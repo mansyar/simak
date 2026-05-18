@@ -1,34 +1,39 @@
 // @ts-check
 // Modularity check — enforces max 500 lines per source file
-// Uses plain Node.js for speed (no tsx overhead, no experimental APIs)
-import { readFileSync, readdirSync, statSync } from 'node:fs'
-import { extname, join, resolve } from 'node:path'
+// Runs on files passed via CLI args (lint-staged passes staged files)
+// Only checks src/, tests/, and scripts/ directories
+import { readFileSync } from 'node:fs'
+import { extname, normalize } from 'node:path'
 
 const MAX_LINES = 500
-const SOURCE_DIR = resolve(import.meta.dirname, '..', 'src')
-const EXTENSIONS = new Set(['.ts', '.tsx'])
+const ALLOWED_DIRS = ['src', 'tests', 'scripts']
+const ALLOWED_EXT = new Set(['.ts', '.tsx', '.js'])
 const EXCLUDE_FILES = new Set(['routeTree.gen.ts'])
 
-/** @param {string} dir @returns {string[]} */
-function collectFiles(dir) {
-  const files = []
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const fullPath = join(dir, entry.name)
-    if (entry.isDirectory()) {
-      files.push(...collectFiles(fullPath))
-    } else if (entry.isFile() && EXTENSIONS.has(extname(entry.name)) && !EXCLUDE_FILES.has(entry.name)) {
-      files.push(fullPath)
-    }
-  }
-  return files
+/** @param {string} filePath @returns {boolean} */
+function isInAllowedDir(filePath) {
+  const normalized = normalize(filePath).replace(/\\/g, '/')
+  return ALLOWED_DIRS.some((dir) => normalized.startsWith(dir) || normalized.includes(`/${dir}/`))
 }
 
-const files = collectFiles(SOURCE_DIR)
-let hasError = false
+// Accept files from CLI args (passed by lint-staged)
+const stagedFiles = process.argv.slice(2)
 
-for (const file of files) {
+if (stagedFiles.length === 0) {
+  console.log('ℹ️  No files to check.')
+  process.exit(0)
+}
+
+let hasError = false
+let checkedCount = 0
+
+for (const file of stagedFiles) {
+  if (!ALLOWED_EXT.has(extname(file)) || !isInAllowedDir(file)) continue
+  if (EXCLUDE_FILES.has(file.split(/[/\\]/).pop() ?? '')) continue
+
   const content = readFileSync(file, 'utf-8')
   const lines = content.split('\n').length
+  checkedCount++
 
   if (lines > MAX_LINES) {
     console.error(`❌ ${file}: ${lines} lines (max: ${MAX_LINES})`)
@@ -40,5 +45,5 @@ if (hasError) {
   console.error('\n❌ Modularity check failed. Some files exceed the 500-line limit.')
   process.exit(1)
 } else {
-  console.log(`✅ All ${files.length} source files are within the ${MAX_LINES}-line limit.`)
+  console.log(`✅ All ${checkedCount} staged files are within the ${MAX_LINES}-line limit.`)
 }
