@@ -67,7 +67,7 @@
     "*.{ts,tsx}": [
       "eslint --fix",
       "prettier --write",
-      "tsx scripts/check-modularity.ts"
+      "node scripts/check-modularity.js"
     ],
     "*.{json,md,css}": [
       "prettier --write"
