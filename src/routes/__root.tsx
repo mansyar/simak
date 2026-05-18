@@ -1,7 +1,53 @@
 /// <reference types="vite/client" />
 import type { ReactNode } from 'react'
 import { Outlet, createRootRoute, HeadContent, Scripts } from '@tanstack/react-router'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import globalCss from '../app/global.css?url'
+import type { Locales } from '../i18n/types'
+
+const queryClient = new QueryClient()
+
+// Placeholder ThemeProvider — replaces the hook-based approach for SSR compatibility
+function ThemeScript() {
+  return (
+    <script
+      dangerouslySetInnerHTML={{
+        __html: `
+          (function() {
+            try {
+              var theme = localStorage.getItem('simak-theme');
+              if (!theme) {
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+              }
+              if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+              }
+            } catch(e) {}
+          })();
+        `,
+      }}
+    />
+  )
+}
+
+// Placeholder i18n provider context
+import { createContext, useContext } from 'react'
+
+type I18nContextType = {
+  locale: Locales
+  setLocale: (locale: Locales) => void
+  t: (key: string) => string
+}
+
+const I18nContext = createContext<I18nContextType>({
+  locale: 'en',
+  setLocale: () => {},
+  t: (key: string) => key,
+})
+
+export function useI18n() {
+  return useContext(I18nContext)
+}
 
 export const Route = createRootRoute({
   head: () => ({
@@ -39,6 +85,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html>
       <head>
+        <ThemeScript />
         <HeadContent />
       </head>
       <body>
@@ -50,7 +97,13 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             Skip to content
           </a>
         </div>
-        {children}
+        <QueryClientProvider client={queryClient}>
+          <I18nContext.Provider
+            value={{ locale: 'en', setLocale: () => {}, t: (key: string) => key }}
+          >
+            {children}
+          </I18nContext.Provider>
+        </QueryClientProvider>
         <Scripts />
       </body>
     </html>
