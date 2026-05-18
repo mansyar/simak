@@ -102,3 +102,7 @@
 - [ ] Verify full git hook chain: commit triggers lint-staged, push triggers typecheck + vitest
 - [ ] Verify all quality gates pass (>80% coverage, no lint errors, typecheck passes)
 - [ ] Verify dark mode toggle, language switcher, and i18n type-safety all work together
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [commit: 5143ef8]
