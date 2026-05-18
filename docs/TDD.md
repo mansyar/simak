@@ -90,7 +90,8 @@ The role-specific layout guard means a student accessing `/instructor/reviews` i
 ```
 simak/
 ├── src/
-│   ├── app/                  → TanStack Router route files (role layouts + public/shared)
+│   ├── routes/               → TanStack Router route files (file-based routing in `src/routes/`)
+│   ├── app/                  → Application root files (global.css, legacy __root.tsx location)
 │   ├── components/           → React components
 │   │   ├── ui/               → shadcn/ui primitives
 │   │   ├── layout/           → Sidebar, header, dashboard shell

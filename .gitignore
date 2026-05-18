@@ -1,0 +1,10 @@
+node_modules/
+.env
+.output/
+dist/
+build/
+.lfstorage/
+.husky/_/
+coverage/
+*.tsbuildinfo
+.turbo/
