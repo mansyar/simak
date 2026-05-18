@@ -2,7 +2,7 @@
 
 ## Phase 1: Project Initialization & Configuration
 
-- [x] Task: Scaffold TanStack Start project using `pnpm create @tanstack/start` [note: CLI template registry unavailable; manually scaffolded from scratch per build-from-scratch guide]
+- [x] Task: Scaffold TanStack Start project using `pnpm create @tanstack/start` [commit: d0f3398] [note: CLI template registry unavailable; manually scaffolded from scratch per build-from-scratch guide]
   - [x] Manually scaffolded project from scratch (CLI template registry unavailable)
   - [x] Project root has clean structure (no nested project directory, no boilerplate)
   - [x] Create `package.json` with correct dependencies
@@ -11,7 +11,7 @@
   - [x] Create `app.config.ts` with TanStack Start configuration
   - [x] Create `vite.config.ts` with React plugin, path aliases, Tailwind v4, vitest config
   - [x] Verify `pnpm run dev` starts without errors on port 3000
-- [x] Task: Configure TypeScript, ESLint, and Prettier
+- [x] Task: Configure TypeScript, ESLint, and Prettier [commit: d0f3398]
   - [x] Create `eslint.config.js` with TypeScript + React rules, `@/` alias resolution, import ordering
   - [x] Create `.prettierrc` (single quotes, trailing commas, 100 print width, compatible with ESLint)
   - [x] Verify TypeScript typecheck passes (`pnpm typecheck` - no errors)
