@@ -8,7 +8,13 @@ import { extname, normalize } from 'node:path'
 const MAX_LINES = 500
 const ALLOWED_DIRS = ['src', 'tests', 'scripts']
 const ALLOWED_EXT = new Set(['.ts', '.tsx', '.js'])
-const EXCLUDE_FILES = new Set(['routeTree.gen.ts'])
+// Generated files pattern (e.g. routeTree.gen.ts) — skip line limit checks
+const EXCLUDE_GEN_PATTERN = /\.gen\.(ts|tsx)$/
+// Known auto-generated file paths (relative to project root)
+const EXCLUDE_PATHS = new Set([
+  'src/i18n/types.ts',
+  'src/i18n/detect-locale.ts',
+])
 
 /** @param {string} filePath @returns {boolean} */
 function isInAllowedDir(filePath) {
@@ -29,7 +35,8 @@ let checkedCount = 0
 
 for (const file of stagedFiles) {
   if (!ALLOWED_EXT.has(extname(file)) || !isInAllowedDir(file)) continue
-  if (EXCLUDE_FILES.has(file.split(/[/\\]/).pop() ?? '')) continue
+  const fileName = file.split(/[/\\]/).pop() ?? ''
+  if (EXCLUDE_GEN_PATTERN.test(fileName) || EXCLUDE_PATHS.has(file)) continue
 
   const content = readFileSync(file, 'utf-8')
   const lines = content.split('\n').length
