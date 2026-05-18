@@ -32,6 +32,8 @@ export default defineConfig({
         'src/i18n/index.ts',
         'src/hooks/**',
         'src/routes/**',
+        'src/components/ui/**',
+        'src/lib/**',
       ],
       thresholds: {
         lines: 80,

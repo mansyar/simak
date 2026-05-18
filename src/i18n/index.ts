@@ -1,6 +1,5 @@
 // Import generated types
 import type { Locales, Translation, TranslationFunctions } from './types'
-import { detectLocale as detectLocaleFn } from './detect-locale'
 
 export type { Locales, Translation, TranslationFunctions }
 
