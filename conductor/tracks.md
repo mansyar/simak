@@ -4,6 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Track 1.1 — Project Scaffolding (Initialize TanStack Start project, tooling, Docker Compose, git hooks, i18n, shadcn/ui)**
-  *Link: [./tracks/project_scaffolding_20260519/](./tracks/project_scaffolding_20260519/)*
-
+- [~] **Track: Track 1.1 — Project Scaffolding (Initialize TanStack Start project, tooling, Docker Compose, git hooks, i18n, shadcn/ui)**
+  _Link: [./tracks/project_scaffolding_20260519/](./tracks/project_scaffolding_20260519/)_

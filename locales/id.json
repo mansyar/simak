@@ -1,0 +1,61 @@
+{
+  "app": {
+    "name": "SIMAK",
+    "tagline": "Sistem Informasi & Manajemen Akademik"
+  },
+  "auth": {
+    "login": "Masuk",
+    "logout": "Keluar",
+    "email": "Email",
+    "password": "Kata Sandi",
+    "signIn": "Masuk",
+    "signUp": "Daftar",
+    "forgotPassword": "Lupa Kata Sandi?",
+    "resetPassword": "Atur Ulang Kata Sandi",
+    "invalidCredentials": "Email atau kata sandi tidak valid",
+    "sessionExpired": "Sesi Anda telah berakhir. Silakan masuk kembali."
+  },
+  "nav": {
+    "dashboard": "Dasbor",
+    "assignments": "Tugas",
+    "consultations": "Konsultasi",
+    "settings": "Pengaturan",
+    "users": "Pengguna",
+    "templates": "Templat"
+  },
+  "common": {
+    "save": "Simpan",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "edit": "Ubah",
+    "create": "Buat",
+    "search": "Cari",
+    "filter": "Filter",
+    "loading": "Memuat...",
+    "error": "Terjadi kesalahan",
+    "success": "Berhasil",
+    "confirm": "Konfirmasi",
+    "back": "Kembali",
+    "next": "Lanjut",
+    "submit": "Kirim",
+    "noResults": "Tidak ada hasil",
+    "viewAll": "Lihat Semua"
+  },
+  "theme": {
+    "light": "Mode Terang",
+    "dark": "Mode Gelap",
+    "toggle": "Ganti tema"
+  },
+  "language": {
+    "en": "English",
+    "id": "Bahasa Indonesia",
+    "switch": "Ganti bahasa"
+  },
+  "error": {
+    "notFound": "Halaman tidak ditemukan",
+    "forbidden": "Anda tidak memiliki izin untuk mengakses halaman ini",
+    "serverError": "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
+    "required": "Bidang ini wajib diisi",
+    "invalidEmail": "Masukkan alamat email yang valid"
+  }
+}
