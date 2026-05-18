@@ -2,23 +2,23 @@
 
 ## 1. Technology Stack
 
-| Layer | Technology | Rationale |
-| --- | --- | --- |
-| **Framework** | TanStack Start (Vite + SSR) | Full-stack React meta-framework with type-safe routing, server functions, and fast Vite dev server. |
-| **Routing** | TanStack Router | File-based routing with type-safe params and search params. Zod integration for runtime validation. |
-| **Server State** | TanStack Query | Native TanStack Start integration. Caching, deduplication, background refetching. |
-| **UI Library** | shadcn/ui (Radix UI primitives) | Accessible, composable components with built-in ARIA compliance. |
-| **Styling** | Tailwind CSS v4 | Utility-first CSS with design system integration. |
-| **Validation** | Zod | Runtime schema validation for forms and API inputs. |
-| **Forms** | React Hook Form + Zod | Performant forms with validation resolver. |
-| **Authentication** | Better-Auth | Framework-agnostic auth with email/password, session management, role support. |
-| **Database** | PostgreSQL | Relational data model with strong integrity constraints. |
-| **ORM** | Drizzle ORM | Type-safe SQL-first ORM. Lightweight, no code generation, runs natively in server functions. |
-| **File Storage** | Cloudflare R2 | S3-compatible object storage with presigned URL uploads. |
-| **Email** | Resend | Transactional email API for invitations and password setup. |
-| **i18n** | typesafe-i18n | Type-safe translations with compile-time checks. Works in both client and server functions. |
-| **Testing** | Vitest + Playwright | Vitest for unit and integration tests; Playwright for E2E. |
-| **Deployment** | Docker + Coolify | Self-hosted on a VPS. |
+| Layer              | Technology                      | Rationale                                                                                           |
+| ------------------ | ------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **Framework**      | TanStack Start (Vite + SSR)     | Full-stack React meta-framework with type-safe routing, server functions, and fast Vite dev server. |
+| **Routing**        | TanStack Router                 | File-based routing with type-safe params and search params. Zod integration for runtime validation. |
+| **Server State**   | TanStack Query                  | Native TanStack Start integration. Caching, deduplication, background refetching.                   |
+| **UI Library**     | shadcn/ui (Radix UI primitives) | Accessible, composable components with built-in ARIA compliance.                                    |
+| **Styling**        | Tailwind CSS v4                 | Utility-first CSS with design system integration.                                                   |
+| **Validation**     | Zod                             | Runtime schema validation for forms and API inputs.                                                 |
+| **Forms**          | React Hook Form + Zod           | Performant forms with validation resolver.                                                          |
+| **Authentication** | Better-Auth                     | Framework-agnostic auth with email/password, session management, role support.                      |
+| **Database**       | PostgreSQL                      | Relational data model with strong integrity constraints.                                            |
+| **ORM**            | Drizzle ORM                     | Type-safe SQL-first ORM. Lightweight, no code generation, runs natively in server functions.        |
+| **File Storage**   | Cloudflare R2                   | S3-compatible object storage with presigned URL uploads.                                            |
+| **Email**          | Resend                          | Transactional email API for invitations and password setup.                                         |
+| **i18n**           | typesafe-i18n                   | Type-safe translations with compile-time checks. Works in both client and server functions.         |
+| **Testing**        | Vitest + Playwright             | Vitest for unit and integration tests; Playwright for E2E.                                          |
+| **Deployment**     | Docker + Coolify                | Self-hosted on a VPS.                                                                               |
 
 ### MVP Scope Legend
 
@@ -90,7 +90,8 @@ The role-specific layout guard means a student accessing `/instructor/reviews` i
 ```
 simak/
 ├── src/
-│   ├── app/                  → TanStack Router route files (role layouts + public/shared)
+│   ├── routes/               → TanStack Router route files (file-based routing in `src/routes/`)
+│   ├── app/                  → Application root files (global.css, legacy __root.tsx location)
 │   ├── components/           → React components
 │   │   ├── ui/               → shadcn/ui primitives
 │   │   ├── layout/           → Sidebar, header, dashboard shell
@@ -144,11 +145,11 @@ simak/
 
 `/dashboard` is a shared route that renders different widgets based on the logged-in user's role. Each widget is a summary card linking to the full dedicated page.
 
-| Role | Widgets |
-| --- | --- |
-| **Student** | Active assignments (up to 4 cards with progress), items pending review, upcoming deadlines, recent notifications. Links to `/student/assignments`. |
+| Role           | Widgets                                                                                                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Student**    | Active assignments (up to 4 cards with progress), items pending review, upcoming deadlines, recent notifications. Links to `/student/assignments`.                                          |
 | **Instructor** | Pending reviews (top 5 with student name + checkpoint), assignments nearing their deadline, quick "Create assignment" action. Links to `/instructor/reviews` and `/instructor/assignments`. |
-| **Admin** | Stat cards: total users, total templates, active assignments. Quick actions: "Create user", "Create template". Links to `/admin/users` and `/admin/templates`. |
+| **Admin**      | Stat cards: total users, total templates, active assignments. Quick actions: "Create user", "Create template". Links to `/admin/users` and `/admin/templates`.                              |
 
 Widget data is fetched via a single **aggregated server function** per role. Instead of the client issuing 4 separate queries (assignments + checkpoints + submissions + notifications), the server function executes one multi-join query and returns a pre-shaped payload. This avoids N+1 and minimizes round-trips.
 
@@ -195,211 +196,211 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 
 #### users
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | text (PK) | UUID |
-| name | text, not null | Full name |
-| email | text, unique, not null | Login identifier |
-| role | enum, not null | superadmin \| admin \| instructor \| student |
-| locale | text, default 'en' | Language preference: 'en' \| 'id'. Used for UI, notifications, and email templates. |
-| createdAt | timestamp | |
-| updatedAt | timestamp | |
-| deletedAt | timestamp | Soft delete |
+| Column    | Type                   | Notes                                                                               |
+| --------- | ---------------------- | ----------------------------------------------------------------------------------- |
+| id        | text (PK)              | UUID                                                                                |
+| name      | text, not null         | Full name                                                                           |
+| email     | text, unique, not null | Login identifier                                                                    |
+| role      | enum, not null         | superadmin \| admin \| instructor \| student                                        |
+| locale    | text, default 'en'     | Language preference: 'en' \| 'id'. Used for UI, notifications, and email templates. |
+| createdAt | timestamp              |                                                                                     |
+| updatedAt | timestamp              |                                                                                     |
+| deletedAt | timestamp              | Soft delete                                                                         |
 
 #### password_reset_tokens
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| userId | text (FK → users) | |
-| token | text, unique, not null | Cryptographic random |
-| expiresAt | timestamp, not null | 1 hour from creation |
-| used | boolean, default false | Single-use enforcement |
-| createdAt | timestamp | |
+| Column    | Type                   | Notes                  |
+| --------- | ---------------------- | ---------------------- |
+| id        | serial (PK)            |                        |
+| userId    | text (FK → users)      |                        |
+| token     | text, unique, not null | Cryptographic random   |
+| expiresAt | timestamp, not null    | 1 hour from creation   |
+| used      | boolean, default false | Single-use enforcement |
+| createdAt | timestamp              |                        |
 
 #### assignment_templates
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| type | text, not null | e.g. "Thesis", "Research Paper" |
-| name | text, not null | Display name |
-| createdBy | text (FK → users) | Admin who created it |
-| createdAt | timestamp | |
-| updatedAt | timestamp | |
-| deletedAt | timestamp | Soft delete |
+| Column    | Type              | Notes                           |
+| --------- | ----------------- | ------------------------------- |
+| id        | serial (PK)       |                                 |
+| type      | text, not null    | e.g. "Thesis", "Research Paper" |
+| name      | text, not null    | Display name                    |
+| createdBy | text (FK → users) | Admin who created it            |
+| createdAt | timestamp         |                                 |
+| updatedAt | timestamp         |                                 |
+| deletedAt | timestamp         | Soft delete                     |
 
 #### template_checkpoints
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| templateId | integer (FK → assignment_templates) | |
-| name | text, not null | e.g. "Abstract", "Introduction" |
-| order | integer, not null | Position in sequence |
-| createdAt | timestamp | |
+| Column     | Type                                | Notes                           |
+| ---------- | ----------------------------------- | ------------------------------- |
+| id         | serial (PK)                         |                                 |
+| templateId | integer (FK → assignment_templates) |                                 |
+| name       | text, not null                      | e.g. "Abstract", "Introduction" |
+| order      | integer, not null                   | Position in sequence            |
+| createdAt  | timestamp                           |                                 |
 
 #### assignments
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| templateId | integer (FK → assignment_templates) | Template used |
-| title | text, not null | |
-| description | text | |
-| finalDeadline | timestamp, not null | Soft target deadline — individual checkpoint dueDates enforce locking; finalDeadline is a display/guide |
-| instructorId | text (FK → users) | |
-| createdAt | timestamp | |
-| updatedAt | timestamp | |
-| deletedAt | timestamp | Soft delete |
+| Column        | Type                                | Notes                                                                                                   |
+| ------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| id            | serial (PK)                         |                                                                                                         |
+| templateId    | integer (FK → assignment_templates) | Template used                                                                                           |
+| title         | text, not null                      |                                                                                                         |
+| description   | text                                |                                                                                                         |
+| finalDeadline | timestamp, not null                 | Soft target deadline — individual checkpoint dueDates enforce locking; finalDeadline is a display/guide |
+| instructorId  | text (FK → users)                   |                                                                                                         |
+| createdAt     | timestamp                           |                                                                                                         |
+| updatedAt     | timestamp                           |                                                                                                         |
+| deletedAt     | timestamp                           | Soft delete                                                                                             |
 
 #### assignment_students [v1]
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| assignmentId | integer (FK → assignments) | |
-| studentId | text (FK → users) | |
-| createdAt | timestamp | |
+| Column       | Type                       | Notes |
+| ------------ | -------------------------- | ----- |
+| id           | serial (PK)                |       |
+| assignmentId | integer (FK → assignments) |       |
+| studentId    | text (FK → users)          |       |
+| createdAt    | timestamp                  |       |
 
-*Note: Each row represents one student's individual participation. Group assignments (collaborative submissions) will be added in v2.*
+_Note: Each row represents one student's individual participation. Group assignments (collaborative submissions) will be added in v2._
 
 #### checkpoints
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| assignmentId | integer (FK → assignments) | |
-| name | text, not null | Copied from template |
-| order | integer, not null | |
-| dueDate | timestamp | Per-checkpoint deadline (optional) |
-| minConsultations | integer, default 0 | Required for submission unlock |
-| state | enum, not null | locked \| unlocked \| submitted \| under_review \| passed \| revise |
-| createdAt | timestamp | |
-| updatedAt | timestamp | |
+| Column           | Type                       | Notes                                                               |
+| ---------------- | -------------------------- | ------------------------------------------------------------------- |
+| id               | serial (PK)                |                                                                     |
+| assignmentId     | integer (FK → assignments) |                                                                     |
+| name             | text, not null             | Copied from template                                                |
+| order            | integer, not null          |                                                                     |
+| dueDate          | timestamp                  | Per-checkpoint deadline (optional)                                  |
+| minConsultations | integer, default 0         | Required for submission unlock                                      |
+| state            | enum, not null             | locked \| unlocked \| submitted \| under_review \| passed \| revise |
+| createdAt        | timestamp                  |                                                                     |
+| updatedAt        | timestamp                  |                                                                     |
 
 #### submissions
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| checkpointId | integer (FK → checkpoints) | |
-| uploadedBy | text (FK → users) | User who uploaded (future-proof for group assignments) |
-| fileKey | text, not null | R2 object key (UUID-based) |
-| fileName | text, not null | Original filename |
-| fileSize | integer, not null | Size in bytes (Max 25MB) |
-| version | integer, default 1 | Auto-calculated at insert. Each resubmission creates a new row with version = previous max + 1 |
-| uploadedAt | timestamp | |
+| Column       | Type                       | Notes                                                                                          |
+| ------------ | -------------------------- | ---------------------------------------------------------------------------------------------- |
+| id           | serial (PK)                |                                                                                                |
+| checkpointId | integer (FK → checkpoints) |                                                                                                |
+| uploadedBy   | text (FK → users)          | User who uploaded (future-proof for group assignments)                                         |
+| fileKey      | text, not null             | R2 object key (UUID-based)                                                                     |
+| fileName     | text, not null             | Original filename                                                                              |
+| fileSize     | integer, not null          | Size in bytes (Max 25MB)                                                                       |
+| version      | integer, default 1         | Auto-calculated at insert. Each resubmission creates a new row with version = previous max + 1 |
+| uploadedAt   | timestamp                  |                                                                                                |
 
 #### reviews
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| submissionId | integer (FK → submissions) | |
-| instructorId | text (FK → users) | |
-| decision | text, not null | pass \| revise |
-| comment | text | |
-| feedbackFileKey | text | R2 key for optional feedback file |
-| revisionDeadline | timestamp | Deadline for resubmission (if revise) |
-| createdAt | timestamp | |
-| reviewedAt | timestamp | When instructor submitted the review (for SLA calculation) |
+| Column           | Type                       | Notes                                                      |
+| ---------------- | -------------------------- | ---------------------------------------------------------- |
+| id               | serial (PK)                |                                                            |
+| submissionId     | integer (FK → submissions) |                                                            |
+| instructorId     | text (FK → users)          |                                                            |
+| decision         | text, not null             | pass \| revise                                             |
+| comment          | text                       |                                                            |
+| feedbackFileKey  | text                       | R2 key for optional feedback file                          |
+| revisionDeadline | timestamp                  | Deadline for resubmission (if revise)                      |
+| createdAt        | timestamp                  |                                                            |
+| reviewedAt       | timestamp                  | When instructor submitted the review (for SLA calculation) |
 
 #### consultations
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| assignmentId | integer (FK → assignments) | |
-| checkpointId | integer (FK → checkpoints) | Which stage this consultation supports |
-| studentId | text (FK → users) | |
-| verifiedById | text (FK → users) | Internal instructor who verified the log |
-| status | enum, not null | pending \| verified \| rejected |
-| notes | text | Session notes from student |
-| externalConsultantName | text | Name if session was with external supervisor |
-| sessionType | text | internal \| external |
-| verifiedAt | timestamp | When instructor verified |
-| createdAt | timestamp | |
+| Column                 | Type                       | Notes                                        |
+| ---------------------- | -------------------------- | -------------------------------------------- |
+| id                     | serial (PK)                |                                              |
+| assignmentId           | integer (FK → assignments) |                                              |
+| checkpointId           | integer (FK → checkpoints) | Which stage this consultation supports       |
+| studentId              | text (FK → users)          |                                              |
+| verifiedById           | text (FK → users)          | Internal instructor who verified the log     |
+| status                 | enum, not null             | pending \| verified \| rejected              |
+| notes                  | text                       | Session notes from student                   |
+| externalConsultantName | text                       | Name if session was with external supervisor |
+| sessionType            | text                       | internal \| external                         |
+| verifiedAt             | timestamp                  | When instructor verified                     |
+| createdAt              | timestamp                  |                                              |
 
 #### notifications
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| userId | text (FK → users) | Recipient |
-| type | text, not null | Event type identifier |
-| title | text, not null | Short summary |
-| message | text | Body |
-| read | boolean, default false | |
-| channel | text, not null | in_app \| email |
-| metadata | jsonb | Event-specific data (e.g. assignmentId) |
-| createdAt | timestamp | |
+| Column    | Type                   | Notes                                   |
+| --------- | ---------------------- | --------------------------------------- |
+| id        | serial (PK)            |                                         |
+| userId    | text (FK → users)      | Recipient                               |
+| type      | text, not null         | Event type identifier                   |
+| title     | text, not null         | Short summary                           |
+| message   | text                   | Body                                    |
+| read      | boolean, default false |                                         |
+| channel   | text, not null         | in_app \| email                         |
+| metadata  | jsonb                  | Event-specific data (e.g. assignmentId) |
+| createdAt | timestamp              |                                         |
 
 #### notification_preferences [v2]
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| userId | text (FK → users) | |
-| eventType | text, not null | e.g. review_completed, deadline_missed |
-| channel | text, not null | in_app \| email |
-| enabled | boolean, default true | |
-| Unique constraint | (userId, eventType, channel) | One preference per combination |
+| Column            | Type                         | Notes                                  |
+| ----------------- | ---------------------------- | -------------------------------------- |
+| id                | serial (PK)                  |                                        |
+| userId            | text (FK → users)            |                                        |
+| eventType         | text, not null               | e.g. review_completed, deadline_missed |
+| channel           | text, not null               | in_app \| email                        |
+| enabled           | boolean, default true        |                                        |
+| Unique constraint | (userId, eventType, channel) | One preference per combination         |
 
 #### extension_requests [v2]
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| assignmentId | integer (FK → assignments) | |
-| studentId | text (FK → users) | |
-| requestedDeadline | timestamp, not null | Proposed new deadline |
-| reason | text | |
-| status | text, not null | pending \| approved \| rejected |
-| reviewedBy | text (FK → users) | Instructor who decided |
-| createdAt | timestamp | |
-| updatedAt | timestamp | |
+| Column            | Type                       | Notes                           |
+| ----------------- | -------------------------- | ------------------------------- |
+| id                | serial (PK)                |                                 |
+| assignmentId      | integer (FK → assignments) |                                 |
+| studentId         | text (FK → users)          |                                 |
+| requestedDeadline | timestamp, not null        | Proposed new deadline           |
+| reason            | text                       |                                 |
+| status            | text, not null             | pending \| approved \| rejected |
+| reviewedBy        | text (FK → users)          | Instructor who decided          |
+| createdAt         | timestamp                  |                                 |
+| updatedAt         | timestamp                  |                                 |
 
 #### email_queue [v2]
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| recipientEmail | text, not null | |
-| subject | text, not null | |
-| bodyHtml | text, not null | |
-| status | text, not null | pending \| sent \| failed |
-| attempts | integer, default 0 | |
-| lastAttemptAt | timestamp | |
-| errorMessage | text | Last failure reason |
-| createdAt | timestamp | |
+| Column         | Type               | Notes                     |
+| -------------- | ------------------ | ------------------------- |
+| id             | serial (PK)        |                           |
+| recipientEmail | text, not null     |                           |
+| subject        | text, not null     |                           |
+| bodyHtml       | text, not null     |                           |
+| status         | text, not null     | pending \| sent \| failed |
+| attempts       | integer, default 0 |                           |
+| lastAttemptAt  | timestamp          |                           |
+| errorMessage   | text               | Last failure reason       |
+| createdAt      | timestamp          |                           |
 
 #### audit_logs [v2]
 
-| Column | Type | Notes |
-| --- | --- | --- |
-| id | serial (PK) | |
-| userId | text (FK → users) | Who performed the action |
-| action | text, not null | e.g. user.created, template.deleted |
-| entityType | text | e.g. user, assignment |
-| entityId | text | ID of affected entity |
-| metadata | jsonb | Additional context |
-| createdAt | timestamp | |
+| Column     | Type              | Notes                               |
+| ---------- | ----------------- | ----------------------------------- |
+| id         | serial (PK)       |                                     |
+| userId     | text (FK → users) | Who performed the action            |
+| action     | text, not null    | e.g. user.created, template.deleted |
+| entityType | text              | e.g. user, assignment               |
+| entityId   | text              | ID of affected entity               |
+| metadata   | jsonb             | Additional context                  |
+| createdAt  | timestamp         |                                     |
 
 ### Database Indexes
 
-| Table | Column(s) | Type | Purpose |
-| --- | --- | --- | --- |
-| `checkpoints` | `assignmentId` | b-tree | Fetch checkpoints when loading an assignment |
-| `submissions` | `checkpointId` | b-tree | Fetch submissions for a checkpoint |
-| `submissions` | `uploadedBy` | b-tree | Student's submission history |
-| `reviews` | `submissionId` | b-tree | Fetch review for a submission |
-| `consultations` | `checkpointId` | b-tree | Count consultations for gating logic |
-| `consultations` | `status` | b-tree | Filter pending verifications |
-| `notifications` | `userId`, `read` | composite b-tree | Notification center filtering |
-| `password_reset_tokens` | `token` | unique b-tree | Token lookup on password setup |
-| `audit_logs` | `userId` | b-tree | Filter by admin (v2) |
-| `email_queue` | `status` | b-tree | Pick pending emails for delivery (v2) |
+| Table                   | Column(s)        | Type             | Purpose                                      |
+| ----------------------- | ---------------- | ---------------- | -------------------------------------------- |
+| `checkpoints`           | `assignmentId`   | b-tree           | Fetch checkpoints when loading an assignment |
+| `submissions`           | `checkpointId`   | b-tree           | Fetch submissions for a checkpoint           |
+| `submissions`           | `uploadedBy`     | b-tree           | Student's submission history                 |
+| `reviews`               | `submissionId`   | b-tree           | Fetch review for a submission                |
+| `consultations`         | `checkpointId`   | b-tree           | Count consultations for gating logic         |
+| `consultations`         | `status`         | b-tree           | Filter pending verifications                 |
+| `notifications`         | `userId`, `read` | composite b-tree | Notification center filtering                |
+| `password_reset_tokens` | `token`          | unique b-tree    | Token lookup on password setup               |
+| `audit_logs`            | `userId`         | b-tree           | Filter by admin (v2)                         |
+| `email_queue`           | `status`         | b-tree           | Pick pending emails for delivery (v2)        |
 
 All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migration generated with `drizzle-kit generate`.
 
@@ -421,20 +422,20 @@ Admin       (creates Instructors and Students)
 
 **Permission boundaries:**
 
-| Action | SuperAdmin | Admin | Instructor | Student |
-| --- | --- | --- | --- | --- |
-| Create Admin | ✓ | — | — | — |
-| Create Instructor/Student | — | ✓ | — | — |
-| Manage templates | — | ✓ | — | — |
-| Create assignments | — | — | ✓ | — |
-| Review submissions | — | — | ✓ | — |
-| Submit checkpoint work | — | — | — | ✓ |
-| Log consultations | — | — | — | ✓ |
-| Verify consultations | — | — | ✓ | — |
-| View own progress | — | — | — | ✓ |
-| View all progress | — | — | ✓ | — |
-| View system analytics | — | — | — | — |
-| Read audit logs | ✓ | ✓ | — | — |
+| Action                    | SuperAdmin | Admin | Instructor | Student |
+| ------------------------- | ---------- | ----- | ---------- | ------- |
+| Create Admin              | ✓          | —     | —          | —       |
+| Create Instructor/Student | —          | ✓     | —          | —       |
+| Manage templates          | —          | ✓     | —          | —       |
+| Create assignments        | —          | —     | ✓          | —       |
+| Review submissions        | —          | —     | ✓          | —       |
+| Submit checkpoint work    | —          | —     | —          | ✓       |
+| Log consultations         | —          | —     | —          | ✓       |
+| Verify consultations      | —          | —     | ✓          | —       |
+| View own progress         | —          | —     | —          | ✓       |
+| View all progress         | —          | —     | ✓          | —       |
+| View system analytics     | —          | —     | —          | —       |
+| Read audit logs           | ✓          | ✓     | —          | —       |
 
 ### User Registration Flow [v1]
 
@@ -461,6 +462,7 @@ Admin       (creates Instructors and Students)
 ```
 
 **Key rules:**
+
 - No self-registration. No `/auth/register` page.
 - Password setup links expire after 1 hour.
 - Tokens are single-use.
@@ -495,14 +497,14 @@ Admin       (creates Instructors and Students)
 
 ### Rules
 
-| Aspect | Rule |
-| --- | --- |
-| **Accepted formats** | `.docx` and `.pdf` only. Enforced client-side (accept attribute) and server-side (MIME check). |
-| **File naming** | UUID-based keys in R2 (e.g. `submissions/{uuid}.pdf`). Original name stored in DB. |
-| **Presigned URLs** | 5 minutes for upload, 1 hour for download. |
-| **Versioning** | Version increments by 1 each time a student resubmits after a REVISE decision. Initial submission is version 1. |
-| **Preview** | PDF: in-browser via blob URL. [v2: use range requests to fetch only the first few pages for thumbnail preview instead of downloading the full 25MB file.] DOCX: metadata display only (name, size, date, version). |
-| **Permissions** | Students see own submissions; instructors see all for their assignments; admins see all. |
+| Aspect               | Rule                                                                                                                                                                                                               |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Accepted formats** | `.docx` and `.pdf` only. Enforced client-side (accept attribute) and server-side (MIME check).                                                                                                                     |
+| **File naming**      | UUID-based keys in R2 (e.g. `submissions/{uuid}.pdf`). Original name stored in DB.                                                                                                                                 |
+| **Presigned URLs**   | 5 minutes for upload, 1 hour for download.                                                                                                                                                                         |
+| **Versioning**       | Version increments by 1 each time a student resubmits after a REVISE decision. Initial submission is version 1.                                                                                                    |
+| **Preview**          | PDF: in-browser via blob URL. [v2: use range requests to fetch only the first few pages for thumbnail preview instead of downloading the full 25MB file.] DOCX: metadata display only (name, size, date, version). |
+| **Permissions**      | Students see own submissions; instructors see all for their assignments; admins see all.                                                                                                                           |
 
 ---
 
@@ -515,18 +517,19 @@ LOCKED → UNLOCKED → SUBMITTED → UNDER_REVIEW → PASSED
                                              → REVISE → UNLOCKED (loop)
 ```
 
-| State | Meaning | User action |
-| --- | --- | --- |
-| LOCKED | Prerequisite not met; or overdue and not unlocked | None |
-| UNLOCKED | Eligible for submission | Student can upload |
-| SUBMITTED | Files uploaded, awaiting review | Wait |
-| UNDER_REVIEW | Instructor is reviewing | Wait |
-| PASSED | Approved | Next checkpoint unlocks |
-| REVISE | Changes requested | Resubmit by revision deadline |
+| State        | Meaning                                           | User action                   |
+| ------------ | ------------------------------------------------- | ----------------------------- |
+| LOCKED       | Prerequisite not met; or overdue and not unlocked | None                          |
+| UNLOCKED     | Eligible for submission                           | Student can upload            |
+| SUBMITTED    | Files uploaded, awaiting review                   | Wait                          |
+| UNDER_REVIEW | Instructor is reviewing                           | Wait                          |
+| PASSED       | Approved                                          | Next checkpoint unlocks       |
+| REVISE       | Changes requested                                 | Resubmit by revision deadline |
 
 ### Unlock Rules
 
 A checkpoint unlocks when:
+
 1. Previous checkpoint state === PASSED (or it is the first checkpoint).
 2. Number of verified consultations for this checkpoint >= `minConsultations`.
 
@@ -568,18 +571,18 @@ A checkpoint unlocks when:
 
 ### Events & Channels
 
-| Event | Trigger | In-app [v1] | Email [v2] |
-| --- | --- | --- | --- |
-| invitation_sent | Admin creates user | — | ✓ |
-| password_setup | Password set by user | — | ✓ |
-| submission_received | Student uploads file | ✓ (instructor) | ✓ (instructor) |
-| review_completed | Instructor marks pass/revise | ✓ (student) | ✓ (student) |
-| revision_requested | Instructor marks revise | ✓ (student) | ✓ (student) |
-| deadline_approaching | 24h / 1h before due date | ✓ | ✓ |
-| deadline_missed | Checkpoint overdue | ✓ | ✓ |
-| consultation_verified | Instructor approves log | ✓ (student) | — |
-| extension_requested | Student requests extension | ✓ (instructor) | ✓ (instructor) [v2] |
-| sla_breach | Instructor misses review SLA | ✓ (admin) | — |
+| Event                 | Trigger                      | In-app [v1]    | Email [v2]          |
+| --------------------- | ---------------------------- | -------------- | ------------------- |
+| invitation_sent       | Admin creates user           | —              | ✓                   |
+| password_setup        | Password set by user         | —              | ✓                   |
+| submission_received   | Student uploads file         | ✓ (instructor) | ✓ (instructor)      |
+| review_completed      | Instructor marks pass/revise | ✓ (student)    | ✓ (student)         |
+| revision_requested    | Instructor marks revise      | ✓ (student)    | ✓ (student)         |
+| deadline_approaching  | 24h / 1h before due date     | ✓              | ✓                   |
+| deadline_missed       | Checkpoint overdue           | ✓              | ✓                   |
+| consultation_verified | Instructor approves log      | ✓ (student)    | —                   |
+| extension_requested   | Student requests extension   | ✓ (instructor) | ✓ (instructor) [v2] |
+| sla_breach            | Instructor misses review SLA | ✓ (admin)      | —                   |
 
 ### In-App Delivery [v1]
 
@@ -608,25 +611,25 @@ A checkpoint unlocks when:
 
 ### Strategy
 
-| Layer | Approach |
-| --- | --- |
-| **Server functions** | Validate inputs with Zod before processing. Return typed error responses. Never expose stack traces to the client. |
-| **File upload** | Server-side MIME validation. R2 failures surface as upload errors with retry guidance to the user. |
-| **Email delivery** | Queue-based with retry. Transient failures are retried; permanent failures are logged. |
-| **Database** | Drizzle query errors caught and mapped to user-friendly messages (e.g. "Failed to load assignments"). |
-| **Client** | TanStack Query `onError` callbacks show toast notifications. Form errors displayed inline per field. |
-| **Unexpected errors** | A global error boundary catches render crashes and shows a fallback UI with a reload option. |
-| **Auth failures** | Expired sessions trigger automatic redirect to `/auth/login`. |
+| Layer                 | Approach                                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **Server functions**  | Validate inputs with Zod before processing. Return typed error responses. Never expose stack traces to the client. |
+| **File upload**       | Server-side MIME validation. R2 failures surface as upload errors with retry guidance to the user.                 |
+| **Email delivery**    | Queue-based with retry. Transient failures are retried; permanent failures are logged.                             |
+| **Database**          | Drizzle query errors caught and mapped to user-friendly messages (e.g. "Failed to load assignments").              |
+| **Client**            | TanStack Query `onError` callbacks show toast notifications. Form errors displayed inline per field.               |
+| **Unexpected errors** | A global error boundary catches render crashes and shows a fallback UI with a reload option.                       |
+| **Auth failures**     | Expired sessions trigger automatic redirect to `/auth/login`.                                                      |
 
 ### Error Categories
 
-| Category | Example | User Impact |
-| --- | --- | --- |
-| Validation | Invalid file type, missing required field | Inline form error |
-| Authorization | Non-instructor tries to create assignment | Redirect + message |
-| Not found | Deleted assignment accessed via stale link | 404 page |
-| Transient | R2 timeout, database connection drop | Retry + toast notification |
-| Permanent | Server misconfiguration | Error boundary fallback |
+| Category      | Example                                    | User Impact                |
+| ------------- | ------------------------------------------ | -------------------------- |
+| Validation    | Invalid file type, missing required field  | Inline form error          |
+| Authorization | Non-instructor tries to create assignment  | Redirect + message         |
+| Not found     | Deleted assignment accessed via stale link | 404 page                   |
+| Transient     | R2 timeout, database connection drop       | Retry + toast notification |
+| Permanent     | Server misconfiguration                    | Error boundary fallback    |
 
 ---
 
@@ -634,29 +637,29 @@ A checkpoint unlocks when:
 
 ### Unit Tests (Vitest) [v1]
 
-| Focus | Examples |
-| --- | --- |
-| **Gating logic** | Checkpoint unlock conditions, consultation counting, sequential order enforcement. |
+| Focus                 | Examples                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------- |
+| **Gating logic**      | Checkpoint unlock conditions, consultation counting, sequential order enforcement.    |
 | **State transitions** | Valid and invalid checkpoint state transitions (e.g. can't go from LOCKED to PASSED). |
-| **Validation** | Zod schema tests for all input types (assignment creation, submission upload, etc.). |
-| **Permission checks** | Role-based access logic unit tests. |
+| **Validation**        | Zod schema tests for all input types (assignment creation, submission upload, etc.).  |
+| **Permission checks** | Role-based access logic unit tests.                                                   |
 
 ### Integration Tests (Vitest) [v2]
 
-| Focus | Examples |
-| --- | --- |
-| **Server functions** | Call server functions with test database, verify DB state changes. |
-| **Auth flow** | Login, session validation, role enforcement end-to-end within test server. |
-| **File upload flow** | Presigned URL generation → mock upload → metadata persistence. |
+| Focus                | Examples                                                                   |
+| -------------------- | -------------------------------------------------------------------------- |
+| **Server functions** | Call server functions with test database, verify DB state changes.         |
+| **Auth flow**        | Login, session validation, role enforcement end-to-end within test server. |
+| **File upload flow** | Presigned URL generation → mock upload → metadata persistence.             |
 
 ### E2E Tests (Playwright) [v2]
 
-| Flow | What it validates |
-| --- | --- |
-| **Complete submit → review cycle** | Student uploads → instructor reviews → pass/revise reflects in UI. |
-| **User creation flow** | Admin creates user → email sent → password setup → login. |
-| **Consultation flow** | Student logs consultation → instructor verifies → progress updates. |
-| **Deadline enforcement** | Overdue checkpoint locks → instructor unlocks → student can submit. |
+| Flow                               | What it validates                                                   |
+| ---------------------------------- | ------------------------------------------------------------------- |
+| **Complete submit → review cycle** | Student uploads → instructor reviews → pass/revise reflects in UI.  |
+| **User creation flow**             | Admin creates user → email sent → password setup → login.           |
+| **Consultation flow**              | Student logs consultation → instructor verifies → progress updates. |
+| **Deadline enforcement**           | Overdue checkpoint locks → instructor unlocks → student can submit. |
 
 ---
 
@@ -679,13 +682,13 @@ A checkpoint unlocks when:
 
 ### Rendering Strategy
 
-| Page type | Strategy |
-| --- | --- |
-| Login / Password setup | Static, no SSR needed. |
-| Dashboard | SSR for initial data, client revalidation for real-time updates. |
-| Assignment detail | SSR for checkpoint list. |
-| File management | Client-rendered (heavily interactive). |
-| Analytics | SSR skeleton + client hydrate (charts need JS). |
+| Page type              | Strategy                                                         |
+| ---------------------- | ---------------------------------------------------------------- |
+| Login / Password setup | Static, no SSR needed.                                           |
+| Dashboard              | SSR for initial data, client revalidation for real-time updates. |
+| Assignment detail      | SSR for checkpoint list.                                         |
+| File management        | Client-rendered (heavily interactive).                           |
+| Analytics              | SSR skeleton + client hydrate (charts need JS).                  |
 
 ### Vite Optimizations [v1]
 
@@ -704,25 +707,25 @@ A checkpoint unlocks when:
 
 ### Coolify Configuration
 
-| Setting | Value |
-| --- | --- |
-| Build pack | Docker |
-| Port | 3000 |
-| Database | PostgreSQL service (managed by Coolify) |
-| SSL | Auto-proxied via Coolify's Traefik reverse proxy |
+| Setting    | Value                                            |
+| ---------- | ------------------------------------------------ |
+| Build pack | Docker                                           |
+| Port       | 3000                                             |
+| Database   | PostgreSQL service (managed by Coolify)          |
+| SSL        | Auto-proxied via Coolify's Traefik reverse proxy |
 
 ### Environment Variables
 
-| Variable | Purpose |
-| --- | --- |
-| `DATABASE_URL` | PostgreSQL connection string |
-| `R2_ENDPOINT` | Cloudflare R2 endpoint URL |
-| `R2_ACCESS_KEY_ID` | R2 API access key |
-| `R2_SECRET_ACCESS_KEY` | R2 API secret key |
-| `R2_BUCKET_NAME` | R2 bucket for uploads |
-| `RESEND_API_KEY` | Resend API key for email delivery |
-| `BETTER_AUTH_SECRET` | Signing secret for auth tokens |
-| `BETTER_AUTH_URL` | Public URL of the app |
+| Variable               | Purpose                           |
+| ---------------------- | --------------------------------- |
+| `DATABASE_URL`         | PostgreSQL connection string      |
+| `R2_ENDPOINT`          | Cloudflare R2 endpoint URL        |
+| `R2_ACCESS_KEY_ID`     | R2 API access key                 |
+| `R2_SECRET_ACCESS_KEY` | R2 API secret key                 |
+| `R2_BUCKET_NAME`       | R2 bucket for uploads             |
+| `RESEND_API_KEY`       | Resend API key for email delivery |
+| `BETTER_AUTH_SECRET`   | Signing secret for auth tokens    |
+| `BETTER_AUTH_URL`      | Public URL of the app             |
 
 ### Database Migrations [v1]
 
@@ -744,15 +747,15 @@ A checkpoint unlocks when:
 
 All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by category:
 
-| Category | Components |
-| --- | --- |
-| **Form** | Input, Textarea, Select, Checkbox, Radio, Form |
-| **Layout** | Sidebar, Tabs, Card, Separator |
-| **Navigation** | Breadcrumb, Navigation Menu |
-| **Data Display** | Table, Avatar, Badge, Card |
-| **Feedback** | Alert, Progress, Dialog, Popover, Toast, Sheet |
-| **Charts** | Recharts-based components |
-| **Overlay** | Dialog, Sheet, Dropdown Menu |
+| Category         | Components                                     |
+| ---------------- | ---------------------------------------------- |
+| **Form**         | Input, Textarea, Select, Checkbox, Radio, Form |
+| **Layout**       | Sidebar, Tabs, Card, Separator                 |
+| **Navigation**   | Breadcrumb, Navigation Menu                    |
+| **Data Display** | Table, Avatar, Badge, Card                     |
+| **Feedback**     | Alert, Progress, Dialog, Popover, Toast, Sheet |
+| **Charts**       | Recharts-based components                      |
+| **Overlay**      | Dialog, Sheet, Dropdown Menu                   |
 
 ### Theme
 
@@ -789,12 +792,12 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 
 ### Translation Scope
 
-| Surface | Strategy | Example |
-| --- | --- | --- |
-| **UI labels** | Static translation keys | `t('button.submit')` |
-| **Dynamic text** | Interpolation with parameters | `t('checkpoint.passed', { name: checkpoint.name })` |
-| **Notifications** | Store event `type` + `params` in DB. Render with current locale at display time. | `{ type: 'review_completed', params: { checkpointName } }` |
-| **Email templates** | Render at send time based on recipient's locale. | Resend email body in `en` or `id` |
+| Surface             | Strategy                                                                         | Example                                                    |
+| ------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **UI labels**       | Static translation keys                                                          | `t('button.submit')`                                       |
+| **Dynamic text**    | Interpolation with parameters                                                    | `t('checkpoint.passed', { name: checkpoint.name })`        |
+| **Notifications**   | Store event `type` + `params` in DB. Render with current locale at display time. | `{ type: 'review_completed', params: { checkpointName } }` |
+| **Email templates** | Render at send time based on recipient's locale.                                 | Resend email body in `en` or `id`                          |
 
 ### Files
 
@@ -812,30 +815,30 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 
 ## Appendix: MVP vs Post-MVP Summary
 
-| Feature | MVP [v1] | Post-MVP [v2] |
-| --- | --- | --- |
-| Authentication (login, session, password reset) | ✓ | |
-| User registration (SuperAdmin seed, Admin creates users, email invite) | ✓ | |
-| Role-based access control | ✓ | |
-| Assignment template CRUD | ✓ | |
-| Assignment creation with student selection | ✓ | |
-| Checkpoint submission (sequential, pass/revise) | ✓ | |
-| File upload to R2 (single student) | ✓ | |
-| File preview (PDF) and download | ✓ | |
-| In-app notification center | ✓ | |
-| Consultation logging + verification | ✓ | |
-| Error handling (validation, auth, boundary) | ✓ | |
-| Responsive UI, dark mode, accessibility | ✓ | |
-| Bilingual i18n (English + Indonesian) | ✓ | |
-| Vitest unit tests (gating logic, state transitions) | ✓ | |
-| Group assignments | | ✓ |
-| Two-factor authentication | | ✓ |
-| Email notifications (transactional beyond invitations) | | ✓ |
-| Push notifications (Web Push) | | ✓ |
-| Notification preferences | | ✓ |
-| Analytics dashboards | | ✓ |
-| Reports with scheduling and export | | ✓ |
-| Deadline extension workflow | | ✓ |
-| Audit logging | | ✓ |
-| Integration tests | | ✓ |
-| Playwright E2E tests | | ✓ |
+| Feature                                                                | MVP [v1] | Post-MVP [v2] |
+| ---------------------------------------------------------------------- | -------- | ------------- |
+| Authentication (login, session, password reset)                        | ✓        |               |
+| User registration (SuperAdmin seed, Admin creates users, email invite) | ✓        |               |
+| Role-based access control                                              | ✓        |               |
+| Assignment template CRUD                                               | ✓        |               |
+| Assignment creation with student selection                             | ✓        |               |
+| Checkpoint submission (sequential, pass/revise)                        | ✓        |               |
+| File upload to R2 (single student)                                     | ✓        |               |
+| File preview (PDF) and download                                        | ✓        |               |
+| In-app notification center                                             | ✓        |               |
+| Consultation logging + verification                                    | ✓        |               |
+| Error handling (validation, auth, boundary)                            | ✓        |               |
+| Responsive UI, dark mode, accessibility                                | ✓        |               |
+| Bilingual i18n (English + Indonesian)                                  | ✓        |               |
+| Vitest unit tests (gating logic, state transitions)                    | ✓        |               |
+| Group assignments                                                      |          | ✓             |
+| Two-factor authentication                                              |          | ✓             |
+| Email notifications (transactional beyond invitations)                 |          | ✓             |
+| Push notifications (Web Push)                                          |          | ✓             |
+| Notification preferences                                               |          | ✓             |
+| Analytics dashboards                                                   |          | ✓             |
+| Reports with scheduling and export                                     |          | ✓             |
+| Deadline extension workflow                                            |          | ✓             |
+| Audit logging                                                          |          | ✓             |
+| Integration tests                                                      |          | ✓             |
+| Playwright E2E tests                                                   |          | ✓             |

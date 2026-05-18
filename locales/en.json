@@ -1,0 +1,61 @@
+{
+  "app": {
+    "name": "SIMAK",
+    "tagline": "Academic Information & Management System"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "invalidCredentials": "Invalid email or password",
+    "sessionExpired": "Your session has expired. Please login again."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "assignments": "Assignments",
+    "consultations": "Consultations",
+    "settings": "Settings",
+    "users": "Users",
+    "templates": "Templates"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "noResults": "No results found",
+    "viewAll": "View All"
+  },
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode",
+    "toggle": "Toggle theme"
+  },
+  "language": {
+    "en": "English",
+    "id": "Bahasa Indonesia",
+    "switch": "Switch language"
+  },
+  "error": {
+    "notFound": "Page not found",
+    "forbidden": "You do not have permission to access this page",
+    "serverError": "An unexpected error occurred. Please try again later.",
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address"
+  }
+}
