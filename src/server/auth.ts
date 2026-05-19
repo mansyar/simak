@@ -1,3 +1,4 @@
+import { createServerFn } from '@tanstack/react-start';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { redirect } from '@tanstack/react-router';
 import { auth } from '../auth/config';
@@ -19,7 +20,7 @@ export type Session = {
   };
 } | null;
 
-export async function getSessionFromHeaders(): Promise<Session> {
+const _getSession = createServerFn({ method: 'GET' }).handler(async () => {
   const headers = getRequestHeaders();
   const result = await auth.api.getSession({ headers });
 
@@ -44,6 +45,10 @@ export async function getSessionFromHeaders(): Promise<Session> {
       expiresAt: u.session.expiresAt,
     },
   };
+});
+
+export async function getSessionFromHeaders(): Promise<Session> {
+  return _getSession();
 }
 
 export async function requireRole(roles: string[]): Promise<Session> {
