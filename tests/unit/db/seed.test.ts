@@ -11,9 +11,12 @@ describe('Seed script', () => {
   });
 
   it('should require SUPERADMIN_EMAIL and SUPERADMIN_PASSWORD env vars', async () => {
-    // Don't set the env vars
+    // Clear env vars to test validation
+    vi.stubEnv('SUPERADMIN_EMAIL', '');
+    vi.stubEnv('SUPERADMIN_PASSWORD', '');
     const mod = await import('@/db/seed');
     await expect(mod.seedSuperAdmin()).rejects.toThrow(/SUPERADMIN_EMAIL|SUPERADMIN_PASSWORD/);
+    vi.unstubAllEnvs();
   });
 
   it('should validate SUPERADMIN_EMAIL format', async () => {
