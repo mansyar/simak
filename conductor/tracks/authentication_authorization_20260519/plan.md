@@ -37,17 +37,17 @@
 
 **Objective:** Configure Better-Auth with the Drizzle adapter, custom table mappings, and `tanstackStartCookies` plugin. Set up the API route handler and frontend auth client. Initialize the email service.
 
-- [ ] Task: Create Better-Auth server configuration (`src/auth/config.ts`)
-  - [ ] Import `betterAuth` from `better-auth`
-  - [ ] Import `drizzleAdapter` from `@better-auth/drizzle-adapter`
-  - [ ] Import `db` from `@/db/index`
-  - [ ] Configure with `database: drizzleAdapter(db, { provider: 'pg' })`
-  - [ ] Set `user.modelName: 'users'` to map to our existing `users` table
-  - [ ] Configure `emailAndPassword: { enabled: true }`
-  - [ ] Add `additionalFields` for `role` (string, required, input: false) and `locale` (string, default: 'en')
-  - [ ] Add `tanstackStartCookies()` plugin (must be last plugin)
-  - [ ] Read `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` from env
-  - [ ] Export `auth` instance
+- [x] Task: Create Better-Auth server configuration (`src/auth/config.ts`) `e306dd9`
+  - [x] Import `betterAuth` from `better-auth`
+  - [x] Import `drizzleAdapter` from `@better-auth/drizzle-adapter`
+  - [x] Import `getDb` from `@/db/index` (uses singleton db instance)
+  - [x] Configure with `database: drizzleAdapter(getDb(), { provider: 'pg' })`
+  - [x] Set `user: 'users'` schema mapping to our existing `users` table
+  - [x] Configure `emailAndPassword: { enabled: true }`
+  - [x] Add `additionalFields` for `role` (string, required, input: false) and `locale` (string, default: 'en')
+  - [x] Add `tanstackStartCookies()` plugin (imported from `better-auth/tanstack-start`)
+  - [x] Read env vars via `getEnv()` (validated in env.ts)
+  - [x] Export `auth` instance
 - [ ] Task: Create API route handler (`src/routes/api/auth/$.ts`)
   - [ ] Create catch-all route at `/api/auth/*`
   - [ ] Handle GET and POST by delegating to `auth.handler(request)`
