@@ -21,16 +21,17 @@
 - [x] Task: Update Drizzle barrel exports and relations `b6aab98`
   - [x] Add `session`, `account`, `verification` to barrel export in `schema/index.ts`
   - [x] Add relations for new tables (session→user, account→user, verification→user)
-- [ ] Task: Generate and verify new migration
-  - [ ] Run `drizzle-kit generate` and confirm valid SQL output
-- [ ] Task: Write unit tests for new schema
-  - [ ] Test `session` table has correct columns and FK to users
-  - [ ] Test `account` table has correct columns and FK to users
-  - [ ] Test `verification` table has correct columns
-  - [ ] Test `users` table now has `emailVerified` and `image` columns
-  - [ ] Test `passwordResetTokens` is no longer exported
-  - [ ] Test new relations are properly defined
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Generate and verify new migration `cc21dfb`
+  - [x] Generate Drizzle migration (manual: drizzle-kit requires TTY for schema conflict prompt; created equivalent SQL manually)
+  - [x] Verify migration includes: create session, account, verification tables; add email_verified and image to users; drop password_reset_tokens
+- [x] Task: Write unit tests for new schema (completed in prior task commits)
+  - [x] Test `session` table has correct columns and FK to users
+  - [x] Test `account` table has correct columns and FK to users
+  - [x] Test `verification` table has correct columns
+  - [x] Test `users` table now has `emailVerified` and `image` columns
+  - [x] Test `passwordResetTokens` is no longer exported
+  - [x] Test new relations are properly defined
+- [~] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2 — Better-Auth Configuration & API Setup
 
