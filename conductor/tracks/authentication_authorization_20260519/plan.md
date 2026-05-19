@@ -7,10 +7,10 @@
 - [x] Task: Install new dependencies `6d2a628`
   - [x] Add `@better-auth/drizzle-adapter` to `package.json`
   - [x] Add `resend` to `package.json`
-- [ ] Task: Create Better-Auth schema tables in Drizzle
-  - [ ] Create `src/db/schema/auth.ts` with `session` table (id, userId FK→users, token unique, expiresAt, ipAddress, userAgent, createdAt, updatedAt)
-  - [ ] Add `account` table to `src/db/schema/auth.ts` (id, userId FK→users, accountId, providerId, password, accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt, scope, idToken, createdAt, updatedAt)
-  - [ ] Add `verification` table to `src/db/schema/auth.ts` (id, identifier, value, expiresAt, createdAt, updatedAt)
+- [x] Task: Create Better-Auth schema tables in Drizzle `0126da3`
+  - [x] Create `src/db/schema/auth.ts` with `session` table (id, userId FK→users, token unique, expiresAt, ipAddress, userAgent, createdAt, updatedAt)
+  - [x] Add `account` table to `src/db/schema/auth.ts` (id, userId FK→users, accountId, providerId, password, accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt, scope, idToken, createdAt, updatedAt)
+  - [x] Add `verification` table to `src/db/schema/auth.ts` (id, identifier, value, expiresAt, createdAt, updatedAt)
 - [ ] Task: Modify existing `users` table
   - [ ] Add `emailVerified` column (boolean, default false) to `src/db/schema/users.ts`
   - [ ] Add `image` column (text, nullable) to `src/db/schema/users.ts`
