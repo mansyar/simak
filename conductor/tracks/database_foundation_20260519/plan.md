@@ -20,14 +20,14 @@
 
 ## Phase 2: Database Client & Migration Runner
 
-- [ ] Task: Create Minimal Client Stub & Write Tests
-  - [ ] Create minimal `src/db/index.ts` stub with exported type placeholder (so imports resolve)
-  - [ ] Write tests for `src/db/index.ts` — verify exported shape, types, and that client has expected methods
-  - [ ] Run tests and confirm they **fail** (stub doesn't implement the interface yet)
-- [ ] Task: Implement Database Client & Migration Runner (Green Phase)
-  - [ ] Create `src/db/index.ts` — initialize postgres.js client with `DATABASE_URL`, wrap with Drizzle ORM, export typed `db` instance
-  - [ ] Create `src/db/migrate.ts` — programmatic runner using Drizzle's `migrate` API from `drizzle-orm/postgres-js/migrator`. This is what `pnpm db:migrate` executes via `tsx`
-  - [ ] Run tests and confirm they pass
+- [x] Task: Create Minimal Client Stub & Write Tests
+  - [x] Create minimal `src/db/index.ts` stub with exported type placeholder (so imports resolve)
+  - [x] Write tests for `src/db/index.ts` — verify exported shape, types, and that client has expected methods
+  - [x] Run tests and confirm they **fail** (stub doesn't implement the interface yet)
+- [x] Task: Implement Database Client & Migration Runner (Green Phase) [3f50306]
+  - [x] Create `src/db/index.ts` — initialize postgres.js client with `DATABASE_URL`, wrap with Drizzle ORM, export typed `db` instance
+  - [x] Create `src/db/migrate.ts` — programmatic runner using Drizzle's `migrate` API from `drizzle-orm/postgres-js/migrator`. This is what `pnpm db:migrate` executes via `tsx`
+  - [x] Run tests and confirm they pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Database Client & Migration Runner' (Protocol in workflow.md)
 
 ## Phase 3: User & Auth Schema
