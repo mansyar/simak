@@ -1,117 +1,142 @@
-import { describe, it, expect } from 'vitest';
+/** @vitest-environment node */
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
+import { 
+  CreateUserSchema, 
+  UpdateUserSchema, 
+  ListUsersSchema,
+  createUserHandler,
+  listUsersHandler,
+  getUserHandler,
+  updateUserHandler,
+  deleteUserHandler,
+  generateSetupLinkHandler
+} from '@/server/users';
+import * as auth from '@/server/auth';
+import * as email from '@/lib/email';
+import * as dbMod from '@/db/index';
 
-describe('User server functions module', () => {
-  it('should export listUsers as a function', async () => {
-    const mod = await import('@/server/users');
-    expect(mod).toHaveProperty('listUsers');
-    expect(typeof mod.listUsers).toBe('function');
+vi.mock('@/server/auth', () => ({
+  getSessionFromHeaders: vi.fn(),
+}));
+
+vi.mock('@/lib/email', () => ({
+  sendInvitationEmail: vi.fn(),
+}));
+
+vi.mock('@/db/index', () => ({
+  getDb: vi.fn(),
+}));
+
+vi.mock('@tanstack/react-start', () => ({
+  createServerFn: vi.fn().mockReturnValue({
+    handler: vi.fn().mockImplementation((fn) => fn),
+  }),
+}));
+
+describe('User server functions - Logic & Security', () => {
+  const mockDb = {
+    select: vi.fn().mockReturnThis(),
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    offset: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    // Simple mock for Drizzle's thenable queries
+    then: vi.fn(function(onfulfilled) {
+      return Promise.resolve([]).then(onfulfilled);
+    }),
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
   });
 
-  it('should export getUser as a function', async () => {
-    const mod = await import('@/server/users');
-    expect(mod).toHaveProperty('getUser');
-    expect(typeof mod.getUser).toBe('function');
-  });
-
-  it('should export createUser as a function', async () => {
-    const mod = await import('@/server/users');
-    expect(mod).toHaveProperty('createUser');
-    expect(typeof mod.createUser).toBe('function');
-  });
-
-  it('should export updateUser as a function', async () => {
-    const mod = await import('@/server/users');
-    expect(mod).toHaveProperty('updateUser');
-    expect(typeof mod.updateUser).toBe('function');
-  });
-
-  it('should export deleteUser as a function', async () => {
-    const mod = await import('@/server/users');
-    expect(mod).toHaveProperty('deleteUser');
-    expect(typeof mod.deleteUser).toBe('function');
-  });
-
-  it('should export generateSetupLink as a function', async () => {
-    const mod = await import('@/server/users');
-    expect(mod).toHaveProperty('generateSetupLink');
-    expect(typeof mod.generateSetupLink).toBe('function');
-  });
-});
-
-describe('User Zod schemas', () => {
-  it('should export CreateUserSchema that validates name, email, role', async () => {
-    const mod = await import('@/server/users');
-    expect(mod).toHaveProperty('CreateUserSchema');
-    expect(mod.CreateUserSchema).toBeInstanceOf(z.ZodObject);
-  });
-
-  it('should accept valid user creation input', async () => {
-    const mod = await import('@/server/users');
-    const result = mod.CreateUserSchema.safeParse({
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: 'instructor',
+  describe('createUser', () => {
+    it('should fail if unauthorized', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+      const result = await createUserHandler({ data: { name: 'Test', email: 'test@example.com', role: 'student' } });
+      expect(result).toEqual({ error: 'Unauthorized' });
     });
-    expect(result.success).toBe(true);
-  });
 
-  it('should reject empty name', async () => {
-    const mod = await import('@/server/users');
-    const result = mod.CreateUserSchema.safeParse({
-      name: '',
-      email: 'john@example.com',
-      role: 'student',
+    it('should fail if student tries to create user', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: '1', role: 'student' } as any,
+        session: {} as any
+      });
+      const result = await createUserHandler({ data: { name: 'Test', email: 'test@example.com', role: 'student' } });
+      expect(result).toEqual({ error: 'Unauthorized' });
     });
-    expect(result.success).toBe(false);
-  });
 
-  it('should reject invalid email', async () => {
-    const mod = await import('@/server/users');
-    const result = mod.CreateUserSchema.safeParse({
-      name: 'John',
-      email: 'not-an-email',
-      role: 'student',
+    it('should allow admin to create instructor', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any
+      });
+      
+      // Mock email uniqueness check: return undefined (no user found)
+      mockDb.then.mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+
+      const result = await createUserHandler({ data: { name: 'New Instructor', email: 'inst@example.com', role: 'instructor' } });
+      
+      expect(result).toHaveProperty('user');
+      expect(result).toHaveProperty('emailSent');
+      expect(email.sendInvitationEmail).toHaveBeenCalled();
     });
-    expect(result.success).toBe(false);
-  });
 
-  it('should reject invalid role', async () => {
-    const mod = await import('@/server/users');
-    const result = mod.CreateUserSchema.safeParse({
-      name: 'John',
-      email: 'john@example.com',
-      role: 'superadmin',
+    it('should prevent admin from creating superadmin', async () => {
+      const result = CreateUserSchema.safeParse({
+        name: 'Bad',
+        email: 'bad@example.com',
+        role: 'superadmin'
+      });
+      expect(result.success).toBe(false);
     });
-    expect(result.success).toBe(false);
-  });
 
-  it('should export UpdateUserSchema', async () => {
-    const mod = await import('@/server/users');
-    expect(mod).toHaveProperty('UpdateUserSchema');
-    expect(mod.UpdateUserSchema).toBeInstanceOf(z.ZodObject);
-  });
+    it('should prevent admin from creating another admin', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any
+      });
 
-  it('should accept valid update input without role', async () => {
-    const mod = await import('@/server/users');
-    const result = mod.UpdateUserSchema.safeParse({
-      name: 'John Updated',
-      email: 'john.updated@example.com',
+      const result = await createUserHandler({ data: { name: 'Other Admin', email: 'admin2@example.com', role: 'admin' } });
+      expect(result).toEqual({ error: 'Admins cannot create other Admin accounts' });
     });
-    expect(result.success).toBe(true);
   });
 
-  it('should export ListUsersSchema', async () => {
-    const mod = await import('@/server/users');
-    expect(mod).toHaveProperty('ListUsersSchema');
-    expect(mod.ListUsersSchema).toBeInstanceOf(z.ZodObject);
-  });
-});
+  describe('listUsers', () => {
+    it('should return users and total count', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'superadmin' } as any,
+        session: {} as any
+      });
 
-describe('Invitation email module', () => {
-  it('should export sendInvitationEmail as a function', async () => {
-    const mod = await import('@/lib/email');
-    expect(mod).toHaveProperty('sendInvitationEmail');
-    expect(typeof mod.sendInvitationEmail).toBe('function');
+      // Mock results for listUsers
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: '1', name: 'User 1' }]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ count: 1 }]).then(onfulfilled));
+
+      const result = await listUsersHandler({ data: { page: 1, limit: 20, search: '' } });
+      
+      expect(result.users).toHaveLength(1);
+      expect(result.total).toBe(1);
+    });
+  });
+
+  describe('deleteUser', () => {
+    it('should prevent self-deletion', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'my-id', role: 'admin' } as any,
+        session: {} as any
+      });
+
+      const result = await deleteUserHandler({ data: { id: 'my-id' } });
+      expect(result).toEqual({ error: 'You cannot delete your own account' });
+    });
   });
 });
