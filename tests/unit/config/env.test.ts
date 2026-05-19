@@ -20,6 +20,8 @@ describe('Environment validation', () => {
     process.env.RESEND_API_KEY = 're_test';
     process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
     process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
 
     const { getEnv } = await import('@/config/env');
     const env = getEnv();
@@ -29,6 +31,7 @@ describe('Environment validation', () => {
   });
 
   it('should throw on missing DATABASE_URL', async () => {
+    delete process.env.DATABASE_URL;
     process.env.R2_ENDPOINT = 'https://account.r2.cloudflarestorage.com';
     process.env.R2_ACCESS_KEY_ID = 'test-key';
     process.env.R2_SECRET_ACCESS_KEY = 'test-secret';
@@ -37,10 +40,31 @@ describe('Environment validation', () => {
     process.env.RESEND_API_KEY = 're_test';
     process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
     process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
     // Intentionally leave DATABASE_URL undefined
 
     const { getEnv } = await import('@/config/env');
     expect(() => getEnv()).toThrow('Environment variable validation failed');
+  });
+
+  it('should cache env result on repeated calls', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.R2_ENDPOINT = 'https://account.r2.cloudflarestorage.com';
+    process.env.R2_ACCESS_KEY_ID = 'test-key';
+    process.env.R2_SECRET_ACCESS_KEY = 'test-secret';
+    process.env.R2_BUCKET_NAME = 'simak-uploads';
+    process.env.R2_PUBLIC_URL = 'https://pub-test.r2.dev';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+
+    const { getEnv } = await import('@/config/env');
+    const first = getEnv();
+    const second = getEnv();
+    expect(first).toBe(second);
   });
 
   it('should throw on invalid DATABASE_URL format', async () => {
@@ -53,12 +77,15 @@ describe('Environment validation', () => {
     process.env.RESEND_API_KEY = 're_test';
     process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
     process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
 
     const { getEnv } = await import('@/config/env');
     expect(() => getEnv()).toThrow();
   });
 
   it('should throw on missing BETTER_AUTH_SECRET', async () => {
+    delete process.env.BETTER_AUTH_SECRET;
     process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
     process.env.R2_ENDPOINT = 'https://account.r2.cloudflarestorage.com';
     process.env.R2_ACCESS_KEY_ID = 'test-key';
@@ -67,6 +94,8 @@ describe('Environment validation', () => {
     process.env.R2_PUBLIC_URL = 'https://pub-test.r2.dev';
     process.env.RESEND_API_KEY = 're_test';
     process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
     // Intentionally leave BETTER_AUTH_SECRET undefined
 
     const { getEnv } = await import('@/config/env');
