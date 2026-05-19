@@ -1,6 +1,6 @@
 # Implementation Plan: Authentication & Authorization
 
-## Phase 1 — Database Schema Updates for Better-Auth
+## Phase 1 — Database Schema Updates for Better-Auth [checkpoint: 82df97d]
 
 **Objective:** Add Better-Auth's required tables (`session`, `account`, `verification`), extend the `users` table with `emailVerified` and `image` columns, remove the now-redundant `password_reset_tokens` table, update Drizzle relations, and generate a new migration.
 
@@ -31,7 +31,7 @@
   - [x] Test `users` table now has `emailVerified` and `image` columns
   - [x] Test `passwordResetTokens` is no longer exported
   - [x] Test new relations are properly defined
-- [~] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) `82df97d`
 
 ## Phase 2 — Better-Auth Configuration & API Setup
 
