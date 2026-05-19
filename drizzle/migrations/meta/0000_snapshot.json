@@ -6,7 +6,7 @@
   "tables": {
     "public.password_reset_tokens": {
       "name": "password_reset_tokens",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
@@ -89,7 +89,7 @@
     },
     "public.users": {
       "name": "users",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
@@ -160,7 +160,7 @@
     },
     "public.assignment_templates": {
       "name": "assignment_templates",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
@@ -227,7 +227,7 @@
     },
     "public.template_checkpoints": {
       "name": "template_checkpoints",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
@@ -281,7 +281,7 @@
     },
     "public.assignment_students": {
       "name": "assignment_students",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
@@ -338,7 +338,7 @@
     },
     "public.assignments": {
       "name": "assignments",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
@@ -426,7 +426,7 @@
     },
     "public.checkpoints": {
       "name": "checkpoints",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
@@ -523,7 +523,7 @@
     },
     "public.reviews": {
       "name": "reviews",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
@@ -626,7 +626,7 @@
     },
     "public.submissions": {
       "name": "submissions",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
@@ -739,7 +739,7 @@
     },
     "public.consultations": {
       "name": "consultations",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
@@ -888,7 +888,7 @@
     },
     "public.notifications": {
       "name": "notifications",
-      "schema": "",
+      "schema": "public",
       "columns": {
         "id": {
           "name": "id",
