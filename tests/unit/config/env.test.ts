@@ -20,6 +20,8 @@ describe('Environment validation', () => {
     process.env.RESEND_API_KEY = 're_test';
     process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
     process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
 
     const { getEnv } = await import('@/config/env');
     const env = getEnv();
@@ -37,6 +39,8 @@ describe('Environment validation', () => {
     process.env.RESEND_API_KEY = 're_test';
     process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
     process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
     // Intentionally leave DATABASE_URL undefined
 
     const { getEnv } = await import('@/config/env');
@@ -53,6 +57,8 @@ describe('Environment validation', () => {
     process.env.RESEND_API_KEY = 're_test';
     process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
     process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
 
     const { getEnv } = await import('@/config/env');
     expect(() => getEnv()).toThrow();
