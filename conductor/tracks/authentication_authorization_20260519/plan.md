@@ -11,9 +11,9 @@
   - [x] Create `src/db/schema/auth.ts` with `session` table (id, userId FK→users, token unique, expiresAt, ipAddress, userAgent, createdAt, updatedAt)
   - [x] Add `account` table to `src/db/schema/auth.ts` (id, userId FK→users, accountId, providerId, password, accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt, scope, idToken, createdAt, updatedAt)
   - [x] Add `verification` table to `src/db/schema/auth.ts` (id, identifier, value, expiresAt, createdAt, updatedAt)
-- [ ] Task: Modify existing `users` table
-  - [ ] Add `emailVerified` column (boolean, default false) to `src/db/schema/users.ts`
-  - [ ] Add `image` column (text, nullable) to `src/db/schema/users.ts`
+- [x] Task: Modify existing `users` table `8dd7c2e`
+  - [x] Add `emailVerified` column (boolean, default false) to `src/db/schema/users.ts`
+  - [x] Add `image` column (text, nullable) to `src/db/schema/users.ts`
 - [ ] Task: Remove `password_reset_tokens` table
   - [ ] Delete `passwordResetTokens` table from `src/db/schema/users.ts`
   - [ ] Remove related relation from `src/db/schema/index.ts`
