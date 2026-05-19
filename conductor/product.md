@@ -13,6 +13,7 @@ SIMAK (Sistem Informasi dan Manajemen Akademik) is a web-based academic informat
 ## Core Problem
 
 Students and instructors lack a centralized system to:
+
 - Track assignment progress through staged checkpoints
 - Provide and receive structured feedback on submissions
 - Manage consultation sessions (Kartu Bimbingan)
@@ -28,6 +29,7 @@ Students and instructors lack a centralized system to:
 ## Core Features
 
 ### MVP (v1)
+
 - **Role-based access** — SuperAdmin, Admin, Instructor, Student roles with permission boundaries
 - **Invitation-only registration** — No self-signup; accounts are created by admins with email-based password setup
 - **Assignment templates** — Admin-defined templates with ordered checkpoint lists
@@ -54,3 +56,20 @@ Students and instructors lack a centralized system to:
 - **Trust but verify** — Students log consultations; instructors verify; gating respects verified counts only
 - **Fair deadlines** — Late instructor reviews automatically extend student deadlines by the breach duration
 - **Sequential by design** — Checkpoints enforce ordered completion; no skipping ahead
+
+---
+
+## Completed Tracks
+
+### Track 1.3: Authentication & Authorization (May 2026)
+
+- **Better-Auth integration** with Drizzle ORM adapter and PostgreSQL-backed sessions
+- **Email/password authentication** with session management via HTTP-only cookies
+- **Route guard system** — `_authenticated` and `_unauthenticated` pathless layouts with SSR-based session validation
+- **Login page** (`/auth/login`) — Email/password form with inline error handling
+- **Dashboard stub** (`/dashboard`) — Role-aware greeting with navigation links and logout
+- **Password reset flow** — Forgot password (`/auth/forgot-password`) and reset password (`/auth/reset-password?token=xxx`) pages
+- **Password setup flow** (`/auth/setup-password`) — Token-based initial password setup for invitation flow
+- **Email integration** — Resend-powered password reset emails with SIMAK-branded HTML templates
+- **SuperAdmin seed** — Script creates user with hashed password in the `account` table
+- **Translation keys** added for auth and dashboard strings in both EN and ID locales

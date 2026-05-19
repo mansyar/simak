@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('Auth server configuration', () => {
   it('should export auth instance from config module', async () => {
@@ -15,6 +15,29 @@ describe('Auth server configuration', () => {
     const { auth } = await import('@/auth/config');
     expect(auth.api).toHaveProperty('getSession');
     expect(typeof auth.api.getSession).toBe('function');
+  });
+
+  it('should have additionalFields configured', async () => {
+    const mod = await import('@/auth/config');
+    const opts = mod.auth.options as Record<string, unknown>;
+    expect(opts.additionalFields).toBeDefined();
+  });
+
+  it('should have tanstackStartCookies plugin', async () => {
+    const mod = await import('@/auth/config');
+    const opts = mod.auth.options as Record<string, unknown>;
+    const plugins = opts.plugins as Array<{ id: string }>;
+    expect(plugins.some((p) => p.id === 'tanstack-start-cookies')).toBe(true);
+  });
+
+  it('should have sendResetPassword callback', async () => {
+    const { auth } = await import('@/auth/config');
+    const emailPw = (auth.options as Record<string, unknown>).emailAndPassword as Record<
+      string,
+      unknown
+    >;
+    expect(emailPw.enabled).toBe(true);
+    expect(typeof emailPw.sendResetPassword).toBe('function');
   });
 });
 
