@@ -30,6 +30,7 @@ export default defineConfig({
         'src/i18n/types.ts',
         'src/i18n/detect-locale.ts',
         'src/i18n/index.ts',
+        'src/db/schema/**',
         'src/hooks/**',
         'src/routes/**',
         'src/components/ui/**',
