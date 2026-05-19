@@ -115,6 +115,10 @@
 
 ## Phase 10: Migration Generation & End-to-End Verification [checkpoint: 6611088]
 
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [7aa6e28]
+
 - [x] Task: Generate Migration SQL Programmatically [6611088]
   - [x] Run `pnpm db:generate` (`drizzle-kit generate`) — confirm exit code 0
   - [x] Verify migration SQL files created in `drizzle/migrations/`
