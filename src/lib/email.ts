@@ -12,6 +12,8 @@ function getResend(): Resend {
   return _resend;
 }
 
+const FROM_ADDRESS = process.env.EMAIL_FROM || 'SIMAK <noreply@simak.app>';
+
 export async function sendPasswordResetEmail(params: {
   email: string;
   name: string;
@@ -21,7 +23,7 @@ export async function sendPasswordResetEmail(params: {
   const resetUrl = `${getEnv().BETTER_AUTH_URL}/auth/reset-password?token=${params.token}`;
 
   const { error } = await resend.emails.send({
-    from: 'SIMAK <noreply@simak.app>',
+    from: FROM_ADDRESS,
     to: params.email,
     subject: 'Reset your SIMAK password',
     html: `
@@ -87,7 +89,7 @@ export async function sendInvitationEmail(params: {
   const setupUrl = `${getEnv().BETTER_AUTH_URL}/auth/setup-password?token=${params.token}`;
 
   const { error } = await resend.emails.send({
-    from: 'SIMAK <noreply@simak.app>',
+    from: FROM_ADDRESS,
     to: params.email,
     subject: INVITATION_SUBJECT,
     html: `
