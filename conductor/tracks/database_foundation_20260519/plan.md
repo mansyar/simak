@@ -30,7 +30,7 @@
   - [x] Run tests and confirm they pass
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Database Client & Migration Runner' (Protocol in workflow.md) [9a894e6]
 
-## Phase 3: User & Auth Schema
+## Phase 3: User & Auth Schema [checkpoint: 3b799ed]
 
 - [x] Task: Write User Schema Tests (Red Phase) [8f1f3c0]
   - [x] Write tests for `users` table schema — verify columns, types, primary key, unique constraint on email
@@ -40,7 +40,7 @@
   - [x] Create `src/db/schema/users.ts` with `users` table (id, name, email, role, locale, timestamps, soft delete)
   - [x] Create `password_reset_tokens` table with FK to users, unique **index** on `token`, expiresAt, used flag
   - [x] Run tests and confirm they pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: User & Auth Schema' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: User & Auth Schema' (Protocol in workflow.md) [3b799ed]
 
 ## Phase 4: Template Schema
 
