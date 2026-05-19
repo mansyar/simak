@@ -101,7 +101,7 @@ export function CreateUserDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('adminUsers.table.role')}</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
                         <span data-slot="select-value" className="flex flex-1 text-left">
