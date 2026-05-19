@@ -147,3 +147,7 @@
   - [ ] Test password confirmation matching
   - [ ] Test error views for invalid tokens
 - [x] Task: Conductor - User Manual Verification 'Phase 5' (Protocol in workflow.md) `2c9ecf1`
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions `e630885`
