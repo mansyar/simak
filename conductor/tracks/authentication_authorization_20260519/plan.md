@@ -14,10 +14,10 @@
 - [x] Task: Modify existing `users` table `8dd7c2e`
   - [x] Add `emailVerified` column (boolean, default false) to `src/db/schema/users.ts`
   - [x] Add `image` column (text, nullable) to `src/db/schema/users.ts`
-- [ ] Task: Remove `password_reset_tokens` table
-  - [ ] Delete `passwordResetTokens` table from `src/db/schema/users.ts`
-  - [ ] Remove related relation from `src/db/schema/index.ts`
-  - [ ] Remove export/import references to `passwordResetTokens`
+- [x] Task: Remove `password_reset_tokens` table `5345b2b`
+  - [x] Delete `passwordResetTokens` table from `src/db/schema/users.ts`
+  - [x] Remove related relation from `src/db/schema/index.ts`
+  - [x] Remove export/import references to `passwordResetTokens`
 - [ ] Task: Update Drizzle barrel exports and relations
   - [ ] Add `session`, `account`, `verification` to barrel export in `schema/index.ts`
   - [ ] Add relations for new tables (session→user, account→user, verification→user)
