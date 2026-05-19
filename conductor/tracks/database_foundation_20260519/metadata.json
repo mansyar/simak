@@ -1,8 +1,0 @@
-{
-  "track_id": "database_foundation_20260519",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-05-19T10:02:00Z",
-  "updated_at": "2026-05-19T10:02:00Z",
-  "description": "Track 1.2 — Database Foundation: Define all Drizzle ORM schema files, database client, migration infrastructure, and SuperAdmin seed script"
-}
