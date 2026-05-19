@@ -59,11 +59,13 @@
 - [x] Task: Create email integration (`src/lib/email.ts`) `2cdd64b`
   - [x] Initialize Resend client using validated env vars (via getEnv())
   - [x] Create `sendPasswordResetEmail` template helper with SIMAK-branded HTML template
-- [ ] Task: Write unit tests for auth configuration
-  - [ ] Test `auth` instance is created without errors
-  - [ ] Test `authClient` is created without errors
-  - [ ] Test email client initialization
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Write unit tests for auth configuration `f012c2c`
+  - [x] Test `auth` instance is created without errors
+  - [x] Test `auth.handler` and `auth.api.getSession` exist
+  - [x] Test `authClient` is exported as a function
+  - [x] Test `sendPasswordResetEmail` is exported
+  - [x] Test Resend import is available
+- [~] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3 — Route Guards & Dashboard Stub
 
