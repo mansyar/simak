@@ -33,7 +33,7 @@
   - [x] Test new relations are properly defined
 - [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) `82df97d`
 
-## Phase 2 — Better-Auth Configuration & API Setup
+## Phase 2 — Better-Auth Configuration & API Setup [checkpoint: 8068fb3]
 
 **Objective:** Configure Better-Auth with the Drizzle adapter, custom table mappings, and `tanstackStartCookies` plugin. Set up the API route handler and frontend auth client. Initialize the email service.
 
@@ -65,7 +65,7 @@
   - [x] Test `authClient` is exported as a function
   - [x] Test `sendPasswordResetEmail` is exported
   - [x] Test Resend import is available
-- [~] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) `8068fb3`
 
 ## Phase 3 — Route Guards & Dashboard Stub
 
