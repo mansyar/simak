@@ -2,6 +2,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { UserFilters } from '@/components/admin/users/UserFilters';
 
+vi.mock('@/routes/__root', () => ({
+  useI18n: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'adminUsers.searchPlaceholder': 'Search users by name or email...',
+        'adminUsers.allRoles': 'All Roles',
+        'adminUsers.role_superadmin': 'Super Admin',
+        'adminUsers.role_admin': 'Admin',
+        'adminUsers.role_instructor': 'Instructor',
+        'adminUsers.role_student': 'Student',
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
 describe('UserFilters', () => {
   const onSearchChange = vi.fn();
   const onRoleChange = vi.fn();
