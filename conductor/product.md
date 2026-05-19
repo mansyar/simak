@@ -73,3 +73,18 @@ Students and instructors lack a centralized system to:
 - **Email integration** — Resend-powered password reset emails with SIMAK-branded HTML templates
 - **SuperAdmin seed** — Script creates user with hashed password in the `account` table
 - **Translation keys** added for auth and dashboard strings in both EN and ID locales
+
+### Track 2.1: User Management (Admin) (May 2026)
+
+- **Admin sidebar layout** — Pathless `_admin` layout with role guard (`requireRole(['superadmin', 'admin'])`) and sidebar navigation
+- **User list page** (`/admin/users`) — Paginated table with search by name/email, role filter, and delete confirmation
+- **Create user dialog** — Dialog-based form with Name, Email, and Role fields (Admin/Instructor/Student); sends invitation email via Resend
+- **Edit user sheet** — Slide-in panel for editing Name and Email (role is never editable)
+- **Server-side CRUD** — `createServerFn`-based functions: `listUsers`, `createUser`, `updateUser`, `deleteUser`, `getUser`, `generateSetupLink`
+- **Invitation email flow** — `sendInvitationEmail` with SIMAK-branded "Welcome" template (separate from password reset)
+- **Custom password setup** — Token-based setup-password handler that validates UUID tokens against the `verification` table
+- **Soft-delete** — Users are soft-deleted (`deletedAt`), excluded from list queries, and excluded from email uniqueness checks
+- **Role-based creation rules** — SuperAdmin can create Admin accounts; Admin can only create Instructor/Student
+- **i18n translations** — Full English and Indonesian translations for admin sidebar, user table, forms, and messages
+- **Language switcher** — EN/ID toggle in the top-right of admin pages and dashboard
+- **Test user seeding** — `seedTestUsers()` creates Instructor and Student accounts with configurable password
