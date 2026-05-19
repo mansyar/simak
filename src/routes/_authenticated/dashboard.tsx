@@ -24,7 +24,7 @@ function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-4">
       <h1 className="text-3xl font-bold text-foreground">
-        {t('nav.welcome').replace('{name}', displayName)}
+        {t('nav.welcome', { name: displayName })}
       </h1>
       <p className="text-lg text-muted-foreground">{t('nav.role_' + role)}</p>
       <nav className="flex flex-col gap-2">
