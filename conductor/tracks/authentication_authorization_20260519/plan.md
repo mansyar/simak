@@ -18,9 +18,9 @@
   - [x] Delete `passwordResetTokens` table from `src/db/schema/users.ts`
   - [x] Remove related relation from `src/db/schema/index.ts`
   - [x] Remove export/import references to `passwordResetTokens`
-- [ ] Task: Update Drizzle barrel exports and relations
-  - [ ] Add `session`, `account`, `verification` to barrel export in `schema/index.ts`
-  - [ ] Add relations for new tables (session→user, account→user, verification→user)
+- [x] Task: Update Drizzle barrel exports and relations `b6aab98`
+  - [x] Add `session`, `account`, `verification` to barrel export in `schema/index.ts`
+  - [x] Add relations for new tables (session→user, account→user, verification→user)
 - [ ] Task: Generate and verify new migration
   - [ ] Run `drizzle-kit generate` and confirm valid SQL output
 - [ ] Task: Write unit tests for new schema
