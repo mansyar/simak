@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 import { getDb } from './index';
 import { users, account } from './schema/index';
 import { hashPassword } from 'better-auth/crypto';
+import crypto from 'node:crypto';
 
 /**
  * Validate seed environment variables.
@@ -67,10 +68,51 @@ export async function seedSuperAdmin(): Promise<void> {
   console.log(`SuperAdmin user created (${email}).`);
 }
 
+export async function seedTestUsers(): Promise<void> {
+  const db = getDb();
+  const testPassword = process.env.TEST_USER_PASSWORD || 'password';
+  const hashedPassword = await hashPassword(testPassword);
+
+  const testUsers = [
+    { name: 'Instructor', email: 'instructor@simak.app', role: 'instructor' as const },
+    { name: 'Student', email: 'student@simak.app', role: 'student' as const },
+  ];
+
+  for (const u of testUsers) {
+    const existing = await db.select().from(users).where(eq(users.email, u.email));
+    if (existing.length > 0) {
+      console.log(`Test user already exists (${u.email}). Skipping.`);
+      continue;
+    }
+
+    const userId = crypto.randomUUID();
+
+    await db.insert(users).values({
+      id: userId,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      emailVerified: true,
+      locale: 'en',
+    });
+
+    await db.insert(account).values({
+      id: crypto.randomUUID(),
+      userId,
+      accountId: userId,
+      providerId: 'credential',
+      password: hashedPassword,
+    });
+
+    console.log(`Test user created: ${u.name} (${u.email}) / ${testPassword}`);
+  }
+}
+
 // Allow running directly: `tsx src/db/seed.ts`
 const isMainModule = process.argv[1]?.endsWith('seed.ts');
 if (isMainModule) {
   seedSuperAdmin()
+    .then(() => seedTestUsers())
     .then(() => process.exit(0))
     .catch((err) => {
       console.error('Seed failed:', err);
