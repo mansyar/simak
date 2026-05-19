@@ -14,9 +14,6 @@ export default defineConfig({
     },
   },
   plugins: [tailwindcss(), tanstackStart(), viteReact()],
-  define: {
-    global: 'globalThis',
-  },
   test: {
     globals: true,
     environment: 'jsdom',

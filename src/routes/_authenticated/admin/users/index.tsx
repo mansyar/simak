@@ -27,8 +27,7 @@ export const Route = createFileRoute('/_authenticated/admin/users/')({
     role: search.role,
   }),
   loader: async ({ deps }) => {
-    // Dynamic import prevents server-only deps from being bundled client-side
-    const { listUsers } = await import('@/server/users');
+    // Static import is safe - users.ts only has createServerFn stubs + Zod schemas (no server-only deps)
     // @ts-expect-error - listUsers handler type inference limitation
     return listUsers({ data: deps });
   },

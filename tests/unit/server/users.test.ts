@@ -1,17 +1,19 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
-import { 
-  CreateUserSchema, 
-  UpdateUserSchema, 
+import {
+  CreateUserSchema,
+  UpdateUserSchema,
   ListUsersSchema,
+} from '@/server/users';
+import {
   createUserHandler,
   listUsersHandler,
   getUserHandler,
   updateUserHandler,
   deleteUserHandler,
-  generateSetupLinkHandler
-} from '@/server/users';
+  generateSetupLinkHandler,
+} from '@/server/users.server';
 import * as auth from '@/server/auth';
 import * as email from '@/lib/email';
 import * as dbMod from '@/db/index';
