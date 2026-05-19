@@ -14,8 +14,9 @@
     "lint": "eslint .",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/db/migrate.ts",
+    "db:migrate": "node --env-file=.env --import=tsx src/db/migrate.ts",
     "db:push": "drizzle-kit push",
+    "db:seed": "node --env-file=.env --import=tsx src/db/seed.ts",
     "generate:i18n": "tsx scripts/generate-i18n-types.ts",
     "prepare": "husky"
   },

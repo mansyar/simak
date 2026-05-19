@@ -20,5 +20,17 @@ export function getDb(): Db {
   return _db;
 }
 
-/** Singleton db instance — use for read queries. For writes, prefer getDb() with explicit tx. */
-export const db = getDb();
+/**
+ * Singleton db instance — lazy-loaded.
+ * Use for read queries. For writes, prefer getDb() with explicit tx.
+ */
+function createLazyDb(): Db {
+  let instance: Db | null = null;
+  return new Proxy({} as Db, {
+    get(_, prop) {
+      if (!instance) instance = getDb();
+      return Reflect.get(instance, prop, instance);
+    },
+  });
+}
+export const db = createLazyDb();
