@@ -25,42 +25,42 @@
 
 **Objective:** Implement all server-side CRUD functions with proper validation, invitation email flow, and edge case handling.
 
-- [ ] Task: Write tests for user server functions
-  - [ ] Write unit test for user creation Zod schema (valid/invalid inputs, role restrictions)
-  - [ ] Write unit test for `createUser` — success path (user insert + verification token insert + email call)
-  - [ ] Write unit test for `createUser` — duplicate email (same email as active user → error)
-  - [ ] Write unit test for `createUser` — email collision with soft-deleted user (should also error — unique constraint)
-  - [ ] Write unit test for `createUser` — email send failure (user created, no rollback, returns warning)
-  - [ ] Write unit test for `createUser` — Admin cannot create another Admin role (server-side enforcement)
-  - [ ] Write unit test for `listUsers` — pagination, search filtering by name/email (ILIKE), role filter
-  - [ ] Write unit test for `listUsers` — excludes soft-deleted users
-  - [ ] Write unit test for `updateUser` — name and email update (role unchanged)
-  - [ ] Write unit test for `updateUser` — email uniqueness excludes own current email (`id != ?`)
-  - [ ] Write unit test for `updateUser` — email uniqueness excludes soft-deleted users
-  - [ ] Write unit test for `deleteUser` — sets deletedAt timestamp
-  - [ ] Write unit test for `deleteUser` — prevents deleting own account (current user matches target id)
-  - [ ] Write unit test for `generateSetupLink` — creates verification token and returns full URL
-  - [ ] Write unit test for `generateSetupLink` — fails if user is soft-deleted
-  - [ ] Write unit test for `getUser` — returns user by id
-  - [ ] Write unit test for `getUser` — non-SuperAdmin requesting SuperAdmin returns null (404)
-  - [ ] Write unit test for `getUser` — soft-deleted user returns null
-  - [ ] Write unit test for `sendInvitationEmail` — exported function, calls Resend with correct params
-- [ ] Task: Implement server functions
-  - [ ] Create `src/server/users.ts` with all exported server functions using `createServerFn`
-  - [ ] Create Zod schemas: `CreateUserSchema`, `UpdateUserSchema`, `ListUsersSchema`, `UserIdParamSchema`
-  - [ ] Implement `createUser`:
+- [x] Task: Write tests for user server functions (6c9c017)
+  - [x] Write unit test for user creation Zod schema (valid/invalid inputs, role restrictions)
+  - [x] Write unit test for `createUser` — success path (user insert + verification token insert + email call)
+  - [x] Write unit test for `createUser` — duplicate email (same email as active user → error)
+  - [x] Write unit test for `createUser` — email collision with soft-deleted user (should also error — unique constraint)
+  - [x] Write unit test for `createUser` — email send failure (user created, no rollback, returns warning)
+  - [x] Write unit test for `createUser` — Admin cannot create another Admin role (server-side enforcement)
+  - [x] Write unit test for `listUsers` — pagination, search filtering by name/email (ILIKE), role filter
+  - [x] Write unit test for `listUsers` — excludes soft-deleted users
+  - [x] Write unit test for `updateUser` — name and email update (role unchanged)
+  - [x] Write unit test for `updateUser` — email uniqueness excludes own current email (`id != ?`)
+  - [x] Write unit test for `updateUser` — email uniqueness excludes soft-deleted users
+  - [x] Write unit test for `deleteUser` — sets deletedAt timestamp
+  - [x] Write unit test for `deleteUser` — prevents deleting own account (current user matches target id)
+  - [x] Write unit test for `generateSetupLink` — creates verification token and returns full URL
+  - [x] Write unit test for `generateSetupLink` — fails if user is soft-deleted
+  - [x] Write unit test for `getUser` — returns user by id
+  - [x] Write unit test for `getUser` — non-SuperAdmin requesting SuperAdmin returns null (404)
+  - [x] Write unit test for `getUser` — soft-deleted user returns null
+  - [x] Write unit test for `sendInvitationEmail` — exported function, calls Resend with correct params
+- [x] Task: Implement server functions (6c9c017)
+  - [x] Create `src/server/users.ts` with all exported server functions using `createServerFn`
+  - [x] Create Zod schemas: `CreateUserSchema`, `UpdateUserSchema`, `ListUsersSchema`, `UserIdParamSchema`
+  - [x] Implement `createUser`:
     1. Validate email not already in use (active + soft-deleted users — catches unique constraint early)
     2. Validate role creation rules (non-SuperAdmin cannot create Admin)
     3. Insert into `users` table
     4. Insert into `verification` table (identifier=email, value=crypto.randomUUID(), expiresAt=1hr)
     5. Call `sendInvitationEmail()` — catch failure, do NOT rollback user creation
     6. Return user + `{ emailSent: boolean }`
-  - [ ] Implement `listUsers` — paginated query with ILIKE search on name/email, role filter, exclude `deletedAt IS NOT NULL`, return `{ users, total }`
-  - [ ] Implement `updateUser` — validate email uniqueness with `AND id != ? AND deletedAt IS NULL`, update only name + email
-  - [ ] Implement `deleteUser` — set `deletedAt = now()`, prevent self-deletion (compare with session user id)
-  - [ ] Implement `generateSetupLink` — insert verification token, construct URL, return full URL; fail if user soft-deleted
-  - [ ] Implement `getUser` — fetch by id, if session user is non-SuperAdmin and target is SuperAdmin → return null
-  - [ ] Create `src/lib/email.ts` — add `sendInvitationEmail(params: { email, name, token })` with SIMAK-branded "Welcome" template (separate from `sendPasswordResetEmail`)
+  - [x] Implement `listUsers` — paginated query with ILIKE search on name/email, role filter, exclude `deletedAt IS NOT NULL`, return `{ users, total }`
+  - [x] Implement `updateUser` — validate email uniqueness with `AND id != ? AND deletedAt IS NULL`, update only name + email
+  - [x] Implement `deleteUser` — set `deletedAt = now()`, prevent self-deletion (compare with session user id)
+  - [x] Implement `generateSetupLink` — insert verification token, construct URL, return full URL; fail if user soft-deleted
+  - [x] Implement `getUser` — fetch by id, if session user is non-SuperAdmin and target is SuperAdmin → return null
+  - [x] Create `src/lib/email.ts` — add `sendInvitationEmail(params: { email, name, token })` with SIMAK-branded "Welcome" template (separate from `sendPasswordResetEmail`)
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions, Invitation Email & Zod Validation' (Protocol in workflow.md)
 
 ## Phase 3: User List Page
