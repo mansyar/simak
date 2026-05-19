@@ -61,7 +61,7 @@
   - [x] Implement `generateSetupLink` — insert verification token, construct URL, return full URL; fail if user soft-deleted
   - [x] Implement `getUser` — fetch by id, if session user is non-SuperAdmin and target is SuperAdmin → return null
   - [x] Create `src/lib/email.ts` — add `sendInvitationEmail(params: { email, name, token })` with SIMAK-branded "Welcome" template (separate from `sendPasswordResetEmail`)
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions, Invitation Email & Zod Validation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Server Functions, Invitation Email & Zod Validation' (Protocol in workflow.md)
 
 ## Phase 3: User List Page
 
