@@ -52,13 +52,13 @@
   - [x] Create catch-all route at `/api/auth/$`
   - [x] Handle GET and POST by delegating to `auth.handler(request)`
   - [x] Use TanStack Start's `server.handlers` pattern with `createFileRoute`
-- [ ] Task: Create frontend auth client (`src/lib/auth-client.ts`)
-  - [ ] Import `createAuthClient` from `better-auth/react`
-  - [ ] Create and export `authClient` with baseURL
-  - [ ] Export convenience methods: `signIn`, `signOut`, `useSession`, etc.
-- [ ] Task: Create email integration (`src/lib/email.ts`)
-  - [ ] Initialize Resend client using validated env vars
-  - [ ] Create `sendPasswordResetEmail` template helper
+- [x] Task: Create frontend auth client (`src/lib/auth-client.ts`) `12fd0a7`
+  - [x] Import `createAuthClient` from `better-auth/react`
+  - [x] Create and export `authClient` with baseURL from window.location.origin
+  - [x] Provides `useSession()`, `signIn`, `signOut`, etc. via `better-auth/react`
+- [x] Task: Create email integration (`src/lib/email.ts`) `2cdd64b`
+  - [x] Initialize Resend client using validated env vars (via getEnv())
+  - [x] Create `sendPasswordResetEmail` template helper with SIMAK-branded HTML template
 - [ ] Task: Write unit tests for auth configuration
   - [ ] Test `auth` instance is created without errors
   - [ ] Test `authClient` is created without errors
