@@ -32,14 +32,14 @@
 
 ## Phase 3: User & Auth Schema
 
-- [ ] Task: Write User Schema Tests (Red Phase)
-  - [ ] Write tests for `users` table schema — verify columns, types, primary key, unique constraint on email
-  - [ ] Write tests for `password_reset_tokens` table — verify columns, FK to users, unique index on `token`
-  - [ ] Run tests and confirm they fail
-- [ ] Task: Implement User Schema (Green Phase)
-  - [ ] Create `src/db/schema/users.ts` with `users` table (id, name, email, role, locale, timestamps, soft delete)
-  - [ ] Create `password_reset_tokens` table with FK to users, unique **index** on `token`, expiresAt, used flag
-  - [ ] Run tests and confirm they pass
+- [x] Task: Write User Schema Tests (Red Phase) [8f1f3c0]
+  - [x] Write tests for `users` table schema — verify columns, types, primary key, unique constraint on email
+  - [x] Write tests for `password_reset_tokens` table — verify columns, FK to users, unique index on `token`
+  - [x] Run tests and confirm they fail
+- [x] Task: Implement User Schema (Green Phase) [8f1f3c0]
+  - [x] Create `src/db/schema/users.ts` with `users` table (id, name, email, role, locale, timestamps, soft delete)
+  - [x] Create `password_reset_tokens` table with FK to users, unique **index** on `token`, expiresAt, used flag
+  - [x] Run tests and confirm they pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: User & Auth Schema' (Protocol in workflow.md)
 
 ## Phase 4: Template Schema
