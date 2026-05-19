@@ -21,7 +21,7 @@
   - [x] Add i18n translation keys for admin sidebar labels and update `locales/en.json` / `locales/id.json`
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Dependencies, i18n Types & Admin Layout' (Protocol in workflow.md)
 
-## Phase 2: Server Functions, Invitation Email & Zod Validation
+## Phase 2: Server Functions, Invitation Email & Zod Validation [checkpoint: 23d6f9d]
 
 **Objective:** Implement all server-side CRUD functions with proper validation, invitation email flow, and edge case handling.
 
