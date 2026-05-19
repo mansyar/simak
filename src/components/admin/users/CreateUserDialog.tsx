@@ -104,7 +104,9 @@ export function CreateUserDialog({
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('adminUsers.table.role')} />
+                        <span data-slot="select-value" className="flex flex-1 text-left">
+                          {field.value ? t('adminUsers.role_' + field.value) : t('adminUsers.table.role')}
+                        </span>
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
