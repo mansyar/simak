@@ -14,7 +14,9 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as UnauthenticatedAuthResetPasswordRouteImport } from './routes/_unauthenticated/auth/reset-password'
 import { Route as UnauthenticatedAuthLoginRouteImport } from './routes/_unauthenticated/auth/login'
+import { Route as UnauthenticatedAuthForgotPasswordRouteImport } from './routes/_unauthenticated/auth/forgot-password'
 
 const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
   id: '/_unauthenticated',
@@ -39,23 +41,39 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UnauthenticatedAuthResetPasswordRoute =
+  UnauthenticatedAuthResetPasswordRouteImport.update({
+    id: '/auth/reset-password',
+    path: '/auth/reset-password',
+    getParentRoute: () => UnauthenticatedRoute,
+  } as any)
 const UnauthenticatedAuthLoginRoute =
   UnauthenticatedAuthLoginRouteImport.update({
     id: '/auth/login',
     path: '/auth/login',
     getParentRoute: () => UnauthenticatedRoute,
   } as any)
+const UnauthenticatedAuthForgotPasswordRoute =
+  UnauthenticatedAuthForgotPasswordRouteImport.update({
+    id: '/auth/forgot-password',
+    path: '/auth/forgot-password',
+    getParentRoute: () => UnauthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
+  '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
+  '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -64,21 +82,37 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_unauthenticated': typeof UnauthenticatedRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_unauthenticated/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/_unauthenticated/auth/login': typeof UnauthenticatedAuthLoginRoute
+  '/_unauthenticated/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/auth/login' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/reset-password'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/auth/login' | '/api/auth/$'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/auth/forgot-password'
+    | '/auth/login'
+    | '/auth/reset-password'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/_unauthenticated'
     | '/_authenticated/dashboard'
+    | '/_unauthenticated/auth/forgot-password'
     | '/_unauthenticated/auth/login'
+    | '/_unauthenticated/auth/reset-password'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -126,11 +160,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_unauthenticated/auth/reset-password': {
+      id: '/_unauthenticated/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof UnauthenticatedAuthResetPasswordRouteImport
+      parentRoute: typeof UnauthenticatedRoute
+    }
     '/_unauthenticated/auth/login': {
       id: '/_unauthenticated/auth/login'
       path: '/auth/login'
       fullPath: '/auth/login'
       preLoaderRoute: typeof UnauthenticatedAuthLoginRouteImport
+      parentRoute: typeof UnauthenticatedRoute
+    }
+    '/_unauthenticated/auth/forgot-password': {
+      id: '/_unauthenticated/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof UnauthenticatedAuthForgotPasswordRouteImport
       parentRoute: typeof UnauthenticatedRoute
     }
   }
@@ -149,11 +197,16 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface UnauthenticatedRouteChildren {
+  UnauthenticatedAuthForgotPasswordRoute: typeof UnauthenticatedAuthForgotPasswordRoute
   UnauthenticatedAuthLoginRoute: typeof UnauthenticatedAuthLoginRoute
+  UnauthenticatedAuthResetPasswordRoute: typeof UnauthenticatedAuthResetPasswordRoute
 }
 
 const UnauthenticatedRouteChildren: UnauthenticatedRouteChildren = {
+  UnauthenticatedAuthForgotPasswordRoute:
+    UnauthenticatedAuthForgotPasswordRoute,
   UnauthenticatedAuthLoginRoute: UnauthenticatedAuthLoginRoute,
+  UnauthenticatedAuthResetPasswordRoute: UnauthenticatedAuthResetPasswordRoute,
 }
 
 const UnauthenticatedRouteWithChildren = UnauthenticatedRoute._addFileChildren(
