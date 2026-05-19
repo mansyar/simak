@@ -4,9 +4,9 @@
 
 **Objective:** Add Better-Auth's required tables (`session`, `account`, `verification`), extend the `users` table with `emailVerified` and `image` columns, remove the now-redundant `password_reset_tokens` table, update Drizzle relations, and generate a new migration.
 
-- [ ] Task: Install new dependencies
-  - [ ] Add `@better-auth/drizzle-adapter` to `package.json`
-  - [ ] Add `resend` to `package.json`
+- [x] Task: Install new dependencies `6d2a628`
+  - [x] Add `@better-auth/drizzle-adapter` to `package.json`
+  - [x] Add `resend` to `package.json`
 - [ ] Task: Create Better-Auth schema tables in Drizzle
   - [ ] Create `src/db/schema/auth.ts` with `session` table (id, userId FK→users, token unique, expiresAt, ipAddress, userAgent, createdAt, updatedAt)
   - [ ] Add `account` table to `src/db/schema/auth.ts` (id, userId FK→users, accountId, providerId, password, accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt, scope, idToken, createdAt, updatedAt)
