@@ -63,6 +63,39 @@
     "id": "Bahasa Indonesia",
     "switch": "Switch language"
   },
+  "adminSidebar": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "templates": "Templates"
+  },
+  "adminUsers": {
+    "title": "Users",
+    "newUser": "New User",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "empty": "No users found",
+    "createPrompt": "Create your first user",
+    "deleteConfirm": "Are you sure you want to delete {name}?",
+    "deleteSuccess": "User deleted successfully",
+    "createSuccess": "User created successfully. Invitation email sent.",
+    "createSuccessNoEmail": "User created but invitation email failed to send.",
+    "updateSuccess": "User updated successfully",
+    "linkGenerated": "Password setup link generated",
+    "linkCopied": "Link copied to clipboard",
+    "generateLink": "Generate Setup Link",
+    "edit": "Edit User",
+    "role_admin": "Admin",
+    "role_instructor": "Instructor",
+    "role_student": "Student",
+    "emailVerified": "Email Verified",
+    "notVerified": "Not Verified",
+    "createdAt": "Created"
+  },
   "error": {
     "notFound": "Page not found",
     "forbidden": "You do not have permission to access this page",

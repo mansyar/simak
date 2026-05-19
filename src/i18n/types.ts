@@ -63,6 +63,39 @@ export type Translation = {
     required: string;
     invalidEmail: string;
   };
+  adminSidebar: {
+    dashboard: string;
+    users: string;
+    templates: string;
+  };
+  adminUsers: {
+    title: string;
+    newUser: string;
+    table: {
+      name: string;
+      email: string;
+      role: string;
+      createdAt: string;
+      actions: string;
+    };
+    empty: string;
+    createPrompt: string;
+    deleteConfirm: string;
+    deleteSuccess: string;
+    createSuccess: string;
+    createSuccessNoEmail: string;
+    updateSuccess: string;
+    linkGenerated: string;
+    linkCopied: string;
+    generateLink: string;
+    edit: string;
+    role_admin: string;
+    role_instructor: string;
+    role_student: string;
+    emailVerified: string;
+    notVerified: string;
+    createdAt: string;
+  };
 };
 
 export type TranslationFunctions = Record<string, (key: string) => string>;
