@@ -48,10 +48,10 @@
   - [x] Add `tanstackStartCookies()` plugin (imported from `better-auth/tanstack-start`)
   - [x] Read env vars via `getEnv()` (validated in env.ts)
   - [x] Export `auth` instance
-- [ ] Task: Create API route handler (`src/routes/api/auth/$.ts`)
-  - [ ] Create catch-all route at `/api/auth/*`
-  - [ ] Handle GET and POST by delegating to `auth.handler(request)`
-  - [ ] Use TanStack Start's server handlers pattern
+- [x] Task: Create API route handler (`src/routes/api/auth/$.tsx`) `43e9678`
+  - [x] Create catch-all route at `/api/auth/$`
+  - [x] Handle GET and POST by delegating to `auth.handler(request)`
+  - [x] Use TanStack Start's `server.handlers` pattern with `createFileRoute`
 - [ ] Task: Create frontend auth client (`src/lib/auth-client.ts`)
   - [ ] Import `createAuthClient` from `better-auth/react`
   - [ ] Create and export `authClient` with baseURL
