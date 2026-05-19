@@ -2,20 +2,20 @@
 
 ## Phase 1: Dependencies & Configuration
 
-- [ ] Task: Install Dependencies & Create Drizzle Config
-  - [ ] Install `postgres` (runtime) and `drizzle-kit` (dev) via pnpm
-  - [ ] Create `drizzle.config.ts` with PostgreSQL dialect, schema path (`src/db/schema/`), migration output (`drizzle/migrations/`), using **relative imports** (not `@/` path aliases) since Drizzle Kit resolves from project root
-  - [ ] Add Drizzle Kit scripts to `package.json`: `"db:generate": "drizzle-kit generate"`, `"db:migrate": "tsx src/db/migrate.ts"`, `"db:push": "drizzle-kit push"`
-- [ ] Task: Add Environment Variables & Update Validation
-  - [ ] Add `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` to `src/config/env.ts` Zod schema
-  - [ ] Add placeholder values to `.env.example`
-- [ ] Task: Update Existing Tests & Coverage Config (Red Phase)
-  - [ ] Update `tests/unit/config/env.test.ts` — add `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` to all existing test cases that set valid env vars (5 current test cases need updating)
-  - [ ] Add `src/db/schema/**` to coverage exclude list in `vite.config.ts` (schema files are declarative, hard to unit-test to 80%)
-  - [ ] Run all existing tests and confirm they **fail** (env schema will reject missing new vars)
-- [ ] Task: Implement Config & Pass Tests (Green Phase)
-  - [ ] Add `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` to the Zod schema in `src/config/env.ts`
-  - [ ] Run all tests and confirm they pass
+- [x] Task: Install Dependencies & Create Drizzle Config
+  - [x] Install `postgres` (runtime) and `drizzle-kit` (dev) via pnpm
+  - [x] Create `drizzle.config.ts` with PostgreSQL dialect, schema path (`src/db/schema/`), migration output (`drizzle/migrations/`), using **relative imports** (not `@/` path aliases) since Drizzle Kit resolves from project root
+  - [x] Add Drizzle Kit scripts to `package.json`: `"db:generate": "drizzle-kit generate"`, `"db:migrate": "tsx src/db/migrate.ts"`, `"db:push": "drizzle-kit push"`
+- [x] Task: Add Environment Variables & Update Validation
+  - [ ] Add `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` to `src/config/env.ts` Zod schema (deferred to Green Phase)
+  - [x] Add placeholder values to `.env.example`
+- [x] Task: Update Existing Tests & Coverage Config (Red Phase) [b2c00ad]
+  - [x] Update `tests/unit/config/env.test.ts` — add `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` to all existing test cases that set valid env vars (5 current test cases need updating)
+  - [x] Add `src/db/schema/**` to coverage exclude list in `vite.config.ts`
+  - [x] Run all existing tests and confirm they **fail** (env schema will reject missing new vars)
+- [x] Task: Implement Config & Pass Tests (Green Phase) [b2c00ad]
+  - [x] Add `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` to the Zod schema in `src/config/env.ts`
+  - [x] Run all tests and confirm they pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Dependencies & Configuration' (Protocol in workflow.md)
 
 ## Phase 2: Database Client & Migration Runner
