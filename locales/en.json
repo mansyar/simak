@@ -89,6 +89,7 @@
     "linkCopied": "Link copied to clipboard",
     "generateLink": "Generate Setup Link",
     "edit": "Edit User",
+    "role_superadmin": "Super Admin",
     "role_admin": "Admin",
     "role_instructor": "Instructor",
     "role_student": "Student",
