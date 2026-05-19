@@ -46,7 +46,13 @@ export function UserFilters({
       <div className="w-full sm:w-[180px]">
         <Select value={role} onValueChange={(val) => onRoleChange(val || 'all')}>
           <SelectTrigger>
-            <SelectValue placeholder={t('adminUsers.allRoles')} />
+            <SelectValue placeholder={t('adminUsers.allRoles')}>
+              {(renderProps: { value: string | null }) =>
+                renderProps.value
+                  ? t(roleLabels[renderProps.value] || renderProps.value)
+                  : t('adminUsers.allRoles')
+              }
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {Object.entries(roleLabels).map(([value, labelKey]) => (
