@@ -1,6 +1,6 @@
 # Implementation Plan: Track 2.1 — User Management (Admin)
 
-## Phase 1: Dependencies, i18n Types & Admin Layout
+## Phase 1: Dependencies, i18n Types & Admin Layout [checkpoint: a14c5ae]
 
 **Objective:** Set up dependencies, update i18n type definitions, then create the admin layout shell with role guard and sidebar.
 
@@ -19,7 +19,7 @@
   - [x] Create `src/components/layout/admin-sidebar.tsx` — sidebar with links to Dashboard, Users, Templates
   - [x] Style sidebar with active route indication using TanStack Router's `useLocation`
   - [x] Add i18n translation keys for admin sidebar labels and update `locales/en.json` / `locales/id.json`
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Dependencies, i18n Types & Admin Layout' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Dependencies, i18n Types & Admin Layout' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions, Invitation Email & Zod Validation
 
