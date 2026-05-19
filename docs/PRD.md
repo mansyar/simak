@@ -13,7 +13,7 @@
 
 ### Primary Goals (MVP & Post-MVP Scope)
 
-*(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)*
+_(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 - Instructors can assign assignments with structured checkpoints to students.
 - Students can submit work for each checkpoint.
@@ -30,12 +30,12 @@
 
 ## Roles & Permissions
 
-| Role | Description |
-| --- | --- |
-| **SuperAdmin** | Seeds the system. Can create Admin users only. Not involved in day-to-day operations. |
-| **Admin** | Manages users (Instructor, Student) and assignment templates. Sends invitation emails. No involvement in review or submission workflows. |
-| **Instructor** | Creates assignments, reviews submissions, manages deadlines. Can assign multiple assignments per student. |
-| **Student** | Views assignments, uploads checkpoint submissions, tracks progress. Can collaborate on group assignments `[v2]`. |
+| Role           | Description                                                                                                                              |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **SuperAdmin** | Seeds the system. Can create Admin users only. Not involved in day-to-day operations.                                                    |
+| **Admin**      | Manages users (Instructor, Student) and assignment templates. Sends invitation emails. No involvement in review or submission workflows. |
+| **Instructor** | Creates assignments, reviews submissions, manages deadlines. Can assign multiple assignments per student.                                |
+| **Student**    | Views assignments, uploads checkpoint submissions, tracks progress. Can collaborate on group assignments `[v2]`.                         |
 
 ---
 
@@ -45,11 +45,13 @@
 - A **SuperAdmin account is seeded** into the database during initial deployment.
 - SuperAdmin can create Admin accounts via the admin panel.
 - Admin can create Instructor and Student accounts.
-- When an account is created, the system sends an email (via Resend) with a **password setup link**.
-- The link directs the user to a dedicated password setup page where they choose their password.
+- Authentication is powered by **Better-Auth** with email/password, database-backed sessions, and HTTP-only cookies.
+- When an account is created, the system sends an email (via Resend) with a **password setup link** via Better-Auth's `sendResetPassword` flow.
+- The link directs the user to a dedicated password setup page (`/auth/setup-password?token=xxx`) where they choose their password.
 - SuperAdmin and Admin can also generate a password setup link from the dashboard to share manually (e.g., in person).
-- **Forgot Password:** Users can request a password reset from the login page, which sends a one-time reset link to their registered email.
-- After setting a password, the user can log in normally.
+- **Forgot Password:** Users can request a password reset from the login page (`/auth/forgot-password`), which sends a one-time reset link via Better-Auth's `requestPasswordReset` flow.
+- Password reset emails use SIMAK-branded HTML templates sent through Resend.
+- After setting a password, the user can log in at `/auth/login`.
 
 ---
 
@@ -62,7 +64,7 @@
 3. Opens an assignment to view its checkpoints, deadlines, and required consultations.
 4. Submits files for the current checkpoint (`.docx`, `.pdf`).
 5. If review is **Pass** → next checkpoint unlocks.
-6. If review is **Revise** → receives instructor feedback, resubmits (creates new version), and deadline for resubmission. *(Note: If a checkpoint is revised more than 3 times, a non-blocking escalation notification is triggered to the instructor and admin. The escalation is advisory-only — there is no hard block on resubmissions beyond 3.)*
+6. If review is **Revise** → receives instructor feedback, resubmits (creates new version), and deadline for resubmission. _(Note: If a checkpoint is revised more than 3 times, a non-blocking escalation notification is triggered to the instructor and admin. The escalation is advisory-only — there is no hard block on resubmissions beyond 3.)_
 7. Logs consultation sessions with supervisor as needed (via assignment detail page).
 8. Downloads previously submitted files from any checkpoint.
 9. Manages profile, preferences, and notification settings.

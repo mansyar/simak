@@ -190,7 +190,9 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 **ExtensionRequest** — student-initiated deadline extension with approval. [v2]
 **EmailQueue** — background delivery queue for transactional emails. [v2]
 **AuditLog** — administrative action record. [v2]
-**PasswordResetToken** — one-time token for password setup or reset. [v1]
+**Session** — Better-Auth session token, FK to users, expiresAt.
+**Account** — Better-Auth credential provider entry (stores hashed password).
+**Verification** — Better-Auth one-time token for password reset and email verification. Replaces the former `password_reset_tokens` table.
 
 ### Tables
 
@@ -207,16 +209,47 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 | updatedAt | timestamp              |                                                                                     |
 | deletedAt | timestamp              | Soft delete                                                                         |
 
-#### password_reset_tokens
+#### session (Better-Auth)
 
-| Column    | Type                   | Notes                  |
-| --------- | ---------------------- | ---------------------- |
-| id        | serial (PK)            |                        |
-| userId    | text (FK → users)      |                        |
-| token     | text, unique, not null | Cryptographic random   |
-| expiresAt | timestamp, not null    | 1 hour from creation   |
-| used      | boolean, default false | Single-use enforcement |
-| createdAt | timestamp              |                        |
+| Column    | Type                | Notes          |
+| --------- | ------------------- | -------------- |
+| id        | text (PK)           | UUID           |
+| userId    | text (FK → users)   | Cascade delete |
+| token     | text, unique        | Session token  |
+| expiresAt | timestamp, not null | Session expiry |
+| ipAddress | text                |                |
+| userAgent | text                |                |
+| createdAt | timestamp           |                |
+| updatedAt | timestamp           |                |
+
+#### account (Better-Auth)
+
+| Column                | Type              | Notes                                  |
+| --------------------- | ----------------- | -------------------------------------- |
+| id                    | text (PK)         | UUID                                   |
+| userId                | text (FK → users) | Cascade delete                         |
+| accountId             | text, not null    | Same as userId for credential accounts |
+| providerId            | text, not null    | e.g. "credential"                      |
+| password              | text              | Hashed password (scrypt)               |
+| accessToken           | text              |                                        |
+| refreshToken          | text              |                                        |
+| accessTokenExpiresAt  | timestamp         |                                        |
+| refreshTokenExpiresAt | timestamp         |                                        |
+| scope                 | text              |                                        |
+| idToken               | text              |                                        |
+| createdAt             | timestamp         |                                        |
+| updatedAt             | timestamp         |                                        |
+
+#### verification (Better-Auth)
+
+| Column     | Type                | Notes              |
+| ---------- | ------------------- | ------------------ |
+| id         | text (PK)           | UUID               |
+| identifier | text, not null      | e.g. email address |
+| value      | text, not null      | Token value        |
+| expiresAt  | timestamp, not null | 1-hour expiry      |
+| createdAt  | timestamp           |                    |
+| updatedAt  | timestamp           |                    |
 
 #### assignment_templates
 
@@ -470,9 +503,13 @@ Admin       (creates Instructors and Students)
 
 ### Session & Access Control [v1]
 
-- Server-side sessions stored in the database (managed by Better-Auth).
-- Every server function checks session + role before executing.
-- Route-level guard (TanStack Router `beforeLoad`) redirects unauthenticated users to `/auth/login`.
+- Server-side sessions stored in the `session` table (managed by Better-Auth via Drizzle adapter).
+- Session validation via `getSessionFromHeaders()` server function using `auth.api.getSession()` with SSR request headers.
+- Route-level guard via TanStack Router `beforeLoad`:
+  - `_unauthenticated` layout redirects authenticated users to `/dashboard`.
+  - `_authenticated` layout redirects unauthenticated users to `/auth/login`.
+- Role-based access via `requireRole(roles)` helper — wraps session check with role validation.
+- Password hashing uses Better-Auth's built-in scrypt via `better-auth/crypto`.
 - File downloads check ownership and role before generating a presigned URL.
 
 ### Two-Factor Authentication [v2]
