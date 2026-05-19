@@ -7,9 +7,9 @@
 - [x] Task: Install new shadcn/ui component dependencies (fbf55e0)
   - [x] Run `pnpm dlx shadcn@latest add select table skeleton badge` to install required primitives
   - [x] Install `sonner` (toast) or `alert-dialog` if desired (optional — inline banners and `window.confirm()` are acceptable fallbacks)
-- [ ] Task: Update i18n type definitions to support admin sections
-  - [ ] Update `scripts/generate-i18n-types.ts` — add `adminSidebar` and `adminUsers` sections to the static `Translation` type template
-  - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
+- [x] Task: Update i18n type definitions to support admin sections (8f04492)
+  - [x] Update `scripts/generate-i18n-types.ts` — add `adminSidebar` and `adminUsers` sections to the static `Translation` type template
+  - [x] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
 - [ ] Task: Write tests for admin layout guard and sidebar
   - [ ] Write unit test for `_admin.tsx` route export and `beforeLoad` guard (`requireRole` call with [superadmin, admin])
   - [ ] Write unit test for sidebar navigation links render
