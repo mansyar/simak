@@ -18,6 +18,8 @@ export const users = pgTable('users', {
   email: text('email').notNull().unique(),
   role: userRole('role').notNull(),
   locale: text('locale').default('en'),
+  emailVerified: boolean('email_verified').default(false),
+  image: text('image'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
   deletedAt: timestamp('deleted_at'),

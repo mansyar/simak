@@ -17,6 +17,8 @@ describe('Users schema', () => {
     expect(users).toHaveProperty('locale');
     expect(users).toHaveProperty('createdAt');
     expect(users).toHaveProperty('updatedAt');
+    expect(users).toHaveProperty('emailVerified');
+    expect(users).toHaveProperty('image');
     expect(users).toHaveProperty('deletedAt');
   });
 
@@ -37,6 +39,19 @@ describe('Users schema', () => {
     const { users } = await import('@/db/schema/users');
     expect(users.role.notNull).toBe(true);
     expect(users.role.dataType).toBe('string');
+  });
+
+  it('should have emailVerified column with default false on users', async () => {
+    const { users } = await import('@/db/schema/users');
+    expect(users).toHaveProperty('emailVerified');
+    expect(users.emailVerified.default).toBe(false);
+    expect(users.emailVerified.dataType).toBe('boolean');
+  });
+
+  it('should have image column as nullable text on users', async () => {
+    const { users } = await import('@/db/schema/users');
+    expect(users).toHaveProperty('image');
+    expect(users.image.dataType).toBe('string');
   });
 });
 
