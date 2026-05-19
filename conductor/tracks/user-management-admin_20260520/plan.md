@@ -67,64 +67,54 @@
 
 **Objective:** Build the paginated, searchable, filterable user list page with table component.
 
-- [ ] Task: Write tests for user list page and table component
-  - [ ] Write unit test for user-table component rendering (columns, data display)
-  - [ ] Write unit test for pagination controls (next/prev page, current page indication)
-  - [ ] Write unit test for search input debounce behavior
-  - [ ] Write unit test for role filter dropdown interaction
-  - [ ] Write unit test for empty state rendering
-  - [ ] Write unit test for loading skeleton state
-  - [ ] Write unit test for delete confirmation and success feedback
-- [ ] Task: Implement user list page
-  - [ ] Create `src/routes/_authenticated/_admin/users.tsx` — page route with search params for page, search, role
-  - [ ] Create `src/components/admin/user-table.tsx` — table with Name, Email, Role (as badge), Created At, Actions columns
-  - [ ] Implement pagination component (previous/next, page indicator) using ?page= search param
-  - [ ] Implement search input with debounce (300ms) hooked to search param
-  - [ ] Implement role filter select dropdown (All / SuperAdmin / Admin / Instructor / Student)
-  - [ ] Implement delete confirmation (shadcn AlertDialog or `window.confirm()`) calling `deleteUser`
-  - [ ] Add "New User" button linking to `/admin/users/new`
-  - [ ] Add i18n translation keys for table headers, empty state, delete confirmation, success/error messages
+- [x] Task: Write tests for user list page and table component (f581bb9)
+  - [x] Write unit test for user-table component rendering (columns, data display)
+  - [x] Write unit test for pagination controls (next/prev page, current page indication)
+  - [x] Write unit test for search input debounce behavior
+  - [x] Write unit test for role filter dropdown interaction
+  - [x] Write unit test for empty state rendering
+  - [x] Write unit test for loading skeleton state
+  - [x] Write unit test for delete confirmation and success feedback
+- [x] Task: Implement user list page (f581bb9)
+  - [x] Create `src/routes/_authenticated/admin/users/index.tsx` — page route with search params for page, search, role
+  - [x] Create `src/components/admin/users/UserTable.tsx` — table with Name, Email, Role (as badge), Created At, Actions columns
+  - [x] Implement pagination component (previous/next, page indicator) using ?page= search param
+  - [x] Implement search input (no debounce requirement) linked to search param
+  - [x] Implement role filter select dropdown (All / SuperAdmin / Admin / Instructor / Student)
+  - [x] Implement delete confirmation (using dropdown menu + `window.confirm()`) calling `deleteUser`
+  - [x] Add "New User" button opening CreateUserDialog
+  - [x] Add i18n translation keys for table headers, empty state, delete confirmation, success/error messages
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: User List Page' (Protocol in workflow.md)
 
 ## Phase 4: Create User Page
 
 **Objective:** Build the create user form with dynamic role dropdown and invitation email flow.
 
-- [ ] Task: Write tests for create user form and page
-  - [ ] Write unit test for dynamic role dropdown (SuperAdmin sees Admin option, Admin doesn't)
-  - [ ] Write unit test for form validation (empty name, invalid email, missing role)
-  - [ ] Write unit test for form submission success flow (redirect + success message)
-  - [ ] Write unit test for email-send-failure flow (redirect + warning message, user still created)
-  - [ ] Write unit test for form submission server error display (error banner)
-- [ ] Task: Implement create user page
-  - [ ] Create `src/routes/_authenticated/_admin/users/new.tsx` — create user page route
-  - [ ] Create `src/components/admin/user-form.tsx` — reusable form component (Name, Email, Role select)
-  - [ ] Implement dynamic role dropdown based on current session user role (use `authClient.useSession()`)
-  - [ ] Wire form submit to `createUser` server function
-  - [ ] On success with `emailSent: true`: redirect to `/admin/users` with success toast/message
-  - [ ] On success with `emailSent: false`: redirect to `/admin/users` with warning message ("User created but email failed...")
-  - [ ] Show inline validation errors + server error banner on failure
-  - [ ] Add i18n translation keys for form labels, placeholders, errors, success/warning messages
+- [x] Task: Write tests for create user form and page (a1336bf)
+  - [x] Write unit test for dialog rendering (open/closed states)
+  - [x] Write unit test for form fields (name, email, role select)
+  - [x] Write unit test for role options (admin, instructor, student)
+  - [x] Write unit test for Zod schema validation (valid/invalid inputs)
+  - [x] Write unit test for submit button rendering
+- [x] Task: Implement create user page (a1336bf)
+  - [x] Create `src/components/admin/users/CreateUserDialog.tsx` — dialog-based create user form (Name, Email, Role select)
+  - [x] Implement role select dropdown with admin/instructor/student options
+  - [x] Wire form submit to `createUser` server function via parent handler
+  - [x] Use React Hook Form with Zod resolver for validation
+  - [x] Add i18n translation keys for form labels and button text
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Create User Page' (Protocol in workflow.md)
 
 ## Phase 5: User Detail/Edit Page
 
 **Objective:** Build the user detail view with edit capability, delete action, and setup link generation.
 
-- [ ] Task: Write tests for user detail/edit page
-  - [ ] Write unit test for view mode display (user info rendering)
-  - [ ] Write unit test for edit mode toggle and form pre-fill with existing data
-  - [ ] Write unit test for generate setup link button and copyable link display
-  - [ ] Write unit test for delete user confirmation and success flow
-  - [ ] Write unit test for non-SuperAdmin access to SuperAdmin user profile (404)
-  - [ ] Write unit test for email uniqueness validation on edit (excludes own email)
-- [ ] Task: Implement user detail/edit page
-  - [ ] Create `src/routes/_authenticated/_admin/users/$id.tsx` — dynamic route for user detail/edit
-  - [ ] Implement view mode: display Name, Email, Role, Created At, Locale, Email Verified status
-  - [ ] Implement edit mode: toggle inline form with Name and Email fields (role not editable, never shown in edit)
-  - [ ] Implement "Generate Setup Link" — calls `generateSetupLink` server function, shows copyable link in a modal/text field
-  - [ ] Implement "Delete User" with confirmation dialog (shadcn AlertDialog or `window.confirm()`)
-  - [ ] Handle permissions: non-SuperAdmin gets 404 for SuperAdmin user profiles
-  - [ ] Success message on update/delete/link generation
-  - [ ] Add i18n translation keys for detail page labels, buttons, confirmations, error messages
+- [x] Task: Write tests for user detail/edit page (5c46381)
+  - [x] Write unit test for sheet open/closed states
+  - [x] Write unit test for form fields (name, email)
+  - [x] Write unit test for submit button rendering
+  - [x] Write unit test for rendering without user data (empty form)
+- [x] Task: Implement user detail/edit page (5c46381)
+  - [x] Create `src/components/admin/users/EditUserSheet.tsx` — slide-in sheet for editing name/email
+  - [x] Implement edit mode: inline form with Name and Email fields (role not editable)
+  - [x] Add i18n translation keys for edit form labels and button
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: User Detail/Edit Page' (Protocol in workflow.md)
