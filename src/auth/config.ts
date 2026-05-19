@@ -3,15 +3,16 @@ import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { getDb } from '../db/index';
 import { sendPasswordResetEmail } from '../lib/email';
+import * as schema from '../db/schema/index';
 
 export const auth = betterAuth({
   database: drizzleAdapter(getDb(), {
     provider: 'pg',
     schema: {
-      user: 'users',
-      session: 'session',
-      account: 'account',
-      verification: 'verification',
+      user: schema.users,
+      session: schema.session,
+      account: schema.account,
+      verification: schema.verification,
     },
   }),
   emailAndPassword: {

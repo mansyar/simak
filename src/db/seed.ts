@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { getDb } from './index';
-import { users } from './schema/index';
+import { users, account } from './schema/index';
+import { hashPassword } from 'better-auth/crypto';
 
 /**
  * Validate seed environment variables.
@@ -31,7 +32,7 @@ function validateEnv(): { email: string; password: string } {
  * environment variables. Idempotent — safe to run multiple times.
  */
 export async function seedSuperAdmin(): Promise<void> {
-  const { email } = validateEnv();
+  const { email, password } = validateEnv();
   const db = getDb();
 
   // Idempotency: skip if user already exists
@@ -42,11 +43,25 @@ export async function seedSuperAdmin(): Promise<void> {
     return;
   }
 
+  const userId = crypto.randomUUID();
+
+  // Create the user record
   await db.insert(users).values({
+    id: userId,
     name: 'SuperAdmin',
     email,
     role: 'superadmin',
     locale: 'en',
+  });
+
+  // Create the account record with hashed password (Better-Auth credential provider)
+  const hashedPassword = await hashPassword(password);
+  await db.insert(account).values({
+    id: crypto.randomUUID(),
+    userId,
+    accountId: userId,
+    providerId: 'credential',
+    password: hashedPassword,
   });
 
   console.log(`SuperAdmin user created (${email}).`);
