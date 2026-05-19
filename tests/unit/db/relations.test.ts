@@ -6,6 +6,9 @@ describe('Drizzle ORM relations', () => {
 
     const expectedRelations = [
       'usersRelations',
+      'sessionRelations',
+      'accountRelations',
+      'verificationRelations',
       'assignmentTemplatesRelations',
       'templateCheckpointsRelations',
       'assignmentsRelations',
@@ -27,6 +30,9 @@ describe('Drizzle ORM relations', () => {
 
     const expectedTables = [
       'users',
+      'session',
+      'account',
+      'verification',
       'assignmentTemplates',
       'templateCheckpoints',
       'assignments',

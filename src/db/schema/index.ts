@@ -2,6 +2,7 @@ import { relations } from 'drizzle-orm';
 
 // Re-export all schema tables and enums
 export * from './users';
+export * from './auth';
 export * from './templates';
 export * from './assignments';
 export * from './submissions';
@@ -10,6 +11,7 @@ export * from './notifications';
 
 // Import tables for relations
 import { users } from './users';
+import { session, account, verification } from './auth';
 import { assignmentTemplates, templateCheckpoints } from './templates';
 import { assignments, assignmentStudents, checkpoints } from './assignments';
 import { submissions, reviews } from './submissions';
@@ -17,6 +19,22 @@ import { consultations } from './consultations';
 import { notifications } from './notifications';
 
 // ---- Relations ----
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(users, {
+    fields: [session.userId],
+    references: [users.id],
+  }),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(users, {
+    fields: [account.userId],
+    references: [users.id],
+  }),
+}));
+
+export const verificationRelations = relations(verification, () => ({}));
 
 export const usersRelations = relations(users, ({ many }) => ({
   assignments: many(assignments),
