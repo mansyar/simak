@@ -1,26 +1,26 @@
 import { describe, it, expect } from 'vitest';
 
-describe('Admin layout route (_admin)', () => {
+describe('Admin layout route (admin)', () => {
   it('should export a Route from the admin layout module', async () => {
-    const mod = await import('@/routes/_authenticated/_admin');
+    const mod = await import('@/routes/_authenticated/admin');
     expect(mod).toHaveProperty('Route');
   });
 
   it('should have beforeLoad defined in route options', async () => {
-    const { Route } = await import('@/routes/_authenticated/_admin');
+    const { Route } = await import('@/routes/_authenticated/admin');
     expect(Route.options).toBeDefined();
     expect(Route.options.beforeLoad).toBeDefined();
   });
 
   it('should export a component function from the admin layout', async () => {
-    const { Route } = await import('@/routes/_authenticated/_admin');
+    const { Route } = await import('@/routes/_authenticated/admin');
     expect(typeof Route.options.component).toBe('function');
   });
 });
 
 describe('Admin users route', () => {
   it('should export a Route from the users list module', async () => {
-    const mod = await import('@/routes/_authenticated/_admin/users');
+    const mod = await import('@/routes/_authenticated/admin/users');
     expect(mod).toHaveProperty('Route');
   });
 });

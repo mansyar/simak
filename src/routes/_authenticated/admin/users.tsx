@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useI18n } from '../../__root';
 
-export const Route = createFileRoute('/_authenticated/_admin/users')({
+export const Route = createFileRoute('/_authenticated/admin/users')({
   component: UsersPage,
 });
 

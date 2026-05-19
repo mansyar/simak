@@ -2,7 +2,7 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { requireRole } from '../../server/auth';
 import { AdminSidebar } from '../../components/layout/admin-sidebar';
 
-export const Route = createFileRoute('/_authenticated/_admin')({
+export const Route = createFileRoute('/_authenticated/admin')({
   beforeLoad: async () => {
     await requireRole(['superadmin', 'admin']);
   },

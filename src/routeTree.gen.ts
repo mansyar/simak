@@ -13,13 +13,13 @@ import { Route as UnauthenticatedRouteImport } from './routes/_unauthenticated'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/_admin'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as UnauthenticatedAuthSetupPasswordRouteImport } from './routes/_unauthenticated/auth/setup-password'
 import { Route as UnauthenticatedAuthResetPasswordRouteImport } from './routes/_unauthenticated/auth/reset-password'
 import { Route as UnauthenticatedAuthLoginRouteImport } from './routes/_unauthenticated/auth/login'
 import { Route as UnauthenticatedAuthForgotPasswordRouteImport } from './routes/_unauthenticated/auth/forgot-password'
-import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/_admin/users'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 
 const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
   id: '/_unauthenticated',
@@ -40,7 +40,8 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/_admin',
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -80,8 +81,9 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
@@ -90,8 +92,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/users': typeof AuthenticatedAdminUsersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
@@ -103,9 +106,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_unauthenticated': typeof UnauthenticatedRouteWithChildren
-  '/_authenticated/_admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/_admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_unauthenticated/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/_unauthenticated/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/_unauthenticated/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
@@ -116,8 +119,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/dashboard'
-    | '/users'
+    | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -126,8 +130,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/dashboard'
-    | '/users'
+    | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -138,9 +143,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/_unauthenticated'
-    | '/_authenticated/_admin'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
-    | '/_authenticated/_admin/users'
+    | '/_authenticated/admin/users'
     | '/_unauthenticated/auth/forgot-password'
     | '/_unauthenticated/auth/login'
     | '/_unauthenticated/auth/reset-password'
@@ -185,10 +190,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/_admin': {
-      id: '/_authenticated/_admin'
-      path: ''
-      fullPath: '/'
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
@@ -227,10 +232,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnauthenticatedAuthForgotPasswordRouteImport
       parentRoute: typeof UnauthenticatedRoute
     }
-    '/_authenticated/_admin/users': {
-      id: '/_authenticated/_admin/users'
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
       path: '/users'
-      fullPath: '/users'
+      fullPath: '/admin/users'
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
