@@ -13,10 +13,22 @@
     "forgotPassword": "Lupa Kata Sandi?",
     "resetPassword": "Atur Ulang Kata Sandi",
     "invalidCredentials": "Email atau kata sandi tidak valid",
-    "sessionExpired": "Sesi Anda telah berakhir. Silakan masuk kembali."
+    "sessionExpired": "Sesi Anda telah berakhir. Silakan masuk kembali.",
+    "confirmPassword": "Konfirmasi Kata Sandi",
+    "passwordMismatch": "Kata sandi tidak cocok",
+    "linkExpired": "Tautan ini telah kedaluwarsa atau tidak valid. Silakan minta tautan baru.",
+    "setupPassword": "Atur Kata Sandi Anda",
+    "setupSuccess": "Kata sandi berhasil diatur! Anda sekarang dapat masuk.",
+    "resetSuccess": "Kata sandi berhasil diatur ulang! Silakan masuk dengan kata sandi baru Anda.",
+    "checkYourEmail": "Cek email Anda",
+    "forgotPasswordSent": "Jika akun dengan email tersebut ada, kami telah mengirimkan tautan pengaturan ulang kata sandi."
   },
   "nav": {
     "dashboard": "Dasbor",
+    "welcome": "Selamat datang, {name}",
+    "role_student": "Anda masuk sebagai Mahasiswa",
+    "role_instructor": "Anda masuk sebagai Dosen",
+    "role_admin": "Anda masuk sebagai Admin",
     "assignments": "Tugas",
     "consultations": "Konsultasi",
     "settings": "Pengaturan",

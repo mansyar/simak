@@ -13,10 +13,22 @@
     "forgotPassword": "Forgot Password?",
     "resetPassword": "Reset Password",
     "invalidCredentials": "Invalid email or password",
-    "sessionExpired": "Your session has expired. Please login again."
+    "sessionExpired": "Your session has expired. Please login again.",
+    "confirmPassword": "Confirm Password",
+    "passwordMismatch": "Passwords do not match",
+    "linkExpired": "This link has expired or is invalid. Please request a new one.",
+    "setupPassword": "Set Up Your Password",
+    "setupSuccess": "Password set successfully! You can now log in.",
+    "resetSuccess": "Password reset successfully! Please log in with your new password.",
+    "checkYourEmail": "Check your email",
+    "forgotPasswordSent": "If an account exists with that email, we've sent a password reset link."
   },
   "nav": {
     "dashboard": "Dashboard",
+    "welcome": "Welcome, {name}",
+    "role_student": "You are logged in as a Student",
+    "role_instructor": "You are logged in as an Instructor",
+    "role_admin": "You are logged in as an Admin",
     "assignments": "Assignments",
     "consultations": "Consultations",
     "settings": "Settings",
