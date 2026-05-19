@@ -4,9 +4,9 @@
 
 **Objective:** Set up dependencies, update i18n type definitions, then create the admin layout shell with role guard and sidebar.
 
-- [ ] Task: Install new shadcn/ui component dependencies
-  - [ ] Run `pnpm dlx shadcn@latest add select table skeleton badge` to install required primitives
-  - [ ] Install `sonner` (toast) or `alert-dialog` if desired (optional — inline banners and `window.confirm()` are acceptable fallbacks)
+- [x] Task: Install new shadcn/ui component dependencies (fbf55e0)
+  - [x] Run `pnpm dlx shadcn@latest add select table skeleton badge` to install required primitives
+  - [x] Install `sonner` (toast) or `alert-dialog` if desired (optional — inline banners and `window.confirm()` are acceptable fallbacks)
 - [ ] Task: Update i18n type definitions to support admin sections
   - [ ] Update `scripts/generate-i18n-types.ts` — add `adminSidebar` and `adminUsers` sections to the static `Translation` type template
   - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
