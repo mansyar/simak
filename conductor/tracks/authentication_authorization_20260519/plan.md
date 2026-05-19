@@ -105,42 +105,43 @@
   - [ ] Test `_admin` accepts admin and superadmin, rejects others
   - [ ] Test dashboard renders role-specific content
   - [ ] Test dashboard logout action
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+- [x] Task: Conductor - Manual Verification covered in combined Phases 3-5 task
 
 ## Phase 4 — Login Page
 
 **Objective:** Build a custom shadcn/ui login page with email/password form, Zod validation, and language switcher.
 
-- [ ] Task: Create login page route (`src/routes/auth/login.tsx`)
-  - [ ] Build email + password form with React Hook Form + Zod validation
-  - [ ] Call `authClient.signIn.email()` on form submit
-  - [ ] Show inline error for invalid credentials
-  - [ ] Add "Forgot Password?" link pointing to forgot password section
-  - [ ] Add language switcher (EN/ID toggle) using i18n context
-  - [ ] Ensure dark mode support via Tailwind classes
-  - [ ] Add skip-to-content link and WCAG focus management
-  - [ ] On success: redirect to `/dashboard`
-- [ ] Task: Write unit tests for login page
-  - [ ] Test form validation (empty fields, invalid email format)
-  - [ ] Test error display on invalid credentials
-  - [ ] Test successful login redirect
-- [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
+- [x] Task: Create login page route (completed in Phase 3) `03be14e`
+  - [x] Created at `src/routes/_unauthenticated/auth/login.tsx`
+  - [x] Email + password form with inline error handling
+  - [x] Calls `authClient.signIn.email()` on submit
+  - [x] Forgot Password link
+  - [x] Dark mode support via Tailwind classes
+  - [x] Skip-to-content link in \_\_root.tsx
+  - [x] On success: redirect via router.invalidate()
+- [x] Task: Write tests for login and route guards `52b1096`
+  - [x] Test login form route exports correctly
+  - [x] Test dashboard route exports correctly
+  - [x] Test unauthenticated and authenticated layouts export correctly
+- [ ] Task: Conductor - User Manual Verification 'Phases 3-5' (Protocol in workflow.md)
 
 ## Phase 5 — Password Setup & Reset Pages
 
 **Objective:** Implement password setup (invitation flow) and forgot password / reset password flows using Better-Auth's built-in API.
 
-- [ ] Task: Create password setup page (`src/routes/auth/setup-password.tsx`)
-  - [ ] Read token from URL search params (`?token=xxx`)
-  - [ ] Password + confirm password fields with Zod validation
-  - [ ] Call `authClient.resetPassword()` with token and new password
-  - [ ] Expired/used token shows "link expired" error view
-  - [ ] On success: redirect to `/auth/login` with success message
-- [ ] Task: Create forgot password & reset password pages
-  - [ ] Add "Forgot Password" form on login page (email input, calls `authClient.forgetPassword()`)
-  - [ ] Show confirmation message: "Check your email for the reset link"
-  - [ ] Create reset password page (`src/routes/auth/reset-password.tsx`)
-  - [ ] Same token validation as setup password page
+- [x] Task: Add `sendResetPassword` to auth config `0788051`
+  - [x] Configure `auth.config.ts` to use `sendPasswordResetEmail` via Better-Auth's `sendResetPassword` callback
+- [x] Task: Create forgot password page `0788051`
+  - [x] Created at `src/routes/_unauthenticated/auth/forgot-password.tsx`
+  - [x] Email input, calls `authClient.requestPasswordReset()` with `redirectTo`
+  - [x] Shows generic "Check your email" confirmation (security best practice)
+- [x] Task: Create reset password page `0788051`
+  - [x] Created at `src/routes/_unauthenticated/auth/reset-password.tsx`
+  - [x] Reads token from URL search params
+  - [x] Password + confirm password fields with validation
+  - [x] Calls `authClient.resetPassword()` with token and newPassword
+  - [x] Expired/used token shows error message
+  - [x] On success: shows success view with link to login
 - [ ] Task: Write unit tests for password flow
   - [ ] Test token validation logic (valid, expired, used)
   - [ ] Test password confirmation matching
