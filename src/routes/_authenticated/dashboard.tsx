@@ -1,5 +1,6 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { authClient } from '../../lib/auth-client';
+import { LanguageSwitcher } from '../../components/layout/language-switcher';
 import { useI18n } from '../__root';
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
@@ -9,7 +10,7 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 function DashboardPage() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
-  const { t } = useI18n();
+  const { t, locale, setLocale } = useI18n();
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -23,6 +24,9 @@ function DashboardPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-4">
+      <div className="w-full flex items-center justify-end">
+        <LanguageSwitcher currentLocale={locale} onSwitch={setLocale} />
+      </div>
       <h1 className="text-3xl font-bold text-foreground">
         {t('nav.welcome', { name: displayName })}
       </h1>
