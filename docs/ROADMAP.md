@@ -125,13 +125,13 @@ This phase establishes the project scaffold, local dev environment (Docker Compo
 
 **Tests to Add:**
 
-- `tests/unit/env.test.ts` — Validate env schema parses correctly
+- `tests/unit/config/env.test.ts` — Validate env schema parses correctly (update existing test file with new env vars)
 
 **Definition of Done:**
 
 - `drizzle-kit generate` produces SQL migration files
-- `drizzle-kit migrate` applies migrations to a running PostgreSQL instance
-- Running seed script creates the SuperAdmin user in the database
+- `pnpm db:migrate` (via `tsx src/db/migrate.ts`) applies migrations to a running PostgreSQL instance
+- Running seed script creates the SuperAdmin user in the database (and is idempotent on re-run)
 - All table relationships and indexes defined per TDD section 3
 
 **Acceptance Criteria:**

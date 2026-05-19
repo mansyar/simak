@@ -716,16 +716,18 @@ A checkpoint unlocks when:
 
 ### Environment Variables
 
-| Variable               | Purpose                           |
-| ---------------------- | --------------------------------- |
-| `DATABASE_URL`         | PostgreSQL connection string      |
-| `R2_ENDPOINT`          | Cloudflare R2 endpoint URL        |
-| `R2_ACCESS_KEY_ID`     | R2 API access key                 |
-| `R2_SECRET_ACCESS_KEY` | R2 API secret key                 |
-| `R2_BUCKET_NAME`       | R2 bucket for uploads             |
-| `RESEND_API_KEY`       | Resend API key for email delivery |
-| `BETTER_AUTH_SECRET`   | Signing secret for auth tokens    |
-| `BETTER_AUTH_URL`      | Public URL of the app             |
+| Variable               | Purpose                            |
+| ---------------------- | ---------------------------------- |
+| `DATABASE_URL`         | PostgreSQL connection string       |
+| `R2_ENDPOINT`          | Cloudflare R2 endpoint URL         |
+| `R2_ACCESS_KEY_ID`     | R2 API access key                  |
+| `R2_SECRET_ACCESS_KEY` | R2 API secret key                  |
+| `R2_BUCKET_NAME`       | R2 bucket for uploads              |
+| `RESEND_API_KEY`       | Resend API key for email delivery  |
+| `BETTER_AUTH_SECRET`   | Signing secret for auth tokens     |
+| `BETTER_AUTH_URL`      | Public URL of the app              |
+| `SUPERADMIN_EMAIL`     | Email for the seeded SuperAdmin    |
+| `SUPERADMIN_PASSWORD`  | Password for the seeded SuperAdmin |
 
 ### Database Migrations [v1]
 

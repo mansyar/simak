@@ -2,7 +2,7 @@
 
 ## Overview
 
-Define all Drizzle ORM schema files for the SIMAK database, set up the database client with connection pooling, create migration infrastructure with Drizzle Kit, and write a SuperAdmin seed script. This track establishes every table needed for MVP (v1) and v2 features, even if unused in early tracks, to avoid disruptive schema migrations later.
+Define all Drizzle ORM schema files for the SIMAK database, set up the database client with connection pooling, create migration infrastructure with Drizzle Kit, and write a SuperAdmin seed script. This track establishes all v1 (MVP) tables. v2-only tables (extension_requests, email_queue, audit_logs, AssignmentGroupMember) are deferred — they will be introduced via additive migrations in their respective tracks.
 
 ## Driver & Tooling
 
@@ -211,11 +211,12 @@ Define all Drizzle ORM schema files for the SIMAK database, set up the database 
 
 1. **Drizzle Kit Configuration** — `drizzle.config.ts` must specify PostgreSQL dialect, schema path (`src/db/schema/`), and migration output directory (`drizzle/migrations/`).
 2. **Database Client** — `src/db/index.ts` initializes the postgres.js client with `DATABASE_URL` and wraps it with Drizzle ORM.
-3. **Migration Runner** — `src/db/migrate.ts` programmatically runs Drizzle migrations using the Drizzle migration runner API.
+3. **Migration Runner** — `src/db/migrate.ts` programmatically runs Drizzle migrations using `drizzle-orm/postgres-js/migrator`. This is the single source of truth — invoked via `tsx src/db/migrate.ts` (aliased as `pnpm db:migrate`). Do NOT use `drizzle-kit migrate` in the Docker entrypoint.
 4. **Schema Definitions** — All 10 tables defined above with proper types, primary keys, foreign keys, defaults, and enums.
 5. **Relations** — Drizzle relations defined for all foreign key relationships listed above.
-6. **Indexes** — All 8 indexes from the table above defined using Drizzle's `index()` and `uniqueIndex()` APIs.
-7. **SuperAdmin Seed** — `src/db/seed.ts` creates a SuperAdmin user with email/password from `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` env vars, using a cryptographically hashed password.
+6. **Indexes** — All 8 indexes from the table above defined inline alongside their respective table definitions using Drizzle's `index()` and `uniqueIndex()` APIs (not in the barrel export file).
+7. **SuperAdmin Seed** — `src/db/seed.ts` creates a SuperAdmin user with email/password from `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` env vars, using a cryptographically hashed password. The script **must be idempotent** — running it multiple times should not fail or create duplicate users (use `ON CONFLICT (email) DO NOTHING`).
+8. **Better-Auth Compatibility** — The `users` table should be designed with awareness that Better-Auth (Track 1.3) will add its own columns (e.g., hashed password, email verification) via future additive migrations. The core `users` table must not conflict with Better-Auth's expected schema (uses `id` as text UUID, has `email` as unique identifier).
 
 ## Acceptance Criteria
 
@@ -228,10 +229,12 @@ Define all Drizzle ORM schema files for the SIMAK database, set up the database 
 - [ ] Drizzle relations are defined for all foreign key relationships
 - [ ] postgres.js driver is used (not pg)
 - [ ] `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` env vars are added to `.env.example`
+- [ ] Seed script is idempotent — running twice does not throw or duplicate
+- [ ] `docs/TDD.md` updated with `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` in the Environment Variables table
+- [ ] `docs/ROADMAP.md` test path corrected to `tests/unit/config/env.test.ts`
 
 ## Out of Scope
 
 - Better-Auth integration (deferred to Track 1.3)
-- Notification preferences table runtime usage (v2)
-- Email queue, audit logs, extension requests tables (v2 — schema defined in code for future use)
+- Notification preferences, extension_requests, email_queue, audit_logs, AssignmentGroupMember tables (v2 — deferred to their respective tracks; will be introduced via additive migrations)
 - Integration tests requiring a live database (unit tests only for env validation and schema shape)
