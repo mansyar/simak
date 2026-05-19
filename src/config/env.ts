@@ -24,12 +24,12 @@ export function getEnv(): Env {
   const result = envSchema.safeParse(process.env);
 
   if (!result.success) {
-    const errors = result.error.errors
-      .map((e) => `  - ${e.path.join('.')}: ${e.message}`)
+    const errorMessages = result.error.issues
+      .map((issue) => `  - ${String(issue.path ?? '')}: ${issue.message}`)
       .join('\n');
 
     throw new Error(
-      `Environment variable validation failed:\n${errors}\n\n` +
+      `Environment variable validation failed:\n${errorMessages}\n\n` +
         `Please ensure all required environment variables are set in your .env file.`,
     );
   }
