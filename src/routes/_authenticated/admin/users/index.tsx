@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
+import { useServerFn } from '@tanstack/react-start';
 import { listUsers, deleteUser, generateSetupLink, createUser, updateUser } from '@/server/users';
 import { UserTable, UserRow } from '@/components/admin/users/UserTable';
 import { UserFilters } from '@/components/admin/users/UserFilters';
@@ -26,6 +27,8 @@ export const Route = createFileRoute('/_authenticated/admin/users/')({
     role: search.role,
   }),
   loader: async ({ deps }) => {
+    // Dynamic import prevents server-only deps from being bundled client-side
+    const { listUsers } = await import('@/server/users');
     // @ts-expect-error - listUsers handler type inference limitation
     return listUsers({ data: deps });
   },
@@ -41,6 +44,11 @@ function UsersPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | null>(null);
+
+  const deleteUserFn = useServerFn(deleteUser);
+  const generateSetupLinkFn = useServerFn(generateSetupLink);
+  const createUserFn = useServerFn(createUser);
+  const updateUserFn = useServerFn(updateUser);
 
   const handleSearchChange = (value: string) => {
     navigate({
@@ -65,15 +73,13 @@ function UsersPage() {
 
   const handleDelete = async (user: UserRow) => {
     if (confirm(t('adminUsers.deleteConfirm', { name: user.name }))) {
-      // @ts-expect-error - deleteUser handler type inference limitation
-      await deleteUser({ data: { id: user.id } });
+      await (deleteUserFn as any)({ data: { id: user.id } });
       navigate({ search: (prev) => prev }); // Refresh
     }
   };
 
   const handleGenerateLink = async (user: UserRow) => {
-    // @ts-expect-error - generateSetupLink handler type inference limitation
-    const result = await generateSetupLink({ data: { id: user.id } });
+    const result = await (generateSetupLinkFn as any)({ data: { id: user.id } });
     if ('url' in result) {
       alert(`Setup Link: ${result.url}`);
     } else {
@@ -82,8 +88,7 @@ function UsersPage() {
   };
 
   const handleCreateUser = async (values: Record<string, unknown>) => {
-    // @ts-expect-error - createUser handler type inference limitation
-    const result = await createUser({ data: values });
+    const result = await (createUserFn as any)({ data: values });
     if (result.error) {
       alert(`${t('common.error')}: ${result.error}`);
     } else {
@@ -92,8 +97,7 @@ function UsersPage() {
   };
 
   const handleUpdateUser = async (id: string, values: Record<string, unknown>) => {
-    // @ts-expect-error - updateUser handler type inference limitation
-    const result = await updateUser({ data: { ...values, id } });
+    const result = await (updateUserFn as any)({ data: { ...values, id } });
     if (result.error) {
       alert(`${t('common.error')}: ${result.error}`);
     } else {
