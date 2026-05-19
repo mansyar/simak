@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { authClient } from '../../../lib/auth-client';
+import { useI18n } from '../../__root';
 
 export const Route = createFileRoute('/_unauthenticated/auth/forgot-password')({
   component: ForgotPasswordPage,
 });
 
 function ForgotPasswordPage() {
+  const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,12 +38,10 @@ function ForgotPasswordPage() {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="w-full max-w-sm rounded-lg border bg-card p-6 text-center shadow-sm">
-          <h1 className="mb-4 text-2xl font-bold text-foreground">Check your email</h1>
-          <p className="mb-6 text-sm text-muted-foreground">
-            If an account exists with that email, we've sent a password reset link.
-          </p>
+          <h1 className="mb-4 text-2xl font-bold text-foreground">{t('auth.checkYourEmail')}</h1>
+          <p className="mb-6 text-sm text-muted-foreground">{t('auth.forgotPasswordSent')}</p>
           <Link to="/auth/login" className="text-sm text-primary hover:underline">
-            Back to Login
+            {t('common.back')}
           </Link>
         </div>
       </div>
@@ -51,15 +51,15 @@ function ForgotPasswordPage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-sm rounded-lg border bg-card p-6 shadow-sm">
-        <h1 className="mb-2 text-center text-2xl font-bold text-foreground">Reset Password</h1>
-        <p className="mb-6 text-center text-sm text-muted-foreground">
-          Enter your email and we'll send you a reset link.
-        </p>
+        <h1 className="mb-2 text-center text-2xl font-bold text-foreground">
+          {t('auth.resetPassword')}
+        </h1>
+        <p className="mb-6 text-center text-sm text-muted-foreground">{t('auth.forgotPassword')}</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label htmlFor="email" className="mb-1 block text-sm font-medium text-foreground">
-              Email
+              {t('auth.email')}
             </label>
             <input
               id="email"
@@ -84,12 +84,12 @@ function ForgotPasswordPage() {
             disabled={isSubmitting}
             className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
-            {isSubmitting ? 'Sending...' : 'Send Reset Link'}
+            {isSubmitting ? t('common.loading') : t('common.submit')}
           </button>
 
           <div className="text-center">
             <Link to="/auth/login" className="text-sm text-primary hover:underline">
-              Back to Login
+              {t('common.back')}
             </Link>
           </div>
         </form>

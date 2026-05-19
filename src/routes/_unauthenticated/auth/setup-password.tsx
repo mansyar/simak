@@ -3,14 +3,14 @@ import { useState } from 'react';
 import { authClient } from '../../../lib/auth-client';
 import { useI18n } from '../../__root';
 
-export const Route = createFileRoute('/_unauthenticated/auth/reset-password')({
+export const Route = createFileRoute('/_unauthenticated/auth/setup-password')({
   validateSearch: (search: Record<string, string | undefined>) => ({
     token: search.token ?? '',
   }),
-  component: ResetPasswordPage,
+  component: SetupPasswordPage,
 });
 
-function ResetPasswordPage() {
+function SetupPasswordPage() {
   const { token } = Route.useSearch();
   const { t } = useI18n();
   const router = useRouter();
@@ -59,8 +59,25 @@ function ResetPasswordPage() {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="w-full max-w-sm rounded-lg border bg-card p-6 text-center shadow-sm">
-          <h1 className="mb-4 text-2xl font-bold text-foreground">{t('auth.resetSuccess')}</h1>
-          <p className="mb-6 text-sm text-muted-foreground">{t('auth.resetSuccess')}</p>
+          <h1 className="mb-4 text-2xl font-bold text-foreground">{t('auth.setupSuccess')}</h1>
+          <p className="mb-6 text-sm text-muted-foreground">{t('auth.setupSuccess')}</p>
+          <Link
+            to="/auth/login"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            {t('auth.login')}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!token) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="w-full max-w-sm rounded-lg border bg-card p-6 text-center shadow-sm">
+          <h1 className="mb-4 text-2xl font-bold text-foreground">{t('auth.linkExpired')}</h1>
+          <p className="mb-6 text-sm text-muted-foreground">{t('auth.linkExpired')}</p>
           <Link
             to="/auth/login"
             className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
@@ -76,7 +93,7 @@ function ResetPasswordPage() {
     <div className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-sm rounded-lg border bg-card p-6 shadow-sm">
         <h1 className="mb-2 text-center text-2xl font-bold text-foreground">
-          {t('auth.resetPassword')}
+          {t('auth.setupPassword')}
         </h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -122,7 +139,7 @@ function ResetPasswordPage() {
 
           <button
             type="submit"
-            disabled={isSubmitting || !token}
+            disabled={isSubmitting}
             className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {isSubmitting ? t('common.loading') : t('common.submit')}
