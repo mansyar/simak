@@ -13,7 +13,7 @@ export default defineConfig({
       '@': '/src',
     },
   },
-  plugins: [tanstackStart(), viteReact(), tailwindcss()],
+  plugins: [tailwindcss(), tanstackStart(), viteReact()],
   test: {
     globals: true,
     environment: 'jsdom',
