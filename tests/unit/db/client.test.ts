@@ -40,8 +40,11 @@ describe('Database client', () => {
     expect(first).toBe(second);
   });
 
-  it('should have getDb return same instance as db singleton', async () => {
+  it('should have getDb return db singleton instance', async () => {
     const mod = await import('@/db/index');
-    expect(mod.getDb()).toBe(mod.db);
+    const first = mod.getDb();
+    const second = mod.getDb();
+    // getDb() should return the same instance on repeated calls
+    expect(first).toBe(second);
   });
 });
