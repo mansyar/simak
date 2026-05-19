@@ -1,12 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  serial,
-  boolean,
-  pgEnum,
-  uniqueIndex,
-} from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
 
 export const userRole = pgEnum('user_role', ['superadmin', 'admin', 'instructor', 'student']);
 
@@ -24,18 +16,3 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').defaultNow(),
   deletedAt: timestamp('deleted_at'),
 });
-
-export const passwordResetTokens = pgTable(
-  'password_reset_tokens',
-  {
-    id: serial('id').primaryKey(),
-    userId: text('user_id')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    token: text('token').notNull().unique(),
-    expiresAt: timestamp('expires_at').notNull(),
-    used: boolean('used').default(false),
-    createdAt: timestamp('created_at').defaultNow(),
-  },
-  (table) => [uniqueIndex('password_reset_token_idx').on(table.token)],
-);

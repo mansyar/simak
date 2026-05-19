@@ -9,7 +9,7 @@ export * from './consultations';
 export * from './notifications';
 
 // Import tables for relations
-import { users, passwordResetTokens } from './users';
+import { users } from './users';
 import { assignmentTemplates, templateCheckpoints } from './templates';
 import { assignments, assignmentStudents, checkpoints } from './assignments';
 import { submissions, reviews } from './submissions';
@@ -19,20 +19,12 @@ import { notifications } from './notifications';
 // ---- Relations ----
 
 export const usersRelations = relations(users, ({ many }) => ({
-  passwordResetTokens: many(passwordResetTokens),
   assignments: many(assignments),
   assignmentStudents: many(assignmentStudents),
   submissions: many(submissions),
   reviews: many(reviews),
   consultationsAsStudent: many(consultations),
   consultationsAsVerifier: many(consultations),
-}));
-
-export const passwordResetTokensRelations = relations(passwordResetTokens, ({ one }) => ({
-  user: one(users, {
-    fields: [passwordResetTokens.userId],
-    references: [users.id],
-  }),
 }));
 
 export const assignmentTemplatesRelations = relations(assignmentTemplates, ({ many, one }) => ({
