@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: User Management (Admin)**
+- [x] **Track: User Management (Admin)**
   _Link: [./tracks/user-management-admin_20260520/](./tracks/user-management-admin_20260520/)_
