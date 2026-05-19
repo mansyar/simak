@@ -32,4 +32,16 @@ describe('Database client', () => {
     const { db } = await import('@/db/index');
     expect(typeof db.delete).toBe('function');
   });
+
+  it('should return cached instance on repeated getDb calls', async () => {
+    const mod = await import('@/db/index');
+    const first = mod.getDb();
+    const second = mod.getDb();
+    expect(first).toBe(second);
+  });
+
+  it('should have getDb return same instance as db singleton', async () => {
+    const mod = await import('@/db/index');
+    expect(mod.getDb()).toBe(mod.db);
+  });
 });
