@@ -10,15 +10,15 @@
 - [x] Task: Update i18n type definitions to support admin sections (8f04492)
   - [x] Update `scripts/generate-i18n-types.ts` — add `adminSidebar` and `adminUsers` sections to the static `Translation` type template
   - [x] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
-- [ ] Task: Write tests for admin layout guard and sidebar
-  - [ ] Write unit test for `_admin.tsx` route export and `beforeLoad` guard (`requireRole` call with [superadmin, admin])
-  - [ ] Write unit test for sidebar navigation links render
-  - [ ] Write unit test for redirect behavior when non-admin user accesses layout
-- [ ] Task: Implement admin layout and sidebar
-  - [ ] Create `src/routes/_authenticated/_admin.tsx` — pathless layout nested under \_authenticated, with `beforeLoad` calling `requireRole(['superadmin', 'admin'])`
-  - [ ] Create `src/components/layout/admin-sidebar.tsx` — sidebar with links to Dashboard, Users, Templates
-  - [ ] Style sidebar with active route indication using TanStack Router's `useLocation`
-  - [ ] Add i18n translation keys for admin sidebar labels and update `locales/en.json` / `locales/id.json`
+- [x] Task: Write tests for admin layout guard and sidebar (4effc7f)
+  - [x] Write unit test for `_admin.tsx` route export and `beforeLoad` guard (`requireRole` call with [superadmin, admin])
+  - [x] Write unit test for sidebar navigation links render
+  - [x] Write unit test for redirect behavior when non-admin user accesses layout
+- [x] Task: Implement admin layout and sidebar (4effc7f)
+  - [x] Create `src/routes/_authenticated/_admin.tsx` — pathless layout nested under \_authenticated, with `beforeLoad` calling `requireRole(['superadmin', 'admin'])`
+  - [x] Create `src/components/layout/admin-sidebar.tsx` — sidebar with links to Dashboard, Users, Templates
+  - [x] Style sidebar with active route indication using TanStack Router's `useLocation`
+  - [x] Add i18n translation keys for admin sidebar labels and update `locales/en.json` / `locales/id.json`
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Dependencies, i18n Types & Admin Layout' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions, Invitation Email & Zod Validation
