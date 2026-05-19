@@ -1,6 +1,6 @@
 # Implementation Plan: Database Foundation
 
-## Phase 1: Dependencies & Configuration
+## Phase 1: Dependencies & Configuration [checkpoint: b3a753a]
 
 - [x] Task: Install Dependencies & Create Drizzle Config
   - [x] Install `postgres` (runtime) and `drizzle-kit` (dev) via pnpm
@@ -16,7 +16,7 @@
 - [x] Task: Implement Config & Pass Tests (Green Phase) [b2c00ad]
   - [x] Add `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` to the Zod schema in `src/config/env.ts`
   - [x] Run all tests and confirm they pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Dependencies & Configuration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Dependencies & Configuration' (Protocol in workflow.md) [b3a753a]
 
 ## Phase 2: Database Client & Migration Runner
 
