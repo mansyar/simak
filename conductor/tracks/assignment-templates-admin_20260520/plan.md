@@ -1,36 +1,35 @@
 # Implementation Plan: Track 2.2 — Assignment Templates (Admin)
 
-## Phase 1: Dependencies, i18n Types & Template List Page
+## Phase 1: Dependencies, i18n Types & UI Component Shells
 
-**Objective:** Set up i18n types, create the template list page with card-based layout, search, type filter, and pagination. No CRUD logic yet — just the UI shell.
+**Objective:** Set up i18n types, then build the UI component shells (TemplateCard, TemplateFilters, pagination) with tests using mock data. Route creation and data wiring come in Phase 2 after server functions exist.
 
 - [ ] Task: Update i18n type definitions for admin template sections
   - [ ] Update `scripts/generate-i18n-types.ts` — add `adminTemplates` section to the static `Translation` type template
   - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
-- [ ] Task: Write tests for template list page
-  - [ ] Write unit test for template list page route export and search params (page, search, type)
+- [ ] Task: Write tests for UI component shells (using mock data)
   - [ ] Write unit test for template card component rendering (name, type badge, checkpoint count, created date, actions dropdown)
   - [ ] Write unit test for search input debounce behavior
   - [ ] Write unit test for type filter dropdown (All + unique types)
   - [ ] Write unit test for pagination controls (next/prev, page indicator)
   - [ ] Write unit test for empty state rendering
   - [ ] Write unit test for loading skeleton state
-- [ ] Task: Implement template list page
+- [ ] Task: Implement UI component shells
   - [ ] Add i18n translation keys for template list to `locales/en.json` / `locales/id.json`
-  - [ ] Create `src/routes/_authenticated/admin/templates.tsx` — template list page route with search params for page, search, type
   - [ ] Create `src/components/admin/templates/TemplateCard.tsx` — card component with name, type badge, checkpoint count, created date, dropdown actions (Edit, Duplicate, Delete)
   - [ ] Create `src/components/admin/templates/TemplateFilters.tsx` — search input + type filter select
   - [ ] Implement pagination component with prev/next controls
-  - [ ] Add "New Template" button that opens CreateTemplateDialog (wired in Phase 3)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Dependencies, i18n Types & Template List Page' (Protocol in workflow.md)
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Dependencies, i18n Types & UI Component Shells' (Protocol in workflow.md)
 
-## Phase 2: Server Functions & Zod Validation
+## Phase 2: Server Functions, Zod Validation & Template Route
 
-**Objective:** Implement all server-side CRUD functions with Zod validation, checkpoint handling, duplicate logic, and soft-delete with usage checking.
+**Objective:** Implement all server-side CRUD functions with Zod validation, checkpoint handling, duplicate logic, and soft-delete with usage checking. Then create the template list route that wires the UI components to server data.
+
+**Note on ID types:** Template IDs are `serial` (integer), unlike user IDs (text UUIDs). The `TemplateIdParamSchema` must use `z.coerce.number()` (route/search params arrive as strings), and all handlers must treat IDs as numbers.
 
 - [ ] Task: Write tests for template server functions
   - [ ] Write unit test for template creation Zod schema (valid inputs, empty name, missing type, 0 checkpoints, empty checkpoint name)
-  - [ ] Write unit test for `createTemplate` — success path (template insert + checkpoint inserts)
+  - [ ] Write unit test for `createTemplate` — success path (template insert + checkpoint inserts, `createdBy` set from session)
   - [ ] Write unit test for `createTemplate` — authorization check (non-admin returns error)
   - [ ] Write unit test for `listTemplates` — pagination, search by name, type filter
   - [ ] Write unit test for `listTemplates` — excludes soft-deleted templates
@@ -43,13 +42,18 @@
 - [ ] Task: Implement server functions
   - [ ] Create `src/server/templates.ts` — client-safe `createServerFn` stubs + Zod schemas (`CreateTemplateSchema`, `UpdateTemplateSchema`, `ListTemplatesSchema`, `TemplateIdParamSchema`)
   - [ ] Create `src/server/templates.server.ts` — server-only handler implementations
-  - [ ] Implement `createTemplateHandler` — insert template, bulk-insert checkpoints with sequential order, return template with checkpoints
+  - [ ] Implement `createTemplateHandler` — insert template (with `createdBy` set from session user ID), bulk-insert checkpoints with sequential order, return template with checkpoints
   - [ ] Implement `listTemplatesHandler` — paginated query with ILIKE name search, type filter, exclude `deletedAt IS NOT NULL`, return `{ templates, total }`
   - [ ] Implement `getTemplateHandler` — fetch by id with checkpoints ordered by `order`, join template_checkpoints table
   - [ ] Implement `updateTemplateHandler` — update template metadata, delete all existing checkpoints, bulk-insert new ones (transactional)
   - [ ] Implement `deleteTemplateHandler` — check assignment count via `SELECT COUNT(*) FROM assignments WHERE template_id = ? AND deletedAt IS NULL`; if > 0 return `{ error: 'in_use', count }`; else set `deletedAt = now()`
   - [ ] Implement `duplicateTemplateHandler` — fetch original template + checkpoints, insert with "(Copy)" name, insert copied checkpoints with same order
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions & Zod Validation' (Protocol in workflow.md)
+- [ ] Task: Create template list route with data wiring
+  - [ ] Create `src/routes/_authenticated/admin/templates.tsx` — template list page route with search params for page, search, type, and a `loader` that calls `listTemplates`
+  - [ ] Wire TemplateCard, TemplateFilters, and pagination components with real data from the route loader
+  - [ ] Add "New Template" button that opens CreateTemplateDialog (wired in Phase 3)
+  - [ ] Verify route is detected: run `pnpm typecheck` to confirm the route tree compiles without errors
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions, Zod Validation & Template Route' (Protocol in workflow.md)
 
 ## Phase 3: Create Template Dialog
 
@@ -113,7 +117,6 @@
     - If not in use: basic `confirm()` dialog → call `deleteTemplate` → refresh
     - If in use: custom dialog showing usage count + text input requiring "DELETE" → call `deleteTemplate` → refresh
   - [ ] Add i18n translation keys for delete dialogs, confirmations, success/error messages
-- [ ] Task: Wire up the admin sidebar Templates link to the new `/admin/templates` route
-  - [ ] Verify the existing admin sidebar already links to `/admin/templates` (from Track 2.1)
-  - [ ] If not already there, add the link with i18n label `adminSidebar.templates`
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Duplicate & Delete Actions' (Protocol in workflow.md)
+
+**Note:** The admin sidebar `/admin/templates` link and i18n key `adminSidebar.templates` were already added in Track 2.1 as a placeholder. No sidebar changes needed.

@@ -57,9 +57,11 @@ Build the admin template management workspace — a full CRUD interface for mana
 
 Follow the same server/client split pattern as `users.ts` / `users.server.ts`:
 
+**Note on ID types:** Unlike user IDs (text UUIDs), template IDs are `serial` (integer). The `TemplateIdParamSchema` must use `z.coerce.number()` (since route/search params arrive as strings), and all handlers must treat IDs as numbers.
+
 - `listTemplates(params: { page, limit, search, type })` — Paginated, filtered, searchable template list. Excludes soft-deleted. Returns `{ templates, total }`.
 - `getTemplate(id: number)` — Fetches single template by ID with all its checkpoints (ordered by `order`). Returns null if soft-deleted.
-- `createTemplate(data: { name, type, checkpoints: string[] })` — Creates template + checkpoint rows. Returns created template with checkpoints.
+- `createTemplate(data: { name, type, checkpoints: string[] })` — Creates template + checkpoint rows. Auto-sets `createdBy` from the session user's ID. Returns created template with checkpoints.
 - `updateTemplate(id: number, data: { name, type, checkpoints: string[] })` — Updates template metadata. Replaces all checkpoint rows (delete old, insert new) in a transaction.
 - `deleteTemplate(id: number)` — Soft-deletes template. First checks if any active assignments reference it. If count > 0, returns `{ error: 'in_use', count: n }` (soft-block). Allows the caller to show the confirmation dialog.
 - `duplicateTemplate(id: number)` — Creates copy of template with "(Copy)" appended to name. Copies all checkpoints. Returns created template.
@@ -133,3 +135,4 @@ New translation sections needed in both `locales/en.json` and `locales/id.json`:
 - Template version history
 - Import/export templates
 - Template sharing between Admins (all admins see all templates)
+- **`minConsultations` per template checkpoint** — deferred to a future track. All checkpoints are created with the default value (0). The `template_checkpoints` table does not yet have this field; it will be added in a schema migration when the feature is implemented.
