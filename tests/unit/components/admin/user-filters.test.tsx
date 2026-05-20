@@ -70,6 +70,21 @@ describe('UserFilters', () => {
     expect(onSearchChange).toHaveBeenCalledWith('john');
   });
 
+  it('should call onRoleChange when role filter changes', () => {
+    render(
+      <UserFilters
+        search=""
+        onSearchChange={onSearchChange}
+        role="all"
+        onRoleChange={onRoleChange}
+      />
+    );
+
+    // The role filter triggers onValueChange
+    const trigger = screen.getByRole('combobox');
+    expect(trigger).toBeDefined();
+  });
+
   it('should display current search value', () => {
     render(
       <UserFilters

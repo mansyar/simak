@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 import { CreateUserSchema } from '@/server/users';
 
@@ -68,7 +68,11 @@ vi.mock('@/components/ui/input', () => ({
 
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, type, loading, ...props }: any) => (
-    <button type={type} data-testid="submit-btn" disabled={loading} {...props}>
+    <button type={type} data-testid="submit-btn" disabled={loading} onClick={(e: any) => {
+      // Find the parent form and submit it
+      const form = e.currentTarget.closest('form');
+      if (form) form.requestSubmit();
+    }} {...props}>
       {loading ? 'Loading...' : children}
     </button>
   ),
@@ -136,6 +140,17 @@ describe('CreateUserDialog', () => {
     expect(options[0].getAttribute('value')).toBe('admin');
     expect(options[1].getAttribute('value')).toBe('instructor');
     expect(options[2].getAttribute('value')).toBe('student');
+  });
+
+  it('should render submit button with Create label', () => {
+    render(<CreateUserDialog open={true} onOpenChange={vi.fn()} onSubmit={onSubmit} />);
+    expect(screen.getByText('Create')).toBeDefined();
+  });
+
+  it('should render submit button and form', () => {
+    render(<CreateUserDialog open={true} onOpenChange={vi.fn()} onSubmit={onSubmit} />);
+    expect(screen.getByTestId('form')).toBeDefined();
+    expect(screen.getByTestId('submit-btn')).toBeDefined();
   });
 
   it('should validate the Zod schema correctly', () => {

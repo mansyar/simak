@@ -84,6 +84,23 @@ describe('Environment validation', () => {
     expect(() => getEnv()).toThrow();
   });
 
+  it('should throw error with multiple missing fields', async () => {
+    delete process.env.DATABASE_URL;
+    delete process.env.BETTER_AUTH_SECRET;
+    delete process.env.SUPERADMIN_EMAIL;
+
+    const { getEnv } = await import('@/config/env');
+    try {
+      getEnv();
+      expect(true).toBe(false); // Shouldn't reach here
+    } catch (e) {
+      const err = e as Error;
+      expect(err.message).toContain('Environment variable validation failed');
+      // Verify the .map() error path is exercised (multiple issues formatted)
+      expect(err.message).toContain('  -');
+    }
+  });
+
   it('should throw on missing BETTER_AUTH_SECRET', async () => {
     delete process.env.BETTER_AUTH_SECRET;
     process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';

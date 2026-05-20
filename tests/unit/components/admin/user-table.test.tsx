@@ -83,4 +83,22 @@ describe('UserTable', () => {
     const menuTriggers = screen.getAllByRole('button', { name: 'Open menu' });
     expect(menuTriggers).toHaveLength(2);
   });
+
+  it('should render a row for unverified users with Not Verified badge', () => {
+    const unverifiedUsers = [
+      {
+        id: '3',
+        name: 'New User',
+        email: 'new@example.com',
+        role: 'student' as const,
+        emailVerified: false,
+        createdAt: new Date(),
+      },
+    ];
+    render(<UserTable data={unverifiedUsers} onEdit={onEdit} onDelete={onDelete} onGenerateLink={onGenerateLink} />);
+
+    expect(screen.getByText('New User')).toBeDefined();
+    expect(screen.getByText('adminUsers.notVerified')).toBeDefined();
+    expect(screen.getByText('adminUsers.role_student')).toBeDefined();
+  });
 });
