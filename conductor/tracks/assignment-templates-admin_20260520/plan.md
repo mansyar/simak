@@ -53,36 +53,36 @@
   - [ ] Wire TemplateCard, TemplateFilters, and pagination components with real data from the route loader
   - [ ] Add "New Template" button that opens CreateTemplateDialog (wired in Phase 3)
   - [ ] Verify route is detected: run `pnpm typecheck` to confirm the route tree compiles without errors
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions, Zod Validation & Template Route' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Server Functions, Zod Validation & Template Route' (Protocol in workflow.md)
 
-## Phase 3: Create Template Dialog
+## Phase 3: Create Template Dialog [checkpoint: f01fc2f]
 
 **Objective:** Build the create template dialog with dynamic checkpoint list (add/remove/reorder via ▲/▼ buttons).
 
-- [ ] Task: Write tests for create template dialog
-  - [ ] Write unit test for dialog open/closed state
-  - [ ] Write unit test for form fields (name, type, checkpoint rows)
-  - [ ] Write unit test for add/remove checkpoint row functionality (min 1 enforced)
-  - [ ] Write unit test for ▲/▼ reorder buttons (swap order values)
-  - [ ] Write unit test for form validation (empty name, empty type, zero checkpoints, empty checkpoint name)
-  - [ ] Write unit test for form submission success (dialog closes, refresh triggered)
-  - [ ] Write unit test for form submission server error display (error banner)
-  - [ ] Write unit test for loading state (submit spinner, fields disabled)
-- [ ] Task: Implement create template dialog
-  - [ ] Create `src/components/admin/templates/CreateTemplateDialog.tsx` — dialog with form
-  - [ ] Create `src/components/admin/templates/CheckpointListEditor.tsx` — dynamic list with add/remove/▲/▼ buttons
-  - [ ] Implement checkpoint row management: add (appends empty row), remove (removes row, enforces min 1), move up/down (swaps positions)
-  - [ ] Wire form submit to `createTemplate` server function
-  - [ ] On success: close dialog, refresh template list, show success message (inline banner or alert)
-  - [ ] Show inline validation errors + server error banner on failure
-  - [ ] Add i18n translation keys for form labels, placeholders, errors, success messages
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Create Template Dialog' (Protocol in workflow.md)
+- [x] Task: Write tests for create template dialog (f8d924f)
+  - [x] Write unit test for dialog open/closed state
+  - [x] Write unit test for form fields (name, type, checkpoint rows)
+  - [x] Write unit test for add/remove checkpoint row functionality (min 1 enforced)
+  - [x] Write unit test for ▲/▼ reorder buttons (swap order values)
+  - [x] Write unit test for form validation (empty name, empty type, zero checkpoints, empty checkpoint name)
+  - [x] Write unit test for form submission success (dialog closes, refresh triggered)
+  - [x] Write unit test for form submission server error display (error banner)
+  - [x] Write unit test for loading state (submit spinner, fields disabled)
+- [x] Task: Implement create template dialog (f8d924f)
+  - [x] Create `src/components/admin/templates/CreateTemplateDialog.tsx` — dialog with form
+  - [x] Create `src/components/admin/templates/CheckpointListEditor.tsx` — dynamic list with add/remove/▲/▼ buttons
+  - [x] Implement checkpoint row management: add (appends empty row), remove (removes row, enforces min 1), move up/down (swaps positions)
+  - [x] Wire form submit to `createTemplate` server function
+  - [x] On success: close dialog, refresh template list, show success message (inline banner or alert)
+  - [x] Show inline validation errors + server error banner on failure
+  - [x] Add i18n translation keys for form labels, placeholders, errors, success messages
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Create Template Dialog' (Protocol in workflow.md)
 
 ## Phase 4: Edit Template Sheet
 
 **Objective:** Build the edit template sheet with pre-filled data, checkpoint list editing, and in-use banner.
 
-- [ ] Task: Write tests for edit template sheet
+- [~] Task: Write tests for edit template sheet
   - [ ] Write unit test for sheet open/closed state
   - [ ] Write unit test for form pre-filled with existing template data
   - [ ] Write unit test for add/remove/reorder checkpoint rows
