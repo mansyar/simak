@@ -63,15 +63,21 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
       header: t('adminUsers.table.role'),
       cell: ({ row }) => {
         const role = row.original.role;
-        const variants: Record<'superadmin' | 'admin' | 'instructor' | 'student', 'default' | 'secondary' | 'outline' | 'destructive'> = {
+        const roleVariants: Record<'superadmin' | 'admin' | 'instructor' | 'student', 'default' | 'secondary' | 'outline' | 'destructive'> = {
           superadmin: 'default',
           admin: 'secondary',
           instructor: 'outline',
           student: 'outline',
         };
+        const roleLabels: Record<string, string> = {
+          superadmin: 'adminUsers.role_superadmin',
+          admin: 'adminUsers.role_admin',
+          instructor: 'adminUsers.role_instructor',
+          student: 'adminUsers.role_student',
+        };
         return (
-          <Badge variant={variants[role] || 'outline'} className="capitalize">
-            {t(`adminUsers.role_${role}` as any)}
+          <Badge variant={roleVariants[role] || 'outline'} className="capitalize">
+            {t(roleLabels[role] || role)}
           </Badge>
         );
       },

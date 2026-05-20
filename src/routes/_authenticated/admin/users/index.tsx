@@ -39,7 +39,7 @@ function UsersPage() {
   const { users, total } = Route.useLoaderData();
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
-  const [isRefreshing] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | null>(null);
@@ -117,7 +117,11 @@ function UsersPage() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => navigate({ search: (prev) => prev })}
+            onClick={() => {
+              setIsRefreshing(true);
+              navigate({ search: (prev) => prev });
+              setTimeout(() => setIsRefreshing(false), 1500);
+            }}
             disabled={isRefreshing}
           >
             <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
