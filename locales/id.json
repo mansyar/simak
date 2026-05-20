@@ -63,6 +63,42 @@
     "id": "Bahasa Indonesia",
     "switch": "Ganti bahasa"
   },
+  "adminSidebar": {
+    "dashboard": "Dasbor",
+    "users": "Pengguna",
+    "templates": "Templat"
+  },
+  "adminUsers": {
+    "title": "Pengguna",
+    "newUser": "Pengguna Baru",
+    "table": {
+      "name": "Nama",
+      "email": "Email",
+      "role": "Peran",
+      "createdAt": "Dibuat Pada",
+      "actions": "Aksi"
+    },
+    "empty": "Tidak ada pengguna",
+    "createPrompt": "Buat pengguna pertama Anda",
+    "deleteConfirm": "Apakah Anda yakin ingin menghapus {name}?",
+    "deleteSuccess": "Pengguna berhasil dihapus",
+    "createSuccess": "Pengguna berhasil dibuat. Email undangan terkirim.",
+    "createSuccessNoEmail": "Pengguna berhasil dibuat tetapi email undangan gagal dikirim.",
+    "updateSuccess": "Pengguna berhasil diperbarui",
+    "linkGenerated": "Tautan pengaturan kata sandi berhasil dibuat",
+    "linkCopied": "Tautan disalin ke papan klip",
+    "generateLink": "Buat Tautan Pengaturan",
+    "edit": "Ubah Pengguna",
+    "role_superadmin": "Super Admin",
+    "role_admin": "Admin",
+    "role_instructor": "Dosen",
+    "role_student": "Mahasiswa",
+    "allRoles": "Semua Peran",
+    "searchPlaceholder": "Cari pengguna berdasarkan nama atau email...",
+    "emailVerified": "Email Terverifikasi",
+    "notVerified": "Belum Terverifikasi",
+    "createdAt": "Dibuat"
+  },
   "error": {
     "notFound": "Halaman tidak ditemukan",
     "forbidden": "Anda tidak memiliki izin untuk mengakses halaman ini",

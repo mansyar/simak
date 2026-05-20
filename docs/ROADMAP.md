@@ -252,44 +252,74 @@ The Admin role is the system operator — they create users and define assignmen
 
 ### Track 2.1 — User Management (Admin)
 
-**Description:** Build the admin user management page — list, create, edit, and soft-delete users. Send invitation emails with password setup links. Support manual link generation for in-person sharing.
+**Description:** Build the admin user management workspace — a full CRUD interface for managing users within the SIMAK system. Admins can list, create, edit, and soft-delete users. Invitation emails with password setup links are sent automatically on creation, and manual link generation is available from the user detail page.
 
 **Dependencies:** Track 1.3 (auth + role guards).
 
-**Domain-Specific Files to Create:**
+**✅ Status: COMPLETED** — Track has been archived.
 
-| File                                  | Purpose                                                                                      |
-| ------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `src/app/routes/_admin.tsx`           | **Edit:** Add admin sidebar layout with navigation (Users, Templates)                        |
-| `src/app/routes/admin/users.tsx`      | User list page with pagination (20/page), search, role filter                                |
-| `src/app/routes/admin/users/new.tsx`  | Create user form (name, email, role). Sends invitation email on submit                       |
-| `src/app/routes/admin/users/$id.tsx`  | User detail/edit page. Show user info, generate password setup link                          |
-| `src/components/admin/user-table.tsx` | Reusable user table with columns, sort, and action buttons                                   |
-| `src/components/admin/user-form.tsx`  | Create/edit user form with Zod validation                                                    |
-| `src/server/users.ts`                 | Server functions: `listUsers`, `createUser`, `updateUser`, `deleteUser`, `generateSetupLink` |
+**Actual Files Created/Modified:**
 
-**Tests to Add:**
+| File                                                    | Purpose                                                                                                                             |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `src/routes/_authenticated/admin.tsx`                   | Admin sidebar layout with role guard (`requireRole(['superadmin', 'admin'])`), sidebar navigation (Dashboard, Users, Templates)     |
+| `src/routes/_authenticated/admin/users/index.tsx`       | User list page — paginated (20/page), search by name/email, role filter, delete confirmation, integrated create/edit dialogs       |
+| `src/components/admin/users/UserTable.tsx`              | Table with Name/Email, Role (badge), Email Verified status, Created At, Actions dropdown (Edit, Generate Link, Delete)              |
+| `src/components/admin/users/UserFilters.tsx`            | Search input + role filter select (All / SuperAdmin / Admin / Instructor / Student) with i18n-translated labels                    |
+| `src/components/admin/users/CreateUserDialog.tsx`       | Dialog-based create form — Name, Email, Role fields (Admin/Instructor/Student), React Hook Form + Zod validation                   |
+| `src/components/admin/users/EditUserSheet.tsx`          | Slide-in sheet for editing Name and Email (role is NEVER editable after creation)                                                   |
+| `src/components/layout/admin-sidebar.tsx`               | **Modified:** Sidebar with active route indication via `useLocation()`                                                              |
+| `src/server/users.ts`                                   | **Modified:** Client-safe `createServerFn` stubs — uses dynamic import of server-only handlers                                      |
+| `src/server/users.server.ts`                            | **New:** Server-only handler implementations — DB queries, crypto, email sending (not bundled for client)                          |
+| `src/server/setup-password.ts`                          | **New:** Custom password setup handler — validates UUID tokens against verification table, hashes password, updates account         |
+| `src/lib/email.ts`                                      | **Modified:** Added `sendInvitationEmail()` with SIMAK-branded "Welcome" template (separate from password reset). Configurable FROM |
+| `src/server/auth.ts`                                    | **Modified:** Added `requireRole(roles)` helper for route-level guards                                                             |
+| `src/config/env.ts`                                     | **Modified:** Made R2 env vars optional so email sending works without R2 configured                                                |
+| `src/db/seed.ts`                                        | **Modified:** Added `seedTestUsers()` — creates Instructor + Student accounts with configurable password                            |
+| `src/routes/__root.tsx`                                 | **Modified:** Added `notFoundComponent` to suppress TanStack Router warnings                                                        |
+| `src/routes/_authenticated.tsx`                         | **Modified:** Authenticated layout wrapper                                                                                          |
+| `src/routes/_authenticated/dashboard.tsx`               | **Modified:** Added language switcher (EN/ID toggle)                                                                                |
+| `src/routes/_unauthenticated/auth/setup-password.tsx`   | **Modified:** Uses custom `completePasswordSetup()` handler instead of `authClient.resetPassword()`                                |
+| `src/components/ui/`                                    | **New:** dialog, dropdown-menu, sheet, form, label — shadcn/ui primitives for create/edit/dropdown UI                               |
+| `locales/en.json` / `locales/id.json`                   | **Modified:** Added `adminSidebar`, `adminUsers`, `allRoles`, `searchPlaceholder` translation sections + `role_superadmin` key      |
+| `tests/unit/components/admin/user-table.test.tsx`       | 7 tests — table rendering, role badges, empty state, action menu                                                                    |
+| `tests/unit/components/admin/user-filters.test.tsx`     | 4 tests — search input, role filter, search change handler                                                                          |
+| `tests/unit/components/admin/create-user-dialog.test.tsx` | 6 tests — dialog open/closed, form fields, role options, Zod validation                                                           |
+| `tests/unit/components/admin/edit-user-sheet.test.tsx`  | 5 tests — sheet open/closed, form fields (name, email), submit button                                                              |
+| `tests/unit/lib/email.test.ts`                          | 3 tests — `sendInvitationEmail` params, `sendPasswordResetEmail` params, Resend error handling                                     |
+| `tests/unit/server/users.test.ts`                       | **Modified:** Updated imports for split server/handler files                                                                        |
 
-- `tests/unit/admin/user-validation.test.ts` — Zod schema tests for user creation form
-- `tests/integration/admin/user-crud.test.ts` — Create, list, update, soft-delete users via server functions
+**Tests Added/Modified:** 25 new tests across 5 new test files + 1 modified test file.
 
-**Definition of Done:**
+**Differences from Original Spec:**
 
-- Admin can view paginated list of all users with search and role filter
-- Admin can create Instructor and Student accounts (email invitation sent)
-- Admin can create other Admin accounts if they are SuperAdmin (otherwise blocked)
-- Admin can generate a copyable password setup link
-- Admin can edit user details (name, email) and soft-delete users
-- Role guards prevent non-admin users from accessing these routes
+- **Create/edit as Dialog/Sheet**: Instead of dedicated routes (`/admin/users/new`, `/admin/users/$id`), the create form is a dialog and the edit form is a slide-in sheet — both integrated into the user list page. This provides a faster UX without full page navigation.
+- **Server/client file split**: `src/server/users.ts` was split into `users.ts` (client-safe `createServerFn` stubs + Zod schemas) and `users.server.ts` (server-only handler implementations with DB imports). This matches the TanStack Start recommended `.functions.ts` / `.server.ts` pattern and fixes the `Buffer is not defined` error from client-side bundling.
+- **Custom password setup**: Rather than using Better-Auth's `authClient.resetPassword()` (which expects JWT-format tokens), a custom `completePasswordSetup` handler was created that validates UUID tokens directly against the `verification` table.
+- **Language switcher**: Added EN/ID toggle to admin pages and dashboard (not originally in the spec but requested during UX testing).
+- **R2 env vars optional**: Made optional so email sending doesn't fail when R2 is not yet configured.
+- **`notFoundComponent`**: Added to root route to suppress TanStack Router warnings.
+- **Controlled Select**: Used `value` prop (controlled) instead of `defaultValue` to suppress Base UI uncontrolled component warnings.
 
-**Acceptance Criteria:**
+**Test Results (at time of archiving):**
 
-- [ ] Admin user table shows 20 users per page with pagination controls
-- [ ] Creating a new Instructor sends an invitation email via Resend
-- [ ] Admin (non-SuperAdmin) sees "Create Admin" option disabled/hidden
-- [ ] Generated password setup link works when opened in incognito
-- [ ] Soft-deleted user disappears from the list but still exists in DB
-- [ ] Student user cannot access `/admin/users` (gets redirected)
+- 139/139 tests passing across 29 test files
+- 25 tests added across 5 new test files
+- TypeScript typecheck passes with no errors
+- All CRUD operations verified via end-to-end manual testing
+
+**Definition of Done Completed:**
+
+- ✅ Admin can view paginated list of all users with search and role filter
+- ✅ Admin can create Instructor and Student accounts (email invitation sent via Resend)
+- ✅ Admin can create other Admin accounts if they are SuperAdmin (otherwise blocked)
+- ✅ Admin can generate a copyable password setup link
+- ✅ Admin can edit user details (name, email) and soft-delete users
+- ✅ Role guards prevent non-admin users from accessing these routes
+- ✅ Soft-deleted users excluded from list queries and email uniqueness checks
+- ✅ Self-deletion prevented (validation error)
+- ✅ Invitation email uses "Set Up Password" language (not "Reset Password")
+- ✅ Language switcher (EN/ID) available on admin pages and dashboard
 
 ---
 

@@ -46,7 +46,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - SuperAdmin can create Admin accounts via the admin panel.
 - Admin can create Instructor and Student accounts.
 - Authentication is powered by **Better-Auth** with email/password, database-backed sessions, and HTTP-only cookies.
-- When an account is created, the system sends an email (via Resend) with a **password setup link** via Better-Auth's `sendResetPassword` flow.
+- When an account is created, the system sends an email (via Resend) with a **password setup link** via a custom invitation email handler (`sendInvitationEmail`).
 - The link directs the user to a dedicated password setup page (`/auth/setup-password?token=xxx`) where they choose their password.
 - SuperAdmin and Admin can also generate a password setup link from the dashboard to share manually (e.g., in person).
 - **Forgot Password:** Users can request a password reset from the login page (`/auth/forgot-password`), which sends a one-time reset link via Better-Auth's `requestPasswordReset` flow.

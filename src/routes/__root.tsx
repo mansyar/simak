@@ -1,11 +1,40 @@
 /// <reference types="vite/client" />
+import { useState, createContext, useContext, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { Outlet, createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import globalCss from '../app/global.css?url';
 import type { Locales } from '../i18n/types';
+import { detectLocale } from '../i18n/index';
+import enTranslations from '../../locales/en.json';
+import idTranslations from '../../locales/id.json';
 
 const queryClient = new QueryClient();
+
+type TranslationRecord = { [key: string]: string | TranslationRecord };
+
+const translations: Record<Locales, TranslationRecord> = {
+  en: enTranslations as TranslationRecord,
+  id: idTranslations as TranslationRecord,
+};
+
+function resolveKey(obj: TranslationRecord, key: string): string {
+  const parts = key.split('.');
+  let current: TranslationRecord | string = obj;
+  for (const part of parts) {
+    if (typeof current === 'object' && current !== null && part in current) {
+      current = current[part];
+    } else {
+      return key;
+    }
+  }
+  return typeof current === 'string' ? current : key;
+}
+
+function interpolate(text: string, params?: Record<string, string>): string {
+  if (!params) return text;
+  return text.replace(/\{(\w+)\}/g, (_, p) => params[p] ?? `{${p}}`);
+}
 
 // Placeholder ThemeProvider — replaces the hook-based approach for SSR compatibility
 function ThemeScript() {
@@ -30,26 +59,57 @@ function ThemeScript() {
   );
 }
 
-// Placeholder i18n provider context
-import { createContext, useContext } from 'react';
-
+// i18n provider context
 type I18nContextType = {
   locale: Locales;
   setLocale: (locale: Locales) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string>) => string;
 };
 
 const I18nContext = createContext<I18nContextType>({
   locale: 'en',
   setLocale: () => {},
-  t: (key: string) => key,
+  t: (_key: string) => _key,
 });
 
 export function useI18n() {
   return useContext(I18nContext);
 }
 
+function useI18nProvider() {
+  const [locale, setLocaleState] = useState<Locales>(() => {
+    if (typeof window === 'undefined') return 'en';
+    return detectLocale();
+  });
+
+  const setLocale = useCallback((newLocale: Locales) => {
+    setLocaleState(newLocale);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('simak-locale', newLocale);
+    }
+  }, []);
+
+  const t = useCallback(
+    (key: string, params?: Record<string, string>): string => {
+      const raw = resolveKey(translations[locale], key);
+      return interpolate(raw, params);
+    },
+    [locale],
+  );
+
+  return { locale, setLocale, t };
+}
+
 export const Route = createRootRoute({
+  notFoundComponent: () => (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
+      <h1 className="text-4xl font-bold text-foreground">404</h1>
+      <p className="text-lg text-muted-foreground">Page not found</p>
+      <a href="/dashboard" className="text-primary hover:underline">
+        Go to Dashboard
+      </a>
+    </div>
+  ),
   head: () => ({
     meta: [
       {
@@ -82,8 +142,10 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+  const i18n = useI18nProvider();
+
   return (
-    <html>
+    <html lang={i18n.locale}>
       <head>
         <ThemeScript />
         <HeadContent />
@@ -98,11 +160,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           </a>
         </div>
         <QueryClientProvider client={queryClient}>
-          <I18nContext.Provider
-            value={{ locale: 'en', setLocale: () => {}, t: (key: string) => key }}
-          >
-            {children}
-          </I18nContext.Provider>
+          <I18nContext.Provider value={i18n}>{children}</I18nContext.Provider>
         </QueryClientProvider>
         <Scripts />
       </body>
