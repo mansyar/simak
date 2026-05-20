@@ -19,7 +19,7 @@
   - [ ] Create `src/components/admin/templates/TemplateCard.tsx` — card component with name, type badge, checkpoint count, created date, dropdown actions (Edit, Duplicate, Delete)
   - [ ] Create `src/components/admin/templates/TemplateFilters.tsx` — search input + type filter select
   - [ ] Implement pagination component with prev/next controls
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Dependencies, i18n Types & UI Component Shells' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Dependencies, i18n Types & UI Component Shells' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions, Zod Validation & Template Route
 
@@ -27,7 +27,7 @@
 
 **Note on ID types:** Template IDs are `serial` (integer), unlike user IDs (text UUIDs). The `TemplateIdParamSchema` must use `z.coerce.number()` (route/search params arrive as strings), and all handlers must treat IDs as numbers.
 
-- [ ] Task: Write tests for template server functions
+- [x] Task: Write tests for template server functions (43ba305)
   - [ ] Write unit test for template creation Zod schema (valid inputs, empty name, missing type, 0 checkpoints, empty checkpoint name)
   - [ ] Write unit test for `createTemplate` — success path (template insert + checkpoint inserts, `createdBy` set from session)
   - [ ] Write unit test for `createTemplate` — authorization check (non-admin returns error)
@@ -39,7 +39,7 @@
   - [ ] Write unit test for `deleteTemplate` — sets deletedAt, not in use case
   - [ ] Write unit test for `deleteTemplate` — returns in_use error with count when assignments reference it
   - [ ] Write unit test for `duplicateTemplate` — copies template + checkpoints, appends "(Copy)"
-- [ ] Task: Implement server functions
+- [x] Task: Implement server functions (43ba305)
   - [ ] Create `src/server/templates.ts` — client-safe `createServerFn` stubs + Zod schemas (`CreateTemplateSchema`, `UpdateTemplateSchema`, `ListTemplatesSchema`, `TemplateIdParamSchema`)
   - [ ] Create `src/server/templates.server.ts` — server-only handler implementations
   - [ ] Implement `createTemplateHandler` — insert template (with `createdBy` set from session user ID), bulk-insert checkpoints with sequential order, return template with checkpoints
@@ -48,7 +48,7 @@
   - [ ] Implement `updateTemplateHandler` — update template metadata, delete all existing checkpoints, bulk-insert new ones (transactional)
   - [ ] Implement `deleteTemplateHandler` — check assignment count via `SELECT COUNT(*) FROM assignments WHERE template_id = ? AND deletedAt IS NULL`; if > 0 return `{ error: 'in_use', count }`; else set `deletedAt = now()`
   - [ ] Implement `duplicateTemplateHandler` — fetch original template + checkpoints, insert with "(Copy)" name, insert copied checkpoints with same order
-- [ ] Task: Create template list route with data wiring
+- [x] Task: Create template list route with data wiring (107be79)
   - [ ] Create `src/routes/_authenticated/admin/templates.tsx` — template list page route with search params for page, search, type, and a `loader` that calls `listTemplates`
   - [ ] Wire TemplateCard, TemplateFilters, and pagination components with real data from the route loader
   - [ ] Add "New Template" button that opens CreateTemplateDialog (wired in Phase 3)
