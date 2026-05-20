@@ -4,6 +4,8 @@ import { useServerFn } from '@tanstack/react-start';
 import {
   listTemplates,
   createTemplate,
+  getTemplate,
+  updateTemplate,
   deleteTemplate,
   duplicateTemplate,
 } from '@/server/templates';
@@ -13,6 +15,7 @@ import { TemplatePagination } from '@/components/admin/templates/TemplatePaginat
 import { TemplateEmptyState } from '@/components/admin/templates/TemplateEmptyState';
 import { TemplateLoadingSkeleton } from '@/components/admin/templates/TemplateLoadingSkeleton';
 import { CreateTemplateDialog } from '@/components/admin/templates/CreateTemplateDialog';
+import { EditTemplateSheet } from '@/components/admin/templates/EditTemplateSheet';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { z } from 'zod';
@@ -49,10 +52,14 @@ function TemplatesPage() {
   const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<any>(null);
 
   const deleteTemplateFn = useServerFn(deleteTemplate);
   const duplicateTemplateFn = useServerFn(duplicateTemplate);
   const createTemplateFn = useServerFn(createTemplate);
+  const getTemplateFn = useServerFn(getTemplate);
+  const updateTemplateFn = useServerFn(updateTemplate);
 
   const handleSearchChange = (value: string) => {
     navigate({
@@ -85,9 +92,21 @@ function TemplatesPage() {
     navigate({ search: (prev) => prev }); // Refresh
   };
 
-  const handleEdit = (template: TemplateRow) => {
-    // Phase 4 will wire this to EditTemplateSheet
-    navigate({ search: (prev) => prev });
+  const handleEdit = async (template: TemplateRow) => {
+    const result = await (getTemplateFn as any)({ data: { id: template.id } });
+    if (result) {
+      setEditingTemplate(result);
+      setIsEditSheetOpen(true);
+    }
+  };
+
+  const handleUpdateTemplate = async (id: number, values: Record<string, unknown>) => {
+    const result = await (updateTemplateFn as any)({ data: { ...values, id } });
+    return result;
+  };
+
+  const handleEditSuccess = () => {
+    navigate({ search: (prev) => prev }); // Refresh
   };
 
   const handleDelete = async (template: TemplateRow) => {
@@ -141,6 +160,14 @@ function TemplatesPage() {
         onOpenChange={setIsCreateDialogOpen}
         onSubmit={handleCreateTemplate}
         onSuccess={handleCreateSuccess}
+      />
+
+      <EditTemplateSheet
+        template={editingTemplate}
+        open={isEditSheetOpen}
+        onOpenChange={setIsEditSheetOpen}
+        onSubmit={handleUpdateTemplate}
+        onSuccess={handleEditSuccess}
       />
 
       <TemplateFilters

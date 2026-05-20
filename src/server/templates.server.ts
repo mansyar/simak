@@ -113,6 +113,12 @@ export async function getTemplateHandler(args: { data: TemplateIdParam }) {
     return null;
   }
 
+  // Get active assignment count for in-use banner
+  const [{ assignmentCount }] = await db
+    .select({ assignmentCount: sql<number>`count(*)::int` })
+    .from(assignments)
+    .where(and(eq(assignments.templateId, id), isNull(assignments.deletedAt)));
+
   const checkpoints = await db
     .select({
       id: templateCheckpoints.id,
@@ -123,7 +129,7 @@ export async function getTemplateHandler(args: { data: TemplateIdParam }) {
     .where(eq(templateCheckpoints.templateId, id))
     .orderBy(templateCheckpoints.order);
 
-  return { ...template, checkpoints };
+  return { ...template, checkpoints, assignmentCount: Number(assignmentCount) };
 }
 
 export async function createTemplateHandler(args: { data: CreateTemplateInput }) {
