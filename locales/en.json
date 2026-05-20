@@ -99,6 +99,37 @@
     "notVerified": "Not Verified",
     "createdAt": "Created"
   },
+  "adminTemplates": {
+    "title": "Templates",
+    "newTemplate": "New Template",
+    "searchPlaceholder": "Search templates...",
+    "filterByType": "All Types",
+    "checkpointCount": "{count} checkpoints",
+    "empty": "No templates found",
+    "createPrompt": "Create your first template",
+    "form": {
+      "name": "Template Name",
+      "type": "Type",
+      "checkpoints": "Checkpoints",
+      "checkpointName": "Checkpoint Name",
+      "addCheckpoint": "Add Checkpoint",
+      "removeCheckpoint": "Remove",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down"
+    },
+    "actions": {
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "delete": "Delete"
+    },
+    "createSuccess": "Template created successfully",
+    "updateSuccess": "Template updated successfully",
+    "duplicateSuccess": "Template duplicated successfully",
+    "deleteConfirm": "Delete this template?",
+    "deleteInUse": "This template is used by {count} assignment(s). Type DELETE to confirm.",
+    "deleteSuccess": "Template deleted successfully",
+    "inUseBanner": "This template is used by {count} assignment(s). Changes will affect future assignment creation."
+  },
   "error": {
     "notFound": "Page not found",
     "forbidden": "You do not have permission to access this page",

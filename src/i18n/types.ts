@@ -96,6 +96,37 @@ export type Translation = {
     notVerified: string
     createdAt: string
   }
+  adminTemplates: {
+    title: string
+    newTemplate: string
+    searchPlaceholder: string
+    filterByType: string
+    checkpointCount: string
+    empty: string
+    createPrompt: string
+    form: {
+      name: string
+      type: string
+      checkpoints: string
+      checkpointName: string
+      addCheckpoint: string
+      removeCheckpoint: string
+      moveUp: string
+      moveDown: string
+    }
+    actions: {
+      edit: string
+      duplicate: string
+      delete: string
+    }
+    createSuccess: string
+    updateSuccess: string
+    duplicateSuccess: string
+    deleteConfirm: string
+    deleteInUse: string
+    deleteSuccess: string
+    inUseBanner: string
+  }
 }
 
 export type TranslationFunctions = Record<string, (key: string) => string>
