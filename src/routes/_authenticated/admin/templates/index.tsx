@@ -1,12 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
-import { listTemplates, deleteTemplate, duplicateTemplate } from '@/server/templates';
+import {
+  listTemplates,
+  createTemplate,
+  deleteTemplate,
+  duplicateTemplate,
+} from '@/server/templates';
 import { TemplateCard, TemplateRow } from '@/components/admin/templates/TemplateCard';
 import { TemplateFilters } from '@/components/admin/templates/TemplateFilters';
 import { TemplatePagination } from '@/components/admin/templates/TemplatePagination';
 import { TemplateEmptyState } from '@/components/admin/templates/TemplateEmptyState';
 import { TemplateLoadingSkeleton } from '@/components/admin/templates/TemplateLoadingSkeleton';
+import { CreateTemplateDialog } from '@/components/admin/templates/CreateTemplateDialog';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { z } from 'zod';
@@ -42,9 +48,11 @@ function TemplatesPage() {
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const deleteTemplateFn = useServerFn(deleteTemplate);
   const duplicateTemplateFn = useServerFn(duplicateTemplate);
+  const createTemplateFn = useServerFn(createTemplate);
 
   const handleSearchChange = (value: string) => {
     navigate({
@@ -66,6 +74,15 @@ function TemplatesPage() {
     navigate({
       search: (prev) => ({ ...prev, page }),
     });
+  };
+
+  const handleCreateTemplate = async (values: Record<string, unknown>) => {
+    const result = await (createTemplateFn as any)({ data: values });
+    return result;
+  };
+
+  const handleCreateSuccess = () => {
+    navigate({ search: (prev) => prev }); // Refresh
   };
 
   const handleEdit = (template: TemplateRow) => {
@@ -112,12 +129,19 @@ function TemplatesPage() {
           >
             <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </Button>
-          <Button onClick={() => navigate({ search: (prev) => prev })}>
+          <Button onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             {t('adminTemplates.newTemplate')}
           </Button>
         </div>
       </div>
+
+      <CreateTemplateDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onSubmit={handleCreateTemplate}
+        onSuccess={handleCreateSuccess}
+      />
 
       <TemplateFilters
         search={searchParams.search}
@@ -128,7 +152,7 @@ function TemplatesPage() {
       />
 
       {templates.length === 0 ? (
-        <TemplateEmptyState onCreateNew={() => navigate({ search: (prev) => prev })} />
+        <TemplateEmptyState onCreateNew={() => setIsCreateDialogOpen(true)} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {templates.map((template) => (
