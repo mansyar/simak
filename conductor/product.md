@@ -88,3 +88,16 @@ Students and instructors lack a centralized system to:
 - **i18n translations** — Full English and Indonesian translations for admin sidebar, user table, forms, and messages
 - **Language switcher** — EN/ID toggle in the top-right of admin pages and dashboard
 - **Test user seeding** — `seedTestUsers()` creates Instructor and Student accounts with configurable password
+
+### Track 2.2: Assignment Templates (Admin) (May 2026)
+
+- **Template management page** (`/admin/templates`) — Card-based list with search by name, type filter dropdown, pagination (20/page), and loading skeleton states
+- **Create template dialog** — Dialog with Name (text), Type (free-text), and dynamic checkpoint list (add/remove/reorder via ▲/▼ buttons); defaults to 3 checkpoint rows
+- **Edit template sheet** — Slide-in panel with pre-filled Name, Type, and checkpoint data; reuses CheckpointListEditor for checkpoint management
+- **Server-side CRUD** — `createServerFn`-based functions: `createTemplate`, `listTemplates`, `getTemplate`, `updateTemplate`, `deleteTemplate`, `duplicateTemplate`
+- **Checkpoint management** — Dynamic list with add, remove (min 1 enforced), and ▲/▼ reorder buttons; order persists via sequential `order` column
+- **Soft-delete with usage check** — Templates are soft-deleted (`deletedAt`); deletion blocked with count if active assignments reference it (requires typing "DELETE")
+- **Template duplication** — Duplicates template + all checkpoints with "(Copy)" suffix (supports smart naming for multiple copies)
+- **In-use banner** — Edit sheet shows warning banner with assignment count if template is in use by active assignments
+- **Zod validation** — Client + server validation: name required, type required, min 1 checkpoint, no empty checkpoint names
+- **i18n translations** — Full English and Indonesian translations for template management UI, form labels, messages, and error states

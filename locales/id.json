@@ -51,7 +51,8 @@
     "next": "Lanjut",
     "submit": "Kirim",
     "noResults": "Tidak ada hasil",
-    "viewAll": "Lihat Semua"
+    "viewAll": "Lihat Semua",
+    "page": "Halaman"
   },
   "theme": {
     "light": "Mode Terang",
@@ -98,6 +99,37 @@
     "emailVerified": "Email Terverifikasi",
     "notVerified": "Belum Terverifikasi",
     "createdAt": "Dibuat"
+  },
+  "adminTemplates": {
+    "title": "Templat",
+    "newTemplate": "Templat Baru",
+    "searchPlaceholder": "Cari templat...",
+    "filterByType": "Semua Tipe",
+    "checkpointCount": "{count} checkpoint",
+    "empty": "Tidak ada templat",
+    "createPrompt": "Buat templat pertama Anda",
+    "form": {
+      "name": "Nama Templat",
+      "type": "Tipe",
+      "checkpoints": "Checkpoint",
+      "checkpointName": "Nama Checkpoint",
+      "addCheckpoint": "Tambah Checkpoint",
+      "removeCheckpoint": "Hapus",
+      "moveUp": "Naik",
+      "moveDown": "Turun"
+    },
+    "actions": {
+      "edit": "Ubah",
+      "duplicate": "Duplikasi",
+      "delete": "Hapus"
+    },
+    "createSuccess": "Templat berhasil dibuat",
+    "updateSuccess": "Templat berhasil diperbarui",
+    "duplicateSuccess": "Templat berhasil diduplikasi",
+    "deleteConfirm": "Hapus templat ini?",
+    "deleteInUse": "Templat ini digunakan oleh {count} tugas. Ketik DELETE untuk mengonfirmasi.",
+    "deleteSuccess": "Templat berhasil dihapus",
+    "inUseBanner": "Templat ini digunakan oleh {count} tugas. Perubahan akan memengaruhi pembuatan tugas di masa mendatang."
   },
   "error": {
     "notFound": "Halaman tidak ditemukan",
