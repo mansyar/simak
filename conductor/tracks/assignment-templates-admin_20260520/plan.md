@@ -4,7 +4,7 @@
 
 **Objective:** Set up i18n types, then build the UI component shells (TemplateCard, TemplateFilters, pagination) with tests using mock data. Route creation and data wiring come in Phase 2 after server functions exist.
 
-- [ ] Task: Update i18n type definitions for admin template sections
+- [x] Task: Update i18n type definitions for admin template sections (665b005)
   - [ ] Update `scripts/generate-i18n-types.ts` — add `adminTemplates` section to the static `Translation` type template
   - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
 - [ ] Task: Write tests for UI component shells (using mock data)
