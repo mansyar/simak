@@ -99,24 +99,24 @@
   - [x] Add i18n translation keys for sheet labels, in-use banner, success messages
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Edit Template Sheet' (Protocol in workflow.md)
 
-## Phase 5: Duplicate & Delete Actions
+## Phase 5: Duplicate & Delete Actions [checkpoint: 3ce9d21]
 
 **Objective:** Wire up duplicate action and implement soft-blocked delete with usage count warning.
 
-- [~] Task: Write tests for duplicate and delete actions
-  - [ ] Write unit test for duplicate action — calls `duplicateTemplate`, shows success message, refreshes list
-  - [ ] Write unit test for delete action — unused template — basic confirmation, calls `deleteTemplate`, success
-  - [ ] Write unit test for delete action — used template — shows "in_use" warning with count, requires typing "DELETE", then calls `deleteTemplate`
-  - [ ] Write unit test for delete action — used template — user cancels (closes dialog without deleting)
-  - [ ] Write unit test for duplicate server error handling
-- [ ] Task: Implement duplicate and delete on template list page
-  - [ ] Wire duplicate action in TemplateCard dropdown to `duplicateTemplate` server function
-  - [ ] On duplicate success: show success message and refresh list
-  - [ ] Implement delete confirmation with conditional behavior:
+- [x] Task: Write tests for duplicate and delete actions (3ce9d21)
+  - [x] Write unit test for duplicate action — calls `duplicateTemplate`, shows success message, refreshes list
+  - [x] Write unit test for delete action — unused template — basic confirmation, calls `deleteTemplate`, success
+  - [x] Write unit test for delete action — used template — shows "in_use" warning with count, requires typing "DELETE", then calls `deleteTemplate`
+  - [x] Write unit test for delete action — used template — user cancels (closes dialog without deleting)
+  - [x] Write unit test for duplicate server error handling
+- [x] Task: Implement duplicate and delete on template list page (3ce9d21)
+  - [x] Wire duplicate action in TemplateCard dropdown to `duplicateTemplate` server function
+  - [x] On duplicate success: show success message and refresh list
+  - [x] Implement delete confirmation with conditional behavior:
     - Check if template is in use via server (or frontend tracks a `_assignmentCount` field on the template)
     - If not in use: basic `confirm()` dialog → call `deleteTemplate` → refresh
     - If in use: custom dialog showing usage count + text input requiring "DELETE" → call `deleteTemplate` → refresh
-  - [ ] Add i18n translation keys for delete dialogs, confirmations, success/error messages
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Duplicate & Delete Actions' (Protocol in workflow.md)
+  - [x] Add i18n translation keys for delete dialogs, confirmations, success/error messages
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Duplicate & Delete Actions' (Protocol in workflow.md)
 
 **Note:** The admin sidebar `/admin/templates` link and i18n key `adminSidebar.templates` were already added in Track 2.1 as a placeholder. No sidebar changes needed.

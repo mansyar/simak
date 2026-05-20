@@ -54,7 +54,14 @@ function TemplatesPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<any>(null);
+  interface EditingTemplate {
+    id: number;
+    name: string;
+    type: string;
+    checkpoints: { id: number; name: string; order: number }[];
+    assignmentCount: number;
+  }
+  const [editingTemplate, setEditingTemplate] = useState<EditingTemplate | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deletingTemplate, setDeletingTemplate] = useState<{
     id: number;
