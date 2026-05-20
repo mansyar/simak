@@ -1,6 +1,6 @@
 # Implementation Plan: Track 2.2 — Assignment Templates (Admin)
 
-## Phase 1: Dependencies, i18n Types & UI Component Shells
+## Phase 1: Dependencies, i18n Types & UI Component Shells [checkpoint: d4ce44b]
 
 **Objective:** Set up i18n types, then build the UI component shells (TemplateCard, TemplateFilters, pagination) with tests using mock data. Route creation and data wiring come in Phase 2 after server functions exist.
 
