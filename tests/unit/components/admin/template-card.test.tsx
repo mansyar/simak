@@ -47,7 +47,7 @@ describe('TemplateCard', () => {
   const mockTemplate = {
     id: 1,
     name: 'Thesis Template',
-    typeLabel: 'Thesis',
+    type: 'Thesis',
     checkpointCount: 4,
     createdAt: new Date('2025-01-15'),
   };
