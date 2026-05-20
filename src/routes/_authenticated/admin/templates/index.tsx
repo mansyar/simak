@@ -1,0 +1,155 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { useState } from 'react';
+import { useServerFn } from '@tanstack/react-start';
+import { listTemplates, deleteTemplate, duplicateTemplate } from '@/server/templates';
+import { TemplateCard, TemplateRow } from '@/components/admin/templates/TemplateCard';
+import { TemplateFilters } from '@/components/admin/templates/TemplateFilters';
+import { TemplatePagination } from '@/components/admin/templates/TemplatePagination';
+import { TemplateEmptyState } from '@/components/admin/templates/TemplateEmptyState';
+import { TemplateLoadingSkeleton } from '@/components/admin/templates/TemplateLoadingSkeleton';
+import { Button } from '@/components/ui/button';
+import { Plus, RefreshCcw } from 'lucide-react';
+import { z } from 'zod';
+import { useI18n } from '../../../__root';
+
+const TemplateSearchSchema = z.object({
+  page: z.number().optional().default(1),
+  limit: z.number().optional().default(20),
+  search: z.string().optional().default(''),
+  type: z.string().optional().default(''),
+});
+
+export const Route = createFileRoute('/_authenticated/admin/templates/')({
+  validateSearch: (search) => TemplateSearchSchema.parse(search),
+  loaderDeps: ({ search }) => ({
+    page: search.page,
+    limit: search.limit,
+    search: search.search,
+    type: search.type,
+  }),
+  loader: async ({ deps }) => {
+    return listTemplates({ data: deps });
+  },
+  pendingComponent: () => <TemplateLoadingSkeleton />,
+  component: TemplatesPage,
+});
+
+function TemplatesPage() {
+  const { t } = useI18n();
+  const data = Route.useLoaderData();
+  const templates: TemplateRow[] = data?.templates ?? [];
+  const total = data?.total ?? 0;
+  const searchParams = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const deleteTemplateFn = useServerFn(deleteTemplate);
+  const duplicateTemplateFn = useServerFn(duplicateTemplate);
+
+  const handleSearchChange = (value: string) => {
+    navigate({
+      search: (prev) => ({ ...prev, search: value, page: 1 }),
+    });
+  };
+
+  const handleTypeChange = (value: string) => {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        type: value === 'all' ? '' : value,
+        page: 1,
+      }),
+    });
+  };
+
+  const handlePageChange = (page: number) => {
+    navigate({
+      search: (prev) => ({ ...prev, page }),
+    });
+  };
+
+  const handleEdit = (template: TemplateRow) => {
+    // Phase 4 will wire this to EditTemplateSheet
+    navigate({ search: (prev) => prev });
+  };
+
+  const handleDelete = async (template: TemplateRow) => {
+    if (confirm(t('adminTemplates.deleteConfirm'))) {
+      await (deleteTemplateFn as any)({ data: { id: template.id } });
+      navigate({ search: (prev) => prev });
+    }
+  };
+
+  const handleDuplicate = async (template: TemplateRow) => {
+    const result = await (duplicateTemplateFn as any)({ data: { id: template.id } });
+    if (result.template) {
+      navigate({ search: (prev) => prev }); // Refresh
+    }
+  };
+
+  // Unique template types for filter dropdown
+  const allTypes = [...new Set(templates.map((t) => t.type))];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t('adminTemplates.title')}</h1>
+          <p className="text-muted-foreground">
+            Manage assignment templates and checkpoint structures.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => {
+              setIsRefreshing(true);
+              navigate({ search: (prev) => prev });
+              setTimeout(() => setIsRefreshing(false), 1500);
+            }}
+            disabled={isRefreshing}
+          >
+            <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </Button>
+          <Button onClick={() => navigate({ search: (prev) => prev })}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('adminTemplates.newTemplate')}
+          </Button>
+        </div>
+      </div>
+
+      <TemplateFilters
+        search={searchParams.search}
+        onSearchChange={handleSearchChange}
+        type={searchParams.type || 'all'}
+        types={allTypes}
+        onTypeChange={handleTypeChange}
+      />
+
+      {templates.length === 0 ? (
+        <TemplateEmptyState onCreateNew={() => navigate({ search: (prev) => prev })} />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {templates.map((template) => (
+            <TemplateCard
+              key={template.id}
+              template={template}
+              onEdit={handleEdit}
+              onDuplicate={handleDuplicate}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
+
+      {templates.length > 0 && (
+        <TemplatePagination
+          currentPage={searchParams.page}
+          totalPages={Math.max(1, Math.ceil(total / searchParams.limit))}
+          onPageChange={handlePageChange}
+        />
+      )}
+    </div>
+  );
+}
