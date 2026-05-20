@@ -118,3 +118,6 @@
   - [x] Implement edit mode: inline form with Name and Email fields (role not editable)
   - [x] Add i18n translation keys for edit form labels and button
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: User Detail/Edit Page' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions (383d948)
