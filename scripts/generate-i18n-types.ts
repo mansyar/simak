@@ -54,6 +54,7 @@ export type Translation = {
     submit: string
     noResults: string
     viewAll: string
+    page: string
   }
   theme: {
     light: string

@@ -51,7 +51,8 @@
     "next": "Lanjut",
     "submit": "Kirim",
     "noResults": "Tidak ada hasil",
-    "viewAll": "Lihat Semua"
+    "viewAll": "Lihat Semua",
+    "page": "Halaman"
   },
   "theme": {
     "light": "Mode Terang",

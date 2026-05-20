@@ -51,7 +51,8 @@
     "next": "Next",
     "submit": "Submit",
     "noResults": "No results found",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "page": "Page"
   },
   "theme": {
     "light": "Light Mode",
