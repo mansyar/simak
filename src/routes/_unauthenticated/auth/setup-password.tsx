@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
-import { authClient } from '../../../lib/auth-client';
+import { completePasswordSetup } from '../../../server/setup-password';
 import { useI18n } from '../../__root';
 
 export const Route = createFileRoute('/_unauthenticated/auth/setup-password')({
@@ -42,9 +42,10 @@ function SetupPasswordPage() {
     setIsSubmitting(true);
 
     try {
-      const result = await authClient.resetPassword({ token, newPassword: password });
+      // @ts-expect-error - server function type inference limitation
+      const result = await completePasswordSetup({ data: { token, password } });
       if (result.error) {
-        setError(result.error.message ?? t('auth.linkExpired'));
+        setError(result.error);
       } else {
         setSuccess(true);
       }
