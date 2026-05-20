@@ -7,14 +7,14 @@
 - [x] Task: Update i18n type definitions for admin template sections (665b005)
   - [ ] Update `scripts/generate-i18n-types.ts` — add `adminTemplates` section to the static `Translation` type template
   - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
-- [ ] Task: Write tests for UI component shells (using mock data)
+- [x] Task: Write tests for UI component shells (using mock data) (7c7ebb6)
   - [ ] Write unit test for template card component rendering (name, type badge, checkpoint count, created date, actions dropdown)
   - [ ] Write unit test for search input debounce behavior
   - [ ] Write unit test for type filter dropdown (All + unique types)
   - [ ] Write unit test for pagination controls (next/prev, page indicator)
   - [ ] Write unit test for empty state rendering
   - [ ] Write unit test for loading skeleton state
-- [ ] Task: Implement UI component shells
+- [x] Task: Implement UI component shells (7c7ebb6)
   - [ ] Add i18n translation keys for template list to `locales/en.json` / `locales/id.json`
   - [ ] Create `src/components/admin/templates/TemplateCard.tsx` — card component with name, type badge, checkpoint count, created date, dropdown actions (Edit, Duplicate, Delete)
   - [ ] Create `src/components/admin/templates/TemplateFilters.tsx` — search input + type filter select
