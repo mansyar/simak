@@ -21,7 +21,7 @@
   - [ ] Implement pagination component with prev/next controls
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Dependencies, i18n Types & UI Component Shells' (Protocol in workflow.md)
 
-## Phase 2: Server Functions, Zod Validation & Template Route
+## Phase 2: Server Functions, Zod Validation & Template Route [checkpoint: 978d3d5]
 
 **Objective:** Implement all server-side CRUD functions with Zod validation, checkpoint handling, duplicate logic, and soft-delete with usage checking. Then create the template list route that wires the UI components to server data.
 
