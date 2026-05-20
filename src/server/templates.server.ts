@@ -1,5 +1,5 @@
 // Server-only helpers (not imported by client code)
-import { eq, ilike, and, isNull, sql } from 'drizzle-orm';
+import { eq, inArray, and, isNull, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates';
 import { assignments } from '../db/schema/assignments';
@@ -47,17 +47,33 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
       createdBy: assignmentTemplates.createdBy,
       createdAt: assignmentTemplates.createdAt,
       updatedAt: assignmentTemplates.updatedAt,
-      checkpointCount: sql<number>`(
-        SELECT count(*)::int
-        FROM ${templateCheckpoints}
-        WHERE ${templateCheckpoints.templateId} = ${assignmentTemplates.id}
-      )`,
     })
     .from(assignmentTemplates)
     .where(and(...conditions))
     .orderBy(assignmentTemplates.createdAt)
     .limit(limit)
     .offset((page - 1) * limit);
+
+  // Enrich with checkpoint counts in a separate query
+  const templateIds = templatesData.map((t) => t.id);
+  let checkpointCounts: Map<number, number> = new Map();
+  if (templateIds.length > 0) {
+    const counts = await db
+      .select({
+        templateId: templateCheckpoints.templateId,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(templateCheckpoints)
+      .where(inArray(templateCheckpoints.templateId, templateIds))
+      .groupBy(templateCheckpoints.templateId);
+
+    checkpointCounts = new Map(counts.map((c) => [c.templateId, Number(c.count)]));
+  }
+
+  const templatesWithCounts = templatesData.map((t) => ({
+    ...t,
+    checkpointCount: checkpointCounts.get(t.id) ?? 0,
+  }));
 
   // Total count for pagination
   const [{ count }] = await db
@@ -66,7 +82,7 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
     .where(and(...conditions));
 
   return {
-    templates: templatesData,
+    templates: templatesWithCounts,
     total: Number(count),
   };
 }

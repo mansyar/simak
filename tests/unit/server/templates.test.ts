@@ -140,6 +140,7 @@ describe('Template server functions - Logic & Security', () => {
     update: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
+    groupBy: vi.fn().mockReturnThis(),
     then: vi.fn(function (onfulfilled: any) {
       return Promise.resolve([]).then(onfulfilled);
     }),
@@ -236,13 +237,15 @@ describe('Template server functions - Logic & Security', () => {
     it('should return templates and total count', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
 
-      // First await: select templates with subquery → returns [template]
-      // Second await: count query → returns [{ count: 1 }]
+      // First await: select templates → returns [template]
+      // Second await: count of checkpoints per template (groupBy)
+      // Third await: total count query
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis', checkpointCount: 3 }]).then(
-            onfulfilled,
-          ),
+          Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ count: 1 }]).then(onfulfilled),
@@ -251,6 +254,7 @@ describe('Template server functions - Logic & Security', () => {
       const result = await listTemplatesHandler({ data: listData });
 
       expect(result.templates).toHaveLength(1);
+      expect(result.templates[0].checkpointCount).toBe(3);
       expect(result.total).toBe(1);
     });
 
