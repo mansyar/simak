@@ -14,9 +14,9 @@ import { useI18n } from '../../../routes/__root';
 export type TemplateRow = {
   id: number;
   name: string;
-  typeLabel: string;
+  type: string;
   checkpointCount: number;
-  createdAt: Date;
+  createdAt: Date | null;
 };
 
 interface TemplateCardProps {
@@ -36,13 +36,13 @@ export function TemplateCard({ template, onEdit, onDuplicate, onDelete }: Templa
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-lg">{template.name}</h3>
-              <Badge variant="secondary">{template.typeLabel}</Badge>
+              <Badge variant="secondary">{template.type}</Badge>
             </div>
             <p className="text-sm text-muted-foreground">
               {t('adminTemplates.checkpointCount', { count: String(template.checkpointCount) })}
             </p>
             <p className="text-xs text-muted-foreground">
-              {format(new Date(template.createdAt), 'MMM d, yyyy')}
+              {template.createdAt ? format(new Date(template.createdAt), 'MMM d, yyyy') : ''}
             </p>
           </div>
           <DropdownMenu>

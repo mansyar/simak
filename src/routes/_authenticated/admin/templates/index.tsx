@@ -16,6 +16,7 @@ import { TemplateEmptyState } from '@/components/admin/templates/TemplateEmptySt
 import { TemplateLoadingSkeleton } from '@/components/admin/templates/TemplateLoadingSkeleton';
 import { CreateTemplateDialog } from '@/components/admin/templates/CreateTemplateDialog';
 import { EditTemplateSheet } from '@/components/admin/templates/EditTemplateSheet';
+import { DeleteTemplateDialog } from '@/components/admin/templates/DeleteTemplateDialog';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { z } from 'zod';
@@ -54,6 +55,11 @@ function TemplatesPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<any>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingTemplate, setDeletingTemplate] = useState<{
+    id: number;
+    usageCount: number;
+  } | null>(null);
 
   const deleteTemplateFn = useServerFn(deleteTemplate);
   const duplicateTemplateFn = useServerFn(duplicateTemplate);
@@ -110,9 +116,18 @@ function TemplatesPage() {
   };
 
   const handleDelete = async (template: TemplateRow) => {
-    if (confirm(t('adminTemplates.deleteConfirm'))) {
-      await (deleteTemplateFn as any)({ data: { id: template.id } });
-      navigate({ search: (prev) => prev });
+    // First check if template is in use
+    const fullTemplate = await (getTemplateFn as any)({ data: { id: template.id } });
+    const usageCount = fullTemplate?.assignmentCount ?? 0;
+    setDeletingTemplate({ id: template.id, usageCount });
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingTemplate) return;
+    const result = await (deleteTemplateFn as any)({ data: { id: deletingTemplate.id } });
+    if (result.success || result.error === 'in_use') {
+      navigate({ search: (prev) => prev }); // Refresh
     }
   };
 
@@ -168,6 +183,13 @@ function TemplatesPage() {
         onOpenChange={setIsEditSheetOpen}
         onSubmit={handleUpdateTemplate}
         onSuccess={handleEditSuccess}
+      />
+
+      <DeleteTemplateDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        usageCount={deletingTemplate?.usageCount ?? 0}
       />
 
       <TemplateFilters

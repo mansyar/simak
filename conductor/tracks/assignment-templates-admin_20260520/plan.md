@@ -78,32 +78,32 @@
   - [x] Add i18n translation keys for form labels, placeholders, errors, success messages
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Create Template Dialog' (Protocol in workflow.md)
 
-## Phase 4: Edit Template Sheet
+## Phase 4: Edit Template Sheet [checkpoint: 60d690c]
 
 **Objective:** Build the edit template sheet with pre-filled data, checkpoint list editing, and in-use banner.
 
-- [~] Task: Write tests for edit template sheet
-  - [ ] Write unit test for sheet open/closed state
-  - [ ] Write unit test for form pre-filled with existing template data
-  - [ ] Write unit test for add/remove/reorder checkpoint rows
-  - [ ] Write unit test for submit success (sheet closes, list refreshes)
-  - [ ] Write unit test for in-use banner display (when template has assignment count > 0)
-  - [ ] Write unit test for server error display
-- [ ] Task: Implement edit template sheet
-  - [ ] Create `src/components/admin/templates/EditTemplateSheet.tsx` — slide-in sheet with pre-filled form
-  - [ ] Reuse `CheckpointListEditor.tsx` for checkpoint editing
-  - [ ] Fetch template data via `getTemplate` server function (or pass from list data)
-  - [ ] Implement in-use banner: check if template has active assignment count; if > 0, show info banner with count
-  - [ ] Wire submit to `updateTemplate` server function
-  - [ ] On success: close sheet, refresh list, show success message
-  - [ ] Add i18n translation keys for sheet labels, in-use banner, success messages
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Edit Template Sheet' (Protocol in workflow.md)
+- [x] Task: Write tests for edit template sheet (60d690c)
+  - [x] Write unit test for sheet open/closed state
+  - [x] Write unit test for form pre-filled with existing template data
+  - [x] Write unit test for add/remove/reorder checkpoint rows
+  - [x] Write unit test for submit success (sheet closes, list refreshes)
+  - [x] Write unit test for in-use banner display (when template has assignment count > 0)
+  - [x] Write unit test for server error display
+- [x] Task: Implement edit template sheet (60d690c)
+  - [x] Create `src/components/admin/templates/EditTemplateSheet.tsx` — slide-in sheet with pre-filled form
+  - [x] Reuse `CheckpointListEditor.tsx` for checkpoint editing
+  - [x] Fetch template data via `getTemplate` server function (or pass from list data)
+  - [x] Implement in-use banner: check if template has active assignment count; if > 0, show info banner with count
+  - [x] Wire submit to `updateTemplate` server function
+  - [x] On success: close sheet, refresh list, show success message
+  - [x] Add i18n translation keys for sheet labels, in-use banner, success messages
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Edit Template Sheet' (Protocol in workflow.md)
 
 ## Phase 5: Duplicate & Delete Actions
 
 **Objective:** Wire up duplicate action and implement soft-blocked delete with usage count warning.
 
-- [ ] Task: Write tests for duplicate and delete actions
+- [~] Task: Write tests for duplicate and delete actions
   - [ ] Write unit test for duplicate action — calls `duplicateTemplate`, shows success message, refreshes list
   - [ ] Write unit test for delete action — unused template — basic confirmation, calls `deleteTemplate`, success
   - [ ] Write unit test for delete action — used template — shows "in_use" warning with count, requires typing "DELETE", then calls `deleteTemplate`
