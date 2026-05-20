@@ -1,0 +1,8 @@
+{
+  "track_id": "user-management-admin_20260520",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-05-20T05:25:00Z",
+  "updated_at": "2026-05-20T05:25:00Z",
+  "description": "Build the admin user management page — list, create, edit, and soft-delete users. Send invitation emails with password setup links. Support manual link generation for in-person sharing."
+}
