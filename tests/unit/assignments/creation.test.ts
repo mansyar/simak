@@ -85,7 +85,7 @@ describe('Assignment Server Functions', () => {
     });
 
     it('should succeed and instantiate checkpoints for students', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession);
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
 
       // Mock returning inserted assignment ID = 42
       mockDb.returning.mockImplementation(() => {
@@ -129,7 +129,7 @@ describe('Assignment Server Functions', () => {
     });
 
     it('should return list of instructor assignments and total count', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession);
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
 
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
@@ -162,7 +162,7 @@ describe('Assignment Server Functions', () => {
     });
 
     it('should return null if assignment not found or belongs to another instructor', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession);
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([]).then(onfulfilled),
       );
@@ -172,7 +172,7 @@ describe('Assignment Server Functions', () => {
     });
 
     it('should return assignment details with student progress', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession);
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
 
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
