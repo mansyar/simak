@@ -1,6 +1,6 @@
 # Plan: Track 3.2 — Student Assignment Viewing
 
-## Phase 1: Student Layout & Sidebar
+## Phase 1: Student Layout & Sidebar [checkpoint: 81c609b]
 
 - [x] Task: Create server functions for student assignment queries [f43884c]
   - [x] Add Zod schemas and `createServerFn` stubs in `src/server/assignments.ts`
@@ -14,7 +14,7 @@
   - [x] Add `studentSidebar` translation keys to `locales/en.json` and `locales/id.json`
   - [x] Write unit tests for student layout (role guard, sidebar rendering)
   - [x] Write unit tests for student sidebar (link rendering, active state, i18n)
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Student Layout & Sidebar' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Student Layout & Sidebar' (Protocol in workflow.md)
 
 ## Phase 2: Student Assignment List Page
 
