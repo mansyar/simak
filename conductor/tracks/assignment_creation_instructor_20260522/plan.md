@@ -2,18 +2,18 @@
 
 ## Phase 1: Server-Side Functions & Testing
 
-- [ ] Task: Implement Drizzle Query logic & split server files for Assignments
-  - [ ] Define client stubs, routes validation schemas and Zod types in `src/server/assignments.ts`
-  - [ ] Create database query logic in `src/server/assignments.server.ts`
-  - [ ] Implement `listInstructorAssignments` with paginated offset, title search, and instructor ownership filtering
-  - [ ] Implement `createAssignment` with transaction to insert assignments, assignment_students, and copy/instantiate checkpoints per student
-  - [ ] Implement `getAssignmentDetail` to fetch assignment summary, assigned students list, and checkpoint progress statuses
-- [ ] Task: TDD - Unit and Integration Tests for Assignment Server Functions
-  - [ ] Write failing unit test suite `tests/unit/assignments/creation.test.ts` to test checkpoint copy/instantiation logic (Red Phase)
-  - [ ] Write failing integration test suite `tests/integration/assignments/create-assignment.test.ts` to test complete wizard save flow in DB transaction (Red Phase)
-  - [ ] Implement and verify both test suites pass successfully (Green Phase)
-  - [ ] Verify test coverage for `src/server/assignments.server.ts` is > 80%
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Server-Side Functions & Testing' (Protocol in workflow.md)
+- [x] Task: Implement Drizzle Query logic & split server files for Assignments
+  - [x] Define client stubs, routes validation schemas and Zod types in `src/server/assignments.ts`
+  - [x] Create database query logic in `src/server/assignments.server.ts`
+  - [x] Implement `listInstructorAssignments` with paginated offset, title search, and instructor ownership filtering
+  - [x] Implement `createAssignment` with transaction to insert assignments, assignment_students, and copy/instantiate checkpoints per student
+  - [x] Implement `getAssignmentDetail` to fetch assignment summary, assigned students list, and checkpoint progress statuses
+- [x] Task: TDD - Unit and Integration Tests for Assignment Server Functions
+  - [x] Write failing unit test suite `tests/unit/assignments/creation.test.ts` to test checkpoint copy/instantiation logic (Red Phase)
+  - [x] Write failing integration test suite `tests/integration/assignments/create-assignment.test.ts` to test complete wizard save flow in DB transaction (Red Phase)
+  - [x] Implement and verify both test suites pass successfully (Green Phase)
+  - [x] Verify test coverage for `src/server/assignments.server.ts` is > 80%
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Server-Side Functions & Testing' (Protocol in workflow.md)
 
 ## Phase 2: Listing & Detail Views UI
 

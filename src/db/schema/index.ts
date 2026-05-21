@@ -91,6 +91,10 @@ export const checkpointsRelations = relations(checkpoints, ({ many, one }) => ({
     fields: [checkpoints.assignmentId],
     references: [assignments.id],
   }),
+  student: one(users, {
+    fields: [checkpoints.studentId],
+    references: [users.id],
+  }),
   submissions: many(submissions),
 }));
 

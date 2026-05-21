@@ -45,6 +45,9 @@ export const checkpoints = pgTable(
     assignmentId: integer('assignment_id')
       .notNull()
       .references(() => assignments.id, { onDelete: 'cascade' }),
+    studentId: text('student_id')
+      .notNull()
+      .references(() => users.id),
     name: text('name').notNull(),
     order: integer('order').notNull(),
     dueDate: timestamp('due_date'),
@@ -53,5 +56,8 @@ export const checkpoints = pgTable(
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
   },
-  (table) => [index('checkpoints_assignment_id_idx').on(table.assignmentId)],
+  (table) => [
+    index('checkpoints_assignment_id_idx').on(table.assignmentId),
+    index('checkpoints_student_id_idx').on(table.studentId),
+  ],
 );
