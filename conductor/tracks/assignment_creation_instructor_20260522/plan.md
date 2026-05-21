@@ -32,7 +32,7 @@
   - [x] Write failing component tests for Assignments list page filters, skeleton loading, and empty states (Red Phase)
   - [x] Write failing component tests for progress-table component row rendering and status badges (Red Phase)
   - [x] Implement and verify both test suites pass successfully (Green Phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Listing & Detail Views UI' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Listing & Detail Views UI' (Protocol in workflow.md)
 
 ## Phase 3: Creation Wizard UI & Flow
 
