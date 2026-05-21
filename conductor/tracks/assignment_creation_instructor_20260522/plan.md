@@ -28,10 +28,10 @@
   - [x] Create dynamic route file `src/routes/_authenticated/instructor/assignments/$id.tsx`
   - [x] Create `progress-table.tsx` component displaying assigned students, current checkpoint, and overall completion percentages
   - [x] Add status badge colors for checkpoint states (passed, under_review, submitted, locked, unlocked, revise)
-- [ ] Task: TDD - Unit Tests for Listing & Detail Components
-  - [ ] Write failing component tests for Assignments list page filters, skeleton loading, and empty states (Red Phase)
-  - [ ] Write failing component tests for progress-table component row rendering and status badges (Red Phase)
-  - [ ] Implement and verify both test suites pass successfully (Green Phase)
+- [x] Task: TDD - Unit Tests for Listing & Detail Components [x] (Commit: d28cd3a)
+  - [x] Write failing component tests for Assignments list page filters, skeleton loading, and empty states (Red Phase)
+  - [x] Write failing component tests for progress-table component row rendering and status badges (Red Phase)
+  - [x] Implement and verify both test suites pass successfully (Green Phase)
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Listing & Detail Views UI' (Protocol in workflow.md)
 
 ## Phase 3: Creation Wizard UI & Flow
