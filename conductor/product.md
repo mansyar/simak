@@ -101,3 +101,12 @@ Students and instructors lack a centralized system to:
 - **In-use banner** — Edit sheet shows warning banner with assignment count if template is in use by active assignments
 - **Zod validation** — Client + server validation: name required, type required, min 1 checkpoint, no empty checkpoint names
 - **i18n translations** — Full English and Indonesian translations for template management UI, form labels, messages, and error states
+
+### Track 3.1: Assignment Creation (Instructor) (May 2026)
+
+- **Instructor Assignments listing page** (`/instructor/assignments`) — Paginated card-based or list view of assignments created by the instructor with title search, key metadata, and responsive skeleton states.
+- **Assignment Creation Wizard** (`/instructor/assignments/new`) — Multi-step visual form (Select Template -> Fill Details -> Select Students -> Confirm) using `React Hook Form` and Zod resolver for input validations.
+- **Template and Student selection** — Smart `TemplatePicker` with checkpoint previews and `StudentPicker` searchable multi-select combobox.
+- **Sequential checkpoint copy/instantiation** — Server-side transaction in `createAssignment` that instantiates assignment-student mappings and copies checkpoints, initializing the first checkpoint as `unlocked` and subsequent ones as `locked`.
+- **Assignment Detail & Progress dashboard** (`/instructor/assignments/$id`) — Interactive progress-table displaying student checkpoint statuses (Passed, Submitted, Under Review, Revise, Unlocked, Locked) and completion percentages.
+- **i18n translations** — Full English and Indonesian translations for wizard steps, forms, progress badges, error validation alerts, and dashboard states.
