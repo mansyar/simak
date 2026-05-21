@@ -6,7 +6,12 @@ import { users, verification } from '../db/schema/index';
 import { sendInvitationEmail } from '../lib/email';
 import { getSessionFromHeaders } from './auth';
 import type { z } from 'zod';
-import type { CreateUserSchema, UpdateUserSchema, ListUsersSchema, UserIdParamSchema } from './users';
+import type {
+  CreateUserSchema,
+  UpdateUserSchema,
+  ListUsersSchema,
+  UserIdParamSchema,
+} from './users';
 
 type CreateUserInput = z.infer<typeof CreateUserSchema>;
 type UpdateUserInput = z.infer<typeof UpdateUserSchema>;
@@ -15,11 +20,25 @@ type UserIdParam = z.infer<typeof UserIdParamSchema>;
 
 export async function listUsersHandler(args: { data: ListUsersInput }) {
   const session = await getSessionFromHeaders();
-  if (!session || (session.user.role !== 'admin' && session.user.role !== 'superadmin')) {
+  if (!session) {
     return { users: [], total: 0 };
   }
 
-  const { search, role, page, limit } = args.data;
+  const isAdmin = session.user.role === 'admin' || session.user.role === 'superadmin';
+  const isInstructor = session.user.role === 'instructor';
+
+  if (!isAdmin && !isInstructor) {
+    return { users: [], total: 0 };
+  }
+
+  const { search, page, limit } = args.data;
+  let { role } = args.data;
+
+  // Instructors are only authorized to search/list student users
+  if (isInstructor) {
+    role = 'student';
+  }
+
   const db = getDb();
   const conditions = [isNull(users.deletedAt)];
 
@@ -29,7 +48,9 @@ export async function listUsersHandler(args: { data: ListUsersInput }) {
   }
 
   if (search) {
-    conditions.push(sql`${users.name} ILIKE ${'%' + search + '%'} OR ${users.email} ILIKE ${'%' + search + '%'}`);
+    conditions.push(
+      sql`${users.name} ILIKE ${'%' + search + '%'} OR ${users.email} ILIKE ${'%' + search + '%'}`,
+    );
   }
 
   if (role) {
@@ -199,10 +220,7 @@ export async function deleteUserHandler(args: { data: UserIdParam }) {
   }
 
   const db = getDb();
-  await db
-    .update(users)
-    .set({ deletedAt: new Date() })
-    .where(eq(users.id, args.data.id));
+  await db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, args.data.id));
 
   return { success: true };
 }
