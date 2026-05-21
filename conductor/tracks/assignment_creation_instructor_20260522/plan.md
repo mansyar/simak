@@ -20,10 +20,10 @@
 - [x] Task: Create i18n translation keys [x] (Commit: 6121631)
   - [x] Add English translations for instructor dashboard, assignments list, table headers, and status badges in `locales/en.json`
   - [x] Add Indonesian translations in `locales/id.json`
-- [ ] Task: Implement Assignment Listing View
-  - [ ] Add sidebar navigation link for Instructor Assignments
-  - [ ] Create layout/route file `src/routes/_authenticated/instructor/assignments/index.tsx`
-  - [ ] Build card-based and list view of instructor-owned assignments with search filter, pagination, and skeleton loading card states
+- [x] Task: Implement Assignment Listing View [x] (Commit: 1b9b8eb)
+  - [x] Add sidebar navigation link for Instructor Assignments
+  - [x] Create layout/route file `src/routes/_authenticated/instructor/assignments/index.tsx`
+  - [x] Build card-based and list view of instructor-owned assignments with search filter, pagination, and skeleton loading card states
 - [ ] Task: Implement Assignment Detail and Progress Dashboard
   - [ ] Create dynamic route file `src/routes/_authenticated/instructor/assignments/$id.tsx`
   - [ ] Create `progress-table.tsx` component displaying assigned students, current checkpoint, and overall completion percentages
