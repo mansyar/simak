@@ -24,10 +24,10 @@
   - [x] Add sidebar navigation link for Instructor Assignments
   - [x] Create layout/route file `src/routes/_authenticated/instructor/assignments/index.tsx`
   - [x] Build card-based and list view of instructor-owned assignments with search filter, pagination, and skeleton loading card states
-- [ ] Task: Implement Assignment Detail and Progress Dashboard
-  - [ ] Create dynamic route file `src/routes/_authenticated/instructor/assignments/$id.tsx`
-  - [ ] Create `progress-table.tsx` component displaying assigned students, current checkpoint, and overall completion percentages
-  - [ ] Add status badge colors for checkpoint states (passed, under_review, submitted, locked, unlocked, revise)
+- [x] Task: Implement Assignment Detail and Progress Dashboard [x] (Commit: 5f83e08)
+  - [x] Create dynamic route file `src/routes/_authenticated/instructor/assignments/$id.tsx`
+  - [x] Create `progress-table.tsx` component displaying assigned students, current checkpoint, and overall completion percentages
+  - [x] Add status badge colors for checkpoint states (passed, under_review, submitted, locked, unlocked, revise)
 - [ ] Task: TDD - Unit Tests for Listing & Detail Components
   - [ ] Write failing component tests for Assignments list page filters, skeleton loading, and empty states (Red Phase)
   - [ ] Write failing component tests for progress-table component row rendering and status badges (Red Phase)
