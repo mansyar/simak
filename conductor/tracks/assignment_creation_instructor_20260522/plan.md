@@ -36,10 +36,10 @@
 
 ## Phase 3: Creation Wizard UI & Flow
 
-- [ ] Task: Implement step-by-step Wizard Container & Forms
-  - [ ] Create wizard route file `src/routes/_authenticated/instructor/assignments/new.tsx`
-  - [ ] Create dynamic wizard container `assignment-wizard.tsx` with a premium visual step indicator (Select Template -> Fill Details -> Select Students -> Confirm)
-  - [ ] Integrate React Hook Form and Zod resolver for input validations
+- [x] Task: Implement step-by-step Wizard Container & Forms [x] (Commit: 18417cc)
+  - [x] Create wizard route file `src/routes/_authenticated/instructor/assignments/new.tsx`
+  - [x] Create dynamic wizard container `assignment-wizard.tsx` with a premium visual step indicator (Select Template -> Fill Details -> Select Students -> Confirm)
+  - [x] Integrate React Hook Form and Zod resolver for input validations
 - [ ] Task: Create Wizard Steps components
   - [ ] Create `template-picker.tsx` showing template cards and checkpoint previews
   - [ ] Create `student-picker.tsx` with a searchable multi-select combobox filtering role = student
