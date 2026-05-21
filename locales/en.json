@@ -209,8 +209,14 @@
       "submitted": "Submitted",
       "locked": "Locked",
       "unlocked": "Unlocked",
-      "revise": "Revise"
-    }
+      "revise": "Revise",
+      "overdue": "Overdue"
+    },
+    "timeline": "Checkpoint Timeline",
+    "submit": "Submit",
+    "consultations": "Consultations: {current}/{required}",
+    "notFound": "Assignment not found",
+    "notFoundDescription": "This assignment does not exist or you don't have access to it."
   },
   "error": {
     "notFound": "Page not found",

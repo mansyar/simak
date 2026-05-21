@@ -209,8 +209,14 @@
       "submitted": "Dikirim",
       "locked": "Terkunci",
       "unlocked": "Terbuka",
-      "revise": "Revisi"
-    }
+      "revise": "Revisi",
+      "overdue": "Terlambat"
+    },
+    "timeline": "Linimasa Checkpoint",
+    "submit": "Kumpulkan",
+    "consultations": "Konsultasi: {current}/{required}",
+    "notFound": "Tugas tidak ditemukan",
+    "notFoundDescription": "Tugas ini tidak ada atau Anda tidak memiliki akses ke tugas ini."
   },
   "error": {
     "notFound": "Halaman tidak ditemukan",
