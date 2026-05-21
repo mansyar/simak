@@ -48,4 +48,4 @@
   - [x] Write failing integration tests for wizard navigation, validation guards on each step, and final transaction submission (Red Phase)
   - [x] Verify validation errors for empty fields, past dates, or empty student list are correctly displayed inline
   - [x] Make all wizard tests pass (Green Phase)
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Creation Wizard UI & Flow' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Creation Wizard UI & Flow' (Protocol in workflow.md)
