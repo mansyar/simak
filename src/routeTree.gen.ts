@@ -25,6 +25,7 @@ import { Route as AuthenticatedStudentAssignmentsIndexRouteImport } from './rout
 import { Route as AuthenticatedInstructorAssignmentsIndexRouteImport } from './routes/_authenticated/instructor/assignments/index'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_authenticated/admin/templates/index'
+import { Route as AuthenticatedStudentAssignmentsIdRouteImport } from './routes/_authenticated/student/assignments/$id'
 import { Route as AuthenticatedInstructorAssignmentsNewRouteImport } from './routes/_authenticated/instructor/assignments/new'
 import { Route as AuthenticatedInstructorAssignmentsIdRouteImport } from './routes/_authenticated/instructor/assignments/$id'
 
@@ -114,6 +115,12 @@ const AuthenticatedAdminTemplatesIndexRoute =
     path: '/templates/',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedStudentAssignmentsIdRoute =
+  AuthenticatedStudentAssignmentsIdRouteImport.update({
+    id: '/assignments/$id',
+    path: '/assignments/$id',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
 const AuthenticatedInstructorAssignmentsNewRoute =
   AuthenticatedInstructorAssignmentsNewRouteImport.update({
     id: '/assignments/new',
@@ -140,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
+  '/student/assignments/$id': typeof AuthenticatedStudentAssignmentsIdRoute
   '/admin/templates/': typeof AuthenticatedAdminTemplatesIndexRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/instructor/assignments/': typeof AuthenticatedInstructorAssignmentsIndexRoute
@@ -158,6 +166,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
+  '/student/assignments/$id': typeof AuthenticatedStudentAssignmentsIdRoute
   '/admin/templates': typeof AuthenticatedAdminTemplatesIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
   '/instructor/assignments': typeof AuthenticatedInstructorAssignmentsIndexRoute
@@ -179,6 +188,7 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/_authenticated/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
+  '/_authenticated/student/assignments/$id': typeof AuthenticatedStudentAssignmentsIdRoute
   '/_authenticated/admin/templates/': typeof AuthenticatedAdminTemplatesIndexRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/_authenticated/instructor/assignments/': typeof AuthenticatedInstructorAssignmentsIndexRoute
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/instructor/assignments/$id'
     | '/instructor/assignments/new'
+    | '/student/assignments/$id'
     | '/admin/templates/'
     | '/admin/users/'
     | '/instructor/assignments/'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/instructor/assignments/$id'
     | '/instructor/assignments/new'
+    | '/student/assignments/$id'
     | '/admin/templates'
     | '/admin/users'
     | '/instructor/assignments'
@@ -237,6 +249,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/_authenticated/instructor/assignments/$id'
     | '/_authenticated/instructor/assignments/new'
+    | '/_authenticated/student/assignments/$id'
     | '/_authenticated/admin/templates/'
     | '/_authenticated/admin/users/'
     | '/_authenticated/instructor/assignments/'
@@ -364,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTemplatesIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/student/assignments/$id': {
+      id: '/_authenticated/student/assignments/$id'
+      path: '/assignments/$id'
+      fullPath: '/student/assignments/$id'
+      preLoaderRoute: typeof AuthenticatedStudentAssignmentsIdRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
     '/_authenticated/instructor/assignments/new': {
       id: '/_authenticated/instructor/assignments/new'
       path: '/assignments/new'
@@ -416,10 +436,13 @@ const AuthenticatedInstructorRouteWithChildren =
   )
 
 interface AuthenticatedStudentRouteChildren {
+  AuthenticatedStudentAssignmentsIdRoute: typeof AuthenticatedStudentAssignmentsIdRoute
   AuthenticatedStudentAssignmentsIndexRoute: typeof AuthenticatedStudentAssignmentsIndexRoute
 }
 
 const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
+  AuthenticatedStudentAssignmentsIdRoute:
+    AuthenticatedStudentAssignmentsIdRoute,
   AuthenticatedStudentAssignmentsIndexRoute:
     AuthenticatedStudentAssignmentsIndexRoute,
 }

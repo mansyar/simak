@@ -35,21 +35,21 @@
 
 ## Phase 3: Student Assignment Detail & Checkpoint Timeline
 
-- [ ] Task: Build student assignment detail page
-  - [ ] Create `src/routes/_authenticated/student/assignments/$id.tsx` route (SSR with client hydration)
-  - [ ] Create `src/components/student/assignments/CheckpointTimeline.tsx` vertical timeline layout
-  - [ ] Create `src/components/student/assignments/CheckpointCard.tsx` with state badge, due date, blocking reasons, and consultation progress (X/Y verified)
-  - [ ] Create `src/components/student/assignments/AssignmentDetailHeader.tsx` with title, description, instructor, deadline
-  - [ ] Add `studentAssignments.detail` and `studentAssignments.status` translation keys to `locales/en.json` and `locales/id.json`
-  - [ ] Write unit tests for CheckpointTimeline (order, all checkpoints displayed)
-  - [ ] Write unit tests for CheckpointCard (state badge colors, due date, overdue indicator, lock reasons, consultation progress bar)
-  - [ ] Write unit tests for AssignmentDetailHeader (metadata display, instructor name)
-  - [ ] Write unit tests for assignment detail route (SSR data, ownership guard, loading state)
-- [ ] Task: Add consultation count to assignment detail server function
-  - [ ] Extend `getStudentAssignmentDetailHandler` to query `consultations` table (group by `checkpoint_id`, count where `status = 'verified'`)
-  - [ ] Return `verifiedConsultationCount` per checkpoint in the response payload
-  - [ ] Write unit test for consultation count query logic
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Student Assignment Detail & Checkpoint Timeline' (Protocol in workflow.md)
+- [x] Task: Build student assignment detail page [4115268]
+  - [x] Create `src/routes/_authenticated/student/assignments/$id.tsx` route (SSR with client hydration)
+  - [x] Create `src/components/student/assignments/CheckpointTimeline.tsx` vertical timeline layout
+  - [x] Create `src/components/student/assignments/CheckpointCard.tsx` with state badge, due date, blocking reasons, and consultation progress (X/Y verified)
+  - [x] Create `src/components/student/assignments/AssignmentDetailHeader.tsx` with title, description, instructor, deadline
+  - [x] Add `studentAssignments` detail translation keys to `locales/en.json` and `locales/id.json`
+  - [x] Write unit tests for CheckpointTimeline (order, all checkpoints displayed)
+  - [x] Write unit tests for CheckpointCard (state badge colors, due date, overdue indicator, lock reasons, consultation progress bar)
+  - [x] Write unit tests for AssignmentDetailHeader (metadata display, instructor name)
+  - [x] Write unit tests for assignment detail route (SSR data, ownership guard, loading state)
+- [x] Task: Add consultation count to assignment detail server function [f43884c]
+  - [x] Extend `getStudentAssignmentDetailHandler` to query `consultations` table (group by `checkpoint_id`, count where `status = 'verified'`)
+  - [x] Return `verifiedConsultationCount` per checkpoint in the response payload
+  - [x] Write unit test for consultation count query logic
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Student Assignment Detail & Checkpoint Timeline' (Protocol in workflow.md)
 
 ## Phase 4: Final Verification & Polish
 

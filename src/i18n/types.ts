@@ -81,6 +81,11 @@ export type Translation = {
     progress: string
     empty: string
     emptyPrompt: string
+    timeline: string
+    submit: string
+    consultations: string
+    notFound: string
+    notFoundDescription: string
     status: {
       passed: string
       under_review: string
@@ -88,6 +93,7 @@ export type Translation = {
       locked: string
       unlocked: string
       revise: string
+      overdue: string
     }
   }
   adminUsers: {
