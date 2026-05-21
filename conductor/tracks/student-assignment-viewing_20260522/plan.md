@@ -18,19 +18,19 @@
 
 ## Phase 2: Student Assignment List Page
 
-- [ ] Task: Build student assignment list UI
-  - [ ] Create `src/routes/_authenticated/student/assignments/index.tsx` route
-  - [ ] Create `src/components/student/assignments/AssignmentCard.tsx` with title, template badge, deadline, progress
-  - [ ] Create `src/components/student/assignments/AssignmentFilters.tsx` with search input for filtering by title
-  - [ ] Create `src/components/student/assignments/AssignmentListEmptyState.tsx`
-  - [ ] Create `src/components/student/assignments/AssignmentListLoadingSkeleton.tsx`
-  - [ ] Add `studentAssignments` list translation keys to `locales/en.json` and `locales/id.json`
-  - [ ] Update `scripts/generate-i18n-types.ts` with `studentAssignments` section in `Translation` type
-  - [ ] Write unit tests for AssignmentCard (metadata rendering, progress display)
-  - [ ] Write unit tests for AssignmentFilters (search input render, change handler)
-  - [ ] Write unit tests for AssignmentListEmptyState (message, prompt)
-  - [ ] Write unit tests for AssignmentListLoadingSkeleton (skeleton count, default)
-  - [ ] Write unit tests for assignment list route (pagination, search, loading states)
+- [x] Task: Build student assignment list UI [b44ce6d]
+  - [x] Create `src/routes/_authenticated/student/assignments/index.tsx` route
+  - [x] Create `src/components/student/assignments/StudentAssignmentCard.tsx` with title, template badge, deadline, progress
+  - [x] Create `src/components/student/assignments/StudentAssignmentFilters.tsx` with search input for filtering by title
+  - [x] Create `src/components/student/assignments/StudentAssignmentEmptyState.tsx`
+  - [x] Create `src/components/student/assignments/StudentAssignmentLoadingSkeleton.tsx`
+  - [x] Add `studentAssignments` list translation keys to `locales/en.json` and `locales/id.json`
+  - [x] Update `scripts/generate-i18n-types.ts` with `studentAssignments` section in `Translation` type
+  - [x] Write unit tests for StudentAssignmentCard (metadata rendering, progress display)
+  - [x] Write unit tests for StudentAssignmentFilters (search input render, change handler)
+  - [x] Write unit tests for StudentAssignmentEmptyState (message, prompt)
+  - [x] Write unit tests for StudentAssignmentLoadingSkeleton (skeleton count, default)
+  - [x] Write unit tests for assignment list route (pagination, search, loading states)
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Student Assignment List Page' (Protocol in workflow.md)
 
 ## Phase 3: Student Assignment Detail & Checkpoint Timeline
