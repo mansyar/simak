@@ -11,6 +11,7 @@
 - [ ] Task: Create student sidebar layout route
   - [ ] Create `src/routes/_authenticated/student.tsx` with `requireRole(['student'])` guard
   - [ ] Create `src/components/layout/student-sidebar.tsx` (matching instructor pattern)
+  - [ ] Add `studentSidebar` translation keys to `locales/en.json` and `locales/id.json`
   - [ ] Write unit tests for student layout (role guard, sidebar rendering)
   - [ ] Write unit tests for student sidebar (link rendering, active state, i18n)
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Student Layout & Sidebar' (Protocol in workflow.md)
@@ -20,9 +21,13 @@
 - [ ] Task: Build student assignment list UI
   - [ ] Create `src/routes/_authenticated/student/assignments/index.tsx` route
   - [ ] Create `src/components/student/assignments/AssignmentCard.tsx` with title, template badge, deadline, progress
+  - [ ] Create `src/components/student/assignments/AssignmentFilters.tsx` with search input for filtering by title
   - [ ] Create `src/components/student/assignments/AssignmentListEmptyState.tsx`
   - [ ] Create `src/components/student/assignments/AssignmentListLoadingSkeleton.tsx`
+  - [ ] Add `studentAssignments` list translation keys to `locales/en.json` and `locales/id.json`
+  - [ ] Update `scripts/generate-i18n-types.ts` with `studentAssignments` section in `Translation` type
   - [ ] Write unit tests for AssignmentCard (metadata rendering, progress display)
+  - [ ] Write unit tests for AssignmentFilters (search input render, change handler)
   - [ ] Write unit tests for AssignmentListEmptyState (message, prompt)
   - [ ] Write unit tests for AssignmentListLoadingSkeleton (skeleton count, default)
   - [ ] Write unit tests for assignment list route (pagination, search, loading states)
@@ -33,19 +38,24 @@
 - [ ] Task: Build student assignment detail page
   - [ ] Create `src/routes/_authenticated/student/assignments/$id.tsx` route (SSR with client hydration)
   - [ ] Create `src/components/student/assignments/CheckpointTimeline.tsx` vertical timeline layout
-  - [ ] Create `src/components/student/assignments/CheckpointCard.tsx` with state badge, due date, blocking reasons
+  - [ ] Create `src/components/student/assignments/CheckpointCard.tsx` with state badge, due date, blocking reasons, and consultation progress (X/Y verified)
   - [ ] Create `src/components/student/assignments/AssignmentDetailHeader.tsx` with title, description, instructor, deadline
+  - [ ] Add `studentAssignments.detail` and `studentAssignments.status` translation keys to `locales/en.json` and `locales/id.json`
   - [ ] Write unit tests for CheckpointTimeline (order, all checkpoints displayed)
-  - [ ] Write unit tests for CheckpointCard (state badge colors, due date, overdue indicator, lock reasons, consultation progress)
+  - [ ] Write unit tests for CheckpointCard (state badge colors, due date, overdue indicator, lock reasons, consultation progress bar)
   - [ ] Write unit tests for AssignmentDetailHeader (metadata display, instructor name)
   - [ ] Write unit tests for assignment detail route (SSR data, ownership guard, loading state)
+- [ ] Task: Add consultation count to assignment detail server function
+  - [ ] Extend `getStudentAssignmentDetailHandler` to query `consultations` table (group by `checkpoint_id`, count where `status = 'verified'`)
+  - [ ] Return `verifiedConsultationCount` per checkpoint in the response payload
+  - [ ] Write unit test for consultation count query logic
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Student Assignment Detail & Checkpoint Timeline' (Protocol in workflow.md)
 
-## Phase 4: i18n Translations & Final Polish
+## Phase 4: Final Verification & Polish
 
-- [ ] Task: Add translation keys for student assignment views
-  - [ ] Add all `studentAssignments` keys to `locales/en.json`
-  - [ ] Add all `studentAssignments` keys to `locales/id.json`
-- [ ] Task: Verify no hardcoded strings across all new components
+- [ ] Task: Audit all new components for i18n coverage
+  - [ ] Verify no hardcoded user-facing strings exist in any new component
+  - [ ] Verify all `en.json` and `id.json` entries for `studentSidebar`, `studentAssignments` have complete key parity
 - [ ] Task: Run full test suite and verify coverage >80%
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: i18n Translations & Final Polish' (Protocol in workflow.md)
+- [ ] Task: Run typecheck (`pnpm typecheck`) and lint (`pnpm lint`) and fix any issues
+- [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Verification & Polish' (Protocol in workflow.md)

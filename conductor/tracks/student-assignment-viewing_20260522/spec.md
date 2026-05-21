@@ -21,7 +21,7 @@ Enable students to view their assigned assignments and check progress through a 
 
 - Paginated list of assignments assigned to the logged-in student (20 per page)
 - Each assignment card shows: title, template type badge, final deadline, progress percentage
-- Search by assignment title
+- Search by assignment title via a filter/search input component
 - Loading state with animated skeleton cards
 - Empty state with "No assignments yet" message
 - Page state persisted in URL search params (`?page=2`)
@@ -52,8 +52,14 @@ Enable students to view their assigned assignments and check progress through a 
 ### FR5 — Server Functions
 
 - `listStudentAssignments` — Paginated, searchable list of assignments for the current student (via `assignmentStudents` join)
-- `getStudentAssignmentDetail` — Single assignment detail with checkpoints and progress, verified against student ownership
+- `getStudentAssignmentDetail` — Single assignment detail with checkpoints and progress, verified against student ownership. **Must include per-checkpoint verified consultation count** (query `consultations` table where `status = 'verified'` and group by `checkpoint_id`) to support the "Insufficient consultations: X/Y verified" gating display.
 - Both follow the `.ts` / `.server.ts` split pattern (Zod stubs in `assignments.ts`, handlers in `assignments.server.ts`)
+
+### FR6 — i18n Translation Keys
+
+- Translation keys for the `studentSidebar` section must be added in Phase 1 alongside the sidebar component
+- Translation keys for `studentAssignments` list and detail sections must be added in Phases 2–3 alongside their respective components
+- i18n TypeScript type definitions in `scripts/generate-i18n-types.ts` must be updated to include the new `studentAssignments` section
 
 ## Non-Functional Requirements
 
