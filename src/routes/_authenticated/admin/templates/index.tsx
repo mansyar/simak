@@ -38,7 +38,7 @@ export const Route = createFileRoute('/_authenticated/admin/templates/')({
     type: search.type,
   }),
   loader: async ({ deps }) => {
-    return listTemplates({ data: deps });
+    return (listTemplates as any)({ data: deps });
   },
   pendingComponent: () => <TemplateLoadingSkeleton />,
   component: TemplatesPage,
