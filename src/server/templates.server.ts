@@ -65,9 +65,11 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
     .limit(limit)
     .offset((page - 1) * limit);
 
-  // Enrich with checkpoint counts in a separate query
+  // Enrich with checkpoints and counts in a separate query
   const templateIds = templatesData.map((t) => t.id);
   let checkpointCounts: Map<number, number> = new Map();
+  const checkpointsMap: Map<number, string[]> = new Map();
+
   if (templateIds.length > 0) {
     const counts = await db
       .select({
@@ -79,11 +81,27 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
       .groupBy(templateCheckpoints.templateId);
 
     checkpointCounts = new Map(counts.map((c) => [c.templateId, Number(c.count)]));
+
+    const allCheckpoints = await db
+      .select({
+        templateId: templateCheckpoints.templateId,
+        name: templateCheckpoints.name,
+      })
+      .from(templateCheckpoints)
+      .where(inArray(templateCheckpoints.templateId, templateIds))
+      .orderBy(templateCheckpoints.order);
+
+    allCheckpoints.forEach((cp) => {
+      const list = checkpointsMap.get(cp.templateId) ?? [];
+      list.push(cp.name);
+      checkpointsMap.set(cp.templateId, list);
+    });
   }
 
   const templatesWithCounts = templatesData.map((t) => ({
     ...t,
     checkpointCount: checkpointCounts.get(t.id) ?? 0,
+    checkpoints: checkpointsMap.get(t.id) ?? [],
   }));
 
   // Total count for pagination

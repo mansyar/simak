@@ -239,13 +239,17 @@ describe('Template server functions - Logic & Security', () => {
 
       // First await: select templates → returns [template]
       // Second await: count of checkpoints per template (groupBy)
-      // Third await: total count query
+      // Third await: checkpoints list query (allCheckpoints)
+      // Fourth await: total count query
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis' }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, name: 'Proposal', order: 1 }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ count: 1 }]).then(onfulfilled),
