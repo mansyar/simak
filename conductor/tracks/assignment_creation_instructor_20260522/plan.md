@@ -1,6 +1,6 @@
 # Track 3.1 — Assignment Creation (Instructor) Implementation Plan
 
-## Phase 1: Server-Side Functions & Testing
+## Phase 1: Server-Side Functions & Testing [x] (Commit: e111166b2d4ad2faa4edcece9115632c0a9798b9)
 
 - [x] Task: Implement Drizzle Query logic & split server files for Assignments
   - [x] Define client stubs, routes validation schemas and Zod types in `src/server/assignments.ts`
@@ -17,9 +17,9 @@
 
 ## Phase 2: Listing & Detail Views UI
 
-- [ ] Task: Create i18n translation keys
-  - [ ] Add English translations for instructor dashboard, assignments list, table headers, and status badges in `locales/en.json`
-  - [ ] Add Indonesian translations in `locales/id.json`
+- [x] Task: Create i18n translation keys [x] (Commit: 6121631)
+  - [x] Add English translations for instructor dashboard, assignments list, table headers, and status badges in `locales/en.json`
+  - [x] Add Indonesian translations in `locales/id.json`
 - [ ] Task: Implement Assignment Listing View
   - [ ] Add sidebar navigation link for Instructor Assignments
   - [ ] Create layout/route file `src/routes/_authenticated/instructor/assignments/index.tsx`
