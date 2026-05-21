@@ -21,9 +21,20 @@ function isAdmin(session: any): session is { user: { id: string; role: string };
   return !!session && (session.user.role === 'admin' || session.user.role === 'superadmin');
 }
 
+function isInstructorOrAdmin(
+  session: any,
+): session is { user: { id: string; role: string }; session: any } {
+  return (
+    !!session &&
+    (session.user.role === 'admin' ||
+      session.user.role === 'superadmin' ||
+      session.user.role === 'instructor')
+  );
+}
+
 export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
   const session = await getSessionFromHeaders();
-  if (!isAdmin(session)) {
+  if (!isInstructorOrAdmin(session)) {
     return { templates: [], total: 0 };
   }
 
@@ -89,7 +100,7 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
 
 export async function getTemplateHandler(args: { data: TemplateIdParam }) {
   const session = await getSessionFromHeaders();
-  if (!isAdmin(session)) {
+  if (!isInstructorOrAdmin(session)) {
     return null;
   }
 
