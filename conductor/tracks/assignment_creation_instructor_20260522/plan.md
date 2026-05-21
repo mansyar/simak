@@ -40,10 +40,10 @@
   - [x] Create wizard route file `src/routes/_authenticated/instructor/assignments/new.tsx`
   - [x] Create dynamic wizard container `assignment-wizard.tsx` with a premium visual step indicator (Select Template -> Fill Details -> Select Students -> Confirm)
   - [x] Integrate React Hook Form and Zod resolver for input validations
-- [ ] Task: Create Wizard Steps components
-  - [ ] Create `template-picker.tsx` showing template cards and checkpoint previews
-  - [ ] Create `student-picker.tsx` with a searchable multi-select combobox filtering role = student
-  - [ ] Build the confirmation summary step showcasing all choices before submitting
+- [x] Task: Create Wizard Steps components [x] (Commit: b691ce8)
+  - [x] Create `template-picker.tsx` showing template cards and checkpoint previews
+  - [x] Create `student-picker.tsx` with a searchable multi-select combobox filtering role = student
+  - [x] Build the confirmation summary step showcasing all choices before submitting
 - [ ] Task: Integration & Validation Tests for Wizard UI
   - [ ] Write failing integration tests for wizard navigation, validation guards on each step, and final transaction submission (Red Phase)
   - [ ] Verify validation errors for empty fields, past dates, or empty student list are correctly displayed inline
