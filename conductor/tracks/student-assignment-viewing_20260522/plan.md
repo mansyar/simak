@@ -14,7 +14,7 @@
   - [x] Add `studentSidebar` translation keys to `locales/en.json` and `locales/id.json`
   - [x] Write unit tests for student layout (role guard, sidebar rendering)
   - [x] Write unit tests for student sidebar (link rendering, active state, i18n)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Student Layout & Sidebar' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Student Layout & Sidebar' (Protocol in workflow.md)
 
 ## Phase 2: Student Assignment List Page
 
