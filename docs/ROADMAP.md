@@ -260,34 +260,34 @@ The Admin role is the system operator — they create users and define assignmen
 
 **Actual Files Created/Modified:**
 
-| File                                                    | Purpose                                                                                                                             |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `src/routes/_authenticated/admin.tsx`                   | Admin sidebar layout with role guard (`requireRole(['superadmin', 'admin'])`), sidebar navigation (Dashboard, Users, Templates)     |
-| `src/routes/_authenticated/admin/users/index.tsx`       | User list page — paginated (20/page), search by name/email, role filter, delete confirmation, integrated create/edit dialogs       |
-| `src/components/admin/users/UserTable.tsx`              | Table with Name/Email, Role (badge), Email Verified status, Created At, Actions dropdown (Edit, Generate Link, Delete)              |
-| `src/components/admin/users/UserFilters.tsx`            | Search input + role filter select (All / SuperAdmin / Admin / Instructor / Student) with i18n-translated labels                    |
-| `src/components/admin/users/CreateUserDialog.tsx`       | Dialog-based create form — Name, Email, Role fields (Admin/Instructor/Student), React Hook Form + Zod validation                   |
-| `src/components/admin/users/EditUserSheet.tsx`          | Slide-in sheet for editing Name and Email (role is NEVER editable after creation)                                                   |
-| `src/components/layout/admin-sidebar.tsx`               | **Modified:** Sidebar with active route indication via `useLocation()`                                                              |
-| `src/server/users.ts`                                   | **Modified:** Client-safe `createServerFn` stubs — uses dynamic import of server-only handlers                                      |
-| `src/server/users.server.ts`                            | **New:** Server-only handler implementations — DB queries, crypto, email sending (not bundled for client)                          |
-| `src/server/setup-password.ts`                          | **New:** Custom password setup handler — validates UUID tokens against verification table, hashes password, updates account         |
-| `src/lib/email.ts`                                      | **Modified:** Added `sendInvitationEmail()` with SIMAK-branded "Welcome" template (separate from password reset). Configurable FROM |
-| `src/server/auth.ts`                                    | **Modified:** Added `requireRole(roles)` helper for route-level guards                                                             |
-| `src/config/env.ts`                                     | **Modified:** Made R2 env vars optional so email sending works without R2 configured                                                |
-| `src/db/seed.ts`                                        | **Modified:** Added `seedTestUsers()` — creates Instructor + Student accounts with configurable password                            |
-| `src/routes/__root.tsx`                                 | **Modified:** Added `notFoundComponent` to suppress TanStack Router warnings                                                        |
-| `src/routes/_authenticated.tsx`                         | **Modified:** Authenticated layout wrapper                                                                                          |
-| `src/routes/_authenticated/dashboard.tsx`               | **Modified:** Added language switcher (EN/ID toggle)                                                                                |
-| `src/routes/_unauthenticated/auth/setup-password.tsx`   | **Modified:** Uses custom `completePasswordSetup()` handler instead of `authClient.resetPassword()`                                |
-| `src/components/ui/`                                    | **New:** dialog, dropdown-menu, sheet, form, label — shadcn/ui primitives for create/edit/dropdown UI                               |
-| `locales/en.json` / `locales/id.json`                   | **Modified:** Added `adminSidebar`, `adminUsers`, `allRoles`, `searchPlaceholder` translation sections + `role_superadmin` key      |
-| `tests/unit/components/admin/user-table.test.tsx`       | 7 tests — table rendering, role badges, empty state, action menu                                                                    |
-| `tests/unit/components/admin/user-filters.test.tsx`     | 4 tests — search input, role filter, search change handler                                                                          |
-| `tests/unit/components/admin/create-user-dialog.test.tsx` | 6 tests — dialog open/closed, form fields, role options, Zod validation                                                           |
-| `tests/unit/components/admin/edit-user-sheet.test.tsx`  | 5 tests — sheet open/closed, form fields (name, email), submit button                                                              |
-| `tests/unit/lib/email.test.ts`                          | 3 tests — `sendInvitationEmail` params, `sendPasswordResetEmail` params, Resend error handling                                     |
-| `tests/unit/server/users.test.ts`                       | **Modified:** Updated imports for split server/handler files                                                                        |
+| File                                                      | Purpose                                                                                                                             |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `src/routes/_authenticated/admin.tsx`                     | Admin sidebar layout with role guard (`requireRole(['superadmin', 'admin'])`), sidebar navigation (Dashboard, Users, Templates)     |
+| `src/routes/_authenticated/admin/users/index.tsx`         | User list page — paginated (20/page), search by name/email, role filter, delete confirmation, integrated create/edit dialogs        |
+| `src/components/admin/users/UserTable.tsx`                | Table with Name/Email, Role (badge), Email Verified status, Created At, Actions dropdown (Edit, Generate Link, Delete)              |
+| `src/components/admin/users/UserFilters.tsx`              | Search input + role filter select (All / SuperAdmin / Admin / Instructor / Student) with i18n-translated labels                     |
+| `src/components/admin/users/CreateUserDialog.tsx`         | Dialog-based create form — Name, Email, Role fields (Admin/Instructor/Student), React Hook Form + Zod validation                    |
+| `src/components/admin/users/EditUserSheet.tsx`            | Slide-in sheet for editing Name and Email (role is NEVER editable after creation)                                                   |
+| `src/components/layout/admin-sidebar.tsx`                 | **Modified:** Sidebar with active route indication via `useLocation()`                                                              |
+| `src/server/users.ts`                                     | **Modified:** Client-safe `createServerFn` stubs — uses dynamic import of server-only handlers                                      |
+| `src/server/users.server.ts`                              | **New:** Server-only handler implementations — DB queries, crypto, email sending (not bundled for client)                           |
+| `src/server/setup-password.ts`                            | **New:** Custom password setup handler — validates UUID tokens against verification table, hashes password, updates account         |
+| `src/lib/email.ts`                                        | **Modified:** Added `sendInvitationEmail()` with SIMAK-branded "Welcome" template (separate from password reset). Configurable FROM |
+| `src/server/auth.ts`                                      | **Modified:** Added `requireRole(roles)` helper for route-level guards                                                              |
+| `src/config/env.ts`                                       | **Modified:** Made R2 env vars optional so email sending works without R2 configured                                                |
+| `src/db/seed.ts`                                          | **Modified:** Added `seedTestUsers()` — creates Instructor + Student accounts with configurable password                            |
+| `src/routes/__root.tsx`                                   | **Modified:** Added `notFoundComponent` to suppress TanStack Router warnings                                                        |
+| `src/routes/_authenticated.tsx`                           | **Modified:** Authenticated layout wrapper                                                                                          |
+| `src/routes/_authenticated/dashboard.tsx`                 | **Modified:** Added language switcher (EN/ID toggle)                                                                                |
+| `src/routes/_unauthenticated/auth/setup-password.tsx`     | **Modified:** Uses custom `completePasswordSetup()` handler instead of `authClient.resetPassword()`                                 |
+| `src/components/ui/`                                      | **New:** dialog, dropdown-menu, sheet, form, label — shadcn/ui primitives for create/edit/dropdown UI                               |
+| `locales/en.json` / `locales/id.json`                     | **Modified:** Added `adminSidebar`, `adminUsers`, `allRoles`, `searchPlaceholder` translation sections + `role_superadmin` key      |
+| `tests/unit/components/admin/user-table.test.tsx`         | 7 tests — table rendering, role badges, empty state, action menu                                                                    |
+| `tests/unit/components/admin/user-filters.test.tsx`       | 4 tests — search input, role filter, search change handler                                                                          |
+| `tests/unit/components/admin/create-user-dialog.test.tsx` | 6 tests — dialog open/closed, form fields, role options, Zod validation                                                             |
+| `tests/unit/components/admin/edit-user-sheet.test.tsx`    | 5 tests — sheet open/closed, form fields (name, email), submit button                                                               |
+| `tests/unit/lib/email.test.ts`                            | 3 tests — `sendInvitationEmail` params, `sendPasswordResetEmail` params, Resend error handling                                      |
+| `tests/unit/server/users.test.ts`                         | **Modified:** Updated imports for split server/handler files                                                                        |
 
 **Tests Added/Modified:** 25 new tests across 5 new test files + 1 modified test file.
 
@@ -329,39 +329,65 @@ The Admin role is the system operator — they create users and define assignmen
 
 **Dependencies:** Track 2.1 (admin layout and sidebar exist).
 
-**Domain-Specific Files to Create:**
+**✅ Status: COMPLETED** — Track has been archived.
 
-| File                                              | Purpose                                                                                                      |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `src/app/routes/admin/templates.tsx`              | Template list page with pagination, type filter, duplicate action                                            |
-| `src/app/routes/admin/templates/new.tsx`          | Create template: name, type, add/remove/reorder checkpoints                                                  |
-| `src/app/routes/admin/templates/$id.tsx`          | Template detail/edit page. Edit name, type, checkpoint list. Warning if used in assignments                  |
-| `src/components/admin/template-card.tsx`          | Template card for list view (name, type, checkpoint count)                                                   |
-| `src/components/admin/template-form.tsx`          | Template form with draggable checkpoint list                                                                 |
-| `src/components/admin/checkpoint-list-editor.tsx` | Reorderable list of checkpoint names with add/remove buttons                                                 |
-| `src/server/templates.ts`                         | Server functions: `listTemplates`, `createTemplate`, `updateTemplate`, `deleteTemplate`, `duplicateTemplate` |
+**Actual Files Created/Modified:**
 
-**Tests to Add:**
+| File                                                             | Purpose                                                                                                                                                                          |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/routes/_authenticated/admin/templates/index.tsx`            | Template list page — card-based layout with search by name, type filter dropdown, pagination (20/page), and loading skeleton states                                              |
+| `src/components/admin/templates/CreateTemplateDialog.tsx`        | Dialog with Name (text), Type (free-text), and dynamic checkpoint list (add/remove/reorder via ▲/▼ buttons); defaults to 3 checkpoint rows                                       |
+| `src/components/admin/templates/EditTemplateSheet.tsx`           | Slide-in panel with pre-filled Name, Type, and checkpoint data; reuses CheckpointListEditor; in-use banner with assignment count                                                 |
+| `src/components/admin/templates/CheckpointListEditor.tsx`        | Dynamic checkpoint list component with add, remove (min 1 enforced), and ▲/▼ reorder buttons                                                                                     |
+| `src/components/admin/templates/DeleteTemplateDialog.tsx`        | Conditional delete dialog — basic confirm for unused; requires typing "DELETE" for in-use templates with usage count warning                                                     |
+| `src/components/admin/templates/TemplateCard.tsx`                | Card component with name, type badge, checkpoint count, created date, dropdown actions (Edit, Duplicate, Delete)                                                                 |
+| `src/components/admin/templates/TemplateFilters.tsx`             | Search input + type filter select dropdown (All + unique types from existing templates)                                                                                          |
+| `src/components/admin/templates/TemplatePagination.tsx`          | Prev/next pagination controls with page indicator                                                                                                                                |
+| `src/components/admin/templates/TemplateEmptyState.tsx`          | "No templates found" message with prompt to create one                                                                                                                           |
+| `src/components/admin/templates/TemplateLoadingSkeleton.tsx`     | Animated skeleton cards (default 6) for loading state                                                                                                                            |
+| `src/server/templates.ts`                                        | Client-safe `createServerFn` stubs + Zod schemas (`CreateTemplateSchema`, `UpdateTemplateSchema`, `ListTemplatesSchema`, `TemplateIdParamSchema`)                                |
+| `src/server/templates.server.ts`                                 | Server-only handlers: `createTemplate`, `listTemplates`, `getTemplate`, `updateTemplate`, `deleteTemplate` (soft-delete + in_use check), `duplicateTemplate` (smart Copy naming) |
+| `locales/en.json` / `locales/id.json`                            | **Modified:** Added `adminTemplates` translation section (30+ keys for UI labels, form fields, messages, and errors)                                                             |
+| `scripts/generate-i18n-types.ts`                                 | **Modified:** Added `adminTemplates` section to `Translation` type template                                                                                                      |
+| `tests/unit/components/admin/template-card.test.tsx`             | 4 tests — template name, type badge, checkpoint count, actions dropdown                                                                                                          |
+| `tests/unit/components/admin/template-filters.test.tsx`          | 6 tests — search input, type filter, all/unique types, value display, empty types                                                                                                |
+| `tests/unit/components/admin/template-pagination.test.tsx`       | 7 tests — page indicator, prev/next disabled states, page change callbacks, single page                                                                                          |
+| `tests/unit/components/admin/template-empty-state.test.tsx`      | 4 tests — empty message, create prompt, button render, click handler                                                                                                             |
+| `tests/unit/components/admin/template-loading-skeleton.test.tsx` | 3 tests — skeleton card rendering, default count, custom count                                                                                                                   |
+| `tests/unit/components/admin/create-template-dialog.test.tsx`    | 6 tests — dialog open/closed, form fields, 3 default checkpoint rows, Zod validation                                                                                             |
+| `tests/unit/components/admin/edit-template-sheet.test.tsx`       | 5 tests — sheet open/closed, pre-filled name/type fields, submit button, Zod validation                                                                                          |
+| `tests/unit/components/admin/delete-template-dialog.test.tsx`    | 11 tests — dialog open/closed, basic confirm, in-use warning, DELETE input, disabled/enabled states, confirm/cancel handlers                                                     |
+| `tests/unit/i18n/admin-templates-types.test.ts`                  | 2 tests — verifies `adminTemplates` section exists in generated `Translation` type with all required keys                                                                        |
+| `tests/unit/server/templates.test.ts`                            | 28 tests — Zod schema validation (Create, List, TemplateId), handler auth checks, CRUD logic, soft-delete in_use, duplicate naming                                               |
 
-- `tests/unit/admin/template-validation.test.ts` — Template form Zod schema tests
-- `tests/integration/admin/template-crud.test.ts` — CRUD server functions with DB verification
+**Tests Added:** 76 new tests across 9 new test files + 1 modified test file.
 
-**Definition of Done:**
+**Differences from Original Spec:**
 
-- Admin can create a template with a name, type label, and ordered checkpoints
-- Admin can edit template metadata and reorder/rename/remove checkpoints
-- Admin can duplicate a template (copies all checkpoints)
-- Admin can soft-delete a template (warning if currently used by assignments)
-- Template validation prevents creating a template with zero checkpoints
+- **Dialog/Sheet instead of dedicated routes**: Instead of `/admin/templates/new` and `/admin/templates/$id` routes, create uses a dialog and edit uses a slide-in sheet — both integrated into the list page for faster UX without full page navigation.
+- **▲/▼ buttons instead of drag-and-drop**: Checkpoint reordering uses up/down buttons (as specified). Drag-and-drop deferred as out of scope.
+- **Server/client file split**: Follows the same `users.ts` / `users.server.ts` pattern from Track 2.1 — dynamic imports for server-only handlers.
+- **Template IDs**: Uses `serial` (integer) instead of UUID, matching the database schema. `TemplateIdParamSchema` uses `z.coerce.number()` for route/search params.
 
-**Acceptance Criteria:**
+**Test Results (at time of archiving):**
 
-- [ ] Creating a template with 3 checkpoints shows all 3 in order after save
-- [ ] Reordering checkpoints (drag or up/down buttons) persists on reload
-- [ ] Duplicating a template creates an identical copy with "(Copy)" appended to name
-- [ ] Deleting a template shows confirmation dialog with usage warning
-- [ ] Creating a template with 0 checkpoints shows form validation error
-- [ ] Template list can be filtered by type and searched by name
+- 223/223 tests passing across 39 test files
+- 76 new tests across 9 new test files
+- TypeScript typecheck passes with no errors
+- All CRUD operations verified via end-to-end manual testing
+
+**Definition of Done Completed:**
+
+- ✅ Admin can create a template with name, type, and 3+ ordered checkpoints
+- ✅ Checkpoints can be reordered with ▲/▼ buttons; order persists on reload
+- ✅ Creating a template with 0 checkpoints shows form validation error
+- ✅ Duplicating a template creates an identical copy with "(Copy)" appended to name
+- ✅ Deleting an unused template succeeds with basic confirmation
+- ✅ Deleting a template used by assignments shows usage count and requires typing "DELETE"
+- ✅ Template list can be filtered by type and searched by name
+- ✅ Template list is paginated (20 per page)
+- ✅ Admin editing a template used by assignments sees an info banner
+- ✅ Non-admin users cannot access template management (redirected)
 
 ---
 
