@@ -3,7 +3,6 @@ import { AssignmentWizard } from '@/components/instructor/assignments/Assignment
 import { ArrowLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
 
-// @ts-expect-error - TanStack Router generated route typings might not be in sync
 export const Route = createFileRoute('/_authenticated/instructor/assignments/new')({
   component: NewAssignmentPage,
 });
