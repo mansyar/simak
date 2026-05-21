@@ -15,7 +15,7 @@
   - [x] Verify test coverage for `src/server/assignments.server.ts` is > 80%
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Server-Side Functions & Testing' (Protocol in workflow.md)
 
-## Phase 2: Listing & Detail Views UI
+## Phase 2: Listing & Detail Views UI [checkpoint: 6179cb6]
 
 - [x] Task: Create i18n translation keys [x] (Commit: 6121631)
   - [x] Add English translations for instructor dashboard, assignments list, table headers, and status badges in `locales/en.json`
