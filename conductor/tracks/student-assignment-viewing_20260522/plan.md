@@ -53,9 +53,13 @@
 
 ## Phase 4: Final Verification & Polish
 
-- [ ] Task: Audit all new components for i18n coverage
-  - [ ] Verify no hardcoded user-facing strings exist in any new component
-  - [ ] Verify all `en.json` and `id.json` entries for `studentSidebar`, `studentAssignments` have complete key parity
-- [ ] Task: Run full test suite and verify coverage >80%
-- [ ] Task: Run typecheck (`pnpm typecheck`) and lint (`pnpm lint`) and fix any issues
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Verification & Polish' (Protocol in workflow.md)
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [8d8a767]
+
+- [x] Task: Audit all new components for i18n coverage
+  - [x] Verify no hardcoded user-facing strings exist in any new component
+  - [x] Verify all `en.json` and `id.json` entries for `studentSidebar`, `studentAssignments` have complete key parity
+- [x] Task: Run full test suite and verify coverage >80%
+- [x] Task: Run typecheck (`pnpm typecheck`) and lint (`pnpm lint`) and fix any issues
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Final Verification & Polish' (Protocol in workflow.md)
