@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnauthenticatedRouteImport } from './routes/_unauthenticated'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedInstructorRouteImport } from './routes/_authenticated/instructor'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -19,8 +20,11 @@ import { Route as UnauthenticatedAuthSetupPasswordRouteImport } from './routes/_
 import { Route as UnauthenticatedAuthResetPasswordRouteImport } from './routes/_unauthenticated/auth/reset-password'
 import { Route as UnauthenticatedAuthLoginRouteImport } from './routes/_unauthenticated/auth/login'
 import { Route as UnauthenticatedAuthForgotPasswordRouteImport } from './routes/_unauthenticated/auth/forgot-password'
+import { Route as AuthenticatedInstructorAssignmentsIndexRouteImport } from './routes/_authenticated/instructor/assignments/index'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_authenticated/admin/templates/index'
+import { Route as AuthenticatedInstructorAssignmentsNewRouteImport } from './routes/_authenticated/instructor/assignments/new'
+import { Route as AuthenticatedInstructorAssignmentsIdRouteImport } from './routes/_authenticated/instructor/assignments/$id'
 
 const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
   id: '/_unauthenticated',
@@ -34,6 +38,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedInstructorRoute = AuthenticatedInstructorRouteImport.update({
+  id: '/instructor',
+  path: '/instructor',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -74,6 +83,12 @@ const UnauthenticatedAuthForgotPasswordRoute =
     path: '/auth/forgot-password',
     getParentRoute: () => UnauthenticatedRoute,
   } as any)
+const AuthenticatedInstructorAssignmentsIndexRoute =
+  AuthenticatedInstructorAssignmentsIndexRouteImport.update({
+    id: '/assignments/',
+    path: '/assignments/',
+    getParentRoute: () => AuthenticatedInstructorRoute,
+  } as any)
 const AuthenticatedAdminUsersIndexRoute =
   AuthenticatedAdminUsersIndexRouteImport.update({
     id: '/users/',
@@ -86,30 +101,50 @@ const AuthenticatedAdminTemplatesIndexRoute =
     path: '/templates/',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedInstructorAssignmentsNewRoute =
+  AuthenticatedInstructorAssignmentsNewRouteImport.update({
+    id: '/assignments/new',
+    path: '/assignments/new',
+    getParentRoute: () => AuthenticatedInstructorRoute,
+  } as any)
+const AuthenticatedInstructorAssignmentsIdRoute =
+  AuthenticatedInstructorAssignmentsIdRouteImport.update({
+    id: '/assignments/$id',
+    path: '/assignments/$id',
+    getParentRoute: () => AuthenticatedInstructorRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/auth/setup-password': typeof UnauthenticatedAuthSetupPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
+  '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/admin/templates/': typeof AuthenticatedAdminTemplatesIndexRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
+  '/instructor/assignments/': typeof AuthenticatedInstructorAssignmentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/auth/setup-password': typeof UnauthenticatedAuthSetupPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
+  '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/admin/templates': typeof AuthenticatedAdminTemplatesIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
+  '/instructor/assignments': typeof AuthenticatedInstructorAssignmentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -118,13 +153,17 @@ export interface FileRoutesById {
   '/_unauthenticated': typeof UnauthenticatedRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/_unauthenticated/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/_unauthenticated/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/_unauthenticated/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/_unauthenticated/auth/setup-password': typeof UnauthenticatedAuthSetupPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_authenticated/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
+  '/_authenticated/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/_authenticated/admin/templates/': typeof AuthenticatedAdminTemplatesIndexRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
+  '/_authenticated/instructor/assignments/': typeof AuthenticatedInstructorAssignmentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,25 +171,33 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/dashboard'
+    | '/instructor'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/setup-password'
     | '/api/auth/$'
+    | '/instructor/assignments/$id'
+    | '/instructor/assignments/new'
     | '/admin/templates/'
     | '/admin/users/'
+    | '/instructor/assignments/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/dashboard'
+    | '/instructor'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/setup-password'
     | '/api/auth/$'
+    | '/instructor/assignments/$id'
+    | '/instructor/assignments/new'
     | '/admin/templates'
     | '/admin/users'
+    | '/instructor/assignments'
   id:
     | '__root__'
     | '/'
@@ -158,13 +205,17 @@ export interface FileRouteTypes {
     | '/_unauthenticated'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/_authenticated/instructor'
     | '/_unauthenticated/auth/forgot-password'
     | '/_unauthenticated/auth/login'
     | '/_unauthenticated/auth/reset-password'
     | '/_unauthenticated/auth/setup-password'
     | '/api/auth/$'
+    | '/_authenticated/instructor/assignments/$id'
+    | '/_authenticated/instructor/assignments/new'
     | '/_authenticated/admin/templates/'
     | '/_authenticated/admin/users/'
+    | '/_authenticated/instructor/assignments/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -196,6 +247,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/instructor': {
+      id: '/_authenticated/instructor'
+      path: '/instructor'
+      fullPath: '/instructor'
+      preLoaderRoute: typeof AuthenticatedInstructorRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -246,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnauthenticatedAuthForgotPasswordRouteImport
       parentRoute: typeof UnauthenticatedRoute
     }
+    '/_authenticated/instructor/assignments/': {
+      id: '/_authenticated/instructor/assignments/'
+      path: '/assignments'
+      fullPath: '/instructor/assignments/'
+      preLoaderRoute: typeof AuthenticatedInstructorAssignmentsIndexRouteImport
+      parentRoute: typeof AuthenticatedInstructorRoute
+    }
     '/_authenticated/admin/users/': {
       id: '/_authenticated/admin/users/'
       path: '/users'
@@ -259,6 +324,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/templates/'
       preLoaderRoute: typeof AuthenticatedAdminTemplatesIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/instructor/assignments/new': {
+      id: '/_authenticated/instructor/assignments/new'
+      path: '/assignments/new'
+      fullPath: '/instructor/assignments/new'
+      preLoaderRoute: typeof AuthenticatedInstructorAssignmentsNewRouteImport
+      parentRoute: typeof AuthenticatedInstructorRoute
+    }
+    '/_authenticated/instructor/assignments/$id': {
+      id: '/_authenticated/instructor/assignments/$id'
+      path: '/assignments/$id'
+      fullPath: '/instructor/assignments/$id'
+      preLoaderRoute: typeof AuthenticatedInstructorAssignmentsIdRouteImport
+      parentRoute: typeof AuthenticatedInstructorRoute
     }
   }
 }
@@ -276,14 +355,37 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedInstructorRouteChildren {
+  AuthenticatedInstructorAssignmentsIdRoute: typeof AuthenticatedInstructorAssignmentsIdRoute
+  AuthenticatedInstructorAssignmentsNewRoute: typeof AuthenticatedInstructorAssignmentsNewRoute
+  AuthenticatedInstructorAssignmentsIndexRoute: typeof AuthenticatedInstructorAssignmentsIndexRoute
+}
+
+const AuthenticatedInstructorRouteChildren: AuthenticatedInstructorRouteChildren =
+  {
+    AuthenticatedInstructorAssignmentsIdRoute:
+      AuthenticatedInstructorAssignmentsIdRoute,
+    AuthenticatedInstructorAssignmentsNewRoute:
+      AuthenticatedInstructorAssignmentsNewRoute,
+    AuthenticatedInstructorAssignmentsIndexRoute:
+      AuthenticatedInstructorAssignmentsIndexRoute,
+  }
+
+const AuthenticatedInstructorRouteWithChildren =
+  AuthenticatedInstructorRoute._addFileChildren(
+    AuthenticatedInstructorRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedInstructorRoute: typeof AuthenticatedInstructorRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedInstructorRoute: AuthenticatedInstructorRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
