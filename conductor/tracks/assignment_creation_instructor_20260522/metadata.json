@@ -1,0 +1,8 @@
+{
+  "track_id": "assignment_creation_instructor_20260522",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-05-22T05:13:30Z",
+  "updated_at": "2026-05-22T05:13:30Z",
+  "description": "implement Track 3.1 — Assignment Creation (Instructor) as detailed in docs/ROADMAP.md docs/PRD.md docs/TDD.md"
+}
