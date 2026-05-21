@@ -33,7 +33,7 @@
   - [x] Write unit tests for assignment list route (pagination, search, loading states)
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Student Assignment List Page' (Protocol in workflow.md)
 
-## Phase 3: Student Assignment Detail & Checkpoint Timeline
+## Phase 3: Student Assignment Detail & Checkpoint Timeline [checkpoint: 9175f44]
 
 - [x] Task: Build student assignment detail page [4115268]
   - [x] Create `src/routes/_authenticated/student/assignments/$id.tsx` route (SSR with client hydration)
@@ -49,7 +49,7 @@
   - [x] Extend `getStudentAssignmentDetailHandler` to query `consultations` table (group by `checkpoint_id`, count where `status = 'verified'`)
   - [x] Return `verifiedConsultationCount` per checkpoint in the response payload
   - [x] Write unit test for consultation count query logic
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Student Assignment Detail & Checkpoint Timeline' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Student Assignment Detail & Checkpoint Timeline' (Protocol in workflow.md)
 
 ## Phase 4: Final Verification & Polish
 
