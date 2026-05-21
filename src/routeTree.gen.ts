@@ -20,6 +20,7 @@ import { Route as UnauthenticatedAuthResetPasswordRouteImport } from './routes/_
 import { Route as UnauthenticatedAuthLoginRouteImport } from './routes/_unauthenticated/auth/login'
 import { Route as UnauthenticatedAuthForgotPasswordRouteImport } from './routes/_unauthenticated/auth/forgot-password'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
+import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_authenticated/admin/templates/index'
 
 const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
   id: '/_unauthenticated',
@@ -79,6 +80,12 @@ const AuthenticatedAdminUsersIndexRoute =
     path: '/users/',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminTemplatesIndexRoute =
+  AuthenticatedAdminTemplatesIndexRouteImport.update({
+    id: '/templates/',
+    path: '/templates/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/auth/setup-password': typeof UnauthenticatedAuthSetupPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/templates/': typeof AuthenticatedAdminTemplatesIndexRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -100,6 +108,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/auth/setup-password': typeof UnauthenticatedAuthSetupPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/templates': typeof AuthenticatedAdminTemplatesIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -114,6 +123,7 @@ export interface FileRoutesById {
   '/_unauthenticated/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/_unauthenticated/auth/setup-password': typeof UnauthenticatedAuthSetupPasswordRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_authenticated/admin/templates/': typeof AuthenticatedAdminTemplatesIndexRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/setup-password'
     | '/api/auth/$'
+    | '/admin/templates/'
     | '/admin/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/setup-password'
     | '/api/auth/$'
+    | '/admin/templates'
     | '/admin/users'
   id:
     | '__root__'
@@ -151,6 +163,7 @@ export interface FileRouteTypes {
     | '/_unauthenticated/auth/reset-password'
     | '/_unauthenticated/auth/setup-password'
     | '/api/auth/$'
+    | '/_authenticated/admin/templates/'
     | '/_authenticated/admin/users/'
   fileRoutesById: FileRoutesById
 }
@@ -240,14 +253,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/templates/': {
+      id: '/_authenticated/admin/templates/'
+      path: '/templates'
+      fullPath: '/admin/templates/'
+      preLoaderRoute: typeof AuthenticatedAdminTemplatesIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminTemplatesIndexRoute: typeof AuthenticatedAdminTemplatesIndexRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminTemplatesIndexRoute: AuthenticatedAdminTemplatesIndexRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
 
