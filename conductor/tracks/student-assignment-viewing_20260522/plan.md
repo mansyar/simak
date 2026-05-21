@@ -31,7 +31,7 @@
   - [x] Write unit tests for StudentAssignmentEmptyState (message, prompt)
   - [x] Write unit tests for StudentAssignmentLoadingSkeleton (skeleton count, default)
   - [x] Write unit tests for assignment list route (pagination, search, loading states)
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Student Assignment List Page' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Student Assignment List Page' (Protocol in workflow.md)
 
 ## Phase 3: Student Assignment Detail & Checkpoint Timeline
 
