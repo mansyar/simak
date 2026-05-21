@@ -2,12 +2,12 @@
 
 ## Phase 1: Student Layout & Sidebar
 
-- [ ] Task: Create server functions for student assignment queries
-  - [ ] Add Zod schemas and `createServerFn` stubs in `src/server/assignments.ts`
-  - [ ] Implement handlers in `src/server/assignments.server.ts`
-  - [ ] Write unit tests for Zod schemas (validation, auth checks)
-  - [ ] Write integration test for `listStudentAssignments` (student sees only own assignments)
-  - [ ] Write integration test for `getStudentAssignmentDetail` (ownership check, forbidden for other student)
+- [x] Task: Create server functions for student assignment queries [f43884c]
+  - [x] Add Zod schemas and `createServerFn` stubs in `src/server/assignments.ts`
+  - [x] Implement handlers in `src/server/assignments.server.ts`
+  - [x] Write unit tests for Zod schemas (validation, auth checks)
+  - [x] Write integration test for `listStudentAssignments` (student sees only own assignments)
+  - [x] Write integration test for `getStudentAssignmentDetail` (ownership check, forbidden for other student)
 - [ ] Task: Create student sidebar layout route
   - [ ] Create `src/routes/_authenticated/student.tsx` with `requireRole(['student'])` guard
   - [ ] Create `src/components/layout/student-sidebar.tsx` (matching instructor pattern)
