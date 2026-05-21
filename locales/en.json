@@ -131,6 +131,66 @@
     "deleteSuccess": "Template deleted successfully",
     "inUseBanner": "This template is used by {count} assignment(s). Changes will affect future assignment creation."
   },
+  "instructorAssignments": {
+    "title": "Assignments",
+    "newAssignment": "New Assignment",
+    "searchPlaceholder": "Search assignments by title...",
+    "studentCount": "{count} Students",
+    "finalDeadline": "Deadline: {date}",
+    "empty": "No assignments found",
+    "createPrompt": "Create your first assignment",
+    "table": {
+      "student": "Student",
+      "email": "Email",
+      "progress": "Progress",
+      "activeCheckpoint": "Active Checkpoint",
+      "actions": "Actions"
+    },
+    "status": {
+      "passed": "Passed",
+      "under_review": "Under Review",
+      "submitted": "Submitted",
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "revise": "Revise"
+    },
+    "details": {
+      "title": "Assignment Details",
+      "overview": "Overview",
+      "studentsProgress": "Students Progress",
+      "template": "Template",
+      "type": "Type",
+      "deadline": "Final Deadline",
+      "created": "Created At",
+      "description": "Description"
+    },
+    "wizard": {
+      "stepTemplate": "Select Template",
+      "stepDetails": "Assignment Details",
+      "stepStudents": "Assign Students",
+      "stepConfirm": "Confirm & Create",
+      "prev": "Previous",
+      "next": "Next",
+      "submit": "Create Assignment",
+      "submitting": "Creating...",
+      "selectTemplatePrompt": "Choose an assignment template to define milestones",
+      "fillDetailsPrompt": "Enter the title, description, and key target dates",
+      "selectStudentsPrompt": "Assign this cohort assignment to one or more students",
+      "reviewPrompt": "Verify everything before launching this assignment",
+      "titleLabel": "Assignment Title",
+      "titlePlaceholder": "e.g., Undergraduate Thesis 2026",
+      "descriptionLabel": "Description / Guidelines",
+      "descriptionPlaceholder": "Provide instructions, files to upload, or milestone guidelines...",
+      "deadlineLabel": "Final Submission Deadline",
+      "selectedStudents": "{count} students selected",
+      "noStudentsSelected": "No students selected yet",
+      "templateSelected": "Template: {name}",
+      "checkpointsPreview": "Milestones Preview",
+      "searchStudents": "Search students by name or email...",
+      "successMessage": "Assignment created successfully!",
+      "errorMessage": "Failed to create assignment. Please try again."
+    }
+  },
   "error": {
     "notFound": "Page not found",
     "forbidden": "You do not have permission to access this page",

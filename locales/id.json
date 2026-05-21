@@ -131,6 +131,66 @@
     "deleteSuccess": "Templat berhasil dihapus",
     "inUseBanner": "Templat ini digunakan oleh {count} tugas. Perubahan akan memengaruhi pembuatan tugas di masa mendatang."
   },
+  "instructorAssignments": {
+    "title": "Tugas",
+    "newAssignment": "Tugas Baru",
+    "searchPlaceholder": "Cari tugas berdasarkan judul...",
+    "studentCount": "{count} Mahasiswa",
+    "finalDeadline": "Tenggat: {date}",
+    "empty": "Tidak ada tugas ditemukan",
+    "createPrompt": "Buat tugas pertama Anda",
+    "table": {
+      "student": "Mahasiswa",
+      "email": "Email",
+      "progress": "Progres",
+      "activeCheckpoint": "Checkpoint Aktif",
+      "actions": "Aksi"
+    },
+    "status": {
+      "passed": "Lulus",
+      "under_review": "Sedang Ditinjau",
+      "submitted": "Dikirim",
+      "locked": "Terkunci",
+      "unlocked": "Terbuka",
+      "revise": "Revisi"
+    },
+    "details": {
+      "title": "Detail Tugas",
+      "overview": "Ikhtisar",
+      "studentsProgress": "Progres Mahasiswa",
+      "template": "Templat",
+      "type": "Tipe",
+      "deadline": "Tenggat Akhir",
+      "created": "Dibuat Pada",
+      "description": "Deskripsi"
+    },
+    "wizard": {
+      "stepTemplate": "Pilih Templat",
+      "stepDetails": "Detail Tugas",
+      "stepStudents": "Pilih Mahasiswa",
+      "stepConfirm": "Konfirmasi & Buat",
+      "prev": "Sebelumnya",
+      "next": "Selanjutnya",
+      "submit": "Buat Tugas",
+      "submitting": "Membuat...",
+      "selectTemplatePrompt": "Pilih templat tugas untuk menentukan tahapan tugas",
+      "fillDetailsPrompt": "Masukkan judul, deskripsi, dan tanggal target utama",
+      "selectStudentsPrompt": "Tugaskan tugas kelompok/kohort ini ke satu atau lebih mahasiswa",
+      "reviewPrompt": "Verifikasi semuanya sebelum meluncurkan tugas ini",
+      "titleLabel": "Judul Tugas",
+      "titlePlaceholder": "misal, Skripsi Mahasiswa 2026",
+      "descriptionLabel": "Deskripsi / Panduan",
+      "descriptionPlaceholder": "Berikan instruksi, file untuk diunggah, atau panduan setiap tahapan...",
+      "deadlineLabel": "Tenggat Waktu Pengumpulan Akhir",
+      "selectedStudents": "{count} mahasiswa terpilih",
+      "noStudentsSelected": "Belum ada mahasiswa terpilih",
+      "templateSelected": "Templat: {name}",
+      "checkpointsPreview": "Pratinjau Tahapan",
+      "searchStudents": "Cari mahasiswa berdasarkan nama atau email...",
+      "successMessage": "Tugas berhasil dibuat!",
+      "errorMessage": "Gagal membuat tugas. Silakan coba lagi."
+    }
+  },
   "error": {
     "notFound": "Halaman tidak ditemukan",
     "forbidden": "Anda tidak memiliki izin untuk mengakses halaman ini",
