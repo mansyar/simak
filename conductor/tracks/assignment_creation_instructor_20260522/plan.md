@@ -44,8 +44,8 @@
   - [x] Create `template-picker.tsx` showing template cards and checkpoint previews
   - [x] Create `student-picker.tsx` with a searchable multi-select combobox filtering role = student
   - [x] Build the confirmation summary step showcasing all choices before submitting
-- [ ] Task: Integration & Validation Tests for Wizard UI
-  - [ ] Write failing integration tests for wizard navigation, validation guards on each step, and final transaction submission (Red Phase)
-  - [ ] Verify validation errors for empty fields, past dates, or empty student list are correctly displayed inline
-  - [ ] Make all wizard tests pass (Green Phase)
+- [x] Task: Integration & Validation Tests for Wizard UI [x] (Commit: 6a8407d)
+  - [x] Write failing integration tests for wizard navigation, validation guards on each step, and final transaction submission (Red Phase)
+  - [x] Verify validation errors for empty fields, past dates, or empty student list are correctly displayed inline
+  - [x] Make all wizard tests pass (Green Phase)
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Creation Wizard UI & Flow' (Protocol in workflow.md)
