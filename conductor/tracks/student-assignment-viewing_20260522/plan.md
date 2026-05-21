@@ -8,12 +8,12 @@
   - [x] Write unit tests for Zod schemas (validation, auth checks)
   - [x] Write integration test for `listStudentAssignments` (student sees only own assignments)
   - [x] Write integration test for `getStudentAssignmentDetail` (ownership check, forbidden for other student)
-- [ ] Task: Create student sidebar layout route
-  - [ ] Create `src/routes/_authenticated/student.tsx` with `requireRole(['student'])` guard
-  - [ ] Create `src/components/layout/student-sidebar.tsx` (matching instructor pattern)
-  - [ ] Add `studentSidebar` translation keys to `locales/en.json` and `locales/id.json`
-  - [ ] Write unit tests for student layout (role guard, sidebar rendering)
-  - [ ] Write unit tests for student sidebar (link rendering, active state, i18n)
+- [x] Task: Create student sidebar layout route [0961315]
+  - [x] Create `src/routes/_authenticated/student.tsx` with `requireRole(['student'])` guard
+  - [x] Create `src/components/layout/student-sidebar.tsx` (matching instructor pattern)
+  - [x] Add `studentSidebar` translation keys to `locales/en.json` and `locales/id.json`
+  - [x] Write unit tests for student layout (role guard, sidebar rendering)
+  - [x] Write unit tests for student sidebar (link rendering, active state, i18n)
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Student Layout & Sidebar' (Protocol in workflow.md)
 
 ## Phase 2: Student Assignment List Page
