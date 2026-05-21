@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { TemplateCard } from '@/components/admin/templates/TemplateCard';
 
 vi.mock('@/routes/__root', () => ({
@@ -20,11 +20,15 @@ vi.mock('@/routes/__root', () => ({
 vi.mock('@/components/ui/dropdown-menu', () => ({
   DropdownMenu: ({ children }: any) => <div data-testid="dropdown-menu">{children}</div>,
   DropdownMenuContent: ({ children }: any) => <div data-testid="dropdown-content">{children}</div>,
-  DropdownMenuItem: ({ children, onClick }: any) => (
-    <button data-testid="dropdown-item" onClick={onClick}>
-      {children}
-    </button>
-  ),
+  DropdownMenuItem: ({ children, onClick, className }: any) => {
+    // Extract text content from children array (icon + text)
+    const text = Array.isArray(children) ? children[1] : children;
+    return (
+      <button onClick={onClick} className={className}>
+        {children}
+      </button>
+    );
+  },
   DropdownMenuTrigger: ({ children }: any) => (
     <button data-testid="dropdown-trigger">{children}</button>
   ),
@@ -107,5 +111,73 @@ describe('TemplateCard', () => {
     );
     expect(screen.getByTestId('dropdown-menu')).toBeDefined();
     expect(screen.getByTestId('dropdown-trigger')).toBeDefined();
+  });
+
+  it('should call onEdit when edit dropdown item is clicked', () => {
+    render(
+      <TemplateCard
+        template={mockTemplate}
+        onEdit={onEdit}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('Edit'));
+    expect(onEdit).toHaveBeenCalledWith(mockTemplate);
+  });
+
+  it('should call onDuplicate when duplicate dropdown item is clicked', () => {
+    render(
+      <TemplateCard
+        template={mockTemplate}
+        onEdit={onEdit}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('Duplicate'));
+    expect(onDuplicate).toHaveBeenCalledWith(mockTemplate);
+  });
+
+  it('should call onDelete when delete dropdown item is clicked', () => {
+    render(
+      <TemplateCard
+        template={mockTemplate}
+        onEdit={onEdit}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+      />,
+    );
+
+    fireEvent.click(screen.getByText('Delete'));
+    expect(onDelete).toHaveBeenCalledWith(mockTemplate);
+  });
+
+  it('should render formatted date', () => {
+    render(
+      <TemplateCard
+        template={mockTemplate}
+        onEdit={onEdit}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+      />,
+    );
+    expect(screen.getByText('Jan 15, 2025')).toBeDefined();
+  });
+
+  it('should render without date when createdAt is null', () => {
+    const templateNoDate = { ...mockTemplate, createdAt: null };
+    render(
+      <TemplateCard
+        template={templateNoDate}
+        onEdit={onEdit}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+      />,
+    );
+    const datePattern = /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/;
+    expect(screen.queryByText(datePattern)).toBeNull();
   });
 });

@@ -1,6 +1,40 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { EditUserSheet } from '@/components/admin/users/EditUserSheet';
+
+// Mock react-hook-form to bypass validation
+vi.mock('react-hook-form', () => ({
+  useForm: () => ({
+    register: vi.fn(),
+    handleSubmit: (fn: any) => (e?: any) => {
+      if (e?.preventDefault) e.preventDefault();
+      return Promise.resolve(fn({ name: 'John Doe', email: 'john@example.com' }));
+    },
+    watch: () => ({}),
+    getValues: () => ({}),
+    setValue: vi.fn(),
+    reset: vi.fn(),
+    formState: { errors: {}, isSubmitting: false },
+  }),
+  Controller: ({ render, name }: any) => render({ field: { value: '', onChange: vi.fn(), name } }),
+  FormProvider: ({ children }: any) => <div>{children}</div>,
+  useFormContext: () => ({
+    register: vi.fn(),
+    handleSubmit: (fn: any) => (e?: any) => {
+      if (e?.preventDefault) e.preventDefault();
+      return Promise.resolve(fn({ name: 'John Doe', email: 'john@example.com' }));
+    },
+    watch: () => ({}),
+    getValues: () => ({}),
+    setValue: vi.fn(),
+    reset: vi.fn(),
+    formState: { errors: {}, isSubmitting: false },
+  }),
+}));
+
+vi.mock('@hookform/resolvers/zod', () => ({
+  zodResolver: () => () => ({ values: {}, errors: {} }),
+}));
 
 // Mock the UI components
 vi.mock('@/components/ui/sheet', () => ({
@@ -24,9 +58,7 @@ vi.mock('@/components/ui/sheet', () => ({
 }));
 
 vi.mock('@/components/ui/form', () => ({
-  Form: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="form">{children}</div>
-  ),
+  Form: ({ children }: { children: React.ReactNode }) => <div data-testid="form">{children}</div>,
   FormControl: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="form-control">{children}</div>
   ),
@@ -45,7 +77,9 @@ vi.mock('@/components/ui/form', () => ({
 }));
 
 vi.mock('@/components/ui/input', () => ({
-  Input: (props: any) => <input data-testid={`input-${props.name || props.placeholder}`} {...props} />,
+  Input: (props: any) => (
+    <input data-testid={`input-${props.name || props.placeholder}`} {...props} />
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
@@ -82,12 +116,7 @@ describe('EditUserSheet', () => {
 
   it('should render when open with user data', () => {
     render(
-      <EditUserSheet
-        user={mockUser}
-        open={true}
-        onOpenChange={onOpenChange}
-        onSubmit={onSubmit}
-      />
+      <EditUserSheet user={mockUser} open={true} onOpenChange={onOpenChange} onSubmit={onSubmit} />,
     );
 
     expect(screen.getByTestId('sheet')).toBeDefined();
@@ -102,7 +131,7 @@ describe('EditUserSheet', () => {
         open={false}
         onOpenChange={onOpenChange}
         onSubmit={onSubmit}
-      />
+      />,
     );
 
     expect(screen.queryByTestId('sheet')).toBeNull();
@@ -110,12 +139,7 @@ describe('EditUserSheet', () => {
 
   it('should render form with two fields (name and email)', () => {
     render(
-      <EditUserSheet
-        user={mockUser}
-        open={true}
-        onOpenChange={onOpenChange}
-        onSubmit={onSubmit}
-      />
+      <EditUserSheet user={mockUser} open={true} onOpenChange={onOpenChange} onSubmit={onSubmit} />,
     );
 
     const fields = screen.getAllByTestId('form-field');
@@ -126,25 +150,33 @@ describe('EditUserSheet', () => {
 
   it('should render submit button', () => {
     render(
-      <EditUserSheet
-        user={mockUser}
-        open={true}
-        onOpenChange={onOpenChange}
-        onSubmit={onSubmit}
-      />
+      <EditUserSheet user={mockUser} open={true} onOpenChange={onOpenChange} onSubmit={onSubmit} />,
     );
 
     expect(screen.getByTestId('submit-btn')).toBeDefined();
   });
 
+  it('should call onSubmit when form is submitted', async () => {
+    const submitFn = vi.fn().mockResolvedValue(undefined);
+    const onClose = vi.fn();
+    const { container } = render(
+      <EditUserSheet user={mockUser} open={true} onOpenChange={onClose} onSubmit={submitFn} />,
+    );
+
+    const formEl = container.querySelector('form');
+    if (formEl) {
+      fireEvent.submit(formEl);
+    }
+
+    await vi.waitFor(() => {
+      expect(submitFn).toHaveBeenCalledOnce();
+    });
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
   it('should render sheet with empty form when open even without user data', () => {
     render(
-      <EditUserSheet
-        user={null}
-        open={true}
-        onOpenChange={onOpenChange}
-        onSubmit={onSubmit}
-      />
+      <EditUserSheet user={null} open={true} onOpenChange={onOpenChange} onSubmit={onSubmit} />,
     );
 
     // Sheet renders with empty fields when user is null

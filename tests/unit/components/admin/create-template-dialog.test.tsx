@@ -1,9 +1,43 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { CreateTemplateDialog } from '@/components/admin/templates/CreateTemplateDialog';
+// Direct import to test Zod schema validation
 import { CreateTemplateSchema } from '@/server/templates';
 
-// Mock UI components
+// Minimal react-hook-form mock
+vi.mock('react-hook-form', () => ({
+  useForm: () => ({
+    register: vi.fn(),
+    handleSubmit: (fn: any) => (e?: any) => {
+      if (e?.preventDefault) e.preventDefault();
+      return Promise.resolve(fn({ name: '', type: '', checkpoints: ['', '', ''] }));
+    },
+    watch: () => ['', '', ''],
+    getValues: () => ['', '', ''],
+    setValue: vi.fn(),
+    reset: vi.fn(),
+    formState: { errors: {}, isSubmitting: false },
+  }),
+  Controller: ({ render, name }: any) => render({ field: { value: '', onChange: vi.fn(), name } }),
+  FormProvider: ({ children }: any) => <div>{children}</div>,
+  useFormContext: () => ({
+    watch: () => ['', '', ''],
+    getValues: () => ['', '', ''],
+    setValue: vi.fn(),
+    reset: vi.fn(),
+    register: vi.fn(),
+    handleSubmit: (fn: any) => (e?: any) => {
+      if (e?.preventDefault) e.preventDefault();
+      return Promise.resolve(fn({ name: '', type: '', checkpoints: ['', '', ''] }));
+    },
+    formState: { errors: {}, isSubmitting: false },
+  }),
+}));
+
+vi.mock('@hookform/resolvers/zod', () => ({
+  zodResolver: () => () => ({ values: {}, errors: {} }),
+}));
+
 vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: any) => (open ? <div data-testid="dialog">{children}</div> : null),
   DialogContent: ({ children }: any) => <div data-testid="dialog-content">{children}</div>,
@@ -15,31 +49,23 @@ vi.mock('@/components/ui/dialog', () => ({
 
 vi.mock('@/components/ui/form', () => ({
   Form: ({ children }: any) => <div data-testid="form">{children}</div>,
-  FormControl: ({ children }: any) => <div data-testid="form-control">{children}</div>,
-  FormField: ({ render, name }: any) => (
-    <div data-testid="form-field" data-field-name={name}>
-      {render ? render({ field: { value: '', onChange: () => {}, name } }) : null}
-    </div>
-  ),
+  FormField: ({ render, name }: any) => render({ field: { value: '', onChange: vi.fn(), name } }),
   FormItem: ({ children }: any) => <div data-testid="form-item">{children}</div>,
-  FormLabel: ({ children }: any) => <div data-testid="form-label">{children}</div>,
+  FormLabel: ({ children }: any) => <label data-testid="form-label">{children}</label>,
+  FormControl: ({ children }: any) => <div data-testid="form-control">{children}</div>,
   FormMessage: () => <div data-testid="form-message" />,
 }));
 
 vi.mock('@/components/ui/input', () => ({
-  Input: (props: any) => <input data-testid={`input-${props.name || 'generic'}`} {...props} />,
+  Input: (props: any) => <input data-testid="input" {...props} />,
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, type, loading, ...props }: any) => (
-    <button type={type} data-testid="submit-btn" disabled={loading} {...props}>
-      {loading ? 'Loading...' : children}
+  Button: ({ children, type, onClick, ...props }: any) => (
+    <button type={type || 'button'} onClick={onClick} {...props}>
+      {children}
     </button>
   ),
-}));
-
-vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children }: any) => <span data-testid="badge">{children}</span>,
 }));
 
 vi.mock('@/routes/__root', () => ({
@@ -51,16 +77,9 @@ vi.mock('@/routes/__root', () => ({
         'adminTemplates.form.name': 'Template Name',
         'adminTemplates.form.type': 'Type',
         'adminTemplates.form.checkpoints': 'Checkpoints',
-        'adminTemplates.form.checkpointName': 'Checkpoint Name',
-        'adminTemplates.form.addCheckpoint': 'Add Checkpoint',
-        'adminTemplates.form.removeCheckpoint': 'Remove',
-        'adminTemplates.form.moveUp': 'Move Up',
-        'adminTemplates.form.moveDown': 'Move Down',
-        'adminTemplates.createSuccess': 'Template created successfully',
         'common.create': 'Create',
         'common.cancel': 'Cancel',
         'common.error': 'Error',
-        'common.submit': 'Submit',
       };
       return translations[key] || key;
     },
@@ -68,121 +87,149 @@ vi.mock('@/routes/__root', () => ({
 }));
 
 describe('CreateTemplateDialog', () => {
-  const onSubmit = vi.fn().mockResolvedValue(undefined);
+  const onSubmit = vi.fn();
   const onSuccess = vi.fn();
+  const onOpenChange = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should render title when open', () => {
+  it('should render when open', () => {
     render(
       <CreateTemplateDialog
         open={true}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onSubmit={onSubmit}
         onSuccess={onSuccess}
       />,
     );
-    expect(screen.getByTestId('dialog')).toBeDefined();
-    expect(screen.getByTestId('dialog-title')).toBeDefined();
-    expect(screen.getByTestId('dialog-desc')).toBeDefined();
+    expect(screen.getByText('New Template')).toBeDefined();
+    expect(screen.getByText('Create your first template')).toBeDefined();
   });
 
-  it('should not render dialog when closed', () => {
+  it('should not render when closed', () => {
     render(
       <CreateTemplateDialog
         open={false}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onSubmit={onSubmit}
         onSuccess={onSuccess}
       />,
     );
-    expect(screen.queryByTestId('dialog')).toBeNull();
+    expect(screen.queryByText('New Template')).toBeNull();
   });
 
-  it('should render form with name and type fields', () => {
+  it('should render form fields', () => {
     render(
       <CreateTemplateDialog
         open={true}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onSubmit={onSubmit}
         onSuccess={onSuccess}
       />,
     );
-    const fields = screen.getAllByTestId('form-field');
-    const fieldNames = fields.map((f) => f.getAttribute('data-field-name'));
-    expect(fieldNames).toContain('name');
-    expect(fieldNames).toContain('type');
+    expect(screen.getByText('Template Name')).toBeDefined();
+    expect(screen.getByText('Type')).toBeDefined();
+    expect(screen.getByText('Checkpoints')).toBeDefined();
   });
 
-  it('should render submit button', () => {
+  it('should render Create and Cancel buttons', () => {
     render(
       <CreateTemplateDialog
         open={true}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onSubmit={onSubmit}
         onSuccess={onSuccess}
       />,
     );
-    const submitBtns = screen.getAllByTestId('submit-btn');
-    // Find the submit button with type="submit"
-    const submitBtn = submitBtns.find((btn) => btn.getAttribute('type') === 'submit');
-    expect(submitBtn).toBeDefined();
+    expect(screen.getByText('Create')).toBeDefined();
+    expect(screen.getByText('Cancel')).toBeDefined();
   });
 
-  it('should render 3 default checkpoint rows', () => {
+  it('should call onOpenChange when Cancel is clicked', () => {
     render(
       <CreateTemplateDialog
         open={true}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onSubmit={onSubmit}
         onSuccess={onSuccess}
       />,
     );
-    const checkpointInputs = screen.getAllByPlaceholderText('Checkpoint Name');
-    expect(checkpointInputs.length).toBe(3);
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('should validate the Zod schema correctly', () => {
+  it('should validate Zod schema correctly', () => {
     // Valid input
-    const valid = CreateTemplateSchema.safeParse({
-      name: 'Thesis Template',
-      type: 'Thesis',
-      checkpoints: ['Chapter 1', 'Chapter 2'],
-    });
-    expect(valid.success).toBe(true);
-
+    expect(
+      CreateTemplateSchema.safeParse({ name: 'Test', type: 'Thesis', checkpoints: ['Ch1'] })
+        .success,
+    ).toBe(true);
     // Empty name
-    const emptyName = CreateTemplateSchema.safeParse({
-      name: '',
-      type: 'Thesis',
-      checkpoints: ['Chapter 1'],
-    });
-    expect(emptyName.success).toBe(false);
-
+    expect(
+      CreateTemplateSchema.safeParse({ name: '', type: 'Thesis', checkpoints: ['Ch1'] }).success,
+    ).toBe(false);
     // Empty type
-    const emptyType = CreateTemplateSchema.safeParse({
-      name: 'Test',
-      type: '',
-      checkpoints: ['Chapter 1'],
-    });
-    expect(emptyType.success).toBe(false);
-
-    // Zero checkpoints
-    const noCheckpoints = CreateTemplateSchema.safeParse({
-      name: 'Test',
-      type: 'Thesis',
-      checkpoints: [],
-    });
-    expect(noCheckpoints.success).toBe(false);
-
+    expect(
+      CreateTemplateSchema.safeParse({ name: 'Test', type: '', checkpoints: ['Ch1'] }).success,
+    ).toBe(false);
+    // No checkpoints
+    expect(
+      CreateTemplateSchema.safeParse({ name: 'Test', type: 'Thesis', checkpoints: [] }).success,
+    ).toBe(false);
     // Empty checkpoint name
-    const emptyCheckpoint = CreateTemplateSchema.safeParse({
-      name: 'Test',
-      type: 'Thesis',
-      checkpoints: ['Chapter 1', ''],
+    expect(
+      CreateTemplateSchema.safeParse({ name: 'Test', type: 'Thesis', checkpoints: [''] }).success,
+    ).toBe(false);
+  });
+
+  it('should call onSubmit when form is submitted', async () => {
+    const submitFn = vi.fn().mockResolvedValue({ template: { id: 1 } });
+    const onClose = vi.fn();
+    const onSucceed = vi.fn();
+    const { container } = render(
+      <CreateTemplateDialog
+        open={true}
+        onOpenChange={onClose}
+        onSubmit={submitFn}
+        onSuccess={onSucceed}
+      />,
+    );
+
+    const formEl = container.querySelector('form');
+    if (formEl) {
+      fireEvent.submit(formEl);
+    }
+
+    await vi.waitFor(() => {
+      expect(submitFn).toHaveBeenCalledOnce();
     });
-    expect(emptyCheckpoint.success).toBe(false);
+    expect(onSucceed).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledWith(false);
+  });
+
+  it('should show server error on submit failure', async () => {
+    const submitFn = vi.fn().mockResolvedValue({ error: 'Server error occurred' });
+    const onClose = vi.fn();
+    const onSucceed = vi.fn();
+    const { container } = render(
+      <CreateTemplateDialog
+        open={true}
+        onOpenChange={onClose}
+        onSubmit={submitFn}
+        onSuccess={onSucceed}
+      />,
+    );
+
+    const formEl = container.querySelector('form');
+    if (formEl) {
+      fireEvent.submit(formEl);
+    }
+
+    await vi.waitFor(() => {
+      expect(screen.getByText(/Server error/)).toBeDefined();
+    });
+    expect(onSucceed).not.toHaveBeenCalled();
   });
 });

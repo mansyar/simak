@@ -2,6 +2,26 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { UserFilters } from '@/components/admin/users/UserFilters';
 
+vi.mock('@/components/ui/input', () => ({
+  Input: (props: any) => <input data-testid="search-input" {...props} />,
+}));
+
+vi.mock('@/components/ui/select', () => ({
+  Select: ({ children, onValueChange, value }: any) => (
+    <select
+      data-testid="role-select"
+      value={value}
+      onChange={(e) => onValueChange?.(e.target.value)}
+    >
+      {children}
+    </select>
+  ),
+  SelectContent: ({ children }: any) => <>{children}</>,
+  SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
+  SelectTrigger: ({ children }: any) => <div>{children}</div>,
+  SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
+}));
+
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
     t: (key: string) => {
@@ -33,26 +53,24 @@ describe('UserFilters', () => {
         onSearchChange={onSearchChange}
         role="all"
         onRoleChange={onRoleChange}
-      />
+      />,
     );
 
     const searchInput = screen.getByPlaceholderText('Search users by name or email...');
     expect(searchInput).toBeDefined();
   });
 
-  it('should render role filter dropdown with current value', () => {
+  it('should render role filter select', () => {
     render(
       <UserFilters
         search=""
         onSearchChange={onSearchChange}
         role="all"
         onRoleChange={onRoleChange}
-      />
+      />,
     );
 
-    // The select trigger shows the current value
-    const trigger = screen.getByRole('combobox');
-    expect(trigger).toBeDefined();
+    expect(screen.getByTestId('role-select')).toBeDefined();
   });
 
   it('should call onSearchChange when search input value changes', () => {
@@ -62,7 +80,7 @@ describe('UserFilters', () => {
         onSearchChange={onSearchChange}
         role="all"
         onRoleChange={onRoleChange}
-      />
+      />,
     );
 
     const searchInput = screen.getByPlaceholderText('Search users by name or email...');
@@ -70,19 +88,34 @@ describe('UserFilters', () => {
     expect(onSearchChange).toHaveBeenCalledWith('john');
   });
 
-  it('should call onRoleChange when role filter changes', () => {
+  it('should call onRoleChange when role filter select changes', () => {
+    const roleChangeSpy = vi.fn();
     render(
       <UserFilters
         search=""
         onSearchChange={onSearchChange}
         role="all"
-        onRoleChange={onRoleChange}
-      />
+        onRoleChange={roleChangeSpy}
+      />,
     );
 
-    // The role filter triggers onValueChange
-    const trigger = screen.getByRole('combobox');
-    expect(trigger).toBeDefined();
+    const select = screen.getByTestId('role-select');
+    fireEvent.change(select, { target: { value: 'admin' } });
+    expect(roleChangeSpy).toHaveBeenCalled();
+  });
+
+  it('should display selected role label when role is set', () => {
+    render(
+      <UserFilters
+        search=""
+        onSearchChange={onSearchChange}
+        role="admin"
+        onRoleChange={onRoleChange}
+      />,
+    );
+
+    const select = screen.getByTestId('role-select') as HTMLSelectElement;
+    expect(select.value).toBe('admin');
   });
 
   it('should display current search value', () => {
@@ -92,10 +125,12 @@ describe('UserFilters', () => {
         onSearchChange={onSearchChange}
         role="all"
         onRoleChange={onRoleChange}
-      />
+      />,
     );
 
-    const searchInput = screen.getByPlaceholderText('Search users by name or email...') as HTMLInputElement;
+    const searchInput = screen.getByPlaceholderText(
+      'Search users by name or email...',
+    ) as HTMLInputElement;
     expect(searchInput.value).toBe('test');
   });
 });

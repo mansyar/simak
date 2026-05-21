@@ -3,6 +3,40 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 import { CreateUserSchema } from '@/server/users';
 
+// Mock react-hook-form to bypass validation and submit with mock values
+vi.mock('react-hook-form', () => ({
+  useForm: () => ({
+    register: vi.fn(),
+    handleSubmit: (fn: any) => (e?: any) => {
+      if (e?.preventDefault) e.preventDefault();
+      return Promise.resolve(fn({ name: 'Test User', email: 'test@example.com', role: 'student' }));
+    },
+    watch: () => ({}),
+    getValues: () => ({}),
+    setValue: vi.fn(),
+    reset: vi.fn(),
+    formState: { errors: {}, isSubmitting: false },
+  }),
+  Controller: ({ render, name }: any) => render({ field: { value: '', onChange: vi.fn(), name } }),
+  FormProvider: ({ children }: any) => <div>{children}</div>,
+  useFormContext: () => ({
+    register: vi.fn(),
+    handleSubmit: (fn: any) => (e?: any) => {
+      if (e?.preventDefault) e.preventDefault();
+      return Promise.resolve(fn({ name: 'Test User', email: 'test@example.com', role: 'student' }));
+    },
+    watch: () => ({}),
+    getValues: () => ({}),
+    setValue: vi.fn(),
+    reset: vi.fn(),
+    formState: { errors: {}, isSubmitting: false },
+  }),
+}));
+
+vi.mock('@hookform/resolvers/zod', () => ({
+  zodResolver: () => () => ({ values: {}, errors: {} }),
+}));
+
 // Mock the UI components that have complex dependencies
 vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ children, open }: { children: React.ReactNode; open: boolean }) =>
@@ -25,17 +59,25 @@ vi.mock('@/components/ui/dialog', () => ({
 }));
 
 vi.mock('@/components/ui/form', () => ({
-  Form: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="form">{children}</div>
-  ),
+  Form: ({ children }: { children: React.ReactNode }) => <div data-testid="form">{children}</div>,
   FormControl: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="form-control">{children}</div>
   ),
-  FormField: ({ render, name }: { render: any; name: string }) => (
-    <div data-testid="form-field" data-field-name={name}>
-      {render ? render({ field: { value: '', onChange: () => {}, name } }) : null}
-    </div>
-  ),
+  FormField: ({ render, name }: { render: any; name: string }) => {
+    const fieldValues: Record<string, string> = {
+      name: 'Test User',
+      email: 'test@example.com',
+      role: 'student',
+      checkpoints: '',
+    };
+    return (
+      <div data-testid="form-field" data-field-name={name}>
+        {render
+          ? render({ field: { value: fieldValues[name] || '', onChange: () => {}, name } })
+          : null}
+      </div>
+    );
+  },
   FormItem: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="form-item">{children}</div>
   ),
@@ -47,32 +89,25 @@ vi.mock('@/components/ui/form', () => ({
 
 vi.mock('@/components/ui/select', () => ({
   Select: ({ children, onValueChange }: any) => (
-    <select
-      data-testid="role-select"
-      onChange={(e) => onValueChange?.(e.target.value)}
-    >
+    <select data-testid="role-select" onChange={(e) => onValueChange?.(e.target.value)}>
       {children}
     </select>
   ),
   SelectContent: ({ children }: any) => <div>{children}</div>,
-  SelectItem: ({ value, children }: any) => (
-    <option value={value}>{children}</option>
-  ),
+  SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
   SelectTrigger: ({ children }: any) => <div>{children}</div>,
   SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
 }));
 
 vi.mock('@/components/ui/input', () => ({
-  Input: (props: any) => <input data-testid={`input-${props.name || props.placeholder}`} {...props} />,
+  Input: (props: any) => (
+    <input data-testid={`input-${props.name || props.placeholder}`} {...props} />
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, type, loading, ...props }: any) => (
-    <button type={type} data-testid="submit-btn" disabled={loading} onClick={(e: any) => {
-      // Find the parent form and submit it
-      const form = e.currentTarget.closest('form');
-      if (form) form.requestSubmit();
-    }} {...props}>
+    <button type={type} data-testid="submit-btn" disabled={loading} {...props}>
       {loading ? 'Loading...' : children}
     </button>
   ),
@@ -151,6 +186,25 @@ describe('CreateUserDialog', () => {
     render(<CreateUserDialog open={true} onOpenChange={vi.fn()} onSubmit={onSubmit} />);
     expect(screen.getByTestId('form')).toBeDefined();
     expect(screen.getByTestId('submit-btn')).toBeDefined();
+  });
+
+  it('should call onSubmit when form is submitted', async () => {
+    const submitFn = vi.fn().mockResolvedValue(undefined);
+    const onClose = vi.fn();
+    const { container } = render(
+      <CreateUserDialog open={true} onOpenChange={onClose} onSubmit={submitFn} />,
+    );
+
+    // Find the actual form element and submit it
+    const formEl = container.querySelector('form');
+    if (formEl) {
+      fireEvent.submit(formEl);
+    }
+
+    await vi.waitFor(() => {
+      expect(submitFn).toHaveBeenCalledOnce();
+    });
+    expect(onClose).toHaveBeenCalledOnce();
   });
 
   it('should validate the Zod schema correctly', () => {

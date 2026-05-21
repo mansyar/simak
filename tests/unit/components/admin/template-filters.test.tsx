@@ -28,7 +28,7 @@ vi.mock('@/components/ui/select', () => ({
       {children}
     </select>
   ),
-  SelectContent: ({ children }: any) => <div>{children}</div>,
+  SelectContent: ({ children }: any) => <>{children}</>,
   SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
   SelectTrigger: ({ children }: any) => <div>{children}</div>,
   SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
@@ -100,6 +100,20 @@ describe('TemplateFilters', () => {
     const searchInput = screen.getByTestId('search-input');
     fireEvent.change(searchInput, { target: { value: 'thesis' } });
     expect(onSearchChange).toHaveBeenCalledWith('thesis');
+  });
+
+  it('should display selected type value when type is set', () => {
+    render(
+      <TemplateFilters
+        search=""
+        onSearchChange={onSearchChange}
+        type="Thesis"
+        types={['Thesis', 'Research Paper']}
+        onTypeChange={onTypeChange}
+      />,
+    );
+    const selectEl = screen.getByTestId('type-select') as HTMLSelectElement;
+    expect(selectEl.value).toBe('Thesis');
   });
 
   it('should display current search value', () => {

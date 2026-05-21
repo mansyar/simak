@@ -1,0 +1,105 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { CheckpointListEditor } from '@/components/admin/templates/CheckpointListEditor';
+
+vi.mock('@/routes/__root', () => ({
+  useI18n: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'adminTemplates.form.moveUp': 'Move Up',
+        'adminTemplates.form.moveDown': 'Move Down',
+        'adminTemplates.form.checkpointName': 'Checkpoint Name',
+        'adminTemplates.form.removeCheckpoint': 'Remove',
+        'adminTemplates.form.addCheckpoint': 'Add Checkpoint',
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
+vi.mock('@/components/ui/input', () => ({
+  Input: (props: any) => <input {...props} />,
+}));
+
+vi.mock('@/components/ui/button', () => ({
+  Button: ({ children, onClick, disabled, ...props }: any) => (
+    <button onClick={onClick} disabled={disabled} {...props}>
+      {children}
+    </button>
+  ),
+}));
+
+describe('CheckpointListEditor', () => {
+  const defaultProps = {
+    checkpoints: ['Chapter 1', 'Chapter 2', 'Chapter 3'],
+    onAdd: vi.fn(),
+    onRemove: vi.fn(),
+    onChange: vi.fn(),
+    onMoveUp: vi.fn(),
+    onMoveDown: vi.fn(),
+  };
+
+  it('should render all checkpoints', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    expect(screen.getByDisplayValue('Chapter 1')).toBeDefined();
+    expect(screen.getByDisplayValue('Chapter 2')).toBeDefined();
+    expect(screen.getByDisplayValue('Chapter 3')).toBeDefined();
+  });
+
+  it('should call onChange when input value changes', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    fireEvent.change(screen.getByDisplayValue('Chapter 1'), { target: { value: 'Introduction' } });
+    expect(defaultProps.onChange).toHaveBeenCalledWith(0, 'Introduction');
+  });
+
+  it('should call onAdd when Add Checkpoint is clicked', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    fireEvent.click(screen.getByText('Add Checkpoint'));
+    expect(defaultProps.onAdd).toHaveBeenCalledOnce();
+  });
+
+  it('should call onRemove when Remove button is clicked', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    const removeBtns = screen.getAllByLabelText('Remove');
+    fireEvent.click(removeBtns[0]);
+    expect(defaultProps.onRemove).toHaveBeenCalledWith(0);
+  });
+
+  it('should call onMoveUp when Move Up is clicked', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    fireEvent.click(screen.getAllByLabelText('Move Up')[1]);
+    expect(defaultProps.onMoveUp).toHaveBeenCalledWith(1);
+  });
+
+  it('should call onMoveDown when Move Down is clicked', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    fireEvent.click(screen.getAllByLabelText('Move Down')[0]);
+    expect(defaultProps.onMoveDown).toHaveBeenCalledWith(0);
+  });
+
+  it('should disable Move Up on first checkpoint', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    expect((screen.getAllByLabelText('Move Up')[0] as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('should disable Move Down on last checkpoint', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    const downBtns = screen.getAllByLabelText('Move Down');
+    expect((downBtns[downBtns.length - 1] as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('should show error text when errors prop is provided', () => {
+    render(<CheckpointListEditor {...defaultProps} errors={[undefined, 'Required', undefined]} />);
+    expect(screen.getByText('Required')).toBeDefined();
+  });
+
+  it('should disable Remove when only one checkpoint', () => {
+    render(<CheckpointListEditor {...defaultProps} checkpoints={['Only']} />);
+    expect((screen.getByLabelText('Remove') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('should render Add Checkpoint button', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    expect(screen.getByText('Add Checkpoint')).toBeDefined();
+  });
+});

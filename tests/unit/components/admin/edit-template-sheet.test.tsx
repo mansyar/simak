@@ -1,7 +1,41 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EditTemplateSheet } from '@/components/admin/templates/EditTemplateSheet';
 import { UpdateTemplateSchema } from '@/server/templates';
+
+// Minimal react-hook-form mock
+vi.mock('react-hook-form', () => ({
+  useForm: () => ({
+    register: vi.fn(),
+    handleSubmit: (fn: any) => (e?: any) => {
+      if (e?.preventDefault) e.preventDefault();
+      return Promise.resolve(fn({ name: '', type: '', checkpoints: ['', ''] }));
+    },
+    watch: () => ['', ''],
+    getValues: () => ['', ''],
+    setValue: vi.fn(),
+    reset: vi.fn(),
+    formState: { errors: {}, isSubmitting: false },
+  }),
+  Controller: ({ render, name }: any) => render({ field: { value: '', onChange: vi.fn(), name } }),
+  FormProvider: ({ children }: any) => <div>{children}</div>,
+  useFormContext: () => ({
+    watch: () => ['', ''],
+    getValues: () => ['', ''],
+    setValue: vi.fn(),
+    reset: vi.fn(),
+    register: vi.fn(),
+    handleSubmit: (fn: any) => (e?: any) => {
+      if (e?.preventDefault) e.preventDefault();
+      return Promise.resolve(fn({ name: '', type: '', checkpoints: ['', ''] }));
+    },
+    formState: { errors: {}, isSubmitting: false },
+  }),
+}));
+
+vi.mock('@hookform/resolvers/zod', () => ({
+  zodResolver: () => () => ({ values: {}, errors: {} }),
+}));
 
 vi.mock('@/components/ui/sheet', () => ({
   Sheet: ({ children, open }: any) => (open ? <div data-testid="sheet">{children}</div> : null),
@@ -14,34 +48,22 @@ vi.mock('@/components/ui/sheet', () => ({
 
 vi.mock('@/components/ui/form', () => ({
   Form: ({ children }: any) => <div data-testid="form">{children}</div>,
-  FormControl: ({ children }: any) => <div data-testid="form-control">{children}</div>,
-  FormField: ({ render, name }: any) => (
-    <div data-testid="form-field" data-field-name={name}>
-      {render ? render({ field: { value: '', onChange: () => {}, name } }) : null}
-    </div>
-  ),
+  FormField: ({ render, name }: any) => render({ field: { value: '', onChange: vi.fn(), name } }),
   FormItem: ({ children }: any) => <div data-testid="form-item">{children}</div>,
-  FormLabel: ({ children }: any) => <div data-testid="form-label">{children}</div>,
+  FormLabel: ({ children }: any) => <label data-testid="form-label">{children}</label>,
+  FormControl: ({ children }: any) => <div data-testid="form-control">{children}</div>,
   FormMessage: () => <div data-testid="form-message" />,
 }));
 
 vi.mock('@/components/ui/input', () => ({
-  Input: (props: any) => <input data-testid={`input-${props.name || 'generic'}`} {...props} />,
+  Input: (props: any) => <input data-testid="input" {...props} />,
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, type, loading, ...props }: any) => (
-    <button type={type} data-testid="submit-btn" disabled={loading} {...props}>
-      {loading ? 'Loading...' : children}
-    </button>
-  ),
-}));
-
-vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, variant }: any) => (
-    <span data-testid="badge" data-variant={variant}>
+  Button: ({ children, type, onClick, ...props }: any) => (
+    <button type={type || 'button'} onClick={onClick} {...props}>
       {children}
-    </span>
+    </button>
   ),
 }));
 
@@ -53,17 +75,10 @@ vi.mock('@/routes/__root', () => ({
         'adminTemplates.form.name': 'Template Name',
         'adminTemplates.form.type': 'Type',
         'adminTemplates.form.checkpoints': 'Checkpoints',
-        'adminTemplates.form.checkpointName': 'Checkpoint Name',
-        'adminTemplates.form.addCheckpoint': 'Add Checkpoint',
-        'adminTemplates.form.removeCheckpoint': 'Remove',
-        'adminTemplates.form.moveUp': 'Move Up',
-        'adminTemplates.form.moveDown': 'Move Down',
-        'adminTemplates.updateSuccess': 'Template updated successfully',
         'adminTemplates.inUseBanner': params
-          ? `This template is used by ${params.count} assignment(s).`
+          ? `This template is used by ${String(params.count)} assignment(s).`
           : key,
         'common.save': 'Save',
-        'common.cancel': 'Cancel',
         'common.error': 'Error',
       };
       return translations[key] || key;
@@ -82,94 +97,198 @@ describe('EditTemplateSheet', () => {
     ],
   };
 
-  const onSubmit = vi.fn().mockResolvedValue({ success: true });
+  const onSubmit = vi.fn();
+  const onSuccess = vi.fn();
+  const onOpenChange = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should render title when open with template data', () => {
+  it('should render when open with template data', () => {
     render(
       <EditTemplateSheet
         template={mockTemplate}
         open={true}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onSubmit={onSubmit}
-        onSuccess={vi.fn()}
+        onSuccess={onSuccess}
       />,
     );
-    expect(screen.getByTestId('sheet')).toBeDefined();
-    expect(screen.getByTestId('sheet-title')).toBeDefined();
-    expect(screen.getByTestId('sheet-desc')).toBeDefined();
+    expect(screen.getByText('Edit Template')).toBeDefined();
+    expect(screen.getByText('Edit template name, type, and checkpoints.')).toBeDefined();
   });
 
-  it('should not render sheet when closed', () => {
+  it('should not render when closed', () => {
     render(
       <EditTemplateSheet
         template={mockTemplate}
         open={false}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onSubmit={onSubmit}
-        onSuccess={vi.fn()}
+        onSuccess={onSuccess}
       />,
     );
-    expect(screen.queryByTestId('sheet')).toBeNull();
+    expect(screen.queryByText('Edit Template')).toBeNull();
   });
 
-  it('should render form with name and type fields', () => {
+  it('should render form fields', () => {
     render(
       <EditTemplateSheet
         template={mockTemplate}
         open={true}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onSubmit={onSubmit}
-        onSuccess={vi.fn()}
+        onSuccess={onSuccess}
       />,
     );
-    const fields = screen.getAllByTestId('form-field');
-    const fieldNames = fields.map((f) => f.getAttribute('data-field-name'));
-    expect(fieldNames).toContain('name');
-    expect(fieldNames).toContain('type');
+    expect(screen.getByText('Template Name')).toBeDefined();
+    expect(screen.getByText('Type')).toBeDefined();
+    expect(screen.getByText('Checkpoints')).toBeDefined();
   });
 
-  it('should render submit button', () => {
+  it('should render Save button', () => {
     render(
       <EditTemplateSheet
         template={mockTemplate}
         open={true}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onSubmit={onSubmit}
-        onSuccess={vi.fn()}
+        onSuccess={onSuccess}
       />,
     );
-    const submitBtns = screen.getAllByTestId('submit-btn');
-    const saveBtn = submitBtns.find((btn) => btn.textContent === 'Save');
-    expect(saveBtn).toBeDefined();
+    expect(screen.getByText('Save')).toBeDefined();
   });
 
-  it('should validate the Zod schema correctly', () => {
-    // Valid input
-    const valid = UpdateTemplateSchema.safeParse({
-      name: 'Updated Template',
-      type: 'Thesis',
-      checkpoints: ['Ch 1', 'Ch 2'],
-    });
-    expect(valid.success).toBe(true);
+  it('should render in-use banner when template has assignments', () => {
+    render(
+      <EditTemplateSheet
+        template={{ ...mockTemplate, assignmentCount: 3 }}
+        open={true}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+        onSuccess={onSuccess}
+      />,
+    );
+    expect(screen.getByText(/used by 3/)).toBeDefined();
+  });
 
+  it('should not render in-use banner when template has no assignments', () => {
+    render(
+      <EditTemplateSheet
+        template={{ ...mockTemplate, assignmentCount: 0 }}
+        open={true}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+        onSuccess={onSuccess}
+      />,
+    );
+    expect(screen.queryByText(/used by/)).toBeNull();
+  });
+
+  it('should not render in-use banner when assignmentCount is undefined', () => {
+    render(
+      <EditTemplateSheet
+        template={mockTemplate}
+        open={true}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+        onSuccess={onSuccess}
+      />,
+    );
+    expect(screen.queryByText(/used by/)).toBeNull();
+  });
+
+  it('should validate UpdateTemplateSchema correctly', () => {
+    // Valid
+    expect(
+      UpdateTemplateSchema.safeParse({ name: 'Test', type: 'Thesis', checkpoints: ['Ch1'] })
+        .success,
+    ).toBe(true);
     // Empty name
-    const emptyName = UpdateTemplateSchema.safeParse({
-      name: '',
-      type: 'Thesis',
-      checkpoints: ['Ch 1'],
-    });
-    expect(emptyName.success).toBe(false);
+    expect(
+      UpdateTemplateSchema.safeParse({ name: '', type: 'Thesis', checkpoints: ['Ch1'] }).success,
+    ).toBe(false);
+    // No checkpoints
+    expect(
+      UpdateTemplateSchema.safeParse({ name: 'Test', type: 'Thesis', checkpoints: [] }).success,
+    ).toBe(false);
+  });
 
-    // Zero checkpoints
-    const noCheckpoints = UpdateTemplateSchema.safeParse({
-      name: 'Test',
-      type: 'Thesis',
-      checkpoints: [],
+  it('should handle null template gracefully', () => {
+    render(
+      <EditTemplateSheet
+        template={null}
+        open={true}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+        onSuccess={onSuccess}
+      />,
+    );
+    expect(screen.getByText('Edit Template')).toBeDefined();
+  });
+
+  it('should call onSubmit when form is submitted', async () => {
+    const submitFn = vi.fn().mockResolvedValue({ success: true });
+    const onClose = vi.fn();
+    const onSucceed = vi.fn();
+    const { container } = render(
+      <EditTemplateSheet
+        template={{
+          id: 1,
+          name: 'Test',
+          type: 'Thesis',
+          checkpoints: [{ id: 1, name: 'Ch1', order: 1 }],
+        }}
+        open={true}
+        onOpenChange={onClose}
+        onSubmit={submitFn}
+        onSuccess={onSucceed}
+      />,
+    );
+
+    const formEl = container.querySelector('form');
+    if (formEl) {
+      fireEvent.submit(formEl);
+    }
+
+    await vi.waitFor(() => {
+      expect(submitFn).toHaveBeenCalledOnce();
     });
-    expect(noCheckpoints.success).toBe(false);
+    expect(onSucceed).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledWith(false);
+  });
+
+  it('should toggle open state correctly', () => {
+    const onClose = vi.fn();
+    const { rerender } = render(
+      <EditTemplateSheet
+        template={{
+          id: 1,
+          name: 'Test',
+          type: 'Thesis',
+          checkpoints: [{ id: 1, name: 'Ch1', order: 1 }],
+        }}
+        open={true}
+        onOpenChange={onClose}
+        onSubmit={vi.fn()}
+        onSuccess={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Edit Template')).toBeDefined();
+
+    // Rerender with closed
+    rerender(
+      <EditTemplateSheet
+        template={null}
+        open={false}
+        onOpenChange={onClose}
+        onSubmit={vi.fn()}
+        onSuccess={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText('Edit Template')).toBeNull();
   });
 });
