@@ -34,7 +34,7 @@
   - [x] Implement and verify both test suites pass successfully (Green Phase)
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Listing & Detail Views UI' (Protocol in workflow.md)
 
-## Phase 3: Creation Wizard UI & Flow
+## Phase 3: Creation Wizard UI & Flow [checkpoint: 29d83fb]
 
 - [x] Task: Implement step-by-step Wizard Container & Forms [x] (Commit: 18417cc)
   - [x] Create wizard route file `src/routes/_authenticated/instructor/assignments/new.tsx`
