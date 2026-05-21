@@ -191,6 +191,10 @@
       "errorMessage": "Gagal membuat tugas. Silakan coba lagi."
     }
   },
+  "studentSidebar": {
+    "dashboard": "Dasbor",
+    "assignments": "Tugas"
+  },
   "error": {
     "notFound": "Halaman tidak ditemukan",
     "forbidden": "Anda tidak memiliki izin untuk mengakses halaman ini",

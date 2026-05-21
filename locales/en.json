@@ -191,6 +191,10 @@
       "errorMessage": "Failed to create assignment. Please try again."
     }
   },
+  "studentSidebar": {
+    "dashboard": "Dashboard",
+    "assignments": "Assignments"
+  },
   "error": {
     "notFound": "Page not found",
     "forbidden": "You do not have permission to access this page",
