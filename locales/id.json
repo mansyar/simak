@@ -195,6 +195,23 @@
     "dashboard": "Dasbor",
     "assignments": "Tugas"
   },
+  "studentAssignments": {
+    "title": "Tugas Saya",
+    "subtitle": "Lihat dan lacak kemajuan tugas akademik yang diberikan kepada Anda.",
+    "searchPlaceholder": "Cari tugas berdasarkan judul...",
+    "finalDeadline": "Tenggat: {date}",
+    "progress": "Progres",
+    "empty": "Belum ada tugas",
+    "emptyPrompt": "Ketika dosen memberikan tugas, tugas akan muncul di sini.",
+    "status": {
+      "passed": "Lulus",
+      "under_review": "Sedang Ditinjau",
+      "submitted": "Dikirim",
+      "locked": "Terkunci",
+      "unlocked": "Terbuka",
+      "revise": "Revisi"
+    }
+  },
   "error": {
     "notFound": "Halaman tidak ditemukan",
     "forbidden": "Anda tidak memiliki izin untuk mengakses halaman ini",
