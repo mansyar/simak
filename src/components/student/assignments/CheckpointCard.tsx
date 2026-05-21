@@ -51,6 +51,23 @@ const stateConfig: Record<string, { label: string; containerClass: string; badge
   },
 };
 
+function getTranslatedBlockingReason(
+  reason: string,
+  t: (key: string, params?: Record<string, string>) => string,
+): string {
+  if (reason.startsWith('Previous checkpoint not passed')) {
+    return t('studentAssignments.blockedByPrevious');
+  }
+  const consultMatch = reason.match(/Insufficient consultations: (\d+)\/(\d+) verified/);
+  if (consultMatch) {
+    return t('studentAssignments.blockedByConsultations', {
+      current: consultMatch[1],
+      required: consultMatch[2],
+    });
+  }
+  return reason;
+}
+
 export function CheckpointCard({ checkpoint }: CheckpointCardProps) {
   const { t } = useI18n();
   const config = stateConfig[checkpoint.state] ?? stateConfig.locked;
@@ -106,15 +123,18 @@ export function CheckpointCard({ checkpoint }: CheckpointCardProps) {
           {/* Blocking reasons */}
           {checkpoint.blockingReasons && checkpoint.blockingReasons.length > 0 && (
             <div className="mt-2 space-y-1">
-              {checkpoint.blockingReasons.map((reason, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-start gap-1.5 text-xs text-red-600 dark:text-red-400"
-                >
-                  <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
-                  <span>{reason}</span>
-                </div>
-              ))}
+              {checkpoint.blockingReasons.map((reason, idx) => {
+                const translatedReason = getTranslatedBlockingReason(reason, t);
+                return (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-1.5 text-xs text-red-600 dark:text-red-400"
+                  >
+                    <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
+                    <span>{translatedReason}</span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

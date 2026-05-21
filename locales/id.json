@@ -215,6 +215,8 @@
     "timeline": "Linimasa Checkpoint",
     "submit": "Kumpulkan",
     "consultations": "Konsultasi: {current}/{required}",
+    "blockedByPrevious": "Checkpoint sebelumnya belum lulus",
+    "blockedByConsultations": "Konsultasi tidak mencukupi: {current}/{required} terverifikasi",
     "notFound": "Tugas tidak ditemukan",
     "notFoundDescription": "Tugas ini tidak ada atau Anda tidak memiliki akses ke tugas ini."
   },

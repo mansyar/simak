@@ -215,6 +215,8 @@
     "timeline": "Checkpoint Timeline",
     "submit": "Submit",
     "consultations": "Consultations: {current}/{required}",
+    "blockedByPrevious": "Previous checkpoint not passed",
+    "blockedByConsultations": "Insufficient consultations: {current}/{required} verified",
     "notFound": "Assignment not found",
     "notFoundDescription": "This assignment does not exist or you don't have access to it."
   },

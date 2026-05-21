@@ -63,8 +63,8 @@ describe('CheckpointCard', () => {
 
   it('should display blocking reasons for locked checkpoints', () => {
     render(<CheckpointCard checkpoint={lockedCheckpoint} />);
-    expect(screen.getByText('Previous checkpoint not passed')).toBeDefined();
-    expect(screen.getByText('Insufficient consultations: 0/1 verified')).toBeDefined();
+    expect(screen.getByText('studentAssignments.blockedByPrevious')).toBeDefined();
+    expect(screen.getByText(/studentAssignments.blockedByConsultations/)).toBeDefined();
   });
 
   it('should indicate overdue checkpoints', () => {

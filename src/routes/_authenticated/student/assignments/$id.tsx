@@ -44,7 +44,6 @@ function AssignmentNotFound() {
 function AssignmentDetailPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData() as any;
-  const navigate = Route.useNavigate() as any;
 
   if (!data) {
     return <AssignmentNotFound />;

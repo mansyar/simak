@@ -93,6 +93,8 @@ export type Translation = {
     timeline: string
     submit: string
     consultations: string
+    blockedByPrevious: string
+    blockedByConsultations: string
     notFound: string
     notFoundDescription: string
     status: {
