@@ -16,7 +16,7 @@
   - [x] Write unit tests for student sidebar (link rendering, active state, i18n)
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Student Layout & Sidebar' (Protocol in workflow.md)
 
-## Phase 2: Student Assignment List Page
+## Phase 2: Student Assignment List Page [checkpoint: 11eb743]
 
 - [x] Task: Build student assignment list UI [b44ce6d]
   - [x] Create `src/routes/_authenticated/student/assignments/index.tsx` route
@@ -31,7 +31,7 @@
   - [x] Write unit tests for StudentAssignmentEmptyState (message, prompt)
   - [x] Write unit tests for StudentAssignmentLoadingSkeleton (skeleton count, default)
   - [x] Write unit tests for assignment list route (pagination, search, loading states)
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Student Assignment List Page' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Student Assignment List Page' (Protocol in workflow.md)
 
 ## Phase 3: Student Assignment Detail & Checkpoint Timeline
 
