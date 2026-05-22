@@ -2,9 +2,9 @@
 
 ## Phase 1: R2 Storage Client & Presigned URL Generation
 
-- [ ] Task: Install R2 SDK dependencies
-  - [ ] Run `pnpm add @aws-sdk/client-s3 @aws-sdk/s3-request-presigner`
-  - [ ] Verify import works by running `pnpm typecheck`
+- [x] Task: Install R2 SDK dependencies [9002978]
+  - [x] Run `pnpm add @aws-sdk/client-s3 @aws-sdk/s3-request-presigner`
+  - [x] Verify import works by running `pnpm typecheck`
 - [ ] Task: Write tests for R2 storage client
   - [ ] Test: `getR2Client()` returns null when R2 env vars are missing (dev fallback)
   - [ ] Test: `getR2Client()` returns configured S3 client when env vars are present
