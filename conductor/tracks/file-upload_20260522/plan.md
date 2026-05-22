@@ -21,7 +21,7 @@
   - [ ] Create dev fallback: in-memory mock that logs operations and returns fake URLs when R2 not configured
 - [x] Task: Conductor - User Manual Verification 'R2 Storage Client & Presigned URL Generation' (Protocol in workflow.md) [e464bbe]
 
-## Phase 2: Server Functions for Submissions
+## Phase 2: Server Functions for Submissions [checkpoint: 0d8c580]
 
 - [x] Task: Write tests for submission server functions [40dbf75]
   - [x] Test: `submitCheckpoint` Zod schema validation (valid/invalid inputs)
@@ -47,7 +47,7 @@
   - [x] Create `src/server/files.ts` — presigned URL server functions
     - [x] `getPresignedUploadUrl` — validates checkpoint state (`unlocked` or `revise`), generates UUID file key via `generateFileKey()`, returns `{ uploadUrl, fileKey }` to the client
     - [x] `getPresignedDownloadUrl` — validates submission ownership, generates GET URL (1hr expiry)
-- [ ] Task: Conductor - User Manual Verification 'Server Functions for Submissions' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Server Functions for Submissions' (Protocol in workflow.md) [0d8c580]
 
 ## Phase 3: Checkpoint Submission Page & Components
 
