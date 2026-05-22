@@ -94,6 +94,15 @@
   - [x] Run `pnpm generate:i18n` to regenerate TypeScript types
 - [ ] Task: Conductor - User Manual Verification 'Checkpoint Submission Page & Components' (Protocol in workflow.md)
 
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [364feeb]
+  - Rename `_r2Client` to `r2Client` (style guide: no underscore prefix)
+  - Replace plain `<button>` with `Button variant="link"` for View Submission
+  - Add `role="alert"` to error divs (accessibility)
+  - Use locale from `useI18n()` in `formatDate` (was hardcoded `en-US`)
+  - Add 4 new tests for Resubmit + View Submission button branches
+
 ## Phase 4: Integration & Final Verification
 
 - [x] Task: Run full test suite and verify coverage >80% [428 tests, 83.13% statements]
