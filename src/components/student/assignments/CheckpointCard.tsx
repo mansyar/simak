@@ -1,5 +1,5 @@
 import { format, isPast } from 'date-fns';
-import { Link } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
 import { Button } from '@/components/ui/button';
 import { Clock, AlertCircle, Users, ExternalLink } from 'lucide-react';
@@ -72,6 +72,7 @@ function getTranslatedBlockingReason(
 
 export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps) {
   const { t } = useI18n();
+  const navigate = useNavigate() as any;
   const config = stateConfig[checkpoint.state] ?? stateConfig.locked;
   const isOverdue =
     checkpoint.dueDate && isPast(new Date(checkpoint.dueDate)) && checkpoint.state !== 'passed';
@@ -143,36 +144,50 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
 
         {/* Action buttons */}
         {checkpoint.state === 'unlocked' && (
-          <Link
-            to="/student/assignments/$id/checkpoints/$checkpointId"
-            params={{ id: String(assignmentId), checkpointId: String(checkpoint.id) }}
+          <Button
+            size="sm"
+            className="shrink-0"
+            onClick={() =>
+              navigate({
+                to: '/student/assignments/$id/checkpoints/$checkpointId',
+                params: { id: String(assignmentId), checkpointId: String(checkpoint.id) },
+              })
+            }
           >
-            <Button size="sm" className="shrink-0">
-              {t('studentAssignments.submit')}
-            </Button>
-          </Link>
+            {t('studentAssignments.submit')}
+          </Button>
         )}
         {checkpoint.state === 'revise' && (
-          <Link
-            to="/student/assignments/$id/checkpoints/$checkpointId"
-            params={{ id: String(assignmentId), checkpointId: String(checkpoint.id) }}
+          <Button
+            size="sm"
+            variant="outline"
+            className="shrink-0"
+            onClick={() =>
+              navigate({
+                to: '/student/assignments/$id/checkpoints/$checkpointId',
+                params: { id: String(assignmentId), checkpointId: String(checkpoint.id) },
+              })
+            }
           >
-            <Button size="sm" variant="outline" className="shrink-0">
-              {t('studentAssignments.resubmit')}
-            </Button>
-          </Link>
+            {t('studentAssignments.resubmit')}
+          </Button>
         )}
         {(checkpoint.state === 'submitted' ||
           checkpoint.state === 'under_review' ||
           checkpoint.state === 'passed') && (
-          <Link
-            to="/student/assignments/$id/checkpoints/$checkpointId"
-            params={{ id: String(assignmentId), checkpointId: String(checkpoint.id) }}
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground shrink-0"
+          <button
+            type="button"
+            onClick={() =>
+              navigate({
+                to: '/student/assignments/$id/checkpoints/$checkpointId',
+                params: { id: String(assignmentId), checkpointId: String(checkpoint.id) },
+              })
+            }
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
           >
             <ExternalLink className="h-3 w-3" />
             {t('studentAssignments.viewSubmission')}
-          </Link>
+          </button>
         )}
       </div>
     </div>
