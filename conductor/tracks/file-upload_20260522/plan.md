@@ -1,6 +1,6 @@
 # Implementation Plan: Track 4.1 — File Upload & Submission (Student)
 
-## Phase 1: R2 Storage Client & Presigned URL Generation
+## Phase 1: R2 Storage Client & Presigned URL Generation [checkpoint: e464bbe]
 
 - [x] Task: Install R2 SDK dependencies [9002978]
   - [x] Run `pnpm add @aws-sdk/client-s3 @aws-sdk/s3-request-presigner`
@@ -19,7 +19,7 @@
   - [ ] Create `generatePresignedUploadUrl({ key, contentType })` — PUT URL, 5min expiry
   - [ ] Create `generatePresignedDownloadUrl({ key })` — GET URL, 1hr expiry
   - [ ] Create dev fallback: in-memory mock that logs operations and returns fake URLs when R2 not configured
-- [ ] Task: Conductor - User Manual Verification 'R2 Storage Client & Presigned URL Generation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'R2 Storage Client & Presigned URL Generation' (Protocol in workflow.md) [e464bbe]
 
 ## Phase 2: Server Functions for Submissions
 
