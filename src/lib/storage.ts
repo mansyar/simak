@@ -32,6 +32,9 @@ export function getR2Client(): S3Client | null {
     region: 'auto',
     endpoint,
     credentials: { accessKeyId, secretAccessKey },
+    // Disable automatic checksum headers that trigger extra CORS preflight
+    requestChecksumCalculation: 'WHEN_REQUIRED',
+    responseChecksumValidation: 'WHEN_REQUIRED',
   });
 
   return _r2Client;
