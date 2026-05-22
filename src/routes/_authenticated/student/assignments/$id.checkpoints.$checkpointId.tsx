@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { getStudentAssignmentDetail } from '@/server/assignments';
 import { listSubmissions, submitCheckpoint } from '@/server/submissions';
 import { getPresignedUploadUrl } from '@/server/files';
@@ -6,6 +6,7 @@ import { FileUploader } from '@/components/files/file-uploader';
 import { FileList } from '@/components/files/file-list';
 import { SubmissionStatus } from '@/components/files/submission-status';
 import { Button } from '@/components/ui/button';
+import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
 import { ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { useState, useCallback } from 'react';
@@ -14,39 +15,74 @@ export const Route = createFileRoute(
   '/_authenticated/student/assignments/$id/checkpoints/$checkpointId',
 )({
   loader: async ({ params }) => {
-    const { id, checkpointId } = params as any;
-    const assignmentData = await (getStudentAssignmentDetail as any)({
-      data: { id: Number(id) },
-    });
+    try {
+      const { id, checkpointId } = params as any;
+      const assignmentData = await (getStudentAssignmentDetail as any)({
+        data: { id: Number(id) },
+      });
 
-    if (!assignmentData) return null;
+      if (!assignmentData) return null;
 
-    // Find the specific checkpoint
-    const checkpoint = (assignmentData.checkpoints ?? []).find(
-      (cp: any) => cp.id === Number(checkpointId),
-    );
+      // Find the specific checkpoint
+      const checkpoint = (assignmentData.checkpoints ?? []).find(
+        (cp: any) => cp.id === Number(checkpointId),
+      );
 
-    if (!checkpoint) return null;
+      if (!checkpoint) return null;
 
-    // Fetch submissions for this checkpoint
-    const submissionsData = await (listSubmissions as any)({
-      data: { checkpointId: Number(checkpointId) },
-    });
+      // Fetch submissions for this checkpoint
+      const submissionsData = await (listSubmissions as any)({
+        data: { checkpointId: Number(checkpointId) },
+      });
 
-    // Find the latest review (from the most recent submission)
-    const latestReview = null;
-    // Review data will come from the reviews table (Track 5.1)
+      // Find the latest review (from the most recent submission)
+      const latestReview = null;
+      // Review data will come from the reviews table (Track 5.1)
 
-    return {
-      assignmentId: Number(id),
-      assignmentTitle: assignmentData.title,
-      checkpoint,
-      submissions: submissionsData?.submissions ?? [],
-      latestReview,
-    };
+      return {
+        assignmentId: Number(id),
+        assignmentTitle: assignmentData.title,
+        checkpoint,
+        submissions: submissionsData?.submissions ?? [],
+        latestReview,
+      };
+    } catch (err) {
+      console.error('Failed to load submission page:', err);
+      return null;
+    }
   },
+  pendingComponent: () => (
+    <div className="space-y-6">
+      <StudentAssignmentLoadingSkeleton count={1} />
+    </div>
+  ),
+  notFoundComponent: () => <SubmissionNotFound />,
   component: CheckpointSubmissionPage,
 });
+
+function SubmissionNotFound() {
+  const { t } = useI18n();
+  const navigate = useNavigate() as any;
+
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <h2 className="text-xl font-semibold text-foreground mb-2">
+        {t('studentAssignments.notFound')}
+      </h2>
+      <p className="text-sm text-muted-foreground mb-4">
+        {t('studentAssignments.notFoundDescription')}
+      </p>
+      <Button
+        variant="outline"
+        type="button"
+        onClick={() => navigate({ to: '/student/assignments', search: {} })}
+      >
+        <ChevronLeft className="mr-2 h-4 w-4" />
+        {t('common.back')}
+      </Button>
+    </div>
+  );
+}
 
 function CheckpointSubmissionPage() {
   const { t } = useI18n();
