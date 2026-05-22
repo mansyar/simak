@@ -89,7 +89,7 @@ function AssignmentDetailPage() {
       <AssignmentDetailHeader detail={detail} />
 
       <div className="border-t pt-6">
-        <CheckpointTimeline checkpoints={checkpoints} />
+        <CheckpointTimeline checkpoints={checkpoints} assignmentId={data.id} />
       </div>
     </div>
   );

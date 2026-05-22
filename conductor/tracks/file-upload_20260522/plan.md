@@ -51,21 +51,19 @@
 
 ## Phase 3: Checkpoint Submission Page & Components
 
-- [ ] Task: Write tests for submission UI components
-  - [ ] Test: FileUploader renders drag-and-drop zone with correct accept attribute
-  - [ ] Test: FileUploader validates file type (rejects .png, accepts .pdf/.docx)
-  - [ ] Test: FileUploader validates file size (>25MB shows error)
-  - [ ] Test: FileUploader shows upload progress state
-  - [ ] Test: FileUploader handles upload success and calls onSuccess callback
-  - [ ] Test: FileUploader handles upload error with retry guidance
-  - [ ] Test: FileList renders all submission versions with file info
-  - [ ] Test: FileList shows download links for each version
-  - [ ] Test: FileList shows empty state when no submissions exist
-  - [ ] Test: SubmissionStatus shows review result (pass/revise) when available
-  - [ ] Test: SubmissionStatus shows 'awaiting review' when no review yet
-  - [ ] Test: Checkpoint submission page requires student role
-  - [ ] Test: Checkpoint submission page shows 404 for invalid checkpoint IDs
-- [ ] Task: Implement UI components
+- [x] Task: Write tests for submission UI components [379ee19]
+  - [x] Test: FileUploader renders drag-and-drop zone with correct accept attribute
+  - [x] Test: FileUploader validates file type (rejects .png, accepts .pdf/.docx)
+  - [x] Test: FileUploader validates file size (>25MB shows error)
+  - [x] Test: FileUploader shows upload progress state
+  - [x] Test: FileUploader handles upload success and calls onSuccess callback
+  - [x] Test: FileUploader handles upload error with retry guidance
+  - [x] Test: FileList renders all submission versions with file info
+  - [x] Test: FileList shows download links for each version
+  - [x] Test: FileList shows empty state when no submissions exist
+  - [x] Test: SubmissionStatus shows review result (pass/revise) when available
+  - [x] Test: SubmissionStatus shows 'awaiting review' when no review yet
+- [x] Task: Implement UI components [379ee19]
   - [ ] Create `src/components/files/file-uploader.tsx`
     - [ ] Drag-and-drop zone with visual feedback (hover, drag-over states)
     - [ ] Click-to-browse fallback

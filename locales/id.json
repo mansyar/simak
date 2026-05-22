@@ -214,11 +214,49 @@
     },
     "timeline": "Linimasa Checkpoint",
     "submit": "Kumpulkan",
+    "resubmit": "Kumpulkan Ulang",
+    "viewSubmission": "Lihat Pengumpulan",
     "consultations": "Konsultasi: {current}/{required}",
     "blockedByPrevious": "Checkpoint sebelumnya belum lulus",
     "blockedByConsultations": "Konsultasi tidak mencukupi: {current}/{required} terverifikasi",
     "notFound": "Tugas tidak ditemukan",
     "notFoundDescription": "Tugas ini tidak ada atau Anda tidak memiliki akses ke tugas ini."
+  },
+  "files": {
+    "dropzone": {
+      "title": "Letakkan file di sini atau klik untuk mencari",
+      "subtitle": "Seret dan lepas file tugas Anda untuk mengunggah"
+    },
+    "maxSize": "Maks 25 MB",
+    "upload": "Unggah",
+    "uploading": "Mengunggah...",
+    "uploadSuccess": "File berhasil diunggah!",
+    "uploadAnother": "Unggah Lainnya",
+    "retry": "Coba Lagi",
+    "version": "Versi {version}",
+    "download": "Unduh",
+    "noSubmissions": "Belum ada pengumpulan",
+    "noSubmissionsHint": "Unggah file Anda menggunakan area drop di atas",
+    "validation": {
+      "invalidType": "Hanya file .docx dan .pdf yang diterima",
+      "fileTooLarge": "Ukuran file harus di bawah 25 MB"
+    },
+    "table": {
+      "version": "Versi",
+      "fileName": "Nama File",
+      "fileSize": "Ukuran File",
+      "uploadedAt": "Diunggah Pada",
+      "action": "Aksi"
+    },
+    "review": {
+      "title": "Hasil Review",
+      "passed": "Lulus",
+      "revise": "Perlu Revisi",
+      "awaiting": "Menunggu Review",
+      "awaitingHint": "Pengumpulan Anda akan direview oleh dosen",
+      "reviewedOn": "Direview pada {date}"
+    },
+    "revisionDeadline": "Tenggat revisi: {date}"
   },
   "error": {
     "notFound": "Halaman tidak ditemukan",
