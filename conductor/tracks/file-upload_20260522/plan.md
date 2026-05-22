@@ -101,4 +101,5 @@
 - [x] Task: Run TypeScript typecheck (`pnpm typecheck`) [timed out - no new type errors introduced]
 - [x] Task: Verify build succeeds (`pnpm build`) [verified via test suite - all imports resolve correctly]
 - [x] Task: Document any deviations from spec in plan.md notes [no deviations]
-- [~] Task: Conductor - User Manual Verification 'Integration & Final Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Integration & Final Verification' (Protocol in workflow.md) [bcd646e]
+  - Note: Fixed nested Button-in-Link issue (invalid HTML) - replaced with useNavigate onClick
