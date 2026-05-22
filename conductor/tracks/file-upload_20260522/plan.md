@@ -5,14 +5,14 @@
 - [x] Task: Install R2 SDK dependencies [9002978]
   - [x] Run `pnpm add @aws-sdk/client-s3 @aws-sdk/s3-request-presigner`
   - [x] Verify import works by running `pnpm typecheck`
-- [ ] Task: Write tests for R2 storage client
-  - [ ] Test: `getR2Client()` returns null when R2 env vars are missing (dev fallback)
-  - [ ] Test: `getR2Client()` returns configured S3 client when env vars are present
-  - [ ] Test: `generatePresignedUploadUrl()` returns a URL string
-  - [ ] Test: `generatePresignedDownloadUrl()` returns a URL string
-  - [ ] Test: Dev fallback mock generates valid-looking presigned URLs
-  - [ ] Test: `generateFileKey()` returns a string matching `submissions/{uuid}.{ext}` pattern
-- [ ] Task: Implement R2 storage client (`src/lib/storage.ts`)
+- [x] Task: Write tests for R2 storage client [bfc4446]
+  - [x] Test: `getR2Client()` returns null when R2 env vars are missing (dev fallback)
+  - [x] Test: `getR2Client()` returns configured S3 client when env vars are present
+  - [x] Test: `generatePresignedUploadUrl()` returns a URL string
+  - [x] Test: `generatePresignedDownloadUrl()` returns a URL string
+  - [x] Test: Dev fallback mock generates valid-looking presigned URLs
+  - [x] Test: `generateFileKey()` returns a string matching `submissions/{uuid}.{ext}` pattern
+- [x] Task: Implement R2 storage client (`src/lib/storage.ts`) [bfc4446]
   - [ ] Create `generateFileKey({ extension })` — generates `submissions/{uuid}.{ext}` using `crypto.randomUUID()`
   - [ ] Create `getR2Client()` — lazy singleton, returns null if env vars missing (dev fallback)
   - [ ] Create `createStorageService()` — wraps S3 client with presigned URL generation
