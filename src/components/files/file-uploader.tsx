@@ -180,7 +180,10 @@ export function FileUploader({
 
       {/* Validation error */}
       {validationError && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400">
+        <div
+          role="alert"
+          className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400"
+        >
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{validationError}</span>
         </div>
@@ -188,7 +191,10 @@ export function FileUploader({
 
       {/* Upload error */}
       {uploadError && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400">
+        <div
+          role="alert"
+          className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400"
+        >
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{uploadError}</span>
           <Button variant="outline" size="sm" className="ml-auto" onClick={handleReset}>

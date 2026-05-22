@@ -175,19 +175,20 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
         {(checkpoint.state === 'submitted' ||
           checkpoint.state === 'under_review' ||
           checkpoint.state === 'passed') && (
-          <button
-            type="button"
+          <Button
+            variant="link"
+            size="sm"
             onClick={() =>
               navigate({
                 to: '/student/assignments/$id/checkpoints/$checkpointId',
                 params: { id: String(assignmentId), checkpointId: String(checkpoint.id) },
               })
             }
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
+            className="shrink-0"
           >
             <ExternalLink className="h-3 w-3" />
             {t('studentAssignments.viewSubmission')}
-          </button>
+          </Button>
         )}
       </div>
     </div>

@@ -103,3 +103,5 @@
 - [x] Task: Document any deviations from spec in plan.md notes [no deviations]
 - [x] Task: Conductor - User Manual Verification 'Integration & Final Verification' (Protocol in workflow.md) [bcd646e]
   - Note: Fixed nested Button-in-Link issue (invalid HTML) - replaced with useNavigate onClick
+  - Note: Fixed missing Outlet in parent route (child route content never rendered)
+  - Note: R2 bucket CORS policy must be configured for uploads to work (AllowedOrigins, AllowedMethods: GET/PUT/HEAD)

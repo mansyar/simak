@@ -100,4 +100,27 @@ describe('CheckpointCard', () => {
     render(<CheckpointCard checkpoint={lockedCheckpoint} assignmentId={101} />);
     expect(screen.queryByText('studentAssignments.submit')).toBeNull();
   });
+
+  it('should render resubmit button for revise state', () => {
+    const reviseCheckpoint = { ...passedCheckpoint, state: 'revise' as const };
+    render(<CheckpointCard checkpoint={reviseCheckpoint} assignmentId={101} />);
+    expect(screen.getByText('studentAssignments.resubmit')).toBeDefined();
+  });
+
+  it('should render view submission link for submitted state', () => {
+    const submittedCheckpoint = { ...passedCheckpoint, state: 'submitted' as const };
+    render(<CheckpointCard checkpoint={submittedCheckpoint} assignmentId={101} />);
+    expect(screen.getByText('studentAssignments.viewSubmission')).toBeDefined();
+  });
+
+  it('should render view submission link for under_review state', () => {
+    const underReviewCheckpoint = { ...passedCheckpoint, state: 'under_review' as const };
+    render(<CheckpointCard checkpoint={underReviewCheckpoint} assignmentId={101} />);
+    expect(screen.getByText('studentAssignments.viewSubmission')).toBeDefined();
+  });
+
+  it('should render view submission link for passed state', () => {
+    render(<CheckpointCard checkpoint={passedCheckpoint} assignmentId={101} />);
+    expect(screen.getByText('studentAssignments.viewSubmission')).toBeDefined();
+  });
 });

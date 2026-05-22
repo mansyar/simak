@@ -10,14 +10,14 @@ export function generateFileKey(extension: string): string {
   return `submissions/${uuid}.${extension}`;
 }
 
-let _r2Client: S3Client | null = null;
+let r2Client: S3Client | null = null;
 
 /**
  * Returns a lazy singleton S3 client configured for Cloudflare R2.
  * Returns null if R2 env vars are not configured (dev fallback).
  */
 export function getR2Client(): S3Client | null {
-  if (_r2Client) return _r2Client;
+  if (r2Client) return r2Client;
 
   const endpoint = process.env.R2_ENDPOINT;
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
@@ -28,7 +28,7 @@ export function getR2Client(): S3Client | null {
     return null;
   }
 
-  _r2Client = new S3Client({
+  r2Client = new S3Client({
     region: 'auto',
     endpoint,
     credentials: { accessKeyId, secretAccessKey },
@@ -37,7 +37,7 @@ export function getR2Client(): S3Client | null {
     responseChecksumValidation: 'WHEN_REQUIRED',
   });
 
-  return _r2Client;
+  return r2Client;
 }
 
 /**

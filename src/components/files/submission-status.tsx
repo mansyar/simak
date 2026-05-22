@@ -15,9 +15,9 @@ interface SubmissionStatusProps {
   review: ReviewData | null;
 }
 
-function formatDate(date: Date | string | null | undefined): string {
+function formatDate(date: Date | string | null | undefined, locale: string): string {
   if (!date) return '';
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -25,7 +25,7 @@ function formatDate(date: Date | string | null | undefined): string {
 }
 
 export function SubmissionStatus({ review }: SubmissionStatusProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   if (!review) {
     return (
@@ -100,7 +100,7 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
             <span>
-              {t('files.revisionDeadline', { date: formatDate(review.revisionDeadline) })}
+              {t('files.revisionDeadline', { date: formatDate(review.revisionDeadline, locale) })}
             </span>
           </div>
         )}
@@ -108,7 +108,7 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
         {/* Review date */}
         {review.reviewedAt && (
           <p className="text-xs text-muted-foreground">
-            {t('files.review.reviewedOn', { date: formatDate(review.reviewedAt) })}
+            {t('files.review.reviewedOn', { date: formatDate(review.reviewedAt, locale) })}
           </p>
         )}
       </CardContent>
