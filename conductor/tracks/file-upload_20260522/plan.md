@@ -23,30 +23,30 @@
 
 ## Phase 2: Server Functions for Submissions
 
-- [ ] Task: Write tests for submission server functions
-  - [ ] Test: `submitCheckpoint` Zod schema validation (valid/invalid inputs)
-  - [ ] Test: `submitCheckpoint` rejects upload to locked checkpoint
-  - [ ] Test: `submitCheckpoint` transitions `unlocked` → `submitted` on first upload
-  - [ ] Test: `submitCheckpoint` rejects upload to already-submitted checkpoint (no revise)
-  - [ ] Test: `submitCheckpoint` accepts upload from `revise` state and transitions to `submitted`
-  - [ ] Test: Version auto-increment: first upload = v1, second resubmit = v2, third = v3 (auto-calculated via `SELECT COALESCE(MAX(version),0)+1`)
-  - [ ] Test: `listSubmissions` returns all versions for a checkpoint, newest first
-  - [ ] Test: `getSubmissionDetail` returns single submission record with ownership check
-  - [ ] Test: `getPresignedUploadUrl` generates UUID file key, returns both key and presigned URL
-  - [ ] Test: `getPresignedDownloadUrl` validates ownership, calls storage service
-  - [ ] Test: Ownership guard — student A cannot list/submit/download for student B's checkpoints
-- [ ] Task: Implement server functions (`src/server/submissions.ts`, `src/server/submissions.server.ts`)
-  - [ ] Create `src/server/submissions.ts` — client-safe stubs + Zod schemas
-    - [ ] `SubmitCheckpointSchema` — checkpointId, fileKey, fileName, fileSize
-    - [ ] `ListSubmissionsSchema` — checkpointId
-    - [ ] `GetSubmissionDetailSchema` — submissionId
-  - [ ] Create `src/server/submissions.server.ts` — server-only handlers
-    - [ ] `submitCheckpointHandler` — validates checkpoint is `unlocked` or `revise`, enforces ownership via assignmentStudents join, calculates version as `COALESCE(MAX(version),0)+1`, inserts submission record, transitions checkpoint state to `submitted`
-    - [ ] `listSubmissionsHandler` — lists all versions for a checkpoint with ownership check, ordered by version DESC
-    - [ ] `getSubmissionDetailHandler` — single submission with ownership check
-  - [ ] Create `src/server/files.ts` — presigned URL server functions
-    - [ ] `getPresignedUploadUrl` — validates checkpoint state (`unlocked` or `revise`), generates UUID file key via `generateFileKey()`, returns `{ uploadUrl, fileKey }` to the client
-    - [ ] `getPresignedDownloadUrl` — validates submission ownership, generates GET URL (1hr expiry)
+- [x] Task: Write tests for submission server functions [40dbf75]
+  - [x] Test: `submitCheckpoint` Zod schema validation (valid/invalid inputs)
+  - [x] Test: `submitCheckpoint` rejects upload to locked checkpoint
+  - [x] Test: `submitCheckpoint` transitions `unlocked` → `submitted` on first upload
+  - [x] Test: `submitCheckpoint` rejects upload to already-submitted checkpoint (no revise)
+  - [x] Test: `submitCheckpoint` accepts upload from `revise` state and transitions to `submitted`
+  - [x] Test: Version auto-increment: first upload = v1, second resubmit = v2, third = v3 (auto-calculated via `SELECT COALESCE(MAX(version),0)+1`)
+  - [x] Test: `listSubmissions` returns all versions for a checkpoint, newest first
+  - [x] Test: `getSubmissionDetail` returns single submission record with ownership check
+  - [x] Test: `getPresignedUploadUrl` generates UUID file key, returns both key and presigned URL
+  - [x] Test: `getPresignedDownloadUrl` validates ownership, calls storage service
+  - [x] Test: Ownership guard — student A cannot list/submit/download for student B's checkpoints
+- [x] Task: Implement server functions (`src/server/submissions.ts`, `src/server/submissions.server.ts`) [40dbf75]
+  - [x] Create `src/server/submissions.ts` — client-safe stubs + Zod schemas
+    - [x] `SubmitCheckpointSchema` — checkpointId, fileKey, fileName, fileSize
+    - [x] `ListSubmissionsSchema` — checkpointId
+    - [x] `GetSubmissionDetailSchema` — submissionId
+  - [x] Create `src/server/submissions.server.ts` — server-only handlers
+    - [x] `submitCheckpointHandler` — validates checkpoint is `unlocked` or `revise`, enforces ownership via assignmentStudents join, calculates version as `COALESCE(MAX(version),0)+1`, inserts submission record, transitions checkpoint state to `submitted`
+    - [x] `listSubmissionsHandler` — lists all versions for a checkpoint with ownership check, ordered by version DESC
+    - [x] `getSubmissionDetailHandler` — single submission with ownership check
+  - [x] Create `src/server/files.ts` — presigned URL server functions
+    - [x] `getPresignedUploadUrl` — validates checkpoint state (`unlocked` or `revise`), generates UUID file key via `generateFileKey()`, returns `{ uploadUrl, fileKey }` to the client
+    - [x] `getPresignedDownloadUrl` — validates submission ownership, generates GET URL (1hr expiry)
 - [ ] Task: Conductor - User Manual Verification 'Server Functions for Submissions' (Protocol in workflow.md)
 
 ## Phase 3: Checkpoint Submission Page & Components
