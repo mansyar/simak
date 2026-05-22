@@ -2,18 +2,23 @@
 
 ## Phase 1: R2 Storage Client & Presigned URL Generation
 
+- [ ] Task: Install R2 SDK dependencies
+  - [ ] Run `pnpm add @aws-sdk/client-s3 @aws-sdk/s3-request-presigner`
+  - [ ] Verify import works by running `pnpm typecheck`
 - [ ] Task: Write tests for R2 storage client
   - [ ] Test: `getR2Client()` returns null when R2 env vars are missing (dev fallback)
   - [ ] Test: `getR2Client()` returns configured S3 client when env vars are present
   - [ ] Test: `generatePresignedUploadUrl()` returns a URL string
   - [ ] Test: `generatePresignedDownloadUrl()` returns a URL string
   - [ ] Test: Dev fallback mock generates valid-looking presigned URLs
+  - [ ] Test: `generateFileKey()` returns a string matching `submissions/{uuid}.{ext}` pattern
 - [ ] Task: Implement R2 storage client (`src/lib/storage.ts`)
+  - [ ] Create `generateFileKey({ extension })` — generates `submissions/{uuid}.{ext}` using `crypto.randomUUID()`
   - [ ] Create `getR2Client()` — lazy singleton, returns null if env vars missing (dev fallback)
   - [ ] Create `createStorageService()` — wraps S3 client with presigned URL generation
   - [ ] Create `generatePresignedUploadUrl({ key, contentType })` — PUT URL, 5min expiry
   - [ ] Create `generatePresignedDownloadUrl({ key })` — GET URL, 1hr expiry
-  - [ ] Create dev fallback: in-memory mock that logs operations when R2 not configured
+  - [ ] Create dev fallback: in-memory mock that logs operations and returns fake URLs when R2 not configured
 - [ ] Task: Conductor - User Manual Verification 'R2 Storage Client & Presigned URL Generation' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions for Submissions
@@ -23,27 +28,25 @@
   - [ ] Test: `submitCheckpoint` rejects upload to locked checkpoint
   - [ ] Test: `submitCheckpoint` transitions `unlocked` → `submitted` on first upload
   - [ ] Test: `submitCheckpoint` rejects upload to already-submitted checkpoint (no revise)
-  - [ ] Test: `submitCheckpoint` transitions `revise` → `unlocked` on resubmit
-  - [ ] Test: Version auto-increment: first upload = v1, resubmit = v2
-  - [ ] Test: `listSubmissions` returns all versions for a checkpoint
-  - [ ] Test: `getSubmissionDetail` returns single submission record
-  - [ ] Test: `getPresignedUploadUrl` server function calls storage service
-  - [ ] Test: `getPresignedDownloadUrl` server function calls storage service
-  - [ ] Test: `confirmUpload` creates DB record with correct file metadata
-  - [ ] Test: Ownership guard — student A cannot list/submit for student B's checkpoints
+  - [ ] Test: `submitCheckpoint` accepts upload from `revise` state and transitions to `submitted`
+  - [ ] Test: Version auto-increment: first upload = v1, second resubmit = v2, third = v3 (auto-calculated via `SELECT COALESCE(MAX(version),0)+1`)
+  - [ ] Test: `listSubmissions` returns all versions for a checkpoint, newest first
+  - [ ] Test: `getSubmissionDetail` returns single submission record with ownership check
+  - [ ] Test: `getPresignedUploadUrl` generates UUID file key, returns both key and presigned URL
+  - [ ] Test: `getPresignedDownloadUrl` validates ownership, calls storage service
+  - [ ] Test: Ownership guard — student A cannot list/submit/download for student B's checkpoints
 - [ ] Task: Implement server functions (`src/server/submissions.ts`, `src/server/submissions.server.ts`)
   - [ ] Create `src/server/submissions.ts` — client-safe stubs + Zod schemas
     - [ ] `SubmitCheckpointSchema` — checkpointId, fileKey, fileName, fileSize
     - [ ] `ListSubmissionsSchema` — checkpointId
     - [ ] `GetSubmissionDetailSchema` — submissionId
   - [ ] Create `src/server/submissions.server.ts` — server-only handlers
-    - [ ] `submitCheckpointHandler` — validates state, enforces ownership, inserts record, updates checkpoint state
-    - [ ] `listSubmissionsHandler` — lists all versions for a checkpoint with ownership check
+    - [ ] `submitCheckpointHandler` — validates checkpoint is `unlocked` or `revise`, enforces ownership via assignmentStudents join, calculates version as `COALESCE(MAX(version),0)+1`, inserts submission record, transitions checkpoint state to `submitted`
+    - [ ] `listSubmissionsHandler` — lists all versions for a checkpoint with ownership check, ordered by version DESC
     - [ ] `getSubmissionDetailHandler` — single submission with ownership check
   - [ ] Create `src/server/files.ts` — presigned URL server functions
-    - [ ] `getPresignedUploadUrl` — validates checkpoint state, generates PUT URL
-    - [ ] `getPresignedDownloadUrl` — validates ownership, generates GET URL
-    - [ ] `confirmUpload` — records file metadata in DB after client uploads to R2
+    - [ ] `getPresignedUploadUrl` — validates checkpoint state (`unlocked` or `revise`), generates UUID file key via `generateFileKey()`, returns `{ uploadUrl, fileKey }` to the client
+    - [ ] `getPresignedDownloadUrl` — validates submission ownership, generates GET URL (1hr expiry)
 - [ ] Task: Conductor - User Manual Verification 'Server Functions for Submissions' (Protocol in workflow.md)
 
 ## Phase 3: Checkpoint Submission Page & Components
@@ -84,9 +87,14 @@
     - [ ] Loader: fetch checkpoint detail, submissions, latest review
     - [ ] Renders: FileUploader + FileList + SubmissionStatus
     - [ ] Back navigation to assignment detail
+- [ ] Task: Update existing CheckpointCard to link to submission page
+  - [ ] Wire the existing "Submit" button (shown when `state === 'unlocked'`) as a `<Link>` to `/student/assignments/$id/checkpoints/$checkpointId`
+  - [ ] Add a "Resubmit" button when `state === 'revise'` linking to the same route
+  - [ ] Add a "View Submission" link when `state === 'submitted'` or `state === 'under_review'` or `state === 'passed'`
 - [ ] Add i18n translation keys
-  - [ ] English (en.json): file uploader labels, validation messages, submission history headers, status labels
+  - [ ] English (en.json): file uploader labels, validation messages, submission history headers, status labels, resubmit, view submission
   - [ ] Indonesian (id.json): matching translation keys
+  - [ ] Run `pnpm generate:i18n` to regenerate TypeScript types
 - [ ] Task: Conductor - User Manual Verification 'Checkpoint Submission Page & Components' (Protocol in workflow.md)
 
 ## Phase 4: Integration & Final Verification
@@ -94,4 +102,6 @@
 - [ ] Task: Run full test suite and verify coverage >80%
 - [ ] Task: Run TypeScript typecheck (`pnpm typecheck`)
 - [ ] Task: Run linter (`pnpm lint`)
+- [ ] Task: Verify build succeeds (`pnpm build`)
+- [ ] Task: Document any deviations from spec in plan.md notes
 - [ ] Task: Conductor - User Manual Verification 'Integration & Final Verification' (Protocol in workflow.md)

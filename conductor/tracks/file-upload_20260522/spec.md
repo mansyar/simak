@@ -15,17 +15,18 @@ Students can upload `.docx`/`.pdf` files for unlocked checkpoints via a dedicate
 
 ### FR1: File Upload via Presigned URLs
 
-- Server generates a short-lived (5 min) presigned PUT URL for R2
-- Client uploads the file directly to R2 via the presigned URL
-- After successful upload, client calls `confirmUpload` to record metadata in the database
-- File key in R2: `submissions/{uuid}.{ext}`
+- Server generates a UUID-based file key (`submissions/{uuid}.{ext}`) and returns it alongside a short-lived (5 min) presigned PUT URL
+- Client uploads the file directly to R2 via the presigned URL using the provided key
+- After successful upload, client calls `submitCheckpoint` to record the submission metadata in the database and transition the checkpoint state
+- The file key is generated server-side to prevent key collisions and ensure traceability
 
 ### FR2: File Validation
 
 - Accepted formats: `.docx` and `.pdf` only
 - Maximum file size: 25MB
-- Validation enforced both client-side (accept attribute, JS check) and server-side (MIME/content check)
-- Uploading to a locked checkpoint returns a server-side validation error
+- **Client-side**: Accept attribute + JS `file.type` and `file.size` checks (covers typical user mistakes)
+- **Server-side**: Validate file extension from the filename. Note: true MIME/content inspection is not possible with presigned URLs since the file goes directly from browser to R2 — the server never receives the file bytes. The R2 bucket may be configured with a bucket policy to restrict content types as an additional safeguard.
+- Uploading to a locked checkpoint returns a server-side validation error (checked before presigned URL generation)
 
 ### FR3: Submission Versioning
 
@@ -36,8 +37,10 @@ Students can upload `.docx`/`.pdf` files for unlocked checkpoints via a dedicate
 ### FR4: Checkpoint State Transitions
 
 - `unlocked` → `submitted` on first successful upload
-- `revise` → `unlocked` on resubmit (student can upload again)
-- The `submitted` → `under_review` transition is triggered when instructor opens the submission (separate track)
+- `revise` → `submitted` on resubmit (the student uploads a file, which transitions the checkpoint directly from `revise` to `submitted` in a single operation)
+- The `submitted` → `under_review` transition is triggered when instructor opens the submission (separate track, Track 5.1)
+
+> **Note:** The TDD state machine shows `REVISE → UNLOCKED (loop)` as a conceptual step indicating the student is unblocked to upload again. In practice, since the upload happens immediately, the actual handler transitions directly from `revise` to `submitted`.
 
 ### FR5: Submission History & Download
 
@@ -77,3 +80,4 @@ Students can upload `.docx`/`.pdf` files for unlocked checkpoints via a dedicate
 - PDF in-browser preview (v2)
 - Group submissions (v2)
 - Email notifications for submissions (v2)
+- Orphan R2 file cleanup (stale presigned URLs where the client uploads to R2 but crashes before calling `submitCheckpoint` — storage impact is negligible for MVP; automated garbage collection deferred to v2)
