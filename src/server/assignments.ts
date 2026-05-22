@@ -46,3 +46,33 @@ export const getAssignmentDetail = createServerFn({ method: 'GET' }).handler(
     return getAssignmentDetailHandler({ data });
   },
 );
+
+// ---- Student Assignment Schemas ----
+
+export const ListStudentAssignmentsSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  search: z.string().optional().default(''),
+});
+
+export const StudentAssignmentIdParamSchema = z.object({
+  id: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
+});
+
+// ---- Student Assignment Server Function Stubs ----
+
+export const listStudentAssignments = createServerFn({ method: 'GET' }).handler(
+  async (args: { data: any }) => {
+    const { listStudentAssignmentsHandler } = await import('./assignments.server');
+    const data = ListStudentAssignmentsSchema.parse(args.data);
+    return listStudentAssignmentsHandler({ data });
+  },
+);
+
+export const getStudentAssignmentDetail = createServerFn({ method: 'GET' }).handler(
+  async (args: { data: any }) => {
+    const { getStudentAssignmentDetailHandler } = await import('./assignments.server');
+    const data = StudentAssignmentIdParamSchema.parse(args.data);
+    return getStudentAssignmentDetailHandler({ data });
+  },
+);

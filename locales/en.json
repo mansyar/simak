@@ -191,6 +191,35 @@
       "errorMessage": "Failed to create assignment. Please try again."
     }
   },
+  "studentSidebar": {
+    "dashboard": "Dashboard",
+    "assignments": "Assignments"
+  },
+  "studentAssignments": {
+    "title": "My Assignments",
+    "subtitle": "View and track the progress of your assigned academic work.",
+    "searchPlaceholder": "Search assignments by title...",
+    "finalDeadline": "Deadline: {date}",
+    "progress": "Progress",
+    "empty": "No assignments yet",
+    "emptyPrompt": "When your instructor assigns work to you, it will appear here.",
+    "status": {
+      "passed": "Passed",
+      "under_review": "Under Review",
+      "submitted": "Submitted",
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "revise": "Revise",
+      "overdue": "Overdue"
+    },
+    "timeline": "Checkpoint Timeline",
+    "submit": "Submit",
+    "consultations": "Consultations: {current}/{required}",
+    "blockedByPrevious": "Previous checkpoint not passed",
+    "blockedByConsultations": "Insufficient consultations: {current}/{required} verified",
+    "notFound": "Assignment not found",
+    "notFoundDescription": "This assignment does not exist or you don't have access to it."
+  },
   "error": {
     "notFound": "Page not found",
     "forbidden": "You do not have permission to access this page",
