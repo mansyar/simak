@@ -69,6 +69,35 @@ export type Translation = {
     users: string
     templates: string
   }
+  studentSidebar: {
+    dashboard: string
+    assignments: string
+  }
+  studentAssignments: {
+    title: string
+    subtitle: string
+    searchPlaceholder: string
+    finalDeadline: string
+    progress: string
+    empty: string
+    emptyPrompt: string
+    timeline: string
+    submit: string
+    consultations: string
+    blockedByPrevious: string
+    blockedByConsultations: string
+    notFound: string
+    notFoundDescription: string
+    status: {
+      passed: string
+      under_review: string
+      submitted: string
+      locked: string
+      unlocked: string
+      revise: string
+      overdue: string
+    }
+  }
   adminUsers: {
     title: string
     newUser: string

@@ -110,3 +110,16 @@ Students and instructors lack a centralized system to:
 - **Sequential checkpoint copy/instantiation** — Server-side transaction in `createAssignment` that instantiates assignment-student mappings and copies checkpoints, initializing the first checkpoint as `unlocked` and subsequent ones as `locked`.
 - **Assignment Detail & Progress dashboard** (`/instructor/assignments/$id`) — Interactive progress-table displaying student checkpoint statuses (Passed, Submitted, Under Review, Revise, Unlocked, Locked) and completion percentages.
 - **i18n translations** — Full English and Indonesian translations for wizard steps, forms, progress badges, error validation alerts, and dashboard states.
+
+### Track 3.2: Student Assignment Viewing (May 2026)
+
+- **Student sidebar layout** — Pathless `_student` layout with `requireRole(['student'])` guard and sidebar navigation (Dashboard, Assignments)
+- **Server functions** — `listStudentAssignments` (paginated, searchable) and `getStudentAssignmentDetail` (ownership-verified with consultation counts via LEFT JOIN)
+- **Assignment list page** (`/student/assignments`) — Card-based list with search by title, pagination (20/page), animated skeleton loading, and empty state
+- **Assignment detail page** (`/student/assignments/$id`) — SSR-rendered detail with instructor name, header metadata, and vertical checkpoint timeline
+- **Checkpoint timeline** — Ordered checkpoint cards with 6 state badges (Passed/Submitted/Under Review/Revise/Unlocked/Locked) with semantic colors
+- **Blocking reasons** — Locked checkpoints display reasons: previous checkpoint not passed, insufficient verified consultations (X/Y)
+- **Overdue indicators** — Past-due checkpoints shown with red text and overdue badge
+- **Consultation progress** — Verified consultation count displayed per checkpoint alongside required minimum
+- **Ownership guard** — Students cannot view other students' assignments; invalid IDs show not-found state
+- **i18n translations** — Full English and Indonesian translations for sidebar, assignments list, detail page, and status badges

@@ -94,24 +94,30 @@ simak/
 │   ├── app/                  → Application root files (global.css, legacy __root.tsx location)
 │   ├── components/           → React components
 │   │   ├── ui/               → shadcn/ui primitives
-│   │   ├── layout/           → Sidebar, header, dashboard shell
-│   │   ├── assignments/      → Assignment cards, checkpoint timeline, submission form
+│   │   ├── layout/           → Sidebar, language switcher, theme toggle
+│   │   ├── student/
+│   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton
+│   │   ├── instructor/
+│   │   │   └── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
 │   │   ├── reviews/          → Review dialog, review queue, feedback upload
 │   │   ├── consultations/    → Log form, verification badge, progress bar
 │   │   ├── files/            → File upload, preview, file list
 │   │   ├── notifications/    → Notification center, badge
 │   │   ├── analytics/        → Charts, metric cards, export
 │   │   ├── settings/         → Preferences, security section
-│   │   └── admin/            → User table, template builder
-│   ├── server/               → Server functions
+│   │   └── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton
+│   ├── server/               → Server functions (split: .ts = client-safe stubs + Zod, .server.ts = handlers)
 │   │   ├── auth.ts           → Login, logout, session
 │   │   ├── users.ts          → User CRUD, invitations
-│   │   ├── assignments.ts    → Assignment CRUD
+│   │   ├── assignments.ts    → Assignment CRUD (instructor + student queries)
+│   │   ├── assignments.server.ts → Server-only assignment handlers
 │   │   ├── submissions.ts    → Upload, versioning
 │   │   ├── reviews.ts        → Review, pass/revise
 │   │   ├── consultations.ts  → Log, verify
 │   │   ├── notifications.ts  → Create, fetch, mark read
 │   │   ├── templates.ts      → Template CRUD
+│   │   ├── templates.server.ts → Server-only template handlers
+│   │   ├── setup-password.ts → Custom password setup handler
 │   │   └── files.ts          → Presigned URL generation
 │   ├── db/
 │   │   ├── schema/           → Drizzle schema (split by domain)
