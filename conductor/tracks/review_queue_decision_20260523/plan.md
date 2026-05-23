@@ -20,8 +20,8 @@
 - [x] Task: Add feedback file upload to file server (`src/server/files.ts` + `src/server/files.server.ts`) [2c7fb1e]
   - [ ] Add `GetPresignedReviewFeedbackUploadUrlSchema` in `files.ts`
   - [ ] Add handler that generates presigned PUT URL using extended `generateFileKey` with `feedback/` prefix
-- [ ] Task: Create database migration for new indexes
-  - [ ] Run `drizzle-kit generate` to create migration with two new indexes: `assignments_instructor_id_idx` on `assignments.instructorId` and `checkpoints_state_assignment_id_idx` on `checkpoints(state, assignmentId)`
+- [x] Task: Create database migration for new indexes [af288c0]
+  - [x] Created manual migration SQL with two new indexes: `assignments_instructor_id_idx` on `assignments.instructorId` and `checkpoints_state_assignment_id_idx` on `checkpoints(state, assignmentId)`
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Server Functions & Data Layer' (Protocol in workflow.md)
 
 ## Phase 2: Review Queue Page (`/instructor/reviews`)
