@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { getStudentAssignmentDetail } from '@/server/assignments';
 import { listSubmissions, submitCheckpoint } from '@/server/submissions';
 import { getPresignedUploadUrl } from '@/server/files';
+import { getLatestReview } from '@/server/reviews';
 import { FileUploader } from '@/components/files/file-uploader';
 import { FileList } from '@/components/files/file-list';
 import { SubmissionStatus } from '@/components/files/submission-status';
@@ -35,9 +36,19 @@ export const Route = createFileRoute(
         data: { checkpointId: Number(checkpointId) },
       });
 
-      // Find the latest review (from the most recent submission)
-      const latestReview = null;
-      // Review data will come from the reviews table (Track 5.1)
+      // Find the latest review (from the reviews table)
+      const reviewData = await (getLatestReview as any)({
+        data: { checkpointId: Number(checkpointId) },
+      });
+      const latestReview = reviewData?.review
+        ? {
+            decision: reviewData.review.decision,
+            comment: reviewData.review.comment,
+            reviewerName: reviewData.review.instructorName,
+            revisionDeadline: reviewData.review.revisionDeadline,
+            reviewedAt: reviewData.review.createdAt,
+          }
+        : null;
 
       return {
         assignmentId: Number(id),
