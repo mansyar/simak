@@ -105,7 +105,7 @@ export async function listPendingReviewsHandler(args: { data: ListPendingReviews
         sql`${submissions.id} IN (
           SELECT DISTINCT ON (s2.checkpoint_id) s2.id
           FROM submissions s2
-          WHERE s2.checkpoint_id = submissions.checkpointId
+          WHERE s2.checkpoint_id = ${submissions.checkpointId}
           ORDER BY s2.checkpoint_id, s2.version DESC
         )`,
         inArray(checkpoints.assignmentId, assignmentIds),
