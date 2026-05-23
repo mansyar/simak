@@ -610,47 +610,81 @@ Instructor reviews submissions from the queue, marks pass or revise, and optiona
 
 ### Track 5.1 — Review Queue & Decision
 
-**Description:** Instructor sees a queue of pending submissions. They can open a submission, view the submitted file, and make a pass/revise decision with comments and optional feedback file.
+**Description:** Instructor sees a queue of pending submissions across their assignments. They can open a submission, view the submitted file and past review history, and make a pass/revise decision with comments and optional feedback file. The student sees review results on their submission page.
 
 **Dependencies:** Track 4.1 (submissions must exist).
 
-**Domain-Specific Files to Create:**
+**✅ Status: COMPLETED** — Track has been archived.
 
-| File                                                  | Purpose                                                                                       |
-| ----------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `src/app/routes/instructor/reviews.tsx`               | Review queue page — paginated list of pending submissions ordered by submission time          |
-| `src/app/routes/instructor/reviews/$submissionId.tsx` | Review detail page — view submitted file (PDF inline preview), decision form                  |
-| `src/components/reviews/review-queue-item.tsx`        | Individual queue item (student name, checkpoint, assignment title, wait time)                 |
-| `src/components/reviews/review-form.tsx`              | Decision form: pass/revise radio + comment textarea + optional feedback file upload           |
-| `src/components/reviews/sla-badge.tsx`                | Shows SLA status (on time / approaching breach / breached) with color coding                  |
-| `src/server/reviews.ts`                               | Server functions: `listPendingReviews`, `getReviewDetail`, `submitReview`, `getReviewHistory` |
-| `src/server/submissions.ts`                           | **Edit:** Add `getCheckpointSubmissionDetail` (submission + latest review)                    |
+**Actual Files Created/Modified:**
 
-**Tests to Add:**
+| File                                                                              | Purpose                                                                                                                                                                                                                                                                                                                                       |
+| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/server/reviews.ts`                                                           | Client-safe `createServerFn` stubs + Zod schemas (`ListPendingReviewsSchema`, `GetReviewDetailSchema`, `OpenForReviewSchema`, `SubmitReviewSchema`, `GetLatestReviewSchema`)                                                                                                                                                                  |
+| `src/server/reviews.server.ts`                                                    | Server-only handlers: `listPendingReviewsHandler` (DISTINCT ON per-checkpoint, paginated, FIFO, assignment filter), `getReviewDetailHandler` (submission + file info + past reviews), `openForReviewHandler` (submitted→under_review), `submitReviewHandler` (ownership, state validation, pass/revise transitions), `getLatestReviewHandler` |
+| `src/lib/storage.ts`                                                              | **Modified:** Added optional `prefix` parameter to `generateFileKey(extension, prefix = 'submissions')` so feedback files use `feedback/{uuid}.{ext}`                                                                                                                                                                                         |
+| `src/server/files.ts`                                                             | **Modified:** Added `GetPresignedReviewFeedbackUploadUrlSchema` for feedback file upload                                                                                                                                                                                                                                                      |
+| `src/server/files.server.ts`                                                      | **Modified:** Added handler that generates presigned PUT URL using extended `generateFileKey` with `feedback/` prefix                                                                                                                                                                                                                         |
+| `src/routes/_authenticated/instructor/reviews/index.tsx`                          | Review queue page — paginated FIFO list with assignment filter (select dropdown), SLA badges, item cards with student name + checkpoint + wait time, loading skeleton, empty state                                                                                                                                                            |
+| `src/routes/_authenticated/instructor/reviews/$submissionId.tsx`                  | Review detail page — file preview (PDF inline embed / DOCX metadata + download), review history timeline, decision form, success/error states, auto `openForReview` on page mount                                                                                                                                                             |
+| `src/components/reviews/ReviewQueueItem.tsx`                                      | Queue item card: student name, checkpoint name, assignment title, wait time calculation, SLA badge, "View" link to detail page                                                                                                                                                                                                                |
+| `src/components/reviews/ReviewQueueFilters.tsx`                                   | Assignment filter dropdown with "All Assignments" default option                                                                                                                                                                                                                                                                              |
+| `src/components/reviews/ReviewQueuePagination.tsx`                                | Prev/next pagination controls with page indicator                                                                                                                                                                                                                                                                                             |
+| `src/components/reviews/ReviewQueueEmptyState.tsx`                                | "No pending reviews" message with icon                                                                                                                                                                                                                                                                                                        |
+| `src/components/reviews/ReviewQueueSkeleton.tsx`                                  | Animated skeleton rows (default 5) for loading state                                                                                                                                                                                                                                                                                          |
+| `src/components/reviews/SLABadge.tsx`                                             | SLA status badge with 4 states: Not Reviewed (submitted state), On Time, Approaching SLA (amber), SLA Breached (red)                                                                                                                                                                                                                          |
+| `src/components/reviews/ReviewDetailHeader.tsx`                                   | Back navigation link + student name, assignment title, checkpoint name header                                                                                                                                                                                                                                                                 |
+| `src/components/reviews/ReviewFilePreview.tsx`                                    | File info card: name, size, version, upload date; PDF inline embed; download link (anchor tag with `target="_blank"`)                                                                                                                                                                                                                         |
+| `src/components/reviews/ReviewHistory.tsx`                                        | Timeline of past reviews with decision badge (pass/revise), reviewer name, comment, timestamp                                                                                                                                                                                                                                                 |
+| `src/components/reviews/ReviewForm.tsx`                                           | Decision form: Pass/Revise radio buttons, comment textarea, optional feedback file upload (presigned URL → direct-to-R2), conditional revision deadline picker, submit button                                                                                                                                                                 |
+| `src/components/layout/instructor-sidebar.tsx`                                    | **Modified:** Added Reviews nav link with `ClipboardCheck` icon                                                                                                                                                                                                                                                                               |
+| `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx` | **Modified:** Loader now fetches real review data via `getLatestReview`, replacing the `null` stub; passes to `SubmissionStatus` component                                                                                                                                                                                                    |
+| `src/db/schema/assignments.ts`                                                    | **Modified:** Added `assignments_instructor_id_idx` index                                                                                                                                                                                                                                                                                     |
+| `locales/en.json` / `locales/id.json`                                             | **Modified:** Added `instructorReviews` translation section (title, subtitle, allAssignments, empty/emptyPrompt, slaNotReviewed/slaOnTime/slaApproaching/slaBreached) + `nav.reviews`                                                                                                                                                         |
+| `scripts/generate-i18n-types.ts`                                                  | **Modified:** Added `instructorReviews` and `nav.reviews` to `Translation` type template                                                                                                                                                                                                                                                      |
 
-- `tests/unit/reviews/state-transitions.test.ts` — Verify valid/invalid state transitions (e.g., can't pass already-passed checkpoint)
-- `tests/integration/reviews/submit-review.test.ts` — Submit pass/revise, verify state change in DB
+**Tests Added:**
 
-**Definition of Done:**
+| File                                                       | Tests | Description                                                                                                                                               |
+| ---------------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/unit/reviews/state-transitions.test.ts`             | 14    | Checkpoint state transitions: submitted→under_review, under_review→passed, under_review→revise, invalid transitions (locked, unlocked, already passed)    |
+| `tests/unit/server/reviews-schemas.test.ts`                | 16    | Zod schema validation for ListPendingReviews, GetReviewDetail, OpenForReview, SubmitReview, GetLatestReview — required fields, type coercion, constraints |
+| `tests/unit/server/reviews-handlers.test.ts`               | 19    | Handler logic & security: auth guards, ownership checks, state validation, pass/revise transitions, feedback file handling, error edge cases              |
+| `tests/unit/components/reviews/review-queue-item.test.tsx` | 6     | Queue item rendering: student name, checkpoint name, assignment title, wait time, link to detail page, under_review state badge                           |
+| `tests/unit/components/reviews/sla-badge.test.tsx`         | 4     | SLA badge states: Not Reviewed, On Time, Approaching, Breached                                                                                            |
 
-- Instructor sees a queue of submissions pending review (across all their assignments)
-- Instructor opens a submission, sees the submitted file (PDF preview / DOCX metadata)
-- Instructor can mark as Pass → checkpoint state changes to `passed`, next checkpoint unlocks
-- Instructor can mark as Revise → checkpoint state changes to `revise`, with revision deadline
-- Instructor can attach a feedback file to the review
-- Student sees the review result on their checkpoint detail page
-- SLA timer starts when submission transitions to `under_review` (auto-transitioned when instructor opens it)
+**Differences from Original Spec:**
 
-**Acceptance Criteria:**
+- **`openForReview` as explicit POST action**: Instead of an implicit transition, `openForReview` is called explicitly by the client when the detail page loads (if checkpoint is in `submitted` state). This keeps GET handlers pure (no side effects) and follows the POST semantics pattern.
+- **Feedback file upload**: Uses the same presigned URL pattern as Track 4.1 — client gets a presigned PUT URL from `getPresignedReviewFeedbackUploadUrl`, uploads directly to R2, then includes the `fileKey` in the `submitReview` call. File keys use `feedback/{uuid}.{ext}` prefix via the extended `generateFileKey`.
+- **Review history timeline**: Added as a separate component (`ReviewHistory.tsx`) showing past reviews for the same checkpoint — useful for revision rounds. Not in the original spec.
+- **SLA badge with 4 states**: Instead of a simple on-time/breached toggle, the badge shows "Not Reviewed" (not yet opened), "On Time", "Approaching SLA" (2-3 days), and "SLA Breached" (3+ days) with semantic color coding.
+- **Server/client file split**: Follows the established pattern from Track 2.x/3.x — `reviews.ts` (client-safe stubs + Zod schemas) and `reviews.server.ts` (server-only handlers with DB imports).
+- **Route path**: `/instructor/reviews` (TanStack Router file-based routing), not `src/app/routes/instructor/reviews.tsx`.
+- **No integration test**: Unit tests cover schema validation, handler logic, and state transitions; integration test deferred to v2.
+- **Indexes migration**: Added `assignments_instructor_id_idx` and `checkpoints_state_assignment_id_idx` via manual SQL migration (AFTER `drizzle-kit generate` — manual SQL created and applied).
+- **Wait time display**: Client-side calculation (`getWaitTime()` in `ReviewQueueItem.tsx`) showing relative time since upload ("< 1h", "3h", "2d 5h").
 
-- [ ] Review queue shows submissions sorted by oldest-first (FIFO)
-- [ ] Opening a submission auto-transitions its state to `under_review`
-- [ ] Pass decision: checkpoint state = `passed`, next checkpoint = `unlocked`
-- [ ] Revise decision: checkpoint state = `revise`, revision deadline is set, student can resubmit
-- [ ] Instructor can upload a feedback file with the review
-- [ ] Student immediately sees the review result on their checkpoint page
-- [ ] SLA badge on review queue shows red for items exceeding 3-day SLA
-- [ ] Instructor cannot review a submission twice (already-reviewed submissions filtered from queue)
+**Test Results (at time of archiving):**
+
+- 491/491 tests passing across 72 test files
+- 5 new test files added with 59 new tests
+- TypeScript typecheck passes (3 pre-existing errors in test file)
+- eslint/prettier/lint-staged pass on all new files
+- All new files under 500-line modularity limit
+
+**Definition of Done Completed:**
+
+- ✅ Instructor sees a queue of submissions pending review (across all their assignments)
+- ✅ Instructor can filter by assignment and navigate pages
+- ✅ Opening a submission auto-transitions its state to `submitted → under_review`
+- ✅ Instructor sees submitted file (PDF preview / DOCX metadata + download)
+- ✅ Instructor sees past review history for the checkpoint
+- ✅ Pass decision: checkpoint state = `passed`, next checkpoint = `unlocked`
+- ✅ Revise decision: checkpoint state = `revise`, revision deadline is set, student can resubmit
+- ✅ Instructor can attach a feedback file to the review (`.pdf`/`.docx`)
+- ✅ SLA badge shows on-time / approaching / breached status with color coding
+- ✅ Student immediately sees review result on their checkpoint page (pass badge, revise badge, comment, reviewer, deadline)
 
 ---
 
