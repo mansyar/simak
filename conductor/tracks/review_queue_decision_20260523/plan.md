@@ -72,4 +72,9 @@
   - [x] `tests/unit/server/reviews-handlers.test.ts` — 19 handler logic & security tests
   - [x] `tests/unit/components/reviews/review-queue-item.test.tsx` — 6 queue item tests
   - [x] `tests/unit/components/reviews/sla-badge.test.tsx` — 4 SLA badge tests
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Student-Side Wiring & i18n' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Review Detail Page & Decision Form' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Student-Side Wiring & i18n' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 468cfda
