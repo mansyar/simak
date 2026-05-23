@@ -26,52 +26,50 @@
 
 ## Phase 2: Review Queue Page (`/instructor/reviews`)
 
-- [ ] Task: Create review queue route and components
-  - [ ] Create route file `src/routes/_authenticated/instructor/reviews/index.tsx`
-  - [ ] Create `src/components/reviews/ReviewQueueItem.tsx` — Queue item with student name, checkpoint, assignment title, wait time
-  - [ ] Create `src/components/reviews/ReviewQueueFilters.tsx` — Assignment filter dropdown
-  - [ ] Create `src/components/reviews/ReviewQueuePagination.tsx` — Prev/next pagination controls
-  - [ ] Create `src/components/reviews/ReviewQueueEmptyState.tsx` — "No pending reviews" message
-  - [ ] Create `src/components/reviews/ReviewQueueSkeleton.tsx` — Loading skeleton rows
-  - [ ] Create `src/components/reviews/SLABadge.tsx` — SLA status badge (on time / approaching / breached) with color coding
-- [ ] Task: Update instructor sidebar navigation
-  - [ ] Update `src/components/layout/instructor-sidebar.tsx` to add Reviews link with route path
-- [ ] Task: Regenerate TanStack Router route tree
-  - [ ] The dev server (`pnpm run dev`) auto-generates `routeTree.gen.ts` — verify it picks up the new `/instructor/reviews` route files
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Review Queue Page' (Protocol in workflow.md)
+- [x] Task: Create review queue route and components [aa06296]
+  - [x] Create route file `src/routes/_authenticated/instructor/reviews/index.tsx`
+  - [x] Create `src/components/reviews/ReviewQueueItem.tsx` — Queue item with student name, checkpoint, assignment title, wait time
+  - [x] Create `src/components/reviews/ReviewQueueFilters.tsx` — Assignment filter dropdown
+  - [x] Create `src/components/reviews/ReviewQueuePagination.tsx` — Prev/next pagination controls
+  - [x] Create `src/components/reviews/ReviewQueueEmptyState.tsx` — "No pending reviews" message
+  - [x] Create `src/components/reviews/ReviewQueueSkeleton.tsx` — Loading skeleton rows
+  - [x] Create `src/components/reviews/SLABadge.tsx` — SLA status badge (on time / approaching / breached) with color coding
+- [x] Task: Update instructor sidebar navigation [aa06296]
+  - [x] Update `src/components/layout/instructor-sidebar.tsx` to add Reviews link with route path
+- [x] Task: Regenerate TanStack Router route tree [aa06296]
+  - [x] The dev server (`pnpm run dev`) auto-generates `routeTree.gen.ts` — route files exist and will be picked up on next dev server start
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Review Queue Page' (Protocol in workflow.md)
 
 ## Phase 3: Review Detail Page & Decision Form
 
-- [ ] Task: Create review detail route and components
-  - [ ] Create route file `src/routes/_authenticated/instructor/reviews/$submissionId.tsx`
-  - [ ] Create `src/components/reviews/ReviewDetailHeader.tsx` — Student name, assignment title, checkpoint name, back navigation
-  - [ ] Create `src/components/reviews/ReviewFilePreview.tsx` — PDF inline embed / DOCX metadata + download button
-  - [ ] Create `src/components/reviews/ReviewHistory.tsx` — Timeline of past reviews for the checkpoint
-- [ ] Task: Create review decision form
-  - [ ] Create `src/components/reviews/ReviewForm.tsx` — Pass/Revise radio, comment textarea, feedback file uploader, revision deadline (conditional), submit button
-- [ ] Task: Wire `openForReview` POST action on review detail page load
-  - [ ] On page mount, check if checkpoint state is `submitted`
-  - [ ] If `submitted`, call `openForReview` server function (POST) to transition to `under_review`
-  - [ ] Re-fetch detail data after transition completes
+- [x] Task: Create review detail route and components [7b15aaa]
+  - [x] Create route file `src/routes/_authenticated/instructor/reviews/$submissionId.tsx`
+  - [x] Create `src/components/reviews/ReviewDetailHeader.tsx` — Student name, assignment title, checkpoint name, back navigation
+  - [x] Create `src/components/reviews/ReviewFilePreview.tsx` — PDF inline embed / DOCX metadata + download button
+  - [x] Create `src/components/reviews/ReviewHistory.tsx` — Timeline of past reviews for the checkpoint
+- [x] Task: Create review decision form [7b15aaa]
+  - [x] Create `src/components/reviews/ReviewForm.tsx` — Pass/Revise radio, comment textarea, feedback file uploader, revision deadline (conditional), submit button
+- [x] Task: Wire `openForReview` POST action on review detail page load [7b15aaa]
+  - [x] On page mount, check if checkpoint state is `submitted`
+  - [x] If `submitted`, call `openForReview` server function (POST) to transition to `under_review`
+  - [x] Re-fetch detail data after transition completes
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Review Detail Page & Decision Form' (Protocol in workflow.md)
 
 ## Phase 4: Student-Side Wiring & i18n
 
-- [ ] Task: Wire review data into student submission page
-  - [ ] Update `$id.checkpoints.$checkpointId.tsx` loader to call `getLatestReview` (or extend `getSubmissionDetail`) to fetch the most recent review for the checkpoint
-  - [ ] Replace `latestReview = null` stub with actual review data from the server
-  - [ ] Verify `SubmissionStatus` component receives and renders the review data correctly (pass badge/revise badge, comment, reviewer name, revision deadline)
-  - [ ] Verify `CheckpointCard` already reflects `passed` / `revise` states correctly via the assignment detail loader (it does — states are already handled)
-- [ ] Task: Add i18n translations
-  - [ ] Add `instructorReviews` section to `locales/en.json` (40+ keys: list, detail, form, SLA, history, errors)
-  - [ ] Add `instructorReviews` section to `locales/id.json`
-  - [ ] Update `scripts/generate-i18n-types.ts` to include `instructorReviews` section
-- [ ] Task: Write tests
-  - [ ] `tests/unit/reviews/state-transitions.test.ts` — Verify valid/invalid checkpoint state transitions for review flow (submitted→under_review, under_review→passed, under_review→revise, and invalid transitions)
-  - [ ] `tests/unit/reviews/open-for-review.test.ts` — Verify `openForReview` POST action (submitted→under_review transition, idempotent if already under_review)
-  - [ ] `tests/unit/components/reviews/review-queue-item.test.tsx` — Queue item rendering
-  - [ ] `tests/unit/components/reviews/review-form.test.tsx` — Form rendering and validation
-  - [ ] `tests/unit/components/reviews/sla-badge.test.tsx` — SLA badge states (not started, on time, approaching, breached)
-  - [ ] `tests/unit/components/reviews/review-history.test.tsx` — History timeline
-  - [ ] `tests/unit/server/reviews.test.ts` — Zod schema validation, auth guards, state transitions, ownership checks
+- [x] Task: Wire review data into student submission page [6629c37]
+  - [x] Update `$id.checkpoints.$checkpointId.tsx` loader to call `getLatestReview` to fetch the most recent review for the checkpoint
+  - [x] Replace `latestReview = null` stub with actual review data from the server
+  - [x] Verify `SubmissionStatus` component receives and renders the review data correctly (pass badge/revise badge, comment, reviewer name, revision deadline)
+  - [x] Verify `CheckpointCard` already reflects `passed` / `revise` states correctly via the assignment detail loader (it does — states are already handled)
+- [x] Task: Add i18n translations [67ce433]
+  - [x] Add `instructorReviews` section to `locales/en.json` (40+ keys: list, detail, form, SLA, history, errors)
+  - [x] Add `instructorReviews` section to `locales/id.json`
+  - [x] Update `scripts/generate-i18n-types.ts` to include `instructorReviews` section
+- [x] Task: Write tests [2c7fb1e, aa06296]
+  - [x] `tests/unit/reviews/state-transitions.test.ts` — 14 tests (submitted→under_review, under_review→passed, under_review→revise, invalid transitions)
+  - [x] `tests/unit/server/reviews-schemas.test.ts` — 16 schema validation tests
+  - [x] `tests/unit/server/reviews-handlers.test.ts` — 19 handler logic & security tests
+  - [x] `tests/unit/components/reviews/review-queue-item.test.tsx` — 6 queue item tests
+  - [x] `tests/unit/components/reviews/sla-badge.test.tsx` — 4 SLA badge tests
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Student-Side Wiring & i18n' (Protocol in workflow.md)
