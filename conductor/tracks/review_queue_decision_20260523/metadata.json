@@ -1,8 +1,0 @@
-{
-  "track_id": "review_queue_decision_20260523",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-05-23T15:20:00Z",
-  "updated_at": "2026-05-23T15:20:00Z",
-  "description": "Instructor sees a queue of pending submissions, views submitted files, and makes pass/revise decisions with comments and optional feedback files."
-}
