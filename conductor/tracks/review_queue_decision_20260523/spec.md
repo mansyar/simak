@@ -10,23 +10,26 @@ Instructor reviews submissions from a dedicated review queue, views submitted fi
 
 ## Overview
 
-The Instructor accesses a dedicated review queue at `/instructor/reviews` showing all pending submissions across their assignments, ordered FIFO (oldest-first). Opening a submission auto-transitions the checkpoint to `under_review`. The instructor sees the submitted file (PDF inline preview / DOCX download), can view past review history, and submits a pass or revise decision with comments and optional feedback file. On pass, the checkpoint transitions to `passed` and the next checkpoint unlocks. On revise, the checkpoint transitions to `revise` with a revision deadline. The student sees the result on their checkpoint detail page immediately.
+The Instructor accesses a dedicated review queue at `/instructor/reviews` showing all pending submissions across their assignments, ordered FIFO (oldest-first). Opening a submission triggers a separate `openForReview` POST action that transitions the checkpoint to `under_review` (not a side effect of the GET load). The instructor sees the submitted file (PDF inline preview / DOCX download), can view past review history, and submits a pass or revise decision with comments and optional feedback file. On pass, the checkpoint transitions to `passed` and the next checkpoint unlocks. On revise, the checkpoint transitions to `revise` with a revision deadline. The student sees the result on their checkpoint detail page immediately via a dedicated `getLatestReview` fetch.
 
 ## Functional Requirements
 
 ### FR1: Review Queue Page (`/instructor/reviews`)
 
 - Paginated list of all pending (submitted state) submissions across all assignments belonging to the instructor.
-- Sorted oldest-first (FIFO) by `submissions.uploaded_at`.
-- Each queue item shows: student name, checkpoint name, assignment title, wait time.
+- Uses `DISTINCT ON (checkpoints.id)` or subquery to get the **latest submission** (max version) per checkpoint — a checkpoint may have multiple submission versions after resubmissions.
+- Sorted oldest-first (FIFO) by the latest submission's `uploaded_at`.
+- Each queue item shows: student name, checkpoint name, assignment title, **wait time** (time elapsed since `uploaded_at`).
 - Assignment filter dropdown to narrow by assignment.
-- SLA badge per item (on time / approaching breach / breached, based on 3-day SLA from submission time).
+- **SLA badge** per item:
+  - For items that have entered `under_review`: status based on elapsed time since `checkpoints.updatedAt` vs 3-day SLA.
+  - For items still in `submitted` (not yet opened): badge shows neutral "Not reviewed" — SLA timer hasn't started yet per TDD 3-day rule.
 - Pagination: 20 items per page, page state in search params.
 - Loading state: skeleton rows.
 
 ### FR2: Review Detail Page (`/instructor/reviews/$submissionId`)
 
-- Auto-transitions the checkpoint to `under_review` on first load (if currently `submitted`).
+- On page load, if the checkpoint state is `submitted`, the page calls a **separate `openForReview` POST action** that transitions the checkpoint to `under_review` and returns success. This keeps the GET data load pure (no mutation side-effects in read handlers).
 - Displays:
   - Student name, assignment title, checkpoint name.
   - Submitted file metadata: name, size, version, upload date.
@@ -61,10 +64,12 @@ The Instructor accesses a dedicated review queue at `/instructor/reviews` showin
 
 ### FR5: Server Functions
 
-- `listPendingReviews` — Paginated, assignment-filterable, sorted oldest-first. Returns queue items with student name, checkpoint name, assignment title, wait time.
-- `getReviewDetail` — Submission detail with file info, presigned download URL, and past review history.
-- `submitReview` — Validates state, records review, transitions checkpoint, unlocks next if pass.
-- `getReviewFeedbackUploadUrl` — Generates a presigned PUT URL for the feedback file (reuses R2 flow from Track 4.1).
+- `listPendingReviews` — Paginated, assignment-filterable, sorted oldest-first. Uses `DISTINCT ON (checkpoints.id)` to get the latest submission per checkpoint. Returns queue items with student name, checkpoint name, assignment title, wait time.
+- `getReviewDetail` — Pure GET. Submission detail with file info, presigned download URL, and past review history. Does NOT mutate state.
+- `openForReview` — POST action. Transitions checkpoint from `submitted` to `under_review` (sets `state` and `updatedAt`). Called by the client after loading review detail when checkpoint is still `submitted`.
+- `submitReview` — Validates state (`submitted`/`under_review` only), validates ownership, records review, transitions checkpoint, unlocks next if pass.
+- `getLatestReview` — Fetches the most recent review for a given checkpoint/submission. Used by the student submission page to display review results.
+- `getReviewFeedbackUploadUrl` — Generates a presigned PUT URL for the feedback file. Lives in `src/server/files.ts` (consistent with existing file operations). Reuses R2 flow; `generateFileKey` is extended to accept an optional prefix parameter for `feedback/` key prefix.
 
 ### FR6: Review Queue Sub-Route Guard
 
@@ -76,6 +81,13 @@ The Instructor accesses a dedicated review queue at `/instructor/reviews` showin
 - The review detail page shows a timeline of all prior reviews for the same checkpoint.
 - Each history entry includes: decision (pass/revise), comment, reviewer name, review date.
 - Useful when a checkpoint has been revised multiple times — instructor sees the full context.
+
+### FR8: Student Review Display
+
+- The student submission page (`/student/assignments/$id/checkpoints/$checkpointId`) currently stubs `latestReview = null` — this track wires in real data.
+- On page load, call `getLatestReview` (or extend `getSubmissionDetail`) to fetch the most recent review for the checkpoint's latest submission.
+- The existing `SubmissionStatus` component already renders the review result — it just needs the data wired in.
+- `CheckpointCard` already reflects all 6 checkpoint states — no changes needed.
 
 ## Data Model
 
@@ -95,13 +107,22 @@ No new tables. Uses existing `reviews` table with the following columns:
 
 The existing `reviews` table already has a `submissionId` index (`reviews_submission_id_idx`).
 
+### New Database Indexes
+
+The review queue query needs efficient access patterns. Add the following indexes in a new migration:
+
+| Table         | Column(s)               | Type             | Purpose                                           |
+| ------------- | ----------------------- | ---------------- | ------------------------------------------------- |
+| `assignments` | `instructorId`          | b-tree           | Filter assignments by instructor for review queue |
+| `checkpoints` | `state`, `assignmentId` | composite b-tree | Filter checkpoints by state and assignment        |
+
 ## State Transitions
 
 ```
 CHECKPOINT:
-  submitted → under_review (auto on review detail page load)
-  under_review → passed (instructor marks pass; next checkpoint unlocks)
-  under_review → revise (instructor marks revise; revision deadline set)
+  submitted → under_review (via openForReview POST action on page load)
+  under_review → passed (via submitReview; next checkpoint unlocks)
+  under_review → revise (via submitReview; revision deadline set)
 ```
 
 ## Acceptance Criteria
@@ -124,3 +145,4 @@ CHECKPOINT:
 - SLA breach notifications (Track 5.2)
 - Automatic deadline adjustments for late reviews (Track 5.2)
 - Manual checkpoint unlock by instructor (Track 5.2)
+- 3-revision escalation notification (PRD: >3 revise decisions on same checkpoint triggers advisory notification to instructor + admin; deferred to Track 7.1 or 5.2)
