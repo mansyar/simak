@@ -3,11 +3,12 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 /**
  * Generates a UUID-based file key for R2 storage.
- * Format: submissions/{uuid}.{extension}
+ * Format: {prefix}/{uuid}.{extension}
+ * Default prefix is 'submissions'.
  */
-export function generateFileKey(extension: string): string {
+export function generateFileKey(extension: string, prefix: string = 'submissions'): string {
   const uuid = crypto.randomUUID();
-  return `submissions/${uuid}.${extension}`;
+  return `${prefix}/${uuid}.${extension}`;
 }
 
 let r2Client: S3Client | null = null;

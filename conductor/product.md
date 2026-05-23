@@ -137,3 +137,15 @@ Students and instructors lack a centralized system to:
 - **SubmissionStatus component** — Review result card showing pass/revise badge, reviewer info, comment, and revision deadline
 - **Ownership guard** — All server functions verify student ownership via `assignmentStudents` join before allowing access
 - **i18n translations** — Full English and Indonesian translations for file upload UI, validation messages, and submission history
+
+### Track 5.1: Review Queue & Decision (May 2026)
+
+- **Review queue page** (`/instructor/reviews`) — Paginated FIFO list of pending submissions across instructor's assignments with assignment filter, wait time display, and SLA badges (Not Reviewed / On Time / Approaching SLA / SLA Breached)
+- **Review detail page** (`/instructor/reviews/$submissionId`) — File preview (PDF inline embed, DOCX metadata + download), review history timeline, and decision form
+- **Review decision form** — Pass/Revise radio buttons, comment textarea, optional feedback file upload (`.pdf`/`.docx` via presigned URLs to R2 with `feedback/` key prefix), conditional revision deadline picker
+- **`openForReview` POST action** — Explicitly transitions checkpoint from `submitted` to `under_review` on detail page load (keeps GET handlers pure)
+- **`submitReview`** — Validates ownership and state, records review in DB, transitions checkpoint: `pass` → unlocks next checkpoint, `revise` → sets revision deadline
+- **Server functions** — `listPendingReviews` (DISTINCT ON per-checkpoint), `getReviewDetail`, `openForReview`, `submitReview`, `getLatestReview` (student-side)
+- **Database indexes** — `assignments_instructor_id_idx` and `checkpoints_state_assignment_id_idx` for review queue query performance
+- **Student page wiring** — Student submission page fetches real review data via `getLatestReview`, replacing the `null` stub
+- **i18n translations** — Full English and Indonesian translations for review queue, detail page, decision form, and SLA badges
