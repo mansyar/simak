@@ -2,22 +2,22 @@
 
 ## Phase 1: Server Functions & Data Layer
 
-- [ ] Task: Create Zod schemas and server function stubs (`src/server/reviews.ts`)
+- [x] Task: Create Zod schemas and server function stubs (`src/server/reviews.ts`) [2c7fb1e]
   - [ ] Define `ListPendingReviewsSchema` (page, limit, assignmentId optional)
   - [ ] Define `GetReviewDetailSchema` (submissionId) — pure GET, no mutation
   - [ ] Define `OpenForReviewSchema` (submissionId) — POST action for `submitted → under_review` transition
   - [ ] Define `SubmitReviewSchema` (submissionId, decision, comment optional, revisionDeadline optional)
   - [ ] Define `GetLatestReviewSchema` (checkpointId) — for student-side review display
   - [ ] Create `listPendingReviews`, `getReviewDetail`, `openForReview`, `submitReview`, `getLatestReview` server function stubs with dynamic imports
-- [ ] Task: Implement server-only handlers (`src/server/reviews.server.ts`)
+- [x] Task: Implement server-only handlers (`src/server/reviews.server.ts`) [2c7fb1e]
   - [ ] `listPendingReviewsHandler` — Query submissions with `submitted` state across instructor's assignments, using `DISTINCT ON (checkpoints.id)` to get latest submission per checkpoint, paginated, FIFO, with assignment filter
   - [ ] `getReviewDetailHandler` — Pure GET: fetch submission + file info + past reviews for checkpoint, with presigned download URL. Does NOT mutate state.
   - [ ] `openForReviewHandler` — POST: validate checkpoint is in `submitted` state, transition to `under_review`, update `updatedAt`. Called explicitly by client after detail page loads.
   - [ ] `submitReviewHandler` — Validate state (submitted/under_review only), validate ownership, record review, transition checkpoint state, unlock next on pass, set deadline on revise
   - [ ] `getLatestReviewHandler` — Fetch most recent review for a checkpoint (used by student submission page to display review results)
-- [ ] Task: Extend `generateFileKey` for feedback file prefix (`src/lib/storage.ts`)
+- [x] Task: Extend `generateFileKey` for feedback file prefix (`src/lib/storage.ts`) [2c7fb1e]
   - [ ] Add optional `prefix` parameter to `generateFileKey(extension, prefix = 'submissions')` so feedback files use `feedback/{uuid}.{ext}` key prefix
-- [ ] Task: Add feedback file upload to file server (`src/server/files.ts` + `src/server/files.server.ts`)
+- [x] Task: Add feedback file upload to file server (`src/server/files.ts` + `src/server/files.server.ts`) [2c7fb1e]
   - [ ] Add `GetPresignedReviewFeedbackUploadUrlSchema` in `files.ts`
   - [ ] Add handler that generates presigned PUT URL using extended `generateFileKey` with `feedback/` prefix
 - [ ] Task: Create database migration for new indexes
