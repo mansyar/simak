@@ -234,7 +234,9 @@ describe('Review handlers - Logic & Security', () => {
   describe('submitReviewHandler', () => {
     it('should reject if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await submitReviewHandler({ data: { submissionId: 1, decision: 'pass' } });
+      const result = await submitReviewHandler({
+        data: { submissionId: 1, decision: 'pass', comment: '' },
+      });
       expect(result).toEqual({ error: 'Unauthorized' });
     });
 
@@ -310,7 +312,9 @@ describe('Review handlers - Logic & Security', () => {
           },
         ]).then(onfulfilled),
       );
-      const result = await submitReviewHandler({ data: { submissionId: 1, decision: 'revise' } });
+      const result = await submitReviewHandler({
+        data: { submissionId: 1, decision: 'revise', comment: '' },
+      });
       expect(result).toEqual({ error: 'Revision deadline is required for revise decision' });
     });
 
@@ -319,7 +323,9 @@ describe('Review handlers - Logic & Security', () => {
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([]).then(onfulfilled),
       );
-      const result = await submitReviewHandler({ data: { submissionId: 1, decision: 'pass' } });
+      const result = await submitReviewHandler({
+        data: { submissionId: 1, decision: 'pass', comment: '' },
+      });
       expect(result).toEqual({ error: 'Submission not found' });
     });
   });
