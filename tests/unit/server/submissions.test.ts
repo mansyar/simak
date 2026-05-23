@@ -368,7 +368,7 @@ describe('Submission server functions - Logic & Security', () => {
           ]).then(onfulfilled),
         );
 
-      const result = await listSubmissionsHandler({ data: { checkpointId: 1 } });
+      const result = (await listSubmissionsHandler({ data: { checkpointId: 1 } })) as any;
       expect(result.submissions).toHaveLength(3);
       expect(result.submissions[0].version).toBe(3);
       expect(result.submissions[1].version).toBe(2);
@@ -413,7 +413,7 @@ describe('Submission server functions - Logic & Security', () => {
         ]).then(onfulfilled),
       );
 
-      const result = await getSubmissionDetailHandler({ data: { submissionId: 1 } });
+      const result = (await getSubmissionDetailHandler({ data: { submissionId: 1 } })) as any;
       expect(result).toHaveProperty('submission');
       expect(result.submission).toHaveProperty('downloadUrl');
       expect(result.submission.fileName).toBe('chapter1.pdf');

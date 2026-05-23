@@ -23,18 +23,18 @@ describe('CheckpointTimeline', () => {
   ];
 
   it('should render all checkpoints in order', () => {
-    render(<CheckpointTimeline checkpoints={checkpoints as any} />);
+    render(<CheckpointTimeline checkpoints={checkpoints as any} assignmentId={101} />);
     const cards = screen.getAllByTestId(/checkpoint-card-/);
     expect(cards).toHaveLength(3);
   });
 
   it('should render the timeline title', () => {
-    render(<CheckpointTimeline checkpoints={checkpoints as any} />);
+    render(<CheckpointTimeline checkpoints={checkpoints as any} assignmentId={101} />);
     expect(screen.getByText('studentAssignments.timeline')).toBeDefined();
   });
 
   it('should display checkpoints in the correct order', () => {
-    render(<CheckpointTimeline checkpoints={checkpoints as any} />);
+    render(<CheckpointTimeline checkpoints={checkpoints as any} assignmentId={101} />);
     const cards = screen.getAllByTestId(/checkpoint-card-/);
     expect(cards[0].textContent).toBe('Proposal');
     expect(cards[1].textContent).toBe('Chapter 1');
