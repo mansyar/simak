@@ -10,6 +10,15 @@ vi.mock('@/routes/__root', () => ({
   }),
 }));
 
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, className, to }: any) => (
+    <a href={to} className={className}>
+      {children}
+    </a>
+  ),
+  useNavigate: () => vi.fn(),
+}));
+
 import { CheckpointCard } from '@/components/student/assignments/CheckpointCard';
 
 describe('CheckpointCard', () => {
@@ -45,50 +54,73 @@ describe('CheckpointCard', () => {
   };
 
   it('should render checkpoint name', () => {
-    render(<CheckpointCard checkpoint={passedCheckpoint} />);
+    render(<CheckpointCard checkpoint={passedCheckpoint} assignmentId={101} />);
     expect(screen.getByText('Proposal')).toBeDefined();
   });
 
   it('should render passed state badge with correct color', () => {
-    render(<CheckpointCard checkpoint={passedCheckpoint} />);
+    render(<CheckpointCard checkpoint={passedCheckpoint} assignmentId={101} />);
     const badge = screen.getByText('studentAssignments.status.passed');
     expect(badge.className).toContain('bg-green');
   });
 
   it('should render locked state badge with correct color', () => {
-    render(<CheckpointCard checkpoint={lockedCheckpoint} />);
+    render(<CheckpointCard checkpoint={lockedCheckpoint} assignmentId={101} />);
     const badge = screen.getByText('studentAssignments.status.locked');
     expect(badge.className).toContain('bg-gray');
   });
 
   it('should display blocking reasons for locked checkpoints', () => {
-    render(<CheckpointCard checkpoint={lockedCheckpoint} />);
+    render(<CheckpointCard checkpoint={lockedCheckpoint} assignmentId={101} />);
     expect(screen.getByText('studentAssignments.blockedByPrevious')).toBeDefined();
     expect(screen.getByText(/studentAssignments.blockedByConsultations/)).toBeDefined();
   });
 
   it('should indicate overdue checkpoints', () => {
-    render(<CheckpointCard checkpoint={overdueCheckpoint} />);
+    render(<CheckpointCard checkpoint={overdueCheckpoint} assignmentId={101} />);
     expect(screen.getByText('studentAssignments.status.overdue')).toBeDefined();
   });
 
   it('should display consultation progress when minConsultations > 0', () => {
-    render(<CheckpointCard checkpoint={passedCheckpoint} />);
+    render(<CheckpointCard checkpoint={passedCheckpoint} assignmentId={101} />);
     expect(screen.getByText(/studentAssignments.consultations/)).toBeDefined();
   });
 
   it('should render due date', () => {
-    render(<CheckpointCard checkpoint={passedCheckpoint} />);
+    render(<CheckpointCard checkpoint={passedCheckpoint} assignmentId={101} />);
     expect(screen.getByText(/Mar/)).toBeDefined();
   });
 
   it('should render submit button for unlocked checkpoints', () => {
-    render(<CheckpointCard checkpoint={overdueCheckpoint} />);
+    render(<CheckpointCard checkpoint={overdueCheckpoint} assignmentId={101} />);
     expect(screen.getByText('studentAssignments.submit')).toBeDefined();
   });
 
   it('should not render submit button for locked checkpoints', () => {
-    render(<CheckpointCard checkpoint={lockedCheckpoint} />);
+    render(<CheckpointCard checkpoint={lockedCheckpoint} assignmentId={101} />);
     expect(screen.queryByText('studentAssignments.submit')).toBeNull();
+  });
+
+  it('should render resubmit button for revise state', () => {
+    const reviseCheckpoint = { ...passedCheckpoint, state: 'revise' as const };
+    render(<CheckpointCard checkpoint={reviseCheckpoint} assignmentId={101} />);
+    expect(screen.getByText('studentAssignments.resubmit')).toBeDefined();
+  });
+
+  it('should render view submission link for submitted state', () => {
+    const submittedCheckpoint = { ...passedCheckpoint, state: 'submitted' as const };
+    render(<CheckpointCard checkpoint={submittedCheckpoint} assignmentId={101} />);
+    expect(screen.getByText('studentAssignments.viewSubmission')).toBeDefined();
+  });
+
+  it('should render view submission link for under_review state', () => {
+    const underReviewCheckpoint = { ...passedCheckpoint, state: 'under_review' as const };
+    render(<CheckpointCard checkpoint={underReviewCheckpoint} assignmentId={101} />);
+    expect(screen.getByText('studentAssignments.viewSubmission')).toBeDefined();
+  });
+
+  it('should render view submission link for passed state', () => {
+    render(<CheckpointCard checkpoint={passedCheckpoint} assignmentId={101} />);
+    expect(screen.getByText('studentAssignments.viewSubmission')).toBeDefined();
   });
 });

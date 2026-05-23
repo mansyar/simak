@@ -1,7 +1,8 @@
 import { format, isPast } from 'date-fns';
+import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
 import { Button } from '@/components/ui/button';
-import { Clock, AlertCircle, Users } from 'lucide-react';
+import { Clock, AlertCircle, Users, ExternalLink } from 'lucide-react';
 
 export interface CheckpointData {
   id: number;
@@ -16,6 +17,7 @@ export interface CheckpointData {
 
 interface CheckpointCardProps {
   checkpoint: CheckpointData;
+  assignmentId: number;
 }
 
 const stateConfig: Record<string, { label: string; containerClass: string; badgeClass: string }> = {
@@ -68,8 +70,9 @@ function getTranslatedBlockingReason(
   return reason;
 }
 
-export function CheckpointCard({ checkpoint }: CheckpointCardProps) {
+export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps) {
   const { t } = useI18n();
+  const navigate = useNavigate() as any;
   const config = stateConfig[checkpoint.state] ?? stateConfig.locked;
   const isOverdue =
     checkpoint.dueDate && isPast(new Date(checkpoint.dueDate)) && checkpoint.state !== 'passed';
@@ -139,10 +142,52 @@ export function CheckpointCard({ checkpoint }: CheckpointCardProps) {
           )}
         </div>
 
-        {/* Action button */}
+        {/* Action buttons */}
         {checkpoint.state === 'unlocked' && (
-          <Button size="sm" className="shrink-0">
+          <Button
+            size="sm"
+            className="shrink-0"
+            onClick={() =>
+              navigate({
+                to: '/student/assignments/$id/checkpoints/$checkpointId',
+                params: { id: String(assignmentId), checkpointId: String(checkpoint.id) },
+              })
+            }
+          >
             {t('studentAssignments.submit')}
+          </Button>
+        )}
+        {checkpoint.state === 'revise' && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="shrink-0"
+            onClick={() =>
+              navigate({
+                to: '/student/assignments/$id/checkpoints/$checkpointId',
+                params: { id: String(assignmentId), checkpointId: String(checkpoint.id) },
+              })
+            }
+          >
+            {t('studentAssignments.resubmit')}
+          </Button>
+        )}
+        {(checkpoint.state === 'submitted' ||
+          checkpoint.state === 'under_review' ||
+          checkpoint.state === 'passed') && (
+          <Button
+            variant="link"
+            size="sm"
+            onClick={() =>
+              navigate({
+                to: '/student/assignments/$id/checkpoints/$checkpointId',
+                params: { id: String(assignmentId), checkpointId: String(checkpoint.id) },
+              })
+            }
+            className="shrink-0"
+          >
+            <ExternalLink className="h-3 w-3" />
+            {t('studentAssignments.viewSubmission')}
           </Button>
         )}
       </div>

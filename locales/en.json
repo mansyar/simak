@@ -214,11 +214,49 @@
     },
     "timeline": "Checkpoint Timeline",
     "submit": "Submit",
+    "resubmit": "Resubmit",
+    "viewSubmission": "View Submission",
     "consultations": "Consultations: {current}/{required}",
     "blockedByPrevious": "Previous checkpoint not passed",
     "blockedByConsultations": "Insufficient consultations: {current}/{required} verified",
     "notFound": "Assignment not found",
     "notFoundDescription": "This assignment does not exist or you don't have access to it."
+  },
+  "files": {
+    "dropzone": {
+      "title": "Drop your file here or click to browse",
+      "subtitle": "Drag and drop your assignment file to upload"
+    },
+    "maxSize": "Max 25 MB",
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "uploadSuccess": "File uploaded successfully!",
+    "uploadAnother": "Upload Another",
+    "retry": "Retry",
+    "version": "Version {version}",
+    "download": "Download",
+    "noSubmissions": "No submissions yet",
+    "noSubmissionsHint": "Upload your file using the drop zone above",
+    "validation": {
+      "invalidType": "Only .docx and .pdf files are accepted",
+      "fileTooLarge": "File size must be under 25 MB"
+    },
+    "table": {
+      "version": "Version",
+      "fileName": "File Name",
+      "fileSize": "File Size",
+      "uploadedAt": "Uploaded At",
+      "action": "Action"
+    },
+    "review": {
+      "title": "Review Result",
+      "passed": "Passed",
+      "revise": "Revise Needed",
+      "awaiting": "Awaiting Review",
+      "awaitingHint": "Your submission will be reviewed by the instructor",
+      "reviewedOn": "Reviewed on {date}"
+    },
+    "revisionDeadline": "Revision deadline: {date}"
   },
   "error": {
     "notFound": "Page not found",

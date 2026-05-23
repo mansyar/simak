@@ -123,3 +123,17 @@ Students and instructors lack a centralized system to:
 - **Consultation progress** — Verified consultation count displayed per checkpoint alongside required minimum
 - **Ownership guard** — Students cannot view other students' assignments; invalid IDs show not-found state
 - **i18n translations** — Full English and Indonesian translations for sidebar, assignments list, detail page, and status badges
+
+### Track 4.1: File Upload & Submission (Student) (May 2026)
+
+- **R2 Storage Client** — `src/lib/storage.ts` with singleton S3 client, UUID-based file key generation (`submissions/{uuid}.{ext}`), presigned PUT URLs (5min) and GET URLs (1hr), and dev fallback mock
+- **R2 SDK** — `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner` for Cloudflare R2 presigned URL generation
+- **Submission server functions** — `submitCheckpoint` (validates unlocked/revise state, enforces ownership, auto-increments version, transitions to `submitted`), `listSubmissions` (version history, newest first), `getSubmissionDetail` (single record with download URL)
+- **File server functions** — `getPresignedUploadUrl` (validates checkpoint state, generates UUID key, returns `{ uploadUrl, fileKey }`), `getPresignedDownloadUrl` (ownership-validated GET URL)
+- **CheckpointCard wiring** — Submit/Resubmit buttons and View Submission link integrated into the checkpoint timeline with `useNavigate` navigation
+- **Submission route page** (`/student/assignments/$id/checkpoints/$checkpointId`) — Full upload flow: presigned URL → direct-to-R2 upload → `submitCheckpoint` call, with FileUploader, FileList (version history table), and SubmissionStatus (review result display)
+- **FileUploader component** — Drag-and-drop zone with click-to-browse fallback, .docx/.pdf validation, 25MB size limit, upload progress indicator, success/error states with retry
+- **FileList component** — Version history table with file name, size, upload date, and download buttons
+- **SubmissionStatus component** — Review result card showing pass/revise badge, reviewer info, comment, and revision deadline
+- **Ownership guard** — All server functions verify student ownership via `assignmentStudents` join before allowing access
+- **i18n translations** — Full English and Indonesian translations for file upload UI, validation messages, and submission history
