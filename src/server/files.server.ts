@@ -10,10 +10,17 @@ import {
   generatePresignedDownloadUrl,
 } from '../lib/storage';
 import type { z } from 'zod';
-import type { GetPresignedUploadUrlSchema, GetPresignedDownloadUrlSchema } from './files';
+import type {
+  GetPresignedUploadUrlSchema,
+  GetPresignedDownloadUrlSchema,
+  GetPresignedReviewFeedbackUploadUrlSchema,
+} from './files';
 
 type GetPresignedUploadUrlInput = z.infer<typeof GetPresignedUploadUrlSchema>;
 type GetPresignedDownloadUrlInput = z.infer<typeof GetPresignedDownloadUrlSchema>;
+type GetPresignedReviewFeedbackUploadUrlInput = z.infer<
+  typeof GetPresignedReviewFeedbackUploadUrlSchema
+>;
 
 function isStudent(session: any): session is { user: { id: string; role: string }; session: any } {
   return !!session && session.user.role === 'student';
@@ -92,4 +99,29 @@ export async function getPresignedDownloadUrlHandler(args: { data: GetPresignedD
   const downloadUrl = await generatePresignedDownloadUrl({ key: submission.fileKey });
 
   return { downloadUrl };
+}
+
+export async function getPresignedReviewFeedbackUploadUrlHandler(args: {
+  data: GetPresignedReviewFeedbackUploadUrlInput;
+}) {
+  const session = await getSessionFromHeaders();
+  if (!isInstructor(session)) {
+    return { error: 'Unauthorized' };
+  }
+
+  const { extension, contentType } = args.data;
+
+  // Generate UUID file key with 'feedback' prefix
+  const fileKey = generateFileKey(extension, 'feedback');
+
+  // Generate presigned upload URL
+  const uploadUrl = await generatePresignedUploadUrl({ key: fileKey, contentType });
+
+  return { uploadUrl, fileKey };
+}
+
+function isInstructor(
+  session: any,
+): session is { user: { id: string; role: string }; session: any } {
+  return !!session && session.user.role === 'instructor';
 }

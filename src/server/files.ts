@@ -27,3 +27,16 @@ export const getPresignedDownloadUrl = createServerFn({ method: 'GET' }).handler
     return getPresignedDownloadUrlHandler({ data });
   },
 );
+
+export const GetPresignedReviewFeedbackUploadUrlSchema = z.object({
+  extension: z.string().min(1, 'File extension is required'),
+  contentType: z.string().min(1, 'Content type is required'),
+});
+
+export const getPresignedReviewFeedbackUploadUrl = createServerFn({ method: 'GET' }).handler(
+  async (args: { data: any }) => {
+    const { getPresignedReviewFeedbackUploadUrlHandler } = await import('./files.server');
+    const data = GetPresignedReviewFeedbackUploadUrlSchema.parse(args.data);
+    return getPresignedReviewFeedbackUploadUrlHandler({ data });
+  },
+);
