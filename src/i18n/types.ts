@@ -23,6 +23,7 @@ export type Translation = {
   nav: {
     dashboard: string
     assignments: string
+    reviews: string
     consultations: string
     settings: string
     users: string
@@ -125,6 +126,17 @@ export type Translation = {
     emailVerified: string
     notVerified: string
     createdAt: string
+  }
+  instructorReviews: {
+    title: string
+    subtitle: string
+    allAssignments: string
+    empty: string
+    emptyPrompt: string
+    slaNotReviewed: string
+    slaOnTime: string
+    slaApproaching: string
+    slaBreached: string
   }
   adminTemplates: {
     title: string

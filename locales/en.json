@@ -30,6 +30,7 @@
     "role_instructor": "You are logged in as an Instructor",
     "role_admin": "You are logged in as an Admin",
     "assignments": "Assignments",
+    "reviews": "Reviews",
     "consultations": "Consultations",
     "settings": "Settings",
     "users": "Users",
@@ -130,6 +131,17 @@
     "deleteInUse": "This template is used by {count} assignment(s). Type DELETE to confirm.",
     "deleteSuccess": "Template deleted successfully",
     "inUseBanner": "This template is used by {count} assignment(s). Changes will affect future assignment creation."
+  },
+  "instructorReviews": {
+    "title": "Review Queue",
+    "subtitle": "Review pending student submissions across your assignments",
+    "allAssignments": "All Assignments",
+    "empty": "No pending reviews",
+    "emptyPrompt": "When students submit work for review, it will appear here.",
+    "slaNotReviewed": "Not Reviewed",
+    "slaOnTime": "On Time",
+    "slaApproaching": "Approaching SLA",
+    "slaBreached": "SLA Breached"
   },
   "instructorAssignments": {
     "title": "Assignments",

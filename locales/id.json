@@ -30,6 +30,7 @@
     "role_instructor": "Anda masuk sebagai Dosen",
     "role_admin": "Anda masuk sebagai Admin",
     "assignments": "Tugas",
+    "reviews": "Review",
     "consultations": "Konsultasi",
     "settings": "Pengaturan",
     "users": "Pengguna",
@@ -130,6 +131,17 @@
     "deleteInUse": "Templat ini digunakan oleh {count} tugas. Ketik DELETE untuk mengonfirmasi.",
     "deleteSuccess": "Templat berhasil dihapus",
     "inUseBanner": "Templat ini digunakan oleh {count} tugas. Perubahan akan memengaruhi pembuatan tugas di masa mendatang."
+  },
+  "instructorReviews": {
+    "title": "Antrean Review",
+    "subtitle": "Review pengumpulan mahasiswa yang menunggu di semua tugas Anda",
+    "allAssignments": "Semua Tugas",
+    "empty": "Tidak ada review tertunda",
+    "emptyPrompt": "Ketika mahasiswa mengumpulkan pekerjaan untuk direview, akan muncul di sini.",
+    "slaNotReviewed": "Belum Direview",
+    "slaOnTime": "Tepat Waktu",
+    "slaApproaching": "Mendekati SLA",
+    "slaBreached": "SLA Terlampaui"
   },
   "instructorAssignments": {
     "title": "Tugas",
