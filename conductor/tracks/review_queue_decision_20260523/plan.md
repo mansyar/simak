@@ -1,6 +1,6 @@
 # Implementation Plan: Review Queue & Decision
 
-## Phase 1: Server Functions & Data Layer
+## Phase 1: Server Functions & Data Layer [checkpoint: b6a074f]
 
 - [x] Task: Create Zod schemas and server function stubs (`src/server/reviews.ts`) [2c7fb1e]
   - [ ] Define `ListPendingReviewsSchema` (page, limit, assignmentId optional)
@@ -22,7 +22,7 @@
   - [ ] Add handler that generates presigned PUT URL using extended `generateFileKey` with `feedback/` prefix
 - [x] Task: Create database migration for new indexes [af288c0]
   - [x] Created manual migration SQL with two new indexes: `assignments_instructor_id_idx` on `assignments.instructorId` and `checkpoints_state_assignment_id_idx` on `checkpoints(state, assignmentId)`
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Server Functions & Data Layer' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Server Functions & Data Layer' (Protocol in workflow.md) [b6a074f]
 
 ## Phase 2: Review Queue Page (`/instructor/reviews`)
 
