@@ -1,6 +1,6 @@
 import { useLocation, Link } from '@tanstack/react-router';
 import { useI18n } from '../../routes/__root';
-import { LayoutDashboard, ClipboardList } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, ClipboardCheck } from 'lucide-react';
 
 export function InstructorSidebar() {
   const { pathname } = useLocation();
@@ -9,6 +9,7 @@ export function InstructorSidebar() {
   const links = [
     { to: '/dashboard', label: 'nav.dashboard', icon: LayoutDashboard },
     { to: '/instructor/assignments', label: 'nav.assignments', icon: ClipboardList },
+    { to: '/instructor/reviews', label: 'nav.reviews', icon: ClipboardCheck },
   ] as const;
 
   return (
