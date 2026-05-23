@@ -19,7 +19,7 @@ export function ReviewDetailHeader({
   return (
     <div className="space-y-4">
       {/* Back navigation */}
-      <Link to="/instructor/reviews" search={() => ({}) as any} className="inline-flex">
+      <Link to="/instructor/reviews" search={{ page: 1, limit: 20 }} className="inline-flex">
         <Button variant="ghost" size="sm" type="button">
           <ChevronLeft className="mr-1 h-4 w-4" />
           {t('common.back')}

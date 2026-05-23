@@ -53,7 +53,8 @@ export function ReviewQueueItem({ item }: ReviewQueueItemProps) {
           updatedAt={item.checkpointUpdatedAt ?? item.uploadedAt}
         />
         <Link
-          to={`/instructor/reviews/${item.submissionId}` as any}
+          to="/instructor/reviews/$submissionId"
+          params={{ submissionId: String(item.submissionId) }}
           data-testid="review-queue-link"
           className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
         >

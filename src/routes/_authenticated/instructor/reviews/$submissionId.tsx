@@ -9,13 +9,35 @@ import { ReviewQueueSkeleton } from '@/components/reviews/ReviewQueueSkeleton';
 import { useI18n } from '../../../__root';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
+interface ReviewDetailLoaderData {
+  submission?: {
+    studentName: string;
+    assignmentTitle: string;
+    checkpointName: string;
+    fileName: string;
+    fileSize: number;
+    version: number;
+    uploadedAt: Date;
+    downloadUrl: string;
+    checkpointState: string;
+  };
+  reviewHistory?: Array<{
+    id: number;
+    decision: 'pass' | 'revise';
+    comment?: string | null;
+    instructorName: string;
+    createdAt: Date;
+  }>;
+  error?: string;
+}
+
 export const Route = createFileRoute('/_authenticated/instructor/reviews/$submissionId')({
-  loader: async ({ params }) => {
+  loader: async ({ params }): Promise<ReviewDetailLoaderData> => {
     try {
       const data = await (getReviewDetail as any)({
         data: { submissionId: Number(params.submissionId) },
       });
-      return data;
+      return data as ReviewDetailLoaderData;
     } catch {
       return { error: 'Failed to load review detail' };
     }
@@ -30,9 +52,9 @@ export const Route = createFileRoute('/_authenticated/instructor/reviews/$submis
 
 function ReviewDetailPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as any;
-  const params = Route.useParams() as any;
-  const navigate = useNavigate() as any;
+  const data = Route.useLoaderData() as ReviewDetailLoaderData;
+  const params = Route.useParams();
+  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [transitioned, setTransitioned] = useState(false);
@@ -41,19 +63,18 @@ function ReviewDetailPage() {
   useEffect(() => {
     if (data?.submission && data.submission.checkpointState === 'submitted' && !transitioned) {
       setTransitioned(true);
-      (openForReview as any)({
-        data: { submissionId: Number(params.submissionId) },
-      }).then(() => {
-        // Re-fetch detail after transition
-        (getReviewDetail as any)({
+      let cancelled = false;
+      (async () => {
+        await (openForReview as any)({
           data: { submissionId: Number(params.submissionId) },
-        }).then((freshData: any) => {
-          if (freshData?.submission) {
-            // Update the route data by navigating to self
-            navigate({ replace: true });
-          }
         });
-      });
+        if (cancelled) return;
+        // Re-fetch detail after transition by navigating to self
+        navigate({ replace: true });
+      })();
+      return () => {
+        cancelled = true;
+      };
     }
   }, [data, params.submissionId, transitioned, navigate]);
 
@@ -83,7 +104,7 @@ function ReviewDetailPage() {
         <CheckCircle2 className="h-12 w-12 text-green-500" />
         <h2 className="text-xl font-semibold">{t('instructorReviews.reviewSubmitted')}</h2>
         <button
-          onClick={() => navigate({ to: '/instructor/reviews', search: {} as any })}
+          onClick={() => navigate({ to: '/instructor/reviews', search: { page: 1, limit: 20 } })}
           className="text-sm text-primary hover:underline"
         >
           {t('instructorReviews.backToQueue')}

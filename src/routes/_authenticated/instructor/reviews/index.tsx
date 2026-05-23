@@ -66,10 +66,10 @@ function ReviewsPage() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => {
+            onClick={async () => {
               setIsRefreshing(true);
-              navigate({ search: (prev: any) => prev });
-              setTimeout(() => setIsRefreshing(false), 1000);
+              await navigate({ search: searchParams });
+              setIsRefreshing(false);
             }}
             disabled={isRefreshing}
           >

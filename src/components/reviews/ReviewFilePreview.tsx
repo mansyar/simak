@@ -1,5 +1,4 @@
-import { FileText, Download, File } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { FileText, Download } from 'lucide-react';
 import { useI18n } from '../../routes/__root';
 
 interface ReviewFilePreviewProps {
@@ -53,15 +52,15 @@ export function ReviewFilePreview({
       )}
 
       {/* Download button */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => window.open(downloadUrl, '_blank')}
-        className="gap-2"
+      <a
+        href={downloadUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
       >
         <Download className="h-4 w-4" />
         {isPdf ? t('instructorReviews.downloadPdf') : t('instructorReviews.downloadFile')}
-      </Button>
+      </a>
     </div>
   );
 }

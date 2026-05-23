@@ -8,9 +8,15 @@ vi.mock('@/routes/__root', () => ({
   }),
 }));
 
-function MockLink({ children, to, ...props }: any) {
+function MockLink({ children, to, params, ...props }: any) {
+  let href = to;
+  if (params) {
+    for (const [key, value] of Object.entries(params)) {
+      href = href.replace(`$${key}`, String(value));
+    }
+  }
   return (
-    <a href={to} {...props}>
+    <a href={href} {...props}>
       {children}
     </a>
   );
