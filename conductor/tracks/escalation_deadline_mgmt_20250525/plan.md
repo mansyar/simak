@@ -1,6 +1,6 @@
 # Implementation Plan: Escalation & Deadline Management
 
-## Phase 1: SLA Breach Detection & Notification
+## Phase 1: SLA Breach Detection & Notification [checkpoint: b9afe9e]
 
 ### Task 1.1 — SLA Calculation Utility
 
