@@ -312,6 +312,57 @@ describe('Submission server functions - Logic & Security', () => {
       const result = await submitCheckpointHandler({ data: submitData });
       expect(result).toEqual({ error: 'Checkpoint is not in a submittable state' });
     });
+
+    it('should block submission when insufficient verified consultations', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 1,
+              assignmentId: 101,
+              studentId: 'student-1',
+              state: 'unlocked',
+              minConsultations: 2,
+            },
+          ]).then(onfulfilled),
+        )
+        // Consultation count query returns only 1 verified
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        );
+
+      const result = await submitCheckpointHandler({ data: submitData });
+      expect(result).toHaveProperty('error');
+      expect(result.error).toContain('requires 2 verified consultations');
+    });
+
+    it('should allow submission when sufficient verified consultations', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 1,
+              assignmentId: 101,
+              studentId: 'student-1',
+              state: 'unlocked',
+              minConsultations: 2,
+            },
+          ]).then(onfulfilled),
+        )
+        // Consultation count query returns 3 verified (>= 2)
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 3 }]).then(onfulfilled),
+        )
+        // Version query
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+
+      const result = await submitCheckpointHandler({ data: submitData });
+      expect(result).toEqual({ success: true });
+    });
   });
 
   describe('listSubmissionsHandler', () => {

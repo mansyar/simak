@@ -3,6 +3,7 @@ import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews } from '../db/schema/submissions';
+import { consultations } from '../db/schema/consultations';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { generatePresignedDownloadUrl } from '../lib/storage';
@@ -338,9 +339,12 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           .set({ state: 'passed', updatedAt: new Date() })
           .where(eq(checkpoints.id, submission.checkpointId));
 
-        // 4c. Unlock the next sequential checkpoint for this student
+        // 4c. Unlock the next sequential checkpoint for this student (with consultation gating)
         const nextCheckpoint = await tx
-          .select({ id: checkpoints.id })
+          .select({
+            id: checkpoints.id,
+            minConsultations: checkpoints.minConsultations,
+          })
           .from(checkpoints)
           .where(
             and(
@@ -353,6 +357,27 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           .limit(1);
 
         if (nextCheckpoint.length > 0) {
+          const minConsults = nextCheckpoint[0].minConsultations ?? 0;
+          if (minConsults > 0) {
+            // Check if student has enough verified consultations for this checkpoint
+            const [{ count }] = await tx
+              .select({ count: sql<number>`count(*)::int` })
+              .from(consultations)
+              .where(
+                and(
+                  eq(consultations.checkpointId, nextCheckpoint[0].id),
+                  eq(consultations.studentId, submission.studentId),
+                  eq(consultations.status, 'verified'),
+                ),
+              );
+
+            if (Number(count) < minConsults) {
+              // Keep locked — consultation requirements not met
+              // The blocking reason is already handled in getStudentAssignmentDetailHandler
+              return;
+            }
+          }
+
           await tx
             .update(checkpoints)
             .set({ state: 'unlocked', updatedAt: new Date() })

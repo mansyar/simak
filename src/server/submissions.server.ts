@@ -3,6 +3,7 @@ import { eq, and, desc, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { checkpoints, assignmentStudents } from '../db/schema/assignments';
 import { submissions } from '../db/schema/submissions';
+import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
 import { generatePresignedDownloadUrl } from '../lib/storage';
 import type { z } from 'zod';
@@ -38,6 +39,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
       assignmentId: checkpoints.assignmentId,
       studentId: checkpoints.studentId,
       state: checkpoints.state,
+      minConsultations: checkpoints.minConsultations,
     })
     .from(checkpoints)
     .innerJoin(assignmentStudents, eq(checkpoints.assignmentId, assignmentStudents.assignmentId))
@@ -60,6 +62,27 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
 
   if (!SUBMITTABLE_STATES.includes(checkpoint.state as (typeof SUBMITTABLE_STATES)[number])) {
     return { error: 'Checkpoint is not in a submittable state' };
+  }
+
+  // 1b. Check consultation gating
+  const minConsults = checkpoint.minConsultations ?? 0;
+  if (minConsults > 0) {
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(consultations)
+      .where(
+        and(
+          eq(consultations.checkpointId, checkpointId),
+          eq(consultations.studentId, session.user.id),
+          eq(consultations.status, 'verified'),
+        ),
+      );
+
+    if (Number(count) < minConsults) {
+      return {
+        error: `Checkpoint requires ${minConsults} verified consultations before submission (currently ${count})`,
+      };
+    }
   }
 
   // 2. Calculate next version number
