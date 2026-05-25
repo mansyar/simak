@@ -91,7 +91,7 @@
 
 ### Task 3.1 — DeadlineManager Component
 
-- [ ] Write failing tests (`tests/unit/components/reviews/deadline-manager.test.tsx`) for:
+- [x] Write failing tests (`tests/unit/components/reviews/deadline-manager.test.tsx`) for:
   - Renders a list of students with their checkpoints and current deadlines
   - Shows "Unlock" button only for `locked` checkpoints
   - Clicking Unlock shows confirmation dialog
@@ -99,15 +99,15 @@
   - "Extend Deadline" date picker is shown per checkpoint
   - New deadline validation (must be future)
   - Loading/error/empty states
-- [ ] Create `src/components/reviews/deadline-manager.tsx`:
+- [x] Create `src/components/reviews/deadline-manager.tsx`:
   - Collapsible section on the assignment detail page
   - Per-student table/accordion showing checkpoints with state badges, current dueDate
   - "Unlock" button (with confirmation dialog) for locked checkpoints
   - "Extend Deadline" date picker per checkpoint with save button
   - TanStack Query mutations for unlock and extend
   - Loading state during mutations
-- [ ] Add i18n keys for Deadline Manager UI labels, buttons, and messages
-- [ ] Verify all tests pass
+- [x] Add i18n keys for Deadline Manager UI labels, buttons, and messages
+- [x] Verify all tests pass — 15/15 tests passing [729d802]
 
 ### Task 3.2 — Integrate Deadline Manager into Assignment Detail Page
 
