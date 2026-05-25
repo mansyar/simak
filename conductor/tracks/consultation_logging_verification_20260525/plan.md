@@ -109,3 +109,6 @@
 - [x] Task: Update template edit sheet (4ac6c82)
 - [x] Task: Write tests for template UI minConsultations (4ac6c82)
 - [x] Task: Conductor - User Manual Verification 'Phase 8: Admin Template UI — minConsultations Field' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions (e8e4c6e)
