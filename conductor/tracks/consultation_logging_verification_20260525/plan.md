@@ -73,57 +73,20 @@
 
 ## Phase 5: Student UI — Consultation Tab
 
-- [ ] Task: Create ConsultationForm component
-  - [ ] Checkpoint selector dropdown (filtered to this assignment)
-  - [ ] Session type radio/select (internal/external)
-  - [ ] External consultant name input (shown conditionally)
-  - [ ] Notes textarea
-  - [ ] Form validation with Zod
-  - [ ] Submit calls `logConsultation` server function
-  - [ ] Loading, success, and error states
-- [ ] Task: Create ConsultationList component
-  - [ ] List of consultation records with status badges (pending/verified/rejected)
-  - [ ] Display: checkpoint name, session type, notes preview, timestamp
-  - [ ] Badge colors: pending=yellow, verified=green, rejected=red
-  - [ ] Empty state when no consultations logged
-  - [ ] Loading skeleton state
-- [ ] Task: Create ConsultationProgress component
-  - [ ] Per-checkpoint progress bar: "X/Y verified"
-  - [ ] Color coding: full=green, partial=yellow, zero=gray
-  - [ ] Display on checkpoint timeline cards
-  - [ ] Assignment-level summary section
-- [ ] Task: Integrate consultation tab into student assignment detail page
-  - [ ] Add tab navigation to `src/routes/_authenticated/student/assignments/$id.tsx` (existing page)
-  - [ ] Add "Consultations" tab alongside existing timeline/submission content
-  - [ ] Tab contains ConsultationForm + ConsultationList + ConsultationProgress
-  - [ ] Fetch verified counts on page load for progress display
-- [ ] Task: Write tests for student consultation UI
-  - [ ] Test ConsultationForm renders and validates
-  - [ ] Test ConsultationList renders status badges correctly
-  - [ ] Test ConsultationProgress displays correct ratio
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Student UI — Consultation Tab' (Protocol in workflow.md)
+- [x] Task: Create ConsultationForm component (1b960aa)
+- [x] Task: Create ConsultationList component (1b960aa)
+- [x] Task: Create ConsultationProgress component (1b960aa)
+- [x] Task: Integrate consultation tab into student assignment detail page (1b960aa)
+- [x] Task: Write tests for student consultation UI (1b960aa)
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Student UI — Consultation Tab' (Protocol in workflow.md)
 
 ## Phase 6: Instructor UI — Verification Tab
 
-- [ ] Task: Create VerificationQueueItem component
-  - [ ] Display: student name, checkpoint name, notes preview (truncated), session type, logged date
-  - [ ] Click handler to open VerificationDialog
-- [ ] Task: Create VerificationDialog component
-  - [ ] Full consultation details: student name, checkpoint, session type, full notes, external consultant name, timestamp
-  - [ ] Verify button — calls `verifyConsultation`, shows loading, closes on success
-  - [ ] Reject button — expands inline text input for reason, calls `rejectConsultation`, closes on success
-  - [ ] Error state display
-- [ ] Task: Integrate verification tab into instructor assignment detail page
-  - [ ] Add tab navigation to `src/routes/_authenticated/instructor/assignments/$id.tsx` (existing page)
-  - [ ] Add "Consultations" tab alongside existing DeadlineManager section
-  - [ ] Tab contains pending queue list (VerificationQueueItem components)
-  - [ ] Re-fetch pending queue after verify/reject
-  - [ ] Show count badge on tab: "Consultations (3)"
-  - [ ] Empty state when no pending consultations
-- [ ] Task: Write tests for instructor verification UI
-  - [ ] Test VerificationDialog renders consultation details
-  - [ ] Test verify and reject actions
-- [ ] Task: Conductor - User Manual Verification 'Phase 6: Instructor UI — Verification Tab' (Protocol in workflow.md)
+- [x] Task: Create VerificationQueueItem component (6124545)
+- [x] Task: Create VerificationDialog component (6124545)
+- [x] Task: Integrate verification tab into instructor assignment detail page (6124545)
+- [x] Task: Write tests for instructor verification UI (6124545)
+- [x] Task: Conductor - User Manual Verification 'Phase 6: Instructor UI — Verification Tab' (Protocol in workflow.md)
 
 ## Phase 7: i18n Translations
 
@@ -142,14 +105,7 @@
 
 ## Phase 8: Admin Template UI — minConsultations Field
 
-- [ ] Task: Update template creation dialog
-  - [ ] Add number input for `minConsultations` (default 0) to each checkpoint row
-  - [ ] Label: "Min. Consultations"
-  - [ ] Submit updated schema with minConsultations values
-- [ ] Task: Update template edit sheet
-  - [ ] Pre-fill minConsultations value when editing existing template
-  - [ ] Same number input per checkpoint row
-- [ ] Task: Write tests for template UI minConsultations
-  - [ ] Test that minConsultations input renders in create dialog
-  - [ ] Test that minConsultations pre-fills in edit sheet
-- [ ] Task: Conductor - User Manual Verification 'Phase 8: Admin Template UI — minConsultations Field' (Protocol in workflow.md)
+- [x] Task: Update template creation dialog (4ac6c82)
+- [x] Task: Update template edit sheet (4ac6c82)
+- [x] Task: Write tests for template UI minConsultations (4ac6c82)
+- [x] Task: Conductor - User Manual Verification 'Phase 8: Admin Template UI — minConsultations Field' (Protocol in workflow.md)
