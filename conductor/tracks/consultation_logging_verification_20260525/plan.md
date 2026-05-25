@@ -56,20 +56,20 @@
   - [x] Unit tests for `listVerifiedCounts` — correct aggregation
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Server Functions — Consultation CRUD' (Protocol in workflow.md)
 
-## Phase 4: Server Functions — Gating Integration
+## Phase 4: Server Functions — Gating Integration [checkpoint: 0d5250c]
 
-- [ ] Task: Integrate gating check into submission flow
+- [x] Task: Integrate gating check into submission flow (0d5250c)
   - [ ] Update `submitCheckpointHandler` in `submissions.server.ts` — before allowing submission, query verified consultation count for the checkpoint and compare against `minConsultations`
   - [ ] Return descriptive error: "Checkpoint requires X verified consultations before submission (currently Y)"
-- [ ] Task: Integrate gating into checkpoint unlock logic
-  - [ ] The existing unlock logic (triggered when previous checkpoint is passed) already runs in `submitReviewHandler`. Add check: if `verifiedConsultations < minConsultations`, keep checkpoint state as `locked` with the unlock reason showing consultation requirement
-  - [ ] The student assignment detail page already displays blocking reasons; ensure "insufficient consultations" reason is displayed for locked checkpoints
-- [ ] Task: Write tests for gating logic
-  - [ ] Unit test: submission blocked when insufficient verified consultations
-  - [ ] Unit test: submission allowed when sufficient verified consultations
-  - [ ] Unit test: unlock blocked when insufficient verified consultations
-  - [ ] Unit test: unlock proceeds when sufficient verified consultations and previous checkpoint passed
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Server Functions — Gating Integration' (Protocol in workflow.md)
+- [x] Task: Integrate gating into checkpoint unlock logic (0d5250c)
+  - [x] The existing unlock logic (triggered when previous checkpoint is passed) already runs in `submitReviewHandler`. Add check: if `verifiedConsultations < minConsultations`, keep checkpoint state as `locked` with the unlock reason showing consultation requirement
+  - [x] The student assignment detail page already displays blocking reasons; ensure "insufficient consultations" reason is displayed for locked checkpoints
+- [x] Task: Write tests for gating logic (0d5250c)
+  - [x] Unit test: submission blocked when insufficient verified consultations
+  - [x] Unit test: submission allowed when sufficient verified consultations
+  - [x] Unit test: unlock blocked when insufficient verified consultations
+  - [x] Unit test: unlock proceeds when sufficient verified consultations and previous checkpoint passed
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Server Functions — Gating Integration' (Protocol in workflow.md)
 
 ## Phase 5: Student UI — Consultation Tab
 
