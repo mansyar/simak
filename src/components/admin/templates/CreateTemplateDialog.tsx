@@ -33,6 +33,8 @@ interface CreateTemplateDialogProps {
   onSuccess: () => void;
 }
 
+const defaultCheckpoint = () => ({ name: '', minConsultations: 0 });
+
 export function CreateTemplateDialog({
   open,
   onOpenChange,
@@ -47,7 +49,7 @@ export function CreateTemplateDialog({
     defaultValues: {
       name: '',
       type: '',
-      checkpoints: ['', '', ''],
+      checkpoints: [defaultCheckpoint(), defaultCheckpoint(), defaultCheckpoint()],
     },
   });
 
@@ -55,7 +57,7 @@ export function CreateTemplateDialog({
 
   const handleAddCheckpoint = useCallback(() => {
     const current = form.getValues('checkpoints');
-    form.setValue('checkpoints', [...current, ''], { shouldValidate: false });
+    form.setValue('checkpoints', [...current, defaultCheckpoint()], { shouldValidate: false });
   }, [form]);
 
   const handleRemoveCheckpoint = useCallback(
@@ -75,7 +77,17 @@ export function CreateTemplateDialog({
     (index: number, value: string) => {
       const current = form.getValues('checkpoints');
       const updated = [...current];
-      updated[index] = value;
+      updated[index] = { ...updated[index], name: value };
+      form.setValue('checkpoints', updated, { shouldValidate: false });
+    },
+    [form],
+  );
+
+  const handleMinConsultationsChange = useCallback(
+    (index: number, value: number) => {
+      const current = form.getValues('checkpoints');
+      const updated = [...current];
+      updated[index] = { ...updated[index], minConsultations: value };
       form.setValue('checkpoints', updated, { shouldValidate: false });
     },
     [form],
@@ -183,6 +195,7 @@ export function CreateTemplateDialog({
                       onAdd={handleAddCheckpoint}
                       onRemove={handleRemoveCheckpoint}
                       onChange={handleCheckpointChange}
+                      onMinConsultationsChange={handleMinConsultationsChange}
                       onMoveUp={handleMoveUp}
                       onMoveDown={handleMoveDown}
                       errors={checkpointValues.map((_, i) => checkpointErrors?.[i]?.message)}

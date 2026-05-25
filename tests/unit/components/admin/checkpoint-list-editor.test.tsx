@@ -31,10 +31,15 @@ vi.mock('@/components/ui/button', () => ({
 
 describe('CheckpointListEditor', () => {
   const defaultProps = {
-    checkpoints: ['Chapter 1', 'Chapter 2', 'Chapter 3'],
+    checkpoints: [
+      { name: 'Chapter 1', minConsultations: 0 },
+      { name: 'Chapter 2', minConsultations: 0 },
+      { name: 'Chapter 3', minConsultations: 0 },
+    ],
     onAdd: vi.fn(),
     onRemove: vi.fn(),
     onChange: vi.fn(),
+    onMinConsultationsChange: vi.fn(),
     onMoveUp: vi.fn(),
     onMoveDown: vi.fn(),
   };
@@ -94,7 +99,7 @@ describe('CheckpointListEditor', () => {
   });
 
   it('should disable Remove when only one checkpoint', () => {
-    render(<CheckpointListEditor {...defaultProps} checkpoints={['Only']} />);
+    render(<CheckpointListEditor {...defaultProps} checkpoints={[{ name: 'Only', minConsultations: 0 }]} />);
     expect((screen.getByLabelText('Remove') as HTMLButtonElement).disabled).toBe(true);
   });
 
