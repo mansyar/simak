@@ -11,7 +11,7 @@
   - [x] Run tests to confirm all existing tests still pass
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema Update' (Protocol in workflow.md)
 
-## Phase 2: Server Functions — Templates Update
+## Phase 2: Server Functions — Templates Update [checkpoint: cd331f6]
 
 - [x] Task: Update Zod schemas for template CRUD to include minConsultations (becbb4e)
   - [x] Update `CreateTemplateSchema` — add `minConsultations: z.number().int().min(0).default(0)` to each checkpoint in the array
@@ -26,7 +26,7 @@
 - [x] Task: Write tests for template minConsultations (becbb4e)
   - [x] Write unit tests for create/update template with minConsultations
   - [x] Write unit test verifying assignment creation copies minConsultations
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions — Templates Update' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Server Functions — Templates Update' (Protocol in workflow.md)
 
 ## Phase 3: Server Functions — Consultation CRUD
 
