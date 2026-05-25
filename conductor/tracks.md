@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Escalation & Deadline Management**
-  _Link: [./tracks/escalation_deadline_mgmt_20250525/](./tracks/escalation_deadline_mgmt_20250525/)_
+- [x] **Track: Escalation & Deadline Management**
+      _Link: [./tracks/escalation_deadline_mgmt_20250525/](./tracks/escalation_deadline_mgmt_20250525/)_
