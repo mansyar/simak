@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { getAssignmentDetail } from '@/server/assignments';
+import { listPendingConsultations } from '@/server/consultations';
 import { ProgressTable } from '@/components/instructor/assignments/ProgressTable';
 import { DeadlineManager } from '@/components/reviews/DeadlineManager';
+import { VerificationQueueItem } from '@/components/consultations/VerificationQueueItem';
+import { VerificationDialog } from '@/components/consultations/VerificationDialog';
 import { Calendar, Users, Clipboard, ArrowLeft, Percent, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useI18n } from '../../../__root';
@@ -16,6 +20,25 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/$id
 function AssignmentDetailPage() {
   const { t } = useI18n();
   const assignment = Route.useLoaderData();
+  const [pendingConsultations, setPendingConsultations] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'overview' | 'consultations'>('overview');
+  const [selectedConsultationId, setSelectedConsultationId] = useState<number | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Load pending consultations
+  useState(() => {
+    if (assignment) {
+      const load = async () => {
+        const result = await (listPendingConsultations as any)({
+          data: { assignmentId: assignment.id },
+        });
+        if (result.consultations) {
+          setPendingConsultations(result.consultations);
+        }
+      };
+      load();
+    }
+  });
 
   if (!assignment) {
     return (
@@ -184,8 +207,88 @@ function AssignmentDetailPage() {
         <ProgressTable students={assignment.students} />
       </div>
 
-      {/* Deadline Manager */}
-      <DeadlineManager students={assignment.students} assignmentId={assignment.id} />
+      {/* Tab Navigation */}
+      <div className="border-b border-border">
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={() => setActiveTab('overview')}
+            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'overview'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {t('instructorAssignments.details.overview')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('consultations')}
+            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'consultations'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {t('consultations.title')}
+            {pendingConsultations.length > 0 && (
+              <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full bg-primary text-primary-foreground">
+                {pendingConsultations.length}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'overview' && (
+        <>
+          {/* Deadline Manager */}
+          <DeadlineManager students={assignment.students} assignmentId={assignment.id} />
+        </>
+      )}
+
+      {activeTab === 'consultations' && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-foreground">
+            {t('consultations.pendingVerification')}
+          </h2>
+
+          {pendingConsultations.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>{t('consultations.noPendingConsultations')}</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {pendingConsultations.map((item: any) => (
+                <VerificationQueueItem
+                  key={item.id}
+                  consultation={item}
+                  onClick={(id) => {
+                    setSelectedConsultationId(id);
+                    setDialogOpen(true);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+
+          <VerificationDialog
+            consultationId={selectedConsultationId}
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+            onActionComplete={async () => {
+              // Refresh pending queue
+              const result = await (listPendingConsultations as any)({
+                data: { assignmentId: assignment.id },
+              });
+              if (result.consultations) {
+                setPendingConsultations(result.consultations);
+              }
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
