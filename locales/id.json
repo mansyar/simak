@@ -114,6 +114,7 @@
       "type": "Tipe",
       "checkpoints": "Checkpoint",
       "checkpointName": "Nama Checkpoint",
+      "minConsultations": "Min. Konsultasi",
       "addCheckpoint": "Tambah Checkpoint",
       "removeCheckpoint": "Hapus",
       "moveUp": "Naik",
@@ -300,6 +301,38 @@
       "reviewedOn": "Direview pada {date}"
     },
     "revisionDeadline": "Tenggat revisi: {date}"
+  },
+  "consultations": {
+    "title": "Konsultasi",
+    "checkpoint": "Checkpoint",
+    "selectCheckpoint": "Pilih checkpoint",
+    "sessionType": "Tipe Sesi",
+    "internal": "Internal",
+    "external": "Eksternal",
+    "externalConsultantName": "Nama Konsultan Eksternal",
+    "consultantNamePlaceholder": "Masukkan nama konsultan",
+    "notes": "Catatan",
+    "notesPlaceholder": "Deskripsikan sesi konsultasi",
+    "logConsultation": "Catat Konsultasi",
+    "previousSessions": "Sesi Sebelumnya",
+    "noConsultations": "Belum ada konsultasi yang dicatat",
+    "status": {
+      "pending": "Menunggu",
+      "verified": "Terverifikasi",
+      "rejected": "Ditolak"
+    },
+    "consultationProgress": "Progress Konsultasi",
+    "verified": "terverifikasi",
+    "pendingVerification": "Menunggu Verifikasi",
+    "noPendingConsultations": "Tidak ada konsultasi yang menunggu verifikasi",
+    "consultationDetail": "Detail Konsultasi",
+    "student": "Mahasiswa",
+    "date": "Tanggal",
+    "verify": "Verifikasi",
+    "reject": "Tolak",
+    "confirmReject": "Konfirmasi Penolakan",
+    "rejectReason": "Alasan Penolakan",
+    "rejectReasonPlaceholder": "Masukkan alasan penolakan"
   },
   "error": {
     "notFound": "Halaman tidak ditemukan",

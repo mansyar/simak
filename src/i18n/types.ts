@@ -189,6 +189,38 @@ export type Translation = {
     deleteSuccess: string
     inUseBanner: string
   }
+  consultations: {
+    title: string
+    checkpoint: string
+    selectCheckpoint: string
+    sessionType: string
+    internal: string
+    external: string
+    externalConsultantName: string
+    consultantNamePlaceholder: string
+    notes: string
+    notesPlaceholder: string
+    logConsultation: string
+    previousSessions: string
+    noConsultations: string
+    status: {
+      pending: string
+      verified: string
+      rejected: string
+    }
+    consultationProgress: string
+    verified: string
+    pendingVerification: string
+    noPendingConsultations: string
+    consultationDetail: string
+    student: string
+    date: string
+    verify: string
+    reject: string
+    confirmReject: string
+    rejectReason: string
+    rejectReasonPlaceholder: string
+  }
 }
 
 export type TranslationFunctions = Record<string, (key: string) => string>

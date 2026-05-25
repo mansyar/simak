@@ -114,6 +114,7 @@
       "type": "Type",
       "checkpoints": "Checkpoints",
       "checkpointName": "Checkpoint Name",
+      "minConsultations": "Min. Consultations",
       "addCheckpoint": "Add Checkpoint",
       "removeCheckpoint": "Remove",
       "moveUp": "Move Up",
@@ -300,6 +301,38 @@
       "reviewedOn": "Reviewed on {date}"
     },
     "revisionDeadline": "Revision deadline: {date}"
+  },
+  "consultations": {
+    "title": "Consultations",
+    "checkpoint": "Checkpoint",
+    "selectCheckpoint": "Select a checkpoint",
+    "sessionType": "Session Type",
+    "internal": "Internal",
+    "external": "External",
+    "externalConsultantName": "External Consultant Name",
+    "consultantNamePlaceholder": "Enter consultant name",
+    "notes": "Notes",
+    "notesPlaceholder": "Describe the consultation session",
+    "logConsultation": "Log Consultation",
+    "previousSessions": "Previous Sessions",
+    "noConsultations": "No consultations logged yet",
+    "status": {
+      "pending": "Pending",
+      "verified": "Verified",
+      "rejected": "Rejected"
+    },
+    "consultationProgress": "Consultation Progress",
+    "verified": "verified",
+    "pendingVerification": "Pending Verification",
+    "noPendingConsultations": "No consultations pending verification",
+    "consultationDetail": "Consultation Detail",
+    "student": "Student",
+    "date": "Date",
+    "verify": "Verify",
+    "reject": "Reject",
+    "confirmReject": "Confirm Reject",
+    "rejectReason": "Rejection Reason",
+    "rejectReasonPlaceholder": "Enter reason for rejection"
   },
   "error": {
     "notFound": "Page not found",
