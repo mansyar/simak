@@ -84,10 +84,9 @@ export function DeadlineManager({ students, assignmentId }: DeadlineManagerProps
   const [error, setError] = useState<string | null>(null);
 
   // Unlock mutation
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const unlockMutation = useMutation<any, Error, number>({
+  const unlockMutation = useMutation({
     mutationFn: async (checkpointId: number) => {
-      const result: any = await unlockCheckpoint({ data: { checkpointId } });
+      const result = await (unlockCheckpoint as any)({ data: { checkpointId } });
       return result;
     },
     onSuccess: () => {
@@ -100,9 +99,15 @@ export function DeadlineManager({ students, assignmentId }: DeadlineManagerProps
   });
 
   // Extend deadline mutation
-  const extendMutation = useMutation<any, Error, { checkpointId: number; newDueDate: Date }>({
-    mutationFn: async ({ checkpointId, newDueDate }) => {
-      const result = await extendDeadline({ data: { checkpointId, newDueDate } });
+  const extendMutation = useMutation({
+    mutationFn: async ({
+      checkpointId,
+      newDueDate,
+    }: {
+      checkpointId: number;
+      newDueDate: Date;
+    }) => {
+      const result = await (extendDeadline as any)({ data: { checkpointId, newDueDate } });
       return result;
     },
     onSuccess: (_data, variables) => {

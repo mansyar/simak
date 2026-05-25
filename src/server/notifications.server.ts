@@ -41,11 +41,11 @@ export async function createNotificationHandler(args: { data: CreateNotification
         title,
         message: message || null,
         channel,
-        metadata: metadata || null,
+        metadata: (metadata as Record<string, unknown>) || null,
       })
       .returning();
 
-    return { notification };
+    return { notification: notification as any };
   } catch (err) {
     console.error('Failed to create notification:', err);
     return { error: 'Internal Server Error' };
@@ -88,7 +88,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
       .offset((page - 1) * limit);
 
     return {
-      items,
+      items: items as any,
       total: Number(count),
     };
   } catch (err) {
