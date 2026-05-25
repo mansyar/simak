@@ -32,7 +32,7 @@ interface EditTemplateSheetProps {
     id: number;
     name: string;
     type: string;
-    checkpoints: { id: number; name: string; order: number }[];
+    checkpoints: { id: number; name: string; order: number; minConsultations?: number | null }[];
     assignmentCount?: number;
   } | null;
   open: boolean;
@@ -51,12 +51,14 @@ export function EditTemplateSheet({
   const { t } = useI18n();
   const [serverError, setServerError] = useState<string | null>(null);
 
+  const defaultCheckpoint = () => ({ name: '', minConsultations: 0 });
+
   const form = useForm<EditTemplateFormValues>({
-    resolver: zodResolver(UpdateTemplateSchema),
+    resolver: zodResolver(UpdateTemplateSchema) as any,
     defaultValues: {
       name: '',
       type: '',
-      checkpoints: [''],
+      checkpoints: [defaultCheckpoint()],
     },
   });
 
@@ -66,7 +68,10 @@ export function EditTemplateSheet({
       form.reset({
         name: template.name,
         type: template.type,
-        checkpoints: template.checkpoints.map((cp) => cp.name),
+        checkpoints: template.checkpoints.map((cp) => ({
+          name: cp.name,
+          minConsultations: cp.minConsultations ?? 0,
+        })),
       });
       setServerError(null);
     }
@@ -76,7 +81,7 @@ export function EditTemplateSheet({
 
   const handleAddCheckpoint = useCallback(() => {
     const current = form.getValues('checkpoints');
-    form.setValue('checkpoints', [...current, ''], { shouldValidate: false });
+    form.setValue('checkpoints', [...current, defaultCheckpoint()], { shouldValidate: false });
   }, [form]);
 
   const handleRemoveCheckpoint = useCallback(
@@ -96,7 +101,17 @@ export function EditTemplateSheet({
     (index: number, value: string) => {
       const current = form.getValues('checkpoints');
       const updated = [...current];
-      updated[index] = value;
+      updated[index] = { ...updated[index], name: value };
+      form.setValue('checkpoints', updated, { shouldValidate: false });
+    },
+    [form],
+  );
+
+  const handleMinConsultationsChange = useCallback(
+    (index: number, value: number) => {
+      const current = form.getValues('checkpoints');
+      const updated = [...current];
+      updated[index] = { ...updated[index], minConsultations: value };
       form.setValue('checkpoints', updated, { shouldValidate: false });
     },
     [form],
@@ -213,6 +228,7 @@ export function EditTemplateSheet({
                       onAdd={handleAddCheckpoint}
                       onRemove={handleRemoveCheckpoint}
                       onChange={handleCheckpointChange}
+                      onMinConsultationsChange={handleMinConsultationsChange}
                       onMoveUp={handleMoveUp}
                       onMoveDown={handleMoveDown}
                       errors={checkpointValues.map((_, i) => checkpointErrors?.[i]?.message)}
