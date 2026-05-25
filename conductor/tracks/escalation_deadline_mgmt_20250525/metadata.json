@@ -1,8 +1,0 @@
-{
-  "track_id": "escalation_deadline_mgmt_20250525",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-05-25T19:05:00Z",
-  "updated_at": "2026-05-25T19:05:00Z",
-  "description": "Track 5.2 — Escalation & Deadline Management: Handle SLA breach notifications, overdue checkpoint unlocking, and automatic deadline adjustments when reviews are late."
-}

@@ -74,7 +74,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 1. Logs in and sees a dashboard with pending reviews and student progress summaries.
 2. Creates new assignments by selecting a template and assigning students.
 3. Reviews submissions from the review queue, providing pass/revise decisions with comments and optional feedback files.
-4. Manages deadlines — sets, extends, or unlocks overdue checkpoints.
+4. Manages deadlines — extends individual checkpoint due dates and unlocks overdue checkpoints via the collapsible Deadline Manager on the assignment detail page.
 5. Monitors student progress across assignments.
 6. Views and validates student consultation logs.
 

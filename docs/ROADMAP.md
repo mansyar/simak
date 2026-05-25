@@ -694,34 +694,55 @@ Instructor reviews submissions from the queue, marks pass or revise, and optiona
 
 **Dependencies:** Track 5.1 (review system works).
 
-**Domain-Specific Files to Create/Edit:**
+**✅ Status: COMPLETED** — Track has been archived.
 
-| File                                          | Purpose                                                                       |
-| --------------------------------------------- | ----------------------------------------------------------------------------- |
-| `src/server/notifications.ts`                 | **Edit:** Add `sla_breach` notification creation                              |
-| `src/server/assignments.ts`                   | **Edit:** Add `unlockCheckpoint` (instructor manual unlock), `extendDeadline` |
-| `src/components/reviews/deadline-manager.tsx` | Dialog for instructor to extend deadlines or unlock checkpoints               |
-| `src/components/reviews/sla-info.tsx`         | SLA status display on assignment detail showing breach history                |
+**Actual Files Created/Modified:**
 
-**Tests to Add:**
+| File                                                         | Purpose                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/server/notifications.ts`                                | **New:** Zod schemas (`CreateNotificationSchema`, `ListNotificationsSchema`), `createServerFn` stubs (`createNotification`, `listNotifications`)                                                                                                                 |
+| `src/server/notifications.server.ts`                         | **New:** Server-only handlers: `createNotificationHandler` (inserts into notifications table), `listNotificationsHandler` (paginated, type-filtered)                                                                                                             |
+| `src/lib/email.ts`                                           | **Modified:** Added `sendSLAAlertEmail()` — SIMAK-branded HTML email template for SLA breach alerts                                                                                                                                                              |
+| `src/server/reviews.server.ts`                               | **Modified:** `submitReviewHandler` now calculates breach duration after review submission; if breach > 0, extends affected + subsequent checkpoint `dueDate` values and assignment `finalDeadline`; creates `sla_breach` in-app + email notifications per Admin |
+| `src/server/assignments.ts`                                  | **Modified:** Added `UnlockCheckpointSchema`, `ExtendDeadlineSchema`, `unlockCheckpoint` stub, `extendDeadline` stub                                                                                                                                             |
+| `src/server/assignments.server.ts`                           | **Modified:** Added `unlockCheckpointHandler` (ownership-verified, locked→unlocked transition), `extendDeadlineHandler` (ownership-verified, any state allowed)                                                                                                  |
+| `src/components/reviews/DeadlineManager.tsx`                 | **New:** Collapsible per-student section with Unlock button (confirmation dialog) and Extend Deadline date picker; TanStack Query mutations for unlock and extend                                                                                                |
+| `src/routes/_authenticated/instructor/assignments/$id.tsx`   | **Modified:** Added `<DeadlineManager>` component below ProgressTable; passes `assignment.students` and `assignment.id`                                                                                                                                          |
+| `locales/en.json` / `locales/id.json`                        | **Modified:** Added `deadlineManager` i18n section (9 keys: title, empty, unlock, unlockConfirm, unlockWarning, unlockError, extend, extendError, currentDeadline)                                                                                               |
+| `conductor/tracks/escalation_deadline_mgmt_20250525/plan.md` | Track plan with 3 phases, 5 tasks, 10 commits                                                                                                                                                                                                                    |
+| `conductor/tracks/escalation_deadline_mgmt_20250525/spec.md` | Track specification with FR-1 through FR-4                                                                                                                                                                                                                       |
+| `conductor/product.md`                                       | **Modified:** Added Completed Tracks entry for Track 5.2                                                                                                                                                                                                         |
 
-- `tests/unit/reviews/sla-calculation.test.ts` — Verify SLA breach detection and deadline adjustment math
+**Tests Added:**
 
-**Definition of Done:**
+| File                                                      | Tests | Description                                                                                                                                                                                                                                                     |
+| --------------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/unit/reviews/sla-calculation.test.ts`              | 5     | `calculateBreachDuration`: on-time returns 0, late returns positive, exactly 3 days, milliseconds precision, no timestamp                                                                                                                                       |
+| `tests/unit/reviews/deadline-adjustment.test.ts`          | 5     | Deadline adjustment: on-time no change, late extends affected, late extends subsequent, extends finalDeadline, per-student scoping                                                                                                                              |
+| `tests/unit/server/notifications.test.ts`                 | 3     | `createNotification` inserts rows, email channel for sla_breach, `listNotifications` filters by type                                                                                                                                                            |
+| `tests/unit/email/sla-breach-email.test.ts`               | 1     | `sendSLAAlertEmail` sends with correct recipient, subject, content                                                                                                                                                                                              |
+| `tests/unit/reviews/sla-integration.test.ts`              | 2     | Full flow: late review triggers notification + email + deadline adjustment; on-time review does nothing                                                                                                                                                         |
+| `tests/unit/assignments/unlock-checkpoint.test.ts`        | 13    | Zod schema validation (4), stub export (1), handler: unlock success, already-unlocked error, already-passed error, not-found, non-owner, non-instructor, unauthenticated, updatedAt verification (8)                                                            |
+| `tests/unit/assignments/extend-deadline.test.ts`          | 14    | Zod schema validation (6), stub export (1), handler: extend success, dueDate/updatedAt update, not-found, non-owner, non-instructor, unauthenticated, extend any state (7)                                                                                      |
+| `tests/unit/components/reviews/deadline-manager.test.tsx` | 15    | Heading render, student list, Unlock button for locked only, no Unlock for passed/unlocked, confirmation dialog, unlockCheckpoint call, extend date inputs, disabled/enabled extend, extendDeadline call, loading, error, empty, state badges, current deadline |
+| `tests/unit/routes/instructor-assignment-detail.test.tsx` | 5     | DeadlineManager render with data, student names visible, assignmentId passed, empty students, heading icon/title                                                                                                                                                |
 
-- When review exceeds 3-day SLA, an `sla_breach` notification is sent to Admin
-- Student's deadlines are automatically extended by the breach duration
-- Instructor can manually unlock an overdue checkpoint
-- Instructor can extend individual checkpoint due dates
-- SLA breach notifications are visible in the admin's notification center
+**Differences from Original Spec:**
 
-**Acceptance Criteria:**
+- **`sla-info.tsx` not created**: The SLA info was already provided by the `SLABadge` component created in Track 5.1. No additional SLA info component was needed on the assignment detail page.
+- **Notification module split**: `src/server/notifications.ts` (client stubs) + `src/server/notifications.server.ts` (server handlers), following the established pattern from Track 2.x/3.x.
+- **`sendSLAAlertEmail` as separate function**: Added to `src/lib/email.ts` as a standalone export alongside `sendPasswordResetEmail` and `sendInvitationEmail` — keeps concerns separated.
+- **Server/client file split**: Follows the established pattern — `assignments.ts` (client-safe stubs + Zod schemas) and `assignments.server.ts` (server-only handlers with DB imports).
+- **Collapsible UI**: Instead of a separate page, the DeadlineManager is a collapsible section on the existing assignment detail page — progressive disclosure, matching the product's UX principles.
+- **Date input for extension**: Uses native `<input type="date">` instead of a shadcn date picker component (which wasn't installed in the project). Simpler and avoids adding a dependency.
 
-- [ ] SLA breach notification appears in admin's notification center when 3 days pass without review
-- [ ] Student's checkpoint deadlines are extended by the number of days the review was delayed
-- [ ] Instructor can unlock an overdue (locked) checkpoint from the assignment detail page
-- [ ] Instructor can extend a specific checkpoint's due date
-- [ ] Extension changes reflect immediately in the student's view
+**Test Results (at time of archiving):**
+
+- 622/622 tests passing across 89 test files (all prior tests + 63 new tests)
+- TypeScript typecheck passes with no errors
+- eslint/prettier/lint-staged pass on all new files
+- All new files under 500-line modularity limit
+- Review fixes applied: removed unused `Unlock` icon import, fixed silently-passing test assertion
 
 ---
 

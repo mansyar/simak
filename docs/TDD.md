@@ -99,7 +99,7 @@ simak/
 │   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton
 │   │   ├── instructor/
 │   │   │   └── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
-│   │   ├── reviews/          → Review dialog, review queue, feedback upload
+│   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager
 │   │   ├── consultations/    → Log form, verification badge, progress bar
 │   │   ├── files/            → File upload, preview, file list
 │   │   ├── notifications/    → Notification center, badge
@@ -115,6 +115,7 @@ simak/
 │   │   ├── reviews.ts        → Review, pass/revise
 │   │   ├── consultations.ts  → Log, verify
 │   │   ├── notifications.ts  → Create, fetch, mark read
+│   │   ├── notifications.server.ts → Server-only notification handlers
 │   │   ├── templates.ts      → Template CRUD
 │   │   ├── templates.server.ts → Server-only template handlers
 │   │   ├── setup-password.ts → Custom password setup handler
