@@ -149,3 +149,14 @@ Students and instructors lack a centralized system to:
 - **Database indexes** — `assignments_instructor_id_idx` and `checkpoints_state_assignment_id_idx` for review queue query performance
 - **Student page wiring** — Student submission page fetches real review data via `getLatestReview`, replacing the `null` stub
 - **i18n translations** — Full English and Indonesian translations for review queue, detail page, decision form, and SLA badges
+
+### Track 5.2: Escalation & Deadline Management (May 2026)
+
+- **SLA breach detection** — `submitReview` handler calculates breach duration after the 3-day SLA; triggers notifications and deadline adjustments
+- **Automatic deadline adjustment** — Late reviews extend affected + subsequent checkpoint `dueDate` values and assignment `finalDeadline` by breach duration (per-student)
+- **Admin notifications** — `sla_breach` in-app + email notifications (via Resend) sent to all Admins
+- **Manual checkpoint unlock** — Server function transitions `locked` → `unlocked` regardless of blocking reasons; instructor-only, ownership-verified
+- **Manual deadline extension** — Server function updates any checkpoint's `dueDate`; no state restriction; instructor-only, ownership-verified
+- **DeadlineManager UI** — Collapsible per-student section on `/instructor/assignments/$id` with Unlock button (confirmation dialog) and Extend Deadline date picker
+- **TanStack Query mutations** — `unlockCheckpoint` and `extendDeadline` via `useMutation` with loading and error states
+- **i18n translations** — Full English and Indonesian translations for the Deadline Manager UI
