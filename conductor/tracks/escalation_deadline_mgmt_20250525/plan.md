@@ -55,7 +55,7 @@
 - [x] Ensure i18n keys added for SLA-related UI strings (if any appear in notifications) — already present in both EN/ID locales (slaBreached, slaOnTime, etc.)
 - [x] Task: Conductor — Phase Completion Verification (Protocol in workflow.md) [fb54c1b]
 
-## Phase 2: Manual Deadline Management (Server)
+## Phase 2: Manual Deadline Management (Server) [checkpoint: 4bd9239]
 
 ### Task 2.1 — Unlock Checkpoint Server Function
 
@@ -85,6 +85,7 @@
   - Update checkpoint `dueDate` and `updatedAt`
   - No state restriction — can extend any checkpoint (locked, unlocked, submitted, revise)
 - [x] All 14 tests pass [bcc78de]
+- [x] Task: Conductor — Phase Completion Verification (Protocol in workflow.md) [4bd9239]
 
 ## Phase 3: Deadline Manager UI
 
