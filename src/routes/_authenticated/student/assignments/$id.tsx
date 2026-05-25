@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import { createFileRoute, Link, Outlet, useMatchRoute } from '@tanstack/react-router';
 import { getStudentAssignmentDetail } from '@/server/assignments';
+import { listConsultations, listVerifiedCounts } from '@/server/consultations';
 import { AssignmentDetailHeader } from '@/components/student/assignments/AssignmentDetailHeader';
 import { CheckpointTimeline } from '@/components/student/assignments/CheckpointTimeline';
 import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
+import { ConsultationForm } from '@/components/consultations/ConsultationForm';
+import { ConsultationList } from '@/components/consultations/ConsultationList';
+import { ConsultationProgress } from '@/components/consultations/ConsultationProgress';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
@@ -45,6 +50,31 @@ function AssignmentDetailPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData() as any;
   const matchRoute = useMatchRoute();
+  const [consultations, setConsultations] = useState<any[]>([]);
+  const [verifiedCounts, setVerifiedCounts] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'timeline' | 'consultations'>('timeline');
+
+  // Load consultation data on mount
+  useState(() => {
+    if (data) {
+      const loadConsultations = async () => {
+        const consResult = await (listConsultations as any)({
+          data: { assignmentId: data.id },
+        });
+        if (consResult.consultations) {
+          setConsultations(consResult.consultations);
+        }
+
+        const countsResult = await (listVerifiedCounts as any)({
+          data: { assignmentId: data.id },
+        });
+        if (countsResult.counts) {
+          setVerifiedCounts(countsResult.counts);
+        }
+      };
+      loadConsultations();
+    }
+  });
 
   // If a child route is active (e.g., /checkpoints/:checkpointId), render it via Outlet
   // The child route (submission page) has its own full layout and back navigation
@@ -79,6 +109,23 @@ function AssignmentDetailPage() {
     blockingReasons: cp.blockingReasons,
   }));
 
+  const handleConsultationSuccess = async () => {
+    // Refresh consultation data
+    const consResult = await (listConsultations as any)({
+      data: { assignmentId: data.id },
+    });
+    if (consResult.consultations) {
+      setConsultations(consResult.consultations);
+    }
+
+    const countsResult = await (listVerifiedCounts as any)({
+      data: { assignmentId: data.id },
+    });
+    if (countsResult.counts) {
+      setVerifiedCounts(countsResult.counts);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -98,9 +145,64 @@ function AssignmentDetailPage() {
 
       <AssignmentDetailHeader detail={detail} />
 
-      <div className="border-t pt-6">
-        <CheckpointTimeline checkpoints={checkpoints} assignmentId={data.id} />
+      {/* Tab Navigation */}
+      <div className="border-b border-border">
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={() => setActiveTab('timeline')}
+            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'timeline'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {t('studentAssignments.checkpointTimeline')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('consultations')}
+            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'consultations'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {t('consultations.title')}
+          </button>
+        </div>
       </div>
+
+      {/* Tab Content */}
+      {activeTab === 'timeline' && (
+        <div className="border-t pt-6">
+          <CheckpointTimeline checkpoints={checkpoints} assignmentId={data.id} />
+        </div>
+      )}
+
+      {activeTab === 'consultations' && (
+        <div className="space-y-6">
+          <ConsultationProgress counts={verifiedCounts} />
+
+          <div className="rounded-lg border bg-card p-5 shadow-sm">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
+              {t('consultations.logConsultation')}
+            </h3>
+            <ConsultationForm
+              assignmentId={data.id}
+              checkpoints={checkpoints.map((cp: any) => ({ id: cp.id, name: cp.name }))}
+              onSuccess={handleConsultationSuccess}
+            />
+          </div>
+
+          <div className="rounded-lg border bg-card p-5 shadow-sm">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
+              {t('consultations.previousSessions')}
+            </h3>
+            <ConsultationList consultations={consultations} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
