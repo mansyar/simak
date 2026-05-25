@@ -13,19 +13,19 @@
 
 ## Phase 2: Server Functions — Templates Update
 
-- [ ] Task: Update Zod schemas for template CRUD to include minConsultations
-  - [ ] Update `CreateTemplateSchema` — add `minConsultations: z.number().int().min(0).default(0)` to each checkpoint in the array
-  - [ ] Update `UpdateTemplateSchema` — same addition
-  - [ ] Update type inference files
-- [ ] Task: Update template server handlers
-  - [ ] Update `createTemplateHandler` to persist `minConsultations` to `template_checkpoints`
-  - [ ] Update `updateTemplateHandler` to persist `minConsultations` to `template_checkpoints`
-  - [ ] Update `getTemplateHandler` and `listTemplatesHandler` to return `minConsultations`
-- [ ] Task: Update assignment creation to copy minConsultations
-  - [ ] Update `createAssignment` handler in `assignments.server.ts` — copy `minConsultations` from `template_checkpoints` to each `checkpoint` row
-- [ ] Task: Write tests for template minConsultations
-  - [ ] Write unit tests for create/update template with minConsultations
-  - [ ] Write unit test verifying assignment creation copies minConsultations
+- [x] Task: Update Zod schemas for template CRUD to include minConsultations (becbb4e)
+  - [x] Update `CreateTemplateSchema` — add `minConsultations: z.number().int().min(0).default(0)` to each checkpoint in the array
+  - [x] Update `UpdateTemplateSchema` — same addition
+  - [x] Update type inference files
+- [x] Task: Update template server handlers (becbb4e)
+  - [x] Update `createTemplateHandler` to persist `minConsultations` to `template_checkpoints`
+  - [x] Update `updateTemplateHandler` to persist `minConsultations` to `template_checkpoints`
+  - [x] Update `getTemplateHandler` and `listTemplatesHandler` to return `minConsultations`
+- [x] Task: Update assignment creation to copy minConsultations (becbb4e)
+  - [x] Update `createAssignment` handler in `assignments.server.ts` — copy `minConsultations` from `template_checkpoints` to each `checkpoint` row
+- [x] Task: Write tests for template minConsultations (becbb4e)
+  - [x] Write unit tests for create/update template with minConsultations
+  - [x] Write unit test verifying assignment creation copies minConsultations
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions — Templates Update' (Protocol in workflow.md)
 
 ## Phase 3: Server Functions — Consultation CRUD
