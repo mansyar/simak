@@ -74,18 +74,17 @@
 
 ### Task 2.2 — Extend Deadline Server Function
 
-- [ ] Write failing tests (`tests/unit/assignments/extend-deadline.test.ts`) for:
-  - Instructor can extend a checkpoint's dueDate in their own assignment
-  - New date must be in the future (validation error for past dates)
-  - Non-owner instructor receives authorization error
-  - Can extend any checkpoint (locked, unlocked, submitted — not just locked)
-- [ ] Add Zod schema `ExtendDeadlineSchema` to `src/server/assignments.ts`
-- [ ] Add server function stub `extendDeadline` to `src/server/assignments.ts`
-- [ ] Implement `extendDeadlineHandler` in `src/server/assignments.server.ts`:
+- [x] Write failing tests (`tests/unit/assignments/extend-deadline.test.ts`) — 14 tests total: 6 schema, 1 stub, 7 handler
+  - Schema validation: valid id+future date, non-positive, missing, non-integer, past date, missing newDueDate
+  - Stub export
+  - Handler: extend success, dueDate/updatedAt update, not-found, non-owner, non-instructor, unauthenticated, extend any state
+- [x] Add Zod schema `ExtendDeadlineSchema` to `src/server/assignments.ts`
+- [x] Add server function stub `extendDeadline` to `src/server/assignments.ts`
+- [x] Implement `extendDeadlineHandler` in `src/server/assignments.server.ts`:
   - Verify assignment ownership (via checkpoint -> assignment join)
   - Update checkpoint `dueDate` and `updatedAt`
-- [ ] Verify all tests pass
-- [ ] Task: Conductor — Phase Completion Verification (Protocol in workflow.md)
+  - No state restriction — can extend any checkpoint (locked, unlocked, submitted, revise)
+- [x] All 14 tests pass [bcc78de]
 
 ## Phase 3: Deadline Manager UI
 
