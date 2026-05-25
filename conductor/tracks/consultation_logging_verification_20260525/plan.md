@@ -28,7 +28,7 @@
   - [x] Write unit test verifying assignment creation copies minConsultations
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Server Functions — Templates Update' (Protocol in workflow.md)
 
-## Phase 3: Server Functions — Consultation CRUD
+## Phase 3: Server Functions — Consultation CRUD [checkpoint: 19ec848]
 
 - [x] Task: Create Zod schemas and server function stubs (`src/server/consultations.ts`) (014e2ec)
   - [x] Define `LogConsultationSchema` (checkpointId, sessionType, externalConsultantName optional, notes)
@@ -54,7 +54,7 @@
   - [x] Unit tests for `verifyConsultation` — success, already verified, not found
   - [x] Unit tests for `rejectConsultation` — success, requires reason
   - [x] Unit tests for `listVerifiedCounts` — correct aggregation
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Server Functions — Consultation CRUD' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Server Functions — Consultation CRUD' (Protocol in workflow.md)
 
 ## Phase 4: Server Functions — Gating Integration
 
