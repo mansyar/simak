@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { getAssignmentDetail } from '@/server/assignments';
 import { ProgressTable } from '@/components/instructor/assignments/ProgressTable';
+import { DeadlineManager } from '@/components/reviews/DeadlineManager';
 import { Calendar, Users, Clipboard, ArrowLeft, Percent, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useI18n } from '../../../__root';
-import { Button } from '@/components/ui/button';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id')({
   loader: async ({ params }) => {
@@ -183,6 +183,9 @@ function AssignmentDetailPage() {
         </div>
         <ProgressTable students={assignment.students} />
       </div>
+
+      {/* Deadline Manager */}
+      <DeadlineManager students={assignment.students} assignmentId={assignment.id} />
     </div>
   );
 }
