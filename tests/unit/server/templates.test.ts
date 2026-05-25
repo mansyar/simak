@@ -34,20 +34,35 @@ vi.mock('@tanstack/react-start', () => ({
 
 describe('Template server functions - Schemas', () => {
   describe('CreateTemplateSchema', () => {
-    it('should accept valid input', () => {
+    it('should accept valid input with defaults', () => {
       const result = CreateTemplateSchema.safeParse({
         name: 'Thesis Template',
         type: 'Thesis',
-        checkpoints: ['Chapter 1', 'Chapter 2', 'Chapter 3'],
+        checkpoints: [{ name: 'Chapter 1' }, { name: 'Chapter 2' }, { name: 'Chapter 3' }],
       });
       expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.checkpoints[0]).toEqual({ name: 'Chapter 1', minConsultations: 0 });
+      }
+    });
+
+    it('should accept explicit minConsultations', () => {
+      const result = CreateTemplateSchema.safeParse({
+        name: 'Thesis Template',
+        type: 'Thesis',
+        checkpoints: [{ name: 'Chapter 1', minConsultations: 3 }],
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.checkpoints[0].minConsultations).toBe(3);
+      }
     });
 
     it('should reject empty name', () => {
       const result = CreateTemplateSchema.safeParse({
         name: '',
         type: 'Thesis',
-        checkpoints: ['Chapter 1'],
+        checkpoints: [{ name: 'Chapter 1' }],
       });
       expect(result.success).toBe(false);
     });
@@ -56,7 +71,7 @@ describe('Template server functions - Schemas', () => {
       const result = CreateTemplateSchema.safeParse({
         name: 'Thesis',
         type: '',
-        checkpoints: ['Chapter 1'],
+        checkpoints: [{ name: 'Chapter 1' }],
       });
       expect(result.success).toBe(false);
     });
@@ -74,9 +89,21 @@ describe('Template server functions - Schemas', () => {
       const result = CreateTemplateSchema.safeParse({
         name: 'Thesis',
         type: 'Thesis',
-        checkpoints: ['Chapter 1', ''],
+        checkpoints: [{ name: 'Chapter 1' }, { name: '' }],
       });
       expect(result.success).toBe(false);
+    });
+
+    it('should coerce string minConsultations to number', () => {
+      const result = CreateTemplateSchema.safeParse({
+        name: 'Thesis',
+        type: 'Thesis',
+        checkpoints: [{ name: 'Ch 1', minConsultations: '5' }],
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.checkpoints[0].minConsultations).toBe(5);
+      }
     });
   });
 
@@ -173,7 +200,7 @@ describe('Template server functions - Logic & Security', () => {
     const createData = {
       name: 'Thesis Template',
       type: 'Thesis',
-      checkpoints: ['Chapter 1', 'Chapter 2'],
+      checkpoints: [{ name: 'Chapter 1', minConsultations: 0 }, { name: 'Chapter 2', minConsultations: 0 }],
     };
 
     it('should fail if unauthorized', async () => {
@@ -346,7 +373,7 @@ describe('Template server functions - Logic & Security', () => {
     const updateData = {
       name: 'Updated Template',
       type: 'Thesis',
-      checkpoints: ['New Ch 1', 'New Ch 2'],
+      checkpoints: [{ name: 'New Ch 1', minConsultations: 0 }, { name: 'New Ch 2', minConsultations: 0 }],
     };
 
     it('should fail if unauthorized', async () => {

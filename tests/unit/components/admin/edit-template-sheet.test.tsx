@@ -202,12 +202,12 @@ describe('EditTemplateSheet', () => {
   it('should validate UpdateTemplateSchema correctly', () => {
     // Valid
     expect(
-      UpdateTemplateSchema.safeParse({ name: 'Test', type: 'Thesis', checkpoints: ['Ch1'] })
+      UpdateTemplateSchema.safeParse({ name: 'Test', type: 'Thesis', checkpoints: [{ name: 'Ch1' }] })
         .success,
     ).toBe(true);
     // Empty name
     expect(
-      UpdateTemplateSchema.safeParse({ name: '', type: 'Thesis', checkpoints: ['Ch1'] }).success,
+      UpdateTemplateSchema.safeParse({ name: '', type: 'Thesis', checkpoints: [{ name: 'Ch1' }] }).success,
     ).toBe(false);
     // No checkpoints
     expect(

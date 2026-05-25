@@ -153,6 +153,7 @@ export async function getTemplateHandler(args: { data: TemplateIdParam }) {
       id: templateCheckpoints.id,
       name: templateCheckpoints.name,
       order: templateCheckpoints.order,
+      minConsultations: templateCheckpoints.minConsultations,
     })
     .from(templateCheckpoints)
     .where(eq(templateCheckpoints.templateId, id))
@@ -181,10 +182,11 @@ export async function createTemplateHandler(args: { data: CreateTemplateInput })
     .then((rows: any) => rows);
 
   // Insert checkpoint rows with sequential order
-  const checkpointRows = checkpoints.map((checkpointName, index) => ({
+  const checkpointRows = checkpoints.map((cp, index) => ({
     templateId: inserted.id,
-    name: checkpointName,
+    name: cp.name,
     order: index + 1,
+    minConsultations: cp.minConsultations ?? 0,
   }));
 
   await db.insert(templateCheckpoints).values(checkpointRows);
@@ -213,10 +215,11 @@ export async function updateTemplateHandler(args: { data: UpdateTemplateInput & 
   // Replace all checkpoint rows (delete old, insert new) in sequence
   await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, id));
 
-  const checkpointRows = checkpoints.map((checkpointName, index) => ({
+  const checkpointRows = checkpoints.map((cp, index) => ({
     templateId: id,
-    name: checkpointName,
+    name: cp.name,
     order: index + 1,
+    minConsultations: cp.minConsultations ?? 0,
   }));
 
   await db.insert(templateCheckpoints).values(checkpointRows);
@@ -306,7 +309,11 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
 
   // Fetch original checkpoints and copy them
   const originalCheckpoints = await db
-    .select({ name: templateCheckpoints.name, order: templateCheckpoints.order })
+    .select({
+      name: templateCheckpoints.name,
+      order: templateCheckpoints.order,
+      minConsultations: templateCheckpoints.minConsultations,
+    })
     .from(templateCheckpoints)
     .where(eq(templateCheckpoints.templateId, id))
     .orderBy(templateCheckpoints.order);
@@ -315,6 +322,7 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
     templateId: inserted.id,
     name: cp.name,
     order: cp.order,
+    minConsultations: cp.minConsultations ?? 0,
   }));
 
   await db.insert(templateCheckpoints).values(checkpointRows);

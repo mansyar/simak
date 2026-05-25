@@ -68,6 +68,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
         .select({
           name: templateCheckpoints.name,
           order: templateCheckpoints.order,
+          minConsultations: templateCheckpoints.minConsultations,
         })
         .from(templateCheckpoints)
         .where(eq(templateCheckpoints.templateId, templateId))
@@ -83,7 +84,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
               studentId,
               name: tcp.name,
               order: tcp.order,
-              minConsultations: 0, // default is 0 or copied
+              minConsultations: tcp.minConsultations ?? 0,
               state: tcp.order === 1 ? ('unlocked' as const) : ('locked' as const),
             });
           });

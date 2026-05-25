@@ -3,11 +3,16 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 
+export const CheckpointInputSchema = z.object({
+  name: z.string().min(1, 'Checkpoint name is required'),
+  minConsultations: z.coerce.number().int().min(0).default(0),
+});
+
 export const CreateTemplateSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   type: z.string().min(1, 'Type is required'),
   checkpoints: z
-    .array(z.string().min(1, 'Checkpoint name is required'))
+    .array(CheckpointInputSchema)
     .min(1, 'At least one checkpoint is required'),
 });
 
@@ -15,7 +20,7 @@ export const UpdateTemplateSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   type: z.string().min(1, 'Type is required'),
   checkpoints: z
-    .array(z.string().min(1, 'Checkpoint name is required'))
+    .array(CheckpointInputSchema)
     .min(1, 'At least one checkpoint is required'),
 });
 
