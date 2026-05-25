@@ -4,21 +4,21 @@
 
 **Objective:** Add the three missing server functions with Zod schemas, stubs, handlers, and TDD tests.
 
-- [ ] Task: Write failing tests for new notification server functions (Red Phase)
-  - [ ] Write tests for `MarkReadSchema` — valid/invalid inputs
-  - [ ] Write tests for `MarkAllReadSchema` — valid/invalid inputs
-  - [ ] Write tests for `GetUnreadCountSchema` — valid/invalid inputs
-  - [ ] Write tests for `markReadHandler` — verifies single notification marked as read, ownership check
-  - [ ] Write tests for `markAllReadHandler` — verifies all unread notifications marked as read for current user
-  - [ ] Write tests for `getUnreadCountHandler` — verifies correct unread count returned
-  - [ ] Run tests and confirm they fail
-- [ ] Task: Implement new notification server functions (Green Phase)
-  - [ ] Add `MarkReadSchema`, `MarkAllReadSchema`, `GetUnreadCountSchema` to `src/server/notifications.ts`
-  - [ ] Add `markRead`, `markAllRead`, `getUnreadCount` server function stubs with dynamic imports
-  - [ ] Implement `markReadHandler` in `notifications.server.ts` — validates ownership, updates `read` to true
-  - [ ] Implement `markAllReadHandler` — updates all unread notifications for session user
-  - [ ] Implement `getUnreadCountHandler` — `COUNT(*) WHERE userId = ? AND read = false`
-  - [ ] Re-run tests and confirm they pass
+- [x] Task: Write failing tests for new notification server functions (Red Phase)
+  - [x] Write tests for `MarkReadSchema` — valid/invalid inputs
+  - [x] Write tests for `MarkAllReadSchema` — valid/invalid inputs
+  - [x] Write tests for `GetUnreadCountSchema` — valid/invalid inputs
+  - [x] Write tests for `markReadHandler` — verifies single notification marked as read, ownership check
+  - [x] Write tests for `markAllReadHandler` — verifies all unread notifications marked as read for current user
+  - [x] Write tests for `getUnreadCountHandler` — verifies correct unread count returned
+  - [x] Run tests and confirm they fail
+- [x] Task: Implement new notification server functions (Green Phase) [33fc349]
+  - [x] Add `MarkReadSchema`, `MarkAllReadSchema`, `GetUnreadCountSchema` to `src/server/notifications.ts`
+  - [x] Add `markRead`, `markAllRead`, `getUnreadCount` server function stubs with dynamic imports
+  - [x] Implement `markReadHandler` in `notifications.server.ts` — validates ownership, updates `read` to true
+  - [x] Implement `markAllReadHandler` — updates all unread notifications for session user
+  - [x] Implement `getUnreadCountHandler` — `COUNT(*) WHERE userId = ? AND read = false`
+  - [x] Re-run tests and confirm they pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Complete Server Functions' (Protocol in workflow.md)
 
 ## Phase 2 — Event Trigger Integration
