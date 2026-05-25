@@ -150,6 +150,18 @@ Students and instructors lack a centralized system to:
 - **Student page wiring** — Student submission page fetches real review data via `getLatestReview`, replacing the `null` stub
 - **i18n translations** — Full English and Indonesian translations for review queue, detail page, decision form, and SLA badges
 
+### Track 6.1: Consultation Logging & Verification (May 2026)
+
+- **Consultation CRUD server functions** — 7 server functions (`logConsultation`, `listConsultations`, `listPendingConsultations`, `verifyConsultation`, `rejectConsultation`, `getConsultationDetail`, `listVerifiedCounts`) with role-based access (student for logging, instructor for verification)
+- **Student consultation UI** — Tab on `/student/assignments/$id` with ConsultationForm (checkpoint selector, session type internal/external, notes), ConsultationList (status badges: pending/verified/rejected), and ConsultationProgress (X/Y verified progress bars per checkpoint + summary)
+- **Instructor verification UI** — Tab on `/instructor/assignments/$id` with VerificationQueueItem (pending queue, FIFO order, count badge) and VerificationDialog (full detail display, verify/reject actions with reason input)
+- **Submission gating** — `submitCheckpointHandler` checks `verified consultations >= minConsultations` before allowing submission; returns descriptive error if insufficient
+- **Unlock gating** — `submitReviewHandler` checks consultation requirements before unlocking next checkpoint; keeps locked if insufficient verified consultations
+- **In-app notifications** — `consultation_logged` → instructor, `consultation_verified` → student, `consultation_rejected` → student with reason
+- **Template minConsultations** — Added `min_consultations` (integer, default 0) to `template_checkpoints` table; CheckpointListEditor now includes number input per checkpoint row; `createAssignmentHandler` copies from template
+- **i18n translations** — Full English and Indonesian translations for consultation UI (form, list, progress, verification dialog, status badges, gating error messages)
+- **Database migration** — New column `min_consultations` on `template_checkpoints` with migration `0003_consultation_min_consultations.sql`
+
 ### Track 5.2: Escalation & Deadline Management (May 2026)
 
 - **SLA breach detection** — `submitReview` handler calculates breach duration after the 3-day SLA; triggers notifications and deadline adjustments
