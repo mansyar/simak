@@ -41,19 +41,19 @@
 
 ### Task 1.4 — SLA Breach Email & Integration
 
-- [ ] Write failing tests (`tests/unit/email/sla-breach-email.test.ts`) for:
+- [x] Write failing tests (`tests/unit/email/sla-breach-email.test.ts`) for:
   - `sendSLAAlertEmail` sends with correct recipient, subject, and content
-- [ ] Add `sendSLAAlertEmail` to `src/lib/email.ts` with SIMAK-branded HTML template
-- [ ] Write failing integration tests for the full flow:
+- [x] Add `sendSLAAlertEmail` to `src/lib/email.ts` with SIMAK-branded HTML template
+- [x] Write failing integration tests for the full flow:
   - `tests/unit/reviews/sla-integration.test.ts` — Late review triggers in-app notification + email + deadline adjustment
   - No notifications/emails for on-time reviews
-- [ ] Wire SLA breach into `submitReviewHandler`:
+- [x] Wire SLA breach into `submitReviewHandler`:
   - After deadline adjustment, query Admin users
   - Create `sla_breach` in-app notification per Admin
   - Create `sla_breach` email notification per Admin and call `sendSLAAlertEmail`
-- [ ] Verify all tests pass
-- [ ] Ensure i18n keys added for SLA-related UI strings (if any appear in notifications)
-- [ ] Task: Conductor — Phase Completion Verification (Protocol in workflow.md)
+- [x] Verify all tests pass
+- [x] Ensure i18n keys added for SLA-related UI strings (if any appear in notifications) — already present in both EN/ID locales (slaBreached, slaOnTime, etc.)
+- [x] Task: Conductor — Phase Completion Verification (Protocol in workflow.md) [fb54c1b]
 
 ## Phase 2: Manual Deadline Management (Server)
 
