@@ -18,5 +18,6 @@ export const templateCheckpoints = pgTable('template_checkpoints', {
     .references(() => assignmentTemplates.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   order: integer('order').notNull(),
+  minConsultations: integer('min_consultations').default(0),
   createdAt: timestamp('created_at').defaultNow(),
 });
