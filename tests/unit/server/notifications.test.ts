@@ -4,9 +4,33 @@ import { z } from 'zod';
 import {
   CreateNotificationSchema,
   ListNotificationsSchema,
+  MarkReadSchema,
+  MarkAllReadSchema,
+  GetUnreadCountSchema,
   createNotification,
   listNotifications,
 } from '@/server/notifications';
+import {
+  markReadHandler,
+  markAllReadHandler,
+  getUnreadCountHandler,
+} from '@/server/notifications.server';
+import * as auth from '@/server/auth';
+import * as dbMod from '@/db/index';
+
+vi.mock('@/server/auth', () => ({
+  getSessionFromHeaders: vi.fn(),
+}));
+
+vi.mock('@/db/index', () => ({
+  getDb: vi.fn(),
+}));
+
+vi.mock('@tanstack/react-start', () => ({
+  createServerFn: vi.fn().mockReturnValue({
+    handler: vi.fn().mockImplementation((fn) => fn),
+  }),
+}));
 
 // Schema validation tests
 describe('Notification schemas', () => {
@@ -106,5 +130,170 @@ describe('Notification server function stubs', () => {
 
   it('should export listNotifications as a function', () => {
     expect(typeof listNotifications).toBe('function');
+  });
+});
+
+// New schema tests for Phase 1
+describe('New notification schemas', () => {
+  describe('MarkReadSchema', () => {
+    it('should accept valid notification ID', () => {
+      const result = MarkReadSchema.safeParse({ notificationId: 1 });
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject non-numeric notificationId', () => {
+      const result = MarkReadSchema.safeParse({ notificationId: 'abc' });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject negative notificationId', () => {
+      const result = MarkReadSchema.safeParse({ notificationId: -1 });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('MarkAllReadSchema', () => {
+    it('should accept empty input', () => {
+      const result = MarkAllReadSchema.safeParse({});
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe('GetUnreadCountSchema', () => {
+    it('should accept empty input', () => {
+      const result = GetUnreadCountSchema.safeParse({});
+      expect(result.success).toBe(true);
+    });
+  });
+});
+
+// Handler tests for Phase 1
+describe('Notification handlers', () => {
+  let mockDb: any;
+  const userSession = {
+    user: { id: 'user-1', role: 'student' as const },
+    session: {} as any,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb = {
+      select: vi.fn().mockReturnThis(),
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      offset: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      set: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      values: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockReturnThis(),
+      then: vi.fn(function (onfulfilled: any) {
+        return Promise.resolve([]).then(onfulfilled);
+      }),
+    };
+    vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
+  });
+
+  describe('markReadHandler', () => {
+    it('should reject if unauthorized', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+
+      const result = await markReadHandler({ data: { notificationId: 1 } });
+      expect(result).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should mark a notification as read if owned by user', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 1, userId: 'user-1', read: false }]).then(onfulfilled),
+      );
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 1, userId: 'user-1', read: true }]).then(onfulfilled),
+      );
+
+      const result = await markReadHandler({ data: { notificationId: 1 } });
+      expect(result).toEqual({ success: true });
+    });
+
+    it('should reject if notification not found', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = await markReadHandler({ data: { notificationId: 999 } });
+      expect(result).toEqual({ error: 'Notification not found' });
+    });
+
+    it('should reject if notification belongs to another user', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      // Mock simulates DB where clause filtering: notification exists but belongs to different user
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = await markReadHandler({ data: { notificationId: 1 } });
+      expect(result).toEqual({ error: 'Notification not found' });
+    });
+  });
+
+  describe('markAllReadHandler', () => {
+    it('should reject if unauthorized', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+
+      const result = await markAllReadHandler({ data: {} });
+      expect(result).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should mark all unread notifications as read for current user', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 5 }]).then(onfulfilled),
+      );
+
+      const result = await markAllReadHandler({ data: {} });
+      expect(result).toEqual({ success: true });
+    });
+
+    it('should succeed even if no unread notifications exist', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 0 }]).then(onfulfilled),
+      );
+
+      const result = await markAllReadHandler({ data: {} });
+      expect(result).toEqual({ success: true });
+    });
+  });
+
+  describe('getUnreadCountHandler', () => {
+    it('should reject if unauthorized', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+
+      const result = await getUnreadCountHandler({ data: {} });
+      expect(result).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should return unread count for current user', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 3 }]).then(onfulfilled),
+      );
+
+      const result = await getUnreadCountHandler({ data: {} });
+      expect(result).toEqual({ count: 3 });
+    });
+
+    it('should return zero when no unread notifications', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 0 }]).then(onfulfilled),
+      );
+
+      const result = await getUnreadCountHandler({ data: {} });
+      expect(result).toEqual({ count: 0 });
+    });
   });
 });

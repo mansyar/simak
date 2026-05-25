@@ -4,10 +4,19 @@ import { getDb } from '../db/index';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import type { z } from 'zod';
-import type { CreateNotificationSchema, ListNotificationsSchema } from './notifications';
+import type {
+  CreateNotificationSchema,
+  ListNotificationsSchema,
+  MarkReadSchema,
+  MarkAllReadSchema,
+  GetUnreadCountSchema,
+} from './notifications';
 
 type CreateNotificationInput = z.infer<typeof CreateNotificationSchema>;
 type ListNotificationsInput = z.infer<typeof ListNotificationsSchema>;
+type MarkReadInput = z.infer<typeof MarkReadSchema>;
+type MarkAllReadInput = z.infer<typeof MarkAllReadSchema>;
+type GetUnreadCountInput = z.infer<typeof GetUnreadCountSchema>;
 
 function isAdmin(session: any): session is { user: { id: string; role: string }; session: any } {
   return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
@@ -93,6 +102,89 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
     };
   } catch (err) {
     console.error('Failed to list notifications:', err);
+    return { error: 'Internal Server Error' };
+  }
+}
+
+// --- Phase 1: New handler implementations ---
+
+/**
+ * Mark a single notification as read.
+ * Validates ownership — only the notification owner can mark it as read.
+ */
+export async function markReadHandler(args: { data: MarkReadInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isAuthenticated(session)) {
+    return { error: 'Unauthorized' };
+  }
+
+  const { notificationId } = args.data;
+  const db = getDb();
+
+  try {
+    // Verify the notification exists and belongs to the current user
+    const [existing] = await db
+      .select({ id: notifications.id, userId: notifications.userId, read: notifications.read })
+      .from(notifications)
+      .where(and(eq(notifications.id, notificationId), eq(notifications.userId, session.user.id)));
+
+    if (!existing) {
+      return { error: 'Notification not found' };
+    }
+
+    await db.update(notifications).set({ read: true }).where(eq(notifications.id, notificationId));
+
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to mark notification as read:', err);
+    return { error: 'Internal Server Error' };
+  }
+}
+
+/**
+ * Mark all unread notifications as read for the current user.
+ */
+export async function markAllReadHandler(args: { data: MarkAllReadInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isAuthenticated(session)) {
+    return { error: 'Unauthorized' };
+  }
+
+  const db = getDb();
+
+  try {
+    await db
+      .update(notifications)
+      .set({ read: true })
+      .where(and(eq(notifications.userId, session.user.id), eq(notifications.read, false)));
+
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to mark all notifications as read:', err);
+    return { error: 'Internal Server Error' };
+  }
+}
+
+/**
+ * Get the count of unread notifications for the current user.
+ */
+export async function getUnreadCountHandler(args: { data: GetUnreadCountInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isAuthenticated(session)) {
+    return { error: 'Unauthorized' };
+  }
+
+  const db = getDb();
+
+  try {
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(notifications)
+      .where(and(eq(notifications.userId, session.user.id), eq(notifications.read, false)));
+
+    return { count: Number(count) };
+  } catch (err) {
+    console.error('Failed to get unread count:', err);
     return { error: 'Internal Server Error' };
   }
 }
