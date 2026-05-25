@@ -1,6 +1,6 @@
 # Implementation Plan: Track 7.1 — In-App Notification System
 
-## Phase 1 — Complete Server Functions (markRead, markAllRead, getUnreadCount)
+## Phase 1 — Complete Server Functions (markRead, markAllRead, getUnreadCount) [checkpoint: 53e17e6]
 
 **Objective:** Add the three missing server functions with Zod schemas, stubs, handlers, and TDD tests.
 
