@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useI18n } from '../../routes/__root';
 import { format } from 'date-fns';
-import { Loader2, ChevronDown, ChevronUp, Clock, Lock, Unlock } from 'lucide-react';
+import { Loader2, ChevronDown, ChevronUp, Clock, Lock } from 'lucide-react';
 
 interface CheckpointData {
   id: number;
