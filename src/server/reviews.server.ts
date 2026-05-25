@@ -356,6 +356,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           .orderBy(checkpoints.order)
           .limit(1);
 
+        let shouldUnlock = true;
         if (nextCheckpoint.length > 0) {
           const minConsults = nextCheckpoint[0].minConsultations ?? 0;
           if (minConsults > 0) {
@@ -372,16 +373,16 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
               );
 
             if (Number(count) < minConsults) {
-              // Keep locked — consultation requirements not met
-              // The blocking reason is already handled in getStudentAssignmentDetailHandler
-              return;
+              shouldUnlock = false;
             }
           }
 
-          await tx
-            .update(checkpoints)
-            .set({ state: 'unlocked', updatedAt: new Date() })
-            .where(eq(checkpoints.id, nextCheckpoint[0].id));
+          if (shouldUnlock) {
+            await tx
+              .update(checkpoints)
+              .set({ state: 'unlocked', updatedAt: new Date() })
+              .where(eq(checkpoints.id, nextCheckpoint[0].id));
+          }
         }
       } else if (decision === 'revise') {
         // 4d. Set checkpoint to revise

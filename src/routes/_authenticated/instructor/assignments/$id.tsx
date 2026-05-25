@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { getAssignmentDetail } from '@/server/assignments';
 import { listPendingConsultations } from '@/server/consultations';
@@ -26,7 +26,7 @@ function AssignmentDetailPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // Load pending consultations
-  useState(() => {
+  useEffect(() => {
     if (assignment) {
       const load = async () => {
         const result = await (listPendingConsultations as any)({
@@ -38,7 +38,7 @@ function AssignmentDetailPage() {
       };
       load();
     }
-  });
+  }, []);
 
   if (!assignment) {
     return (
