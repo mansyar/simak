@@ -27,17 +27,17 @@
 
 ### Task 1.3 — Notification Server Functions (Create)
 
-- [ ] Write failing tests (`tests/unit/server/notifications.test.ts`) for:
+- [x] Write failing tests (`tests/unit/server/notifications.test.ts`) for:
   - `createNotification` creates rows in the `notifications` table
   - Notification with `channel: 'email'` is created for sla_breach
   - `listNotifications` filters by type, ordered by newest first
-- [ ] Create `src/server/notifications.ts` with:
+- [x] Create `src/server/notifications.ts` with:
   - Zod schemas: `CreateNotificationSchema`, `ListNotificationsSchema`
   - Server function stubs: `createNotification`, `listNotifications`
-- [ ] Create `src/server/notifications.server.ts` with:
+- [x] Create `src/server/notifications.server.ts` with:
   - `createNotificationHandler` — inserts into `notifications` table
   - `listNotificationsHandler` — fetches with pagination and type filter
-- [ ] Verify all tests pass
+- [x] Verify all tests pass [952ed84]
 
 ### Task 1.4 — SLA Breach Email & Integration
 
