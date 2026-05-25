@@ -30,31 +30,31 @@
 
 ## Phase 3: Server Functions — Consultation CRUD
 
-- [ ] Task: Create Zod schemas and server function stubs (`src/server/consultations.ts`)
-  - [ ] Define `LogConsultationSchema` (checkpointId, sessionType, externalConsultantName optional, notes)
-  - [ ] Define `ListConsultationsSchema` (assignmentId, checkpointId optional)
-  - [ ] Define `ListPendingConsultationsSchema` (assignmentId)
-  - [ ] Define `VerifyConsultationSchema` (consultationId)
-  - [ ] Define `RejectConsultationSchema` (consultationId, reason)
-  - [ ] Define `GetConsultationDetailSchema` (consultationId)
-  - [ ] Define `ListVerifiedCountsSchema` (assignmentId)
-  - [ ] Create server function stubs with dynamic imports (`logConsultation`, `listConsultations`, `listPendingConsultations`, `verifyConsultation`, `rejectConsultation`, `getConsultationDetail`, `listVerifiedCounts`)
-- [ ] Task: Implement server-only handlers (`src/server/consultations.server.ts`)
-  - [ ] `logConsultationHandler` — Validate student ownership via assignmentStudents, insert consultation with status `pending`, create notification for instructor
-  - [ ] `listConsultationsHandler` — Fetch consultations for student's assignment, newest first, role-aware (student sees own, instructor sees all)
-  - [ ] `listPendingConsultationsHandler` — Fetch pending consultations across all students for an instructor's assignment, oldest first (FIFO)
-  - [ ] `getConsultationDetailHandler` — Full consultation details with student name, checkpoint info
-  - [ ] `verifyConsultationHandler` — Update status to `verified`, set `verifiedById`, `verifiedAt`, create notification for student
-  - [ ] `rejectConsultationHandler` — Update status to `rejected`, set rejection reason, create notification for student
-  - [ ] `listVerifiedCountsHandler` — Aggregate query returning `{ checkpointId, verifiedCount, minConsultations }` per checkpoint
-- [ ] Task: Write tests for consultation server functions
-  - [ ] Unit tests for `logConsultation` — success, unauthorized, wrong role, invalid checkpoint
-  - [ ] Unit tests for `listConsultations` — student view, instructor view, empty
-  - [ ] Unit tests for `listPendingConsultations` — FIFO ordering, empty, ownership guard
-  - [ ] Unit tests for `verifyConsultation` — success, already verified, not found
-  - [ ] Unit tests for `rejectConsultation` — success, requires reason
-  - [ ] Unit tests for `listVerifiedCounts` — correct aggregation
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Server Functions — Consultation CRUD' (Protocol in workflow.md)
+- [x] Task: Create Zod schemas and server function stubs (`src/server/consultations.ts`) (014e2ec)
+  - [x] Define `LogConsultationSchema` (checkpointId, sessionType, externalConsultantName optional, notes)
+  - [x] Define `ListConsultationsSchema` (assignmentId, checkpointId optional)
+  - [x] Define `ListPendingConsultationsSchema` (assignmentId)
+  - [x] Define `VerifyConsultationSchema` (consultationId)
+  - [x] Define `RejectConsultationSchema` (consultationId, reason)
+  - [x] Define `GetConsultationDetailSchema` (consultationId)
+  - [x] Define `ListVerifiedCountsSchema` (assignmentId)
+  - [x] Create server function stubs with dynamic imports (`logConsultation`, `listConsultations`, `listPendingConsultations`, `verifyConsultation`, `rejectConsultation`, `getConsultationDetail`, `listVerifiedCounts`)
+- [x] Task: Implement server-only handlers (`src/server/consultations.server.ts`) (014e2ec)
+  - [x] `logConsultationHandler` — Validate student ownership via assignmentStudents, insert consultation with status `pending`, create notification for instructor
+  - [x] `listConsultationsHandler` — Fetch consultations for student's assignment, newest first, role-aware (student sees own, instructor sees all)
+  - [x] `listPendingConsultationsHandler` — Fetch pending consultations across all students for an instructor's assignment, oldest first (FIFO)
+  - [x] `getConsultationDetailHandler` — Full consultation details with student name, checkpoint info
+  - [x] `verifyConsultationHandler` — Update status to `verified`, set `verifiedById`, `verifiedAt`, create notification for student
+  - [x] `rejectConsultationHandler` — Update status to `rejected`, set rejection reason, create notification for student
+  - [x] `listVerifiedCountsHandler` — Aggregate query returning `{ checkpointId, verifiedCount, minConsultations }` per checkpoint
+- [x] Task: Write tests for consultation server functions (014e2ec)
+  - [x] Unit tests for `logConsultation` — success, unauthorized, wrong role, invalid checkpoint
+  - [x] Unit tests for `listConsultations` — student view, instructor view, empty
+  - [x] Unit tests for `listPendingConsultations` — FIFO ordering, empty, ownership guard
+  - [x] Unit tests for `verifyConsultation` — success, already verified, not found
+  - [x] Unit tests for `rejectConsultation` — success, requires reason
+  - [x] Unit tests for `listVerifiedCounts` — correct aggregation
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Server Functions — Consultation CRUD' (Protocol in workflow.md)
 
 ## Phase 4: Server Functions — Gating Integration
 
