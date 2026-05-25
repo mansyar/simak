@@ -111,12 +111,12 @@
 
 ### Task 3.2 — Integrate Deadline Manager into Assignment Detail Page
 
-- [ ] Write failing tests (`tests/unit/routes/instructor-assignment-detail.test.tsx`) for:
+- [x] Write failing tests (`tests/unit/routes/instructor-assignment-detail.test.tsx`) for:
   - Assignment detail page renders Deadline Manager when data is available
   - Authenticated instructor-only access
-- [ ] Update `src/routes/_authenticated/instructor/assignments/$id.tsx`:
+- [x] Update `src/routes/_authenticated/instructor/assignments/$id.tsx`:
   - Add DeadlineManager component below the progress table
   - Pass assignment and student/checkpoint data to DeadlineManager
   - Collapsible section heading: "Deadline Management"
-- [ ] Verify all tests pass
-- [ ] Task: Conductor — Phase Completion Verification (Protocol in workflow.md)
+- [x] Verify all tests pass — 622/622 tests passing [9219b9e]
+- [~] Task: Conductor — Phase Completion Verification (Protocol in workflow.md)
