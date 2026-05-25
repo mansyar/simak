@@ -87,7 +87,7 @@
 - [x] All 14 tests pass [bcc78de]
 - [x] Task: Conductor — Phase Completion Verification (Protocol in workflow.md) [4bd9239]
 
-## Phase 3: Deadline Manager UI
+## Phase 3: Deadline Manager UI [checkpoint: 13febd0]
 
 ### Task 3.1 — DeadlineManager Component
 
@@ -119,4 +119,4 @@
   - Pass assignment and student/checkpoint data to DeadlineManager
   - Collapsible section heading: "Deadline Management"
 - [x] Verify all tests pass — 622/622 tests passing [9219b9e]
-- [~] Task: Conductor — Phase Completion Verification (Protocol in workflow.md)
+- [x] Task: Conductor — Phase Completion Verification (Protocol in workflow.md) [13febd0]
