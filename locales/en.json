@@ -171,6 +171,17 @@
     "finalDeadline": "Deadline: {date}",
     "empty": "No assignments found",
     "createPrompt": "Create your first assignment",
+    "deadlineManager": {
+      "title": "Deadline Management",
+      "empty": "No students assigned yet.",
+      "unlock": "Unlock",
+      "unlockConfirm": "Unlock Checkpoint",
+      "unlockWarning": "Are you sure you want to unlock \"{checkpoint}\" for {student}? This will bypass all blocking reasons.",
+      "unlockError": "Failed to unlock checkpoint. Please try again.",
+      "extend": "Extend",
+      "extendError": "Failed to extend deadline. Please try again.",
+      "currentDeadline": "Current Deadline"
+    },
     "table": {
       "student": "Student",
       "email": "Email",

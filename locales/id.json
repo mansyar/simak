@@ -171,6 +171,17 @@
     "finalDeadline": "Tenggat: {date}",
     "empty": "Tidak ada tugas ditemukan",
     "createPrompt": "Buat tugas pertama Anda",
+    "deadlineManager": {
+      "title": "Manajemen Tenggat",
+      "empty": "Belum ada mahasiswa yang ditugaskan.",
+      "unlock": "Buka",
+      "unlockConfirm": "Buka Checkpoint",
+      "unlockWarning": "Apakah Anda yakin ingin membuka \"{checkpoint}\" untuk {student}? Ini akan melewati semua alasan pemblokiran.",
+      "unlockError": "Gagal membuka checkpoint. Silakan coba lagi.",
+      "extend": "Perpanjang",
+      "extendError": "Gagal memperpanjang tenggat. Silakan coba lagi.",
+      "currentDeadline": "Tenggat Saat Ini"
+    },
     "table": {
       "student": "Mahasiswa",
       "email": "Email",
