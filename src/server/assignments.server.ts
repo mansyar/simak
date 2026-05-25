@@ -13,6 +13,7 @@ import type {
   AssignmentIdParamSchema,
   ListStudentAssignmentsSchema,
   StudentAssignmentIdParamSchema,
+  UnlockCheckpointSchema,
 } from './assignments';
 
 type CreateAssignmentInput = z.infer<typeof CreateAssignmentSchema>;
@@ -20,6 +21,7 @@ type ListInstructorAssignmentsInput = z.infer<typeof ListInstructorAssignmentsSc
 type AssignmentIdParam = z.infer<typeof AssignmentIdParamSchema>;
 type ListStudentAssignmentsInput = z.infer<typeof ListStudentAssignmentsSchema>;
 type StudentAssignmentIdParam = z.infer<typeof StudentAssignmentIdParamSchema>;
+type UnlockCheckpointInput = z.infer<typeof UnlockCheckpointSchema>;
 
 function isInstructor(
   session: any,
@@ -266,6 +268,57 @@ export async function getAssignmentDetailHandler(args: { data: AssignmentIdParam
     ...assignment,
     students: studentsWithProgress,
   };
+}
+
+// ---- Manual Deadline Management Handlers ----
+
+/**
+ * Unlock a locked checkpoint.
+ * Only the assignment owner (instructor) can unlock checkpoints in their assignment.
+ * Transitions checkpoint from 'locked' to 'unlocked' regardless of blocking reasons.
+ */
+export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isInstructor(session)) {
+    return { error: 'Unauthorized' };
+  }
+
+  const { checkpointId } = args.data;
+  const db = getDb();
+
+  // 1. Fetch checkpoint with assignment info (verify ownership via instructorId)
+  const [checkpoint] = await db
+    .select({
+      id: checkpoints.id,
+      state: checkpoints.state,
+      assignmentInstructorId: assignments.instructorId,
+    })
+    .from(checkpoints)
+    .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+    .where(and(eq(checkpoints.id, checkpointId), isNull(assignments.deletedAt)))
+    .limit(1);
+
+  if (!checkpoint) {
+    return { error: 'Checkpoint not found' };
+  }
+
+  // Verify ownership
+  if (checkpoint.assignmentInstructorId !== session.user.id) {
+    return { error: 'Checkpoint not found' };
+  }
+
+  // 2. Verify checkpoint is in locked state
+  if (checkpoint.state !== 'locked') {
+    return { error: 'Checkpoint is not in locked state' };
+  }
+
+  // 3. Transition to unlocked
+  await db
+    .update(checkpoints)
+    .set({ state: 'unlocked', updatedAt: new Date() })
+    .where(eq(checkpoints.id, checkpointId));
+
+  return { success: true };
 }
 
 // ---- Student Helpers ----

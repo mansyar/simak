@@ -59,20 +59,18 @@
 
 ### Task 2.1 — Unlock Checkpoint Server Function
 
-- [ ] Write failing tests (`tests/unit/assignments/unlock-checkpoint.test.ts`) for:
-  - Instructor can unlock a checkpoint in their own assignment
-  - Locked → unlocked transition succeeds
-  - Already-unlocked checkpoint returns error
-  - Non-owner instructor receives authorization error
-  - Non-instructor user receives authorization error
-- [ ] Add Zod schema `UnlockCheckpointSchema` to `src/server/assignments.ts`
-- [ ] Add server function stub `unlockCheckpoint` to `src/server/assignments.ts`
-- [ ] Implement `unlockCheckpointHandler` in `src/server/assignments.server.ts`:
-  - Verify assignment ownership
+- [x] Write failing tests (`tests/unit/assignments/unlock-checkpoint.test.ts`) — 13 tests total: 4 schema, 1 stub, 8 handler
+  - Schema validation: valid id, non-positive, missing, non-integer
+  - Stub export
+  - Handler: unlocked locked → success, already-unlocked error, already-passed error, not found error, non-owner error, non-instructor error, unauthenticated error, updatedAt verification
+- [x] Add Zod schema `UnlockCheckpointSchema` to `src/server/assignments.ts`
+- [x] Add server function stub `unlockCheckpoint` to `src/server/assignments.ts`
+- [x] Implement `unlockCheckpointHandler` in `src/server/assignments.server.ts`:
+  - Verify assignment ownership via innerJoin + instructorId
   - Verify checkpoint belongs to that assignment
   - Verify checkpoint is in `locked` state
   - Transition to `unlocked`, update `updatedAt`
-- [ ] Verify all tests pass
+- [x] All 13 tests pass
 
 ### Task 2.2 — Extend Deadline Server Function
 

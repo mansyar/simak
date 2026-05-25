@@ -76,3 +76,17 @@ export const getStudentAssignmentDetail = createServerFn({ method: 'GET' }).hand
     return getStudentAssignmentDetailHandler({ data });
   },
 );
+
+// ---- Manual Deadline Management Schemas ----
+
+export const UnlockCheckpointSchema = z.object({
+  checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),
+});
+
+export const unlockCheckpoint = createServerFn({ method: 'POST' }).handler(
+  async (args: { data: any }) => {
+    const { unlockCheckpointHandler } = await import('./assignments.server');
+    const data = UnlockCheckpointSchema.parse(args.data);
+    return unlockCheckpointHandler({ data });
+  },
+);
