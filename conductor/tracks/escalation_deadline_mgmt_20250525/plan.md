@@ -4,13 +4,13 @@
 
 ### Task 1.1 — SLA Calculation Utility
 
-- [ ] Write failing tests (`tests/unit/reviews/sla-calculation.test.ts`) for:
+- [x] Write failing tests (`tests/unit/reviews/sla-calculation.test.ts`) for:
   - `calculateBreachDuration()` — correctly identifies if a review was completed within 3 days (72h)
   - Returns 0 breach when review is on time
   - Returns positive breach duration (in days) when review is late
   - Handles edge cases: exactly 3 days, milliseconds precision, no `under_review` timestamp
-- [ ] Implement `calculateBreachDuration(underReviewAt: Date, reviewedAt: Date): number` utility
-- [ ] Verify all tests pass (`CI=true pnpm vitest run tests/unit/reviews/sla-calculation.test.ts`)
+- [x] Implement `calculateBreachDuration(underReviewAt: Date, reviewedAt: Date): number` utility
+- [x] Verify all tests pass (`CI=true pnpm vitest run tests/unit/reviews/sla-calculation.test.ts`) [cbf6a01]
 
 ### Task 1.2 — Deadline Adjustment in submitReview
 
