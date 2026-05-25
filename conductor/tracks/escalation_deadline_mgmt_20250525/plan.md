@@ -14,16 +14,16 @@
 
 ### Task 1.2 — Deadline Adjustment in submitReview
 
-- [ ] Write failing tests for deadline adjustment logic (`tests/unit/reviews/deadline-adjustment.test.ts`):
+- [x] Write failing tests for deadline adjustment logic (`tests/unit/reviews/deadline-adjustment.test.ts`):
   - On-time review: no deadlines are adjusted
   - Late review: affected checkpoint `dueDate` extended by breach duration
   - Late review: all subsequent checkpoints extended by breach duration
   - Late review: assignment `finalDeadline` extended by breach duration
   - Only the affected student's deadlines are adjusted (other students unchanged)
-- [ ] Modify `submitReviewHandler` in `reviews.server.ts` to:
+- [x] Modify `submitReviewHandler` in `reviews.server.ts` to:
   - Calculate breach duration after review submission
   - If breach > 0, extend affected checkpoint + subsequent checkpoints + assignment finalDeadline within the existing transaction
-- [ ] Verify all tests pass
+- [x] Verify all tests pass [4781287]
 
 ### Task 1.3 — Notification Server Functions (Create)
 
