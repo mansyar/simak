@@ -1,11 +1,12 @@
 // Server-only handlers for review operations
-import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
+import { eq, and, desc, sql, inArray, isNull, gt } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { generatePresignedDownloadUrl } from '../lib/storage';
+import { calculateBreachDuration } from '../lib/sla';
 import type { z } from 'zod';
 import type {
   ListPendingReviewsSchema,
@@ -272,6 +273,10 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       assignmentId: assignments.id,
       instructorId: assignments.instructorId,
       studentId: checkpoints.studentId,
+      checkpointUpdatedAt: checkpoints.updatedAt,
+      checkpointDueDate: checkpoints.dueDate,
+      checkpointOrder: checkpoints.order,
+      finalDeadline: assignments.finalDeadline,
     })
     .from(submissions)
     .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
@@ -349,6 +354,61 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           .update(checkpoints)
           .set({ state: 'revise', updatedAt: new Date() })
           .where(eq(checkpoints.id, submission.checkpointId));
+      }
+
+      // 4e. SLA breach detection & deadline adjustment
+      const breachDays = calculateBreachDuration(
+        submission.checkpointUpdatedAt ?? new Date(),
+        new Date(),
+      );
+
+      if (breachDays > 0) {
+        // Extend affected checkpoint's dueDate (if it has one)
+        if (submission.checkpointDueDate) {
+          const extendedDueDate = new Date(
+            submission.checkpointDueDate.getTime() + breachDays * 24 * 60 * 60 * 1000,
+          );
+          await tx
+            .update(checkpoints)
+            .set({ dueDate: extendedDueDate, updatedAt: new Date() })
+            .where(eq(checkpoints.id, submission.checkpointId));
+        }
+
+        // Extend all subsequent checkpoints for this student in this assignment
+        const subsequentCheckpoints = await tx
+          .select({ id: checkpoints.id, dueDate: checkpoints.dueDate })
+          .from(checkpoints)
+          .where(
+            and(
+              eq(checkpoints.assignmentId, submission.assignmentId),
+              eq(checkpoints.studentId, submission.studentId),
+              gt(checkpoints.order, submission.checkpointOrder!),
+            ),
+          );
+
+        for (const cp of subsequentCheckpoints) {
+          if (cp.dueDate) {
+            await tx
+              .update(checkpoints)
+              .set({
+                dueDate: new Date(cp.dueDate.getTime() + breachDays * 24 * 60 * 60 * 1000),
+                updatedAt: new Date(),
+              })
+              .where(eq(checkpoints.id, cp.id));
+          }
+        }
+
+        // Extend assignment finalDeadline
+        if (submission.finalDeadline) {
+          await tx
+            .update(assignments)
+            .set({
+              finalDeadline: new Date(
+                submission.finalDeadline.getTime() + breachDays * 24 * 60 * 60 * 1000,
+              ),
+            })
+            .where(eq(assignments.id, submission.assignmentId));
+        }
       }
     });
 
