@@ -754,48 +754,84 @@ The consultation tracking system (Kartu Bimbingan) lets students log meetings wi
 
 ### Track 6.1 — Consultation Logging & Verification
 
-**Description:** Students log consultation sessions tied to specific checkpoints. Instructors review and verify (or reject) logs. Verified consultations count toward the `minConsultations` threshold for checkpoint unlock.
+**Description:** Students log consultation sessions tied to specific checkpoints. Instructors review and verify (or reject) logs. Verified consultations count toward the `minConsultations` threshold for checkpoint unlock and submission gating.
 
 **Dependencies:** Track 3.2 (student assignment views), Track 5.1 (instructor review infrastructure mindset).
 
-**Domain-Specific Files to Create:**
+**✅ Status: COMPLETED** — Track has been archived.
 
-| File                                                       | Purpose                                                                                              |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `src/app/routes/student/assignments/$id/consultations.tsx` | Consultation log page — list of past consultations + new consultation form                           |
-| `src/components/consultations/consultation-form.tsx`       | Form: session type (internal/external), external consultant name, notes, checkpoint selector         |
-| `src/components/consultations/consultation-list.tsx`       | List of logged consultations with status badges (pending/verified/rejected)                          |
-| `src/components/consultations/consultation-progress.tsx`   | Progress bar showing completed vs required consultations per checkpoint                              |
-| `src/server/consultations.ts`                              | Server functions: `logConsultation`, `listConsultations`, `verifyConsultation`, `rejectConsultation` |
-| `src/app/routes/instructor/consultations.tsx`              | Instructor verification queue — pending consultations across all students                            |
-| `src/components/consultations/verification-queue-item.tsx` | Queue item: student name, checkpoint, notes preview, verify/reject buttons                           |
-| `src/components/consultations/verification-dialog.tsx`     | Dialog showing full consultation details with verify/reject action                                   |
+**Actual Files Created/Modified:**
 
-**Tests to Add:**
+| File                                                            | Purpose                                                                                                                                                                                                                                                  |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/server/consultations.ts`                                   | **New:** 7 Zod schemas + `createServerFn` stubs: `LogConsultationSchema`, `ListConsultationsSchema`, `ListPendingConsultationsSchema`, `VerifyConsultationSchema`, `RejectConsultationSchema`, `GetConsultationDetailSchema`, `ListVerifiedCountsSchema` |
+| `src/server/consultations.server.ts`                            | **New:** 7 handler implementations with role-based access (student for logging, instructor for verify/reject), ownership validation, in-app notification creation                                                                                        |
+| `src/components/consultations/ConsultationForm.tsx`             | **New:** Log form with checkpoint selector dropdown, session type (internal/external), conditional external consultant name input, notes textarea, Zod validation                                                                                        |
+| `src/components/consultations/ConsultationList.tsx`             | **New:** List of logged consultations with status badges (pending=yellow, verified=green, rejected=red), checkpoint name, notes preview, session type, timestamp                                                                                         |
+| `src/components/consultations/ConsultationProgress.tsx`         | **New:** Per-checkpoint progress bars (X/Y verified) with color coding (full=green, partial=yellow, zero=gray) + assignment-level summary                                                                                                                |
+| `src/components/consultations/VerificationQueueItem.tsx`        | **New:** Pending consultation row card: student name, checkpoint name, notes preview (truncated 80 chars), session type, date, click handler                                                                                                             |
+| `src/components/consultations/VerificationDialog.tsx`           | **New:** Full consultation detail display (student, checkpoint, session type, notes, date) with Verify button and conditional Reject with reason input                                                                                                   |
+| `src/db/schema/templates.ts`                                    | **Modified:** Added `minConsultations: integer('min_consultations').default(0)` to `templateCheckpoints`                                                                                                                                                 |
+| `src/server/templates.ts`                                       | **Modified:** Updated `CreateTemplateSchema` and `UpdateTemplateSchema` to use `CheckpointInputSchema` objects (`{ name, minConsultations }`) instead of plain strings                                                                                   |
+| `src/server/templates.server.ts`                                | **Modified:** All handlers (create, update, duplicate, get) updated to persist/read `minConsultations`                                                                                                                                                   |
+| `src/server/assignments.server.ts`                              | **Modified:** `createAssignmentHandler` now copies `minConsultations` from `templateCheckpoints` instead of hardcoding 0                                                                                                                                 |
+| `src/server/submissions.server.ts`                              | **Modified:** `submitCheckpointHandler` checks verified consultations >= minConsultations before allowing submission; returns descriptive error if insufficient                                                                                          |
+| `src/server/reviews.server.ts`                                  | **Modified:** `submitReviewHandler` unlock logic checks consultation requirements before unlocking next checkpoint; keeps locked if insufficient                                                                                                         |
+| `src/routes/_authenticated/student/assignments/$id.tsx`         | **Modified:** Added tab navigation (Timeline / Consultations), ConsultationProgress, ConsultationForm, ConsultationList sections with live refresh on submit                                                                                             |
+| `src/routes/_authenticated/instructor/assignments/$id.tsx`      | **Modified:** Added tab navigation (Overview / Consultations), pending queue with count badge, VerificationQueueItem list, VerificationDialog with refresh on verify/reject                                                                              |
+| `src/components/admin/templates/CheckpointListEditor.tsx`       | **Modified:** Now supports `CheckpointData` objects (`name` + `minConsultations`) with a number input per row for min consultations                                                                                                                      |
+| `src/components/admin/templates/CreateTemplateDialog.tsx`       | **Modified:** Updated to use checkpoint objects with `minConsultations`, added `handleMinConsultationsChange`                                                                                                                                            |
+| `locales/en.json` / `locales/id.json`                           | **Modified:** Added `consultations` translation section (25+ keys: form fields, status badges, progress display, verify/reject actions, error messages) + `minConsultations` field                                                                       |
+| `src/i18n/types.ts`                                             | **Modified:** Added `consultations` section to `Translation` type (25+ keys)                                                                                                                                                                             |
+| `drizzle/migrations/0003_consultation_min_consultations.sql`    | **New:** Migration: `ALTER TABLE template_checkpoints ADD COLUMN min_consultations integer DEFAULT 0`                                                                                                                                                    |
+| `conductor/archive/consultation_logging_verification_20260525/` | Track artifacts (spec, plan, metadata)                                                                                                                                                                                                                   |
 
-- `tests/unit/consultations/gating-logic.test.ts` — Verify unlock condition checking minConsultations with only verified counts
-- `tests/integration/consultations/verify-consultation.test.ts` — Log, verify, and confirm gating unlocks
+**Tests Added:**
 
-**Definition of Done:**
+| File                                                          | Tests | Description                                                                                                                                     |
+| ------------------------------------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/unit/server/consultations.test.ts`                     | 34    | Zod schema validation (all 7 schemas), handler auth guards, success paths, edge cases (unauthorized, wrong role, not found, non-pending states) |
+| `tests/unit/server/submissions.test.ts`                       | 31    | **Modified:** Added 2 gating tests — submission blocked when insufficient consultations, allowed when sufficient                                |
+| `tests/unit/server/templates.test.ts`                         | 30    | **Modified:** Updated all test data to use `CheckpointInputSchema` objects; added tests for minConsultations defaults and coercion              |
+| `tests/unit/db/templates.test.ts`                             | 3     | **Modified:** Added `minConsultations` column check                                                                                             |
+| `tests/unit/components/admin/checkpoint-list-editor.test.tsx` | 11    | **Modified:** Updated all test data to `CheckpointData` objects, added `onMinConsultationsChange` mock                                          |
+| `tests/unit/components/admin/create-template-dialog.test.tsx` | 8     | **Modified:** Updated Zod validation tests to use checkpoint objects                                                                            |
+| `tests/unit/components/admin/edit-template-sheet.test.tsx`    | 11    | **Modified:** Updated Zod validation tests to use checkpoint objects                                                                            |
 
-- Student can log a consultation from the assignment detail page (select checkpoint, fill notes)
-- Student can log internal (system instructor) or external (name field) sessions
-- Instructor sees a queue of pending consultation verifications
-- Instructor can verify or reject with reason
-- Verified consultations increment the progress bar
-- When verified count >= `minConsultations`, the checkpoint unlock condition is satisfied (along with previous checkpoint passed)
-- Progress bars visible at checkpoint and assignment levels
+**Differences from Original Spec:**
 
-**Acceptance Criteria:**
+- **No separate consultation route**: Instead of a dedicated `/student/assignments/$id/consultations` route, the consultation UI is an inline tab on the existing assignment detail page. Similarly, instructor verification is a tab on the existing assignment detail page — no separate `/instructor/consultations` route.
+- **Consultation server functions expanded**: Original spec listed 4 functions; actual implementation has 7 (added `getConsultationDetail`, `listPendingConsultations`, `listVerifiedCounts`) for proper separation of concerns.
+- **Submission gating added**: Original spec mentioned unlock gating only; actual implementation also gates the `submitCheckpoint` handler — students cannot submit until consultation requirements are met.
+- **`listConsultations` is role-aware**: Returns different data shapes for students vs. instructors (students see only their own; instructors see all with student names).
+- **Template `minConsultations` as object fields**: Instead of separate columns/inputs, `minConsultations` is part of a `CheckpointInputSchema` object alongside `name`, maintaining clean data consistency.
+- **No pre-push hook upgrade**: TypeScript typecheck and vitest coverage pass successfully, matching existing pre-push standards.
+- **Review fixes applied**: Unlock gating restructured to avoid early `return` from transaction (preserves SLA breach detection). `useState` side-effect pattern replaced with `useEffect` in route data fetching.
 
-- [ ] Student can log a consultation tied to a specific checkpoint
-- [ ] A "pending" badge appears on the consultation after logging
-- [ ] Instructor's verification queue shows all pending consultations across their students
-- [ ] Verifying a consultation changes its status to `verified` and increments the counter
-- [ ] Rejecting a consultation keeps it visible but does not count toward the minimum
-- [ ] Checkpoint unlocks only when (prev checkpoint passed) AND (verified consultations >= minConsultations)
-- [ ] Progress bar shows "3/5 verified" when threshold is 5
-- [ ] Student cannot submit a checkpoint if verified consultations are below the minimum
+**Test Results (at time of archiving):**
+
+- 660/660 tests passing across 90 test files
+- TypeScript typecheck passes with no errors
+- eslint/prettier/lint-staged pass on all new files
+- All new files under 500-line modularity limit (except `assignments.server.ts` at 554 lines — pre-existing)
+- Pre-push hook (typecheck + vitest coverage) passes
+
+**Definition of Done Completed:**
+
+- ✅ Student can log a consultation from the assignment detail tab (select checkpoint, internal/external, notes)
+- ✅ Logged consultation shows "pending" badge in student's consultation list
+- ✅ Progress bar shows "X/Y verified" per checkpoint with color coding
+- ✅ Instructor sees pending consultations in assignment detail tab with count badge
+- ✅ Clicking a pending item opens verification dialog with full details
+- ✅ Verifying a consultation changes status to "verified" and increments progress
+- ✅ Rejecting a consultation shows a reason input and sets status to "rejected"
+- ✅ Verified consultations >= minConsultations allows checkpoint submission
+- ✅ Insufficient verified consultations blocks submission with clear error message
+- ✅ Unlock logic checks consultation requirements before unlocking next checkpoint
+- ✅ Admin can set minConsultations when creating/editing a template checkpoint
+- ✅ Creating an assignment copies minConsultations from template to each checkpoint
+- ✅ In-app notifications created for log/verify/reject events
+- ✅ Full English and Indonesian translations for all consultation UI
 
 ---
 

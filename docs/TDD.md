@@ -45,9 +45,8 @@ Throughout this document, features are tagged as:
 ├── /student                              → Student sidebar layout
 │   ├── /student/assignments              → Assignment list [v1]
 │   ├── /student/assignments/$id          → Assignment detail with checkpoints [v1]
-│   ├── /student/assignments/$id/
-│   │   ├── checkpoints/$checkpointId     → Single checkpoint submission [v1]
-│   │   └── consultations                 → Consultation log for this assignment [v1]
+│   │   └── /student/assignments/$id/
+│   │       └── checkpoints/$checkpointId → Single checkpoint submission [v1]
 │   ├── /student/progress                 → Progress tracking [v2]
 │   └── /student/files                    → File manager [v2]
 
@@ -100,7 +99,7 @@ simak/
 │   │   ├── instructor/
 │   │   │   └── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
 │   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager
-│   │   ├── consultations/    → Log form, verification badge, progress bar
+│   │   ├── consultations/    → Log form, consultation list, progress bar, verification queue item, verification dialog
 │   │   ├── files/            → File upload, preview, file list
 │   │   ├── notifications/    → Notification center, badge
 │   │   ├── analytics/        → Charts, metric cards, export
@@ -113,7 +112,7 @@ simak/
 │   │   ├── assignments.server.ts → Server-only assignment handlers
 │   │   ├── submissions.ts    → Upload, versioning
 │   │   ├── reviews.ts        → Review, pass/revise
-│   │   ├── consultations.ts  → Log, verify
+│   │   ├── consultations.ts  → Log, list, verify, reject, detail, counts (split: .ts stubs + .server.ts handlers)
 │   │   ├── notifications.ts  → Create, fetch, mark read
 │   │   ├── notifications.server.ts → Server-only notification handlers
 │   │   ├── templates.ts      → Template CRUD
@@ -272,13 +271,14 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 
 #### template_checkpoints
 
-| Column     | Type                                | Notes                           |
-| ---------- | ----------------------------------- | ------------------------------- |
-| id         | serial (PK)                         |                                 |
-| templateId | integer (FK → assignment_templates) |                                 |
-| name       | text, not null                      | e.g. "Abstract", "Introduction" |
-| order      | integer, not null                   | Position in sequence            |
-| createdAt  | timestamp                           |                                 |
+| Column           | Type                                | Notes                                 |
+| ---------------- | ----------------------------------- | ------------------------------------- |
+| id               | serial (PK)                         |                                       |
+| templateId       | integer (FK → assignment_templates) |                                       |
+| name             | text, not null                      | e.g. "Abstract", "Introduction"       |
+| order            | integer, not null                   | Position in sequence                  |
+| minConsultations | integer, default 0                  | Required for checkpoint unlock/submit |
+| createdAt        | timestamp                           |                                       |
 
 #### assignments
 
