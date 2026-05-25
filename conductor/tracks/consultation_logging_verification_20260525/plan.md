@@ -6,10 +6,10 @@
   - [ ] Update `src/db/schema/templates.ts` — add `minConsultations: integer('min_consultations').default(0)`
   - [ ] Generate migration: `pnpm db:generate`
   - [ ] Apply migration: `pnpm db:migrate`
-- [ ] Task: Verify migration and schema integrity
-  - [ ] Write test to confirm `template_checkpoints` has `min_consultations` column
-  - [ ] Run tests to confirm all existing tests still pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema Update' (Protocol in workflow.md)
+- [x] Task: Verify migration and schema integrity (09d7685)
+  - [x] Write test to confirm `template_checkpoints` has `min_consultations` column
+  - [x] Run tests to confirm all existing tests still pass
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema Update' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions — Templates Update
 
