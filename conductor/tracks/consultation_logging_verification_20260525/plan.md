@@ -1,6 +1,6 @@
 # Implementation Plan: Consultation Logging & Verification
 
-## Phase 1: Database Migration & Schema Update
+## Phase 1: Database Migration & Schema Update [checkpoint: c3a6b30]
 
 - [x] Task: Add minConsultations column to template_checkpoints (24b32a2)
   - [ ] Update `src/db/schema/templates.ts` — add `minConsultations: integer('min_consultations').default(0)`
@@ -9,7 +9,7 @@
 - [x] Task: Verify migration and schema integrity (09d7685)
   - [x] Write test to confirm `template_checkpoints` has `min_consultations` column
   - [x] Run tests to confirm all existing tests still pass
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema Update' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema Update' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions — Templates Update
 
