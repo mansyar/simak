@@ -9,7 +9,7 @@ export const CreateNotificationSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   message: z.string().optional(),
   channel: z.enum(['in_app', 'email'], { message: 'Channel must be in_app or email' }),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 });
 
 export const ListNotificationsSchema = z.object({
