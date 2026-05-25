@@ -14,6 +14,7 @@ import type {
   ListStudentAssignmentsSchema,
   StudentAssignmentIdParamSchema,
   UnlockCheckpointSchema,
+  ExtendDeadlineSchema,
 } from './assignments';
 
 type CreateAssignmentInput = z.infer<typeof CreateAssignmentSchema>;
@@ -22,6 +23,7 @@ type AssignmentIdParam = z.infer<typeof AssignmentIdParamSchema>;
 type ListStudentAssignmentsInput = z.infer<typeof ListStudentAssignmentsSchema>;
 type StudentAssignmentIdParam = z.infer<typeof StudentAssignmentIdParamSchema>;
 type UnlockCheckpointInput = z.infer<typeof UnlockCheckpointSchema>;
+type ExtendDeadlineInput = z.infer<typeof ExtendDeadlineSchema>;
 
 function isInstructor(
   session: any,
@@ -316,6 +318,49 @@ export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInpu
   await db
     .update(checkpoints)
     .set({ state: 'unlocked', updatedAt: new Date() })
+    .where(eq(checkpoints.id, checkpointId));
+
+  return { success: true };
+}
+
+/**
+ * Extend a checkpoint's due date.
+ * Only the assignment owner (instructor) can extend checkpoints in their assignment.
+ * Can extend any checkpoint regardless of state.
+ */
+export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isInstructor(session)) {
+    return { error: 'Unauthorized' };
+  }
+
+  const { checkpointId, newDueDate } = args.data;
+  const db = getDb();
+
+  // 1. Fetch checkpoint with assignment info (verify ownership via instructorId)
+  const [checkpoint] = await db
+    .select({
+      id: checkpoints.id,
+      assignmentInstructorId: assignments.instructorId,
+    })
+    .from(checkpoints)
+    .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+    .where(and(eq(checkpoints.id, checkpointId), isNull(assignments.deletedAt)))
+    .limit(1);
+
+  if (!checkpoint) {
+    return { error: 'Checkpoint not found' };
+  }
+
+  // Verify ownership
+  if (checkpoint.assignmentInstructorId !== session.user.id) {
+    return { error: 'Checkpoint not found' };
+  }
+
+  // 2. Update dueDate and updatedAt
+  await db
+    .update(checkpoints)
+    .set({ dueDate: newDueDate, updatedAt: new Date() })
     .where(eq(checkpoints.id, checkpointId));
 
   return { success: true };

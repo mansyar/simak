@@ -90,3 +90,18 @@ export const unlockCheckpoint = createServerFn({ method: 'POST' }).handler(
     return unlockCheckpointHandler({ data });
   },
 );
+
+export const ExtendDeadlineSchema = z.object({
+  checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),
+  newDueDate: z.coerce.date().refine((d) => d > new Date(), {
+    message: 'New deadline must be in the future',
+  }),
+});
+
+export const extendDeadline = createServerFn({ method: 'POST' }).handler(
+  async (args: { data: any }) => {
+    const { extendDeadlineHandler } = await import('./assignments.server');
+    const data = ExtendDeadlineSchema.parse(args.data);
+    return extendDeadlineHandler({ data });
+  },
+);
