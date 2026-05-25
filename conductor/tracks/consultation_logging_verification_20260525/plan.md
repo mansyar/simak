@@ -2,7 +2,7 @@
 
 ## Phase 1: Database Migration & Schema Update
 
-- [ ] Task: Add minConsultations column to template_checkpoints
+- [x] Task: Add minConsultations column to template_checkpoints (24b32a2)
   - [ ] Update `src/db/schema/templates.ts` — add `minConsultations: integer('min_consultations').default(0)`
   - [ ] Generate migration: `pnpm db:generate`
   - [ ] Apply migration: `pnpm db:migrate`
