@@ -116,3 +116,9 @@
   - [x] pnpm typecheck — zero errors
   - [x] pnpm lint — zero errors
 - [ ] Task: Conductor — User Manual Verification 'Phase 6: Integration Testing & Manual Verification' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [e90f994]
+  - [x] Fix admin escalation alerts query: join users table twice to correctly resolve instructor name vs student name
+  - [x] Fix InstructorDashboard status labels: use i18n translation keys instead of hardcoded English strings
