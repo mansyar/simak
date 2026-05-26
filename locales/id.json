@@ -282,6 +282,22 @@
     "pending": "Tertunda",
     "submittedAgo": "{days} hari yang lalu"
   },
+  "instructorDashboard": {
+    "title": "Dasbor",
+    "subtitle": "Ikhtisar aktivitas mengajar Anda",
+    "pendingReviews": "Review Tertunda",
+    "noPendingReviews": "Tidak ada review tertunda — semuanya selesai!",
+    "recentSubmissions": "Pengumpulan Terbaru",
+    "noRecentSubmissions": "Tidak ada pengumpulan terbaru",
+    "assignmentOverview": "Ringkasan Tugas",
+    "noAssignments": "Belum ada tugas",
+    "quickActions": "Aksi Cepat",
+    "goToReviewQueue": "Ke Antrian Review",
+    "reviewQueueDesc": "Review pengumpulan mahasiswa yang tertunda",
+    "manageAssignments": "Kelola Tugas",
+    "manageAssignmentsDesc": "Buat dan kelola tugas Anda",
+    "pendingCount": "{count} tertunda"
+  },
   "files": {
     "dropzone": {
       "title": "Letakkan file di sini atau klik untuk mencari",

@@ -282,6 +282,22 @@
     "pending": "Pending",
     "submittedAgo": "{days} day(s) ago"
   },
+  "instructorDashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of your teaching activity",
+    "pendingReviews": "Pending Reviews",
+    "noPendingReviews": "No pending reviews — all caught up!",
+    "recentSubmissions": "Recent Submissions",
+    "noRecentSubmissions": "No recent submissions",
+    "assignmentOverview": "Assignment Overview",
+    "noAssignments": "No assignments yet",
+    "quickActions": "Quick Actions",
+    "goToReviewQueue": "Go to Review Queue",
+    "reviewQueueDesc": "Review pending student submissions",
+    "manageAssignments": "Manage Assignments",
+    "manageAssignmentsDesc": "Create and manage your assignments",
+    "pendingCount": "{count} pending"
+  },
   "files": {
     "dropzone": {
       "title": "Drop your file here or click to browse",

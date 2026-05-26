@@ -90,6 +90,22 @@ export type Translation = {
     pending: string
     submittedAgo: string
   }
+  instructorDashboard: {
+    title: string
+    subtitle: string
+    pendingReviews: string
+    noPendingReviews: string
+    recentSubmissions: string
+    noRecentSubmissions: string
+    assignmentOverview: string
+    noAssignments: string
+    quickActions: string
+    goToReviewQueue: string
+    reviewQueueDesc: string
+    manageAssignments: string
+    manageAssignmentsDesc: string
+    pendingCount: string
+  }
   studentAssignments: {
     title: string
     subtitle: string
