@@ -1,0 +1,8 @@
+{
+  "track_id": "notification_system_20260526",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-05-26T05:37:00Z",
+  "updated_at": "2026-05-26T05:37:00Z",
+  "description": "Build the in-app notification engine — events trigger in-app notifications stored in the DB. A notification center with read/unread tracking and priority-aware polling."
+}
