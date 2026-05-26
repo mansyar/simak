@@ -25,11 +25,11 @@
 
 **Objective:** Wire notification creation into existing server handlers for `submission_received`, `review_completed`, and `revision_requested` events.
 
-- [ ] Task: Write failing tests for event trigger notifications (Red Phase)
-  - [ ] Write tests verifying `submitCheckpointHandler` creates `submission_received` notification for the instructor
-  - [ ] Write tests verifying `submitReviewHandler` creates `review_completed` notification (pass decision)
-  - [ ] Write tests verifying `submitReviewHandler` creates `revision_requested` notification (revise decision)
-  - [ ] Run tests and confirm they fail
+- [x] Task: Write failing tests for event trigger notifications (Red Phase) [3d7c577]
+  - [x] Write tests verifying `submitCheckpointHandler` creates `submission_received` notification for the instructor
+  - [x] Write tests verifying `submitReviewHandler` creates `review_completed` notification (pass decision)
+  - [x] Write tests verifying `submitReviewHandler` creates `revision_requested` notification (revise decision)
+  - [x] Run tests and confirm they fail
 - [ ] Task: Implement event trigger notifications (Green Phase)
   - [ ] Add `submission_received` notification creation in `submitCheckpointHandler` — notify the assignment instructor
   - [ ] Add `review_completed` notification creation in `submitReviewHandler` (pass decision) — notify the student
