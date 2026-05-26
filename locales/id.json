@@ -298,6 +298,27 @@
     "manageAssignmentsDesc": "Buat dan kelola tugas Anda",
     "pendingCount": "{count} tertunda"
   },
+  "adminDashboard": {
+    "title": "Dasbor",
+    "subtitle": "Ikhtisar dan metrik sistem",
+    "totalUsers": "Total Pengguna",
+    "instructors": "Dosen",
+    "students": "Mahasiswa",
+    "activeAssignments": "Tugas Aktif",
+    "pendingReviews": "Review Tertunda",
+    "activeConsultations": "Konsultasi Aktif",
+    "recentActivity": "Aktivitas Terbaru",
+    "noRecentActivity": "Tidak ada aktivitas dalam 7 hari terakhir",
+    "escalationAlerts": "Peringatan Eskalasi Tenggat",
+    "noEscalationAlerts": "Tidak ada peringatan eskalasi aktif",
+    "quickActions": "Aksi Cepat",
+    "manageUsers": "Kelola Pengguna",
+    "manageUsersDesc": "Buat dan kelola akun pengguna",
+    "manageTemplates": "Kelola Template",
+    "manageTemplatesDesc": "Buat dan kelola template tugas",
+    "student": "Mahasiswa",
+    "daysOverdue": "hari terlambat"
+  },
   "files": {
     "dropzone": {
       "title": "Letakkan file di sini atau klik untuk mencari",

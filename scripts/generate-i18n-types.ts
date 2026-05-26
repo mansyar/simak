@@ -115,6 +115,27 @@ export type Translation = {
     manageAssignmentsDesc: string
     pendingCount: string
   }
+  adminDashboard: {
+    title: string
+    subtitle: string
+    totalUsers: string
+    instructors: string
+    students: string
+    activeAssignments: string
+    pendingReviews: string
+    activeConsultations: string
+    recentActivity: string
+    noRecentActivity: string
+    escalationAlerts: string
+    noEscalationAlerts: string
+    quickActions: string
+    manageUsers: string
+    manageUsersDesc: string
+    manageTemplates: string
+    manageTemplatesDesc: string
+    student: string
+    daysOverdue: string
+  }
   studentAssignments: {
     title: string
     subtitle: string

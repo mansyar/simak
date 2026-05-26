@@ -298,6 +298,27 @@
     "manageAssignmentsDesc": "Create and manage your assignments",
     "pendingCount": "{count} pending"
   },
+  "adminDashboard": {
+    "title": "Dashboard",
+    "subtitle": "System overview and metrics",
+    "totalUsers": "Total Users",
+    "instructors": "Instructors",
+    "students": "Students",
+    "activeAssignments": "Active Assignments",
+    "pendingReviews": "Pending Reviews",
+    "activeConsultations": "Active Consultations",
+    "recentActivity": "Recent Activity",
+    "noRecentActivity": "No recent activity in the last 7 days",
+    "escalationAlerts": "Deadline Escalation Alerts",
+    "noEscalationAlerts": "No active escalation alerts",
+    "quickActions": "Quick Actions",
+    "manageUsers": "Manage Users",
+    "manageUsersDesc": "Create and manage user accounts",
+    "manageTemplates": "Manage Templates",
+    "manageTemplatesDesc": "Create and manage assignment templates",
+    "student": "Student",
+    "daysOverdue": "days overdue"
+  },
   "files": {
     "dropzone": {
       "title": "Drop your file here or click to browse",
