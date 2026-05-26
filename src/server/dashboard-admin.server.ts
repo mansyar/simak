@@ -1,5 +1,5 @@
 // Server-only handler for admin dashboard data
-import { eq, and, desc, sql, isNull, lte, gte } from 'drizzle-orm';
+import { eq, and, desc, sql, isNull, lte, gte, aliasedTable } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions } from '../db/schema/submissions';
@@ -7,6 +7,8 @@ import { consultations } from '../db/schema/consultations';
 import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
+
+const instructorUsers = aliasedTable(users, 'instructor');
 
 function isAdmin(session: any): session is { user: { id: string; role: string }; session: any } {
   return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
@@ -78,16 +80,17 @@ export async function getAdminDashboardDataHandler() {
     const escalationAlerts = await db
       .select({
         submissionId: submissions.id,
-        instructorName: users.name,
+        instructorName: instructorUsers.name,
         assignmentTitle: assignments.title,
         checkpointName: checkpoints.name,
-        studentName: sql<string>`${users.name}`.as('student_name'),
+        studentName: users.name,
         daysOverdue: sql<number>`extract(day from now() - ${submissions.uploadedAt})::int`,
       })
       .from(submissions)
       .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
       .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
       .innerJoin(users, eq(checkpoints.studentId, users.id))
+      .innerJoin(instructorUsers, eq(assignments.instructorId, instructorUsers.id))
       .where(
         and(
           sql`${checkpoints.state} = 'submitted'`,

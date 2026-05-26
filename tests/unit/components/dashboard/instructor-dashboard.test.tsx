@@ -109,7 +109,7 @@ describe('InstructorDashboard component', () => {
     };
     render(<InstructorDashboard data={dataWithSubs} />);
     expect(screen.getByText('Jane Smith')).toBeDefined();
-    expect(screen.getByText('Submitted')).toBeDefined();
+    expect(screen.getByText('studentAssignments.status.submitted')).toBeDefined();
   });
 
   it('should render assignment overview items', async () => {

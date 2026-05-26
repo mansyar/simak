@@ -169,7 +169,13 @@ export function InstructorDashboard({ data }: Props) {
                           : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'
                   }`}
                 >
-                  {sub.status}
+                  {sub.status === 'Submitted'
+                    ? t('studentAssignments.status.submitted')
+                    : sub.status === 'Under Review'
+                      ? t('studentAssignments.status.under_review')
+                      : sub.status === 'Pass'
+                        ? t('studentAssignments.status.passed')
+                        : t('studentAssignments.status.revise')}
                 </span>
               </li>
             ))}
