@@ -64,13 +64,13 @@
   - [x] Write tests for `NotificationItem` — renders icon, title, message, relative timestamp, read/unread indicator
   - [x] Write tests for `NotificationCenter` — opens slide-over panel, groups by type, supports mark all read, shows empty state
   - [x] Run tests and confirm they fail
-- [ ] Task: Implement notification UI components (Green Phase)
-  - [ ] Create `src/components/notifications/NotificationBadge.tsx` — Bell/BellDot icon + unread count badge, click to open panel
-  - [ ] Create `src/components/notifications/NotificationItem.tsx` — type-based icon, title+message, relative timestamp via date-fns, read/unread styling
-  - [ ] Create `src/components/notifications/NotificationCenter.tsx` — slide-over panel with type-grouped notifications, mark all read, empty state, load more pagination
-  - [ ] Add i18n translation keys for notification UI labels
-  - [ ] Run `pnpm generate:i18n` to regenerate types
-  - [ ] Re-run tests and confirm they pass
+- [x] Task: Implement notification UI components (Green Phase) [0645438]
+  - [x] Create `src/components/notifications/NotificationBadge.tsx` — Bell/BellDot icon + unread count badge, click to open panel
+  - [x] Create `src/components/notifications/NotificationItem.tsx` — type-based icon, title+message, relative timestamp via date-fns, read/unread styling
+  - [x] Create `src/components/notifications/NotificationCenter.tsx` — slide-over panel with type-grouped notifications, mark all read, empty state, load more pagination
+  - [x] Add i18n translation keys for notification UI labels
+  - [x] Run `pnpm generate:i18n` to regenerate types
+  - [x] Re-run tests and confirm they pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: UI Components' (Protocol in workflow.md)
 
 ## Phase 5 — Layout Integration & Final Verification
