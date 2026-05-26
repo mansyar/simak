@@ -21,7 +21,7 @@
   - [x] Re-run tests and confirm they pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Complete Server Functions' (Protocol in workflow.md)
 
-## Phase 2 — Event Trigger Integration
+## Phase 2 — Event Trigger Integration [checkpoint: e832577]
 
 **Objective:** Wire notification creation into existing server handlers for `submission_received`, `review_completed`, and `revision_requested` events.
 
@@ -35,7 +35,7 @@
   - [x] Add `review_completed` notification creation in `submitReviewHandler` (pass decision) — notify the student
   - [x] Add `revision_requested` notification creation in `submitReviewHandler` (revise decision) — notify the student
   - [x] Re-run tests and confirm they pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Event Trigger Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Event Trigger Integration' (Protocol in workflow.md) [e832577]
 
 ## Phase 3 — TanStack Query Hooks with Polling
 
