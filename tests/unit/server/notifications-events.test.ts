@@ -22,6 +22,7 @@ vi.mock('@/lib/storage', () => ({
 
 describe('Event trigger notifications', () => {
   let mockDb: any;
+  let mockTx: any;
   const instructorSession = {
     user: { id: 'instructor-1', role: 'instructor' as const, name: 'Dr. Smith' },
     session: {} as any,
@@ -34,7 +35,7 @@ describe('Event trigger notifications', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    const mockTx = {
+    mockTx = {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),

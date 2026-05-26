@@ -5,6 +5,7 @@ import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { users } from '../db/schema/users';
+import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import { generatePresignedDownloadUrl } from '../lib/storage';
 import { calculateBreachDuration } from '../lib/sla';
@@ -318,6 +319,18 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
 
   // 4. Execute in transaction
   let breachDays = 0;
+  const slaFields: SLASubmissionFields = {
+    checkpointId: submission.checkpointId,
+    checkpointDueDate: submission.checkpointDueDate,
+    checkpointName: submission.checkpointName ?? '',
+    checkpointOrder: submission.checkpointOrder,
+    assignmentId: submission.assignmentId,
+    assignmentTitle: submission.assignmentTitle ?? '',
+    studentId: submission.studentId,
+    studentName: submission.studentName ?? '',
+    finalDeadline: submission.finalDeadline,
+  };
+
   try {
     await db.transaction(async (tx) => {
       // 4a. Insert review record
@@ -399,34 +412,43 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       );
 
       if (breachDays > 0) {
-        const slaFields: SLASubmissionFields = {
-          checkpointId: submission.checkpointId,
-          checkpointDueDate: submission.checkpointDueDate,
-          checkpointName: submission.checkpointName ?? '',
-          checkpointOrder: submission.checkpointOrder,
-          assignmentId: submission.assignmentId,
-          assignmentTitle: submission.assignmentTitle ?? '',
-          studentId: submission.studentId,
-          studentName: submission.studentName ?? '',
-          finalDeadline: submission.finalDeadline,
-        };
         await adjustDeadlinesForBreach(tx, slaFields, breachDays);
+      }
+
+      // 4f. Create notification for the student (review_completed or revision_requested)
+      if (decision === 'pass') {
+        await tx.insert(notifications).values({
+          userId: submission.studentId,
+          type: 'review_completed',
+          title: 'Review Completed',
+          message: `Your submission for checkpoint "${submission.checkpointName}" in assignment "${submission.assignmentTitle}" has passed!`,
+          channel: 'in_app',
+          metadata: {
+            checkpointId: submission.checkpointId,
+            assignmentId: submission.assignmentId,
+            submissionId,
+            decision,
+          },
+        });
+      } else if (decision === 'revise') {
+        await tx.insert(notifications).values({
+          userId: submission.studentId,
+          type: 'revision_requested',
+          title: 'Revision Requested',
+          message: `Your submission for checkpoint "${submission.checkpointName}" in assignment "${submission.assignmentTitle}" requires revision.`,
+          channel: 'in_app',
+          metadata: {
+            checkpointId: submission.checkpointId,
+            assignmentId: submission.assignmentId,
+            submissionId,
+            decision,
+          },
+        });
       }
     });
 
     // 4f. SLA breach notifications (after transaction — advisory, non-critical)
     if (breachDays > 0) {
-      const slaFields: SLASubmissionFields = {
-        checkpointId: submission.checkpointId,
-        checkpointDueDate: submission.checkpointDueDate,
-        checkpointName: submission.checkpointName ?? '',
-        checkpointOrder: submission.checkpointOrder,
-        assignmentId: submission.assignmentId,
-        assignmentTitle: submission.assignmentTitle ?? '',
-        studentId: submission.studentId,
-        studentName: submission.studentName ?? '',
-        finalDeadline: submission.finalDeadline,
-      };
       await dispatchSLABreachNotifications(db, slaFields, breachDays);
     }
 

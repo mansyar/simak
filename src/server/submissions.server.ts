@@ -1,7 +1,8 @@
 // Server-only handlers (not imported by client code)
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
-import { checkpoints, assignmentStudents } from '../db/schema/assignments';
+import { assignments, checkpoints, assignmentStudents } from '../db/schema/assignments';
+import { notifications } from '../db/schema/notifications';
 import { submissions } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
@@ -108,6 +109,36 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
     .update(checkpoints)
     .set({ state: 'submitted', updatedAt: new Date() })
     .where(eq(checkpoints.id, checkpointId));
+
+  // 5. Notify the instructor (submission_received event)
+  try {
+    const [instructorInfo] = await db
+      .select({
+        instructorId: assignments.instructorId,
+        assignmentTitle: assignments.title,
+      })
+      .from(assignments)
+      .where(eq(assignments.id, checkpoint.assignmentId))
+      .limit(1);
+
+    if (instructorInfo) {
+      await db.insert(notifications).values({
+        userId: instructorInfo.instructorId,
+        type: 'submission_received',
+        title: 'New Submission Received',
+        message: `${session.user.name || 'A student'} has submitted a checkpoint for ${instructorInfo.assignmentTitle}.`,
+        channel: 'in_app',
+        metadata: {
+          checkpointId,
+          assignmentId: checkpoint.assignmentId,
+          submissionId: nextVersion,
+        },
+      });
+    }
+  } catch (err) {
+    // Non-blocking error logging for notification dispatch
+    console.error('Failed to create submission_received notification:', err);
+  }
 
   return { success: true };
 }
