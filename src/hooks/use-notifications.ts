@@ -1,16 +1,66 @@
-// Stubs for TanStack Query notification hooks (Red Phase)
-export function useUnreadCount(): any {
-  return {} as any;
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getUnreadCount, listNotifications, markRead, markAllRead } from '@/server/notifications';
+
+export function useUnreadCount() {
+  return useQuery({
+    queryKey: ['notifications', 'unreadCount'],
+    queryFn: async () => {
+      const res = await getUnreadCount({});
+      if ('error' in res) {
+        throw new Error(res.error);
+      }
+      return res.count;
+    },
+    refetchInterval: 15000,
+  });
 }
 
-export function useNotificationsList(_options?: any): any {
-  return {} as any;
+export function useNotificationsList(
+  options: { page?: number; limit?: number; type?: string } = {},
+) {
+  const { page = 1, limit = 20, type } = options;
+  return useQuery({
+    queryKey: ['notifications', 'list', { page, limit, type }],
+    queryFn: async () => {
+      const res = await listNotifications({ data: { page, limit, type } });
+      if ('error' in res) {
+        throw new Error(res.error);
+      }
+      return res;
+    },
+  });
 }
 
-export function useMarkRead(): any {
-  return {} as any;
+export function useMarkRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (notificationId: number) => {
+      const res = await markRead({ data: { notificationId } });
+      if ('error' in res) {
+        throw new Error(res.error);
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'unreadCount'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'list'] });
+    },
+  });
 }
 
-export function useMarkAllRead(): any {
-  return {} as any;
+export function useMarkAllRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const res = await markAllRead({});
+      if ('error' in res) {
+        throw new Error(res.error);
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'unreadCount'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications', 'list'] });
+    },
+  });
 }
