@@ -60,7 +60,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 ### Student
 
 1. Receives invitation email with password setup link or gets link from Admin.
-2. Sets password, logs in, and sees a dashboard with active assignments and progress.
+2. Sets password, logs in, and is redirected to the student dashboard with active assignments overview, upcoming deadlines, pending reviews, and consultation reminders.
 3. Opens an assignment to view its checkpoints, deadlines, and required consultations.
 4. Submits files for the current checkpoint (`.docx`, `.pdf`).
 5. If review is **Pass** → next checkpoint unlocks.
@@ -71,7 +71,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 ### Instructor
 
-1. Logs in and sees a dashboard with pending reviews and student progress summaries.
+1. Logs in and is redirected to the instructor dashboard with pending review queue (SLA badges), recent submissions, assignment overview, and quick actions.
 2. Creates new assignments by selecting a template and assigning students.
 3. Reviews submissions from the review queue, providing pass/revise decisions with comments and optional feedback files.
 4. Manages deadlines — extends individual checkpoint due dates and unlocks overdue checkpoints via the collapsible Deadline Manager on the assignment detail page.
@@ -80,7 +80,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 ### Admin
 
-1. Logs in to an admin dashboard with system-wide metrics.
+1. Logs in and is redirected to the admin dashboard with system-wide metrics (total users, active assignments, pending reviews, active consultations), recent activity feed, deadline escalation alerts, and quick actions.
 2. Creates Instructor and Student accounts — system sends password setup email.
 3. Generates password setup links for manual sharing when needed.
 4. Manages assignment templates — creates templates with ordered checkpoints and types.
@@ -165,7 +165,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 - **Responsive Design**: Usable on desktop and mobile devices with touch-friendly interactions.
 - **Bilingual**: Full English and Indonesian language support. Users can switch via settings or browser preference detection.
-- **Role-based Dashboards**: Each role sees relevant information and actions on first load.
+- **Role-based Dashboards**: Each role has a dedicated dashboard page (`/student/dashboard`, `/instructor/dashboard`, `/admin/dashboard`) with relevant summary widgets and quick actions. Users are redirected to their role's dashboard after login.
 - **Dedicated Pages**: Complex workflows have full-featured dedicated pages linked from the dashboard.
 - **Dark Mode**: Light and dark theme support.
 - **Accessibility**: Keyboard navigation, screen reader support.

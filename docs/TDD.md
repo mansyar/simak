@@ -37,12 +37,12 @@ Throughout this document, features are tagged as:
 /                                         → Landing / Login [v1]
 
 / (authenticated — shared routes)
-├── /dashboard                            → Role-aware landing page with summary widgets [v1]
 ├── /settings                             → Personal preferences (profile, theme, notifs) [v2]
 ├── /settings/security                    → Password change, 2FA, sessions [v2]
 
 / (authenticated — student)
 ├── /student                              → Student sidebar layout
+│   ├── /student/dashboard                → Student dashboard with summary widgets [v1]
 │   ├── /student/assignments              → Assignment list [v1]
 │   ├── /student/assignments/$id          → Assignment detail with checkpoints [v1]
 │   │   └── /student/assignments/$id/
@@ -52,6 +52,7 @@ Throughout this document, features are tagged as:
 
 / (authenticated — instructor)
 ├── /instructor                           → Instructor sidebar layout
+│   ├── /instructor/dashboard             → Instructor dashboard with summary widgets [v1]
 │   ├── /instructor/assignments           → All assignments [v1]
 │   ├── /instructor/assignments/new       → Assignment creation wizard [v1]
 │   ├── /instructor/assignments/$id       → Assignment detail (instructor view) [v1]
@@ -61,6 +62,7 @@ Throughout this document, features are tagged as:
 
 / (authenticated — admin)
 ├── /admin                                → Admin sidebar layout
+│   ├── /admin/dashboard                  → Admin dashboard with system metrics [v1]
 │   ├── /admin/users                      → User management [v1]
 │   ├── /admin/templates                  → Template list [v1]
 │   ├── /admin/templates/$id              → Template editor [v1]
@@ -75,14 +77,13 @@ Throughout this document, features are tagged as:
 ### Route Layout Hierarchy
 
 - **`__root.tsx`** — Top-level providers (theme, query client).
-- **`_unauthenticated.tsx`** — Layout for public pages (login, password setup). Redirects to dashboard if already authenticated.
+- **`_unauthenticated.tsx`** — Layout for public pages (login, password setup). Redirects to role-specific dashboard if already authenticated.
 - **`_authenticated.tsx`** — Auth guard. Checks session, redirects to login if unauthenticated.
-- Shared routes live directly under `_authenticated` (dashboard, settings).
 - **`_student.tsx`** — Student sidebar layout. `beforeLoad` guards that user role === student. All `/student/*` routes inherit this layout.
 - **`_instructor.tsx`** — Instructor sidebar layout. `beforeLoad` guards role === instructor. All `/instructor/*` routes inherit this layout.
 - **`_admin.tsx`** — Admin sidebar layout. `beforeLoad` guards role === admin. All `/admin/*` routes inherit this layout.
 
-The role-specific layout guard means a student accessing `/instructor/reviews` is redirected automatically — no per-route checks needed.
+The role-specific layout guard means a student accessing `/instructor/reviews` is redirected automatically — no per-route checks needed. The `requireRole()` helper redirects unauthorized users to their own role-specific dashboard via `getRoleDashboard()`.
 
 ### Project Structure
 
@@ -93,7 +94,8 @@ simak/
 │   ├── app/                  → Application root files (global.css, legacy __root.tsx location)
 │   ├── components/           → React components
 │   │   ├── ui/               → shadcn/ui primitives
-│   │   ├── layout/           → Sidebar, language switcher, theme toggle
+│   │   ├── layout/           → Sidebar (student, instructor, admin), language switcher, theme toggle
+│   │   ├── dashboard/        → Role-specific dashboard components (StudentDashboard, InstructorDashboard, AdminDashboard)
 │   │   ├── student/
 │   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton
 │   │   ├── instructor/
@@ -118,7 +120,12 @@ simak/
 │   │   ├── templates.ts      → Template CRUD
 │   │   ├── templates.server.ts → Server-only template handlers
 │   │   ├── setup-password.ts → Custom password setup handler
-│   │   └── files.ts          → Presigned URL generation
+│   │   ├── files.ts          → Presigned URL generation
+│   │   ├── dashboard.ts      → Dashboard data stubs (student, instructor, admin)
+│   │   ├── dashboard.server.ts → Re-exports from per-role handler files
+│   │   ├── dashboard-student.server.ts → Student dashboard handler
+│   │   ├── dashboard-instructor.server.ts → Instructor dashboard handler
+│   │   └── dashboard-admin.server.ts → Admin dashboard handler
 │   ├── db/
 │   │   ├── schema/           → Drizzle schema (split by domain)
 │   │   ├── index.ts          → Database client
@@ -129,6 +136,7 @@ simak/
 │   ├── lib/
 │   │   ├── email.ts          → Resend client
 │   │   ├── storage.ts        → R2 client
+│   │   ├── route-utils.ts    → Role-based dashboard routing utility
 │   │   └── utils.ts          → Shared utilities
 │   └── config/
 │       └── env.ts            → Validated environment variables
@@ -149,21 +157,26 @@ simak/
 
 ### Dashboard Widgets [v1]
 
-`/dashboard` is a shared route that renders different widgets based on the logged-in user's role. Each widget is a summary card linking to the full dedicated page.
+Each role gets a dedicated dashboard page rendered within its role layout (`_student`, `_instructor`, `_admin`). After login, users are redirected to their role's dashboard based on their role:
 
-| Role           | Widgets                                                                                                                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Student**    | Active assignments (up to 4 cards with progress), items pending review, upcoming deadlines, recent notifications. Links to `/student/assignments`.                                          |
-| **Instructor** | Pending reviews (top 5 with student name + checkpoint), assignments nearing their deadline, quick "Create assignment" action. Links to `/instructor/reviews` and `/instructor/assignments`. |
-| **Admin**      | Stat cards: total users, total templates, active assignments. Quick actions: "Create user", "Create template". Links to `/admin/users` and `/admin/templates`.                              |
+- `student` → `/student/dashboard`
+- `instructor` → `/instructor/dashboard`
+- `superadmin` / `admin` → `/admin/dashboard`
 
-Widget data is fetched via a single **aggregated server function** per role. Instead of the client issuing 4 separate queries (assignments + checkpoints + submissions + notifications), the server function executes one multi-join query and returns a pre-shaped payload. This avoids N+1 and minimizes round-trips.
+| Role           | Dashboard Route         | Widgets                                                                                                                                                                                                                                                                                    |
+| -------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Student**    | `/student/dashboard`    | Active Assignments (card grid with progress bars), Upcoming Deadlines (next 5, color-coded urgency, overdue badges), Pending Reviews (submissions under review, wait times), Consultation Reminders (pending verifications)                                                                |
+| **Instructor** | `/instructor/dashboard` | Pending Review Queue (count + FIFO list with SLA badges: On Time/Approaching/Breached), Recent Submissions (last 5 with status badges), Assignment Overview (cards with student count, pending count, progress), Quick Actions (Go to Review Queue, Manage Assignments)                    |
+| **Admin**      | `/admin/dashboard`      | System Metrics (6 cards: Total Users, Instructors, Students, Active Assignments, Pending Reviews, Active Consultations), Recent Activity Feed (last 10 events, 7 days), Deadline Escalation Alerts (SLA breaches >3 days with red styling), Quick Actions (Manage Users, Manage Templates) |
+
+Widget data is fetched via a single **aggregated server function** per role. Each handler verifies session + role, executes multiple Drizzle queries, and returns a pre-shaped payload. All widgets show appropriate empty states when no data is available.
 
 Query key: `['dashboard']` with role differentiation handled server-side.
 
 ### Hybrid Navigation Pattern
 
-- **Dashboard as hub**: Each role gets `/dashboard` with summary widgets and quick actions. [v1]
+- **Dashboard as hub**: Each role gets a dedicated dashboard (`/student/dashboard`, `/instructor/dashboard`, `/admin/dashboard`) with summary widgets and quick actions. [v1]
+- **Role-based redirects**: After login, users are redirected to their role's dashboard. The `_unauthenticated` layout redirects authenticated users to their role-specific dashboard via `getRoleDashboard()`. [v1]
 - **Dedicated pages**: Complex workflows have full-featured pages linked from the dashboard. [v1]
 - **Context-aware navigation**: Breadcrumbs and back-links preserve workflow context. [v2]
 
@@ -513,9 +526,9 @@ Admin       (creates Instructors and Students)
 - Server-side sessions stored in the `session` table (managed by Better-Auth via Drizzle adapter).
 - Session validation via `getSessionFromHeaders()` server function using `auth.api.getSession()` with SSR request headers.
 - Route-level guard via TanStack Router `beforeLoad`:
-  - `_unauthenticated` layout redirects authenticated users to `/dashboard`.
+  - `_unauthenticated` layout redirects authenticated users to their role-specific dashboard via `getRoleDashboard()`.
   - `_authenticated` layout redirects unauthenticated users to `/auth/login`.
-- Role-based access via `requireRole(roles)` helper — wraps session check with role validation.
+- Role-based access via `requireRole(roles)` helper — wraps session check with role validation. Unauthorized users are redirected to their own dashboard.
 - Password hashing uses Better-Auth's built-in scrypt via `better-auth/crypto`.
 - File downloads check ownership and role before generating a presigned URL.
 
