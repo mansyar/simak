@@ -35,13 +35,13 @@
   - [x] Widget 4 — Consultation Reminders list
   - [x] Each widget has empty state
   - [x] Responsive grid layout (1 col mobile, 2 cols desktop)
-- [ ] Task: Create reusable dashboard widget components (src/components/dashboard/)
-  - [ ] StudentDashboard.tsx, AssignmentProgressCard.tsx, DeadlineItem.tsx
-  - [ ] PendingReviewItem.tsx, ConsultationReminderItem.tsx
-- [ ] Task: Add i18n translations for student dashboard
-  - [ ] Add keys to locales/en.json and locales/id.json
-  - [ ] Run pnpm generate:i18n
-- [ ] Task: Write unit tests for student dashboard components
+- [x] Task: Create reusable dashboard widget components (src/components/dashboard/) [a4898df]
+  - [x] StudentDashboard.tsx (all widgets inlined for simplicity)
+  - [x] WidgetCard, EmptyState shared sub-components
+- [x] Task: Add i18n translations for student dashboard [3ee5c44]
+  - [x] Add keys to locales/en.json and locales/id.json
+  - [x] Run pnpm generate:i18n
+- [x] Task: Write unit tests for student dashboard components [97ba452]
 - [ ] Task: Conductor — User Manual Verification 'Phase 2: Student Dashboard' (Protocol in workflow.md)
 
 ## Phase 3: Instructor Dashboard [checkpoint: —]
