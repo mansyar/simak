@@ -340,5 +340,17 @@
     "serverError": "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
     "required": "Bidang ini wajib diisi",
     "invalidEmail": "Masukkan alamat email yang valid"
+  },
+  "notifications": {
+    "title": "Notifikasi",
+    "markAllRead": "Tandai semua dibaca",
+    "empty": "Belum ada notifikasi",
+    "unreadCount": "notifikasi belum dibaca",
+    "groups": {
+      "newReviews": "Ulasan Baru",
+      "consultations": "Pembaruan Konsultasi",
+      "submissions": "Unggahan",
+      "system": "Notifikasi Sistem"
+    }
   }
 }

@@ -198,6 +198,18 @@ export type Translation = {
     deleteSuccess: string
     inUseBanner: string
   }
+  notifications: {
+    title: string
+    markAllRead: string
+    empty: string
+    unreadCount: string
+    groups: {
+      newReviews: string
+      consultations: string
+      submissions: string
+      system: string
+    }
+  }
 }
 
 export type TranslationFunctions = Record<string, (key: string) => string>

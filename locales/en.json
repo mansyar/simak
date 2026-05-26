@@ -340,5 +340,17 @@
     "serverError": "An unexpected error occurred. Please try again later.",
     "required": "This field is required",
     "invalidEmail": "Please enter a valid email address"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "empty": "No notifications yet",
+    "unreadCount": "unread notifications",
+    "groups": {
+      "newReviews": "New Reviews",
+      "consultations": "Consultation Updates",
+      "submissions": "Submissions",
+      "system": "System Notifications"
+    }
   }
 }
