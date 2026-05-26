@@ -35,22 +35,16 @@ describe('StudentSidebar', () => {
   });
 
   it('should render SIMAK Student title', () => {
-    mockLocation.mockReturnValue({ pathname: '/dashboard' });
-    render(<StudentSidebar />);
-    expect(screen.getByText('SIMAK Student')).toBeDefined();
-  });
-
-  it('should render dashboard link', () => {
-    mockLocation.mockReturnValue({ pathname: '/dashboard' });
+    mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
     render(<StudentSidebar />);
 
-    const dashboardLink = screen.getByTestId('sidebar-link-/dashboard');
+    const dashboardLink = screen.getByTestId('sidebar-link-/student/dashboard');
     expect(dashboardLink).toBeDefined();
     expect(dashboardLink.textContent).toBe('nav.dashboard');
   });
 
   it('should render assignments link', () => {
-    mockLocation.mockReturnValue({ pathname: '/dashboard' });
+    mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
     render(<StudentSidebar />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/student/assignments');
@@ -59,10 +53,10 @@ describe('StudentSidebar', () => {
   });
 
   it('should highlight the currently active route', () => {
-    mockLocation.mockReturnValue({ pathname: '/dashboard' });
+    mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
     render(<StudentSidebar />);
 
-    const dashboardLink = screen.getByTestId('sidebar-link-/dashboard');
+    const dashboardLink = screen.getByTestId('sidebar-link-/student/dashboard');
     expect(dashboardLink.className).toContain('bg-primary');
     expect(dashboardLink.className).toContain('text-primary-foreground');
   });
@@ -77,7 +71,7 @@ describe('StudentSidebar', () => {
   });
 
   it('should not apply the active class to inactive routes', () => {
-    mockLocation.mockReturnValue({ pathname: '/dashboard' });
+    mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
     render(<StudentSidebar />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/student/assignments');

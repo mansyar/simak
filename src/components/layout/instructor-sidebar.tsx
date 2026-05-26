@@ -7,7 +7,7 @@ export function InstructorSidebar() {
   const { t } = useI18n();
 
   const links = [
-    { to: '/dashboard', label: 'nav.dashboard', icon: LayoutDashboard },
+    { to: '/instructor/dashboard', label: 'nav.dashboard', icon: LayoutDashboard },
     { to: '/instructor/assignments', label: 'nav.assignments', icon: ClipboardList },
     { to: '/instructor/reviews', label: 'nav.reviews', icon: ClipboardCheck },
   ] as const;

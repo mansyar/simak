@@ -6,7 +6,7 @@ export function AdminSidebar() {
   const { t } = useI18n();
 
   const links = [
-    { to: '/dashboard', label: 'adminSidebar.dashboard' },
+    { to: '/admin/dashboard', label: 'adminSidebar.dashboard' },
     { to: '/admin/users', label: 'adminSidebar.users' },
     { to: '/admin/templates', label: 'adminSidebar.templates' },
   ] as const;

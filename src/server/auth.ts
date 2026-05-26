@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { auth } from '../auth/config';
 import { getDb } from '../db/index';
 import { users } from '../db/schema/users';
+import { getRoleDashboard } from '../lib/route-utils';
 
 export type Session = {
   user: {
@@ -73,7 +74,7 @@ export async function requireRole(roles: string[]): Promise<Session> {
   }
 
   if (!roles.includes(session.user.role)) {
-    throw redirect({ to: '/dashboard' as unknown as '.' });
+    throw redirect({ to: getRoleDashboard(session.user.role) as unknown as '.' });
   }
 
   return session;

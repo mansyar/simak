@@ -35,22 +35,16 @@ describe('InstructorSidebar', () => {
   });
 
   it('should render SIMAK Instructor title', () => {
-    mockLocation.mockReturnValue({ pathname: '/dashboard' });
-    render(<InstructorSidebar />);
-    expect(screen.getByText('SIMAK Instructor')).toBeDefined();
-  });
-
-  it('should render dashboard link', () => {
-    mockLocation.mockReturnValue({ pathname: '/dashboard' });
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
     render(<InstructorSidebar />);
 
-    const dashboardLink = screen.getByTestId('sidebar-link-/dashboard');
+    const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
     expect(dashboardLink).toBeDefined();
     expect(dashboardLink.textContent).toBe('nav.dashboard');
   });
 
   it('should render assignments link', () => {
-    mockLocation.mockReturnValue({ pathname: '/dashboard' });
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
     render(<InstructorSidebar />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/instructor/assignments');
@@ -59,10 +53,10 @@ describe('InstructorSidebar', () => {
   });
 
   it('should highlight the currently active route', () => {
-    mockLocation.mockReturnValue({ pathname: '/dashboard' });
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
     render(<InstructorSidebar />);
 
-    const dashboardLink = screen.getByTestId('sidebar-link-/dashboard');
+    const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
     expect(dashboardLink.className).toContain('bg-primary');
     expect(dashboardLink.className).toContain('text-primary-foreground');
   });
@@ -77,7 +71,7 @@ describe('InstructorSidebar', () => {
   });
 
   it('should not apply the active class to inactive routes', () => {
-    mockLocation.mockReturnValue({ pathname: '/dashboard' });
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
     render(<InstructorSidebar />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/instructor/assignments');

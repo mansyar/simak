@@ -38,7 +38,7 @@ describe('AdminSidebar', () => {
     mockLocation.mockReturnValue({ pathname: '/admin/users' });
     render(<AdminSidebar />);
 
-    const dashboardLink = screen.getByTestId('sidebar-link-/dashboard');
+    const dashboardLink = screen.getByTestId('sidebar-link-/admin/dashboard');
     expect(dashboardLink).toBeDefined();
     expect(dashboardLink.textContent).toBe('adminSidebar.dashboard');
   });
@@ -74,7 +74,7 @@ describe('AdminSidebar', () => {
     mockLocation.mockReturnValue({ pathname: '/admin/users' });
     render(<AdminSidebar />);
 
-    const dashboardLink = screen.getByTestId('sidebar-link-/dashboard');
+    const dashboardLink = screen.getByTestId('sidebar-link-/admin/dashboard');
     // Inactive link should NOT have standalone bg-accent (only hover:bg-accent/50 for hover state)
     const classes = dashboardLink.className.split(' ');
     const activeClasses = classes.filter((c) => c === 'bg-accent');

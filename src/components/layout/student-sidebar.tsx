@@ -7,7 +7,7 @@ export function StudentSidebar() {
   const { t } = useI18n();
 
   const links = [
-    { to: '/dashboard', label: 'nav.dashboard', icon: LayoutDashboard },
+    { to: '/student/dashboard', label: 'nav.dashboard', icon: LayoutDashboard },
     { to: '/student/assignments', label: 'nav.assignments', icon: ClipboardList },
   ] as const;
 
