@@ -45,10 +45,10 @@ describe('Notification UI Components', () => {
 
       // Should render bell button
       const btn = screen.getByRole('button', { name: /notification/i });
-      expect(btn).toBeInTheDocument();
+      expect(btn).toBeDefined();
 
       // Unread count badge should not be in the document
-      expect(screen.queryByText('0')).not.toBeInTheDocument();
+      expect(screen.queryByText('0')).toBeNull();
     });
 
     it('renders unread count badge when count is greater than 0', () => {
@@ -62,7 +62,7 @@ describe('Notification UI Components', () => {
 
       // Unread count badge should display "5"
       const badge = screen.getByText('5');
-      expect(badge).toBeInTheDocument();
+      expect(badge).toBeDefined();
 
       // Clicking opens the panel
       const btn = screen.getByRole('button', { name: /notification/i });
@@ -91,15 +91,15 @@ describe('Notification UI Components', () => {
 
       render(<NotificationItem item={sampleNotification} />);
 
-      expect(screen.getByText('Review Passed')).toBeInTheDocument();
-      expect(screen.getByText('Your thesis chapter has been approved.')).toBeInTheDocument();
+      expect(screen.getByText('Review Passed')).toBeDefined();
+      expect(screen.getByText('Your thesis chapter has been approved.')).toBeDefined();
 
       // Relative time (5m ago / 5 mins ago)
-      expect(screen.getByText(/5m|5 min/i)).toBeInTheDocument();
+      expect(screen.getByText(/5m|5 min/i)).toBeDefined();
 
       // Click to mark as read
       const itemRow = screen.getByText('Review Passed').closest('div');
-      expect(itemRow).toBeInTheDocument();
+      expect(itemRow).not.toBeNull();
       fireEvent.click(itemRow!);
 
       expect(mockMutate).toHaveBeenCalledWith(10);
@@ -119,7 +119,7 @@ describe('Notification UI Components', () => {
 
       render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
 
-      expect(screen.getByText('No notifications yet')).toBeInTheDocument();
+      expect(screen.getByText('No notifications yet')).toBeDefined();
     });
 
     it('renders slide-over panel, groups by type, and supports mark all read', () => {
@@ -159,12 +159,12 @@ describe('Notification UI Components', () => {
       render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
 
       // Verify group headers
-      expect(screen.getByText('New Reviews')).toBeInTheDocument();
-      expect(screen.getByText('Consultation Updates')).toBeInTheDocument();
+      expect(screen.getByText('New Reviews')).toBeDefined();
+      expect(screen.getByText('Consultation Updates')).toBeDefined();
 
       // Verify items
-      expect(screen.getByText('Pass Decision')).toBeInTheDocument();
-      expect(screen.getByText('Consultation Approved')).toBeInTheDocument();
+      expect(screen.getByText('Pass Decision')).toBeDefined();
+      expect(screen.getByText('Consultation Approved')).toBeDefined();
 
       // Mark all read button
       const markBtn = screen.getByText('Mark all read');
