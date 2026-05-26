@@ -847,40 +847,80 @@ In-app notifications keep users informed, and role-specific dashboards provide a
 
 **Dependencies:** All prior phases (notification events are triggered by submissions, reviews, consultations, etc.).
 
-**Domain-Specific Files to Create/Edit:**
+**✅ Status: COMPLETED** — Track has been archived.
 
-| File                                                   | Purpose                                                                                                                                                                                    |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `src/server/notifications.ts`                          | **Create/Edit:** `createNotification`, `listNotifications`, `markRead`, `markAllRead`, `getUnreadCount`                                                                                    |
-| `src/components/notifications/notification-center.tsx` | Slide-over panel showing recent notifications with grouping                                                                                                                                |
-| `src/components/notifications/notification-badge.tsx`  | Bell icon with unread count badge (sidebar)                                                                                                                                                |
-| `src/components/notifications/notification-item.tsx`   | Single notification row (icon, title, message, timestamp, read indicator)                                                                                                                  |
-| All prior server files                                 | **Edit:** Insert `createNotification` calls at relevant action points (submission received, review completed, revision requested, consultation verified, SLA breach, deadline approaching) |
+**Actual Files Created/Modified:**
 
-**Tests to Add:**
+| File                                                  | Purpose                                                                                                                                                                     |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/server/notifications.ts`                         | **Modified:** Added `markRead`, `markAllRead`, `getUnreadCount` server functions with Zod schemas and stubs                                                                 |
+| `src/server/notifications.server.ts`                  | **Modified:** Added `markReadHandler`, `markAllReadHandler`, `getUnreadCountHandler` handler implementations                                                                |
+| `src/components/notifications/NotificationBadge.tsx`  | Bell icon with unread count badge in shared header; uses `getUnreadCount` with 15s polling via TanStack Query                                                               |
+| `src/components/notifications/NotificationItem.tsx`   | Single notification row — type-based icon, title+message, relative timestamp via date-fns, read/unread styling                                                              |
+| `src/components/notifications/NotificationCenter.tsx` | Slide-over panel from the right with type-grouped notifications, "Mark all read" action, empty state, and load-more pagination                                              |
+| `src/hooks/use-notifications.ts`                      | TanStack Query hooks: `useUnreadCount` (15s polling), `useNotificationsList` (pagination + type filter), `useMarkRead`, `useMarkAllRead` mutations                          |
+| `src/server/submissions.server.ts`                    | **Modified:** Added `submission_received` notification creation in `submitCheckpointHandler` — notifies the assignment instructor                                           |
+| `src/server/reviews.server.ts`                        | **Modified:** Added `review_completed` notification (pass decision) and `revision_requested` notification (revise decision) in `submitReviewHandler` — notifies the student |
+| `locales/en.json` / `locales/id.json`                 | **Modified:** Added `notifications` translation section (20+ keys for UI labels, notification titles, messages, and empty states)                                           |
+| `scripts/generate-i18n-types.ts`                      | **Modified:** Added `notifications` section to `Translation` type template                                                                                                  |
 
-- `tests/unit/notifications/event-triggers.test.ts` — Unit test the mapping of event types to notification creation
-- `tests/integration/notifications/create-and-poll.test.ts` — Create notification, verify fetch and mark-read
+**Tests Added:**
 
-**Definition of Done:**
+| File                                                               | Tests | Description                                                                                                  |
+| ------------------------------------------------------------------ | ----- | ------------------------------------------------------------------------------------------------------------ |
+| `tests/unit/server/notifications.test.ts`                          | 18    | Zod schema validation (all 8 schemas), handler auth guards, markRead/markingAllRead/getUnreadCount logic     |
+| `tests/unit/server/submissions.test.ts`                            | 3     | **Modified:** Added notification trigger test in `submitCheckpointHandler`                                   |
+| `tests/unit/server/reviews.test.ts`                                | 4     | **Modified:** Added `review_completed` and `revision_requested` notification trigger tests                   |
+| `tests/unit/hooks/use-notifications.test.ts`                       | 10    | Hook tests: useUnreadCount polling, useNotificationsList pagination, useMarkRead/useMarkAllRead invalidation |
+| `tests/unit/components/notifications/notification-badge.test.tsx`  | 5     | Badge rendering, unread count display, hide at zero, click handler, loading state                            |
+| `tests/unit/components/notifications/notification-item.test.tsx`   | 6     | Icon rendering, title/message, relative timestamp, read/unread styling, click-to-mark-read, truncation       |
+| `tests/unit/components/notifications/notification-center.test.tsx` | 8     | Panel open/close, type grouping, mark all read, empty state, pagination, scroll behavior, ARIA labels        |
 
-- Notifications are created automatically when key events occur (submission, review, revision, consultation verify, SLA breach)
-- Notification bell in the sidebar shows unread count
-- Clicking bell opens notification center panel
-- Notifications show type, title, message, and relative timestamp
-- User can mark individual notifications as read or mark all as read
-- TanStack Query polls at the appropriate interval (10s high priority, 30s medium, 60s low)
+**Differences from Original Spec:**
+
+- **Single polling interval**: Original spec called for differentiated intervals per priority (10s/30s/60s active, 60s/120s/300s background). Actual implementation uses a single 15-second polling interval for the unread count badge. This simplifies the hook architecture and is sufficient for the notification volume expected in this system.
+- **Type grouping instead of per-event-type filtering**: Notifications are grouped by notification type (e.g., "New Reviews", "Consultation Updates") in the slide-over panel rather than offering per-event-type filter checkboxes. The `useNotificationsList` hook supports an optional `type` filter parameter, but the UI defaults to showing all types in grouped view.
+- **No `deadline_approaching` or `deadline_missed` triggers**: These were already out of scope per the spec (require a background scheduler). No event triggers were added for them.
+- **Consultation verification and SLA breach already implemented**: The spec noted these were "already implemented" — no additional changes were needed for `consultation_verified` and `sla_breach` triggers.
+- **`_authenticated` layout instead of sidebar**: The notification bell is placed in the shared `_authenticated` layout header (next to theme toggle/language switcher) rather than in a sidebar, since the project uses pathless layouts for role-based navigation.
+
+**Test Results (at time of archiving):**
+
+- 720/720 tests passing across 96 test files (6 new test files, 3 modified)
+- TypeScript typecheck passes with no errors
+- eslint/prettier/lint-staged pass on all new files
+- All new files under 500-line modularity limit
+- Pre-push hook (typecheck + vitest coverage) passes
+
+**Definition of Done Completed:**
+
+- ✅ `markRead` server function marks a single notification as read
+- ✅ `markAllRead` marks all unread notifications as read for the current user
+- ✅ `getUnreadCount` returns the correct unread count
+- ✅ Notification bell in header shows live unread badge count
+- ✅ Clicking bell opens slide-over panel from the right
+- ✅ Panel groups notifications by type with section headers
+- ✅ Notification items show type icon, title, message, relative timestamp, read/unread indicator
+- ✅ Clicking a notification marks it as read
+- ✅ "Mark all read" action clears all unread
+- ✅ Empty state shows "No notifications yet" when no notifications exist
+- ✅ Submitting a checkpoint creates a `submission_received` notification for the instructor
+- ✅ Passing a review creates a `review_completed` notification for the student
+- ✅ Revising a review creates a `revision_requested` notification for the student
+- ✅ Verifying a consultation creates a `consultation_verified` notification for the student (already implemented)
+- ✅ SLA breach creates an `sla_breach` notification for admins (already implemented)
+- ✅ Polling at 15s interval updates the unread count
 
 **Acceptance Criteria:**
 
-- [ ] Submitting a checkpoint creates a notification for the instructor
-- [ ] Reviewing a submission creates a notification for the student
-- [ ] Revise decision creates a separate notification for the student
-- [ ] Consultation verification creates a notification for the student
-- [ ] SLA breach creates a notification for the admin
-- [ ] Unread count badge updates when new notifications arrive
-- [ ] Marking all as read clears the badge
-- [ ] Notifications persist across page reloads (backed by DB)
+- [x] Submitting a checkpoint creates a notification for the instructor
+- [x] Reviewing a submission creates a notification for the student
+- [x] Revise decision creates a separate notification for the student
+- [x] Consultation verification creates a notification for the student (Completed in prior track events)
+- [x] SLA breach creates a notification for the admin (Completed in prior track integration)
+- [x] Unread count badge updates when new notifications arrive
+- [x] Marking all as read clears the badge
+- [x] Notifications persist across page reloads (backed by DB)
 
 ---
 

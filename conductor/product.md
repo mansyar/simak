@@ -172,3 +172,15 @@ Students and instructors lack a centralized system to:
 - **DeadlineManager UI** — Collapsible per-student section on `/instructor/assignments/$id` with Unlock button (confirmation dialog) and Extend Deadline date picker
 - **TanStack Query mutations** — `unlockCheckpoint` and `extendDeadline` via `useMutation` with loading and error states
 - **i18n translations** — Full English and Indonesian translations for the Deadline Manager UI
+
+### Track 7.1: In-App Notification System (May 2026)
+
+- **Server functions** — `markRead`, `markAllRead`, `getUnreadCount` with Zod schemas, client-safe stubs, and server-only handlers
+- **Event trigger integration** — `submitCheckpointHandler` creates `submission_received` notification for the instructor; `submitReviewHandler` creates `review_completed` (pass) and `revision_requested` (revise) notifications for the student
+- **Consultation & SLA notifications** — `consultation_verified` and `sla_breach` notifications were already implemented in prior tracks; no changes needed
+- **TanStack Query hooks** — `useUnreadCount` with 15-second polling interval, `useNotificationsList` with pagination and optional type filter, `useMarkRead` and `useMarkAllRead` mutations with query key invalidation
+- **NotificationBadge component** — Bell/BellDot icon in the shared `_authenticated` layout header; red badge with unread count (auto-hides at zero); click-to-open panel trigger
+- **NotificationItem component** — Type-based icon (lucide-react), title + message (truncated to 2 lines), relative timestamp via `date-fns`, read/unread visual distinction (bold vs normal text, blue dot)
+- **NotificationCenter component** — Slide-over panel from the right with type-grouped sections, "Mark all read" action, empty state ("No notifications yet"), load-more pagination on scroll
+- **i18n translations** — Full English and Indonesian translations for notification UI (20+ keys across labels, titles, messages, and empty states)
+- **Polling behavior** — Single 15-second interval for unread count (simplified from original differentiated priority intervals); sufficient for expected notification volume

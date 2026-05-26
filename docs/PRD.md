@@ -131,10 +131,14 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 ### Notifications
 
-- In-app notification center with read/unread tracking.
+- In-app notification center with read/unread tracking and type-based grouping.
 - Email delivery via Resend for account invitations and password setup.
-- Users receive alerts for submissions, reviews, revision requests, deadline reminders, and missed deadlines.
-- Users control which notification types they receive.
+- Users receive in-app alerts for submissions, reviews, revision requests, and consultation verifications.
+- SLA breach alerts are sent to Admins via in-app notifications.
+- Notification bell in the shared header shows the unread count with 15-second polling.
+- Clicking the bell opens a slide-over panel with grouped notifications, "Mark all read" action, and empty state.
+- Users can mark individual notifications as read or mark all as read.
+- Notification preferences are `[v2]` — currently all event types are enabled for all users.
 
 ### Analytics & Reporting `[v2]`
 
