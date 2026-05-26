@@ -73,7 +73,7 @@
   - [x] Re-run tests and confirm they pass
 - [x] Task: Conductor - User Manual Verification 'Phase 4: UI Components' (Protocol in workflow.md) [6c3c793]
 
-## Phase 5 — Layout Integration & Final Verification
+## Phase 5 — Layout Integration & Final Verification [checkpoint: b5719a4]
 
 **Objective:** Wire the notification bell into the shared authenticated layout and run the full quality gate.
 
