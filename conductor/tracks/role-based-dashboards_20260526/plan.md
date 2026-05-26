@@ -68,39 +68,41 @@
 
 **Objective:** Build the admin dashboard page at /admin/dashboard with 4 widgets.
 
-- [ ] Task: Create admin dashboard page (src/routes/\_authenticated/admin/dashboard.tsx)
-  - [ ] SSR route with loader calling getAdminDashboardData
-  - [ ] Widget 1 — System Metrics grid of metric cards
-  - [ ] Widget 2 — Recent Activity Feed chronological list
-  - [ ] Widget 3 — Deadline Escalation Alerts with red alert styling
-  - [ ] Widget 4 — Quick Actions CTA buttons
-  - [ ] Each widget has empty state
-  - [ ] Responsive grid layout
-- [ ] Task: Create reusable dashboard widget components (src/components/dashboard/)
-  - [ ] AdminDashboard.tsx, MetricCard.tsx, ActivityFeedItem.tsx, EscalationAlertItem.tsx
-- [ ] Task: Add i18n translations for admin dashboard
-  - [ ] Add keys to locales/en.json and locales/id.json
-  - [ ] Run pnpm generate:i18n
-- [ ] Task: Write unit tests for admin dashboard components
+- [x] Task: Create admin dashboard page (src/routes/\_authenticated/admin/dashboard.tsx) [91eea42]
+  - [x] SSR route with loader calling getAdminDashboardData
+  - [x] Widget 1 — System Metrics grid of metric cards
+  - [x] Widget 2 — Recent Activity Feed chronological list
+  - [x] Widget 3 — Deadline Escalation Alerts with red alert styling
+  - [x] Widget 4 — Quick Actions CTA buttons
+  - [x] Each widget has empty state
+  - [x] Responsive grid layout
+- [x] Task: Create reusable dashboard widget components (src/components/dashboard/) [91eea42]
+  - [x] AdminDashboard.tsx with all widgets inlined
+- [x] Task: Add i18n translations for admin dashboard [91eea42]
+  - [x] Add keys to locales/en.json and locales/id.json
+  - [x] Run pnpm generate:i18n
+- [x] Task: Write unit tests for admin dashboard components [91eea42]
 - [ ] Task: Conductor — User Manual Verification 'Phase 4: Admin Dashboard' (Protocol in workflow.md)
 
 ## Phase 5: Route Redirects & Sidebar Updates [checkpoint: —]
 
 **Objective:** Remove old /dashboard route, update login redirect, update sidebar navigation.
 
-- [ ] Task: Update login page redirect (src/routes/\_unauthenticated/auth/login.tsx)
-  - [ ] Redirect to role-specific dashboard after login
-  - [ ] superadmin/admin → /admin/dashboard, instructor → /instructor/dashboard, student → /student/dashboard
-- [ ] Task: Update \_unauthenticated layout redirect (src/routes/\_unauthenticated.tsx)
-  - [ ] Change redirect to role-based dashboard
-- [ ] Task: Update sidebar navigation links
-  - [ ] StudentSidebar: /dashboard → /student/dashboard
-  - [ ] InstructorSidebar: /dashboard → /instructor/dashboard
-  - [ ] AdminSidebar: /dashboard → /admin/dashboard
-- [ ] Task: Remove old dashboard route
-  - [ ] Delete src/routes/\_authenticated/dashboard.tsx
-  - [ ] Update corresponding test file
-- [ ] Task: Write tests for redirect logic
+- [x] Task: Update login page redirect [46c7bc0]
+  - [x] Login page redirects via \_unauthenticated.tsx which now uses getRoleDashboard()
+  - [x] superadmin/admin → /admin/dashboard, instructor → /instructor/dashboard, student → /student/dashboard
+- [x] Task: Update \_unauthenticated layout redirect [46c7bc0]
+  - [x] Changed redirect from /dashboard to role-based dashboard via getRoleDashboard()
+- [x] Task: Update sidebar navigation links [46c7bc0]
+  - [x] StudentSidebar: /dashboard → /student/dashboard
+  - [x] InstructorSidebar: /dashboard → /instructor/dashboard
+  - [x] AdminSidebar: /dashboard → /admin/dashboard
+- [x] Task: Remove old dashboard route [46c7bc0]
+  - [x] Deleted src/routes/\_authenticated/dashboard.tsx
+  - [x] Updated dashboard test file
+- [x] Task: Write tests for redirect logic [46c7bc0]
+  - [x] Created getRoleDashboard utility with tests
+  - [x] Updated sidebar tests with new dashboard paths
 - [ ] Task: Conductor — User Manual Verification 'Phase 5: Route Redirects & Sidebar Updates' (Protocol in workflow.md)
 
 ## Phase 6: Integration Testing & Manual Verification [checkpoint: —]

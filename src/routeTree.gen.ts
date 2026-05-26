@@ -14,7 +14,6 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedStudentRouteImport } from './routes/_authenticated/student'
 import { Route as AuthenticatedInstructorRouteImport } from './routes/_authenticated/instructor'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as UnauthenticatedAuthSetupPasswordRouteImport } from './routes/_unauthenticated/auth/setup-password'
@@ -22,6 +21,8 @@ import { Route as UnauthenticatedAuthResetPasswordRouteImport } from './routes/_
 import { Route as UnauthenticatedAuthLoginRouteImport } from './routes/_unauthenticated/auth/login'
 import { Route as UnauthenticatedAuthForgotPasswordRouteImport } from './routes/_unauthenticated/auth/forgot-password'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated/student/dashboard'
+import { Route as AuthenticatedInstructorDashboardRouteImport } from './routes/_authenticated/instructor/dashboard'
+import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedStudentAssignmentsIndexRouteImport } from './routes/_authenticated/student/assignments/index'
 import { Route as AuthenticatedInstructorReviewsIndexRouteImport } from './routes/_authenticated/instructor/reviews/index'
 import { Route as AuthenticatedInstructorAssignmentsIndexRouteImport } from './routes/_authenticated/instructor/assignments/index'
@@ -54,11 +55,6 @@ const AuthenticatedStudentRoute = AuthenticatedStudentRouteImport.update({
 const AuthenticatedInstructorRoute = AuthenticatedInstructorRouteImport.update({
   id: '/instructor',
   path: '/instructor',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -100,6 +96,18 @@ const AuthenticatedStudentDashboardRoute =
     id: '/dashboard',
     path: '/dashboard',
     getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
+const AuthenticatedInstructorDashboardRoute =
+  AuthenticatedInstructorDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedInstructorRoute,
+  } as any)
+const AuthenticatedAdminDashboardRoute =
+  AuthenticatedAdminDashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedStudentAssignmentsIndexRoute =
   AuthenticatedStudentAssignmentsIndexRouteImport.update({
@@ -165,9 +173,10 @@ const AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/dashboard': typeof AuthenticatedDashboardRoute
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/student': typeof AuthenticatedStudentRouteWithChildren
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
@@ -188,9 +197,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/dashboard': typeof AuthenticatedDashboardRoute
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/student': typeof AuthenticatedStudentRouteWithChildren
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
@@ -214,9 +224,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/_unauthenticated': typeof UnauthenticatedRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
+  '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/_authenticated/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/_unauthenticated/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/_unauthenticated/auth/login': typeof UnauthenticatedAuthLoginRoute
@@ -239,9 +250,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-    | '/dashboard'
     | '/instructor'
     | '/student'
+    | '/admin/dashboard'
+    | '/instructor/dashboard'
     | '/student/dashboard'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -262,9 +274,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
-    | '/dashboard'
     | '/instructor'
     | '/student'
+    | '/admin/dashboard'
+    | '/instructor/dashboard'
     | '/student/dashboard'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -287,9 +300,10 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_unauthenticated'
     | '/_authenticated/admin'
-    | '/_authenticated/dashboard'
     | '/_authenticated/instructor'
     | '/_authenticated/student'
+    | '/_authenticated/admin/dashboard'
+    | '/_authenticated/instructor/dashboard'
     | '/_authenticated/student/dashboard'
     | '/_unauthenticated/auth/forgot-password'
     | '/_unauthenticated/auth/login'
@@ -352,13 +366,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInstructorRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -407,6 +414,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/student/dashboard'
       preLoaderRoute: typeof AuthenticatedStudentDashboardRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
+    }
+    '/_authenticated/instructor/dashboard': {
+      id: '/_authenticated/instructor/dashboard'
+      path: '/dashboard'
+      fullPath: '/instructor/dashboard'
+      preLoaderRoute: typeof AuthenticatedInstructorDashboardRouteImport
+      parentRoute: typeof AuthenticatedInstructorRoute
+    }
+    '/_authenticated/admin/dashboard': {
+      id: '/_authenticated/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/student/assignments/': {
       id: '/_authenticated/student/assignments/'
@@ -482,11 +503,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminTemplatesIndexRoute: typeof AuthenticatedAdminTemplatesIndexRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminTemplatesIndexRoute: AuthenticatedAdminTemplatesIndexRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
@@ -495,6 +518,7 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedInstructorRouteChildren {
+  AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
   AuthenticatedInstructorAssignmentsIdRoute: typeof AuthenticatedInstructorAssignmentsIdRoute
   AuthenticatedInstructorAssignmentsNewRoute: typeof AuthenticatedInstructorAssignmentsNewRoute
   AuthenticatedInstructorReviewsSubmissionIdRoute: typeof AuthenticatedInstructorReviewsSubmissionIdRoute
@@ -504,6 +528,8 @@ interface AuthenticatedInstructorRouteChildren {
 
 const AuthenticatedInstructorRouteChildren: AuthenticatedInstructorRouteChildren =
   {
+    AuthenticatedInstructorDashboardRoute:
+      AuthenticatedInstructorDashboardRoute,
     AuthenticatedInstructorAssignmentsIdRoute:
       AuthenticatedInstructorAssignmentsIdRoute,
     AuthenticatedInstructorAssignmentsNewRoute:
@@ -555,14 +581,12 @@ const AuthenticatedStudentRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedInstructorRoute: typeof AuthenticatedInstructorRouteWithChildren
   AuthenticatedStudentRoute: typeof AuthenticatedStudentRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedInstructorRoute: AuthenticatedInstructorRouteWithChildren,
   AuthenticatedStudentRoute: AuthenticatedStudentRouteWithChildren,
 }
