@@ -30,11 +30,11 @@
   - [x] Write tests verifying `submitReviewHandler` creates `review_completed` notification (pass decision)
   - [x] Write tests verifying `submitReviewHandler` creates `revision_requested` notification (revise decision)
   - [x] Run tests and confirm they fail
-- [ ] Task: Implement event trigger notifications (Green Phase)
-  - [ ] Add `submission_received` notification creation in `submitCheckpointHandler` — notify the assignment instructor
-  - [ ] Add `review_completed` notification creation in `submitReviewHandler` (pass decision) — notify the student
-  - [ ] Add `revision_requested` notification creation in `submitReviewHandler` (revise decision) — notify the student
-  - [ ] Re-run tests and confirm they pass
+- [x] Task: Implement event trigger notifications (Green Phase) [08981db]
+  - [x] Add `submission_received` notification creation in `submitCheckpointHandler` — notify the assignment instructor
+  - [x] Add `review_completed` notification creation in `submitReviewHandler` (pass decision) — notify the student
+  - [x] Add `revision_requested` notification creation in `submitReviewHandler` (revise decision) — notify the student
+  - [x] Re-run tests and confirm they pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Event Trigger Integration' (Protocol in workflow.md)
 
 ## Phase 3 — TanStack Query Hooks with Polling
