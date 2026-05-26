@@ -55,7 +55,7 @@
   - [x] Re-run tests and confirm they pass
 - [x] Task: Conductor - User Manual Verification 'Phase 3: TanStack Query Hooks' (Protocol in workflow.md) [79c3c4e]
 
-## Phase 4 — UI Components
+## Phase 4 — UI Components [checkpoint: 6c3c793]
 
 **Objective:** Build NotificationBadge, NotificationCenter, and NotificationItem components with i18n support.
 
@@ -71,7 +71,7 @@
   - [x] Add i18n translation keys for notification UI labels
   - [x] Run `pnpm generate:i18n` to regenerate types
   - [x] Re-run tests and confirm they pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: UI Components' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: UI Components' (Protocol in workflow.md) [6c3c793]
 
 ## Phase 5 — Layout Integration & Final Verification
 
