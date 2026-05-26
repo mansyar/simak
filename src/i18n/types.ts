@@ -74,6 +74,22 @@ export type Translation = {
     dashboard: string
     assignments: string
   }
+  studentDashboard: {
+    title: string
+    subtitle: string
+    activeAssignments: string
+    noActiveAssignments: string
+    upcomingDeadlines: string
+    noUpcomingDeadlines: string
+    pendingReviews: string
+    noPendingReviews: string
+    consultationReminders: string
+    noConsultationReminders: string
+    overdue: string
+    underReview: string
+    pending: string
+    submittedAgo: string
+  }
   studentAssignments: {
     title: string
     subtitle: string

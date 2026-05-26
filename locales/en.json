@@ -266,6 +266,22 @@
     "notFound": "Assignment not found",
     "notFoundDescription": "This assignment does not exist or you don't have access to it."
   },
+  "studentDashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of your academic progress",
+    "activeAssignments": "Active Assignments",
+    "noActiveAssignments": "No active assignments",
+    "upcomingDeadlines": "Upcoming Deadlines",
+    "noUpcomingDeadlines": "No upcoming deadlines",
+    "pendingReviews": "Pending Reviews",
+    "noPendingReviews": "No pending reviews",
+    "consultationReminders": "Consultation Reminders",
+    "noConsultationReminders": "No pending consultation reminders",
+    "overdue": "Overdue",
+    "underReview": "Under Review",
+    "pending": "Pending",
+    "submittedAgo": "{days} day(s) ago"
+  },
   "files": {
     "dropzone": {
       "title": "Drop your file here or click to browse",

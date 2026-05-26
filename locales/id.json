@@ -266,6 +266,22 @@
     "notFound": "Tugas tidak ditemukan",
     "notFoundDescription": "Tugas ini tidak ada atau Anda tidak memiliki akses ke tugas ini."
   },
+  "studentDashboard": {
+    "title": "Dasbor",
+    "subtitle": "Ikhtisar perkembangan akademik Anda",
+    "activeAssignments": "Tugas Aktif",
+    "noActiveAssignments": "Tidak ada tugas aktif",
+    "upcomingDeadlines": "Tenggat Waktu Mendatang",
+    "noUpcomingDeadlines": "Tidak ada tenggat waktu mendatang",
+    "pendingReviews": "Review Tertunda",
+    "noPendingReviews": "Tidak ada review yang tertunda",
+    "consultationReminders": "Pengingat Konsultasi",
+    "noConsultationReminders": "Tidak ada pengingat konsultasi",
+    "overdue": "Terlambat",
+    "underReview": "Sedang Ditinjau",
+    "pending": "Tertunda",
+    "submittedAgo": "{days} hari yang lalu"
+  },
   "files": {
     "dropzone": {
       "title": "Letakkan file di sini atau klik untuk mencari",
