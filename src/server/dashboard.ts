@@ -9,26 +9,17 @@ export const GetInstructorDashboardDataSchema = z.object({});
 
 export const GetAdminDashboardDataSchema = z.object({});
 
-export const getStudentDashboardData = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
-    const { getStudentDashboardDataHandler } = await import('./dashboard.server');
-    const data = GetStudentDashboardDataSchema.parse(args.data);
-    return getStudentDashboardDataHandler({ data });
-  },
-);
+export const getStudentDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
+  const { getStudentDashboardDataHandler } = await import('./dashboard.server');
+  return getStudentDashboardDataHandler();
+});
 
-export const getInstructorDashboardData = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
-    const { getInstructorDashboardDataHandler } = await import('./dashboard.server');
-    const data = GetInstructorDashboardDataSchema.parse(args.data);
-    return getInstructorDashboardDataHandler({ data });
-  },
-);
+export const getInstructorDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
+  const { getInstructorDashboardDataHandler } = await import('./dashboard.server');
+  return getInstructorDashboardDataHandler();
+});
 
-export const getAdminDashboardData = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
-    const { getAdminDashboardDataHandler } = await import('./dashboard.server');
-    const data = GetAdminDashboardDataSchema.parse(args.data);
-    return getAdminDashboardDataHandler({ data });
-  },
-);
+export const getAdminDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
+  const { getAdminDashboardDataHandler } = await import('./dashboard.server');
+  return getAdminDashboardDataHandler();
+});
