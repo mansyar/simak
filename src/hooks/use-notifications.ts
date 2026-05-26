@@ -5,7 +5,7 @@ export function useUnreadCount() {
   return useQuery({
     queryKey: ['notifications', 'unreadCount'],
     queryFn: async () => {
-      const res = await getUnreadCount({});
+      const res = await (getUnreadCount as any)({ data: {} });
       if ('error' in res) {
         throw new Error(res.error);
       }
@@ -22,7 +22,7 @@ export function useNotificationsList(
   return useQuery({
     queryKey: ['notifications', 'list', { page, limit, type }],
     queryFn: async () => {
-      const res = await listNotifications({ data: { page, limit, type } });
+      const res = await (listNotifications as any)({ data: { page, limit, type } });
       if ('error' in res) {
         throw new Error(res.error);
       }
@@ -35,7 +35,7 @@ export function useMarkRead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (notificationId: number) => {
-      const res = await markRead({ data: { notificationId } });
+      const res = await (markRead as any)({ data: { notificationId } });
       if ('error' in res) {
         throw new Error(res.error);
       }
@@ -52,7 +52,7 @@ export function useMarkAllRead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      const res = await markAllRead({});
+      const res = await (markAllRead as any)({ data: {} });
       if ('error' in res) {
         throw new Error(res.error);
       }

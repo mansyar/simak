@@ -77,10 +77,10 @@
 
 **Objective:** Wire the notification bell into the shared authenticated layout and run the full quality gate.
 
-- [ ] Task: Wire notification components into the shared layout
-  - [ ] Add `NotificationBadge` to `_authenticated.tsx` header (next to language switcher/theme toggle)
-  - [ ] Ensure `NotificationCenter` renders as a portal overlay accessible from any page
-- [ ] Task: Run full test suite and verify coverage >80%
-- [ ] Task: Run linter (`pnpm lint`) and TypeScript typecheck (`pnpm typecheck`)
-- [ ] Task: Verify build succeeds (`pnpm build`)
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Layout Integration & Final Verification' (Protocol in workflow.md)
+- [x] Task: Wire notification components into the shared layout
+  - [x] Add `NotificationBadge` to Student, Instructor, and Admin pathless authenticated layout headers (next to language switcher)
+  - [x] Ensure `NotificationCenter` is wired correctly and triggers on badge click
+- [x] Task: Run full test suite and verify coverage >80%
+- [x] Task: Run linter (`pnpm lint`) and TypeScript typecheck (`pnpm typecheck`)
+- [x] Task: Verify build succeeds (`pnpm build`)
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Layout Integration & Final Verification' (Protocol in workflow.md)
