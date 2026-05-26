@@ -41,12 +41,12 @@
 
 **Objective:** Create custom hooks for notification data fetching with automatic polling for unread count.
 
-- [ ] Task: Write failing tests for notification hooks (Red Phase)
-  - [ ] Write tests for `useUnreadCount` — returns count, polls at 15s interval
-  - [ ] Write tests for `useNotificationsList` — returns paginated list, supports type filter
-  - [ ] Write tests for `useMarkRead` mutation — calls markRead, invalidates query keys
-  - [ ] Write tests for `useMarkAllRead` mutation — calls markAllRead, invalidates query keys
-  - [ ] Run tests and confirm they fail
+- [x] Task: Write failing tests for notification hooks (Red Phase) [859f8c0]
+  - [x] Write tests for `useUnreadCount` — returns count, polls at 15s interval
+  - [x] Write tests for `useNotificationsList` — returns paginated list, supports type filter
+  - [x] Write tests for `useMarkRead` mutation — calls markRead, invalidates query keys
+  - [x] Write tests for `useMarkAllRead` mutation — calls markAllRead, invalidates query keys
+  - [x] Run tests and confirm they fail
 - [ ] Task: Implement notification query hooks (Green Phase)
   - [ ] Create `src/hooks/use-notifications.ts` with `useUnreadCount` query (refetchInterval: 15000)
   - [ ] Add `useNotificationsList` query (pagination + type filter, no auto-polling)
