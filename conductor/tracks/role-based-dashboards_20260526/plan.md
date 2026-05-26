@@ -1,6 +1,6 @@
 # Implementation Plan: Track 7.2 — Role-Based Dashboards
 
-## Phase 1: Server Functions [checkpoint: —]
+## Phase 1: Server Functions [checkpoint: a667217]
 
 **Objective:** Build all dashboard data server functions with Zod schemas, client-safe stubs, and server-only handlers.
 
