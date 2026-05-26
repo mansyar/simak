@@ -27,14 +27,14 @@
 
 **Objective:** Build the student dashboard page at /student/dashboard with 4 widgets.
 
-- [ ] Task: Create student dashboard page (src/routes/\_authenticated/student/dashboard.tsx)
-  - [ ] SSR route with loader calling getStudentDashboardData
-  - [ ] Widget 1 — Active Assignments Overview card grid
-  - [ ] Widget 2 — Upcoming Deadlines list with color-coded urgency
-  - [ ] Widget 3 — Pending Reviews list
-  - [ ] Widget 4 — Consultation Reminders list
-  - [ ] Each widget has empty state
-  - [ ] Responsive grid layout (1 col mobile, 2 cols desktop)
+- [x] Task: Create student dashboard page (src/routes/\_authenticated/student/dashboard.tsx) [a4898df]
+  - [x] SSR route with loader calling getStudentDashboardData
+  - [x] Widget 1 — Active Assignments Overview card grid
+  - [x] Widget 2 — Upcoming Deadlines list with color-coded urgency
+  - [x] Widget 3 — Pending Reviews list
+  - [x] Widget 4 — Consultation Reminders list
+  - [x] Each widget has empty state
+  - [x] Responsive grid layout (1 col mobile, 2 cols desktop)
 - [ ] Task: Create reusable dashboard widget components (src/components/dashboard/)
   - [ ] StudentDashboard.tsx, AssignmentProgressCard.tsx, DeadlineItem.tsx
   - [ ] PendingReviewItem.tsx, ConsultationReminderItem.tsx
