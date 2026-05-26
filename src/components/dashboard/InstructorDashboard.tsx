@@ -1,6 +1,6 @@
 import { useI18n } from '../../routes/__root';
 import { Link } from '@tanstack/react-router';
-import { ClipboardList, ClipboardCheck, FileText, ArrowRight, Clock, Users } from 'lucide-react';
+import { ClipboardList, ClipboardCheck, FileText, ArrowRight, Users } from 'lucide-react';
 
 interface PendingReviewItem {
   submissionId: number;

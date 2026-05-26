@@ -1,0 +1,127 @@
+/** @vitest-environment jsdom */
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+
+vi.mock('@tanstack/react-router', async () => {
+  const actual = await vi.importActual('@tanstack/react-router');
+  return {
+    ...(actual as any),
+    Link: vi.fn().mockImplementation(({ children, ...props }: any) => (
+      <a data-mock-link="" href={props.to || '#'} {...props}>
+        {children}
+      </a>
+    )),
+  };
+});
+
+vi.mock('../../../src/routes/__root', () => ({
+  useI18n: () => ({
+    t: (key: string) => key,
+    locale: 'en' as const,
+    setLocale: vi.fn(),
+  }),
+}));
+
+const emptyData = {
+  metrics: {
+    totalUsers: 0,
+    instructors: 0,
+    students: 0,
+    activeAssignments: 0,
+    pendingReviews: 0,
+    activeConsultations: 0,
+  },
+  recentActivity: [],
+  escalationAlerts: [],
+};
+
+describe('AdminDashboard component', () => {
+  it('should render system metrics section', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    render(<AdminDashboard data={emptyData} />);
+    expect(screen.getByText('adminDashboard.totalUsers')).toBeDefined();
+  });
+
+  it('should render recent activity section', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    render(<AdminDashboard data={emptyData} />);
+    expect(screen.getByText('adminDashboard.recentActivity')).toBeDefined();
+  });
+
+  it('should render escalation alerts section', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    render(<AdminDashboard data={emptyData} />);
+    expect(screen.getByText('adminDashboard.escalationAlerts')).toBeDefined();
+  });
+
+  it('should render quick actions section', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    render(<AdminDashboard data={emptyData} />);
+    expect(screen.getByText('adminDashboard.quickActions')).toBeDefined();
+  });
+
+  it('should show error state when data has error', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    render(<AdminDashboard data={{ error: 'Unauthorized' } as any} />);
+    expect(screen.getByText('common.error')).toBeDefined();
+  });
+
+  it('should render metric values', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    const dataWithMetrics = {
+      ...emptyData,
+      metrics: {
+        totalUsers: 25,
+        instructors: 3,
+        students: 20,
+        activeAssignments: 5,
+        pendingReviews: 7,
+        activeConsultations: 4,
+      },
+    };
+    render(<AdminDashboard data={dataWithMetrics} />);
+    expect(screen.getByText('25')).toBeDefined();
+    expect(screen.getByText('5')).toBeDefined();
+  });
+
+  it('should render recent activity items', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    const dataWithActivity = {
+      ...emptyData,
+      recentActivity: [
+        {
+          id: 1,
+          type: 'submission_received',
+          title: 'New submission',
+          message: 'Student submitted checkpoint',
+          createdAt: new Date().toISOString(),
+        },
+      ],
+    };
+    render(<AdminDashboard data={dataWithActivity} />);
+    expect(screen.getByText('New submission')).toBeDefined();
+    expect(screen.getByText('Student submitted checkpoint')).toBeDefined();
+  });
+
+  it('should render escalation alerts', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    const dataWithAlerts = {
+      ...emptyData,
+      escalationAlerts: [
+        {
+          submissionId: 1,
+          instructorName: 'Dr. Smith',
+          assignmentTitle: 'Thesis',
+          checkpointName: 'Chapter 1',
+          studentName: 'John Doe',
+          daysOverdue: 5,
+        },
+      ],
+    };
+    render(<AdminDashboard data={dataWithAlerts} />);
+    expect(screen.getByText('Dr. Smith')).toBeDefined();
+    expect(
+      screen.getByText((content) => content.includes('5') && content.includes('daysOverdue')),
+    ).toBeDefined();
+  });
+});
