@@ -44,7 +44,7 @@
 - [x] Task: Write unit tests for student dashboard components [97ba452]
 - [ ] Task: Conductor — User Manual Verification 'Phase 2: Student Dashboard' (Protocol in workflow.md)
 
-## Phase 3: Instructor Dashboard [checkpoint: —]
+## Phase 3: Instructor Dashboard [checkpoint: 31ecbb9]
 
 **Objective:** Build the instructor dashboard page at /instructor/dashboard with 4 widgets.
 
@@ -64,7 +64,7 @@
 - [x] Task: Write unit tests for instructor dashboard components [a1758d8]
 - [ ] Task: Conductor — User Manual Verification 'Phase 3: Instructor Dashboard' (Protocol in workflow.md)
 
-## Phase 4: Admin Dashboard [checkpoint: —]
+## Phase 4: Admin Dashboard [checkpoint: 31ecbb9]
 
 **Objective:** Build the admin dashboard page at /admin/dashboard with 4 widgets.
 
@@ -82,9 +82,9 @@
   - [x] Add keys to locales/en.json and locales/id.json
   - [x] Run pnpm generate:i18n
 - [x] Task: Write unit tests for admin dashboard components [91eea42]
-- [ ] Task: Conductor — User Manual Verification 'Phase 4: Admin Dashboard' (Protocol in workflow.md)
+- [x] Task: Conductor — User Manual Verification 'Phase 4: Admin Dashboard' (Protocol in workflow.md)
 
-## Phase 5: Route Redirects & Sidebar Updates [checkpoint: —]
+## Phase 5: Route Redirects & Sidebar Updates [checkpoint: 31ecbb9]
 
 **Objective:** Remove old /dashboard route, update login redirect, update sidebar navigation.
 
@@ -103,7 +103,7 @@
 - [x] Task: Write tests for redirect logic [46c7bc0]
   - [x] Created getRoleDashboard utility with tests
   - [x] Updated sidebar tests with new dashboard paths
-- [ ] Task: Conductor — User Manual Verification 'Phase 5: Route Redirects & Sidebar Updates' (Protocol in workflow.md)
+- [x] Task: Conductor — User Manual Verification 'Phase 5: Route Redirects & Sidebar Updates' (Protocol in workflow.md)
 
 ## Phase 6: Integration Testing & Manual Verification [checkpoint: —]
 
