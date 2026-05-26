@@ -37,7 +37,7 @@
   - [x] Re-run tests and confirm they pass
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Event Trigger Integration' (Protocol in workflow.md) [e832577]
 
-## Phase 3 — TanStack Query Hooks with Polling
+## Phase 3 — TanStack Query Hooks with Polling [checkpoint: 79c3c4e]
 
 **Objective:** Create custom hooks for notification data fetching with automatic polling for unread count.
 
@@ -53,7 +53,7 @@
   - [x] Add `useMarkRead` mutation (invalidates `unreadCount` and `notifications` query keys)
   - [x] Add `useMarkAllRead` mutation (invalidates `unreadCount` and `notifications` query keys)
   - [x] Re-run tests and confirm they pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: TanStack Query Hooks' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: TanStack Query Hooks' (Protocol in workflow.md) [79c3c4e]
 
 ## Phase 4 — UI Components
 
