@@ -47,12 +47,12 @@
   - [x] Write tests for `useMarkRead` mutation — calls markRead, invalidates query keys
   - [x] Write tests for `useMarkAllRead` mutation — calls markAllRead, invalidates query keys
   - [x] Run tests and confirm they fail
-- [ ] Task: Implement notification query hooks (Green Phase)
-  - [ ] Create `src/hooks/use-notifications.ts` with `useUnreadCount` query (refetchInterval: 15000)
-  - [ ] Add `useNotificationsList` query (pagination + type filter, no auto-polling)
-  - [ ] Add `useMarkRead` mutation (invalidates `unreadCount` and `notifications` query keys)
-  - [ ] Add `useMarkAllRead` mutation (invalidates `unreadCount` and `notifications` query keys)
-  - [ ] Re-run tests and confirm they pass
+- [x] Task: Implement notification query hooks (Green Phase) [3321626]
+  - [x] Create `src/hooks/use-notifications.ts` with `useUnreadCount` query (refetchInterval: 15000)
+  - [x] Add `useNotificationsList` query (pagination + type filter, no auto-polling)
+  - [x] Add `useMarkRead` mutation (invalidates `unreadCount` and `notifications` query keys)
+  - [x] Add `useMarkAllRead` mutation (invalidates `unreadCount` and `notifications` query keys)
+  - [x] Re-run tests and confirm they pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: TanStack Query Hooks' (Protocol in workflow.md)
 
 ## Phase 4 — UI Components
