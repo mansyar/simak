@@ -48,20 +48,20 @@
 
 **Objective:** Build the instructor dashboard page at /instructor/dashboard with 4 widgets.
 
-- [ ] Task: Create instructor dashboard page (src/routes/\_authenticated/instructor/dashboard.tsx)
-  - [ ] SSR route with loader calling getInstructorDashboardData
-  - [ ] Widget 1 — Pending Review Queue with SLA badges
-  - [ ] Widget 2 — Recent Submissions list
-  - [ ] Widget 3 — Assignment Overview cards
-  - [ ] Widget 4 — Quick Actions CTA buttons
-  - [ ] Each widget has empty state
-  - [ ] Responsive grid layout
-- [ ] Task: Create reusable dashboard widget components (src/components/dashboard/)
-  - [ ] InstructorDashboard.tsx, AssignmentOverviewCard.tsx, QuickActions.tsx
-- [ ] Task: Add i18n translations for instructor dashboard
-  - [ ] Add keys to locales/en.json and locales/id.json
-  - [ ] Run pnpm generate:i18n
-- [ ] Task: Write unit tests for instructor dashboard components
+- [x] Task: Create instructor dashboard page (src/routes/\_authenticated/instructor/dashboard.tsx) [a1758d8]
+  - [x] SSR route with loader calling getInstructorDashboardData
+  - [x] Widget 1 — Pending Review Queue with SLA badges
+  - [x] Widget 2 — Recent Submissions list
+  - [x] Widget 3 — Assignment Overview cards
+  - [x] Widget 4 — Quick Actions CTA buttons
+  - [x] Each widget has empty state
+  - [x] Responsive grid layout
+- [x] Task: Create reusable dashboard widget components (src/components/dashboard/) [a1758d8]
+  - [x] InstructorDashboard.tsx with all widgets inlined
+- [x] Task: Add i18n translations for instructor dashboard [a1758d8]
+  - [x] Add keys to locales/en.json and locales/id.json
+  - [x] Run pnpm generate:i18n
+- [x] Task: Write unit tests for instructor dashboard components [a1758d8]
 - [ ] Task: Conductor — User Manual Verification 'Phase 3: Instructor Dashboard' (Protocol in workflow.md)
 
 ## Phase 4: Admin Dashboard [checkpoint: —]
