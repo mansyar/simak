@@ -59,11 +59,11 @@
 
 **Objective:** Build NotificationBadge, NotificationCenter, and NotificationItem components with i18n support.
 
-- [ ] Task: Write failing tests for notification UI components (Red Phase)
-  - [ ] Write tests for `NotificationBadge` — renders bell icon, shows unread count, hides at zero
-  - [ ] Write tests for `NotificationItem` — renders icon, title, message, relative timestamp, read/unread indicator
-  - [ ] Write tests for `NotificationCenter` — opens slide-over panel, groups by type, supports mark all read, shows empty state
-  - [ ] Run tests and confirm they fail
+- [x] Task: Write failing tests for notification UI components (Red Phase) [05e5000]
+  - [x] Write tests for `NotificationBadge` — renders bell icon, shows unread count, hides at zero
+  - [x] Write tests for `NotificationItem` — renders icon, title, message, relative timestamp, read/unread indicator
+  - [x] Write tests for `NotificationCenter` — opens slide-over panel, groups by type, supports mark all read, shows empty state
+  - [x] Run tests and confirm they fail
 - [ ] Task: Implement notification UI components (Green Phase)
   - [ ] Create `src/components/notifications/NotificationBadge.tsx` — Bell/BellDot icon + unread count badge, click to open panel
   - [ ] Create `src/components/notifications/NotificationItem.tsx` — type-based icon, title+message, relative timestamp via date-fns, read/unread styling
