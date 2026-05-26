@@ -1,10 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-// Mock the useLocation hook from TanStack Router
+// Mock authClient to prevent real API calls
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    signOut: vi.fn().mockResolvedValue({}),
+  },
+}));
+
+// Mock the useLocation and useRouter hooks from TanStack Router
 const mockLocation = vi.fn();
 vi.mock('@tanstack/react-router', () => ({
   useLocation: () => mockLocation(),
+  useRouter: () => ({ invalidate: vi.fn() }),
   Link: ({
     to,
     children,
@@ -35,7 +43,7 @@ describe('AdminSidebar', () => {
   });
 
   it('should render dashboard link', () => {
-    mockLocation.mockReturnValue({ pathname: '/admin/users' });
+    mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
     render(<AdminSidebar />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/admin/dashboard');
@@ -44,7 +52,7 @@ describe('AdminSidebar', () => {
   });
 
   it('should render users link', () => {
-    mockLocation.mockReturnValue({ pathname: '/admin/users' });
+    mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
     render(<AdminSidebar />);
 
     const usersLink = screen.getByTestId('sidebar-link-/admin/users');
@@ -53,7 +61,7 @@ describe('AdminSidebar', () => {
   });
 
   it('should render templates link', () => {
-    mockLocation.mockReturnValue({ pathname: '/admin/users' });
+    mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
     render(<AdminSidebar />);
 
     const templatesLink = screen.getByTestId('sidebar-link-/admin/templates');
@@ -62,22 +70,27 @@ describe('AdminSidebar', () => {
   });
 
   it('should highlight the currently active route', () => {
-    mockLocation.mockReturnValue({ pathname: '/admin/users' });
-    render(<AdminSidebar />);
-
-    const usersLink = screen.getByTestId('sidebar-link-/admin/users');
-    expect(usersLink.className).toContain('bg-accent');
-    expect(usersLink.className).toContain('text-accent-foreground');
-  });
-
-  it('should not apply the active class to inactive routes', () => {
-    mockLocation.mockReturnValue({ pathname: '/admin/users' });
+    mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
     render(<AdminSidebar />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/admin/dashboard');
-    // Inactive link should NOT have standalone bg-accent (only hover:bg-accent/50 for hover state)
-    const classes = dashboardLink.className.split(' ');
-    const activeClasses = classes.filter((c) => c === 'bg-accent');
-    expect(activeClasses).toHaveLength(0);
+    expect(dashboardLink.className).toContain('bg-primary');
+    expect(dashboardLink.className).toContain('text-primary-foreground');
+  });
+
+  it('should not apply the active class to inactive routes', () => {
+    mockLocation.mockReturnValue({ pathname: '/admin/templates' });
+    render(<AdminSidebar />);
+
+    const dashboardLink = screen.getByTestId('sidebar-link-/admin/dashboard');
+    expect(dashboardLink.className).not.toContain('bg-primary');
+  });
+
+  it('should render logout button', () => {
+    mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
+    render(<AdminSidebar />);
+
+    const logoutButton = screen.getByText('auth.logout');
+    expect(logoutButton).toBeDefined();
   });
 });

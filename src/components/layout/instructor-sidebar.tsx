@@ -1,10 +1,12 @@
-import { useLocation, Link } from '@tanstack/react-router';
+import { useLocation, Link, useRouter } from '@tanstack/react-router';
 import { useI18n } from '../../routes/__root';
-import { LayoutDashboard, ClipboardList, ClipboardCheck } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, ClipboardCheck, LogOut } from 'lucide-react';
+import { authClient } from '../../lib/auth-client';
 
 export function InstructorSidebar() {
   const { pathname } = useLocation();
   const { t } = useI18n();
+  const router = useRouter();
 
   const links = [
     { to: '/instructor/dashboard', label: 'nav.dashboard', icon: LayoutDashboard },
@@ -12,12 +14,17 @@ export function InstructorSidebar() {
     { to: '/instructor/reviews', label: 'nav.reviews', icon: ClipboardCheck },
   ] as const;
 
+  const handleLogout = async () => {
+    await authClient.signOut();
+    router.invalidate();
+  };
+
   return (
-    <aside className="flex w-64 flex-col border-r bg-card p-4 shadow-sm">
-      <div className="mb-6 px-3 py-2 text-xl font-bold text-foreground tracking-tight">
+    <aside className="sticky top-0 flex h-screen w-64 flex-col border-r bg-card shadow-sm">
+      <div className="px-4 py-5 text-xl font-bold text-foreground tracking-tight">
         SIMAK Instructor
       </div>
-      <nav className="flex flex-col gap-1.5">
+      <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 pb-4">
         {links.map((link) => {
           const isActive = pathname === link.to || pathname.startsWith(link.to + '/');
           const Icon = link.icon;
@@ -37,6 +44,15 @@ export function InstructorSidebar() {
           );
         })}
       </nav>
+      <div className="border-t p-3">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-destructive/10 hover:text-destructive"
+        >
+          <LogOut className="h-4 w-4" />
+          {t('auth.logout')}
+        </button>
+      </div>
     </aside>
   );
 }

@@ -1,10 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-// Mock the useLocation hook from TanStack Router
+// Mock authClient to prevent real API calls
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    signOut: vi.fn().mockResolvedValue({}),
+  },
+}));
+
+// Mock the useLocation and useRouter hooks from TanStack Router
 const mockLocation = vi.fn();
 vi.mock('@tanstack/react-router', () => ({
   useLocation: () => mockLocation(),
+  useRouter: () => ({ invalidate: vi.fn() }),
   Link: ({
     to,
     children,
@@ -52,6 +60,15 @@ describe('InstructorSidebar', () => {
     expect(assignmentsLink.textContent).toBe('nav.assignments');
   });
 
+  it('should render reviews link', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(<InstructorSidebar />);
+
+    const reviewsLink = screen.getByTestId('sidebar-link-/instructor/reviews');
+    expect(reviewsLink).toBeDefined();
+    expect(reviewsLink.textContent).toBe('nav.reviews');
+  });
+
   it('should highlight the currently active route', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
     render(<InstructorSidebar />);
@@ -77,5 +94,13 @@ describe('InstructorSidebar', () => {
     const assignmentsLink = screen.getByTestId('sidebar-link-/instructor/assignments');
     expect(assignmentsLink.className).not.toContain('bg-primary');
     expect(assignmentsLink.className).toContain('text-muted-foreground');
+  });
+
+  it('should render logout button', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(<InstructorSidebar />);
+
+    const logoutButton = screen.getByText('auth.logout');
+    expect(logoutButton).toBeDefined();
   });
 });

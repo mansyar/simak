@@ -1,10 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-// Mock the useLocation hook from TanStack Router
+// Mock authClient to prevent real API calls
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    signOut: vi.fn().mockResolvedValue({}),
+  },
+}));
+
+// Mock the useLocation and useRouter hooks from TanStack Router
 const mockLocation = vi.fn();
 vi.mock('@tanstack/react-router', () => ({
   useLocation: () => mockLocation(),
+  useRouter: () => ({ invalidate: vi.fn() }),
   Link: ({
     to,
     children,
@@ -77,5 +85,13 @@ describe('StudentSidebar', () => {
     const assignmentsLink = screen.getByTestId('sidebar-link-/student/assignments');
     expect(assignmentsLink.className).not.toContain('bg-primary');
     expect(assignmentsLink.className).toContain('text-muted-foreground');
+  });
+
+  it('should render logout button', () => {
+    mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
+    render(<StudentSidebar />);
+
+    const logoutButton = screen.getByText('auth.logout');
+    expect(logoutButton).toBeDefined();
   });
 });
