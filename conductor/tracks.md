@@ -4,7 +4,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Role-Based Dashboards**
-      \*Link: ./tracks/role-based-dashboards_20260526/
+- [~] **Track: Role-Based Dashboards**
+  \*Link: ./tracks/role-based-dashboards_20260526/
 
 ---

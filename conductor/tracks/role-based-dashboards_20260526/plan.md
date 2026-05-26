@@ -16,11 +16,11 @@
   - [ ] getAdminDashboardDataHandler — Query users, assignments, submissions, reviews, consultations, notifications for system metrics
   - [ ] All handlers must verify session via getSessionFromHeaders() and check role
   - [ ] All handlers must handle empty data gracefully
-- [ ] Task: Write unit tests for dashboard server functions ( ests/unit/server/dashboard.test.ts)
-  - [ ] Test schema validation
-  - [ ] Test handlers with mocked sessions and database
-  - [ ] Test empty data scenarios
-  - [ ] Test unauthorized access
+- [x] Task: Write unit tests for dashboard server functions (tests/unit/server/dashboard.test.ts) [0cb102d]
+  - [x] Test schema validation
+  - [x] Test handlers with mocked sessions and database
+  - [x] Test empty data scenarios
+  - [x] Test unauthorized access
 - [ ] Task: Conductor — User Manual Verification 'Phase 1: Server Functions' (Protocol in workflow.md)
 
 ## Phase 2: Student Dashboard [checkpoint: —]
