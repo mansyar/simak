@@ -10,7 +10,7 @@
   - [ ] Define GetAdminDashboardDataSchema (no params — uses session)
   - [ ] Create createServerFn stubs: getStudentDashboardData, getInstructorDashboardData, getAdminDashboardData with dynamic imports to handlers
   - [ ] Ensure all stubs follow the existing pattern
-- [ ] Task: Implement server-only dashboard handlers (src/server/dashboard.server.ts)
+- [x] Task: Implement server-only dashboard handlers (src/server/dashboard.server.ts) [0cb102d]
   - [ ] getStudentDashboardDataHandler — Query assignment_students, assignments, checkpoints, submissions, reviews, consultations for the current student
   - [ ] getInstructorDashboardDataHandler — Query assignments, checkpoints, submissions, reviews, users for the instructor
   - [ ] getAdminDashboardDataHandler — Query users, assignments, submissions, reviews, consultations, notifications for system metrics
