@@ -184,3 +184,13 @@ Students and instructors lack a centralized system to:
 - **NotificationCenter component** — Slide-over panel from the right with type-grouped sections, "Mark all read" action, empty state ("No notifications yet"), load-more pagination on scroll
 - **i18n translations** — Full English and Indonesian translations for notification UI (20+ keys across labels, titles, messages, and empty states)
 - **Polling behavior** — Single 15-second interval for unread count (simplified from original differentiated priority intervals); sufficient for expected notification volume
+
+### Track 7.2: Role-Based Dashboards (May 2026)
+
+- **Server functions** — `getStudentDashboardData`, `getInstructorDashboardData`, `getAdminDashboardData` with per-role handlers, Zod schemas, and session-based role verification
+- **Student dashboard** (`/student/dashboard`) — 4 widgets: Active Assignments (progress bars), Upcoming Deadlines (color-coded urgency, overdue badges), Pending Reviews (wait times), Consultation Reminders (pending badges)
+- **Instructor dashboard** (`/instructor/dashboard`) — 4 widgets: Pending Review Queue (SLA badges: On Time/Approaching/Breached), Recent Submissions (status badges), Assignment Overview (student count, progress), Quick Actions (CTA links)
+- **Admin dashboard** (`/admin/dashboard`) — 4 widgets: System Metrics (6 metric cards), Recent Activity Feed (last 10 events, 7 day window), Deadline Escalation Alerts (red styling for >3 days overdue), Quick Actions (CTA links)
+- **Route redirects** — Login and `_unauthenticated` redirect to role-specific dashboards; `requireRole` redirects unauthorized users to their own dashboard; old `/dashboard` route removed
+- **Sidebar improvements** — Full viewport height (sticky, non-scrollable), logout button at bottom with hover-red styling, icons added to admin sidebar, all links updated to role-specific dashboard routes
+- **i18n translations** — Full English and Indonesian translations (studentDashboard: 14 keys, instructorDashboard: 14 keys, adminDashboard: 18 keys)
