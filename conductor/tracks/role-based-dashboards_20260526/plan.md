@@ -23,7 +23,7 @@
   - [x] Test unauthorized access
 - [ ] Task: Conductor — User Manual Verification 'Phase 1: Server Functions' (Protocol in workflow.md)
 
-## Phase 2: Student Dashboard [checkpoint: —]
+## Phase 2: Student Dashboard [checkpoint: c0e134e]
 
 **Objective:** Build the student dashboard page at /student/dashboard with 4 widgets.
 
