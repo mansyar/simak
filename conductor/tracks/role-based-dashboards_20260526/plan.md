@@ -4,7 +4,7 @@
 
 **Objective:** Build all dashboard data server functions with Zod schemas, client-safe stubs, and server-only handlers.
 
-- [ ] Task: Create Zod schemas and client-safe stubs for dashboard server functions (src/server/dashboard.ts)
+- [x] Task: Create Zod schemas and client-safe stubs for dashboard server functions (src/server/dashboard.ts) [1e0402c]
   - [ ] Define GetStudentDashboardDataSchema (no params — uses session)
   - [ ] Define GetInstructorDashboardDataSchema (no params — uses session)
   - [ ] Define GetAdminDashboardDataSchema (no params — uses session)
