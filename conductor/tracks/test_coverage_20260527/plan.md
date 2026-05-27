@@ -138,15 +138,15 @@
   - [x] Write tests for revision deadline picker
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/db/schema/` files (37-67% → >80%)
-  - [ ] Write tests for `assignments.ts` relation exports (50% → >80%)
-  - [ ] Write tests for `auth.ts` relation exports (37.5% → >80%)
-  - [ ] Write tests for `consultations.ts` relation exports (42.85% → >80%)
-  - [ ] Write tests for `notifications.ts` relation exports (66.66% → >80%)
-  - [ ] Write tests for `submissions.ts` relation exports (50% → >80%)
-  - [ ] Write tests for `templates.ts` relation exports (50% → >80%)
-  - [ ] Write tests for `users.ts` relation exports (66.66% → >80%)
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/db/schema/` files (37-67% → >80%)
+  - [x] Write tests for `assignments.ts` relation exports (50% → >80%)
+  - [x] Write tests for `auth.ts` relation exports (37.5% → >80%)
+  - [x] Write tests for `consultations.ts` relation exports (42.85% → >80%)
+  - [x] Write tests for `notifications.ts` relation exports (66.66% → >80%)
+  - [x] Write tests for `submissions.ts` relation exports (50% → >80%)
+  - [x] Write tests for `templates.ts` relation exports (50% → >80%)
+  - [x] Write tests for `users.ts` relation exports (66.66% → >80%)
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: High Coverage - Components & Schema' (Protocol in workflow.md)
 
