@@ -77,9 +77,9 @@
   - [x] Write tests for `src/routes/_authenticated/student/assignments/$id/checkpoints/$checkpointId.tsx` (0% → >80%)
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for API route
-  - [ ] Write tests for `src/routes/api/auth.$.tsx` (0% → >80%)
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for API route
+  - [x] Write tests for `src/routes/api/auth.$.tsx` (0% → >80%)
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Critical Route Coverage' (Protocol in workflow.md)
 
