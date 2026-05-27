@@ -91,11 +91,11 @@
   - [x] Write tests for server function stubs
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/server/consultations.ts` (40% → >80%)
-  - [ ] Analyze uncovered lines (77-93)
-  - [ ] Write tests for Zod schemas
-  - [ ] Write tests for server function stubs
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/server/consultations.ts` (40% → >80%)
+  - [x] Analyze uncovered lines (77-93)
+  - [x] Write tests for Zod schemas
+  - [x] Write tests for server function stubs
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/server/notifications.ts` (40% → >80%)
   - [ ] Analyze uncovered lines (50-65)

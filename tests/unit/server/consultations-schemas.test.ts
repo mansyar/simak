@@ -176,4 +176,48 @@ describe('Consultation Schemas', () => {
       expect(result.success).toBe(false);
     });
   });
+
+  describe('Server Function Stubs', () => {
+    it('should export logConsultation function', async () => {
+      const { logConsultation } = await import('@/server/consultations');
+      expect(logConsultation).toBeDefined();
+      expect(typeof logConsultation).toBe('function');
+    });
+
+    it('should export listConsultations function', async () => {
+      const { listConsultations } = await import('@/server/consultations');
+      expect(listConsultations).toBeDefined();
+      expect(typeof listConsultations).toBe('function');
+    });
+
+    it('should export listPendingConsultations function', async () => {
+      const { listPendingConsultations } = await import('@/server/consultations');
+      expect(listPendingConsultations).toBeDefined();
+      expect(typeof listPendingConsultations).toBe('function');
+    });
+
+    it('should export verifyConsultation function', async () => {
+      const { verifyConsultation } = await import('@/server/consultations');
+      expect(verifyConsultation).toBeDefined();
+      expect(typeof verifyConsultation).toBe('function');
+    });
+
+    it('should export rejectConsultation function', async () => {
+      const { rejectConsultation } = await import('@/server/consultations');
+      expect(rejectConsultation).toBeDefined();
+      expect(typeof rejectConsultation).toBe('function');
+    });
+
+    it('should export getConsultationDetail function', async () => {
+      const { getConsultationDetail } = await import('@/server/consultations');
+      expect(getConsultationDetail).toBeDefined();
+      expect(typeof getConsultationDetail).toBe('function');
+    });
+
+    it('should export listVerifiedCounts function', async () => {
+      const { listVerifiedCounts } = await import('@/server/consultations');
+      expect(listVerifiedCounts).toBeDefined();
+      expect(typeof listVerifiedCounts).toBe('function');
+    });
+  });
 });
