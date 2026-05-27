@@ -1,0 +1,8 @@
+{
+  "track_id": "i18n-full-translation_20260528",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-05-28T07:30:00Z",
+  "updated_at": "2026-05-28T07:30:00Z",
+  "description": "Internationalization — Full Translation Pass: Update type definitions, audit and replace all hardcoded UI strings with i18n keys, ensure 100% translation coverage between en.json and id.json"
+}
