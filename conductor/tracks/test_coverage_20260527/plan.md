@@ -190,10 +190,10 @@
   - [x] Change `statements` threshold from 50 to 80
   - [x] Run `pnpm vitest run --coverage` and verify all thresholds pass
 
-- [ ] Task: Final coverage verification
-  - [ ] Run full test suite with coverage
-  - [ ] Verify >80% for all four metrics
-  - [ ] Verify all existing tests still pass
-  - [ ] Document final coverage numbers
+- [x] Task: Final coverage verification
+  - [x] Run full test suite with coverage
+  - [x] Verify >80% for all four metrics
+  - [x] Verify all existing tests still pass
+  - [x] Document final coverage numbers
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 6: Threshold Update & Final Verification' (Protocol in workflow.md)
