@@ -1143,4 +1143,55 @@ The following features are documented in the PRD and TDD but deferred from this 
 - Playwright E2E tests
 - Redis caching layer
 - PgBouncer connection pooling
+
+---
+
+## Appendix: Post-MVP UX Improvements (Confusing Flows)
+
+The following items were identified during codebase analysis as confusing user flows. These enhancements are deferred to v2:
+
+### UX Improvements for v2
+
+1. **Checkpoint Unlock Blocking Reasons**
+   - **Issue**: Students see "LOCKED" state but don't know WHY (previous checkpoint not passed vs insufficient consultations)
+   - **Fix**: Display blocking reasons prominently on checkpoint cards with clear messaging
+   - **Example**: "🔒 Locked - Checkpoint 1 not passed" vs "🔒 Locked - Need 2 consultations (0/2)"
+
+2. **Consultation Gating Visibility**
+   - **Issue**: Students don't know consultations are required for checkpoint submission
+   - **Fix**: Display consultation requirement on each checkpoint with progress indicator
+   - **Example**: "2/2 consultations required" badge + what counts as consultation
+
+3. **Review Queue Assignment Context**
+   - **Issue**: Review queue shows all submissions without clear assignment context
+   - **Fix**: Sort/filter by assignment with clear "Assignment: [Name]" badges on each item
+
+4. **State Terminology Consistency**
+   - **Issue**: Mixed terminology between technical states and display labels
+   - **Fix**: Standardize terminology: "Submitted" (file uploaded, waiting review), "Pending Review" (instructor side)
+
+5. **Version History Clarity**
+   - **Issue**: Resubmission creates new record but old one stays — unclear which is current
+   - **Fix**: Show version history with "Version 1 of 2" badge or list of all versions
+
+6. **SLA Escalation Notifications**
+   - **Issue**: Deadlines extend automatically but no one is notified
+   - **Fix**: Notify students and instructors when deadlines are extended via in-app notifications
+
+7. **Dashboard Metric Context**
+   - **Issue**: Numbers lack context (e.g., "10 pending reviews" — what does that mean?)
+   - **Fix**: Show breakdown: "10 submissions waiting for review" or "5 consultations pending verification"
+
+### Priority Ranking
+
+| Priority | Issue                     | Impact                 | v2 Roadmap |
+| -------- | ------------------------- | ---------------------- | ---------- |
+| High     | Checkpoint Unlock Reasons | ❌ Student frustration | v2.1       |
+| High     | Consultation Gating       | ❌ Compliance failure  | v2.1       |
+| Medium   | Review Queue Context      | ⚠️ Low productivity    | v2.2       |
+| Medium   | State Terminology         | ⚠️ Confusion           | v2.2       |
+| Low      | Version History           | ⚠️ Audit issues        | v2.3       |
+| Low      | SLA Notifications         | ❌ Student confusion   | v2.3       |
+| Low      | Dashboard Metrics         | ⚠️ Poor UX             | v2.4       |
+
 - Cursor-based pagination
