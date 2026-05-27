@@ -36,8 +36,8 @@
 
 ## Phase 2: Critical Route Coverage (0-20%) [checkpoint: ]
 
-- [ ] Task: Write unit tests for route guard layouts
-  - [ ] Write tests for `src/routes/__root.tsx` (17% → >80%)
+- [x] Task: Write unit tests for route guard layouts [f80026b]
+  - [x] Write tests for `src/routes/__root.tsx` (17% → >80%)
   - [ ] Write tests for `src/routes/_authenticated.tsx` (20% → >80%)
   - [ ] Write tests for `src/routes/_unauthenticated.tsx` (20% → >80%)
   - [ ] Write tests for `src/routes/_authenticated/_admin.tsx` (14% → >80%)
