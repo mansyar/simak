@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 import { Calendar, User, Clipboard } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
 

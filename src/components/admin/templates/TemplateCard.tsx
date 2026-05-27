@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Copy, Pencil, Trash } from 'lucide-react';
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 import { useI18n } from '../../../routes/__root';
 
 export type TemplateRow = {

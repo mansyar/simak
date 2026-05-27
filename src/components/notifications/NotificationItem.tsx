@@ -1,6 +1,6 @@
 import React from 'react';
 import { FileUp, CheckCircle, RefreshCw, ClipboardCheck, AlertTriangle, Bell } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 import { useMarkRead } from '@/hooks/use-notifications';
 
 export interface Notification {

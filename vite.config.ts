@@ -1,4 +1,3 @@
-/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
@@ -14,38 +13,4 @@ export default defineConfig({
     },
   },
   plugins: [tailwindcss(), tanstackStart(), viteReact()],
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    include: ['tests/**/*.test.{ts,tsx}'],
-    testTimeout: 30000,
-
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      include: ['src/**/*.{ts,tsx}'],
-      exclude: [
-        'src/**/*.d.ts',
-        'src/**/*.test.{ts,tsx}',
-        'src/routeTree.gen.ts',
-        'src/router.tsx',
-        'src/i18n/types.ts',
-        'src/i18n/detect-locale.ts',
-        'src/i18n/index.ts',
-        'src/db/schema/**',
-        'src/db/migrate.ts',
-        'src/hooks/**',
-        'src/routes/**',
-        'src/server/**',
-        'src/components/ui/**',
-        'src/lib/**',
-      ],
-      thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 72,
-        statements: 79,
-      },
-    },
-  },
 });

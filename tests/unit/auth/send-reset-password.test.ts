@@ -1,5 +1,21 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// Mock database before any imports
+vi.mock('@/db/index', () => ({
+  getDb: vi.fn().mockReturnValue({
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+  }),
+  db: {
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+  },
+}));
+
 // Mock before any imports - hoisted by vitest
 const mockSend = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 

@@ -1,5 +1,26 @@
 import { describe, it, expect, vi } from 'vitest';
 
+// Mock database before any imports
+vi.mock('@/db/index', () => ({
+  getDb: vi.fn().mockReturnValue({
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+  }),
+  db: {
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+  },
+}));
+
+// Mock email module
+vi.mock('@/lib/email', () => ({
+  sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
+}));
+
 describe('Auth server configuration', () => {
   it('should export auth instance from config module', async () => {
     const mod = await import('@/auth/config');

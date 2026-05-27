@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Calendar, Users, Clipboard } from 'lucide-react';
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 import { useI18n } from '../../../routes/__root';
 import { Badge } from '@/components/ui/badge';
 

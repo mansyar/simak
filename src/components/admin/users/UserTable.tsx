@@ -1,9 +1,4 @@
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -24,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Pencil, Trash, Link as LinkIcon } from 'lucide-react';
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 
 export type UserRow = {
   id: string;
@@ -63,7 +58,10 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
       header: t('adminUsers.table.role'),
       cell: ({ row }) => {
         const role = row.original.role;
-        const roleVariants: Record<'superadmin' | 'admin' | 'instructor' | 'student', 'default' | 'secondary' | 'outline' | 'destructive'> = {
+        const roleVariants: Record<
+          'superadmin' | 'admin' | 'instructor' | 'student',
+          'default' | 'secondary' | 'outline' | 'destructive'
+        > = {
           superadmin: 'default',
           admin: 'secondary',
           instructor: 'outline',
@@ -86,7 +84,10 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
       accessorKey: 'emailVerified',
       header: 'Status',
       cell: ({ row }) => (
-        <Badge variant={row.original.emailVerified ? 'default' : 'secondary'} className="bg-opacity-10">
+        <Badge
+          variant={row.original.emailVerified ? 'default' : 'secondary'}
+          className="bg-opacity-10"
+        >
           {row.original.emailVerified ? t('adminUsers.emailVerified') : t('adminUsers.notVerified')}
         </Badge>
       ),
@@ -108,12 +109,14 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
 
         return (
           <DropdownMenu>
-            <DropdownMenuTrigger render={
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            } />
+            <DropdownMenuTrigger
+              render={
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              }
+            />
             <DropdownMenuContent align="end">
               <DropdownMenuGroup>
                 <DropdownMenuLabel>{t('adminUsers.table.actions')}</DropdownMenuLabel>
@@ -159,10 +162,7 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
                 <TableHead key={header.id}>
                   {header.isPlaceholder
                     ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                    : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               ))}
             </TableRow>
@@ -171,10 +171,7 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
-              >
+              <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

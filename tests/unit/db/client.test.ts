@@ -1,4 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Set DATABASE_URL before any imports
+process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
 
 describe('Database client', () => {
   it('should export db and getDb from the module', async () => {

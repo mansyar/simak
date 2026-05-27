@@ -1,4 +1,35 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// Mock database before any imports
+vi.mock('@/db/index', () => ({
+  getDb: vi.fn().mockReturnValue({
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+  }),
+  db: {
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+  },
+}));
+
+// Mock auth config before importing server/auth
+vi.mock('@/auth/config', () => ({
+  auth: {
+    api: {
+      getSession: vi.fn(),
+    },
+    handler: vi.fn(),
+    options: {
+      emailAndPassword: { enabled: true, sendResetPassword: vi.fn() },
+      additionalFields: { role: { type: 'string', required: true } },
+      plugins: [{ id: 'tanstack-start-cookies' }],
+    },
+  },
+}));
 
 describe('Server auth module', () => {
   it('should export getSessionFromHeaders as a function', async () => {

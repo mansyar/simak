@@ -9,7 +9,7 @@ import { StudentPicker } from './StudentPicker';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 import {
   Clipboard,
   Calendar,

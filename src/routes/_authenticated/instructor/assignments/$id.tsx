@@ -7,7 +7,7 @@ import { DeadlineManager } from '@/components/reviews/DeadlineManager';
 import { VerificationQueueItem } from '@/components/consultations/VerificationQueueItem';
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
 import { Calendar, Users, Clipboard, ArrowLeft, Percent, CheckCircle2 } from 'lucide-react';
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 import { useI18n } from '../../../__root';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id')({

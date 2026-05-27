@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useI18n } from '../../routes/__root';
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 import { Loader2, ChevronDown, ChevronUp, Clock, Lock } from 'lucide-react';
 
 interface CheckpointData {

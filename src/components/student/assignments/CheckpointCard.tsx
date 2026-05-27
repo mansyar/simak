@@ -1,4 +1,5 @@
-import { format, isPast } from 'date-fns';
+import { format } from 'date-fns/format';
+import { isPast } from 'date-fns/isPast';
 import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
 import { Button } from '@/components/ui/button';
