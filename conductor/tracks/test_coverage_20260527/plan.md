@@ -63,13 +63,13 @@
   - [x] Write tests for `src/routes/_authenticated/admin/templates/index.tsx` (0% → >80%)
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for instructor routes
-  - [ ] Write tests for `src/routes/_authenticated/instructor/assignments/index.tsx` (0% → >80%)
-  - [ ] Write tests for `src/routes/_authenticated/instructor/assignments/$id.tsx` (0% → >80%)
-  - [ ] Write tests for `src/routes/_authenticated/instructor/assignments/new.tsx` (0% → >80%)
-  - [ ] Write tests for `src/routes/_authenticated/instructor/reviews/index.tsx` (0% → >80%)
-  - [ ] Write tests for `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` (0% → >80%)
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for instructor routes
+  - [x] Write tests for `src/routes/_authenticated/instructor/assignments/index.tsx` (0% → >80%)
+  - [x] Write tests for `src/routes/_authenticated/instructor/assignments/$id.tsx` (0% → >80%)
+  - [x] Write tests for `src/routes/_authenticated/instructor/assignments/new.tsx` (0% → >80%)
+  - [x] Write tests for `src/routes/_authenticated/instructor/reviews/index.tsx` (0% → >80%)
+  - [x] Write tests for `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` (0% → >80%)
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for student routes
   - [ ] Write tests for `src/routes/_authenticated/student/assignments/index.tsx` (0% → >80%)
