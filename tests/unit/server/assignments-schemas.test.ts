@@ -185,4 +185,48 @@ describe('Assignment Schemas', () => {
       expect(result.success).toBe(false);
     });
   });
+
+  describe('Server Function Stubs', () => {
+    it('should export createAssignment function', async () => {
+      const { createAssignment } = await import('@/server/assignments');
+      expect(createAssignment).toBeDefined();
+      expect(typeof createAssignment).toBe('function');
+    });
+
+    it('should export listInstructorAssignments function', async () => {
+      const { listInstructorAssignments } = await import('@/server/assignments');
+      expect(listInstructorAssignments).toBeDefined();
+      expect(typeof listInstructorAssignments).toBe('function');
+    });
+
+    it('should export getAssignmentDetail function', async () => {
+      const { getAssignmentDetail } = await import('@/server/assignments');
+      expect(getAssignmentDetail).toBeDefined();
+      expect(typeof getAssignmentDetail).toBe('function');
+    });
+
+    it('should export listStudentAssignments function', async () => {
+      const { listStudentAssignments } = await import('@/server/assignments');
+      expect(listStudentAssignments).toBeDefined();
+      expect(typeof listStudentAssignments).toBe('function');
+    });
+
+    it('should export getStudentAssignmentDetail function', async () => {
+      const { getStudentAssignmentDetail } = await import('@/server/assignments');
+      expect(getStudentAssignmentDetail).toBeDefined();
+      expect(typeof getStudentAssignmentDetail).toBe('function');
+    });
+
+    it('should export unlockCheckpoint function', async () => {
+      const { unlockCheckpoint } = await import('@/server/assignments');
+      expect(unlockCheckpoint).toBeDefined();
+      expect(typeof unlockCheckpoint).toBe('function');
+    });
+
+    it('should export extendDeadline function', async () => {
+      const { extendDeadline } = await import('@/server/assignments');
+      expect(extendDeadline).toBeDefined();
+      expect(typeof extendDeadline).toBe('function');
+    });
+  });
 });

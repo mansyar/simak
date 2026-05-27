@@ -85,11 +85,11 @@
 
 ## Phase 3: High Coverage - Server Stubs (20-50%) [checkpoint: ]
 
-- [ ] Task: Write unit tests for `src/server/assignments.ts` (43% → >80%)
-  - [ ] Analyze uncovered lines (82-105)
-  - [ ] Write tests for Zod schemas (CreateAssignmentSchema, UpdateAssignmentSchema)
-  - [ ] Write tests for server function stubs
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/server/assignments.ts` (43% → >80%)
+  - [x] Analyze uncovered lines (82-105)
+  - [x] Write tests for Zod schemas (CreateAssignmentSchema, UpdateAssignmentSchema)
+  - [x] Write tests for server function stubs
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/server/consultations.ts` (40% → >80%)
   - [ ] Analyze uncovered lines (77-93)
