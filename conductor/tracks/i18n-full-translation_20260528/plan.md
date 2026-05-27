@@ -21,15 +21,23 @@
 
 ## Phase 2: Add New Translation Keys to Locale Files
 
-- [ ] Task: Add all new translation keys to locales/en.json
-  - [ ] Add keys for each UI component hardcoded string that needs replacement
-  - [ ] Organize new keys into appropriate sections or create new sections as needed
-- [ ] Task: Add matching translation keys to locales/id.json
-  - [ ] Translate all new keys to Indonesian
-  - [ ] Ensure key structure matches en.json exactly
-- [ ] Task: Regenerate i18n types after locale updates
-  - [ ] Run pnpm generate:i18n
-- [ ] Task: Run translation coverage test to confirm 100% key coverage
+- [x] Task: Add all new translation keys to locales/en.json
+  - [x] Add keys for each UI component hardcoded string that needs replacement
+  - [x] Organize new keys into appropriate sections or create new sections as needed
+  - [x] Added common keys (openMenu, close, skipToContent, goToDashboard, emailPlaceholder, namePlaceholder, searchByName, noSearchResults, typeDeleteToConfirm, templateNamePlaceholder, templateTypePlaceholder)
+  - [x] Added adminUsers.subtitle
+  - [x] Added adminTemplates.subtitle and form placeholders (namePlaceholder, typePlaceholder, minConsPlaceholder)
+  - [x] Added instructorAssignments subtitle, newAssignmentSubtitle, averageProgress
+  - [x] Added language switchToEnglish, switchToIndonesian
+  - [x] Added notifications closePanel, viewNotifications
+  - [x] Added consultations sessionInternal, sessionExternal
+- [x] Task: Add matching translation keys to locales/id.json
+  - [x] Translate all new keys to Indonesian
+  - [x] Ensure key structure matches en.json exactly
+- [x] Task: Regenerate i18n types after locale updates
+  - [x] Run pnpm generate:i18n
+- [x] Task: Run translation coverage test to confirm 100% key coverage
+  - [x] All 127 test files (1139 tests) pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Add New Translation Keys to Locale Files' (Protocol in workflow.md)
 
 ## Phase 3: Replace Hardcoded Strings — Routes & Layouts

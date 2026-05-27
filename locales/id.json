@@ -53,7 +53,18 @@
     "submit": "Kirim",
     "noResults": "Tidak ada hasil",
     "viewAll": "Lihat Semua",
-    "page": "Halaman"
+    "page": "Halaman",
+    "openMenu": "Buka menu",
+    "close": "Tutup",
+    "skipToContent": "Lompat ke konten",
+    "goToDashboard": "Ke Dasbor",
+    "emailPlaceholder": "contoh@email.com",
+    "namePlaceholder": "John Doe",
+    "searchByName": "Cari templat berdasarkan nama atau tipe...",
+    "noSearchResults": "Tidak ada {items} yang ditemukan.",
+    "typeDeleteToConfirm": "Ketik DELETE untuk mengonfirmasi",
+    "templateNamePlaceholder": "misal, Templat Skripsi",
+    "templateTypePlaceholder": "misal, Skripsi, Makalah Penelitian"
   },
   "theme": {
     "light": "Mode Terang",
@@ -63,7 +74,9 @@
   "language": {
     "en": "English",
     "id": "Bahasa Indonesia",
-    "switch": "Ganti bahasa"
+    "switch": "Ganti bahasa",
+    "switchToEnglish": "Ganti ke English",
+    "switchToIndonesian": "Ganti ke Bahasa Indonesia"
   },
   "adminSidebar": {
     "dashboard": "Dasbor",
@@ -72,6 +85,7 @@
   },
   "adminUsers": {
     "title": "Pengguna",
+    "subtitle": "Kelola pengguna, peran, dan izin organisasi Anda.",
     "newUser": "Pengguna Baru",
     "table": {
       "name": "Nama",
@@ -103,6 +117,7 @@
   },
   "adminTemplates": {
     "title": "Templat",
+    "subtitle": "Buat dan kelola templat tugas dengan checkpoint yang terurut.",
     "newTemplate": "Templat Baru",
     "searchPlaceholder": "Cari templat...",
     "filterByType": "Semua Tipe",
@@ -118,7 +133,10 @@
       "addCheckpoint": "Tambah Checkpoint",
       "removeCheckpoint": "Hapus",
       "moveUp": "Naik",
-      "moveDown": "Turun"
+      "moveDown": "Turun",
+      "namePlaceholder": "misal, Templat Skripsi",
+      "typePlaceholder": "misal, Skripsi, Makalah Penelitian",
+      "minConsPlaceholder": "0"
     },
     "actions": {
       "edit": "Ubah",
@@ -166,6 +184,9 @@
   },
   "instructorAssignments": {
     "title": "Tugas",
+    "subtitle": "Lihat dan kelola tugas yang diberikan kepada mahasiswa Anda.",
+    "newAssignmentSubtitle": "Ikuti langkah-langkah untuk mengonfigurasi dan meluncurkan tugas untuk kelompok mahasiswa.",
+    "averageProgress": "Rata-rata Progres",
     "newAssignment": "Tugas Baru",
     "searchPlaceholder": "Cari tugas berdasarkan judul...",
     "studentCount": "{count} Mahasiswa",
@@ -362,6 +383,8 @@
     "sessionType": "Tipe Sesi",
     "internal": "Internal",
     "external": "Eksternal",
+    "sessionInternal": "Internal",
+    "sessionExternal": "Eksternal: {name}",
     "externalConsultantName": "Nama Konsultan Eksternal",
     "consultantNamePlaceholder": "Masukkan nama konsultan",
     "notes": "Catatan",
@@ -399,6 +422,8 @@
     "markAllRead": "Tandai semua dibaca",
     "empty": "Belum ada notifikasi",
     "unreadCount": "notifikasi belum dibaca",
+    "closePanel": "Tutup panel",
+    "viewNotifications": "Lihat notifikasi",
     "groups": {
       "newReviews": "Ulasan Baru",
       "consultations": "Pembaruan Konsultasi",

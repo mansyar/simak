@@ -53,7 +53,18 @@
     "submit": "Submit",
     "noResults": "No results found",
     "viewAll": "View All",
-    "page": "Page"
+    "page": "Page",
+    "openMenu": "Open menu",
+    "close": "Close",
+    "skipToContent": "Skip to content",
+    "goToDashboard": "Go to Dashboard",
+    "emailPlaceholder": "you@example.com",
+    "namePlaceholder": "John Doe",
+    "searchByName": "Search templates by name or type...",
+    "noSearchResults": "No {items} found matching your search.",
+    "typeDeleteToConfirm": "Type DELETE to confirm",
+    "templateNamePlaceholder": "e.g., Thesis Template",
+    "templateTypePlaceholder": "e.g., Thesis, Research Paper"
   },
   "theme": {
     "light": "Light Mode",
@@ -63,7 +74,9 @@
   "language": {
     "en": "English",
     "id": "Bahasa Indonesia",
-    "switch": "Switch language"
+    "switch": "Switch language",
+    "switchToEnglish": "Switch to English",
+    "switchToIndonesian": "Switch to Bahasa Indonesia"
   },
   "adminSidebar": {
     "dashboard": "Dashboard",
@@ -72,6 +85,7 @@
   },
   "adminUsers": {
     "title": "Users",
+    "subtitle": "Manage your organization's users, roles, and permissions.",
     "newUser": "New User",
     "table": {
       "name": "Name",
@@ -103,6 +117,7 @@
   },
   "adminTemplates": {
     "title": "Templates",
+    "subtitle": "Create and manage assignment templates with ordered checkpoints.",
     "newTemplate": "New Template",
     "searchPlaceholder": "Search templates...",
     "filterByType": "All Types",
@@ -118,7 +133,10 @@
       "addCheckpoint": "Add Checkpoint",
       "removeCheckpoint": "Remove",
       "moveUp": "Move Up",
-      "moveDown": "Move Down"
+      "moveDown": "Move Down",
+      "namePlaceholder": "e.g., Thesis Template",
+      "typePlaceholder": "e.g., Thesis, Research Paper",
+      "minConsPlaceholder": "0"
     },
     "actions": {
       "edit": "Edit",
@@ -166,6 +184,9 @@
   },
   "instructorAssignments": {
     "title": "Assignments",
+    "subtitle": "View and manage assignments assigned to your students.",
+    "newAssignmentSubtitle": "Follow the steps to configure and launch an assignment for a student cohort.",
+    "averageProgress": "Average Progress",
     "newAssignment": "New Assignment",
     "searchPlaceholder": "Search assignments by title...",
     "studentCount": "{count} Students",
@@ -362,6 +383,8 @@
     "sessionType": "Session Type",
     "internal": "Internal",
     "external": "External",
+    "sessionInternal": "Internal",
+    "sessionExternal": "External: {name}",
     "externalConsultantName": "External Consultant Name",
     "consultantNamePlaceholder": "Enter consultant name",
     "notes": "Notes",
@@ -399,6 +422,8 @@
     "markAllRead": "Mark all read",
     "empty": "No notifications yet",
     "unreadCount": "unread notifications",
+    "closePanel": "Close panel",
+    "viewNotifications": "View notifications",
     "groups": {
       "newReviews": "New Reviews",
       "consultations": "Consultation Updates",
