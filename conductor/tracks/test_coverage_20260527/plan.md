@@ -183,12 +183,12 @@
 
 ## Phase 6: Threshold Update & Final Verification [checkpoint: ]
 
-- [ ] Task: Update vitest.config.ts coverage thresholds
-  - [ ] Change `lines` threshold from 50 to 80
-  - [ ] Change `functions` threshold from 50 to 80
-  - [ ] Change `branches` threshold from 50 to 80
-  - [ ] Change `statements` threshold from 50 to 80
-  - [ ] Run `pnpm vitest run --coverage` and verify all thresholds pass
+- [x] Task: Update vitest.config.ts coverage thresholds
+  - [x] Change `lines` threshold from 50 to 80
+  - [x] Change `functions` threshold from 50 to 80
+  - [x] Change `branches` threshold from 50 to 80
+  - [x] Change `statements` threshold from 50 to 80
+  - [x] Run `pnpm vitest run --coverage` and verify all thresholds pass
 
 - [ ] Task: Final coverage verification
   - [ ] Run full test suite with coverage
