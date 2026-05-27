@@ -52,11 +52,11 @@
   - [x] Write tests for `src/routes/_unauthenticated/auth/setup-password.tsx` (0% → >80%)
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for dashboard routes
-  - [ ] Write tests for `src/routes/_authenticated/admin/dashboard.tsx` (20% → >80%)
-  - [ ] Write tests for `src/routes/_authenticated/instructor/dashboard.tsx` (20% → >80%)
-  - [ ] Write tests for `src/routes/_authenticated/student/dashboard.tsx` (20% → >80%)
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for dashboard routes
+  - [x] Write tests for `src/routes/_authenticated/admin/dashboard.tsx` (20% → >80%)
+  - [x] Write tests for `src/routes/_authenticated/instructor/dashboard.tsx` (20% → >80%)
+  - [x] Write tests for `src/routes/_authenticated/student/dashboard.tsx` (20% → >80%)
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for admin routes
   - [ ] Write tests for `src/routes/_authenticated/admin/users/index.tsx` (3.38% → >80%)
