@@ -38,12 +38,12 @@
 
 - [x] Task: Write unit tests for route guard layouts [f80026b]
   - [x] Write tests for `src/routes/__root.tsx` (17% → >80%)
-  - [ ] Write tests for `src/routes/_authenticated.tsx` (20% → >80%)
-  - [ ] Write tests for `src/routes/_unauthenticated.tsx` (20% → >80%)
-  - [ ] Write tests for `src/routes/_authenticated/_admin.tsx` (14% → >80%)
-  - [ ] Write tests for `src/routes/_authenticated/_instructor.tsx` (0% → >80%)
-  - [ ] Write tests for `src/routes/_authenticated/_student.tsx` (14% → >80%)
-  - [ ] Run tests and verify coverage increase
+  - [x] Write tests for `src/routes/_authenticated.tsx` (20% → >80%)
+  - [x] Write tests for `src/routes/_unauthenticated.tsx` (20% → >80%)
+  - [x] Write tests for `src/routes/_authenticated/_admin.tsx` (14% → >80%)
+  - [x] Write tests for `src/routes/_authenticated/_instructor.tsx` (0% → >80%)
+  - [x] Write tests for `src/routes/_authenticated/_student.tsx` (14% → >80%)
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for auth routes
   - [ ] Write tests for `src/routes/_unauthenticated/auth/login.tsx` (4.76% → >80%)
