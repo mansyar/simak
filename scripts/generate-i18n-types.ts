@@ -28,6 +28,14 @@ export type Translation = {
     resetPassword: string
     invalidCredentials: string
     sessionExpired: string
+    confirmPassword: string
+    passwordMismatch: string
+    linkExpired: string
+    setupPassword: string
+    setupSuccess: string
+    resetSuccess: string
+    checkYourEmail: string
+    forgotPasswordSent: string
   }
   nav: {
     dashboard: string
@@ -37,6 +45,73 @@ export type Translation = {
     settings: string
     users: string
     templates: string
+    welcome: string
+    role_student: string
+    role_instructor: string
+    role_admin: string
+  }
+  adminUsers: {
+    title: string
+    newUser: string
+    table: {
+      name: string
+      email: string
+      role: string
+      createdAt: string
+      actions: string
+    }
+    empty: string
+    createPrompt: string
+    deleteConfirm: string
+    deleteSuccess: string
+    createSuccess: string
+    createSuccessNoEmail: string
+    updateSuccess: string
+    linkGenerated: string
+    linkCopied: string
+    generateLink: string
+    edit: string
+    role_superadmin: string
+    allRoles: string
+    searchPlaceholder: string
+    role_admin: string
+    role_instructor: string
+    role_student: string
+    emailVerified: string
+    notVerified: string
+    createdAt: string
+  }
+  adminTemplates: {
+    title: string
+    newTemplate: string
+    searchPlaceholder: string
+    filterByType: string
+    checkpointCount: string
+    empty: string
+    createPrompt: string
+    form: {
+      name: string
+      type: string
+      checkpoints: string
+      checkpointName: string
+      addCheckpoint: string
+      removeCheckpoint: string
+      minConsultations: string
+      moveUp: string
+      moveDown: string
+    }
+    actions: {
+      edit: string
+      duplicate: string
+      delete: string
+    }
+    createSuccess: string
+    updateSuccess: string
+    duplicateSuccess: string
+    deleteConfirm: string
+    deleteInUse: string
+    deleteSuccess: string
+    inUseBanner: string
   }
   common: {
     save: string
@@ -146,6 +221,8 @@ export type Translation = {
     emptyPrompt: string
     timeline: string
     submit: string
+    resubmit: string
+    viewSubmission: string
     consultations: string
     blockedByPrevious: string
     blockedByConsultations: string
@@ -160,34 +237,6 @@ export type Translation = {
       revise: string
       overdue: string
     }
-  }
-  adminUsers: {
-    title: string
-    newUser: string
-    table: {
-      name: string
-      email: string
-      role: string
-      createdAt: string
-      actions: string
-    }
-    empty: string
-    createPrompt: string
-    deleteConfirm: string
-    deleteSuccess: string
-    createSuccess: string
-    createSuccessNoEmail: string
-    updateSuccess: string
-    linkGenerated: string
-    linkCopied: string
-    generateLink: string
-    edit: string
-    role_admin: string
-    role_instructor: string
-    role_student: string
-    emailVerified: string
-    notVerified: string
-    createdAt: string
   }
   instructorReviews: {
     title: string
@@ -220,36 +269,55 @@ export type Translation = {
     reviewSubmitted: string
     backToQueue: string
   }
-  adminTemplates: {
+  instructorAssignments: {
     title: string
-    newTemplate: string
+    subtitle: string
     searchPlaceholder: string
-    filterByType: string
-    checkpointCount: string
+    createNew: string
+    myAssignments: string
+    allAssignments: string
+    assignedToMe: string
+    myCheckpoints: string
+    pendingReviews: string
+    submission: string
+    submissionCount: string
+    averageGrade: string
+    percentage: string
+    noAssignments: string
+    emptyPrompt: string
+  }
+  files: {
+    title: string
+    upload: string
+    uploadSuccess: string
+    uploadError: string
+    fileSize: string
+    file: string
+    download: string
+    downloadError: string
     empty: string
-    createPrompt: string
-    form: {
-      name: string
-      type: string
-      checkpoints: string
-      checkpointName: string
-      addCheckpoint: string
-      removeCheckpoint: string
-      moveUp: string
-      moveDown: string
-    }
-    actions: {
-      edit: string
-      duplicate: string
-      delete: string
-    }
-    createSuccess: string
-    updateSuccess: string
-    duplicateSuccess: string
-    deleteConfirm: string
-    deleteInUse: string
-    deleteSuccess: string
-    inUseBanner: string
+    emptyPrompt: string
+  }
+  consultations: {
+    title: string
+    student: string
+    instructor: string
+    edit: string
+    cancel: string
+    submit: string
+    logs: string
+    verify: string
+    reject: string
+    records: string
+    empty: string
+    emptyPrompt: string
+    pending: string
+    verified: string
+    rejected: string
+    comments: string
+    commentPlaceholder: string
+    submitError: string
+    rejectError: string
   }
   notifications: {
     title: string
