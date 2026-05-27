@@ -169,10 +169,10 @@
   - [x] Write tests for edge cases
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/lib/review-sla.ts` (81.25% → >80%)
-  - [ ] Analyze uncovered lines (61-62, 146)
-  - [ ] Write tests for SLA breach edge cases
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/lib/review-sla.ts` (81.25% → >80%)
+  - [x] Analyze uncovered lines (61-62, 146)
+  - [x] Write tests for SLA breach edge cases
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/server/consultations.server.ts` (80.7% → >80%)
   - [ ] Analyze uncovered lines (450-451, 513-514)
