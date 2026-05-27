@@ -26,11 +26,11 @@
   - [x] Write tests for localStorage persistence
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/i18n/index.ts` (5.26% → >80%)
-  - [ ] Analyze i18n initialization and locale detection
-  - [ ] Write tests for locale initialization
-  - [ ] Write tests for translation loading
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/i18n/index.ts` (5.26% → >80%) [f528ba1]
+  - [x] Analyze i18n initialization and locale detection
+  - [x] Write tests for locale initialization
+  - [x] Write tests for translation loading
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Critical Server Coverage' (Protocol in workflow.md)
 
