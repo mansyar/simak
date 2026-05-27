@@ -169,4 +169,42 @@ describe('User Schemas', () => {
       expect(result.success).toBe(false);
     });
   });
+
+  describe('Server Function Stubs', () => {
+    it('should export listUsers function', async () => {
+      const { listUsers } = await import('@/server/users');
+      expect(listUsers).toBeDefined();
+      expect(typeof listUsers).toBe('function');
+    });
+
+    it('should export getUser function', async () => {
+      const { getUser } = await import('@/server/users');
+      expect(getUser).toBeDefined();
+      expect(typeof getUser).toBe('function');
+    });
+
+    it('should export createUser function', async () => {
+      const { createUser } = await import('@/server/users');
+      expect(createUser).toBeDefined();
+      expect(typeof createUser).toBe('function');
+    });
+
+    it('should export updateUser function', async () => {
+      const { updateUser } = await import('@/server/users');
+      expect(updateUser).toBeDefined();
+      expect(typeof updateUser).toBe('function');
+    });
+
+    it('should export deleteUser function', async () => {
+      const { deleteUser } = await import('@/server/users');
+      expect(deleteUser).toBeDefined();
+      expect(typeof deleteUser).toBe('function');
+    });
+
+    it('should export generateSetupLink function', async () => {
+      const { generateSetupLink } = await import('@/server/users');
+      expect(generateSetupLink).toBeDefined();
+      expect(typeof generateSetupLink).toBe('function');
+    });
+  });
 });
