@@ -20,11 +20,11 @@
   - [x] Write tests for `getPresignedDownloadUrl` (ownership validation)
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/hooks/use-theme.ts` (0% → >80%)
-  - [ ] Analyze hook implementation
-  - [ ] Write tests for theme toggle (light/dark/system)
-  - [ ] Write tests for localStorage persistence
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/hooks/use-theme.ts` (0% → >80%) [a9516f9]
+  - [x] Analyze hook implementation
+  - [x] Write tests for theme toggle (light/dark/system)
+  - [x] Write tests for localStorage persistence
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/i18n/index.ts` (5.26% → >80%)
   - [ ] Analyze i18n initialization and locale detection
