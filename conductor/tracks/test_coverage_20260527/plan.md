@@ -83,7 +83,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Critical Route Coverage' (Protocol in workflow.md)
 
-## Phase 3: High Coverage - Server Stubs (20-50%) [checkpoint: ]
+## Phase 3: High Coverage - Server Stubs (20-50%) [checkpoint: 05368c7]
 
 - [x] Task: Write unit tests for `src/server/assignments.ts` (43% → >80%)
   - [x] Analyze uncovered lines (82-105)
@@ -127,7 +127,7 @@
   - [x] Write tests for server function stubs
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: High Coverage - Server Stubs' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: High Coverage - Server Stubs' (Protocol in workflow.md)
 
 ## Phase 4: High Coverage - Components & Schema (20-50%) [checkpoint: ]
 
