@@ -2,21 +2,21 @@
 
 ## Phase 1: Type Definition Updates
 
-- [ ] Task: Update scripts/generate-i18n-types.ts with missing keys in existing sections
-  - [ ] Add missing auth keys: confirmPassword, passwordMismatch, linkExpired, setupPassword, setupSuccess, resetSuccess, checkYourEmail, forgotPasswordSent
-  - [ ] Add missing nav keys: welcome, role_student, role_instructor, role_admin
-  - [ ] Add missing adminUsers keys: role_superadmin, allRoles, searchPlaceholder
-  - [ ] Add missing adminTemplates.form key: minConsultations
-  - [ ] Add missing studentAssignments keys: resubmit, viewSubmission, consultations, notFound, notFoundDescription
-- [ ] Task: Add entire missing sections to generate-i18n-types.ts
-  - [ ] Add instructorAssignments section (all keys from en.json)
-  - [ ] Add files section (all keys from en.json)
-  - [ ] Add consultations section (all keys from en.json)
-- [ ] Task: Regenerate i18n types
-  - [ ] Run pnpm generate:i18n
-  - [ ] Verify src/i18n/types.ts is updated
-- [ ] Task: Update existing test snapshots if needed
-  - [ ] Run pnpm test to confirm all tests still pass
+- [x] Task: Update scripts/generate-i18n-types.ts with missing keys in existing sections (35ea09e)
+  - [x] Add missing auth keys: confirmPassword, passwordMismatch, linkExpired, setupPassword, setupSuccess, resetSuccess, checkYourEmail, forgotPasswordSent — already present in first occurrence; no change needed
+  - [x] Add missing nav keys: welcome, role_student, role_instructor, role_admin — already present; no change needed
+  - [x] Add missing adminUsers keys: role_superadmin, allRoles, searchPlaceholder — already present; no change needed
+  - [x] Add missing adminTemplates.form key: minConsultations — already present; no change needed
+  - [x] Add missing studentAssignments keys: resubmit, viewSubmission, consultations, notFound, notFoundDescription — resubmit/viewSubmission were missing from first occurrence, added; others already present
+- [x] Task: Add entire missing sections to generate-i18n-types.ts (35ea09e)
+  - [x] Add instructorAssignments section (all keys from en.json) — already present in first occurrence; cleaned up duplicates
+  - [x] Add files section (all keys from en.json) — already present; cleaned up duplicates
+  - [x] Add consultations section (all keys from en.json) — already present; cleaned up duplicates
+- [x] Task: Regenerate i18n types (35ea09e)
+  - [x] Run pnpm generate:i18n
+  - [x] Verify src/i18n/types.ts is updated
+- [x] Task: Update existing test snapshots if needed (35ea09e)
+  - [x] Run pnpm test to confirm all tests still pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Type Definition Updates' (Protocol in workflow.md)
 
 ## Phase 2: Add New Translation Keys to Locale Files
