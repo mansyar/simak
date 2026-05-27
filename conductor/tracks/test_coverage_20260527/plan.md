@@ -131,12 +131,12 @@
 
 ## Phase 4: High Coverage - Components & Schema (20-50%) [checkpoint: ]
 
-- [ ] Task: Write unit tests for `src/components/reviews/ReviewForm.tsx` (27% → >80%)
-  - [ ] Analyze uncovered lines (63-99, 144-180)
-  - [ ] Write tests for form submission (pass/revise)
-  - [ ] Write tests for feedback file upload
-  - [ ] Write tests for revision deadline picker
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/components/reviews/ReviewForm.tsx` (27% → >80%)
+  - [x] Analyze uncovered lines (63-99, 144-180)
+  - [x] Write tests for form submission (pass/revise)
+  - [x] Write tests for feedback file upload
+  - [x] Write tests for revision deadline picker
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/db/schema/` files (37-67% → >80%)
   - [ ] Write tests for `assignments.ts` relation exports (50% → >80%)
