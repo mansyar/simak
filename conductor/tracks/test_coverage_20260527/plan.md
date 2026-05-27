@@ -174,10 +174,10 @@
   - [x] Write tests for SLA breach edge cases
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/server/consultations.server.ts` (80.7% → >80%)
-  - [ ] Analyze uncovered lines (450-451, 513-514)
-  - [ ] Write tests for edge cases
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/server/consultations.server.ts` (80.7% → >80%)
+  - [x] Analyze uncovered lines (450-451, 513-514)
+  - [x] Write tests for edge cases
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Medium Coverage - Remaining Gaps' (Protocol in workflow.md)
 
