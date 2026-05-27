@@ -1,0 +1,8 @@
+{
+  "track_id": "dark-mode-responsive-a11y_20260528",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-05-28T09:30:00Z",
+  "updated_at": "2026-05-28T09:30:00Z",
+  "description": "Dark Mode, Responsive UI & Accessibility — comprehensive audit and fix pass across all existing pages and components for dark mode styling, responsive layout (320px–1920px), and WCAG 2.1 AA accessibility compliance"
+}
