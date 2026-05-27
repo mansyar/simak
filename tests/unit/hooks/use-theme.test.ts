@@ -1,77 +1,157 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+/** @vitest-environment jsdom */
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useTheme } from '@/hooks/use-theme';
 
-// Test the pure logic that the useTheme hook relies on
-// The hook itself (useState/useEffect) is tested via component integration in later tracks
+// Mock localStorage
+const localStorageMock = {
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
+};
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-describe('Theme logic (pure functions)', () => {
-  const STORAGE_KEY = 'simak-theme';
+// Mock matchMedia
+const matchMediaMock = vi.fn().mockImplementation((query) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
+}));
+Object.defineProperty(window, 'matchMedia', { value: matchMediaMock });
 
+describe('useTheme', () => {
   beforeEach(() => {
-    localStorage.clear();
     vi.clearAllMocks();
+    document.documentElement.classList.remove('dark');
+  });
 
-    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+  afterEach(() => {
+    document.documentElement.classList.remove('dark');
+  });
+
+  it('should initialize with system preference when no stored theme', () => {
+    localStorageMock.getItem.mockReturnValue(null);
+    matchMediaMock.mockReturnValue({
       matches: false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    }));
+    });
+
+    const { result } = renderHook(() => useTheme());
+
+    expect(result.current.theme).toBe('light');
   });
 
-  it('should default to light when no preference is stored and system is light', () => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    expect(stored).toBeNull();
+  it('should initialize with dark system preference', () => {
+    localStorageMock.getItem.mockReturnValue(null);
+    matchMediaMock.mockReturnValue({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    });
 
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const defaultTheme = stored ?? (prefersDark ? 'dark' : 'light');
-    expect(defaultTheme).toBe('light');
+    const { result } = renderHook(() => useTheme());
+
+    expect(result.current.theme).toBe('dark');
   });
 
-  it('should read stored dark theme from localStorage', () => {
-    localStorage.setItem(STORAGE_KEY, 'dark');
-    const stored = localStorage.getItem(STORAGE_KEY);
-    expect(stored).toBe('dark');
+  it('should initialize with stored theme', () => {
+    localStorageMock.getItem.mockReturnValue('dark');
+
+    const { result } = renderHook(() => useTheme());
+
+    expect(result.current.theme).toBe('dark');
   });
 
-  it('should store theme preference in localStorage', () => {
-    localStorage.setItem(STORAGE_KEY, 'dark');
-    expect(localStorage.getItem(STORAGE_KEY)).toBe('dark');
+  it('should set theme and persist to localStorage', () => {
+    localStorageMock.getItem.mockReturnValue('light');
 
-    localStorage.setItem(STORAGE_KEY, 'light');
-    expect(localStorage.getItem(STORAGE_KEY)).toBe('light');
+    const { result } = renderHook(() => useTheme());
+
+    act(() => {
+      result.current.setTheme('dark');
+    });
+
+    expect(result.current.theme).toBe('dark');
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('simak-theme', 'dark');
   });
 
-  it('should toggle between light and dark', () => {
-    const currentTheme = 'light';
-    const toggledTheme = currentTheme === 'light' ? 'dark' : 'light';
-    expect(toggledTheme).toBe('dark');
+  it('should toggle theme from light to dark', () => {
+    localStorageMock.getItem.mockReturnValue('light');
 
-    const toggledBack = toggledTheme === 'light' ? 'dark' : 'light';
-    expect(toggledBack).toBe('light');
+    const { result } = renderHook(() => useTheme());
+
+    act(() => {
+      result.current.toggleTheme();
+    });
+
+    expect(result.current.theme).toBe('dark');
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('simak-theme', 'dark');
   });
 
-  it('should detect system preference via matchMedia', () => {
-    // Test with light system preference
-    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+  it('should toggle theme from dark to light', () => {
+    localStorageMock.getItem.mockReturnValue('dark');
+
+    const { result } = renderHook(() => useTheme());
+
+    act(() => {
+      result.current.toggleTheme();
+    });
+
+    expect(result.current.theme).toBe('light');
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('simak-theme', 'light');
+  });
+
+  it('should apply dark class to document when theme is dark', () => {
+    localStorageMock.getItem.mockReturnValue('dark');
+
+    renderHook(() => useTheme());
+
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+  });
+
+  it('should remove dark class from document when theme is light', () => {
+    localStorageMock.getItem.mockReturnValue('light');
+    document.documentElement.classList.add('dark');
+
+    renderHook(() => useTheme());
+
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+  });
+
+  it('should listen for system preference changes', () => {
+    const addEventListenerMock = vi.fn();
+    localStorageMock.getItem.mockReturnValue(null);
+    matchMediaMock.mockReturnValue({
       matches: false,
-      media: query,
-    }));
+      addEventListener: addEventListenerMock,
+      removeEventListener: vi.fn(),
+    });
 
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    expect(isDark).toBe(false);
+    renderHook(() => useTheme());
+
+    expect(addEventListenerMock).toHaveBeenCalledWith('change', expect.any(Function));
   });
 
-  it('should detect dark system preference via matchMedia', () => {
-    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
-      matches: query === '(prefers-color-scheme: dark)',
-      media: query,
-    }));
+  it('should cleanup event listener on unmount', () => {
+    const removeEventListenerMock = vi.fn();
+    localStorageMock.getItem.mockReturnValue(null);
+    matchMediaMock.mockReturnValue({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: removeEventListenerMock,
+    });
 
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    expect(isDark).toBe(true);
+    const { unmount } = renderHook(() => useTheme());
+
+    unmount();
+
+    expect(removeEventListenerMock).toHaveBeenCalledWith('change', expect.any(Function));
   });
 });
