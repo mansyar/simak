@@ -1,3 +1,5 @@
+import { useI18n } from '../../routes/__root';
+
 interface PendingConsultation {
   id: number;
   studentName: string;
@@ -14,6 +16,7 @@ interface VerificationQueueItemProps {
 }
 
 export function VerificationQueueItem({ consultation, onClick }: VerificationQueueItemProps) {
+  const { t } = useI18n();
   const notesPreview = consultation.notes
     ? consultation.notes.length > 80
       ? consultation.notes.slice(0, 80) + '...'
@@ -27,9 +30,7 @@ export function VerificationQueueItem({ consultation, onClick }: VerificationQue
       className="w-full text-left rounded-lg border bg-card p-4 shadow-sm hover:bg-accent/50 transition-colors space-y-2"
     >
       <div className="flex items-center justify-between">
-        <span className="font-medium text-sm text-foreground">
-          {consultation.studentName}
-        </span>
+        <span className="font-medium text-sm text-foreground">{consultation.studentName}</span>
         <span className="text-xs text-muted-foreground">
           {new Date(consultation.createdAt).toLocaleDateString()}
         </span>
@@ -38,8 +39,8 @@ export function VerificationQueueItem({ consultation, onClick }: VerificationQue
         {consultation.checkpointName}
         {' · '}
         {consultation.sessionType === 'external' && consultation.externalConsultantName
-          ? `External: ${consultation.externalConsultantName}`
-          : 'Internal'}
+          ? t('consultations.sessionExternal', { name: consultation.externalConsultantName })
+          : t('consultations.sessionInternal')}
       </div>
       <p className="text-sm text-muted-foreground line-clamp-1">{notesPreview}</p>
     </button>

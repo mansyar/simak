@@ -35,7 +35,8 @@
     "consultations": "Konsultasi",
     "settings": "Pengaturan",
     "users": "Pengguna",
-    "templates": "Templat"
+    "templates": "Templat",
+    "branding_instructor": "SIMAK Instruktur"
   },
   "common": {
     "save": "Simpan",
@@ -82,7 +83,8 @@
   "adminSidebar": {
     "dashboard": "Dasbor",
     "users": "Pengguna",
-    "templates": "Templat"
+    "templates": "Templat",
+    "branding": "SIMAK Admin"
   },
   "adminUsers": {
     "title": "Pengguna",
@@ -259,7 +261,8 @@
   },
   "studentSidebar": {
     "dashboard": "Dasbor",
-    "assignments": "Tugas"
+    "assignments": "Tugas",
+    "branding": "SIMAK Mahasiswa"
   },
   "studentAssignments": {
     "title": "Tugas Saya",

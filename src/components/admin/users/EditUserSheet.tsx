@@ -32,12 +32,7 @@ interface EditUserSheetProps {
   onSubmit: (id: string, values: EditUserFormValues) => Promise<void>;
 }
 
-export function EditUserSheet({
-  user,
-  open,
-  onOpenChange,
-  onSubmit,
-}: EditUserSheetProps) {
+export function EditUserSheet({ user, open, onOpenChange, onSubmit }: EditUserSheetProps) {
   const { t } = useI18n();
   const form = useForm<EditUserFormValues>({
     resolver: zodResolver(UpdateUserSchema),
@@ -81,7 +76,7 @@ export function EditUserSheet({
                 <FormItem>
                   <FormLabel>{t('adminUsers.table.name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <Input placeholder={t('common.namePlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,7 +89,7 @@ export function EditUserSheet({
                 <FormItem>
                   <FormLabel>{t('auth.email')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="john@example.com" {...field} />
+                    <Input placeholder={t('common.emailPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

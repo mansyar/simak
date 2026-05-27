@@ -69,7 +69,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search templates by name or type..."
+          placeholder={t('common.searchByName')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9 h-11"
@@ -96,7 +96,9 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
       ) : filteredTemplates.length === 0 ? (
         <div className="p-8 text-center border rounded-xl border-dashed">
           <Clipboard className="h-8 w-8 mx-auto text-muted-foreground opacity-50 mb-3" />
-          <p className="text-sm text-muted-foreground">No templates found matching your search.</p>
+          <p className="text-sm text-muted-foreground">
+            {t('common.noSearchResults', { items: t('adminTemplates.title').toLowerCase() })}
+          </p>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">

@@ -37,11 +37,7 @@ interface CreateUserDialogProps {
   onSubmit: (values: CreateUserFormValues) => Promise<void>;
 }
 
-export function CreateUserDialog({
-  open,
-  onOpenChange,
-  onSubmit,
-}: CreateUserDialogProps) {
+export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDialogProps) {
   const { t } = useI18n();
   const form = useForm<CreateUserFormValues>({
     resolver: zodResolver(CreateUserSchema),
@@ -63,9 +59,7 @@ export function CreateUserDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{t('adminUsers.newUser')}</DialogTitle>
-          <DialogDescription>
-            {t('adminUsers.createPrompt')}
-          </DialogDescription>
+          <DialogDescription>{t('adminUsers.createPrompt')}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
@@ -76,7 +70,7 @@ export function CreateUserDialog({
                 <FormItem>
                   <FormLabel>{t('adminUsers.table.name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <Input placeholder={t('common.namePlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -89,7 +83,7 @@ export function CreateUserDialog({
                 <FormItem>
                   <FormLabel>{t('auth.email')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="john@example.com" {...field} />
+                    <Input placeholder={t('common.emailPlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -105,7 +99,9 @@ export function CreateUserDialog({
                     <FormControl>
                       <SelectTrigger>
                         <span data-slot="select-value" className="flex flex-1 text-left">
-                          {field.value ? t('adminUsers.role_' + field.value) : t('adminUsers.table.role')}
+                          {field.value
+                            ? t('adminUsers.role_' + field.value)
+                            : t('adminUsers.table.role')}
                         </span>
                       </SelectTrigger>
                     </FormControl>

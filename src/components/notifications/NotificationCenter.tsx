@@ -88,7 +88,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
               type="button"
               onClick={onClose}
               className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-              aria-label="Close panel"
+              aria-label={t('notifications.closePanel')}
             >
               <X className="h-5 w-5" />
             </button>

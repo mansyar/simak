@@ -15,6 +15,9 @@ vi.mock('@/routes/__root', () => ({
         'instructorAssignments.wizard.selectTemplatePrompt':
           'Choose an assignment template to define milestones',
         'instructorAssignments.wizard.checkpointsPreview': 'Milestones Preview',
+        'common.searchByName': 'Search templates by name or type...',
+        'adminTemplates.title': 'Templates',
+        'common.noSearchResults': 'No {items} found matching your search.',
       };
       let text = translations[key] || key;
       if (params) {

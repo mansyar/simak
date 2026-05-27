@@ -163,7 +163,9 @@ export function StudentPicker({
       ) : filteredStudents.length === 0 ? (
         <div className="p-8 text-center border rounded-xl border-dashed">
           <Users className="h-8 w-8 mx-auto text-muted-foreground opacity-50 mb-3" />
-          <p className="text-sm text-muted-foreground">No students found matching your search.</p>
+          <p className="text-sm text-muted-foreground">
+            {t('common.noSearchResults', { items: t('common.search').toLowerCase() })}
+          </p>
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 max-h-[380px] overflow-y-auto pr-1">

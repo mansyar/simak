@@ -70,8 +70,10 @@ export function CheckpointListEditor({
                 type="number"
                 min={0}
                 value={checkpoint.minConsultations}
-                onChange={(e) => onMinConsultationsChange(index, Math.max(0, Number(e.target.value)))}
-                placeholder="0"
+                onChange={(e) =>
+                  onMinConsultationsChange(index, Math.max(0, Number(e.target.value)))
+                }
+                placeholder={t('adminTemplates.form.minConsPlaceholder')}
                 data-testid={`checkpoint-min-cons-${index}`}
                 aria-label={t('adminTemplates.form.minConsultations')}
               />

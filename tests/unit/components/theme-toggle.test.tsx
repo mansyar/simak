@@ -4,6 +4,18 @@ import userEvent from '@testing-library/user-event';
 
 import { ThemeToggle } from '@/components/layout/theme-toggle';
 
+vi.mock('@/routes/__root', () => ({
+  useI18n: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'theme.dark': 'Switch to dark mode',
+        'theme.light': 'Switch to light mode',
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
 describe('ThemeToggle', () => {
   it('should render sun icon with correct aria-label in light mode', () => {
     const onToggle = vi.fn();

@@ -162,7 +162,7 @@ export function CreateTemplateDialog({
                 <FormItem>
                   <FormLabel>{t('adminTemplates.form.name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Thesis Template" {...field} />
+                    <Input placeholder={t('adminTemplates.form.namePlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -176,7 +176,7 @@ export function CreateTemplateDialog({
                 <FormItem>
                   <FormLabel>{t('adminTemplates.form.type')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Thesis, Research Paper" {...field} />
+                    <Input placeholder={t('adminTemplates.form.typePlaceholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

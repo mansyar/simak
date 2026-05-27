@@ -70,7 +70,7 @@ export function DeleteTemplateDialog({
             <Input
               value={deleteText}
               onChange={(e) => setDeleteText(e.target.value)}
-              placeholder="Type DELETE to confirm"
+              placeholder={t('common.typeDeleteToConfirm')}
               data-testid="delete-input"
             />
           </div>

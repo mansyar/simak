@@ -1,3 +1,5 @@
+import { useI18n } from '../../routes/__root';
+
 export function LanguageSwitcher({
   currentLocale,
   onSwitch,
@@ -5,6 +7,8 @@ export function LanguageSwitcher({
   currentLocale: 'en' | 'id';
   onSwitch: (locale: 'en' | 'id') => void;
 }) {
+  const { t } = useI18n();
+
   return (
     <div className="inline-flex items-center gap-1 rounded-md border border-border p-1">
       <button
@@ -15,7 +19,7 @@ export function LanguageSwitcher({
             ? 'bg-primary text-primary-foreground'
             : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
         }`}
-        aria-label="Switch to English"
+        aria-label={t('language.switchToEnglish')}
       >
         EN
       </button>
@@ -27,7 +31,7 @@ export function LanguageSwitcher({
             ? 'bg-primary text-primary-foreground'
             : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
         }`}
-        aria-label="Ganti ke Bahasa Indonesia"
+        aria-label={t('language.switchToIndonesian')}
       >
         ID
       </button>

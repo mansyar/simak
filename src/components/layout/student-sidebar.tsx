@@ -21,7 +21,7 @@ export function StudentSidebar() {
   return (
     <aside className="sticky top-0 flex h-screen w-64 flex-col border-r bg-card shadow-sm">
       <div className="px-4 py-5 text-xl font-bold text-foreground tracking-tight">
-        SIMAK Student
+        {t('studentSidebar.branding')}
       </div>
       <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 pb-4">
         {links.map((link) => {

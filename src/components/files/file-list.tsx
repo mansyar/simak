@@ -24,7 +24,10 @@ interface FileListProps {
   onDownload?: (submissionId: number) => Promise<string | void>;
 }
 
-function formatFileSize(bytes: number): string {
+function formatFileSize(
+  bytes: number,
+  t: (key: string, params?: Record<string, string>) => string,
+): string {
   if (bytes >= 1024 * 1024) {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
@@ -34,8 +37,8 @@ function formatFileSize(bytes: number): string {
   return `${bytes} bytes`;
 }
 
-function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
+function formatDate(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -45,7 +48,7 @@ function formatDate(date: Date): string {
 }
 
 export function FileList({ submissions, onDownload }: FileListProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const handleDownload = useCallback(
     async (submissionId: number) => {
@@ -91,10 +94,10 @@ export function FileList({ submissions, onDownload }: FileListProps) {
                 </div>
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {formatFileSize(submission.fileSize)}
+                {formatFileSize(submission.fileSize, t)}
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {formatDate(submission.uploadedAt)}
+                {formatDate(submission.uploadedAt, locale)}
               </TableCell>
               <TableCell>
                 <Button

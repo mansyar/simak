@@ -2,6 +2,24 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { VerificationQueueItem } from '@/components/consultations/VerificationQueueItem';
 
+vi.mock('@/routes/__root', () => ({
+  useI18n: () => ({
+    t: (key: string, params?: Record<string, string>) => {
+      const translations: Record<string, string> = {
+        'consultations.sessionInternal': 'Internal',
+        'consultations.sessionExternal': 'External: {name}',
+      };
+      let text = translations[key] || key;
+      if (params) {
+        Object.entries(params).forEach(([k, v]) => {
+          text = text.replace(`{${k}}`, v);
+        });
+      }
+      return text;
+    },
+  }),
+}));
+
 describe('VerificationQueueItem', () => {
   const onClick = vi.fn();
 

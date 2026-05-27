@@ -35,7 +35,8 @@
     "consultations": "Consultations",
     "settings": "Settings",
     "users": "Users",
-    "templates": "Templates"
+    "templates": "Templates",
+    "branding_instructor": "SIMAK Instructor"
   },
   "common": {
     "save": "Save",
@@ -82,7 +83,8 @@
   "adminSidebar": {
     "dashboard": "Dashboard",
     "users": "Users",
-    "templates": "Templates"
+    "templates": "Templates",
+    "branding": "SIMAK Admin"
   },
   "adminUsers": {
     "title": "Users",
@@ -259,7 +261,8 @@
   },
   "studentSidebar": {
     "dashboard": "Dashboard",
-    "assignments": "Assignments"
+    "assignments": "Assignments",
+    "branding": "SIMAK Student"
   },
   "studentAssignments": {
     "title": "My Assignments",
