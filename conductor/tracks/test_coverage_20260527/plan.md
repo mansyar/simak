@@ -8,11 +8,11 @@
   - [x] Write tests for `requireRole` (authorized, unauthorized, missing role)
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/server/send-password.ts` (0% → >80%)
-  - [ ] Analyze module exports and handler logic
-  - [ ] Write tests for password setup token validation
-  - [ ] Write tests for password update success/failure paths
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/server/setup-password.ts` (0% → >80%) [e769e60]
+  - [x] Analyze module exports and handler logic
+  - [x] Write tests for password setup token validation
+  - [x] Write tests for password update success/failure paths
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/server/files.ts` and `src/server/files.server.ts` (0% → >80%)
   - [ ] Analyze module exports and handler logic
