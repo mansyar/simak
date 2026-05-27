@@ -35,4 +35,24 @@ describe('Dashboard Schemas', () => {
       expect(result.success).toBe(true);
     });
   });
+
+  describe('Server Function Stubs', () => {
+    it('should export getStudentDashboardData function', async () => {
+      const { getStudentDashboardData } = await import('@/server/dashboard');
+      expect(getStudentDashboardData).toBeDefined();
+      expect(typeof getStudentDashboardData).toBe('function');
+    });
+
+    it('should export getInstructorDashboardData function', async () => {
+      const { getInstructorDashboardData } = await import('@/server/dashboard');
+      expect(getInstructorDashboardData).toBeDefined();
+      expect(typeof getInstructorDashboardData).toBe('function');
+    });
+
+    it('should export getAdminDashboardData function', async () => {
+      const { getAdminDashboardData } = await import('@/server/dashboard');
+      expect(getAdminDashboardData).toBeDefined();
+      expect(typeof getAdminDashboardData).toBe('function');
+    });
+  });
 });

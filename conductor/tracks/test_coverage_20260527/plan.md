@@ -121,11 +121,11 @@
   - [x] Write tests for server function stubs
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/server/dashboard.ts` (50% → >80%)
-  - [ ] Analyze uncovered lines (13-24)
-  - [ ] Write tests for Zod schemas
-  - [ ] Write tests for server function stubs
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/server/dashboard.ts` (50% → >80%)
+  - [x] Analyze uncovered lines (13-24)
+  - [x] Write tests for Zod schemas
+  - [x] Write tests for server function stubs
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: High Coverage - Server Stubs' (Protocol in workflow.md)
 
