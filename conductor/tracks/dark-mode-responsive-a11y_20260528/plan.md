@@ -2,7 +2,7 @@
 
 ## Phase 1: Dark Mode Theme Pass — Audit & Fix All Components
 
-- [ ] Task: Audit shadcn/ui primitives for dark mode coverage
+- [x] Task: Audit shadcn/ui primitives for dark mode coverage
   - [ ] Audit `src/components/ui/button.tsx` — verify all variants have `dark:` counterparts
   - [ ] Audit `src/components/ui/input.tsx` — verify `dark:` styles present
   - [ ] Audit `src/components/ui/select.tsx` — verify `dark:` on trigger, popover, items
@@ -14,35 +14,35 @@
   - [ ] Audit `src/components/ui/label.tsx` — verify `dark:` text color
   - [ ] Audit `src/components/ui/form.tsx` — verify `dark:` message colors
   - [ ] Verify all shadcn/ui primitives meet dark mode requirements; fix any gaps found
-- [ ] Task: Audit layout components for dark mode coverage
+- [x] Task: Audit layout components for dark mode coverage
   - [ ] Audit `src/components/layout/admin-sidebar.tsx` — add missing `dark:` variants
   - [ ] Audit `src/components/layout/instructor-sidebar.tsx` — add missing `dark:` variants
   - [ ] Audit `src/components/layout/student-sidebar.tsx` — add missing `dark:` variants
   - [ ] Audit `src/components/layout/language-switcher.tsx` — add missing `dark:` variants
   - [ ] Audit `src/components/layout/theme-toggle.tsx` — verify dark mode works
-- [ ] Task: Audit dashboard components for dark mode coverage
+- [x] Task: Audit dashboard components for dark mode coverage
   - [ ] Audit `src/components/dashboard/StudentDashboard.tsx` — verify all cards, progress bars, badges
   - [ ] Audit `src/components/dashboard/InstructorDashboard.tsx` — verify SLA badges, widgets
   - [ ] Audit `src/components/dashboard/AdminDashboard.tsx` — verify metric cards, alerts
-- [ ] Task: Audit admin components for dark mode coverage
+- [x] Task: Audit admin components for dark mode coverage
   - [ ] Audit `src/components/admin/users/UserTable.tsx`, `UserFilters.tsx`, `CreateUserDialog.tsx`, `EditUserSheet.tsx`
   - [ ] Audit `src/components/admin/templates/*` — TemplateCard, filters, dialogs, sheet, pagination, skeleton
-- [ ] Task: Audit instructor components for dark mode coverage
+- [x] Task: Audit instructor components for dark mode coverage
   - [ ] Audit `src/components/instructor/assignments/*` — AssignmentWizard, TemplatePicker, DetailsForm, StudentPicker, ProgressTable, Card, Filters, EmptyState, Skeleton
   - [ ] Audit `src/components/reviews/*` — ReviewDialog, ReviewQueue, FeedbackUpload, DeadlineManager
-- [ ] Task: Audit student components for dark mode coverage
+- [x] Task: Audit student components for dark mode coverage
   - [ ] Audit `src/components/student/assignments/*` — AssignmentCard, Filters, CheckpointTimeline, CheckpointCard, DetailHeader, EmptyState, LoadingSkeleton
   - [ ] Audit `src/components/consultations/*` — ConsultationForm, List, ProgressBar, VerificationQueueItem, VerificationDialog
   - [ ] Audit `src/components/files/*` — FileUploader, FilePreview, FileList
   - [ ] Audit `src/components/notifications/*` — NotificationBadge, NotificationCenter, NotificationItem
-- [ ] Task: Audit route page files for dark mode coverage
+- [x] Task: Audit route page files for dark mode coverage
   - [ ] Audit auth pages: login, forgot-password, reset-password, setup-password
   - [ ] Audit admin routes: dashboard, users/index, templates/index
   - [ ] Audit instructor routes: dashboard, assignments (index, new, $id), reviews (index, $submissionId)
   - [ ] Audit student routes: dashboard, assignments (index, $id, $id/checkpoints/$checkpointId)
-- [ ] Task: Write failing tests for dark mode detection — verify CSS custom properties are applied (Red phase)
-- [ ] Task: Implement fixes from audit findings; run tests to pass (Green phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Dark Mode Theme Pass' (Protocol in workflow.md)
+- [x] Task: Write failing tests for dark mode detection — verify CSS custom properties are applied (Red phase)
+- [x] Task: Implement fixes from audit findings; run tests to pass (Green phase)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Dark Mode Theme Pass' (Protocol in workflow.md)
 
 ## Phase 2: Responsive Layout Pass
 

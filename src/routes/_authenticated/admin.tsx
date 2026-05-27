@@ -2,10 +2,12 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { requireRole } from '../../server/auth';
 import { AdminSidebar } from '../../components/layout/admin-sidebar';
 import { LanguageSwitcher } from '../../components/layout/language-switcher';
+import { ThemeToggle } from '../../components/layout/theme-toggle';
 import { useI18n } from '../__root';
 import { useState } from 'react';
 import { NotificationBadge } from '../../components/notifications/NotificationBadge';
 import { NotificationCenter } from '../../components/notifications/NotificationCenter';
+import { useTheme } from '../../hooks/use-theme';
 
 export const Route = createFileRoute('/_authenticated/admin')({
   beforeLoad: async () => {
@@ -16,6 +18,7 @@ export const Route = createFileRoute('/_authenticated/admin')({
 
 function AdminLayout() {
   const { locale, setLocale } = useI18n();
+  const { theme, toggleTheme } = useTheme();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   return (
@@ -24,6 +27,7 @@ function AdminLayout() {
       <main className="flex-1 p-6">
         <div className="flex items-center justify-end mb-4 gap-4">
           <NotificationBadge onOpen={() => setIsNotificationOpen(true)} />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <LanguageSwitcher currentLocale={locale} onSwitch={setLocale} />
         </div>
         <Outlet />

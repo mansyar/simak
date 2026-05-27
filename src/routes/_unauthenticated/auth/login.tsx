@@ -2,6 +2,8 @@ import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { authClient } from '../../../lib/auth-client';
 import { useI18n } from '../../__root';
+import { ThemeToggle } from '../../../components/layout/theme-toggle';
+import { useTheme } from '../../../hooks/use-theme';
 
 export const Route = createFileRoute('/_unauthenticated/auth/login')({
   component: LoginPage,
@@ -10,6 +12,7 @@ export const Route = createFileRoute('/_unauthenticated/auth/login')({
 function LoginPage() {
   const router = useRouter();
   const { t } = useI18n();
+  const { theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +40,9 @@ function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <div id="main-content" className="w-full max-w-sm rounded-lg border bg-card p-6 shadow-sm">
+        <div className="flex justify-end mb-2">
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+        </div>
         <h1 className="mb-6 text-center text-2xl font-bold text-foreground">{t('app.name')}</h1>
         <p className="mb-6 text-center text-sm text-muted-foreground">{t('auth.signIn')}</p>
 
