@@ -2,11 +2,11 @@
 
 ## Phase 1: Critical Server Coverage (0-20%) [checkpoint: ]
 
-- [ ] Task: Write unit tests for `src/server/auth.ts` (5.88% → >80%)
-  - [ ] Analyze current uncovered lines (28-80)
-  - [ ] Write tests for `getSessionFromHeaders` edge cases (missing headers, invalid session)
-  - [ ] Write tests for `requireRole` (authorized, unauthorized, missing role)
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/server/auth.ts` (5.88% → >80%) [8bf683e]
+  - [x] Analyze current uncovered lines (28-80)
+  - [x] Write tests for `getSessionFromHeaders` edge cases (missing headers, invalid session)
+  - [x] Write tests for `requireRole` (authorized, unauthorized, missing role)
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/server/send-password.ts` (0% → >80%)
   - [ ] Analyze module exports and handler logic
