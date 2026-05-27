@@ -34,7 +34,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Critical Server Coverage' (Protocol in workflow.md)
 
-## Phase 2: Critical Route Coverage (0-20%) [checkpoint: ]
+## Phase 2: Critical Route Coverage (0-20%) [checkpoint: 24cbf5c]
 
 - [x] Task: Write unit tests for route guard layouts [f80026b]
   - [x] Write tests for `src/routes/__root.tsx` (17% → >80%)
@@ -81,7 +81,7 @@
   - [x] Write tests for `src/routes/api/auth.$.tsx` (0% → >80%)
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Critical Route Coverage' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Critical Route Coverage' (Protocol in workflow.md)
 
 ## Phase 3: High Coverage - Server Stubs (20-50%) [checkpoint: ]
 
