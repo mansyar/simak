@@ -117,4 +117,24 @@ describe('Submission Schemas', () => {
       expect(result.success).toBe(false);
     });
   });
+
+  describe('Server Function Stubs', () => {
+    it('should export submitCheckpoint function', async () => {
+      const { submitCheckpoint } = await import('@/server/submissions');
+      expect(submitCheckpoint).toBeDefined();
+      expect(typeof submitCheckpoint).toBe('function');
+    });
+
+    it('should export listSubmissions function', async () => {
+      const { listSubmissions } = await import('@/server/submissions');
+      expect(listSubmissions).toBeDefined();
+      expect(typeof listSubmissions).toBe('function');
+    });
+
+    it('should export getSubmissionDetail function', async () => {
+      const { getSubmissionDetail } = await import('@/server/submissions');
+      expect(getSubmissionDetail).toBeDefined();
+      expect(typeof getSubmissionDetail).toBe('function');
+    });
+  });
 });
