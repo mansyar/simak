@@ -1,6 +1,6 @@
 # Implementation Plan: Dark Mode, Responsive UI & Accessibility
 
-## Phase 1: Dark Mode Theme Pass — Audit & Fix All Components
+## Phase 1: Dark Mode Theme Pass — Audit & Fix All Components [checkpoint: b8e8a36]
 
 - [x] Task: Audit shadcn/ui primitives for dark mode coverage
   - [ ] Audit `src/components/ui/button.tsx` — verify all variants have `dark:` counterparts
