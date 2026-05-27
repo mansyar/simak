@@ -92,7 +92,7 @@ describe('ReviewForm', () => {
   });
 
   it('should call submitReview on valid pass submission', async () => {
-    vi.mocked(submitReview).mockResolvedValue({ error: null });
+    vi.mocked(submitReview).mockResolvedValue({ success: true });
 
     render(<ReviewForm submissionId={1} onComplete={mockOnComplete} onError={mockOnError} />);
 
@@ -117,7 +117,7 @@ describe('ReviewForm', () => {
   });
 
   it('should call submitReview on valid revise submission', async () => {
-    vi.mocked(submitReview).mockResolvedValue({ error: null });
+    vi.mocked(submitReview).mockResolvedValue({ success: true });
 
     render(<ReviewForm submissionId={1} onComplete={mockOnComplete} onError={mockOnError} />);
 

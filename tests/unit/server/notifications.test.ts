@@ -1,6 +1,5 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { z } from 'zod';
 import {
   CreateNotificationSchema,
   ListNotificationsSchema,
@@ -11,6 +10,8 @@ import {
   listNotifications,
 } from '@/server/notifications';
 import {
+  createNotificationHandler,
+  listNotificationsHandler,
   markReadHandler,
   markAllReadHandler,
   getUnreadCountHandler,
@@ -194,6 +195,89 @@ describe('Notification handlers', () => {
       }),
     };
     vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
+  });
+
+  describe('createNotificationHandler', () => {
+    it('should reject if unauthorized', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+
+      const result = await createNotificationHandler({
+        data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
+      });
+      expect(result).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should create a notification and return it', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      const created = { id: 1, userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' };
+      mockDb.returning.mockResolvedValue([created]);
+
+      const result = await createNotificationHandler({
+        data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
+      });
+      expect(result).toEqual({ notification: created });
+      expect(mockDb.insert).toHaveBeenCalled();
+      expect(mockDb.values).toHaveBeenCalled();
+    });
+
+    it('should handle database error gracefully', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.returning.mockRejectedValue(new Error('DB error'));
+
+      const result = await createNotificationHandler({
+        data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
+      });
+      expect(result).toEqual({ error: 'Internal Server Error' });
+    });
+  });
+
+  describe('listNotificationsHandler', () => {
+    it('should reject if unauthorized', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+
+      const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
+      expect(result).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should return paginated notifications', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      const items = [
+        { id: 1, userId: 'user-1', type: 'test', title: 'Test 1', channel: 'in_app' },
+        { id: 2, userId: 'user-1', type: 'test', title: 'Test 2', channel: 'in_app' },
+      ];
+      // First .then() for count query, second for items query
+      mockDb.then
+        .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 2 }]).then(fn))
+        .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
+
+      const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
+      expect(result).toEqual({ items, total: 2 });
+    });
+
+    it('should filter by notification type', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      const items = [
+        { id: 1, userId: 'user-1', type: 'sla_breach', title: 'SLA', channel: 'in_app' },
+      ];
+      mockDb.then
+        .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 1 }]).then(fn))
+        .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
+
+      const result = await listNotificationsHandler({
+        data: { page: 1, limit: 20, type: 'sla_breach' },
+      });
+      expect(result).toEqual({ items, total: 1 });
+    });
+
+    it('should handle empty results', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.then
+        .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
+        .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
+
+      const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
+      expect(result).toEqual({ items: [], total: 0 });
+    });
   });
 
   describe('markReadHandler', () => {

@@ -1,75 +1,46 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const STORAGE_KEY = 'simak-locale';
-
-describe('Locale detection logic', () => {
+describe('i18n/index.ts', () => {
   beforeEach(() => {
-    localStorage.clear();
-    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
 
-    // Default: English browser
-    Object.defineProperty(navigator, 'language', {
-      value: 'en-US',
-      configurable: true,
+  it('should return en fallback when no locale is stored or detected', async () => {
+    vi.stubGlobal('navigator', { language: 'fr-FR' });
+    const { detectLocale } = await import('@/i18n/index');
+    expect(detectLocale()).toBe('en');
+  });
+
+  it('should return id when browser locale starts with id', async () => {
+    vi.stubGlobal('navigator', { language: 'id-ID' });
+    const { detectLocale } = await import('@/i18n/index');
+    expect(detectLocale()).toBe('id');
+  });
+
+  it('should return en when browser locale starts with en', async () => {
+    vi.stubGlobal('navigator', { language: 'en-US' });
+    const { detectLocale } = await import('@/i18n/index');
+    expect(detectLocale()).toBe('en');
+  });
+
+  it('should prefer stored locale over browser locale', async () => {
+    vi.stubGlobal('navigator', { language: 'en-US' });
+    vi.stubGlobal('localStorage', {
+      getItem: vi.fn().mockReturnValue('id'),
+      setItem: vi.fn(),
     });
+    const { detectLocale } = await import('@/i18n/index');
+    expect(detectLocale()).toBe('id');
   });
 
-  it('should default to "en" when no preference is stored and browser is English', () => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    expect(stored).toBeNull();
-
-    const browserLocale = navigator.language.startsWith('id') ? 'id' : 'en';
-    const detected = stored ?? browserLocale;
-
-    expect(detected).toBe('en');
+  it('should handle undefined navigator gracefully', async () => {
+    vi.stubGlobal('navigator', undefined);
+    const { detectLocale } = await import('@/i18n/index');
+    expect(detectLocale()).toBe('en');
   });
 
-  it('should detect Indonesian locale from browser language', () => {
-    Object.defineProperty(navigator, 'language', {
-      value: 'id-ID',
-      configurable: true,
-    });
-
-    const browserLocale = navigator.language.startsWith('id') ? 'id' : 'en';
-    expect(browserLocale).toBe('id');
-  });
-
-  it('should respect stored user preference over browser language', () => {
-    localStorage.setItem(STORAGE_KEY, 'id');
-
-    const stored = localStorage.getItem(STORAGE_KEY);
-    expect(stored).toBe('id');
-
-    // Stored preference takes precedence over browser
-    const browserLocale = navigator.language.startsWith('id') ? 'id' : 'en';
-    const detected = stored ?? browserLocale;
-
-    expect(detected).toBe('id');
-    expect(detected).not.toBe(browserLocale);
-  });
-
-  it('should fall back to "en" when no locale is detected and browser is unknown', () => {
-    const FALLBACK = 'en';
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const browserLocale = null; // Simulate no browser locale detection
-
-    const detected = stored ?? browserLocale ?? FALLBACK;
-    expect(detected).toBe('en');
-  });
-
-  it('should clear stored preference and fall back to browser language', () => {
-    localStorage.setItem(STORAGE_KEY, 'en');
-    localStorage.removeItem(STORAGE_KEY);
-
-    const stored = localStorage.getItem(STORAGE_KEY);
-    expect(stored).toBeNull();
-
-    Object.defineProperty(navigator, 'language', {
-      value: 'id-ID',
-      configurable: true,
-    });
-
-    const detected = stored ?? (navigator.language.startsWith('id') ? 'id' : 'en');
-    expect(detected).toBe('id');
+  it('should export detectLocale function', async () => {
+    const { detectLocale } = await import('@/i18n/index');
+    expect(typeof detectLocale).toBe('function');
   });
 });
