@@ -1,6 +1,6 @@
 # Plan: Track i18n-full-translation_20260528 — Internationalization — Full Translation Pass
 
-## Phase 1: Type Definition Updates
+## Phase 1: Type Definition Updates [checkpoint: 0639b94]
 
 - [x] Task: Update scripts/generate-i18n-types.ts with missing keys in existing sections (35ea09e)
   - [x] Add missing auth keys: confirmPassword, passwordMismatch, linkExpired, setupPassword, setupSuccess, resetSuccess, checkYourEmail, forgotPasswordSent — already present in first occurrence; no change needed
@@ -17,7 +17,7 @@
   - [x] Verify src/i18n/types.ts is updated
 - [x] Task: Update existing test snapshots if needed (35ea09e)
   - [x] Run pnpm test to confirm all tests still pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Type Definition Updates' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Type Definition Updates' (0639b94)
 
 ## Phase 2: Add New Translation Keys to Locale Files
 
