@@ -30,7 +30,7 @@ function SetupPasswordPage() {
     }
 
     if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError(t('auth.passwordMinLength'));
       return;
     }
 

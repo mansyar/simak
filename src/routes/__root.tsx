@@ -100,16 +100,21 @@ function useI18nProvider() {
   return { locale, setLocale, t };
 }
 
-export const Route = createRootRoute({
-  notFoundComponent: () => (
+function NotFoundComponent() {
+  const { t } = useI18n();
+  return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
       <h1 className="text-4xl font-bold text-foreground">404</h1>
-      <p className="text-lg text-muted-foreground">Page not found</p>
+      <p className="text-lg text-muted-foreground">{t('error.notFound')}</p>
       <a href="/dashboard" className="text-primary hover:underline">
-        Go to Dashboard
+        {t('common.goToDashboard')}
       </a>
     </div>
-  ),
+  );
+}
+
+export const Route = createRootRoute({
+  notFoundComponent: NotFoundComponent,
   head: () => ({
     meta: [
       {
@@ -156,7 +161,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded"
           >
-            Skip to content
+            {i18n.t('common.skipToContent')}
           </a>
         </div>
         <QueryClientProvider client={queryClient}>

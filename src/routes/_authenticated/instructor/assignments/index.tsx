@@ -64,7 +64,7 @@ function AssignmentsPage() {
             {t('instructorAssignments.title')}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Create, track, and monitor academic progress of assigned student cohorts.
+            {t('instructorAssignments.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">

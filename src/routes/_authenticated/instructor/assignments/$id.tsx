@@ -123,7 +123,7 @@ function AssignmentDetailPage() {
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Average Progress
+                {t('instructorAssignments.averageProgress')}
               </p>
               <h3 className="text-2xl font-bold text-foreground mt-1">{avgProgress}%</h3>
             </div>

@@ -16,6 +16,7 @@
     "sessionExpired": "Sesi Anda telah berakhir. Silakan masuk kembali.",
     "confirmPassword": "Konfirmasi Kata Sandi",
     "passwordMismatch": "Kata sandi tidak cocok",
+    "passwordMinLength": "Kata sandi minimal 8 karakter",
     "linkExpired": "Tautan ini telah kedaluwarsa atau tidak valid. Silakan minta tautan baru.",
     "setupPassword": "Atur Kata Sandi Anda",
     "setupSuccess": "Kata sandi berhasil diatur! Anda sekarang dapat masuk.",

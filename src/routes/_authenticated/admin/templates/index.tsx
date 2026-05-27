@@ -153,9 +153,7 @@ function TemplatesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('adminTemplates.title')}</h1>
-          <p className="text-muted-foreground">
-            Manage assignment templates and checkpoint structures.
-          </p>
+          <p className="text-muted-foreground">{t('adminTemplates.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button

@@ -59,7 +59,10 @@ function UsersPage() {
     navigate({
       search: (prev) => ({
         ...prev,
-        role: value === 'all' ? undefined : (value as 'superadmin' | 'admin' | 'instructor' | 'student'),
+        role:
+          value === 'all'
+            ? undefined
+            : (value as 'superadmin' | 'admin' | 'instructor' | 'student'),
         page: 1,
       }),
     });
@@ -109,9 +112,7 @@ function UsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('adminUsers.title')}</h1>
-          <p className="text-muted-foreground">
-            Manage your organization's users, roles, and permissions.
-          </p>
+          <p className="text-muted-foreground">{t('adminUsers.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -169,7 +170,9 @@ function UsersPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate({ search: (prev) => ({ ...prev, page: Math.max(1, (prev.page || 1) - 1) }) })}
+            onClick={() =>
+              navigate({ search: (prev) => ({ ...prev, page: Math.max(1, (prev.page || 1) - 1) }) })
+            }
             disabled={searchParams.page <= 1}
           >
             {t('common.back')}
@@ -177,8 +180,10 @@ function UsersPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate({ search: (prev) => ({ ...prev, page: (prev.page || 1) + 1 }) })}
-            disabled={(searchParams.page * searchParams.limit) >= total}
+            onClick={() =>
+              navigate({ search: (prev) => ({ ...prev, page: (prev.page || 1) + 1 }) })
+            }
+            disabled={searchParams.page * searchParams.limit >= total}
           >
             {t('common.next')}
           </Button>

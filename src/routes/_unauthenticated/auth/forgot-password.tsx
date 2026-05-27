@@ -68,7 +68,7 @@ function ForgotPasswordPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder="you@example.com"
+              placeholder={t('common.emailPlaceholder')}
               autoComplete="email"
             />
           </div>

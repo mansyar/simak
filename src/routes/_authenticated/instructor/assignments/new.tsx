@@ -29,7 +29,7 @@ function NewAssignmentPage() {
             {t('instructorAssignments.newAssignment')}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Follow the steps to configure and launch an assignment for a student cohort.
+            {t('instructorAssignments.newAssignmentSubtitle')}
           </p>
         </div>
       </div>
