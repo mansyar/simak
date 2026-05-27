@@ -181,7 +181,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 5: Medium Coverage - Remaining Gaps' (Protocol in workflow.md)
 
-## Phase 6: Threshold Update & Final Verification [checkpoint: 7c523ff]
+## Phase 6: Threshold Update & Final Verification [checkpoint: 350bb96]
 
 - [x] Task: Update vitest.config.ts coverage thresholds
   - [x] Change `lines` threshold from 50 to 80
