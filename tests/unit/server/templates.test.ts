@@ -191,6 +191,11 @@ describe('Template server functions - Logic & Security', () => {
     session: {} as any,
   };
 
+  const studentSession = {
+    user: { id: 'student-1', role: 'student' } as any,
+    session: {} as any,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
@@ -331,6 +336,13 @@ describe('Template server functions - Logic & Security', () => {
 
       expect(mockDb.where).toHaveBeenCalled();
     });
+
+    it('should return empty for non-instructor/non-admin session', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
+
+      const result = await listTemplatesHandler({ data: listData });
+      expect(result).toEqual({ templates: [], total: 0 });
+    });
   });
 
   describe('getTemplate', () => {
@@ -364,6 +376,12 @@ describe('Template server functions - Logic & Security', () => {
 
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+      const result = await getTemplateHandler({ data: { id: 1 } });
+      expect(result).toBeNull();
+    });
+
+    it('should return null for non-instructor/non-admin session', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
       const result = await getTemplateHandler({ data: { id: 1 } });
       expect(result).toBeNull();
     });
@@ -455,6 +473,13 @@ describe('Template server functions - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await duplicateTemplateHandler({ data: { id: 1 } });
       expect(result).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should return error for non-existent template', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
+      // Default mockDb.then returns [] — no template found
+      const result = await duplicateTemplateHandler({ data: { id: 999 } });
+      expect(result).toEqual({ error: 'Template not found' });
     });
   });
 });

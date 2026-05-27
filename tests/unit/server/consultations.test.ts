@@ -280,6 +280,30 @@ describe('Consultation server functions - Logic & Security', () => {
       const result = await listConsultationsHandler({ data: { assignmentId: 1 } });
       expect(result).toHaveProperty('consultations');
     });
+
+    it('should return consultations filtered by checkpointId for student', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 1, checkpointId: 5, status: 'pending', checkpointName: 'Ch 5' }]).then(
+          onfulfilled,
+        ),
+      );
+
+      const result = await listConsultationsHandler({ data: { assignmentId: 1, checkpointId: 5 } });
+      expect(result).toHaveProperty('consultations');
+    });
+
+    it('should return consultations filtered by checkpointId for instructor', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 1, checkpointId: 5, status: 'pending', studentName: 'Student A' }]).then(
+          onfulfilled,
+        ),
+      );
+
+      const result = await listConsultationsHandler({ data: { assignmentId: 1, checkpointId: 5 } });
+      expect(result).toHaveProperty('consultations');
+    });
   });
 
   describe('listPendingConsultationsHandler', () => {
@@ -344,6 +368,18 @@ describe('Consultation server functions - Logic & Security', () => {
       const result = await verifyConsultationHandler({ data: { consultationId: 1 } });
       expect(result).toEqual({ success: true });
     });
+
+    it('should reject if consultation is not in pending state', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { id: 1, status: 'verified', studentId: 'student-1', assignmentId: 1, instructorId: 'instructor-1' },
+        ]).then(onfulfilled),
+      );
+
+      const result = await verifyConsultationHandler({ data: { consultationId: 1 } });
+      expect(result).toEqual({ error: 'Consultation is not in pending state' });
+    });
   });
 
   describe('rejectConsultationHandler', () => {
@@ -368,6 +404,20 @@ describe('Consultation server functions - Logic & Security', () => {
         data: { consultationId: 1, reason: 'Insufficient detail' },
       });
       expect(result).toEqual({ success: true });
+    });
+
+    it('should reject if consultation is not in pending state', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { id: 1, status: 'verified', studentId: 'student-1', assignmentId: 1, instructorId: 'instructor-1' },
+        ]).then(onfulfilled),
+      );
+
+      const result = await rejectConsultationHandler({
+        data: { consultationId: 1, reason: 'Already done' },
+      });
+      expect(result).toEqual({ error: 'Consultation is not in pending state' });
     });
   });
 
@@ -400,6 +450,16 @@ describe('Consultation server functions - Logic & Security', () => {
 
       const result = await getConsultationDetailHandler({ data: { consultationId: 1 } });
       expect(result).toHaveProperty('consultation');
+    });
+
+    it('should return error for non-existent consultation', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = await getConsultationDetailHandler({ data: { consultationId: 999 } });
+      expect(result).toEqual({ error: 'Consultation not found' });
     });
   });
 

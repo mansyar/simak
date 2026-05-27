@@ -229,6 +229,16 @@ describe('Review handlers - Logic & Security', () => {
       const result = await openForReviewHandler({ data: { submissionId: 1 } });
       expect(result).toEqual({ error: 'Checkpoint is not in submittable state' });
     });
+
+    it('should return error for non-existent submission', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = await openForReviewHandler({ data: { submissionId: 999 } });
+      expect(result).toEqual({ error: 'Submission not found' });
+    });
   });
 
   describe('submitReviewHandler', () => {

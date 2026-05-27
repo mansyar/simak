@@ -114,6 +114,23 @@ describe('User server functions - Logic & Security', () => {
       });
       expect(result).toEqual({ error: 'Admins cannot create other Admin accounts' });
     });
+
+    it('should reject duplicate email', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+
+      // Mock email uniqueness check: return existing user
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 'existing-user' }]).then(onfulfilled),
+      );
+
+      const result = await createUserHandler({
+        data: { name: 'Duplicate', email: 'existing@test.com', role: 'student' },
+      });
+      expect(result).toEqual({ error: 'Email already in use' });
+    });
   });
 
   describe('listUsers', () => {
@@ -134,6 +151,77 @@ describe('User server functions - Logic & Security', () => {
 
       const result = await listUsersHandler({ data: { page: 1, limit: 20, search: '' } });
 
+      expect(result.users).toHaveLength(1);
+      expect(result.total).toBe(1);
+    });
+
+    it('should return empty if no session', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+      const result = await listUsersHandler({ data: { page: 1, limit: 20, search: '' } });
+      expect(result).toEqual({ users: [], total: 0 });
+    });
+
+    it('should return empty if student calls listUsers', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'student-1', role: 'student' } as any,
+        session: {} as any,
+      });
+      const result = await listUsersHandler({ data: { page: 1, limit: 20, search: '' } });
+      expect(result).toEqual({ users: [], total: 0 });
+    });
+
+    it('should filter to students when instructor calls listUsers', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'instructor-1', role: 'instructor' } as any,
+        session: {} as any,
+      });
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 's1', name: 'Student 1', role: 'student' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        );
+
+      const result = await listUsersHandler({ data: { page: 1, limit: 20, search: '' } });
+      expect(result.users).toHaveLength(1);
+      expect(result.users[0].role).toBe('student');
+    });
+
+    it('should exclude superadmin when admin calls listUsers', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 'u1', name: 'User 1', role: 'instructor' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        );
+
+      await listUsersHandler({ data: { page: 1, limit: 20, search: '' } });
+      expect(mockDb.where).toHaveBeenCalled();
+    });
+
+    it('should search by name or email', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'superadmin' } as any,
+        session: {} as any,
+      });
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 'u1', name: 'John', email: 'john@test.com' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        );
+
+      const result = await listUsersHandler({ data: { page: 1, limit: 20, search: 'john' } });
       expect(result.users).toHaveLength(1);
       expect(result.total).toBe(1);
     });
@@ -158,6 +246,12 @@ describe('User server functions - Logic & Security', () => {
 
       const result = await deleteUserHandler({ data: { id: 'user-1' } });
       expect(result).toEqual({ success: true });
+    });
+
+    it('should reject unauthorized (no session)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+      const result = await deleteUserHandler({ data: { id: 'user-1' } });
+      expect(result).toEqual({ error: 'Unauthorized' });
     });
   });
 
@@ -191,6 +285,21 @@ describe('User server functions - Logic & Security', () => {
       const result = await getUserHandler({ data: { id: 'user-1' } });
       expect(result).not.toBeNull();
       expect(result?.id).toBe('user-1');
+    });
+
+    it('should return null when admin requests a superadmin user', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { id: 'super-1', name: 'Super', email: 'super@test.com', role: 'superadmin' },
+        ]).then(fn),
+      );
+
+      const result = await getUserHandler({ data: { id: 'super-1' } });
+      expect(result).toBeNull();
     });
   });
 

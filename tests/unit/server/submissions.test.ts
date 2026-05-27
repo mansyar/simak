@@ -363,6 +363,35 @@ describe('Submission server functions - Logic & Security', () => {
       const result = await submitCheckpointHandler({ data: submitData });
       expect(result).toEqual({ success: true });
     });
+
+    it('should notify instructor on successful submission', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ instructorId: 'instructor-1', assignmentTitle: 'Thesis 2026' }]).then(
+            onfulfilled,
+          ),
+        );
+
+      const result = await submitCheckpointHandler({ data: submitData });
+      expect(result).toEqual({ success: true });
+      expect(mockDb.insert).toHaveBeenCalled();
+      // The notification insert adds a second db.insert call (notification)
+      expect(mockDb.values).toHaveBeenCalledTimes(2);
+      const valuesCalls = vi.mocked(mockDb.values).mock.calls;
+      const notificationValues = valuesCalls[1][0];
+      expect(notificationValues.userId).toBe('instructor-1');
+      expect(notificationValues.type).toBe('submission_received');
+    });
   });
 
   describe('listSubmissionsHandler', () => {

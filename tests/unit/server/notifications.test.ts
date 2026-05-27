@@ -245,7 +245,6 @@ describe('Notification handlers', () => {
         { id: 1, userId: 'user-1', type: 'test', title: 'Test 1', channel: 'in_app' },
         { id: 2, userId: 'user-1', type: 'test', title: 'Test 2', channel: 'in_app' },
       ];
-      // First .then() for count query, second for items query
       mockDb.then
         .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 2 }]).then(fn))
         .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
@@ -278,8 +277,15 @@ describe('Notification handlers', () => {
       const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
       expect(result).toEqual({ items: [], total: 0 });
     });
-  });
 
+    it('should handle database error gracefully', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.select.mockImplementationOnce(() => { throw new Error('DB error'); });
+
+      const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
+      expect(result).toEqual({ error: 'Internal Server Error' });
+    });
+  });
   describe('markReadHandler', () => {
     it('should reject if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
@@ -321,6 +327,14 @@ describe('Notification handlers', () => {
       const result = await markReadHandler({ data: { notificationId: 1 } });
       expect(result).toEqual({ error: 'Notification not found' });
     });
+
+    it('should handle database error gracefully', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.select.mockImplementationOnce(() => { throw new Error('DB error'); });
+
+      const result = await markReadHandler({ data: { notificationId: 1 } });
+      expect(result).toEqual({ error: 'Internal Server Error' });
+    });
   });
 
   describe('markAllReadHandler', () => {
@@ -350,6 +364,14 @@ describe('Notification handlers', () => {
       const result = await markAllReadHandler({ data: {} });
       expect(result).toEqual({ success: true });
     });
+
+    it('should handle database error gracefully', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.update.mockImplementationOnce(() => { throw new Error('DB error'); });
+
+      const result = await markAllReadHandler({ data: {} });
+      expect(result).toEqual({ error: 'Internal Server Error' });
+    });
   });
 
   describe('getUnreadCountHandler', () => {
@@ -378,6 +400,14 @@ describe('Notification handlers', () => {
 
       const result = await getUnreadCountHandler({ data: {} });
       expect(result).toEqual({ count: 0 });
+    });
+
+    it('should handle database error gracefully', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      mockDb.select.mockImplementationOnce(() => { throw new Error('DB error'); });
+
+      const result = await getUnreadCountHandler({ data: {} });
+      expect(result).toEqual({ error: 'Internal Server Error' });
     });
   });
 });
