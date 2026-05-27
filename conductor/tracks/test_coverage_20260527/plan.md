@@ -1,6 +1,6 @@
 # Implementation Plan: Increase Test Coverage to >80%
 
-## Phase 1: Critical Server Coverage (0-20%) [checkpoint: ]
+## Phase 1: Critical Server Coverage (0-20%) [checkpoint: 7e25278]
 
 - [x] Task: Write unit tests for `src/server/auth.ts` (5.88% → >80%) [8bf683e]
   - [x] Analyze current uncovered lines (28-80)
