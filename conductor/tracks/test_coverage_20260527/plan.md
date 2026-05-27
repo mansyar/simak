@@ -14,11 +14,11 @@
   - [x] Write tests for password update success/failure paths
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/server/files.ts` and `src/server/files.server.ts` (0% → >80%)
-  - [ ] Analyze module exports and handler logic
-  - [ ] Write tests for `getPresignedUploadUrl` (valid/invalid checkpoint state)
-  - [ ] Write tests for `getPresignedDownloadUrl` (ownership validation)
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/server/files.ts` and `src/server/files.server.ts` (0% → >80%) [b3770ed]
+  - [x] Analyze module exports and handler logic
+  - [x] Write tests for `getPresignedUploadUrl` (valid/invalid checkpoint state)
+  - [x] Write tests for `getPresignedDownloadUrl` (ownership validation)
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/hooks/use-theme.ts` (0% → >80%)
   - [ ] Analyze hook implementation
