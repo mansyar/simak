@@ -158,11 +158,11 @@
   - [x] Write tests for edge cases (empty data, loading states)
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/components/files/file-uploader.tsx` (66% → >80%)
-  - [ ] Analyze uncovered lines (86-92, 137-138)
-  - [ ] Write tests for drag-and-drop interactions
-  - [ ] Write tests for upload progress states
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/components/files/file-uploader.tsx` (66% → >80%)
+  - [x] Analyze uncovered lines (86-92, 137-138)
+  - [x] Write tests for drag-and-drop interactions
+  - [x] Write tests for upload progress states
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/components/instructor/progress-table.tsx` (82.6% → >80%)
   - [ ] Analyze uncovered lines (43-55, 60)
