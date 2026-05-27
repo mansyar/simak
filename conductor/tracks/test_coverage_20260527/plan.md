@@ -150,7 +150,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 4: High Coverage - Components & Schema' (Protocol in workflow.md)
 
-## Phase 5: Medium Coverage - Remaining Gaps (50-80%) [checkpoint: ]
+## Phase 5: Medium Coverage - Remaining Gaps (50-80%) [checkpoint: 166c2cf]
 
 - [x] Task: Write unit tests for `src/components/dashboard/StudentDashboard.tsx` (64% → >80%)
   - [x] Analyze uncovered lines (99-201)
@@ -179,7 +179,7 @@
   - [x] Write tests for edge cases
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Medium Coverage - Remaining Gaps' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Medium Coverage - Remaining Gaps' (Protocol in workflow.md)
 
 ## Phase 6: Threshold Update & Final Verification [checkpoint: ]
 
