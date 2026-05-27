@@ -1,0 +1,986 @@
+
+ RUN  v4.1.6 C:/Users/Ansyar/Documents/Upskilling/Web Development/simak
+      Coverage enabled with v8
+
+stderr | tests/unit/components/files/file-uploader.test.tsx > FileUploader > should show file size validation error for files over 25MB
+RangeError: Maximum call stack size exceeded
+    at prepareStackTraceCallback (node:internal/errors:144:29)
+    at getStackString (node:internal/util/inspect:1291:13)
+    at formatError (node:internal/util/inspect:1435:15)
+    at formatRaw (node:internal/util/inspect:1030:14)
+    at formatValue (node:internal/util/inspect:885:10)
+    at inspect (node:internal/util/inspect:387:10)
+    at formatWithOptionsInternal (node:internal/util/inspect:2366:40)
+    at formatWithOptions (node:internal/util/inspect:2228:10)
+    at Console.value (node:internal/console/constructor:345:14)
+    at Console.error (node:internal/console/constructor:412:61)
+
+stderr | tests/unit/components/files/file-uploader.test.tsx > FileUploader > should display selected file name after valid file selection
+RangeError: Maximum call stack size exceeded
+    at getStackString (node:internal/util/inspect:1291:13)
+    at formatError (node:internal/util/inspect:1435:15)
+    at formatRaw (node:internal/util/inspect:1030:14)
+    at formatValue (node:internal/util/inspect:885:10)
+    at inspect (node:internal/util/inspect:387:10)
+    at formatWithOptionsInternal (node:internal/util/inspect:2366:40)
+    at formatWithOptions (node:internal/util/inspect:2228:10)
+    at Console.value (node:internal/console/constructor:345:14)
+    at Console.error (node:internal/console/constructor:412:61)
+    at process.env.NODE_ENV.reportGlobalError (C:\Users\Ansyar\Documents\Upskilling\Web Development\simak\node_modules\.pnpm\react-dom@19.2.6_react@19.2.6\node_modules\react-dom\cjs\react-dom-client.development.js:25513:23)
+
+stderr | tests/unit/components/files/file-uploader.test.tsx > FileUploader > should show upload progress state when uploading
+RangeError: Maximum call stack size exceeded
+    at Set.values (<anonymous>)
+    at getRunnerSourceMap (file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/vite@8.0.13_@types+node@25._35b9705d7750715848addfbe182dab7a/node_modules/vite/dist/node/module-runner.js:831:26)
+    at mapSourcePosition (file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/vite@8.0.13_@types+node@25._35b9705d7750715848addfbe182dab7a/node_modules/vite/dist/node/module-runner.js:871:18)
+    at wrapCallSite (file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/vite@8.0.13_@types+node@25._35b9705d7750715848addfbe182dab7a/node_modules/vite/dist/node/module-runner.js:950:18)
+    at Function.prepareStackTrace (file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/vite@8.0.13_@types+node@25._35b9705d7750715848addfbe182dab7a/node_modules/vite/dist/node/module-runner.js:981:78)
+    at prepareStackTraceCallback (node:internal/errors:144:29)
+    at getStackString (node:internal/util/inspect:1291:13)
+    at formatError (node:internal/util/inspect:1435:15)
+    at formatRaw (node:internal/util/inspect:1030:14)
+    at formatValue (node:internal/util/inspect:885:10)
+
+stderr | tests/unit/components/files/file-uploader.test.tsx > FileUploader > should accept .docx files
+RangeError: Maximum call stack size exceeded
+    at Set.values (<anonymous>)
+    at getRunnerSourceMap (file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/vite@8.0.13_@types+node@25._35b9705d7750715848addfbe182dab7a/node_modules/vite/dist/node/module-runner.js:831:26)
+    at mapSourcePosition (file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/vite@8.0.13_@types+node@25._35b9705d7750715848addfbe182dab7a/node_modules/vite/dist/node/module-runner.js:871:18)
+    at wrapCallSite (file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/vite@8.0.13_@types+node@25._35b9705d7750715848addfbe182dab7a/node_modules/vite/dist/node/module-runner.js:950:18)
+    at Function.prepareStackTrace (file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/vite@8.0.13_@types+node@25._35b9705d7750715848addfbe182dab7a/node_modules/vite/dist/node/module-runner.js:981:78)
+    at prepareStackTraceCallback (node:internal/errors:144:29)
+    at getStackString (node:internal/util/inspect:1291:13)
+    at formatError (node:internal/util/inspect:1435:15)
+    at formatRaw (node:internal/util/inspect:1030:14)
+    at formatValue (node:internal/util/inspect:885:10)
+
+┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖stdout | tests/unit/db/seed-success.test.ts > Seed script - success path > should create user and account when no existing user found
+SuperAdmin user created (admin@test.com).
+
+┬╖stdout | tests/unit/db/seed-success.test.ts > Seed script - success path > should skip when user already exists
+SuperAdmin user already exists (admin@test.com). Skipping.
+
+stdout | tests/unit/db/seed-success.test.ts > Seed script - success path > seedTestUsers should create instructor and student when no existing
+Test user created: Instructor (instructor@simak.app) / password
+
+stdout | tests/unit/db/seed-success.test.ts > Seed script - success path > seedTestUsers should create instructor and student when no existing
+Test user created: Student (student@simak.app) / password
+
+stdout | tests/unit/db/seed-success.test.ts > Seed script - success path > seedTestUsers should skip when users already exist
+Test user already exists (instructor@simak.app). Skipping.
+
+stdout | tests/unit/db/seed-success.test.ts > Seed script - success path > seedTestUsers should skip when users already exist
+Test user already exists (student@simak.app). Skipping.
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Initial Render and Step Navigation > should render all 4 wizard steps in the progress bar
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Initial Render and Step Navigation > should start on step 1 (TemplatePicker)
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Initial Render and Step Navigation > should show Cancel button on step 1 and navigate back on click
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Initial Render and Step Navigation > should advance to step 2 when Next is clicked with template selected
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Initial Render and Step Navigation > should prevent advancing past step 1 without selecting a template
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Initial Render and Step Navigation > should navigate back from step 2 to step 1
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Initial Render and Step Navigation > should auto-fill title with template name when selecting a template
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Step 2 - Assignment Details Validation > should show title error when Next is clicked without entering a title
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Step 2 - Assignment Details Validation > should show deadline error when Next is clicked without a deadline
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Step 2 - Assignment Details Validation > should fill details and advance to step 3
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Step 3 - Student Selection Validation > should show error when Next is clicked without selecting students
+An update to AssignmentWizard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/instructor/assignment-wizard.test.tsx > AssignmentWizard > Step 4 - Review and Submit > should show network error message on exception
+Error: Network failure
+    at C:/Users/Ansyar/Documents/Upskilling/Web Development/simak/tests/unit/components/instructor/assignment-wizard.test.tsx:341:68
+    at file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/@vitest+runner@4.1.6/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/@vitest+runner@4.1.6/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/@vitest+runner@4.1.6/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/@vitest+runner@4.1.6/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/@vitest+runner@4.1.6/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/@vitest+runner@4.1.6/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///C:/Users/Ansyar/Documents/Upskilling/Web%20Development/simak/node_modules/.pnpm/@vitest+runner@4.1.6/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should render when open
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should render title
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should display consultation details after loading
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should show error when loading fails
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should show external consultant name for external sessions
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should render Verify and Reject buttons
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should call verifyConsultation and onActionComplete on verify
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should call verifyConsultation and onActionComplete on verify
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should show error on verify failure
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should show error on verify failure
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should show reject reason input when Reject is clicked
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should disable confirm reject when no reason entered
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should enable confirm reject when reason is entered
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should call rejectConsultation on confirm reject
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should call rejectConsultation on confirm reject
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should show error on reject failure
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should show error on reject failure
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should return to verify/reject buttons when Cancel is clicked in reject mode
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/verification-dialog.test.tsx > VerificationDialog > should show error text when present
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to VerificationDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/admin/create-user-dialog.test.tsx > CreateUserDialog > should render title when open
+In HTML, <div> cannot be a child of <select>.
+This will cause a hydration error.
+
+  <CreateUserDialog open={true} onOpenChange={function Mock} onSubmit={function Mock}>
+    <Dialog open={true} onOpenChange={function Mock}>
+      <div data-testid="dialog">
+        <DialogContent className="sm:max-w-[...">
+          <div data-testid="dialog-con...">
+            <DialogHeader>
+            <Form register={function Mock} handleSubmit={function handleSubmit} watch={function watch} ...>
+              <div data-testid="form">
+                <form onSubmit={function} className="space-y-4">
+                  <FormField>
+                  <FormField>
+                  <FormField control={undefined} name="role" render={function render}>
+                    <div data-testid="form-field" data-field-name="role">
+                      <FormItem>
+                        <div data-testid="form-item">
+                          <FormLabel>
+                          <Select value="student" onValueChange={function onChange}>
+>                           <select data-testid="role-select" onChange={function onChange}>
+                              <FormControl>
+>                               <div data-testid="form-control">
+                              ...
+                          ...
+                  ...
+
+<select> cannot contain a nested <div>.
+See this log for the ancestor stack trace.
+
+stderr | tests/unit/components/admin/edit-template-sheet.test.tsx > EditTemplateSheet > should render when open with template data
+Received `false` for a non-boolean attribute `loading`.
+
+If you want to write it to the DOM, pass a string instead: loading="false" or loading={value.toString()}.
+
+If you used to conditionally omit it with loading={condition && value}, pass loading={condition ? value : undefined} instead.
+
+stderr | tests/unit/components/consultations/consultation-form.test.tsx > ConsultationForm > should render checkpoint selector
+In HTML, <span> cannot be a child of <select>.
+This will cause a hydration error.
+
+  <ConsultationForm assignmentId={1} checkpoints={[...]} onSuccess={function Mock}>
+    <form onSubmit={function handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label>
+        <Select value="" onValueChange={function onValueChange}>
+>         <select data-testid="select" value="" onChange={function onChange}>
+            <SelectTrigger id="checkpoint">
+              <SelectValue placeholder="Select a c...">
+>               <span>
+            ...
+      ...
+
+<select> cannot contain a nested <span>.
+See this log for the ancestor stack trace.
+
+stderr | tests/unit/components/consultations/consultation-form.test.tsx > ConsultationForm > should call logConsultation and onSuccess on valid submit
+An update to ConsultationForm inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ConsultationForm inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ConsultationForm inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ConsultationForm inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ConsultationForm inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/consultations/consultation-form.test.tsx > ConsultationForm > should show error when logConsultation returns error
+An update to ConsultationForm inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ConsultationForm inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/admin/create-template-dialog.test.tsx > CreateTemplateDialog > should render when open
+Received `false` for a non-boolean attribute `loading`.
+
+If you want to write it to the DOM, pass a string instead: loading="false" or loading={value.toString()}.
+
+If you used to conditionally omit it with loading={condition && value}, pass loading={condition ? value : undefined} instead.
+
+stderr | tests/unit/components/instructor/student-picker.test.tsx > StudentPicker > should render validation errors if present
+An update to StudentPicker inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to StudentPicker inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/admin/create-template-dialog.test.tsx > CreateTemplateDialog > should show server error on submit failure
+An update to CreateTemplateDialog inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+stderr | tests/unit/components/admin/template-filters.test.tsx > TemplateFilters > should render search input with placeholder
+In HTML, <div> cannot be a child of <select>.
+This will cause a hydration error.
+
+  <TemplateFilters search="" onSearchChange={function Mock} type="all" types={[...]} onTypeChange={function Mock}>
+    <div className="flex flex-...">
+      <div>
+      <div className="w-full sm:...">
+        <Select value="all" onValueChange={function onValueChange}>
+>         <select data-testid="type-select" value="all" onChange={function onChange}>
+            <SelectTrigger>
+>             <div>
+            ...
+
+<select> cannot contain a nested <div>.
+See this log for the ancestor stack trace.
+
+stderr | tests/unit/components/admin/user-filters.test.tsx > UserFilters > should render search input
+In HTML, <div> cannot be a child of <select>.
+This will cause a hydration error.
+
+  <UserFilters search="" onSearchChange={function Mock} role="all" onRoleChange={function Mock}>
+    <div className="flex flex-...">
+      <div>
+      <div className="w-full sm:...">
+        <Select value="all" onValueChange={function onValueChange}>
+>         <select data-testid="role-select" value="all" onChange={function onChange}>
+            <SelectTrigger>
+>             <div>
+            ...
+
+<select> cannot contain a nested <div>.
+See this log for the ancestor stack trace.
+
+┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖┬╖
+
+ Test Files  117 passed (117)
+      Tests  946 passed (946)
+   Start at  11:52:30
+   Duration  49.07s (transform 8.77s, setup 0ms, import 182.88s, tests 101.04s, environment 235.66s)
+
+Import Duration Breakdown (Top 10)
+
+Module                                               Self  Total
+...components/reviews/deadline-manager.test.tsx      97ms  5.36s  ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûê
+ Γå│ src/components/reviews/DeadlineManager.tsx        63ms  4.19s  ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûæΓûæΓûæΓûæ
+ Γå│ src/components/ui/dialog.tsx                      45ms  3.38s  ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæ
+...it/components/admin/edit-user-sheet.test.tsx      92ms  4.46s  ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûæΓûæΓûæ
+...unit/components/files/file-uploader.test.tsx      47ms  4.01s  ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæ
+...ents/notifications/notifications-ui.test.tsx     122ms  3.83s  ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæ
+...ts/student/assignment-detail-header.test.tsx     137ms  3.81s  ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæ
+...routes/instructor-assignment-detail.test.tsx      63ms  3.78s  ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæ
+.../student/student-assignment-filters.test.tsx      79ms  3.42s  ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæ
+.../components/files/submission-status.test.tsx      63ms  3.19s  ΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûêΓûæΓûæΓûæΓûæΓûæΓûæΓûæΓûæ
+
+Total imports: 712
+Slowest import (total-time): 5.36s
+Total import time (self/total): 172.21s / 453.03s
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   59.03 |    59.42 |   54.27 |   59.51 |                   
+ ...dmin/templates |   63.03 |    59.32 |   71.18 |   65.38 |                   
+  ...istEditor.tsx |    87.5 |      100 |   85.71 |    87.5 | 73                
+  ...ateDialog.tsx |   54.23 |    42.85 |   56.25 |   56.36 | ...98-102,109-113 
+  ...ateDialog.tsx |     100 |    83.33 |     100 |     100 | 35-43             
+  ...lateSheet.tsx |      50 |       50 |   52.94 |   52.54 | ...37,147,156-159 
+  ...teFilters.tsx |      80 |       50 |      75 |      80 | 41                
+ ...ts/admin/users |     100 |    73.33 |     100 |     100 |                   
+  ...serDialog.tsx |     100 |       50 |     100 |     100 | 108               
+  ...UserSheet.tsx |     100 |       75 |     100 |     100 | 60                
+  UserFilters.tsx  |     100 |       75 |     100 |     100 | 47-50             
+  UserTable.tsx    |     100 |       75 |     100 |     100 | 77-78,163,174     
+ .../consultations |   95.95 |    88.76 |   95.65 |   98.92 |                   
+  ...ationForm.tsx |   93.33 |    78.94 |   85.71 |   96.55 | 103               
+  ...ationList.tsx |     100 |       90 |     100 |     100 | 46                
+  ...nProgress.tsx |     100 |       90 |     100 |     100 | 50                
+  ...ionDialog.tsx |   95.74 |    90.47 |     100 |     100 | 63-69,83,147      
+ ...ents/dashboard |   81.08 |    50.64 |      80 |   81.08 |                   
+  ...Dashboard.tsx |     100 |    65.51 |     100 |     100 | ...44,165,183-199 
+  ...Dashboard.tsx |   81.25 |    48.14 |     100 |   81.25 | 78-85             
+  ...Dashboard.tsx |   63.63 |    33.33 |   42.85 |   63.63 | 99-201            
+ components/files  |   73.97 |    81.35 |   68.42 |   76.81 |                   
+  file-list.tsx    |   93.33 |       75 |     100 |   93.33 | 29                
+  ...-uploader.tsx |      66 |    76.47 |   45.45 |   68.08 | ...,89-92,137-138 
+  ...on-status.tsx |    87.5 |    94.11 |     100 |     100 | 19                
+ ...or/assignments |      89 |    80.98 |   92.53 |      90 |                   
+  ...entWizard.tsx |   88.37 |    86.84 |    82.6 |   89.87 | ...11,113,138,241 
+  ...ressTable.tsx |    82.6 |    46.15 |     100 |    82.6 | 43-55,60          
+  ...entPicker.tsx |   86.11 |    68.57 |    92.3 |   87.87 | 48-49,70-71       
+  ...atePicker.tsx |    92.3 |     87.5 |     100 |      92 | 41-42             
+ components/layout |   83.78 |      100 |   76.92 |   83.78 |                   
+  ...n-sidebar.tsx |   81.81 |      100 |   66.66 |   81.81 | 18-19             
+  ...r-sidebar.tsx |   81.81 |      100 |   66.66 |   81.81 | 18-19             
+  ...t-sidebar.tsx |   81.81 |      100 |   66.66 |   81.81 | 17-18             
+ .../notifications |    92.1 |    79.48 |     100 |   97.14 |                   
+  ...ionCenter.tsx |      95 |    78.57 |     100 |     100 | 40-42,100         
+  ...ationItem.tsx |   86.66 |       75 |     100 |   92.85 | 36                
+ ...onents/reviews |   69.09 |     60.9 |   85.41 |   71.71 |                   
+  ...neManager.tsx |   82.08 |    70.73 |    87.5 |   86.88 | ...30,160,305-321 
+  ...lePreview.tsx |    87.5 |     87.5 |     100 |     100 | 69                
+  ReviewForm.tsx   |   27.08 |    20.58 |   42.85 |   28.26 | ...,71-99,144-180 
+  ...QueueItem.tsx |      75 |       50 |     100 |      80 | 75-76             
+ ...nt/assignments |   87.87 |     92.3 |      80 |   87.87 |                   
+  ...pointCard.tsx |   78.94 |    91.17 |      50 |   78.94 | 71,152-183        
+ config            |     100 |    83.33 |     100 |     100 |                   
+  env.ts           |     100 |    83.33 |     100 |     100 | 39                
+ db                |   89.28 |     90.9 |   66.66 |   88.88 |                   
+  index.ts         |   93.33 |    83.33 |     100 |    92.3 | 15                
+  seed.ts          |    87.8 |    93.75 |      50 |    87.8 | 114-119           
+ db/schema         |    67.6 |      100 |   45.23 |   60.34 |                   
+  assignments.ts   |      50 |      100 |      25 |      50 | 20-26,38-41,51-54 
+  auth.ts          |    37.5 |      100 |       0 |    37.5 | 7-10,22-25,42     
+  consultations.ts |   42.85 |      100 |      20 |   42.85 | 18-25             
+  notifications.ts |   66.66 |      100 |      50 |   66.66 | 10                
+  submissions.ts   |      50 |      100 |   33.33 |      50 | 11-14,33-36       
+  templates.ts     |      50 |      100 |       0 |      50 | 8,18              
+  users.ts         |   66.66 |      100 |       0 |   66.66 | 8                 
+ hooks             |    83.6 |    72.41 |      95 |   85.96 |                   
+  ...ifications.ts |   85.18 |    63.63 |     100 |   85.18 | 10,27,40,57       
+  use-theme.ts     |   82.35 |    77.77 |      90 |   86.66 | 47-50             
+ i18n              |   89.47 |    88.88 |     100 |     100 |                   
+  index.ts         |   89.47 |    88.88 |     100 |     100 | 9,17              
+ lib               |   94.18 |    88.46 |     100 |    93.9 |                   
+  auth-client.ts   |     100 |       50 |     100 |     100 | 4                 
+  email.ts         |   95.65 |    83.33 |     100 |   95.45 | 79                
+  review-sla.ts    |   81.25 |    66.66 |     100 |   81.25 | 61-62,146         
+  storage.ts       |   96.87 |    95.23 |     100 |   96.77 | 106               
+ routes            |   17.02 |        0 |      10 |   18.18 |                   
+  __root.tsx       |   17.14 |        0 |   13.33 |   18.75 | ...80-100,105-147 
+  ...enticated.tsx |      20 |        0 |       0 |      20 | 6-11              
+  ...enticated.tsx |      20 |        0 |       0 |      20 | 7-12              
+  index.tsx        |       0 |      100 |       0 |       0 | 3-8               
+ ..._authenticated |    9.52 |      100 |       0 |    9.52 |                   
+  admin.tsx        |   14.28 |      100 |       0 |   14.28 | 12-33             
+  instructor.tsx   |       0 |      100 |       0 |       0 | 10-35             
+  student.tsx      |   14.28 |      100 |       0 |   14.28 | 12-35             
+ ...nticated/admin |      20 |      100 |       0 |      20 |                   
+  dashboard.tsx    |      20 |      100 |       0 |      20 | 8-17              
+ ...dmin/templates |       0 |        0 |       0 |       0 |                   
+  index.tsx        |       0 |        0 |       0 |       0 | 25-215            
+ ...ed/admin/users |    3.38 |        0 |       0 |    3.84 |                   
+  index.tsx        |    3.38 |        0 |       0 |    3.84 | 22-180            
+ ...ted/instructor |      20 |      100 |       0 |      20 |                   
+  dashboard.tsx    |      20 |      100 |       0 |      20 | 8-17              
+ ...or/assignments |       0 |        0 |       0 |       0 |                   
+  $id.tsx          |       0 |        0 |       0 |       0 | 13-286            
+  index.tsx        |       0 |        0 |       0 |       0 | 14-100            
+  new.tsx          |       0 |      100 |       0 |       0 | 6-13              
+ ...ructor/reviews |       0 |        0 |       0 |       0 |                   
+  ...missionId.tsx |       0 |        0 |       0 |       0 | 34-149            
+  index.tsx        |       0 |        0 |       0 |       0 | 15-92             
+ ...icated/student |      20 |      100 |       0 |      20 |                   
+  dashboard.tsx    |      20 |      100 |       0 |      20 | 8-17              
+ ...nt/assignments |       0 |        0 |       0 |       0 |                   
+  ...ckpointId.tsx |       0 |        0 |       0 |       0 | 15-206            
+  $id.tsx          |       0 |        0 |       0 |       0 | 15-193            
+  index.tsx        |       0 |        0 |       0 |       0 | 14-87             
+ ...enticated/auth |    0.89 |        0 |       0 |    0.89 |                   
+  ...-password.tsx |       0 |        0 |       0 |       0 | 6-68              
+  login.tsx        |    4.76 |        0 |       0 |    4.76 | 11-70             
+  ...-password.tsx |       0 |        0 |       0 |       0 | 6-110             
+  ...-password.tsx |       0 |        0 |       0 |       0 | 6-128             
+ routes/api/auth   |       0 |      100 |       0 |       0 |                   
+  $.tsx            |       0 |      100 |       0 |       0 | 4-11              
+ server            |   65.16 |    62.71 |   50.59 |   65.22 |                   
+  ...nts.server.ts |   96.32 |    78.94 |     100 |   96.09 | ...01,119,310,358 
+  assignments.ts   |   43.24 |      100 |   22.22 |   43.24 | ...,88-90,103-105 
+  ...ons.server.ts |    80.7 |       75 |     100 |    80.7 | ...50-451,513-514 
+  consultations.ts |      40 |      100 |       0 |      40 | ...77,83-85,91-93 
+  ...min.server.ts |   80.95 |      100 |      50 |   80.95 | 105-123           
+  ...tor.server.ts |   45.83 |    23.07 |   16.66 |   52.38 | ...53,170,180-202 
+  ...ent.server.ts |   45.45 |    22.72 |   16.66 |      50 | ...25-126,181-199 
+  dashboard.ts     |      50 |      100 |       0 |      50 | 13-14,18-19,23-24 
+  files.server.ts  |       0 |        0 |       0 |       0 | 26-126            
+  files.ts         |      40 |      100 |       0 |      40 | 17-19,25-27,38-40 
+  ...ons.server.ts |   45.61 |    38.09 |   57.14 |   45.61 | ...63-164,187-188 
+  notifications.ts |      40 |      100 |       0 |      40 | ...50,55-57,63-65 
+  ...ews.server.ts |   88.04 |    81.08 |     100 |   87.91 | ...74-394,457-458 
+  reviews.ts       |      40 |      100 |       0 |      40 | ...52,58-60,66-68 
+  ...p-password.ts |   14.28 |    36.36 |      25 |   14.28 | 12-88             
+  ...ons.server.ts |   95.91 |       90 |     100 |   95.91 | 125-140           
+  submissions.ts   |      40 |      100 |       0 |      40 | 23-25,31-33,39-41 
+  ...tes.server.ts |   93.93 |    75.51 |     100 |    93.4 | ...80,288,291-293 
+  templates.ts     |   37.93 |      100 |       0 |   37.93 | ...68,74-76,82-84 
+  users.server.ts  |   47.61 |    39.06 |   44.44 |   47.61 | ...09,215,222-254 
+  users.ts         |      40 |      100 |       0 |      40 | ...55,61-63,69-71 
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 59.03% ( 1670/2829 )
+Branches     : 59.42% ( 905/1523 )
+Functions    : 54.27% ( 413/761 )
+Lines        : 59.51% ( 1607/2700 )
+================================================================================
