@@ -152,11 +152,11 @@
 
 ## Phase 5: Medium Coverage - Remaining Gaps (50-80%) [checkpoint: ]
 
-- [ ] Task: Write unit tests for `src/components/dashboard/StudentDashboard.tsx` (64% → >80%)
-  - [ ] Analyze uncovered lines (99-201)
-  - [ ] Write tests for consultation reminders widget
-  - [ ] Write tests for edge cases (empty data, loading states)
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/components/dashboard/StudentDashboard.tsx` (64% → >80%)
+  - [x] Analyze uncovered lines (99-201)
+  - [x] Write tests for consultation reminders widget
+  - [x] Write tests for edge cases (empty data, loading states)
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/components/files/file-uploader.tsx` (66% → >80%)
   - [ ] Analyze uncovered lines (86-92, 137-138)
