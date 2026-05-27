@@ -167,4 +167,42 @@ describe('Template Schemas', () => {
       expect(result.success).toBe(false);
     });
   });
+
+  describe('Server Function Stubs', () => {
+    it('should export listTemplates function', async () => {
+      const { listTemplates } = await import('@/server/templates');
+      expect(listTemplates).toBeDefined();
+      expect(typeof listTemplates).toBe('function');
+    });
+
+    it('should export getTemplate function', async () => {
+      const { getTemplate } = await import('@/server/templates');
+      expect(getTemplate).toBeDefined();
+      expect(typeof getTemplate).toBe('function');
+    });
+
+    it('should export createTemplate function', async () => {
+      const { createTemplate } = await import('@/server/templates');
+      expect(createTemplate).toBeDefined();
+      expect(typeof createTemplate).toBe('function');
+    });
+
+    it('should export updateTemplate function', async () => {
+      const { updateTemplate } = await import('@/server/templates');
+      expect(updateTemplate).toBeDefined();
+      expect(typeof updateTemplate).toBe('function');
+    });
+
+    it('should export deleteTemplate function', async () => {
+      const { deleteTemplate } = await import('@/server/templates');
+      expect(deleteTemplate).toBeDefined();
+      expect(typeof deleteTemplate).toBe('function');
+    });
+
+    it('should export duplicateTemplate function', async () => {
+      const { duplicateTemplate } = await import('@/server/templates');
+      expect(duplicateTemplate).toBeDefined();
+      expect(typeof duplicateTemplate).toBe('function');
+    });
+  });
 });
