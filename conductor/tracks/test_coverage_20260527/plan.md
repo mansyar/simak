@@ -164,10 +164,10 @@
   - [x] Write tests for upload progress states
   - [x] Run tests and verify coverage increase
 
-- [ ] Task: Write unit tests for `src/components/instructor/progress-table.tsx` (82.6% → >80%)
-  - [ ] Analyze uncovered lines (43-55, 60)
-  - [ ] Write tests for edge cases
-  - [ ] Run tests and verify coverage increase
+- [x] Task: Write unit tests for `src/components/instructor/progress-table.tsx` (82.6% → >80%)
+  - [x] Analyze uncovered lines (43-55, 60)
+  - [x] Write tests for edge cases
+  - [x] Run tests and verify coverage increase
 
 - [ ] Task: Write unit tests for `src/lib/review-sla.ts` (81.25% → >80%)
   - [ ] Analyze uncovered lines (61-62, 146)
