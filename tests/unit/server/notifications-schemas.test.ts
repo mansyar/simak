@@ -168,4 +168,36 @@ describe('Notification Schemas', () => {
       expect(result.success).toBe(true);
     });
   });
+
+  describe('Server Function Stubs', () => {
+    it('should export createNotification function', async () => {
+      const { createNotification } = await import('@/server/notifications');
+      expect(createNotification).toBeDefined();
+      expect(typeof createNotification).toBe('function');
+    });
+
+    it('should export listNotifications function', async () => {
+      const { listNotifications } = await import('@/server/notifications');
+      expect(listNotifications).toBeDefined();
+      expect(typeof listNotifications).toBe('function');
+    });
+
+    it('should export markRead function', async () => {
+      const { markRead } = await import('@/server/notifications');
+      expect(markRead).toBeDefined();
+      expect(typeof markRead).toBe('function');
+    });
+
+    it('should export markAllRead function', async () => {
+      const { markAllRead } = await import('@/server/notifications');
+      expect(markAllRead).toBeDefined();
+      expect(typeof markAllRead).toBe('function');
+    });
+
+    it('should export getUnreadCount function', async () => {
+      const { getUnreadCount } = await import('@/server/notifications');
+      expect(getUnreadCount).toBeDefined();
+      expect(typeof getUnreadCount).toBe('function');
+    });
+  });
 });
