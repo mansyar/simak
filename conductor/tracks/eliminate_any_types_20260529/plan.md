@@ -15,7 +15,7 @@
   - [x] Run `pnpm lint` — must pass
 - [x] Task: Conductor — User Manual Verification 'Phase 1: Shared Types + ESLint Config' (Protocol in workflow.md)
 
-## Phase 2: Fix `.server.ts` Files — Session Type Guards
+## Phase 2: Fix `.server.ts` Files — Session Type Guards [checkpoint: 00b7787]
 
 **Objective:** Replace `session: any` with the shared `NonNullableSession` type in all server handler files.
 
@@ -35,7 +35,7 @@
 - [x] Task: Verify all changes compile
   - [x] Run `pnpm typecheck` — must pass
   - [x] Run `pnpm test` — must pass
-- [~] Task: Conductor — User Manual Verification 'Phase 2: Fix .server.ts Type Guards' (Protocol in workflow.md)
+- [x] Task: Conductor — User Manual Verification 'Phase 2: Fix .server.ts Type Guards' (Protocol in workflow.md)
 
 ## Phase 3: Fix Server Stub Files — `args: { data: any }`
 
