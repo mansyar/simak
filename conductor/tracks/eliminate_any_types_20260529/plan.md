@@ -1,6 +1,6 @@
 # Implementation Plan: Eliminate `any` Type Usage
 
-## Phase 1: Shared Types + ESLint Config
+## Phase 1: Shared Types + ESLint Config [checkpoint: 23f7a9d]
 
 **Objective:** Create the foundation — shared types file and update ESLint config.
 
@@ -13,7 +13,7 @@
 - [x] Task: Verify foundation compiles
   - [x] Run `pnpm typecheck` — must pass
   - [x] Run `pnpm lint` — must pass
-- [ ] Task: Conductor — User Manual Verification 'Phase 1: Shared Types + ESLint Config' (Protocol in workflow.md)
+- [x] Task: Conductor — User Manual Verification 'Phase 1: Shared Types + ESLint Config' (Protocol in workflow.md)
 
 ## Phase 2: Fix `.server.ts` Files — Session Type Guards
 
