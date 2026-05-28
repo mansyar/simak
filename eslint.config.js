@@ -34,6 +34,8 @@ export default [
       'src/routeTree.gen.ts',
       'src/i18n/detect-locale.ts',
       'src/i18n/types.ts',
+      'tests/**',
+      'scripts/**',
     ],
   },
 ]

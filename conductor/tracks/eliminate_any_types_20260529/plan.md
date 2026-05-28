@@ -4,15 +4,15 @@
 
 **Objective:** Create the foundation — shared types file and update ESLint config.
 
-- [ ] Task: Create `src/lib/types.ts` with shared type utilities
+- [x] Task: Create `src/lib/types.ts` with shared type utilities
   - [ ] Define `NonNullableSession` type (non-null session shape: `{ user: { id: string; role: string }; session: { id: string; token: string; expiresAt: Date } }`)
   - [ ] Define `ServerFnArgs` generic type `ServerFnArgs<T = unknown> = { data: T }` for stub handlers
   - [ ] Export types for use across all server files
-- [ ] Task: Update ESLint config to add `tests/**` and `scripts/**` to ignores
-  - [ ] Add `'tests/**'`, `'scripts/**'` to the ignores array in `eslint.config.js`
-- [ ] Task: Verify foundation compiles
-  - [ ] Run `pnpm typecheck` — must pass
-  - [ ] Run `pnpm lint` — must pass
+- [x] Task: Update ESLint config to add `tests/**` and `scripts/**` to ignores
+  - [x] Add `'tests/**'`, `'scripts/**'` to the ignores array in `eslint.config.js`
+- [x] Task: Verify foundation compiles
+  - [x] Run `pnpm typecheck` — must pass
+  - [x] Run `pnpm lint` — must pass
 - [ ] Task: Conductor — User Manual Verification 'Phase 1: Shared Types + ESLint Config' (Protocol in workflow.md)
 
 ## Phase 2: Fix `.server.ts` Files — Session Type Guards
