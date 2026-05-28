@@ -7,10 +7,11 @@ import { consultations } from '../db/schema/consultations';
 import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
+import type { NonNullableSession } from '../lib/types';
 
 const instructorUsers = aliasedTable(users, 'instructor');
 
-function isAdmin(session: any): session is { user: { id: string; role: string }; session: any } {
+function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
 }
 
