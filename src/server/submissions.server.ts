@@ -7,6 +7,7 @@ import { submissions } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
 import { generatePresignedDownloadUrl } from '../lib/storage';
+import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
   SubmitCheckpointSchema,
@@ -18,7 +19,7 @@ type SubmitCheckpointInput = z.infer<typeof SubmitCheckpointSchema>;
 type ListSubmissionsInput = z.infer<typeof ListSubmissionsSchema>;
 type GetSubmissionDetailInput = z.infer<typeof GetSubmissionDetailSchema>;
 
-function isStudent(session: any): session is { user: { id: string; role: string }; session: any } {
+function isStudent(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'student';
 }
 
