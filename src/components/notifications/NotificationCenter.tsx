@@ -39,7 +39,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
 
   if (!isOpen) return null;
 
-  const items: Notification[] = data?.items || [];
+  const items: Notification[] = (data?.items as Notification[]) || [];
 
   // Group notifications
   const groupedNotifications = GROUP_CONFIGS.map((group) => {

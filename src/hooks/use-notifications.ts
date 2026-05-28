@@ -5,7 +5,11 @@ export function useUnreadCount() {
   return useQuery({
     queryKey: ['notifications', 'unreadCount'],
     queryFn: async () => {
-      const res = await (getUnreadCount as any)({ data: {} });
+      const res = await (
+        getUnreadCount as unknown as (args: {
+          data: Record<string, never>;
+        }) => Promise<{ count: number; error?: string }>
+      )({ data: {} });
       if ('error' in res) {
         throw new Error(res.error);
       }
@@ -22,7 +26,11 @@ export function useNotificationsList(
   return useQuery({
     queryKey: ['notifications', 'list', { page, limit, type }],
     queryFn: async () => {
-      const res = await (listNotifications as any)({ data: { page, limit, type } });
+      const res = await (
+        listNotifications as unknown as (args: {
+          data: { page: number; limit: number; type?: string };
+        }) => Promise<{ items: unknown[]; total: number; error?: string }>
+      )({ data: { page, limit, type } });
       if ('error' in res) {
         throw new Error(res.error);
       }
@@ -35,7 +43,11 @@ export function useMarkRead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (notificationId: number) => {
-      const res = await (markRead as any)({ data: { notificationId } });
+      const res = await (
+        markRead as unknown as (args: {
+          data: { notificationId: number };
+        }) => Promise<{ error?: string }>
+      )({ data: { notificationId } });
       if ('error' in res) {
         throw new Error(res.error);
       }
@@ -52,7 +64,11 @@ export function useMarkAllRead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      const res = await (markAllRead as any)({ data: {} });
+      const res = await (
+        markAllRead as unknown as (args: {
+          data: Record<string, never>;
+        }) => Promise<{ error?: string }>
+      )({ data: {} });
       if ('error' in res) {
         throw new Error(res.error);
       }
