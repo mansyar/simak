@@ -206,9 +206,9 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 **Consultation** — student-instructor meeting log, tied to a specific checkpoint.
 **Notification** — in-app event log.
 **NotificationPreference** — per-user, per-event, per-channel toggle. [v2]
-**ExtensionRequest** — student-initiated deadline extension with reason categories (Personal, Research, Health, Other), instructor approval/rejection workflow, configurable caps, and auto-extension of subsequent checkpoints and assignment finalDeadline. [v2]
+**ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, subsequent checkpoints and assignment finalDeadline auto-extend. [v2]
+**AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v2]
 **EmailQueue** — background delivery queue for transactional emails. [v2]
-**AuditLog** — administrative action record. [v2]
 **Session** — Better-Auth session token, FK to users, expiresAt.
 **Account** — Better-Auth credential provider entry (stores hashed password).
 **Verification** — Better-Auth one-time token for password reset and email verification. Replaces the former `password_reset_tokens` table.
@@ -284,28 +284,31 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 
 #### template_checkpoints
 
-| Column           | Type                                | Notes                                 |
-| ---------------- | ----------------------------------- | ------------------------------------- |
-| id               | serial (PK)                         |                                       |
-| templateId       | integer (FK → assignment_templates) |                                       |
-| name             | text, not null                      | e.g. "Abstract", "Introduction"       |
-| order            | integer, not null                   | Position in sequence                  |
-| minConsultations | integer, default 0                  | Required for checkpoint unlock/submit |
-| createdAt        | timestamp                           |                                       |
+| Column            | Type                                | Notes                                    |
+| ----------------- | ----------------------------------- | ---------------------------------------- |
+| id                | serial (PK)                         |                                          |
+| templateId        | integer (FK → assignment_templates) |                                          |
+| name              | text, not null                      | e.g. "Abstract", "Introduction"          |
+| order             | integer, not null                   | Position in sequence                     |
+| minConsultations  | integer, default 0                  | Required for checkpoint unlock/submit    |
+| estimatedDuration | integer, default 0                  | Days allotted for this checkpoint `[v2]` |
+| createdAt         | timestamp                           |                                          |
 
 #### assignments
 
-| Column        | Type                                | Notes                                                                                                   |
-| ------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| id            | serial (PK)                         |                                                                                                         |
-| templateId    | integer (FK → assignment_templates) | Template used                                                                                           |
-| title         | text, not null                      |                                                                                                         |
-| description   | text                                |                                                                                                         |
-| finalDeadline | timestamp, not null                 | Soft target deadline — individual checkpoint dueDates enforce locking; finalDeadline is a display/guide |
-| instructorId  | text (FK → users)                   |                                                                                                         |
-| createdAt     | timestamp                           |                                                                                                         |
-| updatedAt     | timestamp                           |                                                                                                         |
-| deletedAt     | timestamp                           | Soft delete                                                                                             |
+| Column             | Type                                | Notes                                                                                                   |
+| ------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| id                 | serial (PK)                         |                                                                                                         |
+| templateId         | integer (FK → assignment_templates) | Template used                                                                                           |
+| title              | text, not null                      |                                                                                                         |
+| description        | text                                |                                                                                                         |
+| finalDeadline      | timestamp, not null                 | Soft target deadline — individual checkpoint dueDates enforce locking; finalDeadline is a display/guide |
+| instructorId       | text (FK → users)                   |                                                                                                         |
+| maxExtensionDays   | integer, default 7                  | Admin cap per request, CHECK (1–30) `[v2]`                                                              |
+| maxTotalExtensions | integer, default 3                  | Cap per assignment, CHECK (1–10) `[v2]`                                                                 |
+| createdAt          | timestamp                           |                                                                                                         |
+| updatedAt          | timestamp                           |                                                                                                         |
+| deletedAt          | timestamp                           | Soft delete                                                                                             |
 
 #### assignment_students [v1]
 
@@ -402,24 +405,37 @@ _Note: Each row represents one student's individual participation. Group assignm
 
 #### extension_requests [v2]
 
-| Column                  | Type                       | Notes                                   |
-| ----------------------- | -------------------------- | --------------------------------------- |
-| id                      | serial (PK)                |                                         |
-| assignmentId            | integer (FK → assignments) |                                         |
-| studentId               | text (FK → users)          |                                         |
-| requestedDeadline       | timestamp, not null        | Proposed new deadline                   |
-| reason                  | text                       | Student's reason                        |
-| category                | text, not null             | personal \| research \| health \| other |
-| extensionDays           | integer, not null          | Days to extend (1-7)                    |
-| status                  | text, not null             | pending \| approved \| rejected         |
-| reviewedBy              | text (FK → users)          | Instructor who reviewed                 |
-| approvedBy              | text (FK → users)          | Instructor who approved                 |
-| extendedBy              | text (FK → users)          | Instructor who extended                 |
-| extensionReason         | text                       | Instructor's comment                    |
-| maxExtensionDays        | integer, not null          | Admin cap (default: 7)                  |
-| hasReachedMaxExtensions | boolean, not null          | Cap reached?                            |
-| createdAt               | timestamp                  |                                         |
-| updatedAt               | timestamp                  |                                         |
+| Column            | Type                       | Notes                                          |
+| ----------------- | -------------------------- | ---------------------------------------------- |
+| id                | serial (PK)                |                                                |
+| assignmentId      | integer (FK → assignments) |                                                |
+| studentId         | text (FK → users)          |                                                |
+| checkpointId      | integer (FK → checkpoints) | NULLABLE — which specific checkpoint is needed |
+| requestedDeadline | timestamp, not null        | Proposed new deadline                          |
+| reason            | text, not null             | Student's explanation                          |
+| category          | text, not null             | personal \| research \| health \| other        |
+| extensionDays     | integer, not null          | 1–30 (CHECK constraint)                        |
+| status            | text, not null             | pending \| approved \| rejected                |
+| resolvedBy        | text (FK → users)          | NULLABLE — instructor who acted                |
+| resolutionReason  | text                       | NULLABLE — required for rejection              |
+| createdAt         | timestamp                  |                                                |
+| resolvedAt        | timestamp                  | NULLABLE                                       |
+
+Index on `(assignmentId, status)` for instructor queue queries.
+
+#### audit_log [v2]
+
+| Column     | Type              | Notes                                                                                              |
+| ---------- | ----------------- | -------------------------------------------------------------------------------------------------- |
+| id         | serial (PK)       |                                                                                                    |
+| actorId    | text (FK → users) | NOT NULL — who performed the action                                                                |
+| action     | text, not null    | `user.created`, `template.deleted`, `assignment.created`, `review.passed`, etc.                    |
+| entityType | text, not null    | `user` \| `template` \| `assignment` \| `checkpoint` \| `submission` \| `review` \| `consultation` |
+| entityId   | text, not null    | Stringified ID of affected entity                                                                  |
+| details    | jsonb             | NULLABLE — previous value, new value, reason, etc.                                                 |
+| createdAt  | timestamp         | DEFAULT NOW()                                                                                      |
+
+Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for type filtering. Index on `(entity_type, entity_id)` for entity-specific history.
 
 #### email_queue [v2]
 
@@ -435,32 +451,23 @@ _Note: Each row represents one student's individual participation. Group assignm
 | errorMessage   | text               | Last failure reason       |
 | createdAt      | timestamp          |                           |
 
-#### audit_logs [v2]
-
-| Column     | Type              | Notes                               |
-| ---------- | ----------------- | ----------------------------------- |
-| id         | serial (PK)       |                                     |
-| userId     | text (FK → users) | Who performed the action            |
-| action     | text, not null    | e.g. user.created, template.deleted |
-| entityType | text              | e.g. user, assignment               |
-| entityId   | text              | ID of affected entity               |
-| metadata   | jsonb             | Additional context                  |
-| createdAt  | timestamp         |                                     |
-
 ### Database Indexes
 
-| Table                   | Column(s)        | Type             | Purpose                                      |
-| ----------------------- | ---------------- | ---------------- | -------------------------------------------- |
-| `checkpoints`           | `assignmentId`   | b-tree           | Fetch checkpoints when loading an assignment |
-| `submissions`           | `checkpointId`   | b-tree           | Fetch submissions for a checkpoint           |
-| `submissions`           | `uploadedBy`     | b-tree           | Student's submission history                 |
-| `reviews`               | `submissionId`   | b-tree           | Fetch review for a submission                |
-| `consultations`         | `checkpointId`   | b-tree           | Count consultations for gating logic         |
-| `consultations`         | `status`         | b-tree           | Filter pending verifications                 |
-| `notifications`         | `userId`, `read` | composite b-tree | Notification center filtering                |
-| `password_reset_tokens` | `token`          | unique b-tree    | Token lookup on password setup               |
-| `audit_logs`            | `userId`         | b-tree           | Filter by admin (v2)                         |
-| `email_queue`           | `status`         | b-tree           | Pick pending emails for delivery (v2)        |
+| Table                   | Column(s)                | Type             | Purpose                                      |
+| ----------------------- | ------------------------ | ---------------- | -------------------------------------------- |
+| `checkpoints`           | `assignmentId`           | b-tree           | Fetch checkpoints when loading an assignment |
+| `submissions`           | `checkpointId`           | b-tree           | Fetch submissions for a checkpoint           |
+| `submissions`           | `uploadedBy`             | b-tree           | Student's submission history                 |
+| `reviews`               | `submissionId`           | b-tree           | Fetch review for a submission                |
+| `consultations`         | `checkpointId`           | b-tree           | Count consultations for gating logic         |
+| `consultations`         | `status`                 | b-tree           | Filter pending verifications                 |
+| `notifications`         | `userId`, `read`         | composite b-tree | Notification center filtering                |
+| `password_reset_tokens` | `token`                  | unique b-tree    | Token lookup on password setup               |
+| `audit_log`             | `createdAt`              | b-tree           | Time-ordered queries (v2)                    |
+| `audit_log`             | `action`                 | b-tree           | Type filtering (v2)                          |
+| `audit_log`             | `entityType`, `entityId` | composite b-tree | Entity-specific history (v2)                 |
+| `extension_requests`    | `assignmentId`, `status` | composite b-tree | Instructor queue queries (v2)                |
+| `email_queue`           | `status`                 | b-tree           | Pick pending emails for delivery (v2)        |
 
 All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migration generated with `drizzle-kit generate`.
 
@@ -541,9 +548,11 @@ Admin       (creates Instructors and Students)
 
 ### Two-Factor Authentication [v2]
 
-- TOTP via authenticator app.
-- Backup codes (8 single-use) generated on enable.
-- Per-user enable/disable.
+- TOTP via authenticator app using Better Auth's built-in `twoFactor` plugin.
+- Backup codes (8 single-use) generated on enable; user must confirm they've saved them.
+- Login prompts for 6-digit TOTP code when 2FA is enabled; backup code works as fallback.
+- Per-user enable/disable with current password confirmation.
+- Active sessions dashboard showing device, IP, and timestamp per session. Users can revoke specific sessions or all other sessions.
 
 ---
 

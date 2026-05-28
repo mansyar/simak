@@ -24,7 +24,9 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Both students and instructors can view and download previously submitted checkpoint files.
 - Consultation sessions (Kartu Bimbingan) are tracked as a requirement for assignment completion.
 - Admins can view system-wide analytics and audit logs. `[v2]`
-- Students can request deadline extensions via an approval workflow. `[v2]`
+- Students and instructors can request and manage deadline extensions via a configurable approval workflow. `[v2]`
+- Users can enable two-factor authentication (TOTP) for enhanced account security. `[v2]`
+- Assignment templates include estimated duration per checkpoint, allowing auto-calculation of checkpoint dueDates during assignment creation. `[v2]`
 
 ---
 
@@ -101,6 +103,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Admin defines templates with a fixed ordered list of checkpoints.
 - Each template has a `type` label (e.g., Thesis, Research Paper).
 - Templates can be duplicated, filtered, and reused when creating assignments.
+- Each template checkpoint includes an `estimatedDuration` (days). During assignment creation, checkpoint dueDates are auto-calculated from the base date + cumulative durations. Instructors can override before finalizing. `[v2]`
 
 ### Assignment Management
 
@@ -119,12 +122,12 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Instructors can attach feedback files to reviews.
 - Late submissions are controlled: overdue checkpoints lock automatically; instructors can unlock them.
 - **SLA & Escalation (Addressing the Instructor Bottleneck):** To ensure students aren't unfairly blocked, if an instructor does not review a submission within a defined SLA (e.g., 3 days), an automated escalation alert is sent to the Admin, and the student's subsequent deadlines are **automatically extended by the number of days the review was delayed** (breach duration is added to affected deadlines).
-- **Deadline Extension Workflow:**
-  - **Student-Initiated:** Students can request deadline extensions via an approval workflow with reason categories (Personal, Research, Health, Other)
-  - **Instructor-Initiated:** Instructors can directly extend deadlines without student request
-  - **Auto-Adjustment:** Subsequent checkpoints and assignment finalDeadline auto-extend when extension approved
-  - **Configurable Caps:** Admin-configurable extension limits (max extension days and max total extensions per assignment)
-  - **Audit Trail:** Complete history of all extension requests, decisions, and reasons
+- **Deadline Extension Workflow: `[v2]`**
+  - **Student-Initiated:** Students can request deadline extensions via an approval workflow with reason categories (Personal, Research, Health, Other) and a proposed duration (1–30 days). Instructors approve or reject with optional comment.
+  - **Instructor-Initiated:** Instructors can directly extend deadlines for one or all checkpoints without student request. Bulk extension applies +N days to all remaining checkpoints for a student.
+  - **Auto-Adjustment:** Subsequent checkpoints and assignment finalDeadline auto-extend when an extension is approved or directly applied.
+  - **Configurable Caps:** Admin-configurable extension limits per assignment: `maxExtensionDays` (1–30, default 7) and `maxTotalExtensions` (1–10, default 3).
+  - **Audit Trail:** All deadline changes — approved requests, direct extensions, and manual unlocks — are recorded in the shared `audit_log` table with actor, previous/next values, reason, and timestamp.
 
 ### Consultation Tracking (Kartu Bimbingan)
 
@@ -145,6 +148,14 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Clicking the bell opens a slide-over panel with grouped notifications, "Mark all read" action, and empty state.
 - Users can mark individual notifications as read or mark all as read.
 - Notification preferences are `[v2]` — currently all event types are enabled for all users.
+
+### Two-Factor Authentication `[v2]`
+
+- Users can enable TOTP-based two-factor authentication via an authenticator app.
+- 8 single-use backup codes are generated on enable.
+- Login prompts for a 6-digit TOTP code when 2FA is enabled.
+- Backup codes work as a fallback when the authenticator device is unavailable.
+- Users can view and revoke active sessions from their security settings.
 
 ### Analytics & Reporting `[v2]`
 
@@ -191,5 +202,5 @@ Core entities:
 - **Review** — instructor decision (pass/revise) + comments + deadline + optional feedback file.
 - **Consultation** — log entry for a student-instructor session tied to a specific checkpoint.
 - **Notification** — in-app and/or email event logs.
-- **ExtensionRequest** `[v2]` — student request for deadline extension with approval workflow.
-- **AuditLog** `[v2]` — administrative action trail.
+- **AuditLog** `[v2]` — immutable record of all meaningful system actions (user created/deleted, template CRUD, assignment creation, review decisions, deadline changes, unlock actions, consultation verifications/rejections). Includes actor, action type, entity reference, and JSON details.
+- **ExtensionRequest** `[v2]` — student-initiated deadline extension request with reason category, proposed duration, and approval/rejection by instructor. Subject to admin-configurable caps (`maxExtensionDays`, `maxTotalExtensions`).
