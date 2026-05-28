@@ -37,6 +37,7 @@ vi.mock('@tanstack/react-router', () => ({
     }),
     useNavigate: vi.fn().mockReturnValue(vi.fn()),
   })),
+  useRouter: vi.fn().mockReturnValue({ invalidate: vi.fn() }),
 }));
 
 // Mock server audit-logs

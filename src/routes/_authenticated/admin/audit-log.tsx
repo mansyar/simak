@@ -1,6 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useServerFn } from '@tanstack/react-start';
 import { listAuditLogs } from '@/server/audit-logs';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '../../__root';
@@ -49,12 +48,13 @@ export const Route = createFileRoute('/_authenticated/admin/audit-log')({
 });
 
 function AuditLogPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const data = Route.useLoaderData();
   const entries = data?.entries ?? [];
   const total = data?.total ?? 0;
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
+  const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
@@ -62,7 +62,7 @@ function AuditLogPage() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await (listAuditLogs as any)({ data: { ...searchParams } });
+    await router.invalidate();
     setIsRefreshing(false);
   };
 
@@ -92,7 +92,7 @@ function AuditLogPage() {
 
   const formatTimestamp = (date: Date | string | null) => {
     if (!date) return '-';
-    return new Date(date).toLocaleString();
+    return new Date(date).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US');
   };
 
   return (
