@@ -7,6 +7,7 @@ import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { consultations } from '../db/schema/consultations';
+import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
   CreateAssignmentSchema,
@@ -26,9 +27,7 @@ type StudentAssignmentIdParam = z.infer<typeof StudentAssignmentIdParamSchema>;
 type UnlockCheckpointInput = z.infer<typeof UnlockCheckpointSchema>;
 type ExtendDeadlineInput = z.infer<typeof ExtendDeadlineSchema>;
 
-function isInstructor(
-  session: any,
-): session is { user: { id: string; role: string }; session: any } {
+function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
 }
 
