@@ -6,6 +6,7 @@ import { checkpoints, assignments, assignmentStudents } from '../db/schema/assig
 import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
+import { logAuditEvent } from '../lib/audit';
 import { verifyAssignmentAccess } from './ownership';
 import type { z } from 'zod';
 import type {
@@ -344,6 +345,14 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
       },
     });
 
+    await logAuditEvent({
+      actorId: session.user.id,
+      action: 'consultation.verified',
+      entityType: 'consultation',
+      entityId: String(consultationId),
+      details: { checkpoint: consultation.assignmentId, student: consultation.studentId },
+    });
+
     return { success: true };
   } catch (err) {
     console.error('Failed to verify consultation:', err);
@@ -417,6 +426,14 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
       },
     });
 
+    await logAuditEvent({
+      actorId: session.user.id,
+      action: 'consultation.rejected',
+      entityType: 'consultation',
+      entityId: String(consultationId),
+      details: { checkpoint: consultation.assignmentId, student: consultation.studentId, reason },
+    });
+
     return { success: true };
   } catch (err) {
     console.error('Failed to reject consultation:', err);
@@ -424,71 +441,4 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
   }
 }
 
-/**
- * Return verified consultation count per checkpoint for an assignment.
- * Used for gating logic and progress display.
- */
-export async function listVerifiedCountsHandler(args: { data: ListVerifiedCountsInput }) {
-  const session = await getSessionFromHeaders();
-  if (!session) {
-    return { error: 'Unauthorized' };
-  }
-
-  const { assignmentId } = args.data;
-  const db = getDb();
-
-  try {
-    const role = session.user.role;
-
-    // Verify access
-    const accessError = await verifyAssignmentAccess(db, assignmentId, session);
-    if (accessError) return accessError;
-
-    // Build conditions based on role
-    const checkpointConditions = [eq(checkpoints.assignmentId, assignmentId)];
-    if (role === 'student') {
-      checkpointConditions.push(eq(checkpoints.studentId, session.user.id));
-    }
-
-    // Get checkpoints for this assignment (filtered by student if student role)
-    const checkpointData = await db
-      .select({
-        id: checkpoints.id,
-        name: checkpoints.name,
-        order: checkpoints.order,
-        minConsultations: checkpoints.minConsultations,
-      })
-      .from(checkpoints)
-      .where(and(...checkpointConditions))
-      .orderBy(checkpoints.order);
-
-    // Build consultation count conditions
-    const result = [];
-    for (const cp of checkpointData) {
-      const consConditions = [
-        eq(consultations.checkpointId, cp.id),
-        eq(consultations.status, 'verified'),
-      ];
-      if (role === 'student') {
-        consConditions.push(eq(consultations.studentId, session.user.id));
-      }
-
-      const [countResult] = await db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(consultations)
-        .where(and(...consConditions));
-
-      result.push({
-        checkpointId: cp.id,
-        checkpointName: cp.name,
-        verifiedCount: Number(countResult?.count ?? 0),
-        minConsultations: cp.minConsultations ?? 0,
-      });
-    }
-
-    return { counts: result };
-  } catch (err) {
-    console.error('Failed to list verified counts:', err);
-    return { error: 'Internal Server Error' };
-  }
-}
+export { listVerifiedCountsHandler } from './consultations-extras.server';

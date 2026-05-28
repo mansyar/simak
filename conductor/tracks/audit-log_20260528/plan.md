@@ -82,7 +82,7 @@
 
 ## Phase 6: Wire Consultation Handlers
 
-- [ ] Task: Write consultation handler audit tests (Red Phase)
+- [~] Task: Write consultation handler audit tests (Red Phase)
   - [ ] Create test file `tests/unit/server/consultations-audit.test.ts`
   - [ ] Test verifyConsultationHandler writes `consultation.verified` audit entry
   - [ ] Test rejectConsultationHandler writes `consultation.rejected` audit entry
