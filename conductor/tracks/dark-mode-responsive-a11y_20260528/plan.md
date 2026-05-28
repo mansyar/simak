@@ -72,22 +72,22 @@
   - [ ] Fix any undersized targets (add padding or min-height/width)
 - [x] Task: Write failing tests for responsive behavior — verify no horizontal overflow at 320px (Red phase)
 - [x] Task: Implement fixes from responsive audit; run tests to pass (Green phase)
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Responsive Layout Pass' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Responsive Layout Pass' (Protocol in workflow.md)
 
 ## Phase 3: Accessibility Pass
 
-- [ ] Task: Audit and fix keyboard navigation
+- [x] Task: Audit and fix keyboard navigation
   - [ ] Verify Tab order is logical across all pages
   - [ ] Ensure all interactive elements are reachable by keyboard
   - [ ] Ensure no focus traps (except intentional dialog focus trapping)
   - [ ] Ensure dialogs/sheets have proper focus trapping on open and return focus on close
-- [ ] Task: Audit and fix focus indicators
+- [x] Task: Audit and fix focus indicators
   - [ ] Ensure all interactive elements have `focus-visible:` ring classes
   - [ ] Verify focus ring has sufficient contrast in both light and dark modes
-- [ ] Task: Audit and fix heading hierarchy
+- [x] Task: Audit and fix heading hierarchy
   - [ ] Ensure every page has exactly one `h1`
   - [ ] Ensure heading levels don't skip (h1 → h2 → h3, never h1 → h3)
-- [ ] Task: Add ARIA labels
+- [x] Task: Add ARIA labels
   - [ ] Add `aria-label` to theme toggle button
   - [ ] Add `aria-label` to language switcher buttons
   - [ ] Add `aria-label` to dialog/sheet close buttons
@@ -96,14 +96,14 @@
   - [ ] Add `aria-label` to delete/remove icon buttons
   - [ ] Add `aria-label` to ▲/▼ reorder buttons in checkpoint editor
   - [ ] Add `aria-label` to pagination controls
-- [ ] Task: Add ARIA live regions for dynamic content
+- [x] Task: Add ARIA live regions for dynamic content
   - [ ] Add `aria-live="polite"` region for form validation errors
   - [ ] Add `aria-live="polite"` region for submission status messages
   - [ ] Add `aria-live="polite"` region for notification count changes
-- [ ] Task: Verify form error announcements
+- [x] Task: Verify form error announcements
   - [ ] Ensure form inputs have `aria-describedby` pointing to error message element
   - [ ] Ensure error messages have `role="alert"` or live in `aria-live` region
-- [ ] Task: Add `aria-hidden="true"` to all decorative icons throughout components
-- [ ] Task: Write failing a11y unit tests — verify ARIA attributes, focus management, heading hierarchy (Red phase)
-- [ ] Task: Implement fixes from a11y audit; run tests to pass (Green phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Accessibility Pass' (Protocol in workflow.md)
+- [x] Task: Add `aria-hidden="true"` to all decorative icons throughout components
+- [x] Task: Write failing a11y unit tests — verify ARIA attributes, focus management, heading hierarchy (Red phase)
+- [x] Task: Implement fixes from a11y audit; run tests to pass (Green phase)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Accessibility Pass' (Protocol in workflow.md)

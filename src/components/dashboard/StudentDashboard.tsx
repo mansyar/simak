@@ -79,7 +79,7 @@ export function StudentDashboard({ data }: Props) {
 
   if (data?.error) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-12" aria-live="polite">
         <p className="text-destructive">{t('common.error')}</p>
       </div>
     );

@@ -118,7 +118,11 @@ export function ConsultationForm({ assignmentId, checkpoints, onSuccess }: Consu
         />
       </div>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && (
+        <p className="text-sm text-destructive" aria-live="polite">
+          {error}
+        </p>
+      )}
 
       <Button type="submit" disabled={loading || !checkpointId || !notes}>
         {loading ? t('common.loading') : t('consultations.logConsultation')}

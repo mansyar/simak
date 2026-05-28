@@ -255,7 +255,10 @@ export function AssignmentWizard() {
             </div>
 
             {errors.submit && (
-              <div className="p-4 rounded-lg bg-destructive/10 text-destructive text-sm font-semibold border border-destructive/20">
+              <div
+                className="p-4 rounded-lg bg-destructive/10 text-destructive text-sm font-semibold border border-destructive/20"
+                aria-live="polite"
+              >
                 {errors.submit}
               </div>
             )}

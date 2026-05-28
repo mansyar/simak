@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
-import { getConsultationDetail, verifyConsultation, rejectConsultation } from '@/server/consultations';
+import {
+  getConsultationDetail,
+  verifyConsultation,
+  rejectConsultation,
+} from '@/server/consultations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -106,30 +110,42 @@ export function VerificationDialog({
           <div className="py-8 text-center text-muted-foreground">{t('common.loading')}</div>
         )}
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && (
+          <p className="text-sm text-destructive" aria-live="polite">
+            {error}
+          </p>
+        )}
 
         {detail && (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <span className="text-xs text-muted-foreground font-medium">{t('consultations.student')}</span>
+                <span className="text-xs text-muted-foreground font-medium">
+                  {t('consultations.student')}
+                </span>
                 <p className="text-foreground">{detail.studentName}</p>
               </div>
               <div>
-                <span className="text-xs text-muted-foreground font-medium">{t('consultations.checkpoint')}</span>
+                <span className="text-xs text-muted-foreground font-medium">
+                  {t('consultations.checkpoint')}
+                </span>
                 <p className="text-foreground">{detail.checkpointName}</p>
               </div>
               <div>
-                <span className="text-xs text-muted-foreground font-medium">{t('consultations.sessionType')}</span>
+                <span className="text-xs text-muted-foreground font-medium">
+                  {t('consultations.sessionType')}
+                </span>
                 <p className="text-foreground">
-                  {detail.sessionType === 'external' ? t('consultations.external') : t('consultations.internal')}
+                  {detail.sessionType === 'external'
+                    ? t('consultations.external')
+                    : t('consultations.internal')}
                 </p>
               </div>
               <div>
-                <span className="text-xs text-muted-foreground font-medium">{t('consultations.date')}</span>
-                <p className="text-foreground">
-                  {new Date(detail.createdAt).toLocaleDateString()}
-                </p>
+                <span className="text-xs text-muted-foreground font-medium">
+                  {t('consultations.date')}
+                </span>
+                <p className="text-foreground">{new Date(detail.createdAt).toLocaleDateString()}</p>
               </div>
             </div>
 
@@ -143,7 +159,9 @@ export function VerificationDialog({
             )}
 
             <div className="text-sm">
-              <span className="text-xs text-muted-foreground font-medium">{t('consultations.notes')}</span>
+              <span className="text-xs text-muted-foreground font-medium">
+                {t('consultations.notes')}
+              </span>
               <p className="text-foreground whitespace-pre-wrap">{detail.notes ?? '-'}</p>
             </div>
 

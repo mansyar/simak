@@ -14,7 +14,7 @@ export function LanguageSwitcher({
       <button
         type="button"
         onClick={() => onSwitch('en')}
-        className={`rounded px-2 py-1 min-h-11 text-sm font-medium transition-colors ${
+        className={`rounded px-2 py-1 min-h-11 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
           currentLocale === 'en'
             ? 'bg-primary text-primary-foreground'
             : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
@@ -26,7 +26,7 @@ export function LanguageSwitcher({
       <button
         type="button"
         onClick={() => onSwitch('id')}
-        className={`rounded px-2 py-1 min-h-11 text-sm font-medium transition-colors ${
+        className={`rounded px-2 py-1 min-h-11 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
           currentLocale === 'id'
             ? 'bg-primary text-primary-foreground'
             : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'

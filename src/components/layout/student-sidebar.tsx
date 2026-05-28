@@ -44,7 +44,7 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
           </span>
           <button
             onClick={onClose}
-            className="rounded-md p-1 min-h-11 min-w-11 text-muted-foreground hover:bg-accent hover:text-accent-foreground lg:hidden"
+            className="rounded-md p-1 min-h-11 min-w-11 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
             aria-label="Close menu"
           >
             <X className="h-5 w-5" />
@@ -65,7 +65,7 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
                     : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4" aria-hidden="true" />
                 {t(link.label)}
               </Link>
             );

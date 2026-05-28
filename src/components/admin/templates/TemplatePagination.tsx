@@ -26,6 +26,7 @@ export function TemplatePagination({
           size="sm"
           disabled={currentPage <= 1}
           onClick={() => onPageChange(currentPage - 1)}
+          aria-label={t('common.previousPage')}
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
           {t('common.back')}
@@ -35,6 +36,7 @@ export function TemplatePagination({
           size="sm"
           disabled={currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
+          aria-label={t('common.nextPage')}
         >
           {t('common.next')}
           <ChevronRight className="h-4 w-4 ml-1" />

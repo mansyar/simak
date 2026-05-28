@@ -18,7 +18,7 @@ export function NotificationBadge({ onOpen }: { onOpen: () => void }) {
     >
       {hasUnread ? (
         <>
-          <BellDot className="h-5 w-5 text-red-500" />
+          <BellDot className="h-5 w-5 text-red-500" aria-hidden="true" />
           <span
             role="status"
             className="absolute top-1 right-1 inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[9px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4"
@@ -27,7 +27,7 @@ export function NotificationBadge({ onOpen }: { onOpen: () => void }) {
           </span>
         </>
       ) : (
-        <Bell className="h-5 w-5" />
+        <Bell className="h-5 w-5" aria-hidden="true" />
       )}
     </button>
   );
