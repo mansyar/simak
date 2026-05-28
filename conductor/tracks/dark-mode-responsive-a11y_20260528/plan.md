@@ -44,7 +44,7 @@
 - [x] Task: Implement fixes from audit findings; run tests to pass (Green phase)
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Dark Mode Theme Pass' (Protocol in workflow.md)
 
-## Phase 2: Responsive Layout Pass
+## Phase 2: Responsive Layout Pass [checkpoint: dc7883a]
 
 - [x] Task: Add responsive sidebar behavior
   - [ ] Implement mobile sidebar collapse/hamburger menu for admin, instructor, student sidebars
