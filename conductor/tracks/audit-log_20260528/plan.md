@@ -1,6 +1,6 @@
 # Implementation Plan: Track 1.1 — Comprehensive Audit Log
 
-## Phase 1: Database Schema & Migration
+## Phase 1: Database Schema & Migration [checkpoint: 60c674c]
 
 - [x] Task: Write audit_log schema tests (Red Phase) a8a23f8
   - [x] Create test file `tests/unit/db/audit-log-schema.test.ts`
