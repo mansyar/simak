@@ -18,18 +18,18 @@ const AuditLogSearchSchema = z.object({
 });
 
 const ACTION_TYPES = [
-  'user.created',
-  'user.deleted',
-  'template.created',
-  'template.updated',
-  'template.deleted',
-  'assignment.created',
-  'review.passed',
-  'review.revised',
-  'checkpoint.unlocked',
-  'deadline.extended',
-  'consultation.verified',
-  'consultation.rejected',
+  { value: 'user.created', label: 'adminAuditLog.actionLabels.userCreated' },
+  { value: 'user.deleted', label: 'adminAuditLog.actionLabels.userDeleted' },
+  { value: 'template.created', label: 'adminAuditLog.actionLabels.templateCreated' },
+  { value: 'template.updated', label: 'adminAuditLog.actionLabels.templateUpdated' },
+  { value: 'template.deleted', label: 'adminAuditLog.actionLabels.templateDeleted' },
+  { value: 'assignment.created', label: 'adminAuditLog.actionLabels.assignmentCreated' },
+  { value: 'review.passed', label: 'adminAuditLog.actionLabels.reviewPassed' },
+  { value: 'review.revised', label: 'adminAuditLog.actionLabels.reviewRevised' },
+  { value: 'checkpoint.unlocked', label: 'adminAuditLog.actionLabels.checkpointUnlocked' },
+  { value: 'deadline.extended', label: 'adminAuditLog.actionLabels.deadlineExtended' },
+  { value: 'consultation.verified', label: 'adminAuditLog.actionLabels.consultationVerified' },
+  { value: 'consultation.rejected', label: 'adminAuditLog.actionLabels.consultationRejected' },
 ] as const;
 
 export const Route = createFileRoute('/_authenticated/admin/audit-log')({
@@ -128,8 +128,8 @@ function AuditLogPage() {
         >
           <option value="">{t('adminAuditLog.allActions')}</option>
           {ACTION_TYPES.map((action) => (
-            <option key={action} value={action}>
-              {action}
+            <option key={action.value} value={action.value}>
+              {t(action.label)}
             </option>
           ))}
         </select>

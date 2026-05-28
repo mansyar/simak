@@ -118,7 +118,11 @@ export type Translation = {
     confirm: string
     back: string
     next: string
+    previous: string
     submit: string
+    refresh: string
+    hide: string
+    view: string
     noResults: string
     viewAll: string
     page: string
@@ -162,6 +166,20 @@ export type Translation = {
       entityType: string
       entityId: string
       details: string
+    }
+    actionLabels: {
+      userCreated: string
+      userDeleted: string
+      templateCreated: string
+      templateUpdated: string
+      templateDeleted: string
+      assignmentCreated: string
+      reviewPassed: string
+      reviewRevised: string
+      checkpointUnlocked: string
+      deadlineExtended: string
+      consultationVerified: string
+      consultationRejected: string
     }
   }
   studentSidebar: {

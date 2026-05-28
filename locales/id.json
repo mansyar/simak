@@ -52,7 +52,11 @@
     "confirm": "Konfirmasi",
     "back": "Kembali",
     "next": "Lanjut",
+    "previous": "Sebelumnya",
     "submit": "Kirim",
+    "refresh": "Muat Ulang",
+    "hide": "Sembunyikan",
+    "view": "Lihat",
     "noResults": "Tidak ada hasil",
     "viewAll": "Lihat Semua",
     "page": "Halaman",
@@ -104,6 +108,20 @@
       "entityType": "Entitas",
       "entityId": "ID Entitas",
       "details": "Detail"
+    },
+    "actionLabels": {
+      "userCreated": "Pengguna Dibuat",
+      "userDeleted": "Pengguna Dihapus",
+      "templateCreated": "Templat Dibuat",
+      "templateUpdated": "Templat Diperbarui",
+      "templateDeleted": "Templat Dihapus",
+      "assignmentCreated": "Tugas Dibuat",
+      "reviewPassed": "Review Lolos",
+      "reviewRevised": "Review Revisi",
+      "checkpointUnlocked": "Titik Periksa Dibuka",
+      "deadlineExtended": "Batas Waktu Diperpanjang",
+      "consultationVerified": "Konsultasi Terverifikasi",
+      "consultationRejected": "Konsultasi Ditolak"
     }
   },
   "adminUsers": {

@@ -52,7 +52,11 @@
     "confirm": "Confirm",
     "back": "Back",
     "next": "Next",
+    "previous": "Previous",
     "submit": "Submit",
+    "refresh": "Refresh",
+    "hide": "Hide",
+    "view": "View",
     "noResults": "No results found",
     "viewAll": "View All",
     "page": "Page",
@@ -104,6 +108,20 @@
       "entityType": "Entity",
       "entityId": "Entity ID",
       "details": "Details"
+    },
+    "actionLabels": {
+      "userCreated": "User Created",
+      "userDeleted": "User Deleted",
+      "templateCreated": "Template Created",
+      "templateUpdated": "Template Updated",
+      "templateDeleted": "Template Deleted",
+      "assignmentCreated": "Assignment Created",
+      "reviewPassed": "Review Passed",
+      "reviewRevised": "Review Revised",
+      "checkpointUnlocked": "Checkpoint Unlocked",
+      "deadlineExtended": "Deadline Extended",
+      "consultationVerified": "Consultation Verified",
+      "consultationRejected": "Consultation Rejected"
     }
   },
   "adminUsers": {
