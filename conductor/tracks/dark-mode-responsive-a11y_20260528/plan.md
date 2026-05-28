@@ -107,3 +107,7 @@
 - [x] Task: Write failing a11y unit tests — verify ARIA attributes, focus management, heading hierarchy (Red phase)
 - [x] Task: Implement fixes from a11y audit; run tests to pass (Green phase)
 - [~] Task: Conductor - User Manual Verification 'Phase 3: Accessibility Pass' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 651c687
