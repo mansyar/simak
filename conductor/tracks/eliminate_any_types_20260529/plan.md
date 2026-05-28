@@ -41,20 +41,20 @@
 
 **Objective:** Replace `args: { data: any }` with `args: { data: unknown }` in all `createServerFn` stubs.
 
-- [ ] Task: Fix `src/server/users.ts` — 6 stubs (`listUsers`, `getUser`, `createUser`, `updateUser`, `deleteUser`, `generateSetupLink`)
-- [ ] Task: Fix `src/server/templates.ts` — 6 stubs (`listTemplates`, `getTemplate`, `createTemplate`, `updateTemplate`, `deleteTemplate`, `duplicateTemplate`)
-- [ ] Task: Fix `src/server/assignments.ts` — 7 stubs (`createAssignment`, `listInstructorAssignments`, `getAssignmentDetail`, `listStudentAssignments`, `getStudentAssignmentDetail`, `unlockCheckpoint`, `extendDeadline`)
-- [ ] Task: Fix `src/server/consultations.ts` — 7 stubs (`logConsultation`, `listConsultations`, `listPendingConsultations`, `verifyConsultation`, `rejectConsultation`, `getConsultationDetail`, `listVerifiedCounts`)
-- [ ] Task: Fix `src/server/reviews.ts` — 5 stubs (`listPendingReviews`, `getReviewDetail`, `openForReview`, `submitReview`, `getLatestReview`)
-- [ ] Task: Fix `src/server/submissions.ts` — 3 stubs (`submitCheckpoint`, `listSubmissions`, `getSubmissionDetail`)
-- [ ] Task: Fix `src/server/files.ts` — 3 stubs (`getPresignedUploadUrl`, `getPresignedDownloadUrl`, `getPresignedReviewFeedbackUploadUrl`)
-- [ ] Task: Fix `src/server/notifications.ts` — 5 stubs (`createNotification`, `listNotifications`, `markRead`, `markAllRead`, `getUnreadCount`)
-- [ ] Task: Fix `src/server/audit-logs.ts` — 2 stubs (`listAuditLogs`, `getAuditLogDetail`)
-- [ ] Task: Fix `src/server/setup-password.ts` — 1 stub
-- [ ] Task: Verify all changes compile
-  - [ ] Run `pnpm typecheck` — must pass
-  - [ ] Run `pnpm test` — must pass
-- [ ] Task: Conductor — User Manual Verification 'Phase 3: Fix Server Stubs' (Protocol in workflow.md)
+- [x] Task: Fix `src/server/users.ts` — 6 stubs (`listUsers`, `getUser`, `createUser`, `updateUser`, `deleteUser`, `generateSetupLink`)
+- [x] Task: Fix `src/server/templates.ts` — 6 stubs (`listTemplates`, `getTemplate`, `createTemplate`, `updateTemplate`, `deleteTemplate`, `duplicateTemplate`)
+- [x] Task: Fix `src/server/assignments.ts` — 7 stubs (`createAssignment`, `listInstructorAssignments`, `getAssignmentDetail`, `listStudentAssignments`, `getStudentAssignmentDetail`, `unlockCheckpoint`, `extendDeadline`)
+- [x] Task: Fix `src/server/consultations.ts` — 7 stubs (`logConsultation`, `listConsultations`, `listPendingConsultations`, `verifyConsultation`, `rejectConsultation`, `getConsultationDetail`, `listVerifiedCounts`)
+- [x] Task: Fix `src/server/reviews.ts` — 5 stubs (`listPendingReviews`, `getReviewDetail`, `openForReview`, `submitReview`, `getLatestReview`)
+- [x] Task: Fix `src/server/submissions.ts` — 3 stubs (`submitCheckpoint`, `listSubmissions`, `getSubmissionDetail`)
+- [x] Task: Fix `src/server/files.ts` — 3 stubs (`getPresignedUploadUrl`, `getPresignedDownloadUrl`, `getPresignedReviewFeedbackUploadUrl`)
+- [x] Task: Fix `src/server/notifications.ts` — 5 stubs (`createNotification`, `listNotifications`, `markRead`, `markAllRead`, `getUnreadCount`)
+- [x] Task: Fix `src/server/audit-logs.ts` — 2 stubs (`listAuditLogs`, `getAuditLogDetail`)
+- [x] Task: Fix `src/server/setup-password.ts` — 1 stub
+- [x] Task: Verify all changes compile
+  - [x] Run `pnpm typecheck` — must pass
+  - [x] Run `pnpm test` — must pass
+- [~] Task: Conductor — User Manual Verification 'Phase 3: Fix Server Stubs' (Protocol in workflow.md)
 
 ## Phase 4: Fix Route Files — `as any` Casts + `any[]` + Callback Params
 
