@@ -7,6 +7,7 @@ import { consultations } from '../db/schema/consultations';
 import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
+import { verifyCheckpointAccess } from './ownership';
 import { generatePresignedDownloadUrl } from '../lib/storage';
 import { calculateBreachDuration } from '../lib/sla';
 import {
@@ -471,6 +472,10 @@ export async function getLatestReviewHandler(args: { data: GetLatestReviewInput 
 
   const { checkpointId } = args.data;
   const db = getDb();
+
+  // Ownership check: verify the checkpoint belongs to this user
+  const accessError = await verifyCheckpointAccess(db, checkpointId, session);
+  if (accessError) return accessError;
 
   // Fetch the most recent review for the checkpoint's latest submission
   const [latestReview] = await db

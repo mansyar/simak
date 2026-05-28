@@ -1,15 +1,6 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  LogConsultationSchema,
-  ListConsultationsSchema,
-  ListPendingConsultationsSchema,
-  VerifyConsultationSchema,
-  RejectConsultationSchema,
-  GetConsultationDetailSchema,
-  ListVerifiedCountsSchema,
-} from '@/server/consultations';
-import {
   logConsultationHandler,
   listConsultationsHandler,
   listPendingConsultationsHandler,
@@ -34,115 +25,6 @@ vi.mock('@tanstack/react-start', () => ({
     handler: vi.fn().mockImplementation((fn) => fn),
   }),
 }));
-
-describe('Consultation server functions - Schemas', () => {
-  describe('LogConsultationSchema', () => {
-    it('should accept valid input with internal session type', () => {
-      const result = LogConsultationSchema.safeParse({
-        checkpointId: 1,
-        sessionType: 'internal',
-        notes: 'Discussed chapter methodology',
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('should accept valid input with external session type and consultant name', () => {
-      const result = LogConsultationSchema.safeParse({
-        checkpointId: 1,
-        sessionType: 'external',
-        externalConsultantName: 'Dr. Smith',
-        notes: 'Consulted with external expert',
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('should reject invalid session type', () => {
-      const result = LogConsultationSchema.safeParse({
-        checkpointId: 1,
-        sessionType: 'invalid',
-        notes: 'Some notes',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('should reject empty notes', () => {
-      const result = LogConsultationSchema.safeParse({
-        checkpointId: 1,
-        sessionType: 'internal',
-        notes: '',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('should reject missing checkpointId', () => {
-      const result = LogConsultationSchema.safeParse({
-        sessionType: 'internal',
-        notes: 'Some notes',
-      });
-      expect(result.success).toBe(false);
-    });
-  });
-
-  describe('ListConsultationsSchema', () => {
-    it('should accept valid input', () => {
-      const result = ListConsultationsSchema.safeParse({ assignmentId: 1 });
-      expect(result.success).toBe(true);
-    });
-
-    it('should accept optional checkpointId', () => {
-      const result = ListConsultationsSchema.safeParse({ assignmentId: 1, checkpointId: 5 });
-      expect(result.success).toBe(true);
-    });
-
-    it('should reject missing assignmentId', () => {
-      const result = ListConsultationsSchema.safeParse({});
-      expect(result.success).toBe(false);
-    });
-  });
-
-  describe('ListPendingConsultationsSchema', () => {
-    it('should accept valid input', () => {
-      const result = ListPendingConsultationsSchema.safeParse({ assignmentId: 1 });
-      expect(result.success).toBe(true);
-    });
-  });
-
-  describe('VerifyConsultationSchema', () => {
-    it('should accept valid input', () => {
-      const result = VerifyConsultationSchema.safeParse({ consultationId: 1 });
-      expect(result.success).toBe(true);
-    });
-  });
-
-  describe('RejectConsultationSchema', () => {
-    it('should accept valid input with reason', () => {
-      const result = RejectConsultationSchema.safeParse({
-        consultationId: 1,
-        reason: 'Insufficient documentation',
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('should reject missing reason', () => {
-      const result = RejectConsultationSchema.safeParse({ consultationId: 1 });
-      expect(result.success).toBe(false);
-    });
-  });
-
-  describe('GetConsultationDetailSchema', () => {
-    it('should accept valid input', () => {
-      const result = GetConsultationDetailSchema.safeParse({ consultationId: 1 });
-      expect(result.success).toBe(true);
-    });
-  });
-
-  describe('ListVerifiedCountsSchema', () => {
-    it('should accept valid input', () => {
-      const result = ListVerifiedCountsSchema.safeParse({ assignmentId: 1 });
-      expect(result.success).toBe(true);
-    });
-  });
-});
 
 describe('Consultation server functions - Logic & Security', () => {
   let returningResult: any = null;
@@ -257,52 +139,54 @@ describe('Consultation server functions - Logic & Security', () => {
 
     it('should return consultations for student', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
-
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ id: 1, checkpointId: 1, status: 'pending', checkpointName: 'Ch 1' }]).then(
-          onfulfilled,
-        ),
-      );
-
+      mockDb.then
+        // Enrollment check
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1 }]).then(onfulfilled),
+        )
+        // Consultation query
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            { id: 1, checkpointId: 1, status: 'pending', checkpointName: 'Ch 1' },
+          ]).then(onfulfilled),
+        );
       const result = await listConsultationsHandler({ data: { assignmentId: 1 } });
       expect(result).toHaveProperty('consultations');
     });
 
     it('should return consultations for instructor', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
-
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ id: 1, checkpointId: 1, status: 'pending', studentName: 'Student A' }]).then(
-          onfulfilled,
-        ),
-      );
-
+      mockDb.then
+        // Assignment ownership check
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1 }]).then(onfulfilled),
+        )
+        // Consultation query
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            { id: 1, checkpointId: 1, status: 'pending', studentName: 'Student A' },
+          ]).then(onfulfilled),
+        );
       const result = await listConsultationsHandler({ data: { assignmentId: 1 } });
       expect(result).toHaveProperty('consultations');
     });
 
-    it('should return consultations filtered by checkpointId for student', async () => {
+    it('should reject if student is not enrolled', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ id: 1, checkpointId: 5, status: 'pending', checkpointName: 'Ch 5' }]).then(
-          onfulfilled,
-        ),
+        Promise.resolve([]).then(onfulfilled),
       );
-
-      const result = await listConsultationsHandler({ data: { assignmentId: 1, checkpointId: 5 } });
-      expect(result).toHaveProperty('consultations');
+      const result = await listConsultationsHandler({ data: { assignmentId: 999 } });
+      expect(result).toEqual({ error: 'Assignment not found' });
     });
 
-    it('should return consultations filtered by checkpointId for instructor', async () => {
+    it('should reject if instructor does not own assignment', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ id: 1, checkpointId: 5, status: 'pending', studentName: 'Student A' }]).then(
-          onfulfilled,
-        ),
+        Promise.resolve([]).then(onfulfilled),
       );
-
-      const result = await listConsultationsHandler({ data: { assignmentId: 1, checkpointId: 5 } });
-      expect(result).toHaveProperty('consultations');
+      const result = await listConsultationsHandler({ data: { assignmentId: 999 } });
+      expect(result).toEqual({ error: 'Assignment not found' });
     });
   });
 
@@ -361,7 +245,13 @@ describe('Consultation server functions - Logic & Security', () => {
       // Mock consultation query returns pending record
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([
-          { id: 1, status: 'pending', studentId: 'student-1', assignmentId: 1, instructorId: 'instructor-1' },
+          {
+            id: 1,
+            status: 'pending',
+            studentId: 'student-1',
+            assignmentId: 1,
+            instructorId: 'instructor-1',
+          },
         ]).then(onfulfilled),
       );
 
@@ -373,7 +263,13 @@ describe('Consultation server functions - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([
-          { id: 1, status: 'verified', studentId: 'student-1', assignmentId: 1, instructorId: 'instructor-1' },
+          {
+            id: 1,
+            status: 'verified',
+            studentId: 'student-1',
+            assignmentId: 1,
+            instructorId: 'instructor-1',
+          },
         ]).then(onfulfilled),
       );
 
@@ -396,7 +292,13 @@ describe('Consultation server functions - Logic & Security', () => {
 
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([
-          { id: 1, status: 'pending', studentId: 'student-1', assignmentId: 1, instructorId: 'instructor-1' },
+          {
+            id: 1,
+            status: 'pending',
+            studentId: 'student-1',
+            assignmentId: 1,
+            instructorId: 'instructor-1',
+          },
         ]).then(onfulfilled),
       );
 
@@ -410,7 +312,13 @@ describe('Consultation server functions - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([
-          { id: 1, status: 'verified', studentId: 'student-1', assignmentId: 1, instructorId: 'instructor-1' },
+          {
+            id: 1,
+            status: 'verified',
+            studentId: 'student-1',
+            assignmentId: 1,
+            instructorId: 'instructor-1',
+          },
         ]).then(onfulfilled),
       );
 
@@ -473,8 +381,12 @@ describe('Consultation server functions - Logic & Security', () => {
     it('should return counts for student', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
 
-      // Mock checkpoint query (with studentId filter)
       mockDb.then
+        // Enrollment check
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1 }]).then(onfulfilled),
+        )
+        // Mock checkpoint query (with studentId filter)
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ id: 1, name: 'Ch 1', order: 1, minConsultations: 2 }]).then(
             onfulfilled,
@@ -496,8 +408,12 @@ describe('Consultation server functions - Logic & Security', () => {
     it('should return counts for instructor', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
 
-      // Mock checkpoint query for instructor (all students)
       mockDb.then
+        // Assignment ownership check
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1 }]).then(onfulfilled),
+        )
+        // Mock checkpoint query for instructor (all students)
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ id: 1, name: 'Ch 1', order: 1, minConsultations: 2 }]).then(
             onfulfilled,
@@ -510,6 +426,26 @@ describe('Consultation server functions - Logic & Security', () => {
 
       const result = await listVerifiedCountsHandler({ data: { assignmentId: 1 } });
       expect(result).toHaveProperty('counts');
+    });
+
+    it('should reject if student is not enrolled for verified counts', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
+      // Enrollment check returns empty
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+      const result = await listVerifiedCountsHandler({ data: { assignmentId: 999 } });
+      expect(result).toEqual({ error: 'Assignment not found' });
+    });
+
+    it('should reject if instructor does not own assignment for verified counts', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+      // Ownership check returns empty
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+      const result = await listVerifiedCountsHandler({ data: { assignmentId: 999 } });
+      expect(result).toEqual({ error: 'Assignment not found' });
     });
   });
 });

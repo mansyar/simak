@@ -6,6 +6,7 @@ import { checkpoints, assignments, assignmentStudents } from '../db/schema/assig
 import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
+import { verifyAssignmentAccess } from './ownership';
 import type { z } from 'zod';
 import type {
   LogConsultationSchema,
@@ -83,7 +84,8 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
         studentId: session.user.id,
         status: 'pending',
         sessionType,
-        externalConsultantName: sessionType === 'external' ? (externalConsultantName ?? null) : null,
+        externalConsultantName:
+          sessionType === 'external' ? (externalConsultantName ?? null) : null,
         notes,
       })
       .returning({ id: consultations.id });
@@ -123,65 +125,40 @@ export async function listConsultationsHandler(args: { data: ListConsultationsIn
   const db = getDb();
 
   try {
-    if (isStudent(session)) {
-      // Students see only their own consultations
-      const conditions = [
-        eq(consultations.assignmentId, assignmentId),
-        eq(consultations.studentId, session.user.id),
-      ];
-      if (checkpointId) {
-        conditions.push(eq(consultations.checkpointId, checkpointId));
-      }
+    const role = session.user.role;
+    const accessError = await verifyAssignmentAccess(db, assignmentId, session);
+    if (accessError) return accessError;
 
-      const items = await db
-        .select({
-          id: consultations.id,
-          checkpointId: consultations.checkpointId,
-          sessionType: consultations.sessionType,
-          externalConsultantName: consultations.externalConsultantName,
-          notes: consultations.notes,
-          status: consultations.status,
-          checkpointName: checkpoints.name,
-          createdAt: consultations.createdAt,
-        })
-        .from(consultations)
-        .innerJoin(checkpoints, eq(consultations.checkpointId, checkpoints.id))
-        .where(and(...conditions))
-        .orderBy(desc(consultations.createdAt));
+    // Common conditions
+    const conditions = [eq(consultations.assignmentId, assignmentId)];
+    if (checkpointId) conditions.push(eq(consultations.checkpointId, checkpointId));
+    if (role === 'student') conditions.push(eq(consultations.studentId, session.user.id));
 
-      return { consultations: items };
-    }
+    const baseQuery = db
+      .select({
+        id: consultations.id,
+        checkpointId: consultations.checkpointId,
+        sessionType: consultations.sessionType,
+        externalConsultantName: consultations.externalConsultantName,
+        notes: consultations.notes,
+        status: consultations.status,
+        checkpointName: checkpoints.name,
+        createdAt: consultations.createdAt,
+        ...(role === 'instructor'
+          ? { studentId: consultations.studentId, studentName: users.name }
+          : {}),
+      })
+      .from(consultations)
+      .innerJoin(checkpoints, eq(consultations.checkpointId, checkpoints.id));
 
-    if (isInstructor(session)) {
-      // Instructors see all consultations for their assignment
-      const conditions = [eq(consultations.assignmentId, assignmentId)];
-      if (checkpointId) {
-        conditions.push(eq(consultations.checkpointId, checkpointId));
-      }
+    const query =
+      role === 'instructor'
+        ? baseQuery.innerJoin(users, eq(consultations.studentId, users.id))
+        : baseQuery;
 
-      const items = await db
-        .select({
-          id: consultations.id,
-          studentId: consultations.studentId,
-          checkpointId: consultations.checkpointId,
-          sessionType: consultations.sessionType,
-          externalConsultantName: consultations.externalConsultantName,
-          notes: consultations.notes,
-          status: consultations.status,
-          studentName: users.name,
-          checkpointName: checkpoints.name,
-          createdAt: consultations.createdAt,
-        })
-        .from(consultations)
-        .innerJoin(checkpoints, eq(consultations.checkpointId, checkpoints.id))
-        .innerJoin(users, eq(consultations.studentId, users.id))
-        .where(and(...conditions))
-        .orderBy(desc(consultations.createdAt));
+    const items = await query.where(and(...conditions)).orderBy(desc(consultations.createdAt));
 
-      return { consultations: items };
-    }
-
-    return { error: 'Unauthorized' };
+    return { consultations: items };
   } catch (err) {
     console.error('Failed to list consultations:', err);
     return { error: 'Internal Server Error' };
@@ -292,12 +269,7 @@ export async function listPendingConsultationsHandler(args: {
       .from(consultations)
       .innerJoin(checkpoints, eq(consultations.checkpointId, checkpoints.id))
       .innerJoin(users, eq(consultations.studentId, users.id))
-      .where(
-        and(
-          eq(consultations.assignmentId, assignmentId),
-          eq(consultations.status, 'pending'),
-        ),
-      )
+      .where(and(eq(consultations.assignmentId, assignmentId), eq(consultations.status, 'pending')))
       .orderBy(asc(consultations.createdAt));
 
     return { consultations: items };
@@ -466,9 +438,15 @@ export async function listVerifiedCountsHandler(args: { data: ListVerifiedCounts
   const db = getDb();
 
   try {
+    const role = session.user.role;
+
+    // Verify access
+    const accessError = await verifyAssignmentAccess(db, assignmentId, session);
+    if (accessError) return accessError;
+
     // Build conditions based on role
     const checkpointConditions = [eq(checkpoints.assignmentId, assignmentId)];
-    if (isStudent(session)) {
+    if (role === 'student') {
       checkpointConditions.push(eq(checkpoints.studentId, session.user.id));
     }
 
@@ -491,7 +469,7 @@ export async function listVerifiedCountsHandler(args: { data: ListVerifiedCounts
         eq(consultations.checkpointId, cp.id),
         eq(consultations.status, 'verified'),
       ];
-      if (isStudent(session)) {
+      if (role === 'student') {
         consConditions.push(eq(consultations.studentId, session.user.id));
       }
 

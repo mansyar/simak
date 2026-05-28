@@ -175,6 +175,10 @@ describe('Notification handlers', () => {
     user: { id: 'user-1', role: 'student' as const },
     session: {} as any,
   };
+  const adminSession = {
+    user: { id: 'admin-1', role: 'admin' as const },
+    session: {} as any,
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -207,8 +211,17 @@ describe('Notification handlers', () => {
       expect(result).toEqual({ error: 'Unauthorized' });
     });
 
-    it('should create a notification and return it', async () => {
+    it('should reject if non-admin', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+
+      const result = await createNotificationHandler({
+        data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
+      });
+      expect(result).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should create a notification and return it when admin', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
       const created = { id: 1, userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' };
       mockDb.returning.mockResolvedValue([created]);
 
@@ -221,7 +234,7 @@ describe('Notification handlers', () => {
     });
 
     it('should handle database error gracefully', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
       mockDb.returning.mockRejectedValue(new Error('DB error'));
 
       const result = await createNotificationHandler({
@@ -280,7 +293,9 @@ describe('Notification handlers', () => {
 
     it('should handle database error gracefully', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
-      mockDb.select.mockImplementationOnce(() => { throw new Error('DB error'); });
+      mockDb.select.mockImplementationOnce(() => {
+        throw new Error('DB error');
+      });
 
       const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
       expect(result).toEqual({ error: 'Internal Server Error' });
@@ -330,7 +345,9 @@ describe('Notification handlers', () => {
 
     it('should handle database error gracefully', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
-      mockDb.select.mockImplementationOnce(() => { throw new Error('DB error'); });
+      mockDb.select.mockImplementationOnce(() => {
+        throw new Error('DB error');
+      });
 
       const result = await markReadHandler({ data: { notificationId: 1 } });
       expect(result).toEqual({ error: 'Internal Server Error' });
@@ -367,7 +384,9 @@ describe('Notification handlers', () => {
 
     it('should handle database error gracefully', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
-      mockDb.update.mockImplementationOnce(() => { throw new Error('DB error'); });
+      mockDb.update.mockImplementationOnce(() => {
+        throw new Error('DB error');
+      });
 
       const result = await markAllReadHandler({ data: {} });
       expect(result).toEqual({ error: 'Internal Server Error' });
@@ -404,7 +423,9 @@ describe('Notification handlers', () => {
 
     it('should handle database error gracefully', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
-      mockDb.select.mockImplementationOnce(() => { throw new Error('DB error'); });
+      mockDb.select.mockImplementationOnce(() => {
+        throw new Error('DB error');
+      });
 
       const result = await getUnreadCountHandler({ data: {} });
       expect(result).toEqual({ error: 'Internal Server Error' });

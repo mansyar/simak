@@ -341,32 +341,86 @@ describe('Review handlers - Logic & Security', () => {
   });
 
   describe('getLatestReviewHandler', () => {
-    it('should return the most recent review for a checkpoint', async () => {
+    it('should return the most recent review for a student checkpoint', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            id: 10,
-            decision: 'revise',
-            comment: 'Needs improvement',
-            instructorName: 'Dr. Smith',
-            createdAt: new Date('2026-05-23'),
-            revisionDeadline: new Date('2026-06-01'),
-          },
-        ]).then(onfulfilled),
-      );
+      // First query: ownership check (returns a checkpoint row)
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 100 }]).then(onfulfilled),
+        )
+        // Second query: review fetch
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 10,
+              decision: 'revise',
+              comment: 'Needs improvement',
+              instructorName: 'Dr. Smith',
+              createdAt: new Date('2026-05-23'),
+              revisionDeadline: new Date('2026-06-01'),
+            },
+          ]).then(onfulfilled),
+        );
       const result = (await getLatestReviewHandler({ data: { checkpointId: 100 } })) as any;
       expect(result.review).toBeDefined();
       expect(result.review.decision).toBe('revise');
     });
 
+    it('should return the most recent review for an instructor-owned checkpoint', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      // First query: ownership check (returns a checkpoint row)
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 100 }]).then(onfulfilled),
+        )
+        // Second query: review fetch
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 10,
+              decision: 'pass',
+              comment: 'Well done',
+              instructorName: 'Dr. Smith',
+              createdAt: new Date('2026-05-23'),
+            },
+          ]).then(onfulfilled),
+        );
+      const result = (await getLatestReviewHandler({ data: { checkpointId: 100 } })) as any;
+      expect(result.review).toBeDefined();
+      expect(result.review.decision).toBe('pass');
+    });
+
     it('should return null if no review exists', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+      // First query: ownership check (returns a checkpoint row)
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 999 }]).then(onfulfilled),
+        )
+        // Second query: no review found
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+      const result = (await getLatestReviewHandler({ data: { checkpointId: 999 } })) as any;
+      expect(result.review).toBeNull();
+    });
+
+    it('should reject if student does not own the checkpoint', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+      // Ownership check returns empty (checkpoint not assigned to this student)
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([]).then(onfulfilled),
       );
-      const result = (await getLatestReviewHandler({ data: { checkpointId: 999 } })) as any;
-      expect(result.review).toBeNull();
+      const result = await getLatestReviewHandler({ data: { checkpointId: 100 } });
+      expect(result).toEqual({ error: 'Checkpoint not found' });
+    });
+
+    it('should reject if instructor does not own the checkpoint', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(otherInstructorSession as any);
+      // Ownership check returns empty (checkpoint belongs to another instructor)
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+      const result = await getLatestReviewHandler({ data: { checkpointId: 100 } });
+      expect(result).toEqual({ error: 'Checkpoint not found' });
     });
 
     it('should reject if unauthorized', async () => {

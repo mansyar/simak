@@ -30,11 +30,11 @@ function isAuthenticated(
 
 /**
  * Create a notification row.
- * Requires authentication (used server-side by other handlers, but also callable).
+ * Admin-only — other handlers create notifications via direct DB inserts in transactions.
  */
 export async function createNotificationHandler(args: { data: CreateNotificationInput }) {
   const session = await getSessionFromHeaders();
-  if (!isAuthenticated(session)) {
+  if (!isAdmin(session)) {
     return { error: 'Unauthorized' };
   }
 
