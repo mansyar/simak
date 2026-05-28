@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import { getDb } from '../db/index';
 import { users, verification } from '../db/schema/index';
 import { sendInvitationEmail } from '../lib/email';
+import { logAuditEvent } from '../lib/audit';
 import { getSessionFromHeaders } from './auth';
 import type { z } from 'zod';
 import type {
@@ -157,6 +158,14 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
     locale: session.user.locale || 'en',
   });
 
+  await logAuditEvent({
+    actorId: session.user.id,
+    action: 'user.created',
+    entityType: 'user',
+    entityId: userId,
+    details: { role, email: userEmail },
+  });
+
   await db.insert(verification).values({
     id: crypto.randomUUID(),
     identifier: userEmail,
@@ -221,6 +230,13 @@ export async function deleteUserHandler(args: { data: UserIdParam }) {
 
   const db = getDb();
   await db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, args.data.id));
+
+  await logAuditEvent({
+    actorId: session.user.id,
+    action: 'user.deleted',
+    entityType: 'user',
+    entityId: args.data.id,
+  });
 
   return { success: true };
 }
