@@ -2,7 +2,7 @@
 
 ## Phase 1: Database Schema & Migration
 
-- [ ] Task: Write audit_log schema tests (Red Phase)
+- [x] Task: Write audit_log schema tests (Red Phase) a8a23f8
   - [ ] Create test file `tests/unit/db/audit-log-schema.test.ts`
   - [ ] Test table exists with correct columns (id, actorId, action, entityType, entityId, details, createdAt)
   - [ ] Test foreign key constraint on actorId → users.id
