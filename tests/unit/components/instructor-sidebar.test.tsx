@@ -44,7 +44,7 @@ describe('InstructorSidebar', () => {
 
   it('should render SIMAK Instructor title', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
-    render(<InstructorSidebar />);
+    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
     expect(dashboardLink).toBeDefined();
@@ -53,7 +53,7 @@ describe('InstructorSidebar', () => {
 
   it('should render assignments link', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
-    render(<InstructorSidebar />);
+    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/instructor/assignments');
     expect(assignmentsLink).toBeDefined();
@@ -62,7 +62,7 @@ describe('InstructorSidebar', () => {
 
   it('should render reviews link', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
-    render(<InstructorSidebar />);
+    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const reviewsLink = screen.getByTestId('sidebar-link-/instructor/reviews');
     expect(reviewsLink).toBeDefined();
@@ -71,7 +71,7 @@ describe('InstructorSidebar', () => {
 
   it('should highlight the currently active route', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
-    render(<InstructorSidebar />);
+    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
     expect(dashboardLink.className).toContain('bg-primary');
@@ -80,7 +80,7 @@ describe('InstructorSidebar', () => {
 
   it('should highlight active route with sub-paths', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/assignments/new' });
-    render(<InstructorSidebar />);
+    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/instructor/assignments');
     expect(assignmentsLink.className).toContain('bg-primary');
@@ -89,7 +89,7 @@ describe('InstructorSidebar', () => {
 
   it('should not apply the active class to inactive routes', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
-    render(<InstructorSidebar />);
+    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/instructor/assignments');
     expect(assignmentsLink.className).not.toContain('bg-primary');
@@ -98,7 +98,7 @@ describe('InstructorSidebar', () => {
 
   it('should render logout button', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
-    render(<InstructorSidebar />);
+    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const logoutButton = screen.getByText('auth.logout');
     expect(logoutButton).toBeDefined();

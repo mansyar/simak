@@ -46,7 +46,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           <button
             onClick={onClose}
             className="rounded-md p-1 min-h-11 min-w-11 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
-            aria-label="Close menu"
+            aria-label={t('common.closeMenu')}
           >
             <X className="h-5 w-5" />
           </button>

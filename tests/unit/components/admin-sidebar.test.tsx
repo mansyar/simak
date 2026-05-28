@@ -44,7 +44,7 @@ describe('AdminSidebar', () => {
 
   it('should render dashboard link', () => {
     mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
-    render(<AdminSidebar />);
+    render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/admin/dashboard');
     expect(dashboardLink).toBeDefined();
@@ -53,7 +53,7 @@ describe('AdminSidebar', () => {
 
   it('should render users link', () => {
     mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
-    render(<AdminSidebar />);
+    render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
 
     const usersLink = screen.getByTestId('sidebar-link-/admin/users');
     expect(usersLink).toBeDefined();
@@ -62,7 +62,7 @@ describe('AdminSidebar', () => {
 
   it('should render templates link', () => {
     mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
-    render(<AdminSidebar />);
+    render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
 
     const templatesLink = screen.getByTestId('sidebar-link-/admin/templates');
     expect(templatesLink).toBeDefined();
@@ -71,7 +71,7 @@ describe('AdminSidebar', () => {
 
   it('should highlight the currently active route', () => {
     mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
-    render(<AdminSidebar />);
+    render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/admin/dashboard');
     expect(dashboardLink.className).toContain('bg-primary');
@@ -80,7 +80,7 @@ describe('AdminSidebar', () => {
 
   it('should not apply the active class to inactive routes', () => {
     mockLocation.mockReturnValue({ pathname: '/admin/templates' });
-    render(<AdminSidebar />);
+    render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/admin/dashboard');
     expect(dashboardLink.className).not.toContain('bg-primary');
@@ -88,7 +88,7 @@ describe('AdminSidebar', () => {
 
   it('should render logout button', () => {
     mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
-    render(<AdminSidebar />);
+    render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
 
     const logoutButton = screen.getByText('auth.logout');
     expect(logoutButton).toBeDefined();
