@@ -17,44 +17,55 @@ export const Route = createFileRoute(
 )({
   loader: async ({ params }) => {
     try {
-      const { id, checkpointId } = params as any;
-      const assignmentData = await (getStudentAssignmentDetail as any)({
-        data: { id: Number(id) },
-      });
+      const { id, checkpointId } = params;
+      // @ts-expect-error - handler type inference limitation
+      const assignmentData = await getStudentAssignmentDetail({ data: { id: Number(id) } });
 
       if (!assignmentData) return null;
 
       // Find the specific checkpoint
-      const checkpoint = (assignmentData.checkpoints ?? []).find(
-        (cp: any) => cp.id === Number(checkpointId),
-      );
+      const checkpoint = (
+        (assignmentData as { checkpoints: { id: number; state: string; name: string }[] })
+          .checkpoints ?? []
+      ).find((cp) => cp.id === Number(checkpointId));
 
       if (!checkpoint) return null;
 
       // Fetch submissions for this checkpoint
-      const submissionsData = await (listSubmissions as any)({
+      // @ts-expect-error - handler type inference limitation
+      const submissionsData = await listSubmissions({
         data: { checkpointId: Number(checkpointId) },
       });
 
       // Find the latest review (from the reviews table)
-      const reviewData = await (getLatestReview as any)({
-        data: { checkpointId: Number(checkpointId) },
-      });
+      // @ts-expect-error - handler type inference limitation
+      const reviewData = await getLatestReview({ data: { checkpointId: Number(checkpointId) } });
       const latestReview = reviewData?.review
-        ? {
-            decision: reviewData.review.decision,
-            comment: reviewData.review.comment,
-            reviewerName: reviewData.review.instructorName,
-            revisionDeadline: reviewData.review.revisionDeadline,
-            reviewedAt: reviewData.review.createdAt,
-          }
+        ? ({
+            decision: reviewData.review.decision as 'pass' | 'revise',
+            comment: reviewData.review.comment ?? null,
+            reviewerName: reviewData.review.instructorName ?? null,
+            revisionDeadline: reviewData.review.revisionDeadline ?? null,
+            reviewedAt: reviewData.review.createdAt ?? null,
+          } as const)
         : null;
 
       return {
         assignmentId: Number(id),
-        assignmentTitle: assignmentData.title,
+        assignmentTitle: (assignmentData as { title: string }).title,
         checkpoint,
-        submissions: submissionsData?.submissions ?? [],
+        submissions:
+          (
+            submissionsData as unknown as {
+              submissions: {
+                id: number;
+                version: number;
+                fileName: string;
+                fileSize: number;
+                uploadedAt: Date;
+              }[];
+            }
+          ).submissions ?? [],
         latestReview,
       };
     } catch (err) {
@@ -73,7 +84,7 @@ export const Route = createFileRoute(
 
 function SubmissionNotFound() {
   const { t } = useI18n();
-  const navigate = useNavigate() as any;
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -86,7 +97,9 @@ function SubmissionNotFound() {
       <Button
         variant="outline"
         type="button"
-        onClick={() => navigate({ to: '/student/assignments', search: {} })}
+        onClick={() =>
+          navigate({ to: '/student/assignments', search: { page: 1, limit: 20, search: '' } })
+        }
       >
         <ChevronLeft className="mr-2 h-4 w-4" />
         {t('common.back')}
@@ -97,13 +110,15 @@ function SubmissionNotFound() {
 
 function CheckpointSubmissionPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as any;
-  const params = Route.useParams() as any;
-  const navigate = Route.useNavigate() as any;
+  const data = Route.useLoaderData();
+  const params = Route.useParams();
+  const navigate = Route.useNavigate();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [submissions, setSubmissions] = useState(data?.submissions ?? []);
+  const [submissions, setSubmissions] = useState<
+    { id: number; version: number; fileName: string; fileSize: number; uploadedAt: Date }[]
+  >(data?.submissions ?? []);
 
   const handleUploadSuccess = useCallback(
     async (file: File) => {
@@ -119,7 +134,10 @@ function CheckpointSubmissionPage() {
             : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
         // Step 1: Get presigned upload URL
-        const uploadData = await (getPresignedUploadUrl as any)({
+        const getUploadUrlFn = getPresignedUploadUrl as unknown as (args: {
+          data: { checkpointId: number; contentType: string; extension: string };
+        }) => Promise<{ uploadUrl: string; fileKey: string; error?: string }>;
+        const uploadData = await getUploadUrlFn({
           data: {
             checkpointId: Number(params.checkpointId),
             contentType,
@@ -145,7 +163,10 @@ function CheckpointSubmissionPage() {
         }
 
         // Step 3: Submit checkpoint
-        const result = await (submitCheckpoint as any)({
+        const submitFn = submitCheckpoint as unknown as (args: {
+          data: { checkpointId: number; fileKey: string; fileName: string; fileSize: number };
+        }) => Promise<{ error?: string }>;
+        const result = await submitFn({
           data: {
             checkpointId: Number(params.checkpointId),
             fileKey: uploadData.fileKey,
@@ -163,7 +184,18 @@ function CheckpointSubmissionPage() {
         setIsUploading(false);
 
         // Refresh submissions list
-        const submissionsData = await (listSubmissions as any)({
+        const listSubFn = listSubmissions as unknown as (args: {
+          data: { checkpointId: number };
+        }) => Promise<{
+          submissions: {
+            id: number;
+            version: number;
+            fileName: string;
+            fileSize: number;
+            uploadedAt: Date;
+          }[];
+        }>;
+        const submissionsData = await listSubFn({
           data: { checkpointId: Number(params.checkpointId) },
         });
         setSubmissions(submissionsData?.submissions ?? []);
@@ -177,7 +209,10 @@ function CheckpointSubmissionPage() {
 
   const handleDownload = useCallback(async (submissionId: number) => {
     const { getPresignedDownloadUrl } = await import('@/server/files');
-    const result = await (getPresignedDownloadUrl as any)({
+    const downloadFn = getPresignedDownloadUrl as unknown as (args: {
+      data: { submissionId: number };
+    }) => Promise<{ downloadUrl?: string }>;
+    const result = await downloadFn({
       data: { submissionId },
     });
     if (result?.downloadUrl) {
@@ -191,7 +226,11 @@ function CheckpointSubmissionPage() {
         <h2 className="text-xl font-semibold text-foreground mb-2">
           {t('studentAssignments.notFound')}
         </h2>
-        <Link to="/student/assignments" search={() => ({}) as any} className="inline-flex">
+        <Link
+          to="/student/assignments"
+          search={{ page: 1, limit: 20, search: '' }}
+          className="inline-flex"
+        >
           <Button variant="outline" type="button">
             <ChevronLeft className="mr-2 h-4 w-4" />
             {t('common.back')}
