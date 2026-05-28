@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 
 export const completePasswordSetup = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { token, password } = args.data as { token: string; password: string };
 
     if (!token || !password || password.length < 8) {
