@@ -25,7 +25,8 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/')(
     search: search.search,
   }),
   loader: async ({ deps }) => {
-    return (listInstructorAssignments as any)({ data: deps });
+    // @ts-expect-error - handler type inference limitation
+    return listInstructorAssignments({ data: deps });
   },
   pendingComponent: () => <AssignmentLoadingSkeleton />,
   component: AssignmentsPage,
@@ -33,27 +34,45 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/')(
 
 function AssignmentsPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as any;
-  const assignments = data?.assignments ?? [];
-  const total = data?.total ?? 0;
-  const searchParams = Route.useSearch() as any;
-  const navigate = Route.useNavigate() as any;
+  const data = Route.useLoaderData();
+  const assignments =
+    (
+      data as unknown as {
+        assignments?: {
+          id: number;
+          title: string;
+          templateType: string;
+          templateName: string;
+          finalDeadline: Date;
+          createdAt: Date;
+          status: string;
+          studentCount: number;
+        }[];
+      }
+    )?.assignments ?? [];
+  const total = (data as unknown as { total?: number })?.total ?? 0;
+  const searchParams = Route.useSearch();
+  const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleSearchChange = (value: string) => {
     navigate({
-      search: (prev: any) => ({ ...prev, search: value, page: 1 }),
+      search: (prev: z.infer<typeof AssignmentSearchSchema>) => ({
+        ...prev,
+        search: value,
+        page: 1,
+      }),
     });
   };
 
   const handlePageChange = (page: number) => {
     navigate({
-      search: (prev: any) => ({ ...prev, page }),
+      search: (prev: z.infer<typeof AssignmentSearchSchema>) => ({ ...prev, page }),
     });
   };
 
   const handleCreateNew = () => {
-    navigate({ to: '/instructor/assignments/new' as any });
+    navigate({ to: '/instructor/assignments/new' as never, search: {} as never });
   };
 
   return (
