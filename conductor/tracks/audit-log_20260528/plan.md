@@ -78,7 +78,7 @@
   - [x] Import logAuditEvent in `src/server/reviews.server.ts`
   - [x] Add audit call in submitReviewHandler for both pass and revise decisions
   - [x] Run tests and confirm they pass
-- [~] Task: Conductor - User Manual Verification 'Phase 5: Wire Assignment & Review Handlers' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Wire Assignment & Review Handlers' (Protocol in workflow.md)
 
 ## Phase 6: Wire Consultation Handlers
 
