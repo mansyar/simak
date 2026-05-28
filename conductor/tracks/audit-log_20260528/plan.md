@@ -50,19 +50,19 @@
 
 ## Phase 4: Wire Template Handlers
 
-- [ ] Task: Write template handler audit tests (Red Phase)
-  - [ ] Create test file `tests/unit/server/templates-audit.test.ts`
-  - [ ] Test createTemplateHandler writes `template.created` audit entry
-  - [ ] Test updateTemplateHandler writes `template.updated` audit entry
-  - [ ] Test deleteTemplateHandler writes `template.deleted` audit entry
-  - [ ] Run tests and confirm they fail
-- [ ] Task: Wire template handlers to audit log (Green Phase)
-  - [ ] Import logAuditEvent in `src/server/templates.server.ts`
-  - [ ] Add audit call in createTemplateHandler after successful insert
-  - [ ] Add audit call in updateTemplateHandler after successful update
-  - [ ] Add audit call in deleteTemplateHandler after soft-delete
-  - [ ] Run tests and confirm they pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Wire Template Handlers' (Protocol in workflow.md)
+- [x] Task: Write template handler audit tests (Red Phase) c162496
+  - [x] Create test file `tests/unit/server/templates-audit.test.ts`
+  - [x] Test createTemplateHandler writes `template.created` audit entry
+  - [x] Test updateTemplateHandler writes `template.updated` audit entry
+  - [x] Test deleteTemplateHandler writes `template.deleted` audit entry
+  - [x] Run tests and confirm they fail
+- [x] Task: Wire template handlers to audit log (Green Phase) c162496
+  - [x] Import logAuditEvent in `src/server/templates.server.ts`
+  - [x] Add audit call in createTemplateHandler after successful insert
+  - [x] Add audit call in updateTemplateHandler after successful update
+  - [x] Add audit call in deleteTemplateHandler after soft-delete
+  - [x] Run tests and confirm they pass
+- [~] Task: Conductor - User Manual Verification 'Phase 4: Wire Template Handlers' (Protocol in workflow.md)
 
 ## Phase 5: Wire Assignment & Review Handlers
 
