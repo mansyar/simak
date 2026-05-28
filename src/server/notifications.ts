@@ -19,7 +19,7 @@ export const ListNotificationsSchema = z.object({
 });
 
 export const createNotification = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { createNotificationHandler } = await import('./notifications.server');
     const data = CreateNotificationSchema.parse(args.data);
     return createNotificationHandler({ data });
@@ -27,7 +27,7 @@ export const createNotification = createServerFn({ method: 'POST' }).handler(
 );
 
 export const listNotifications = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { listNotificationsHandler } = await import('./notifications.server');
     const data = ListNotificationsSchema.parse(args.data);
     return listNotificationsHandler({ data });
@@ -44,14 +44,16 @@ export const MarkAllReadSchema = z.object({});
 
 export const GetUnreadCountSchema = z.object({});
 
-export const markRead = createServerFn({ method: 'POST' }).handler(async (args: { data: any }) => {
-  const { markReadHandler } = await import('./notifications.server');
-  const data = MarkReadSchema.parse(args.data);
-  return markReadHandler({ data });
-});
+export const markRead = createServerFn({ method: 'POST' }).handler(
+  async (args: { data: unknown }) => {
+    const { markReadHandler } = await import('./notifications.server');
+    const data = MarkReadSchema.parse(args.data);
+    return markReadHandler({ data });
+  },
+);
 
 export const markAllRead = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { markAllReadHandler } = await import('./notifications.server');
     const data = MarkAllReadSchema.parse(args.data);
     return markAllReadHandler({ data });
@@ -59,7 +61,7 @@ export const markAllRead = createServerFn({ method: 'POST' }).handler(
 );
 
 export const getUnreadCount = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getUnreadCountHandler } = await import('./notifications.server');
     const data = GetUnreadCountSchema.parse(args.data);
     return getUnreadCountHandler({ data });
