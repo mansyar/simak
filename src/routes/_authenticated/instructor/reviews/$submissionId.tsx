@@ -34,9 +34,8 @@ interface ReviewDetailLoaderData {
 export const Route = createFileRoute('/_authenticated/instructor/reviews/$submissionId')({
   loader: async ({ params }): Promise<ReviewDetailLoaderData> => {
     try {
-      const data = await (getReviewDetail as any)({
-        data: { submissionId: Number(params.submissionId) },
-      });
+      // @ts-expect-error - handler type inference limitation
+      const data = await getReviewDetail({ data: { submissionId: Number(params.submissionId) } });
       return data as ReviewDetailLoaderData;
     } catch {
       return { error: 'Failed to load review detail' };
@@ -65,9 +64,10 @@ function ReviewDetailPage() {
       setTransitioned(true);
       let cancelled = false;
       (async () => {
-        await (openForReview as any)({
-          data: { submissionId: Number(params.submissionId) },
-        });
+        const openFn = openForReview as unknown as (args: {
+          data: { submissionId: number };
+        }) => Promise<unknown>;
+        await openFn({ data: { submissionId: Number(params.submissionId) } });
         if (cancelled) return;
         // Re-fetch detail after transition by navigating to self
         navigate({ replace: true });
