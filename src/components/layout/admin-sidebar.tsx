@@ -1,6 +1,6 @@
 import { useLocation, Link, useRouter } from '@tanstack/react-router';
 import { useI18n } from '../../routes/__root';
-import { LayoutDashboard, Users, FileType, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, Users, FileType, ScrollText, LogOut, X } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 
 interface AdminSidebarProps {
@@ -17,6 +17,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { to: '/admin/dashboard', label: 'adminSidebar.dashboard', icon: LayoutDashboard },
     { to: '/admin/users', label: 'adminSidebar.users', icon: Users },
     { to: '/admin/templates', label: 'adminSidebar.templates', icon: FileType },
+    { to: '/admin/audit-log', label: 'adminSidebar.auditLog', icon: ScrollText },
   ] as const;
 
   const handleLogout = async () => {

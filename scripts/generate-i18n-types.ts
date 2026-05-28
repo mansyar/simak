@@ -153,6 +153,25 @@ export type Translation = {
     dashboard: string
     users: string
     templates: string
+    auditLog: string
+  }
+  adminAuditLog: {
+    title: string
+    subtitle: string
+    searchPlaceholder: string
+    allActions: string
+    dateFrom: string
+    dateTo: string
+    empty: string
+    showing: string
+    auditTable: {
+      timestamp: string
+      action: string
+      actor: string
+      entityType: string
+      entityId: string
+      details: string
+    }
   }
   studentSidebar: {
     dashboard: string

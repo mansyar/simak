@@ -85,7 +85,26 @@
     "dashboard": "Dashboard",
     "users": "Users",
     "templates": "Templates",
+    "auditLog": "Audit Log",
     "branding": "SIMAK Admin"
+  },
+  "adminAuditLog": {
+    "title": "Audit Log",
+    "subtitle": "View and search system-wide audit trail of all meaningful actions.",
+    "searchPlaceholder": "Search by entity ID or details...",
+    "allActions": "All Actions",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "empty": "No audit log entries found",
+    "showing": "Showing {from}-{to} of {total} entries",
+    "auditTable": {
+      "timestamp": "Timestamp",
+      "action": "Action",
+      "actor": "Actor",
+      "entityType": "Entity",
+      "entityId": "Entity ID",
+      "details": "Details"
+    }
   },
   "adminUsers": {
     "title": "Users",

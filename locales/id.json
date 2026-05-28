@@ -85,7 +85,26 @@
     "dashboard": "Dasbor",
     "users": "Pengguna",
     "templates": "Templat",
+    "auditLog": "Log Audit",
     "branding": "SIMAK Admin"
+  },
+  "adminAuditLog": {
+    "title": "Log Audit",
+    "subtitle": "Lihat dan cari jejak audit sistem dari semua tindakan penting.",
+    "searchPlaceholder": "Cari berdasarkan ID entitas atau detail...",
+    "allActions": "Semua Tindakan",
+    "dateFrom": "Dari",
+    "dateTo": "Sampai",
+    "empty": "Tidak ada entri log audit ditemukan",
+    "showing": "Menampilkan {from}-{to} dari {total} entri",
+    "auditTable": {
+      "timestamp": "Waktu",
+      "action": "Tindakan",
+      "actor": "Pelaku",
+      "entityType": "Entitas",
+      "entityId": "ID Entitas",
+      "details": "Detail"
+    }
   },
   "adminUsers": {
     "title": "Pengguna",
