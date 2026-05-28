@@ -61,6 +61,18 @@ Students and instructors lack a centralized system to:
 
 ## Completed Tracks
 
+### Track 1.1: Comprehensive Audit Log (May 2026)
+
+- **audit_log database table** — Serial PK, actor_id FK→users, action, entity_type, entity_id, details (jsonb), created_at with indexes on (created_at DESC), (action), (entity_type, entity_id)
+- **DB migration** — Generated with Drizzle Kit, applied to dev database
+- **logAuditEvent helper** (`src/lib/audit.ts`) — Single-import helper used across all handlers to write to audit_log
+- **Handler wiring** — All handlers log audit events: user.created/deleted, template.created/updated/deleted, assignment.created, review.passed/revised, consultation.verified/rejected
+- **Server functions** — `listAuditLogs` (paginated with filters) and `getAuditLogDetail` in `src/server/audit-logs.ts` and `audit-logs.server.ts`
+- **Admin audit log viewer** (`/admin/audit-log`) — Paginated table with Timestamp, Action badge, Actor, Entity Type, Entity ID, expandable Details JSON; filters by action type dropdown, date range pickers, free-text search
+- **Sidebar link** — 'Audit Log' link with ScrollText icon in admin sidebar
+- **i18n translations** — Full English and Indonesian translations for audit log UI including action type labels
+- **Tests** — Server handler tests and route component tests
+
 ### Track 1.3: Authentication & Authorization (May 2026)
 
 - **Better-Auth integration** with Drizzle ORM adapter and PostgreSQL-backed sessions
