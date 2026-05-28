@@ -3,20 +3,20 @@
 ## Phase 1: Database Schema & Migration
 
 - [x] Task: Write audit_log schema tests (Red Phase) a8a23f8
-  - [ ] Create test file `tests/unit/db/audit-log-schema.test.ts`
-  - [ ] Test table exists with correct columns (id, actorId, action, entityType, entityId, details, createdAt)
-  - [ ] Test foreign key constraint on actorId → users.id
-  - [ ] Test indexes exist (created_at, action, entity_type+entity_id)
-  - [ ] Run tests and confirm they fail
-- [ ] Task: Implement audit_log schema (Green Phase)
-  - [ ] Create `src/db/schema/audit-log.ts` with Drizzle table definition
-  - [ ] Add indexes using Drizzle's index() API
-  - [ ] Export from `src/db/schema/index.ts`
-  - [ ] Run tests and confirm they pass
-- [ ] Task: Generate and run migration
-  - [ ] Run `pnpm db:generate` to create migration SQL
-  - [ ] Run `pnpm db:push` to apply to dev database
-  - [ ] Verify table exists in database
+  - [x] Create test file `tests/unit/db/audit-log-schema.test.ts`
+  - [x] Test table exists with correct columns (id, actorId, action, entityType, entityId, details, createdAt)
+  - [x] Test foreign key constraint on actorId → users.id
+  - [x] Test indexes exist (created_at, action, entity_type+entity_id)
+  - [x] Run tests and confirm they fail
+- [x] Task: Implement audit_log schema (Green Phase) a8a23f8
+  - [x] Create `src/db/schema/audit-log.ts` with Drizzle table definition
+  - [x] Add indexes using Drizzle's index() API
+  - [x] Export from `src/db/schema/index.ts`
+  - [x] Run tests and confirm they pass
+- [x] Task: Generate and run migration a8a23f8
+  - [x] Run `pnpm db:generate` to create migration SQL
+  - [x] Run `pnpm db:push` to apply to dev database
+  - [x] Verify table exists in database
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Schema & Migration' (Protocol in workflow.md)
 
 ## Phase 2: Audit Log Helper
