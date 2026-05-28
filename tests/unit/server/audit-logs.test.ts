@@ -122,12 +122,26 @@ describe('Audit log handlers', () => {
   ];
 
   const adminSession = {
-    user: { id: 'admin-1', role: 'superadmin' as const },
+    user: {
+      id: 'admin-1',
+      name: 'Admin',
+      email: 'admin@test.com',
+      role: 'superadmin' as const,
+      locale: 'en',
+      emailVerified: true,
+    },
     session: {} as any,
   };
 
   const nonAdminSession = {
-    user: { id: 'student-1', role: 'student' as const },
+    user: {
+      id: 'student-1',
+      name: 'Student',
+      email: 'student@test.com',
+      role: 'student' as const,
+      locale: 'en',
+      emailVerified: true,
+    },
     session: {} as any,
   };
 
@@ -155,7 +169,7 @@ describe('Audit log handlers', () => {
 
       const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
       const result = await listAuditLogsHandler({
-        data: { page: 1, limit: 20 },
+        data: { page: 1, limit: 20, action: '', dateFrom: '', dateTo: '', search: '' },
       });
 
       expect(result).toBeDefined();
@@ -167,7 +181,11 @@ describe('Audit log handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(nonAdminSession);
 
       const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
-      await expect(listAuditLogsHandler({ data: { page: 1, limit: 20 } })).rejects.toThrow();
+      await expect(
+        listAuditLogsHandler({
+          data: { page: 1, limit: 20, action: '', dateFrom: '', dateTo: '', search: '' },
+        }),
+      ).rejects.toThrow();
     });
 
     it('should filter by action type', async () => {
@@ -180,7 +198,7 @@ describe('Audit log handlers', () => {
 
       const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
       const result = await listAuditLogsHandler({
-        data: { page: 1, limit: 20, action: 'user.created' },
+        data: { page: 1, limit: 20, action: 'user.created', dateFrom: '', dateTo: '', search: '' },
       });
 
       expect(result.entries.every((e: any) => e.action === 'user.created')).toBe(true);
@@ -194,7 +212,7 @@ describe('Audit log handlers', () => {
 
       const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
       const result = await listAuditLogsHandler({
-        data: { page: 1, limit: 20 },
+        data: { page: 1, limit: 20, action: '', dateFrom: '', dateTo: '', search: '' },
       });
 
       expect(result.entries).toHaveLength(0);

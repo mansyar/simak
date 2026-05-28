@@ -79,7 +79,21 @@ export async function listAuditLogsHandler(input: ListAuditLogsInput) {
   const [countResult, entries] = await Promise.all([countQuery, dataQuery]);
   const total = Number(countResult[0]?.total ?? 0);
 
-  return { entries, total, page, limit };
+  // Cast entries to a serializable format for TanStack Start
+  return {
+    entries: entries.map((entry) => ({
+      id: entry.id,
+      actorId: entry.actorId,
+      action: entry.action,
+      entityType: entry.entityType,
+      entityId: entry.entityId,
+      details: entry.details as Record<string, string | number | boolean | null> | null,
+      createdAt: entry.createdAt?.toISOString() ?? null,
+    })),
+    total,
+    page,
+    limit,
+  };
 }
 
 export async function getAuditLogDetailHandler(input: GetAuditLogDetailInput) {
@@ -101,5 +115,14 @@ export async function getAuditLogDetailHandler(input: GetAuditLogDetailInput) {
     throw new Error('Audit log entry not found');
   }
 
-  return result[0];
+  const entry = result[0];
+  return {
+    id: entry.id,
+    actorId: entry.actorId,
+    action: entry.action,
+    entityType: entry.entityType,
+    entityId: entry.entityId,
+    details: entry.details as Record<string, string | number | boolean | null> | null,
+    createdAt: entry.createdAt?.toISOString() ?? null,
+  };
 }

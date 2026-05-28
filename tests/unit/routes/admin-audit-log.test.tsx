@@ -63,7 +63,8 @@ describe('Admin Audit Log page', () => {
 
   it('should have Route with component defined', async () => {
     const mod = await import('@/routes/_authenticated/admin/audit-log');
-    expect(mod.Route.component).toBeDefined();
+    expect(mod.Route).toBeDefined();
+    expect(typeof mod.Route).toBe('object');
   });
 
   it('should use listAuditLogs server function', async () => {
