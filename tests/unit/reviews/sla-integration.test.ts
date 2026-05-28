@@ -38,6 +38,10 @@ vi.mock('@/lib/sla', () => ({
   calculateBreachDuration: vi.fn(),
 }));
 
+vi.mock('@/lib/audit', () => ({
+  logAuditEvent: vi.fn(),
+}));
+
 vi.mock('@/lib/storage', () => ({
   generateFileKey: vi.fn().mockReturnValue('feedback/test-uuid.pdf'),
   generatePresignedUploadUrl: vi.fn().mockResolvedValue('https://presigned-upload.test/url'),

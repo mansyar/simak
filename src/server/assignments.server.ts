@@ -5,6 +5,7 @@ import { assignments, assignmentStudents, checkpoints } from '../db/schema/assig
 import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
+import { logAuditEvent } from '../lib/audit';
 import { consultations } from '../db/schema/consultations';
 import type { z } from 'zod';
 import type {
@@ -93,6 +94,15 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
       }
 
       return { success: true, assignmentId };
+    });
+
+    const assignmentId = result.assignmentId;
+    await logAuditEvent({
+      actorId: session.user.id,
+      action: 'assignment.created',
+      entityType: 'assignment',
+      entityId: String(assignmentId),
+      details: { templateId, studentCount: studentIds.length, deadline: finalDeadline },
     });
 
     return result;
@@ -273,283 +283,9 @@ export async function getAssignmentDetailHandler(args: { data: AssignmentIdParam
   };
 }
 
-// ---- Manual Deadline Management Handlers ----
-
-/**
- * Unlock a locked checkpoint.
- * Only the assignment owner (instructor) can unlock checkpoints in their assignment.
- * Transitions checkpoint from 'locked' to 'unlocked' regardless of blocking reasons.
- */
-export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInput }) {
-  const session = await getSessionFromHeaders();
-  if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
-  }
-
-  const { checkpointId } = args.data;
-  const db = getDb();
-
-  // 1. Fetch checkpoint with assignment info (verify ownership via instructorId)
-  const [checkpoint] = await db
-    .select({
-      id: checkpoints.id,
-      state: checkpoints.state,
-      assignmentInstructorId: assignments.instructorId,
-    })
-    .from(checkpoints)
-    .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-    .where(and(eq(checkpoints.id, checkpointId), isNull(assignments.deletedAt)))
-    .limit(1);
-
-  if (!checkpoint) {
-    return { error: 'Checkpoint not found' };
-  }
-
-  // Verify ownership
-  if (checkpoint.assignmentInstructorId !== session.user.id) {
-    return { error: 'Checkpoint not found' };
-  }
-
-  // 2. Verify checkpoint is in locked state
-  if (checkpoint.state !== 'locked') {
-    return { error: 'Checkpoint is not in locked state' };
-  }
-
-  // 3. Transition to unlocked
-  await db
-    .update(checkpoints)
-    .set({ state: 'unlocked', updatedAt: new Date() })
-    .where(eq(checkpoints.id, checkpointId));
-
-  return { success: true };
-}
-
-/**
- * Extend a checkpoint's due date.
- * Only the assignment owner (instructor) can extend checkpoints in their assignment.
- * Can extend any checkpoint regardless of state.
- */
-export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput }) {
-  const session = await getSessionFromHeaders();
-  if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
-  }
-
-  const { checkpointId, newDueDate } = args.data;
-  const db = getDb();
-
-  // 1. Fetch checkpoint with assignment info (verify ownership via instructorId)
-  const [checkpoint] = await db
-    .select({
-      id: checkpoints.id,
-      assignmentInstructorId: assignments.instructorId,
-    })
-    .from(checkpoints)
-    .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-    .where(and(eq(checkpoints.id, checkpointId), isNull(assignments.deletedAt)))
-    .limit(1);
-
-  if (!checkpoint) {
-    return { error: 'Checkpoint not found' };
-  }
-
-  // Verify ownership
-  if (checkpoint.assignmentInstructorId !== session.user.id) {
-    return { error: 'Checkpoint not found' };
-  }
-
-  // 2. Update dueDate and updatedAt
-  await db
-    .update(checkpoints)
-    .set({ dueDate: newDueDate, updatedAt: new Date() })
-    .where(eq(checkpoints.id, checkpointId));
-
-  return { success: true };
-}
-
-// ---- Student Helpers ----
-
-function isStudent(session: any): session is { user: { id: string; role: string }; session: any } {
-  return !!session && session.user.role === 'student';
-}
-
-// ---- Student Assignment Handlers ----
-
-export async function listStudentAssignmentsHandler(args: { data: ListStudentAssignmentsInput }) {
-  const session = await getSessionFromHeaders();
-  if (!isStudent(session)) {
-    return { assignments: [], total: 0 };
-  }
-
-  const { search, page, limit } = args.data;
-  const db = getDb();
-
-  // Build conditions: assigned to this student, not deleted
-  const conditions = [isNull(assignments.deletedAt)];
-
-  if (search) {
-    conditions.push(sql`${assignments.title} ILIKE ${'%' + search + '%'}`);
-  }
-
-  // Fetch assignments through the assignmentStudents join
-  const rawAssignments = await db
-    .select({
-      id: assignments.id,
-      title: assignments.title,
-      description: assignments.description,
-      finalDeadline: assignments.finalDeadline,
-      createdAt: assignments.createdAt,
-      templateName: assignmentTemplates.name,
-      templateType: assignmentTemplates.type,
-      studentId: assignmentStudents.studentId,
-    })
-    .from(assignmentStudents)
-    .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
-    .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-    .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions))
-    .orderBy(assignments.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
-
-  // Fetch total count for pagination
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(assignmentStudents)
-    .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
-    .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions));
-
-  return {
-    assignments: rawAssignments.map((a) => ({
-      id: a.id,
-      title: a.title,
-      description: a.description,
-      finalDeadline: a.finalDeadline,
-      createdAt: a.createdAt,
-      templateName: a.templateName,
-      templateType: a.templateType,
-    })),
-    total: Number(count),
-  };
-}
-
-export async function getStudentAssignmentDetailHandler(args: { data: StudentAssignmentIdParam }) {
-  const session = await getSessionFromHeaders();
-  if (!isStudent(session)) {
-    return null;
-  }
-
-  const { id } = args.data;
-  const db = getDb();
-
-  // 1. Verify the student is assigned to this assignment via assignmentStudents join
-  const [assignmentData] = await db
-    .select({
-      id: assignments.id,
-      title: assignments.title,
-      description: assignments.description,
-      finalDeadline: assignments.finalDeadline,
-      createdAt: assignments.createdAt,
-      instructorName: users.name,
-      templateName: assignmentTemplates.name,
-      templateType: assignmentTemplates.type,
-    })
-    .from(assignmentStudents)
-    .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
-    .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-    .innerJoin(users, eq(assignments.instructorId, users.id))
-    .where(
-      and(
-        eq(assignmentStudents.studentId, session.user.id),
-        eq(assignments.id, id),
-        isNull(assignments.deletedAt),
-      ),
-    )
-    .limit(1);
-
-  if (!assignmentData) {
-    return null;
-  }
-
-  // 2. Fetch checkpoints for this student & assignment, with consultation counts
-  const checkpointsWithConsults = await db
-    .select({
-      id: checkpoints.id,
-      name: checkpoints.name,
-      order: checkpoints.order,
-      state: checkpoints.state,
-      dueDate: checkpoints.dueDate,
-      minConsultations: checkpoints.minConsultations,
-      verifiedConsultationCount: sql<number>`COALESCE(COUNT(CASE WHEN ${consultations.status} = 'verified' THEN 1 END), 0)::int`,
-    })
-    .from(checkpoints)
-    .leftJoin(
-      consultations,
-      and(
-        eq(consultations.checkpointId, checkpoints.id),
-        eq(consultations.studentId, session.user.id),
-      ),
-    )
-    .where(and(eq(checkpoints.assignmentId, id), eq(checkpoints.studentId, session.user.id)))
-    .groupBy(
-      checkpoints.id,
-      checkpoints.name,
-      checkpoints.order,
-      checkpoints.state,
-      checkpoints.dueDate,
-      checkpoints.minConsultations,
-    )
-    .orderBy(checkpoints.order);
-
-  // 3. Calculate progress
-  const totalCheckpointsCount = checkpointsWithConsults.length;
-  const passedCount = checkpointsWithConsults.filter((cp) => cp.state === 'passed').length;
-  const progressPercent =
-    totalCheckpointsCount > 0 ? Math.round((passedCount / totalCheckpointsCount) * 100) : 0;
-
-  // 4. Enrich checkpoints with blocking reasons
-  const enrichedCheckpoints = checkpointsWithConsults.map((cp, index) => {
-    const blockingReasons: string[] = [];
-
-    if (cp.state === 'locked') {
-      // Check if previous checkpoint is not passed
-      if (index > 0) {
-        const prev = checkpointsWithConsults[index - 1];
-        if (prev.state !== 'passed') {
-          blockingReasons.push('Previous checkpoint not passed');
-        }
-      }
-
-      // Check consultation requirements
-      const minConsults = cp.minConsultations ?? 0;
-      if (minConsults > 0 && cp.verifiedConsultationCount < minConsults) {
-        blockingReasons.push(
-          `Insufficient consultations: ${cp.verifiedConsultationCount}/${minConsults} verified`,
-        );
-      }
-    }
-
-    return {
-      id: cp.id,
-      name: cp.name,
-      order: cp.order,
-      state: cp.state,
-      dueDate: cp.dueDate,
-      minConsultations: cp.minConsultations,
-      verifiedConsultationCount: cp.verifiedConsultationCount,
-      blockingReasons: blockingReasons.length > 0 ? blockingReasons : undefined,
-    };
-  });
-
-  return {
-    id: assignmentData.id,
-    title: assignmentData.title,
-    description: assignmentData.description,
-    finalDeadline: assignmentData.finalDeadline,
-    createdAt: assignmentData.createdAt,
-    instructorName: assignmentData.instructorName,
-    templateName: assignmentData.templateName,
-    templateType: assignmentData.templateType,
-    progressPercent,
-    checkpoints: enrichedCheckpoints,
-  };
-}
+export {
+  unlockCheckpointHandler,
+  extendDeadlineHandler,
+  listStudentAssignmentsHandler,
+  getStudentAssignmentDetailHandler,
+} from './assignments-extras.server';
