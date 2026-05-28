@@ -1,7 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { listStudentAssignments } from '@/server/assignments';
-import { StudentAssignmentCard } from '@/components/student/assignments/StudentAssignmentCard';
+import {
+  StudentAssignmentCard,
+  StudentAssignmentRow,
+} from '@/components/student/assignments/StudentAssignmentCard';
 import { StudentAssignmentFilters } from '@/components/student/assignments/StudentAssignmentFilters';
 import { StudentAssignmentEmptyState } from '@/components/student/assignments/StudentAssignmentEmptyState';
 import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
@@ -25,7 +28,8 @@ export const Route = createFileRoute('/_authenticated/student/assignments/')({
     search: search.search,
   }),
   loader: async ({ deps }) => {
-    return (listStudentAssignments as any)({ data: deps });
+    // @ts-expect-error - listStudentAssignments handler type inference limitation
+    return listStudentAssignments({ data: deps });
   },
   pendingComponent: () => <StudentAssignmentLoadingSkeleton />,
   component: AssignmentsPage,
@@ -33,22 +37,26 @@ export const Route = createFileRoute('/_authenticated/student/assignments/')({
 
 function AssignmentsPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as any;
+  const data = Route.useLoaderData() as
+    | { assignments: StudentAssignmentRow[]; total: number }
+    | undefined;
   const assignments = data?.assignments ?? [];
   const total = data?.total ?? 0;
-  const searchParams = Route.useSearch() as any;
-  const navigate = Route.useNavigate() as any;
+  const searchParams = Route.useSearch();
+  const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  type StudentSearchParams = z.infer<typeof AssignmentSearchSchema>;
 
   const handleSearchChange = (value: string) => {
     navigate({
-      search: (prev: any) => ({ ...prev, search: value, page: 1 }),
+      search: (prev: StudentSearchParams) => ({ ...prev, search: value, page: 1 }),
     });
   };
 
   const handlePageChange = (page: number) => {
     navigate({
-      search: (prev: any) => ({ ...prev, page }),
+      search: (prev: StudentSearchParams) => ({ ...prev, page }),
     });
   };
 
@@ -67,7 +75,7 @@ function AssignmentsPage() {
             size="icon"
             onClick={() => {
               setIsRefreshing(true);
-              navigate({ search: (prev: any) => prev });
+              navigate({ search: (prev: StudentSearchParams) => prev });
               setTimeout(() => setIsRefreshing(false), 1000);
             }}
             disabled={isRefreshing}
@@ -83,7 +91,7 @@ function AssignmentsPage() {
         <StudentAssignmentEmptyState />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {assignments.map((assignment: any) => (
+          {assignments.map((assignment: StudentAssignmentRow) => (
             <StudentAssignmentCard key={assignment.id} assignment={assignment} />
           ))}
         </div>
