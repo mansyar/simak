@@ -17,7 +17,7 @@ export const GetAuditLogDetailSchema = z.object({
 });
 
 export const listAuditLogs = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { listAuditLogsHandler } = await import('./audit-logs.server');
     const data = ListAuditLogsSchema.parse(args.data);
     return listAuditLogsHandler({ data });
@@ -25,7 +25,7 @@ export const listAuditLogs = createServerFn({ method: 'GET' }).handler(
 );
 
 export const getAuditLogDetail = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getAuditLogDetailHandler } = await import('./audit-logs.server');
     const data = GetAuditLogDetailSchema.parse(args.data);
     return getAuditLogDetailHandler({ data });
