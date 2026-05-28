@@ -46,7 +46,7 @@
   - [x] Add audit call in createUserHandler after successful insert
   - [x] Add audit call in deleteUserHandler after soft-delete
   - [x] Run tests and confirm they pass
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Wire User Handlers' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Wire User Handlers' (Protocol in workflow.md)
 
 ## Phase 4: Wire Template Handlers
 
