@@ -35,7 +35,11 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
 
       setIsUploadingFeedback(true);
       try {
-        const uploadData = await (getPresignedReviewFeedbackUploadUrl as any)({
+        const uploadData = await (
+          getPresignedReviewFeedbackUploadUrl as unknown as (args: {
+            data: { extension: string; contentType: string };
+          }) => Promise<{ uploadUrl: string; fileKey: string; error?: string }>
+        )({
           data: { extension, contentType },
         });
 
@@ -77,7 +81,17 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
 
     setIsSubmitting(true);
     try {
-      const result = await (submitReview as any)({
+      const result = await (
+        submitReview as unknown as (args: {
+          data: {
+            submissionId: number;
+            decision: 'pass' | 'revise';
+            comment: string;
+            feedbackFileKey?: string;
+            revisionDeadline?: string;
+          };
+        }) => Promise<{ error?: string }>
+      )({
         data: {
           submissionId,
           decision,
