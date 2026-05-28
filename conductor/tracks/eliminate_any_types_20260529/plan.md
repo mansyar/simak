@@ -19,23 +19,23 @@
 
 **Objective:** Replace `session: any` with the shared `NonNullableSession` type in all server handler files.
 
-- [ ] Task: Fix `src/server/submissions.server.ts` — `isStudent(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/server/files.server.ts` — `isStudent(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/server/consultations.server.ts` — `isStudent(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/server/reviews.server.ts` — `isInstructor(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/server/reviews-extras.server.ts` — `isInstructor(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/server/assignments.server.ts` — session type guard → use `NonNullableSession`
-- [ ] Task: Fix `src/server/assignments-extras.server.ts` — `isInstructor(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/server/templates.server.ts` — `isAdmin(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/server/notifications.server.ts` — `isAdmin(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/server/dashboard-admin.server.ts` — `isAdmin(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/server/dashboard-student.server.ts` — `isStudent(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/server/dashboard-instructor.server.ts` — `isInstructor(session: any)` → use `NonNullableSession`
-- [ ] Task: Fix `src/lib/review-sla.ts` — `tx: any, db: any` → use proper types from `drizzle-orm`
-- [ ] Task: Verify all changes compile
-  - [ ] Run `pnpm typecheck` — must pass
-  - [ ] Run `pnpm test` — must pass
-- [ ] Task: Conductor — User Manual Verification 'Phase 2: Fix .server.ts Type Guards' (Protocol in workflow.md)
+- [x] Task: Fix `src/server/submissions.server.ts` — `isStudent(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/server/files.server.ts` — `isStudent(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/server/consultations.server.ts` — `isStudent(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/server/reviews.server.ts` — `isInstructor(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/server/reviews-extras.server.ts` — `isInstructor(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/server/assignments.server.ts` — session type guard → use `NonNullableSession`
+- [x] Task: Fix `src/server/assignments-extras.server.ts` — `isInstructor(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/server/templates.server.ts` — `isAdmin(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/server/notifications.server.ts` — `isAdmin(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/server/dashboard-admin.server.ts` — `isAdmin(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/server/dashboard-student.server.ts` — `isStudent(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/server/dashboard-instructor.server.ts` — `isInstructor(session: any)` → use `NonNullableSession`
+- [x] Task: Fix `src/lib/review-sla.ts` — `tx: any, db: any` → use proper types from `drizzle-orm`
+- [x] Task: Verify all changes compile
+  - [x] Run `pnpm typecheck` — must pass
+  - [x] Run `pnpm test` — must pass
+- [~] Task: Conductor — User Manual Verification 'Phase 2: Fix .server.ts Type Guards' (Protocol in workflow.md)
 
 ## Phase 3: Fix Server Stub Files — `args: { data: any }`
 
