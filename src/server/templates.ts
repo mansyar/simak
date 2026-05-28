@@ -32,7 +32,7 @@ export const TemplateIdParamSchema = z.object({
 });
 
 export const listTemplates = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { listTemplatesHandler } = await import('./templates.server');
     const data = ListTemplatesSchema.parse(args.data);
     return listTemplatesHandler({ data });
@@ -40,7 +40,7 @@ export const listTemplates = createServerFn({ method: 'GET' }).handler(
 );
 
 export const getTemplate = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getTemplateHandler } = await import('./templates.server');
     const data = TemplateIdParamSchema.parse(args.data);
     return getTemplateHandler({ data });
@@ -48,7 +48,7 @@ export const getTemplate = createServerFn({ method: 'GET' }).handler(
 );
 
 export const createTemplate = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { createTemplateHandler } = await import('./templates.server');
     const data = CreateTemplateSchema.parse(args.data);
     return createTemplateHandler({ data });
@@ -56,7 +56,7 @@ export const createTemplate = createServerFn({ method: 'POST' }).handler(
 );
 
 export const updateTemplate = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { updateTemplateHandler } = await import('./templates.server');
     const data = UpdateTemplateSchema.extend({ id: z.coerce.number().int().positive() }).parse(
       args.data,
@@ -66,7 +66,7 @@ export const updateTemplate = createServerFn({ method: 'POST' }).handler(
 );
 
 export const deleteTemplate = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { deleteTemplateHandler } = await import('./templates.server');
     const data = TemplateIdParamSchema.parse(args.data);
     return deleteTemplateHandler({ data });
@@ -74,7 +74,7 @@ export const deleteTemplate = createServerFn({ method: 'POST' }).handler(
 );
 
 export const duplicateTemplate = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { duplicateTemplateHandler } = await import('./templates.server');
     const data = TemplateIdParamSchema.parse(args.data);
     return duplicateTemplateHandler({ data });
