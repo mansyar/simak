@@ -61,7 +61,7 @@
 **Objective:** Remove all `as any`, `any[]`, and callback `: any` params from route files.
 
 - [x] Task: Fix `src/routes/_authenticated/admin/audit-log.tsx` — navigate search callbacks + map callback [a244865]
-- [ ] Task: Fix `src/routes/_authenticated/admin/users/index.tsx` — server fn calls + `as any` casts
+- [x] Task: Fix `src/routes/_authenticated/admin/users/index.tsx` — server fn calls + `as any` casts [ab9541d]
 - [ ] Task: Fix `src/routes/_authenticated/admin/templates/index.tsx` — server fn calls + `as any` casts
 - [ ] Task: Fix `src/routes/_authenticated/student/assignments/index.tsx` — navigate callbacks + map callback
 - [ ] Task: Fix `src/routes/_authenticated/student/assignments/$id.tsx` — loader data + params + server fn calls + `as any` casts
