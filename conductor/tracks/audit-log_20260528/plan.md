@@ -19,7 +19,7 @@
   - [x] Verify table exists in database
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Database Schema & Migration' (Protocol in workflow.md)
 
-## Phase 2: Audit Log Helper
+## Phase 2: Audit Log Helper [checkpoint: 1658fc6]
 
 - [x] Task: Write logAuditEvent helper tests (Red Phase) 505bf15
   - [x] Create test file `tests/unit/lib/audit.test.ts`
