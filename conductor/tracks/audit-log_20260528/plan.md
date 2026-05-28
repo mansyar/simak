@@ -36,17 +36,17 @@
 
 ## Phase 3: Wire User Handlers
 
-- [ ] Task: Write user handler audit tests (Red Phase)
-  - [ ] Create test file `tests/unit/server/users-audit.test.ts`
-  - [ ] Test createUserHandler writes `user.created` audit entry
-  - [ ] Test deleteUserHandler writes `user.deleted` audit entry
-  - [ ] Run tests and confirm they fail
-- [ ] Task: Wire user handlers to audit log (Green Phase)
-  - [ ] Import logAuditEvent in `src/server/users.server.ts`
-  - [ ] Add audit call in createUserHandler after successful insert
-  - [ ] Add audit call in deleteUserHandler after soft-delete
-  - [ ] Run tests and confirm they pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Wire User Handlers' (Protocol in workflow.md)
+- [x] Task: Write user handler audit tests (Red Phase) 0e0c447
+  - [x] Create test file `tests/unit/server/users-audit.test.ts`
+  - [x] Test createUserHandler writes `user.created` audit entry
+  - [x] Test deleteUserHandler writes `user.deleted` audit entry
+  - [x] Run tests and confirm they fail
+- [x] Task: Wire user handlers to audit log (Green Phase) 0e0c447
+  - [x] Import logAuditEvent in `src/server/users.server.ts`
+  - [x] Add audit call in createUserHandler after successful insert
+  - [x] Add audit call in deleteUserHandler after soft-delete
+  - [x] Run tests and confirm they pass
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Wire User Handlers' (Protocol in workflow.md)
 
 ## Phase 4: Wire Template Handlers
 
