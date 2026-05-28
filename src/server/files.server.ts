@@ -9,6 +9,7 @@ import {
   generatePresignedUploadUrl,
   generatePresignedDownloadUrl,
 } from '../lib/storage';
+import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
   GetPresignedUploadUrlSchema,
@@ -22,7 +23,7 @@ type GetPresignedReviewFeedbackUploadUrlInput = z.infer<
   typeof GetPresignedReviewFeedbackUploadUrlSchema
 >;
 
-function isStudent(session: any): session is { user: { id: string; role: string }; session: any } {
+function isStudent(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'student';
 }
 
@@ -120,8 +121,6 @@ export async function getPresignedReviewFeedbackUploadUrlHandler(args: {
   return { uploadUrl, fileKey };
 }
 
-function isInstructor(
-  session: any,
-): session is { user: { id: string; role: string }; session: any } {
+function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
 }
