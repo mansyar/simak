@@ -55,7 +55,11 @@ export function AssignmentWizard() {
     // Load student list so we have their names/emails for the summary screen
     async function loadStudents() {
       try {
-        const response = await (listUsers as any)({
+        const response = await (
+          listUsers as unknown as (args: {
+            data: { page: number; limit: number; search: string; role?: string };
+          }) => Promise<{ users: Student[] }>
+        )({
           data: { page: 1, limit: 200, search: '', role: 'student' },
         });
         if (response && response.users) {
@@ -140,7 +144,17 @@ export function AssignmentWizard() {
 
     try {
       setIsSubmitting(true);
-      const res = await (createAssignment as any)({
+      const res = await (
+        createAssignment as unknown as (args: {
+          data: {
+            templateId: number | undefined;
+            title: string;
+            description: string;
+            finalDeadline: string;
+            studentIds: string[];
+          };
+        }) => Promise<{ success: boolean; assignmentId: number; error?: string }>
+      )({
         data: {
           templateId: selectedTemplate?.id,
           title,
@@ -151,7 +165,7 @@ export function AssignmentWizard() {
       });
 
       if (res && res.success) {
-        navigate({ to: ('/instructor/assignments/' + res.assignmentId) as any });
+        navigate({ to: ('/instructor/assignments/' + res.assignmentId) as never });
       } else {
         setErrors({ submit: res?.error || 'Failed to create assignment' });
       }
@@ -388,14 +402,14 @@ export function AssignmentWizard() {
           variant="outline"
           onClick={
             currentStep === 1
-              ? () => navigate({ to: '/instructor/assignments' as any })
+              ? () => navigate({ to: '/instructor/assignments' as never })
               : handlePrev
           }
           disabled={isSubmitting}
           className="font-semibold"
         >
           <ChevronLeft className="mr-1.5 h-4 w-4" />
-          {currentStep === 1 ? t('common.cancel' as any) : t('instructorAssignments.wizard.prev')}
+          {currentStep === 1 ? t('common.cancel') : t('instructorAssignments.wizard.prev')}
         </Button>
 
         {currentStep < steps.length ? (
