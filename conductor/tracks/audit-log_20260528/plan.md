@@ -21,18 +21,18 @@
 
 ## Phase 2: Audit Log Helper
 
-- [ ] Task: Write logAuditEvent helper tests (Red Phase)
-  - [ ] Create test file `tests/unit/lib/audit.test.ts`
-  - [ ] Test writes correct row to audit_log table with all fields
-  - [ ] Test handles missing details gracefully (null)
-  - [ ] Test actorId is required (throws on missing)
-  - [ ] Run tests and confirm they fail
-- [ ] Task: Implement logAuditEvent helper (Green Phase)
-  - [ ] Create `src/lib/audit.ts` with logAuditEvent function
-  - [ ] Import getDb and auditLog schema
-  - [ ] Insert row with provided fields
-  - [ ] Run tests and confirm they pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Audit Log Helper' (Protocol in workflow.md)
+- [x] Task: Write logAuditEvent helper tests (Red Phase) 505bf15
+  - [x] Create test file `tests/unit/lib/audit.test.ts`
+  - [x] Test writes correct row to audit_log table with all fields
+  - [x] Test handles missing details gracefully (null)
+  - [x] Test actorId is required (throws on missing)
+  - [x] Run tests and confirm they fail
+- [x] Task: Implement logAuditEvent helper (Green Phase) 505bf15
+  - [x] Create `src/lib/audit.ts` with logAuditEvent function
+  - [x] Import getDb and auditLog schema
+  - [x] Insert row with provided fields
+  - [x] Run tests and confirm they pass
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Audit Log Helper' (Protocol in workflow.md)
 
 ## Phase 3: Wire User Handlers
 
