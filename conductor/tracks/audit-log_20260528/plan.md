@@ -96,18 +96,18 @@
 
 ## Phase 7: Admin Audit Log Viewer
 
-- [ ] Task: Write admin audit log viewer tests (Red Phase)
-  - [ ] Create test file `tests/unit/server/audit-logs.test.ts`
-  - [ ] Test listAuditLogs returns paginated entries
-  - [ ] Test listAuditLogs filters by action type
-  - [ ] Test listAuditLogs filters by date range
-  - [ ] Test non-admin cannot access (returns empty or error)
-  - [ ] Run tests and confirm they fail
-- [ ] Task: Implement admin audit log server functions (Green Phase)
-  - [ ] Create `src/server/audit-logs.ts` with Zod schemas and createServerFn stubs
-  - [ ] Create `src/server/audit-logs.server.ts` with handler implementations
-  - [ ] Implement listAuditLogsHandler with pagination and filters
-  - [ ] Run tests and confirm they pass
+- [x] Task: Write admin audit log viewer tests (Red Phase) 2f13562
+  - [x] Create test file `tests/unit/server/audit-logs.test.ts`
+  - [x] Test listAuditLogs returns paginated entries
+  - [x] Test listAuditLogs filters by action type
+  - [x] Test listAuditLogs filters by date range
+  - [x] Test non-admin cannot access (returns empty or error)
+  - [x] Run tests and confirm they fail
+- [x] Task: Implement admin audit log server functions (Green Phase) 2f13562
+  - [x] Create `src/server/audit-logs.ts` with Zod schemas and createServerFn stubs
+  - [x] Create `src/server/audit-logs.server.ts` with handler implementations
+  - [x] Implement listAuditLogsHandler with pagination and filters
+  - [x] Run tests and confirm they pass
 - [ ] Task: Write admin audit log page tests (Red Phase)
   - [ ] Create test file `tests/unit/routes/admin-audit-log.test.tsx`
   - [ ] Test page renders with audit log table
