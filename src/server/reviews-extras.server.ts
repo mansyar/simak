@@ -6,19 +6,18 @@ import { submissions, reviews } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { verifyCheckpointAccess } from './ownership';
+import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type { OpenForReviewSchema, GetLatestReviewSchema } from './reviews';
 
 type OpenForReviewInput = z.infer<typeof OpenForReviewSchema>;
 type GetLatestReviewInput = z.infer<typeof GetLatestReviewSchema>;
 
-function isInstructor(
-  session: any,
-): session is { user: { id: string; role: string }; session: any } {
+function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
 }
 
-function isStudent(session: any): session is { user: { id: string; role: string }; session: any } {
+function isStudent(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'student';
 }
 
