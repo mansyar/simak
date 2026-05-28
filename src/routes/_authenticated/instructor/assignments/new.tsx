@@ -16,7 +16,8 @@ function NewAssignmentPage() {
       <div className="flex flex-col gap-3">
         <div>
           <Link
-            to={'/instructor/assignments' as any}
+            to="/instructor/assignments"
+            search={{ page: 1, limit: 20, search: '' }}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
