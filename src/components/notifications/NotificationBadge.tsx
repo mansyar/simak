@@ -13,7 +13,7 @@ export function NotificationBadge({ onOpen }: { onOpen: () => void }) {
     <button
       type="button"
       onClick={onOpen}
-      className="relative rounded-full p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      className="relative rounded-full p-2 min-h-11 min-w-11 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       aria-label={t('notifications.viewNotifications')}
     >
       {hasUnread ? (

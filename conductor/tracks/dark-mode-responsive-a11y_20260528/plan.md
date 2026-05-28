@@ -42,37 +42,37 @@
   - [ ] Audit student routes: dashboard, assignments (index, $id, $id/checkpoints/$checkpointId)
 - [x] Task: Write failing tests for dark mode detection — verify CSS custom properties are applied (Red phase)
 - [x] Task: Implement fixes from audit findings; run tests to pass (Green phase)
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Dark Mode Theme Pass' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Dark Mode Theme Pass' (Protocol in workflow.md)
 
 ## Phase 2: Responsive Layout Pass
 
-- [ ] Task: Add responsive sidebar behavior
+- [x] Task: Add responsive sidebar behavior
   - [ ] Implement mobile sidebar collapse/hamburger menu for admin, instructor, student sidebars
   - [ ] Ensure sidebar transforms to bottom nav or drawer on small viewports
-- [ ] Task: Make auth pages responsive
+- [x] Task: Make auth pages responsive
   - [ ] Login, forgot-password, reset-password, setup-password — ensure forms are centered and usable at 320px
-- [ ] Task: Make dashboard pages responsive
+- [x] Task: Make dashboard pages responsive
   - [ ] Student dashboard — grid goes from 2-col → 1-col on mobile; deadline/reminder lists stack
   - [ ] Instructor dashboard — widgets stack vertically; review queue items use mobile-friendly layout
   - [ ] Admin dashboard — 6 metric cards go 2-col then 1-col; activity feed and alerts stack
-- [ ] Task: Make admin pages responsive
+- [x] Task: Make admin pages responsive
   - [ ] Admin users page — table horizontally scrolls; filters stack on mobile
   - [ ] Admin templates page — cards go 1-col on mobile; search/filter controls stack
-- [ ] Task: Make instructor pages responsive
+- [x] Task: Make instructor pages responsive
   - [ ] Assignments list — cards go 1-col
   - [ ] Assignment wizard — full-screen on mobile; step indicator adapts
   - [ ] Assignment detail — student progress table scrolls horizontally
   - [ ] Reviews list and detail — layout stacks on mobile
-- [ ] Task: Make student pages responsive
+- [x] Task: Make student pages responsive
   - [ ] Assignments list — cards go 1-col
   - [ ] Assignment detail — checkpoint timeline adapts to mobile (vertical layout)
   - [ ] Checkpoint submission page — file upload zone, version history, review result stack
-- [ ] Task: Ensure touch targets minimum 44x44px
+- [x] Task: Ensure touch targets minimum 44x44px
   - [ ] Audit all buttons, links, interactive elements for touch target size
   - [ ] Fix any undersized targets (add padding or min-height/width)
-- [ ] Task: Write failing tests for responsive behavior — verify no horizontal overflow at 320px (Red phase)
-- [ ] Task: Implement fixes from responsive audit; run tests to pass (Green phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Responsive Layout Pass' (Protocol in workflow.md)
+- [x] Task: Write failing tests for responsive behavior — verify no horizontal overflow at 320px (Red phase)
+- [x] Task: Implement fixes from responsive audit; run tests to pass (Green phase)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Responsive Layout Pass' (Protocol in workflow.md)
 
 ## Phase 3: Accessibility Pass
 
