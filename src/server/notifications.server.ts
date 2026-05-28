@@ -3,6 +3,7 @@ import { eq, and, desc, sql, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
+import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
   CreateNotificationSchema,
@@ -18,13 +19,11 @@ type MarkReadInput = z.infer<typeof MarkReadSchema>;
 type MarkAllReadInput = z.infer<typeof MarkAllReadSchema>;
 type GetUnreadCountInput = z.infer<typeof GetUnreadCountSchema>;
 
-function isAdmin(session: any): session is { user: { id: string; role: string }; session: any } {
+function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
 }
 
-function isAuthenticated(
-  session: any,
-): session is { user: { id: string; role: string }; session: any } {
+function isAuthenticated(session: NonNullableSession | null): session is NonNullableSession {
   return !!session;
 }
 
