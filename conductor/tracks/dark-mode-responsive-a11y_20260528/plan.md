@@ -74,7 +74,7 @@
 - [x] Task: Implement fixes from responsive audit; run tests to pass (Green phase)
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Responsive Layout Pass' (Protocol in workflow.md)
 
-## Phase 3: Accessibility Pass
+## Phase 3: Accessibility Pass [checkpoint: c3fd8f0]
 
 - [x] Task: Audit and fix keyboard navigation
   - [ ] Verify Tab order is logical across all pages
