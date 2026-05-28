@@ -58,7 +58,7 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
             return (
               <Link
                 key={link.to}
-                to={link.to as any}
+                to={link.to as never}
                 onClick={handleLinkClick}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
