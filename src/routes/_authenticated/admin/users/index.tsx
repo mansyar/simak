@@ -49,15 +49,17 @@ function UsersPage() {
   const createUserFn = useServerFn(createUser);
   const updateUserFn = useServerFn(updateUser);
 
+  type UserSearchParams = z.infer<typeof UserSearchSchema>;
+
   const handleSearchChange = (value: string) => {
     navigate({
-      search: (prev) => ({ ...prev, search: value, page: 1 }),
+      search: (prev: UserSearchParams) => ({ ...prev, search: value, page: 1 }),
     });
   };
 
   const handleRoleChange = (value: string) => {
     navigate({
-      search: (prev) => ({
+      search: (prev: UserSearchParams) => ({
         ...prev,
         role:
           value === 'all'
@@ -75,13 +77,15 @@ function UsersPage() {
 
   const handleDelete = async (user: UserRow) => {
     if (confirm(t('adminUsers.deleteConfirm', { name: user.name }))) {
-      await (deleteUserFn as any)({ data: { id: user.id } });
-      navigate({ search: (prev) => prev }); // Refresh
+      // @ts-expect-error - useServerFn type inference limitation
+      await deleteUserFn({ data: { id: user.id } });
+      navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
     }
   };
 
   const handleGenerateLink = async (user: UserRow) => {
-    const result = await (generateSetupLinkFn as any)({ data: { id: user.id } });
+    // @ts-expect-error - useServerFn type inference limitation
+    const result = await generateSetupLinkFn({ data: { id: user.id } });
     if ('url' in result) {
       alert(`Setup Link: ${result.url}`);
     } else {
@@ -90,20 +94,22 @@ function UsersPage() {
   };
 
   const handleCreateUser = async (values: Record<string, unknown>) => {
-    const result = await (createUserFn as any)({ data: values });
+    // @ts-expect-error - useServerFn type inference limitation
+    const result = await createUserFn({ data: values });
     if (result.error) {
       alert(`${t('common.error')}: ${result.error}`);
     } else {
-      navigate({ search: (prev) => prev }); // Refresh
+      navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
     }
   };
 
   const handleUpdateUser = async (id: string, values: Record<string, unknown>) => {
-    const result = await (updateUserFn as any)({ data: { ...values, id } });
+    // @ts-expect-error - useServerFn type inference limitation
+    const result = await updateUserFn({ data: { ...values, id } });
     if (result.error) {
       alert(`${t('common.error')}: ${result.error}`);
     } else {
-      navigate({ search: (prev) => prev }); // Refresh
+      navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
     }
   };
 
@@ -120,7 +126,7 @@ function UsersPage() {
             size="icon"
             onClick={() => {
               setIsRefreshing(true);
-              navigate({ search: (prev) => prev });
+              navigate({ search: (prev: UserSearchParams) => prev });
               setTimeout(() => setIsRefreshing(false), 1500);
             }}
             disabled={isRefreshing}
@@ -155,8 +161,7 @@ function UsersPage() {
       />
 
       <UserTable
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data={users as any}
+        data={users as UserRow[]}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onGenerateLink={handleGenerateLink}
@@ -171,7 +176,12 @@ function UsersPage() {
             variant="outline"
             size="sm"
             onClick={() =>
-              navigate({ search: (prev) => ({ ...prev, page: Math.max(1, (prev.page || 1) - 1) }) })
+              navigate({
+                search: (prev: UserSearchParams) => ({
+                  ...prev,
+                  page: Math.max(1, (prev.page || 1) - 1),
+                }),
+              })
             }
             disabled={searchParams.page <= 1}
           >
@@ -181,7 +191,9 @@ function UsersPage() {
             variant="outline"
             size="sm"
             onClick={() =>
-              navigate({ search: (prev) => ({ ...prev, page: (prev.page || 1) + 1 }) })
+              navigate({
+                search: (prev: UserSearchParams) => ({ ...prev, page: (prev.page || 1) + 1 }),
+              })
             }
             disabled={searchParams.page * searchParams.limit >= total}
           >
