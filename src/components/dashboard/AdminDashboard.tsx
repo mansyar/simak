@@ -212,7 +212,7 @@ export function AdminDashboard({ data }: Props) {
       <WidgetCard title={t('adminDashboard.quickActions')}>
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
-            to={'/admin/users' as any}
+            to={'/admin/users' as never}
             className="flex items-center gap-3 rounded-lg border p-4 hover:bg-accent/50 transition-colors"
           >
             <UserPlus className="h-5 w-5 text-primary" />
@@ -224,7 +224,7 @@ export function AdminDashboard({ data }: Props) {
             </div>
           </Link>
           <Link
-            to={'/admin/templates' as any}
+            to={'/admin/templates' as never}
             className="flex items-center gap-3 rounded-lg border p-4 hover:bg-accent/50 transition-colors"
           >
             <FileType className="h-5 w-5 text-primary" />
