@@ -4,6 +4,7 @@ import { getDb } from '../db/index';
 import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates';
 import { assignments } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
+import { logAuditEvent } from '../lib/audit';
 import type { z } from 'zod';
 import type {
   CreateTemplateSchema,
@@ -181,6 +182,14 @@ export async function createTemplateHandler(args: { data: CreateTemplateInput })
     .returning({ id: assignmentTemplates.id })
     .then((rows: any) => rows);
 
+  await logAuditEvent({
+    actorId: session.user.id,
+    action: 'template.created',
+    entityType: 'template',
+    entityId: inserted.id.toString(),
+    details: { name, type, checkpointCount: checkpoints.length },
+  });
+
   // Insert checkpoint rows with sequential order
   const checkpointRows = checkpoints.map((cp, index) => ({
     templateId: inserted.id,
@@ -224,6 +233,14 @@ export async function updateTemplateHandler(args: { data: UpdateTemplateInput & 
 
   await db.insert(templateCheckpoints).values(checkpointRows);
 
+  await logAuditEvent({
+    actorId: session.user.id,
+    action: 'template.updated',
+    entityType: 'template',
+    entityId: id.toString(),
+    details: { name, type, checkpointCount: checkpoints.length },
+  });
+
   return { success: true };
 }
 
@@ -251,6 +268,13 @@ export async function deleteTemplateHandler(args: { data: TemplateIdParam }) {
     .update(assignmentTemplates)
     .set({ deletedAt: new Date() })
     .where(eq(assignmentTemplates.id, id));
+
+  await logAuditEvent({
+    actorId: session.user.id,
+    action: 'template.deleted',
+    entityType: 'template',
+    entityId: id.toString(),
+  });
 
   return { success: true };
 }
