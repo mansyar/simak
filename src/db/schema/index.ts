@@ -8,6 +8,7 @@ export * from './assignments';
 export * from './submissions';
 export * from './consultations';
 export * from './notifications';
+export * from './audit-log';
 
 // Import tables for relations
 import { users } from './users';

@@ -29,6 +29,13 @@
       "when": 1779220000000,
       "tag": "0003_consultation_min_consultations",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780166400000,
+      "tag": "0004_audit_log",
+      "breakpoints": true
     }
   ]
 }
