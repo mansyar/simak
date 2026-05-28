@@ -6,8 +6,9 @@ import { assignmentTemplates } from '../db/schema/templates';
 import { submissions } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
+import type { NonNullableSession } from '../lib/types';
 
-function isStudent(session: any): session is { user: { id: string; role: string }; session: any } {
+function isStudent(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'student';
 }
 
