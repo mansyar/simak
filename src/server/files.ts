@@ -13,7 +13,7 @@ export const GetPresignedDownloadUrlSchema = z.object({
 });
 
 export const getPresignedUploadUrl = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getPresignedUploadUrlHandler } = await import('./files.server');
     const data = GetPresignedUploadUrlSchema.parse(args.data);
     return getPresignedUploadUrlHandler({ data });
@@ -21,7 +21,7 @@ export const getPresignedUploadUrl = createServerFn({ method: 'GET' }).handler(
 );
 
 export const getPresignedDownloadUrl = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getPresignedDownloadUrlHandler } = await import('./files.server');
     const data = GetPresignedDownloadUrlSchema.parse(args.data);
     return getPresignedDownloadUrlHandler({ data });
@@ -34,7 +34,7 @@ export const GetPresignedReviewFeedbackUploadUrlSchema = z.object({
 });
 
 export const getPresignedReviewFeedbackUploadUrl = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getPresignedReviewFeedbackUploadUrlHandler } = await import('./files.server');
     const data = GetPresignedReviewFeedbackUploadUrlSchema.parse(args.data);
     return getPresignedReviewFeedbackUploadUrlHandler({ data });
