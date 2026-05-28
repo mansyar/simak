@@ -19,7 +19,7 @@ export const GetSubmissionDetailSchema = z.object({
 });
 
 export const submitCheckpoint = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { submitCheckpointHandler } = await import('./submissions.server');
     const data = SubmitCheckpointSchema.parse(args.data);
     return submitCheckpointHandler({ data });
@@ -27,7 +27,7 @@ export const submitCheckpoint = createServerFn({ method: 'POST' }).handler(
 );
 
 export const listSubmissions = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { listSubmissionsHandler } = await import('./submissions.server');
     const data = ListSubmissionsSchema.parse(args.data);
     return listSubmissionsHandler({ data });
@@ -35,7 +35,7 @@ export const listSubmissions = createServerFn({ method: 'GET' }).handler(
 );
 
 export const getSubmissionDetail = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getSubmissionDetailHandler } = await import('./submissions.server');
     const data = GetSubmissionDetailSchema.parse(args.data);
     return getSubmissionDetailHandler({ data });
