@@ -11,17 +11,13 @@ export const CheckpointInputSchema = z.object({
 export const CreateTemplateSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   type: z.string().min(1, 'Type is required'),
-  checkpoints: z
-    .array(CheckpointInputSchema)
-    .min(1, 'At least one checkpoint is required'),
+  checkpoints: z.array(CheckpointInputSchema).min(1, 'At least one checkpoint is required'),
 });
 
 export const UpdateTemplateSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   type: z.string().min(1, 'Type is required'),
-  checkpoints: z
-    .array(CheckpointInputSchema)
-    .min(1, 'At least one checkpoint is required'),
+  checkpoints: z.array(CheckpointInputSchema).min(1, 'At least one checkpoint is required'),
 });
 
 export const ListTemplatesSchema = z.object({

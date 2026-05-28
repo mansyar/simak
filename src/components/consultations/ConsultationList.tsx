@@ -34,23 +34,16 @@ export function ConsultationList({ consultations }: ConsultationListProps) {
   return (
     <div className="space-y-3">
       {consultations.map((item) => (
-        <div
-          key={item.id}
-          className="rounded-lg border bg-card p-4 shadow-sm space-y-2"
-        >
+        <div key={item.id} className="rounded-lg border bg-card p-4 shadow-sm space-y-2">
           <div className="flex items-center justify-between">
-            <span className="font-medium text-sm text-foreground">
-              {item.checkpointName}
-            </span>
+            <span className="font-medium text-sm text-foreground">{item.checkpointName}</span>
             <span
               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadgeColors[item.status] ?? 'bg-gray-100 text-gray-800'}`}
             >
               {t(`consultations.status.${item.status}`)}
             </span>
           </div>
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {item.notes ?? '-'}
-          </p>
+          <p className="text-sm text-muted-foreground line-clamp-2">{item.notes ?? '-'}</p>
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>
               {item.sessionType === 'external' && item.externalConsultantName

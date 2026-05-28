@@ -24,12 +24,7 @@ const roleLabels: Record<string, string> = {
   student: 'adminUsers.role_student',
 };
 
-export function UserFilters({
-  search,
-  onSearchChange,
-  role,
-  onRoleChange,
-}: UserFiltersProps) {
+export function UserFilters({ search, onSearchChange, role, onRoleChange }: UserFiltersProps) {
   const { t } = useI18n();
 
   return (

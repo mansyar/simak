@@ -47,14 +47,16 @@ export function ConsultationProgress({ counts }: ConsultationProgressProps) {
       {counts.map((cp) => {
         if (cp.minConsultations === 0) return null;
 
-        const progress = cp.minConsultations > 0
-          ? Math.min(100, (cp.verifiedCount / cp.minConsultations) * 100)
-          : 0;
-        const barColor = cp.verifiedCount >= cp.minConsultations
-          ? 'bg-green-500'
-          : cp.verifiedCount > 0
-            ? 'bg-yellow-500'
-            : 'bg-gray-300 dark:bg-gray-600';
+        const progress =
+          cp.minConsultations > 0
+            ? Math.min(100, (cp.verifiedCount / cp.minConsultations) * 100)
+            : 0;
+        const barColor =
+          cp.verifiedCount >= cp.minConsultations
+            ? 'bg-green-500'
+            : cp.verifiedCount > 0
+              ? 'bg-yellow-500'
+              : 'bg-gray-300 dark:bg-gray-600';
 
         return (
           <div key={cp.checkpointId} className="space-y-1">

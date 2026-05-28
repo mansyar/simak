@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 
-export const completePasswordSetup = createServerFn({ method: 'POST' })
-  .handler(async (args: { data: any }) => {
+export const completePasswordSetup = createServerFn({ method: 'POST' }).handler(
+  async (args: { data: any }) => {
     const { token, password } = args.data as { token: string; password: string };
 
     if (!token || !password || password.length < 8) {
@@ -21,12 +21,7 @@ export const completePasswordSetup = createServerFn({ method: 'POST' })
     const verificationRecord = await db
       .select()
       .from(verification)
-      .where(
-        and(
-          eq(verification.value, token),
-          gt(verification.expiresAt, new Date()),
-        ),
-      )
+      .where(and(eq(verification.value, token), gt(verification.expiresAt, new Date())))
       .limit(1)
       .then((rows) => rows[0]);
 
@@ -81,9 +76,8 @@ export const completePasswordSetup = createServerFn({ method: 'POST' })
       .where(eq(users.id, user.id));
 
     // Delete the used verification token
-    await db
-      .delete(verification)
-      .where(eq(verification.id, verificationRecord.id));
+    await db.delete(verification).where(eq(verification.id, verificationRecord.id));
 
     return { success: true };
-  });
+  },
+);
