@@ -32,7 +32,7 @@
   - [x] Import getDb and auditLog schema
   - [x] Insert row with provided fields
   - [x] Run tests and confirm they pass
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Audit Log Helper' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Audit Log Helper' (Protocol in workflow.md)
 
 ## Phase 3: Wire User Handlers
 
