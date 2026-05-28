@@ -116,7 +116,7 @@ export function InstructorDashboard({ data }: Props) {
             {d.pendingReviewItems.slice(0, 10).map((item) => (
               <Link
                 key={item.submissionId}
-                to={('/instructor/reviews/' + item.submissionId) as any}
+                to={('/instructor/reviews/' + item.submissionId) as never}
                 className="flex items-center justify-between rounded-lg border p-3 hover:bg-accent/50 transition-colors"
               >
                 <div className="min-w-0 flex-1">
@@ -133,7 +133,7 @@ export function InstructorDashboard({ data }: Props) {
             ))}
             {d.pendingReviewItems.length > 10 && (
               <Link
-                to={'/instructor/reviews' as any}
+                to={'/instructor/reviews' as never}
                 className="block text-center text-sm text-primary hover:underline py-2"
               >
                 {t('common.viewAll')}
@@ -192,7 +192,7 @@ export function InstructorDashboard({ data }: Props) {
             {d.assignments.slice(0, 5).map((assignment) => (
               <Link
                 key={assignment.id}
-                to={`/instructor/assignments/${assignment.id}` as any}
+                to={`/instructor/assignments/${assignment.id}` as never}
                 className="block rounded-lg border p-3 hover:bg-accent/50 transition-colors"
               >
                 <div className="flex items-center justify-between mb-1">
@@ -231,7 +231,7 @@ export function InstructorDashboard({ data }: Props) {
       <WidgetCard title={t('instructorDashboard.quickActions')}>
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
-            to={'/instructor/reviews' as any}
+            to={'/instructor/reviews' as never}
             className="flex items-center gap-3 rounded-lg border p-4 hover:bg-accent/50 transition-colors"
           >
             <ClipboardCheck className="h-5 w-5 text-primary" />
@@ -245,7 +245,7 @@ export function InstructorDashboard({ data }: Props) {
             </div>
           </Link>
           <Link
-            to={'/instructor/assignments' as any}
+            to={'/instructor/assignments' as never}
             className="flex items-center gap-3 rounded-lg border p-4 hover:bg-accent/50 transition-colors"
           >
             <ClipboardList className="h-5 w-5 text-primary" />
