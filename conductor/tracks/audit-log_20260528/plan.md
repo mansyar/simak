@@ -64,21 +64,21 @@
   - [x] Run tests and confirm they pass
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Wire Template Handlers' (Protocol in workflow.md)
 
-## Phase 5: Wire Assignment & Review Handlers
+## Phase 5: Wire Assignment & Review Handlers [checkpoint: ce7e8d4]
 
-- [ ] Task: Write assignment & review handler audit tests (Red Phase)
-  - [ ] Create test file `tests/unit/server/assignments-audit.test.ts`
-  - [ ] Test createAssignmentHandler writes `assignment.created` audit entry
-  - [ ] Test submitReviewHandler (pass) writes `review.passed` audit entry
-  - [ ] Test submitReviewHandler (revise) writes `review.revised` audit entry
-  - [ ] Run tests and confirm they fail
-- [ ] Task: Wire assignment & review handlers to audit log (Green Phase)
-  - [ ] Import logAuditEvent in `src/server/assignments.server.ts`
-  - [ ] Add audit call in createAssignmentHandler after successful transaction
-  - [ ] Import logAuditEvent in `src/server/reviews.server.ts`
-  - [ ] Add audit call in submitReviewHandler for both pass and revise decisions
-  - [ ] Run tests and confirm they pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Wire Assignment & Review Handlers' (Protocol in workflow.md)
+- [x] Task: Write assignment & review handler audit tests (Red Phase) 39ac3c2
+  - [x] Create test file `tests/unit/server/assignments-audit.test.ts`
+  - [x] Test createAssignmentHandler writes `assignment.created` audit entry
+  - [x] Test submitReviewHandler (pass) writes `review.passed` audit entry
+  - [x] Test submitReviewHandler (revise) writes `review.revised` audit entry
+  - [x] Run tests and confirm they fail
+- [x] Task: Wire assignment & review handlers to audit log (Green Phase) 39ac3c2
+  - [x] Import logAuditEvent in `src/server/assignments.server.ts`
+  - [x] Add audit call in createAssignmentHandler after successful transaction
+  - [x] Import logAuditEvent in `src/server/reviews.server.ts`
+  - [x] Add audit call in submitReviewHandler for both pass and revise decisions
+  - [x] Run tests and confirm they pass
+- [~] Task: Conductor - User Manual Verification 'Phase 5: Wire Assignment & Review Handlers' (Protocol in workflow.md)
 
 ## Phase 6: Wire Consultation Handlers
 
