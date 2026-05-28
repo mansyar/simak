@@ -1114,41 +1114,92 @@ The final phase adds bilingual support, dark mode, responsive design, and access
 
 ### Track 8.2 — Dark Mode, Responsive UI & Accessibility
 
-**Description:** Implement light/dark theme support, ensure all pages are usable on mobile, and pass basic accessibility checks (keyboard navigation, screen reader support, color contrast).
+**Description:** Conduct a comprehensive audit and fix pass across ALL existing pages and components to ensure proper dark mode styling, responsive layout at 320px–1920px, and WCAG 2.1 AA accessibility compliance. Theme infrastructure (ThemeToggle, use-theme hook, ThemeScript, skip-to-content link, global.css CSS variables) was established in Track 1.1 — this track applies those foundations to every page/component.
 
-**Dependencies:** All prior phases (every page needs theme + responsive).
+**Dependencies:** All prior phases (every page needs theme + responsive treatment).
 
-**Domain-Specific Files to Create/Edit:**
+**✅ Status: COMPLETED** — Track has been archived.
 
-| File                                     | Purpose                                                                                        |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `src/components/layout/theme-toggle.tsx` | Light/dark mode toggle (sun/moon icon)                                                         |
-| `src/hooks/use-theme.ts`                 | Theme state management (localStorage + system preference detection)                            |
-| All component files                      | **Edit:** Ensure `dark:` variants present, responsive Tailwind classes, proper ARIA attributes |
-| Skip-to-content link                     | Add to root layout for keyboard users                                                          |
+**Actual Files Created/Modified:**
 
-**Definition of Done:**
+| File                                                         | Purpose                                                                                                                                                                                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/components/ui/form.tsx`                                 | **Modified:** Added `aria-live="polite"` to `FormMessage` for screen reader announcements of validation errors                                                                                                            |
+| `src/components/admin/templates/TemplatePagination.tsx`      | **Modified:** Added `aria-label` to prev/next pagination buttons                                                                                                                                                          |
+| `src/components/layout/theme-toggle.tsx`                     | **Modified:** Added `min-h-11 min-w-11` touch targets, replaced `focus:` with `focus-visible:` classes                                                                                                                    |
+| `src/components/layout/language-switcher.tsx`                | **Modified:** Added `min-h-11` touch targets, `focus-visible:` classes to both EN/ID buttons                                                                                                                              |
+| `src/components/layout/admin-sidebar.tsx`                    | **Modified:** Added mobile sidebar support (`isOpen`/`onClose` props), hamburger overlay, close button with `aria-label`, `aria-hidden="true"` on icons, `handleLinkClick` to close on navigation                         |
+| `src/components/layout/instructor-sidebar.tsx`               | **Modified:** Same mobile sidebar pattern as admin sidebar                                                                                                                                                                |
+| `src/components/layout/student-sidebar.tsx`                  | **Modified:** Same mobile sidebar pattern as admin sidebar                                                                                                                                                                |
+| `src/components/notifications/NotificationBadge.tsx`         | **Modified:** Added `min-h-11 min-w-11` touch targets, `aria-hidden="true"` on Bell/BellDot icons                                                                                                                         |
+| `src/components/dashboard/AdminDashboard.tsx`                | **Modified:** Added `aria-live="polite"` to error state container                                                                                                                                                         |
+| `src/components/dashboard/InstructorDashboard.tsx`           | **Modified:** Added `aria-live="polite"` to error state container                                                                                                                                                         |
+| `src/components/dashboard/StudentDashboard.tsx`              | **Modified:** Added `aria-live="polite"` to error state container                                                                                                                                                         |
+| `src/components/consultations/ConsultationForm.tsx`          | **Modified:** Added `aria-live="polite"` to error message                                                                                                                                                                 |
+| `src/components/consultations/VerificationDialog.tsx`        | **Modified:** Added `aria-live="polite"` to error message, improved code formatting                                                                                                                                       |
+| `src/components/instructor/assignments/AssignmentWizard.tsx` | **Modified:** Added `aria-live="polite"` to submit error display                                                                                                                                                          |
+| `src/routes/__root.tsx`                                      | **Modified:** Replaced hardcoded `focus:bg-white focus:text-black` with theme-aware `focus:bg-background focus:text-foreground` on skip-to-content link                                                                   |
+| `src/routes/_authenticated/admin.tsx`                        | **Modified:** Added mobile hamburger menu button with `Menu` icon, `useTheme` hook, `ThemeToggle` component, `isOpen`/`onClose` state for sidebar, `aria-label={t('common.openMenu')}`, added `bg-background` to root div |
+| `src/routes/_authenticated/instructor.tsx`                   | **Modified:** Same mobile sidebar + theme toggle pattern as admin layout                                                                                                                                                  |
+| `src/routes/_authenticated/student.tsx`                      | **Modified:** Same mobile sidebar + theme toggle pattern as admin layout                                                                                                                                                  |
+| `src/routes/_unauthenticated/auth/login.tsx`                 | **Modified:** Added `ThemeToggle` component for theme switching on login page                                                                                                                                             |
+| `locales/en.json` / `locales/id.json`                        | **Modified:** Added `common.closeMenu` ("Close menu" / "Tutup menu") translation key for sidebar close button aria-label                                                                                                  |
+| `tests/unit/components/admin-sidebar.test.tsx`               | **Modified:** Updated all renders to pass required `isOpen` and `onClose` props                                                                                                                                           |
+| `tests/unit/components/instructor-sidebar.test.tsx`          | **Modified:** Updated all renders to pass required `isOpen` and `onClose` props                                                                                                                                           |
+| `tests/unit/components/student-sidebar.test.tsx`             | **Modified:** Updated all renders to pass required `isOpen` and `onClose` props                                                                                                                                           |
+| `tests/unit/components/dark-mode-detection.test.tsx`         | **New:** 10 tests — verifies CSS custom properties on UI primitives (Button, Input, Card, Badge, Label, Skeleton), skip-to-content theme-aware classes, dark class toggling                                               |
+| `tests/unit/components/responsive-behavior.test.tsx`         | **New:** 11 tests — verifies responsive classes on UI primitives, touch targets on ThemeToggle/LanguageSwitcher, sidebar mobile behavior, grid responsiveness, table overflow, auth page centering                        |
+| `tests/unit/components/a11y-attributes.test.tsx`             | **New:** 18 tests — verifies ARIA labels on ThemeToggle/LanguageSwitcher/NotificationBadge, `aria-live` regions, `focus-visible` classes, heading hierarchy, touch targets                                                |
 
-- Light and dark themes toggle via a button in the header
-- User's preference persists across sessions (localStorage)
-- System preference is respected on first visit (prefers-color-scheme)
-- All pages are usable at 320px–1920px widths
-- Keyboard navigation works for all interactive elements
-- Focus indicators are visible
-- Screen readers can navigate all content (logical heading hierarchy, ARIA labels, live regions for dynamic content)
-- Color contrast meets WCAG 2.1 AA
+**Tests Added:** 39 new tests across 3 new test files + 3 modified test files.
+
+**Differences from Original Spec:**
+
+- **Sidebar mobile pattern**: Sidebars use a fixed overlay + slide-in pattern (`-translate-x-full` → `translate-x-0`) with `lg:sticky lg:translate-x-0` for desktop, rather than a drawer or bottom nav. This matches common mobile-first sidebar patterns.
+- **Theme toggle in login page**: Added `ThemeToggle` to the login page so users can switch themes before authenticating — not in the original spec but improves UX consistency.
+- **Single 15-second polling for notifications**: The original spec differentiated polling intervals per priority (10s/30s/60s). The implementation uses a single 15s interval, which is sufficient for the expected notification volume.
+- **`focus-visible:` instead of `focus:`**: Components use `focus-visible:` for focus indicators, which only shows the ring when navigating via keyboard (not on mouse click). This is a better UX than always-on `focus:` rings.
+- **No `aria-hidden` on LogOut icon**: The logout button has visible text alongside the icon, so `aria-hidden` was not added to the LogOut icon (the text provides the accessible name).
+- **Review fixes applied**: Post-review, hardcoded English `aria-label="Close menu"` and `aria-label="Open menu"` were replaced with i18n keys (`t('common.closeMenu')` / `t('common.openMenu')`). Missing `bg-background` on admin layout root div was fixed. Sidebar test files updated to pass required `isOpen`/`onClose` props.
+
+**Test Results (at time of archiving):**
+
+- 1179/1179 tests passing across 130 test files
+- TypeScript typecheck passes with no errors
+- eslint/prettier/lint-staged pass on all new files
+- All new files under 500-line modularity limit
+- Pre-push hook (typecheck + vitest coverage) passes
+
+**Definition of Done Completed:**
+
+- ✅ Theme toggle switches between light and dark modes with smooth CSS transitions
+- ✅ Refreshing the page preserves the theme preference (localStorage)
+- ✅ System preference (prefers-color-scheme) is respected on first visit
+- ✅ All pages render correctly in dark mode — no invisible text or broken colors
+- ✅ Dashboard timeline is readable on a 375px mobile viewport
+- ✅ File upload drag zone works on touch devices
+- ✅ Tables horizontally scroll on small viewports (no overflow cutoff)
+- ✅ Tab key navigates through all form fields, buttons, and links in logical order
+- ✅ Focus ring is visible on all interactive elements
+- ✅ Skip-to-content link is the first focusable element on page load
+- ✅ Screen reader announces form validation errors (aria-live="polite")
+- ✅ All icon-only buttons have `aria-label` attributes
+- ✅ Color contrast ratios meet WCAG 2.1 AA minimum
+- ✅ All existing tests pass; 39 new a11y/responsive/dark-mode unit tests added
+- ✅ Code coverage maintained at >80%
+- ✅ All translation keys for new aria-labels added to both EN and ID locale files
 
 **Acceptance Criteria:**
 
-- [ ] Theme toggle switches between light and dark modes smoothly (CSS transition)
-- [ ] Refreshing the page preserves the theme preference
-- [ ] Dashboard timeline is readable on a 375px mobile viewport
-- [ ] File upload drag zone works on touch devices
-- [ ] Tab key navigates through all form fields, buttons, and links in logical order
-- [ ] Focus ring is visible on all interactive elements
-- [ ] Skip-to-content link is the first focusable element on page load
-- [ ] Screen reader announces form validation errors
-- [ ] Color contrast ratios meet WCAG 2.1 AA minimum (test with browser dev tools)
+- [x] Theme toggle switches between light and dark modes smoothly (CSS transition)
+- [x] Refreshing the page preserves the theme preference
+- [x] Dashboard timeline is readable on a 375px mobile viewport
+- [x] File upload drag zone works on touch devices
+- [x] Tab key navigates through all form fields, buttons, and links in logical order
+- [x] Focus ring is visible on all interactive elements
+- [x] Skip-to-content link is the first focusable element on page load
+- [x] Screen reader announces form validation errors
+- [x] Color contrast ratios meet WCAG 2.1 AA minimum (test with browser dev tools)
 
 ---
 

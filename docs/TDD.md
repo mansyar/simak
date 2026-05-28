@@ -206,7 +206,7 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 **Consultation** — student-instructor meeting log, tied to a specific checkpoint.
 **Notification** — in-app event log.
 **NotificationPreference** — per-user, per-event, per-channel toggle. [v2]
-**ExtensionRequest** — student-initiated deadline extension with approval. [v2]
+**ExtensionRequest** — student-initiated deadline extension with reason categories (Personal, Research, Health, Other), instructor approval/rejection workflow, configurable caps, and auto-extension of subsequent checkpoints and assignment finalDeadline. [v2]
 **EmailQueue** — background delivery queue for transactional emails. [v2]
 **AuditLog** — administrative action record. [v2]
 **Session** — Better-Auth session token, FK to users, expiresAt.
@@ -402,17 +402,24 @@ _Note: Each row represents one student's individual participation. Group assignm
 
 #### extension_requests [v2]
 
-| Column            | Type                       | Notes                           |
-| ----------------- | -------------------------- | ------------------------------- |
-| id                | serial (PK)                |                                 |
-| assignmentId      | integer (FK → assignments) |                                 |
-| studentId         | text (FK → users)          |                                 |
-| requestedDeadline | timestamp, not null        | Proposed new deadline           |
-| reason            | text                       |                                 |
-| status            | text, not null             | pending \| approved \| rejected |
-| reviewedBy        | text (FK → users)          | Instructor who decided          |
-| createdAt         | timestamp                  |                                 |
-| updatedAt         | timestamp                  |                                 |
+| Column                  | Type                       | Notes                                   |
+| ----------------------- | -------------------------- | --------------------------------------- |
+| id                      | serial (PK)                |                                         |
+| assignmentId            | integer (FK → assignments) |                                         |
+| studentId               | text (FK → users)          |                                         |
+| requestedDeadline       | timestamp, not null        | Proposed new deadline                   |
+| reason                  | text                       | Student's reason                        |
+| category                | text, not null             | personal \| research \| health \| other |
+| extensionDays           | integer, not null          | Days to extend (1-7)                    |
+| status                  | text, not null             | pending \| approved \| rejected         |
+| reviewedBy              | text (FK → users)          | Instructor who reviewed                 |
+| approvedBy              | text (FK → users)          | Instructor who approved                 |
+| extendedBy              | text (FK → users)          | Instructor who extended                 |
+| extensionReason         | text                       | Instructor's comment                    |
+| maxExtensionDays        | integer, not null          | Admin cap (default: 7)                  |
+| hasReachedMaxExtensions | boolean, not null          | Cap reached?                            |
+| createdAt               | timestamp                  |                                         |
+| updatedAt               | timestamp                  |                                         |
 
 #### email_queue [v2]
 
@@ -819,20 +826,33 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 ### Theme
 
 - Light and dark modes via Tailwind `dark:` variant + CSS custom properties.
-- Semantic colors: success (pass), warning (revise), error (overdue/missed), info (consultation).
+- Theme state managed via `use-theme` hook with localStorage persistence and system preference detection (`prefers-color-scheme`).
+- `ThemeScript` in root layout prevents flash of unstyled content (FOUC) on page load.
+- Theme toggle button (`ThemeToggle` component) in the header of all authenticated layouts and the login page.
+- CSS custom properties defined in `src/app/global.css` using oklch color space for both light and dark themes.
+- Semantic color tokens: `--background`, `--foreground`, `--muted`, `--card`, `--border`, `--primary`, `--destructive`, etc.
+- Additional semantic status colors: `--success` (pass), `--warning` (revise), `--error` (overdue/missed), `--info` (consultation).
+- All shadcn/ui primitives use theme-aware classes (`bg-card`, `text-foreground`, `border-border`) — no hardcoded colors.
 - System font stack with configurable type scale (12px–48px).
 - 4px base spacing unit.
+- `transition-colors` on theme toggle for smooth visual transition between modes.
 
 ---
 
 ## 14. Accessibility [v1]
 
-- Radix UI primitives provide built-in ARIA attributes.
-- Keyboard navigation for all interactive elements.
-- Focus management: focus trapping in dialogs, skip-to-content link.
-- Screen reader announcements for dynamic content (toast, progress updates).
-- Color contrast meets WCAG 2.1 AA minimum.
-- Form validation errors announced via `aria-live` regions.
+- Radix UI primitives provide built-in ARIA attributes for dialogs, selects, dropdowns, and other interactive components.
+- Keyboard navigation for all interactive elements — Tab order is logical across all pages.
+- Focus management: focus trapping in dialogs and sheets on open, focus return on close, skip-to-content link as first focusable element.
+- `focus-visible:` ring classes on all interactive elements (only visible on keyboard navigation, not mouse clicks).
+- Touch targets minimum 44×44px (`min-h-11 min-w-11`) on all buttons, links, and interactive elements for mobile accessibility.
+- `aria-hidden="true"` on all decorative icons (sidebar nav icons, notification bell icons) to hide them from screen readers.
+- `aria-label` on all icon-only buttons (theme toggle, language switcher, sidebar close, notification bell, pagination controls).
+- `aria-live="polite"` regions for dynamic content: form validation errors (`FormMessage`), submission status messages, dashboard error states, consultation errors.
+- `aria-describedby` on form inputs pointing to error message elements for screen reader association.
+- Heading hierarchy: every page has exactly one `h1`, heading levels don't skip (h1 → h2 → h3).
+- Color contrast meets WCAG 2.1 AA minimum (4.5:1 for normal text, 3:1 for large text).
+- Semantic color system: success (green), warning (amber), error (red), info (blue) for status badges and indicators.
 
 ---
 

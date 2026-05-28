@@ -119,6 +119,12 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Instructors can attach feedback files to reviews.
 - Late submissions are controlled: overdue checkpoints lock automatically; instructors can unlock them.
 - **SLA & Escalation (Addressing the Instructor Bottleneck):** To ensure students aren't unfairly blocked, if an instructor does not review a submission within a defined SLA (e.g., 3 days), an automated escalation alert is sent to the Admin, and the student's subsequent deadlines are **automatically extended by the number of days the review was delayed** (breach duration is added to affected deadlines).
+- **Deadline Extension Workflow:**
+  - **Student-Initiated:** Students can request deadline extensions via an approval workflow with reason categories (Personal, Research, Health, Other)
+  - **Instructor-Initiated:** Instructors can directly extend deadlines without student request
+  - **Auto-Adjustment:** Subsequent checkpoints and assignment finalDeadline auto-extend when extension approved
+  - **Configurable Caps:** Admin-configurable extension limits (max extension days and max total extensions per assignment)
+  - **Audit Trail:** Complete history of all extension requests, decisions, and reasons
 
 ### Consultation Tracking (Kartu Bimbingan)
 
