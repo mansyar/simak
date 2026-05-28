@@ -81,23 +81,23 @@
 
 **Objective:** Remove all `as any` casts from shared components.
 
-- [ ] Task: Fix `src/components/reviews/ReviewForm.tsx` — server fn calls
-- [ ] Task: Fix `src/components/consultations/ConsultationForm.tsx` — server fn call
-- [ ] Task: Fix `src/components/consultations/VerificationDialog.tsx` — server fn calls
-- [ ] Task: Fix `src/components/instructor/assignments/AssignmentWizard.tsx` — server fn calls + navigate + i18n casts
-- [ ] Task: Fix `src/components/instructor/assignments/TemplatePicker.tsx` — server fn call
-- [ ] Task: Fix `src/components/instructor/assignments/StudentPicker.tsx` — server fn call
-- [ ] Task: Fix `src/components/admin/templates/CreateTemplateDialog.tsx` — zodResolver cast
-- [ ] Task: Fix `src/components/admin/templates/EditTemplateSheet.tsx` — zodResolver cast
-- [ ] Task: Fix `src/components/dashboard/AdminDashboard.tsx` — navigate casts
-- [ ] Task: Fix `src/components/dashboard/InstructorDashboard.tsx` — navigate casts
-- [ ] Task: Fix `src/components/dashboard/StudentDashboard.tsx` — navigate cast
-- [ ] Task: Fix `src/components/layout/student-sidebar.tsx` — link `to` cast
-- [ ] Task: Fix `src/components/layout/instructor-sidebar.tsx` — link `to` cast
-- [ ] Task: Fix `src/hooks/use-notifications.ts` — any type usage
-- [ ] Task: Verify all changes compile
-  - [ ] Run `pnpm typecheck` — must pass
-  - [ ] Run `pnpm test` — must pass
+- [x] Task: Fix `src/components/reviews/ReviewForm.tsx` — server fn calls [1be9f85]
+- [x] Task: Fix `src/components/consultations/ConsultationForm.tsx` — server fn call [c7548b5]
+- [x] Task: Fix `src/components/consultations/VerificationDialog.tsx` — server fn calls [3a5c3ac]
+- [x] Task: Fix `src/components/instructor/assignments/AssignmentWizard.tsx` — server fn calls + navigate + i18n casts [9c4d5f9]
+- [x] Task: Fix `src/components/instructor/assignments/TemplatePicker.tsx` — server fn call [1590dfc]
+- [x] Task: Fix `src/components/instructor/assignments/StudentPicker.tsx` — server fn call [05601e5]
+- [x] Task: Fix `src/components/admin/templates/CreateTemplateDialog.tsx` — zodResolver cast [1b424e9]
+- [x] Task: Fix `src/components/admin/templates/EditTemplateSheet.tsx` — zodResolver cast [481e9c0]
+- [x] Task: Fix `src/components/dashboard/AdminDashboard.tsx` — navigate casts [cea5530]
+- [x] Task: Fix `src/components/dashboard/InstructorDashboard.tsx` — navigate casts [73d0f8e]
+- [x] Task: Fix `src/components/dashboard/StudentDashboard.tsx` — navigate cast [58ba6b7]
+- [x] Task: Fix `src/components/layout/student-sidebar.tsx` — link `to` cast [fd49305]
+- [x] Task: Fix `src/components/layout/instructor-sidebar.tsx` — link `to` cast [876fc2e]
+- [x] Task: Fix `src/hooks/use-notifications.ts` — any type usage [c604aca]
+- [x] Task: Verify all changes compile
+  - [x] Run `pnpm typecheck` — must pass
+  - [x] Run `pnpm test` — must pass
 - [ ] Task: Conductor — User Manual Verification 'Phase 5: Fix Component Files' (Protocol in workflow.md)
 
 ## Phase 6: Final Verification
