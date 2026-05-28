@@ -5,6 +5,7 @@ import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates
 import { assignments } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
+import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
   CreateTemplateSchema,
@@ -18,13 +19,11 @@ type UpdateTemplateInput = z.infer<typeof UpdateTemplateSchema>;
 type ListTemplatesInput = z.infer<typeof ListTemplatesSchema>;
 type TemplateIdParam = z.infer<typeof TemplateIdParamSchema>;
 
-function isAdmin(session: any): session is { user: { id: string; role: string }; session: any } {
+function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && (session.user.role === 'admin' || session.user.role === 'superadmin');
 }
 
-function isInstructorOrAdmin(
-  session: any,
-): session is { user: { id: string; role: string }; session: any } {
+function isInstructorOrAdmin(session: NonNullableSession | null): session is NonNullableSession {
   return (
     !!session &&
     (session.user.role === 'admin' ||
