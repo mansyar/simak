@@ -3,6 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { getAssignmentDetail } from '@/server/assignments';
 import { listPendingConsultations } from '@/server/consultations';
 import { ProgressTable } from '@/components/instructor/assignments/ProgressTable';
+import type { StudentProgress } from '@/components/instructor/assignments/ProgressTable';
 import { DeadlineManager } from '@/components/reviews/DeadlineManager';
 import { VerificationQueueItem } from '@/components/consultations/VerificationQueueItem';
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
@@ -12,15 +13,35 @@ import { useI18n } from '../../../__root';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id')({
   loader: async ({ params }) => {
-    return (getAssignmentDetail as any)({ data: { id: Number((params as any).id) } });
+    // @ts-expect-error - handler type inference limitation
+    return getAssignmentDetail({ data: { id: Number(params.id) } });
   },
   component: AssignmentDetailPage,
 });
 
 function AssignmentDetailPage() {
   const { t } = useI18n();
-  const assignment = Route.useLoaderData();
-  const [pendingConsultations, setPendingConsultations] = useState<any[]>([]);
+  const assignment = Route.useLoaderData() as unknown as {
+    id: number;
+    title: string;
+    description: string | null;
+    finalDeadline: Date;
+    createdAt: Date;
+    templateName: string;
+    templateType: string;
+    instructorId: number;
+    students: StudentProgress[];
+  } | null;
+  interface PendingConsultation {
+    id: number;
+    studentName: string;
+    checkpointName: string;
+    sessionType: string | null;
+    externalConsultantName: string | null;
+    notes: string | null;
+    createdAt: string;
+  }
+  const [pendingConsultations, setPendingConsultations] = useState<PendingConsultation[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'consultations'>('overview');
   const [selectedConsultationId, setSelectedConsultationId] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -28,8 +49,11 @@ function AssignmentDetailPage() {
   // Load pending consultations
   useEffect(() => {
     if (assignment) {
+      const listPendingFn = listPendingConsultations as unknown as (args: {
+        data: { assignmentId: number };
+      }) => Promise<{ consultations: PendingConsultation[] }>;
       const load = async () => {
-        const result = await (listPendingConsultations as any)({
+        const result = await listPendingFn({
           data: { assignmentId: assignment.id },
         });
         if (result.consultations) {
@@ -47,7 +71,11 @@ function AssignmentDetailPage() {
         <p className="text-muted-foreground mb-4">
           This assignment could not be found or you do not have permission to view it.
         </p>
-        <Link to={'/instructor/assignments' as any} className="text-primary hover:underline">
+        <Link
+          to="/instructor/assignments"
+          search={{ page: 1, limit: 20, search: '' }}
+          className="text-primary hover:underline"
+        >
           {t('common.back')}
         </Link>
       </div>
@@ -59,12 +87,14 @@ function AssignmentDetailPage() {
   const avgProgress =
     totalStudents > 0
       ? Math.round(
-          assignment.students.reduce((sum: number, s: any) => sum + s.progressPercent, 0) /
-            totalStudents,
+          assignment.students.reduce(
+            (sum: number, s: StudentProgress) => sum + s.progressPercent,
+            0,
+          ) / totalStudents,
         )
       : 0;
   const completedStudents = assignment.students.filter(
-    (s: any) => s.progressPercent === 100,
+    (s: StudentProgress) => s.progressPercent === 100,
   ).length;
 
   return (
@@ -73,7 +103,8 @@ function AssignmentDetailPage() {
       <div className="flex flex-col gap-4">
         <div>
           <Link
-            to={'/instructor/assignments' as any}
+            to="/instructor/assignments"
+            search={{ page: 1, limit: 20, search: '' }}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -244,7 +275,29 @@ function AssignmentDetailPage() {
       {activeTab === 'overview' && (
         <>
           {/* Deadline Manager */}
-          <DeadlineManager students={assignment.students} assignmentId={assignment.id} />
+          <DeadlineManager
+            students={
+              assignment.students as unknown as {
+                id: string;
+                name: string;
+                email: string;
+                progressPercent: number;
+                passedCount: number;
+                totalCheckpointsCount: number;
+                activeCheckpoint: { id: number; name: string; state: string } | null;
+                checkpoints: {
+                  id: number;
+                  name: string;
+                  order: number;
+                  state: 'locked' | 'unlocked' | 'submitted' | 'under_review' | 'passed' | 'revise';
+                  studentId: string;
+                  dueDate: Date | null;
+                  minConsultations: number | null;
+                }[];
+              }[]
+            }
+            assignmentId={assignment.id}
+          />
         </>
       )}
 
@@ -260,7 +313,7 @@ function AssignmentDetailPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {pendingConsultations.map((item: any) => (
+              {pendingConsultations.map((item: PendingConsultation) => (
                 <VerificationQueueItem
                   key={item.id}
                   consultation={item}
@@ -279,7 +332,10 @@ function AssignmentDetailPage() {
             onOpenChange={setDialogOpen}
             onActionComplete={async () => {
               // Refresh pending queue
-              const result = await (listPendingConsultations as any)({
+              const listPendingFn = listPendingConsultations as unknown as (args: {
+                data: { assignmentId: number };
+              }) => Promise<{ consultations: PendingConsultation[] }>;
+              const result = await listPendingFn({
                 data: { assignmentId: assignment.id },
               });
               if (result.consultations) {
