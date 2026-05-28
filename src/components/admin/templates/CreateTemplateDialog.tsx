@@ -45,7 +45,7 @@ export function CreateTemplateDialog({
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<CreateTemplateFormValues>({
-    resolver: zodResolver(CreateTemplateSchema) as any,
+    resolver: zodResolver(CreateTemplateSchema) as never,
     defaultValues: {
       name: '',
       type: '',
