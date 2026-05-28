@@ -26,7 +26,8 @@ export const Route = createFileRoute('/_authenticated/instructor/reviews/')({
     assignmentId: search.assignmentId,
   }),
   loader: async ({ deps }) => {
-    return (listPendingReviews as any)({ data: deps });
+    // @ts-expect-error - handler type inference limitation
+    return listPendingReviews({ data: deps });
   },
   pendingComponent: () => <ReviewQueueSkeleton />,
   component: ReviewsPage,
@@ -34,22 +35,26 @@ export const Route = createFileRoute('/_authenticated/instructor/reviews/')({
 
 function ReviewsPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as any;
-  const items = (data?.items ?? []) as ReviewQueueItemData[];
-  const total = data?.total ?? 0;
-  const searchParams = Route.useSearch() as any;
-  const navigate = Route.useNavigate() as any;
+  const data = Route.useLoaderData();
+  const items = (data as { items?: ReviewQueueItemData[] })?.items ?? [];
+  const total = (data as { total?: number })?.total ?? 0;
+  const searchParams = Route.useSearch();
+  const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleAssignmentChange = (assignmentId: number | null) => {
     navigate({
-      search: (prev: any) => ({ ...prev, assignmentId, page: 1 }),
+      search: (prev: z.infer<typeof ReviewSearchSchema>) => ({
+        ...prev,
+        assignmentId: assignmentId ?? undefined,
+        page: 1,
+      }),
     });
   };
 
   const handlePageChange = (page: number) => {
     navigate({
-      search: (prev: any) => ({ ...prev, page }),
+      search: (prev: z.infer<typeof ReviewSearchSchema>) => ({ ...prev, page }),
     });
   };
 
