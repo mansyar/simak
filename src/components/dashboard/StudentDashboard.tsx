@@ -98,7 +98,7 @@ export function StudentDashboard({ data }: Props) {
             {d.activeAssignments.map((assignment) => (
               <Link
                 key={assignment.id}
-                to={`/student/assignments/${assignment.id}` as any}
+                to={`/student/assignments/${assignment.id}` as never}
                 className="block rounded-lg border bg-card p-4 hover:bg-accent/50 transition-colors"
               >
                 <div className="flex items-center justify-between mb-2">
