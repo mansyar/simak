@@ -9,6 +9,7 @@ import { checkpoints, assignments } from '../db/schema/assignments';
 import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { sendSLAAlertEmail } from './email';
+import type { Db } from '../db/index';
 
 export interface SLASubmissionFields {
   checkpointId: number;
@@ -30,7 +31,7 @@ export interface SLASubmissionFields {
  * Must be called inside the review transaction (tx).
  */
 export async function adjustDeadlinesForBreach(
-  tx: any,
+  tx: Db,
   submission: SLASubmissionFields,
   breachDays: number,
 ): Promise<void> {
@@ -89,7 +90,7 @@ export async function adjustDeadlinesForBreach(
  * Advisory only — failures are logged but do not propagate the error.
  */
 export async function dispatchSLABreachNotifications(
-  db: any,
+  db: Db,
   submission: SLASubmissionFields,
   breachDays: number,
 ): Promise<void> {
