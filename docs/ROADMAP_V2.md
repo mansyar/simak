@@ -20,7 +20,7 @@ This track goes first so all subsequent tracks can write to the audit log from d
 
 **Dependencies:** V1 database foundation (Drizzle schema, DB client).
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete (May 2026)
 
 **Estimated Scope:**
 
@@ -87,15 +87,15 @@ Single-import helper used across all handlers. Writes to `audit_log` table. No c
 
 **Acceptance Criteria:**
 
-- [ ] `audit_log` table created with proper indexes
-- [ ] `logAuditEvent` helper exists and is importable from any handler
-- [ ] All existing handlers listed above write an audit log entry on execution
-- [ ] Admin audit log page at `/admin/audit-log` loads with paginated entries
-- [ ] Admin can filter by action type (dropdown derived from distinct values)
-- [ ] Admin can filter by date range
-- [ ] Non-admin users cannot access the audit log page (redirected)
-- [ ] Audit log entries are immutable (no update/delete endpoint)
-- [ ] i18n translations for audit log UI
+- [x] `audit_log` table created with proper indexes
+- [x] `logAuditEvent` helper exists and is importable from any handler
+- [x] All existing handlers listed above write an audit log entry on execution
+- [x] Admin audit log page at `/admin/audit-log` loads with paginated entries
+- [x] Admin can filter by action type (dropdown derived from distinct values)
+- [x] Admin can filter by date range
+- [x] Non-admin users cannot access the audit log page (redirected)
+- [x] Audit log entries are immutable (no update/delete endpoint)
+- [x] i18n translations for audit log UI
 
 **Test Plan:**
 

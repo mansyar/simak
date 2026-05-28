@@ -66,6 +66,7 @@ Throughout this document, features are tagged as:
 │   ├── /admin/users                      → User management [v1]
 │   ├── /admin/templates                  → Template list [v1]
 │   ├── /admin/templates/$id              → Template editor [v1]
+│   ├── /admin/audit-log                  → Audit log viewer
 │   ├── /admin/analytics                  → System analytics [v2]
 │   └── /admin/settings                   → System configuration [v2]
 
@@ -119,6 +120,8 @@ simak/
 │   │   ├── notifications.server.ts → Server-only notification handlers
 │   │   ├── templates.ts      → Template CRUD
 │   │   ├── templates.server.ts → Server-only template handlers
+│   │   ├── audit-logs.ts      → Audit log query stubs + Zod schemas
+│   │   ├── audit-logs.server.ts → Server-only audit log handlers
 │   │   ├── setup-password.ts → Custom password setup handler
 │   │   ├── files.ts          → Presigned URL generation
 │   │   ├── dashboard.ts      → Dashboard data stubs (student, instructor, admin)

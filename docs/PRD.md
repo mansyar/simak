@@ -23,7 +23,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Admins can manage users and assignment templates.
 - Both students and instructors can view and download previously submitted checkpoint files.
 - Consultation sessions (Kartu Bimbingan) are tracked as a requirement for assignment completion.
-- Admins can view system-wide analytics and audit logs. `[v2]`
+- Admins can view system-wide analytics and audit logs. (Audit log viewer implemented at `/admin/audit-log`) `[v2]`
 - Students and instructors can request and manage deadline extensions via a configurable approval workflow. `[v2]`
 - Users can enable two-factor authentication (TOTP) for enhanced account security. `[v2]`
 - Assignment templates include estimated duration per checkpoint, allowing auto-calculation of checkpoint dueDates during assignment creation. `[v2]`
@@ -202,5 +202,5 @@ Core entities:
 - **Review** — instructor decision (pass/revise) + comments + deadline + optional feedback file.
 - **Consultation** — log entry for a student-instructor session tied to a specific checkpoint.
 - **Notification** — in-app and/or email event logs.
-- **AuditLog** `[v2]` — immutable record of all meaningful system actions (user created/deleted, template CRUD, assignment creation, review decisions, deadline changes, unlock actions, consultation verifications/rejections). Includes actor, action type, entity reference, and JSON details.
+- **AuditLog** — immutable record of all meaningful system actions (user created/deleted, template CRUD, assignment creation, review decisions, deadline changes, unlock actions, consultation verifications/rejections). Includes actor, action type, entity reference, and JSON details. Implemented with an admin viewer at `/admin/audit-log`.
 - **ExtensionRequest** `[v2]` — student-initiated deadline extension request with reason category, proposed duration, and approval/rejection by instructor. Subject to admin-configurable caps (`maxExtensionDays`, `maxTotalExtensions`).
