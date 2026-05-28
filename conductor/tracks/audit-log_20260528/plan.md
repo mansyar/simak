@@ -62,7 +62,7 @@
   - [x] Add audit call in updateTemplateHandler after successful update
   - [x] Add audit call in deleteTemplateHandler after soft-delete
   - [x] Run tests and confirm they pass
-- [~] Task: Conductor - User Manual Verification 'Phase 4: Wire Template Handlers' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Wire Template Handlers' (Protocol in workflow.md)
 
 ## Phase 5: Wire Assignment & Review Handlers
 
