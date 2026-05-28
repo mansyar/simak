@@ -31,7 +31,11 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
       try {
         setLoading(true);
         // Fetch all templates (with a high limit to capture all of them for picker)
-        const response = await (listTemplates as any)({
+        const response = await (
+          listTemplates as unknown as (args: {
+            data: { page: number; limit: number; search: string; type?: string };
+          }) => Promise<{ templates: Template[] }>
+        )({
           data: { page: 1, limit: 100, search: '' },
         });
         if (response && response.templates) {
