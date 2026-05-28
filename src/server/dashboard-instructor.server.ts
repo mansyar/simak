@@ -5,10 +5,9 @@ import { assignments, assignmentStudents, checkpoints } from '../db/schema/assig
 import { submissions } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
+import type { NonNullableSession } from '../lib/types';
 
-function isInstructor(
-  session: any,
-): session is { user: { id: string; role: string }; session: any } {
+function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
 }
 
