@@ -54,7 +54,7 @@ export function EditTemplateSheet({
   const defaultCheckpoint = () => ({ name: '', minConsultations: 0 });
 
   const form = useForm<EditTemplateFormValues>({
-    resolver: zodResolver(UpdateTemplateSchema) as any,
+    resolver: zodResolver(UpdateTemplateSchema) as never,
     defaultValues: {
       name: '',
       type: '',
