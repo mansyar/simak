@@ -24,7 +24,7 @@ export const AssignmentIdParamSchema = z.object({
 });
 
 export const createAssignment = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { createAssignmentHandler } = await import('./assignments.server');
     const data = CreateAssignmentSchema.parse(args.data);
     return createAssignmentHandler({ data });
@@ -32,7 +32,7 @@ export const createAssignment = createServerFn({ method: 'POST' }).handler(
 );
 
 export const listInstructorAssignments = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { listInstructorAssignmentsHandler } = await import('./assignments.server');
     const data = ListInstructorAssignmentsSchema.parse(args.data);
     return listInstructorAssignmentsHandler({ data });
@@ -40,7 +40,7 @@ export const listInstructorAssignments = createServerFn({ method: 'GET' }).handl
 );
 
 export const getAssignmentDetail = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getAssignmentDetailHandler } = await import('./assignments.server');
     const data = AssignmentIdParamSchema.parse(args.data);
     return getAssignmentDetailHandler({ data });
@@ -62,7 +62,7 @@ export const StudentAssignmentIdParamSchema = z.object({
 // ---- Student Assignment Server Function Stubs ----
 
 export const listStudentAssignments = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { listStudentAssignmentsHandler } = await import('./assignments.server');
     const data = ListStudentAssignmentsSchema.parse(args.data);
     return listStudentAssignmentsHandler({ data });
@@ -70,7 +70,7 @@ export const listStudentAssignments = createServerFn({ method: 'GET' }).handler(
 );
 
 export const getStudentAssignmentDetail = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getStudentAssignmentDetailHandler } = await import('./assignments.server');
     const data = StudentAssignmentIdParamSchema.parse(args.data);
     return getStudentAssignmentDetailHandler({ data });
@@ -84,7 +84,7 @@ export const UnlockCheckpointSchema = z.object({
 });
 
 export const unlockCheckpoint = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { unlockCheckpointHandler } = await import('./assignments.server');
     const data = UnlockCheckpointSchema.parse(args.data);
     return unlockCheckpointHandler({ data });
@@ -99,7 +99,7 @@ export const ExtendDeadlineSchema = z.object({
 });
 
 export const extendDeadline = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { extendDeadlineHandler } = await import('./assignments.server');
     const data = ExtendDeadlineSchema.parse(args.data);
     return extendDeadlineHandler({ data });
