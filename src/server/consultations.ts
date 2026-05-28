@@ -39,7 +39,7 @@ export const ListVerifiedCountsSchema = z.object({
 });
 
 export const logConsultation = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { logConsultationHandler } = await import('./consultations.server');
     const data = LogConsultationSchema.parse(args.data);
     return logConsultationHandler({ data });
@@ -47,7 +47,7 @@ export const logConsultation = createServerFn({ method: 'POST' }).handler(
 );
 
 export const listConsultations = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { listConsultationsHandler } = await import('./consultations.server');
     const data = ListConsultationsSchema.parse(args.data);
     return listConsultationsHandler({ data });
@@ -55,7 +55,7 @@ export const listConsultations = createServerFn({ method: 'GET' }).handler(
 );
 
 export const listPendingConsultations = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { listPendingConsultationsHandler } = await import('./consultations.server');
     const data = ListPendingConsultationsSchema.parse(args.data);
     return listPendingConsultationsHandler({ data });
@@ -63,7 +63,7 @@ export const listPendingConsultations = createServerFn({ method: 'GET' }).handle
 );
 
 export const verifyConsultation = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { verifyConsultationHandler } = await import('./consultations.server');
     const data = VerifyConsultationSchema.parse(args.data);
     return verifyConsultationHandler({ data });
@@ -71,7 +71,7 @@ export const verifyConsultation = createServerFn({ method: 'POST' }).handler(
 );
 
 export const rejectConsultation = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { rejectConsultationHandler } = await import('./consultations.server');
     const data = RejectConsultationSchema.parse(args.data);
     return rejectConsultationHandler({ data });
@@ -79,7 +79,7 @@ export const rejectConsultation = createServerFn({ method: 'POST' }).handler(
 );
 
 export const getConsultationDetail = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getConsultationDetailHandler } = await import('./consultations.server');
     const data = GetConsultationDetailSchema.parse(args.data);
     return getConsultationDetailHandler({ data });
@@ -87,7 +87,7 @@ export const getConsultationDetail = createServerFn({ method: 'GET' }).handler(
 );
 
 export const listVerifiedCounts = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { listVerifiedCountsHandler } = await import('./consultations.server');
     const data = ListVerifiedCountsSchema.parse(args.data);
     return listVerifiedCountsHandler({ data });
