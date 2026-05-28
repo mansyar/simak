@@ -38,7 +38,8 @@ export const Route = createFileRoute('/_authenticated/admin/templates/')({
     type: search.type,
   }),
   loader: async ({ deps }) => {
-    return (listTemplates as any)({ data: deps });
+    // @ts-expect-error - listTemplates handler type inference limitation
+    return listTemplates({ data: deps });
   },
   pendingComponent: () => <TemplateLoadingSkeleton />,
   component: TemplatesPage,
@@ -74,15 +75,17 @@ function TemplatesPage() {
   const getTemplateFn = useServerFn(getTemplate);
   const updateTemplateFn = useServerFn(updateTemplate);
 
+  type TemplateSearchParams = z.infer<typeof TemplateSearchSchema>;
+
   const handleSearchChange = (value: string) => {
     navigate({
-      search: (prev) => ({ ...prev, search: value, page: 1 }),
+      search: (prev: TemplateSearchParams) => ({ ...prev, search: value, page: 1 }),
     });
   };
 
   const handleTypeChange = (value: string) => {
     navigate({
-      search: (prev) => ({
+      search: (prev: TemplateSearchParams) => ({
         ...prev,
         type: value === 'all' ? '' : value,
         page: 1,
@@ -92,56 +95,65 @@ function TemplatesPage() {
 
   const handlePageChange = (page: number) => {
     navigate({
-      search: (prev) => ({ ...prev, page }),
+      search: (prev: TemplateSearchParams) => ({ ...prev, page }),
     });
   };
 
   const handleCreateTemplate = async (values: Record<string, unknown>) => {
-    const result = await (createTemplateFn as any)({ data: values });
+    // @ts-expect-error - useServerFn type inference limitation
+    const result = await createTemplateFn({ data: values });
     return result;
   };
 
   const handleCreateSuccess = () => {
-    navigate({ search: (prev) => prev }); // Refresh
+    navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
   };
 
   const handleEdit = async (template: TemplateRow) => {
-    const result = await (getTemplateFn as any)({ data: { id: template.id } });
+    // @ts-expect-error - useServerFn type inference limitation
+    const result = await getTemplateFn({ data: { id: template.id } });
     if (result) {
-      setEditingTemplate(result);
+      setEditingTemplate(result as EditingTemplate);
       setIsEditSheetOpen(true);
     }
   };
 
   const handleUpdateTemplate = async (id: number, values: Record<string, unknown>) => {
-    const result = await (updateTemplateFn as any)({ data: { ...values, id } });
-    return result;
+    // @ts-expect-error - useServerFn type inference limitation
+    const result = await updateTemplateFn({ data: { ...values, id } });
+    return result as Record<string, unknown>;
   };
 
   const handleEditSuccess = () => {
-    navigate({ search: (prev) => prev }); // Refresh
+    navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
   };
 
   const handleDelete = async (template: TemplateRow) => {
     // First check if template is in use
-    const fullTemplate = await (getTemplateFn as any)({ data: { id: template.id } });
-    const usageCount = fullTemplate?.assignmentCount ?? 0;
+    // @ts-expect-error - useServerFn type inference limitation
+    const fullTemplate = await getTemplateFn({ data: { id: template.id } });
+    const usageCount = (fullTemplate as { assignmentCount?: number })?.assignmentCount ?? 0;
     setDeletingTemplate({ id: template.id, usageCount });
     setIsDeleteDialogOpen(true);
   };
 
   const handleConfirmDelete = async () => {
     if (!deletingTemplate) return;
-    const result = await (deleteTemplateFn as any)({ data: { id: deletingTemplate.id } });
-    if (result.success || result.error === 'in_use') {
-      navigate({ search: (prev) => prev }); // Refresh
+    // @ts-expect-error - useServerFn type inference limitation
+    const result = await deleteTemplateFn({ data: { id: deletingTemplate.id } });
+    if (
+      (result as { success?: boolean; error?: string }).success ||
+      (result as { error?: string }).error === 'in_use'
+    ) {
+      navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
     }
   };
 
   const handleDuplicate = async (template: TemplateRow) => {
-    const result = await (duplicateTemplateFn as any)({ data: { id: template.id } });
-    if (result.template) {
-      navigate({ search: (prev) => prev }); // Refresh
+    // @ts-expect-error - useServerFn type inference limitation
+    const result = await duplicateTemplateFn({ data: { id: template.id } });
+    if ((result as { template?: unknown }).template) {
+      navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
     }
   };
 
