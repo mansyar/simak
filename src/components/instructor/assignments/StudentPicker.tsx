@@ -38,7 +38,11 @@ export function StudentPicker({
       try {
         setLoading(true);
         // Request page 1 with high limit to capture all student users
-        const response = await (listUsers as any)({
+        const response = await (
+          listUsers as unknown as (args: {
+            data: { page: number; limit: number; search: string; role?: string };
+          }) => Promise<{ users: Student[] }>
+        )({
           data: { page: 1, limit: 200, search: '', role: 'student' },
         });
         if (response && response.users) {
