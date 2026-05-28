@@ -63,18 +63,18 @@
 - [x] Task: Fix `src/routes/_authenticated/admin/audit-log.tsx` — navigate search callbacks + map callback [a244865]
 - [x] Task: Fix `src/routes/_authenticated/admin/users/index.tsx` — server fn calls + `as any` casts [ab9541d]
 - [x] Task: Fix `src/routes/_authenticated/admin/templates/index.tsx` — server fn calls + `as any` casts [21f4ef9]
-- [ ] Task: Fix `src/routes/_authenticated/student/assignments/index.tsx` — navigate callbacks + map callback
-- [ ] Task: Fix `src/routes/_authenticated/student/assignments/$id.tsx` — loader data + params + server fn calls + `as any` casts
-- [ ] Task: Fix `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx` — loader data + params + navigate + server fn calls
-- [ ] Task: Fix `src/routes/_authenticated/instructor/reviews/index.tsx` — loader data + search params + navigate
-- [ ] Task: Fix `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` — server fn calls
-- [ ] Task: Fix `src/routes/_authenticated/instructor/assignments/index.tsx` — loader data + search params + navigate + map callback
-- [ ] Task: Fix `src/routes/_authenticated/instructor/assignments/$id.tsx` — loader data + params + `any[]` useState + map callbacks
-- [ ] Task: Fix `src/routes/_authenticated/instructor/assignments/new.tsx` — navigate cast
-- [ ] Task: Add `tests/**` and `scripts/**` to ESLint ignores (if not done in Phase 1)
-- [ ] Task: Verify all changes compile
-  - [ ] Run `pnpm typecheck` — must pass
-  - [ ] Run `pnpm test` — must pass
+- [x] Task: Fix `src/routes/_authenticated/student/assignments/index.tsx` — navigate callbacks + map callback [a9248e8]
+- [x] Task: Fix `src/routes/_authenticated/student/assignments/$id.tsx` — loader data + params + server fn calls + `as any` casts [acae9db]
+- [x] Task: Fix `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx` — loader data + params + navigate + server fn calls [2d205d1]
+- [x] Task: Fix `src/routes/_authenticated/instructor/reviews/index.tsx` — loader data + search params + navigate [066dcb5]
+- [x] Task: Fix `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` — server fn calls [1881b26]
+- [x] Task: Fix `src/routes/_authenticated/instructor/assignments/index.tsx` — loader data + search params + navigate + map callback [6ad76bd]
+- [x] Task: Fix `src/routes/_authenticated/instructor/assignments/$id.tsx` — loader data + params + `any[]` useState + map callbacks [4d71966]
+- [x] Task: Fix `src/routes/_authenticated/instructor/assignments/new.tsx` — navigate cast [a76fc64]
+- [x] Task: Add `tests/**` and `scripts/**` to ESLint ignores (if not done in Phase 1)
+- [x] Task: Verify all changes compile
+  - [x] Run `pnpm typecheck` — must pass
+  - [x] Run `pnpm test` — must pass
 - [ ] Task: Conductor — User Manual Verification 'Phase 4: Fix Route Files' (Protocol in workflow.md)
 
 ## Phase 5: Fix Component Files — `as any` Casts
