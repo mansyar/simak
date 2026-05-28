@@ -7,6 +7,16 @@ import { RefreshCcw, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 
+interface AuditLogEntry {
+  id: number;
+  actorId: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  details: Record<string, unknown> | null;
+  createdAt: string | null;
+}
+
 const AuditLogSearchSchema = z.object({
   page: z.number().optional().default(1),
   limit: z.number().optional().default(50),
@@ -42,7 +52,8 @@ export const Route = createFileRoute('/_authenticated/admin/audit-log')({
     search: search.search,
   }),
   loader: async ({ deps }) => {
-    return (listAuditLogs as any)({ data: deps });
+    // @ts-expect-error - listAuditLogs handler type inference limitation
+    return listAuditLogs({ data: deps });
   },
   component: AuditLogPage,
 });
@@ -66,24 +77,26 @@ function AuditLogPage() {
     setIsRefreshing(false);
   };
 
+  type AuditLogSearchParams = z.infer<typeof AuditLogSearchSchema>;
+
   const handleSearchChange = (value: string) => {
-    navigate({ search: (prev: any) => ({ ...prev, search: value, page: 1 }) });
+    navigate({ search: (prev: AuditLogSearchParams) => ({ ...prev, search: value, page: 1 }) });
   };
 
   const handleActionFilter = (value: string) => {
-    navigate({ search: (prev: any) => ({ ...prev, action: value, page: 1 }) });
+    navigate({ search: (prev: AuditLogSearchParams) => ({ ...prev, action: value, page: 1 }) });
   };
 
   const handleDateFromChange = (value: string) => {
-    navigate({ search: (prev: any) => ({ ...prev, dateFrom: value, page: 1 }) });
+    navigate({ search: (prev: AuditLogSearchParams) => ({ ...prev, dateFrom: value, page: 1 }) });
   };
 
   const handleDateToChange = (value: string) => {
-    navigate({ search: (prev: any) => ({ ...prev, dateTo: value, page: 1 }) });
+    navigate({ search: (prev: AuditLogSearchParams) => ({ ...prev, dateTo: value, page: 1 }) });
   };
 
   const goToPage = (page: number) => {
-    navigate({ search: (prev: any) => ({ ...prev, page }) });
+    navigate({ search: (prev: AuditLogSearchParams) => ({ ...prev, page }) });
   };
 
   const toggleDetails = (id: number) => {
@@ -184,7 +197,7 @@ function AuditLogPage() {
                   </td>
                 </tr>
               ) : (
-                entries.map((entry: any) => (
+                entries.map((entry: AuditLogEntry) => (
                   <tr key={entry.id} className="border-b hover:bg-muted/30">
                     <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">
                       {formatTimestamp(entry.createdAt)}
