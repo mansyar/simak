@@ -34,7 +34,7 @@
   - [x] Run tests and confirm they pass
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Audit Log Helper' (Protocol in workflow.md)
 
-## Phase 3: Wire User Handlers
+## Phase 3: Wire User Handlers [checkpoint: 595127d]
 
 - [x] Task: Write user handler audit tests (Red Phase) 0e0c447
   - [x] Create test file `tests/unit/server/users-audit.test.ts`
