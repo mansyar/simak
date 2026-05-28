@@ -149,3 +149,7 @@
   - [ ] Test pagination
   - [ ] Verify non-admin users are redirected
 - [ ] Task: Conductor - User Manual Verification 'Phase 8: Final Verification & Checkpoint' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 89bbf7c
