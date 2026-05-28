@@ -60,7 +60,11 @@ export function VerificationDialog({
   const loadDetail = async (id: number) => {
     setLoading(true);
     setError(null);
-    const result = await (getConsultationDetail as any)({ data: { consultationId: id } });
+    const result = await (
+      getConsultationDetail as unknown as (args: {
+        data: { consultationId: number };
+      }) => Promise<{ consultation: DetailData; error?: string }>
+    )({ data: { consultationId: id } });
     if (result.consultation) {
       setDetail(result.consultation);
     } else {
@@ -73,7 +77,11 @@ export function VerificationDialog({
     if (!consultationId) return;
     setLoading(true);
     setError(null);
-    const result = await (verifyConsultation as any)({ data: { consultationId } });
+    const result = await (
+      verifyConsultation as unknown as (args: {
+        data: { consultationId: number };
+      }) => Promise<{ success: boolean; error: string | null }>
+    )({ data: { consultationId } });
     if (result.success) {
       onOpenChange(false);
       onActionComplete();
@@ -87,7 +95,11 @@ export function VerificationDialog({
     if (!consultationId || !rejectReason.trim()) return;
     setLoading(true);
     setError(null);
-    const result = await (rejectConsultation as any)({
+    const result = await (
+      rejectConsultation as unknown as (args: {
+        data: { consultationId: number; reason: string };
+      }) => Promise<{ success: boolean; error: string | null }>
+    )({
       data: { consultationId, reason: rejectReason.trim() },
     });
     if (result.success) {
