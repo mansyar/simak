@@ -108,26 +108,26 @@
   - [x] Create `src/server/audit-logs.server.ts` with handler implementations
   - [x] Implement listAuditLogsHandler with pagination and filters
   - [x] Run tests and confirm they pass
-- [ ] Task: Write admin audit log page tests (Red Phase)
-  - [ ] Create test file `tests/unit/routes/admin-audit-log.test.tsx`
-  - [ ] Test page renders with audit log table
-  - [ ] Test pagination works
-  - [ ] Test action filter dropdown works
-  - [ ] Run tests and confirm they fail
-- [ ] Task: Implement admin audit log page (Green Phase)
-  - [ ] Create `src/routes/_authenticated/_admin/audit-log.tsx`
-  - [ ] Implement AuditLogTable component with columns: Timestamp, Action, Actor, Entity Type, Entity ID, Details
-  - [ ] Implement AuditLogFilters component with action type dropdown and date range
-  - [ ] Add pagination component
-  - [ ] Add role guard (requireRole(['superadmin', 'admin']))
-  - [ ] Run tests and confirm they pass
-- [ ] Task: Add i18n translations for audit log UI
-  - [ ] Add English translations to `locales/en.json`
-  - [ ] Add Indonesian translations to `locales/id.json`
-  - [ ] Run `pnpm generate:i18n` to update types
-- [ ] Task: Add sidebar link to audit log
-  - [ ] Update admin sidebar to include Audit Log link
-  - [ ] Run `pnpm typecheck` to verify
+- [x] Task: Write admin audit log page tests (Red Phase) e1c0afe
+  - [x] Create test file `tests/unit/routes/admin-audit-log.test.tsx`
+  - [x] Test page renders with audit log table
+  - [x] Test pagination works
+  - [x] Test action filter dropdown works
+  - [x] Run tests and confirm they fail
+- [x] Task: Implement admin audit log page (Green Phase) e1c0afe
+  - [x] Create `src/routes/_authenticated/admin/audit-log.tsx`
+  - [x] Implement AuditLogTable component with columns: Timestamp, Action, Actor, Entity Type, Entity ID, Details
+  - [x] Implement AuditLogFilters component with action type dropdown and date range
+  - [x] Add pagination component
+  - [x] Add role guard (route under /\_authenticated/admin)
+  - [x] Run tests and confirm they pass
+- [x] Task: Add i18n translations for audit log UI e1c0afe
+  - [x] Add English translations to `locales/en.json`
+  - [x] Add Indonesian translations to `locales/id.json`
+  - [x] Run `pnpm generate:i18n` to update types
+- [x] Task: Add sidebar link to audit log e1c0afe
+  - [x] Update admin sidebar to include Audit Log link
+  - [x] Run `pnpm typecheck` to verify
 - [ ] Task: Conductor - User Manual Verification 'Phase 7: Admin Audit Log Viewer' (Protocol in workflow.md)
 
 ## Phase 8: Final Verification & Checkpoint
