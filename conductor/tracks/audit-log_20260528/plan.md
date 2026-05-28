@@ -80,19 +80,19 @@
   - [x] Run tests and confirm they pass
 - [x] Task: Conductor - User Manual Verification 'Phase 5: Wire Assignment & Review Handlers' (Protocol in workflow.md)
 
-## Phase 6: Wire Consultation Handlers
+## Phase 6: Wire Consultation Handlers [checkpoint: a3fd86c]
 
-- [~] Task: Write consultation handler audit tests (Red Phase)
-  - [ ] Create test file `tests/unit/server/consultations-audit.test.ts`
-  - [ ] Test verifyConsultationHandler writes `consultation.verified` audit entry
-  - [ ] Test rejectConsultationHandler writes `consultation.rejected` audit entry
-  - [ ] Run tests and confirm they fail
-- [ ] Task: Wire consultation handlers to audit log (Green Phase)
-  - [ ] Import logAuditEvent in `src/server/consultations.server.ts`
-  - [ ] Add audit call in verifyConsultationHandler after successful verification
-  - [ ] Add audit call in rejectConsultationHandler after successful rejection
-  - [ ] Run tests and confirm they pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 6: Wire Consultation Handlers' (Protocol in workflow.md)
+- [x] Task: Write consultation handler audit tests (Red Phase) b897a23
+  - [x] Create test file `tests/unit/server/consultations-audit.test.ts`
+  - [x] Test verifyConsultationHandler writes `consultation.verified` audit entry
+  - [x] Test rejectConsultationHandler writes `consultation.rejected` audit entry
+  - [x] Run tests and confirm they fail
+- [x] Task: Wire consultation handlers to audit log (Green Phase) b897a23
+  - [x] Import logAuditEvent in `src/server/consultations.server.ts`
+  - [x] Add audit call in verifyConsultationHandler after successful verification
+  - [x] Add audit call in rejectConsultationHandler after successful rejection
+  - [x] Run tests and confirm they pass
+- [x] Task: Conductor - User Manual Verification 'Phase 6: Wire Consultation Handlers' (Protocol in workflow.md)
 
 ## Phase 7: Admin Audit Log Viewer
 
