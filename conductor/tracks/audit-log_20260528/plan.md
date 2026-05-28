@@ -48,7 +48,7 @@
   - [x] Run tests and confirm they pass
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Wire User Handlers' (Protocol in workflow.md)
 
-## Phase 4: Wire Template Handlers
+## Phase 4: Wire Template Handlers [checkpoint: 12922e0]
 
 - [x] Task: Write template handler audit tests (Red Phase) c162496
   - [x] Create test file `tests/unit/server/templates-audit.test.ts`
