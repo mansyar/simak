@@ -30,7 +30,7 @@ export const GetLatestReviewSchema = z.object({
 });
 
 export const listPendingReviews = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { listPendingReviewsHandler } = await import('./reviews.server');
     const data = ListPendingReviewsSchema.parse(args.data);
     return listPendingReviewsHandler({ data });
@@ -38,7 +38,7 @@ export const listPendingReviews = createServerFn({ method: 'GET' }).handler(
 );
 
 export const getReviewDetail = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getReviewDetailHandler } = await import('./reviews.server');
     const data = GetReviewDetailSchema.parse(args.data);
     return getReviewDetailHandler({ data });
@@ -46,7 +46,7 @@ export const getReviewDetail = createServerFn({ method: 'GET' }).handler(
 );
 
 export const openForReview = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { openForReviewHandler } = await import('./reviews.server');
     const data = OpenForReviewSchema.parse(args.data);
     return openForReviewHandler({ data });
@@ -54,7 +54,7 @@ export const openForReview = createServerFn({ method: 'POST' }).handler(
 );
 
 export const submitReview = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { submitReviewHandler } = await import('./reviews.server');
     const data = SubmitReviewSchema.parse(args.data);
     return submitReviewHandler({ data });
@@ -62,7 +62,7 @@ export const submitReview = createServerFn({ method: 'POST' }).handler(
 );
 
 export const getLatestReview = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: any }) => {
+  async (args: { data: unknown }) => {
     const { getLatestReviewHandler } = await import('./reviews.server');
     const data = GetLatestReviewSchema.parse(args.data);
     return getLatestReviewHandler({ data });
