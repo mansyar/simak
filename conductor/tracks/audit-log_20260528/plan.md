@@ -17,7 +17,7 @@
   - [x] Run `pnpm db:generate` to create migration SQL
   - [x] Run `pnpm db:push` to apply to dev database
   - [x] Verify table exists in database
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Schema & Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Database Schema & Migration' (Protocol in workflow.md)
 
 ## Phase 2: Audit Log Helper
 
