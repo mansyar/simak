@@ -39,7 +39,16 @@ export function ConsultationForm({ assignmentId, checkpoints, onSuccess }: Consu
     setLoading(true);
     setError(null);
 
-    const result = await (logConsultation as any)({
+    const result = await (
+      logConsultation as unknown as (args: {
+        data: {
+          checkpointId: number;
+          sessionType: string;
+          externalConsultantName?: string;
+          notes: string;
+        };
+      }) => Promise<{ error?: string }>
+    )({
       data: {
         checkpointId: Number(checkpointId),
         sessionType,
