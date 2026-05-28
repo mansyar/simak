@@ -14,7 +14,8 @@ import { useI18n } from '../../../__root';
 
 export const Route = createFileRoute('/_authenticated/student/assignments/$id')({
   loader: async ({ params }) => {
-    return (getStudentAssignmentDetail as any)({ data: { id: Number((params as any).id) } });
+    // @ts-expect-error - getStudentAssignmentDetail handler type inference limitation
+    return getStudentAssignmentDetail({ data: { id: Number(params.id) } });
   },
   pendingComponent: () => (
     <div className="space-y-6">
@@ -36,7 +37,11 @@ function AssignmentNotFound() {
       <p className="text-sm text-muted-foreground mb-4">
         {t('studentAssignments.notFoundDescription')}
       </p>
-      <Link to="/student/assignments" className="inline-flex" search={() => ({}) as any}>
+      <Link
+        to="/student/assignments"
+        className="inline-flex"
+        search={() => ({ page: 1, limit: 20, search: '' })}
+      >
         <Button variant="outline" type="button">
           <ChevronLeft className="mr-2 h-4 w-4" />
           {t('common.back')}
@@ -48,28 +53,59 @@ function AssignmentNotFound() {
 
 function AssignmentDetailPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as any;
+  const data = Route.useLoaderData();
   const matchRoute = useMatchRoute();
-  const [consultations, setConsultations] = useState<any[]>([]);
-  const [verifiedCounts, setVerifiedCounts] = useState<any[]>([]);
+  const [consultations, setConsultations] = useState<
+    {
+      id: number;
+      checkpointName: string;
+      sessionType: string | null;
+      externalConsultantName: string | null;
+      notes: string | null;
+      status: string;
+      createdAt: string;
+    }[]
+  >([]);
+  const [verifiedCounts, setVerifiedCounts] = useState<
+    {
+      checkpointId: number;
+      checkpointName: string;
+      verifiedCount: number;
+      minConsultations: number;
+    }[]
+  >([]);
   const [activeTab, setActiveTab] = useState<'timeline' | 'consultations'>('timeline');
 
   // Load consultation data on mount
   useEffect(() => {
     if (data) {
       const loadConsultations = async () => {
-        const consResult = await (listConsultations as any)({
-          data: { assignmentId: data.id },
+        const listConsFn = listConsultations as unknown as (args: {
+          data: { assignmentId: number };
+        }) => Promise<unknown>;
+        const listCountsFn = listVerifiedCounts as unknown as (args: {
+          data: { assignmentId: number };
+        }) => Promise<unknown>;
+        const consResult = await listConsFn({
+          data: { assignmentId: (data as { id: number }).id },
         });
-        if (consResult.consultations) {
-          setConsultations(consResult.consultations);
+        if (
+          consResult &&
+          typeof consResult === 'object' &&
+          'consultations' in (consResult as Record<string, unknown>)
+        ) {
+          setConsultations((consResult as { consultations: typeof consultations }).consultations);
         }
 
-        const countsResult = await (listVerifiedCounts as any)({
-          data: { assignmentId: data.id },
+        const countsResult = await listCountsFn({
+          data: { assignmentId: (data as { id: number }).id },
         });
-        if (countsResult.counts) {
-          setVerifiedCounts(countsResult.counts);
+        if (
+          countsResult &&
+          typeof countsResult === 'object' &&
+          'counts' in (countsResult as Record<string, unknown>)
+        ) {
+          setVerifiedCounts((countsResult as { counts: typeof verifiedCounts }).counts);
         }
       };
       loadConsultations();
@@ -80,7 +116,7 @@ function AssignmentDetailPage() {
   // The child route (submission page) has its own full layout and back navigation
   const isOnCheckpointChild = matchRoute({
     to: '/student/assignments/$id/checkpoints/$checkpointId',
-  } as any);
+  } as never);
   if (isOnCheckpointChild) {
     return <Outlet />;
   }
@@ -98,7 +134,18 @@ function AssignmentDetailPage() {
     templateType: data.templateType,
   };
 
-  const checkpoints = (data.checkpoints ?? []).map((cp: any) => ({
+  const checkpoints = (
+    ((data as Record<string, unknown>).checkpoints as {
+      id: number;
+      name: string;
+      order: number;
+      state: 'locked' | 'unlocked' | 'submitted' | 'under_review' | 'passed' | 'revise';
+      dueDate: string | null;
+      minConsultations: number;
+      verifiedConsultationCount: number;
+      blockingReasons: string[];
+    }[]) ?? []
+  ).map((cp) => ({
     id: cp.id,
     name: cp.name,
     order: cp.order,
@@ -111,25 +158,43 @@ function AssignmentDetailPage() {
 
   const handleConsultationSuccess = async () => {
     // Refresh consultation data
-    const consResult = await (listConsultations as any)({
-      data: { assignmentId: data.id },
+    const listConsFn = listConsultations as unknown as (args: {
+      data: { assignmentId: number };
+    }) => Promise<unknown>;
+    const listCountsFn = listVerifiedCounts as unknown as (args: {
+      data: { assignmentId: number };
+    }) => Promise<unknown>;
+    const consResult = await listConsFn({
+      data: { assignmentId: (data as { id: number }).id },
     });
-    if (consResult.consultations) {
-      setConsultations(consResult.consultations);
+    if (
+      consResult &&
+      typeof consResult === 'object' &&
+      'consultations' in (consResult as Record<string, unknown>)
+    ) {
+      setConsultations((consResult as { consultations: typeof consultations }).consultations);
     }
 
-    const countsResult = await (listVerifiedCounts as any)({
-      data: { assignmentId: data.id },
+    const countsResult = await listCountsFn({
+      data: { assignmentId: (data as { id: number }).id },
     });
-    if (countsResult.counts) {
-      setVerifiedCounts(countsResult.counts);
+    if (
+      countsResult &&
+      typeof countsResult === 'object' &&
+      'counts' in (countsResult as Record<string, unknown>)
+    ) {
+      setVerifiedCounts((countsResult as { counts: typeof verifiedCounts }).counts);
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Link to="/student/assignments" search={() => ({}) as any} className="inline-flex">
+        <Link
+          to="/student/assignments"
+          search={() => ({ page: 1, limit: 20, search: '' })}
+          className="inline-flex"
+        >
           <Button variant="ghost" size="sm" type="button">
             <ChevronLeft className="mr-1 h-4 w-4" />
             {t('common.back')}
@@ -190,7 +255,7 @@ function AssignmentDetailPage() {
             </h3>
             <ConsultationForm
               assignmentId={data.id}
-              checkpoints={checkpoints.map((cp: any) => ({ id: cp.id, name: cp.name }))}
+              checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
               onSuccess={handleConsultationSuccess}
             />
           </div>
