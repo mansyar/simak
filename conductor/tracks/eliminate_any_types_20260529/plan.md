@@ -37,7 +37,7 @@
   - [x] Run `pnpm test` — must pass
 - [x] Task: Conductor — User Manual Verification 'Phase 2: Fix .server.ts Type Guards' (Protocol in workflow.md)
 
-## Phase 3: Fix Server Stub Files — `args: { data: any }`
+## Phase 3: Fix Server Stub Files — `args: { data: any }` [checkpoint: 79028fd]
 
 **Objective:** Replace `args: { data: any }` with `args: { data: unknown }` in all `createServerFn` stubs.
 
@@ -54,7 +54,7 @@
 - [x] Task: Verify all changes compile
   - [x] Run `pnpm typecheck` — must pass
   - [x] Run `pnpm test` — must pass
-- [~] Task: Conductor — User Manual Verification 'Phase 3: Fix Server Stubs' (Protocol in workflow.md)
+- [x] Task: Conductor — User Manual Verification 'Phase 3: Fix Server Stubs' (Protocol in workflow.md)
 
 ## Phase 4: Fix Route Files — `as any` Casts + `any[]` + Callback Params
 
