@@ -4,5 +4,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Estimated Duration & Auto-Calculated DueDates**
-      _Link: ./tracks/estimated_duration_duedates_20260529/_
+_(No active tracks. Create a new track with `/conductor:track`)_
