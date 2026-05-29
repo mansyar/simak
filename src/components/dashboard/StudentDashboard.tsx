@@ -36,7 +36,7 @@ interface ConsultationReminder {
   consultationDate: string;
 }
 
-interface StudentDashboardData {
+export interface StudentDashboardData {
   activeAssignments: ActiveAssignment[];
   upcomingDeadlines: UpcomingDeadline[];
   pendingReviews: PendingReview[];

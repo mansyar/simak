@@ -32,8 +32,7 @@ const _getSession = createServerFn({ method: 'GET' }).handler(async () => {
     return null;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const u = result as any;
+  const u = result as unknown as NonNullable<Session>;
 
   // Query the database directly for role and locale since Better Auth
   // session doesn't include additional fields by default

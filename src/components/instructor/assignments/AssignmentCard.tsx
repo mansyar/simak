@@ -70,7 +70,7 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
         </div>
 
         <Link
-          to={`/instructor/assignments/${assignment.id}` as any}
+          to={`/instructor/assignments/${assignment.id}` as never}
           className="inline-flex items-center justify-center rounded-md text-xs font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-accent hover:text-accent-foreground px-2.5 py-1.5 text-primary"
         >
           {t('common.viewAll')} &rarr;

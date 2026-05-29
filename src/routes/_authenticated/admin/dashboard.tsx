@@ -1,18 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getAdminDashboardData } from '@/server/dashboard';
 import { useI18n } from '../../__root';
-import { AdminDashboard } from '@/components/dashboard/AdminDashboard';
+import { AdminDashboard, type AdminDashboardData } from '@/components/dashboard/AdminDashboard';
 
 export const Route = createFileRoute('/_authenticated/admin/dashboard')({
   loader: async () => {
-    return (getAdminDashboardData as any)();
+    return getAdminDashboardData();
   },
   component: AdminDashboardPage,
 });
 
 function AdminDashboardPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as any;
+  const data = Route.useLoaderData() as unknown as AdminDashboardData;
 
   return (
     <div className="space-y-6">

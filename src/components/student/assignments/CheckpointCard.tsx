@@ -73,7 +73,7 @@ function getTranslatedBlockingReason(
 
 export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps) {
   const { t } = useI18n();
-  const navigate = useNavigate() as any;
+  const navigate = useNavigate();
   const config = stateConfig[checkpoint.state] ?? stateConfig.locked;
   const isOverdue =
     checkpoint.dueDate && isPast(new Date(checkpoint.dueDate)) && checkpoint.state !== 'passed';

@@ -76,7 +76,14 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
 
       // 4. Instantiate checkpoints for each student
       if (tCheckpoints.length > 0) {
-        const checkpointRows: any[] = [];
+        const checkpointRows: {
+          assignmentId: number;
+          studentId: string;
+          name: string;
+          order: number;
+          minConsultations: number;
+          state: 'unlocked' | 'locked';
+        }[] = [];
         for (const studentId of studentIds) {
           tCheckpoints.forEach((tcp) => {
             checkpointRows.push({
@@ -223,7 +230,24 @@ export async function getAssignmentDetailHandler(args: { data: AssignmentIdParam
     .orderBy(users.name);
 
   const studentIds = studentsList.map((s) => s.id);
-  const studentsWithProgress: any[] = [];
+  const studentsWithProgress: {
+    id: string;
+    name: string;
+    email: string;
+    passedCount: number;
+    totalCheckpointsCount: number;
+    progressPercent: number;
+    activeCheckpoint: { id: number; name: string; state: string } | null;
+    checkpoints: {
+      id: number;
+      name: string;
+      order: number;
+      state: string;
+      studentId: string;
+      dueDate: Date | null;
+      minConsultations: number | null;
+    }[];
+  }[] = [];
 
   if (studentIds.length > 0) {
     // 3. Fetch all checkpoints for these students

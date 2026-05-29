@@ -37,7 +37,7 @@ interface EscalationAlert {
   daysOverdue: number;
 }
 
-interface AdminDashboardData {
+export interface AdminDashboardData {
   metrics: SystemMetrics;
   recentActivity: ActivityEvent[];
   escalationAlerts: EscalationAlert[];

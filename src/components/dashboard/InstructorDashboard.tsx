@@ -29,7 +29,7 @@ interface AssignmentOverview {
   overallProgressPercent: number;
 }
 
-interface InstructorDashboardData {
+export interface InstructorDashboardData {
   pendingReviewCount: number;
   pendingReviewItems: PendingReviewItem[];
   recentSubmissions: RecentSubmission[];

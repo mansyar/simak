@@ -86,7 +86,11 @@ export function DeadlineManager({ students, assignmentId }: DeadlineManagerProps
   // Unlock mutation
   const unlockMutation = useMutation({
     mutationFn: async (checkpointId: number) => {
-      const result = await (unlockCheckpoint as any)({ data: { checkpointId } });
+      const result = await (
+        unlockCheckpoint as unknown as (args: {
+          data: { checkpointId: number };
+        }) => Promise<unknown>
+      )({ data: { checkpointId } });
       return result;
     },
     onSuccess: () => {
@@ -107,7 +111,11 @@ export function DeadlineManager({ students, assignmentId }: DeadlineManagerProps
       checkpointId: number;
       newDueDate: Date;
     }) => {
-      const result = await (extendDeadline as any)({ data: { checkpointId, newDueDate } });
+      const result = await (
+        extendDeadline as unknown as (args: {
+          data: { checkpointId: number; newDueDate: Date };
+        }) => Promise<unknown>
+      )({ data: { checkpointId, newDueDate } });
       return result;
     },
     onSuccess: (_data, variables) => {

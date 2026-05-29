@@ -53,7 +53,7 @@ export async function createNotificationHandler(args: { data: CreateNotification
       })
       .returning();
 
-    return { notification: notification as any };
+    return { notification: notification as never };
   } catch (err) {
     console.error('Failed to create notification:', err);
     return { error: 'Internal Server Error' };
@@ -96,7 +96,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
       .offset((page - 1) * limit);
 
     return {
-      items: items as any,
+      items: items as never,
       total: Number(count),
     };
   } catch (err) {

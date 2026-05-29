@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { listInstructorAssignments } from '@/server/assignments';
 import { AssignmentCard } from '@/components/instructor/assignments/AssignmentCard';
@@ -45,7 +45,7 @@ function AssignmentsPage() {
           templateName: string;
           finalDeadline: Date;
           createdAt: Date;
-          status: string;
+          description: string | null;
           studentCount: number;
         }[];
       }
@@ -57,17 +57,19 @@ function AssignmentsPage() {
 
   const handleSearchChange = (value: string) => {
     navigate({
-      search: (prev: z.infer<typeof AssignmentSearchSchema>) => ({
-        ...prev,
-        search: value,
-        page: 1,
-      }),
+      search: (prev: z.infer<typeof AssignmentSearchSchema>) =>
+        ({
+          ...prev,
+          search: value,
+          page: 1,
+        }) satisfies z.infer<typeof AssignmentSearchSchema>,
     });
   };
 
   const handlePageChange = (page: number) => {
     navigate({
-      search: (prev: z.infer<typeof AssignmentSearchSchema>) => ({ ...prev, page }),
+      search: (prev: z.infer<typeof AssignmentSearchSchema>) =>
+        ({ ...prev, page }) satisfies z.infer<typeof AssignmentSearchSchema>,
     });
   };
 
@@ -92,7 +94,7 @@ function AssignmentsPage() {
             size="icon"
             onClick={() => {
               setIsRefreshing(true);
-              navigate({ search: (prev: any) => prev });
+              navigate({ search: (prev: z.infer<typeof AssignmentSearchSchema>) => prev });
               setTimeout(() => setIsRefreshing(false), 1000);
             }}
             disabled={isRefreshing}
@@ -115,7 +117,7 @@ function AssignmentsPage() {
         <AssignmentEmptyState onCreateNew={handleCreateNew} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {assignments.map((assignment: any) => (
+          {assignments.map((assignment) => (
             <AssignmentCard key={assignment.id} assignment={assignment} />
           ))}
         </div>

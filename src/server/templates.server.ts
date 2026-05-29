@@ -179,7 +179,7 @@ export async function createTemplateHandler(args: { data: CreateTemplateInput })
       createdBy: session.user.id,
     })
     .returning({ id: assignmentTemplates.id })
-    .then((rows: any) => rows);
+    .then((rows) => rows);
 
   await logAuditEvent({
     actorId: session.user.id,
@@ -328,7 +328,7 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
       createdBy: session.user.id,
     })
     .returning({ id: assignmentTemplates.id })
-    .then((rows: any) => rows);
+    .then((rows) => rows);
 
   // Fetch original checkpoints and copy them
   const originalCheckpoints = await db

@@ -1,18 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getStudentDashboardData } from '@/server/dashboard';
 import { useI18n } from '../../__root';
-import { StudentDashboard } from '@/components/dashboard/StudentDashboard';
+import {
+  StudentDashboard,
+  type StudentDashboardData,
+} from '@/components/dashboard/StudentDashboard';
 
 export const Route = createFileRoute('/_authenticated/student/dashboard')({
   loader: async () => {
-    return (getStudentDashboardData as any)();
+    return getStudentDashboardData();
   },
   component: StudentDashboardPage,
 });
 
 function StudentDashboardPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as any;
+  const data = Route.useLoaderData() as unknown as StudentDashboardData;
 
   return (
     <div className="space-y-6">

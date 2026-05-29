@@ -32,7 +32,14 @@ export async function getInstructorDashboardDataHandler() {
 
     const assignmentIds = instructorAssignments.map((a) => a.id);
     let pendingReviewCount = 0;
-    let pendingReviewItems: any[] = [];
+    let pendingReviewItems: {
+      submissionId: number;
+      checkpointId: number;
+      checkpointName: string;
+      assignmentTitle: string;
+      studentName: string;
+      submittedAt: Date | null;
+    }[] = [];
 
     if (assignmentIds.length > 0) {
       const [{ count }] = await db
