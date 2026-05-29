@@ -2,13 +2,13 @@
 
 ## Phase 1: Database Migration & Schema [checkpoint: TBD]
 
-- [ ] Task: Add `estimated_duration` column to `template_checkpoints` schema
-  - [ ] Add `estimatedDuration: integer('estimated_duration').default(0)` to `src/db/schema/templates.ts`
-  - [ ] Generate Drizzle migration via `pnpm db:generate`
-  - [ ] Verify migration SQL is correct (adds column, nullable with default 0)
-- [ ] Task: Write backfill migration SQL
-  - [ ] Create SQL migration file: backfill existing `template_checkpoints` with `estimated_duration = 14`
-  - [ ] Create SQL migration file: backfill existing `checkpoints.dueDate` where NULL, using `assignment.createdAt + cumulative estimated_duration` from template (fallback 14 days if template soft-deleted)
+- [x] Task: Add `estimated_duration` column to `template_checkpoints` schema (8686d0f)
+  - [x] Add `estimatedDuration: integer('estimated_duration').default(0)` to `src/db/schema/templates.ts`
+  - [x] Generate Drizzle migration via `pnpm db:generate` (manual SQL created as `0005_estimated_duration.sql`)
+  - [x] Verify migration SQL is correct (adds column, nullable with default 0)
+- [x] Task: Write backfill migration SQL (8686d0f)
+  - [x] Create SQL migration file: backfill existing `template_checkpoints` with `estimated_duration = 14`
+  - [x] Create SQL migration file: backfill existing `checkpoints.dueDate` where NULL, using `assignment.createdAt + cumulative estimated_duration` from template (fallback 14 days if template soft-deleted)
 - [ ] Task: Write tests for schema changes
   - [ ] Unit test — `template_checkpoints.estimatedDuration` column exists with correct type and default
   - [ ] Unit test — import verification for updated schema barrel exports
