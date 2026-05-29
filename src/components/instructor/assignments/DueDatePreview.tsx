@@ -44,7 +44,7 @@ export function DueDatePreview({
   const getEffectiveDate = (order: number): Date => {
     const override = overrides.find((o) => o.checkpointOrder === order);
     if (override) {
-      return new Date(override.dueDate + 'T00:00:00');
+      return new Date(override.dueDate);
     }
     return calculatedDueDates.find((c) => c.order === order)?.calculatedDate ?? new Date();
   };
