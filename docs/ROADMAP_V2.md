@@ -115,20 +115,7 @@ Single-import helper used across all handlers. Writes to `audit_log` table. No c
 
 **Dependencies:** Track 1.1 (audit log — assignment creation and deadline changes are logged).
 
-**Status:** ⏳ Planned
-
-**Estimated Scope:**
-
-| Area                                                         | Effort |
-| ------------------------------------------------------------ | ------ |
-| Schema migration (add `estimated_duration` column)           | Small  |
-| Template admin UI (add duration input per checkpoint row)    | Medium |
-| `createAssignmentHandler` — pre-fill dueDates from durations | Medium |
-| Assignment creation wizard — show calculated dates preview   | Medium |
-| Sequential ordering validation (server + client)             | Small  |
-| Backfill migration for existing templates/assignments        | Small  |
-| Wire audit log into `createAssignmentHandler`                | Small  |
-| Test updates                                                 | Medium |
+**Status:** ✅ Complete (May 2026)
 
 **Database Schema Changes:**
 
@@ -142,30 +129,52 @@ Single-import helper used across all handlers. Writes to `audit_log` table. No c
 
 **Acceptance Criteria:**
 
-- [ ] Template checkpoint form shows `estimated_duration` input (integer, min 0, default 7)
-- [ ] Assignment creation calculates `dueDate` as `assignment.createdAt + Σ(durations)` per checkpoint
-- [ ] Instructor can override any calculated `dueDate` before finalizing
-- [ ] Server-side validation rejects out-of-order dueDates (CP3 due before CP1)
-- [ ] Server-side validation rejects past dueDates
-- [ ] Existing `extendDeadlineHandler` is reused for post-creation adjustments (no new handler)
-- [ ] `createAssignmentHandler` writes `assignment.created` audit log entry
-- [ ] Student assignment detail page shows real dueDates on all checkpoints
-- [ ] Student dashboard "Upcoming Deadlines" widget shows all checkpoints (no longer filtered out by `IS NOT NULL`)
-- [ ] SLA breach `adjustDeadlinesForBreach` now operates on real dates
-- [ ] Migration adds `estimated_duration` column + backfills existing templates with 14-day default
-- [ ] i18n translations for duration labels and UI
+- [x] Template checkpoint form shows `estimated_duration` input (integer, min 0, default 7)
+- [x] Assignment creation calculates `dueDate` as `assignment.createdAt + Σ(durations)` per checkpoint
+- [x] Instructor can override any calculated `dueDate` before finalizing
+- [x] Server-side validation rejects out-of-order dueDates (CP3 due before CP1)
+- [x] Server-side validation rejects past dueDates
+- [x] Existing `extendDeadlineHandler` is reused for post-creation adjustments (no new handler)
+- [x] `createAssignmentHandler` writes `assignment.created` audit log entry
+- [x] Student assignment detail page shows real dueDates on all checkpoints
+- [x] Student dashboard "Upcoming Deadlines" widget shows all checkpoints (no longer filtered out by `IS NOT NULL`)
+- [x] SLA breach `adjustDeadlinesForBreach` now operates on real dates
+- [x] Migration adds `estimated_duration` column + backfills existing templates with 14-day default
+- [x] i18n translations for duration labels and UI
 
-**Test Plan:**
+**Actual Files Created/Modified:**
 
-| Area                  | Approach                                                                |
-| --------------------- | ----------------------------------------------------------------------- |
-| Duration calculation  | Unit test — `baseDate + cumulative durations` for 3 checkpoints         |
-| Assignment creation   | Unit test — handler inserts dueDates matching template durations        |
-| Sequential validation | Unit test — rejects out-of-order, accepts valid order                   |
-| Override flow         | Unit test — instructor override persists after creation                 |
-| Audit log wiring      | Unit test — `createAssignmentHandler` writes `assignment.created` entry |
-| Backfill migration    | Manual verification on dev DB                                           |
-| Existing regression   | Full test suite must pass (no regressions)                              |
+| File                                                          | Purpose                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `drizzle/migrations/0005_estimated_duration.sql`              | Migration SQL — add `estimated_duration` column, backfill existing templates with 14-day default, backfill existing checkpoints.dueDate from template durations                                                             |
+| `src/db/schema/templates.ts`                                  | **Modified:** Added `estimatedDuration: integer('estimated_duration').default(0)` to `templateCheckpoints` schema                                                                                                           |
+| `src/server/due-dates.server.ts`                              | **New:** `calculateDueDates()` — cumulative duration calc; `validateDueDates()` — sequential ordering + past date validation                                                                                                |
+| `src/server/assignments.ts`                                   | **Modified:** Added `OverrideDueDateSchema` + `overrideDueDates` field to `CreateAssignmentSchema`; exported `CreateAssignmentInputSchema`                                                                                  |
+| `src/server/assignments.server.ts`                            | **Modified:** Fetches `estimatedDuration` from template; calculates dueDates via `calculateDueDates`; applies overrides; validates via `validateDueDates`                                                                   |
+| `src/server/templates.ts`                                     | **Modified:** Added `estimatedDuration: z.coerce.number().int().min(0).default(7)` to `CheckpointInputSchema`                                                                                                               |
+| `src/server/templates.server.ts`                              | **Modified:** All handlers (get, create, update, duplicate) now read/write `estimatedDuration` on checkpoints                                                                                                               |
+| `src/server/dashboard-student.server.ts`                      | **Modified:** Removed `IS NOT NULL` SQL filter and `.filter((d) => d.dueDate)` JS guard on upcoming deadlines query                                                                                                         |
+| `src/lib/review-sla.ts`                                       | **Modified:** Removed null-guard `if (cp.dueDate)` and `if (submission.checkpointDueDate)` now that dueDates are always populated                                                                                           |
+| `src/components/admin/templates/CheckpointListEditor.tsx`     | **Modified:** Added `estimatedDuration` input per checkpoint row + column headers + hint text                                                                                                                               |
+| `src/components/instructor/assignments/DueDatePreview.tsx`    | **New:** Due date preview step — shows calculated dates + override inputs for each checkpoint                                                                                                                               |
+| `src/components/instructor/assignments/ReviewStep.tsx`        | **New:** Extracted review step component (previously inline in AssignmentWizard)                                                                                                                                            |
+| `src/components/instructor/assignments/AssignmentWizard.tsx`  | **Modified:** Added Step 4 (DueDatePreview) between Step 3 (Students) and Step 5 (Confirm); passes `overrideDueDates` to `createAssignment`                                                                                 |
+| `locales/en.json` / `locales/id.json`                         | **Modified:** Added `estimatedDuration`, `durationPlaceholder`, `durationHint`, `minConsHint` to `adminTemplates.form`; added `stepDueDates`, `dueDatesPrompt`, `daysLabel`, `dueDateFor` to `instructorAssignments.wizard` |
+| `tests/unit/server/due-dates.test.ts`                         | **New:** 9 tests — cumulative calculation (3 checkpoints), zero duration, null duration, valid order, out-of-order, same-day reject, past dates, future dates                                                               |
+| `tests/unit/server/assignments-duration.test.ts`              | **New:** 1 test — full `createAssignmentHandler` integration with duration-based dueDates and audit log verification                                                                                                        |
+| `tests/unit/components/instructor/due-date-preview.test.tsx`  | **New:** 9 tests — checkpoint cards render, cumulative calculation, zero duration, default baseDate, override highlight, user change, clear, update, empty state                                                            |
+| `tests/unit/components/instructor/assignment-wizard.test.tsx` | **Modified:** Updated for 5-step wizard; added DueDatePreview tests, override verification, submission without overrides                                                                                                    |
+| `tests/unit/server/dashboard.test.ts`                         | **Modified:** Updated for removed IS NOT NULL filter                                                                                                                                                                        |
+| `tests/unit/server/notifications-events.test.ts`              | **Modified:** Updated with valid dueDates instead of null                                                                                                                                                                   |
+
+**Test Results (at time of archiving):**
+
+- 1242/1242 tests passing across 141 test files
+- TypeScript typecheck passes with no errors
+- eslint/prettier/lint-staged pass on all new files
+- All new files under 500-line modularity limit
+- Pre-push hook (typecheck + vitest coverage) passes
+- Review fixes applied: transaction rollback on validation failure, non-null assertions replaced with safe fallbacks
 
 ---
 

@@ -287,15 +287,15 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 
 #### template_checkpoints
 
-| Column            | Type                                | Notes                                    |
-| ----------------- | ----------------------------------- | ---------------------------------------- |
-| id                | serial (PK)                         |                                          |
-| templateId        | integer (FK → assignment_templates) |                                          |
-| name              | text, not null                      | e.g. "Abstract", "Introduction"          |
-| order             | integer, not null                   | Position in sequence                     |
-| minConsultations  | integer, default 0                  | Required for checkpoint unlock/submit    |
-| estimatedDuration | integer, default 0                  | Days allotted for this checkpoint `[v2]` |
-| createdAt         | timestamp                           |                                          |
+| Column            | Type                                | Notes                                 |
+| ----------------- | ----------------------------------- | ------------------------------------- |
+| id                | serial (PK)                         |                                       |
+| templateId        | integer (FK → assignment_templates) |                                       |
+| name              | text, not null                      | e.g. "Abstract", "Introduction"       |
+| order             | integer, not null                   | Position in sequence                  |
+| minConsultations  | integer, default 0                  | Required for checkpoint unlock/submit |
+| estimatedDuration | integer, default 0                  | Days allotted for this checkpoint     |
+| createdAt         | timestamp                           |                                       |
 
 #### assignments
 
@@ -326,17 +326,17 @@ _Note: Each row represents one student's individual participation. Group assignm
 
 #### checkpoints
 
-| Column           | Type                       | Notes                                                               |
-| ---------------- | -------------------------- | ------------------------------------------------------------------- |
-| id               | serial (PK)                |                                                                     |
-| assignmentId     | integer (FK → assignments) |                                                                     |
-| name             | text, not null             | Copied from template                                                |
-| order            | integer, not null          |                                                                     |
-| dueDate          | timestamp                  | Per-checkpoint deadline (optional)                                  |
-| minConsultations | integer, default 0         | Required for submission unlock                                      |
-| state            | enum, not null             | locked \| unlocked \| submitted \| under_review \| passed \| revise |
-| createdAt        | timestamp                  |                                                                     |
-| updatedAt        | timestamp                  |                                                                     |
+| Column           | Type                       | Notes                                                                       |
+| ---------------- | -------------------------- | --------------------------------------------------------------------------- |
+| id               | serial (PK)                |                                                                             |
+| assignmentId     | integer (FK → assignments) |                                                                             |
+| name             | text, not null             | Copied from template                                                        |
+| order            | integer, not null          |                                                                             |
+| dueDate          | timestamp                  | Per-checkpoint deadline (auto-calculated from template `estimatedDuration`) |
+| minConsultations | integer, default 0         | Required for submission unlock                                              |
+| state            | enum, not null             | locked \| unlocked \| submitted \| under_review \| passed \| revise         |
+| createdAt        | timestamp                  |                                                                             |
+| updatedAt        | timestamp                  |                                                                             |
 
 #### submissions
 

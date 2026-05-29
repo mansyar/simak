@@ -1203,6 +1203,67 @@ The final phase adds bilingual support, dark mode, responsive design, and access
 
 ---
 
+---
+
+## Phase 9: Post-MVP Enhancements
+
+Post-MVP feature tracks that extend V1 foundations. These are tracked separately from the V1 roadmap above.
+
+---
+
+### Track 1.2 — Estimated Duration & Auto-Calculated DueDates
+
+**Description:** Add `estimated_duration` (days) to `template_checkpoints`. During assignment creation, auto-calculate each checkpoint's `dueDate` as `baseDate + cumulative durations`. Instructors can override calculated dates before finalizing. Validate sequential ordering (CP1 < CP2 < CP3) and reject past dates.
+
+**Dependencies:** Track 2.2 (templates with checkpoints), Track 3.1 (assignment creation), Track 3.2 (student views), Track 5.2 (SLA/deadline management).
+
+**✅ Status: COMPLETED** — Track has been archived.
+
+**Actual Files Created/Modified:**
+
+| File                                                          | Purpose                                                                                                    |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `drizzle/migrations/0005_estimated_duration.sql`              | Migration SQL — add `estimated_duration` column, backfill existing templates, backfill checkpoints.dueDate |
+| `src/db/schema/templates.ts`                                  | **Modified:** Added `estimatedDuration` column to `templateCheckpoints` schema                             |
+| `src/server/due-dates.server.ts`                              | **New:** `calculateDueDates()` + `validateDueDates()` utilities                                            |
+| `src/server/assignments.ts`                                   | **Modified:** Added `OverrideDueDateSchema`, `overrideDueDates` field to `CreateAssignmentSchema`          |
+| `src/server/assignments.server.ts`                            | **Modified:** Duration-based dueDate calculation, override application, server-side validation             |
+| `src/server/templates.ts`                                     | **Modified:** Added `estimatedDuration` to `CheckpointInputSchema`                                         |
+| `src/server/templates.server.ts`                              | **Modified:** All handlers persist/read `estimatedDuration` on template checkpoints                        |
+| `src/server/dashboard-student.server.ts`                      | **Modified:** Removed `IS NOT NULL` filter on upcoming deadlines query                                     |
+| `src/lib/review-sla.ts`                                       | **Modified:** Removed null-guards for checkpoint dueDates (now always populated)                           |
+| `src/components/admin/templates/CheckpointListEditor.tsx`     | **Modified:** Added `estimatedDuration` input per checkpoint row                                           |
+| `src/components/instructor/assignments/DueDatePreview.tsx`    | **New:** Due date preview/override step in assignment wizard                                               |
+| `src/components/instructor/assignments/ReviewStep.tsx`        | **New:** Extracted review step component                                                                   |
+| `src/components/instructor/assignments/AssignmentWizard.tsx`  | **Modified:** Added Step 4 (DueDatePreview), 5-step wizard                                                 |
+| `locales/en.json` / `locales/id.json`                         | **Modified:** Added translation keys for duration inputs and due date preview                              |
+| `tests/unit/server/due-dates.test.ts`                         | **New:** 9 tests for calculateDueDates + validateDueDates                                                  |
+| `tests/unit/server/assignments-duration.test.ts`              | **New:** Handler integration test with duration-based dueDates                                             |
+| `tests/unit/components/instructor/due-date-preview.test.tsx`  | **New:** 9 tests for DueDatePreview component                                                              |
+| `tests/unit/components/instructor/assignment-wizard.test.tsx` | **Modified:** Updated for 5-step wizard, override tests                                                    |
+
+**Test Results (at time of archiving):**
+
+- 1242/1242 tests passing across 141 test files
+- TypeScript typecheck passes with no errors
+- All new files under 500-line modularity limit
+- Review fixes applied: transaction rollback on validation failure, non-null assertions replaced with safe fallbacks
+
+**Definition of Done Completed:**
+
+- ✅ Template checkpoints have `estimated_duration` input (integer, min 0, default 7)
+- ✅ Assignment creation calculates `dueDate` as `createdAt + Σ(durations)` per checkpoint
+- ✅ Instructor can override any calculated `dueDate` before finalizing
+- ✅ Server-side validation rejects out-of-order dueDates (CP3 due before CP1) and past dates
+- ✅ Existing `extendDeadlineHandler` reused for post-creation adjustments
+- ✅ `createAssignmentHandler` writes `assignment.created` audit log entry
+- ✅ Student dashboard "Upcoming Deadlines" widget shows all checkpoints (no longer filtered by `IS NOT NULL`)
+- ✅ SLA breach `adjustDeadlinesForBreach` now operates on real dates
+- ✅ Migration adds `estimated_duration` column + backfills existing data
+- ✅ i18n translations for duration labels and UI
+
+---
+
 ## Appendix: Dependency Graph
 
 ```
@@ -1216,6 +1277,7 @@ Track 1.1 (Scaffold + Docker Compose + Git Hooks + pnpm + i18n infra)
                     │                               └── Track 4.1 (File Submit + R2)
                     │                                       └── Track 5.1 (Review Queue)
                     │                                               └── Track 5.2 (SLA + Escalation)
+                    │                                                       └── Post-MVP: Track 1.2 (Estimated Duration & DueDates)
                     ├── Track 6.1 (Consultations)
                     ├── Track 7.1 (Notifications)
                     │       └── Track 7.2 (Dashboards)
@@ -1235,7 +1297,6 @@ The following features are documented in the PRD and TDD but deferred from this 
 - Analytics dashboards with charts
 - Reports builder with scheduling and export
 - Deadline extension approval workflow
-- Audit logging
 - Integration tests (Vitest)
 - Playwright E2E tests
 - Redis caching layer

@@ -26,7 +26,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Admins can view system-wide analytics and audit logs. (Audit log viewer implemented at `/admin/audit-log`) `[v2]`
 - Students and instructors can request and manage deadline extensions via a configurable approval workflow. `[v2]`
 - Users can enable two-factor authentication (TOTP) for enhanced account security. `[v2]`
-- Assignment templates include estimated duration per checkpoint, allowing auto-calculation of checkpoint dueDates during assignment creation. `[v2]`
+- Assignment templates include estimated duration per checkpoint, allowing auto-calculation of checkpoint dueDates during assignment creation.
 
 ---
 
@@ -103,7 +103,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Admin defines templates with a fixed ordered list of checkpoints.
 - Each template has a `type` label (e.g., Thesis, Research Paper).
 - Templates can be duplicated, filtered, and reused when creating assignments.
-- Each template checkpoint includes an `estimatedDuration` (days). During assignment creation, checkpoint dueDates are auto-calculated from the base date + cumulative durations. Instructors can override before finalizing. `[v2]`
+- Each template checkpoint includes an `estimatedDuration` (days). During assignment creation, checkpoint dueDates are auto-calculated from the base date + cumulative durations. Instructors can override before finalizing.
 
 ### Assignment Management
 
