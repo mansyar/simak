@@ -68,7 +68,7 @@
   - [ ] Display: checkpoint name + calculated dueDate (read-only, editable date input)
   - [ ] Calculate on client-side based on template's estimated_durations for preview
   - [ ] Pass override values through wizard state to submission
-- [ ] Task: Update wizard step components in `src/components/instructor/assignments/wizard/`
+- [x] Task: Update wizard step components in `src/components/instructor/assignments/wizard/` (f14de44)
   - [ ] Add DueDatePreviewStep or integrate into existing step
   - [ ] Show clear visual: "Calculated from template durations"
   - [ ] Allow per-checkpoint date override
