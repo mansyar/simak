@@ -64,7 +64,7 @@ describe('Template handlers audit logging', () => {
         data: {
           name: 'Test Template',
           type: 'Thesis',
-          checkpoints: [{ name: 'Chapter 1', minConsultations: 0 }],
+          checkpoints: [{ name: 'Chapter 1', minConsultations: 0, estimatedDuration: 7 }],
         },
       });
 
@@ -91,7 +91,7 @@ describe('Template handlers audit logging', () => {
           id: 123,
           name: 'Updated Template',
           type: 'Thesis',
-          checkpoints: [{ name: 'Chapter 1', minConsultations: 0 }],
+          checkpoints: [{ name: 'Chapter 1', minConsultations: 0, estimatedDuration: 7 }],
         },
       });
 
