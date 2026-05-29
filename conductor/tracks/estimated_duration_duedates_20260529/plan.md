@@ -64,15 +64,15 @@
 ## Phase 4: Assignment Creation Wizard — DueDate Preview & Override [checkpoint: 6def9fc]
 
 - [x] Task: Add dueDate preview step to assignment creation wizard (7e8a0e3)
-  - [ ] After template selection → show calculated dueDates per checkpoint
-  - [ ] Display: checkpoint name + calculated dueDate (read-only, editable date input)
-  - [ ] Calculate on client-side based on template's estimated_durations for preview
-  - [ ] Pass override values through wizard state to submission
+  - [x] After template selection → show calculated dueDates per checkpoint
+  - [x] Display: checkpoint name + calculated dueDate (read-only, editable date input)
+  - [x] Calculate on client-side based on template's estimated_durations for preview
+  - [x] Pass override values through wizard state to submission
 - [x] Task: Update wizard step components in `src/components/instructor/assignments/wizard/` (f14de44)
-  - [ ] Add DueDatePreviewStep or integrate into existing step
-  - [ ] Show clear visual: "Calculated from template durations"
-  - [ ] Allow per-checkpoint date override
-  - [ ] Show validation feedback if dates are out-of-order
+  - [x] Add DueDatePreviewStep or integrate into existing step
+  - [x] Show clear visual: "Calculated from template durations"
+  - [x] Allow per-checkpoint date override
+  - [x] Show validation feedback if dates are out-of-order
 - [x] Task: Write tests for wizard dueDate preview (6def9fc)
   - [x] Test: DueDatePreviewStep renders calculated dates
   - [x] Test: Instructor can override a date
@@ -113,3 +113,9 @@
 - [x] Task: Final verification against acceptance criteria
   - [x] Confirm all 12 acceptance criteria items are satisfied
 - [x] Task: Conductor - User Manual Verification 'Phase 6: Integration & Final Verification' (Protocol in workflow.md)
+
+---
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 2bed56b
