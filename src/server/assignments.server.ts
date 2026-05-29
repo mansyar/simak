@@ -7,6 +7,7 @@ import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { consultations } from '../db/schema/consultations';
+import { calculateDueDates, validateDueDates } from './due-dates.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -84,50 +85,20 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
 
       const baseDate = assignmentRow?.createdAt ?? new Date();
 
-      // Helper: calculate cumulative dueDate for a checkpoint
-      function calculateDueDate(order: number): Date {
-        let cumulativeDays = 0;
-        for (const tcp of tCheckpoints) {
-          cumulativeDays += tcp.estimatedDuration ?? 0;
-          if (tcp.order === order) break;
-        }
-        const result = new Date(baseDate);
-        result.setDate(result.getDate() + cumulativeDays);
-        return result;
-      }
+      // 5. Calculate dueDates and apply instructor overrides
+      const checkpointDueDates = calculateDueDates(tCheckpoints, baseDate);
 
-      // 5. Build checkpoint dueDates with instructor overrides
-      const checkpointDueDates: Map<number, Date> = new Map();
-      for (const tcp of tCheckpoints) {
-        let dueDate = calculateDueDate(tcp.order);
-
-        // Apply override if provided for this checkpoint order
-        if (overrideDueDates) {
-          const override = overrideDueDates.find((o) => o.checkpointOrder === tcp.order);
-          if (override) {
-            dueDate = override.dueDate;
-          }
-        }
-
-        checkpointDueDates.set(tcp.order, dueDate);
-      }
-
-      // Validate sequential ordering: CP1.dueDate < CP2.dueDate < CP3.dueDate
-      const orderedDueDates = [...checkpointDueDates.entries()].sort((a, b) => a[0] - b[0]);
-      for (let i = 1; i < orderedDueDates.length; i++) {
-        if (orderedDueDates[i][1] <= orderedDueDates[i - 1][1]) {
-          return {
-            error: `Checkpoint ${orderedDueDates[i][0]} dueDate must be after checkpoint ${orderedDueDates[i - 1][0]}`,
-          };
+      // Apply overrides if provided
+      if (overrideDueDates) {
+        for (const override of overrideDueDates) {
+          checkpointDueDates.set(override.checkpointOrder, override.dueDate);
         }
       }
 
-      // Validate no past dueDates
-      const now = new Date();
-      for (const [, dueDate] of orderedDueDates) {
-        if (dueDate < now) {
-          return { error: 'Checkpoint dueDate must not be in the future' };
-        }
+      // Validate sequential ordering and past dates
+      const validation = validateDueDates(checkpointDueDates);
+      if (!validation.valid) {
+        return { error: validation.error };
       }
 
       // 6. Instantiate checkpoints for each student with calculated/overridden dueDates

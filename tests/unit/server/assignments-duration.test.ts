@@ -51,7 +51,6 @@ describe('Assignment duration calculation', () => {
         session: {} as any,
       });
 
-      // First select returns template checkpoints with durations
       mockDb.returning.mockResolvedValue([{ id: 789 }]);
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([
@@ -60,7 +59,6 @@ describe('Assignment duration calculation', () => {
           { name: 'CP3', order: 3, minConsultations: 1, estimatedDuration: 21 },
         ]).then(onfulfilled),
       );
-      // Second select returns assignment createdAt
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ createdAt: new Date('2026-06-01T00:00:00Z') }]).then(onfulfilled),
       );
