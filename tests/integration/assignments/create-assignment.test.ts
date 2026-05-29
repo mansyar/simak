@@ -8,6 +8,7 @@ import {
   checkpoints,
   assignmentTemplates,
   templateCheckpoints,
+  auditLog,
 } from '@/db/schema/index';
 import { createAssignmentHandler } from '@/server/assignments.server';
 import * as auth from '@/server/auth';
@@ -69,6 +70,10 @@ describe('Assignment Creation Integration Flow', () => {
     await db.delete(assignments).where(eq(assignments.templateId, templateId));
     await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, templateId));
     await db.delete(assignmentTemplates).where(eq(assignmentTemplates.id, templateId));
+    // Delete audit log entries first to avoid FK violations
+    await db.delete(auditLog).where(eq(auditLog.actorId, instructorId));
+    await db.delete(auditLog).where(eq(auditLog.actorId, student1Id));
+    await db.delete(auditLog).where(eq(auditLog.actorId, student2Id));
     await db.delete(users).where(eq(users.id, instructorId));
     await db.delete(users).where(eq(users.id, student1Id));
     await db.delete(users).where(eq(users.id, student2Id));
