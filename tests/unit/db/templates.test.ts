@@ -25,6 +25,7 @@ describe('Assignment templates schema', () => {
     expect(templateCheckpoints).toHaveProperty('name');
     expect(templateCheckpoints).toHaveProperty('order');
     expect(templateCheckpoints).toHaveProperty('minConsultations');
+    expect(templateCheckpoints).toHaveProperty('estimatedDuration');
     expect(templateCheckpoints).toHaveProperty('createdAt');
   });
 });
