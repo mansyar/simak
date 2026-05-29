@@ -9,9 +9,9 @@
 - [x] Task: Write backfill migration SQL (8686d0f)
   - [x] Create SQL migration file: backfill existing `template_checkpoints` with `estimated_duration = 14`
   - [x] Create SQL migration file: backfill existing `checkpoints.dueDate` where NULL, using `assignment.createdAt + cumulative estimated_duration` from template (fallback 14 days if template soft-deleted)
-- [ ] Task: Write tests for schema changes
-  - [ ] Unit test — `template_checkpoints.estimatedDuration` column exists with correct type and default
-  - [ ] Unit test — import verification for updated schema barrel exports
+- [x] Task: Write tests for schema changes (8686d0f)
+  - [x] Unit test — `template_checkpoints.estimatedDuration` column exists with correct type and default
+  - [x] Unit test — import verification for updated schema barrel exports (existing tests cover this)
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema' (Protocol in workflow.md)
 
 ---
