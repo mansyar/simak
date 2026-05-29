@@ -133,9 +133,9 @@ describe('Event trigger notifications', () => {
             checkpointName: 'Chapter 1',
             assignmentTitle: 'Thesis 2026',
             checkpointUpdatedAt: new Date('2026-05-20'),
-            checkpointDueDate: null,
+            checkpointDueDate: new Date('2026-06-15'),
             checkpointOrder: 1,
-            finalDeadline: null,
+            finalDeadline: new Date('2026-07-01'),
           },
         ]).then(onfulfilled),
       );
@@ -180,9 +180,9 @@ describe('Event trigger notifications', () => {
             checkpointName: 'Chapter 1',
             assignmentTitle: 'Thesis 2026',
             checkpointUpdatedAt: new Date('2026-05-20'),
-            checkpointDueDate: null,
+            checkpointDueDate: new Date('2026-06-15'),
             checkpointOrder: 1,
-            finalDeadline: null,
+            finalDeadline: new Date('2026-07-01'),
           },
         ]).then(onfulfilled),
       );

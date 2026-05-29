@@ -101,6 +101,7 @@ export async function getStudentDashboardDataHandler() {
     });
 
     // 2. Upcoming deadlines (next 5 upcoming due dates)
+    // After Phase 1 backfill, all checkpoints have real dueDates
     const upcomingDeadlines = await db
       .select({
         assignmentId: assignments.id,
@@ -111,27 +112,19 @@ export async function getStudentDashboardDataHandler() {
       })
       .from(checkpoints)
       .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-      .where(
-        and(
-          eq(checkpoints.studentId, studentId),
-          isNull(assignments.deletedAt),
-          sql`${checkpoints.dueDate} IS NOT NULL`,
-        ),
-      )
+      .where(and(eq(checkpoints.studentId, studentId), isNull(assignments.deletedAt)))
       .orderBy(checkpoints.dueDate)
       .limit(5);
 
     const now = new Date();
-    const deadlines = upcomingDeadlines
-      .filter((d) => d.dueDate)
-      .map((d) => ({
-        assignmentId: d.assignmentId,
-        assignmentTitle: d.assignmentTitle,
-        checkpointName: d.checkpointName,
-        dueDate: d.dueDate!,
-        state: d.state,
-        isOverdue: d.dueDate! < now,
-      }));
+    const deadlines = upcomingDeadlines.map((d) => ({
+      assignmentId: d.assignmentId,
+      assignmentTitle: d.assignmentTitle,
+      checkpointName: d.checkpointName,
+      dueDate: d.dueDate!,
+      state: d.state,
+      isOverdue: d.dueDate! < now,
+    }));
 
     // 3. Pending reviews — submissions under instructor review (last 30 days)
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);

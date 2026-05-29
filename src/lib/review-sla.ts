@@ -35,16 +35,15 @@ export async function adjustDeadlinesForBreach(
   submission: SLASubmissionFields,
   breachDays: number,
 ): Promise<void> {
-  // Extend affected checkpoint's dueDate (if it has one)
-  if (submission.checkpointDueDate) {
-    const extendedDueDate = new Date(
-      submission.checkpointDueDate.getTime() + breachDays * 24 * 60 * 60 * 1000,
-    );
-    await tx
-      .update(checkpoints)
-      .set({ dueDate: extendedDueDate, updatedAt: new Date() })
-      .where(eq(checkpoints.id, submission.checkpointId));
-  }
+  // Extend affected checkpoint's dueDate
+  // After Phase 1 backfill, checkpoint dueDates are always populated
+  const extendedDueDate = new Date(
+    submission.checkpointDueDate!.getTime() + breachDays * 24 * 60 * 60 * 1000,
+  );
+  await tx
+    .update(checkpoints)
+    .set({ dueDate: extendedDueDate, updatedAt: new Date() })
+    .where(eq(checkpoints.id, submission.checkpointId));
 
   // Extend all subsequent checkpoints for this student in this assignment
   const subsequentCheckpoints = await tx
@@ -59,15 +58,14 @@ export async function adjustDeadlinesForBreach(
     );
 
   for (const cp of subsequentCheckpoints) {
-    if (cp.dueDate) {
-      await tx
-        .update(checkpoints)
-        .set({
-          dueDate: new Date(cp.dueDate.getTime() + breachDays * 24 * 60 * 60 * 1000),
-          updatedAt: new Date(),
-        })
-        .where(eq(checkpoints.id, cp.id));
-    }
+    // After Phase 1 backfill, all checkpoint dueDates are populated
+    await tx
+      .update(checkpoints)
+      .set({
+        dueDate: new Date(cp.dueDate!.getTime() + breachDays * 24 * 60 * 60 * 1000),
+        updatedAt: new Date(),
+      })
+      .where(eq(checkpoints.id, cp.id));
   }
 
   // Extend assignment finalDeadline
