@@ -341,6 +341,34 @@ describe('AssignmentWizard', () => {
     });
   });
 
+  describe('DueDatePreview step renders', () => {
+    it('should render DueDatePreview on step 4 with checkpoint names', async () => {
+      render(<AssignmentWizard />);
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      // Wait for async getTemplate to resolve and set checkpointDetails
+      await waitFor(() => {
+        expect(screen.getByTestId('selected-template-id').textContent).toBe('1');
+      });
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
+      const fd = new Date();
+      fd.setFullYear(fd.getFullYear() + 1);
+      fireEvent.change(screen.getByTestId('input-deadline'), {
+        target: { value: fd.toISOString().slice(0, 16) },
+      });
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.click(screen.getByTestId('toggle-student-1'));
+      fireEvent.click(screen.getByText('Next'));
+      await waitFor(() => {
+        expect(screen.getByTestId('due-date-preview')).toBeDefined();
+        expect(screen.getByTestId('checkpoint-1')).toBeDefined();
+      });
+      expect(screen.getByTestId('checkpoint-1').textContent).toBe('Proposal');
+      expect(screen.getByTestId('checkpoint-2').textContent).toBe('Drafting');
+      expect(screen.getByTestId('checkpoint-3').textContent).toBe('Defense');
+    });
+  });
+
   describe('Step 5 - Review and Submit', () => {
     beforeEach(() => {
       vi.mocked(assignmentsApi.createAssignment).mockResolvedValue({
