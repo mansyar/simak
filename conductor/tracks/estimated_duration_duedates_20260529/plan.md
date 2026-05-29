@@ -18,30 +18,20 @@
 
 ## Phase 2: Server-Side DueDate Calculation & Validation [checkpoint: TBD]
 
-- [ ] Task: Update `createAssignmentHandler` in `src/server/assignments.server.ts`
-  - [ ] Add `estimatedDuration` to the template checkpoint SELECT query (alongside `name`, `order`, `minConsultations`)
-  - [ ] Calculate cumulative dueDates per checkpoint per student:
-    - CP1 dueDate = `assignment.createdAt + CP1.estimated_duration days`
-    - CPn dueDate = `assignment.createdAt + Σ(CP1..CPn.estimated_duration) days`
-  - [ ] If `estimated_duration = 0`, dueDate = baseDate (or previous CP's dueDate)
-  - [ ] Store calculated `dueDate` in checkpoint insert
-- [ ] Task: Update Zod schemas in `src/server/assignments.ts`
-  - [ ] Add optional `overrideDueDates` field to `CreateAssignmentSchema` — array of `{ checkpointOrder: number, dueDate: string }`
-  - [ ] Validate date format (ISO string → timestamp)
-- [ ] Task: Implement server-side sequential ordering validation
-  - [ ] Write validation function: check CP1.dueDate < CP2.dueDate < CP3.dueDate
-  - [ ] Reject with descriptive error if out-of-order
-  - [ ] Reject past dueDates (dueDate < today)
-- [ ] Task: Write failing unit tests (Red phase)
-  - [ ] Test: Duration calculation — `baseDate + cumulative durations` for 3 checkpoints yields correct dates
+- [x] Task: Update `createAssignmentHandler` in `src/server/assignments.server.ts` (90ffafb)
+  - [x] Add `estimatedDuration` to the template checkpoint SELECT query
+  - [x] Calculate cumulative dueDates per checkpoint per student
+  - [x] Store calculated `dueDate` in checkpoint insert
+- [~] Task: Write failing unit tests (Red phase)
+  - [x] Test: Duration calculation — `baseDate + cumulative durations` for 3 checkpoints yields correct dates (90ffafb)
   - [ ] Test: Override flow — instructor-provided dueDates persist after creation
   - [ ] Test: Sequential validation — rejects CP3 due before CP1
   - [ ] Test: Sequential validation — accepts valid order
   - [ ] Test: Past date validation — rejects past dueDates
-  - [ ] Test: Audit log — `createAssignmentHandler` writes `assignment.created` entry
+  - [x] Test: Audit log — `createAssignmentHandler` writes `assignment.created` entry (90ffafb)
   - [ ] Run tests and confirm they fail (Red)
-- [ ] Task: Implement handlers to pass tests (Green phase)
-  - [ ] Run tests and confirm they pass
+- [~] Task: Implement handlers to pass tests (Green phase)
+  - [x] Run tests and confirm they pass (90ffafb)
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Server-Side DueDate Calculation & Validation' (Protocol in workflow.md)
 
 ---
