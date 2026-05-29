@@ -3,6 +3,11 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 
+export const OverrideDueDateSchema = z.object({
+  checkpointOrder: z.coerce.number().int().positive('Checkpoint order must be positive'),
+  dueDate: z.coerce.date(),
+});
+
 export const CreateAssignmentSchema = z.object({
   templateId: z.coerce.number().int().positive('Template is required'),
   title: z.string().min(3, 'Title must be at least 3 characters').max(100, 'Title is too long'),
@@ -11,6 +16,7 @@ export const CreateAssignmentSchema = z.object({
     message: 'Final deadline must be in the future',
   }),
   studentIds: z.array(z.string().min(1)).min(1, 'At least one student must be selected'),
+  overrideDueDates: z.array(OverrideDueDateSchema).optional(),
 });
 
 export const ListInstructorAssignmentsSchema = z.object({
@@ -22,6 +28,8 @@ export const ListInstructorAssignmentsSchema = z.object({
 export const AssignmentIdParamSchema = z.object({
   id: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
 });
+
+export const CreateAssignmentInputSchema = CreateAssignmentSchema;
 
 export const createAssignment = createServerFn({ method: 'POST' }).handler(
   async (args: { data: unknown }) => {

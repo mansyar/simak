@@ -37,7 +37,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
     return { error: 'Unauthorized' };
   }
 
-  const { templateId, title, description, finalDeadline, studentIds } = args.data;
+  const { templateId, title, description, finalDeadline, studentIds, overrideDueDates } = args.data;
   const db = getDb();
 
   try {
@@ -96,7 +96,41 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
         return result;
       }
 
-      // 5. Instantiate checkpoints for each student with calculated dueDates
+      // 5. Build checkpoint dueDates with instructor overrides
+      const checkpointDueDates: Map<number, Date> = new Map();
+      for (const tcp of tCheckpoints) {
+        let dueDate = calculateDueDate(tcp.order);
+
+        // Apply override if provided for this checkpoint order
+        if (overrideDueDates) {
+          const override = overrideDueDates.find((o) => o.checkpointOrder === tcp.order);
+          if (override) {
+            dueDate = override.dueDate;
+          }
+        }
+
+        checkpointDueDates.set(tcp.order, dueDate);
+      }
+
+      // Validate sequential ordering: CP1.dueDate < CP2.dueDate < CP3.dueDate
+      const orderedDueDates = [...checkpointDueDates.entries()].sort((a, b) => a[0] - b[0]);
+      for (let i = 1; i < orderedDueDates.length; i++) {
+        if (orderedDueDates[i][1] <= orderedDueDates[i - 1][1]) {
+          return {
+            error: `Checkpoint ${orderedDueDates[i][0]} dueDate must be after checkpoint ${orderedDueDates[i - 1][0]}`,
+          };
+        }
+      }
+
+      // Validate no past dueDates
+      const now = new Date();
+      for (const [, dueDate] of orderedDueDates) {
+        if (dueDate < now) {
+          return { error: 'Checkpoint dueDate must not be in the future' };
+        }
+      }
+
+      // 6. Instantiate checkpoints for each student with calculated/overridden dueDates
       if (tCheckpoints.length > 0) {
         const checkpointRows: {
           assignmentId: number;
@@ -115,7 +149,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
               name: tcp.name,
               order: tcp.order,
               minConsultations: tcp.minConsultations ?? 0,
-              dueDate: calculateDueDate(tcp.order),
+              dueDate: checkpointDueDates.get(tcp.order)!,
               state: tcp.order === 1 ? ('unlocked' as const) : ('locked' as const),
             });
           });
@@ -125,6 +159,11 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
 
       return { success: true, assignmentId };
     });
+
+    // If validation failed inside transaction, return error without audit log
+    if ('error' in result) {
+      return result;
+    }
 
     const assignmentId = result.assignmentId;
     await logAuditEvent({
