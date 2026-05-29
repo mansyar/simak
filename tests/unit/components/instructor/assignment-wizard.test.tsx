@@ -54,13 +54,19 @@ vi.mock('@/server/users', () => ({
 }));
 
 vi.mock('@/components/instructor/assignments/DueDatePreview', () => ({
-  DueDatePreview: ({ checkpoints }: any) => (
+  DueDatePreview: ({ checkpoints, onOverride }: any) => (
     <div data-testid="due-date-preview">
       {checkpoints.map((cp: any) => (
         <span key={cp.order} data-testid={`checkpoint-${cp.order}`}>
           {cp.name}
         </span>
       ))}
+      <button
+        data-testid="set-override"
+        onClick={() => onOverride([{ checkpointOrder: 1, dueDate: '2027-06-15T12:00:00.000Z' }])}
+      >
+        Set Override
+      </button>
     </div>
   ),
 }));
@@ -400,6 +406,33 @@ describe('AssignmentWizard', () => {
       expect(callArg.data.templateId).toBe(1);
       expect(callArg.data.studentIds).toEqual(['student-1', 'student-2']);
       expect(mockNavigate).toHaveBeenCalledWith({ to: '/instructor/assignments/42' });
+    });
+
+    it('should show override button on due date step and submit without overrideDueDates when none set', async () => {
+      render(<AssignmentWizard />);
+      // Navigate to step 4
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
+      const future = new Date();
+      future.setFullYear(future.getFullYear() + 1);
+      fireEvent.change(screen.getByTestId('input-deadline'), {
+        target: { value: future.toISOString().slice(0, 16) },
+      });
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.click(screen.getByTestId('toggle-student-1'));
+      fireEvent.click(screen.getByText('Next'));
+      // Verify override button exists on Step 4
+      expect(screen.getByTestId('set-override')).toBeDefined();
+      // Advance to Step 5 and submit without setting any override
+      fireEvent.click(screen.getByText('Next'));
+      await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
+      fireEvent.click(screen.getByText('Create Assignment'));
+      await waitFor(() => expect(assignmentsApi.createAssignment).toHaveBeenCalledOnce());
+      const callArg = vi.mocked(assignmentsApi.createAssignment).mock.calls[0][0] as any;
+      expect(callArg.data.title).toBe('Final Thesis');
+      // When no override is set, overrideDueDates should not be sent
+      expect(callArg.data.overrideDueDates).toBeUndefined();
     });
 
     it('should show submit error when creation fails', async () => {
