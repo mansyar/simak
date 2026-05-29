@@ -57,16 +57,21 @@ describe('Assignment Creation Integration Flow', () => {
     templateId = tpl.id;
 
     await db.insert(templateCheckpoints).values([
-      { templateId, name: 'Template CP 1', order: 1 },
-      { templateId, name: 'Template CP 2', order: 2 },
+      { templateId, name: 'Template CP 1', order: 1, estimatedDuration: 14 },
+      { templateId, name: 'Template CP 2', order: 2, estimatedDuration: 21 },
     ]);
   });
 
   afterEach(async () => {
-    // Clean up
-    await db.delete(checkpoints).where(eq(checkpoints.assignmentId, templateId));
-    await db.delete(assignmentStudents).where(eq(assignmentStudents.studentId, student1Id));
-    await db.delete(assignmentStudents).where(eq(assignmentStudents.studentId, student2Id));
+    // Clean up — delete assignment-related records first
+    const assRows = await db
+      .select({ id: assignments.id })
+      .from(assignments)
+      .where(eq(assignments.templateId, templateId));
+    for (const ass of assRows) {
+      await db.delete(checkpoints).where(eq(checkpoints.assignmentId, ass.id));
+      await db.delete(assignmentStudents).where(eq(assignmentStudents.assignmentId, ass.id));
+    }
     await db.delete(assignments).where(eq(assignments.templateId, templateId));
     await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, templateId));
     await db.delete(assignmentTemplates).where(eq(assignmentTemplates.id, templateId));
@@ -119,6 +124,12 @@ describe('Assignment Creation Integration Flow', () => {
     expect(student1Checkpoints).toHaveLength(2);
     expect(student1Checkpoints[0].state).toBe('unlocked');
     expect(student1Checkpoints[1].state).toBe('locked');
+    // Verify dueDates are populated (not null) with sequential ordering
+    expect(student1Checkpoints[0].dueDate).toBeInstanceOf(Date);
+    expect(student1Checkpoints[1].dueDate).toBeInstanceOf(Date);
+    expect(student1Checkpoints[1].dueDate!.getTime()).toBeGreaterThan(
+      student1Checkpoints[0].dueDate!.getTime(),
+    );
 
     const student2Checkpoints = await db
       .select()
@@ -127,5 +138,8 @@ describe('Assignment Creation Integration Flow', () => {
     expect(student2Checkpoints).toHaveLength(2);
     expect(student2Checkpoints[0].state).toBe('unlocked');
     expect(student2Checkpoints[1].state).toBe('locked');
+    // Verify dueDates are populated and sequential for second student
+    expect(student2Checkpoints[0].dueDate).toBeInstanceOf(Date);
+    expect(student2Checkpoints[1].dueDate).toBeInstanceOf(Date);
   });
 });
