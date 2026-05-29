@@ -111,3 +111,7 @@
   - [ ] `pnpm build` — production build succeeds
 - [x] Task: Final grep check for any remaining `: any`, `as any`, `any[]` in `src/`
 - [x] Task: Conductor — User Manual Verification 'Phase 6: Final Verification' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions — commit remaining cleanup changes [59f5945]
