@@ -9,6 +9,7 @@ export * from './submissions';
 export * from './consultations';
 export * from './notifications';
 export * from './audit-log';
+export * from './extensions';
 
 // Import tables for relations
 import { users } from './users';
@@ -18,6 +19,7 @@ import { assignments, assignmentStudents, checkpoints } from './assignments';
 import { submissions, reviews } from './submissions';
 import { consultations } from './consultations';
 import { notifications } from './notifications';
+import { extensionRequests } from './extensions';
 
 // ---- Relations ----
 
@@ -144,6 +146,25 @@ export const consultationsRelations = relations(consultations, ({ one }) => ({
 export const notificationsRelations = relations(notifications, ({ one }) => ({
   user: one(users, {
     fields: [notifications.userId],
+    references: [users.id],
+  }),
+}));
+
+export const extensionRequestsRelations = relations(extensionRequests, ({ one }) => ({
+  assignment: one(assignments, {
+    fields: [extensionRequests.assignmentId],
+    references: [assignments.id],
+  }),
+  student: one(users, {
+    fields: [extensionRequests.studentId],
+    references: [users.id],
+  }),
+  checkpoint: one(checkpoints, {
+    fields: [extensionRequests.checkpointId],
+    references: [checkpoints.id],
+  }),
+  resolver: one(users, {
+    fields: [extensionRequests.resolvedBy],
     references: [users.id],
   }),
 }));

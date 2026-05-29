@@ -19,6 +19,8 @@ describe('Assignments schema', () => {
     expect(assignments).toHaveProperty('createdAt');
     expect(assignments).toHaveProperty('updatedAt');
     expect(assignments).toHaveProperty('deletedAt');
+    expect(assignments).toHaveProperty('maxExtensionDays');
+    expect(assignments).toHaveProperty('maxTotalExtensions');
   });
 
   it('should have correct columns on assignmentStudents', async () => {

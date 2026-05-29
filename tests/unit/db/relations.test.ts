@@ -18,6 +18,7 @@ describe('Drizzle ORM relations', () => {
       'reviewsRelations',
       'consultationsRelations',
       'notificationsRelations',
+      'extensionRequestsRelations',
     ];
 
     for (const rel of expectedRelations) {
@@ -42,6 +43,7 @@ describe('Drizzle ORM relations', () => {
       'reviews',
       'consultations',
       'notifications',
+      'extensionRequests',
     ];
 
     for (const table of expectedTables) {

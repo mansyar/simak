@@ -27,6 +27,8 @@ export const assignments = pgTable(
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
     deletedAt: timestamp('deleted_at'),
+    maxExtensionDays: integer('max_extension_days').default(7),
+    maxTotalExtensions: integer('max_total_extensions').default(3),
   },
   (table) => [index('assignments_instructor_id_idx').on(table.instructorId)],
 );

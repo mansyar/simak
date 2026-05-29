@@ -2,17 +2,17 @@
 
 ## Phase 1: Database Migration & Schema
 
-- [ ] Task: Create Drizzle schema for `extension_requests` table
-  - [ ] Define `extensionRequests` table in `src/db/schema/extensions.ts` with all columns, FK references, and CHECK constraints
-  - [ ] Add `extensionRequestsRelations` in `src/db/schema/index.ts`
-  - [ ] Export `extensionRequests` from `src/db/schema/index.ts`
-- [ ] Task: Add extension cap columns to `assignments` schema
-  - [ ] Add `maxExtensionDays: integer('max_extension_days').default(7)` to `src/db/schema/assignments.ts`
-  - [ ] Add `maxTotalExtensions: integer('max_total_extensions').default(3)` to `src/db/schema/assignments.ts`
-- [ ] Task: Generate Drizzle migration
-  - [ ] Run `pnpm db:generate`
-  - [ ] Verify migration SQL is correct (extension_requests table, assignment columns)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema' (Protocol in workflow.md)
+- [x] Task: Create Drizzle schema for `extension_requests` table
+  - [x] Define `extensionRequests` table in `src/db/schema/extensions.ts` with all columns, FK references, and CHECK constraints
+  - [x] Add `extensionRequestsRelations` in `src/db/schema/index.ts`
+  - [x] Export `extensionRequests` from `src/db/schema/index.ts`
+- [x] Task: Add extension cap columns to `assignments` schema
+  - [x] Add `maxExtensionDays: integer('max_extension_days').default(7)` to `src/db/schema/assignments.ts`
+  - [x] Add `maxTotalExtensions: integer('max_total_extensions').default(3)` to `src/db/schema/assignments.ts`
+- [x] Task: Generate Drizzle migration
+  - [x] Run `pnpm db:generate` (migration created manually as SQL file)
+  - [x] Verify migration SQL is correct (extension_requests table, assignment columns)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions — Extension Request Handlers
 
