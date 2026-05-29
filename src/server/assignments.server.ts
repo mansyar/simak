@@ -63,18 +63,40 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
       }));
       await tx.insert(assignmentStudents).values(studentRows);
 
-      // 3. Fetch template checkpoints
+      // 3. Fetch template checkpoints with estimated_duration
       const tCheckpoints = await tx
         .select({
           name: templateCheckpoints.name,
           order: templateCheckpoints.order,
           minConsultations: templateCheckpoints.minConsultations,
+          estimatedDuration: templateCheckpoints.estimatedDuration,
         })
         .from(templateCheckpoints)
         .where(eq(templateCheckpoints.templateId, templateId))
         .orderBy(templateCheckpoints.order);
 
-      // 4. Instantiate checkpoints for each student
+      // 4. Fetch assignment createdAt to use as base date for calculations
+      const [assignmentRow] = await tx
+        .select({ createdAt: assignments.createdAt })
+        .from(assignments)
+        .where(eq(assignments.id, assignmentId))
+        .limit(1);
+
+      const baseDate = assignmentRow?.createdAt ?? new Date();
+
+      // Helper: calculate cumulative dueDate for a checkpoint
+      function calculateDueDate(order: number): Date {
+        let cumulativeDays = 0;
+        for (const tcp of tCheckpoints) {
+          cumulativeDays += tcp.estimatedDuration ?? 0;
+          if (tcp.order === order) break;
+        }
+        const result = new Date(baseDate);
+        result.setDate(result.getDate() + cumulativeDays);
+        return result;
+      }
+
+      // 5. Instantiate checkpoints for each student with calculated dueDates
       if (tCheckpoints.length > 0) {
         const checkpointRows: {
           assignmentId: number;
@@ -82,6 +104,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
           name: string;
           order: number;
           minConsultations: number;
+          dueDate: Date;
           state: 'unlocked' | 'locked';
         }[] = [];
         for (const studentId of studentIds) {
@@ -92,6 +115,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
               name: tcp.name,
               order: tcp.order,
               minConsultations: tcp.minConsultations ?? 0,
+              dueDate: calculateDueDate(tcp.order),
               state: tcp.order === 1 ? ('unlocked' as const) : ('locked' as const),
             });
           });
