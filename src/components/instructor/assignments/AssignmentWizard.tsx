@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
 import { createAssignment } from '@/server/assignments';
+import { getTemplate } from '@/server/templates';
 import { listUsers } from '@/server/users';
 import { TemplatePicker } from './TemplatePicker';
 import { AssignmentDetailsForm } from './AssignmentDetailsForm';
 import { StudentPicker } from './StudentPicker';
+import { DueDatePreview } from './DueDatePreview';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,6 +36,17 @@ interface Template {
   checkpoints: string[];
 }
 
+interface CheckpointDetail {
+  name: string;
+  order: number;
+  estimatedDuration: number;
+}
+
+interface DueDateOverride {
+  checkpointOrder: number;
+  dueDate: string;
+}
+
 export function AssignmentWizard() {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -45,6 +58,11 @@ export function AssignmentWizard() {
   const [description, setDescription] = useState('');
   const [finalDeadline, setFinalDeadline] = useState('');
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+
+  // Template checkpoint details (contains estimated_duration)
+  const [checkpointDetails, setCheckpointDetails] = useState<CheckpointDetail[]>([]);
+  // Due date overrides
+  const [dueDateOverrides, setDueDateOverrides] = useState<DueDateOverride[]>([]);
 
   // List of all students for lookup in final review step
   const [students, setStudents] = useState<Student[]>([]);
@@ -72,13 +90,35 @@ export function AssignmentWizard() {
     loadStudents();
   }, []);
 
-  const handleSelectTemplate = (tpl: Template) => {
+  const handleSelectTemplate = async (tpl: Template) => {
     setSelectedTemplate(tpl);
     // Suggest a default title if not set
     if (!title) {
       setTitle(`${tpl.name} - Cohort ${new Date().getFullYear()}`);
     }
     setErrors((prev) => ({ ...prev, templateId: '' }));
+
+    // Fetch template details to get estimated_durations
+    try {
+      const response = await (
+        getTemplate as unknown as (args: { data: { id: number } }) => Promise<{
+          id: number;
+          checkpoints: { name: string; order: number; estimatedDuration: number | null }[];
+        } | null>
+      )({ data: { id: tpl.id } });
+      if (response && response.checkpoints) {
+        const details: CheckpointDetail[] = response.checkpoints.map((cp) => ({
+          name: cp.name,
+          order: cp.order,
+          estimatedDuration: cp.estimatedDuration ?? 7,
+        }));
+        setCheckpointDetails(details);
+        // Reset overrides when template changes
+        setDueDateOverrides([]);
+      }
+    } catch (err) {
+      console.error('Failed to fetch template details', err);
+    }
   };
 
   const handleToggleStudent = (id: string) => {
@@ -138,12 +178,13 @@ export function AssignmentWizard() {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)) {
       return;
     }
 
     try {
       setIsSubmitting(true);
+      const overrideDueDates = dueDateOverrides.length > 0 ? dueDateOverrides : undefined;
       const res = await (
         createAssignment as unknown as (args: {
           data: {
@@ -152,6 +193,7 @@ export function AssignmentWizard() {
             description: string;
             finalDeadline: string;
             studentIds: string[];
+            overrideDueDates?: { checkpointOrder: number; dueDate: string }[];
           };
         }) => Promise<{ success: boolean; assignmentId: number; error?: string }>
       )({
@@ -161,6 +203,7 @@ export function AssignmentWizard() {
           description,
           finalDeadline: new Date(finalDeadline).toISOString(),
           studentIds: selectedStudentIds,
+          overrideDueDates,
         },
       });
 
@@ -185,7 +228,8 @@ export function AssignmentWizard() {
     { num: 1, label: t('instructorAssignments.wizard.stepTemplate') },
     { num: 2, label: t('instructorAssignments.wizard.stepDetails') },
     { num: 3, label: t('instructorAssignments.wizard.stepStudents') },
-    { num: 4, label: t('instructorAssignments.wizard.stepConfirm') },
+    { num: 4, label: t('instructorAssignments.wizard.stepDueDates') },
+    { num: 5, label: t('instructorAssignments.wizard.stepConfirm') },
   ];
 
   return (
@@ -257,7 +301,15 @@ export function AssignmentWizard() {
           />
         )}
 
-        {currentStep === 4 && selectedTemplate && (
+        {currentStep === 4 && (
+          <DueDatePreview
+            checkpoints={checkpointDetails}
+            overrides={dueDateOverrides}
+            onOverride={setDueDateOverrides}
+          />
+        )}
+
+        {currentStep === 5 && selectedTemplate && (
           <div className="space-y-6">
             <div className="flex flex-col gap-2">
               <h2 className="text-xl font-bold tracking-tight text-foreground">

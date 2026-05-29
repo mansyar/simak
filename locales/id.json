@@ -296,6 +296,10 @@
       "noStudentsSelected": "Belum ada mahasiswa terpilih",
       "templateSelected": "Templat: {name}",
       "checkpointsPreview": "Pratinjau Tahapan",
+      "stepDueDates": "Tenggat Waktu",
+      "dueDatesPrompt": "Tinjau dan sesuaikan tenggat waktu untuk setiap tahapan.",
+      "daysLabel": "{count} hari",
+      "dueDateFor": "Tenggat waktu untuk",
       "searchStudents": "Cari mahasiswa berdasarkan nama atau email...",
       "successMessage": "Tugas berhasil dibuat!",
       "errorMessage": "Gagal membuat tugas. Silakan coba lagi."

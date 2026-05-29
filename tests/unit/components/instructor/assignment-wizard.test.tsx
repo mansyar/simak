@@ -17,8 +17,10 @@ vi.mock('@/routes/__root', () => ({
         'instructorAssignments.wizard.stepTemplate': 'Select Template',
         'instructorAssignments.wizard.stepDetails': 'Step 2: Assignment Details',
         'instructorAssignments.wizard.stepStudents': 'Assign Students',
+        'instructorAssignments.wizard.stepDueDates': 'Due Dates',
         'instructorAssignments.wizard.stepConfirm': 'Review & Confirm',
         'instructorAssignments.wizard.reviewPrompt': 'Please review before submitting',
+        'instructorAssignments.wizard.dueDatesPrompt': 'Review and adjust due dates',
         'instructorAssignments.wizard.next': 'Next',
         'instructorAssignments.wizard.prev': 'Back',
         'instructorAssignments.wizard.submit': 'Create Assignment',
@@ -43,12 +45,28 @@ vi.mock('@/server/assignments', () => ({
   createAssignment: vi.fn(),
 }));
 
+vi.mock('@/server/templates', () => ({
+  getTemplate: vi.fn(),
+}));
+
 vi.mock('@/server/users', () => ({
   listUsers: vi.fn(),
 }));
 
-// Helper: navigate through all 3 steps to reach Step 4 or trigger validation on Step 3
-function navigateToStep4({ selectStudents = true }: { selectStudents?: boolean } = {}) {
+vi.mock('@/components/instructor/assignments/DueDatePreview', () => ({
+  DueDatePreview: ({ checkpoints }: any) => (
+    <div data-testid="due-date-preview">
+      {checkpoints.map((cp: any) => (
+        <span key={cp.order} data-testid={`checkpoint-${cp.order}`}>
+          {cp.name}
+        </span>
+      ))}
+    </div>
+  ),
+}));
+
+// Helper: navigate through all 4 steps to reach Step 5 (Review) or trigger validation on Step 3
+function navigateToStep5({ selectStudents = true }: { selectStudents?: boolean } = {}) {
   fireEvent.click(screen.getByTestId('select-thesis-template'));
   fireEvent.click(screen.getByText('Next'));
   fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
@@ -62,8 +80,11 @@ function navigateToStep4({ selectStudents = true }: { selectStudents?: boolean }
     fireEvent.click(screen.getByTestId('toggle-student-1'));
     fireEvent.click(screen.getByTestId('toggle-student-2'));
   }
-  // Always press Next to either advance to Step 4 or trigger validation
   fireEvent.click(screen.getByText('Next'));
+  // Step 4 (DueDatePreview) - no validation needed, advance to Step 5
+  if (selectStudents) {
+    fireEvent.click(screen.getByText('Next'));
+  }
 }
 
 // Mock child components to simplify tests
@@ -163,6 +184,7 @@ vi.mock('@/components/ui/badge', () => ({
 }));
 
 import * as assignmentsApi from '@/server/assignments';
+import * as templatesApi from '@/server/templates';
 import * as usersApi from '@/server/users';
 
 describe('AssignmentWizard', () => {
@@ -171,17 +193,28 @@ describe('AssignmentWizard', () => {
     { id: 'student-2', name: 'Bob Marley', email: 'bob@test.com' },
   ];
 
+  const mockTemplateDetails = {
+    id: 1,
+    checkpoints: [
+      { name: 'Proposal', order: 1, estimatedDuration: 14 },
+      { name: 'Drafting', order: 2, estimatedDuration: 30 },
+      { name: 'Defense', order: 3, estimatedDuration: 7 },
+    ],
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockStudents, total: 2 } as any);
+    vi.mocked(templatesApi.getTemplate).mockResolvedValue(mockTemplateDetails as any);
   });
 
   describe('Initial Render and Step Navigation', () => {
-    it('should render all 4 wizard steps in the progress bar', () => {
+    it('should render all 5 wizard steps in the progress bar', () => {
       render(<AssignmentWizard />);
       expect(screen.getByText('Select Template')).toBeDefined();
       expect(screen.getByText('Step 2: Assignment Details')).toBeDefined();
       expect(screen.getByText('Assign Students')).toBeDefined();
+      expect(screen.getByText('Due Dates')).toBeDefined();
       expect(screen.getByText('Review & Confirm')).toBeDefined();
     });
 
@@ -282,14 +315,33 @@ describe('AssignmentWizard', () => {
   describe('Step 3 - Student Selection Validation', () => {
     it('should show error when Next is clicked without selecting students', () => {
       render(<AssignmentWizard />);
-      navigateToStep4({ selectStudents: false });
+      navigateToStep5({ selectStudents: false });
       expect(screen.getByTestId('error-students').textContent).toBe(
         'Please select at least one student',
       );
     });
   });
 
-  describe('Step 4 - Review and Submit', () => {
+  describe('Step 4 - Due Date Preview', () => {
+    it('should show due date preview step with checkpoint names', () => {
+      render(<AssignmentWizard />);
+      // Navigate to step 4 (skip step 3 validation by selecting students)
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
+      const fd = new Date();
+      fd.setFullYear(fd.getFullYear() + 1);
+      fireEvent.change(screen.getByTestId('input-deadline'), {
+        target: { value: fd.toISOString().slice(0, 16) },
+      });
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.click(screen.getByTestId('toggle-student-1'));
+      fireEvent.click(screen.getByText('Next'));
+      expect(screen.getByTestId('due-date-preview')).toBeDefined();
+    });
+  });
+
+  describe('Step 5 - Review and Submit', () => {
     beforeEach(() => {
       vi.mocked(assignmentsApi.createAssignment).mockResolvedValue({
         success: true,
@@ -299,7 +351,7 @@ describe('AssignmentWizard', () => {
 
     it('should show review screen with all details after completing steps', async () => {
       render(<AssignmentWizard />);
-      navigateToStep4();
+      navigateToStep5();
       await waitFor(() => {
         expect(screen.getAllByText('Review & Confirm').length).toBeGreaterThanOrEqual(2);
         expect(screen.getByText('Please review before submitting')).toBeDefined();
@@ -311,7 +363,7 @@ describe('AssignmentWizard', () => {
 
     it('should call createAssignment and navigate on successful submit', async () => {
       render(<AssignmentWizard />);
-      navigateToStep4();
+      navigateToStep5();
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));
       await waitFor(() => expect(assignmentsApi.createAssignment).toHaveBeenCalledOnce());
@@ -328,7 +380,7 @@ describe('AssignmentWizard', () => {
         error: 'Template is no longer available',
       } as any);
       render(<AssignmentWizard />);
-      navigateToStep4();
+      navigateToStep5();
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));
       await waitFor(() =>
@@ -340,7 +392,7 @@ describe('AssignmentWizard', () => {
     it('should show network error message on exception', async () => {
       vi.mocked(assignmentsApi.createAssignment).mockRejectedValue(new Error('Network failure'));
       render(<AssignmentWizard />);
-      navigateToStep4();
+      navigateToStep5();
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));
       await waitFor(() =>

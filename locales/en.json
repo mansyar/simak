@@ -296,6 +296,10 @@
       "noStudentsSelected": "No students selected yet",
       "templateSelected": "Template: {name}",
       "checkpointsPreview": "Milestones Preview",
+      "stepDueDates": "Due Dates",
+      "dueDatesPrompt": "Review and adjust due dates for each checkpoint milestone.",
+      "daysLabel": "{count} days",
+      "dueDateFor": "Due date for",
       "searchStudents": "Search students by name or email...",
       "successMessage": "Assignment created successfully!",
       "errorMessage": "Failed to create assignment. Please try again."
