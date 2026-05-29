@@ -61,7 +61,7 @@
 
 ---
 
-## Phase 4: Assignment Creation Wizard — DueDate Preview & Override [checkpoint: TBD]
+## Phase 4: Assignment Creation Wizard — DueDate Preview & Override [checkpoint: 6def9fc]
 
 - [x] Task: Add dueDate preview step to assignment creation wizard (7e8a0e3)
   - [ ] After template selection → show calculated dueDates per checkpoint
