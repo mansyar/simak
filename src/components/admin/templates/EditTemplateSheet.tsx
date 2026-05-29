@@ -240,17 +240,19 @@ export function EditTemplateSheet({
                 <FormItem>
                   <FormLabel>{t('adminTemplates.form.checkpoints')}</FormLabel>
                   <FormControl>
-                    <CheckpointListEditor
-                      checkpoints={checkpointValues}
-                      onAdd={handleAddCheckpoint}
-                      onRemove={handleRemoveCheckpoint}
-                      onChange={handleCheckpointChange}
-                      onMinConsultationsChange={handleMinConsultationsChange}
-                      onEstimatedDurationChange={handleEstimatedDurationChange}
-                      onMoveUp={handleMoveUp}
-                      onMoveDown={handleMoveDown}
-                      errors={checkpointValues.map((_, i) => checkpointErrors?.[i]?.message)}
-                    />
+                    <div className="max-h-72 overflow-y-auto pr-1 -mr-1 space-y-0">
+                      <CheckpointListEditor
+                        checkpoints={checkpointValues}
+                        onAdd={handleAddCheckpoint}
+                        onRemove={handleRemoveCheckpoint}
+                        onChange={handleCheckpointChange}
+                        onMinConsultationsChange={handleMinConsultationsChange}
+                        onEstimatedDurationChange={handleEstimatedDurationChange}
+                        onMoveUp={handleMoveUp}
+                        onMoveDown={handleMoveDown}
+                        errors={checkpointValues.map((_, i) => checkpointErrors?.[i]?.message)}
+                      />
+                    </div>
                   </FormControl>
                   {checkpointErrors?.message && (
                     <p className="text-sm text-destructive mt-1">{checkpointErrors.message}</p>
