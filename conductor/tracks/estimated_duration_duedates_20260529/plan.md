@@ -88,15 +88,16 @@
   - [ ] Run backfill SQL for existing template_checkpoints (set default 14)
   - [ ] Run backfill SQL for existing checkpoints.dueDate (reconstruct from template)
   - [ ] Manual verification on dev DB
-- [ ] Task: Fix student dashboard query (remove `IS NOT NULL` filter on dueDate)
-  - [ ] Find the "Upcoming Deadlines" widget query in `src/server/dashboard-student.server.ts`
-  - [ ] Remove `dueDate IS NOT NULL` condition now that real dates exist
-- [ ] Task: Verify SLA breach `adjustDeadlinesForBreach` works with real dueDates
-  - [ ] Review handler logic — ensure no NULL-skipping code paths
-  - [ ] Update any guard conditions that filter out NULL dueDates
-- [ ] Task: Write regression tests
-  - [ ] Test: Student dashboard shows deadlines without NULL-filter
-  - [ ] Test: SLA breach handler operates on non-NULL dueDates
+- [x] Task: Fix student dashboard query (remove `IS NOT NULL` filter on dueDate) (0e7736b)
+  - [x] Find the "Upcoming Deadlines" widget query in `src/server/dashboard-student.server.ts`
+  - [x] Remove `dueDate IS NOT NULL` condition now that real dates exist
+  - [x] Remove JS `.filter((d) => d.dueDate)` safety filter
+- [x] Task: Verify SLA breach `adjustDeadlinesForBreach` works with real dueDates (0e7736b)
+  - [x] Review handler logic — ensure no NULL-skipping code paths
+  - [x] Update guard conditions: remove NULL-guard for checkpoint dueDates (now always populated)
+- [x] Task: Write regression tests (0e7736b)
+  - [x] Test: Student dashboard shows 3 deadlines without NULL-filter
+  - [x] Test: notifications-events.test.ts uses valid dueDates instead of null
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Backfill & Student-Facing Fixes' (Protocol in workflow.md)
 
 ---
