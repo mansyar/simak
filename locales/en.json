@@ -179,7 +179,9 @@
       "namePlaceholder": "e.g., Thesis Template",
       "typePlaceholder": "e.g., Thesis, Research Paper",
       "minConsPlaceholder": "0",
-      "durationPlaceholder": "7"
+      "durationPlaceholder": "7",
+      "minConsHint": "Verified consultations required before submission",
+      "durationHint": "Days allotted for this checkpoint"
     },
     "actions": {
       "edit": "Edit",

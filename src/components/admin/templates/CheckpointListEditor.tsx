@@ -36,6 +36,26 @@ export function CheckpointListEditor({
 
   return (
     <div className="space-y-3">
+      {/* Column headers */}
+      <div className="flex items-start gap-2 px-1">
+        <div className="w-[52px] shrink-0" /> {/* spacer for reorder buttons */}
+        <div className="flex-1">
+          <span className="text-xs font-medium text-muted-foreground">
+            {t('adminTemplates.form.checkpointName')}
+          </span>
+        </div>
+        <div className="w-28">
+          <span className="text-xs font-medium text-muted-foreground">
+            {t('adminTemplates.form.minConsultations')}
+          </span>
+        </div>
+        <div className="w-24">
+          <span className="text-xs font-medium text-muted-foreground">
+            {t('adminTemplates.form.estimatedDuration')}
+          </span>
+        </div>
+        <div className="w-9 shrink-0" /> {/* spacer for remove button */}
+      </div>
       <div className="space-y-2">
         {checkpoints.map((checkpoint, index) => (
           <div key={index} className="flex items-start gap-2">
@@ -59,7 +79,7 @@ export function CheckpointListEditor({
                 <ChevronDown className="h-3 w-3" />
               </button>
             </div>
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 space-y-1">
               <Input
                 value={checkpoint.name}
                 onChange={(e) => onChange(index, e.target.value)}
@@ -68,7 +88,7 @@ export function CheckpointListEditor({
               />
               {errors?.[index] && <p className="text-sm text-destructive mt-1">{errors[index]}</p>}
             </div>
-            <div className="w-28">
+            <div className="w-28 space-y-1">
               <Input
                 type="number"
                 min={0}
@@ -80,8 +100,11 @@ export function CheckpointListEditor({
                 data-testid={`checkpoint-min-cons-${index}`}
                 aria-label={t('adminTemplates.form.minConsultations')}
               />
+              <p className="text-[10px] leading-tight text-muted-foreground">
+                {t('adminTemplates.form.minConsHint')}
+              </p>
             </div>
-            <div className="w-24">
+            <div className="w-24 space-y-1">
               <Input
                 type="number"
                 min={0}
@@ -93,6 +116,9 @@ export function CheckpointListEditor({
                 data-testid={`checkpoint-duration-${index}`}
                 aria-label={t('adminTemplates.form.estimatedDuration')}
               />
+              <p className="text-[10px] leading-tight text-muted-foreground">
+                {t('adminTemplates.form.durationHint')}
+              </p>
             </div>
             <Button
               type="button"
@@ -100,7 +126,7 @@ export function CheckpointListEditor({
               size="icon"
               onClick={() => onRemove(index)}
               disabled={checkpoints.length <= 1}
-              className="mt-0.5"
+              className="mt-1"
               aria-label={t('adminTemplates.form.removeCheckpoint')}
             >
               <X className="h-4 w-4" />

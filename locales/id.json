@@ -179,7 +179,9 @@
       "namePlaceholder": "misal, Templat Skripsi",
       "typePlaceholder": "misal, Skripsi, Makalah Penelitian",
       "minConsPlaceholder": "0",
-      "durationPlaceholder": "7"
+      "durationPlaceholder": "7",
+      "minConsHint": "Konsultasi terverifikasi diperlukan sebelum pengumpulan",
+      "durationHint": "Hari yang dialokasikan untuk checkpoint ini"
     },
     "actions": {
       "edit": "Ubah",

@@ -13,6 +13,8 @@ vi.mock('@/routes/__root', () => ({
         'adminTemplates.form.estimatedDuration': 'Est. Duration (days)',
         'adminTemplates.form.removeCheckpoint': 'Remove',
         'adminTemplates.form.addCheckpoint': 'Add Checkpoint',
+        'adminTemplates.form.minConsHint': 'Verified consultations required before submission',
+        'adminTemplates.form.durationHint': 'Days allotted for this checkpoint',
       };
       return translations[key] || key;
     },
