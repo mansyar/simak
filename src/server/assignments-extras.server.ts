@@ -5,6 +5,7 @@ import { assignments, assignmentStudents, checkpoints } from '../db/schema/assig
 import { assignmentTemplates } from '../db/schema/templates';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
+import { logAuditEvent } from '../lib/audit';
 import { consultations } from '../db/schema/consultations';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -47,6 +48,7 @@ export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInpu
       id: checkpoints.id,
       state: checkpoints.state,
       assignmentInstructorId: assignments.instructorId,
+      assignmentId: checkpoints.assignmentId,
     })
     .from(checkpoints)
     .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
@@ -70,6 +72,14 @@ export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInpu
     .set({ state: 'unlocked', updatedAt: new Date() })
     .where(eq(checkpoints.id, checkpointId));
 
+  await logAuditEvent({
+    actorId: session.user.id,
+    action: 'checkpoint.unlocked',
+    entityType: 'checkpoint',
+    entityId: String(checkpointId),
+    details: { assignmentId: checkpoint.assignmentId },
+  });
+
   return { success: true };
 }
 
@@ -91,6 +101,7 @@ export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput })
     .select({
       id: checkpoints.id,
       assignmentInstructorId: assignments.instructorId,
+      assignmentId: checkpoints.assignmentId,
     })
     .from(checkpoints)
     .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
@@ -109,6 +120,14 @@ export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput })
     .update(checkpoints)
     .set({ dueDate: newDueDate, updatedAt: new Date() })
     .where(eq(checkpoints.id, checkpointId));
+
+  await logAuditEvent({
+    actorId: session.user.id,
+    action: 'deadline.extended',
+    entityType: 'checkpoint',
+    entityId: String(checkpointId),
+    details: { assignmentId: checkpoint.assignmentId, newDueDate: newDueDate.toISOString() },
+  });
 
   return { success: true };
 }

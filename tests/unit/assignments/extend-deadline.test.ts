@@ -1,10 +1,7 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
-import {
-  ExtendDeadlineSchema,
-  extendDeadline,
-} from '@/server/assignments';
+import { ExtendDeadlineSchema, extendDeadline } from '@/server/assignments';
 import { extendDeadlineHandler } from '@/server/assignments.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
@@ -97,6 +94,7 @@ describe('extendDeadlineHandler', () => {
         id: 100,
         dueDate: new Date(Date.now() + 3 * 86400000),
         assignmentInstructorId: 'instructor-1',
+        assignmentId: 1,
         ...overrides,
       },
     ];
@@ -113,6 +111,8 @@ describe('extendDeadlineHandler', () => {
       limit: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
       set: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      values: vi.fn().mockReturnThis(),
       leftJoin: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
     };
@@ -137,10 +137,10 @@ describe('extendDeadlineHandler', () => {
   it('should extend a checkpoint due date in own assignment', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-    const result = await runHandlerWithResult(
-      makeCheckpointRow(),
-      { checkpointId: 100, newDueDate: futureDate },
-    );
+    const result = await runHandlerWithResult(makeCheckpointRow(), {
+      checkpointId: 100,
+      newDueDate: futureDate,
+    });
 
     expect(result).toEqual({ success: true });
   });
@@ -148,10 +148,7 @@ describe('extendDeadlineHandler', () => {
   it('should update the dueDate and updatedAt when extending', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-    await runHandlerWithResult(
-      makeCheckpointRow(),
-      { checkpointId: 100, newDueDate: futureDate },
-    );
+    await runHandlerWithResult(makeCheckpointRow(), { checkpointId: 100, newDueDate: futureDate });
 
     expect(mockDb.update).toHaveBeenCalled();
     const setCall = mockDb.set.mock.calls[0][0];
@@ -162,10 +159,7 @@ describe('extendDeadlineHandler', () => {
   it('should return error if checkpoint not found', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-    const result = await runHandlerWithResult(
-      [],
-      { checkpointId: 999, newDueDate: futureDate },
-    );
+    const result = await runHandlerWithResult([], { checkpointId: 999, newDueDate: futureDate });
 
     expect(result).toEqual({ error: 'Checkpoint not found' });
   });
@@ -174,10 +168,7 @@ describe('extendDeadlineHandler', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
     // Empty result simulates both not-found and non-ownership (same behavior)
-    const result = await runHandlerWithResult(
-      [],
-      { checkpointId: 200, newDueDate: futureDate },
-    );
+    const result = await runHandlerWithResult([], { checkpointId: 200, newDueDate: futureDate });
 
     expect(result).toEqual({ error: 'Checkpoint not found' });
   });
@@ -206,10 +197,10 @@ describe('extendDeadlineHandler', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
     // Test with a checkpoint in 'submitted' state (not locked)
-    const result = await runHandlerWithResult(
-      makeCheckpointRow({ state: 'submitted' }),
-      { checkpointId: 100, newDueDate: futureDate },
-    );
+    const result = await runHandlerWithResult(makeCheckpointRow({ state: 'submitted' }), {
+      checkpointId: 100,
+      newDueDate: futureDate,
+    });
 
     expect(result).toEqual({ success: true });
   });

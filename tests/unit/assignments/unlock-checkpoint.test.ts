@@ -62,6 +62,7 @@ describe('unlockCheckpointHandler', () => {
         id: 100,
         state: 'locked',
         assignmentInstructorId: 'instructor-1',
+        assignmentId: 1,
         ...overrides,
       },
     ];
@@ -80,6 +81,8 @@ describe('unlockCheckpointHandler', () => {
       limit: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
       set: vi.fn().mockReturnThis(),
+      insert: vi.fn().mockReturnThis(),
+      values: vi.fn().mockReturnThis(),
       leftJoin: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       // Override then dynamically per test by replacing the whole mockDb
@@ -103,10 +106,9 @@ describe('unlockCheckpointHandler', () => {
   it('should unlock a locked checkpoint in own assignment', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-    const result = await runHandlerWithResult(
-      makeCheckpointRow({ state: 'locked' }),
-      { checkpointId: 100 },
-    );
+    const result = await runHandlerWithResult(makeCheckpointRow({ state: 'locked' }), {
+      checkpointId: 100,
+    });
 
     expect(result).toEqual({ success: true });
   });
@@ -114,10 +116,9 @@ describe('unlockCheckpointHandler', () => {
   it('should return error if checkpoint is already unlocked', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-    const result = await runHandlerWithResult(
-      makeCheckpointRow({ state: 'unlocked' }),
-      { checkpointId: 100 },
-    );
+    const result = await runHandlerWithResult(makeCheckpointRow({ state: 'unlocked' }), {
+      checkpointId: 100,
+    });
 
     expect(result).toEqual({ error: 'Checkpoint is not in locked state' });
   });
@@ -125,10 +126,9 @@ describe('unlockCheckpointHandler', () => {
   it('should return error if checkpoint is already passed', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-    const result = await runHandlerWithResult(
-      makeCheckpointRow({ state: 'passed' }),
-      { checkpointId: 100 },
-    );
+    const result = await runHandlerWithResult(makeCheckpointRow({ state: 'passed' }), {
+      checkpointId: 100,
+    });
 
     expect(result).toEqual({ error: 'Checkpoint is not in locked state' });
   });
@@ -136,10 +136,7 @@ describe('unlockCheckpointHandler', () => {
   it('should return error if checkpoint not found', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-    const result = await runHandlerWithResult(
-      [],
-      { checkpointId: 999 },
-    );
+    const result = await runHandlerWithResult([], { checkpointId: 999 });
 
     expect(result).toEqual({ error: 'Checkpoint not found' });
   });
@@ -148,10 +145,7 @@ describe('unlockCheckpointHandler', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
     // Empty result simulates both not-found and non-ownership (same behavior)
-    const result = await runHandlerWithResult(
-      [],
-      { checkpointId: 200 },
-    );
+    const result = await runHandlerWithResult([], { checkpointId: 200 });
 
     expect(result).toEqual({ error: 'Checkpoint not found' });
   });
@@ -179,10 +173,7 @@ describe('unlockCheckpointHandler', () => {
   it('should update updatedAt when unlocking', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-    await runHandlerWithResult(
-      makeCheckpointRow({ state: 'locked' }),
-      { checkpointId: 100 },
-    );
+    await runHandlerWithResult(makeCheckpointRow({ state: 'locked' }), { checkpointId: 100 });
 
     // Verify update was called with updatedAt
     expect(mockDb.update).toHaveBeenCalled();
