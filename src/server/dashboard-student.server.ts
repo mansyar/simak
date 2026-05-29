@@ -121,9 +121,9 @@ export async function getStudentDashboardDataHandler() {
       assignmentId: d.assignmentId,
       assignmentTitle: d.assignmentTitle,
       checkpointName: d.checkpointName,
-      dueDate: d.dueDate!,
+      dueDate: d.dueDate ?? new Date(),
       state: d.state,
-      isOverdue: d.dueDate! < now,
+      isOverdue: (d.dueDate ?? new Date()) < now,
     }));
 
     // 3. Pending reviews — submissions under instructor review (last 30 days)

@@ -38,7 +38,7 @@ export async function adjustDeadlinesForBreach(
   // Extend affected checkpoint's dueDate
   // After Phase 1 backfill, checkpoint dueDates are always populated
   const extendedDueDate = new Date(
-    submission.checkpointDueDate!.getTime() + breachDays * 24 * 60 * 60 * 1000,
+    (submission.checkpointDueDate ?? new Date()).getTime() + breachDays * 24 * 60 * 60 * 1000,
   );
   await tx
     .update(checkpoints)
@@ -53,7 +53,7 @@ export async function adjustDeadlinesForBreach(
       and(
         eq(checkpoints.assignmentId, submission.assignmentId),
         eq(checkpoints.studentId, submission.studentId),
-        gt(checkpoints.order, submission.checkpointOrder!),
+        gt(checkpoints.order, submission.checkpointOrder ?? 0),
       ),
     );
 
@@ -62,7 +62,7 @@ export async function adjustDeadlinesForBreach(
     await tx
       .update(checkpoints)
       .set({
-        dueDate: new Date(cp.dueDate!.getTime() + breachDays * 24 * 60 * 60 * 1000),
+        dueDate: new Date((cp.dueDate ?? new Date()).getTime() + breachDays * 24 * 60 * 60 * 1000),
         updatedAt: new Date(),
       })
       .where(eq(checkpoints.id, cp.id));

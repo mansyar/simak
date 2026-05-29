@@ -98,7 +98,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
       // Validate sequential ordering and past dates
       const validation = validateDueDates(checkpointDueDates);
       if (!validation.valid) {
-        return { error: validation.error };
+        throw new Error(validation.error);
       }
 
       // 6. Instantiate checkpoints for each student with calculated/overridden dueDates
@@ -120,7 +120,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
               name: tcp.name,
               order: tcp.order,
               minConsultations: tcp.minConsultations ?? 0,
-              dueDate: checkpointDueDates.get(tcp.order)!,
+              dueDate: checkpointDueDates.get(tcp.order) ?? new Date(),
               state: tcp.order === 1 ? ('unlocked' as const) : ('locked' as const),
             });
           });
@@ -131,10 +131,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
       return { success: true, assignmentId };
     });
 
-    // If validation failed inside transaction, return error without audit log
-    if ('error' in result) {
-      return result;
-    }
+    // If validation throws inside transaction, the catch block handles it
 
     const assignmentId = result.assignmentId;
     await logAuditEvent({
@@ -147,6 +144,11 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
 
     return result;
   } catch (err) {
+    // Validation errors (thrown inside transaction) return the specific message
+    // All other errors return a generic server error
+    if (err instanceof Error && err.message.startsWith('Checkpoint')) {
+      return { error: err.message };
+    }
     console.error('Failed to create assignment:', err);
     return { error: 'Internal Server Error' };
   }
