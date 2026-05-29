@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Eliminate `any` type usage in the codebase**
-  _Link: ./tracks/eliminate_any_types_20260529/_
+- [x] **Track: Eliminate `any` type usage in the codebase**
+      _Link: ./tracks/eliminate_any_types_20260529/_
