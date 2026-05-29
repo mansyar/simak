@@ -206,8 +206,9 @@ describe('Assignment Server Functions', () => {
         expect(result.students).toHaveLength(1);
         expect(result.students[0].passedCount).toBe(1);
         expect(result.students[0].progressPercent).toBe(50);
-        expect(result.students[0].activeCheckpoint.name).toBe('Milestone 2');
-        expect(result.students[0].activeCheckpoint.state).toBe('unlocked');
+        expect(result.students[0].activeCheckpoint).not.toBeNull();
+        expect(result.students[0].activeCheckpoint!.name).toBe('Milestone 2');
+        expect(result.students[0].activeCheckpoint!.state).toBe('unlocked');
       }
     });
   });
