@@ -41,24 +41,23 @@
 
 ## Phase 3: Template Admin UI — Duration Input [checkpoint: TBD]
 
-- [ ] Task: Update `CheckpointListEditor` component
-  - [ ] Add number input field per checkpoint row for `estimated_duration`
-  - [ ] Type: integer, min 0, default 7
-  - [ ] Label: "Estimated Duration (days)"
-  - [ ] Wire into form state for create/edit template flows
-- [ ] Task: Update template server handlers
-  - [ ] `createTemplateHandler`: include `estimated_duration` in checkpoint insert
-  - [ ] `updateTemplateHandler`: include `estimated_duration` in checkpoint update
-  - [ ] `getTemplateHandler`: return `estimated_duration` in response
-  - [ ] `duplicateTemplateHandler`: copy `estimated_duration` with checkpoint duplication
-- [ ] Task: Write tests for template duration UI changes
-  - [ ] Test: `CheckpointListEditor` renders duration input per row
-  - [ ] Test: Creating template persists estimated_duration per checkpoint
-  - [ ] Test: Editing template updates estimated_duration
-- [ ] Task: i18n — add translation keys for duration labels
-  - [ ] Add keys to `locales/en.json` and `locales/id.json`
-  - [ ] Regenerate i18n types via `pnpm generate:i18n`
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Template Admin UI' (Protocol in workflow.md)
+- [x] Task: Update `CheckpointListEditor` component (f461a94)
+  - [x] Add number input field per checkpoint row for `estimated_duration`
+  - [x] Type: integer, min 0, default 7
+  - [x] Label: "Estimated Duration (days)"
+  - [x] Wire into form state for create/edit template flows
+- [x] Task: Update template server handlers (f461a94)
+  - [x] `createTemplateHandler`: include `estimated_duration` in checkpoint insert
+  - [x] `updateTemplateHandler`: include `estimated_duration` in checkpoint update
+  - [x] `getTemplateHandler`: return `estimated_duration` in response
+  - [x] `duplicateTemplateHandler`: copy `estimated_duration` with checkpoint duplication
+- [x] Task: Write & update tests for template duration (f461a94)
+  - [x] Test: `CheckpointListEditor` renders duration input per row
+  - [x] Test: `onEstimatedDurationChange` callback fires on input change
+  - [x] Test: Schema defaults to `estimatedDuration: 7`
+- [x] Task: i18n — add translation keys for duration labels (f461a94)
+  - [x] Add `estimatedDuration`, `durationPlaceholder` to `locales/en.json` and `locales/id.json`
+  - [x] Regenerate i18n types via `pnpm generate:i18n`
 
 ---
 
