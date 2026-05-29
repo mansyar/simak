@@ -12,7 +12,9 @@
 - [x] Task: Generate Drizzle migration
   - [x] Run `pnpm db:generate` (migration created manually as SQL file)
   - [x] Verify migration SQL is correct (extension_requests table, assignment columns)
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema' (Protocol in workflow.md)
+  - [x] Phase checkpoint SHA: `391d6ef33f4171586a772712bb34eb48e3f1dfe1`
+  - [x] Git note attached with audit verification report
 
 ## Phase 2: Server Functions — Extension Request Handlers
 
