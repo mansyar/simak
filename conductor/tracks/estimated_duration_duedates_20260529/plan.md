@@ -1,6 +1,6 @@
 # Implementation Plan: Track 1.2 — Estimated Duration & Auto-Calculated DueDates
 
-## Phase 1: Database Migration & Schema [checkpoint: TBD]
+## Phase 1: Database Migration & Schema [checkpoint: 87eae20]
 
 - [x] Task: Add `estimated_duration` column to `template_checkpoints` schema (8686d0f)
   - [x] Add `estimatedDuration: integer('estimated_duration').default(0)` to `src/db/schema/templates.ts`
@@ -12,7 +12,7 @@
 - [x] Task: Write tests for schema changes (8686d0f)
   - [x] Unit test — `template_checkpoints.estimatedDuration` column exists with correct type and default
   - [x] Unit test — import verification for updated schema barrel exports (existing tests cover this)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Database Migration & Schema' (Protocol in workflow.md) (87eae20)
 
 ---
 
