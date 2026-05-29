@@ -32,14 +32,28 @@ export const Route = createFileRoute(
       if (!checkpoint) return null;
 
       // Fetch submissions for this checkpoint
-      // @ts-expect-error - handler type inference limitation
-      const submissionsData = await listSubmissions({
+      const submissionsData = await (
+        listSubmissions as unknown as (args: {
+          data: { checkpointId: number };
+        }) => Promise<{ submissions?: unknown }>
+      )({
         data: { checkpointId: Number(checkpointId) },
       });
 
       // Find the latest review (from the reviews table)
-      // @ts-expect-error - handler type inference limitation
-      const reviewData = await getLatestReview({ data: { checkpointId: Number(checkpointId) } });
+      const reviewData = await (
+        getLatestReview as unknown as (args: {
+          data: { checkpointId: number };
+        }) => Promise<{
+          review?: {
+            decision: string;
+            comment: string | null;
+            instructorName: string;
+            revisionDeadline: string | null;
+            createdAt: string | null;
+          } | null;
+        }>
+      )({ data: { checkpointId: Number(checkpointId) } });
       const latestReview = reviewData?.review
         ? ({
             decision: reviewData.review.decision as 'pass' | 'revise',
