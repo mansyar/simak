@@ -18,24 +18,24 @@
 
 ## Phase 2: Server Functions — Extension Request Handlers
 
-- [ ] Task: Create `src/server/extensions.ts` with Zod schemas
-  - [ ] Define `RequestExtensionSchema` (assignmentId, checkpointId nullable, category enum, reason min 10, extensionDays 1–30)
-  - [ ] Define `ListExtensionRequestsSchema` (assignmentId, status optional, page, limit)
-  - [ ] Define `ApproveExtensionSchema` (requestId, resolutionReason optional)
-  - [ ] Define `RejectExtensionSchema` (requestId, resolutionReason required min 20)
-  - [ ] Define `BulkExtendSchema` (assignmentId, studentId, extraDays positive int, reason)
-  - [ ] Create client-safe `createServerFn` stubs for all 5 handlers
-- [ ] Task: Create `src/server/extensions.server.ts` with handlers
-  - [ ] Write `requestExtensionHandler` — validates caps, creates request, sends notification
-  - [ ] Write `listPendingExtensionsHandler` — lists pending requests (instructor-only, ownership-guarded)
-  - [ ] Write `approveExtensionHandler` — approves, extends checkpoints, logs audit event, notifies student
-  - [ ] Write `rejectExtensionHandler` — rejects with reason, logs audit event, notifies student
-  - [ ] Write `bulkExtendHandler` — extends all unfinished checkpoints by +N days, logs per-extension audit events
-  - [ ] Add `calculateExtensionAdjustment` helper — extends affected + subsequent checkpoints and finalDeadline
-- [ ] Task: Wire existing handlers to audit log
-  - [ ] Modify `extendDeadlineHandler` (assignments.server.ts) — add `logAuditEvent('deadline.extended')`
-  - [ ] Modify `unlockCheckpointHandler` (assignments.server.ts) — add `logAuditEvent('checkpoint.unlocked')`
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions' (Protocol in workflow.md)
+- [x] Task: Create `src/server/extensions.ts` with Zod schemas
+  - [x] Define `RequestExtensionSchema` (assignmentId, checkpointId nullable, category enum, reason min 10, extensionDays 1–30)
+  - [x] Define `ListExtensionRequestsSchema` (assignmentId, status optional, page, limit)
+  - [x] Define `ApproveExtensionSchema` (requestId, resolutionReason optional)
+  - [x] Define `RejectExtensionSchema` (requestId, resolutionReason required min 20)
+  - [x] Define `BulkExtendSchema` (assignmentId, studentId, extraDays positive int, reason)
+  - [x] Create client-safe `createServerFn` stubs for all 5 handlers
+- [x] Task: Create `src/server/extensions.server.ts` with handlers (split into 2 files for ≤500 line limit)
+  - [x] `extensions.server.ts` (279 lines): `requestExtensionHandler` + `listExtensionRequestsHandler`
+  - [x] `extensions-extras.server.ts` (408 lines): `approveExtensionHandler`, `rejectExtensionHandler`, `bulkExtendHandler`
+  - [x] Add `calculateExtensionAdjustment` helper — extends affected + subsequent checkpoints and finalDeadline
+  - [x] Re-export extras from `extensions.server.ts`
+- [x] Task: Wire existing handlers to audit log
+  - [x] Modify `extendDeadlineHandler` — add `logAuditEvent('deadline.extended')`
+  - [x] Modify `unlockCheckpointHandler` — add `logAuditEvent('checkpoint.unlocked')`
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Server Functions' (Protocol in workflow.md)
+  - [ ] Phase checkpoint SHA: `45b7897c42ed2d8ce37555998b4024faf70dd95b`
+  - [ ] Git note attached with audit verification report
 
 ## Phase 3: Notification Events & i18n
 
