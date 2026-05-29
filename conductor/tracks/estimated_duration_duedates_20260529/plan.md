@@ -63,7 +63,7 @@
 
 ## Phase 4: Assignment Creation Wizard — DueDate Preview & Override [checkpoint: TBD]
 
-- [ ] Task: Add dueDate preview step to assignment creation wizard
+- [x] Task: Add dueDate preview step to assignment creation wizard (7e8a0e3)
   - [ ] After template selection → show calculated dueDates per checkpoint
   - [ ] Display: checkpoint name + calculated dueDate (read-only, editable date input)
   - [ ] Calculate on client-side based on template's estimated_durations for preview
