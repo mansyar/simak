@@ -171,13 +171,15 @@
       "checkpoints": "Checkpoints",
       "checkpointName": "Checkpoint Name",
       "minConsultations": "Min. Consultations",
+      "estimatedDuration": "Est. Duration (days)",
       "addCheckpoint": "Add Checkpoint",
       "removeCheckpoint": "Remove",
       "moveUp": "Move Up",
       "moveDown": "Move Down",
       "namePlaceholder": "e.g., Thesis Template",
       "typePlaceholder": "e.g., Thesis, Research Paper",
-      "minConsPlaceholder": "0"
+      "minConsPlaceholder": "0",
+      "durationPlaceholder": "7"
     },
     "actions": {
       "edit": "Edit",

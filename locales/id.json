@@ -171,13 +171,15 @@
       "checkpoints": "Checkpoint",
       "checkpointName": "Nama Checkpoint",
       "minConsultations": "Min. Konsultasi",
+      "estimatedDuration": "Estimasi Durasi (hari)",
       "addCheckpoint": "Tambah Checkpoint",
       "removeCheckpoint": "Hapus",
       "moveUp": "Naik",
       "moveDown": "Turun",
       "namePlaceholder": "misal, Templat Skripsi",
       "typePlaceholder": "misal, Skripsi, Makalah Penelitian",
-      "minConsPlaceholder": "0"
+      "minConsPlaceholder": "0",
+      "durationPlaceholder": "7"
     },
     "actions": {
       "edit": "Ubah",

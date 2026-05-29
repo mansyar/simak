@@ -9,6 +9,8 @@ vi.mock('@/routes/__root', () => ({
         'adminTemplates.form.moveUp': 'Move Up',
         'adminTemplates.form.moveDown': 'Move Down',
         'adminTemplates.form.checkpointName': 'Checkpoint Name',
+        'adminTemplates.form.minConsultations': 'Min. Consultations',
+        'adminTemplates.form.estimatedDuration': 'Est. Duration (days)',
         'adminTemplates.form.removeCheckpoint': 'Remove',
         'adminTemplates.form.addCheckpoint': 'Add Checkpoint',
       };
@@ -32,14 +34,15 @@ vi.mock('@/components/ui/button', () => ({
 describe('CheckpointListEditor', () => {
   const defaultProps = {
     checkpoints: [
-      { name: 'Chapter 1', minConsultations: 0 },
-      { name: 'Chapter 2', minConsultations: 0 },
-      { name: 'Chapter 3', minConsultations: 0 },
+      { name: 'Chapter 1', minConsultations: 0, estimatedDuration: 7 },
+      { name: 'Chapter 2', minConsultations: 0, estimatedDuration: 14 },
+      { name: 'Chapter 3', minConsultations: 0, estimatedDuration: 21 },
     ],
     onAdd: vi.fn(),
     onRemove: vi.fn(),
     onChange: vi.fn(),
     onMinConsultationsChange: vi.fn(),
+    onEstimatedDurationChange: vi.fn(),
     onMoveUp: vi.fn(),
     onMoveDown: vi.fn(),
   };
@@ -99,8 +102,20 @@ describe('CheckpointListEditor', () => {
   });
 
   it('should disable Remove when only one checkpoint', () => {
-    render(<CheckpointListEditor {...defaultProps} checkpoints={[{ name: 'Only', minConsultations: 0 }]} />);
+    render(
+      <CheckpointListEditor
+        {...defaultProps}
+        checkpoints={[{ name: 'Only', minConsultations: 0, estimatedDuration: 7 }]}
+      />,
+    );
     expect((screen.getByLabelText('Remove') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('should call onEstimatedDurationChange when duration input changes', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    const durationInputs = screen.getAllByLabelText('Est. Duration (days)');
+    fireEvent.change(durationInputs[0], { target: { value: '14' } });
+    expect(defaultProps.onEstimatedDurationChange).toHaveBeenCalledWith(0, 14);
   });
 
   it('should render Add Checkpoint button', () => {

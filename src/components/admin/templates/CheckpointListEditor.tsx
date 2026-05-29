@@ -6,6 +6,7 @@ import { useI18n } from '../../../routes/__root';
 interface CheckpointData {
   name: string;
   minConsultations: number;
+  estimatedDuration?: number;
 }
 
 interface CheckpointListEditorProps {
@@ -14,6 +15,7 @@ interface CheckpointListEditorProps {
   onRemove: (index: number) => void;
   onChange: (index: number, value: string) => void;
   onMinConsultationsChange: (index: number, value: number) => void;
+  onEstimatedDurationChange: (index: number, value: number) => void;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
   errors?: (string | undefined)[];
@@ -25,6 +27,7 @@ export function CheckpointListEditor({
   onRemove,
   onChange,
   onMinConsultationsChange,
+  onEstimatedDurationChange,
   onMoveUp,
   onMoveDown,
   errors,
@@ -76,6 +79,19 @@ export function CheckpointListEditor({
                 placeholder={t('adminTemplates.form.minConsPlaceholder')}
                 data-testid={`checkpoint-min-cons-${index}`}
                 aria-label={t('adminTemplates.form.minConsultations')}
+              />
+            </div>
+            <div className="w-24">
+              <Input
+                type="number"
+                min={0}
+                value={checkpoint.estimatedDuration ?? 7}
+                onChange={(e) =>
+                  onEstimatedDurationChange(index, Math.max(0, Number(e.target.value)))
+                }
+                placeholder={t('adminTemplates.form.durationPlaceholder')}
+                data-testid={`checkpoint-duration-${index}`}
+                aria-label={t('adminTemplates.form.estimatedDuration')}
               />
             </div>
             <Button

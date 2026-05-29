@@ -32,7 +32,13 @@ interface EditTemplateSheetProps {
     id: number;
     name: string;
     type: string;
-    checkpoints: { id: number; name: string; order: number; minConsultations?: number | null }[];
+    checkpoints: {
+      id: number;
+      name: string;
+      order: number;
+      minConsultations?: number | null;
+      estimatedDuration?: number | null;
+    }[];
     assignmentCount?: number;
   } | null;
   open: boolean;
@@ -51,7 +57,7 @@ export function EditTemplateSheet({
   const { t } = useI18n();
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const defaultCheckpoint = () => ({ name: '', minConsultations: 0 });
+  const defaultCheckpoint = () => ({ name: '', minConsultations: 0, estimatedDuration: 7 });
 
   const form = useForm<EditTemplateFormValues>({
     resolver: zodResolver(UpdateTemplateSchema) as never,
@@ -71,6 +77,7 @@ export function EditTemplateSheet({
         checkpoints: template.checkpoints.map((cp) => ({
           name: cp.name,
           minConsultations: cp.minConsultations ?? 0,
+          estimatedDuration: cp.estimatedDuration ?? 7,
         })),
       });
       setServerError(null);
@@ -112,6 +119,16 @@ export function EditTemplateSheet({
       const current = form.getValues('checkpoints');
       const updated = [...current];
       updated[index] = { ...updated[index], minConsultations: value };
+      form.setValue('checkpoints', updated, { shouldValidate: false });
+    },
+    [form],
+  );
+
+  const handleEstimatedDurationChange = useCallback(
+    (index: number, value: number) => {
+      const current = form.getValues('checkpoints');
+      const updated = [...current];
+      updated[index] = { ...updated[index], estimatedDuration: value };
       form.setValue('checkpoints', updated, { shouldValidate: false });
     },
     [form],
@@ -229,6 +246,7 @@ export function EditTemplateSheet({
                       onRemove={handleRemoveCheckpoint}
                       onChange={handleCheckpointChange}
                       onMinConsultationsChange={handleMinConsultationsChange}
+                      onEstimatedDurationChange={handleEstimatedDurationChange}
                       onMoveUp={handleMoveUp}
                       onMoveDown={handleMoveDown}
                       errors={checkpointValues.map((_, i) => checkpointErrors?.[i]?.message)}

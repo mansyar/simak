@@ -33,7 +33,7 @@ interface CreateTemplateDialogProps {
   onSuccess: () => void;
 }
 
-const defaultCheckpoint = () => ({ name: '', minConsultations: 0 });
+const defaultCheckpoint = () => ({ name: '', minConsultations: 0, estimatedDuration: 7 });
 
 export function CreateTemplateDialog({
   open,
@@ -88,6 +88,16 @@ export function CreateTemplateDialog({
       const current = form.getValues('checkpoints');
       const updated = [...current];
       updated[index] = { ...updated[index], minConsultations: value };
+      form.setValue('checkpoints', updated, { shouldValidate: false });
+    },
+    [form],
+  );
+
+  const handleEstimatedDurationChange = useCallback(
+    (index: number, value: number) => {
+      const current = form.getValues('checkpoints');
+      const updated = [...current];
+      updated[index] = { ...updated[index], estimatedDuration: value };
       form.setValue('checkpoints', updated, { shouldValidate: false });
     },
     [form],
@@ -196,6 +206,7 @@ export function CreateTemplateDialog({
                       onRemove={handleRemoveCheckpoint}
                       onChange={handleCheckpointChange}
                       onMinConsultationsChange={handleMinConsultationsChange}
+                      onEstimatedDurationChange={handleEstimatedDurationChange}
                       onMoveUp={handleMoveUp}
                       onMoveDown={handleMoveDown}
                       errors={checkpointValues.map((_, i) => checkpointErrors?.[i]?.message)}

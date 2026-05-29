@@ -6,6 +6,7 @@ import { z } from 'zod';
 export const CheckpointInputSchema = z.object({
   name: z.string().min(1, 'Checkpoint name is required'),
   minConsultations: z.coerce.number().int().min(0).default(0),
+  estimatedDuration: z.coerce.number().int().min(0).default(7),
 });
 
 export const CreateTemplateSchema = z.object({

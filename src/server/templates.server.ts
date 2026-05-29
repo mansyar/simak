@@ -154,6 +154,7 @@ export async function getTemplateHandler(args: { data: TemplateIdParam }) {
       name: templateCheckpoints.name,
       order: templateCheckpoints.order,
       minConsultations: templateCheckpoints.minConsultations,
+      estimatedDuration: templateCheckpoints.estimatedDuration,
     })
     .from(templateCheckpoints)
     .where(eq(templateCheckpoints.templateId, id))
@@ -195,6 +196,7 @@ export async function createTemplateHandler(args: { data: CreateTemplateInput })
     name: cp.name,
     order: index + 1,
     minConsultations: cp.minConsultations ?? 0,
+    estimatedDuration: cp.estimatedDuration ?? 7,
   }));
 
   await db.insert(templateCheckpoints).values(checkpointRows);
@@ -228,6 +230,7 @@ export async function updateTemplateHandler(args: { data: UpdateTemplateInput & 
     name: cp.name,
     order: index + 1,
     minConsultations: cp.minConsultations ?? 0,
+    estimatedDuration: cp.estimatedDuration ?? 7,
   }));
 
   await db.insert(templateCheckpoints).values(checkpointRows);
@@ -336,6 +339,7 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
       name: templateCheckpoints.name,
       order: templateCheckpoints.order,
       minConsultations: templateCheckpoints.minConsultations,
+      estimatedDuration: templateCheckpoints.estimatedDuration,
     })
     .from(templateCheckpoints)
     .where(eq(templateCheckpoints.templateId, id))
@@ -346,6 +350,7 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
     name: cp.name,
     order: cp.order,
     minConsultations: cp.minConsultations ?? 0,
+    estimatedDuration: cp.estimatedDuration ?? 7,
   }));
 
   await db.insert(templateCheckpoints).values(checkpointRows);

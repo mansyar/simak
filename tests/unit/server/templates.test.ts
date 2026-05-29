@@ -42,7 +42,11 @@ describe('Template server functions - Schemas', () => {
       });
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.checkpoints[0]).toEqual({ name: 'Chapter 1', minConsultations: 0 });
+        expect(result.data.checkpoints[0]).toEqual({
+          name: 'Chapter 1',
+          minConsultations: 0,
+          estimatedDuration: 7,
+        });
       }
     });
 
@@ -50,7 +54,7 @@ describe('Template server functions - Schemas', () => {
       const result = CreateTemplateSchema.safeParse({
         name: 'Thesis Template',
         type: 'Thesis',
-        checkpoints: [{ name: 'Chapter 1', minConsultations: 3 }],
+        checkpoints: [{ name: 'Chapter 1', minConsultations: 3, estimatedDuration: 7 }],
       });
       expect(result.success).toBe(true);
       if (result.success) {
@@ -98,7 +102,7 @@ describe('Template server functions - Schemas', () => {
       const result = CreateTemplateSchema.safeParse({
         name: 'Thesis',
         type: 'Thesis',
-        checkpoints: [{ name: 'Ch 1', minConsultations: '5' }],
+        checkpoints: [{ name: 'Ch 1', minConsultations: '5', estimatedDuration: 7 }],
       });
       expect(result.success).toBe(true);
       if (result.success) {
@@ -205,7 +209,10 @@ describe('Template server functions - Logic & Security', () => {
     const createData = {
       name: 'Thesis Template',
       type: 'Thesis',
-      checkpoints: [{ name: 'Chapter 1', minConsultations: 0 }, { name: 'Chapter 2', minConsultations: 0 }],
+      checkpoints: [
+        { name: 'Chapter 1', minConsultations: 0, estimatedDuration: 7 },
+        { name: 'Chapter 2', minConsultations: 0, estimatedDuration: 7 },
+      ],
     };
 
     it('should fail if unauthorized', async () => {
@@ -391,7 +398,10 @@ describe('Template server functions - Logic & Security', () => {
     const updateData = {
       name: 'Updated Template',
       type: 'Thesis',
-      checkpoints: [{ name: 'New Ch 1', minConsultations: 0 }, { name: 'New Ch 2', minConsultations: 0 }],
+      checkpoints: [
+        { name: 'New Ch 1', minConsultations: 0, estimatedDuration: 7 },
+        { name: 'New Ch 2', minConsultations: 0, estimatedDuration: 7 },
+      ],
     };
 
     it('should fail if unauthorized', async () => {
