@@ -189,6 +189,8 @@ export type Translation = {
       deadlineExtended: string
       consultationVerified: string
       consultationRejected: string
+      extensionApproved: string
+      extensionRejected: string
     }
   }
   studentSidebar: {
@@ -367,6 +369,59 @@ export type Translation = {
       submissions: string
       system: string
     }
+  }
+  extensions: {
+    requestTitle: string
+    category: string
+    categoryPlaceholder: string
+    reason: string
+    reasonPlaceholder: string
+    reasonMinChars: string
+    duration: string
+    durationHint: string
+    checkpoint: string
+    checkpointHint: string
+    submit: string
+    submitting: string
+    successMessage: string
+    queueTitle: string
+    pendingCount: string
+    noPending: string
+    historyTitle: string
+    noHistory: string
+    tableDate: string
+    tableCategory: string
+    tableDuration: string
+    tableStatus: string
+    tableResolution: string
+    statusPending: string
+    statusApproved: string
+    statusRejected: string
+    approveDialogTitle: string
+    approveComment: string
+    approveConfirm: string
+    approveSuccess: string
+    rejectDialogTitle: string
+    rejectReasonRequired: string
+    rejectReasonChars: string
+    rejectConfirm: string
+    rejectSuccess: string
+    bulkExtendTitle: string
+    bulkExtendDays: string
+    bulkExtendReason: string
+    bulkExtendApply: string
+    bulkExtendConfirm: string
+    bulkExtendSuccess: string
+    notificationRequested: string
+    notificationApproved: string
+    notificationRejected: string
+    notificationDeadlineExtended: string
+    categoryPersonal: string
+    categoryResearch: string
+    categoryHealth: string
+    categoryOther: string
+    maxExtensionsReached: string
+    daysExceeded: string
   }
 }
 
