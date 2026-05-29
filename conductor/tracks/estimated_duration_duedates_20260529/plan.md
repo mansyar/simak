@@ -73,10 +73,10 @@
   - [ ] Show clear visual: "Calculated from template durations"
   - [ ] Allow per-checkpoint date override
   - [ ] Show validation feedback if dates are out-of-order
-- [ ] Task: Write tests for wizard dueDate preview
-  - [ ] Test: DueDatePreviewStep renders calculated dates
-  - [ ] Test: Instructor can override a date
-  - [ ] Test: Override values are submitted with createAssignment
+- [x] Task: Write tests for wizard dueDate preview (6def9fc)
+  - [x] Test: DueDatePreviewStep renders calculated dates
+  - [x] Test: Instructor can override a date
+  - [x] Test: Override values are submitted with createAssignment
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Assignment Creation Wizard' (Protocol in workflow.md)
 
 ---
