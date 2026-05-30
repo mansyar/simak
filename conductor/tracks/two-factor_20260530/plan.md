@@ -60,7 +60,7 @@
 - [x] Write component tests for 2FA settings UI — SHA: 6650886
 - [x] Conductor - User Manual Verification 'Phase 5' (Protocol in workflow.md)
 
-## Phase 6: Session Management UI [checkpoint: 93273ec]
+## Phase 6: Session Management UI [checkpoint: a7b427e]
 
 ### Tasks
 
@@ -71,7 +71,7 @@
 - [x] Implement revoke all other sessions button — SHA: 93273ec
 - [x] Wire TanStack Query mutations for session operations — SHA: 93273ec
 - [x] Write component tests for session management UI — SHA: 93273ec
-- [x] Conductor - User Manual Verification 'Phase 6' (Protocol in workflow.md)
+- [x] Conductor - User Manual Verification 'Phase 6' (Protocol in workflow.md) — SHA: a7b427e
 
 ## Phase 7: i18n & Integration Testing
 
