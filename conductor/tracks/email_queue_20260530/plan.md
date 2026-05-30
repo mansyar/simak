@@ -78,13 +78,13 @@
   - [x] Add `adminDashboard.emailQueue.pending`, `.sent`, `.failed` to `locales/en.json`
   - [x] Add Indonesian translations to `locales/id.json`
   - [x] Regenerate i18n types with `pnpm generate:i18n`
-- [x] Task: Write tests for admin widget (test update commit)
+- [x] Task: Write tests for admin widget (27b373f)
   - [x] Test dashboard handler returns queue counts
   - [x] Test widget component renders queue section
   - [x] Run `CI=true pnpm test` and confirm all tests pass (1359 passed, 151 files)
 - [x] Task: Implement widget — make tests pass (Green phase)
   - [x] Run `CI=true pnpm test` and confirm all tests pass
-- [ ] Task: Conductor - User Manual Verification 'Admin Dashboard Widget & i18n' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Admin Dashboard Widget & i18n' (Protocol in workflow.md)
 
 ## Phase 5: Final Verification
 
