@@ -21,17 +21,17 @@
 - [x] Write unit tests for all server functions
 - [x] Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
-## Phase 3: Session Management Server Functions
+## Phase 3: Session Management Server Functions [checkpoint: pending]
 
 ### Tasks
 
-- [ ] Create `src/server/sessions.ts` with Zod schemas and server function stubs
-- [ ] Create `src/server/sessions.server.ts` with handler implementations
-- [ ] Implement `listActiveSessions` — returns all sessions for current user
-- [ ] Implement `revokeSession` — invalidates a specific session
-- [ ] Implement `revokeAllOtherSessions` — invalidates all sessions except current
-- [ ] Parse user agent string for device type display
-- [ ] Write unit tests for session management functions
+- [x] Create `src/server/sessions.ts` with Zod schemas and server function stubs — SHA: dd7b291
+- [x] Create `src/server/sessions.server.ts` with handler implementations — SHA: dd7b291
+- [x] Implement `listActiveSessions` — returns all sessions for current user — SHA: dd7b291
+- [x] Implement `revokeSession` — invalidates a specific session — SHA: dd7b291
+- [x] Implement `revokeAllOtherSessions` — invalidates all sessions except current — SHA: dd7b291
+- [x] Parse user agent string for device type display — SHA: dd7b291
+- [x] Write unit tests for session management functions — SHA: dd7b291
 - [ ] Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
 ## Phase 4: 2FA Login Flow
