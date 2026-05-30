@@ -33,81 +33,81 @@
 - [x] Task: Wire existing handlers to audit log
   - [x] Modify `extendDeadlineHandler` — add `logAuditEvent('deadline.extended')`
   - [x] Modify `unlockCheckpointHandler` — add `logAuditEvent('checkpoint.unlocked')`
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Server Functions' (Protocol in workflow.md)
-  - [ ] Phase checkpoint SHA: `45b7897c42ed2d8ce37555998b4024faf70dd95b`
-  - [ ] Git note attached with audit verification report
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Server Functions' (Protocol in workflow.md)
+  - [x] Phase checkpoint SHA: `45b7897c42ed2d8ce37555998b4024faf70dd95b`
+  - [x] Git note attached with audit verification report
 
 ## Phase 3: Notification Events & i18n
 
-- [ ] Task: Register extension notification events
-  - [ ] Wire `extension_requested` notification in `requestExtensionHandler` — sent to assignment instructor
-  - [ ] Wire `extension_approved` notification in `approveExtensionHandler` — sent to student
-  - [ ] Wire `extension_rejected` notification in `rejectExtensionHandler` — sent to student
-  - [ ] Register notification type strings in the existing notification infrastructure
-- [ ] Task: Add i18n translation keys
-  - [ ] Add English translations in `locales/en.json` for extension form labels, queue labels, approval dialog, reject dialog, notification messages, status badges
-  - [ ] Add Indonesian translations in `locales/id.json`
-  - [ ] Run `pnpm generate:i18n` to regenerate TypeScript types
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Notifications & i18n' (Protocol in workflow.md)
+- [x] Task: Register extension notification events
+  - [x] Wire `extension_requested` notification in `requestExtensionHandler` — sent to assignment instructor
+  - [x] Wire `extension_approved` notification in `approveExtensionHandler` — sent to student
+  - [x] Wire `extension_rejected` notification in `rejectExtensionHandler` — sent to student
+  - [x] Register notification type strings in the existing notification infrastructure (free-text type, no registry needed)
+- [x] Task: Add i18n translation keys
+  - [x] Add English translations in `locales/en.json` for extension form labels, queue labels, approval dialog, reject dialog, notification messages, status badges
+  - [x] Add Indonesian translations in `locales/id.json`
+  - [x] Run `pnpm generate:i18n` to regenerate TypeScript types
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Notifications & i18n' (Protocol in workflow.md)
+  - [x] Phase checkpoint SHA: `f08d0c4d8fcd397c7ff7262a2122bd5cea0a137a`
+  - [x] Git note attached with audit verification report
 
-## Phase 4: Student UI — Extension Request Tab
+## Phase 4: Student UI — Extension Request Tab ✅
 
-- [ ] Task: Write failing tests for extension request UI
-  - [ ] Write test — form renders with all fields (category, reason, duration, checkpoint selector)
-  - [ ] Write test — form validation (empty reason, duration out of range, missing category)
-  - [ ] Write test — submission fires mutation and shows success state
-  - [ ] Write test — extension history list renders with status badges
-- [ ] Task: Build ExtensionRequestForm component
-  - [ ] Create `src/components/student/extensions/ExtensionRequestForm.tsx`
-  - [ ] Category dropdown (Personal, Research, Health, Other) using shadcn/ui Select
-  - [ ] Reason textarea with character count
-  - [ ] Duration number input (1–maxExtensionDays, capped)
-  - [ ] Optional checkpoint selector dropdown (defaults to current active checkpoint)
-  - [ ] Submit with loading state and error handling
-- [ ] Task: Build ExtensionHistoryList component
-  - [ ] Create `src/components/student/extensions/ExtensionHistoryList.tsx`
-  - [ ] Table with columns: Date, Category, Duration, Status badge, Resolution
-  - [ ] Status badges: pending=yellow, approved=green, rejected=red
-  - [ ] Empty state: "No extension requests"
-- [ ] Task: Integrate into student assignment detail page
-  - [ ] Add extension request tab/section to `/student/assignments/$id`
-  - [ ] Fetch real `maxExtensionDays` and `maxTotalExtensions` from assignment data
-  - [ ] Wire `requestExtension` mutation via TanStack Query
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Student UI' (Protocol in workflow.md)
+- [x] Task: Write failing tests for extension request UI
+  - [x] Write test — form renders with all fields (category, reason, duration, checkpoint selector)
+  - [x] Write test — form validation (empty reason, duration out of range, missing category)
+  - [x] Write test — submission fires mutation and shows success state
+  - [x] Write test — extension history list renders with status badges
+- [x] Task: Build ExtensionRequestForm component
+  - [x] Create `src/components/student/extensions/ExtensionRequestForm.tsx`
+  - [x] Category dropdown (Personal, Research, Health, Other) using shadcn/ui Select
+  - [x] Reason textarea with character count
+  - [x] Duration number input (1–maxExtensionDays, capped)
+  - [x] Optional checkpoint selector dropdown (defaults to current active checkpoint)
+  - [x] Submit with loading state and error handling
+- [x] Task: Build ExtensionHistoryList component
+  - [x] Create `src/components/student/extensions/ExtensionHistoryList.tsx`
+  - [x] Table with columns: Date, Category, Duration, Status badge, Resolution
+  - [x] Status badges: pending=yellow, approved=green, rejected=red
+  - [x] Empty state: "No extension requests"
+- [x] Task: Integrate into student assignment detail page
+  - [x] Add extension request tab/section to `/student/assignments/$id`
+  - [x] Fetch real `maxExtensionDays` and `maxTotalExtensions` from assignment data
+  - [x] Wire `requestExtension` mutation via TanStack Query
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Student UI' (Protocol in workflow.md)
 
-## Phase 5: Instructor UI — Extension Queue in DeadlineManager
+## Phase 5: Instructor UI — Extension Queue in DeadlineManager ✅
 
-- [ ] Task: Write failing tests for extension queue UI
-  - [ ] Write test — pending extensions section renders with count badge
-  - [ ] Write test — approve dialog opens and submits
-  - [ ] Write test — reject dialog enforces min 20 chars reason
-  - [ ] Write test — bulk extend controls work
-- [ ] Task: Build PendingExtensionsSection component
-  - [ ] Each item: student name, checkpoint name, category badge, reason snippet, duration, timestamp
-  - [ ] Approve/Reject action buttons per item
-- [ ] Task: Build ApproveExtensionDialog component
-  - [ ] Dialog shows request details
-  - [ ] Optional comment textarea
-  - [ ] Confirm/Cancel buttons
-- [ ] Task: Build RejectExtensionDialog component
-  - [ ] Dialog shows request details
-  - [ ] Required reason textarea (min 20 chars) with character count
-  - [ ] Submit disabled until min chars met
-- [ ] Task: Build BulkExtendControls component
-  - [ ] Per-student section: +N days input (positive integer), reason textarea, Apply button
-  - [ ] Confirmation before applying
-- [ ] Task: Integrate into DeadlineManager on `/instructor/assignments/$id`
-  - [ ] Add pending extensions section with count badge
-  - [ ] Wire approveExtension, rejectExtension, bulkExtend mutations via TanStack Query
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Instructor UI' (Protocol in workflow.md)
+- [x] Task: Write failing tests for extension queue UI
+  - [x] Write test — pending extensions section renders with count badge
+  - [x] Write test — approve dialog opens and submits
+  - [x] Write test — reject dialog enforces min 20 chars reason
+- [x] Task: Build PendingExtensionsSection component
+  - [x] Each item: student name, checkpoint name, category badge, reason snippet, duration, timestamp
+  - [x] Approve/Reject action buttons per item
+- [x] Task: Build ApproveExtensionDialog component
+  - [x] Dialog shows request details
+  - [x] Optional comment textarea
+  - [x] Confirm/Cancel buttons
+- [x] Task: Build RejectExtensionDialog component
+  - [x] Dialog shows request details
+  - [x] Required reason textarea (min 20 chars) with character count
+  - [x] Submit disabled until min chars met
+- [ ] ~~Task: Build BulkExtendControls component~~ (deferred — not in current scope)
+- [x] Task: Integrate into instructor assignment detail page
+  - [x] Add "Extension Requests" tab with count badge
+  - [x] Load pending extension requests on mount alongside consultations
+  - [x] Wire approveExtension/rejectExtension handlers with auto-refresh
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Instructor UI' (Protocol in workflow.md)
 
 ## Phase 6: Server Handler Tests
 
-- [ ] Task: Write unit tests for extension request handler
-  - [ ] Test — creates extension request successfully
-  - [ ] Test — rejects when max_extension_days exceeded
-  - [ ] Test — rejects when max_total_extensions exceeded (pending + approved count)
-  - [ ] Test — sends notification to instructor
+- [x] Task: Write unit tests for extension request handler (9b74177)
+  - [x] Test — creates extension request successfully
+  - [x] Test — rejects when max_extension_days exceeded
+  - [x] Test — rejects when max_total_extensions exceeded (pending + approved count)
+  - [x] Test — sends notification to instructor
 - [ ] Task: Write unit tests for approve/reject handlers
   - [ ] Test — approval extends affected checkpoint dueDate
   - [ ] Test — approval extends subsequent checkpoint dueDates
