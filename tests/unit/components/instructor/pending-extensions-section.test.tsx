@@ -24,6 +24,21 @@ vi.mock('@/routes/__root', () => ({
         'extensions.category.research': 'Research',
         'extensions.category.health': 'Health',
         'extensions.category.other': 'Other',
+        'extensions.dialog.approve.title': 'Approve Extension Request',
+        'extensions.dialog.approve.description':
+          'This will extend the deadline for {student} by {count} days.',
+        'extensions.dialog.approve.confirm': 'Confirm Approval',
+        'extensions.dialog.approve.cancel': 'Cancel',
+        'extensions.dialog.approve.comment': 'Comment (optional)',
+        'extensions.dialog.approve.commentPlaceholder': 'Add a note about this approval...',
+        'extensions.dialog.reject.title': 'Reject Extension Request',
+        'extensions.dialog.reject.description':
+          "Provide a reason for rejecting {student}'s request for {count} days.",
+        'extensions.dialog.reject.confirm': 'Confirm Rejection',
+        'extensions.dialog.reject.cancel': 'Cancel',
+        'extensions.dialog.reject.reason': 'Reason for rejection',
+        'extensions.dialog.reject.reasonPlaceholder': 'Explain why this request is being rejected...',
+        'extensions.dialog.reject.charCount': '{count}/{min} characters',
       };
       let text = translations[key] || key;
       if (params) {
@@ -170,5 +185,89 @@ describe('PendingExtensionsSection', () => {
     );
     const skeletons = document.querySelectorAll('.animate-pulse');
     expect(skeletons.length).toBeGreaterThan(0);
+  });
+
+  it('should not render checkpoint section when checkpointName is null', () => {
+    const requestNoCheckpoint = [{ ...mockRequests[0], checkpointName: null }];
+    render(
+      <PendingExtensionsSection
+        requests={requestNoCheckpoint}
+        loading={false}
+        onApprove={() => {}}
+        onReject={() => {}}
+      />,
+    );
+    expect(screen.queryByText((content) => content.includes('Checkpoint'))).toBeNull();
+  });
+
+  it('should open approve dialog when approve button is clicked', () => {
+    render(
+      <PendingExtensionsSection
+        requests={[mockRequests[0]]}
+        loading={false}
+        onApprove={() => {}}
+        onReject={() => {}}
+      />,
+    );
+    fireEvent.click(screen.getByText('Approve'));
+    expect(screen.getByText('Approve Extension Request')).toBeDefined();
+  });
+
+  it('should open reject dialog when reject button is clicked', () => {
+    render(
+      <PendingExtensionsSection
+        requests={[mockRequests[0]]}
+        loading={false}
+        onApprove={() => {}}
+        onReject={() => {}}
+      />,
+    );
+    fireEvent.click(screen.getByText('Reject'));
+    expect(screen.getByText('Reject Extension Request')).toBeDefined();
+  });
+
+  it('should call onApprove after confirming in approve dialog', () => {
+    const onApprove = vi.fn();
+    render(
+      <PendingExtensionsSection
+        requests={[mockRequests[0]]}
+        loading={false}
+        onApprove={onApprove}
+        onReject={() => {}}
+      />,
+    );
+    fireEvent.click(screen.getByText('Approve'));
+    fireEvent.click(screen.getByText('Confirm Approval'));
+    expect(onApprove).toHaveBeenCalledWith(1, undefined);
+  });
+
+  it('should close approve dialog when cancel is clicked', () => {
+    render(
+      <PendingExtensionsSection
+        requests={[mockRequests[0]]}
+        loading={false}
+        onApprove={() => {}}
+        onReject={() => {}}
+      />,
+    );
+    fireEvent.click(screen.getByText('Approve'));
+    expect(screen.getByText('Approve Extension Request')).toBeDefined();
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(screen.queryByText('Approve Extension Request')).toBeNull();
+  });
+
+  it('should close reject dialog when cancel is clicked', () => {
+    render(
+      <PendingExtensionsSection
+        requests={[mockRequests[0]]}
+        loading={false}
+        onApprove={() => {}}
+        onReject={() => {}}
+      />,
+    );
+    fireEvent.click(screen.getByText('Reject'));
+    expect(screen.getByText('Reject Extension Request')).toBeDefined();
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(screen.queryByText('Reject Extension Request')).toBeNull();
   });
 });

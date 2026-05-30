@@ -102,6 +102,50 @@ describe('ApproveExtensionDialog', () => {
     fireEvent.click(screen.getByText('Confirm Approval'));
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
+
+  it('should call onOpenChange(false) when cancel is clicked', () => {
+    const onOpenChange = vi.fn();
+    render(
+      <ApproveExtensionDialog
+        request={mockRequest}
+        open={true}
+        onOpenChange={onOpenChange}
+        onConfirm={() => {}}
+      />,
+    );
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('should allow entering a comment', () => {
+    render(
+      <ApproveExtensionDialog
+        request={mockRequest}
+        open={true}
+        onOpenChange={() => {}}
+        onConfirm={() => {}}
+      />,
+    );
+    const textarea = screen.getByPlaceholderText('Add a note about this approval...');
+    fireEvent.change(textarea, { target: { value: 'Approved due to valid reasons.' } });
+    expect((textarea as HTMLTextAreaElement).value).toBe('Approved due to valid reasons.');
+  });
+
+  it('should call onConfirm with comment when provided', () => {
+    const onConfirm = vi.fn();
+    render(
+      <ApproveExtensionDialog
+        request={mockRequest}
+        open={true}
+        onOpenChange={() => {}}
+        onConfirm={onConfirm}
+      />,
+    );
+    const textarea = screen.getByPlaceholderText('Add a note about this approval...');
+    fireEvent.change(textarea, { target: { value: 'Approved for valid reasons.' } });
+    fireEvent.click(screen.getByText('Confirm Approval'));
+    expect(onConfirm).toHaveBeenCalledWith('Approved for valid reasons.');
+  });
 });
 
 describe('RejectExtensionDialog', () => {
@@ -189,6 +233,35 @@ describe('RejectExtensionDialog', () => {
       target: { value: 'This is a valid rejection reason with enough chars' },
     });
     expect(screen.getByText(/characters/)).toBeDefined();
+  });
+
+  it('should call onOpenChange(false) when cancel is clicked', () => {
+    const onOpenChange = vi.fn();
+    render(
+      <RejectExtensionDialog
+        request={mockRequest}
+        open={true}
+        onOpenChange={onOpenChange}
+        onConfirm={() => {}}
+      />,
+    );
+    fireEvent.click(screen.getByText('Cancel'));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('should guard against confirm with empty reason', () => {
+    const onConfirm = vi.fn();
+    render(
+      <RejectExtensionDialog
+        request={mockRequest}
+        open={true}
+        onOpenChange={() => {}}
+        onConfirm={onConfirm}
+      />,
+    );
+    const confirmButton = screen.getByText('Confirm Rejection').closest('button')!;
+    fireEvent.click(confirmButton);
+    expect(onConfirm).not.toHaveBeenCalled();
   });
 
   it('should call onConfirm with reason when confirm is clicked', () => {
