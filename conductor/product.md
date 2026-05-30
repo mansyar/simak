@@ -43,6 +43,7 @@ Students and instructors lack a centralized system to:
 - **Deadline management** — Auto-locking overdue checkpoints, instructor override, SLA breach escalation (3-day review SLA)
 - **Bilingual i18n** — Full English and Indonesian language support
 - **Dark mode & responsive UI** — Light/dark themes, mobile-friendly, accessible (WCAG 2.1 AA)
+- **Settings Hub** — Unified settings page accessible from all role sidebars with Profile (name editing, avatar upload), Password (inline change form), Security (2FA + Session Management), Appearance (language EN/ID, theme light/dark), and Accessibility (reduced motion toggle); persisted via `users.settings` jsonb
 
 ## Success Metrics
 
