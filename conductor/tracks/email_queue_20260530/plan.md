@@ -3,20 +3,20 @@
 
 ## Phase 1: Database Schema & Migration
 
-- [ ] Task: Create Drizzle schema for `email_queue` table
-  - [ ] Create `src/db/schema/email-queue.ts` with `emailQueue` table definition
-  - [ ] Define columns: id (serial PK), recipient_email, subject, body_html, template_type (CHECK constraint), status, attempts, last_attempt_at, error_message, created_at
-  - [ ] Add index on `(status, created_at ASC)` for dequeuing
-  - [ ] Register table in `src/db/schema/index.ts` (re-export + relations)
+- [x] Task: Create Drizzle schema for `email_queue` table (46465f9)
+  - [x] Create `src/db/schema/email-queue.ts` with `emailQueue` table definition
+  - [x] Define columns: id (serial PK), recipient_email, subject, body_html, template_type (CHECK constraint), status, attempts, last_attempt_at, error_message, created_at
+  - [x] Add index on `(status, created_at ASC)` for dequeuing
+  - [x] Register table in `src/db/schema/index.ts` (re-export + relations)
 - [ ] Task: Generate Drizzle migration
   - [ ] Run `pnpm db:generate` to produce migration SQL
   - [ ] Apply migration with `pnpm db:push` to dev database
-- [ ] Task: Write tests for schema
-  - [ ] Test column types and constraints
-  - [ ] Test index existence
-  - [ ] Run `CI=true pnpm test` and confirm new tests fail (Red phase)
-- [ ] Task: Implement schema — make tests pass (Green phase)
-  - [ ] Run `CI=true pnpm test` and confirm all tests pass
+- [x] Task: Write tests for schema (46465f9)
+  - [x] Test column types and constraints
+  - [x] Test index existence
+  - [x] Run `CI=true pnpm test` and confirm new tests fail (Red phase)
+- [x] Task: Implement schema — make tests pass (46465f9)
+  - [x] Run `CI=true pnpm test` and confirm all tests pass
 - [ ] Task: Conductor - User Manual Verification 'Database Schema & Migration' (Protocol in workflow.md)
 
 ## Phase 2: Enqueue Helpers
