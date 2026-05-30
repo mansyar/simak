@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan: Track 4.1 — Background Email Queue with Retry
 
 ## Phase 1: Database Schema & Migration
@@ -96,3 +97,4 @@
 - [ ] Task: Verify modularity limits
   - [ ] `node scripts/check-modularity.js` — all new files under 500 lines
 - [ ] Task: Conductor - User Manual Verification 'Final Verification' (Protocol in workflow.md)
+      </protect>

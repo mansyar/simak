@@ -1,3 +1,4 @@
+<protect>
 # Track 4.1 — Background Email Queue with Retry
 
 ## Overview
@@ -117,3 +118,4 @@ Add translation keys for:
 - Email template editing in the admin panel
 - Metrics/analytics on email delivery (send time, open rate)
 - Dead letter queue or webhook-based delivery status
+  </protect>
