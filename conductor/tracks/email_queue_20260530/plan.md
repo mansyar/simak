@@ -56,15 +56,15 @@
   - [x] Create `src/lib/email-queue-init.ts` that starts a `setInterval` at 30s
   - [x] Import and call init from the app entry point (via `import.meta.env.SSR` in `src/router.tsx`)
   - [x] Handle graceful cleanup (clearInterval on server shutdown)
-- [~] Task: Write tests for processor
-  - [ ] Test dequeuing — picks pending rows in correct order
-  - [ ] Test send success — updates status to `sent`
-  - [ ] Test send failure — increments attempts, stores error
-  - [ ] Test backoff — skips emails not yet due for retry
-  - [ ] Test max attempts — marks `failed` after 3 failures
-  - [ ] Run `CI=true pnpm test` and confirm new tests fail (Red phase)
-- [ ] Task: Implement processor — make tests pass (Green phase)
-  - [ ] Run `CI=true pnpm test` and confirm all tests pass
+- [x] Task: Write tests for processor (b200428)
+  - [x] Test dequeuing — picks pending rows in correct order
+  - [x] Test send success — updates status to `sent`
+  - [x] Test send failure — increments attempts, stores error
+  - [x] Test backoff — skips emails not yet due for retry
+  - [x] Test max attempts — marks `failed` after 3 failures
+  - [x] Run `CI=true pnpm test` and confirm new tests fail (Red phase) — initial mock issue resolved
+- [x] Task: Implement processor — make tests pass (Green phase)
+  - [x] Run `CI=true pnpm test` and confirm all tests pass (1356 passed, 151 files)
 - [ ] Task: Conductor - User Manual Verification 'Background Processor' (Protocol in workflow.md)
 
 ## Phase 4: Admin Dashboard Widget & i18n
