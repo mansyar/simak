@@ -1,3 +1,4 @@
+<protect>
 # Track 3.1: Two-Factor Authentication & Session Management
 
 ## Overview
@@ -63,3 +64,4 @@ Enable TOTP-based two-factor authentication via Better Auth's built-in `twoFacto
 - WebAuthn/FIDO2 hardware keys
 - SMS-based 2FA
 - Session activity logging beyond basic metadata
+  </protect>

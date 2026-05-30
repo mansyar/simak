@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan: Track 3.1 — Two-Factor Authentication & Session Management
 
 ## Phase 1: Database Schema & Better Auth Configuration
@@ -89,3 +90,4 @@
 - [ ] Run full test suite to verify no regressions
 - [ ] Verify accessibility (keyboard navigation, screen reader support)
 - [ ] Conductor - User Manual Verification 'Phase 7' (Protocol in workflow.md)
+      </protect>
