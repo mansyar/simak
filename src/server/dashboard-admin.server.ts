@@ -6,6 +6,7 @@ import { submissions } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
+import { emailQueue } from '../db/schema/email-queue';
 import { getSessionFromHeaders } from './auth';
 import type { NonNullableSession } from '../lib/types';
 
@@ -76,7 +77,16 @@ export async function getAdminDashboardDataHandler() {
       .orderBy(desc(notifications.createdAt))
       .limit(10);
 
-    // 3. Deadline escalation alerts — active SLA breaches (submissions older than 3 days)
+    // 3. Email queue counts
+    const [emailCounts] = await db
+      .select({
+        pending: sql<number>`count(*) FILTER (WHERE ${emailQueue.status} = 'pending')::int`,
+        sent: sql<number>`count(*) FILTER (WHERE ${emailQueue.status} = 'sent')::int`,
+        failed: sql<number>`count(*) FILTER (WHERE ${emailQueue.status} = 'failed')::int`,
+      })
+      .from(emailQueue);
+
+    // 4. Deadline escalation alerts — active SLA breaches (submissions older than 3 days)
     const slaThreshold = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
     const escalationAlerts = await db
       .select({
@@ -103,6 +113,11 @@ export async function getAdminDashboardDataHandler() {
 
     return {
       metrics,
+      emailQueueCounts: {
+        pending: Number(emailCounts.pending),
+        sent: Number(emailCounts.sent),
+        failed: Number(emailCounts.failed),
+      },
       recentActivity: recentActivity.map((ra) => ({
         id: ra.id,
         type: ra.type,

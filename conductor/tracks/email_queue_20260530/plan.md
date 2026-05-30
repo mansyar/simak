@@ -69,15 +69,15 @@
 
 ## Phase 4: Admin Dashboard Widget & i18n
 
-- [ ] Task: Add email queue status query to admin dashboard handler
-  - [ ] In `src/server/dashboard-admin.server.ts`, add query to count pending/sent/failed
-- [ ] Task: Create AdminEmailQueueWidget component
-  - [ ] Small card component showing 3 stat boxes (Pending, Sent, Failed) with color coding
-  - [ ] Display on `/admin/dashboard` alongside existing metric cards
-- [ ] Task: Add i18n translations
-  - [ ] Add `adminDashboard.emailQueue.pending`, `.sent`, `.failed` to `locales/en.json`
-  - [ ] Add Indonesian translations to `locales/id.json`
-  - [ ] Regenerate i18n types with `pnpm generate:i18n`
+- [x] Task: Add email queue status query to admin dashboard handler
+  - [x] In `src/server/dashboard-admin.server.ts`, add query to count pending/sent/failed
+- [x] Task: Create AdminEmailQueueWidget component
+  - [x] Small card component showing 3 stat boxes (Pending, Sent, Failed) with color coding
+  - [x] Display on `/admin/dashboard` alongside existing metric cards
+- [x] Task: Add i18n translations
+  - [x] Add `adminDashboard.emailQueue.pending`, `.sent`, `.failed` to `locales/en.json`
+  - [x] Add Indonesian translations to `locales/id.json`
+  - [x] Regenerate i18n types with `pnpm generate:i18n`
 - [ ] Task: Write tests for admin widget
   - [ ] Test dashboard handler returns queue counts
   - [ ] Test widget component renders counts correctly

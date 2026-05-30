@@ -390,7 +390,12 @@
     "manageTemplates": "Manage Templates",
     "manageTemplatesDesc": "Create and manage assignment templates",
     "student": "Student",
-    "daysOverdue": "days overdue"
+    "daysOverdue": "days overdue",
+    "emailQueue": {
+      "pending": "Pending",
+      "sent": "Sent",
+      "failed": "Failed"
+    }
   },
   "files": {
     "dropzone": {

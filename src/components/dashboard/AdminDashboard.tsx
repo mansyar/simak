@@ -9,6 +9,9 @@ import {
   AlertTriangle,
   UserPlus,
   FileType,
+  Mail,
+  MailCheck,
+  MailX,
 } from 'lucide-react';
 
 interface SystemMetrics {
@@ -28,6 +31,12 @@ interface ActivityEvent {
   createdAt: string;
 }
 
+interface EmailQueueCounts {
+  pending: number;
+  sent: number;
+  failed: number;
+}
+
 interface EscalationAlert {
   submissionId: number;
   instructorName: string;
@@ -39,6 +48,7 @@ interface EscalationAlert {
 
 export interface AdminDashboardData {
   metrics: SystemMetrics;
+  emailQueueCounts: EmailQueueCounts;
   recentActivity: ActivityEvent[];
   escalationAlerts: EscalationAlert[];
   error?: string;
@@ -146,8 +156,51 @@ export function AdminDashboard({ data }: Props) {
         />
       </div>
 
+      {/* Widget 2: Email Queue Status */}
+      <WidgetCard title="Email Queue">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="flex items-center gap-3 rounded-lg border bg-card p-4">
+            <div className="rounded-full bg-blue-500/10 p-2">
+              <Mail className="h-5 w-5 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-foreground">
+                {d.emailQueueCounts?.pending ?? 0}
+              </p>
+              <p className="text-xs text-blue-500 font-medium">
+                {t('adminDashboard.emailQueue.pending')}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-lg border bg-card p-4">
+            <div className="rounded-full bg-green-500/10 p-2">
+              <MailCheck className="h-5 w-5 text-green-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-foreground">{d.emailQueueCounts?.sent ?? 0}</p>
+              <p className="text-xs text-green-500 font-medium">
+                {t('adminDashboard.emailQueue.sent')}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-lg border bg-card p-4">
+            <div className="rounded-full bg-red-500/10 p-2">
+              <MailX className="h-5 w-5 text-red-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-foreground">
+                {d.emailQueueCounts?.failed ?? 0}
+              </p>
+              <p className="text-xs text-red-500 font-medium">
+                {t('adminDashboard.emailQueue.failed')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </WidgetCard>
+
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Widget 2: Recent Activity Feed */}
+        {/* Widget 3: Recent Activity Feed */}
         <WidgetCard title={t('adminDashboard.recentActivity')}>
           {d.recentActivity.length === 0 ? (
             <EmptyState message={t('adminDashboard.noRecentActivity')} />

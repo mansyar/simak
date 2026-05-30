@@ -390,7 +390,12 @@
     "manageTemplates": "Kelola Template",
     "manageTemplatesDesc": "Buat dan kelola template tugas",
     "student": "Mahasiswa",
-    "daysOverdue": "hari terlambat"
+    "daysOverdue": "hari terlambat",
+    "emailQueue": {
+      "pending": "Menunggu",
+      "sent": "Terkirim",
+      "failed": "Gagal"
+    }
   },
   "files": {
     "dropzone": {
