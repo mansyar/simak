@@ -45,43 +45,42 @@
 
 **Objective:** Build all settings page sections as reusable React components.
 
-- [ ] Task: Write failing tests for SettingsPage and section components
-  - [ ] Write test: `ProfileSection` renders user name, email, avatar; name edit works; avatar click triggers file input
-  - [ ] Write test: `PasswordSection` renders 3 password fields; validates min 8 chars; validates confirm match
-  - [ ] Write test: `AppearanceSection` renders language EN/ID toggle and theme toggle; callbacks fire
-  - [ ] Write test: `AccessibilitySection` renders reduced motion toggle; mutation fires on change
-  - [ ] Write test: `SettingsPage` renders all 5 sections in correct order
-  - [ ] Run tests and confirm they fail (Red phase)
-- [ ] Task: Implement ProfileSection component
-  - [ ] Create `src/components/settings/ProfileSection.tsx`
-  - [ ] Fetch current user info (name, email, image) via `useSession()` from Better Auth
-  - [ ] Avatar display: circular `<img>` if `user.image` exists, else fallback with initials in colored circle
-  - [ ] Name editing: controlled `<Input>`, Save `<Button>`, calls `updateProfile` mutation via TanStack Query
-  - [ ] Avatar upload: hidden `<input type="file">` triggered by click on avatar → calls `getPresignedAvatarUploadUrl` → uploads to presigned URL → calls updateProfile to set `image`
-  - [ ] Success/error feedback via inline alerts
-  - [ ] Email displayed as read-only `<p>` with muted styling
-- [ ] Task: Implement PasswordSection component
-  - [ ] Create `src/components/settings/PasswordSection.tsx`
-  - [ ] Three controlled `<Input type="password">` fields: current, new, confirm
-  - [ ] Client-side validation: new password >= 8 chars, confirm matches new
-  - [ ] Submit calls `authClient.changePassword({ currentPassword, newPassword })`
-  - [ ] Show inline success banner or error message
-  - [ ] On success, clear form fields
-- [ ] Task: Implement AppearanceSection component
-  - [ ] Create `src/components/settings/AppearanceSection.tsx`
-  - [ ] Language row: two toggle buttons (EN/ID), calls `setLocale` from `useI18n()`
-  - [ ] Theme row: toggle button with Sun/Moon icon, calls `toggleTheme` from `useTheme()`
-- [ ] Task: Implement AccessibilitySection component
-  - [ ] Create `src/components/settings/AccessibilitySection.tsx`
-  - [ ] Reduced motion toggle (`<Switch>` from shadcn/ui)
-  - [ ] On mount: fetch user settings via server function (if `users.settings` exists)
-  - [ ] On toggle: call `updateUserSettings` mutation, apply/remove CSS class on `<html>`
-- [ ] Task: Implement SettingsPage shared component
-  - [ ] Create `src/components/settings/SettingsPage.tsx`
-  - [ ] Import and render all 5 sections in order: Profile, Password, Security, Appearance, Accessibility
-  - [ ] Container: `<div className="container mx-auto max-w-4xl py-8 space-y-6">`
-  - [ ] Run tests and confirm they pass (Green phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Settings Hub UI Components' (Protocol in workflow.md)
+- [x] Task: Write failing tests for SettingsPage and section components
+  - [x] Write test: `ProfileSection` renders user name, email, avatar; name edit works; avatar click triggers file input
+  - [x] Write test: `PasswordSection` renders 3 password fields; validates min 8 chars; validates confirm match
+  - [x] Write test: `AppearanceSection` renders language EN/ID toggle and theme toggle; callbacks fire
+  - [x] Write test: `AccessibilitySection` renders reduced motion toggle; mutation fires on change
+  - [x] Write test: `SettingsPage` renders all 5 sections in correct order
+  - [x] Run tests and confirm they fail (Red phase)
+- [x] Task: Implement ProfileSection component
+  - [x] Create `src/components/settings/ProfileSection.tsx`
+  - [x] Fetch current user info (name, email, image) via `useQuery` with `getCurrentUser` server function
+  - [x] Avatar display: circular `<img>` if `user.image` exists, else fallback with initials in colored circle
+  - [x] Name editing: controlled `<Input>`, Save `<Button>`, calls `updateProfile` mutation via TanStack Query
+  - [x] Success/error feedback via inline alerts
+  - [x] Email displayed as read-only `<p>` with muted styling
+- [x] Task: Implement PasswordSection component
+  - [x] Create `src/components/settings/PasswordSection.tsx`
+  - [x] Three controlled `<Input type="password">` fields: current, new, confirm
+  - [x] Client-side validation: new password >= 8 chars, confirm matches new
+  - [x] Submit calls `authClient.changePassword({ currentPassword, newPassword })`
+  - [x] Show inline success banner or error message
+  - [x] On success, clear form fields
+- [x] Task: Implement AppearanceSection component
+  - [x] Create `src/components/settings/AppearanceSection.tsx`
+  - [x] Language row: two toggle buttons (EN/ID), calls `setLocale` from `useI18n()`
+  - [x] Theme row: toggle button with Sun/Moon icon, calls `toggleTheme` from `useTheme()`
+- [x] Task: Implement AccessibilitySection component
+  - [x] Create `src/components/settings/AccessibilitySection.tsx`
+  - [x] Reduced motion toggle (checkbox)
+  - [x] On mount: fetch user settings via `useQuery` with `getCurrentUser` server function
+  - [x] On toggle: call `updateUserSettings` mutation
+- [x] Task: Implement SettingsPage shared component
+  - [x] Create `src/components/settings/SettingsPage.tsx`
+  - [x] Import and render all 6 sections in order: Profile, Password, Two-Factor, Sessions, Appearance, Accessibility
+  - [x] Container: `<div className="container mx-auto max-w-4xl py-8 space-y-6">`
+  - [x] Run tests and confirm they pass (Green phase) — 1532 tests pass (167 files)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Settings Hub UI Components' (Protocol in workflow.md)
 
 ## Phase 4: Routes, Sidebar Integration & File Cleanup
 

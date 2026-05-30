@@ -51,6 +51,36 @@ export async function getPresignedAvatarUploadUrlHandler(args: unknown) {
   }
 }
 
+export async function getCurrentUserHandler() {
+  const session = await getSessionFromHeaders();
+  if (!session) return { error: 'Unauthorized' };
+
+  const { user } = session;
+  try {
+    const db = getDb();
+    const record = await db
+      .select({
+        name: users.name,
+        email: users.email,
+        image: users.image,
+        settings: users.settings,
+      })
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1)
+      .then((rows) => rows[0]);
+
+    if (!record) return { error: 'User not found' };
+
+    return {
+      user: { id: user.id, name: record.name, email: record.email, image: record.image },
+      settings: record.settings ?? null,
+    };
+  } catch {
+    return { error: 'Failed to fetch user data' };
+  }
+}
+
 export async function updateUserSettingsHandler(args: unknown) {
   const session = await getSessionFromHeaders();
   if (!session) return { error: 'Unauthorized' };

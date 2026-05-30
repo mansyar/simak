@@ -7,11 +7,13 @@ import {
   updateProfile,
   updateUserSettings,
   getPresignedAvatarUploadUrl,
+  getCurrentUser,
 } from '@/server/settings';
 import {
   updateProfileHandler,
   updateUserSettingsHandler,
   getPresignedAvatarUploadUrlHandler,
+  getCurrentUserHandler,
 } from '@/server/settings.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
@@ -97,13 +99,23 @@ describe('Settings server function stubs', () => {
   it('should export getPresignedAvatarUploadUrl as a function', () => {
     expect(typeof getPresignedAvatarUploadUrl).toBe('function');
   });
+
+  it('should export getCurrentUser as a function', () => {
+    expect(typeof getCurrentUser).toBe('function');
+  });
 });
 
 // Handler tests
 describe('Settings handlers', () => {
   let mockDb: any;
   const mockSession = {
-    user: { id: 'user-1', role: 'student' as const, name: 'John', email: 'john@test.com', image: null },
+    user: {
+      id: 'user-1',
+      role: 'student' as const,
+      name: 'John',
+      email: 'john@test.com',
+      image: null,
+    },
     session: {} as any,
   };
 
@@ -164,7 +176,9 @@ describe('Settings handlers', () => {
     it('should generate correct avatars/ key prefix and return presigned URL', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
       vi.mocked(storage.generateFileKey).mockReturnValue('avatars/uuid.jpg');
-      vi.mocked(storage.generatePresignedUploadUrl).mockResolvedValue('https://fake-upload.example.com/avatars/uuid.jpg');
+      vi.mocked(storage.generatePresignedUploadUrl).mockResolvedValue(
+        'https://fake-upload.example.com/avatars/uuid.jpg',
+      );
 
       const result = await getPresignedAvatarUploadUrlHandler({ extension: 'jpg' });
       expect(storage.generateFileKey).toHaveBeenCalledWith('jpg', 'avatars');
@@ -186,7 +200,9 @@ describe('Settings handlers', () => {
 
     it('should handle storage failure gracefully', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
-      vi.mocked(storage.generatePresignedUploadUrl).mockRejectedValue(new Error('R2 not configured'));
+      vi.mocked(storage.generatePresignedUploadUrl).mockRejectedValue(
+        new Error('R2 not configured'),
+      );
 
       const result = await getPresignedAvatarUploadUrlHandler({ extension: 'jpg' });
       expect(result).toEqual({ error: 'Failed to generate upload URL' });
@@ -204,7 +220,8 @@ describe('Settings handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
       const updatedSettings = { reducedMotion: true };
       mockDb.returning.mockReturnValue({
-        then: (onfulfilled: any) => Promise.resolve([{ settings: updatedSettings }]).then(onfulfilled),
+        then: (onfulfilled: any) =>
+          Promise.resolve([{ settings: updatedSettings }]).then(onfulfilled),
       });
 
       const result = await updateUserSettingsHandler({ reducedMotion: true });
@@ -221,6 +238,70 @@ describe('Settings handlers', () => {
 
       const result = await updateUserSettingsHandler({ reducedMotion: false });
       expect(result).toEqual({ error: 'Failed to update settings' });
+    });
+  });
+
+  describe('getCurrentUserHandler', () => {
+    it('should reject if unauthorized (no session)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+      const result = await getCurrentUserHandler();
+      expect(result).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should return user data and settings for authenticated user', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+      const mockRecord = {
+        name: 'John',
+        email: 'john@test.com',
+        image: null,
+        settings: { reducedMotion: true },
+      };
+      mockDb.limit = vi.fn().mockReturnThis();
+      mockDb.then = vi.fn((onfulfilled: any) => Promise.resolve([mockRecord]).then(onfulfilled));
+
+      const result = await getCurrentUserHandler();
+      expect(result).toEqual({
+        user: { id: 'user-1', name: 'John', email: 'john@test.com', image: null },
+        settings: { reducedMotion: true },
+      });
+    });
+
+    it('should return null settings when user has no settings', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+      const mockRecord = {
+        name: 'John',
+        email: 'john@test.com',
+        image: null,
+        settings: null,
+      };
+      mockDb.limit = vi.fn().mockReturnThis();
+      mockDb.then = vi.fn((onfulfilled: any) => Promise.resolve([mockRecord]).then(onfulfilled));
+
+      const result = await getCurrentUserHandler();
+      expect(result).toEqual({
+        user: { id: 'user-1', name: 'John', email: 'john@test.com', image: null },
+        settings: null,
+      });
+    });
+
+    it('should return error when user not found', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+      mockDb.limit = vi.fn().mockReturnThis();
+      mockDb.then = vi.fn((onfulfilled: any) => Promise.resolve([undefined]).then(onfulfilled));
+
+      const result = await getCurrentUserHandler();
+      expect(result).toEqual({ error: 'User not found' });
+    });
+
+    it('should handle database failure gracefully', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+      mockDb.limit = vi.fn().mockReturnThis();
+      mockDb.then = vi.fn((_onfulfilled: any, onrejected: any) =>
+        Promise.reject(new Error('DB error')).catch(onrejected),
+      );
+
+      const result = await getCurrentUserHandler();
+      expect(result).toEqual({ error: 'Failed to fetch user data' });
     });
   });
 });
