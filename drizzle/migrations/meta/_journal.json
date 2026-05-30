@@ -50,6 +50,13 @@
       "when": 1779199500000,
       "tag": "0006_extension_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1779250000000,
+      "tag": "0007_email_queue",
+      "breakpoints": true
     }
   ]
 }

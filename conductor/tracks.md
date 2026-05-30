@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Background Email Queue with Retry**
-      _Link: ./tracks/email_queue_20260530/_
+- [~] **Track: Background Email Queue with Retry**
+  _Link: ./tracks/email_queue_20260530/_

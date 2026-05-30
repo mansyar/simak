@@ -8,9 +8,10 @@
   - [x] Define columns: id (serial PK), recipient_email, subject, body_html, template_type (CHECK constraint), status, attempts, last_attempt_at, error_message, created_at
   - [x] Add index on `(status, created_at ASC)` for dequeuing
   - [x] Register table in `src/db/schema/index.ts` (re-export + relations)
-- [ ] Task: Generate Drizzle migration
-  - [ ] Run `pnpm db:generate` to produce migration SQL
-  - [ ] Apply migration with `pnpm db:push` to dev database
+- [x] Task: Generate Drizzle migration
+  - [x] Manually wrote `drizzle/migrations/0007_email_queue.sql` (drizzle-kit generate failed due to stale snapshot state — see git notes)
+  - [x] Updated `drizzle/migrations/meta/_journal.json` with entry 0007
+  - [x] Applied email_queue table to dev DB via `drizzle-kit push` (push works; migrate framework has stale \_\_drizzle_migrations state)
 - [x] Task: Write tests for schema (46465f9)
   - [x] Test column types and constraints
   - [x] Test index existence
