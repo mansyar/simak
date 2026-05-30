@@ -7,7 +7,7 @@
 
 - [x] Configure Better Auth `twoFactor` plugin in `src/auth/config.ts` — SHA: 6e02f49
 - [x] Generate and apply database migration for 2FA tables — SHA: eb42c61
-- [ ] Verify `twoFactor` tables are created (two_factor, backup_codes)
+- [x] Verify `twoFactor` tables are created (two_factor, backup_codes) — SHA: eb42c61
 - [ ] Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: 2FA Server Functions
