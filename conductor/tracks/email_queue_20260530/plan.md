@@ -22,16 +22,16 @@
 
 ## Phase 2: Enqueue Helpers
 
-- [ ] Task: Create `enqueueEmail` internal helper in `src/lib/email.ts`
-  - [ ] Add function that inserts a row into `email_queue` with status `pending`
-  - [ ] Accept recipient_email, subject, body_html, template_type as parameters
-- [ ] Task: Refactor `sendPasswordResetEmail` to enqueue
-  - [ ] Keep the same function signature
-  - [ ] Generate HTML template as before, then call `enqueueEmail` instead of `resend.emails.send()`
-- [ ] Task: Refactor `sendInvitationEmail` to enqueue
-  - [ ] Same pattern — generate HTML, call `enqueueEmail`
-- [ ] Task: Refactor `sendSLAAlertEmail` to enqueue
-  - [ ] Same pattern — generate HTML, call `enqueueEmail`
+- [x] Task: Create `enqueueEmail` internal helper in `src/lib/email.ts`
+  - [x] Add function that inserts a row into `email_queue` with status `pending`
+  - [x] Accept recipient_email, subject, body_html, template_type as parameters
+- [~] Task: Refactor `sendPasswordResetEmail` to enqueue
+  - [~] Keep the same function signature
+  - [~] Generate HTML template as before, then call `enqueueEmail` instead of `resend.emails.send()`
+- [~] Task: Refactor `sendInvitationEmail` to enqueue
+  - [~] Same pattern — generate HTML, call `enqueueEmail`
+- [~] Task: Refactor `sendSLAAlertEmail` to enqueue
+  - [~] Same pattern — generate HTML, call `enqueueEmail`
 - [ ] Task: Update existing email tests
   - [ ] Update `tests/unit/lib/email.test.ts` to mock DB insert instead of Resend
   - [ ] Update `tests/unit/email/sla-breach-email.test.ts` to mock DB insert instead of Resend

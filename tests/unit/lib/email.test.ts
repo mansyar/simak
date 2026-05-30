@@ -1,25 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { sendInvitationEmail, sendPasswordResetEmail } from '@/lib/email';
-import { Resend } from 'resend';
+import { sendInvitationEmail, sendPasswordResetEmail, type TemplateType } from '@/lib/email';
 import { getEnv } from '@/config/env';
+import { getDb } from '@/db/index';
+import { emailQueue } from '@/db/schema/index';
 
-const { sendMock, mockResendInstance, MockResend } = vi.hoisted(() => {
-  const send = vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null });
-  class MockResend {
-    emails = { send };
-  }
-  return { 
-    sendMock: send,
-    MockResend,
-    mockResendInstance: new MockResend()
-  };
-});
-
-vi.mock('resend', () => {
-  return {
-    Resend: MockResend,
-  };
-});
+vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
 
 vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({
@@ -28,61 +13,85 @@ vi.mock('@/config/env', () => ({
   }),
 }));
 
+function createMockDb() {
+  const values = vi.fn().mockReturnThis();
+  const insert = vi.fn().mockReturnValue({ values });
+  return { insert, values };
+}
+
 describe('Email library', () => {
+  let mockDb: ReturnType<typeof createMockDb>;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    // Since it's a singleton mockResendInstance, we need to clear the mock function manually if clearAllMocks doesn't catch it
-    sendMock.mockClear();
+    mockDb = createMockDb();
+    vi.mocked(getDb).mockReturnValue(mockDb as any);
   });
 
-  it('should send an invitation email with correct parameters', async () => {
-    const params = {
-      email: 'test@example.com',
-      name: 'Test User',
-      token: 'test-token',
-    };
+  describe('sendPasswordResetEmail', () => {
+    it('should enqueue a password reset email with correct data', async () => {
+      const params = {
+        email: 'reset@example.com',
+        name: 'Reset User',
+        token: 'reset-token',
+      };
 
-    await sendInvitationEmail(params);
+      await sendPasswordResetEmail(params);
 
-    expect(sendMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: params.email,
-        subject: expect.stringContaining('Welcome'),
-        html: expect.stringContaining('http://localhost:3000/auth/setup-password?token=test-token'),
-      })
-    );
-  });
-
-  it('should send a password reset email with correct parameters', async () => {
-    const params = {
-      email: 'reset@example.com',
-      name: 'Reset User',
-      token: 'reset-token',
-    };
-
-    await sendPasswordResetEmail(params);
-
-    expect(sendMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: params.email,
-        subject: expect.stringContaining('Reset'),
-        html: expect.stringContaining('http://localhost:3000/auth/reset-password?token=reset-token'),
-      })
-    );
-  });
-
-  it('should throw an error if email sending fails', async () => {
-    sendMock.mockResolvedValueOnce({
-      data: null,
-      error: { name: 'Error', message: 'Failed to send' },
+      expect(mockDb.insert).toHaveBeenCalledWith(emailQueue);
+      expect(mockDb.values).toHaveBeenCalledWith(
+        expect.objectContaining({
+          recipientEmail: params.email,
+          subject: 'Reset your SIMAK password',
+          templateType: 'password_reset',
+          status: 'pending',
+          attempts: 0,
+        }),
+      );
     });
 
-    const params = {
-      email: 'fail@example.com',
-      name: 'Fail User',
-      token: 'fail-token',
-    };
+    it('should include reset URL in the email body', async () => {
+      await sendPasswordResetEmail({
+        email: 'user@example.com',
+        name: 'User',
+        token: 'my-token',
+      });
 
-    await expect(sendInvitationEmail(params)).rejects.toThrow('Failed to send invitation email: Failed to send');
+      const htmlArg = mockDb.values.mock.calls[0][0].bodyHtml;
+      expect(htmlArg).toContain('http://localhost:3000/auth/reset-password?token=my-token');
+    });
+  });
+
+  describe('sendInvitationEmail', () => {
+    it('should enqueue an invitation email with correct data', async () => {
+      const params = {
+        email: 'test@example.com',
+        name: 'Test User',
+        token: 'test-token',
+      };
+
+      await sendInvitationEmail(params);
+
+      expect(mockDb.insert).toHaveBeenCalledWith(emailQueue);
+      expect(mockDb.values).toHaveBeenCalledWith(
+        expect.objectContaining({
+          recipientEmail: params.email,
+          templateType: 'invitation',
+          status: 'pending',
+          attempts: 0,
+        }),
+      );
+    });
+
+    it('should include setup URL in the email body', async () => {
+      await sendInvitationEmail({
+        email: 'new@example.com',
+        name: 'New User',
+        token: 'invite-token',
+      });
+
+      const htmlArg = mockDb.values.mock.calls[0][0].bodyHtml;
+      expect(htmlArg).toContain('http://localhost:3000/auth/setup-password?token=invite-token');
+    });
   });
 });

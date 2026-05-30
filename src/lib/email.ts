@@ -1,32 +1,39 @@
-import { Resend } from 'resend';
 import { getEnv } from '../config/env';
+import { getDb } from '@/db/index';
+import { emailQueue } from '@/db/schema/index';
+
+export type TemplateType = 'password_reset' | 'invitation' | 'sla_alert';
 
 const INVITATION_SUBJECT = 'Welcome to SIMAK — Set up your password';
 
-let _resend: Resend | null = null;
-
-function getResend(): Resend {
-  if (_resend) return _resend;
-  const env = getEnv();
-  _resend = new Resend(env.RESEND_API_KEY);
-  return _resend;
+export async function enqueueEmail(params: {
+  recipientEmail: string;
+  subject: string;
+  bodyHtml: string;
+  templateType: TemplateType;
+}): Promise<void> {
+  const db = getDb();
+  await db.insert(emailQueue).values({
+    recipientEmail: params.recipientEmail,
+    subject: params.subject,
+    bodyHtml: params.bodyHtml,
+    templateType: params.templateType,
+    status: 'pending',
+    attempts: 0,
+  });
 }
-
-const FROM_ADDRESS = process.env.EMAIL_FROM || 'SIMAK <noreply@simak.app>';
 
 export async function sendPasswordResetEmail(params: {
   email: string;
   name: string;
   token: string;
 }): Promise<void> {
-  const resend = getResend();
   const resetUrl = `${getEnv().BETTER_AUTH_URL}/auth/reset-password?token=${params.token}`;
 
-  const { error } = await resend.emails.send({
-    from: FROM_ADDRESS,
-    to: params.email,
+  await enqueueEmail({
+    recipientEmail: params.email,
     subject: 'Reset your SIMAK password',
-    html: `
+    bodyHtml: `
       <!DOCTYPE html>
       <html>
         <head>
@@ -73,11 +80,8 @@ export async function sendPasswordResetEmail(params: {
         </body>
       </html>
     `,
+    templateType: 'password_reset',
   });
-
-  if (error) {
-    throw new Error(`Failed to send password reset email: ${error.message}`);
-  }
 }
 
 export async function sendInvitationEmail(params: {
@@ -85,14 +89,12 @@ export async function sendInvitationEmail(params: {
   name: string;
   token: string;
 }): Promise<void> {
-  const resend = getResend();
   const setupUrl = `${getEnv().BETTER_AUTH_URL}/auth/setup-password?token=${params.token}`;
 
-  const { error } = await resend.emails.send({
-    from: FROM_ADDRESS,
-    to: params.email,
+  await enqueueEmail({
+    recipientEmail: params.email,
     subject: INVITATION_SUBJECT,
-    html: `
+    bodyHtml: `
       <!DOCTYPE html>
       <html>
         <head>
@@ -139,11 +141,8 @@ export async function sendInvitationEmail(params: {
         </body>
       </html>
     `,
+    templateType: 'invitation',
   });
-
-  if (error) {
-    throw new Error(`Failed to send invitation email: ${error.message}`);
-  }
 }
 
 export async function sendSLAAlertEmail(params: {
@@ -154,15 +153,13 @@ export async function sendSLAAlertEmail(params: {
   checkpointName: string;
   breachDays: number;
 }): Promise<void> {
-  const resend = getResend();
   const { adminEmail, adminName, assignmentTitle, studentName, checkpointName, breachDays } =
     params;
 
-  const { error } = await resend.emails.send({
-    from: FROM_ADDRESS,
-    to: adminEmail,
+  await enqueueEmail({
+    recipientEmail: adminEmail,
     subject: `SLA Breach Alert — ${assignmentTitle}`,
-    html: `
+    bodyHtml: `
       <!DOCTYPE html>
       <html>
         <head>
@@ -217,9 +214,6 @@ export async function sendSLAAlertEmail(params: {
         </body>
       </html>
     `,
+    templateType: 'sla_alert',
   });
-
-  if (error) {
-    throw new Error(`Failed to send SLA alert email: ${error.message}`);
-  }
 }

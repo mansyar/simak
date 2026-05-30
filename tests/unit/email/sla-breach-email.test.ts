@@ -1,24 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { sendSLAAlertEmail } from '@/lib/email';
-import { Resend } from 'resend';
+import { getDb } from '@/db/index';
+import { emailQueue } from '@/db/schema/index';
 
-const { sendMock, mockResendInstance, MockResend } = vi.hoisted(() => {
-  const send = vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null });
-  class MockResend {
-    emails = { send };
-  }
-  return {
-    sendMock: send,
-    MockResend,
-    mockResendInstance: new MockResend(),
-  };
-});
-
-vi.mock('resend', () => {
-  return {
-    Resend: MockResend,
-  };
-});
+vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
 
 vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({
@@ -27,13 +12,22 @@ vi.mock('@/config/env', () => ({
   }),
 }));
 
+function createMockDb() {
+  const values = vi.fn().mockReturnThis();
+  const insert = vi.fn().mockReturnValue({ values });
+  return { insert, values };
+}
+
 describe('SLA Alert Email', () => {
+  let mockDb: ReturnType<typeof createMockDb>;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    sendMock.mockClear();
+    mockDb = createMockDb();
+    vi.mocked(getDb).mockReturnValue(mockDb as any);
   });
 
-  it('should send SLA breach email with correct parameters', async () => {
+  it('should enqueue SLA breach email with correct parameters', async () => {
     await sendSLAAlertEmail({
       adminEmail: 'admin@university.ac.id',
       adminName: 'Admin User',
@@ -43,11 +37,14 @@ describe('SLA Alert Email', () => {
       breachDays: 3,
     });
 
-    expect(sendMock).toHaveBeenCalledWith(
+    expect(mockDb.insert).toHaveBeenCalledWith(emailQueue);
+    expect(mockDb.values).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: 'admin@university.ac.id',
+        recipientEmail: 'admin@university.ac.id',
         subject: expect.stringContaining('SLA'),
-        html: expect.stringContaining('Thesis 2026'),
+        templateType: 'sla_alert',
+        status: 'pending',
+        attempts: 0,
       }),
     );
   });
@@ -62,11 +59,8 @@ describe('SLA Alert Email', () => {
       breachDays: 5,
     });
 
-    expect(sendMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        html: expect.stringContaining('Research Paper'),
-      }),
-    );
+    const htmlArg = mockDb.values.mock.calls[0][0].bodyHtml;
+    expect(htmlArg).toContain('Research Paper');
   });
 
   it('should include student and checkpoint names', async () => {
@@ -79,7 +73,7 @@ describe('SLA Alert Email', () => {
       breachDays: 2,
     });
 
-    const htmlArg = sendMock.mock.calls[0][0].html;
+    const htmlArg = mockDb.values.mock.calls[0][0].bodyHtml;
     expect(htmlArg).toContain('Charlie');
     expect(htmlArg).toContain('Methodology');
   });
@@ -94,25 +88,7 @@ describe('SLA Alert Email', () => {
       breachDays: 7,
     });
 
-    const htmlArg = sendMock.mock.calls[0][0].html;
+    const htmlArg = mockDb.values.mock.calls[0][0].bodyHtml;
     expect(htmlArg).toContain('7 days');
-  });
-
-  it('should throw an error if email sending fails', async () => {
-    sendMock.mockResolvedValueOnce({
-      data: null,
-      error: { name: 'Error', message: 'Failed to send' },
-    });
-
-    await expect(
-      sendSLAAlertEmail({
-        adminEmail: 'fail@test.com',
-        adminName: 'Fail',
-        assignmentTitle: 'Test',
-        studentName: 'User',
-        checkpointName: 'CP1',
-        breachDays: 1,
-      }),
-    ).rejects.toThrow('Failed to send SLA alert email: Failed to send');
   });
 });

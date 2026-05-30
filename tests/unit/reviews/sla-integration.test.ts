@@ -4,20 +4,7 @@ import { submitReviewHandler } from '@/server/reviews.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import * as sla from '@/lib/sla';
-import { Resend } from 'resend';
-
-// Mock email
-const { sendMock, MockResend: MockResendClass } = vi.hoisted(() => {
-  const send = vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null });
-  class MockResend {
-    emails = { send };
-  }
-  return { sendMock: send, MockResend: MockResend };
-});
-
-vi.mock('resend', () => ({
-  Resend: MockResendClass,
-}));
+import { emailQueue } from '@/db/schema/index';
 
 vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({
@@ -76,7 +63,6 @@ describe('SLA Integration — Full Flow', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    sendMock.mockClear();
 
     mockTx = makeMockTx();
 
@@ -139,8 +125,14 @@ describe('SLA Integration — Full Flow', () => {
 
     // Should have called calculateBreachDuration
     expect(sla.calculateBreachDuration).toHaveBeenCalled();
-    // Should have sent an SLA alert email (to each admin)
-    expect(sendMock).toHaveBeenCalledTimes(2);
+    // Should have enqueued SLA alert emails (insert into email_queue)
+    expect(mockDb.insert).toHaveBeenCalledWith(emailQueue);
+    expect(mockDb.values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        templateType: 'sla_alert',
+        status: 'pending',
+      }),
+    );
   });
 
   it('should NOT trigger SLA breach for on-time review', async () => {
@@ -170,8 +162,8 @@ describe('SLA Integration — Full Flow', () => {
       data: { submissionId: 1, decision: 'pass', comment: 'Good work!' },
     });
 
-    // Should not have sent any SLA emails
-    expect(sendMock).not.toHaveBeenCalled();
+    // Should not have enqueued any SLA emails
+    expect(mockDb.values).not.toHaveBeenCalled();
   });
 
   it('should send SLA email with correct details per admin', async () => {
@@ -210,10 +202,17 @@ describe('SLA Integration — Full Flow', () => {
       data: { submissionId: 1, decision: 'pass', comment: 'Nice work!' },
     });
 
-    // Verify email content
-    const emailCall = sendMock.mock.calls[0][0];
-    expect(emailCall.to).toBe('admin1@test.com');
-    expect(emailCall.subject).toContain('SLA Breach Alert');
-    expect(emailCall.html).toContain('2 days');
+    // Verify enqueued email content
+    expect(mockDb.insert).toHaveBeenCalledWith(emailQueue);
+    // Find the values call with SLA alert data (among many other DB values calls)
+    const slaCall = mockDb.values.mock.calls.find(
+      (call: any[]) => call[0]?.templateType === 'sla_alert',
+    )?.[0];
+    expect(slaCall).toBeDefined();
+    expect(slaCall.recipientEmail).toBe('admin1@test.com');
+    expect(slaCall.subject).toContain('SLA Breach Alert');
+    expect(slaCall.bodyHtml).toContain('2 days');
+    expect(slaCall.templateType).toBe('sla_alert');
+    expect(slaCall.status).toBe('pending');
   });
 });
