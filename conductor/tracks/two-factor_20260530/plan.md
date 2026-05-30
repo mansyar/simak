@@ -5,8 +5,8 @@
 
 ### Tasks
 
-- [x] Configure Better Auth `twoFactor` plugin in `src/auth/config.ts` — SHA: TBD
-- [~] Generate and apply database migration for 2FA tables
+- [x] Configure Better Auth `twoFactor` plugin in `src/auth/config.ts` — SHA: 6e02f49
+- [x] Generate and apply database migration for 2FA tables — SHA: eb42c61
 - [ ] Verify `twoFactor` tables are created (two_factor, backup_codes)
 - [ ] Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
