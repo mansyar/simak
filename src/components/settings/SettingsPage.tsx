@@ -7,7 +7,7 @@ import { SessionManagement } from './SessionManagement';
 
 export function SettingsPage() {
   return (
-    <div className="container mx-auto max-w-2xl space-y-8 py-8">
+    <div className="space-y-6">
       <ProfileSection />
       <PasswordSection />
       <TwoFactorSettings />

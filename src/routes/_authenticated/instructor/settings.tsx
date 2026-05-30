@@ -10,8 +10,10 @@ function InstructorSettingsPage() {
   const { t } = useI18n();
 
   return (
-    <div className="container mx-auto max-w-4xl py-8">
-      <h1 className="mb-8 text-2xl font-bold">{t('settings.title')}</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t('settings.title')}</h1>
+      </div>
       <SettingsPage />
     </div>
   );

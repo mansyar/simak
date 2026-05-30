@@ -141,6 +141,6 @@ describe('SettingsPage', () => {
     const { container } = render(<SettingsPage />);
 
     const mainContainer = container.firstChild as HTMLElement;
-    expect(mainContainer.className).toContain('container');
+    expect(mainContainer.className).toContain('space-y-6');
   });
 });
