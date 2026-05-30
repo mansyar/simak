@@ -24,9 +24,9 @@ function InstructorLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex h-screen bg-background overflow-hidden">
       <InstructorSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <main className="flex-1 flex flex-col p-6 overflow-x-auto lg:pl-64">
+      <main className="flex-1 flex flex-col p-6 overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={() => setIsSidebarOpen(true)}
