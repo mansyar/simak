@@ -14,7 +14,7 @@ export * from './email-queue';
 
 // Import tables for relations
 import { users } from './users';
-import { session, account, verification } from './auth';
+import { session, account, verification, twoFactor } from './auth';
 import { assignmentTemplates, templateCheckpoints } from './templates';
 import { assignments, assignmentStudents, checkpoints } from './assignments';
 import { submissions, reviews } from './submissions';
@@ -41,6 +41,13 @@ export const accountRelations = relations(account, ({ one }) => ({
 
 export const verificationRelations = relations(verification, () => ({}));
 
+export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
+  user: one(users, {
+    fields: [twoFactor.userId],
+    references: [users.id],
+  }),
+}));
+
 export const usersRelations = relations(users, ({ many }) => ({
   assignments: many(assignments),
   assignmentStudents: many(assignmentStudents),
@@ -48,6 +55,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   reviews: many(reviews),
   consultationsAsStudent: many(consultations),
   consultationsAsVerifier: many(consultations),
+  twoFactor: many(twoFactor),
 }));
 
 export const assignmentTemplatesRelations = relations(assignmentTemplates, ({ many, one }) => ({
