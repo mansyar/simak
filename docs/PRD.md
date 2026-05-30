@@ -25,7 +25,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Consultation sessions (Kartu Bimbingan) are tracked as a requirement for assignment completion.
 - Admins can view system-wide analytics and audit logs. (Audit log viewer implemented at `/admin/audit-log`) `[v2]`
 - Students and instructors can request and manage deadline extensions via a configurable approval workflow.
-- Users can enable two-factor authentication (TOTP) for enhanced account security. `[v2]`
+- Users can enable two-factor authentication (TOTP) for enhanced account security.
 - Assignment templates include estimated duration per checkpoint, allowing auto-calculation of checkpoint dueDates during assignment creation.
 
 ---
@@ -149,13 +149,17 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Users can mark individual notifications as read or mark all as read.
 - Notification preferences are `[v2]` — currently all event types are enabled for all users.
 
-### Two-Factor Authentication `[v2]`
+### Two-Factor Authentication & Session Management
 
-- Users can enable TOTP-based two-factor authentication via an authenticator app.
-- 8 single-use backup codes are generated on enable.
+- Users can enable TOTP-based two-factor authentication via an authenticator app using Better Auth's built-in `twoFactor` plugin.
+- 8 single-use backup codes are generated on enable (shown during setup only — codes are stored encrypted).
 - Login prompts for a 6-digit TOTP code when 2FA is enabled.
 - Backup codes work as a fallback when the authenticator device is unavailable.
-- Users can view and revoke active sessions from their security settings.
+- Users can enable/disable 2FA with current password confirmation.
+- Active sessions panel shows device type, IP address, and last activity per session.
+- Users can revoke individual sessions or all other sessions at once.
+- Email notification sent on 2FA enable/disable.
+- All 2FA and session management actions are logged to the audit log.
 
 ### Analytics & Reporting `[v2]`
 

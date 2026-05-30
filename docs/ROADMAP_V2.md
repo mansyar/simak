@@ -357,43 +357,37 @@ Two-factor authentication using Better Auth's built-in `twoFactor` plugin, plus 
 
 **Dependencies:** V1.3 (Better Auth base auth with Drizzle adapter).
 
-**Status:** ⏳ Planned
-
-**Estimated Scope:**
-
-| Area                                                  | Effort |
-| ----------------------------------------------------- | ------ |
-| Better Auth `twoFactor` plugin configuration          | Small  |
-| 2FA enable/disable UI (QR code, backup codes display) | Medium |
-| 2FA login flow (TOTP prompt after password)           | Medium |
-| Active sessions dashboard                             | Medium |
-| Session revocation                                    | Small  |
-| Tests                                                 | Medium |
+**Status:** ✅ Complete (May 2026)
 
 **Database Schema Changes:**
 
-Better Auth's `twoFactor` plugin manages its own tables via the Drizzle adapter. The `session` table already has `ip_address` and `user_agent` columns (added in V1 auth track). No additional custom schema changes needed.
+Added `twoFactor` table via Better Auth's Drizzle adapter with:
+
+- `secret`, `backup_codes`, `verified`, `user_id` columns
+- Index on `user_id` for session queries
+- `twoFactorEnabled` boolean column on `users` table
 
 **Acceptance Criteria:**
 
-- [ ] User can enable 2FA via authenticator app (TOTP QR code)
-- [ ] Backup codes (8) displayed on enable; user must confirm they've saved them
-- [ ] Login prompts for 6-digit TOTP code when 2FA is enabled
-- [ ] Backup code works as fallback when TOTP device is unavailable
-- [ ] User can disable 2FA with current password confirmation
-- [ ] Active sessions list shows device, IP, timestamp for all sessions
-- [ ] Session revocation works (revoke specific session or all other sessions)
-- [ ] New device login notification (optional — v2.1 enhancement)
-- [ ] i18n translations for 2FA and session management UI
+- [x] User can enable 2FA via authenticator app (TOTP QR code)
+- [x] Backup codes (8) displayed on enable; user must confirm they've saved them
+- [x] Login prompts for 6-digit TOTP code when 2FA is enabled
+- [x] Backup code works as fallback when TOTP device is unavailable
+- [x] User can disable 2FA with current password confirmation
+- [x] Active sessions list shows device, IP, timestamp for all sessions
+- [x] Session revocation works (revoke specific session or all other sessions)
+- [ ] New device login notification (optional — v2.1 enhancement) — deferred
+- [x] Email notification sent on 2FA enable/disable
+- [x] All 2FA actions logged to audit log
+- [x] i18n translations for 2FA and session management UI
 
-**Test Plan:**
+**Test Results (at time of archiving):**
 
-| Area               | Approach                                   |
-| ------------------ | ------------------------------------------ |
-| 2FA enable/disable | Unit test — Better Auth plugin integration |
-| TOTP verification  | Unit test — valid/invalid code scenarios   |
-| Session management | Unit test — list sessions, revoke session  |
-| 2FA login flow     | Unit test — login with 2FA prompt          |
+- 1448/1448 tests passing across 159 test files
+- TypeScript typecheck passes with no errors
+- eslint/prettier/lint-staged pass on all new files
+- All new files under 500-line modularity limit
+- Review fixes applied: removed encrypted backup codes retrieval from DB, fixed unauthorized response consistency, applied naming convention fixes
 
 ---
 

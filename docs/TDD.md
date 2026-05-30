@@ -37,8 +37,7 @@ Throughout this document, features are tagged as:
 /                                         → Landing / Login [v1]
 
 / (authenticated — shared routes)
-├── /settings                             → Personal preferences (profile, theme, notifs) [v2]
-├── /settings/security                    → Password change, 2FA, sessions [v2]
+├── /settings                             → Security settings (2FA & session management)
 
 / (authenticated — student)
 ├── /student                              → Student sidebar layout
@@ -72,6 +71,8 @@ Throughout this document, features are tagged as:
 
 / (unauthenticated)
 ├── /auth/login                           → Login page [v1]
+├── /auth/verify-2fa                   → 2FA TOTP code input [v1]
+├── /auth/verify-backup-code           → Backup code fallback [v1]
 └── /auth/setup-password                  → Password setup from invitation [v1]
 ```
 
@@ -124,6 +125,10 @@ simak/
 │   │   ├── audit-logs.server.ts → Server-only audit log handlers
 │   │   ├── setup-password.ts → Custom password setup handler
 │   │   ├── files.ts          → Presigned URL generation
+│   │   ├── two-factor.ts     → 2FA stubs + Zod schemas
+│   │   ├── two-factor.server.ts → 2FA server handlers
+│   │   ├── sessions.ts       → Session management stubs + Zod schemas
+│   │   ├── sessions.server.ts → Server-only session handlers (list, revoke)
 │   │   ├── dashboard.ts      → Dashboard data stubs (student, instructor, admin)
 │   │   ├── dashboard.server.ts → Re-exports from per-role handler files
 │   │   ├── dashboard-student.server.ts → Student dashboard handler
@@ -212,6 +217,7 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 **ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, subsequent checkpoints and assignment finalDeadline auto-extend.
 **AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v2]
 **EmailQueue** — background delivery queue for transactional emails. [v2]
+**TwoFactor** — TOTP configuration (secret, backup codes) managed by Better Auth's `twoFactor` plugin.
 **Session** — Better-Auth session token, FK to users, expiresAt.
 **Account** — Better-Auth credential provider entry (stores hashed password).
 **Verification** — Better-Auth one-time token for password reset and email verification. Replaces the former `password_reset_tokens` table.
@@ -220,16 +226,17 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 
 #### users
 
-| Column    | Type                   | Notes                                                                               |
-| --------- | ---------------------- | ----------------------------------------------------------------------------------- |
-| id        | text (PK)              | UUID                                                                                |
-| name      | text, not null         | Full name                                                                           |
-| email     | text, unique, not null | Login identifier                                                                    |
-| role      | enum, not null         | superadmin \| admin \| instructor \| student                                        |
-| locale    | text, default 'en'     | Language preference: 'en' \| 'id'. Used for UI, notifications, and email templates. |
-| createdAt | timestamp              |                                                                                     |
-| updatedAt | timestamp              |                                                                                     |
-| deletedAt | timestamp              | Soft delete                                                                         |
+| Column           | Type                   | Notes                                                                               |
+| ---------------- | ---------------------- | ----------------------------------------------------------------------------------- |
+| id               | text (PK)              | UUID                                                                                |
+| name             | text, not null         | Full name                                                                           |
+| email            | text, unique, not null | Login identifier                                                                    |
+| role             | enum, not null         | superadmin \| admin \| instructor \| student                                        |
+| locale           | text, default 'en'     | Language preference: 'en' \| 'id'. Used for UI, notifications, and email templates. |
+| createdAt        | timestamp              |                                                                                     |
+| updatedAt        | timestamp              |                                                                                     |
+| deletedAt        | timestamp              | Soft delete                                                                         |
+| twoFactorEnabled | boolean, default false | Whether the user has enabled TOTP 2FA                                               |
 
 #### session (Better-Auth)
 
@@ -261,6 +268,16 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 | idToken               | text              |                                        |
 | createdAt             | timestamp         |                                        |
 | updatedAt             | timestamp         |                                        |
+
+#### two_factor (Better-Auth plugin)
+
+| Column      | Type                  | Notes                                             |
+| ----------- | --------------------- | ------------------------------------------------- |
+| id          | text (PK)             | UUID                                              |
+| secret      | text, not null        | Encrypted TOTP secret                             |
+| backupCodes | text, not null        | Encrypted JSON array of 8 single-use backup codes |
+| verified    | boolean, default true | Whether 2FA setup has been verified               |
+| userId      | text (FK → users)     | Cascade delete                                    |
 
 #### verification (Better-Auth)
 
@@ -550,13 +567,15 @@ Admin       (creates Instructors and Students)
 - Password hashing uses Better-Auth's built-in scrypt via `better-auth/crypto`.
 - File downloads check ownership and role before generating a presigned URL.
 
-### Two-Factor Authentication [v2]
+### Two-Factor Authentication & Session Management
 
 - TOTP via authenticator app using Better Auth's built-in `twoFactor` plugin.
 - Backup codes (8 single-use) generated on enable; user must confirm they've saved them.
 - Login prompts for 6-digit TOTP code when 2FA is enabled; backup code works as fallback.
 - Per-user enable/disable with current password confirmation.
 - Active sessions dashboard showing device, IP, and timestamp per session. Users can revoke specific sessions or all other sessions.
+- Email notification sent on 2FA enable/disable via the email queue.
+- All 2FA and session actions logged to the audit log.
 
 ---
 
