@@ -108,6 +108,134 @@ describe('listActiveSessionsHandler', () => {
     expect(result.total).toBe(0);
   });
 
+  it('should handle null user agent gracefully', async () => {
+    mockGetSessionFromHeaders.mockResolvedValue(createMockSession());
+    const sessions = [createMockDbSession({ userAgent: null })];
+    const mockSelect = vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          orderBy: vi.fn().mockResolvedValue(sessions),
+        }),
+      }),
+    });
+    mockGetDb.mockReturnValue({ select: mockSelect } as any);
+
+    const result = (await listActiveSessionsHandler()) as {
+      sessions: Array<{ device: { browser: string; os: string; device: string } }>;
+    };
+
+    expect(result.sessions[0].device).toEqual({
+      browser: 'Unknown',
+      os: 'Unknown',
+      device: 'Unknown',
+    });
+  });
+
+  it('should parse macOS Safari user agent', async () => {
+    mockGetSessionFromHeaders.mockResolvedValue(createMockSession());
+    const sessions = [
+      createMockDbSession({
+        userAgent:
+          'Mozilla/5.0 (Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+      }),
+    ];
+    const mockSelect = vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          orderBy: vi.fn().mockResolvedValue(sessions),
+        }),
+      }),
+    });
+    mockGetDb.mockReturnValue({ select: mockSelect } as any);
+
+    const result = (await listActiveSessionsHandler()) as {
+      sessions: Array<{ device: { browser: string; os: string; device: string } }>;
+    };
+
+    expect(result.sessions[0].device.browser).toBe('Safari');
+    expect(result.sessions[0].device.os).toBe('macOS');
+    expect(result.sessions[0].device.device).toBe('Desktop');
+  });
+
+  it('should parse Android Chrome user agent', async () => {
+    mockGetSessionFromHeaders.mockResolvedValue(createMockSession());
+    const sessions = [
+      createMockDbSession({
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      }),
+    ];
+    const mockSelect = vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          orderBy: vi.fn().mockResolvedValue(sessions),
+        }),
+      }),
+    });
+    mockGetDb.mockReturnValue({ select: mockSelect } as any);
+
+    const result = (await listActiveSessionsHandler()) as {
+      sessions: Array<{ device: { browser: string; os: string; device: string } }>;
+    };
+
+    expect(result.sessions[0].device.browser).toBe('Chrome');
+    // Android UA includes "Linux" and the Linux check runs first
+    expect(result.sessions[0].device.os).toBe('Linux');
+    expect(result.sessions[0].device.device).toBe('Mobile');
+  });
+
+  it('should parse iPad Safari user agent', async () => {
+    mockGetSessionFromHeaders.mockResolvedValue(createMockSession());
+    const sessions = [
+      createMockDbSession({
+        userAgent:
+          'Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+      }),
+    ];
+    const mockSelect = vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          orderBy: vi.fn().mockResolvedValue(sessions),
+        }),
+      }),
+    });
+    mockGetDb.mockReturnValue({ select: mockSelect } as any);
+
+    const result = (await listActiveSessionsHandler()) as {
+      sessions: Array<{ device: { browser: string; os: string; device: string } }>;
+    };
+
+    expect(result.sessions[0].device.browser).toBe('Safari');
+    // iPad UA includes "Mac OS X" (os=macOS) and "Mobile" (device=Mobile, not Tablet)
+    expect(result.sessions[0].device.os).toBe('macOS');
+    expect(result.sessions[0].device.device).toBe('Mobile');
+  });
+
+  it('should parse Linux Firefox user agent', async () => {
+    mockGetSessionFromHeaders.mockResolvedValue(createMockSession());
+    const sessions = [
+      createMockDbSession({
+        userAgent: 'Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0',
+      }),
+    ];
+    const mockSelect = vi.fn().mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          orderBy: vi.fn().mockResolvedValue(sessions),
+        }),
+      }),
+    });
+    mockGetDb.mockReturnValue({ select: mockSelect } as any);
+
+    const result = (await listActiveSessionsHandler()) as {
+      sessions: Array<{ device: { browser: string; os: string; device: string } }>;
+    };
+
+    expect(result.sessions[0].device.browser).toBe('Firefox');
+    expect(result.sessions[0].device.os).toBe('Linux');
+    expect(result.sessions[0].device.device).toBe('Desktop');
+  });
+
   it('should include device info from user agent', async () => {
     mockGetSessionFromHeaders.mockResolvedValue(createMockSession());
     const sessions = [
