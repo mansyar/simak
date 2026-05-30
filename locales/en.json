@@ -584,6 +584,18 @@
       "regenerateError": "Failed to regenerate backup codes. Please try again.",
       "saveBackupCodes": "Save Backup Codes"
     },
+    "sessions": {
+      "title": "Active Sessions",
+      "description": "Manage your active login sessions across devices.",
+      "current": "Current",
+      "noSessions": "No active sessions found.",
+      "revokeTitle": "Revoke Session",
+      "revokeDescription": "This will immediately log out the selected session.",
+      "revoke": "Revoke",
+      "revokeAllTitle": "Revoke All Other Sessions",
+      "revokeAllDescription": "This will log out {count} other session(s). Your current session will remain active.",
+      "revokeAllOthers": "Revoke All Other Sessions"
+    },
     "password": "Password"
   }
 }

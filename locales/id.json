@@ -584,6 +584,18 @@
       "regenerateError": "Gagal membuat ulang kode cadangan. Silakan coba lagi.",
       "saveBackupCodes": "Simpan Kode Cadangan"
     },
+    "sessions": {
+      "title": "Sesi Aktif",
+      "description": "Kelola sesi login aktif Anda di berbagai perangkat.",
+      "current": "Saat Ini",
+      "noSessions": "Tidak ada sesi aktif yang ditemukan.",
+      "revokeTitle": "Cabut Sesi",
+      "revokeDescription": "Ini akan segera logout sesi yang dipilih.",
+      "revoke": "Cabut",
+      "revokeAllTitle": "Cabut Semua Sesi Lain",
+      "revokeAllDescription": "Ini akan logout {count} sesi lainnya. Sesi Anda saat ini akan tetap aktif.",
+      "revokeAllOthers": "Cabut Semua Sesi Lain"
+    },
     "password": "Kata Sandi"
   }
 }

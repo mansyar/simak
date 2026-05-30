@@ -446,6 +446,18 @@ export type Translation = {
       regenerateError: string
       saveBackupCodes: string
     }
+    sessions: {
+      title: string
+      description: string
+      current: string
+      noSessions: string
+      revokeTitle: string
+      revokeDescription: string
+      revoke: string
+      revokeAllTitle: string
+      revokeAllDescription: string
+      revokeAllOthers: string
+    }
     password: string
   }
 }
