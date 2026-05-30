@@ -67,7 +67,7 @@ describe('ProfileSection', () => {
 
     render(<ProfileSection />);
 
-    expect(screen.getByText('Loading...')).toBeDefined();
+    expect(screen.getByText('common.loading')).toBeDefined();
   });
 
   it('should update name via mutation when Save is clicked', async () => {

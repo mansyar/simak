@@ -109,7 +109,7 @@ describe('AccessibilitySection', () => {
 
     render(<AccessibilitySection />);
 
-    expect(screen.getByText('Loading...')).toBeDefined();
+    expect(screen.getByText('common.loading')).toBeDefined();
   });
 
   it('should default to false when settings are null', () => {
