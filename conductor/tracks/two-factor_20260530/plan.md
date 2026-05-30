@@ -10,7 +10,7 @@
 - [x] Verify `twoFactor` tables are created (two_factor, backup_codes) — SHA: eb42c61
 - [x] Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md) — SHA: ab25642
 
-## Phase 2: 2FA Server Functions
+## Phase 2: 2FA Server Functions [checkpoint: b0e75bd]
 
 ### Tasks
 
@@ -19,7 +19,7 @@
 - [x] Wire up audit log events for 2FA actions
 - [x] Send email notifications for 2FA status changes
 - [x] Write unit tests for all server functions
-- [ ] Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3: Session Management Server Functions
 
