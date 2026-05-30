@@ -20,26 +20,26 @@
 
 **Objective:** Implement all server-side handlers with Zod validation and tests.
 
-- [ ] Task: Write Zod schemas in settings.ts stub file
-  - [ ] Create `src/server/settings.ts` with `UpdateProfileSchema`, `UpdateUserSettingsSchema`, `GetPresignedAvatarUploadUrlSchema`
-  - [ ] Create `createServerFn` stubs that dynamically import from `.server.ts`
-  - [ ] Export all schemas and stubs
-- [ ] Task: Write failing tests for server handlers
-  - [ ] Write test: `updateProfileHandler` validates non-empty name, max 100 chars
-  - [ ] Write test: `updateProfileHandler` updates users.name and returns updated user
-  - [ ] Write test: `updateProfileHandler` rejects unauthorized (no session)
-  - [ ] Write test: `getPresignedAvatarUploadUrlHandler` returns presigned URL
-  - [ ] Write test: `getPresignedAvatarUploadUrlHandler` generates correct `avatars/` key prefix
-  - [ ] Write test: `updateUserSettingsHandler` writes and reads settings jsonb
-  - [ ] Write test: `updateUserSettingsHandler` partial update preserves existing settings
-  - [ ] Run tests and confirm they fail (Red phase)
-- [ ] Task: Implement server handlers in settings.server.ts
-  - [ ] Create `src/server/settings.server.ts`
-  - [ ] Implement `updateProfileHandler` — validates session with `getSessionFromHeaders()`, updates `users.name` via Drizzle, returns updated user
-  - [ ] Implement `getPresignedAvatarUploadUrlHandler` — validates session, generates `avatars/{uuid}.{ext}` via `generateFileKey()`, calls `generatePresignedUploadUrl()`, returns `{ uploadUrl, fileKey }`
-  - [ ] Implement `updateUserSettingsHandler` — validates session, upserts `users.settings` jsonb, returns updated settings
-  - [ ] Run tests and confirm they pass (Green phase)
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions' (Protocol in workflow.md)
+- [x] Task: Write Zod schemas in settings.ts stub file `1b1485e`
+  - [x] Create `src/server/settings.ts` with `UpdateProfileSchema`, `UpdateUserSettingsSchema`, `GetPresignedAvatarUploadUrlSchema`
+  - [x] Create `createServerFn` stubs that dynamically import from `.server.ts`
+  - [x] Export all schemas and stubs
+- [x] Task: Write failing tests for server handlers `1b1485e`
+  - [x] Write test: `updateProfileHandler` validates non-empty name, max 100 chars
+  - [x] Write test: `updateProfileHandler` updates users.name and returns updated user
+  - [x] Write test: `updateProfileHandler` rejects unauthorized (no session)
+  - [x] Write test: `getPresignedAvatarUploadUrlHandler` returns presigned URL
+  - [x] Write test: `getPresignedAvatarUploadUrlHandler` generates correct `avatars/` key prefix
+  - [x] Write test: `updateUserSettingsHandler` writes and reads settings jsonb
+  - [x] Write test: `updateUserSettingsHandler` partial update preserves existing settings
+  - [x] Run tests and confirm they fail (Red phase)
+- [x] Task: Implement server handlers in settings.server.ts `1b1485e`
+  - [x] Create `src/server/settings.server.ts`
+  - [x] Implement `updateProfileHandler` — validates session with `getSessionFromHeaders()`, updates `users.name` via Drizzle, returns updated user
+  - [x] Implement `getPresignedAvatarUploadUrlHandler` — validates session, generates `avatars/{uuid}.{ext}` via `generateFileKey()`, calls `generatePresignedUploadUrl()`, returns `{ uploadUrl, fileKey }`
+  - [x] Implement `updateUserSettingsHandler` — validates session, upserts `users.settings` jsonb, returns updated settings
+  - [x] Run tests and confirm they pass (Green phase)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Server Functions' (Protocol in workflow.md) `1b1485e`
 
 ## Phase 3: Settings Hub UI Components
 
