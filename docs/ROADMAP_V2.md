@@ -560,48 +560,68 @@ Settings hub, notification preferences, and file preview optimization — increm
 
 ### Track 6.1 — Settings Hub
 
-**Description:** A unified settings page accessible from the sidebar. Includes profile editing (name, email display, avatar upload), password change, 2FA management (links to Phase 3), language/theme preferences, and accessibility settings.
+**Description:** A unified settings page accessible from the sidebar for all roles. Includes profile editing (name, avatar upload, read-only email), password change, 2FA & session management, language/theme preferences, and accessibility settings (reduced motion). Uses role-specific routes (`/student/settings`, `/instructor/settings`, `/admin/settings`) inheriting sidebar layouts.
 
-**Dependencies:** V1 auth (password change), V1 theme/language infrastructure.
+**Dependencies:** V1 auth (password change), V1 theme/language infrastructure, Track 3.1 (2FA & Session Management components), V1 R2 storage client, V1 sidebar layouts.
 
-**Status:** ⏳ Planned
-
-**Estimated Scope:**
-
-| Area                                 | Effort |
-| ------------------------------------ | ------ |
-| Settings hub page layout (all roles) | Medium |
-| Profile editing (name, email)        | Small  |
-| Avatar upload (presigned URL → R2)   | Medium |
-| Password change form                 | Small  |
-| Language/theme preference toggles    | Small  |
-| i18n translations                    | Small  |
-| Tests                                | Medium |
+**Status:** ✅ Complete (May 2026)
 
 **Database Schema Changes:**
 
 **Modified: `users`** (add column)
 
-| Column   | Type  | Notes                                                |
-| -------- | ----- | ---------------------------------------------------- |
-| settings | jsonb | NULLABLE — profile, theme, accessibility preferences |
+| Column   | Type  | Notes                                               |
+| -------- | ----- | --------------------------------------------------- |
+| settings | jsonb | NULLABLE — `{ reducedMotion: boolean }` preferences |
 
 **Acceptance Criteria:**
 
-- [ ] Settings hub page accessible from sidebar for all roles
-- [ ] Profile editing (name, email) saves correctly with validation
-- [ ] Avatar upload works (presigned URL → direct-to-R2 → URL saved on user)
-- [ ] Password change works via Better Auth
-- [ ] Language switcher and theme toggle still work (previously sidebar-only)
-- [ ] i18n translations for settings UI
+- [x] Settings hub page accessible from sidebar for all three roles — `/student/settings`, `/instructor/settings`, `/admin/settings`
+- [x] Profile name editing saves with validation (non-empty, max 100)
+- [x] Avatar upload via presigned URL → R2 `avatars/` prefix → `users.image` updated
+- [x] Current avatar shown as circle; initials fallback when none
+- [x] Email displayed read-only
+- [x] Password change via Better Auth with validation (min 8 chars, confirm match)
+- [x] Language switcher and theme toggle work on settings page (reuse existing `useI18n()` and `useTheme()`)
+- [x] Reduced motion toggle persists via `settings` jsonb
+- [x] 2FA and Session Management remain functional unchanged (reuse existing components)
+- [x] All new UI strings translated in EN and ID
+- [x] Migration adds `settings` column to `users`
+- [x] No regression — all existing tests pass
 
-**Test Plan:**
+**Actual Files Created/Modified:**
 
-| Area            | Approach                                                |
-| --------------- | ------------------------------------------------------- |
-| Profile update  | Unit test — update handler validates and persists       |
-| Avatar upload   | Unit test — presigned URL generated, user.image updated |
-| Password change | Unit test — Better Auth flow works                      |
+| File                                               | Action                                        |
+| -------------------------------------------------- | --------------------------------------------- |
+| `src/db/schema/users.ts`                           | **Modified:** Added `settings` jsonb column   |
+| `src/server/settings.ts`                           | **New:** Zod schemas + `createServerFn` stubs |
+| `src/server/settings.server.ts`                    | **New:** Server handlers                      |
+| `src/routes/_student/settings.tsx`                 | **New:** Minimal route, imports SettingsPage  |
+| `src/routes/_instructor/settings.tsx`              | **New:** Minimal route, imports SettingsPage  |
+| `src/routes/_admin/settings.tsx`                   | **New:** Minimal route, imports SettingsPage  |
+| `src/routes/_authenticated/settings.tsx`           | **Removed:** Replaced by role-specific routes |
+| `src/components/settings/SettingsPage.tsx`         | **New:** Shared settings hub component        |
+| `src/components/settings/ProfileSection.tsx`       | **New:** Profile editing + avatar upload      |
+| `src/components/settings/PasswordSection.tsx`      | **New:** Inline password change form          |
+| `src/components/settings/AppearanceSection.tsx`    | **New:** Language EN/ID + theme toggles       |
+| `src/components/settings/AccessibilitySection.tsx` | **New:** Reduced motion toggle                |
+| `src/components/layout/student-sidebar.tsx`        | **Modified:** Added Settings link             |
+| `src/components/layout/instructor-sidebar.tsx`     | **Modified:** Added Settings link             |
+| `src/components/layout/admin-sidebar.tsx`          | **Modified:** Added Settings link             |
+| `locales/en.json`                                  | **Modified:** Added settings section keys     |
+| `locales/id.json`                                  | **Modified:** Added ID translations           |
+| `scripts/generate-i18n-types.ts`                   | **Modified:** Added settings i18n type defs   |
+
+**Test Results (at time of archiving):**
+
+- 1537/1537 tests passing across 170 test files
+- TypeScript typecheck passes with no errors
+- eslint/prettier/lint-staged pass on all new files
+- All new files under 500-line modularity limit
+- Pre-push hook (typecheck + vitest coverage) passes
+- Coverage for new `settings.server.ts` is 100%
+- Review fixes applied: hardcoded "Loading..." strings replaced with `t('common.loading')` i18n keys
+- **Deviation:** Used native checkbox for reduced motion toggle (no shadcn/ui Switch component available)
 
 ---
 
@@ -721,14 +741,14 @@ Integration tests against a real PostgreSQL database, deferred from V1.
 
 ## Priority Summary
 
-| Priority         | Track                     | Rationale                                                                |
-| ---------------- | ------------------------- | ------------------------------------------------------------------------ |
-| 🔴 **Immediate** | Track 1.1 (Audit Log)     | Foundation — all later tracks write to it; enables accountability        |
-| 🔴 **Immediate** | Track 1.2 (DueDates)      | Fixes broken V1 deadline logic; unblocks all deadline-dependent features |
-| 🔴 **High**      | Track 1.3 (Extensions)    | Depends on Track 1.1 + 1.2; student/instructor extension workflow        |
-| 🔴 **High**      | Track 4.1 (Email Queue)   | Removes synchronous Resend bottleneck; improves reliability              |
-| 🟠 **Medium**    | Track 2.1 (Groups)        | Largest feature request; significant scope                               |
-| 🟡 **Lower**     | Tracks 3.1, 5.1, 6.x, 7.1 | Security, analytics, UX, testing — valuable but not blocking             |
+| Priority         | Track                          | Rationale                                                                |
+| ---------------- | ------------------------------ | ------------------------------------------------------------------------ |
+| 🔴 **Immediate** | Track 1.1 (Audit Log)          | Foundation — all later tracks write to it; enables accountability        |
+| 🔴 **Immediate** | Track 1.2 (DueDates)           | Fixes broken V1 deadline logic; unblocks all deadline-dependent features |
+| 🔴 **High**      | Track 1.3 (Extensions)         | Depends on Track 1.1 + 1.2; student/instructor extension workflow        |
+| 🔴 **High**      | Track 4.1 (Email Queue)        | Removes synchronous Resend bottleneck; improves reliability              |
+| 🟠 **Medium**    | Track 2.1 (Groups)             | Largest feature request; significant scope                               |
+| 🟡 **Lower**     | Tracks 3.1, 5.1, 6.2, 6.3, 7.1 | Security, analytics, UX, testing — valuable but not blocking             |
 
 ## Implementation Strategy
 
@@ -832,11 +852,13 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 3. ✅ Track 1.2 — Estimated Duration & Auto-Calculated DueDates (Complete)
 4. ✅ Track 1.3 — Deadline Extension Workflow (Complete)
 5. ✅ Track 4.1 — Background Email Queue with Retry (Complete)
-6. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
-7. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-8. [ ] Write failing tests
-9. [ ] Implement features
-10. [ ] Verify & archive
+6. ✅ Track 3.1 — Two-Factor Authentication & Session Management (Complete)
+7. ✅ Track 6.1 — Settings Hub (Complete)
+8. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
+9. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+10. [ ] Write failing tests
+11. [ ] Implement features
+12. [ ] Verify & archive
 
 ---
 

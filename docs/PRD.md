@@ -27,6 +27,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Students and instructors can request and manage deadline extensions via a configurable approval workflow.
 - Users can enable two-factor authentication (TOTP) for enhanced account security.
 - Assignment templates include estimated duration per checkpoint, allowing auto-calculation of checkpoint dueDates during assignment creation.
+- Users have a unified **Settings Hub** (role-specific routes at `/student/settings`, `/instructor/settings`, `/admin/settings`) where they can edit their profile name and avatar, change password, manage 2FA and sessions, switch language and theme, and configure accessibility preferences (reduced motion).
 
 ---
 
@@ -197,7 +198,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 Core entities:
 
-- **User** — with role (SuperAdmin, Admin, Instructor, Student).
+- **User** — with role (SuperAdmin, Admin, Instructor, Student) and optional `settings` jsonb column for storing profile, theme, and accessibility preferences (e.g., reduced motion).
 - **AssignmentTemplate** — defines type + ordered checkpoint names.
 - **Assignment** — ties template to one or more students + final deadline + title + description.
 - **AssignmentGroupMember** `[v2]` — maps students to group assignments.

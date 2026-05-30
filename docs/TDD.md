@@ -37,11 +37,12 @@ Throughout this document, features are tagged as:
 /                                         → Landing / Login [v1]
 
 / (authenticated — shared routes)
-├── /settings                             → Security settings (2FA & session management)
+│   No shared settings route — replaced by role-specific routes below
 
 / (authenticated — student)
 ├── /student                              → Student sidebar layout
 │   ├── /student/dashboard                → Student dashboard with summary widgets [v1]
+│   ├── /student/settings                 → Settings hub (profile, password, appearance, accessibility) [v1]
 │   ├── /student/assignments              → Assignment list [v1]
 │   ├── /student/assignments/$id          → Assignment detail with checkpoints [v1]
 │   │   └── /student/assignments/$id/
@@ -52,6 +53,7 @@ Throughout this document, features are tagged as:
 / (authenticated — instructor)
 ├── /instructor                           → Instructor sidebar layout
 │   ├── /instructor/dashboard             → Instructor dashboard with summary widgets [v1]
+│   ├── /instructor/settings              → Settings hub (profile, password, appearance, accessibility) [v1]
 │   ├── /instructor/assignments           → All assignments [v1]
 │   ├── /instructor/assignments/new       → Assignment creation wizard [v1]
 │   ├── /instructor/assignments/$id       → Assignment detail (instructor view) [v1]
@@ -62,6 +64,7 @@ Throughout this document, features are tagged as:
 / (authenticated — admin)
 ├── /admin                                → Admin sidebar layout
 │   ├── /admin/dashboard                  → Admin dashboard with system metrics [v1]
+│   ├── /admin/settings                   → Settings hub (profile, password, appearance, accessibility) [v1]
 │   ├── /admin/users                      → User management [v1]
 │   ├── /admin/templates                  → Template list [v1]
 │   ├── /admin/templates/$id              → Template editor [v1]
@@ -107,7 +110,7 @@ simak/
 │   │   ├── files/            → File upload, preview, file list
 │   │   ├── notifications/    → Notification center, badge
 │   │   ├── analytics/        → Charts, metric cards, export
-│   │   ├── settings/         → Preferences, security section
+│   │   ├── settings/         → SettingsPage, ProfileSection, PasswordSection, AppearanceSection, AccessibilitySection
 │   │   └── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton
 │   ├── server/               → Server functions (split: .ts = client-safe stubs + Zod, .server.ts = handlers)
 │   │   ├── auth.ts           → Login, logout, session
@@ -125,6 +128,8 @@ simak/
 │   │   ├── audit-logs.server.ts → Server-only audit log handlers
 │   │   ├── setup-password.ts → Custom password setup handler
 │   │   ├── files.ts          → Presigned URL generation
+│   │   ├── settings.ts       → Settings hub stubs (UpdateProfileSchema, UpdateUserSettingsSchema, GetPresignedAvatarUploadUrlSchema)
+│   │   ├── settings.server.ts → Settings hub handlers (updateProfile, getPresignedAvatarUploadUrl, updateUserSettings)
 │   │   ├── two-factor.ts     → 2FA stubs + Zod schemas
 │   │   ├── two-factor.server.ts → 2FA server handlers
 │   │   ├── sessions.ts       → Session management stubs + Zod schemas
@@ -233,6 +238,7 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 | email            | text, unique, not null | Login identifier                                                                    |
 | role             | enum, not null         | superadmin \| admin \| instructor \| student                                        |
 | locale           | text, default 'en'     | Language preference: 'en' \| 'id'. Used for UI, notifications, and email templates. |
+| settings         | jsonb                  | NULLABLE — `{ reducedMotion: boolean }`. Profile, theme, and accessibility prefs.   |
 | createdAt        | timestamp              |                                                                                     |
 | updatedAt        | timestamp              |                                                                                     |
 | deletedAt        | timestamp              | Soft delete                                                                         |
@@ -898,7 +904,7 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 ### Locale Resolution
 
 1. **First visit (unauthenticated)**: Detect from browser `navigator.language`. If Indonesian → use `id`, otherwise fall back to `en`. A **language switcher toggle** is available on the login and password setup pages so users can switch before authenticating.
-2. **Logged-in user**: Use the `locale` column from the user's profile (can change in `/settings`).
+2. **Logged-in user**: Use the `locale` column from the user's profile (can change in the settings hub at `/student/settings`, `/instructor/settings`, or `/admin/settings`).
 3. **Server functions**: Resolve locale from the authenticated user's session. Used for email subjects, notification messages, and validation errors.
 
 ### Translation Scope
@@ -919,7 +925,7 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 ### User Preference
 
 - Stored in `users.locale` (`'en' | 'id'`).
-- Changeable via `/settings`.
+- Changeable via the settings hub (`/student/settings`, `/instructor/settings`, or `/admin/settings`).
 - Default for new users: browser detection → fallback to `en`.
 
 ---
