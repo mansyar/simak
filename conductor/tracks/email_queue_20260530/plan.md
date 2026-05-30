@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Track 4.1 — Background Email Queue with Retry
 
-## Phase 1: Database Schema & Migration
+## Phase 1: Database Schema & Migration [checkpoint: 73e51a3]
 
 - [x] Task: Create Drizzle schema for `email_queue` table (46465f9)
   - [x] Create `src/db/schema/email-queue.ts` with `emailQueue` table definition
@@ -9,16 +9,16 @@
   - [x] Add index on `(status, created_at ASC)` for dequeuing
   - [x] Register table in `src/db/schema/index.ts` (re-export + relations)
 - [x] Task: Generate Drizzle migration
-  - [x] Manually wrote `drizzle/migrations/0007_email_queue.sql` (drizzle-kit generate failed due to stale snapshot state — see git notes)
+  - [x] Manually wrote `drizzle/migrations/0007_email_queue.sql` (drizzle-kit generate failed due to stale snapshot state)
   - [x] Updated `drizzle/migrations/meta/_journal.json` with entry 0007
-  - [x] Applied email_queue table to dev DB via `drizzle-kit push` (push works; migrate framework has stale \_\_drizzle_migrations state)
+  - [x] Applied email_queue table to dev DB via `drizzle-kit push`
 - [x] Task: Write tests for schema (46465f9)
   - [x] Test column types and constraints
   - [x] Test index existence
   - [x] Run `CI=true pnpm test` and confirm new tests fail (Red phase)
 - [x] Task: Implement schema — make tests pass (46465f9)
   - [x] Run `CI=true pnpm test` and confirm all tests pass
-- [ ] Task: Conductor - User Manual Verification 'Database Schema & Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Database Schema & Migration' (73e51a3)
 
 ## Phase 2: Enqueue Helpers
 
