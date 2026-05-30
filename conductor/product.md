@@ -208,6 +208,17 @@ Students and instructors lack a centralized system to:
 - **Sidebar improvements** — Full viewport height (sticky, non-scrollable), logout button at bottom with hover-red styling, icons added to admin sidebar, all links updated to role-specific dashboard routes
 - **i18n translations** — Full English and Indonesian translations (studentDashboard: 14 keys, instructorDashboard: 14 keys, adminDashboard: 18 keys)
 
+### Track 4.1: Background Email Queue with Retry (May 2026)
+
+- **`email_queue` database table** — Serial PK, 7 data columns (recipient_email, subject, body_html, template_type with CHECK constraint, status, attempts, error_message), timestamps (last_attempt_at, created_at); composite index on (status, created_at ASC)
+- **DB Migration** — Manually written `0007_email_queue.sql` (drizzle-kit generate unavailable due to stale snapshot state)
+- **Enqueue helpers** — New `enqueueEmail()` inserts into email_queue; all 3 send functions (`sendPasswordResetEmail`, `sendInvitationEmail`, `sendSLAAlertEmail`) refactored to enqueue instead of calling Resend directly; `getResend()` singleton removed
+- **Background processor** — In-process setInterval every 30s that dequeues up to 10 pending emails per cycle and sends via Resend with exponential backoff (0s/30s/5min/30min); after 3 failures marks as `failed` with stored error message
+- **Auto-start wiring** — Processor auto-started via `import.meta.env.SSR` guard in `src/router.tsx`; supports graceful `clearInterval` on shutdown
+- **Admin dashboard widget** — Email Queue card with 3 stat boxes: Pending (blue/Mail), Sent (green/MailCheck), Failed (red/MailX); counts via FILTER query in existing dashboard handler
+- **i18n translations** — `adminDashboard.emailQueue.{pending,sent,failed}` in EN and ID locales
+- **Tests** — Schema tests, enqueue mock tests, processor tests (9 tests), admin handler + component rendering tests
+
 ### Track 1.3: Deadline Extension Workflow (May 2026)
 
 - **New `extension_requests` database table** — Tracks student-submitted extension requests with category (personal/research/health/other), reason, duration, status (pending/approved/rejected), and resolution metadata
