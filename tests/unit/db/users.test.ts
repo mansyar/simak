@@ -57,4 +57,11 @@ describe('Users schema', () => {
     expect(users).toHaveProperty('image');
     expect(users.image.dataType).toBe('string');
   });
+
+  it('should have twoFactorEnabled column with default false on users', async () => {
+    const { users } = await import('@/db/schema/users');
+    expect(users).toHaveProperty('twoFactorEnabled');
+    expect(users.twoFactorEnabled.default).toBe(false);
+    expect(users.twoFactorEnabled.dataType).toBe('boolean');
+  });
 });
