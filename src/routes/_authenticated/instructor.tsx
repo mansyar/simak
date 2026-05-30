@@ -26,7 +26,7 @@ function InstructorLayout() {
   return (
     <div className="flex min-h-screen bg-background">
       <InstructorSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <main className="flex-1 flex flex-col p-6 overflow-x-auto">
+      <main className="flex-1 flex flex-col p-6 overflow-x-auto lg:pl-64">
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={() => setIsSidebarOpen(true)}

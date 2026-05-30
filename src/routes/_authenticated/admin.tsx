@@ -26,7 +26,7 @@ function AdminLayout() {
   return (
     <div className="flex min-h-screen bg-background">
       <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-6 lg:pl-64">
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => setIsSidebarOpen(true)}
