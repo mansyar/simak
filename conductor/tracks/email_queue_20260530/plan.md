@@ -35,8 +35,8 @@
 - [x] Task: Update existing email tests (2802e9f)
   - [x] Run `CI=true pnpm test` and confirm new tests fail (Red phase)
 - [x] Task: Implement enqueue — make tests pass (Green phase)
-  - [ ] Run `CI=true pnpm test` and confirm all tests pass
-- [ ] Task: Conductor - User Manual Verification 'Enqueue Helpers' (Protocol in workflow.md)
+  - [x] Run `CI=true pnpm test` and confirm all tests pass
+- [x] Task: Conductor - User Manual Verification 'Enqueue Helpers' (Protocol in workflow.md)
 
 ## Phase 3: Background Processor
 
@@ -65,7 +65,7 @@
   - [x] Run `CI=true pnpm test` and confirm new tests fail (Red phase) — initial mock issue resolved
 - [x] Task: Implement processor — make tests pass (Green phase)
   - [x] Run `CI=true pnpm test` and confirm all tests pass (1356 passed, 151 files)
-- [ ] Task: Conductor - User Manual Verification 'Background Processor' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Background Processor' (Protocol in workflow.md)
 
 ## Phase 4: Admin Dashboard Widget & i18n [checkpoint: 0026718]
 
@@ -88,11 +88,11 @@
 
 ## Phase 5: Final Verification
 
-- [ ] Task: Run full test suite
-  - [ ] `pnpm typecheck` — no type errors
-  - [ ] `CI=true pnpm test` — all tests pass (including existing)
-  - [ ] `pnpm lint` — no lint errors
-- [ ] Task: Verify modularity limits
-  - [ ] `node scripts/check-modularity.js` — all new files under 500 lines
-- [ ] Task: Conductor - User Manual Verification 'Final Verification' (Protocol in workflow.md)
+- [x] Task: Run full test suite
+  - [x] `pnpm typecheck` — no type errors
+  - [x] `CI=true pnpm test` — all tests pass (1359 passed, 152 files)
+  - [x] `pnpm lint` — no lint errors
+- [x] Task: Verify modularity limits
+  - [x] `node scripts/check-modularity.js` — all new files under 500 lines
+- [x] Task: Conductor - User Manual Verification 'Final Verification' (Protocol in workflow.md)
       </protect>
