@@ -65,7 +65,9 @@ export function ProfileSection() {
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="flex items-center justify-center py-8">Loading...</CardContent>
+        <CardContent className="flex items-center justify-center py-8">
+          {t('common.loading')}
+        </CardContent>
       </Card>
     );
   }
