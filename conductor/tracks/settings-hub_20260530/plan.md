@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan: Track 6.1 — Settings Hub
 
 ## Phase 1: Database Schema, i18n Types & Dependencies
@@ -118,3 +119,4 @@
 - [ ] Task: Verify build succeeds (`pnpm build`)
 - [ ] Task: Document any deviations from spec in notes
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Integration & Final Verification' (Protocol in workflow.md)
+      </protect>

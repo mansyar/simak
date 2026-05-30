@@ -1,3 +1,4 @@
+<protect>
 # Track 6.1 — Settings Hub
 
 ## Overview
@@ -164,3 +165,5 @@ Sections on the page (stacked vertically in this order):
 | AppearanceSection           | Language + theme toggles render             |
 | AccessibilitySection        | Toggle renders, mutation fires              |
 | Sidebar links               | All 3 sidebars render Settings link         |
+
+</protect>
