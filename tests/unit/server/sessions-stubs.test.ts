@@ -24,16 +24,16 @@ describe('sessions stubs', () => {
 
   it('should export listActiveSessions server function', () => {
     expect(listActiveSessions).toBeDefined();
-    expect(typeof listActiveSessions).toBe('object');
+    expect(typeof listActiveSessions).toBe('function');
   });
 
   it('should export revokeSession server function', () => {
     expect(revokeSession).toBeDefined();
-    expect(typeof revokeSession).toBe('object');
+    expect(typeof revokeSession).toBe('function');
   });
 
   it('should export revokeAllOtherSessions server function', () => {
     expect(revokeAllOtherSessions).toBeDefined();
-    expect(typeof revokeAllOtherSessions).toBe('object');
+    expect(typeof revokeAllOtherSessions).toBe('function');
   });
 });

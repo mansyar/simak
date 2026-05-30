@@ -84,21 +84,26 @@ describe('two-factor stubs', () => {
 
   it('should export generateTwoFactorSetup server function', () => {
     expect(generateTwoFactorSetup).toBeDefined();
+    expect(typeof generateTwoFactorSetup).toBe('function');
   });
 
   it('should export enableTwoFactor server function', () => {
     expect(enableTwoFactor).toBeDefined();
+    expect(typeof enableTwoFactor).toBe('function');
   });
 
   it('should export disableTwoFactor server function', () => {
     expect(disableTwoFactor).toBeDefined();
+    expect(typeof disableTwoFactor).toBe('function');
   });
 
   it('should export regenerateBackupCodes server function', () => {
     expect(regenerateBackupCodes).toBeDefined();
+    expect(typeof regenerateBackupCodes).toBe('function');
   });
 
   it('should export getTwoFactorStatus server function', () => {
     expect(getTwoFactorStatus).toBeDefined();
+    expect(typeof getTwoFactorStatus).toBe('function');
   });
 });
