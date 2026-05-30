@@ -1,0 +1,8 @@
+{
+  "track_id": "two-factor_20260530",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-05-30T15:12:00Z",
+  "updated_at": "2026-05-30T15:12:00Z",
+  "description": "Enable TOTP-based 2FA via Better Auth's twoFactor plugin. Users can enable/disable 2FA with an authenticator app, generate backup codes, view active sessions, and revoke sessions."
+}
