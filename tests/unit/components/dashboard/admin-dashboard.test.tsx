@@ -31,6 +31,7 @@ const emptyData = {
     pendingReviews: 0,
     activeConsultations: 0,
   },
+  emailQueueCounts: { pending: 0, sent: 0, failed: 0 },
   recentActivity: [],
   escalationAlerts: [],
 };
@@ -58,6 +59,27 @@ describe('AdminDashboard component', () => {
     const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
     render(<AdminDashboard data={emptyData} />);
     expect(screen.getByText('adminDashboard.quickActions')).toBeDefined();
+  });
+
+  it('should render email queue section', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    render(<AdminDashboard data={emptyData} />);
+    expect(screen.getByText('Email Queue')).toBeDefined();
+    expect(screen.getByText('adminDashboard.emailQueue.pending')).toBeDefined();
+    expect(screen.getByText('adminDashboard.emailQueue.sent')).toBeDefined();
+    expect(screen.getByText('adminDashboard.emailQueue.failed')).toBeDefined();
+  });
+
+  it('should render email queue counts', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    const dataWithCounts = {
+      ...emptyData,
+      emailQueueCounts: { pending: 3, sent: 15, failed: 1 },
+    };
+    render(<AdminDashboard data={dataWithCounts} />);
+    expect(screen.getByText('3')).toBeDefined();
+    expect(screen.getByText('15')).toBeDefined();
+    expect(screen.getByText('1')).toBeDefined();
   });
 
   it('should show error state when data has error', async () => {
