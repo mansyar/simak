@@ -108,21 +108,26 @@
   - [x] Test — rejects when max_extension_days exceeded
   - [x] Test — rejects when max_total_extensions exceeded (pending + approved count)
   - [x] Test — sends notification to instructor
-- [ ] Task: Write unit tests for approve/reject handlers
-  - [ ] Test — approval extends affected checkpoint dueDate
-  - [ ] Test — approval extends subsequent checkpoint dueDates
-  - [ ] Test — approval extends assignment finalDeadline
-  - [ ] Test — approve logs `deadline.extension_approved` audit event
-  - [ ] Test — reject with reason logs `deadline.extension_rejected` audit event
-  - [ ] Test — reject requires min 20 chars reason
-- [ ] Task: Write unit tests for bulk extension handler
-  - [ ] Test — extends all unfinished checkpoints (locked, unlocked, submitted, under_review, revise)
-  - [ ] Test — skips passed checkpoints
-  - [ ] Test — logs individual `deadline.extended` audit events per checkpoint
-- [ ] Task: Write unit tests for audit log wiring
-  - [ ] Test — `extendDeadlineHandler` logs `deadline.extended`
-  - [ ] Test — `unlockCheckpointHandler` logs `checkpoint.unlocked`
-- [ ] Task: Verify full test suite passes
-  - [ ] Run `pnpm test:coverage`
-  - [ ] Run `pnpm typecheck`
-  - [ ] Run `pnpm lint`
+- [x] Task: Write unit tests for approve/reject handlers (a1676ee)
+  - [x] Test — approval extends affected checkpoint dueDate
+  - [x] Test — approval extends subsequent checkpoint dueDates
+  - [x] Test — approval extends assignment finalDeadline
+  - [x] Test — approve logs `deadline.extension_approved` audit event
+  - [x] Test — reject with reason logs `deadline.extension_rejected` audit event
+  - [x] Test — reject requires min 20 chars reason
+- [x] Task: Write unit tests for bulk extension handler (e5599af)
+  - [x] Test — extends all unfinished checkpoints (locked, unlocked, submitted, under_review, revise)
+  - [x] Test — skips passed checkpoints
+  - [x] Test — logs individual `deadline.extended` audit events per checkpoint
+- [x] Task: Write unit tests for audit log wiring (32803b5)
+  - [x] Test — `extendDeadlineHandler` logs `deadline.extended`
+  - [x] Test — `unlockCheckpointHandler` logs `checkpoint.unlocked`
+- [x] Task: Verify full test suite passes
+  - [x] Run `pnpm test:coverage` — 149 files, 1333 tests passed (pre-existing coverage threshold not met — functions 79%, branches 79.25% vs 80%, not caused by this track)
+  - [x] Run `pnpm typecheck` — passed
+  - [x] Run `pnpm lint` — passed (0 errors, 42 pre-existing warnings)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions (984f5df)
+  - [x] Fix: Change `listExtensionRequestsHandler` from `desc(createdAt)` to `asc(createdAt)` for FIFO ordering per spec
