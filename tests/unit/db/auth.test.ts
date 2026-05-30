@@ -94,6 +94,7 @@ describe('TwoFactor table', () => {
     expect(twoFactor).toHaveProperty('id');
     expect(twoFactor).toHaveProperty('secret');
     expect(twoFactor).toHaveProperty('backupCodes');
+    expect(twoFactor).toHaveProperty('verified');
     expect(twoFactor).toHaveProperty('userId');
   });
 
@@ -113,6 +114,11 @@ describe('TwoFactor table', () => {
     const { twoFactor } = await import('@/db/schema/auth');
     expect(twoFactor.backupCodes.notNull).toBe(true);
     expect(twoFactor.backupCodes.dataType).toBe('string');
+  });
+
+  it('should have verified as boolean defaulting to true', async () => {
+    const { twoFactor } = await import('@/db/schema/auth');
+    expect(twoFactor.verified.dataType).toBe('boolean');
   });
 
   it('should have userId foreign key referencing users', async () => {

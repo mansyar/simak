@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, index, boolean } from 'drizzle-orm/pg-core';
 import { users } from './users';
 
 export const session = pgTable('session', {
@@ -55,6 +55,7 @@ export const twoFactor = pgTable(
       .$defaultFn(() => crypto.randomUUID()),
     secret: text('secret').notNull(),
     backupCodes: text('backup_codes').notNull(),
+    verified: boolean('verified').default(true),
     userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
