@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('qrcode.react', () => ({
   QRCodeSVG: ({ value }: { value: string }) => <div data-testid="qr-code" data-value={value} />,
@@ -124,5 +124,20 @@ describe('TwoFactorSettings', () => {
     mockUseQuery.mockReturnValue({ data: null, isLoading: false });
     render(<TwoFactorSettings />);
     expect(screen.getByText('Add an extra layer of security')).toBeDefined();
+  });
+
+  it('should open enable dialog when clicking Enable 2FA', () => {
+    mockUseQuery.mockReturnValue({ data: { enabled: false }, isLoading: false });
+    render(<TwoFactorSettings />);
+    fireEvent.click(screen.getByText('Enable 2FA'));
+    expect(screen.getByText('Enter your password')).toBeDefined();
+    expect(screen.getByText('Cancel')).toBeDefined();
+  });
+
+  it('should open disable dialog when clicking Disable 2FA', () => {
+    mockUseQuery.mockReturnValue({ data: { enabled: true }, isLoading: false });
+    render(<TwoFactorSettings />);
+    fireEvent.click(screen.getByText('Disable 2FA'));
+    expect(screen.getByText('Enter your password to disable')).toBeDefined();
   });
 });
