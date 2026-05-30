@@ -95,4 +95,8 @@
 - [x] Task: Verify modularity limits
   - [x] `node scripts/check-modularity.js` — all new files under 500 lines
 - [x] Task: Conductor - User Manual Verification 'Final Verification' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions (c2572f4)
       </protect>
