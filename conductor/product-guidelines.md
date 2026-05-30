@@ -1,3 +1,4 @@
+<protect>
 # Product Guidelines
 
 ## Writing Style & Tone
@@ -66,3 +67,4 @@
 - **Sequential enforcement** — Checkpoint state transitions must be validated server-side; client-side checks are supplementary
 - **File isolation** — Presigned URLs enforce ownership via userId and role checks
 - **All server functions** validate session + role before executing
+  </protect>

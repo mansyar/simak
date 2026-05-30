@@ -1,3 +1,4 @@
+<protect>
 # Initial Concept
 
 SIMAK (Sistem Informasi dan Manajemen Akademik) — Help students and instructors track assignment progress through defined checkpoints with structured feedback cycles.
@@ -221,3 +222,5 @@ Students and instructors lack a centralized system to:
 - **i18n translations** — Full English and Indonesian translations for extension request form, instructor queue, approval/rejection dialogs, and notification titles
 - **Server handler tests** — Unit tests for request, list, approve, reject, bulk, and audit log wiring handlers
 - **UI component tests** — Unit tests for student request form, history list, instructor queue section, and approval/rejection dialogs
+
+</protect>

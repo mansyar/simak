@@ -1,3 +1,4 @@
+<protect>
 # Technology Stack
 
 ## Core Framework
@@ -52,3 +53,5 @@
 - pnpm >= 9
 - PostgreSQL >= 16
 - Docker (for local dev and production build)
+
+</protect>
