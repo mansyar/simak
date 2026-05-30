@@ -51,7 +51,7 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
             <X className="h-5 w-5" />
           </button>
         </div>
-        <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 pb-4">
+        <nav className="flex flex-1 flex-col gap-1.5 px-3 pb-4">
           {links.map((link) => {
             const isActive = pathname === link.to || pathname.startsWith(link.to + '/');
             const Icon = link.icon;
