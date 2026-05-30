@@ -120,4 +120,7 @@
   - **Deviation #1**: No Switch component exists in shadcn/ui. Used native checkbox for reduced motion toggle instead.
   - **Deviation #2**: Coverage thresholds slightly below 80% (pre-existing; new code at 100%).
 - [x] Task: Conductor - User Manual Verification 'Phase 5: Integration & Final Verification' (Protocol in workflow.md)
-      </protect>
+
+## Phase 6: Review Fixes
+
+- [x] Task: Apply review suggestions — replace hardcoded "Loading..." strings with t('common.loading') i18n key `6edd726`
