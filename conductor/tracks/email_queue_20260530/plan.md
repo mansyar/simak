@@ -56,7 +56,7 @@
   - [x] Create `src/lib/email-queue-init.ts` that starts a `setInterval` at 30s
   - [x] Import and call init from the app entry point (via `import.meta.env.SSR` in `src/router.tsx`)
   - [x] Handle graceful cleanup (clearInterval on server shutdown)
-- [ ] Task: Write tests for processor
+- [~] Task: Write tests for processor
   - [ ] Test dequeuing — picks pending rows in correct order
   - [ ] Test send success — updates status to `sent`
   - [ ] Test send failure — increments attempts, stores error
