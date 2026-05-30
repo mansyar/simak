@@ -51,6 +51,13 @@ describe('Auth server configuration', () => {
     expect(plugins.some((p) => p.id === 'tanstack-start-cookies')).toBe(true);
   });
 
+  it('should have twoFactor plugin', async () => {
+    const mod = await import('@/auth/config');
+    const opts = mod.auth.options as Record<string, unknown>;
+    const plugins = opts.plugins as Array<{ id: string }>;
+    expect(plugins.some((p) => p.id === 'two-factor')).toBe(true);
+  });
+
   it('should have sendResetPassword callback', async () => {
     const { auth } = await import('@/auth/config');
     const emailPw = (auth.options as Record<string, unknown>).emailAndPassword as Record<

@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
+import { twoFactor } from 'better-auth/plugins';
 import { getDb } from '../db/index';
 import { sendPasswordResetEmail } from '../lib/email';
 import * as schema from '../db/schema/index';
@@ -39,5 +40,10 @@ export const auth = betterAuth({
       defaultValue: 'en',
     },
   },
-  plugins: [tanstackStartCookies()],
+  plugins: [
+    tanstackStartCookies(),
+    twoFactor({
+      issuer: 'SIMAK',
+    }),
+  ],
 });
