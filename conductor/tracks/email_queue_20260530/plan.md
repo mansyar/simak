@@ -22,22 +22,19 @@
 
 ## Phase 2: Enqueue Helpers
 
-- [x] Task: Create `enqueueEmail` internal helper in `src/lib/email.ts`
+- [x] Task: Create `enqueueEmail` internal helper in `src/lib/email.ts` (2802e9f)
   - [x] Add function that inserts a row into `email_queue` with status `pending`
   - [x] Accept recipient_email, subject, body_html, template_type as parameters
-- [~] Task: Refactor `sendPasswordResetEmail` to enqueue
-  - [~] Keep the same function signature
-  - [~] Generate HTML template as before, then call `enqueueEmail` instead of `resend.emails.send()`
-- [~] Task: Refactor `sendInvitationEmail` to enqueue
-  - [~] Same pattern — generate HTML, call `enqueueEmail`
-- [~] Task: Refactor `sendSLAAlertEmail` to enqueue
-  - [~] Same pattern — generate HTML, call `enqueueEmail`
-- [ ] Task: Update existing email tests
-  - [ ] Update `tests/unit/lib/email.test.ts` to mock DB insert instead of Resend
-  - [ ] Update `tests/unit/email/sla-breach-email.test.ts` to mock DB insert instead of Resend
-  - [ ] Add new test for `enqueueEmail` helper
-  - [ ] Run `CI=true pnpm test` and confirm new tests fail (Red phase)
-- [ ] Task: Implement enqueue — make tests pass (Green phase)
+- [x] Task: Refactor `sendPasswordResetEmail` to enqueue (2802e9f)
+  - [x] Keep the same function signature
+  - [x] Generate HTML template as before, then call `enqueueEmail` instead of `resend.emails.send()`
+- [x] Task: Refactor `sendInvitationEmail` to enqueue (2802e9f)
+  - [x] Same pattern — generate HTML, call `enqueueEmail`
+- [x] Task: Refactor `sendSLAAlertEmail` to enqueue (2802e9f)
+  - [x] Same pattern — generate HTML, call `enqueueEmail`
+- [x] Task: Update existing email tests (2802e9f)
+  - [x] Run `CI=true pnpm test` and confirm new tests fail (Red phase)
+- [x] Task: Implement enqueue — make tests pass (Green phase)
   - [ ] Run `CI=true pnpm test` and confirm all tests pass
 - [ ] Task: Conductor - User Manual Verification 'Enqueue Helpers' (Protocol in workflow.md)
 
