@@ -85,6 +85,7 @@ function createMockSession(
       email: overrides.userEmail ?? 'test@example.com',
       emailVerified: overrides.emailVerified ?? true,
       image: overrides.image ?? null,
+      twoFactorEnabled: false,
     },
     session: {
       id: overrides.sessionId ?? 'session-123',
