@@ -46,32 +46,32 @@
 - [x] Write unit tests for 2FA login flow — SHA: cc4e5a7
 - [x] Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
 
-## Phase 5: 2FA Settings UI
+## Phase 5: 2FA Settings UI [checkpoint: 6650886]
 
 ### Tasks
 
-- [ ] Create 2FA settings section in user profile/settings page
-- [ ] Implement QR code display component
-- [ ] Implement backup codes modal with copy/download functionality
-- [ ] Implement enable/disable 2FA toggle with confirmation dialogs
-- [ ] Add current 2FA status indicator
-- [ ] Wire TanStack Query mutations for 2FA operations
-- [ ] Add loading and error states
-- [ ] Write component tests for 2FA settings UI
-- [ ] Conductor - User Manual Verification 'Phase 5' (Protocol in workflow.md)
+- [x] Create 2FA settings section in user profile/settings page — SHA: 6650886
+- [x] Implement QR code display component — SHA: 6650886
+- [x] Implement backup codes modal with copy/download functionality — SHA: 6650886
+- [x] Implement enable/disable 2FA toggle with confirmation dialogs — SHA: 6650886
+- [x] Add current 2FA status indicator — SHA: 6650886
+- [x] Wire TanStack Query mutations for 2FA operations — SHA: 6650886
+- [x] Add loading and error states — SHA: 6650886
+- [x] Write component tests for 2FA settings UI — SHA: 6650886
+- [x] Conductor - User Manual Verification 'Phase 5' (Protocol in workflow.md)
 
-## Phase 6: Session Management UI
+## Phase 6: Session Management UI [checkpoint: 93273ec]
 
 ### Tasks
 
-- [ ] Create active sessions list component
-- [ ] Display device type, IP address, and timestamp per session
-- [ ] Highlight current session
-- [ ] Implement revoke session button with confirmation
-- [ ] Implement revoke all other sessions button
-- [ ] Wire TanStack Query mutations for session operations
-- [ ] Write component tests for session management UI
-- [ ] Conductor - User Manual Verification 'Phase 6' (Protocol in workflow.md)
+- [x] Create active sessions list component — SHA: 93273ec
+- [x] Display device type, IP address, and timestamp per session — SHA: 93273ec
+- [x] Highlight current session — SHA: 93273ec
+- [x] Implement revoke session button with confirmation — SHA: 93273ec
+- [x] Implement revoke all other sessions button — SHA: 93273ec
+- [x] Wire TanStack Query mutations for session operations — SHA: 93273ec
+- [x] Write component tests for session management UI — SHA: 93273ec
+- [x] Conductor - User Manual Verification 'Phase 6' (Protocol in workflow.md)
 
 ## Phase 7: i18n & Integration Testing
 
