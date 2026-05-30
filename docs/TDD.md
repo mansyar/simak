@@ -209,7 +209,7 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 **Consultation** — student-instructor meeting log, tied to a specific checkpoint.
 **Notification** — in-app event log.
 **NotificationPreference** — per-user, per-event, per-channel toggle. [v2]
-**ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, subsequent checkpoints and assignment finalDeadline auto-extend. [v2]
+**ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, subsequent checkpoints and assignment finalDeadline auto-extend.
 **AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v2]
 **EmailQueue** — background delivery queue for transactional emails. [v2]
 **Session** — Better-Auth session token, FK to users, expiresAt.
@@ -406,7 +406,7 @@ _Note: Each row represents one student's individual participation. Group assignm
 | enabled           | boolean, default true        |                                        |
 | Unique constraint | (userId, eventType, channel) | One preference per combination         |
 
-#### extension_requests [v2]
+#### extension_requests
 
 | Column            | Type                       | Notes                                          |
 | ----------------- | -------------------------- | ---------------------------------------------- |
@@ -469,7 +469,7 @@ Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for t
 | `audit_log`             | `createdAt`              | b-tree           | Time-ordered queries (v2)                    |
 | `audit_log`             | `action`                 | b-tree           | Type filtering (v2)                          |
 | `audit_log`             | `entityType`, `entityId` | composite b-tree | Entity-specific history (v2)                 |
-| `extension_requests`    | `assignmentId`, `status` | composite b-tree | Instructor queue queries (v2)                |
+| `extension_requests`    | `assignmentId`, `status` | composite b-tree | Instructor queue queries                     |
 | `email_queue`           | `status`                 | b-tree           | Pick pending emails for delivery (v2)        |
 
 All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migration generated with `drizzle-kit generate`.

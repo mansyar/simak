@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { getAssignmentDetail } from '@/server/assignments';
 import { listPendingConsultations } from '@/server/consultations';
+import { listExtensionRequests, approveExtension, rejectExtension } from '@/server/extensions';
 import { ProgressTable } from '@/components/instructor/assignments/ProgressTable';
 import type { StudentProgress } from '@/components/instructor/assignments/ProgressTable';
 import { DeadlineManager } from '@/components/reviews/DeadlineManager';
 import { VerificationQueueItem } from '@/components/consultations/VerificationQueueItem';
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
+import { PendingExtensionsSection } from '@/components/instructor/extensions/PendingExtensionsSection';
+import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
 import { Calendar, Users, Clipboard, ArrowLeft, Percent, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns/format';
 import { useI18n } from '../../../__root';
@@ -42,27 +45,84 @@ function AssignmentDetailPage() {
     createdAt: string;
   }
   const [pendingConsultations, setPendingConsultations] = useState<PendingConsultation[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'consultations'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'consultations' | 'extensions'>(
+    'overview',
+  );
   const [selectedConsultationId, setSelectedConsultationId] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [extensionRequests, setExtensionRequests] = useState<ExtensionRequestItem[]>([]);
+  const [extensionsLoading, setExtensionsLoading] = useState(false);
 
-  // Load pending consultations
+  // Load pending consultations and extension requests
   useEffect(() => {
     if (assignment) {
       const listPendingFn = listPendingConsultations as unknown as (args: {
         data: { assignmentId: number };
       }) => Promise<{ consultations: PendingConsultation[] }>;
+      const listExtensionsFn = listExtensionRequests as unknown as (args: {
+        data: { assignmentId: number; status: string; page: number; limit: number };
+      }) => Promise<{ items: ExtensionRequestItem[] }>;
       const load = async () => {
-        const result = await listPendingFn({
-          data: { assignmentId: assignment.id },
-        });
-        if (result.consultations) {
-          setPendingConsultations(result.consultations);
+        const [consultResult, extResult] = await Promise.all([
+          listPendingFn({ data: { assignmentId: assignment.id } }),
+          listExtensionsFn({
+            data: { assignmentId: assignment.id, status: 'pending', page: 1, limit: 50 },
+          }),
+        ]);
+        if (consultResult.consultations) {
+          setPendingConsultations(consultResult.consultations);
         }
+        if ('items' in extResult) {
+          setExtensionRequests(extResult.items);
+        }
+        setExtensionsLoading(false);
       };
+      setExtensionsLoading(true);
       load();
     }
   }, []);
+
+  // Handle extension approval
+  const handleApproveExtension = async (requestId: number, comment?: string) => {
+    const approveFn = approveExtension as unknown as (args: {
+      data: { requestId: number; resolutionReason?: string };
+    }) => Promise<{ error?: string }>;
+    const result = await approveFn({
+      data: { requestId, resolutionReason: comment },
+    });
+    if (result.error) return;
+    // Refresh list
+    const listExtensionsFn = listExtensionRequests as unknown as (args: {
+      data: { assignmentId: number; status: string; page: number; limit: number };
+    }) => Promise<{ items: ExtensionRequestItem[] }>;
+    const extResult = await listExtensionsFn({
+      data: { assignmentId: assignment!.id, status: 'pending', page: 1, limit: 50 },
+    });
+    if ('items' in extResult) {
+      setExtensionRequests(extResult.items);
+    }
+  };
+
+  // Handle extension rejection
+  const handleRejectExtension = async (requestId: number, reason: string) => {
+    const rejectFn = rejectExtension as unknown as (args: {
+      data: { requestId: number; resolutionReason: string };
+    }) => Promise<{ error?: string }>;
+    const result = await rejectFn({
+      data: { requestId, resolutionReason: reason },
+    });
+    if (result.error) return;
+    // Refresh list
+    const listExtensionsFn = listExtensionRequests as unknown as (args: {
+      data: { assignmentId: number; status: string; page: number; limit: number };
+    }) => Promise<{ items: ExtensionRequestItem[] }>;
+    const extResult = await listExtensionsFn({
+      data: { assignmentId: assignment!.id, status: 'pending', page: 1, limit: 50 },
+    });
+    if ('items' in extResult) {
+      setExtensionRequests(extResult.items);
+    }
+  };
 
   if (!assignment) {
     return (
@@ -268,6 +328,22 @@ function AssignmentDetailPage() {
               </span>
             )}
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('extensions')}
+            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'extensions'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {t('extensions.queueTitle')}
+            {extensionRequests.length > 0 && (
+              <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full bg-primary text-primary-foreground">
+                {extensionRequests.length}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
@@ -344,6 +420,15 @@ function AssignmentDetailPage() {
             }}
           />
         </div>
+      )}
+
+      {activeTab === 'extensions' && (
+        <PendingExtensionsSection
+          requests={extensionRequests}
+          loading={extensionsLoading}
+          onApprove={handleApproveExtension}
+          onReject={handleRejectExtension}
+        />
       )}
     </div>
   );

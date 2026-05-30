@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { createFileRoute, Link, Outlet, useMatchRoute } from '@tanstack/react-router';
 import { getStudentAssignmentDetail } from '@/server/assignments';
 import { listConsultations, listVerifiedCounts } from '@/server/consultations';
+import { listMyExtensionRequests } from '@/server/extensions';
 import { AssignmentDetailHeader } from '@/components/student/assignments/AssignmentDetailHeader';
 import { CheckpointTimeline } from '@/components/student/assignments/CheckpointTimeline';
 import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
 import { ConsultationForm } from '@/components/consultations/ConsultationForm';
 import { ConsultationList } from '@/components/consultations/ConsultationList';
 import { ConsultationProgress } from '@/components/consultations/ConsultationProgress';
+import { ExtensionRequestForm } from '@/components/student/extensions/ExtensionRequestForm';
+import { ExtensionHistoryList } from '@/components/student/extensions/ExtensionHistoryList';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
@@ -74,7 +77,22 @@ function AssignmentDetailPage() {
       minConsultations: number;
     }[]
   >([]);
-  const [activeTab, setActiveTab] = useState<'timeline' | 'consultations'>('timeline');
+  const [activeTab, setActiveTab] = useState<'timeline' | 'consultations' | 'extensions'>(
+    'timeline',
+  );
+  const [extensionItems, setExtensionItems] = useState<
+    {
+      id: number;
+      category: string;
+      extensionDays: number;
+      status: 'pending' | 'approved' | 'rejected';
+      reason: string | null;
+      createdAt: string;
+      resolvedAt: string | null;
+      resolutionReason: string | null;
+      checkpointName: string | null;
+    }[]
+  >([]);
 
   // Load consultation data on mount
   useEffect(() => {
@@ -106,6 +124,21 @@ function AssignmentDetailPage() {
           'counts' in (countsResult as Record<string, unknown>)
         ) {
           setVerifiedCounts((countsResult as { counts: typeof verifiedCounts }).counts);
+        }
+
+        // Load extension requests
+        const listExtFn = listMyExtensionRequests as unknown as (args: {
+          data: { assignmentId: number };
+        }) => Promise<unknown>;
+        const extResult = await listExtFn({
+          data: { assignmentId: (data as { id: number }).id },
+        });
+        if (
+          extResult &&
+          typeof extResult === 'object' &&
+          'items' in (extResult as Record<string, unknown>)
+        ) {
+          setExtensionItems((extResult as { items: typeof extensionItems }).items);
         }
       };
       loadConsultations();
@@ -187,6 +220,23 @@ function AssignmentDetailPage() {
     }
   };
 
+  const handleExtensionSuccess = async () => {
+    // Refresh extension data
+    const listExtFn = listMyExtensionRequests as unknown as (args: {
+      data: { assignmentId: number };
+    }) => Promise<unknown>;
+    const extResult = await listExtFn({
+      data: { assignmentId: (data as { id: number }).id },
+    });
+    if (
+      extResult &&
+      typeof extResult === 'object' &&
+      'items' in (extResult as Record<string, unknown>)
+    ) {
+      setExtensionItems((extResult as { items: typeof extensionItems }).items);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -235,6 +285,17 @@ function AssignmentDetailPage() {
           >
             {t('consultations.title')}
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('extensions')}
+            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'extensions'
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {t('extensions.requestTitle')}
+          </button>
         </div>
       </div>
 
@@ -266,6 +327,25 @@ function AssignmentDetailPage() {
             </h3>
             <ConsultationList consultations={consultations} />
           </div>
+        </div>
+      )}
+
+      {activeTab === 'extensions' && (
+        <div className="space-y-6">
+          <div className="rounded-lg border bg-card p-5 shadow-sm">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
+              {t('extensions.requestTitle')}
+            </h3>
+            <ExtensionRequestForm
+              assignmentId={data.id}
+              maxExtensionDays={data.maxExtensionDays ?? 7}
+              maxTotalExtensions={data.maxTotalExtensions ?? 3}
+              checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
+              onSuccess={handleExtensionSuccess}
+            />
+          </div>
+
+          <ExtensionHistoryList items={extensionItems} />
         </div>
       )}
     </div>

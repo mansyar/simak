@@ -205,6 +205,8 @@ export async function getStudentAssignmentDetailHandler(args: { data: StudentAss
       instructorName: users.name,
       templateName: assignmentTemplates.name,
       templateType: assignmentTemplates.type,
+      maxExtensionDays: assignments.maxExtensionDays,
+      maxTotalExtensions: assignments.maxTotalExtensions,
     })
     .from(assignmentStudents)
     .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
@@ -297,6 +299,8 @@ export async function getStudentAssignmentDetailHandler(args: { data: StudentAss
     instructorName: assignmentData.instructorName,
     templateName: assignmentData.templateName,
     templateType: assignmentData.templateType,
+    maxExtensionDays: assignmentData.maxExtensionDays ?? 7,
+    maxTotalExtensions: assignmentData.maxTotalExtensions ?? 3,
     progressPercent,
     checkpoints: enrichedCheckpoints,
   };

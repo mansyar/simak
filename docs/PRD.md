@@ -24,7 +24,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Both students and instructors can view and download previously submitted checkpoint files.
 - Consultation sessions (Kartu Bimbingan) are tracked as a requirement for assignment completion.
 - Admins can view system-wide analytics and audit logs. (Audit log viewer implemented at `/admin/audit-log`) `[v2]`
-- Students and instructors can request and manage deadline extensions via a configurable approval workflow. `[v2]`
+- Students and instructors can request and manage deadline extensions via a configurable approval workflow.
 - Users can enable two-factor authentication (TOTP) for enhanced account security. `[v2]`
 - Assignment templates include estimated duration per checkpoint, allowing auto-calculation of checkpoint dueDates during assignment creation.
 
@@ -110,7 +110,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Instructors create assignments from templates, assign title + description, set a final deadline, and select one or more students.
 - Each selected student gets their own independent progress, checkpoint states, and submissions tied to the same assignment.
 - Group assignments (collaborative submissions by multiple students) are deferred to a post-MVP iteration. `[v2]`
-- Deadlines can be extended via an approval workflow. `[v2]`
+- Deadlines can be extended via an approval workflow.
 - Progress tracking shows completion status for each student.
 
 ### Checkpoints & Submissions
@@ -122,7 +122,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Instructors can attach feedback files to reviews.
 - Late submissions are controlled: overdue checkpoints lock automatically; instructors can unlock them.
 - **SLA & Escalation (Addressing the Instructor Bottleneck):** To ensure students aren't unfairly blocked, if an instructor does not review a submission within a defined SLA (e.g., 3 days), an automated escalation alert is sent to the Admin, and the student's subsequent deadlines are **automatically extended by the number of days the review was delayed** (breach duration is added to affected deadlines).
-- **Deadline Extension Workflow: `[v2]`**
+- **Deadline Extension Workflow**
   - **Student-Initiated:** Students can request deadline extensions via an approval workflow with reason categories (Personal, Research, Health, Other) and a proposed duration (1–30 days). Instructors approve or reject with optional comment.
   - **Instructor-Initiated:** Instructors can directly extend deadlines for one or all checkpoints without student request. Bulk extension applies +N days to all remaining checkpoints for a student.
   - **Auto-Adjustment:** Subsequent checkpoints and assignment finalDeadline auto-extend when an extension is approved or directly applied.
@@ -203,4 +203,4 @@ Core entities:
 - **Consultation** — log entry for a student-instructor session tied to a specific checkpoint.
 - **Notification** — in-app and/or email event logs.
 - **AuditLog** — immutable record of all meaningful system actions (user created/deleted, template CRUD, assignment creation, review decisions, deadline changes, unlock actions, consultation verifications/rejections). Includes actor, action type, entity reference, and JSON details. Implemented with an admin viewer at `/admin/audit-log`.
-- **ExtensionRequest** `[v2]` — student-initiated deadline extension request with reason category, proposed duration, and approval/rejection by instructor. Subject to admin-configurable caps (`maxExtensionDays`, `maxTotalExtensions`).
+- **ExtensionRequest** — student-initiated deadline extension request with reason category, proposed duration, and approval/rejection by instructor. Subject to admin-configurable caps (`maxExtensionDays`, `maxTotalExtensions`).

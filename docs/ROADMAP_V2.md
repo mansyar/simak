@@ -186,7 +186,7 @@ Admin-configurable caps: max extension days per request (1–30) and max total e
 
 **Dependencies:** Track 1.1 (audit log — all extension actions logged). Track 1.2 (dueDates must exist before extension is meaningful).
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete (May 2026)
 
 **Estimated Scope:**
 
@@ -236,18 +236,18 @@ Index on `(assignment_id, status)` for instructor queue queries.
 
 **Acceptance Criteria:**
 
-- [ ] Admin can configure max extension days (1–30, default 7) and max total extensions (1–10, default 3) per assignment
-- [ ] Student can submit extension request with reason category, custom reason, and duration (1–max_extension_days)
-- [ ] Cap validation rejects requests exceeding max_extension_days or max_total_extensions
-- [ ] Instructor sees pending extension requests queue (filterable by assignment, status)
-- [ ] Instructor can approve request → auto-extends affected checkpoint + subsequent checkpoints + finalDeadline; `deadline.extension_approved` logged to audit log
-- [ ] Instructor can reject request with required reason (min 20 chars); `deadline.extension_rejected` logged
-- [ ] Student notified when request is approved or rejected (in-app notification)
-- [ ] Instructor can directly extend all checkpoints for a student by N days (bulk, bypassing request); `deadline.extended` logged
-- [ ] Existing `extendDeadlineHandler` writes `deadline.extended` to audit log
-- [ ] Existing `unlockCheckpointHandler` writes `checkpoint.unlocked` to audit log
-- [ ] Student can see extension history on their assignment detail page
-- [ ] i18n translations for extension request form, queue, approval dialog, and notifications
+- [x] Admin can configure max extension days (1–30, default 7) and max total extensions (1–10, default 3) per assignment
+- [x] Student can submit extension request with reason category, custom reason, and duration (1–max_extension_days)
+- [x] Cap validation rejects requests exceeding max_extension_days or max_total_extensions
+- [x] Instructor sees pending extension requests queue (filterable by assignment, status)
+- [x] Instructor can approve request → auto-extends affected checkpoint + subsequent checkpoints + finalDeadline; `deadline.extension_approved` logged to audit log
+- [x] Instructor can reject request with required reason (min 20 chars); `deadline.extension_rejected` logged
+- [x] Student notified when request is approved or rejected (in-app notification)
+- [x] Instructor can directly extend all checkpoints for a student by N days (bulk, bypassing request); `deadline.extended` logged
+- [x] Existing `extendDeadlineHandler` writes `deadline.extended` to audit log
+- [x] Existing `unlockCheckpointHandler` writes `checkpoint.unlocked` to audit log
+- [x] Student can see extension history on their assignment detail page
+- [x] i18n translations for extension request form, queue, approval dialog, and notifications
 
 **Test Plan:**
 
@@ -802,11 +802,14 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 ## Next Steps
 
 1. ✅ Roadmap v2 finalized — excessive features stripped to Appendix A
-2. [ ] Select first track to implement (recommended: **Track 1.1 — Estimated Duration & Auto-Calculated DueDates**)
-3. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-4. [ ] Write failing tests
-5. [ ] Implement features
-6. [ ] Verify & archive
+2. ✅ Track 1.1 — Comprehensive Audit Log (Complete)
+3. ✅ Track 1.2 — Estimated Duration & Auto-Calculated DueDates (Complete)
+4. ✅ Track 1.3 — Deadline Extension Workflow (Complete)
+5. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
+6. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+7. [ ] Write failing tests
+8. [ ] Implement features
+9. [ ] Verify & archive
 
 ---
 

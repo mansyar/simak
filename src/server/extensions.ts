@@ -34,6 +34,10 @@ export const RejectExtensionSchema = z.object({
   resolutionReason: z.string().min(20, 'Resolution reason must be at least 20 characters'),
 });
 
+export const ListMyExtensionsSchema = z.object({
+  assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
+});
+
 export const BulkExtendSchema = z.object({
   assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
   studentId: z.string().min(1, 'Student ID is required'),
@@ -56,6 +60,14 @@ export const listExtensionRequests = createServerFn({ method: 'GET' }).handler(
     const { listExtensionRequestsHandler } = await import('./extensions.server');
     const data = ListExtensionRequestsSchema.parse(args.data);
     return listExtensionRequestsHandler({ data });
+  },
+);
+
+export const listMyExtensionRequests = createServerFn({ method: 'GET' }).handler(
+  async (args: { data: unknown }) => {
+    const { listMyExtensionRequestsHandler } = await import('./extensions.server');
+    const data = ListMyExtensionsSchema.parse(args.data);
+    return listMyExtensionRequestsHandler({ data });
   },
 );
 
