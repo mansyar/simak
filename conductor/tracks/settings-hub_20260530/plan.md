@@ -14,7 +14,7 @@
   - [x] Modify `locales/en.json` — add new keys under `settings` section
 - [x] Task: Add matching translation values to Indonesian locale file `ee5455c`
   - [x] Modify `locales/id.json` — add matching keys under `settings` section
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Schema, i18n Types & Dependencies' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Database Schema, i18n Types & Dependencies' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions
 
