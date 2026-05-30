@@ -1,5 +1,5 @@
 // Server-only handlers for extension request operations
-import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
+import { eq, and, asc, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
 import { extensionRequests } from '../db/schema/extensions';
@@ -8,10 +8,15 @@ import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
-import type { RequestExtensionSchema, ListExtensionRequestsSchema } from './extensions';
+import type {
+  RequestExtensionSchema,
+  ListExtensionRequestsSchema,
+  ListMyExtensionsSchema,
+} from './extensions';
 
 type RequestExtensionInput = z.infer<typeof RequestExtensionSchema>;
 type ListExtensionRequestsInput = z.infer<typeof ListExtensionRequestsSchema>;
+type ListMyExtensionsInput = z.infer<typeof ListMyExtensionsSchema>;
 
 function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
@@ -260,13 +265,74 @@ export async function listExtensionRequestsHandler(args: { data: ListExtensionRe
       .innerJoin(users, eq(extensionRequests.studentId, users.id))
       .leftJoin(checkpoints, eq(extensionRequests.checkpointId, checkpoints.id))
       .where(and(...conditions))
-      .orderBy(desc(extensionRequests.createdAt))
+      .orderBy(asc(extensionRequests.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);
 
     return { items, total: Number(count) };
   } catch (err) {
     console.error('Failed to list extension requests:', err);
+    return { error: 'Internal Server Error' };
+  }
+}
+
+/**
+ * List extension requests for a student's own assignment.
+ * Student-only. Returns their own requests without pagination (history is typically short).
+ */
+export async function listMyExtensionRequestsHandler(args: { data: ListMyExtensionsInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isStudent(session)) {
+    return { error: 'Unauthorized' };
+  }
+
+  const { assignmentId } = args.data;
+  const db = getDb();
+
+  try {
+    // Verify enrollment
+    const [enrollment] = await db
+      .select({ id: assignmentStudents.id })
+      .from(assignmentStudents)
+      .where(
+        and(
+          eq(assignmentStudents.assignmentId, assignmentId),
+          eq(assignmentStudents.studentId, session.user.id),
+        ),
+      )
+      .limit(1);
+
+    if (!enrollment) {
+      return { error: 'Assignment not found' };
+    }
+
+    const items = await db
+      .select({
+        id: extensionRequests.id,
+        checkpointId: extensionRequests.checkpointId,
+        checkpointName: checkpoints.name,
+        requestedDeadline: extensionRequests.requestedDeadline,
+        reason: extensionRequests.reason,
+        category: extensionRequests.category,
+        extensionDays: extensionRequests.extensionDays,
+        status: extensionRequests.status,
+        resolutionReason: extensionRequests.resolutionReason,
+        createdAt: extensionRequests.createdAt,
+        resolvedAt: extensionRequests.resolvedAt,
+      })
+      .from(extensionRequests)
+      .leftJoin(checkpoints, eq(extensionRequests.checkpointId, checkpoints.id))
+      .where(
+        and(
+          eq(extensionRequests.assignmentId, assignmentId),
+          eq(extensionRequests.studentId, session.user.id),
+        ),
+      )
+      .orderBy(desc(extensionRequests.createdAt));
+
+    return { items };
+  } catch (err) {
+    console.error('Failed to list my extension requests:', err);
     return { error: 'Internal Server Error' };
   }
 }
