@@ -442,17 +442,18 @@ Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for t
 
 #### email_queue [v2]
 
-| Column         | Type               | Notes                     |
-| -------------- | ------------------ | ------------------------- |
-| id             | serial (PK)        |                           |
-| recipientEmail | text, not null     |                           |
-| subject        | text, not null     |                           |
-| bodyHtml       | text, not null     |                           |
-| status         | text, not null     | pending \| sent \| failed |
-| attempts       | integer, default 0 |                           |
-| lastAttemptAt  | timestamp          |                           |
-| errorMessage   | text               | Last failure reason       |
-| createdAt      | timestamp          |                           |
+| Column         | Type               | Notes                                           |
+| -------------- | ------------------ | ----------------------------------------------- |
+| id             | serial (PK)        |                                                 |
+| recipientEmail | text, not null     |                                                 |
+| subject        | text, not null     |                                                 |
+| bodyHtml       | text, not null     |                                                 |
+| templateType   | text, not null     | `password_reset` \| `invitation` \| `sla_alert` |
+| status         | text, not null     | `pending` \| `sent` \| `failed`                 |
+| attempts       | integer, default 0 |                                                 |
+| lastAttemptAt  | timestamp          | NULLABLE                                        |
+| errorMessage   | text               | NULLABLE — last failure reason                  |
+| createdAt      | timestamp          | DEFAULT NOW()                                   |
 
 ### Database Indexes
 
@@ -673,7 +674,7 @@ A checkpoint unlocks when:
 ### Email Delivery [v2]
 
 - Sent via Resend API.
-- Email queue (`email_queue` table) with retry logic: 3 attempts (5min, 30min, 2h backoff).
+- Email queue (`email_queue` table) with retry logic: 3 attempts with exponential backoff (30s, 5min, 30min).
 - Dead letter after 3 failed attempts (logged, not retried).
 
 ### Preferences [v2]

@@ -405,11 +405,11 @@ Currently, all email sends (password reset, invitation, SLA alerts) are synchron
 
 ### Track 4.1 — Background Email Queue with Retry
 
-**Description:** Create an `email_queue` table. Refactor `sendPasswordResetEmail`, `sendInvitationEmail`, and `sendSLAAlertEmail` to enqueue rather than calling Resend synchronously. A background processor (edge function or cron job) dequeues and sends emails with exponential backoff retry.
+**Description:** Create an `email_queue` table. Refactor `sendPasswordResetEmail`, `sendInvitationEmail`, and `sendSLAAlertEmail` to enqueue rather than calling Resend synchronously. A background processor (SSR-only interval) dequeues and sends emails with exponential backoff retry.
 
 **Dependencies:** V1 email sending infrastructure (`src/lib/email.ts`).
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete (May 2026)
 
 **Estimated Scope:**
 
@@ -432,7 +432,7 @@ Currently, all email sends (password reset, invitation, SLA alerts) are synchron
 | recipient_email | text, not null     |                                                 |
 | subject         | text, not null     |                                                 |
 | body_html       | text, not null     |                                                 |
-| template_type   | text               | `password_reset` \| `invitation` \| `sla_alert` |
+| template_type   | text, not null     | `password_reset` \| `invitation` \| `sla_alert` |
 | status          | text, not null     | `pending` \| `sent` \| `failed`                 |
 | attempts        | integer, default 0 |                                                 |
 | last_attempt_at | timestamp          | NULLABLE                                        |
@@ -443,14 +443,37 @@ Index on `(status, created_at ASC)` for efficient dequeuing.
 
 **Acceptance Criteria:**
 
-- [ ] Email queue table stores outbound emails with status tracking
-- [ ] All three email-sending functions enqueue instead of calling Resend directly
-- [ ] Background processor dequeues and sends pending emails every 30 seconds
-- [ ] Retry logic: 3 attempts with exponential backoff (30s, 5min, 30min)
-- [ ] After 3 failures → marked `failed` with stored error message
-- [ ] Admin dashboard shows queue status counts (pending/sent/failed)
-- [ ] No regression in email content or formatting
-- [ ] i18n translations for queue status labels
+- [x] Email queue table stores outbound emails with status tracking
+- [x] All three email-sending functions enqueue instead of calling Resend directly
+- [x] Background processor dequeues and sends pending emails every 30 seconds
+- [x] Retry logic: 3 attempts with exponential backoff (30s, 5min, 30min)
+- [x] After 3 failures → marked `failed` with stored error message
+- [x] Admin dashboard shows queue status counts (pending/sent/failed)
+- [x] No regression in email content or formatting
+- [x] i18n translations for queue status labels
+- [x] CHECK constraints on `template_type` and `status` columns in migration SQL
+
+**Actual Files Created/Modified:**
+
+| File                                                       | Purpose                                                                                                                                          |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `drizzle/migrations/0007_email_queue.sql`                  | Migration SQL — create `email_queue` table with indexes and CHECK constraints                                                                    |
+| `src/db/schema/email-queue.ts`                             | **New:** Drizzle schema for `email_queue` table with `templateType` enum and `status` enum                                                       |
+| `src/db/schema/index.ts`                                   | **Modified:** Re-export `emailQueue` schema                                                                                                      |
+| `src/lib/email.ts`                                         | **Modified:** Refactored `sendPasswordResetEmail`, `sendInvitationEmail`, `sendSLAAlertEmail` to call `enqueueEmail` instead of Resend directly  |
+| `src/lib/email-queue-processor.ts`                         | **New:** Background processor — Resend singleton, backoff logic (30s/5min/30min), max 10 items per tick, max 3 attempts                          |
+| `src/lib/email-queue-init.ts`                              | **New:** 30s interval init with graceful shutdown signal handling                                                                                |
+| `src/router.tsx`                                           | **Modified:** Dynamic SSR-only import of email queue init                                                                                        |
+| `src/server/dashboard-admin.server.ts`                     | **Modified:** Added email queue status counts using FILTER clauses                                                                               |
+| `src/components/dashboard/AdminDashboard.tsx`              | **Modified:** Added Email Queue widget card with 3 stat boxes (pending/sent/failed) using i18n keys                                              |
+| `locales/en.json` / `locales/id.json`                      | **Modified:** Added `adminDashboard.emailQueue.{title,pending,sent,failed}` translation keys                                                     |
+| `tests/unit/db/schema/email-queue.test.ts`                 | **New:** Schema test — checks column existence                                                                                                   |
+| `tests/unit/server/email-queue-processor.test.ts`          | **New:** 249-line test covering dequeuing order, send success, failure, Resend error response, backoff, max attempts, null attempts, empty queue |
+| `tests/unit/server/email.test.ts`                          | **New:** Tests that `sendPasswordResetEmail`, `sendInvitationEmail`, `sendSLAAlertEmail` enqueue with correct data                               |
+| `tests/unit/server/dashboard-admin.test.ts`                | **New:** 212-line test covering auth, metrics, recent activity, escalation alerts, email queue counts                                            |
+| `tests/unit/components/dashboard/admin-dashboard.test.tsx` | **New:** Component test for Email Queue widget rendering and count display                                                                       |
+| `tests/integration/sla-escalation.test.ts`                 | **Modified:** Refactored from Resend mocks to DB mocks                                                                                           |
+| `tests/unit/server/dashboard.test.ts`                      | **Modified:** Migrated admin handler tests out to `dashboard-admin.test.ts`                                                                      |
 
 **Test Plan:**
 
@@ -460,6 +483,15 @@ Index on `(status, created_at ASC)` for efficient dequeuing.
 | Dequeue processor | Unit test — picks pending rows, calls Resend, updates status            |
 | Retry logic       | Unit test — increments attempts, respects backoff, marks failed after 3 |
 | Admin widget      | Unit test — renders queue status counts                                 |
+
+**Test Results (at time of archiving):**
+
+- 1359/1359 tests passing across 152 test files
+- TypeScript typecheck passes with no errors
+- eslint/prettier/lint-staged pass on all new files
+- All new files under 500-line modularity limit
+- Pre-push hook (typecheck + vitest coverage) passes
+- Review fixes applied: CHECK constraints added to migration SQL, FROM address made configurable via env var
 
 ---
 
@@ -805,11 +837,12 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 2. ✅ Track 1.1 — Comprehensive Audit Log (Complete)
 3. ✅ Track 1.2 — Estimated Duration & Auto-Calculated DueDates (Complete)
 4. ✅ Track 1.3 — Deadline Extension Workflow (Complete)
-5. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
-6. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-7. [ ] Write failing tests
-8. [ ] Implement features
-9. [ ] Verify & archive
+5. ✅ Track 4.1 — Background Email Queue with Retry (Complete)
+6. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
+7. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+8. [ ] Write failing tests
+9. [ ] Implement features
+10. [ ] Verify & archive
 
 ---
 
