@@ -29,6 +29,10 @@ vi.mock('@tanstack/react-start', () => ({
 }));
 
 describe('Assignment & Review handlers audit logging', () => {
+  const instructorSession = {
+    user: { id: 'instructor-1', role: 'instructor' } as any,
+    session: {} as any,
+  };
   let mockDb: any;
 
   beforeEach(() => {
@@ -187,6 +191,88 @@ describe('Assignment & Review handlers audit logging', () => {
         entityId: '101',
         details: { checkpointName: 'Chapter 1', revisionDeadline: '2026-06-15' },
       });
+    });
+  });
+
+  describe('extendDeadlineHandler', () => {
+    it('should log deadline.extended audit event on successful extension', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+
+      const futureDate = new Date(Date.now() + 7 * 86400000);
+
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { id: 100, assignmentInstructorId: 'instructor-1', assignmentId: 1 },
+        ]).then(onfulfilled),
+      );
+
+      const { extendDeadlineHandler } = await import('@/server/assignments.server');
+      const result = await extendDeadlineHandler({
+        data: { checkpointId: 100, newDueDate: futureDate },
+      });
+
+      expect(result).toEqual({ success: true });
+      expect(auditMod.logAuditEvent).toHaveBeenCalledWith({
+        actorId: 'instructor-1',
+        action: 'deadline.extended',
+        entityType: 'checkpoint',
+        entityId: '100',
+        details: { assignmentId: 1, newDueDate: futureDate.toISOString() },
+      });
+    });
+
+    it('should not log audit event if checkpoint not found', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const { extendDeadlineHandler } = await import('@/server/assignments.server');
+      await extendDeadlineHandler({
+        data: { checkpointId: 999, newDueDate: new Date() },
+      });
+
+      expect(auditMod.logAuditEvent).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('unlockCheckpointHandler', () => {
+    it('should log checkpoint.unlocked audit event on successful unlock', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { id: 100, state: 'locked', assignmentInstructorId: 'instructor-1', assignmentId: 1 },
+        ]).then(onfulfilled),
+      );
+
+      const { unlockCheckpointHandler } = await import('@/server/assignments.server');
+      const result = await unlockCheckpointHandler({ data: { checkpointId: 100 } });
+
+      expect(result).toEqual({ success: true });
+      expect(auditMod.logAuditEvent).toHaveBeenCalledWith({
+        actorId: 'instructor-1',
+        action: 'checkpoint.unlocked',
+        entityType: 'checkpoint',
+        entityId: '100',
+        details: { assignmentId: 1 },
+      });
+    });
+
+    it('should not log audit event if checkpoint already unlocked', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { id: 100, state: 'unlocked', assignmentInstructorId: 'instructor-1', assignmentId: 1 },
+        ]).then(onfulfilled),
+      );
+
+      const { unlockCheckpointHandler } = await import('@/server/assignments.server');
+      await unlockCheckpointHandler({ data: { checkpointId: 100 } });
+
+      expect(auditMod.logAuditEvent).not.toHaveBeenCalled();
     });
   });
 });
