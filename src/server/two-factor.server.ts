@@ -40,8 +40,8 @@ export async function generateTwoFactorSetupHandler(args: { data: EnableTwoFacto
       headers,
     });
 
-    const response = (result as { response?: { totpURI?: string; backupCodes?: string[] } })
-      .response;
+    // auth.api.enableTwoFactor() returns { totpURI, backupCodes } directly
+    const data = result as unknown as { totpURI?: string; backupCodes?: string[] };
 
     // Log audit event
     await logAuditEvent({
@@ -52,8 +52,8 @@ export async function generateTwoFactorSetupHandler(args: { data: EnableTwoFacto
     });
 
     return {
-      totpURI: response?.totpURI ?? '',
-      backupCodes: response?.backupCodes ?? [],
+      totpURI: data?.totpURI ?? '',
+      backupCodes: data?.backupCodes ?? [],
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
@@ -74,17 +74,10 @@ export async function enableTwoFactorHandler(args: { data: VerifyTwoFactorInput 
   const headers = getRequestHeaders();
 
   try {
-    await auth.api.verifyTwoFactorOTP({
+    await auth.api.verifyTOTP({
       body: { code: args.data.code, trustDevice: args.data.trustDevice },
       headers,
     });
-
-    // Mark 2FA as enabled on the user
-    const db = getDb();
-    await db
-      .update(users)
-      .set({ twoFactorEnabled: true, updatedAt: new Date() })
-      .where(eq(users.id, session.user.id));
 
     // Log audit event
     await logAuditEvent({

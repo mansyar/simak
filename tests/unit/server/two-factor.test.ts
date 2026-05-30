@@ -22,7 +22,7 @@ vi.mock('@/auth/config', () => ({
   auth: {
     api: {
       enableTwoFactor: vi.fn(),
-      verifyTwoFactorOTP: vi.fn(),
+      verifyTOTP: vi.fn(),
       disableTwoFactor: vi.fn(),
       generateBackupCodes: vi.fn(),
     },
@@ -109,10 +109,8 @@ describe('Two-factor server functions', () => {
     it('should call auth.api.enableTwoFactor and return totpURI + backupCodes', async () => {
       vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
       vi.mocked(auth.api.enableTwoFactor).mockResolvedValue({
-        response: {
-          totpURI: 'otpauth://totp/SIMAK:test@example.com?secret=ABC123',
-          backupCodes: ['code1-code2', 'code3-code4'],
-        },
+        totpURI: 'otpauth://totp/SIMAK:test@example.com?secret=ABC123',
+        backupCodes: ['code1-code2', 'code3-code4'],
       } as any);
 
       const result = await generateTwoFactorSetupHandler({
@@ -133,7 +131,8 @@ describe('Two-factor server functions', () => {
     it('should log audit event on success', async () => {
       vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
       vi.mocked(auth.api.enableTwoFactor).mockResolvedValue({
-        response: { totpURI: 'otpauth://...', backupCodes: [] },
+        totpURI: 'otpauth://...',
+        backupCodes: [],
       } as any);
 
       await generateTwoFactorSetupHandler({
@@ -173,21 +172,16 @@ describe('Two-factor server functions', () => {
       expect(result).toEqual({ error: 'Unauthorized' });
     });
 
-    it('should verify TOTP code, update user, log audit, and send email', async () => {
+    it('should verify TOTP code, log audit, and send email', async () => {
       vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
-      vi.mocked(auth.api.verifyTwoFactorOTP).mockResolvedValue({} as any);
-
-      const mockUpdateSet = vi.fn().mockResolvedValue(undefined);
-      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
-      mockDb.update.mockReturnValue({ set: mockUpdateSet } as any);
-      mockUpdateSet.mockReturnValue({ where: mockUpdateWhere } as any);
+      vi.mocked(auth.api.verifyTOTP).mockResolvedValue({} as any);
 
       const result = await enableTwoFactorHandler({
         data: { code: '123456', trustDevice: true },
       });
 
       expect(result).toEqual({ success: true });
-      expect(auth.api.verifyTwoFactorOTP).toHaveBeenCalledWith(
+      expect(auth.api.verifyTOTP).toHaveBeenCalledWith(
         expect.objectContaining({
           body: { code: '123456', trustDevice: true },
         }),
@@ -208,7 +202,7 @@ describe('Two-factor server functions', () => {
 
     it('should return error on verification failure', async () => {
       vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
-      vi.mocked(auth.api.verifyTwoFactorOTP).mockRejectedValue(new Error('Invalid TOTP code'));
+      vi.mocked(auth.api.verifyTOTP).mockRejectedValue(new Error('Invalid TOTP code'));
 
       const result = await enableTwoFactorHandler({
         data: { code: '000000', trustDevice: false },
