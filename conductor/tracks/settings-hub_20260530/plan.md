@@ -5,15 +5,15 @@
 
 **Objective:** Add `settings` jsonb column to users table, update i18n type definitions with new settings subsection keys, add translation values to locale files.
 
-- [ ] Task: Add `settings` jsonb column to users Drizzle schema
-  - [ ] Modify `src/db/schema/users.ts` — add `settings: jsonb('settings').$type<{ reducedMotion: boolean }>()`
-- [ ] Task: Update i18n type definitions for settings profile/password/appearance/accessibility sections
-  - [ ] Modify `scripts/generate-i18n-types.ts` — add nested keys under `settings.profile` (title, nameLabel, emailLabel, avatarLabel, saveName, nameSuccess, nameError), `settings.password` (title, description, currentPassword, newPassword, confirmPassword, changePassword, passwordSuccess, passwordError, passwordMinLength, passwordMismatch), `settings.appearance` (title, description, languageLabel, themeLabel), `settings.accessibility` (title, description, reducedMotionLabel, reducedMotionHint)
-  - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
-- [ ] Task: Add translation values to English locale file
-  - [ ] Modify `locales/en.json` — add new keys under `settings` section
-- [ ] Task: Add matching translation values to Indonesian locale file
-  - [ ] Modify `locales/id.json` — add matching keys under `settings` section
+- [x] Task: Add `settings` jsonb column to users Drizzle schema `ee5455c`
+  - [x] Modify `src/db/schema/users.ts` — add `settings: jsonb('settings').$type<{ reducedMotion: boolean }>()`
+- [x] Task: Update i18n type definitions for settings profile/password/appearance/accessibility sections `ee5455c`
+  - [x] Modify `scripts/generate-i18n-types.ts` — add nested keys under `settings.profile` (title, nameLabel, emailLabel, avatarLabel, saveName, nameSuccess, nameError), `settings.password` (title, description, currentPassword, newPassword, confirmPassword, changePassword, passwordSuccess, passwordError, passwordMinLength, passwordMismatch), `settings.appearance` (title, description, languageLabel, themeLabel), `settings.accessibility` (title, description, reducedMotionLabel, reducedMotionHint)
+  - [x] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
+- [x] Task: Add translation values to English locale file `ee5455c`
+  - [x] Modify `locales/en.json` — add new keys under `settings` section
+- [x] Task: Add matching translation values to Indonesian locale file `ee5455c`
+  - [x] Modify `locales/id.json` — add matching keys under `settings` section
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Database Schema, i18n Types & Dependencies' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions
