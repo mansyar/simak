@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import QRCode from 'react-qr-code';
+import { QRCodeSVG } from 'qrcode.react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,14 +14,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Shield, ShieldOff, Copy, RefreshCw, Download } from 'lucide-react';
+import { Shield, ShieldOff, RefreshCw } from 'lucide-react';
 import {
   getTwoFactorStatus,
   generateTwoFactorSetup,
   enableTwoFactor,
   disableTwoFactor,
-  getBackupCodes,
-  regenerateBackupCodes,
 } from '@/server/two-factor';
 import { useI18n } from '@/routes/__root';
 
@@ -31,7 +29,6 @@ export function TwoFactorSettings() {
 
   const [isEnableDialogOpen, setIsEnableDialogOpen] = useState(false);
   const [isDisableDialogOpen, setIsDisableDialogOpen] = useState(false);
-  const [isBackupCodesDialogOpen, setIsBackupCodesDialogOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [totpCode, setTotpCode] = useState('');
   const [totpUri, setTotpUri] = useState('');
@@ -47,17 +44,6 @@ export function TwoFactorSettings() {
       )({ data: {} });
       return result as { enabled: boolean };
     },
-  });
-
-  const { data: backupCodesData } = useQuery({
-    queryKey: ['backupCodes'],
-    queryFn: async () => {
-      const result = await (
-        getBackupCodes as unknown as (args: { data: Record<string, never> }) => Promise<unknown>
-      )({ data: {} });
-      return result as { backupCodes: string | null };
-    },
-    enabled: statusData?.enabled ?? false,
   });
 
   const generateSetupMutation = useMutation({
@@ -120,37 +106,12 @@ export function TwoFactorSettings() {
         return;
       }
       queryClient.invalidateQueries({ queryKey: ['twoFactorStatus'] });
-      queryClient.invalidateQueries({ queryKey: ['backupCodes'] });
       setIsDisableDialogOpen(false);
       setPassword('');
       setError('');
     },
     onError: () => {
       setError(t('settings.twoFactor.disableError'));
-    },
-  });
-
-  const regenerateMutation = useMutation({
-    mutationFn: async (pwd: string) => {
-      const result = await (
-        regenerateBackupCodes as unknown as (args: {
-          data: { password: string };
-        }) => Promise<unknown>
-      )({ data: { password: pwd } });
-      return result as { backupCodes?: string[]; error?: string };
-    },
-    onSuccess: (data) => {
-      if (data.error) {
-        setError(data.error);
-        return;
-      }
-      setBackupCodes(data.backupCodes ?? []);
-      queryClient.invalidateQueries({ queryKey: ['backupCodes'] });
-      setPassword('');
-      setError('');
-    },
-    onError: () => {
-      setError(t('settings.twoFactor.regenerateError'));
     },
   });
 
@@ -175,26 +136,7 @@ export function TwoFactorSettings() {
     disableMutation.mutate(password);
   };
 
-  const handleRegenerate = () => {
-    regenerateMutation.mutate(password);
-  };
-
-  const copyBackupCodes = () => {
-    navigator.clipboard.writeText(backupCodes.join('\n'));
-  };
-
-  const downloadBackupCodes = () => {
-    const blob = new Blob([backupCodes.join('\n')], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'simak-backup-codes.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   const is2FAEnabled = statusData?.enabled ?? false;
-  const currentBackupCodes = backupCodesData?.backupCodes?.split(',') ?? [];
 
   if (statusLoading) {
     return (
@@ -222,11 +164,6 @@ export function TwoFactorSettings() {
               <Badge variant={is2FAEnabled ? 'default' : 'secondary'}>
                 {is2FAEnabled ? t('settings.twoFactor.enabled') : t('settings.twoFactor.disabled')}
               </Badge>
-              {is2FAEnabled && currentBackupCodes.length > 0 && (
-                <Button variant="ghost" size="sm" onClick={() => setIsBackupCodesDialogOpen(true)}>
-                  {t('settings.twoFactor.viewBackupCodes')}
-                </Button>
-              )}
             </div>
             <div className="flex gap-2">
               {is2FAEnabled ? (
@@ -285,8 +222,14 @@ export function TwoFactorSettings() {
           {setupStep === 'qr' && (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">{t('settings.twoFactor.scanQR')}</p>
-              <div className="flex justify-center p-4 bg-white rounded-lg">
-                <QRCode value={totpUri} size={200} />
+              <div className="flex justify-center p-6 bg-white rounded-lg">
+                <QRCodeSVG
+                  value={totpUri}
+                  size={224}
+                  level="M"
+                  bgColor="#FFFFFF"
+                  fgColor="#000000"
+                />
               </div>
               <Button
                 variant="outline"
@@ -407,83 +350,6 @@ export function TwoFactorSettings() {
             >
               {disableMutation.isPending && <RefreshCw className="h-4 w-4 animate-spin mr-2" />}
               {t('settings.twoFactor.disable')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Backup Codes Dialog */}
-      <Dialog
-        open={isBackupCodesDialogOpen}
-        onOpenChange={(open) => {
-          setIsBackupCodesDialogOpen(open);
-          if (!open) {
-            setPassword('');
-            setError('');
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t('settings.twoFactor.backupCodesTitle')}</DialogTitle>
-            <DialogDescription>{t('settings.twoFactor.backupCodesDescription')}</DialogDescription>
-          </DialogHeader>
-
-          {error && (
-            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>
-          )}
-
-          <div className="p-3 bg-muted rounded-md font-mono text-xs space-y-1">
-            {currentBackupCodes.map((code, i) => (
-              <div key={i}>{code}</div>
-            ))}
-          </div>
-
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={copyBackupCodes} className="flex-1">
-              <Copy className="h-4 w-4 mr-2" />
-              {t('settings.twoFactor.copy')}
-            </Button>
-            <Button variant="outline" size="sm" onClick={downloadBackupCodes} className="flex-1">
-              <Download className="h-4 w-4 mr-2" />
-              {t('settings.twoFactor.download')}
-            </Button>
-          </div>
-
-          <div className="space-y-2 pt-2 border-t">
-            <Label htmlFor="regenerate-password">{t('settings.twoFactor.regenerate')}</Label>
-            <div className="flex gap-2">
-              <Input
-                id="regenerate-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('settings.password')}
-              />
-              <Button
-                variant="outline"
-                onClick={handleRegenerate}
-                disabled={!password || regenerateMutation.isPending}
-              >
-                {regenerateMutation.isPending ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsBackupCodesDialogOpen(false);
-                setPassword('');
-                setError('');
-              }}
-            >
-              {t('common.close')}
             </Button>
           </DialogFooter>
         </DialogContent>

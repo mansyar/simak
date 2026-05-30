@@ -211,30 +211,6 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
 }
 
 /**
- * Get the current user's backup codes (encrypted).
- */
-export async function getBackupCodesHandler(_args: { data: GetTwoFactorStatusInput }) {
-  const session = await getSessionFromHeaders();
-  if (!session) {
-    return { error: 'Unauthorized' };
-  }
-
-  const db = getDb();
-  const record = await db
-    .select({ backupCodes: twoFactor.backupCodes })
-    .from(twoFactor)
-    .where(eq(twoFactor.userId, session.user.id))
-    .limit(1)
-    .then((rows) => rows[0]);
-
-  if (!record) {
-    return { backupCodes: null };
-  }
-
-  return { backupCodes: record.backupCodes };
-}
-
-/**
  * Regenerate backup codes after password verification.
  */
 export async function regenerateBackupCodesHandler(args: { data: RegenerateBackupCodesInput }) {

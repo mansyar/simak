@@ -55,14 +55,6 @@ export const disableTwoFactor = createServerFn({ method: 'POST' }).handler(
   },
 );
 
-export const getBackupCodes = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
-    const { getBackupCodesHandler } = await import('./two-factor.server');
-    const data = GetTwoFactorStatusSchema.parse(args.data);
-    return getBackupCodesHandler({ data });
-  },
-);
-
 export const regenerateBackupCodes = createServerFn({ method: 'POST' }).handler(
   async (args: { data: unknown }) => {
     const { regenerateBackupCodesHandler } = await import('./two-factor.server');

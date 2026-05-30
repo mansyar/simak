@@ -50,9 +50,7 @@ export function SessionManagement() {
   const { data: sessionsData, isLoading } = useQuery({
     queryKey: ['activeSessions'],
     queryFn: async () => {
-      const result = await (
-        listActiveSessions as unknown as (args: { data: Record<string, never> }) => Promise<unknown>
-      )({ data: {} });
+      const result = await (listActiveSessions as unknown as () => Promise<unknown>)();
       return result as { sessions: SessionItem[]; total: number };
     },
   });

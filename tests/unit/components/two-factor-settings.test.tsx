@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-vi.mock('react-qr-code', () => ({
-  default: ({ value }: { value: string }) => <div data-testid="qr-code" data-value={value} />,
+vi.mock('qrcode.react', () => ({
+  QRCodeSVG: ({ value }: { value: string }) => <div data-testid="qr-code" data-value={value} />,
 }));
 
 vi.mock('@/lib/auth-client', () => ({
@@ -34,7 +34,6 @@ vi.mock('@/server/two-factor', () => ({
   generateTwoFactorSetup: { url: '/api/two-factor/setup' },
   enableTwoFactor: { url: '/api/two-factor/enable' },
   disableTwoFactor: { url: '/api/two-factor/disable' },
-  getBackupCodes: { url: '/api/two-factor/backup-codes' },
   regenerateBackupCodes: { url: '/api/two-factor/regenerate-codes' },
 }));
 

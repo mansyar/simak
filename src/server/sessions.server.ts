@@ -1,7 +1,7 @@
 // Server-only handlers for session management (not imported by client code)
 import { eq, and, ne } from 'drizzle-orm';
 import { getDb } from '../db/index';
-import { session } from '../db/schema/index';
+import { session as sessionTable } from '../db/schema/index';
 import { logAuditEvent } from '../lib/audit';
 import { getSessionFromHeaders } from './auth';
 import type { z } from 'zod';
@@ -42,15 +42,15 @@ function parseUserAgent(ua: string | null): {
 export async function listActiveSessionsHandler() {
   const session_ = await getSessionFromHeaders();
   if (!session_) {
-    return { sessions: [], total: 0 };
+    return { error: 'Unauthorized' };
   }
 
   const db = getDb();
   const sessions = await db
     .select()
-    .from(session)
-    .where(eq(session.userId, session_.user.id))
-    .orderBy(session.createdAt);
+    .from(sessionTable)
+    .where(eq(sessionTable.userId, session_.user.id))
+    .orderBy(sessionTable.createdAt);
 
   const enriched = sessions.map((s) => ({
     id: s.id,
@@ -78,8 +78,10 @@ export async function revokeSessionHandler(args: { data: RevokeSessionInput }) {
   try {
     const db = getDb();
     await db
-      .delete(session)
-      .where(and(eq(session.id, args.data.sessionId), eq(session.userId, session_.user.id)));
+      .delete(sessionTable)
+      .where(
+        and(eq(sessionTable.id, args.data.sessionId), eq(sessionTable.userId, session_.user.id)),
+      );
 
     await logAuditEvent({
       actorId: session_.user.id,
@@ -103,8 +105,10 @@ export async function revokeAllOtherSessionsHandler() {
   try {
     const db = getDb();
     const result = await db
-      .delete(session)
-      .where(and(eq(session.userId, session_.user.id), ne(session.id, session_.session.id)));
+      .delete(sessionTable)
+      .where(
+        and(eq(sessionTable.userId, session_.user.id), ne(sessionTable.id, session_.session.id)),
+      );
 
     const revokedCount = (result as { rowCount?: number })?.rowCount ?? 0;
 

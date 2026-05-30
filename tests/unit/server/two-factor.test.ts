@@ -4,7 +4,6 @@ import {
   generateTwoFactorSetupHandler,
   enableTwoFactorHandler,
   disableTwoFactorHandler,
-  getBackupCodesHandler,
   regenerateBackupCodesHandler,
   getTwoFactorStatusHandler,
 } from '@/server/two-factor.server';
@@ -271,42 +270,6 @@ describe('Two-factor server functions', () => {
       });
 
       expect(result).toEqual({ error: 'Wrong password' });
-    });
-  });
-
-  // ─── getBackupCodesHandler ───────────────────────────────────
-
-  describe('getBackupCodesHandler', () => {
-    it('should return Unauthorized when no session', async () => {
-      vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(null);
-
-      const result = await getBackupCodesHandler({ data: {} });
-
-      expect(result).toEqual({ error: 'Unauthorized' });
-    });
-
-    it('should return backup codes from database', async () => {
-      vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
-
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ backupCodes: 'encrypted-codes-here' }]).then(onfulfilled),
-      );
-
-      const result = await getBackupCodesHandler({ data: {} });
-
-      expect(result).toEqual({ backupCodes: 'encrypted-codes-here' });
-    });
-
-    it('should return null backupCodes when no 2FA record', async () => {
-      vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
-
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
-
-      const result = await getBackupCodesHandler({ data: {} });
-
-      expect(result).toEqual({ backupCodes: null });
     });
   });
 

@@ -67,7 +67,7 @@ describe('listActiveSessionsHandler', () => {
   it('should return unauthorized when no session', async () => {
     mockGetSessionFromHeaders.mockResolvedValue(null);
     const result = await listActiveSessionsHandler();
-    expect(result).toEqual({ sessions: [], total: 0 });
+    expect(result).toEqual({ error: 'Unauthorized' });
   });
 
   it('should return all sessions for current user', async () => {
