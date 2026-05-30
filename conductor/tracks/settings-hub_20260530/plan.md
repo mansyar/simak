@@ -16,7 +16,7 @@
   - [x] Modify `locales/id.json` — add matching keys under `settings` section
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Database Schema, i18n Types & Dependencies' (Protocol in workflow.md)
 
-## Phase 2: Server Functions
+## Phase 2: Server Functions [checkpoint: 085eb0d]
 
 **Objective:** Implement all server-side handlers with Zod validation and tests.
 
