@@ -67,7 +67,7 @@
   - [x] Run `CI=true pnpm test` and confirm all tests pass (1356 passed, 151 files)
 - [ ] Task: Conductor - User Manual Verification 'Background Processor' (Protocol in workflow.md)
 
-## Phase 4: Admin Dashboard Widget & i18n
+## Phase 4: Admin Dashboard Widget & i18n [checkpoint: 0026718]
 
 - [x] Task: Add email queue status query to admin dashboard handler (65e4401)
   - [x] In `src/server/dashboard-admin.server.ts`, add query to count pending/sent/failed
