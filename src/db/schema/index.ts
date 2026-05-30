@@ -10,6 +10,7 @@ export * from './consultations';
 export * from './notifications';
 export * from './audit-log';
 export * from './extensions';
+export * from './email-queue';
 
 // Import tables for relations
 import { users } from './users';
@@ -20,6 +21,7 @@ import { submissions, reviews } from './submissions';
 import { consultations } from './consultations';
 import { notifications } from './notifications';
 import { extensionRequests } from './extensions';
+import { emailQueue } from './email-queue';
 
 // ---- Relations ----
 
@@ -149,6 +151,8 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const emailQueueRelations = relations(emailQueue, () => ({}));
 
 export const extensionRequestsRelations = relations(extensionRequests, ({ one }) => ({
   assignment: one(assignments, {
