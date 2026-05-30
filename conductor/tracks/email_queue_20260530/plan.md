@@ -40,7 +40,7 @@
 
 ## Phase 3: Background Processor
 
-- [x] Task: Create email queue processor module (`src/lib/email-queue-processor.ts`)
+- [x] Task: Create email queue processor module (`src/lib/email-queue-processor.ts`) (06689ba)
   - [x] Implement `processEmailQueue()` function:
     - [x] Query pending emails ordered by `created_at ASC`
     - [x] For each: attempt Resend via shared `sendEmailWithResend()`
@@ -52,7 +52,7 @@
     - [x] Attempt 1 → 2: min 30s since last_attempt_at
     - [x] Attempt 2 → 3: min 5min since last_attempt_at
     - [x] Attempt 3 → fail: min 30min since last_attempt_at
-- [x] Task: Wire processor into server startup
+- [x] Task: Wire processor into server startup (06689ba)
   - [x] Create `src/lib/email-queue-init.ts` that starts a `setInterval` at 30s
   - [x] Import and call init from the app entry point (via `import.meta.env.SSR` in `src/router.tsx`)
   - [x] Handle graceful cleanup (clearInterval on server shutdown)
