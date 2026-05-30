@@ -58,8 +58,9 @@ export async function processEmailQueue(): Promise<{
     processed++;
 
     try {
+      const fromAddr = process.env.EMAIL_FROM || 'SIMAK <noreply@simak.app>';
       const result = await resend.emails.send({
-        from: 'SIMAK <noreply@simak.app>',
+        from: fromAddr,
         to: email.recipientEmail,
         subject: email.subject,
         html: email.bodyHtml,
