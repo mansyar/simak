@@ -23,18 +23,25 @@ vi.mock('@/routes/__root', () => ({
       return translations[key] || key;
     },
     locale: 'en',
-    setLocale: vi.fn(),
+    setLocale: mockSetLocale,
   }),
 }));
+
+const mockSetLocale = vi.fn();
+const mockToggleTheme = vi.fn();
 
 vi.mock('@/hooks/use-theme', () => ({
   useTheme: () => ({
     theme: 'light',
-    toggleTheme: vi.fn(),
+    toggleTheme: mockToggleTheme,
   }),
 }));
 
 describe('AppearanceSection', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should render language and theme labels', () => {
     render(<AppearanceSection />);
 
@@ -54,5 +61,32 @@ describe('AppearanceSection', () => {
 
     const themeButton = screen.getByLabelText('Toggle theme');
     expect(themeButton).toBeDefined();
+  });
+
+  it('should call setLocale with "id" when ID button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<AppearanceSection />);
+
+    await user.click(screen.getByText('ID'));
+
+    expect(mockSetLocale).toHaveBeenCalledWith('id');
+  });
+
+  it('should call setLocale with "en" when EN button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<AppearanceSection />);
+
+    await user.click(screen.getByText('EN'));
+
+    expect(mockSetLocale).toHaveBeenCalledWith('en');
+  });
+
+  it('should call toggleTheme when theme button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<AppearanceSection />);
+
+    await user.click(screen.getByLabelText('Toggle theme'));
+
+    expect(mockToggleTheme).toHaveBeenCalledOnce();
   });
 });
