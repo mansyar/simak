@@ -13,7 +13,6 @@ import { Route as UnauthenticatedRouteImport } from './routes/_unauthenticated'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedStudentRouteImport } from './routes/_authenticated/student'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedInstructorRouteImport } from './routes/_authenticated/instructor'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -23,8 +22,11 @@ import { Route as UnauthenticatedAuthSetupPasswordRouteImport } from './routes/_
 import { Route as UnauthenticatedAuthResetPasswordRouteImport } from './routes/_unauthenticated/auth/reset-password'
 import { Route as UnauthenticatedAuthLoginRouteImport } from './routes/_unauthenticated/auth/login'
 import { Route as UnauthenticatedAuthForgotPasswordRouteImport } from './routes/_unauthenticated/auth/forgot-password'
+import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated/student/settings'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated/student/dashboard'
+import { Route as AuthenticatedInstructorSettingsRouteImport } from './routes/_authenticated/instructor/settings'
 import { Route as AuthenticatedInstructorDashboardRouteImport } from './routes/_authenticated/instructor/dashboard'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminAuditLogRouteImport } from './routes/_authenticated/admin/audit-log'
 import { Route as AuthenticatedStudentAssignmentsIndexRouteImport } from './routes/_authenticated/student/assignments/index'
@@ -54,11 +56,6 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedStudentRoute = AuthenticatedStudentRouteImport.update({
   id: '/student',
   path: '/student',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedInstructorRoute = AuthenticatedInstructorRouteImport.update({
@@ -112,17 +109,35 @@ const UnauthenticatedAuthForgotPasswordRoute =
     path: '/auth/forgot-password',
     getParentRoute: () => UnauthenticatedRoute,
   } as any)
+const AuthenticatedStudentSettingsRoute =
+  AuthenticatedStudentSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
 const AuthenticatedStudentDashboardRoute =
   AuthenticatedStudentDashboardRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
+const AuthenticatedInstructorSettingsRoute =
+  AuthenticatedInstructorSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedInstructorRoute,
+  } as any)
 const AuthenticatedInstructorDashboardRoute =
   AuthenticatedInstructorDashboardRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
     getParentRoute: () => AuthenticatedInstructorRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminDashboardRoute =
   AuthenticatedAdminDashboardRouteImport.update({
@@ -201,12 +216,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
-  '/settings': typeof AuthenticatedSettingsRoute
   '/student': typeof AuthenticatedStudentRouteWithChildren
   '/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
+  '/instructor/settings': typeof AuthenticatedInstructorSettingsRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
@@ -229,12 +246,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
-  '/settings': typeof AuthenticatedSettingsRoute
   '/student': typeof AuthenticatedStudentRouteWithChildren
   '/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
+  '/instructor/settings': typeof AuthenticatedInstructorSettingsRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
@@ -260,12 +279,14 @@ export interface FileRoutesById {
   '/_unauthenticated': typeof UnauthenticatedRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/instructor': typeof AuthenticatedInstructorRouteWithChildren
-  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
   '/_authenticated/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
+  '/_authenticated/instructor/settings': typeof AuthenticatedInstructorSettingsRoute
   '/_authenticated/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/_unauthenticated/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/_unauthenticated/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/_unauthenticated/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
@@ -290,12 +311,14 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/instructor'
-    | '/settings'
     | '/student'
     | '/admin/audit-log'
     | '/admin/dashboard'
+    | '/admin/settings'
     | '/instructor/dashboard'
+    | '/instructor/settings'
     | '/student/dashboard'
+    | '/student/settings'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -318,12 +341,14 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/instructor'
-    | '/settings'
     | '/student'
     | '/admin/audit-log'
     | '/admin/dashboard'
+    | '/admin/settings'
     | '/instructor/dashboard'
+    | '/instructor/settings'
     | '/student/dashboard'
+    | '/student/settings'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
@@ -348,12 +373,14 @@ export interface FileRouteTypes {
     | '/_unauthenticated'
     | '/_authenticated/admin'
     | '/_authenticated/instructor'
-    | '/_authenticated/settings'
     | '/_authenticated/student'
     | '/_authenticated/admin/audit-log'
     | '/_authenticated/admin/dashboard'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/instructor/dashboard'
+    | '/_authenticated/instructor/settings'
     | '/_authenticated/student/dashboard'
+    | '/_authenticated/student/settings'
     | '/_unauthenticated/auth/forgot-password'
     | '/_unauthenticated/auth/login'
     | '/_unauthenticated/auth/reset-password'
@@ -408,13 +435,6 @@ declare module '@tanstack/react-router' {
       path: '/student'
       fullPath: '/student'
       preLoaderRoute: typeof AuthenticatedStudentRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/instructor': {
@@ -480,6 +500,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnauthenticatedAuthForgotPasswordRouteImport
       parentRoute: typeof UnauthenticatedRoute
     }
+    '/_authenticated/student/settings': {
+      id: '/_authenticated/student/settings'
+      path: '/settings'
+      fullPath: '/student/settings'
+      preLoaderRoute: typeof AuthenticatedStudentSettingsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
     '/_authenticated/student/dashboard': {
       id: '/_authenticated/student/dashboard'
       path: '/dashboard'
@@ -487,12 +514,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentDashboardRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
+    '/_authenticated/instructor/settings': {
+      id: '/_authenticated/instructor/settings'
+      path: '/settings'
+      fullPath: '/instructor/settings'
+      preLoaderRoute: typeof AuthenticatedInstructorSettingsRouteImport
+      parentRoute: typeof AuthenticatedInstructorRoute
+    }
     '/_authenticated/instructor/dashboard': {
       id: '/_authenticated/instructor/dashboard'
       path: '/dashboard'
       fullPath: '/instructor/dashboard'
       preLoaderRoute: typeof AuthenticatedInstructorDashboardRouteImport
       parentRoute: typeof AuthenticatedInstructorRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/dashboard': {
       id: '/_authenticated/admin/dashboard'
@@ -584,6 +625,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAuditLogRoute: typeof AuthenticatedAdminAuditLogRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminTemplatesIndexRoute: typeof AuthenticatedAdminTemplatesIndexRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -591,6 +633,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAuditLogRoute: AuthenticatedAdminAuditLogRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminTemplatesIndexRoute: AuthenticatedAdminTemplatesIndexRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
@@ -600,6 +643,7 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedInstructorRouteChildren {
   AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
+  AuthenticatedInstructorSettingsRoute: typeof AuthenticatedInstructorSettingsRoute
   AuthenticatedInstructorAssignmentsIdRoute: typeof AuthenticatedInstructorAssignmentsIdRoute
   AuthenticatedInstructorAssignmentsNewRoute: typeof AuthenticatedInstructorAssignmentsNewRoute
   AuthenticatedInstructorReviewsSubmissionIdRoute: typeof AuthenticatedInstructorReviewsSubmissionIdRoute
@@ -611,6 +655,7 @@ const AuthenticatedInstructorRouteChildren: AuthenticatedInstructorRouteChildren
   {
     AuthenticatedInstructorDashboardRoute:
       AuthenticatedInstructorDashboardRoute,
+    AuthenticatedInstructorSettingsRoute: AuthenticatedInstructorSettingsRoute,
     AuthenticatedInstructorAssignmentsIdRoute:
       AuthenticatedInstructorAssignmentsIdRoute,
     AuthenticatedInstructorAssignmentsNewRoute:
@@ -645,12 +690,14 @@ const AuthenticatedStudentAssignmentsIdRouteWithChildren =
 
 interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
+  AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
   AuthenticatedStudentAssignmentsIdRoute: typeof AuthenticatedStudentAssignmentsIdRouteWithChildren
   AuthenticatedStudentAssignmentsIndexRoute: typeof AuthenticatedStudentAssignmentsIndexRoute
 }
 
 const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
+  AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
   AuthenticatedStudentAssignmentsIdRoute:
     AuthenticatedStudentAssignmentsIdRouteWithChildren,
   AuthenticatedStudentAssignmentsIndexRoute:
@@ -663,14 +710,12 @@ const AuthenticatedStudentRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedInstructorRoute: typeof AuthenticatedInstructorRouteWithChildren
-  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedStudentRoute: typeof AuthenticatedStudentRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedInstructorRoute: AuthenticatedInstructorRouteWithChildren,
-  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedStudentRoute: AuthenticatedStudentRouteWithChildren,
 }
 

@@ -1,6 +1,6 @@
 import { useLocation, Link, useRouter } from '@tanstack/react-router';
 import { useI18n } from '../../routes/__root';
-import { LayoutDashboard, ClipboardList, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Settings, LogOut, X } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 
 interface StudentSidebarProps {
@@ -16,6 +16,7 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
   const links = [
     { to: '/student/dashboard', label: 'nav.dashboard', icon: LayoutDashboard },
     { to: '/student/assignments', label: 'nav.assignments', icon: ClipboardList },
+    { to: '/student/settings', label: 'nav.settings', icon: Settings },
   ] as const;
 
   const handleLogout = async () => {
