@@ -22,7 +22,17 @@
     "setupSuccess": "Kata sandi berhasil diatur! Anda sekarang dapat masuk.",
     "resetSuccess": "Kata sandi berhasil diatur ulang! Silakan masuk dengan kata sandi baru Anda.",
     "checkYourEmail": "Cek email Anda",
-    "forgotPasswordSent": "Jika akun dengan email tersebut ada, kami telah mengirimkan tautan pengaturan ulang kata sandi."
+    "forgotPasswordSent": "Jika akun dengan email tersebut ada, kami telah mengirimkan tautan pengaturan ulang kata sandi.",
+    "verifyTwoFactor": "Verifikasi Autentikasi Dua Faktor",
+    "verifyTwoFactorDescription": "Masukkan kode 6 digit dari aplikasi autentikator Anda",
+    "totpCode": "Kode Verifikasi",
+    "invalidCode": "Kode verifikasi tidak valid. Silakan coba lagi.",
+    "useBackupCode": "Gunakan kode cadangan",
+    "verifyBackupCode": "Verifikasi Kode Cadangan",
+    "verifyBackupCodeDescription": "Masukkan salah satu kode cadangan Anda untuk memverifikasi identitas",
+    "backupCode": "Kode Cadangan",
+    "invalidBackupCode": "Kode cadangan tidak valid. Silakan coba lagi.",
+    "useTotpCode": "Gunakan kode autentikator"
   },
   "nav": {
     "dashboard": "Dasbor",
@@ -67,6 +77,7 @@
     "goToDashboard": "Ke Dasbor",
     "emailPlaceholder": "contoh@email.com",
     "namePlaceholder": "John Doe",
+    "verify": "Verifikasi",
     "searchByName": "Cari templat berdasarkan nama atau tipe...",
     "noSearchResults": "Tidak ada {items} yang ditemukan.",
     "typeDeleteToConfirm": "Ketik DELETE untuk mengonfirmasi",

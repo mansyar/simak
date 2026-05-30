@@ -34,6 +34,10 @@ vi.mock('@/lib/auth-client', () => ({
     },
     requestPasswordReset: vi.fn(),
     resetPassword: vi.fn(),
+    twoFactor: {
+      verifyTotp: vi.fn(),
+      verifyBackupCode: vi.fn(),
+    },
   },
 }));
 
@@ -111,6 +115,30 @@ describe('Auth Routes', () => {
     it('should have validateSearch in route config', async () => {
       const { Route } = await import('@/routes/_unauthenticated/auth/setup-password');
       expect(Route).toHaveProperty('validateSearch');
+    });
+  });
+
+  describe('Verify 2FA Page', () => {
+    it('should export Route', async () => {
+      const { Route } = await import('@/routes/_unauthenticated/auth/verify-2fa');
+      expect(Route).toBeDefined();
+    });
+
+    it('should have component in route config', async () => {
+      const { Route } = await import('@/routes/_unauthenticated/auth/verify-2fa');
+      expect(Route).toHaveProperty('component');
+    });
+  });
+
+  describe('Verify Backup Code Page', () => {
+    it('should export Route', async () => {
+      const { Route } = await import('@/routes/_unauthenticated/auth/verify-backup-code');
+      expect(Route).toBeDefined();
+    });
+
+    it('should have component in route config', async () => {
+      const { Route } = await import('@/routes/_unauthenticated/auth/verify-backup-code');
+      expect(Route).toHaveProperty('component');
     });
   });
 });

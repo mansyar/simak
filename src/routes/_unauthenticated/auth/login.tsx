@@ -28,7 +28,13 @@ function LoginPage() {
       if (result.error) {
         setError(result.error.message ?? t('auth.invalidCredentials'));
       } else {
-        router.invalidate();
+        // Check if 2FA redirect is required
+        const data = result.data as { twoFactorRedirect?: boolean } | undefined;
+        if (data?.twoFactorRedirect) {
+          router.navigate({ to: '/auth/verify-2fa' as never });
+        } else {
+          router.invalidate();
+        }
       }
     } catch {
       setError(t('common.error'));

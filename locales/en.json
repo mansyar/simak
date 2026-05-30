@@ -22,7 +22,17 @@
     "setupSuccess": "Password set successfully! You can now log in.",
     "resetSuccess": "Password reset successfully! Please log in with your new password.",
     "checkYourEmail": "Check your email",
-    "forgotPasswordSent": "If an account exists with that email, we've sent a password reset link."
+    "forgotPasswordSent": "If an account exists with that email, we've sent a password reset link.",
+    "verifyTwoFactor": "Verify Two-Factor Authentication",
+    "verifyTwoFactorDescription": "Enter the 6-digit code from your authenticator app",
+    "totpCode": "Verification Code",
+    "invalidCode": "Invalid verification code. Please try again.",
+    "useBackupCode": "Use a backup code instead",
+    "verifyBackupCode": "Verify Backup Code",
+    "verifyBackupCodeDescription": "Enter one of your backup codes to verify your identity",
+    "backupCode": "Backup Code",
+    "invalidBackupCode": "Invalid backup code. Please try again.",
+    "useTotpCode": "Use an authenticator code instead"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -67,6 +77,7 @@
     "goToDashboard": "Go to Dashboard",
     "emailPlaceholder": "you@example.com",
     "namePlaceholder": "John Doe",
+    "verify": "Verify",
     "searchByName": "Search templates by name or type...",
     "noSearchResults": "No {items} found matching your search.",
     "typeDeleteToConfirm": "Type DELETE to confirm",

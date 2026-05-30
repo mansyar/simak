@@ -16,6 +16,8 @@ import { Route as AuthenticatedStudentRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedInstructorRouteImport } from './routes/_authenticated/instructor'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as UnauthenticatedAuthVerifyBackupCodeRouteImport } from './routes/_unauthenticated/auth/verify-backup-code'
+import { Route as UnauthenticatedAuthVerify2faRouteImport } from './routes/_unauthenticated/auth/verify-2fa'
 import { Route as UnauthenticatedAuthSetupPasswordRouteImport } from './routes/_unauthenticated/auth/setup-password'
 import { Route as UnauthenticatedAuthResetPasswordRouteImport } from './routes/_unauthenticated/auth/reset-password'
 import { Route as UnauthenticatedAuthLoginRouteImport } from './routes/_unauthenticated/auth/login'
@@ -68,6 +70,18 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UnauthenticatedAuthVerifyBackupCodeRoute =
+  UnauthenticatedAuthVerifyBackupCodeRouteImport.update({
+    id: '/auth/verify-backup-code',
+    path: '/auth/verify-backup-code',
+    getParentRoute: () => UnauthenticatedRoute,
+  } as any)
+const UnauthenticatedAuthVerify2faRoute =
+  UnauthenticatedAuthVerify2faRouteImport.update({
+    id: '/auth/verify-2fa',
+    path: '/auth/verify-2fa',
+    getParentRoute: () => UnauthenticatedRoute,
+  } as any)
 const UnauthenticatedAuthSetupPasswordRoute =
   UnauthenticatedAuthSetupPasswordRouteImport.update({
     id: '/auth/setup-password',
@@ -190,6 +204,8 @@ export interface FileRoutesByFullPath {
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/auth/setup-password': typeof UnauthenticatedAuthSetupPasswordRoute
+  '/auth/verify-2fa': typeof UnauthenticatedAuthVerify2faRoute
+  '/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
@@ -215,6 +231,8 @@ export interface FileRoutesByTo {
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/auth/setup-password': typeof UnauthenticatedAuthSetupPasswordRoute
+  '/auth/verify-2fa': typeof UnauthenticatedAuthVerify2faRoute
+  '/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
@@ -243,6 +261,8 @@ export interface FileRoutesById {
   '/_unauthenticated/auth/login': typeof UnauthenticatedAuthLoginRoute
   '/_unauthenticated/auth/reset-password': typeof UnauthenticatedAuthResetPasswordRoute
   '/_unauthenticated/auth/setup-password': typeof UnauthenticatedAuthSetupPasswordRoute
+  '/_unauthenticated/auth/verify-2fa': typeof UnauthenticatedAuthVerify2faRoute
+  '/_unauthenticated/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/_authenticated/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
@@ -270,6 +290,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/setup-password'
+    | '/auth/verify-2fa'
+    | '/auth/verify-backup-code'
     | '/api/auth/$'
     | '/instructor/assignments/$id'
     | '/instructor/assignments/new'
@@ -295,6 +317,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/reset-password'
     | '/auth/setup-password'
+    | '/auth/verify-2fa'
+    | '/auth/verify-backup-code'
     | '/api/auth/$'
     | '/instructor/assignments/$id'
     | '/instructor/assignments/new'
@@ -322,6 +346,8 @@ export interface FileRouteTypes {
     | '/_unauthenticated/auth/login'
     | '/_unauthenticated/auth/reset-password'
     | '/_unauthenticated/auth/setup-password'
+    | '/_unauthenticated/auth/verify-2fa'
+    | '/_unauthenticated/auth/verify-backup-code'
     | '/api/auth/$'
     | '/_authenticated/instructor/assignments/$id'
     | '/_authenticated/instructor/assignments/new'
@@ -392,6 +418,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_unauthenticated/auth/verify-backup-code': {
+      id: '/_unauthenticated/auth/verify-backup-code'
+      path: '/auth/verify-backup-code'
+      fullPath: '/auth/verify-backup-code'
+      preLoaderRoute: typeof UnauthenticatedAuthVerifyBackupCodeRouteImport
+      parentRoute: typeof UnauthenticatedRoute
+    }
+    '/_unauthenticated/auth/verify-2fa': {
+      id: '/_unauthenticated/auth/verify-2fa'
+      path: '/auth/verify-2fa'
+      fullPath: '/auth/verify-2fa'
+      preLoaderRoute: typeof UnauthenticatedAuthVerify2faRouteImport
+      parentRoute: typeof UnauthenticatedRoute
     }
     '/_unauthenticated/auth/setup-password': {
       id: '/_unauthenticated/auth/setup-password'
@@ -622,6 +662,8 @@ interface UnauthenticatedRouteChildren {
   UnauthenticatedAuthLoginRoute: typeof UnauthenticatedAuthLoginRoute
   UnauthenticatedAuthResetPasswordRoute: typeof UnauthenticatedAuthResetPasswordRoute
   UnauthenticatedAuthSetupPasswordRoute: typeof UnauthenticatedAuthSetupPasswordRoute
+  UnauthenticatedAuthVerify2faRoute: typeof UnauthenticatedAuthVerify2faRoute
+  UnauthenticatedAuthVerifyBackupCodeRoute: typeof UnauthenticatedAuthVerifyBackupCodeRoute
 }
 
 const UnauthenticatedRouteChildren: UnauthenticatedRouteChildren = {
@@ -630,6 +672,9 @@ const UnauthenticatedRouteChildren: UnauthenticatedRouteChildren = {
   UnauthenticatedAuthLoginRoute: UnauthenticatedAuthLoginRoute,
   UnauthenticatedAuthResetPasswordRoute: UnauthenticatedAuthResetPasswordRoute,
   UnauthenticatedAuthSetupPasswordRoute: UnauthenticatedAuthSetupPasswordRoute,
+  UnauthenticatedAuthVerify2faRoute: UnauthenticatedAuthVerify2faRoute,
+  UnauthenticatedAuthVerifyBackupCodeRoute:
+    UnauthenticatedAuthVerifyBackupCodeRoute,
 }
 
 const UnauthenticatedRouteWithChildren = UnauthenticatedRoute._addFileChildren(

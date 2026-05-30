@@ -38,13 +38,12 @@
 
 ### Tasks
 
-- [ ] Modify login flow to detect 2FA requirement after password verification
-- [ ] Create `/auth/verify-2fa` route with TOTP code input
-- [ ] Create `/auth/verify-backup-code` route for backup code fallback
-- [ ] Implement server function to verify TOTP code
-- [ ] Implement server function to verify backup code
-- [ ] Handle failed attempts with appropriate error messages
-- [ ] Write unit tests for 2FA verification handlers
+- [x] Add `twoFactorClient` plugin to auth client config
+- [x] Modify login flow to detect 2FA requirement after password verification
+- [x] Create `/auth/verify-2fa` route with TOTP code input
+- [x] Create `/auth/verify-backup-code` route for backup code fallback
+- [x] Handle failed attempts with appropriate error messages
+- [x] Write unit tests for 2FA login flow
 - [ ] Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
 
 ## Phase 5: 2FA Settings UI
