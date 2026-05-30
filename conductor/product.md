@@ -219,6 +219,20 @@ Students and instructors lack a centralized system to:
 - **i18n translations** — `adminDashboard.emailQueue.{pending,sent,failed}` in EN and ID locales
 - **Tests** — Schema tests, enqueue mock tests, processor tests (9 tests), admin handler + component rendering tests
 
+### Track 3.1: Two-Factor Authentication & Session Management (May 2026)
+
+- **TOTP-based 2FA** — Users enable 2FA via authenticator app (QR code scanning)
+- **Backup codes** — 8 single-use cryptographically random codes
+- **2FA login flow** — Dedicated 2FA page; TOTP input; backup code fallback
+- **Disable 2FA** — Password confirmation required
+- **Session management** — Active sessions list with device, IP, timestamp
+- **Session revocation** — Revoke specific or all other sessions
+- **Email notifications** — Sent on 2FA enable/disable
+- **Settings page** (`/settings`) — 2FA and session management cards
+- **Audit logging** — All 2FA and session actions logged
+- **i18n** — Full EN and ID translations
+- **Tests** — Server handler, component, i18n codegen tests
+
 ### Track 1.3: Deadline Extension Workflow (May 2026)
 
 - **New `extension_requests` database table** — Tracks student-submitted extension requests with category (personal/research/health/other), reason, duration, status (pending/approved/rejected), and resolution metadata
