@@ -551,5 +551,39 @@
     "categoryOther": "Lainnya",
     "maxExtensionsReached": "Maksimal {count} perpanjangan diizinkan. Anda telah menggunakan {used}.",
     "daysExceeded": "Hari perpanjangan tidak boleh melebihi {max} untuk tugas ini."
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "twoFactor": {
+      "title": "Autentikasi Dua Faktor",
+      "description": "Tambahkan lapisan keamanan ekstra ke akun Anda dengan mewajibkan kode verifikasi dari aplikasi autentikator.",
+      "enabled": "Aktif",
+      "disabled": "Nonaktif",
+      "enable": "Aktifkan 2FA",
+      "disable": "Nonaktifkan 2FA",
+      "enableTitle": "Aktifkan Autentikasi Dua Faktor",
+      "enableDescription": "Pindai kode QR di bawah ini dengan aplikasi autentikator Anda (Google Authenticator, Authy, dll.)",
+      "confirmPassword": "Masukkan kata sandi Anda untuk mengonfirmasi",
+      "setup": "Pengaturan",
+      "scanQR": "Pindai kode QR ini dengan aplikasi autentikator Anda",
+      "continueToVerify": "Lanjut ke Verifikasi",
+      "enterCode": "Masukkan kode 6 digit dari aplikasi autentikator Anda",
+      "totpCode": "Kode Verifikasi",
+      "verify": "Verifikasi",
+      "setupError": "Gagal mengatur 2FA. Silakan coba lagi.",
+      "verifyError": "Kode verifikasi tidak valid. Silakan coba lagi.",
+      "disableTitle": "Nonaktifkan Autentikasi Dua Faktor",
+      "disableDescription": "Masukkan kata sandi Anda untuk menonaktifkan 2FA. Akun Anda akan kurang aman.",
+      "disableError": "Gagal menonaktifkan 2FA. Silakan coba lagi.",
+      "viewBackupCodes": "Lihat Kode Cadangan",
+      "backupCodesTitle": "Kode Cadangan",
+      "backupCodesDescription": "Simpan kode-kode ini di tempat yang aman. Setiap kode hanya bisa digunakan sekali.",
+      "copy": "Salin",
+      "download": "Unduh",
+      "regenerate": "Buat Ulang Kode",
+      "regenerateError": "Gagal membuat ulang kode cadangan. Silakan coba lagi.",
+      "saveBackupCodes": "Simpan Kode Cadangan"
+    },
+    "password": "Kata Sandi"
   }
 }

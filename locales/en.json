@@ -551,5 +551,39 @@
     "categoryOther": "Other",
     "maxExtensionsReached": "Maximum {count} extension(s) allowed. You have used {used}.",
     "daysExceeded": "Extension days cannot exceed {max} for this assignment."
+  },
+  "settings": {
+    "title": "Settings",
+    "twoFactor": {
+      "title": "Two-Factor Authentication",
+      "description": "Add an extra layer of security to your account by requiring a verification code from your authenticator app.",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "enable": "Enable 2FA",
+      "disable": "Disable 2FA",
+      "enableTitle": "Enable Two-Factor Authentication",
+      "enableDescription": "Scan the QR code below with your authenticator app (Google Authenticator, Authy, etc.)",
+      "confirmPassword": "Enter your password to confirm",
+      "setup": "Setup",
+      "scanQR": "Scan this QR code with your authenticator app",
+      "continueToVerify": "Continue to Verification",
+      "enterCode": "Enter the 6-digit code from your authenticator app",
+      "totpCode": "Verification Code",
+      "verify": "Verify",
+      "setupError": "Failed to set up 2FA. Please try again.",
+      "verifyError": "Invalid verification code. Please try again.",
+      "disableTitle": "Disable Two-Factor Authentication",
+      "disableDescription": "Enter your password to disable 2FA. Your account will be less secure.",
+      "disableError": "Failed to disable 2FA. Please try again.",
+      "viewBackupCodes": "View Backup Codes",
+      "backupCodesTitle": "Backup Codes",
+      "backupCodesDescription": "Save these codes in a secure location. Each code can only be used once.",
+      "copy": "Copy",
+      "download": "Download",
+      "regenerate": "Regenerate Codes",
+      "regenerateError": "Failed to regenerate backup codes. Please try again.",
+      "saveBackupCodes": "Save Backup Codes"
+    },
+    "password": "Password"
   }
 }

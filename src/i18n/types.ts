@@ -414,6 +414,40 @@ export type Translation = {
     maxExtensionsReached: string
     daysExceeded: string
   }
+  settings: {
+    title: string
+    twoFactor: {
+      title: string
+      description: string
+      enabled: string
+      disabled: string
+      enable: string
+      disable: string
+      enableTitle: string
+      enableDescription: string
+      confirmPassword: string
+      setup: string
+      scanQR: string
+      continueToVerify: string
+      enterCode: string
+      totpCode: string
+      verify: string
+      setupError: string
+      verifyError: string
+      disableTitle: string
+      disableDescription: string
+      disableError: string
+      viewBackupCodes: string
+      backupCodesTitle: string
+      backupCodesDescription: string
+      copy: string
+      download: string
+      regenerate: string
+      regenerateError: string
+      saveBackupCodes: string
+    }
+    password: string
+  }
 }
 
 export type TranslationFunctions = Record<string, (key: string) => string>

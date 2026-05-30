@@ -13,6 +13,7 @@ import { Route as UnauthenticatedRouteImport } from './routes/_unauthenticated'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedStudentRouteImport } from './routes/_authenticated/student'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedInstructorRouteImport } from './routes/_authenticated/instructor'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -53,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedStudentRoute = AuthenticatedStudentRouteImport.update({
   id: '/student',
   path: '/student',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedInstructorRoute = AuthenticatedInstructorRouteImport.update({
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
+  '/settings': typeof AuthenticatedSettingsRoute
   '/student': typeof AuthenticatedStudentRouteWithChildren
   '/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
+  '/settings': typeof AuthenticatedSettingsRoute
   '/student': typeof AuthenticatedStudentRouteWithChildren
   '/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/_unauthenticated': typeof UnauthenticatedRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/instructor': typeof AuthenticatedInstructorRouteWithChildren
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
   '/_authenticated/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/instructor'
+    | '/settings'
     | '/student'
     | '/admin/audit-log'
     | '/admin/dashboard'
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/instructor'
+    | '/settings'
     | '/student'
     | '/admin/audit-log'
     | '/admin/dashboard'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/_unauthenticated'
     | '/_authenticated/admin'
     | '/_authenticated/instructor'
+    | '/_authenticated/settings'
     | '/_authenticated/student'
     | '/_authenticated/admin/audit-log'
     | '/_authenticated/admin/dashboard'
@@ -396,6 +408,13 @@ declare module '@tanstack/react-router' {
       path: '/student'
       fullPath: '/student'
       preLoaderRoute: typeof AuthenticatedStudentRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/instructor': {
@@ -644,12 +663,14 @@ const AuthenticatedStudentRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedInstructorRoute: typeof AuthenticatedInstructorRouteWithChildren
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedStudentRoute: typeof AuthenticatedStudentRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedInstructorRoute: AuthenticatedInstructorRouteWithChildren,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedStudentRoute: AuthenticatedStudentRouteWithChildren,
 }
 
