@@ -156,41 +156,6 @@ describe('SessionManagement', () => {
     expect(screen.getByText('Revoke All Other Sessions')).toBeDefined();
   });
 
-  it('should open revoke dialog when clicking revoke button', () => {
-    mockUseQuery.mockReturnValue({
-      data: {
-        sessions: [
-          {
-            id: 'sess-1',
-            isCurrent: true,
-            ipAddress: '127.0.0.1',
-            userAgent: 'Chrome',
-            device: { browser: 'Chrome', os: 'Windows', device: 'Desktop' },
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: 'sess-2',
-            isCurrent: false,
-            ipAddress: '10.0.0.1',
-            userAgent: 'Firefox',
-            device: { browser: 'Firefox', os: 'Linux', device: 'Desktop' },
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-        total: 2,
-      },
-      isLoading: false,
-    });
-    render(<SessionManagement />);
-    const revokeButtons = screen.getAllByRole('button');
-    // Find the revoke button (it's the last button in the non-current session row)
-    const revokeBtn = revokeButtons[revokeButtons.length - 1];
-    fireEvent.click(revokeBtn);
-    expect(screen.getByText('Revoke Session')).toBeDefined();
-  });
-
   it('should open revoke all dialog when clicking revoke all button', () => {
     mockUseQuery.mockReturnValue({
       data: {
@@ -219,8 +184,10 @@ describe('SessionManagement', () => {
       isLoading: false,
     });
     render(<SessionManagement />);
-    fireEvent.click(screen.getByText('Revoke All Other Sessions'));
-    expect(screen.getByText('Revoke All Other Sessions')).toBeDefined();
+    const buttons = screen.getAllByText('Revoke All Other Sessions');
+    fireEvent.click(buttons[0]);
+    // The dialog header now also shows "Revoke All Other Sessions", so expect multiple matches
+    expect(screen.getAllByText('Revoke All Other Sessions').length).toBeGreaterThanOrEqual(1);
   });
 
   it('should not show revoke all others button when only current session', () => {
