@@ -34,17 +34,17 @@
 - [x] Write unit tests for session management functions — SHA: dd7b291
 - [x] Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) — SHA: 1a78f43
 
-## Phase 4: 2FA Login Flow
+## Phase 4: 2FA Login Flow [checkpoint: <sha>]
 
 ### Tasks
 
-- [x] Add `twoFactorClient` plugin to auth client config
-- [x] Modify login flow to detect 2FA requirement after password verification
-- [x] Create `/auth/verify-2fa` route with TOTP code input
-- [x] Create `/auth/verify-backup-code` route for backup code fallback
-- [x] Handle failed attempts with appropriate error messages
-- [x] Write unit tests for 2FA login flow
-- [ ] Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
+- [x] Add `twoFactorClient` plugin to auth client config — SHA: cc4e5a7
+- [x] Modify login flow to detect 2FA requirement after password verification — SHA: cc4e5a7
+- [x] Create `/auth/verify-2fa` route with TOTP code input — SHA: cc4e5a7
+- [x] Create `/auth/verify-backup-code` route for backup code fallback — SHA: cc4e5a7
+- [x] Handle failed attempts with appropriate error messages — SHA: cc4e5a7
+- [x] Write unit tests for 2FA login flow — SHA: cc4e5a7
+- [x] Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
 
 ## Phase 5: 2FA Settings UI
 
