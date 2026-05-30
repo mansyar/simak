@@ -144,4 +144,79 @@ describe('TemplateFilters', () => {
     expect(options.length).toBe(1); // Only All Types
     expect(options[0].textContent).toBe('All Types');
   });
+
+  it('should call onTypeChange when type filter selection changes', () => {
+    render(
+      <TemplateFilters
+        search=""
+        onSearchChange={onSearchChange}
+        type="all"
+        types={['Thesis', 'Research Paper']}
+        onTypeChange={onTypeChange}
+      />,
+    );
+    const select = screen.getByTestId('type-select');
+    fireEvent.change(select, { target: { value: 'Thesis' } });
+    expect(onTypeChange).toHaveBeenCalledWith('Thesis');
+  });
+
+  it('should display selected type in filter trigger when type is not "all"', () => {
+    render(
+      <TemplateFilters
+        search=""
+        onSearchChange={onSearchChange}
+        type="Thesis"
+        types={['Thesis', 'Research Paper']}
+        onTypeChange={onTypeChange}
+      />,
+    );
+    const selectTrigger = document.querySelector('[data-slot="select-value"]');
+    expect(selectTrigger).toBeDefined();
+    expect(selectTrigger?.textContent).toBe('Thesis');
+  });
+
+  it('should display placeholder in filter trigger when type is "all"', () => {
+    render(
+      <TemplateFilters
+        search=""
+        onSearchChange={onSearchChange}
+        type="all"
+        types={['Thesis', 'Research Paper']}
+        onTypeChange={onTypeChange}
+      />,
+    );
+    const selectTrigger = document.querySelector('[data-slot="select-value"]');
+    expect(selectTrigger).toBeDefined();
+    expect(selectTrigger?.textContent).toBe('All Types');
+  });
+
+  it('should fallback to "all" when onTypeChange receives empty value', () => {
+    render(
+      <TemplateFilters
+        search=""
+        onSearchChange={onSearchChange}
+        type="all"
+        types={['Thesis', 'Research Paper']}
+        onTypeChange={onTypeChange}
+      />,
+    );
+    const select = screen.getByTestId('type-select');
+    fireEvent.change(select, { target: { value: '' } });
+    expect(onTypeChange).toHaveBeenCalledWith('all');
+  });
+
+  it('should call onTypeChange with empty string fallback to "all" via onValueChange', () => {
+    render(
+      <TemplateFilters
+        search=""
+        onSearchChange={onSearchChange}
+        type="Thesis"
+        types={['Thesis']}
+        onTypeChange={onTypeChange}
+      />,
+    );
+    const select = screen.getByTestId('type-select');
+    fireEvent.change(select, { target: { value: '' } });
+    expect(onTypeChange).toHaveBeenCalledWith('all');
+  });
 });

@@ -594,7 +594,8 @@
       "revoke": "Revoke",
       "revokeAllTitle": "Revoke All Other Sessions",
       "revokeAllDescription": "This will log out {count} other session(s). Your current session will remain active.",
-      "revokeAllOthers": "Revoke All Other Sessions"
+      "revokeAllOthers": "Revoke All Other Sessions",
+      "revokeAll": "Revoke All"
     },
     "profile": {
       "title": "Profile",

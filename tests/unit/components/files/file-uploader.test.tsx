@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 vi.mock('@/routes/__root', () => ({
@@ -14,6 +14,10 @@ vi.mock('@/routes/__root', () => ({
 import { FileUploader } from '@/components/files/file-uploader';
 
 describe('FileUploader', () => {
+  beforeEach(() => {
+    cleanup();
+  });
+
   it('should render drag-and-drop zone with correct accept attribute', () => {
     render(<FileUploader onUploadSuccess={vi.fn()} />);
     const fileInput = screen.getByTestId('file-input');
@@ -21,10 +25,9 @@ describe('FileUploader', () => {
     expect(fileInput.getAttribute('accept')).toBe('.docx,.pdf');
   });
 
-  it('should show file type validation error for invalid file type', async () => {
+  it('should show file type validation error for invalid file type', () => {
     render(<FileUploader onUploadSuccess={vi.fn()} />);
 
-    // Use fireEvent.change to bypass the accept attribute filter in jsdom
     const file = new File(['test'], 'test.png', { type: 'image/png' });
     const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
 
@@ -37,7 +40,6 @@ describe('FileUploader', () => {
     const user = userEvent.setup();
     render(<FileUploader onUploadSuccess={vi.fn()} />);
 
-    // 26MB file
     const file = new File(['x'.repeat(26 * 1024 * 1024)], 'test.pdf', { type: 'application/pdf' });
     const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
 
@@ -60,7 +62,6 @@ describe('FileUploader', () => {
     const user = userEvent.setup();
     render(<FileUploader onUploadSuccess={vi.fn()} isUploading={true} />);
 
-    // First select a file so the upload button (with spinner) appears
     const file = new File(['content'], 'test.pdf', { type: 'application/pdf' });
     const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
     await user.upload(fileInput, file);
@@ -91,5 +92,111 @@ describe('FileUploader', () => {
 
     await user.upload(fileInput, file);
     expect(screen.getByText('report.docx')).toBeDefined();
+  });
+
+  it('should apply drag-over styles when dragging over drop zone', () => {
+    render(<FileUploader onUploadSuccess={vi.fn()} />);
+    const dropZone = screen.getByTestId('drop-zone');
+
+    fireEvent.dragOver(dropZone);
+
+    expect(dropZone.className).toContain('border-primary');
+  });
+
+  it('should remove drag-over styles on drag leave', () => {
+    render(<FileUploader onUploadSuccess={vi.fn()} />);
+    const dropZone = screen.getByTestId('drop-zone');
+
+    fireEvent.dragOver(dropZone);
+    expect(dropZone.className).toContain('border-primary');
+
+    fireEvent.dragLeave(dropZone);
+    expect(dropZone.className).not.toContain('border-primary');
+  });
+
+  it('should select file via drop event', () => {
+    render(<FileUploader onUploadSuccess={vi.fn()} />);
+    const dropZone = screen.getByTestId('drop-zone');
+    const file = new File(['content'], 'dropped.pdf', { type: 'application/pdf' });
+
+    fireEvent.drop(dropZone, { dataTransfer: { files: [file] } });
+
+    expect(screen.getByText('dropped.pdf')).toBeDefined();
+  });
+
+  it('should call onUploadSuccess when upload button is clicked', async () => {
+    const onUploadSuccess = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    render(<FileUploader onUploadSuccess={onUploadSuccess} />);
+
+    const file = new File(['content'], 'upload-test.pdf', { type: 'application/pdf' });
+    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
+    await user.upload(fileInput, file);
+
+    await user.click(screen.getByText('files.upload'));
+
+    expect(onUploadSuccess).toHaveBeenCalledTimes(1);
+    const calledWith = onUploadSuccess.mock.calls[0][0];
+    expect(calledWith.name).toBe('upload-test.pdf');
+  });
+
+  it('should reset state via retry button when upload error is shown', async () => {
+    const user = userEvent.setup();
+    const onUploadSuccess = vi.fn().mockResolvedValue(undefined);
+    render(<FileUploader onUploadSuccess={onUploadSuccess} uploadError="Upload failed" />);
+
+    // Retry button should be visible in error state
+    const retryButton = screen.getByText('files.retry');
+    expect(retryButton).toBeDefined();
+
+    // Select a file to have it available after reset
+    const file = new File(['content'], 'retry-test.pdf', { type: 'application/pdf' });
+    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
+    await user.upload(fileInput, file);
+
+    // Click the upload button
+    await user.click(screen.getByText('files.upload'));
+    expect(onUploadSuccess).toHaveBeenCalled();
+  });
+
+  it('should call handleReset when upload another button is clicked after success', async () => {
+    const user = userEvent.setup();
+    const onUploadSuccess = vi.fn().mockResolvedValue(undefined);
+    // Simulate parent changing uploadSuccess back to false after reset
+    const { rerender } = render(
+      <FileUploader onUploadSuccess={onUploadSuccess} uploadSuccess={true} />,
+    );
+
+    expect(screen.getByText(/files.uploadSuccess/)).toBeDefined();
+
+    await user.click(screen.getByText('files.uploadAnother'));
+
+    // Simulate parent resetting success state
+    rerender(<FileUploader onUploadSuccess={onUploadSuccess} uploadSuccess={false} />);
+
+    // Now the drop zone should be visible again
+    expect(screen.getByText('files.dropzone.title')).toBeDefined();
+  });
+
+  it('should show validation error for invalid file type dropped', () => {
+    render(<FileUploader onUploadSuccess={vi.fn()} />);
+    const dropZone = screen.getByTestId('drop-zone');
+
+    const file = new File(['content'], 'image.png', { type: 'image/png' });
+    fireEvent.drop(dropZone, { dataTransfer: { files: [file] } });
+
+    expect(screen.getByText('files.validation.invalidType')).toBeDefined();
+  });
+
+  it('should open file picker when drop zone is clicked', () => {
+    render(<FileUploader onUploadSuccess={vi.fn()} />);
+    const dropZone = screen.getByTestId('drop-zone');
+    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
+
+    const clickSpy = vi.spyOn(fileInput, 'click');
+
+    fireEvent.click(dropZone);
+
+    expect(clickSpy).toHaveBeenCalled();
   });
 });

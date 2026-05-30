@@ -594,7 +594,8 @@
       "revoke": "Cabut",
       "revokeAllTitle": "Cabut Semua Sesi Lain",
       "revokeAllDescription": "Ini akan logout {count} sesi lainnya. Sesi Anda saat ini akan tetap aktif.",
-      "revokeAllOthers": "Cabut Semua Sesi Lain"
+      "revokeAllOthers": "Cabut Semua Sesi Lain",
+      "revokeAll": "Cabut Semua"
     },
     "profile": {
       "title": "Profil",
