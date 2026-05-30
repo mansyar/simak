@@ -125,7 +125,9 @@ describe('listActiveSessionsHandler', () => {
     });
     mockGetDb.mockReturnValue({ select: mockSelect } as any);
 
-    const result = await listActiveSessionsHandler();
+    const result = (await listActiveSessionsHandler()) as {
+      sessions: Array<{ userAgent: string | null }>;
+    };
 
     expect(result.sessions[0].userAgent).toContain('Chrome');
   });
