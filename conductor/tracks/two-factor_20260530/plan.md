@@ -14,16 +14,11 @@
 
 ### Tasks
 
-- [ ] Create `src/server/two-factor.ts` with Zod schemas and server function stubs
-- [ ] Create `src/server/two-factor.server.ts` with handler implementations
-- [ ] Implement `generateTwoFactorSetup` — returns QR code URL and secret
-- [ ] Implement `enableTwoFactor` — activates 2FA after TOTP verification
-- [ ] Implement `disableTwoFactor` — deactivates 2FA after password confirmation
-- [ ] Implement `getBackupCodes` — returns user's backup codes
-- [ ] Implement `regenerateBackupCodes` — generates new backup codes
-- [ ] Wire audit log events: `two_factor.enabled`, `two_factor.disabled`
-- [ ] Send email notification on 2FA enable/disable
-- [ ] Write unit tests for all server functions
+- [x] Create two-factor server function stubs (`src/server/two-factor.ts`)
+- [x] Implement two-factor handlers (`src/server/two-factor.server.ts`) — SHA: 444d851
+- [x] Wire up audit log events for 2FA actions
+- [x] Send email notifications for 2FA status changes
+- [x] Write unit tests for all server functions
 - [ ] Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3: Session Management Server Functions
