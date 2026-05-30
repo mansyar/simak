@@ -458,7 +458,39 @@ export type Translation = {
       revokeAllDescription: string
       revokeAllOthers: string
     }
-    password: string
+    profile: {
+      title: string
+      nameLabel: string
+      emailLabel: string
+      avatarLabel: string
+      saveName: string
+      nameSuccess: string
+      nameError: string
+    }
+    password: {
+      title: string
+      description: string
+      currentPassword: string
+      newPassword: string
+      confirmPassword: string
+      changePassword: string
+      passwordSuccess: string
+      passwordError: string
+      passwordMinLength: string
+      passwordMismatch: string
+    }
+    appearance: {
+      title: string
+      description: string
+      languageLabel: string
+      themeLabel: string
+    }
+    accessibility: {
+      title: string
+      description: string
+      reducedMotionLabel: string
+      reducedMotionHint: string
+    }
   }
 }
 

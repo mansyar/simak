@@ -596,6 +596,38 @@
       "revokeAllDescription": "This will log out {count} other session(s). Your current session will remain active.",
       "revokeAllOthers": "Revoke All Other Sessions"
     },
-    "password": "Password"
+    "profile": {
+      "title": "Profile",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "avatarLabel": "Profile Picture",
+      "saveName": "Save Name",
+      "nameSuccess": "Name updated successfully",
+      "nameError": "Failed to update name"
+    },
+    "password": {
+      "title": "Password",
+      "description": "Change your current password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "changePassword": "Change Password",
+      "passwordSuccess": "Password changed successfully",
+      "passwordError": "Failed to change password",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize how the application looks",
+      "languageLabel": "Language",
+      "themeLabel": "Theme"
+    },
+    "accessibility": {
+      "title": "Accessibility",
+      "description": "Accessibility settings for a better experience",
+      "reducedMotionLabel": "Reduced Motion",
+      "reducedMotionHint": "Reduce animations and transitions throughout the app"
+    }
   }
 }

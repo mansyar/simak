@@ -596,6 +596,38 @@
       "revokeAllDescription": "Ini akan logout {count} sesi lainnya. Sesi Anda saat ini akan tetap aktif.",
       "revokeAllOthers": "Cabut Semua Sesi Lain"
     },
-    "password": "Kata Sandi"
+    "profile": {
+      "title": "Profil",
+      "nameLabel": "Nama",
+      "emailLabel": "Email",
+      "avatarLabel": "Foto Profil",
+      "saveName": "Simpan Nama",
+      "nameSuccess": "Nama berhasil diperbarui",
+      "nameError": "Gagal memperbarui nama"
+    },
+    "password": {
+      "title": "Kata Sandi",
+      "description": "Ubah kata sandi Anda saat ini",
+      "currentPassword": "Kata Sandi Saat Ini",
+      "newPassword": "Kata Sandi Baru",
+      "confirmPassword": "Konfirmasi Kata Sandi Baru",
+      "changePassword": "Ubah Kata Sandi",
+      "passwordSuccess": "Kata sandi berhasil diubah",
+      "passwordError": "Gagal mengubah kata sandi",
+      "passwordMinLength": "Kata sandi minimal 8 karakter",
+      "passwordMismatch": "Kata sandi tidak cocok"
+    },
+    "appearance": {
+      "title": "Tampilan",
+      "description": "Sesuaikan tampilan aplikasi",
+      "languageLabel": "Bahasa",
+      "themeLabel": "Tema"
+    },
+    "accessibility": {
+      "title": "Aksesibilitas",
+      "description": "Pengaturan aksesibilitas untuk pengalaman yang lebih baik",
+      "reducedMotionLabel": "Gerakan Dikurangi",
+      "reducedMotionHint": "Kurangi animasi dan transisi di seluruh aplikasi"
+    }
   }
 }

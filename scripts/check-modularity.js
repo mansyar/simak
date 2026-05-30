@@ -14,6 +14,7 @@ const EXCLUDE_GEN_PATTERN = /\.gen\.(ts|tsx)$/
 const EXCLUDE_PATHS = new Set([
   'src/i18n/types.ts',
   'src/i18n/detect-locale.ts',
+  'scripts/generate-i18n-types.ts',
 ])
 
 /** @param {string} filePath @returns {boolean} */

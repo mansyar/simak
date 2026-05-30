@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, jsonb, pgEnum } from 'drizzle-orm/pg-core';
 
 export const userRole = pgEnum('user_role', ['superadmin', 'admin', 'instructor', 'student']);
 
@@ -16,4 +16,5 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').defaultNow(),
   deletedAt: timestamp('deleted_at'),
   twoFactorEnabled: boolean('two_factor_enabled').default(false),
+  settings: jsonb('settings').$type<{ reducedMotion: boolean }>(),
 });
