@@ -40,22 +40,22 @@
 
 ## Phase 3: Background Processor
 
-- [ ] Task: Create email queue processor module (`src/lib/email-queue-processor.ts`)
-  - [ ] Implement `processEmailQueue()` function:
-    - [ ] Query pending emails ordered by `created_at ASC`
-    - [ ] For each: attempt Resend via shared `sendEmailWithResend()`
-    - [ ] On success: update status to `sent`
-    - [ ] On failure: increment attempts, store error_message, update last_attempt_at
-    - [ ] After 3 failures: mark status as `failed`
-- [ ] Task: Implement retry backoff logic
-  - [ ] Skip emails that were attempted less than the backoff interval ago:
-    - [ ] Attempt 1 → 2: min 30s since last_attempt_at
-    - [ ] Attempt 2 → 3: min 5min since last_attempt_at
-    - [ ] Attempt 3 → fail: min 30min since last_attempt_at
-- [ ] Task: Wire processor into server startup
-  - [ ] Create `src/lib/email-queue-init.ts` that starts a `setInterval` at 30s
-  - [ ] Import and call init from the app entry point
-  - [ ] Handle graceful cleanup (clearInterval on server shutdown)
+- [x] Task: Create email queue processor module (`src/lib/email-queue-processor.ts`)
+  - [x] Implement `processEmailQueue()` function:
+    - [x] Query pending emails ordered by `created_at ASC`
+    - [x] For each: attempt Resend via shared `sendEmailWithResend()`
+    - [x] On success: update status to `sent`
+    - [x] On failure: increment attempts, store error_message, update last_attempt_at
+    - [x] After 3 failures: mark status as `failed`
+- [x] Task: Implement retry backoff logic
+  - [x] Skip emails that were attempted less than the backoff interval ago:
+    - [x] Attempt 1 → 2: min 30s since last_attempt_at
+    - [x] Attempt 2 → 3: min 5min since last_attempt_at
+    - [x] Attempt 3 → fail: min 30min since last_attempt_at
+- [x] Task: Wire processor into server startup
+  - [x] Create `src/lib/email-queue-init.ts` that starts a `setInterval` at 30s
+  - [x] Import and call init from the app entry point (via `import.meta.env.SSR` in `src/router.tsx`)
+  - [x] Handle graceful cleanup (clearInterval on server shutdown)
 - [ ] Task: Write tests for processor
   - [ ] Test dequeuing — picks pending rows in correct order
   - [ ] Test send success — updates status to `sent`
