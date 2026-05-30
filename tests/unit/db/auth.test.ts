@@ -82,6 +82,58 @@ describe('Account table', () => {
   });
 });
 
+describe('TwoFactor table', () => {
+  it('should export twoFactor table from auth schema', async () => {
+    const mod = await import('@/db/schema/auth');
+    expect(mod).toHaveProperty('twoFactor');
+  });
+
+  it('should have correct columns', async () => {
+    const { twoFactor } = await import('@/db/schema/auth');
+
+    expect(twoFactor).toHaveProperty('id');
+    expect(twoFactor).toHaveProperty('secret');
+    expect(twoFactor).toHaveProperty('backupCodes');
+    expect(twoFactor).toHaveProperty('userId');
+  });
+
+  it('should have id as text primary key', async () => {
+    const { twoFactor } = await import('@/db/schema/auth');
+    expect(twoFactor.id.dataType).toBe('string');
+    expect(twoFactor.id.primary).toBe(true);
+  });
+
+  it('should have secret as text not null', async () => {
+    const { twoFactor } = await import('@/db/schema/auth');
+    expect(twoFactor.secret.notNull).toBe(true);
+    expect(twoFactor.secret.dataType).toBe('string');
+  });
+
+  it('should have backupCodes as text not null', async () => {
+    const { twoFactor } = await import('@/db/schema/auth');
+    expect(twoFactor.backupCodes.notNull).toBe(true);
+    expect(twoFactor.backupCodes.dataType).toBe('string');
+  });
+
+  it('should have userId foreign key referencing users', async () => {
+    const { twoFactor } = await import('@/db/schema/auth');
+    expect(twoFactor.userId.notNull).toBe(true);
+    expect(twoFactor.userId.dataType).toBe('string');
+  });
+});
+
+describe('Users twoFactorEnabled column', () => {
+  it('should have twoFactorEnabled column on users table', async () => {
+    const { users } = await import('@/db/schema/users');
+    expect(users).toHaveProperty('twoFactorEnabled');
+  });
+
+  it('should have twoFactorEnabled as boolean defaulting to false', async () => {
+    const { users } = await import('@/db/schema/users');
+    expect(users.twoFactorEnabled.dataType).toBe('boolean');
+  });
+});
+
 describe('Verification table', () => {
   it('should have correct columns', async () => {
     const { verification } = await import('@/db/schema/auth');

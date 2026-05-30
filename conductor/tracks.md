@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Two-Factor Authentication & Session Management**
-      _Link: [./tracks/two-factor_20260530/](./tracks/two-factor_20260530/)_
+- [~] **Track: Two-Factor Authentication & Session Management**
+  _Link: [./tracks/two-factor_20260530/](./tracks/two-factor_20260530/)_

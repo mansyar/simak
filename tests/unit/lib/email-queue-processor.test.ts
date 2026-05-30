@@ -233,6 +233,45 @@ describe('email-queue-processor', () => {
       expect(setCall?.attempts).toBe(1); // null → 0 + 1
     });
 
+    it('clamps backoff index for attempts >= 3 (30min interval)', async () => {
+      // attempts=3 means backoff index is clamped to 3 → 30 min delay
+      const oldEnough = new Date(Date.now() - 2_000_000); // 33 min ago > 30 min
+      const emails = [
+        makeEmail({
+          id: 1,
+          attempts: 3,
+          lastAttemptAt: oldEnough,
+        }),
+      ];
+      mockDb.then.mockImplementation((onfulfilled: (v: any) => any) =>
+        Promise.resolve(emails).then(onfulfilled),
+      );
+      mockResendSend.mockResolvedValue({ data: { id: 'sent-1' }, error: null });
+
+      const result = await processEmailQueue();
+
+      expect(result.processed).toBe(1);
+      expect(result.sent).toBe(1);
+    });
+
+    it('uses custom EMAIL_FROM env var when set', async () => {
+      const origFrom = process.env.EMAIL_FROM;
+      process.env.EMAIL_FROM = 'custom@simak.app';
+
+      mockDb.then.mockImplementation((onfulfilled: (v: any) => any) =>
+        Promise.resolve([makeEmail()]).then(onfulfilled),
+      );
+      mockResendSend.mockResolvedValue({ data: { id: 'sent-1' }, error: null });
+
+      await processEmailQueue();
+
+      expect(mockResendSend).toHaveBeenCalled();
+      const sendArgs = mockResendSend.mock.calls[0]?.[0];
+      expect(sendArgs?.from).toBe('custom@simak.app');
+
+      process.env.EMAIL_FROM = origFrom;
+    });
+
     it('returns counts when queue is empty', async () => {
       mockDb.then.mockImplementation((onfulfilled: (v: any) => any) =>
         Promise.resolve([]).then(onfulfilled),
