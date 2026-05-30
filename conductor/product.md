@@ -206,3 +206,18 @@ Students and instructors lack a centralized system to:
 - **Route redirects** — Login and `_unauthenticated` redirect to role-specific dashboards; `requireRole` redirects unauthorized users to their own dashboard; old `/dashboard` route removed
 - **Sidebar improvements** — Full viewport height (sticky, non-scrollable), logout button at bottom with hover-red styling, icons added to admin sidebar, all links updated to role-specific dashboard routes
 - **i18n translations** — Full English and Indonesian translations (studentDashboard: 14 keys, instructorDashboard: 14 keys, adminDashboard: 18 keys)
+
+### Track 1.3: Deadline Extension Workflow (May 2026)
+
+- **New `extension_requests` database table** — Tracks student-submitted extension requests with category (personal/research/health/other), reason, duration, status (pending/approved/rejected), and resolution metadata
+- **DB migration** — Generated with Drizzle Kit, applied to dev database
+- **Student-initiated extension flow** — Students submit requests with category, reason (min 10 chars), and duration (1–max_extension_days); capped by per-assignment `maxExtensionDays` (1–30, default 7) and `maxTotalExtensions` (1–10, default 3)
+- **Instructor approval/rejection queue** — FIFO pending requests list per assignment with Approve (optional comment) and Reject (required reason, min 20 chars) actions
+- **Auto-deadline adjustment on approval** — Extends affected checkpoint + subsequent checkpoints + assignment `finalDeadline`
+- **Instructor-initiated bulk extension** — Directly extends all unfinished checkpoints for a student by +N days with reason
+- **Audit log integration** — `deadline.extension_approved`, `deadline.extension_rejected`, `deadline.extended`, and `checkpoint.unlocked` audit events
+- **In-app notifications** — `extension_requested` → instructor, `extension_approved`/`extension_rejected` → student
+- **Student extension history** — Table on assignment detail page showing past requests with status badges (pending/approved/rejected)
+- **i18n translations** — Full English and Indonesian translations for extension request form, instructor queue, approval/rejection dialogs, and notification titles
+- **Server handler tests** — Unit tests for request, list, approve, reject, bulk, and audit log wiring handlers
+- **UI component tests** — Unit tests for student request form, history list, instructor queue section, and approval/rejection dialogs
