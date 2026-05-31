@@ -1,6 +1,6 @@
 # Track: UI Redesign — Implementation Plan
 
-## Phase 1: Design Tokens & Foundation
+## Phase 1: Design Tokens & Foundation [checkpoint: 33da752]
 
 - [x] Task: Download and set up self-hosted fonts (Fraunces, DM Sans) [85d5088]
   - [x] Download font files (woff2 format) from Google Fonts — via @fontsource-variable npm packages
