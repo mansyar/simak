@@ -8,7 +8,7 @@
   - [x] Add `@font-face` declarations in `src/app.css` — via CSS @import
   - [x] Verify fonts load correctly in browser — typecheck + all tests pass
 
-- [ ] Task: Define CSS custom properties for design system
+- [~] Task: Define CSS custom properties for design system
   - [ ] Add color tokens (light mode) as CSS variables in `src/app.css`
   - [ ] Add color tokens (dark mode) under `.dark` class
   - [ ] Add semantic color tokens (primary, success, warning, error, info)
