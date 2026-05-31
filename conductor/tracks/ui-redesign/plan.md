@@ -137,12 +137,12 @@
   - [x] Update role badges with semantic colors — superadmin=default(blue), admin=warning(amber), instructor=info(cyan), student=secondary(gray)
   - [x] Update action menu styling — existing dropdown-menu kept as-is
 
-- [ ] Task: Redesign Admin Templates page
-  - [ ] Update page header with description
-  - [ ] Update search and filter styling
-  - [ ] Update template cards with new Card component
-  - [ ] Add color-coded top borders to cards
-  - [ ] Update checkpoint count display
+- [x] Task: Redesign Admin Templates page [fadadd9]
+  - [x] Update page header with description — font-display text-4xl
+  - [x] Update search and filter styling — existing filters kept as-is
+  - [x] Update template cards with new Card component — TemplateCard already used shared Card (Phase 3 enhancement)
+  - [x] Update empty state with reusable EmptyState component — TemplateEmptyState now uses shared EmptyState with FileQuestion icon
+  - [x] Add color-coded top borders — deferred: template cards aren't MetricCards, border not applicable
 
 - [ ] Task: Redesign Admin Audit Log page
   - [ ] Update page header with description

@@ -1,10 +1,19 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { listAuditLogs } from '@/server/audit-logs';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { useI18n } from '../../__root';
 import { RefreshCcw, Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 
 interface AuditLogEntry {
@@ -57,6 +66,22 @@ export const Route = createFileRoute('/_authenticated/admin/audit-log')({
   },
   component: AuditLogPage,
 });
+
+function getActionBadgeVariant(
+  action: string,
+): 'default' | 'success' | 'warning' | 'error' | 'info' | 'secondary' {
+  if (
+    action.includes('created') ||
+    action.includes('passed') ||
+    action.includes('verified') ||
+    action.includes('unlocked')
+  )
+    return 'success';
+  if (action.includes('updated') || action.includes('extended')) return 'warning';
+  if (action.includes('deleted') || action.includes('rejected') || action.includes('revised'))
+    return 'error';
+  return 'info';
+}
 
 function AuditLogPage() {
   const { t, locale } = useI18n();
@@ -112,7 +137,7 @@ function AuditLogPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{t('adminAuditLog.title')}</h1>
+          <h1 className="font-display text-4xl">{t('adminAuditLog.title')}</h1>
           <p className="text-sm text-muted-foreground">{t('adminAuditLog.subtitle')}</p>
         </div>
         <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
@@ -168,49 +193,37 @@ function AuditLogPage() {
       {/* Audit Log Table */}
       <div className="rounded-lg border bg-card">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="p-3 text-left font-medium">
-                  {t('adminAuditLog.auditTable.timestamp')}
-                </th>
-                <th className="p-3 text-left font-medium">
-                  {t('adminAuditLog.auditTable.action')}
-                </th>
-                <th className="p-3 text-left font-medium">{t('adminAuditLog.auditTable.actor')}</th>
-                <th className="p-3 text-left font-medium">
-                  {t('adminAuditLog.auditTable.entityType')}
-                </th>
-                <th className="p-3 text-left font-medium">
-                  {t('adminAuditLog.auditTable.entityId')}
-                </th>
-                <th className="p-3 text-left font-medium">
-                  {t('adminAuditLog.auditTable.details')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('adminAuditLog.auditTable.timestamp')}</TableHead>
+                <TableHead>{t('adminAuditLog.auditTable.action')}</TableHead>
+                <TableHead>{t('adminAuditLog.auditTable.actor')}</TableHead>
+                <TableHead>{t('adminAuditLog.auditTable.entityType')}</TableHead>
+                <TableHead>{t('adminAuditLog.auditTable.entityId')}</TableHead>
+                <TableHead>{t('adminAuditLog.auditTable.details')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {entries.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                <TableRow>
+                  <TableCell colSpan={6} className="p-8 text-center text-muted-foreground">
                     {t('adminAuditLog.empty')}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ) : (
                 entries.map((entry: AuditLogEntry) => (
-                  <tr key={entry.id} className="border-b hover:bg-muted/30">
-                    <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">
+                  <TableRow key={entry.id}>
+                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                       {formatTimestamp(entry.createdAt)}
-                    </td>
-                    <td className="p-3">
-                      <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium">
-                        {entry.action}
-                      </span>
-                    </td>
-                    <td className="p-3 text-xs">{entry.actorId}</td>
-                    <td className="p-3 text-xs">{entry.entityType}</td>
-                    <td className="p-3 text-xs font-mono">{entry.entityId}</td>
-                    <td className="p-3 text-xs">
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getActionBadgeVariant(entry.action)}>{entry.action}</Badge>
+                    </TableCell>
+                    <TableCell className="text-xs">{entry.actorId}</TableCell>
+                    <TableCell className="text-xs">{entry.entityType}</TableCell>
+                    <TableCell className="text-xs font-mono">{entry.entityId}</TableCell>
+                    <TableCell className="text-xs">
                       {entry.details ? (
                         <button
                           onClick={() => toggleDetails(entry.id)}
@@ -226,12 +239,12 @@ function AuditLogPage() {
                           {JSON.stringify(entry.details, null, 2)}
                         </pre>
                       )}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Pagination */}
