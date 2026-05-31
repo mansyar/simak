@@ -203,6 +203,10 @@ export type Translation = {
   studentSidebar: {
     dashboard: string
     assignments: string
+    settings: string
+    branding: string
+    sectionMain: string
+    sectionPreferences: string
   }
   studentDashboard: {
     title: string

@@ -2,12 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock authClient to prevent real API calls
-const { mockSignOut } = vi.hoisted(() => ({
+const { mockSignOut, mockUseSession } = vi.hoisted(() => ({
   mockSignOut: vi.fn().mockResolvedValue({}),
+  mockUseSession: vi.fn(),
 }));
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
     signOut: mockSignOut,
+    useSession: mockUseSession,
   },
 }));
 
@@ -48,15 +50,20 @@ import { StudentSidebar } from '@/components/layout/student-sidebar';
 describe('StudentSidebar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseSession.mockReturnValue({
+      data: {
+        user: { name: 'Test Student', email: 'student@test.com' },
+      },
+    });
   });
 
-  it('should render SIMAK Student title', () => {
+  it('should render dashboard link', () => {
     mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
     render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/student/dashboard');
     expect(dashboardLink).toBeDefined();
-    expect(dashboardLink.textContent).toBe('nav.dashboard');
+    expect(dashboardLink.textContent).toContain('studentSidebar.dashboard');
   });
 
   it('should render assignments link', () => {
@@ -65,16 +72,17 @@ describe('StudentSidebar', () => {
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/student/assignments');
     expect(assignmentsLink).toBeDefined();
-    expect(assignmentsLink.textContent).toBe('nav.assignments');
+    expect(assignmentsLink.textContent).toContain('studentSidebar.assignments');
   });
 
-  it('should highlight the currently active route', () => {
+  it('should highlight the currently active route with sidebar accent classes', () => {
     mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
     render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/student/dashboard');
-    expect(dashboardLink.className).toContain('bg-primary');
-    expect(dashboardLink.className).toContain('text-primary-foreground');
+    expect(dashboardLink.className).toContain('border-sidebar-primary');
+    expect(dashboardLink.className).toContain('bg-sidebar-accent');
+    expect(dashboardLink.className).toContain('text-sidebar-primary-foreground');
   });
 
   it('should highlight active route with sub-paths', () => {
@@ -82,8 +90,9 @@ describe('StudentSidebar', () => {
     render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/student/assignments');
-    expect(assignmentsLink.className).toContain('bg-primary');
-    expect(assignmentsLink.className).toContain('text-primary-foreground');
+    expect(assignmentsLink.className).toContain('border-sidebar-primary');
+    expect(assignmentsLink.className).toContain('bg-sidebar-accent');
+    expect(assignmentsLink.className).toContain('text-sidebar-primary-foreground');
   });
 
   it('should not apply the active class to inactive routes', () => {
@@ -91,8 +100,8 @@ describe('StudentSidebar', () => {
     render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/student/assignments');
-    expect(assignmentsLink.className).not.toContain('bg-primary');
-    expect(assignmentsLink.className).toContain('text-muted-foreground');
+    expect(assignmentsLink.className).not.toContain('border-sidebar-primary');
+    expect(assignmentsLink.className).toContain('text-sidebar-foreground');
   });
 
   it('should render logout button', () => {
@@ -110,7 +119,6 @@ describe('StudentSidebar', () => {
     const logoutButton = screen.getByText('auth.logout');
     fireEvent.click(logoutButton);
 
-    // Wait for async logout to complete
     await vi.waitFor(() => {
       expect(mockSignOut).toHaveBeenCalled();
     });

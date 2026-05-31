@@ -331,7 +331,10 @@
   "studentSidebar": {
     "dashboard": "Dasbor",
     "assignments": "Tugas",
-    "branding": "SIMAK Mahasiswa"
+    "settings": "Pengaturan",
+    "branding": "SIMAK",
+    "sectionMain": "UTAMA",
+    "sectionPreferences": "PENGATURAN"
   },
   "studentAssignments": {
     "title": "Tugas Saya",

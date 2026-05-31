@@ -1,6 +1,6 @@
 import { useLocation, Link, useRouter } from '@tanstack/react-router';
 import { useI18n } from '../../routes/__root';
-import { LayoutDashboard, ClipboardList, Settings, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Settings, LogOut, X, GraduationCap } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 
 interface StudentSidebarProps {
@@ -12,11 +12,16 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
   const { pathname } = useLocation();
   const { t } = useI18n();
   const router = useRouter();
+  const { data: sessionData } = authClient.useSession();
+  const user = sessionData?.user;
 
-  const links = [
-    { to: '/student/dashboard', label: 'nav.dashboard', icon: LayoutDashboard },
-    { to: '/student/assignments', label: 'nav.assignments', icon: ClipboardList },
-    { to: '/student/settings', label: 'nav.settings', icon: Settings },
+  const mainLinks = [
+    { to: '/student/dashboard', label: 'studentSidebar.dashboard', icon: LayoutDashboard },
+    { to: '/student/assignments', label: 'studentSidebar.assignments', icon: ClipboardList },
+  ] as const;
+
+  const preferenceLinks = [
+    { to: '/student/settings', label: 'studentSidebar.settings', icon: Settings },
   ] as const;
 
   const handleLogout = async () => {
@@ -28,6 +33,8 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
     onClose();
   };
 
+  const isActiveLink = (to: string) => pathname === to || pathname.startsWith(to + '/');
+
   return (
     <>
       {/* Mobile overlay */}
@@ -35,47 +42,102 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-card shadow-sm transition-transform duration-200 ease-in-out lg:sticky lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[272px] flex-col border-r border-sidebar-border bg-sidebar shadow-lg transition-transform duration-200 ease-in-out lg:sticky lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between px-4 py-5">
-          <span className="text-xl font-bold text-foreground tracking-tight">
-            {t('studentSidebar.branding')}
-          </span>
+        {/* Branding */}
+        <div className="flex items-center justify-between px-5 py-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <GraduationCap className="h-5 w-5" />
+            </div>
+            <span className="text-lg font-display font-bold tracking-tight text-sidebar-primary-foreground">
+              {t('studentSidebar.branding')}
+            </span>
+          </div>
           <button
             onClick={onClose}
-            className="rounded-md p-1 min-h-11 min-w-11 text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring lg:hidden"
             aria-label={t('common.closeMenu')}
           >
             <X className="h-5 w-5" />
           </button>
         </div>
-        <nav className="flex flex-1 flex-col gap-1.5 px-3 pb-4">
-          {links.map((link) => {
-            const isActive = pathname === link.to || pathname.startsWith(link.to + '/');
+
+        {/* Navigation */}
+        <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-4 pb-4">
+          {/* MAIN section */}
+          <span className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">
+            {t('studentSidebar.sectionMain')}
+          </span>
+          {mainLinks.map((link) => {
+            const isActive = isActiveLink(link.to);
             const Icon = link.icon;
             return (
               <Link
                 key={link.to}
-                to={link.to as never}
+                to={link.to as unknown as '.'}
                 onClick={handleLinkClick}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 rounded-lg border-l-[3px] px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    ? 'border-sidebar-primary bg-sidebar-accent text-sidebar-primary-foreground'
+                    : 'border-transparent text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary-foreground'
                 }`}
               >
-                <Icon className="h-4 w-4" aria-hidden="true" />
+                <Icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                {t(link.label)}
+              </Link>
+            );
+          })}
+
+          {/* PREFERENCES section */}
+          <span className="px-3 pb-1 pt-5 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">
+            {t('studentSidebar.sectionPreferences')}
+          </span>
+          {preferenceLinks.map((link) => {
+            const isActive = isActiveLink(link.to);
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.to}
+                to={link.to as unknown as '.'}
+                onClick={handleLinkClick}
+                className={`flex items-center gap-3 rounded-lg border-l-[3px] px-3 py-2.5 text-sm font-medium transition-all ${
+                  isActive
+                    ? 'border-sidebar-primary bg-sidebar-accent text-sidebar-primary-foreground'
+                    : 'border-transparent text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary-foreground'
+                }`}
+              >
+                <Icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                 {t(link.label)}
               </Link>
             );
           })}
         </nav>
-        <div className="border-t p-3">
+
+        {/* User card */}
+        {user && (
+          <div className="mx-4 mb-2 rounded-lg bg-sidebar-accent/30 p-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground">
+                {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || '?'}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-sidebar-primary-foreground">
+                  {user.name || 'User'}
+                </p>
+                <p className="truncate text-xs text-sidebar-foreground">{user.email || ''}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Logout */}
+        <div className="border-t border-sidebar-border p-4">
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-all hover:bg-destructive/10 hover:text-destructive"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-all hover:bg-red-500/10 hover:text-red-400"
           >
             <LogOut className="h-4 w-4" />
             {t('auth.logout')}

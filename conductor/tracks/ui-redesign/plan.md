@@ -55,7 +55,7 @@
   - [ ] Add section labels
   - [ ] Update user card and logout styling
 
-- [ ] Task: Redesign Student Sidebar
+- [~] Task: Redesign Student Sidebar
   - [ ] Apply same dark navy background
   - [ ] Add left accent border for active state
   - [ ] Update link styles and hover states

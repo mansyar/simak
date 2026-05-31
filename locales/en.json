@@ -331,7 +331,10 @@
   "studentSidebar": {
     "dashboard": "Dashboard",
     "assignments": "Assignments",
-    "branding": "SIMAK Student"
+    "settings": "Settings",
+    "branding": "SIMAK",
+    "sectionMain": "MAIN",
+    "sectionPreferences": "PREFERENCES"
   },
   "studentAssignments": {
     "title": "My Assignments",
