@@ -146,4 +146,11 @@ describe('AdminDashboard component', () => {
       screen.getByText((content) => content.includes('5') && content.includes('daysOverdue')),
     ).toBeDefined();
   });
+
+  it('should render MetricCard with font-display class', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    const { container } = render(<AdminDashboard data={emptyData} />);
+    const fontDisplayEls = container.querySelectorAll('.font-display');
+    expect(fontDisplayEls.length).toBeGreaterThanOrEqual(6);
+  });
 });
