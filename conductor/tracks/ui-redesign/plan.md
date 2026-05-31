@@ -79,7 +79,7 @@
 
 ## Phase 3: Core UI Components
 
-- [ ] Task: Enhance Card component
+- [~] Task: Enhance Card component
   - [ ] Update border radius to md (10px)
   - [ ] Add surface background color
   - [ ] Add subtle border color
