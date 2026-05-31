@@ -129,13 +129,13 @@
   - [x] Update Quick Actions section styling — hover lift, colored icon backgrounds
   - [x] Update Escalation Alerts styling — alert cards with EmptyState component
 
-- [ ] Task: Redesign Admin Users page
-  - [ ] Update page header with description
-  - [ ] Update search bar and filter styling
-  - [ ] Update table with sticky headers and zebra
-  - [ ] Add status dot indicators
-  - [ ] Update role badges with semantic colors
-  - [ ] Update action menu styling
+- [x] Task: Redesign Admin Users page [6c4470d]
+  - [x] Update page header with description — font-display text-4xl
+  - [x] Update search bar and filter styling — existing search kept as-is
+  - [x] Update table with sticky headers and zebra — via Card + CardContent(p-0) wrapper (Table already enhanced in Phase 3)
+  - [x] Add status dot indicators — StatusDot inside semantic Badge (verified=success, inactive=secondary)
+  - [x] Update role badges with semantic colors — superadmin=default(blue), admin=warning(amber), instructor=info(cyan), student=secondary(gray)
+  - [x] Update action menu styling — existing dropdown-menu kept as-is
 
 - [ ] Task: Redesign Admin Templates page
   - [ ] Update page header with description
