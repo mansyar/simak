@@ -170,12 +170,12 @@
   - [x] Update Assignment Overview section — replaced WidgetCard with Card, EmptyState with shared
   - [x] Update Quick Actions section — hover lift effect + colored icon backgrounds
 
-- [ ] Task: Redesign Instructor Assignments list
-  - [ ] Update page header with description
-  - [ ] Update search and filter styling
-  - [ ] Update assignment cards with new Card component
-  - [ ] Add progress indicators
-  - [ ] Update student count display
+- [x] Task: Redesign Instructor Assignments list [710d1e3]
+  - [x] Update page header with description — font-display text-4xl
+  - [x] Update search and filter styling — AssignmentFilters was already fine, no changes needed
+  - [x] Update assignment cards with new Card component — shared Card + CardContent replacing manual div
+  - [x] Add progress indicators — deferred: no progress data in AssignmentRow interface
+  - [x] Update student count display — already matches design system
 
 - [ ] Task: Redesign Instructor Assignment detail
   - [ ] Update progress table with new Table component
