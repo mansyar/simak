@@ -8,6 +8,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
+import { StatusDot } from '@/components/ui/status-dot';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -18,7 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Pencil, Trash, Link as LinkIcon } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash, Link as LinkIcon, Users } from 'lucide-react';
 import { format } from 'date-fns/format';
 
 export type UserRow = {
@@ -60,12 +63,21 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
         const role = row.original.role;
         const roleVariants: Record<
           'superadmin' | 'admin' | 'instructor' | 'student',
-          'default' | 'secondary' | 'outline' | 'destructive'
+          | 'default'
+          | 'secondary'
+          | 'destructive'
+          | 'outline'
+          | 'success'
+          | 'warning'
+          | 'error'
+          | 'info'
+          | 'ghost'
+          | 'link'
         > = {
           superadmin: 'default',
-          admin: 'secondary',
-          instructor: 'outline',
-          student: 'outline',
+          admin: 'warning',
+          instructor: 'info',
+          student: 'secondary',
         };
         const roleLabels: Record<string, string> = {
           superadmin: 'adminUsers.role_superadmin',
@@ -83,14 +95,15 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
     {
       accessorKey: 'emailVerified',
       header: 'Status',
-      cell: ({ row }) => (
-        <Badge
-          variant={row.original.emailVerified ? 'default' : 'secondary'}
-          className="bg-opacity-10"
-        >
-          {row.original.emailVerified ? t('adminUsers.emailVerified') : t('adminUsers.notVerified')}
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const verified = row.original.emailVerified;
+        return (
+          <Badge variant={verified ? 'success' : 'secondary'} className="gap-1.5">
+            <StatusDot variant={verified ? 'verified' : 'inactive'} />
+            {verified ? t('adminUsers.emailVerified') : t('adminUsers.notVerified')}
+          </Badge>
+        );
+      },
     },
     {
       accessorKey: 'createdAt',
@@ -153,41 +166,47 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
   });
 
   return (
-    <div className="rounded-md border bg-card">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
                 ))}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No users found.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="p-0">
+                  <EmptyState
+                    icon={Users}
+                    title={t('adminUsers.empty')}
+                    description={t('adminUsers.emptyPrompt')}
+                  />
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }

@@ -108,7 +108,8 @@ describe('UserTable', () => {
       <UserTable data={[]} onEdit={onEdit} onDelete={onDelete} onGenerateLink={onGenerateLink} />,
     );
 
-    expect(screen.getByText('No users found.')).toBeDefined();
+    expect(screen.getByText('adminUsers.empty')).toBeDefined();
+    expect(screen.getByText('adminUsers.emptyPrompt')).toBeDefined();
   });
 
   it('should render action dropdown menus for each user', () => {

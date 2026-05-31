@@ -159,6 +159,7 @@
       "actions": "Aksi"
     },
     "empty": "Tidak ada pengguna",
+    "emptyPrompt": "Mulai dengan menambahkan pengguna baru",
     "createPrompt": "Buat pengguna pertama Anda",
     "deleteConfirm": "Apakah Anda yakin ingin menghapus {name}?",
     "deleteSuccess": "Pengguna berhasil dihapus",

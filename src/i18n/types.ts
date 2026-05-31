@@ -52,6 +52,7 @@ export type Translation = {
       actions: string
     }
     empty: string
+    emptyPrompt: string
     createPrompt: string
     deleteConfirm: string
     deleteSuccess: string

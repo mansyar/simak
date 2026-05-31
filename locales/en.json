@@ -159,6 +159,7 @@
       "actions": "Actions"
     },
     "empty": "No users found",
+    "emptyPrompt": "Get started by adding a new user",
     "createPrompt": "Create your first user",
     "deleteConfirm": "Are you sure you want to delete {name}?",
     "deleteSuccess": "User deleted successfully",
