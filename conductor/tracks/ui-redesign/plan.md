@@ -156,19 +156,19 @@
   - [x] Update form styling — inherits from global design tokens
   - [x] Update button styling — inherits from global design tokens
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md) [checkpoint: 841dde3]
 
 ---
 
 ## Phase 5: Instructor Pages
 
-- [ ] Task: Redesign Instructor Dashboard
-  - [ ] Update page title with welcome message
-  - [ ] Replace stat cards with MetricCard components
-  - [ ] Update Pending Reviews section with SLA badges
-  - [ ] Update Recent Submissions section
-  - [ ] Update Assignment Overview section
-  - [ ] Update Quick Actions section
+- [x] Task: Redesign Instructor Dashboard [ef32a11]
+  - [x] Update page title with welcome message — route already had font-display text-4xl
+  - [x] Replace stat cards with MetricCard components — added Pending Reviews, Active Assignments, Total Students
+  - [x] Update Pending Reviews section with SLA badges — replaced with shared Badge (success/warning/error)
+  - [x] Update Recent Submissions section — replaced WidgetCard with Card, status badges with Badge
+  - [x] Update Assignment Overview section — replaced WidgetCard with Card, EmptyState with shared
+  - [x] Update Quick Actions section — hover lift effect + colored icon backgrounds
 
 - [ ] Task: Redesign Instructor Assignments list
   - [ ] Update page header with description

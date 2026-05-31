@@ -25,10 +25,6 @@ vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to }: any) => <a href={to}>{children}</a>,
 }));
 
-vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children }: any) => <span>{children}</span>,
-}));
-
 describe('AssignmentCard', () => {
   const assignment = {
     id: 1,
