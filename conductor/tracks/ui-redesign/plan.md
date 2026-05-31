@@ -110,10 +110,10 @@
   - [x] Add CTA button slot
   - [x] Center content with proper padding
 
-- [ ] Task: Create StatusDot component
-  - [ ] Implement green dot for verified/active
-  - [ ] Implement gray dot for not verified/inactive
-  - [ ] Add proper sizing and spacing
+- [x] Task: Create StatusDot component [224006a]
+  - [x] Implement green dot for verified/active
+  - [x] Implement gray dot for not verified/inactive
+  - [x] Add proper sizing and spacing
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
