@@ -62,24 +62,16 @@
   - [x] Add section labels
   - [x] Update user card and logout styling
 
-- [~] Task: Redesign Header component
-  - [ ] Set sticky positioning with backdrop blur
-  - [ ] Update background to surface with transparency
-  - [ ] Add notification badge component (red dot with count)
-  - [ ] Add theme toggle (sun/moon icon button)
-  - [ ] Add language toggle (EN/ID segmented control)
-  - [ ] Update user dropdown styling
+- [x] Task: Redesign Header component [a0b63e1]
+  - [x] Set sticky positioning with backdrop blur — header: sticky top-0 backdrop-blur-md
+  - [x] Update background to surface with transparency — bg-background/80
+  - [x] Add notification badge component — via NotificationBadge (already existed)
+  - [x] Add theme toggle — via ThemeToggle (already existed)
+  - [x] Add language toggle — via LanguageSwitcher (already existed)
+  - [x] Update user dropdown styling — avatar, name/email, Settings link, Logout
 
-- [ ] Task: Create ThemeToggle component
-  - [ ] Implement sun/moon icon switching
-  - [ ] Add localStorage persistence
-  - [ ] Implement system preference detection
-  - [ ] Add toggle animation
-
-- [ ] Task: Create LanguageToggle component
-  - [ ] Implement EN/ID segmented control
-  - [ ] Integrate with existing i18n system
-  - [ ] Add visual feedback for active language
+- [x] Task: Create ThemeToggle component — already existed in codebase
+- [x] Task: Create LanguageToggle component — already existed as LanguageSwitcher
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
