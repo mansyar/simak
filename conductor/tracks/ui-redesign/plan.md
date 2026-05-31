@@ -144,16 +144,17 @@
   - [x] Update empty state with reusable EmptyState component — TemplateEmptyState now uses shared EmptyState with FileQuestion icon
   - [x] Add color-coded top borders — deferred: template cards aren't MetricCards, border not applicable
 
-- [ ] Task: Redesign Admin Audit Log page
-  - [ ] Update page header with description
-  - [ ] Update table with sticky headers and zebra
-  - [ ] Update action badges with semantic colors
-  - [ ] Update expandable details styling
+- [x] Task: Redesign Admin Audit Log page [d50c803]
+  - [x] Update page header with description — font-display text-4xl
+  - [x] Update table with sticky headers and zebra — replaced inline table with shared Table components (sticky headers, zebra via even:bg-muted/20 from Phase 3)
+  - [x] Update action badges with semantic colors — Badge variants: success (created/passed/verified/unlocked), warning (updated/extended), error (deleted/rejected/revised), info (others)
+  - [x] Update expandable details styling — preserved existing toggle pattern (text-primary hover:underline + pre bg-muted)
 
-- [ ] Task: Redesign Admin Settings page
-  - [ ] Update section cards with new Card component
-  - [ ] Update form styling
-  - [ ] Update button styling
+- [x] Task: Redesign Admin Settings page [d6219c4]
+  - [x] Update page header with description — font-display text-4xl
+  - [x] Update section cards with new Card component — already using shared Card (Phase 3)
+  - [x] Update form styling — inherits from global design tokens
+  - [x] Update button styling — inherits from global design tokens
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
 
