@@ -79,11 +79,11 @@
 
 ## Phase 3: Core UI Components
 
-- [~] Task: Enhance Card component
-  - [ ] Update border radius to md (10px)
-  - [ ] Add surface background color
-  - [ ] Add subtle border color
-  - [ ] Add hover state (surface-hover)
+- [x] Task: Enhance Card component [015e10d]
+  - [x] Update border radius to md (10px) — rounded-xl → rounded-md
+  - [x] Add surface background color — already used bg-card, no change needed
+  - [x] Add subtle border color — ring-1 ring-foreground/10 → border
+  - [x] Add hover state (surface-hover) — added hover:bg-muted/50 with transition-colors
 
 - [ ] Task: Enhance Table component
   - [ ] Add sticky header with shadow
