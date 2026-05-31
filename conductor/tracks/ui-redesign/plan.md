@@ -8,15 +8,15 @@
   - [x] Add `@font-face` declarations in `src/app.css` — via CSS @import
   - [x] Verify fonts load correctly in browser — typecheck + all tests pass
 
-- [~] Task: Define CSS custom properties for design system
-  - [ ] Add color tokens (light mode) as CSS variables in `src/app.css`
-  - [ ] Add color tokens (dark mode) under `.dark` class
-  - [ ] Add semantic color tokens (primary, success, warning, error, info)
-  - [ ] Add sidebar-specific color tokens
-  - [ ] Add typography tokens (font families, sizes, weights)
-  - [ ] Add spacing scale tokens (xs through 3xl)
-  - [ ] Add border radius tokens
-  - [ ] Add shadow tokens
+- [x] Task: Define CSS custom properties for design system [e05d5b1]
+  - [x] Add color tokens (light mode) as CSS variables in `src/app.css`
+  - [x] Add color tokens (dark mode) under `.dark` class
+  - [x] Add semantic color tokens (primary, success, warning, error, info)
+  - [x] Add sidebar-specific color tokens
+  - [x] Add typography tokens (font families, sizes, weights)
+  - [x] Add spacing scale tokens (xs through 3xl)
+  - [x] Add border radius tokens
+  - [ ] Add shadow tokens — TODO: will be added when component shadows are applied
 
 - [ ] Task: Update Tailwind configuration
   - [ ] Extend `tailwind.config.ts` with custom color palette
