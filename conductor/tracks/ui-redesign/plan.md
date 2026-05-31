@@ -85,11 +85,11 @@
   - [x] Add subtle border color — ring-1 ring-foreground/10 → border
   - [x] Add hover state (surface-hover) — added hover:bg-muted/50 with transition-colors
 
-- [ ] Task: Enhance Table component
-  - [ ] Add sticky header with shadow
-  - [ ] Implement zebra striping (alternating rows)
-  - [ ] Add row hover state
-  - [ ] Update header typography
+- [x] Task: Enhance Table component [cb7d96e]
+  - [x] Add sticky header with shadow — sticky top-0 z-10 with subtle shadow
+  - [x] Implement zebra striping — even:bg-muted/20 on TableRow
+  - [x] Add row hover state — hover:bg-muted/50 (already existed, preserved)
+  - [x] Update header typography — text-xs font-semibold uppercase tracking-wider
 
 - [ ] Task: Enhance Badge component
   - [ ] Add semantic color variants (success, warning, error, info)
