@@ -26,12 +26,12 @@
   - [x] Add shadow extensions — added warm-toned shadow tokens using oklch color-mix
   - [x] Configure dark mode class strategy — via @custom-variant dark (done in Task 2)
 
-- [ ] Task: Update global styles and base layer
-  - [ ] Update `body` font to DM Sans
-  - [ ] Update heading styles to use Fraunces
-  - [ ] Set default background color to warm white
-  - [ ] Set default text color to stone-900
-  - [ ] Update focus ring styles for accessibility
+- [x] Task: Update global styles and base layer [e05d5b1]
+  - [x] Update `body` font to DM Sans — handled via --font-sans in @theme inline
+  - [x] Update heading styles to use Fraunces — handled via --font-display in @theme inline
+  - [x] Set default background color to warm white — --background: oklch(0.982 0.004 60)
+  - [x] Set default text color to stone-900 — --foreground: oklch(0.145 0.006 50)
+  - [x] Update focus ring styles for accessibility — outline-ring/50 using blue #3B82F6
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
