@@ -32,22 +32,14 @@ export function SLABadge({ state, updatedAt }: SLABadgeProps) {
 
   if (elapsed >= APPROACHING_MS) {
     return (
-      <Badge
-        variant="outline"
-        className="border-amber-400 text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950"
-        data-testid="sla-badge"
-      >
+      <Badge variant="warning" data-testid="sla-badge">
         {t('instructorReviews.slaApproaching')}
       </Badge>
     );
   }
 
   return (
-    <Badge
-      variant="outline"
-      className="border-emerald-400 text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950"
-      data-testid="sla-badge"
-    >
+    <Badge variant="success" data-testid="sla-badge">
       {t('instructorReviews.slaOnTime')}
     </Badge>
   );

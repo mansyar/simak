@@ -177,11 +177,11 @@
   - [x] Add progress indicators — deferred: no progress data in AssignmentRow interface
   - [x] Update student count display — already matches design system
 
-- [ ] Task: Redesign Instructor Assignment detail
-  - [ ] Update progress table with new Table component
-  - [ ] Update status badges with semantic colors
-  - [ ] Update deadline display with urgency indicators
-  - [ ] Update DeadlineManager section styling
+- [x] Task: Redesign Instructor Assignment detail [e616778]
+  - [x] Update progress table with new Table component — already done (Phase 3)
+  - [x] Update status badges with semantic colors — ProgressTable+DeadlineManager: manual spans → shared Badge
+  - [x] Update deadline display with urgency indicators — overdue dates shown in text-destructive
+  - [x] Update DeadlineManager section styling — rounded-xl → rounded-md
 
 - [ ] Task: Redesign Instructor Reviews queue
   - [ ] Update page header with description

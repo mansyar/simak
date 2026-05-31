@@ -7,7 +7,7 @@ import { ReviewQueueFilters } from '@/components/reviews/ReviewQueueFilters';
 import { ReviewQueueEmptyState } from '@/components/reviews/ReviewQueueEmptyState';
 import { ReviewQueueSkeleton } from '@/components/reviews/ReviewQueueSkeleton';
 import { ReviewQueuePagination } from '@/components/reviews/ReviewQueuePagination';
-import { RefreshCcw, ClipboardList } from 'lucide-react';
+import { RefreshCcw } from 'lucide-react';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '../../../__root';
@@ -62,9 +62,7 @@ function ReviewsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            {t('instructorReviews.title')}
-          </h1>
+          <h1 className="font-display text-4xl">{t('instructorReviews.title')}</h1>
           <p className="text-sm text-muted-foreground mt-1">{t('instructorReviews.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
