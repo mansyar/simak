@@ -37,7 +37,7 @@
 
 ---
 
-## Phase 2: Shared Layout Components
+## Phase 2: Shared Layout Components [checkpoint: e95c2ca]
 
 - [x] Task: Redesign Admin Sidebar [abe793a]
   - [ ] Update sidebar background to dark navy (#1C2333)
