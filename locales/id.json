@@ -101,7 +101,9 @@
     "users": "Pengguna",
     "templates": "Templat",
     "auditLog": "Log Audit",
-    "branding": "SIMAK Admin"
+    "branding": "SIMAK",
+    "sectionMain": "UTAMA",
+    "sectionPreferences": "PENGATURAN"
   },
   "adminAuditLog": {
     "title": "Log Audit",

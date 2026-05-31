@@ -2,12 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock authClient to prevent real API calls
-const { mockSignOut } = vi.hoisted(() => ({
+const { mockSignOut, mockUseSession } = vi.hoisted(() => ({
   mockSignOut: vi.fn().mockResolvedValue({}),
+  mockUseSession: vi.fn(),
 }));
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
     signOut: mockSignOut,
+    useSession: mockUseSession,
   },
 }));
 
@@ -48,6 +50,13 @@ import { AdminSidebar } from '@/components/layout/admin-sidebar';
 describe('AdminSidebar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseSession.mockReturnValue({
+      data: {
+        user: { name: 'Admin User', email: 'admin@example.com', role: 'superadmin' },
+        session: {},
+      },
+      isPending: false,
+    });
   });
 
   it('should render dashboard link', () => {
@@ -82,8 +91,9 @@ describe('AdminSidebar', () => {
     render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/admin/dashboard');
-    expect(dashboardLink.className).toContain('bg-primary');
-    expect(dashboardLink.className).toContain('text-primary-foreground');
+    expect(dashboardLink.className).toContain('border-sidebar-primary');
+    expect(dashboardLink.className).toContain('bg-sidebar-accent');
+    expect(dashboardLink.className).toContain('text-sidebar-primary-foreground');
   });
 
   it('should not apply the active class to inactive routes', () => {
@@ -91,7 +101,7 @@ describe('AdminSidebar', () => {
     render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/admin/dashboard');
-    expect(dashboardLink.className).not.toContain('bg-primary');
+    expect(dashboardLink.className).not.toContain('border-sidebar-primary');
   });
 
   it('should render logout button', () => {

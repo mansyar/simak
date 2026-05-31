@@ -101,7 +101,9 @@
     "users": "Users",
     "templates": "Templates",
     "auditLog": "Audit Log",
-    "branding": "SIMAK Admin"
+    "branding": "SIMAK",
+    "sectionMain": "MAIN",
+    "sectionPreferences": "PREFERENCES"
   },
   "adminAuditLog": {
     "title": "Audit Log",

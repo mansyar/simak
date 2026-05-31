@@ -39,7 +39,7 @@
 
 ## Phase 2: Shared Layout Components
 
-- [ ] Task: Redesign Admin Sidebar
+- [~] Task: Redesign Admin Sidebar
   - [ ] Update sidebar background to dark navy (#1C2333)
   - [ ] Add left accent border (3px blue) for active state
   - [ ] Update link hover states with background tint
