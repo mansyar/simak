@@ -34,23 +34,11 @@ export function ProgressTable({ students }: ProgressTableProps) {
   const getStatusBadge = (state: string) => {
     switch (state) {
       case 'passed':
-        return (
-          <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200/50">
-            {t('instructorAssignments.status.passed')}
-          </span>
-        );
+        return <Badge variant="success">{t('instructorAssignments.status.passed')}</Badge>;
       case 'under_review':
-        return (
-          <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200/50">
-            {t('instructorAssignments.status.under_review')}
-          </span>
-        );
+        return <Badge variant="warning">{t('instructorAssignments.status.under_review')}</Badge>;
       case 'submitted':
-        return (
-          <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 border border-blue-200/50">
-            {t('instructorAssignments.status.submitted')}
-          </span>
-        );
+        return <Badge variant="info">{t('instructorAssignments.status.submitted')}</Badge>;
       case 'revise':
         return <Badge variant="destructive">{t('instructorAssignments.status.revise')}</Badge>;
       case 'unlocked':

@@ -45,23 +45,11 @@ interface DeadlineManagerProps {
 function StatusBadge({ state, t }: { state: string; t: (key: string) => string }) {
   switch (state) {
     case 'passed':
-      return (
-        <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-200/50">
-          {t('instructorAssignments.status.passed')}
-        </span>
-      );
+      return <Badge variant="success">{t('instructorAssignments.status.passed')}</Badge>;
     case 'under_review':
-      return (
-        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200/50">
-          {t('instructorAssignments.status.under_review')}
-        </span>
-      );
+      return <Badge variant="warning">{t('instructorAssignments.status.under_review')}</Badge>;
     case 'submitted':
-      return (
-        <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 border border-blue-200/50">
-          {t('instructorAssignments.status.submitted')}
-        </span>
-      );
+      return <Badge variant="info">{t('instructorAssignments.status.submitted')}</Badge>;
     case 'revise':
       return <Badge variant="destructive">{t('instructorAssignments.status.revise')}</Badge>;
     case 'unlocked':
@@ -169,9 +157,18 @@ export function DeadlineManager({ students, assignmentId }: DeadlineManagerProps
     }
   };
 
+  const isOverdue = (date: Date | null) => {
+    if (!date) return false;
+    try {
+      return new Date(date) < new Date();
+    } catch {
+      return false;
+    }
+  };
+
   if (students.length === 0) {
     return (
-      <div className="rounded-xl border bg-card p-6 shadow-sm">
+      <div className="rounded-md border bg-card p-6 shadow-sm">
         <h3 className="text-base font-semibold text-foreground mb-2">
           {t('instructorAssignments.deadlineManager.title')}
         </h3>
@@ -183,7 +180,7 @@ export function DeadlineManager({ students, assignmentId }: DeadlineManagerProps
   }
 
   return (
-    <div className="rounded-xl border bg-card p-5 shadow-sm space-y-4">
+    <div className="rounded-md border bg-card p-5 shadow-sm space-y-4">
       <h3 className="text-base font-semibold text-foreground border-b pb-2 flex items-center gap-2">
         <Clock className="h-4 w-4 text-muted-foreground" />
         {t('instructorAssignments.deadlineManager.title')}
@@ -243,7 +240,11 @@ export function DeadlineManager({ students, assignmentId }: DeadlineManagerProps
                     {/* Current deadline */}
                     <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
                       <span>{t('instructorAssignments.deadlineManager.currentDeadline')}:</span>
-                      <span className="font-medium">{formatDate(cp.dueDate)}</span>
+                      <span
+                        className={`font-medium ${isOverdue(cp.dueDate) ? 'text-destructive' : ''}`}
+                      >
+                        {formatDate(cp.dueDate)}
+                      </span>
                     </div>
 
                     {/* Actions */}

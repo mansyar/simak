@@ -10,8 +10,19 @@ import { VerificationQueueItem } from '@/components/consultations/VerificationQu
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
 import { PendingExtensionsSection } from '@/components/instructor/extensions/PendingExtensionsSection';
 import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
-import { Calendar, Users, Clipboard, ArrowLeft, Percent, CheckCircle2 } from 'lucide-react';
+import {
+  Calendar,
+  Users,
+  Clipboard,
+  ArrowLeft,
+  Percent,
+  CheckCircle2,
+  MessageSquare,
+} from 'lucide-react';
 import { format } from 'date-fns/format';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useI18n } from '../../../__root';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id')({
@@ -179,9 +190,7 @@ function AssignmentDetailPage() {
                 {assignment.templateType}
               </span>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground mt-2">
-              {assignment.title}
-            </h1>
+            <h1 className="font-display text-4xl text-foreground mt-2">{assignment.title}</h1>
             {assignment.description && (
               <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-relaxed">
                 {assignment.description}
@@ -193,7 +202,7 @@ function AssignmentDetailPage() {
 
       {/* Overview Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="relative overflow-hidden rounded-xl border bg-card p-5 shadow-sm">
+        <div className="relative overflow-hidden rounded-md border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="rounded-lg bg-primary/10 p-2.5 text-primary">
               <Users className="h-5 w-5" />
@@ -207,7 +216,7 @@ function AssignmentDetailPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-xl border bg-card p-5 shadow-sm">
+        <div className="relative overflow-hidden rounded-md border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="rounded-lg bg-primary/10 p-2.5 text-primary">
               <Percent className="h-5 w-5" />
@@ -221,7 +230,7 @@ function AssignmentDetailPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-xl border bg-card p-5 shadow-sm">
+        <div className="relative overflow-hidden rounded-md border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="rounded-lg bg-emerald-500/10 p-2.5 text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 className="h-5 w-5" />
@@ -237,7 +246,7 @@ function AssignmentDetailPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-xl border bg-card p-5 shadow-sm">
+        <div className="relative overflow-hidden rounded-md border bg-card p-5 shadow-sm">
           <div className="flex items-center gap-4">
             <div className="rounded-lg bg-primary/10 p-2.5 text-primary">
               <Calendar className="h-5 w-5" />
@@ -255,43 +264,45 @@ function AssignmentDetailPage() {
       </div>
 
       {/* Details Meta Block */}
-      <div className="rounded-xl border bg-card p-5 shadow-sm space-y-4">
-        <h3 className="text-base font-semibold text-foreground border-b pb-2">
-          {t('instructorAssignments.details.overview')}
-        </h3>
-        <div className="grid gap-4 sm:grid-cols-3 text-sm">
-          <div className="space-y-1">
-            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-              {t('instructorAssignments.details.template')}
-            </span>
-            <div className="flex items-center gap-2 font-medium text-foreground">
-              <Clipboard className="h-4 w-4 text-primary/60" />
-              {assignment.templateName}
+      <Card>
+        <div className="p-5 space-y-4">
+          <h3 className="text-base font-semibold text-foreground border-b pb-2">
+            {t('instructorAssignments.details.overview')}
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3 text-sm">
+            <div className="space-y-1">
+              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                {t('instructorAssignments.details.template')}
+              </span>
+              <div className="flex items-center gap-2 font-medium text-foreground">
+                <Clipboard className="h-4 w-4 text-primary/60" />
+                {assignment.templateName}
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-1">
-            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-              {t('instructorAssignments.details.type')}
-            </span>
-            <div className="font-medium text-foreground">{assignment.templateType}</div>
-          </div>
+            <div className="space-y-1">
+              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                {t('instructorAssignments.details.type')}
+              </span>
+              <div className="font-medium text-foreground">{assignment.templateType}</div>
+            </div>
 
-          <div className="space-y-1">
-            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-              {t('instructorAssignments.details.created')}
-            </span>
-            <div className="font-medium text-foreground">
-              {format(new Date(assignment.createdAt), 'MMM d, yyyy HH:mm')}
+            <div className="space-y-1">
+              <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                {t('instructorAssignments.details.created')}
+              </span>
+              <div className="font-medium text-foreground">
+                {format(new Date(assignment.createdAt), 'MMM d, yyyy HH:mm')}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Progress Table */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold tracking-tight text-foreground">
+          <h2 className="font-display text-2xl text-foreground">
             {t('instructorAssignments.details.studentsProgress')}
           </h2>
         </div>
@@ -323,9 +334,9 @@ function AssignmentDetailPage() {
           >
             {t('consultations.title')}
             {pendingConsultations.length > 0 && (
-              <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full bg-primary text-primary-foreground">
+              <Badge variant="default" className="ml-1.5">
                 {pendingConsultations.length}
-              </span>
+              </Badge>
             )}
           </button>
           <button
@@ -339,9 +350,9 @@ function AssignmentDetailPage() {
           >
             {t('extensions.queueTitle')}
             {extensionRequests.length > 0 && (
-              <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full bg-primary text-primary-foreground">
+              <Badge variant="default" className="ml-1.5">
                 {extensionRequests.length}
-              </span>
+              </Badge>
             )}
           </button>
         </div>
@@ -384,9 +395,11 @@ function AssignmentDetailPage() {
           </h2>
 
           {pendingConsultations.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>{t('consultations.noPendingConsultations')}</p>
-            </div>
+            <EmptyState
+              icon={MessageSquare}
+              title={t('consultations.noPendingConsultations')}
+              description={t('consultations.noPendingConsultations')}
+            />
           ) : (
             <div className="space-y-3">
               {pendingConsultations.map((item: PendingConsultation) => (
