@@ -33,9 +33,10 @@ describe('InstructorDashboard component', () => {
   it('should render pending reviews section', async () => {
     const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
     render(<InstructorDashboard data={emptyData} />);
-    expect(
-      screen.getByText((content) => content.startsWith('instructorDashboard.pendingReviews')),
-    ).toBeDefined();
+    const elements = screen.getAllByText((content) =>
+      content.startsWith('instructorDashboard.pendingReviews'),
+    );
+    expect(elements.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should render recent submissions section', async () => {

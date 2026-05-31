@@ -384,6 +384,8 @@
     "title": "Dashboard",
     "subtitle": "Overview of your teaching activity",
     "pendingReviews": "Pending Reviews",
+    "activeAssignments": "Active Assignments",
+    "totalStudents": "Total Students",
     "noPendingReviews": "No pending reviews — all caught up!",
     "recentSubmissions": "Recent Submissions",
     "noRecentSubmissions": "No recent submissions",

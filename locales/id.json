@@ -384,6 +384,8 @@
     "title": "Dasbor",
     "subtitle": "Ikhtisar aktivitas mengajar Anda",
     "pendingReviews": "Review Tertunda",
+    "activeAssignments": "Tugas Aktif",
+    "totalStudents": "Total Mahasiswa",
     "noPendingReviews": "Tidak ada review tertunda — semuanya selesai!",
     "recentSubmissions": "Pengumpulan Terbaru",
     "noRecentSubmissions": "Tidak ada pengumpulan terbaru",

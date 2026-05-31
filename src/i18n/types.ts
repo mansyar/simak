@@ -224,6 +224,8 @@ export type Translation = {
     title: string
     subtitle: string
     pendingReviews: string
+    activeAssignments: string
+    totalStudents: string
     noPendingReviews: string
     recentSubmissions: string
     noRecentSubmissions: string
