@@ -77,7 +77,7 @@
 
 ---
 
-## Phase 3: Core UI Components
+## Phase 3: Core UI Components [checkpoint: 6ee67f6]
 
 - [x] Task: Enhance Card component [015e10d]
   - [x] Update border radius to md (10px) — rounded-xl → rounded-md
@@ -115,7 +115,7 @@
   - [x] Implement gray dot for not verified/inactive
   - [x] Add proper sizing and spacing
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
 ---
 
