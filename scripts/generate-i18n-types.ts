@@ -154,6 +154,17 @@ export type Translation = {
     users: string
     templates: string
     auditLog: string
+    branding: string
+    sectionMain: string
+    sectionPreferences: string
+  }
+  instructorSidebar: {
+    dashboard: string
+    assignments: string
+    reviews: string
+    branding: string
+    sectionMain: string
+    sectionPreferences: string
   }
   adminAuditLog: {
     title: string

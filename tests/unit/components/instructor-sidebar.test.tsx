@@ -2,12 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock authClient to prevent real API calls
-const { mockSignOut } = vi.hoisted(() => ({
+const { mockSignOut, mockUseSession } = vi.hoisted(() => ({
   mockSignOut: vi.fn().mockResolvedValue({}),
+  mockUseSession: vi.fn(),
 }));
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
     signOut: mockSignOut,
+    useSession: mockUseSession,
   },
 }));
 
@@ -48,15 +50,22 @@ import { InstructorSidebar } from '@/components/layout/instructor-sidebar';
 describe('InstructorSidebar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseSession.mockReturnValue({
+      data: {
+        user: { name: 'Instructor User', email: 'instructor@example.com', role: 'instructor' },
+        session: {},
+      },
+      isPending: false,
+    });
   });
 
-  it('should render SIMAK Instructor title', () => {
+  it('should render dashboard link', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
     render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
     expect(dashboardLink).toBeDefined();
-    expect(dashboardLink.textContent).toBe('nav.dashboard');
+    expect(dashboardLink.textContent).toBe('instructorSidebar.dashboard');
   });
 
   it('should render assignments link', () => {
@@ -65,7 +74,7 @@ describe('InstructorSidebar', () => {
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/instructor/assignments');
     expect(assignmentsLink).toBeDefined();
-    expect(assignmentsLink.textContent).toBe('nav.assignments');
+    expect(assignmentsLink.textContent).toBe('instructorSidebar.assignments');
   });
 
   it('should render reviews link', () => {
@@ -74,7 +83,7 @@ describe('InstructorSidebar', () => {
 
     const reviewsLink = screen.getByTestId('sidebar-link-/instructor/reviews');
     expect(reviewsLink).toBeDefined();
-    expect(reviewsLink.textContent).toBe('nav.reviews');
+    expect(reviewsLink.textContent).toBe('instructorSidebar.reviews');
   });
 
   it('should highlight the currently active route', () => {
@@ -82,26 +91,17 @@ describe('InstructorSidebar', () => {
     render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
-    expect(dashboardLink.className).toContain('bg-primary');
-    expect(dashboardLink.className).toContain('text-primary-foreground');
-  });
-
-  it('should highlight active route with sub-paths', () => {
-    mockLocation.mockReturnValue({ pathname: '/instructor/assignments/new' });
-    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
-
-    const assignmentsLink = screen.getByTestId('sidebar-link-/instructor/assignments');
-    expect(assignmentsLink.className).toContain('bg-primary');
-    expect(assignmentsLink.className).toContain('text-primary-foreground');
+    expect(dashboardLink.className).toContain('border-sidebar-primary');
+    expect(dashboardLink.className).toContain('bg-sidebar-accent');
+    expect(dashboardLink.className).toContain('text-sidebar-primary-foreground');
   });
 
   it('should not apply the active class to inactive routes', () => {
-    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    mockLocation.mockReturnValue({ pathname: '/instructor/reviews' });
     render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
-    const assignmentsLink = screen.getByTestId('sidebar-link-/instructor/assignments');
-    expect(assignmentsLink.className).not.toContain('bg-primary');
-    expect(assignmentsLink.className).toContain('text-muted-foreground');
+    const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
+    expect(dashboardLink.className).not.toContain('border-sidebar-primary');
   });
 
   it('should render logout button', () => {

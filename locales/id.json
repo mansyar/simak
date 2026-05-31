@@ -105,6 +105,14 @@
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
   },
+  "instructorSidebar": {
+    "dashboard": "Dasbor",
+    "assignments": "Tugas",
+    "reviews": "Review",
+    "branding": "SIMAK",
+    "sectionMain": "UTAMA",
+    "sectionPreferences": "PENGATURAN"
+  },
   "adminAuditLog": {
     "title": "Log Audit",
     "subtitle": "Lihat dan cari jejak audit sistem dari semua tindakan penting.",

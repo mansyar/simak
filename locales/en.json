@@ -105,6 +105,14 @@
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
   },
+  "instructorSidebar": {
+    "dashboard": "Dashboard",
+    "assignments": "Assignments",
+    "reviews": "Reviews",
+    "branding": "SIMAK",
+    "sectionMain": "MAIN",
+    "sectionPreferences": "PREFERENCES"
+  },
   "adminAuditLog": {
     "title": "Audit Log",
     "subtitle": "View and search system-wide audit trail of all meaningful actions.",

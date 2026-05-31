@@ -48,7 +48,7 @@
   - [ ] Update logout button with red hover state
   - [ ] Add icons to all navigation links
 
-- [ ] Task: Redesign Instructor Sidebar
+- [~] Task: Redesign Instructor Sidebar
   - [ ] Apply same dark navy background
   - [ ] Add left accent border for active state
   - [ ] Update link styles and hover states
