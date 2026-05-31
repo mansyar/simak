@@ -121,13 +121,13 @@
 
 ## Phase 4: Admin Pages
 
-- [ ] Task: Redesign Admin Dashboard
-  - [ ] Update page title typography (Fraunces, 2rem)
-  - [ ] Replace stat cards with MetricCard components
-  - [ ] Update Email Queue section with colored stat boxes
-  - [ ] Update Recent Activity section styling
-  - [ ] Update Quick Actions section styling
-  - [ ] Update Escalation Alerts styling
+- [x] Task: Redesign Admin Dashboard [6cd12ed]
+  - [x] Update page title typography (Fraunces, 2rem) — font-display text-4xl
+  - [x] Replace stat cards with MetricCard components — with color variants (primary, warning, success, info)
+  - [x] Update Email Queue section with colored stat boxes — using font-display values, semantic icons
+  - [x] Update Recent Activity section styling — using StatusDot, Card component
+  - [x] Update Quick Actions section styling — hover lift, colored icon backgrounds
+  - [x] Update Escalation Alerts styling — alert cards with EmptyState component
 
 - [ ] Task: Redesign Admin Users page
   - [ ] Update page header with description
