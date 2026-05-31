@@ -18,7 +18,7 @@
   - [x] Add border radius tokens
   - [ ] Add shadow tokens — TODO: will be added when component shadows are applied
 
-- [ ] Task: Update Tailwind configuration
+- [~] Task: Update Tailwind configuration
   - [ ] Extend `tailwind.config.ts` with custom color palette
   - [ ] Add font family mappings (display, body)
   - [ ] Add spacing scale extensions
