@@ -55,12 +55,12 @@
   - [ ] Add section labels
   - [ ] Update user card and logout styling
 
-- [~] Task: Redesign Student Sidebar
-  - [ ] Apply same dark navy background
-  - [ ] Add left accent border for active state
-  - [ ] Update link styles and hover states
-  - [ ] Add section labels
-  - [ ] Update user card and logout styling
+- [x] Task: Redesign Student Sidebar [6cf2843]
+  - [x] Apply same dark navy background
+  - [x] Add left accent border for active state
+  - [x] Update link styles and hover states
+  - [x] Add section labels
+  - [x] Update user card and logout styling
 
 - [ ] Task: Redesign Header component
   - [ ] Set sticky positioning with backdrop blur
