@@ -18,13 +18,13 @@
   - [x] Add border radius tokens
   - [ ] Add shadow tokens — TODO: will be added when component shadows are applied
 
-- [~] Task: Update Tailwind configuration
-  - [ ] Extend `tailwind.config.ts` with custom color palette
-  - [ ] Add font family mappings (display, body)
-  - [ ] Add spacing scale extensions
-  - [ ] Add border radius extensions
-  - [ ] Add shadow extensions
-  - [ ] Configure dark mode class strategy
+- [x] Task: Update Tailwind configuration [697e2ad]
+  - [x] Extend `tailwind.config.ts` with custom color palette — via @theme inline in global.css (Tailwind v4 CSS-first approach)
+  - [x] Add font family mappings (display, body) — done in Task 1 via @theme inline
+  - [x] Add spacing scale extensions — Tailwind v4 defaults already match spec's 4px-base scale
+  - [x] Add border radius extensions — done in Task 2 via @theme inline
+  - [x] Add shadow extensions — added warm-toned shadow tokens using oklch color-mix
+  - [x] Configure dark mode class strategy — via @custom-variant dark (done in Task 2)
 
 - [ ] Task: Update global styles and base layer
   - [ ] Update `body` font to DM Sans
