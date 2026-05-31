@@ -91,24 +91,24 @@
   - [x] Add row hover state — hover:bg-muted/50 (already existed, preserved)
   - [x] Update header typography — text-xs font-semibold uppercase tracking-wider
 
-- [ ] Task: Enhance Badge component
-  - [ ] Add semantic color variants (success, warning, error, info)
-  - [ ] Add dot indicator variant
-  - [ ] Update border radius to full (pill shape)
+- [x] Task: Enhance Badge component [c479627]
+  - [x] Add semantic color variants (success, warning, error, info)
+  - [x] Add dot indicator variant
+  - [x] Update border radius to full (pill shape) — already rounded-4xl, no change needed
 
-- [ ] Task: Create MetricCard component
-  - [ ] Implement color-coded top border (3px)
-  - [ ] Add icon container (44px, rounded, tinted background)
-  - [ ] Add number display (Fraunces, 2.25rem, 700)
-  - [ ] Add label text (0.8125rem, muted)
-  - [ ] Add hover animation (translateY(-2px))
+- [x] Task: Create MetricCard component [87ffa2a]
+  - [x] Implement color-coded top border (3px)
+  - [x] Add icon container (44px, rounded, tinted background)
+  - [x] Add number display (Fraunces, 2.25rem, 700)
+  - [x] Add label text (0.8125rem, muted)
+  - [x] Add hover animation (translateY(-2px))
 
-- [ ] Task: Create EmptyState component
-  - [ ] Add icon container (64px, dashed border)
-  - [ ] Add headline text (h3, 0.9375rem, 600)
-  - [ ] Add description text (body, 0.8125rem, muted)
-  - [ ] Add CTA button slot
-  - [ ] Center content with proper padding
+- [x] Task: Create EmptyState component
+  - [x] Add icon container (64px, dashed border)
+  - [x] Add headline text (h3, 0.9375rem, 600)
+  - [x] Add description text (body, 0.8125rem, muted)
+  - [x] Add CTA button slot
+  - [x] Center content with proper padding
 
 - [ ] Task: Create StatusDot component
   - [ ] Implement green dot for verified/active
