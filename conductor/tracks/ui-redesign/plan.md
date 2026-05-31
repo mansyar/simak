@@ -62,7 +62,7 @@
   - [x] Add section labels
   - [x] Update user card and logout styling
 
-- [ ] Task: Redesign Header component
+- [~] Task: Redesign Header component
   - [ ] Set sticky positioning with backdrop blur
   - [ ] Update background to surface with transparency
   - [ ] Add notification badge component (red dot with count)

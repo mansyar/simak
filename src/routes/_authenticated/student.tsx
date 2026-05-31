@@ -1,14 +1,9 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { requireRole } from '../../server/auth';
 import { StudentSidebar } from '../../components/layout/student-sidebar';
-import { LanguageSwitcher } from '../../components/layout/language-switcher';
-import { ThemeToggle } from '../../components/layout/theme-toggle';
-import { useI18n } from '../__root';
+import { AppHeader } from '../../components/layout/app-header';
 import { useState } from 'react';
-import { NotificationBadge } from '../../components/notifications/NotificationBadge';
 import { NotificationCenter } from '../../components/notifications/NotificationCenter';
-import { useTheme } from '../../hooks/use-theme';
-import { Menu } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/student')({
   beforeLoad: async () => {
@@ -18,33 +13,23 @@ export const Route = createFileRoute('/_authenticated/student')({
 });
 
 function StudentLayout() {
-  const { t, locale, setLocale } = useI18n();
-  const { theme, toggleTheme } = useTheme();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       <StudentSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <main className="flex-1 flex flex-col p-6 overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="rounded-md p-2 min-h-11 min-w-11 text-muted-foreground hover:bg-accent hover:text-accent-foreground lg:hidden"
-            aria-label={t('common.openMenu')}
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <div className="flex items-center gap-4">
-            <NotificationBadge onOpen={() => setIsNotificationOpen(true)} />
-            <ThemeToggle theme={theme} onToggle={toggleTheme} />
-            <LanguageSwitcher currentLocale={locale} onSwitch={setLocale} />
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <AppHeader
+          onMenuToggle={() => setIsSidebarOpen(true)}
+          onNotificationOpen={() => setIsNotificationOpen(true)}
+        />
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="flex flex-col gap-6">
+            <Outlet />
           </div>
-        </div>
-        <div className="flex-1 flex flex-col gap-6">
-          <Outlet />
-        </div>
-      </main>
+        </main>
+      </div>
       <NotificationCenter
         isOpen={isNotificationOpen}
         onClose={() => setIsNotificationOpen(false)}
