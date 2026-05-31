@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMAK — Admin Dashboard Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       SIMAK Warm Academic — Design Tokens
+       ============================================================ */
+    :root {
+      /* === Brand === */
+      --brand: #2563EB;
+      --brand-light: #DBEAFE;
+      --brand-dark: #1D4ED8;
+
+      /* === Semantic === */
+      --success: #059669;
+      --success-light: #D1FAE5;
+      --warning: #D97706;
+      --warning-light: #FEF3C7;
+      --error: #DC2626;
+      --error-light: #FEE2E2;
+      --info: #0891B2;
+      --info-light: #CFFAFE;
+
+      /* === Surface (Light) === */
+      --bg: #FAF9F7;
+      --surface: #FFFFFF;
+      --surface-raised: #FFFFFF;
+      --surface-hover: #F5F3EF;
+      --border: #E7E5E0;
+      --border-subtle: #F0EDE8;
+
+      /* === Text (Light) === */
+      --text: #1C1917;
+      --text-secondary: #57534E;
+      --text-muted: #A8A29E;
+      --text-inverse: #FFFFFF;
+
+      /* === Sidebar === */
+      --sidebar-bg: #1C2333;
+      --sidebar-surface: #242D3F;
+      --sidebar-hover: #2A3448;
+      --sidebar-active-bg: rgba(37, 99, 235, 0.12);
+      --sidebar-active-border: #3B82F6;
+      --sidebar-text: #94A3B8;
+      --sidebar-text-active: #FFFFFF;
+      --sidebar-text-heading: #CBD5E1;
+
+      /* === Spacing === */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+
+      /* === Radius === */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+      --radius-full: 9999px;
+
+      /* === Shadow === */
+      --shadow-xs: 0 1px 2px rgba(28, 25, 23, 0.04);
+      --shadow-sm: 0 1px 3px rgba(28, 25, 23, 0.06), 0 1px 2px rgba(28, 25, 23, 0.04);
+      --shadow-md: 0 4px 6px -1px rgba(28, 25, 23, 0.07), 0 2px 4px -2px rgba(28, 25, 23, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(28, 25, 23, 0.08), 0 4px 6px -4px rgba(28, 25, 23, 0.04);
+      --shadow-card-hover: 0 12px 24px -4px rgba(28, 25, 23, 0.12), 0 4px 8px -2px rgba(28, 25, 23, 0.06);
+
+      /* === Typography === */
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+
+    /* === Dark Mode === */
+    .dark {
+      --bg: #0F1115;
+      --surface: #181B22;
+      --surface-raised: #1F2229;
+      --surface-hover: #252830;
+      --border: #2A2D35;
+      --border-subtle: #22252C;
+      --text: #F5F5F4;
+      --text-secondary: #A8A29E;
+      --text-muted: #6B6560;
+      --text-inverse: #1C1917;
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.3);
+      --shadow-card-hover: 0 12px 24px -4px rgba(0,0,0,0.6);
+      --brand-light: rgba(37, 99, 235, 0.15);
+      --success-light: rgba(5, 150, 105, 0.15);
+      --warning-light: rgba(217, 119, 6, 0.15);
+      --error-light: rgba(220, 38, 38, 0.15);
+      --info-light: rgba(8, 145, 178, 0.15);
+    }
+
+    /* ============================================================
+       Reset & Base
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ============================================================
+       Layout
+       ============================================================ */
+    .app {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* ============================================================
+       Sidebar
+       ============================================================ */
+    .sidebar {
+      width: 272px;
+      min-width: 272px;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 40;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      transition: width 0.2s ease, min-width 0.2s ease;
+    }
+
+    .sidebar-brand {
+      padding: var(--space-6) var(--space-5);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .sidebar-brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+    }
+
+    .sidebar-brand-name {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: var(--space-4) var(--space-3);
+      overflow-y: auto;
+    }
+
+    .sidebar-section-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--sidebar-text);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: var(--space-4) var(--space-3) var(--space-2);
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-3);
+      border-radius: var(--radius-md);
+      color: var(--sidebar-text);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      position: relative;
+      margin-bottom: 2px;
+    }
+
+    .sidebar-link:hover {
+      color: var(--sidebar-text-active);
+      background: var(--sidebar-hover);
+    }
+
+    .sidebar-link.active {
+      color: var(--sidebar-text-active);
+      background: var(--sidebar-active-bg);
+    }
+
+    .sidebar-link.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: var(--sidebar-active-border);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .sidebar-link svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .sidebar-link.active svg {
+      opacity: 1;
+    }
+
+    .sidebar-link-badge {
+      margin-left: auto;
+      background: var(--error);
+      color: white;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: var(--radius-full);
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-user {
+      padding: var(--space-4) var(--space-4);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: var(--sidebar-surface);
+      margin: 0 var(--space-3) var(--space-3);
+      border-radius: var(--radius-md);
+    }
+
+    .sidebar-user-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      cursor: pointer;
+      padding: var(--space-2);
+      border-radius: var(--radius-sm);
+      transition: background 0.15s ease;
+    }
+
+    .sidebar-user-card:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .sidebar-user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sidebar-user-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-user-email {
+      font-size: 0.75rem;
+      color: var(--sidebar-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-logout {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-3);
+      margin: 0 var(--space-3) var(--space-3);
+      border-radius: var(--radius-md);
+      color: var(--sidebar-text);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      background: none;
+      border: none;
+      width: calc(100% - var(--space-6));
+      text-align: left;
+    }
+
+    .sidebar-logout:hover {
+      color: #FCA5A5;
+      background: rgba(220, 38, 38, 0.1);
+    }
+
+    .sidebar-logout svg {
+      width: 20px;
+      height: 20px;
+      opacity: 0.7;
+    }
+
+    /* ============================================================
+       Main Content
+       ============================================================ */
+    .main {
+      flex: 1;
+      margin-left: 272px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ============================================================
+       Header
+       ============================================================ */
+    .header {
+      height: 64px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-8);
+      gap: var(--space-4);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,0.85);
+    }
+
+    .dark .header {
+      background: rgba(24, 27, 34, 0.85);
+    }
+
+    .header-spacer {
+      flex: 1;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .header-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .header-btn:hover {
+      background: var(--surface-hover);
+      color: var(--text);
+    }
+
+    .header-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 18px;
+      height: 18px;
+      background: var(--error);
+      color: white;
+      font-size: 0.625rem;
+      font-weight: 700;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--surface);
+    }
+
+    .lang-toggle {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      height: 36px;
+    }
+
+    .lang-toggle button {
+      padding: 0 var(--space-3);
+      border: none;
+      background: transparent;
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .lang-toggle button.active {
+      background: var(--text);
+      color: var(--text-inverse);
+    }
+
+    .lang-toggle button:hover:not(.active) {
+      background: var(--surface-hover);
+    }
+
+    /* ============================================================
+       Page Content
+       ============================================================ */
+    .page {
+      padding: var(--space-8);
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+    }
+
+    .page-header {
+      margin-bottom: var(--space-8);
+    }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    .page-subtitle {
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+      margin-top: var(--space-1);
+    }
+
+    /* ============================================================
+       Metric Cards
+       ============================================================ */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-5);
+      margin-bottom: var(--space-8);
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .metric-card.blue::before { background: linear-gradient(90deg, #3B82F6, #2563EB); }
+    .metric-card.green::before { background: linear-gradient(90deg, #10B981, #059669); }
+    .metric-card.amber::before { background: linear-gradient(90deg, #F59E0B, #D97706); }
+    .metric-card.red::before { background: linear-gradient(90deg, #EF4444, #DC2626); }
+    .metric-card.cyan::before { background: linear-gradient(90deg, #06B6D4, #0891B2); }
+    .metric-card.purple::before { background: linear-gradient(90deg, #8B5CF6, #7C3AED); }
+
+    .metric-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-4);
+    }
+
+    .metric-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .metric-icon.blue { background: var(--brand-light); color: var(--brand); }
+    .metric-icon.green { background: var(--success-light); color: var(--success); }
+    .metric-icon.amber { background: var(--warning-light); color: var(--warning); }
+    .metric-icon.red { background: var(--error-light); color: var(--error); }
+    .metric-icon.cyan { background: var(--info-light); color: var(--info); }
+    .metric-icon.purple { background: rgba(139, 92, 246, 0.12); color: #8B5CF6; }
+
+    .metric-value {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .metric-label {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-top: var(--space-1);
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       Section Cards
+       ============================================================ */
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-5);
+      margin-bottom: var(--space-8);
+    }
+
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .section-action {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--brand);
+      text-decoration: none;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: var(--font-body);
+      transition: color 0.15s ease;
+    }
+
+    .section-action:hover {
+      color: var(--brand-dark);
+    }
+
+    .section-body {
+      padding: var(--space-6);
+    }
+
+    /* ============================================================
+       Email Queue Stats
+       ============================================================ */
+    .email-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+    }
+
+    .email-stat {
+      text-align: center;
+      padding: var(--space-5);
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .email-stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-3);
+    }
+
+    .email-stat-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .email-stat-icon.blue { background: var(--brand-light); color: var(--brand); }
+    .email-stat-icon.green { background: var(--success-light); color: var(--success); }
+    .email-stat-icon.red { background: var(--error-light); color: var(--error); }
+
+    .email-stat-value {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .email-stat-label {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-top: var(--space-1);
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       Activity Feed
+       ============================================================ */
+    .activity-list {
+      list-style: none;
+    }
+
+    .activity-item {
+      display: flex;
+      gap: var(--space-4);
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .activity-item:first-child {
+      padding-top: 0;
+    }
+
+    .activity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    .activity-dot.blue { background: var(--brand); }
+    .activity-dot.green { background: var(--success); }
+    .activity-dot.amber { background: var(--warning); }
+    .activity-dot.red { background: var(--error); }
+
+    .activity-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .activity-text {
+      font-size: 0.875rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .activity-text strong {
+      font-weight: 600;
+    }
+
+    .activity-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: var(--space-1);
+    }
+
+    /* ============================================================
+       Escalation Alerts
+       ============================================================ */
+    .alert-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--error-light);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-3);
+    }
+
+    .alert-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .alert-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background: var(--error);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .alert-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .alert-content {
+      flex: 1;
+    }
+
+    .alert-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .alert-desc {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================================
+       Empty State
+       ============================================================ */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-10) var(--space-6);
+    }
+
+    .empty-state-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-full);
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-5);
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .empty-state-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: var(--space-1);
+    }
+
+    .empty-state-desc {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    /* ============================================================
+       Quick Actions
+       ============================================================ */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+    }
+
+    .quick-action {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      color: var(--text);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .quick-action:hover {
+      background: var(--surface-hover);
+      border-color: var(--brand);
+      transform: translateY(-1px);
+    }
+
+    .quick-action-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--brand-light);
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .quick-action-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ============================================================
+       Demo Theme Toggle Button
+       ============================================================ */
+    .demo-theme-btn {
+      position: fixed;
+      bottom: var(--space-6);
+      right: var(--space-6);
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: var(--text);
+      color: var(--text-inverse);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      transition: transform 0.2s ease;
+    }
+
+    .demo-theme-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .demo-theme-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* ============================================================
+       Responsive
+       ============================================================ */
+    @media (max-width: 1024px) {
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .section-grid { grid-template-columns: 1fr; }
+      .quick-actions { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .page { padding: var(--space-5); }
+      .metrics-grid { grid-template-columns: 1fr; }
+      .email-stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- ============================================================
+         Sidebar
+         ============================================================ -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">🎓</div>
+        <span class="sidebar-brand-name">SIMAK</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+
+        <a href="#" class="sidebar-link active">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          Dashboard
+        </a>
+
+        <a href="#" class="sidebar-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Users
+        </a>
+
+        <a href="#" class="sidebar-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+          Templates
+        </a>
+
+        <a href="#" class="sidebar-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+          Audit Log
+        </a>
+
+        <div class="sidebar-section-label" style="margin-top: var(--space-4);">Preferences</div>
+
+        <a href="#" class="sidebar-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          Settings
+        </a>
+      </nav>
+
+      <div style="padding: 0 var(--space-3) var(--space-3);">
+        <button class="sidebar-logout">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+          Log out
+        </button>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="sidebar-user-card">
+          <div class="sidebar-user-avatar">SA</div>
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name">SuperAdmin</div>
+            <div class="sidebar-user-email">superadmin@simak.local</div>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--sidebar-text);"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============================================================
+         Main Content
+         ============================================================ -->
+    <main class="main">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-spacer"></div>
+
+        <div class="header-actions">
+          <div class="lang-toggle">
+            <button class="active">EN</button>
+            <button>ID</button>
+          </div>
+
+          <button class="header-btn" title="Notifications">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            <span class="notification-badge">3</span>
+          </button>
+
+          <button class="header-btn" id="themeToggle" title="Toggle theme">
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <div class="page">
+        <div class="page-header">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle">System overview and metrics</p>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card blue">
+            <div class="metric-icon blue">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="metric-value">6</div>
+            <div class="metric-label">Total Users</div>
+          </div>
+
+          <div class="metric-card amber">
+            <div class="metric-icon amber">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/></svg>
+            </div>
+            <div class="metric-value">2</div>
+            <div class="metric-label">Instructors</div>
+          </div>
+
+          <div class="metric-card green">
+            <div class="metric-icon green">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div class="metric-value">3</div>
+            <div class="metric-label">Students</div>
+          </div>
+
+          <div class="metric-card cyan">
+            <div class="metric-icon cyan">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+            </div>
+            <div class="metric-value">1</div>
+            <div class="metric-label">Active Assignments</div>
+          </div>
+
+          <div class="metric-card purple">
+            <div class="metric-icon purple">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </div>
+            <div class="metric-value">0</div>
+            <div class="metric-label">Pending Reviews</div>
+          </div>
+
+          <div class="metric-card green">
+            <div class="metric-icon green">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="metric-value">0</div>
+            <div class="metric-label">Active Consultations</div>
+          </div>
+        </div>
+
+        <!-- Email Queue & Activity -->
+        <div class="section-grid">
+          <!-- Email Queue -->
+          <div class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">Email Queue</h2>
+              <button class="section-action">View All</button>
+            </div>
+            <div class="section-body">
+              <div class="email-stats">
+                <div class="email-stat">
+                  <div class="email-stat-icon blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  </div>
+                  <div class="email-stat-value">0</div>
+                  <div class="email-stat-label">Pending</div>
+                </div>
+                <div class="email-stat">
+                  <div class="email-stat-icon green">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><path d="m17 21 5-5"/><path d="m2 21 5-5"/></svg>
+                  </div>
+                  <div class="email-stat-value">0</div>
+                  <div class="email-stat-label">Sent</div>
+                </div>
+                <div class="email-stat">
+                  <div class="email-stat-icon red">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><line x1="17" x2="17" y1="11" y2="11"/></svg>
+                  </div>
+                  <div class="email-stat-value">1</div>
+                  <div class="email-stat-label">Failed</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Deadline Escalation Alerts -->
+          <div class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">Deadline Escalation Alerts</h2>
+            </div>
+            <div class="section-body">
+              <div class="empty-state">
+                <div class="empty-state-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+                </div>
+                <div class="empty-state-title">No active escalation alerts</div>
+                <div class="empty-state-desc">All assignments are on track</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity & Quick Actions -->
+        <div class="section-grid">
+          <!-- Recent Activity -->
+          <div class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">Recent Activity</h2>
+              <button class="section-action">View All</button>
+            </div>
+            <div class="section-body">
+              <ul class="activity-list">
+                <li class="activity-item">
+                  <div class="activity-dot green"></div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>Instructor</strong> created assignment "Thesis Project"</div>
+                    <div class="activity-time">2 hours ago</div>
+                  </div>
+                </li>
+                <li class="activity-item">
+                  <div class="activity-dot blue"></div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>Student 1</strong> submitted file for "Literature Review"</div>
+                    <div class="activity-time">5 hours ago</div>
+                  </div>
+                </li>
+                <li class="activity-item">
+                  <div class="activity-dot amber"></div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>Instructor</strong> requested revision on "Methodology"</div>
+                    <div class="activity-time">Yesterday</div>
+                  </div>
+                </li>
+                <li class="activity-item">
+                  <div class="activity-dot green"></div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>SuperAdmin</strong> created user "Student 2"</div>
+                    <div class="activity-time">2 days ago</div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">Quick Actions</h2>
+            </div>
+            <div class="section-body">
+              <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+                <a href="#" class="quick-action">
+                  <div class="quick-action-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+                  </div>
+                  Create New User
+                </a>
+                <a href="#" class="quick-action">
+                  <div class="quick-action-icon" style="background: var(--success-light); color: var(--success);">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+                  </div>
+                  Create Template
+                </a>
+                <a href="#" class="quick-action">
+                  <div class="quick-action-icon" style="background: var(--warning-light); color: var(--warning);">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                  </div>
+                  View Audit Log
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Theme Toggle FAB -->
+  <button class="demo-theme-btn" id="themeFab" title="Toggle dark/light mode">
+    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+  </button>
+
+  <script>
+    // Theme toggle
+    const html = document.documentElement;
+    const themeFab = document.getElementById('themeFab');
+    const headerToggle = document.getElementById('themeToggle');
+
+    function getSystemTheme() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function getStoredTheme() {
+      return localStorage.getItem('simak-theme');
+    }
+
+    function setTheme(theme) {
+      html.classList.toggle('dark', theme === 'dark');
+      localStorage.setItem('simak-theme', theme);
+
+      document.querySelectorAll('.sun-icon').forEach(el => el.style.display = theme === 'dark' ? 'none' : 'block');
+      document.querySelectorAll('.moon-icon').forEach(el => el.style.display = theme === 'dark' ? 'block' : 'none');
+    }
+
+    // Initialize
+    setTheme(getStoredTheme() || getSystemTheme());
+
+    themeFab.addEventListener('click', () => {
+      setTheme(html.classList.contains('dark') ? 'light' : 'dark');
+    });
+
+    headerToggle.addEventListener('click', () => {
+      setTheme(html.classList.contains('dark') ? 'light' : 'dark');
+    });
+
+    // Language toggle (visual only for mockup)
+    document.querySelectorAll('.lang-toggle button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

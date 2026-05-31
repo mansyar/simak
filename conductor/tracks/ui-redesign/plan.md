@@ -2,7 +2,7 @@
 
 ## Phase 1: Design Tokens & Foundation
 
-- [ ] Task: Download and set up self-hosted fonts (Fraunces, DM Sans)
+- [~] Task: Download and set up self-hosted fonts (Fraunces, DM Sans)
   - [ ] Download font files (woff2 format) from Google Fonts
   - [ ] Create `public/fonts/` directory structure
   - [ ] Add `@font-face` declarations in `src/app.css`
