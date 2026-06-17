@@ -160,7 +160,7 @@
 
 ---
 
-## Phase 5: Instructor Pages
+## Phase 5: Instructor Pages [checkpoint: 05513f2]
 
 - [x] Task: Redesign Instructor Dashboard [ef32a11]
   - [x] Update page title with welcome message — route already had font-display text-4xl
@@ -194,18 +194,17 @@
   - [x] Update review history badges — shared Badge semantic variants
   - [x] Update error/no-data states — shared EmptyState component
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 5' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 5' (Protocol in workflow.md) [05513f2]
 
 ---
 
 ## Phase 6: Student Pages
 
-- [ ] Task: Redesign Student Dashboard
-  - [ ] Update page title with welcome message
-  - [ ] Update Active Assignments with progress bars
-  - [ ] Update Upcoming Deadlines with urgency colors
-  - [ ] Update Pending Reviews section
-  - [ ] Update Consultation Reminders section
+- [x] Task: Redesign Student Dashboard [5085a3d]
+  - [x] WidgetCard → shared Card + CardHeader + CardTitle + CardContent
+  - [x] Inline EmptyState → shared EmptyState
+  - [x] Manual badge spans → shared Badge (warning, destructive)
+  - [x] Overdue indicator → shared Badge
 
 - [ ] Task: Redesign Student Assignments list
   - [ ] Update page header with description
