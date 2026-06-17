@@ -189,11 +189,10 @@
   - [ ] Update SLA badges (On Time, Approaching, Breached)
   - [ ] Update wait time display
 
-- [ ] Task: Redesign Instructor Review detail
-  - [ ] Update file preview section styling
-  - [ ] Update review history timeline
-  - [ ] Update decision form styling
-  - [ ] Update feedback upload section
+- [x] Task: Redesign Instructor Review detail [ebaf56b]
+  - [x] Update page title — font-display text-3xl (ReviewDetailHeader)
+  - [x] Update review history badges — shared Badge semantic variants
+  - [x] Update error/no-data states — shared EmptyState component
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 5' (Protocol in workflow.md)
 
