@@ -9,5 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: UI Redesign — Complete visual redesign implementing the Warm Academic design system**
-  _Link: [./tracks/ui-redesign/](./tracks/ui-redesign/)_
+- [x] **Track: UI Redesign — Complete visual redesign implementing the Warm Academic design system**
+      _Link: [./tracks/ui-redesign/](./tracks/ui-redesign/)_

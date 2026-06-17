@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { listPendingReviews } from '@/server/reviews';
-import { ReviewQueueItem } from '@/components/reviews/ReviewQueueItem';
 import type { ReviewQueueItemData } from '@/components/reviews/ReviewQueueItem';
+import { ReviewQueueTable } from '@/components/reviews/ReviewQueueTable';
 import { ReviewQueueFilters } from '@/components/reviews/ReviewQueueFilters';
 import { ReviewQueueEmptyState } from '@/components/reviews/ReviewQueueEmptyState';
 import { ReviewQueueSkeleton } from '@/components/reviews/ReviewQueueSkeleton';
@@ -87,15 +87,7 @@ function ReviewsPage() {
         onAssignmentChange={handleAssignmentChange}
       />
 
-      {items.length === 0 ? (
-        <ReviewQueueEmptyState />
-      ) : (
-        <div className="space-y-3">
-          {items.map((item) => (
-            <ReviewQueueItem key={item.submissionId} item={item} />
-          ))}
-        </div>
-      )}
+      {items.length === 0 ? <ReviewQueueEmptyState /> : <ReviewQueueTable data={items} />}
 
       {items.length > 0 && (
         <ReviewQueuePagination

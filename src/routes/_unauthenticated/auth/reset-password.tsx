@@ -1,7 +1,13 @@
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { authClient } from '../../../lib/auth-client';
 import { useI18n } from '../../__root';
+import { LanguageSwitcher } from '../../../components/layout/language-switcher';
+import { ThemeToggle } from '../../../components/layout/theme-toggle';
+import { useTheme } from '../../../hooks/use-theme';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
+import { Button } from '../../../components/ui/button';
 
 export const Route = createFileRoute('/_unauthenticated/auth/reset-password')({
   validateSearch: (search: Record<string, string | undefined>) => ({
@@ -12,8 +18,8 @@ export const Route = createFileRoute('/_unauthenticated/auth/reset-password')({
 
 function ResetPasswordPage() {
   const { token } = Route.useSearch();
-  const { t } = useI18n();
-  const router = useRouter();
+  const { t, locale, setLocale } = useI18n();
+  const { theme, toggleTheme } = useTheme();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -57,15 +63,18 @@ function ResetPasswordPage() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <div className="w-full max-w-sm rounded-lg border bg-card p-6 text-center shadow-sm">
-          <h1 className="mb-4 text-2xl font-bold text-foreground">{t('auth.resetSuccess')}</h1>
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <div className="w-full max-w-sm rounded-xl border bg-card p-8 text-center shadow-lg">
+          <div className="mb-6 flex items-center justify-between">
+            <LanguageSwitcher currentLocale={locale} onSwitch={setLocale} />
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          </div>
+          <h1 className="mb-2 font-display text-2xl font-bold text-foreground">
+            {t('auth.resetSuccess')}
+          </h1>
           <p className="mb-6 text-sm text-muted-foreground">{t('auth.resetSuccess')}</p>
-          <Link
-            to="/auth/login"
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            {t('auth.login')}
+          <Link to="/auth/login">
+            <Button className="w-full">{t('auth.login')}</Button>
           </Link>
         </div>
       </div>
@@ -73,43 +82,41 @@ function ResetPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-sm rounded-lg border bg-card p-6 shadow-sm">
-        <h1 className="mb-2 text-center text-2xl font-bold text-foreground">
-          {t('auth.resetPassword')}
-        </h1>
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="w-full max-w-sm rounded-xl border bg-card p-8 shadow-lg">
+        <div className="mb-6 flex items-center justify-between">
+          <LanguageSwitcher currentLocale={locale} onSwitch={setLocale} />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+        </div>
+
+        <div className="mb-6 text-center">
+          <h1 className="font-display text-2xl font-bold text-foreground">
+            {t('auth.resetPassword')}
+          </h1>
+        </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-foreground">
-              {t('auth.password')}
-            </label>
-            <input
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="password">{t('auth.password')}</Label>
+            <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               autoComplete="new-password"
             />
           </div>
 
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="mb-1 block text-sm font-medium text-foreground"
-            >
-              {t('auth.confirmPassword')}
-            </label>
-            <input
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
+            <Input
               id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               autoComplete="new-password"
             />
           </div>
@@ -120,13 +127,14 @@ function ResetPasswordPage() {
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting || !token}
-            className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+            loading={isSubmitting}
+            className="w-full"
           >
-            {isSubmitting ? t('common.loading') : t('common.submit')}
-          </button>
+            {t('common.submit')}
+          </Button>
 
           <div className="text-center">
             <Link to="/auth/login" className="text-sm text-primary hover:underline">
