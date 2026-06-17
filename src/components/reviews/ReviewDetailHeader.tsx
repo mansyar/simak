@@ -28,7 +28,7 @@ export function ReviewDetailHeader({
 
       {/* Header info */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">{studentName}</h1>
+        <h1 className="font-display text-3xl text-foreground">{studentName}</h1>
         <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
           <span>{assignmentTitle}</span>
           <span>—</span>

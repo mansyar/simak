@@ -7,7 +7,8 @@ import { ReviewHistory } from '@/components/reviews/ReviewHistory';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
 import { ReviewQueueSkeleton } from '@/components/reviews/ReviewQueueSkeleton';
 import { useI18n } from '../../../__root';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, SearchX } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface ReviewDetailLoaderData {
   submission?: {
@@ -79,21 +80,11 @@ function ReviewDetailPage() {
   }, [data, params.submissionId, transitioned, navigate]);
 
   if (data?.error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <AlertCircle className="h-8 w-8 text-destructive mb-2" />
-        <p className="text-muted-foreground">{data.error}</p>
-      </div>
-    );
+    return <EmptyState icon={AlertCircle} title={data.error} description="" />;
   }
 
   if (!data?.submission) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <AlertCircle className="h-8 w-8 text-muted-foreground mb-2" />
-        <p className="text-muted-foreground">{t('common.noResults')}</p>
-      </div>
-    );
+    return <EmptyState icon={SearchX} title={t('common.noResults')} description="" />;
   }
 
   const { submission, reviewHistory } = data;

@@ -36,14 +36,7 @@ export function ReviewHistory({ reviews }: ReviewHistoryProps) {
             </div>
             <div className="flex-1 space-y-1">
               <div className="flex items-center gap-2">
-                <Badge
-                  variant="secondary"
-                  className={
-                    review.decision === 'pass'
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                      : 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300'
-                  }
-                >
+                <Badge variant={review.decision === 'pass' ? 'success' : 'warning'}>
                   {review.decision === 'pass'
                     ? t('instructorReviews.passed')
                     : t('instructorReviews.revise')}
