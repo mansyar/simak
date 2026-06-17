@@ -1,7 +1,9 @@
+<protect>
 # Implementation Plan: Migrate to oxlint + oxfmt
 
 ## Phase 1: Install New Tools & Remove Old Dependencies
 
+- [ ] Task: Read spec.md — Review requirements before starting implementation
 - [ ] Task: Install oxlint and oxfmt as devDependencies
   - [ ] Run `pnpm add -D oxlint oxfmt`
 - [ ] Task: Remove ESLint and Prettier packages
@@ -13,6 +15,7 @@
 
 ## Phase 2: Create Configuration Files
 
+- [ ] Task: Read spec.md — Review FR-2, FR-3, FR-6 before configuring
 - [ ] Task: Create oxlint config (`oxlintrc.json`)
   - [ ] Map existing ESLint rules to oxlint equivalents
   - [ ] Configure recommended + typescript + react strict rules
@@ -28,6 +31,7 @@
 
 ## Phase 3: Update Scripts & Hooks
 
+- [ ] Task: Read spec.md — Review FR-4, FR-5 before updating
 - [ ] Task: Update `package.json` scripts
   - [ ] Change `lint` script to `oxlint .`
   - [ ] Change `format` script to `oxfmt --write "src/**/*.{ts,tsx,css}"`
@@ -38,6 +42,7 @@
 
 ## Phase 4: Format, Lint & Fix
 
+- [ ] Task: Read spec.md — Review FR-7, NFR-2, NFR-3 before running tools
 - [ ] Task: Run oxfmt to reformat all source files
   - [ ] Run `pnpm format`
   - [ ] Verify no formatting errors
@@ -50,6 +55,7 @@
 
 ## Phase 5: Verify Everything Works
 
+- [ ] Task: Read spec.md — Review Acceptance Criteria before final verification
 - [ ] Task: Run full verification suite
   - [ ] `pnpm lint` passes (exit 0)
   - [ ] `pnpm format` runs without errors
@@ -60,3 +66,4 @@
 - [ ] Task: Update `tech-stack.md` to reflect oxlint + oxfmt
   - [ ] Change "ESLint + Prettier" to "oxlint + oxfmt" in Testing & Quality table
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Verify Everything Works' (Protocol in workflow.md)
+      </protect>

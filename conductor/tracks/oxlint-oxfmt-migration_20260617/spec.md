@@ -1,3 +1,4 @@
+<protect>
 # Specification: Migrate to oxlint + oxfmt
 
 ## Overview
@@ -81,3 +82,4 @@ Migrate the project's code quality tooling from ESLint + Prettier to oxlint + ox
 - CI/CD pipeline changes (if any)
 - Adding oxlint/oxfmt to Docker build
 - Migrating IDE settings (VS Code extensions)
+  </protect>
