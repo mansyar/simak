@@ -3,6 +3,7 @@ import { isPast } from 'date-fns/isPast';
 import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Clock, AlertCircle, Users, ExternalLink } from 'lucide-react';
 
 export interface CheckpointData {
@@ -21,36 +22,43 @@ interface CheckpointCardProps {
   assignmentId: number;
 }
 
-const stateConfig: Record<string, { label: string; containerClass: string; badgeClass: string }> = {
+const stateConfig: Record<
+  string,
+  {
+    label: string;
+    containerClass: string;
+    badgeVariant: 'success' | 'info' | 'warning' | 'destructive' | 'default' | 'outline';
+  }
+> = {
   passed: {
     label: 'studentAssignments.status.passed',
     containerClass: 'border-l-green-500 bg-green-50 dark:bg-green-950/20',
-    badgeClass: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
+    badgeVariant: 'success',
   },
   submitted: {
     label: 'studentAssignments.status.submitted',
     containerClass: 'border-l-blue-500 bg-blue-50 dark:bg-blue-950/20',
-    badgeClass: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
+    badgeVariant: 'info',
   },
   under_review: {
     label: 'studentAssignments.status.under_review',
     containerClass: 'border-l-amber-500 bg-amber-50 dark:bg-amber-950/20',
-    badgeClass: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300',
+    badgeVariant: 'warning',
   },
   revise: {
     label: 'studentAssignments.status.revise',
     containerClass: 'border-l-orange-500 bg-orange-50 dark:bg-orange-950/20',
-    badgeClass: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300',
+    badgeVariant: 'destructive',
   },
   unlocked: {
     label: 'studentAssignments.status.unlocked',
     containerClass: 'border-l-teal-500 bg-teal-50 dark:bg-teal-950/20',
-    badgeClass: 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300',
+    badgeVariant: 'default',
   },
   locked: {
     label: 'studentAssignments.status.locked',
     containerClass: 'border-l-gray-400 bg-gray-50 dark:bg-gray-900/20',
-    badgeClass: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+    badgeVariant: 'outline',
   },
 };
 
@@ -86,16 +94,12 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="text-sm font-semibold text-foreground">{checkpoint.name}</h4>
-            <span
-              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${config.badgeClass}`}
-            >
-              {t(config.label)}
-            </span>
+            <Badge variant={config.badgeVariant}>{t(config.label)}</Badge>
             {isOverdue && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-600 dark:text-red-400">
+              <Badge variant="destructive" className="gap-1">
                 <AlertCircle className="h-3 w-3" />
                 {t('studentAssignments.status.overdue')}
-              </span>
+              </Badge>
             )}
           </div>
 

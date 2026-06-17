@@ -1,6 +1,7 @@
 import { format } from 'date-fns/format';
 import { Calendar, User, Clipboard } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
+import { Badge } from '@/components/ui/badge';
 
 export interface AssignmentDetail {
   title: string;
@@ -21,13 +22,11 @@ export function AssignmentDetailHeader({ detail }: AssignmentDetailHeaderProps) 
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-2">
-        <span className="text-[10px] font-bold tracking-wider uppercase text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-          {detail.templateType}
-        </span>
+        <Badge variant="default">{detail.templateType}</Badge>
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">{detail.title}</h1>
+        <h1 className="font-display text-3xl text-foreground">{detail.title}</h1>
         {detail.description && (
           <p className="mt-2 text-sm text-muted-foreground">{detail.description}</p>
         )}
