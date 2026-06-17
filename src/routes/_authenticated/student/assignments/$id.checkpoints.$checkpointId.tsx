@@ -7,8 +7,10 @@ import { FileUploader } from '@/components/files/file-uploader';
 import { FileList } from '@/components/files/file-list';
 import { SubmissionStatus } from '@/components/files/submission-status';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
-import { ChevronLeft } from 'lucide-react';
+import { SearchX, AlertCircle, ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { useState, useCallback } from 'react';
 
@@ -42,9 +44,7 @@ export const Route = createFileRoute(
 
       // Find the latest review (from the reviews table)
       const reviewData = await (
-        getLatestReview as unknown as (args: {
-          data: { checkpointId: number };
-        }) => Promise<{
+        getLatestReview as unknown as (args: { data: { checkpointId: number } }) => Promise<{
           review?: {
             decision: string;
             comment: string | null;
@@ -101,16 +101,13 @@ function SubmissionNotFound() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <h2 className="text-xl font-semibold text-foreground mb-2">
-        {t('studentAssignments.notFound')}
-      </h2>
-      <p className="text-sm text-muted-foreground mb-4">
-        {t('studentAssignments.notFoundDescription')}
-      </p>
+    <EmptyState
+      icon={SearchX}
+      title={t('studentAssignments.notFound')}
+      description={t('studentAssignments.notFoundDescription')}
+    >
       <Button
         variant="outline"
-        type="button"
         onClick={() =>
           navigate({ to: '/student/assignments', search: { page: 1, limit: 20, search: '' } })
         }
@@ -118,7 +115,7 @@ function SubmissionNotFound() {
         <ChevronLeft className="mr-2 h-4 w-4" />
         {t('common.back')}
       </Button>
-    </div>
+    </EmptyState>
   );
 }
 
@@ -236,21 +233,18 @@ function CheckpointSubmissionPage() {
 
   if (!data) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <h2 className="text-xl font-semibold text-foreground mb-2">
-          {t('studentAssignments.notFound')}
-        </h2>
-        <Link
-          to="/student/assignments"
-          search={{ page: 1, limit: 20, search: '' }}
-          className="inline-flex"
-        >
+      <EmptyState
+        icon={SearchX}
+        title={t('studentAssignments.notFound')}
+        description={t('studentAssignments.notFoundDescription')}
+      >
+        <Link to="/student/assignments" search={{ page: 1, limit: 20, search: '' }}>
           <Button variant="outline" type="button">
             <ChevronLeft className="mr-2 h-4 w-4" />
             {t('common.back')}
           </Button>
         </Link>
-      </div>
+      </EmptyState>
     );
   }
 
@@ -272,9 +266,7 @@ function CheckpointSubmissionPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          {data.checkpoint.name}
-        </h1>
+        <h1 className="font-display text-3xl text-foreground">{data.checkpoint.name}</h1>
         <p className="text-sm text-muted-foreground mt-1">{data.assignmentTitle}</p>
       </div>
 
@@ -293,7 +285,7 @@ function CheckpointSubmissionPage() {
 
       {/* Submission history */}
       <div>
-        <h2 className="text-lg font-semibold text-foreground mb-3">{t('files.table.version')}</h2>
+        <h2 className="font-display text-2xl text-foreground mb-3">{t('files.table.version')}</h2>
         <FileList submissions={submissions} onDownload={handleDownload} />
       </div>
     </div>

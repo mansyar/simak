@@ -9,7 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Download, FileText, Inbox } from 'lucide-react';
+import { Download, FileText, FileQuestion } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface Submission {
   id: number;
@@ -61,11 +62,11 @@ export function FileList({ submissions, onDownload }: FileListProps) {
 
   if (submissions.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-        <Inbox className="mb-2 h-8 w-8 text-muted-foreground" />
-        <p className="text-sm font-medium text-foreground">{t('files.noSubmissions')}</p>
-        <p className="text-xs text-muted-foreground">{t('files.noSubmissionsHint')}</p>
-      </div>
+      <EmptyState
+        icon={FileQuestion}
+        title={t('files.empty')}
+        description={t('files.emptyPrompt')}
+      />
     );
   }
 

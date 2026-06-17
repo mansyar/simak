@@ -79,6 +79,6 @@ describe('FileList', () => {
 
   it('should show empty state when no submissions exist', () => {
     render(<FileList submissions={[]} />);
-    expect(screen.getByText('files.noSubmissions')).toBeDefined();
+    expect(screen.getByText('files.empty')).toBeDefined();
   });
 });

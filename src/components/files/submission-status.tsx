@@ -24,6 +24,21 @@ function formatDate(date: Date | string | null | undefined, locale: string): str
   }).format(new Date(date));
 }
 
+const statusConfig = {
+  pass: {
+    badgeVariant: 'success' as const,
+    icon: CheckCircle2,
+    iconClass: 'text-green-500',
+    labelKey: 'files.review.passed',
+  },
+  revise: {
+    badgeVariant: 'destructive' as const,
+    icon: RefreshCcw,
+    iconClass: 'text-orange-500',
+    labelKey: 'files.review.revise',
+  },
+};
+
 export function SubmissionStatus({ review }: SubmissionStatusProps) {
   const { t, locale } = useI18n();
 
@@ -46,37 +61,19 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
     );
   }
 
-  const isPassed = review.decision === 'pass';
+  const config = statusConfig[review.decision];
+  const Icon = config.icon;
 
   return (
-    <Card className={isPassed ? 'border-l-green-500' : 'border-l-orange-500'}>
+    <Card className={review.decision === 'pass' ? 'border-l-green-500' : 'border-l-orange-500'}>
       <CardHeader>
         <CardTitle className="text-base">{t('files.review.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {/* Decision badge */}
         <div className="flex items-center gap-2">
-          {isPassed ? (
-            <>
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
-              <Badge
-                variant="secondary"
-                className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-              >
-                {t('files.review.passed')}
-              </Badge>
-            </>
-          ) : (
-            <>
-              <RefreshCcw className="h-5 w-5 text-orange-500" />
-              <Badge
-                variant="secondary"
-                className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300"
-              >
-                {t('files.review.revise')}
-              </Badge>
-            </>
-          )}
+          <Icon className={`h-5 w-5 ${config.iconClass}`} />
+          <Badge variant={config.badgeVariant}>{t(config.labelKey)}</Badge>
         </div>
 
         {/* Reviewer */}
@@ -96,7 +93,7 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
         )}
 
         {/* Revision deadline */}
-        {!isPassed && review.revisionDeadline && (
+        {review.decision !== 'pass' && review.revisionDeadline && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
             <span>
