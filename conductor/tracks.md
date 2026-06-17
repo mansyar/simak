@@ -11,3 +11,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: UI Redesign — Complete visual redesign implementing the Warm Academic design system**
       _Link: [./tracks/ui-redesign/](./tracks/ui-redesign/)_
+
+---
+
+- [ ] **Track: Migrate to oxlint + oxfmt — Replace ESLint + Prettier with Oxc toolchain**
+      _Link: [./tracks/oxlint-oxfmt-migration_20260617/](./tracks/oxlint-oxfmt-migration_20260617/)_

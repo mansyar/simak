@@ -1,0 +1,8 @@
+{
+  "track_id": "oxlint-oxfmt-migration_20260617",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-06-17T09:52:00Z",
+  "updated_at": "2026-06-17T09:52:00Z",
+  "description": "Migrate dev tools lint and formatter to oxlint and oxfmt"
+}
