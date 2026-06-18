@@ -30,6 +30,11 @@ export default defineConfig({
       },
     },
 
+    // Suppress console noise in test output
+    onConsoleLog(log, type) {
+      if (type === 'stderr' || type === 'stdout') return false;
+    },
+
     // Faster reporter
     reporters: ['dot'],
 
