@@ -40,20 +40,20 @@
 ## Phase 2: Shared Layout Components [checkpoint: e95c2ca]
 
 - [x] Task: Redesign Admin Sidebar [abe793a]
-  - [ ] Update sidebar background to dark navy (#1C2333)
-  - [ ] Add left accent border (3px blue) for active state
-  - [ ] Update link hover states with background tint
-  - [ ] Add section labels (MAIN, PREFERENCES) with uppercase styling
-  - [ ] Update user card with surface background
-  - [ ] Update logout button with red hover state
-  - [ ] Add icons to all navigation links
+  - [x] Update sidebar background to dark navy (#1C2333) — bg-sidebar CSS variable
+  - [x] Add left accent border (3px blue) for active state — border-l-[3px] border-sidebar-primary
+  - [x] Update link hover states with background tint — hover:bg-sidebar-accent/50
+  - [x] Add section labels (MAIN, PREFERENCES) with uppercase styling
+  - [x] Update user card with surface background — bg-sidebar-accent/30
+  - [x] Update logout button with red hover state — hover:bg-red-500/10 hover:text-red-400
+  - [x] Add icons to all navigation links
 
 - [x] Task: Redesign Instructor Sidebar [79a0e69]
-  - [ ] Apply same dark navy background
-  - [ ] Add left accent border for active state
-  - [ ] Update link styles and hover states
-  - [ ] Add section labels
-  - [ ] Update user card and logout styling
+  - [x] Apply same dark navy background — bg-sidebar CSS variable
+  - [x] Add left accent border for active state — border-l-[3px] border-sidebar-primary
+  - [x] Update link styles and hover states — hover:bg-sidebar-accent/50
+  - [x] Add section labels — MAIN, PREFERENCES uppercase
+  - [x] Update user card and logout styling — bg-sidebar-accent/30, hover:bg-red-500/10
 
 - [x] Task: Redesign Student Sidebar [6cf2843]
   - [x] Apply same dark navy background
@@ -284,3 +284,9 @@
   - [x] Verify no regressions — all tests pass, build succeeds
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 8' (Protocol in workflow.md)
+
+---
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [4bfc4da]
