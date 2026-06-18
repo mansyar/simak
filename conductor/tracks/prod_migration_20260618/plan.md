@@ -59,11 +59,11 @@
 
 ## Phase 4: SQL Style Guide — Rollback Convention & Expand-Contract Pattern
 
-- [ ] Task: Read spec.md to internalize requirements before starting this phase
-- [ ] Task: Append **Rollback Convention** section to `conductor/code_styleguides/sql.md`
-  - [ ] Add section after the existing §5 Migrations, covering: forward-only migrations; companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`; never auto-applied by `migrate.mjs`; not registered in `meta/_journal.json`; dev test procedure (forward → `psql < rollback.sql` → verify reverted → re-migrate); irreversible data-loss note convention `-- ROLLBACK NOT POSSIBLE: data loss irreversible`; soft-delete (`deleted_at`) preferred over hard `DROP COLUMN`
-- [ ] Task: Append **Expand-Contract Pattern** section to `conductor/code_styleguides/sql.md`
-  - [ ] Add section covering: destructive changes MUST split across deploys; prohibited-in-single-deploy list (`DROP COLUMN`+code reading it, `RENAME COLUMN`+old-name code, `ALTER COLUMN TYPE`+old-type code, `SET NOT NULL` without backfill); 4-step column-rename canonical example; dangerous-operations table (op, lock type, safe approach); `CREATE INDEX CONCURRENTLY` caveat (fails inside Drizzle's tx-wrapped migrations — split into separate file); safe `SET NOT NULL` pattern (`CHECK ... NOT VALID` → `VALIDATE CONSTRAINT` → `SET NOT NULL` → drop CHECK); maintenance-window guidance
+- [x] Task: Read spec.md to internalize requirements before starting this phase
+- [x] Task: Append **Rollback Convention** section to `conductor/code_styleguides/sql.md`
+  - [x] Add section after the existing §5 Migrations, covering: forward-only migrations; companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`; never auto-applied by `migrate.mjs`; not registered in `meta/_journal.json`; dev test procedure (forward → `psql < rollback.sql` → verify reverted → re-migrate); irreversible data-loss note convention `-- ROLLBACK NOT POSSIBLE: data loss irreversible`; soft-delete (`deleted_at`) preferred over hard `DROP COLUMN`
+- [x] Task: Append **Expand-Contract Pattern** section to `conductor/code_styleguides/sql.md`
+  - [x] Add section covering: destructive changes MUST split across deploys; prohibited-in-single-deploy list (`DROP COLUMN`+code reading it, `RENAME COLUMN`+old-name code, `ALTER COLUMN TYPE`+old-type code, `SET NOT NULL` without backfill); 4-step column-rename canonical example; dangerous-operations table (op, lock type, safe approach); `CREATE INDEX CONCURRENTLY` caveat (fails inside Drizzle's tx-wrapped migrations — split into separate file); safe `SET NOT NULL` pattern (`CHECK ... NOT VALID` → `VALIDATE CONSTRAINT` → `SET NOT NULL` → drop CHECK); maintenance-window guidance
 - [ ] Task: Conductor - User Manual Verification 'SQL Style Guide — Rollback Convention & Expand-Contract Pattern' (Protocol in workflow.md)
 
 ## Phase 5: Integration Test & Final Verification
