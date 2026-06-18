@@ -99,8 +99,8 @@ simak/
 │   ├── app/                  → Application root files (global.css, legacy __root.tsx location)
 │   ├── components/           → React components
 │   │   ├── ui/               → shadcn/ui primitives
-│   │   ├── layout/           → Sidebar (student, instructor, admin), language switcher, theme toggle
-│   │   ├── dashboard/        → Role-specific dashboard components (StudentDashboard, InstructorDashboard, AdminDashboard)
+│   │   ├── layout/           → Sidebar (student, instructor, admin — dark navy variants), header (sticky, backdrop blur), language switcher, theme toggle
+│   │   ├── dashboard/        → Role-specific dashboard components (StudentDashboard, InstructorDashboard, AdminDashboard with metric cards)
 │   │   ├── student/
 │   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton
 │   │   ├── instructor/
@@ -851,28 +851,34 @@ A checkpoint unlocks when:
 
 All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by category:
 
-| Category         | Components                                     |
-| ---------------- | ---------------------------------------------- |
-| **Form**         | Input, Textarea, Select, Checkbox, Radio, Form |
-| **Layout**       | Sidebar, Tabs, Card, Separator                 |
-| **Navigation**   | Breadcrumb, Navigation Menu                    |
-| **Data Display** | Table, Avatar, Badge, Card                     |
-| **Feedback**     | Alert, Progress, Dialog, Popover, Toast, Sheet |
-| **Charts**       | Recharts-based components                      |
-| **Overlay**      | Dialog, Sheet, Dropdown Menu                   |
+| Category         | Components                                                |
+| ---------------- | --------------------------------------------------------- |
+| **Form**         | Input, Textarea, Select, Checkbox, Radio, Form            |
+| **Layout**       | Sidebar, Tabs, Card, Separator                            |
+| **Navigation**   | Breadcrumb, Navigation Menu                               |
+| **Data Display** | Table, Avatar, Badge, Card                                |
+| **Feedback**     | Alert, Progress, Dialog, Popover, Toast, Sheet            |
+| **Charts**       | Recharts-based components                                 |
+| **Overlay**      | Dialog, Sheet, Dropdown Menu                              |
+| **Custom**       | MetricCard, EmptyState, LanguageToggle (project-specific) |
 
 ### Theme
 
+- **Design System:** "Warm Academic" — warm neutrals, serif display fonts, semantic color coding. Defined in `docs/UI_REDESIGN.md`.
 - Light and dark modes via Tailwind `dark:` variant + CSS custom properties.
 - Theme state managed via `use-theme` hook with localStorage persistence and system preference detection (`prefers-color-scheme`).
 - `ThemeScript` in root layout prevents flash of unstyled content (FOUC) on page load.
 - Theme toggle button (`ThemeToggle` component) in the header of all authenticated layouts and the login page.
 - CSS custom properties defined in `src/app/global.css` using oklch color space for both light and dark themes.
+- **Light Mode:** Background `#FAF9F7` (warm white), Surface `#FFFFFF`, Border `#E7E5E0` (warm gray), Text `#1C1917` / Secondary `#57534E` / Muted `#A8A29E`.
+- **Dark Mode:** Background `#0F1115`, Surface `#181B22`, Border `#2A2D35`, Text `#F5F5F4` / Secondary `#A8A29E` / Muted `#6B6560`.
+- **Sidebar:** Background `#1C2333` (dark navy), Active Border `#3B82F6`, Text `#94A3B8` / Active `#FFFFFF`.
 - Semantic color tokens: `--background`, `--foreground`, `--muted`, `--card`, `--border`, `--primary`, `--destructive`, etc.
-- Additional semantic status colors: `--success` (pass), `--warning` (revise), `--error` (overdue/missed), `--info` (consultation).
+- Additional semantic status colors: `--success` (#059669, green), `--warning` (#D97706, amber), `--error` (#DC2626, red), `--info` (#0891B2, cyan).
 - All shadcn/ui primitives use theme-aware classes (`bg-card`, `text-foreground`, `border-border`) — no hardcoded colors.
-- System font stack with configurable type scale (12px–48px).
-- 4px base spacing unit.
+- **Typography:** Fraunces (serif) for display/headings (self-hosted in `public/fonts/`), DM Sans (sans-serif) for body text. `font-display: swap` for performance.
+- Type scale: Display 2rem/700, H2 1.5rem/600, H3 1.25rem/600, Body 0.875rem/400, Small 0.75rem/400.
+- 4px base spacing unit. Border radius: sm(6px), md(10px), lg(14px), xl(20px), full(9999px).
 - `transition-colors` on theme toggle for smooth visual transition between modes.
 
 ---

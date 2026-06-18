@@ -185,12 +185,16 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 ## UI Requirements
 
-- **Responsive Design**: Usable on desktop and mobile devices with touch-friendly interactions.
+- **Design System**: "Warm Academic" design system with warm neutrals, serif display fonts (Fraunces for headings, DM Sans for body), and semantic color coding. Defined in `docs/UI_REDESIGN.md`.
+- **Responsive Design**: Usable on desktop and mobile devices with touch-friendly interactions (320px–1920px viewports).
 - **Bilingual**: Full English and Indonesian language support. Users can switch via settings or browser preference detection.
-- **Role-based Dashboards**: Each role has a dedicated dashboard page (`/student/dashboard`, `/instructor/dashboard`, `/admin/dashboard`) with relevant summary widgets and quick actions. Users are redirected to their role's dashboard after login.
+- **Role-based Dashboards**: Each role has a dedicated dashboard page (`/student/dashboard`, `/instructor/dashboard`, `/admin/dashboard`) with metric cards (color-coded top borders, tinted icon backgrounds), summary widgets, and quick actions. Users are redirected to their role's dashboard after login.
 - **Dedicated Pages**: Complex workflows have full-featured dedicated pages linked from the dashboard.
-- **Dark Mode**: Light and dark theme support.
-- **Accessibility**: Keyboard navigation, screen reader support.
+- **Dark Mode**: Light and dark theme support. System preference detection (`prefers-color-scheme`) with manual toggle. Persisted via `localStorage`. Class strategy: `.dark` on `<html>`.
+- **Accessibility**: Keyboard navigation, screen reader support. WCAG 2.1 AA compliance (contrast, focus, ARIA). Touch targets minimum 44×44px.
+- **Sidebar Navigation**: Dark navy sidebar (`#1C2333`) with role-specific navigation, active state indicators (blue left border), and user card with logout.
+- **Typography**: Fraunces (serif) for display/headings, DM Sans (sans-serif) for body text. Self-hosted font files in `public/fonts/`.
+- **Empty States**: Meaningful empty states with 64px icons, dashed borders, headline/description text, and CTA buttons.
 
 ---
 

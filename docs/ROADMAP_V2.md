@@ -558,6 +558,48 @@ Settings hub, notification preferences, and file preview optimization — increm
 
 ---
 
+### Track 6.0 — UI Redesign (Warm Academic Design System)
+
+**Description:** Complete visual redesign of SIMAK's user interface implementing the "Warm Academic" design system. Frontend-only change that restyles all existing pages and components while preserving all current functionality. Includes new color palette (warm neutrals), typography (Fraunces serif headings, DM Sans body), redesigned sidebar navigation (dark navy, 3 role variants), sticky header with backdrop blur, metric cards with color-coded borders, zebra-striped tables, semantic badges, and meaningful empty states.
+
+**Dependencies:** None (visual-only, no backend changes).
+
+**Status:** ✅ Complete (June 2026)
+
+**Key Changes:**
+
+| Area               | Changes                                                                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Design Tokens      | CSS custom properties in `global.css`, Tailwind config — warm neutral palette, semantic colors, typography scale                                                   |
+| Shared Layout      | Redesigned sidebar (admin, instructor, student variants) with dark navy bg, active border indicators, section labels, user card. Sticky header with backdrop blur  |
+| Core UI Components | `MetricCard` (color-coded top border, tinted icon bg, hover lift), `EmptyState` (64px icon, dashed border, CTA), zebra tables with sticky headers, semantic badges |
+| Admin Pages        | Dashboard (metric cards, activity feed, escalation alerts), Users, Templates, Audit Log, Settings                                                                  |
+| Instructor Pages   | Dashboard (SLA badges, pending reviews), Assignments, Reviews                                                                                                      |
+| Student Pages      | Dashboard (progress bars, deadline urgency), Assignments, Checkpoints                                                                                              |
+| Auth Pages         | Login, Password Setup, 2FA — centered card layout                                                                                                                  |
+| Font Loading       | Self-hosted Fraunces + DM Sans in `public/fonts/`, `font-display: swap`                                                                                            |
+| Testing            | Updated test assertions to match new CSS classes                                                                                                                   |
+
+**Acceptance Criteria:**
+
+- [x] All pages use the new Warm Academic design system
+- [x] Metric cards, badges, and status indicators use semantic colors
+- [x] Fraunces for headings, DM Sans for body text throughout
+- [x] Dark mode with system default + manual toggle, persists across sessions
+- [x] Responsive layouts work at 320px–1920px viewports
+- [x] WCAG 2.1 AA compliance maintained
+- [x] All existing functionality preserved — visual-only changes
+- [x] Tests pass (1751 passed, 2 pre-existing date-sensitive failures unrelated to this track)
+- [x] Review fix: `getActivityDotColor` in AdminDashboard now differentiates activity types
+
+**Test Results (at time of archiving):**
+
+- 1751/1753 tests passing (2 pre-existing date-sensitive failures: `assignments-duration.test.ts`, `due-dates.test.ts`)
+- TypeScript typecheck passes with no errors
+- All files under 500-line modularity limit
+
+---
+
 ### Track 6.1 — Settings Hub
 
 **Description:** A unified settings page accessible from the sidebar for all roles. Includes profile editing (name, avatar upload, read-only email), password change, 2FA & session management, language/theme preferences, and accessibility settings (reduced motion). Uses role-specific routes (`/student/settings`, `/instructor/settings`, `/admin/settings`) inheriting sidebar layouts.
@@ -853,12 +895,13 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 4. ✅ Track 1.3 — Deadline Extension Workflow (Complete)
 5. ✅ Track 4.1 — Background Email Queue with Retry (Complete)
 6. ✅ Track 3.1 — Two-Factor Authentication & Session Management (Complete)
-7. ✅ Track 6.1 — Settings Hub (Complete)
-8. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
-9. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-10. [ ] Write failing tests
-11. [ ] Implement features
-12. [ ] Verify & archive
+7. ✅ Track 6.0 — UI Redesign / Warm Academic Design System (Complete)
+8. ✅ Track 6.1 — Settings Hub (Complete)
+9. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
+10. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+11. [ ] Write failing tests
+12. [ ] Implement features
+13. [ ] Verify & archive
 
 ---
 
