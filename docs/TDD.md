@@ -34,7 +34,7 @@ Throughout this document, features are tagged as:
 ### Route Structure
 
 ```
-/                                         → Landing / Login [v1]
+/                                         → Landing page (Hero, Features Grid, How It Works, Footer) [v1]
 
 / (authenticated — shared routes)
 │   No shared settings route — replaced by role-specific routes below
