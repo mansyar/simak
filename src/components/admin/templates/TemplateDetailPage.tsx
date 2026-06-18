@@ -167,7 +167,7 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
         data: { id: number };
       }) => Promise<{ success?: boolean; error?: string }>
     )({ data: { id: template.id } });
-    if (result?.success || result?.error === 'in_use') {
+    if (result?.success) {
       navigate({ to: '/admin/templates', search: { page: 1, limit: 20, search: '', type: '' } });
     }
   };
