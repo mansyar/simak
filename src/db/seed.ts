@@ -130,10 +130,7 @@ export async function seedTestTemplatesAndAssignments(): Promise<void> {
     .from(users)
     .where(eq(users.email, 'instructor@simak.app'));
 
-  const [studentUser] = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, 'student@simak.app'));
+  const [studentUser] = await db.select().from(users).where(eq(users.email, 'student@simak.app'));
 
   if (!instructorUser || !studentUser) {
     console.log('Test users not found. Run seedTestUsers() first. Skipping.');
@@ -179,7 +176,9 @@ export async function seedTestTemplatesAndAssignments(): Promise<void> {
     });
   }
 
-  console.log(`Test template created: "${template.name}" with ${templateCheckpointData.length} checkpoints.`);
+  console.log(
+    `Test template created: "${template.name}" with ${templateCheckpointData.length} checkpoints.`,
+  );
 
   // --- Create assignment from template ---
   const finalDeadline = new Date();
