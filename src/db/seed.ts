@@ -108,9 +108,15 @@ export async function seedTestUsers(): Promise<void> {
   }
 }
 
-// Allow running directly: `tsx src/db/seed.ts`
-const isMainModule = process.argv[1]?.endsWith('seed.ts');
-if (isMainModule) {
+// Allow running directly: `tsx src/db/seed.ts` or `node .output/server/seed.mjs`
+// Cross-platform: compare resolved paths (handles Windows backslashes)
+const isDirectExecution =
+  process.argv[1] &&
+  (process.argv[1].endsWith('seed.ts') ||
+    process.argv[1].endsWith('seed.mjs') ||
+    import.meta.url === `file://${process.argv[1]}` ||
+    import.meta.url === `file:///${process.argv[1].replace(/\\/g, '/')}`);
+if (isDirectExecution) {
   seedSuperAdmin()
     .then(() => seedTestUsers())
     .then(() => process.exit(0))

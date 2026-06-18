@@ -34,7 +34,11 @@ export async function runMigrations() {
 }
 
 // Only run when executed directly (not imported by tests)
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Cross-platform: match by filename suffix (works with relative/absolute paths)
+const isDirectExecution =
+  process.argv[1] &&
+  (process.argv[1].endsWith('migrate.ts') || process.argv[1].endsWith('migrate.mjs'));
+if (isDirectExecution) {
   runMigrations()
     .then(() => process.exit(0))
     .catch((err) => {
