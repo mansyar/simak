@@ -1,26 +1,44 @@
 import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import { sql } from 'drizzle-orm';
 
-async function runMigrations() {
-  const connectionString = process.env.DATABASE_URL;
+export const ADVISORY_LOCK_ID = 789123;
+
+export async function runMigrations() {
+  const connectionString = process.env.MIGRATE_DATABASE_URL ?? process.env.DATABASE_URL;
   if (!connectionString) {
-    console.error('DATABASE_URL environment variable is required');
+    console.error(
+      'MIGRATE_DATABASE_URL or DATABASE_URL environment variable is required',
+      'Set at least one to connect to PostgreSQL.',
+    );
     process.exit(1);
   }
 
-  const sql = postgres(connectionString, { max: 1 });
-  const db = drizzle(sql);
+  const postgresClient = postgres(connectionString, { max: 1, onnotice: () => {} });
+  const db = drizzle(postgresClient);
 
-  console.log('Running migrations...');
-  await migrate(db, { migrationsFolder: './drizzle/migrations' });
-  console.log('Migrations complete.');
+  console.log('Acquiring advisory lock...');
+  await db.execute(sql`SELECT pg_advisory_lock(${sql.raw(String(ADVISORY_LOCK_ID))})`);
 
-  await sql.end();
-  process.exit(0);
+  try {
+    console.log('Running migrations...');
+    await migrate(db, { migrationsFolder: './drizzle/migrations' });
+    console.log('Migrations complete.');
+  } finally {
+    console.log('Releasing advisory lock...');
+    await db.execute(sql`SELECT pg_advisory_unlock(${sql.raw(String(ADVISORY_LOCK_ID))})`);
+  }
+
+  await postgresClient.end();
 }
 
-runMigrations().catch((err) => {
-  console.error('Migration failed:', err);
-  process.exit(1);
-});
+// Only run when executed directly (not imported by tests)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  runMigrations()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error('Migration failed:', err);
+      process.exit(1);
+    });
+}

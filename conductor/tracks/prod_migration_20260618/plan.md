@@ -20,24 +20,24 @@
 
 ## Phase 2: Migration Runner — Advisory Lock + Connection Fallback
 
-- [ ] Task: Read spec.md to internalize requirements before starting this phase
-- [ ] Task: Write failing unit tests for `src/db/migrate.ts` (Red Phase)
-  - [ ] Create `tests/unit/db/migrate.test.ts`
-  - [ ] Mock `postgres` and `drizzle-orm/postgres-js` + `drizzle-orm/postgres-js/migrator` (follow the canonical mock pattern from `tests/unit/server/submissions.test.ts`)
-  - [ ] Test: the advisory lock id constant equals the project-unique value `789123`
-  - [ ] Test: `pg_advisory_lock` is executed before `migrate()` is called
-  - [ ] Test: `pg_advisory_unlock` is executed in the `finally` block even when `migrate()` throws
-  - [ ] Test: when `MIGRATE_DATABASE_URL` is set, the postgres client is constructed with that URL (not `DATABASE_URL`)
-  - [ ] Test: when `MIGRATE_DATABASE_URL` is unset and `DATABASE_URL` is set, the client uses `DATABASE_URL` (fallback)
-  - [ ] Test: when neither env var is set, the runner throws/logs a clear error and the process exits non-zero
-  - [ ] Run `CI=true pnpm test -- tests/unit/db/migrate.test.ts` and confirm the tests fail (current `migrate.ts` has no advisory lock and no `MIGRATE_DATABASE_URL` handling)
-- [ ] Task: Implement advisory lock + connection fallback in `src/db/migrate.ts` (Green Phase)
-  - [ ] Import `sql` from `drizzle-orm` and define `const ADVISORY_LOCK_ID = 789123`
-  - [ ] Resolve connection string as `process.env.MIGRATE_DATABASE_URL ?? process.env.DATABASE_URL`; throw a clear error and `process.exit(1)` if both are absent
-  - [ ] Acquire `pg_advisory_lock` via `db.execute(sql`SELECT pg_advisory_lock(${sql.raw(String(ADVISORY_LOCK_ID))})`)` before `migrate()`
-  - [ ] Wrap `migrate()` in try/finally; release `pg_advisory_unlock` with the same id in `finally`
-  - [ ] Keep `postgres(connectionString, { max: 1, onnotice: () => {} })` and the existing `sql.end()` + exit behavior
-  - [ ] Run `CI=true pnpm test -- tests/unit/db/migrate.test.ts` and confirm all tests pass
+- [x] Task: Read spec.md to internalize requirements before starting this phase
+- [x] Task: Write failing unit tests for `src/db/migrate.ts` (Red Phase)
+  - [x] Create `tests/unit/db/migrate.test.ts`
+  - [x] Mock `postgres` and `drizzle-orm/postgres-js` + `drizzle-orm/postgres-js/migrator` (follow the canonical mock pattern from `tests/unit/server/submissions.test.ts`)
+  - [x] Test: the advisory lock id constant equals the project-unique value `789123`
+  - [x] Test: `pg_advisory_lock` is executed before `migrate()` is called
+  - [x] Test: `pg_advisory_unlock` is executed in the `finally` block even when `migrate()` throws
+  - [x] Test: when `MIGRATE_DATABASE_URL` is set, the postgres client is constructed with that URL (not `DATABASE_URL`)
+  - [x] Test: when `MIGRATE_DATABASE_URL` is unset and `DATABASE_URL` is set, the client uses `DATABASE_URL` (fallback)
+  - [x] Test: when neither env var is set, the runner throws/logs a clear error and the process exits non-zero
+  - [x] Run `CI=true pnpm test -- tests/unit/db/migrate.test.ts` and confirm the tests fail (current `migrate.ts` has no advisory lock and no `MIGRATE_DATABASE_URL` handling)
+- [x] Task: Implement advisory lock + connection fallback in `src/db/migrate.ts` (Green Phase)
+  - [x] Import `sql` from `drizzle-orm` and define `const ADVISORY_LOCK_ID = 789123`
+  - [x] Resolve connection string as `process.env.MIGRATE_DATABASE_URL ?? process.env.DATABASE_URL`; throw a clear error and `process.exit(1)` if both are absent
+  - [x] Acquire `pg_advisory_lock` via `db.execute(sql`SELECT pg_advisory_lock(${sql.raw(String(ADVISORY_LOCK_ID))})`)` before `migrate()`
+  - [x] Wrap `migrate()` in try/finally; release `pg_advisory_unlock` with the same id in `finally`
+  - [x] Keep `postgres(connectionString, { max: 1, onnotice: () => {} })` and the existing `sql.end()` + exit behavior
+  - [x] Run `CI=true pnpm test -- tests/unit/db/migrate.test.ts` and confirm all tests pass
 - [ ] Task: Conductor - User Manual Verification 'Migration Runner — Advisory Lock + Connection Fallback' (Protocol in workflow.md)
 
 ## Phase 3: Bundle Scripts & Dockerfile
