@@ -1,0 +1,16 @@
+{
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "ignore": [
+    "node_modules/",
+    ".output/",
+    "dist/",
+    "build/",
+    "src/routeTree.gen.ts",
+    "src/i18n/detect-locale.ts",
+    "src/i18n/types.ts"
+  ]
+}

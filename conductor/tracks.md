@@ -14,5 +14,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Migrate to oxlint + oxfmt — Replace ESLint + Prettier with Oxc toolchain**
+- [x] **Track: Migrate to oxlint + oxfmt — Replace ESLint + Prettier with Oxc toolchain**
       _Link: [./tracks/oxlint-oxfmt-migration_20260617/](./tracks/oxlint-oxfmt-migration_20260617/)_

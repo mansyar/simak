@@ -80,10 +80,10 @@ Files go **directly to Cloudflare R2** via presigned URLs — the server never s
   ```
 - Coverage thresholds: lines 80%, functions 80%, branches 72%, statements 79%.
 
-## Git & Prettier Quirks
+## Formatting Quirks
 
-- **Semicolons enabled** in Prettier (`.prettierrc`: `semi: true`). This is the non-default Prettier setting.
-- `singleQuote: true`, `trailingComma: 'all'`, `printWidth: 100`.
+- **Formatting via oxfmt** (`.oxfmtrc.json`): `semi: true`, `singleQuote: true`, `trailingComma: 'all'`, `printWidth: 100`, `tabWidth: 2`.
+- **Linting via oxlint** (`.oxlintrc.json`): TypeScript + React plugins, recommended + strict rules.
 - `.gitattributes` enforces **LF line endings** for all source files (`.ts`, `.tsx`, `.js`, etc.) — Windows checkout is fine, commits are always LF.
 - `pnpm-lock.yaml` uses **pnpm** (not npm or yarn). Always use `pnpm` for dependency operations.
 - Commit format: `<type>(<scope>): <description>` — types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.

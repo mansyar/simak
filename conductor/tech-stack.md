@@ -41,11 +41,11 @@
 
 ## Testing & Quality
 
-| Component                  | Technology                              | Purpose                                                 |
-| -------------------------- | --------------------------------------- | ------------------------------------------------------- |
-| **Unit/Integration Tests** | Vitest                                  | Fast unit and integration tests with coverage reporting |
-| **E2E Tests**              | Playwright                              | End-to-end browser tests (v2)                           |
-| **Code Quality**           | ESLint + Prettier + Husky + lint-staged | Pre-commit linting, formatting, typechecking            |
+| Component                  | Technology                           | Purpose                                                 |
+| -------------------------- | ------------------------------------ | ------------------------------------------------------- |
+| **Unit/Integration Tests** | Vitest                               | Fast unit and integration tests with coverage reporting |
+| **E2E Tests**              | Playwright                           | End-to-end browser tests (v2)                           |
+| **Code Quality**           | oxlint + oxfmt + Husky + lint-staged | Pre-commit linting, formatting, typechecking            |
 
 ## Version Requirements
 

@@ -171,7 +171,7 @@ Single-import helper used across all handlers. Writes to `audit_log` table. No c
 
 - 1242/1242 tests passing across 141 test files
 - TypeScript typecheck passes with no errors
-- eslint/prettier/lint-staged pass on all new files
+- oxlint/oxfmt/lint-staged pass on all new files
 - All new files under 500-line modularity limit
 - Pre-push hook (typecheck + vitest coverage) passes
 - Review fixes applied: transaction rollback on validation failure, non-null assertions replaced with safe fallbacks
@@ -385,7 +385,7 @@ Added `twoFactor` table via Better Auth's Drizzle adapter with:
 
 - 1448/1448 tests passing across 159 test files
 - TypeScript typecheck passes with no errors
-- eslint/prettier/lint-staged pass on all new files
+- oxlint/oxfmt/lint-staged pass on all new files
 - All new files under 500-line modularity limit
 - Review fixes applied: removed encrypted backup codes retrieval from DB, fixed unauthorized response consistency, applied naming convention fixes
 
@@ -482,7 +482,7 @@ Index on `(status, created_at ASC)` for efficient dequeuing.
 
 - 1359/1359 tests passing across 152 test files
 - TypeScript typecheck passes with no errors
-- eslint/prettier/lint-staged pass on all new files
+- oxlint/oxfmt/lint-staged pass on all new files
 - All new files under 500-line modularity limit
 - Pre-push hook (typecheck + vitest coverage) passes
 - Review fixes applied: CHECK constraints added to migration SQL, FROM address made configurable via env var
@@ -658,7 +658,7 @@ Settings hub, notification preferences, and file preview optimization — increm
 
 - 1537/1537 tests passing across 170 test files
 - TypeScript typecheck passes with no errors
-- eslint/prettier/lint-staged pass on all new files
+- oxlint/oxfmt/lint-staged pass on all new files
 - All new files under 500-line modularity limit
 - Pre-push hook (typecheck + vitest coverage) passes
 - Coverage for new `settings.server.ts` is 100%
