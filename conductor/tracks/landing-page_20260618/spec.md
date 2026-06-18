@@ -1,3 +1,4 @@
+<protect>
 # Landing Page — Specification
 
 ## Overview
@@ -72,3 +73,4 @@ Replace the current placeholder index route (`/`) with a polished, BibliU-inspir
 - Stats/metrics section
 - Dark mode toggle on landing page
 - Image assets (SVG/CSS only)
+  </protect>

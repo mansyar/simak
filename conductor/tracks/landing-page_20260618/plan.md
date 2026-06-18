@@ -1,7 +1,9 @@
+<protect>
 # Implementation Plan: Landing Page
 
 ## Phase 1: Landing Page Foundation
 
+- [ ] Task 1.0: Read spec.md and review requirements before starting implementation
 - [ ] Task 1.1: Add i18n translation keys for landing page
   - [ ] Add `landing.*` keys to `locales/en.json` (hero, features, howItWorks, footer)
   - [ ] Add `landing.*` keys to `locales/id.json` (Indonesian translations)
@@ -26,3 +28,4 @@
   - [ ] Run `pnpm test` and confirm all tests pass (Green phase)
   - [ ] Run `pnpm test -- --coverage` and verify >80% coverage
 - [ ] Task: Conductor - Phase Completion Verification (Protocol in workflow.md)
+      </protect>
