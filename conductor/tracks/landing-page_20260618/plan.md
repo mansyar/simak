@@ -28,4 +28,8 @@
   - [ ] Run `pnpm test` and confirm all tests pass (Green phase)
   - [ ] Run `pnpm test -- --coverage` and verify >80% coverage
 - [ ] Task: Conductor - Phase Completion Verification (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions (add section IDs, copyright line, fix footer links) 28016cf
       </protect>
