@@ -44,9 +44,9 @@ describe('calculateDueDates', () => {
 describe('validateDueDates', () => {
   it('should accept valid sequential order', () => {
     const dueDates = new Map([
-      [1, new Date('2026-06-08')],
-      [2, new Date('2026-06-22')],
-      [3, new Date('2026-07-13')],
+      [1, new Date('2026-07-01')],
+      [2, new Date('2026-07-15')],
+      [3, new Date('2026-08-01')],
     ]);
 
     const result = validateDueDates(dueDates);

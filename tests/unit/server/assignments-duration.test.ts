@@ -67,7 +67,7 @@ describe('Assignment duration calculation', () => {
       );
       // 3rd await mockDb: assignment createdAt query
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ createdAt: new Date('2026-06-01T00:00:00Z') }]).then(onfulfilled),
+        Promise.resolve([{ createdAt: new Date('2026-07-01T00:00:00Z') }]).then(onfulfilled),
       );
 
       const { createAssignmentHandler } = await import('@/server/assignments.server');
