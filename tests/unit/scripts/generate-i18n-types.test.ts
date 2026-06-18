@@ -33,7 +33,7 @@ describe('i18n type generation', () => {
   it('should have no duplicate sections in Translation type', () => {
     const content = readFileSync(typesPath, 'utf-8');
     // Read all section names from the Translation type by finding lines like "sectionName: {"
-    const sectionPattern = /^\s+(\w+):\s*\{$/gm;
+    const sectionPattern = /^  (\w+):\s*\{$/gm;
     const sections: string[] = [];
     let match;
     while ((match = sectionPattern.exec(content)) !== null) {

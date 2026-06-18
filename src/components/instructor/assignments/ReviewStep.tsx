@@ -105,7 +105,9 @@ export function ReviewStep({
                 {t('instructorAssignments.assignedCohort')}
               </h3>
               <Badge variant="secondary" className="font-bold">
-                {t('instructorAssignments.studentsCount', { count: String(assignedStudents.length) })}
+                {t('instructorAssignments.studentsCount', {
+                  count: String(assignedStudents.length),
+                })}
               </Badge>
             </div>
             <div className="grid gap-2 sm:grid-cols-2 max-h-[160px] overflow-y-auto pr-1">

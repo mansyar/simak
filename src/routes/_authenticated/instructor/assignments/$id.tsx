@@ -139,9 +139,7 @@ function AssignmentDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <h2 className="text-xl font-semibold mb-2">{t('error.notFound')}</h2>
-        <p className="text-muted-foreground mb-4">
-          {t('error.assignmentNotFound')}
-        </p>
+        <p className="text-muted-foreground mb-4">{t('error.assignmentNotFound')}</p>
         <Link
           to="/instructor/assignments"
           search={{ page: 1, limit: 20, search: '' }}

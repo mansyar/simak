@@ -17,6 +17,8 @@ vi.mock('@/routes/__root', () => ({
         'instructorAssignments.wizard.selectedStudents': '{count} students selected',
         'instructorAssignments.wizard.noStudentsSelected': 'No students selected yet',
         'instructorAssignments.wizard.searchStudents': 'Search students by name or email...',
+        'instructorAssignments.selectAll': 'Select All',
+        'instructorAssignments.deselectAll': 'Deselect All',
       };
       let text = translations[key] || key;
       if (params) {

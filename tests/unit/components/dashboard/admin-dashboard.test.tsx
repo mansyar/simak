@@ -64,7 +64,7 @@ describe('AdminDashboard component', () => {
   it('should render email queue section', async () => {
     const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
     render(<AdminDashboard data={emptyData} />);
-    expect(screen.getByText('Email Queue')).toBeDefined();
+    expect(screen.getByText('adminDashboard.emailQueue.title')).toBeDefined();
     expect(screen.getByText('adminDashboard.emailQueue.pending')).toBeDefined();
     expect(screen.getByText('adminDashboard.emailQueue.sent')).toBeDefined();
     expect(screen.getByText('adminDashboard.emailQueue.failed')).toBeDefined();

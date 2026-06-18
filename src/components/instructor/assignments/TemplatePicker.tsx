@@ -129,7 +129,9 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
                       {tpl.name}
                     </h4>
                     <p className="text-xs text-muted-foreground">
-                      {t('instructorAssignments.milestonesCheckpoints', { count: String(tpl.checkpoints.length) })}
+                      {t('instructorAssignments.milestonesCheckpoints', {
+                        count: String(tpl.checkpoints.length),
+                      })}
                     </p>
                   </div>
 

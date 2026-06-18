@@ -63,9 +63,7 @@ export function EditUserSheet({ user, open, onOpenChange, onSubmit }: EditUserSh
       <SheetContent>
         <SheetHeader>
           <SheetTitle>{t('adminUsers.edit')}</SheetTitle>
-          <SheetDescription>
-            {t('adminUsers.editDescription')}
-          </SheetDescription>
+          <SheetDescription>{t('adminUsers.editDescription')}</SheetDescription>
         </SheetHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4 mt-6">

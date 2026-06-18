@@ -5,6 +5,7 @@ import { render, screen } from '@testing-library/react';
 // Mock useI18n hook
 const mockT = (key: string) => {
   const translations: Record<string, string> = {
+    'app.name': 'SIMAK',
     'landing.hero.headline': 'Manage Academic Assignments with Confidence',
     'landing.hero.subheadline':
       'SIMAK helps students and instructors track progress, manage checkpoints, and ensure timely submissions through a structured workflow.',
