@@ -1,1 +1,23 @@
-pnpm lint-staged
+#!/bin/sh
+# Pre-commit hook: run oxlint, oxfmt, and modularity check on staged files
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' || true)
+
+if [ -z "$staged_files" ]; then
+  exit 0
+fi
+
+# Convert newlines to spaces for command args
+files=$(echo "$staged_files" | tr '\n' ' ')
+
+# Run checks
+npx oxlint --fix $files
+npx oxfmt --write $files
+node scripts/check-modularity.js $files
+
+# Re-stage files that were modified by fixers
+echo "$staged_files" | while IFS= read -r file; do
+  if [ -f "$file" ]; then
+    git add "$file"
+  fi
+done

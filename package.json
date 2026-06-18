@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "pnpm generate:i18n && vite dev",
     "build": "pnpm generate:i18n && vite build && pnpm build:migrate && pnpm build:seed",
-    "build:migrate": "esbuild src/db/migrate.ts --bundle --format=esm --platform=node --outfile=.output/server/migrate.mjs",
+    "build:migrate": "esbuild src/db/migrate.ts --bundle --format=esm --platform=node --outfile=.output/server/migrate.mjs --external:child_process",
     "build:seed": "esbuild src/db/seed.ts --bundle --format=esm --platform=node --outfile=.output/server/seed.mjs",
     "start": "vinxi start",
     "test": "vitest run --exclude tests/integration/**",
@@ -18,7 +18,8 @@
     "lint": "oxlint .",
     "format": "oxfmt --write \"src/**/*.{ts,tsx,css}\"",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "node --env-file=.env --import=tsx src/db/migrate.ts",
+    "db:migrate": "drizzle-kit migrate",
+    "db:migrate:prod": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:seed": "node --env-file=.env --import=tsx src/db/seed.ts",
     "generate:i18n": "tsx scripts/generate-i18n-types.ts",
@@ -42,7 +43,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.2.1",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "0.45.2",
     "lucide-react": "^1.16.0",
     "postgres": "^3.4.9",
     "qrcode.react": "^4.2.0",
@@ -66,11 +67,10 @@
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.6",
-    "drizzle-kit": "^0.31.10",
+    "drizzle-kit": "0.31.10",
     "happy-dom": "^20.9.0",
     "husky": "^9.1.0",
     "jsdom": "^26.0.0",
-    "lint-staged": "^15.5.0",
     "oxfmt": "^0.55.0",
     "oxlint": "^1.70.0",
     "shadcn": "^4.7.0",
@@ -81,16 +81,7 @@
     "vite": "^8.0.13",
     "vitest": "^4.1.6"
   },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "oxlint --fix",
-      "oxfmt --write",
-      "node scripts/check-modularity.js"
-    ],
-    "*.{json,md,css}": [
-      "oxfmt --write"
-    ]
-  },
+
   "pnpm": {
     "onlyBuiltDependencies": [
       "better-auth",

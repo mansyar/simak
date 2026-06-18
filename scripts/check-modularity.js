@@ -1,6 +1,6 @@
 // @ts-check
 // Modularity check — enforces max 500 lines per source file
-// Runs on files passed via CLI args (lint-staged passes staged files)
+// Runs on files passed via CLI args (pre-commit hook passes staged files)
 // Only checks src/, tests/, and scripts/ directories
 import { readFileSync } from 'node:fs'
 import { extname, normalize } from 'node:path'
@@ -31,7 +31,7 @@ function toRelative(filePath) {
   return normalized
 }
 
-// Accept files from CLI args (passed by lint-staged)
+// Accept files from CLI args (passed by pre-commit hook)
 const stagedFiles = process.argv.slice(2)
 
 if (stagedFiles.length === 0) {

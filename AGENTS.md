@@ -25,7 +25,7 @@
 | `pnpm generate:i18n`                           | Regenerate i18n TypeScript types                |
 
 **Pre-push gate** (Husky): `pnpm typecheck && pnpm vitest run --coverage`  
-**Pre-commit gate** (Husky): `pnpm lint-staged` (runs ESLint, Prettier, modularity check on staged files)
+**Pre-commit gate** (Husky): `oxlint --fix`, `oxfmt --write`, `node scripts/check-modularity.js` (runs on staged files directly)
 
 ## Architecture Must-Knows
 
