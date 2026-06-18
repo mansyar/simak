@@ -3,19 +3,19 @@
 
 ## Phase 1: Environment Config — `MIGRATE_DATABASE_URL`
 
-- [ ] Task: Read spec.md to internalize requirements before starting this phase
-- [ ] Task: Write failing env tests (Red Phase)
-  - [ ] Add `MIGRATE_DATABASE_URL` to the valid-env test cases in `tests/unit/config/env.test.ts` (set to a valid URL string)
-  - [ ] Add a test case asserting `MIGRATE_DATABASE_URL` is optional (config valid when the var is absent)
-  - [ ] Add a test case asserting an invalid URL string for `MIGRATE_DATABASE_URL` is rejected by the Zod schema
-  - [ ] Run `CI=true pnpm test -- tests/unit/config/env.test.ts` and confirm the new tests fail (env schema does not yet recognize the key)
-- [ ] Task: Implement env schema + `.env.example` (Green Phase)
-  - [ ] Add `MIGRATE_DATABASE_URL: z.string().url().optional()` to the Zod schema in `src/config/env.ts`
-  - [ ] Add `# MIGRATE_DATABASE_URL=postgresql://user:pass@pg-host:5432/simak` (commented) to `.env.example`
-  - [ ] Run `CI=true pnpm test -- tests/unit/config/env.test.ts` and confirm all tests pass
-- [ ] Task: Update `docs/TDD.md` env table
-  - [ ] Add `MIGRATE_DATABASE_URL` row to the environment variables table (section ~line 825)
-  - [ ] Update the "Database Migrations [v1]" section (~line 834) to document: bundled `migrate.mjs` via Coolify pre-deploy, `MIGRATE_DATABASE_URL` bypasses PgBouncer, `pg_advisory_lock` serializes concurrent runs, `seed.mjs` chained after migrate
+- [x] Task: Read spec.md to internalize requirements before starting this phase
+- [x] Task: Write failing env tests (Red Phase)
+  - [x] Add `MIGRATE_DATABASE_URL` to the valid-env test cases in `tests/unit/config/env.test.ts` (set to a valid URL string)
+  - [x] Add a test case asserting `MIGRATE_DATABASE_URL` is optional (config valid when the var is absent)
+  - [x] Add a test case asserting an invalid URL string for `MIGRATE_DATABASE_URL` is rejected by the Zod schema
+  - [x] Run `CI=true pnpm test -- tests/unit/config/env.test.ts` and confirm the new tests fail (env schema does not yet recognize the key)
+- [x] Task: Implement env schema + `.env.example` (Green Phase)
+  - [x] Add `MIGRATE_DATABASE_URL: z.string().url().optional()` to the Zod schema in `src/config/env.ts`
+  - [x] Add `# MIGRATE_DATABASE_URL=postgresql://user:pass@pg-host:5432/simak` (commented) to `.env.example`
+  - [x] Run `CI=true pnpm test -- tests/unit/config/env.test.ts` and confirm all tests pass
+- [x] Task: Update `docs/TDD.md` env table
+  - [x] Add `MIGRATE_DATABASE_URL` row to the environment variables table (section ~line 825)
+  - [x] Update the "Database Migrations [v1]" section (~line 834) to document: bundled `migrate.mjs` via Coolify pre-deploy, `MIGRATE_DATABASE_URL` bypasses PgBouncer, `pg_advisory_lock` serializes concurrent runs, `seed.mjs` chained after migrate
 - [ ] Task: Conductor - User Manual Verification 'Environment Config — MIGRATE_DATABASE_URL' (Protocol in workflow.md)
 
 ## Phase 2: Migration Runner — Advisory Lock + Connection Fallback

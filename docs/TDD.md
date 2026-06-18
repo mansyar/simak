@@ -817,25 +817,30 @@ A checkpoint unlocks when:
 
 ### Environment Variables
 
-| Variable               | Purpose                            |
-| ---------------------- | ---------------------------------- |
-| `DATABASE_URL`         | PostgreSQL connection string       |
-| `R2_ENDPOINT`          | Cloudflare R2 endpoint URL         |
-| `R2_ACCESS_KEY_ID`     | R2 API access key                  |
-| `R2_SECRET_ACCESS_KEY` | R2 API secret key                  |
-| `R2_BUCKET_NAME`       | R2 bucket for uploads              |
-| `R2_PUBLIC_URL`        | R2 public base URL for file access |
-| `RESEND_API_KEY`       | Resend API key for email delivery  |
-| `BETTER_AUTH_SECRET`   | Signing secret for auth tokens     |
-| `BETTER_AUTH_URL`      | Public URL of the app              |
-| `SUPERADMIN_EMAIL`     | Email for the seeded SuperAdmin    |
-| `SUPERADMIN_PASSWORD`  | Password for the seeded SuperAdmin |
+| Variable               | Purpose                                                                 |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `DATABASE_URL`         | PostgreSQL connection string                                            |
+| `MIGRATE_DATABASE_URL` | Direct PostgreSQL connection string for migrations (bypasses PgBouncer) |
+| `R2_ENDPOINT`          | Cloudflare R2 endpoint URL                                              |
+| `R2_ACCESS_KEY_ID`     | R2 API access key                                                       |
+| `R2_SECRET_ACCESS_KEY` | R2 API secret key                                                       |
+| `R2_BUCKET_NAME`       | R2 bucket for uploads                                                   |
+| `R2_PUBLIC_URL`        | R2 public base URL for file access                                      |
+| `RESEND_API_KEY`       | Resend API key for email delivery                                       |
+| `BETTER_AUTH_SECRET`   | Signing secret for auth tokens                                          |
+| `BETTER_AUTH_URL`      | Public URL of the app                                                   |
+| `SUPERADMIN_EMAIL`     | Email for the seeded SuperAdmin                                         |
+| `SUPERADMIN_PASSWORD`  | Password for the seeded SuperAdmin                                      |
 
 ### Database Migrations [v1]
 
 - Drizzle Kit for migration generation and execution.
 - `drizzle-kit push` for development; `drizzle-kit migrate` for production.
-- Migration runs as part of the Docker entrypoint or a separate init container.
+- **Production migration runner**: Bundled `migrate.mjs` via Coolify pre-deploy hook.
+- **PgBouncer bypass**: Use `MIGRATE_DATABASE_URL` to connect directly to PostgreSQL (port 5432) during migrations, bypassing PgBouncer's transaction-mode pooling which breaks Drizzle's prepared statements.
+- **Concurrency guard**: `pg_advisory_lock` (ID: 789123) serializes concurrent migration runs to prevent corruption.
+- **Seed runner**: `seed.mjs` chained after migrations; idempotent (skips existing SuperAdmin).
+- **Rollback convention**: Companion rollback SQL files at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql` for emergency manual execution.
 
 ### Connection Pooling
 

@@ -23,9 +23,11 @@ const envSchema = baseSchema.extend({
   R2_SECRET_ACCESS_KEY: z.string().optional(),
   R2_BUCKET_NAME: z.string().optional(),
   R2_PUBLIC_URL: z.string().url().optional(),
+  MIGRATE_DATABASE_URL: z.string().url().optional(),
 });
 
-export type Env = z.infer<typeof baseSchema> & Partial<z.infer<typeof r2Schema>>;
+export type Env = z.infer<typeof baseSchema> &
+  Partial<z.infer<typeof r2Schema>> & { MIGRATE_DATABASE_URL?: string };
 
 let _env: Env | null = null;
 
