@@ -1,5 +1,5 @@
 // Server-only handlers for notification operations
-import { eq, and, desc, sql, isNull } from 'drizzle-orm';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
@@ -143,7 +143,7 @@ export async function markReadHandler(args: { data: MarkReadInput }) {
 /**
  * Mark all unread notifications as read for the current user.
  */
-export async function markAllReadHandler(args: { data: MarkAllReadInput }) {
+export async function markAllReadHandler(_args: { data: MarkAllReadInput }) {
   const session = await getSessionFromHeaders();
   if (!isAuthenticated(session)) {
     return { error: 'Unauthorized' };
@@ -167,7 +167,7 @@ export async function markAllReadHandler(args: { data: MarkAllReadInput }) {
 /**
  * Get the count of unread notifications for the current user.
  */
-export async function getUnreadCountHandler(args: { data: GetUnreadCountInput }) {
+export async function getUnreadCountHandler(_args: { data: GetUnreadCountInput }) {
   const session = await getSessionFromHeaders();
   if (!isAuthenticated(session)) {
     return { error: 'Unauthorized' };

@@ -8,7 +8,6 @@ import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
-import { verifyCheckpointAccess } from './ownership';
 import { generatePresignedDownloadUrl } from '../lib/storage';
 import { calculateBreachDuration } from '../lib/sla';
 import {
@@ -21,23 +20,15 @@ import type { z } from 'zod';
 import type {
   ListPendingReviewsSchema,
   GetReviewDetailSchema,
-  OpenForReviewSchema,
   SubmitReviewSchema,
-  GetLatestReviewSchema,
 } from './reviews';
 
 type ListPendingReviewsInput = z.infer<typeof ListPendingReviewsSchema>;
 type GetReviewDetailInput = z.infer<typeof GetReviewDetailSchema>;
-type OpenForReviewInput = z.infer<typeof OpenForReviewSchema>;
 type SubmitReviewInput = z.infer<typeof SubmitReviewSchema>;
-type GetLatestReviewInput = z.infer<typeof GetLatestReviewSchema>;
 
 function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
-}
-
-function isStudent(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'student';
 }
 
 const REVIEWABLE_STATES = ['submitted', 'under_review'] as const;

@@ -1,6 +1,6 @@
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Link } from '@tanstack/react-router';
-import { FileText, Clock, User } from 'lucide-react';
+import { FileText, Clock } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SLABadge } from './SLABadge';

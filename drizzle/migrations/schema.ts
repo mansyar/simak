@@ -11,7 +11,6 @@ import {
   unique,
   pgEnum,
 } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
 
 export const checkpointState = pgEnum('checkpoint_state', [
   'locked',

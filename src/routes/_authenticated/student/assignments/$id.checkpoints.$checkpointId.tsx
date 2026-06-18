@@ -7,10 +7,9 @@ import { FileUploader } from '@/components/files/file-uploader';
 import { FileList } from '@/components/files/file-list';
 import { SubmissionStatus } from '@/components/files/submission-status';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
-import { SearchX, AlertCircle, ChevronLeft } from 'lucide-react';
+import { SearchX, ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { useState, useCallback } from 'react';
 
@@ -123,7 +122,6 @@ function CheckpointSubmissionPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData();
   const params = Route.useParams();
-  const navigate = Route.useNavigate();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
@@ -210,7 +208,7 @@ function CheckpointSubmissionPage() {
           data: { checkpointId: Number(params.checkpointId) },
         });
         setSubmissions(submissionsData?.submissions ?? []);
-      } catch (err) {
+      } catch {
         setUploadError(t('files.uploadError'));
         setIsUploading(false);
       }

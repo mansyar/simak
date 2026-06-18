@@ -60,7 +60,7 @@ function StatusBadge({ state, t }: { state: string; t: (key: string) => string }
   }
 }
 
-export function DeadlineManager({ students, assignmentId }: DeadlineManagerProps) {
+export function DeadlineManager({ students, assignmentId: _assignmentId }: DeadlineManagerProps) {
   const { t } = useI18n();
   const [expandedStudents, setExpandedStudents] = useState<Set<string>>(new Set());
   const [unlockTarget, setUnlockTarget] = useState<{

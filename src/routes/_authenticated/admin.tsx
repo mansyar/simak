@@ -2,7 +2,6 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { requireRole } from '../../server/auth';
 import { AdminSidebar } from '../../components/layout/admin-sidebar';
 import { AppHeader } from '../../components/layout/app-header';
-import { useI18n } from '../__root';
 import { useState } from 'react';
 import { NotificationCenter } from '../../components/notifications/NotificationCenter';
 

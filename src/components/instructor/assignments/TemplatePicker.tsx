@@ -3,7 +3,6 @@ import { listTemplates } from '@/server/templates';
 import { useI18n } from '../../../routes/__root';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Clipboard, Search, Check, ChevronRight } from 'lucide-react';
 

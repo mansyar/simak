@@ -20,7 +20,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { format } from 'date-fns/format';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useI18n } from '../../../__root';
@@ -91,7 +91,7 @@ function AssignmentDetailPage() {
       setExtensionsLoading(true);
       load();
     }
-  }, []);
+  }, [assignment]);
 
   // Handle extension approval
   const handleApproveExtension = async (requestId: number, comment?: string) => {

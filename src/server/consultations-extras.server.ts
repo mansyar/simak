@@ -1,4 +1,4 @@
-import { eq, and, sql, asc } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { consultations } from '../db/schema/consultations';
 import { checkpoints } from '../db/schema/assignments';

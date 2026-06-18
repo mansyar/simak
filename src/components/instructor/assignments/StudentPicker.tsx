@@ -24,7 +24,7 @@ export function StudentPicker({
   selectedStudentIds,
   onToggleStudent,
   onSelectAll,
-  onDeselectAll,
+  onDeselectAll: _onDeselectAll,
   errors,
 }: StudentPickerProps) {
   const { t } = useI18n();

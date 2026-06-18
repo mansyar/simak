@@ -1,5 +1,5 @@
 // Server-only helpers (not imported by client code)
-import { eq, ilike, and, isNull, sql, ne } from 'drizzle-orm';
+import { eq, and, isNull, sql, ne } from 'drizzle-orm';
 import crypto from 'node:crypto';
 import { getDb } from '../db/index';
 import { users, verification } from '../db/schema/index';

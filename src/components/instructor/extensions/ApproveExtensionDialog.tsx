@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogFooter,

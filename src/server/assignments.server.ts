@@ -6,7 +6,6 @@ import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
-import { consultations } from '../db/schema/consultations';
 import { calculateDueDates, validateDueDates } from './due-dates.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -14,19 +13,11 @@ import type {
   CreateAssignmentSchema,
   ListInstructorAssignmentsSchema,
   AssignmentIdParamSchema,
-  ListStudentAssignmentsSchema,
-  StudentAssignmentIdParamSchema,
-  UnlockCheckpointSchema,
-  ExtendDeadlineSchema,
 } from './assignments';
 
 type CreateAssignmentInput = z.infer<typeof CreateAssignmentSchema>;
 type ListInstructorAssignmentsInput = z.infer<typeof ListInstructorAssignmentsSchema>;
 type AssignmentIdParam = z.infer<typeof AssignmentIdParamSchema>;
-type ListStudentAssignmentsInput = z.infer<typeof ListStudentAssignmentsSchema>;
-type StudentAssignmentIdParam = z.infer<typeof StudentAssignmentIdParamSchema>;
-type UnlockCheckpointInput = z.infer<typeof UnlockCheckpointSchema>;
-type ExtendDeadlineInput = z.infer<typeof ExtendDeadlineSchema>;
 
 function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';

@@ -88,7 +88,7 @@ export function ExtensionHistoryList({ items }: ExtensionHistoryListProps) {
               <tr key={item.id} className="border-b border-border last:border-b-0">
                 <td className="py-3 pr-4 text-foreground">{formatDate(item.createdAt)}</td>
                 <td className="py-3 pr-4 text-foreground">
-                  {t(getCategoryLabel(item.category) as any)}
+                  {t(getCategoryLabel(item.category) as unknown as string)}
                 </td>
                 <td className="py-3 pr-4 text-foreground">{item.extensionDays} days</td>
                 <td className="py-3 pr-4">
@@ -96,7 +96,7 @@ export function ExtensionHistoryList({ items }: ExtensionHistoryListProps) {
                     className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(item.status)}`}
                   >
                     {t(
-                      `extensions.status${item.status.charAt(0).toUpperCase() + item.status.slice(1)}` as any,
+                      `extensions.status${item.status.charAt(0).toUpperCase() + item.status.slice(1)}` as unknown as string,
                     )}
                   </span>
                 </td>

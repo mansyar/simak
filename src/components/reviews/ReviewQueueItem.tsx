@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { FileText, Clock, User } from 'lucide-react';
+import { FileText, Clock } from 'lucide-react';
 import { useI18n } from '../../routes/__root';
 import { SLABadge } from './SLABadge';
 

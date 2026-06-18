@@ -23,7 +23,11 @@ interface ConsultationFormProps {
   onSuccess: () => void;
 }
 
-export function ConsultationForm({ assignmentId, checkpoints, onSuccess }: ConsultationFormProps) {
+export function ConsultationForm({
+  assignmentId: _assignmentId,
+  checkpoints,
+  onSuccess,
+}: ConsultationFormProps) {
   const { t } = useI18n();
   const [checkpointId, setCheckpointId] = useState<string>('');
   const [sessionType, setSessionType] = useState<string>('internal');

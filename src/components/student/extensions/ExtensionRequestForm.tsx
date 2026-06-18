@@ -30,7 +30,7 @@ const CATEGORY_OPTIONS = ['personal', 'research', 'health', 'other'] as const;
 export function ExtensionRequestForm({
   assignmentId,
   maxExtensionDays,
-  maxTotalExtensions,
+  maxTotalExtensions: _maxTotalExtensions,
   checkpoints,
   onSuccess,
 }: ExtensionRequestFormProps) {
@@ -118,7 +118,9 @@ export function ExtensionRequestForm({
           <SelectContent>
             {CATEGORY_OPTIONS.map((cat) => (
               <SelectItem key={cat} value={cat}>
-                {t(`extensions.category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as any)}
+                {t(
+                  `extensions.category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as unknown as string,
+                )}
               </SelectItem>
             ))}
           </SelectContent>

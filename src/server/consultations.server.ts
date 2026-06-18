@@ -1,5 +1,5 @@
 // Server-only handlers for consultation operations
-import { eq, and, desc, asc, sql, inArray, isNull } from 'drizzle-orm';
+import { eq, and, desc, asc, sql, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { consultations } from '../db/schema/consultations';
 import { checkpoints, assignments, assignmentStudents } from '../db/schema/assignments';
@@ -17,7 +17,6 @@ import type {
   VerifyConsultationSchema,
   RejectConsultationSchema,
   GetConsultationDetailSchema,
-  ListVerifiedCountsSchema,
 } from './consultations';
 
 type LogConsultationInput = z.infer<typeof LogConsultationSchema>;
@@ -26,7 +25,6 @@ type ListPendingConsultationsInput = z.infer<typeof ListPendingConsultationsSche
 type VerifyConsultationInput = z.infer<typeof VerifyConsultationSchema>;
 type RejectConsultationInput = z.infer<typeof RejectConsultationSchema>;
 type GetConsultationDetailInput = z.infer<typeof GetConsultationDetailSchema>;
-type ListVerifiedCountsInput = z.infer<typeof ListVerifiedCountsSchema>;
 
 function isStudent(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'student';

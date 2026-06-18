@@ -27,7 +27,7 @@ interface FileListProps {
 
 function formatFileSize(
   bytes: number,
-  t: (key: string, params?: Record<string, string>) => string,
+  _t: (key: string, params?: Record<string, string>) => string,
 ): string {
   if (bytes >= 1024 * 1024) {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;

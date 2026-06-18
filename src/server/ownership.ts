@@ -1,6 +1,5 @@
 // Shared ownership verification helpers for server handlers
 import { eq, and, isNull } from 'drizzle-orm';
-import { getDb } from '../db/index';
 import { assignments, assignmentStudents } from '../db/schema/assignments';
 import { checkpoints } from '../db/schema/assignments';
 import type { Db } from '../db/index';

@@ -143,7 +143,7 @@ function AssignmentDetailPage() {
       };
       loadConsultations();
     }
-  }, []);
+  }, [data]);
 
   // If a child route is active (e.g., /checkpoints/:checkpointId), render it via Outlet
   // The child route (submission page) has its own full layout and back navigation
