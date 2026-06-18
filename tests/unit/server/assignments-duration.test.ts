@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import * as auditMod from '@/lib/audit';
@@ -27,6 +27,8 @@ describe('Assignment duration calculation', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-15T12:00:00Z'));
     mockDb = {
       transaction: vi.fn(async (cb: any) => cb(mockDb)),
       insert: vi.fn().mockReturnThis(),
@@ -42,6 +44,10 @@ describe('Assignment duration calculation', () => {
       }),
     };
     vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('createAssignmentHandler', () => {

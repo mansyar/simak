@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { calculateDueDates, validateDueDates } from '@/server/due-dates.server';
 
 describe('calculateDueDates', () => {
@@ -42,6 +42,15 @@ describe('calculateDueDates', () => {
 });
 
 describe('validateDueDates', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-15T12:00:00Z'));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('should accept valid sequential order', () => {
     const dueDates = new Map([
       [1, new Date('2026-07-01')],
@@ -56,7 +65,7 @@ describe('validateDueDates', () => {
   it('should reject out-of-order dueDates', () => {
     const dueDates = new Map([
       [1, new Date('2026-07-01')],
-      [2, new Date('2026-06-15')],
+      [2, new Date('2026-06-20')],
     ]);
 
     const result = validateDueDates(dueDates);
@@ -68,8 +77,8 @@ describe('validateDueDates', () => {
 
   it('should accept same-day dueDates (equal)', () => {
     const dueDates = new Map([
-      [1, new Date('2026-06-08')],
-      [2, new Date('2026-06-08')],
+      [1, new Date('2026-06-20')],
+      [2, new Date('2026-06-20')],
     ]);
 
     const result = validateDueDates(dueDates);
