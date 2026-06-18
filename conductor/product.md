@@ -11,6 +11,8 @@ SIMAK (Sistem Informasi dan Manajemen Akademik) — Help students and instructor
 
 SIMAK (Sistem Informasi dan Manajemen Akademik) is a web-based academic information and management system designed for universities and schools. It enables instructors to assign structured assignments with sequential checkpoints, allows students to submit work for review, and facilitates structured feedback cycles.
 
+**Landing Page** — Public-facing introductory page at `/` showcasing key features (Sequential Checkpoints, Structured Feedback, Consultation Tracking, Deadline Management, Bilingual Support, Role-Based Access) with How It Works flow and bilingual support. Always visible to both authenticated and unauthenticated users.
+
 ## Core Problem
 
 Students and instructors lack a centralized system to:
