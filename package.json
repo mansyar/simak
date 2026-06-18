@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm generate:i18n && vite dev",
-    "build": "pnpm generate:i18n && vite build",
+    "build": "pnpm generate:i18n && vite build && pnpm build:migrate && pnpm build:seed",
+    "build:migrate": "esbuild src/db/migrate.ts --bundle --format=esm --platform=node --outfile=.output/server/migrate.mjs",
+    "build:seed": "esbuild src/db/seed.ts --bundle --format=esm --platform=node --outfile=.output/server/seed.mjs",
     "start": "vinxi start",
     "test": "vitest run --exclude tests/integration/**",
     "test:unit": "vitest run --exclude tests/integration/**",

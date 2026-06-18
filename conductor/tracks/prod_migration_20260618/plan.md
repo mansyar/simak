@@ -42,19 +42,19 @@
 
 ## Phase 3: Bundle Scripts & Dockerfile
 
-- [ ] Task: Read spec.md to internalize requirements before starting this phase
-- [ ] Task: Add `build:migrate` and `build:seed` esbuild scripts
-  - [ ] Add `"build:migrate": "esbuild src/db/migrate.ts --bundle --format=esm --platform=node --outfile=.output/server/migrate.mjs"` to `package.json` scripts
-  - [ ] Add `"build:seed": "esbuild src/db/seed.ts --bundle --format=esm --platform=node --outfile=.output/server/seed.mjs"` to `package.json` scripts
-  - [ ] Update `"build"` to chain: `"pnpm generate:i18n && vite build && pnpm build:migrate && pnpm build:seed"`
-  - [ ] Verify `esbuild` resolves (transitive via `vite`); if not resolvable as a direct binary, use `pnpm exec esbuild` or add `esbuild` to `devDependencies` (document the decision in the commit message)
-  - [ ] Run `pnpm build` and confirm `.output/server/migrate.mjs` and `.output/server/seed.mjs` are produced
-- [ ] Task: Update `docker/Dockerfile` to ship migration artifacts
-  - [ ] Add `COPY --from=builder --chown=simak:nodejs /app/drizzle/migrations /app/drizzle/migrations` to the runner stage (after the existing `.output` and `package.json` COPY lines)
-  - [ ] Confirm no other runner-stage changes are needed (no `node_modules`, `tsx`, or `drizzle-kit`)
-- [ ] Task: Verify Docker build & runner image contents (AC-1)
-  - [ ] Run `docker build -t simak:dev -f docker/Dockerfile .`
-  - [ ] Run `docker run --rm simak:dev ls -la .output/server drizzle/migrations` and confirm `migrate.mjs`, `seed.mjs`, and the 10 migration SQL files + `meta/` are present
+- [x] Task: Read spec.md to internalize requirements before starting this phase
+- [x] Task: Add `build:migrate` and `build:seed` esbuild scripts
+  - [x] Add `"build:migrate": "esbuild src/db/migrate.ts --bundle --format=esm --platform=node --outfile=.output/server/migrate.mjs"` to `package.json` scripts
+  - [x] Add `"build:seed": "esbuild src/db/seed.ts --bundle --format=esm --platform=node --outfile=.output/server/seed.mjs"` to `package.json` scripts
+  - [x] Update `"build"` to chain: `"pnpm generate:i18n && vite build && pnpm build:migrate && pnpm build:seed"`
+  - [x] Verify `esbuild` resolves (transitive via `vite`); if not resolvable as a direct binary, use `pnpm exec esbuild` or add `esbuild` to `devDependencies` (document the decision in the commit message)
+  - [x] Run `pnpm build` and confirm `.output/server/migrate.mjs` and `.output/server/seed.mjs` are produced
+- [x] Task: Update `docker/Dockerfile` to ship migration artifacts
+  - [x] Add `COPY --from=builder --chown=simak:nodejs /app/drizzle/migrations /app/drizzle/migrations` to the runner stage (after the existing `.output` and `package.json` COPY lines)
+  - [x] Confirm no other runner-stage changes are needed (no `node_modules`, `tsx`, or `drizzle-kit`)
+- [x] Task: Verify Docker build & runner image contents (AC-1)
+  - [x] Run `docker build -t simak:dev -f docker/Dockerfile .`
+  - [x] Run `docker run --rm simak:dev ls -la .output/server drizzle/migrations` and confirm `migrate.mjs`, `seed.mjs`, and the 10 migration SQL files + `meta/` are present
 - [ ] Task: Conductor - User Manual Verification 'Bundle Scripts & Dockerfile' (Protocol in workflow.md)
 
 ## Phase 4: SQL Style Guide — Rollback Convention & Expand-Contract Pattern

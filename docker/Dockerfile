@@ -19,6 +19,7 @@ RUN adduser --system --uid 1001 simak
 
 COPY --from=builder --chown=simak:nodejs /app/.output /app/.output
 COPY --from=builder --chown=simak:nodejs /app/package.json /app/package.json
+COPY --from=builder --chown=simak:nodejs /app/drizzle/migrations /app/drizzle/migrations
 
 USER simak
 
