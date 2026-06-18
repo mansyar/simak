@@ -17,24 +17,24 @@
 
 ## Phase 2: Route — `/admin/templates/$id` page
 
-- [ ] Task: Read spec.md to understand requirements before implementation
-- [ ] Task: Create route file `src/routes/_authenticated/admin/templates/$id.tsx`
-  - [ ] SSR `loader`: call `getTemplate` with route param `$id`, return template data
-  - [ ] `pendingComponent`: loading skeleton
-  - [ ] `notFoundComponent`: template not found page
-  - [ ] Write unit tests: route exports, loader params, pending state
-- [ ] Task: Build TemplateEditorPage component (inline in route file or separate)
-  - [ ] **Metadata section**: editable name + type inputs, read-only created date + creator name
-  - [ ] **In-use banner**: if assignmentCount > 0, show warning
-  - [ ] **Checkpoint editor**: full-width `CheckpointListEditor` with Save/Cancel buttons
-  - [ ] **Linked assignments section**: fetch `listTemplateAssignments` client-side, display as linked list
-  - [ ] **Delete section**: "Delete Template" button → `DeleteTemplateDialog` → navigate to `/admin/templates` on success
-  - [ ] Save button: calls `updateTemplate`, shows success toast on completion
-  - [ ] Write unit tests: renders all sections, edit interactions, save mutation, delete flow
-- [ ] Task: Add i18n translation keys
-  - [ ] Add `adminTemplates.detail.*` keys to `locales/en.json` and `locales/id.json`
-  - [ ] Run `pnpm generate:i18n`
-  - [ ] Write unit test: translation keys exist in both locales
+- [x] Task: Read spec.md to understand requirements before implementation
+- [x] Task: Create route file `src/routes/_authenticated/admin/templates/$id.tsx`
+  - [x] SSR `loader`: call `getTemplate` with route param `$id`, return template data
+  - [x] `pendingComponent`: loading skeleton
+  - [x] `notFoundComponent`: template not found page
+  - [x] Write unit tests: route exports, loader params, pending state
+- [x] Task: Build TemplateEditorPage component (inline in route file or separate)
+  - [x] **Metadata section**: editable name + type inputs, read-only created date + creator name
+  - [x] **In-use banner**: if assignmentCount > 0, show warning
+  - [x] **Checkpoint editor**: full-width `CheckpointListEditor` with Save/Cancel buttons
+  - [x] **Linked assignments section**: fetch `listTemplateAssignments` client-side, display as linked list
+  - [x] **Delete section**: "Delete Template" button → `DeleteTemplateDialog` → navigate to `/admin/templates` on success
+  - [x] Save button: calls `updateTemplate`, shows success toast on completion
+  - [x] Write unit tests: renders all sections, edit interactions, save mutation, delete flow
+- [x] Task: Add i18n translation keys
+  - [x] Add `adminTemplates.detail.*` keys to `locales/en.json` and `locales/id.json`
+  - [x] Run `pnpm generate:i18n`
+  - [x] Write unit test: translation keys exist in both locales
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Route Page' (Protocol in workflow.md)
 
 ## Phase 3: Update list page — remove sheet, wire navigation

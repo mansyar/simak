@@ -82,7 +82,8 @@
     "noSearchResults": "No {items} found matching your search.",
     "typeDeleteToConfirm": "Type DELETE to confirm",
     "templateNamePlaceholder": "e.g., Thesis Template",
-    "templateTypePlaceholder": "e.g., Thesis, Research Paper"
+    "templateTypePlaceholder": "e.g., Thesis, Research Paper",
+    "saving": "Saving..."
   },
   "theme": {
     "light": "Light Mode",
@@ -218,7 +219,17 @@
     "deleteConfirm": "Delete this template?",
     "deleteInUse": "This template is used by {count} assignment(s). Type DELETE to confirm.",
     "deleteSuccess": "Template deleted successfully",
-    "inUseBanner": "This template is used by {count} assignment(s). Changes will affect future assignment creation."
+    "inUseBanner": "This template is used by {count} assignment(s). Changes will affect future assignment creation.",
+    "detail": {
+      "back": "Back to Templates",
+      "metadata": "Template Information",
+      "checkpoints": "Checkpoints",
+      "assignments": "Assignments using this template",
+      "noAssignments": "No assignments yet",
+      "saveSuccess": "Template saved",
+      "created": "Created",
+      "createdBy": "Created by"
+    }
   },
   "instructorReviews": {
     "title": "Review Queue",

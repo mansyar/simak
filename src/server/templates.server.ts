@@ -2,7 +2,8 @@
 import { eq, inArray, and, isNull, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates';
-import { assignments } from '../db/schema/assignments';
+import { assignments, assignmentStudents } from '../db/schema/assignments';
+import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import type { NonNullableSession } from '../lib/types';
@@ -12,12 +13,14 @@ import type {
   UpdateTemplateSchema,
   ListTemplatesSchema,
   TemplateIdParamSchema,
+  ListTemplateAssignmentsSchema,
 } from './templates';
 
 type CreateTemplateInput = z.infer<typeof CreateTemplateSchema>;
 type UpdateTemplateInput = z.infer<typeof UpdateTemplateSchema>;
 type ListTemplatesInput = z.infer<typeof ListTemplatesSchema>;
 type TemplateIdParam = z.infer<typeof TemplateIdParamSchema>;
+type ListTemplateAssignmentsInput = z.infer<typeof ListTemplateAssignmentsSchema>;
 
 function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && (session.user.role === 'admin' || session.user.role === 'superadmin');
@@ -131,10 +134,12 @@ export async function getTemplateHandler(args: { data: TemplateIdParam }) {
       name: assignmentTemplates.name,
       type: assignmentTemplates.type,
       createdBy: assignmentTemplates.createdBy,
+      createdByName: users.name,
       createdAt: assignmentTemplates.createdAt,
       updatedAt: assignmentTemplates.updatedAt,
     })
     .from(assignmentTemplates)
+    .leftJoin(users, eq(assignmentTemplates.createdBy, users.id))
     .where(and(eq(assignmentTemplates.id, id), isNull(assignmentTemplates.deletedAt)))
     .limit(1);
 
@@ -359,4 +364,54 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
   return getTemplateHandler({ data: { id: inserted.id } }).then((template) => ({
     template,
   }));
+}
+
+export async function listTemplateAssignmentsHandler(args: { data: ListTemplateAssignmentsInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isAdmin(session)) {
+    return { assignments: [] };
+  }
+
+  const db = getDb();
+  const { templateId } = args.data;
+
+  // Get assignments linked to this template with instructor name and student count
+  const templateAssignments = await db
+    .select({
+      id: assignments.id,
+      title: assignments.title,
+      instructorName: users.name,
+      createdAt: assignments.createdAt,
+    })
+    .from(assignments)
+    .innerJoin(users, eq(assignments.instructorId, users.id))
+    .where(and(eq(assignments.templateId, templateId), isNull(assignments.deletedAt)))
+    .orderBy(assignments.createdAt);
+
+  // Get student counts per assignment
+  const assignmentIds = templateAssignments.map((a) => a.id);
+  let studentCounts: Map<number, number> = new Map();
+
+  if (assignmentIds.length > 0) {
+    const counts = await db
+      .select({
+        assignmentId: assignmentStudents.assignmentId,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(assignmentStudents)
+      .where(inArray(assignmentStudents.assignmentId, assignmentIds))
+      .groupBy(assignmentStudents.assignmentId);
+
+    studentCounts = new Map(counts.map((c) => [c.assignmentId, Number(c.count)]));
+  }
+
+  return {
+    assignments: templateAssignments.map((a) => ({
+      id: a.id,
+      title: a.title,
+      instructorName: a.instructorName,
+      studentCount: studentCounts.get(a.id) ?? 0,
+      createdAt: a.createdAt,
+    })),
+  };
 }

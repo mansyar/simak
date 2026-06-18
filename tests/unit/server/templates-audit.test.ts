@@ -35,6 +35,7 @@ describe('Template handlers audit logging', () => {
     set: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
     orderBy: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
     then: vi.fn(function (onfulfilled) {
       return Promise.resolve([]).then(onfulfilled);
     }),

@@ -32,6 +32,10 @@ export const TemplateIdParamSchema = z.object({
   id: z.coerce.number().int().positive('Template ID must be a positive integer'),
 });
 
+export const ListTemplateAssignmentsSchema = z.object({
+  templateId: z.coerce.number().int().positive('Template ID must be a positive integer'),
+});
+
 export const listTemplates = createServerFn({ method: 'GET' }).handler(
   async (args: { data: unknown }) => {
     const { listTemplatesHandler } = await import('./templates.server');
@@ -79,5 +83,13 @@ export const duplicateTemplate = createServerFn({ method: 'POST' }).handler(
     const { duplicateTemplateHandler } = await import('./templates.server');
     const data = TemplateIdParamSchema.parse(args.data);
     return duplicateTemplateHandler({ data });
+  },
+);
+
+export const listTemplateAssignments = createServerFn({ method: 'GET' }).handler(
+  async (args: { data: unknown }) => {
+    const { listTemplateAssignmentsHandler } = await import('./templates.server');
+    const data = ListTemplateAssignmentsSchema.parse(args.data);
+    return listTemplateAssignmentsHandler({ data });
   },
 );

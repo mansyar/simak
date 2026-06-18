@@ -82,7 +82,8 @@
     "noSearchResults": "Tidak ada {items} yang ditemukan.",
     "typeDeleteToConfirm": "Ketik DELETE untuk mengonfirmasi",
     "templateNamePlaceholder": "misal, Templat Skripsi",
-    "templateTypePlaceholder": "misal, Skripsi, Makalah Penelitian"
+    "templateTypePlaceholder": "misal, Skripsi, Makalah Penelitian",
+    "saving": "Menyimpan..."
   },
   "theme": {
     "light": "Mode Terang",
@@ -218,7 +219,17 @@
     "deleteConfirm": "Hapus templat ini?",
     "deleteInUse": "Templat ini digunakan oleh {count} tugas. Ketik DELETE untuk mengonfirmasi.",
     "deleteSuccess": "Templat berhasil dihapus",
-    "inUseBanner": "Templat ini digunakan oleh {count} tugas. Perubahan akan memengaruhi pembuatan tugas di masa mendatang."
+    "inUseBanner": "Templat ini digunakan oleh {count} tugas. Perubahan akan memengaruhi pembuatan tugas di masa mendatang.",
+    "detail": {
+      "back": "Kembali ke Templat",
+      "metadata": "Informasi Templat",
+      "checkpoints": "Checkpoint",
+      "assignments": "Tugas yang menggunakan templat ini",
+      "noAssignments": "Belum ada tugas",
+      "saveSuccess": "Templat berhasil disimpan",
+      "created": "Dibuat",
+      "createdBy": "Dibuat oleh"
+    }
   },
   "instructorReviews": {
     "title": "Antrean Review",

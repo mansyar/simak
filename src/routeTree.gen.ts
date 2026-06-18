@@ -38,6 +38,7 @@ import { Route as AuthenticatedStudentAssignmentsIdRouteImport } from './routes/
 import { Route as AuthenticatedInstructorReviewsSubmissionIdRouteImport } from './routes/_authenticated/instructor/reviews/$submissionId'
 import { Route as AuthenticatedInstructorAssignmentsNewRouteImport } from './routes/_authenticated/instructor/assignments/new'
 import { Route as AuthenticatedInstructorAssignmentsIdRouteImport } from './routes/_authenticated/instructor/assignments/$id'
+import { Route as AuthenticatedAdminTemplatesTemplateIdRouteImport } from './routes/_authenticated/admin/templates/$templateId'
 import { Route as AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRouteImport } from './routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId'
 
 const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
@@ -205,6 +206,12 @@ const AuthenticatedInstructorAssignmentsIdRoute =
     path: '/assignments/$id',
     getParentRoute: () => AuthenticatedInstructorRoute,
   } as any)
+const AuthenticatedAdminTemplatesTemplateIdRoute =
+  AuthenticatedAdminTemplatesTemplateIdRouteImport.update({
+    id: '/templates/$templateId',
+    path: '/templates/$templateId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute =
   AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRouteImport.update({
     id: '/checkpoints/$checkpointId',
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/auth/verify-2fa': typeof UnauthenticatedAuthVerify2faRoute
   '/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
   '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/instructor/reviews/$submissionId': typeof AuthenticatedInstructorReviewsSubmissionIdRoute
@@ -261,6 +269,7 @@ export interface FileRoutesByTo {
   '/auth/verify-2fa': typeof UnauthenticatedAuthVerify2faRoute
   '/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
   '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/instructor/reviews/$submissionId': typeof AuthenticatedInstructorReviewsSubmissionIdRoute
@@ -294,6 +303,7 @@ export interface FileRoutesById {
   '/_unauthenticated/auth/verify-2fa': typeof UnauthenticatedAuthVerify2faRoute
   '/_unauthenticated/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_authenticated/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
   '/_authenticated/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/_authenticated/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/_authenticated/instructor/reviews/$submissionId': typeof AuthenticatedInstructorReviewsSubmissionIdRoute
@@ -326,6 +336,7 @@ export interface FileRouteTypes {
     | '/auth/verify-2fa'
     | '/auth/verify-backup-code'
     | '/api/auth/$'
+    | '/admin/templates/$templateId'
     | '/instructor/assignments/$id'
     | '/instructor/assignments/new'
     | '/instructor/reviews/$submissionId'
@@ -356,6 +367,7 @@ export interface FileRouteTypes {
     | '/auth/verify-2fa'
     | '/auth/verify-backup-code'
     | '/api/auth/$'
+    | '/admin/templates/$templateId'
     | '/instructor/assignments/$id'
     | '/instructor/assignments/new'
     | '/instructor/reviews/$submissionId'
@@ -388,6 +400,7 @@ export interface FileRouteTypes {
     | '/_unauthenticated/auth/verify-2fa'
     | '/_unauthenticated/auth/verify-backup-code'
     | '/api/auth/$'
+    | '/_authenticated/admin/templates/$templateId'
     | '/_authenticated/instructor/assignments/$id'
     | '/_authenticated/instructor/assignments/new'
     | '/_authenticated/instructor/reviews/$submissionId'
@@ -612,6 +625,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInstructorAssignmentsIdRouteImport
       parentRoute: typeof AuthenticatedInstructorRoute
     }
+    '/_authenticated/admin/templates/$templateId': {
+      id: '/_authenticated/admin/templates/$templateId'
+      path: '/templates/$templateId'
+      fullPath: '/admin/templates/$templateId'
+      preLoaderRoute: typeof AuthenticatedAdminTemplatesTemplateIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/student/assignments/$id/checkpoints/$checkpointId': {
       id: '/_authenticated/student/assignments/$id/checkpoints/$checkpointId'
       path: '/checkpoints/$checkpointId'
@@ -626,6 +646,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAuditLogRoute: typeof AuthenticatedAdminAuditLogRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminTemplatesTemplateIdRoute: typeof AuthenticatedAdminTemplatesTemplateIdRoute
   AuthenticatedAdminTemplatesIndexRoute: typeof AuthenticatedAdminTemplatesIndexRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -634,6 +655,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAuditLogRoute: AuthenticatedAdminAuditLogRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+  AuthenticatedAdminTemplatesTemplateIdRoute:
+    AuthenticatedAdminTemplatesTemplateIdRoute,
   AuthenticatedAdminTemplatesIndexRoute: AuthenticatedAdminTemplatesIndexRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }
