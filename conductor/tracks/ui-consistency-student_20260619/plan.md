@@ -1,7 +1,9 @@
+<protect>
 # Track: UI Consistency for Student-Facing UI — Implementation Plan
 
 ## Phase 1: Shared Component Foundation
 
+- [ ] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
 - [ ] Task: Audit existing shadcn/ui primitives for reusability (`Progress`, `Tabs`, `Badge` variants).
   - [ ] Check if `src/components/ui/progress.tsx` exists; if not, scaffold a minimal `Progress` component.
   - [ ] Check if `src/components/ui/tabs.tsx` exists and is suitable for assignment detail tabs.
@@ -18,6 +20,7 @@
 
 ## Phase 2: Assignment Card & Dashboard Cleanup
 
+- [ ] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
 - [ ] Task: Unify the template-type badge across student assignment surfaces.
   - [ ] Write failing tests for `StudentAssignmentCard`, `StudentDashboard`, and `AssignmentDetailHeader` asserting the badge uses a shared `Badge` variant.
   - [ ] Replace inline template-type spans with the shared `Badge` variant in all three components.
@@ -38,6 +41,7 @@
 
 ## Phase 3: Assignment Detail & Checkpoint Timeline
 
+- [ ] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
 - [ ] Task: Replace hardcoded colors in `CheckpointCard.tsx` with semantic tokens.
   - [ ] Write failing tests asserting `CheckpointCard` state containers use semantic color classes (`border-l-success`, `bg-success/10`, etc.) and not literal Tailwind colors (`green-500`, `red-600`, etc.).
   - [ ] Update `stateConfig` to use semantic tokens for all six checkpoint states.
@@ -54,6 +58,7 @@
 
 ## Phase 4: Layout & Cross-Cutting Student Routes
 
+- [ ] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
 - [ ] Task: Refine sidebar active-state styling.
   - [ ] Write failing tests asserting active nav item does not rely on a left border indent.
   - [ ] Update `student-sidebar.tsx` active item to use full-width background highlight without `border-l-[3px]`.
@@ -71,6 +76,7 @@
 
 ## Phase 5: Testing & Quality Gates
 
+- [ ] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
 - [ ] Task: Write/update component tests for all changed components.
   - [ ] `StudentAssignmentCard`
   - [ ] `StudentDashboard`
@@ -92,3 +98,4 @@
   - [ ] Verify sidebar active state on desktop and mobile.
   - [ ] Check responsive behavior at 320px, 768px, and 1920px.
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Testing & Quality Gates' (Protocol in workflow.md)
+</protect>
