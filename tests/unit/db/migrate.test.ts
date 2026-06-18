@@ -1,6 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-// Mock everything at the top level with inline factories (hoisted)
+const mockExecSync = vi.fn().mockReturnValue(Buffer.from('migrations applied'));
+
+vi.mock('node:child_process', () => ({
+  default: { execSync: mockExecSync },
+  execSync: mockExecSync,
+}));
+
 vi.mock('postgres', () => ({
   default: vi.fn(() => ({
     end: vi.fn().mockResolvedValue(undefined),
@@ -14,42 +20,40 @@ vi.mock('drizzle-orm/postgres-js', () => ({
   })),
 }));
 
-vi.mock('drizzle-orm/postgres-js/migrator', () => ({
-  migrate: vi.fn().mockResolvedValue(undefined),
-}));
+async function loadMigrate() {
+  vi.resetModules();
+  return await import('@/db/migrate');
+}
 
 describe('Migration Runner', () => {
   const OLD_ENV = process.env;
 
   beforeEach(() => {
-    vi.resetModules();
     process.env = { ...OLD_ENV };
-    vi.clearAllMocks();
+    mockExecSync.mockReset();
+    mockExecSync.mockReturnValue(Buffer.from('migrations applied'));
   });
 
   it('should export the correct advisory lock ID constant', async () => {
-    const { ADVISORY_LOCK_ID } = await import('@/db/migrate');
+    const { ADVISORY_LOCK_ID } = await loadMigrate();
     expect(ADVISORY_LOCK_ID).toBe(789123);
   });
 
-  it('should acquire pg_advisory_lock before migrate()', async () => {
+  it('should acquire pg_advisory_lock then shell out to drizzle-kit migrate', async () => {
     process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
     delete process.env.MIGRATE_DATABASE_URL;
 
     const postgresModule = await import('postgres');
-    const drizzleModule = await import('drizzle-orm/postgres-js');
-    const migratorModule = await import('drizzle-orm/postgres-js/migrator');
-
-    const { runMigrations } = await import('@/db/migrate');
+    const { runMigrations } = await loadMigrate();
     await runMigrations();
 
-    // Verify postgres was called with DATABASE_URL
     expect(postgresModule.default).toHaveBeenCalledWith('postgresql://localhost:5432/simak', {
       max: 1,
       onnotice: expect.any(Function),
     });
-    // Verify migrate was called
-    expect(migratorModule.migrate).toHaveBeenCalled();
+    expect(mockExecSync).toHaveBeenCalledWith('npx drizzle-kit migrate', {
+      stdio: 'inherit',
+    });
   });
 
   it('should use MIGRATE_DATABASE_URL when set', async () => {
@@ -57,8 +61,7 @@ describe('Migration Runner', () => {
     process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
 
     const postgresModule = await import('postgres');
-
-    const { runMigrations } = await import('@/db/migrate');
+    const { runMigrations } = await loadMigrate();
     await runMigrations();
 
     expect(postgresModule.default).toHaveBeenCalledWith(
@@ -72,8 +75,7 @@ describe('Migration Runner', () => {
     delete process.env.MIGRATE_DATABASE_URL;
 
     const postgresModule = await import('postgres');
-
-    const { runMigrations } = await import('@/db/migrate');
+    const { runMigrations } = await loadMigrate();
     await runMigrations();
 
     expect(postgresModule.default).toHaveBeenCalledWith('postgresql://localhost:5432/simak', {
@@ -91,7 +93,7 @@ describe('Migration Runner', () => {
     }) as (...args: unknown[]) => never);
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const { runMigrations } = await import('@/db/migrate');
+    const { runMigrations } = await loadMigrate();
 
     await expect(runMigrations()).rejects.toThrow('process.exit(1)');
 
@@ -105,30 +107,15 @@ describe('Migration Runner', () => {
     consoleError.mockRestore();
   });
 
-  it('should release pg_advisory_unlock in finally block even when migrate() throws', async () => {
+  it('should release pg_advisory_unlock in finally block even when execSync throws', async () => {
     process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
     delete process.env.MIGRATE_DATABASE_URL;
 
-    // Override migrate mock to throw
-    const migratorModule = await import('drizzle-orm/postgres-js/migrator');
-    vi.mocked(migratorModule.migrate).mockRejectedValueOnce(new Error('Migration failed'));
+    mockExecSync.mockImplementationOnce(() => {
+      throw new Error('Command failed: npx drizzle-kit migrate');
+    });
 
-    const drizzleModule = await import('drizzle-orm/postgres-js');
-    const drizzleSpy = drizzleModule.drizzle as unknown as ReturnType<typeof vi.fn>;
-
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    const { runMigrations } = await import('@/db/migrate');
-
-    await expect(runMigrations()).rejects.toThrow('Migration failed');
-
-    // Verify unlock was called in finally despite the throw
-    // drizzle() was called to construct the db handle
-    expect(drizzleSpy).toHaveBeenCalledTimes(1);
-    // The returned execute spy was called twice (lock + unlock)
-    const mockDb = drizzleSpy.mock.results[0]?.value;
-    expect(mockDb?.execute).toHaveBeenCalledTimes(2);
-
-    consoleSpy.mockRestore();
+    const { runMigrations } = await loadMigrate();
+    await expect(runMigrations()).rejects.toThrow('Command failed: npx drizzle-kit migrate');
   });
 });
