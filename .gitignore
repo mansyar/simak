@@ -11,3 +11,4 @@ coverage/
 */tmp/*
 .vitest-cache/
 .vitest-reports/
+*.tsbuildinfo

@@ -12,7 +12,7 @@
     "test:integration": "vitest run tests/integration",
     "test:watch": "vitest --exclude tests/integration/**",
     "test:coverage": "vitest run --coverage --exclude tests/integration/**",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --incremental",
     "lint": "oxlint .",
     "format": "oxfmt --write \"src/**/*.{ts,tsx,css}\"",
     "db:generate": "drizzle-kit generate",
