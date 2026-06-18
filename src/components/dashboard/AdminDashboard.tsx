@@ -63,8 +63,11 @@ interface Props {
   data: AdminDashboardData;
 }
 
-function getActivityDotColor(_type: string) {
-  return 'verified' as const;
+function getActivityDotColor(type: string) {
+  if (type.includes('created') || type.includes('passed') || type.includes('verified')) {
+    return 'verified' as const;
+  }
+  return 'inactive' as const;
 }
 
 export function AdminDashboard({ data }: Props) {
