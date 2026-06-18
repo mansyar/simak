@@ -113,11 +113,21 @@ describe('Migration Runner', () => {
     const migratorModule = await import('drizzle-orm/postgres-js/migrator');
     vi.mocked(migratorModule.migrate).mockRejectedValueOnce(new Error('Migration failed'));
 
+    const drizzleModule = await import('drizzle-orm/postgres-js');
+    const drizzleSpy = drizzleModule.drizzle as unknown as ReturnType<typeof vi.fn>;
+
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const { runMigrations } = await import('@/db/migrate');
 
     await expect(runMigrations()).rejects.toThrow('Migration failed');
+
+    // Verify unlock was called in finally despite the throw
+    // drizzle() was called to construct the db handle
+    expect(drizzleSpy).toHaveBeenCalledTimes(1);
+    // The returned execute spy was called twice (lock + unlock)
+    const mockDb = drizzleSpy.mock.results[0]?.value;
+    expect(mockDb?.execute).toHaveBeenCalledTimes(2);
 
     consoleSpy.mockRestore();
   });
