@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import globalCss from '../app/global.css?url';
 import type { Locales } from '../i18n/types';
 import { detectLocale } from '../i18n/index';
+import type { TranslationKey } from '../i18n/index';
 import enTranslations from '../../locales/en.json';
 import idTranslations from '../../locales/id.json';
 
@@ -63,7 +64,7 @@ function ThemeScript() {
 type I18nContextType = {
   locale: Locales;
   setLocale: (locale: Locales) => void;
-  t: (key: string, params?: Record<string, string>) => string;
+  t: (key: TranslationKey, params?: Record<string, string>) => string;
 };
 
 const I18nContext = createContext<I18nContextType>({
@@ -90,7 +91,7 @@ function useI18nProvider() {
   }, []);
 
   const t = useCallback(
-    (key: string, params?: Record<string, string>): string => {
+    (key: TranslationKey, params?: Record<string, string>): string => {
       const raw = resolveKey(translations[locale], key);
       return interpolate(raw, params);
     },

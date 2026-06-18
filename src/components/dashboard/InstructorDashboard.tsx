@@ -1,4 +1,5 @@
 import { useI18n } from '../../routes/__root';
+import type { TranslationKey } from '../../i18n/index';
 import { Link } from '@tanstack/react-router';
 import { ClipboardList, ClipboardCheck, FileText, ArrowRight, Users, BookOpen } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -69,7 +70,7 @@ function getStatusBadgeVariant(status: string) {
   }
 }
 
-function getStatusBadgeText(status: string, t: (key: string) => string) {
+function getStatusBadgeText(status: string, t: (key: TranslationKey) => string) {
   switch (status) {
     case 'Submitted':
       return t('studentAssignments.status.submitted');

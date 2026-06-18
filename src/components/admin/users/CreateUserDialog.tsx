@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { CreateUserSchema } from '@/server/users';
 import { useI18n } from '../../../routes/__root';
+import type { TranslationKey } from '../../../i18n/index';
 
 type CreateUserFormValues = z.infer<typeof CreateUserSchema>;
 
@@ -94,7 +95,7 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
                       <SelectTrigger>
                         <span data-slot="select-value" className="flex flex-1 text-left">
                           {field.value
-                            ? t('adminUsers.role_' + field.value)
+                            ? t(('adminUsers.role_' + field.value) as TranslationKey)
                             : t('adminUsers.table.role')}
                         </span>
                       </SelectTrigger>

@@ -42,7 +42,9 @@ interface DeadlineManagerProps {
   assignmentId: number;
 }
 
-function StatusBadge({ state, t }: { state: string; t: (key: string) => string }) {
+import type { TranslationKey } from '../../i18n/index';
+
+function StatusBadge({ state, t }: { state: string; t: (key: TranslationKey) => string }) {
   switch (state) {
     case 'passed':
       return <Badge variant="success">{t('instructorAssignments.status.passed')}</Badge>;

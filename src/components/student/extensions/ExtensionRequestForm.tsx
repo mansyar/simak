@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useI18n } from '../../../routes/__root';
+import type { TranslationKey } from '../../../i18n/index';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -119,7 +120,7 @@ export function ExtensionRequestForm({
             {CATEGORY_OPTIONS.map((cat) => (
               <SelectItem key={cat} value={cat}>
                 {t(
-                  `extensions.category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as unknown as string,
+                  `extensions.category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as TranslationKey,
                 )}
               </SelectItem>
             ))}

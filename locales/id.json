@@ -83,7 +83,9 @@
     "typeDeleteToConfirm": "Ketik DELETE untuk mengonfirmasi",
     "templateNamePlaceholder": "misal, Templat Skripsi",
     "templateTypePlaceholder": "misal, Skripsi, Makalah Penelitian",
-    "saving": "Menyimpan..."
+    "saving": "Menyimpan...",
+    "previousPage": "Sebelumnya",
+    "nextPage": "Selanjutnya"
   },
   "theme": {
     "light": "Mode Terang",
@@ -235,6 +237,12 @@
     "title": "Antrean Review",
     "subtitle": "Review pengumpulan mahasiswa yang menunggu di semua tugas Anda",
     "allAssignments": "Semua Tugas",
+    "table": {
+      "student": "Mahasiswa",
+      "assignment": "Tugas",
+      "waitTime": "Waktu Tunggu",
+      "status": "Status"
+    },
     "empty": "Tidak ada review tertunda",
     "emptyPrompt": "Ketika mahasiswa mengumpulkan pekerjaan untuk direview, akan muncul di sini.",
     "slaNotReviewed": "Belum Direview",
@@ -373,7 +381,8 @@
     "blockedByPrevious": "Checkpoint sebelumnya belum lulus",
     "blockedByConsultations": "Konsultasi tidak mencukupi: {current}/{required} terverifikasi",
     "notFound": "Tugas tidak ditemukan",
-    "notFoundDescription": "Tugas ini tidak ada atau Anda tidak memiliki akses ke tugas ini."
+    "notFoundDescription": "Tugas ini tidak ada atau Anda tidak memiliki akses ke tugas ini.",
+    "checkpointTimeline": "Linimasa Checkpoint"
   },
   "studentDashboard": {
     "title": "Dasbor",
@@ -469,7 +478,10 @@
       "awaitingHint": "Pengumpulan Anda akan direview oleh dosen",
       "reviewedOn": "Direview pada {date}"
     },
-    "revisionDeadline": "Tenggat revisi: {date}"
+    "revisionDeadline": "Tenggat revisi: {date}",
+    "empty": "Tidak ada file",
+    "emptyPrompt": "Unggah file untuk memulai",
+    "uploadError": "Gagal mengunggah file"
   },
   "consultations": {
     "title": "Konsultasi",
@@ -612,6 +624,34 @@
     "statusPending": "Menunggu",
     "statusApproved": "Disetujui",
     "statusRejected": "Ditolak",
+    "dialog": {
+      "approve": {
+        "title": "Setujui Permintaan Perpanjangan",
+        "description": "Apakah Anda yakin ingin menyetujui permintaan perpanjangan ini?",
+        "comment": "Komentar (opsional)",
+        "commentPlaceholder": "Tambahkan catatan tentang persetujuan ini...",
+        "cancel": "Batal",
+        "confirm": "Setujui Perpanjangan"
+      },
+      "reject": {
+        "title": "Tolak Permintaan Perpanjangan",
+        "description": "Apakah Anda yakin ingin menolak permintaan perpanjangan ini?",
+        "reason": "Alasan penolakan",
+        "reasonPlaceholder": "Jelaskan mengapa permintaan ditolak...",
+        "charCount": "{count}/20 karakter",
+        "cancel": "Batal",
+        "confirm": "Tolak Perpanjangan"
+      }
+    },
+    "queue": {
+      "title": "Permintaan Perpanjangan",
+      "noPending": "Tidak ada permintaan perpanjangan tertunda",
+      "durationDays": "{count} hari",
+      "checkpoint": "Checkpoint: {name}",
+      "reason": "Alasan",
+      "approve": "Setujui",
+      "reject": "Tolak"
+    },
     "approveDialogTitle": "Setujui Permintaan Perpanjangan",
     "approveComment": "Komentar (opsional)",
     "approveConfirm": "Setujui Perpanjangan",

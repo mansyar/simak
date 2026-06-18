@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useI18n } from '@/routes/__root';
+import type { TranslationKey } from '@/i18n/index';
 import { Button } from '@/components/ui/button';
 import { ApproveExtensionDialog } from './ApproveExtensionDialog';
 import { RejectExtensionDialog } from './RejectExtensionDialog';
@@ -84,7 +85,7 @@ export function PendingExtensionsSection({
                   <span
                     className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase ${categoryColors[req.category] ?? categoryColors.other}`}
                   >
-                    {t(`extensions.category.${req.category}`)}
+                    {t(`extensions.category.${req.category}` as TranslationKey)}
                   </span>
                   <span className="text-[10px] text-muted-foreground">
                     {t('extensions.queue.durationDays', { count: String(req.extensionDays) })}

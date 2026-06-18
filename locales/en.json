@@ -83,7 +83,9 @@
     "typeDeleteToConfirm": "Type DELETE to confirm",
     "templateNamePlaceholder": "e.g., Thesis Template",
     "templateTypePlaceholder": "e.g., Thesis, Research Paper",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "previousPage": "Previous",
+    "nextPage": "Next"
   },
   "theme": {
     "light": "Light Mode",
@@ -235,6 +237,12 @@
     "title": "Review Queue",
     "subtitle": "Review pending student submissions across your assignments",
     "allAssignments": "All Assignments",
+    "table": {
+      "student": "Student",
+      "assignment": "Assignment",
+      "waitTime": "Wait Time",
+      "status": "Status"
+    },
     "empty": "No pending reviews",
     "emptyPrompt": "When students submit work for review, it will appear here.",
     "slaNotReviewed": "Not Reviewed",
@@ -373,7 +381,8 @@
     "blockedByPrevious": "Previous checkpoint not passed",
     "blockedByConsultations": "Insufficient consultations: {current}/{required} verified",
     "notFound": "Assignment not found",
-    "notFoundDescription": "This assignment does not exist or you don't have access to it."
+    "notFoundDescription": "This assignment does not exist or you don't have access to it.",
+    "checkpointTimeline": "Checkpoint Timeline"
   },
   "studentDashboard": {
     "title": "Dashboard",
@@ -469,7 +478,10 @@
       "awaitingHint": "Your submission will be reviewed by the instructor",
       "reviewedOn": "Reviewed on {date}"
     },
-    "revisionDeadline": "Revision deadline: {date}"
+    "revisionDeadline": "Revision deadline: {date}",
+    "empty": "No files",
+    "emptyPrompt": "Upload a file to get started",
+    "uploadError": "Failed to upload file"
   },
   "consultations": {
     "title": "Consultations",
@@ -612,6 +624,34 @@
     "statusPending": "Pending",
     "statusApproved": "Approved",
     "statusRejected": "Rejected",
+    "dialog": {
+      "approve": {
+        "title": "Approve Extension Request",
+        "description": "Are you sure you want to approve this extension request?",
+        "comment": "Comment (optional)",
+        "commentPlaceholder": "Add a note about this approval...",
+        "cancel": "Cancel",
+        "confirm": "Approve Extension"
+      },
+      "reject": {
+        "title": "Reject Extension Request",
+        "description": "Are you sure you want to reject this extension request?",
+        "reason": "Reason for rejection",
+        "reasonPlaceholder": "Explain why the request is rejected...",
+        "charCount": "{count}/20 characters",
+        "cancel": "Cancel",
+        "confirm": "Reject Extension"
+      }
+    },
+    "queue": {
+      "title": "Extension Requests",
+      "noPending": "No pending extension requests",
+      "durationDays": "{count} days",
+      "checkpoint": "Checkpoint: {name}",
+      "reason": "Reason",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
     "approveDialogTitle": "Approve Extension Request",
     "approveComment": "Comment (optional)",
     "approveConfirm": "Approve Extension",

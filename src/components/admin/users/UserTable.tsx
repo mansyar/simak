@@ -41,6 +41,7 @@ interface UserTableProps {
 }
 
 import { useI18n } from '../../../routes/__root';
+import type { TranslationKey } from '../../../i18n/index';
 
 export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableProps) {
   const { t } = useI18n();
@@ -87,7 +88,7 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
         };
         return (
           <Badge variant={roleVariants[role] || 'outline'} className="capitalize">
-            {t(roleLabels[role] || role)}
+            {t((roleLabels[role] || role) as TranslationKey)}
           </Badge>
         );
       },

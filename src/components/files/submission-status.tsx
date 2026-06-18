@@ -1,4 +1,5 @@
 import { useI18n } from '../../routes/__root';
+import type { TranslationKey } from '../../i18n/index';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, RefreshCcw, Clock, User, MessageSquare } from 'lucide-react';
@@ -73,7 +74,7 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
         {/* Decision badge */}
         <div className="flex items-center gap-2">
           <Icon className={`h-5 w-5 ${config.iconClass}`} />
-          <Badge variant={config.badgeVariant}>{t(config.labelKey)}</Badge>
+          <Badge variant={config.badgeVariant}>{t(config.labelKey as TranslationKey)}</Badge>
         </div>
 
         {/* Reviewer */}

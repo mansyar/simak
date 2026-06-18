@@ -213,7 +213,7 @@ export function TwoFactorSettings() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={t('settings.password')}
+                  placeholder={t('auth.password')}
                 />
               </div>
             </div>
@@ -328,7 +328,7 @@ export function TwoFactorSettings() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={t('settings.password')}
+              placeholder={t('auth.password')}
             />
           </div>
 

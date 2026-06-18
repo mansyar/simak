@@ -3,6 +3,13 @@ import type { Locales, Translation, TranslationFunctions } from './types';
 
 export type { Locales, Translation, TranslationFunctions };
 
+// Type-safe dot-notation key extraction from Translation type
+export type DeepKeys<T, P extends string = ''> = T extends string
+  ? P
+  : { [K in keyof T & string]: DeepKeys<T[K], `${P}${P extends '' ? '' : '.'}${K}`> }[keyof T & string];
+
+export type TranslationKey = DeepKeys<Translation>;
+
 const FALLBACK_LOCALE: Locales = 'en';
 
 function getBrowserLocale(): string | null {

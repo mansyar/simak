@@ -2,6 +2,7 @@ import { format } from 'date-fns/format';
 import { isPast } from 'date-fns/isPast';
 import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
+import type { TranslationKey } from '../../../i18n/index';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, AlertCircle, Users, ExternalLink } from 'lucide-react';
@@ -64,7 +65,7 @@ const stateConfig: Record<
 
 function getTranslatedBlockingReason(
   reason: string,
-  t: (key: string, params?: Record<string, string>) => string,
+  t: (key: TranslationKey, params?: Record<string, string>) => string,
 ): string {
   if (reason.startsWith('Previous checkpoint not passed')) {
     return t('studentAssignments.blockedByPrevious');
@@ -94,7 +95,7 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="text-sm font-semibold text-foreground">{checkpoint.name}</h4>
-            <Badge variant={config.badgeVariant}>{t(config.label)}</Badge>
+            <Badge variant={config.badgeVariant}>{t(config.label as TranslationKey)}</Badge>
             {isOverdue && (
               <Badge variant="destructive" className="gap-1">
                 <AlertCircle className="h-3 w-3" />

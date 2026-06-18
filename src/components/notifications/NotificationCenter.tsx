@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, CheckSquare, Loader2 } from 'lucide-react';
 import { useI18n } from '@/routes/__root';
+import type { TranslationKey } from '@/i18n/index';
 import { useNotificationsList, useMarkAllRead } from '@/hooks/use-notifications';
 import { NotificationItem, type Notification } from './NotificationItem';
 
@@ -115,7 +116,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
               {groupedNotifications.map((group) => (
                 <div key={group.key} className="py-2">
                   <div className="px-4 py-2 bg-muted/30 text-xs font-semibold text-muted-foreground flex items-center justify-between">
-                    <span>{t(group.labelKey)}</span>
+                    <span>{t(group.labelKey as TranslationKey)}</span>
                     <span className="rounded bg-muted px-1.5 py-0.5 text-[10px]">
                       {group.items.length}
                     </span>

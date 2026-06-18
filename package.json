@@ -23,6 +23,8 @@
     "db:push": "drizzle-kit push",
     "db:seed": "node --env-file=.env --import=tsx src/db/seed.ts",
     "generate:i18n": "tsx scripts/generate-i18n-types.ts",
+    "check:i18n": "node scripts/check-i18n-keys.js",
+    "check:i18n:unused": "node scripts/check-i18n-keys.js --show-unused",
     "prepare": "husky"
   },
   "dependencies": {

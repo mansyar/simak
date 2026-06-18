@@ -1,4 +1,5 @@
 import { useI18n } from '../../routes/__root';
+import type { TranslationKey } from '../../i18n/index';
 
 interface ConsultationItem {
   id: number;
@@ -40,7 +41,7 @@ export function ConsultationList({ consultations }: ConsultationListProps) {
             <span
               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadgeColors[item.status] ?? 'bg-gray-100 text-gray-800'}`}
             >
-              {t(`consultations.status.${item.status}`)}
+              {t(`consultations.status.${item.status}` as TranslationKey)}
             </span>
           </div>
           <p className="text-sm text-muted-foreground line-clamp-2">{item.notes ?? '-'}</p>

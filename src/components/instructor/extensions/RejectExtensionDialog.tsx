@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/routes/__root';
+import type { TranslationKey } from '@/i18n/index';
 
 const MIN_REASON_LENGTH = 20;
 
@@ -78,7 +79,7 @@ export function RejectExtensionDialog({
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">
-              {t('extensions.queue.reason')}
+              {t('extensions.queue.reason' as TranslationKey)}
             </p>
             <p className="text-sm text-muted-foreground">{request.reason}</p>
           </div>

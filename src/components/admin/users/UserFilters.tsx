@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
+import type { TranslationKey } from '../../../i18n/index';
 
 interface UserFiltersProps {
   search: string;
@@ -36,13 +37,13 @@ export function UserFilters({ search, onSearchChange, role, onRoleChange }: User
         <Select value={role} onValueChange={(val) => onRoleChange(val || 'all')}>
           <SelectTrigger>
             <span data-slot="select-value" className="flex flex-1 text-left">
-              {role && role !== 'all' ? t(roleLabels[role] || role) : t('adminUsers.allRoles')}
+              {role && role !== 'all' ? t((roleLabels[role] || role) as TranslationKey) : t('adminUsers.allRoles')}
             </span>
           </SelectTrigger>
           <SelectContent>
             {Object.entries(roleLabels).map(([value, labelKey]) => (
               <SelectItem key={value} value={value}>
-                {t(labelKey)}
+                {t(labelKey as TranslationKey)}
               </SelectItem>
             ))}
           </SelectContent>
