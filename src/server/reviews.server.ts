@@ -3,7 +3,7 @@ import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews } from '../db/schema/submissions';
-import { consultations } from '../db/schema/consultations';
+
 import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
@@ -234,9 +234,9 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       finalDeadline: assignments.finalDeadline,
     })
     .from(submissions)
-    .innerJoin(users, eq(checkpoints.studentId, users.id))
     .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
     .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+    .innerJoin(users, eq(checkpoints.studentId, users.id))
     .where(
       and(
         eq(submissions.id, submissionId),
@@ -297,12 +297,11 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           .set({ state: 'passed', updatedAt: new Date() })
           .where(eq(checkpoints.id, submission.checkpointId));
 
-        // 4c. Unlock the next sequential checkpoint for this student (with consultation gating)
+        // 4c. Unlock next sequential checkpoint
+        // (minConsultations gates SUBMISSION, not unlock — enforced in
+        //  submitCheckpointHandler, not here)
         const nextCheckpoint = await tx
-          .select({
-            id: checkpoints.id,
-            minConsultations: checkpoints.minConsultations,
-          })
+          .select({ id: checkpoints.id })
           .from(checkpoints)
           .where(
             and(
@@ -314,33 +313,11 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           .orderBy(checkpoints.order)
           .limit(1);
 
-        let shouldUnlock = true;
         if (nextCheckpoint.length > 0) {
-          const minConsults = nextCheckpoint[0].minConsultations ?? 0;
-          if (minConsults > 0) {
-            // Check if student has enough verified consultations for this checkpoint
-            const [{ count }] = await tx
-              .select({ count: sql<number>`count(*)::int` })
-              .from(consultations)
-              .where(
-                and(
-                  eq(consultations.checkpointId, nextCheckpoint[0].id),
-                  eq(consultations.studentId, submission.studentId),
-                  eq(consultations.status, 'verified'),
-                ),
-              );
-
-            if (Number(count) < minConsults) {
-              shouldUnlock = false;
-            }
-          }
-
-          if (shouldUnlock) {
-            await tx
-              .update(checkpoints)
-              .set({ state: 'unlocked', updatedAt: new Date() })
-              .where(eq(checkpoints.id, nextCheckpoint[0].id));
-          }
+          await tx
+            .update(checkpoints)
+            .set({ state: 'unlocked', updatedAt: new Date() })
+            .where(eq(checkpoints.id, nextCheckpoint[0].id));
         }
       } else if (decision === 'revise') {
         // 4d. Set checkpoint to revise

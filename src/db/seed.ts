@@ -1,6 +1,14 @@
 import { eq } from 'drizzle-orm';
 import { getDb } from './index';
-import { users, account } from './schema/index';
+import {
+  users,
+  account,
+  assignmentTemplates,
+  templateCheckpoints,
+  assignments,
+  assignmentStudents,
+  checkpoints,
+} from './schema/index';
 import { hashPassword } from 'better-auth/crypto';
 import crypto from 'node:crypto';
 
@@ -108,6 +116,117 @@ export async function seedTestUsers(): Promise<void> {
   }
 }
 
+/**
+ * Seed test templates and assignments.
+ * Idempotent — checks if "Test Template" already exists before creating.
+ * Relies on test users (instructor + student) being seeded first.
+ */
+export async function seedTestTemplatesAndAssignments(): Promise<void> {
+  const db = getDb();
+
+  // Find test users
+  const [instructorUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, 'instructor@simak.app'));
+
+  const [studentUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, 'student@simak.app'));
+
+  if (!instructorUser || !studentUser) {
+    console.log('Test users not found. Run seedTestUsers() first. Skipping.');
+    return;
+  }
+
+  // Idempotency: skip if template already exists
+  const existingTemplate = await db
+    .select()
+    .from(assignmentTemplates)
+    .where(eq(assignmentTemplates.name, 'Test Template'));
+
+  if (existingTemplate.length > 0) {
+    console.log('Test template already exists. Skipping.');
+    return;
+  }
+
+  // --- Create template with checkpoints ---
+  const [template] = await db
+    .insert(assignmentTemplates)
+    .values({
+      type: 'thesis',
+      name: 'Test Template',
+      createdBy: instructorUser.id,
+    })
+    .returning();
+
+  const templateCheckpointData = [
+    { name: 'Proposal', order: 1, minConsultations: 1, estimatedDuration: 14 },
+    { name: 'Chapter 1', order: 2, minConsultations: 1, estimatedDuration: 14 },
+    { name: 'Chapter 2', order: 3, minConsultations: 2, estimatedDuration: 21 },
+    { name: 'Chapter 3', order: 4, minConsultations: 2, estimatedDuration: 21 },
+    { name: 'Final Defense', order: 5, minConsultations: 1, estimatedDuration: 7 },
+  ];
+
+  for (const cp of templateCheckpointData) {
+    await db.insert(templateCheckpoints).values({
+      templateId: template.id,
+      name: cp.name,
+      order: cp.order,
+      minConsultations: cp.minConsultations,
+      estimatedDuration: cp.estimatedDuration,
+    });
+  }
+
+  console.log(`Test template created: "${template.name}" with ${templateCheckpointData.length} checkpoints.`);
+
+  // --- Create assignment from template ---
+  const finalDeadline = new Date();
+  finalDeadline.setDate(finalDeadline.getDate() + 90); // 90 days from now
+
+  const [assignment] = await db
+    .insert(assignments)
+    .values({
+      templateId: template.id,
+      title: 'Test Assignment',
+      description: 'A test assignment for development and testing purposes.',
+      finalDeadline,
+      instructorId: instructorUser.id,
+    })
+    .returning();
+
+  console.log(`Test assignment created: "${assignment.title}".`);
+
+  // --- Enroll student ---
+  await db.insert(assignmentStudents).values({
+    assignmentId: assignment.id,
+    studentId: studentUser.id,
+  });
+
+  console.log(`Student enrolled: ${studentUser.email}.`);
+
+  // --- Create per-student checkpoints ---
+  for (const cp of templateCheckpointData) {
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + cp.estimatedDuration);
+    // First checkpoint unlocked so student can upload immediately for testing
+    const state = cp.order === 1 ? 'unlocked' : 'locked';
+
+    await db.insert(checkpoints).values({
+      assignmentId: assignment.id,
+      studentId: studentUser.id,
+      name: cp.name,
+      order: cp.order,
+      dueDate,
+      minConsultations: cp.minConsultations,
+      state,
+    });
+  }
+
+  console.log(`Created ${templateCheckpointData.length} per-student checkpoints.`);
+}
+
 // Allow running directly: `tsx src/db/seed.ts` or `node .output/server/seed.mjs`
 // Cross-platform: compare resolved paths (handles Windows backslashes)
 const isDirectExecution =
@@ -119,6 +238,7 @@ const isDirectExecution =
 if (isDirectExecution) {
   seedSuperAdmin()
     .then(() => seedTestUsers())
+    .then(() => seedTestTemplatesAndAssignments())
     .then(() => process.exit(0))
     .catch((err) => {
       console.error('Seed failed:', err);
