@@ -29,5 +29,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Template Editor Route — Dedicated /admin/templates/$id route replacing EditTemplateSheet modal**
-  _Link: [./tracks/template-editor-route_20260618/](./tracks/template-editor-route_20260618/)_
+- [x] **Track: Template Editor Route — Dedicated /admin/templates/$id route replacing EditTemplateSheet modal**
+      _Archived: ./archive/template-editor-route_20260618/_
