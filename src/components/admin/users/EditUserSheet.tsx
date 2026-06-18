@@ -64,7 +64,7 @@ export function EditUserSheet({ user, open, onOpenChange, onSubmit }: EditUserSh
         <SheetHeader>
           <SheetTitle>{t('adminUsers.edit')}</SheetTitle>
           <SheetDescription>
-            Update user information. Email changes will require re-verification.
+            {t('adminUsers.editDescription')}
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>

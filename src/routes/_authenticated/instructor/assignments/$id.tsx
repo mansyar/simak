@@ -140,7 +140,7 @@ function AssignmentDetailPage() {
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <h2 className="text-xl font-semibold mb-2">{t('error.notFound')}</h2>
         <p className="text-muted-foreground mb-4">
-          This assignment could not be found or you do not have permission to view it.
+          {t('error.assignmentNotFound')}
         </p>
         <Link
           to="/instructor/assignments"
@@ -237,7 +237,7 @@ function AssignmentDetailPage() {
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Completed Cohort
+                {t('instructorAssignments.completedCohort')}
               </p>
               <h3 className="text-2xl font-bold text-foreground mt-1">
                 {completedStudents} / {totalStudents}

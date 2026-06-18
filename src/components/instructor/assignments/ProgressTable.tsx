@@ -146,7 +146,7 @@ export function ProgressTable({ students }: ProgressTableProps) {
                 colSpan={columns.length}
                 className="h-24 text-center text-muted-foreground"
               >
-                No students assigned.
+                {t('instructorAssignments.noStudentsAssigned')}
               </TableCell>
             </TableRow>
           )}

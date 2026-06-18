@@ -70,7 +70,7 @@ function VerifyBackupCodePage() {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               required
-              placeholder="xxxx-xxxx-xxxx"
+              placeholder={t('auth.backupCodePlaceholder')}
               autoComplete="off"
               autoFocus
             />

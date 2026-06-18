@@ -130,7 +130,7 @@ export function AdminDashboard({ data }: Props) {
         {/* Email Queue */}
         <Card>
           <CardHeader>
-            <CardTitle>Email Queue</CardTitle>
+            <CardTitle>{t('adminDashboard.emailQueue.title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-3">

@@ -132,12 +132,12 @@ export function StudentPicker({
             {areAllFilteredSelected ? (
               <>
                 <CheckSquare className="h-4 w-4 text-primary" />
-                Deselect All
+                {t('instructorAssignments.deselectAll')}
               </>
             ) : (
               <>
                 <Square className="h-4 w-4" />
-                Select All
+                {t('instructorAssignments.selectAll')}
               </>
             )}
           </button>

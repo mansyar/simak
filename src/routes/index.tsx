@@ -107,7 +107,7 @@ export function HomePage() {
       <footer className="border-t bg-muted/30 px-6 py-10">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 sm:flex-row sm:justify-between">
           <div>
-            <p className="text-lg font-bold text-foreground">SIMAK</p>
+            <p className="text-lg font-bold text-foreground">{t('app.name')}</p>
             <p className="text-sm text-muted-foreground">{t('landing.footer.description')}</p>
             <p className="mt-1 text-xs text-muted-foreground">&copy; 2026 SIMAK</p>
           </div>

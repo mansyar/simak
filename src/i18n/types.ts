@@ -38,6 +38,7 @@ export type Translation = {
     backupCode: string
     invalidBackupCode: string
     useTotpCode: string
+    backupCodePlaceholder: string
   }
   nav: {
     dashboard: string
@@ -187,6 +188,8 @@ export type Translation = {
     emailVerified: string
     notVerified: string
     createdAt: string
+    showing: string
+    editDescription: string
   }
   adminTemplates: {
     title: string
@@ -352,6 +355,17 @@ export type Translation = {
       successMessage: string
       errorMessage: string
     }
+    completedCohort: string
+    noStudentsAssigned: string
+    assignedCohort: string
+    studentsCount: string
+    selectedRoadmap: string
+    milestonesSequence: string
+    milestonesCheckpoints: string
+    initiallyUnlocked: string
+    selectTemplateHint: string
+    selectAll: string
+    deselectAll: string
   }
   studentSidebar: {
     dashboard: string
@@ -444,6 +458,7 @@ export type Translation = {
     student: string
     daysOverdue: string
     emailQueue: {
+      title: string
       pending: string
       sent: string
       failed: string
@@ -587,6 +602,8 @@ export type Translation = {
     serverError: string
     required: string
     invalidEmail: string
+    assignmentNotFound: string
+    templateNotFound: string
   }
   notifications: {
     title: string

@@ -32,7 +32,8 @@
     "verifyBackupCodeDescription": "Enter one of your backup codes to verify your identity",
     "backupCode": "Backup Code",
     "invalidBackupCode": "Invalid backup code. Please try again.",
-    "useTotpCode": "Use an authenticator code instead"
+    "useTotpCode": "Use an authenticator code instead",
+    "backupCodePlaceholder": "xxxx-xxxx-xxxx"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -181,7 +182,9 @@
     "searchPlaceholder": "Search users by name or email...",
     "emailVerified": "Email Verified",
     "notVerified": "Not Verified",
-    "createdAt": "Created"
+    "createdAt": "Created",
+    "showing": "Showing {count} of {total} users",
+    "editDescription": "Update user information. Email changes will require re-verification."
   },
   "adminTemplates": {
     "title": "Templates",
@@ -346,7 +349,18 @@
       "searchStudents": "Search students by name or email...",
       "successMessage": "Assignment created successfully!",
       "errorMessage": "Failed to create assignment. Please try again."
-    }
+    },
+    "completedCohort": "Completed Cohort",
+    "noStudentsAssigned": "No students assigned.",
+    "assignedCohort": "Assigned Cohort",
+    "studentsCount": "{count} Students",
+    "selectedRoadmap": "Selected Roadmap",
+    "milestonesSequence": "Milestones Sequence",
+    "milestonesCheckpoints": "{count} Milestones / Checkpoints",
+    "initiallyUnlocked": "Initially Unlocked",
+    "selectTemplateHint": "Select a template to view its milestones roadmap.",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All"
   },
   "studentSidebar": {
     "dashboard": "Dashboard",
@@ -439,6 +453,7 @@
     "student": "Student",
     "daysOverdue": "days overdue",
     "emailQueue": {
+      "title": "Email Queue",
       "pending": "Pending",
       "sent": "Sent",
       "failed": "Failed"
@@ -581,7 +596,9 @@
     "forbidden": "You do not have permission to access this page",
     "serverError": "An unexpected error occurred. Please try again later.",
     "required": "This field is required",
-    "invalidEmail": "Please enter a valid email address"
+    "invalidEmail": "Please enter a valid email address",
+    "assignmentNotFound": "This assignment could not be found or you do not have permission to view it.",
+    "templateNotFound": "This template could not be found or you do not have permission to view it."
   },
   "notifications": {
     "title": "Notifications",

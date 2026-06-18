@@ -129,7 +129,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
                       {tpl.name}
                     </h4>
                     <p className="text-xs text-muted-foreground">
-                      {tpl.checkpoints.length} Milestones / Checkpoints
+                      {t('instructorAssignments.milestonesCheckpoints', { count: String(tpl.checkpoints.length) })}
                     </p>
                   </div>
 
@@ -178,7 +178,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
                         </p>
                         {idx === 0 && (
                           <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded-full uppercase tracking-wider">
-                            Initially Unlocked
+                            {t('instructorAssignments.initiallyUnlocked')}
                           </span>
                         )}
                       </div>
@@ -190,7 +190,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
               <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground h-full">
                 <Clipboard className="h-10 w-10 text-muted-foreground/40 mb-3" />
                 <p className="text-sm font-medium">
-                  Select a template to view its milestones roadmap.
+                  {t('instructorAssignments.selectTemplateHint')}
                 </p>
               </div>
             )}

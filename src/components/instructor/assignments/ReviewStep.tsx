@@ -102,10 +102,10 @@ export function ReviewStep({
             <div className="flex items-center justify-between border-b pb-2">
               <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                 <Users className="h-4 w-4 text-primary" />
-                Assigned Cohort
+                {t('instructorAssignments.assignedCohort')}
               </h3>
               <Badge variant="secondary" className="font-bold">
-                {assignedStudents.length} Students
+                {t('instructorAssignments.studentsCount', { count: String(assignedStudents.length) })}
               </Badge>
             </div>
             <div className="grid gap-2 sm:grid-cols-2 max-h-[160px] overflow-y-auto pr-1">
@@ -132,7 +132,7 @@ export function ReviewStep({
           <Card className="p-5 border-primary/20 bg-gradient-to-br from-card to-accent/10 space-y-4">
             <div>
               <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                Selected Roadmap
+                {t('instructorAssignments.selectedRoadmap')}
               </h4>
               <p className="text-base font-bold text-primary mt-1">{selectedTemplate.name}</p>
               <span className="inline-block text-[10px] font-bold uppercase tracking-wide bg-primary/10 text-primary px-2 py-0.5 rounded-full mt-1.5">
@@ -142,7 +142,7 @@ export function ReviewStep({
 
             <div className="border-t pt-3 space-y-3">
               <h5 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                Milestones Sequence
+                {t('instructorAssignments.milestonesSequence')}
               </h5>
               <div className="relative pl-4 space-y-3.5 before:absolute before:left-1.5 before:top-1.5 before:bottom-1.5 before:w-0.5 before:bg-primary/20">
                 {selectedTemplate.checkpoints.map((cp, idx) => (

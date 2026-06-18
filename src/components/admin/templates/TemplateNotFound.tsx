@@ -11,7 +11,7 @@ export function TemplateNotFound() {
       <SearchX className="h-12 w-12 text-muted-foreground mb-4" />
       <h2 className="text-xl font-semibold mb-2">{t('error.notFound')}</h2>
       <p className="text-muted-foreground mb-4">
-        This template could not be found or you do not have permission to view it.
+        {t('error.templateNotFound')}
       </p>
       <Link to="/admin/templates" search={{ page: 1, limit: 20, search: '', type: '' }}>
         <Button variant="outline">{t('adminTemplates.detail.back')}</Button>

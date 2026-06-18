@@ -32,7 +32,8 @@
     "verifyBackupCodeDescription": "Masukkan salah satu kode cadangan Anda untuk memverifikasi identitas",
     "backupCode": "Kode Cadangan",
     "invalidBackupCode": "Kode cadangan tidak valid. Silakan coba lagi.",
-    "useTotpCode": "Gunakan kode autentikator"
+    "useTotpCode": "Gunakan kode autentikator",
+    "backupCodePlaceholder": "xxxx-xxxx-xxxx"
   },
   "nav": {
     "dashboard": "Dasbor",
@@ -181,7 +182,9 @@
     "searchPlaceholder": "Cari pengguna berdasarkan nama atau email...",
     "emailVerified": "Email Terverifikasi",
     "notVerified": "Belum Terverifikasi",
-    "createdAt": "Dibuat"
+    "createdAt": "Dibuat",
+    "showing": "Menampilkan {count} dari {total} pengguna",
+    "editDescription": "Perbarui informasi pengguna. Perubahan email akan memerlukan verifikasi ulang."
   },
   "adminTemplates": {
     "title": "Templat",
@@ -346,7 +349,18 @@
       "searchStudents": "Cari mahasiswa berdasarkan nama atau email...",
       "successMessage": "Tugas berhasil dibuat!",
       "errorMessage": "Gagal membuat tugas. Silakan coba lagi."
-    }
+    },
+    "completedCohort": "Kohort Selesai",
+    "noStudentsAssigned": "Belum ada mahasiswa yang ditugaskan.",
+    "assignedCohort": "Kohort Ditugaskan",
+    "studentsCount": "{count} Mahasiswa",
+    "selectedRoadmap": "Peta Jalan Terpilih",
+    "milestonesSequence": "Urutan Tahapan",
+    "milestonesCheckpoints": "{count} Tahapan / Checkpoint",
+    "initiallyUnlocked": "Awalnya Terbuka",
+    "selectTemplateHint": "Pilih templat untuk melihat peta jalan tahapannya.",
+    "selectAll": "Pilih Semua",
+    "deselectAll": "Batalkan Semua Pilihan"
   },
   "studentSidebar": {
     "dashboard": "Dasbor",
@@ -439,6 +453,7 @@
     "student": "Mahasiswa",
     "daysOverdue": "hari terlambat",
     "emailQueue": {
+      "title": "Antrean Email",
       "pending": "Menunggu",
       "sent": "Terkirim",
       "failed": "Gagal"
@@ -581,7 +596,9 @@
     "forbidden": "Anda tidak memiliki izin untuk mengakses halaman ini",
     "serverError": "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
     "required": "Bidang ini wajib diisi",
-    "invalidEmail": "Masukkan alamat email yang valid"
+    "invalidEmail": "Masukkan alamat email yang valid",
+    "assignmentNotFound": "Tugas ini tidak ditemukan atau Anda tidak memiliki izin untuk melihatnya.",
+    "templateNotFound": "Templat ini tidak ditemukan atau Anda tidak memiliki izin untuk melihatnya."
   },
   "notifications": {
     "title": "Notifikasi",

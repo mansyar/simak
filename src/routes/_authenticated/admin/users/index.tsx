@@ -169,7 +169,7 @@ function UsersPage() {
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing {users.length} of {total} users
+          {t('adminUsers.showing', { count: String(users.length), total: String(total) })}
         </p>
         <div className="flex items-center gap-2">
           <Button
