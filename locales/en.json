@@ -547,9 +547,9 @@
     "footer": {
       "description": "Academic Information & Management System",
       "links": {
-        "assignments": "Assignments",
-        "consultations": "Consultations",
-        "settings": "Settings"
+        "login": "Login",
+        "about": "About",
+        "contact": "Contact"
       }
     }
   },

@@ -547,9 +547,9 @@
     "footer": {
       "description": "Sistem Informasi & Manajemen Akademik",
       "links": {
-        "assignments": "Tugas",
-        "consultations": "Konsultasi",
-        "settings": "Pengaturan"
+        "login": "Masuk",
+        "about": "Tentang",
+        "contact": "Kontak"
       }
     }
   },

@@ -24,7 +24,10 @@ export function HomePage() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Hero */}
-      <section className="relative flex flex-col items-center justify-center px-6 py-24 text-center">
+      <section
+        id="hero"
+        className="relative flex flex-col items-center justify-center px-6 py-24 text-center"
+      >
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-[#6B5CE7]/10 blur-3xl" />
           <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-[#34D399]/10 blur-3xl" />
@@ -48,7 +51,7 @@ export function HomePage() {
       </section>
 
       {/* Features */}
-      <section className="bg-muted/50 px-6 py-20">
+      <section id="features" className="bg-muted/50 px-6 py-20">
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-foreground">{t('landing.features.title')}</h2>
@@ -76,7 +79,7 @@ export function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="px-6 py-20">
+      <section id="how-it-works" className="px-6 py-20">
         <div className="mx-auto max-w-4xl">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-foreground">{t('landing.howItWorks.title')}</h2>
@@ -106,16 +109,17 @@ export function HomePage() {
           <div>
             <p className="text-lg font-bold text-foreground">SIMAK</p>
             <p className="text-sm text-muted-foreground">{t('landing.footer.description')}</p>
+            <p className="mt-1 text-xs text-muted-foreground">&copy; 2026 SIMAK</p>
           </div>
           <nav className="flex gap-6 text-sm text-muted-foreground">
-            <a href="#features" className="hover:text-foreground">
-              {t('landing.footer.links.assignments')}
+            <Link to="/auth/login" className="hover:text-foreground">
+              {t('landing.footer.links.login')}
+            </Link>
+            <a href="#" className="hover:text-foreground">
+              {t('landing.footer.links.about')}
             </a>
-            <a href="#how-it-works" className="hover:text-foreground">
-              {t('landing.footer.links.consultations')}
-            </a>
-            <a href="#hero" className="hover:text-foreground">
-              {t('landing.footer.links.settings')}
+            <a href="#" className="hover:text-foreground">
+              {t('landing.footer.links.contact')}
             </a>
           </nav>
         </div>

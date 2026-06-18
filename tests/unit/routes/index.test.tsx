@@ -42,9 +42,9 @@ const mockT = (key: string) => {
     'landing.howItWorks.step3.description':
       'Instructors review submissions and provide feedback to guide students forward.',
     'landing.footer.description': 'Academic Information & Management System',
-    'landing.footer.links.assignments': 'Assignments',
-    'landing.footer.links.consultations': 'Consultations',
-    'landing.footer.links.settings': 'Settings',
+    'landing.footer.links.login': 'Login',
+    'landing.footer.links.about': 'About',
+    'landing.footer.links.contact': 'Contact',
   };
   return translations[key] || key;
 };
@@ -175,9 +175,9 @@ describe('Landing Page', () => {
 
     it('renders footer links', () => {
       render(<HomePage />);
-      expect(screen.getByText('Assignments')).toBeDefined();
-      expect(screen.getByText('Consultations')).toBeDefined();
-      expect(screen.getByText('Settings')).toBeDefined();
+      expect(screen.getByText('Login')).toBeDefined();
+      expect(screen.getByText('About')).toBeDefined();
+      expect(screen.getByText('Contact')).toBeDefined();
     });
   });
 });

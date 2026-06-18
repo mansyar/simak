@@ -568,9 +568,9 @@ export type Translation = {
     footer: {
       description: string
       links: {
-        assignments: string
-        consultations: string
-        settings: string
+        login: string
+        about: string
+        contact: string
       }
     }
   }
