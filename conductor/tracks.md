@@ -16,3 +16,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Migrate to oxlint + oxfmt — Replace ESLint + Prettier with Oxc toolchain**
       _Archived: ./archive/oxlint-oxfmt-migration_20260617/_
+
+---
+
+- [ ] **Track: Create a landing page for the SIMAK project, inspired by the BibliU landing page design**
+      _Link: [./tracks/landing-page_20260618/](./tracks/landing-page_20260618/)_
