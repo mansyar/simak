@@ -119,17 +119,30 @@ export async function getUserHandler(args: { data: UserIdParam }) {
   return user;
 }
 
+// Role-based creation allowlist (TDD §4 Permissions):
+//   superadmin → admin only
+//   admin      → instructor, student only
+const CREATION_ALLOWED_ROLES: Record<string, readonly string[]> = {
+  superadmin: ['admin'],
+  admin: ['instructor', 'student'],
+};
+
 export async function createUserHandler(args: { data: CreateUserInput }) {
   const session = await getSessionFromHeaders();
-  if (!session || (session.user.role !== 'admin' && session.user.role !== 'superadmin')) {
+  if (!session) {
     return { error: 'Unauthorized' };
   }
 
   const { name, email: userEmail, role } = args.data;
 
-  // Validation: Admin cannot create another Admin account
-  if (session.user.role === 'admin' && role === 'admin') {
-    return { error: 'Admins cannot create other Admin accounts' };
+  // Enforce role creation boundaries. SuperAdmin creates Admins only;
+  // Admin creates Instructors/Students only. Other actor roles are rejected.
+  const allowedRoles = CREATION_ALLOWED_ROLES[session.user.role];
+  if (!allowedRoles || !allowedRoles.includes(role)) {
+    if (session.user.role === 'admin' && role === 'admin') {
+      return { error: 'Admins cannot create other Admin accounts' };
+    }
+    return { error: 'Unauthorized' };
   }
 
   const db = getDb();

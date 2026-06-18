@@ -9,6 +9,7 @@ import {
   generatePresignedUploadUrl,
   generatePresignedDownloadUrl,
 } from '../lib/storage';
+import { validateUploadType } from '../lib/file-validation';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -63,10 +64,16 @@ export async function getPresignedUploadUrlHandler(args: { data: GetPresignedUpl
     return { error: 'Checkpoint is not in a submittable state' };
   }
 
-  // 2. Generate UUID file key
+  // 2. Validate file type server-side (TDD §5: .docx/.pdf only, server-side MIME check)
+  const typeCheck = validateUploadType(extension, contentType);
+  if (!typeCheck.valid) {
+    return { error: typeCheck.error };
+  }
+
+  // 3. Generate UUID file key
   const fileKey = generateFileKey(extension);
 
-  // 3. Generate presigned upload URL
+  // 4. Generate presigned upload URL
   const uploadUrl = await generatePresignedUploadUrl({ key: fileKey, contentType });
 
   return { uploadUrl, fileKey };

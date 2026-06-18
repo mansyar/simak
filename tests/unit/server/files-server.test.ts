@@ -147,6 +147,56 @@ describe('files.server.ts - getPresignedUploadUrlHandler', () => {
     expect(result).toEqual({ error: 'Checkpoint is not in a submittable state' });
   });
 
+  it('should reject unsupported file extension', async () => {
+    vi.mocked(getSessionFromHeaders).mockResolvedValue({
+      user: {
+        id: 'student-1',
+        name: 'Student',
+        email: 's@t.com',
+        role: 'student',
+        locale: 'en',
+        emailVerified: true,
+      },
+      session: { id: 's-1', token: 't-1', expiresAt: new Date() },
+    });
+
+    const mockDb = mockDbQuery([{ id: 1, state: 'unlocked' }]);
+    vi.mocked(getDb).mockReturnValue(mockDb as any);
+
+    const { getPresignedUploadUrlHandler } = await import('@/server/files.server');
+    const result = await getPresignedUploadUrlHandler({
+      data: { checkpointId: 1, contentType: 'image/png', extension: 'png' },
+    });
+    expect(result).toEqual({ error: 'Unsupported file extension' });
+  });
+
+  it('should reject content type that does not match extension', async () => {
+    vi.mocked(getSessionFromHeaders).mockResolvedValue({
+      user: {
+        id: 'student-1',
+        name: 'Student',
+        email: 's@t.com',
+        role: 'student',
+        locale: 'en',
+        emailVerified: true,
+      },
+      session: { id: 's-1', token: 't-1', expiresAt: new Date() },
+    });
+
+    const mockDb = mockDbQuery([{ id: 1, state: 'unlocked' }]);
+    vi.mocked(getDb).mockReturnValue(mockDb as any);
+
+    const { getPresignedUploadUrlHandler } = await import('@/server/files.server');
+    const result = await getPresignedUploadUrlHandler({
+      data: {
+        checkpointId: 1,
+        contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        extension: 'pdf',
+      },
+    });
+    expect(result).toEqual({ error: 'Content type does not match file extension' });
+  });
+
   it('should return upload URL for unlocked checkpoint', async () => {
     vi.mocked(getSessionFromHeaders).mockResolvedValue({
       user: {

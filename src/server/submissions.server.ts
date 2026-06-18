@@ -7,6 +7,7 @@ import { submissions } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
 import { generatePresignedDownloadUrl } from '../lib/storage';
+import { validateUploadSize, validateUploadFileName } from '../lib/file-validation';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -66,7 +67,17 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
     return { error: 'Checkpoint is not in a submittable state' };
   }
 
-  // 1b. Check consultation gating
+  // 1b. Validate file size and type server-side (TDD §5: 25MB max, .docx/.pdf only)
+  const sizeCheck = validateUploadSize(fileSize);
+  if (!sizeCheck.valid) {
+    return { error: sizeCheck.error };
+  }
+  const nameCheck = validateUploadFileName(fileName);
+  if (!nameCheck.valid) {
+    return { error: nameCheck.error };
+  }
+
+  // 1c. Check consultation gating
   const minConsults = checkpoint.minConsultations ?? 0;
   if (minConsults > 0) {
     const [{ count }] = await db

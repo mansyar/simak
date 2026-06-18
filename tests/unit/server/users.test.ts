@@ -115,6 +115,47 @@ describe('User server functions - Logic & Security', () => {
       expect(result).toEqual({ error: 'Admins cannot create other Admin accounts' });
     });
 
+    it('should prevent superadmin from creating instructor (scope violation)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'super-1', role: 'superadmin' } as any,
+        session: {} as any,
+      });
+
+      const result = await createUserHandler({
+        data: { name: 'Bad Instructor', email: 'inst@example.com', role: 'instructor' },
+      });
+      expect(result).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should prevent superadmin from creating student (scope violation)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'super-1', role: 'superadmin' } as any,
+        session: {} as any,
+      });
+
+      const result = await createUserHandler({
+        data: { name: 'Bad Student', email: 'student@example.com', role: 'student' },
+      });
+      expect(result).toEqual({ error: 'Unauthorized' });
+    });
+
+    it('should allow superadmin to create admin', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'super-1', role: 'superadmin' } as any,
+        session: {} as any,
+      });
+
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = await createUserHandler({
+        data: { name: 'New Admin', email: 'admin2@example.com', role: 'admin' },
+      });
+      expect(result).toHaveProperty('user');
+      expect(email.sendInvitationEmail).toHaveBeenCalled();
+    });
+
     it('should reject duplicate email', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
         user: { id: 'admin-1', role: 'admin' } as any,
