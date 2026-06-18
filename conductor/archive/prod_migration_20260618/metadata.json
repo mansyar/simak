@@ -1,0 +1,8 @@
+{
+  "track_id": "prod_migration_20260618",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-06-18T08:13:50Z",
+  "updated_at": "2026-06-18T08:13:50Z",
+  "description": "Production database migration infrastructure — Coolify pre-deploy bundled migrate.mjs + seed.mjs, pg_advisory_lock for multi-replica safety, MIGRATE_DATABASE_URL to bypass PgBouncer, Dockerfile ships migration folder, rollback convention, and expand-contract pattern added to SQL style guide"
+}
