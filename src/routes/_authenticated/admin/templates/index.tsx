@@ -5,7 +5,6 @@ import {
   listTemplates,
   createTemplate,
   getTemplate,
-  updateTemplate,
   deleteTemplate,
   duplicateTemplate,
 } from '@/server/templates';
@@ -15,7 +14,6 @@ import { TemplatePagination } from '@/components/admin/templates/TemplatePaginat
 import { TemplateEmptyState } from '@/components/admin/templates/TemplateEmptyState';
 import { TemplateLoadingSkeleton } from '@/components/admin/templates/TemplateLoadingSkeleton';
 import { CreateTemplateDialog } from '@/components/admin/templates/CreateTemplateDialog';
-import { EditTemplateSheet } from '@/components/admin/templates/EditTemplateSheet';
 import { DeleteTemplateDialog } from '@/components/admin/templates/DeleteTemplateDialog';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCcw } from 'lucide-react';
@@ -54,15 +52,6 @@ function TemplatesPage() {
   const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
-  interface EditingTemplate {
-    id: number;
-    name: string;
-    type: string;
-    checkpoints: { id: number; name: string; order: number }[];
-    assignmentCount: number;
-  }
-  const [editingTemplate, setEditingTemplate] = useState<EditingTemplate | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deletingTemplate, setDeletingTemplate] = useState<{
     id: number;
@@ -73,7 +62,6 @@ function TemplatesPage() {
   const duplicateTemplateFn = useServerFn(duplicateTemplate);
   const createTemplateFn = useServerFn(createTemplate);
   const getTemplateFn = useServerFn(getTemplate);
-  const updateTemplateFn = useServerFn(updateTemplate);
 
   type TemplateSearchParams = z.infer<typeof TemplateSearchSchema>;
 
@@ -105,27 +93,16 @@ function TemplatesPage() {
     return result;
   };
 
-  const handleCreateSuccess = () => {
-    navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
-  };
-
-  const handleEdit = async (template: TemplateRow) => {
-    // @ts-expect-error - useServerFn type inference limitation
-    const result = await getTemplateFn({ data: { id: template.id } });
-    if (result) {
-      setEditingTemplate(result as EditingTemplate);
-      setIsEditSheetOpen(true);
+  const handleCreateSuccess = (templateId?: number) => {
+    if (templateId) {
+      navigate({ to: `/admin/templates/$templateId`, params: { templateId: String(templateId) } });
+    } else {
+      navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
     }
   };
 
-  const handleUpdateTemplate = async (id: number, values: Record<string, unknown>) => {
-    // @ts-expect-error - useServerFn type inference limitation
-    const result = await updateTemplateFn({ data: { ...values, id } });
-    return result as Record<string, unknown>;
-  };
-
-  const handleEditSuccess = () => {
-    navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
+  const handleEdit = (template: TemplateRow) => {
+    navigate({ to: `/admin/templates/$templateId`, params: { templateId: String(template.id) } });
   };
 
   const handleDelete = async (template: TemplateRow) => {
@@ -192,14 +169,6 @@ function TemplatesPage() {
         onOpenChange={setIsCreateDialogOpen}
         onSubmit={handleCreateTemplate}
         onSuccess={handleCreateSuccess}
-      />
-
-      <EditTemplateSheet
-        template={editingTemplate}
-        open={isEditSheetOpen}
-        onOpenChange={setIsEditSheetOpen}
-        onSubmit={handleUpdateTemplate}
-        onSuccess={handleEditSuccess}
       />
 
       <DeleteTemplateDialog

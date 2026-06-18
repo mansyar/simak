@@ -29,8 +29,11 @@ type CreateTemplateFormValues = z.infer<typeof CreateTemplateSchema>;
 interface CreateTemplateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (values: CreateTemplateFormValues) => Promise<{ error?: string; template?: unknown }>;
-  onSuccess: () => void;
+  onSubmit: (values: CreateTemplateFormValues) => Promise<{
+    error?: string;
+    template?: { id?: number } | unknown;
+  }>;
+  onSuccess: (templateId?: number) => void;
 }
 
 const defaultCheckpoint = () => ({ name: '', minConsultations: 0, estimatedDuration: 7 });
@@ -131,9 +134,10 @@ export function CreateTemplateDialog({
     if (result?.error) {
       setServerError(result.error);
     } else {
+      const templateId = (result?.template as { id?: number })?.id;
       form.reset();
       onOpenChange(false);
-      onSuccess();
+      onSuccess(templateId);
     }
   };
 
