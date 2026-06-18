@@ -163,16 +163,21 @@ describe('CreateTemplateDialog', () => {
   it('should validate Zod schema correctly', () => {
     // Valid input
     expect(
-      CreateTemplateSchema.safeParse({ name: 'Test', type: 'Thesis', checkpoints: [{ name: 'Ch1' }] })
-        .success,
+      CreateTemplateSchema.safeParse({
+        name: 'Test',
+        type: 'Thesis',
+        checkpoints: [{ name: 'Ch1' }],
+      }).success,
     ).toBe(true);
     // Empty name
     expect(
-      CreateTemplateSchema.safeParse({ name: '', type: 'Thesis', checkpoints: [{ name: 'Ch1' }] }).success,
+      CreateTemplateSchema.safeParse({ name: '', type: 'Thesis', checkpoints: [{ name: 'Ch1' }] })
+        .success,
     ).toBe(false);
     // Empty type
     expect(
-      CreateTemplateSchema.safeParse({ name: 'Test', type: '', checkpoints: [{ name: 'Ch1' }] }).success,
+      CreateTemplateSchema.safeParse({ name: 'Test', type: '', checkpoints: [{ name: 'Ch1' }] })
+        .success,
     ).toBe(false);
     // No checkpoints
     expect(
@@ -180,7 +185,8 @@ describe('CreateTemplateDialog', () => {
     ).toBe(false);
     // Empty checkpoint name
     expect(
-      CreateTemplateSchema.safeParse({ name: 'Test', type: 'Thesis', checkpoints: [{ name: '' }] }).success,
+      CreateTemplateSchema.safeParse({ name: 'Test', type: 'Thesis', checkpoints: [{ name: '' }] })
+        .success,
     ).toBe(false);
   });
 

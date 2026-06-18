@@ -5,78 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1779151899384,
-      "tag": "0000_misty_korvac",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1779156000000,
-      "tag": "0001_auth_tables",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1779200000000,
-      "tag": "0002_review_queue_indexes",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1779220000000,
-      "tag": "0003_consultation_min_consultations",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1780166400000,
-      "tag": "0004_audit_log",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1779188400000,
-      "tag": "0005_estimated_duration",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1779199500000,
-      "tag": "0006_extension_requests",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1779250000000,
-      "tag": "0007_email_queue",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1780220000000,
-      "tag": "0008_two_factor",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1780300000000,
-      "tag": "0009_schema_integrity",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1781884800000,
-      "tag": "0010_users_settings",
+      "when": 1781779767702,
+      "tag": "0000_keen_omega_flight",
       "breakpoints": true
     }
   ]

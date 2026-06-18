@@ -37,7 +37,8 @@ vi.mock('@/routes/__root', () => ({
         'extensions.dialog.reject.confirm': 'Confirm Rejection',
         'extensions.dialog.reject.cancel': 'Cancel',
         'extensions.dialog.reject.reason': 'Reason for rejection',
-        'extensions.dialog.reject.reasonPlaceholder': 'Explain why this request is being rejected...',
+        'extensions.dialog.reject.reasonPlaceholder':
+          'Explain why this request is being rejected...',
         'extensions.dialog.reject.charCount': '{count}/{min} characters',
       };
       let text = translations[key] || key;
