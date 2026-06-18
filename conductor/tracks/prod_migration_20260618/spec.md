@@ -1,3 +1,4 @@
+<protect>
 # Specification: Production Database Migration Infrastructure
 
 ## Overview
@@ -114,3 +115,4 @@ Chore / Infrastructure (no new user-facing product functionality).
 - **Updating `conductor/workflow.md`** deployment step 4 — explicitly excluded per user decision; the manual step description stays as-is.
 - **PgBouncer deployment itself** — this track only prepares the `MIGRATE_DATABASE_URL` bypass; the PgBouncer sidecar is a separate infrastructure concern.
 - **Startup-hook migration in app boot** — explicitly excluded (pre-deploy hook covers it; adding both causes races and boot latency).
+  </protect>

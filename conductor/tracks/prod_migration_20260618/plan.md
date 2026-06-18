@@ -1,7 +1,9 @@
+<protect>
 # Implementation Plan: Production Database Migration Infrastructure
 
 ## Phase 1: Environment Config — `MIGRATE_DATABASE_URL`
 
+- [ ] Task: Read spec.md to internalize requirements before starting this phase
 - [ ] Task: Write failing env tests (Red Phase)
   - [ ] Add `MIGRATE_DATABASE_URL` to the valid-env test cases in `tests/unit/config/env.test.ts` (set to a valid URL string)
   - [ ] Add a test case asserting `MIGRATE_DATABASE_URL` is optional (config valid when the var is absent)
@@ -18,6 +20,7 @@
 
 ## Phase 2: Migration Runner — Advisory Lock + Connection Fallback
 
+- [ ] Task: Read spec.md to internalize requirements before starting this phase
 - [ ] Task: Write failing unit tests for `src/db/migrate.ts` (Red Phase)
   - [ ] Create `tests/unit/db/migrate.test.ts`
   - [ ] Mock `postgres` and `drizzle-orm/postgres-js` + `drizzle-orm/postgres-js/migrator` (follow the canonical mock pattern from `tests/unit/server/submissions.test.ts`)
@@ -39,6 +42,7 @@
 
 ## Phase 3: Bundle Scripts & Dockerfile
 
+- [ ] Task: Read spec.md to internalize requirements before starting this phase
 - [ ] Task: Add `build:migrate` and `build:seed` esbuild scripts
   - [ ] Add `"build:migrate": "esbuild src/db/migrate.ts --bundle --format=esm --platform=node --outfile=.output/server/migrate.mjs"` to `package.json` scripts
   - [ ] Add `"build:seed": "esbuild src/db/seed.ts --bundle --format=esm --platform=node --outfile=.output/server/seed.mjs"` to `package.json` scripts
@@ -55,6 +59,7 @@
 
 ## Phase 4: SQL Style Guide — Rollback Convention & Expand-Contract Pattern
 
+- [ ] Task: Read spec.md to internalize requirements before starting this phase
 - [ ] Task: Append **Rollback Convention** section to `conductor/code_styleguides/sql.md`
   - [ ] Add section after the existing §5 Migrations, covering: forward-only migrations; companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`; never auto-applied by `migrate.mjs`; not registered in `meta/_journal.json`; dev test procedure (forward → `psql < rollback.sql` → verify reverted → re-migrate); irreversible data-loss note convention `-- ROLLBACK NOT POSSIBLE: data loss irreversible`; soft-delete (`deleted_at`) preferred over hard `DROP COLUMN`
 - [ ] Task: Append **Expand-Contract Pattern** section to `conductor/code_styleguides/sql.md`
@@ -63,6 +68,7 @@
 
 ## Phase 5: Integration Test & Final Verification
 
+- [ ] Task: Read spec.md to internalize requirements before starting this phase
 - [ ] Task: Write integration test for `migrate.mjs` against local PostgreSQL (acceptance gate)
   - [ ] Create `tests/integration/db/migrate.test.ts`
   - [ ] Use the `docker-compose.yml` local PostgreSQL (port 5432); ensure a fresh schema (drop `__drizzle_migrations` + all tables, or use a throwaway DB) in `beforeEach`
@@ -77,3 +83,4 @@
   - [ ] AC-5: document the Coolify pre-deploy abort procedure (inject a broken migration SQL file, run `migrate.mjs`, confirm exit 1) — full Coolify-side verification is a post-deploy manual step; record the procedure in the commit note
   - [ ] Confirm the Coolify service pre-deployment command is documented for the operator: `node .output/server/migrate.mjs && node .output/server/seed.mjs` (not committed to the repo — recorded in the task summary / git note)
 - [ ] Task: Conductor - User Manual Verification 'Integration Test & Final Verification' (Protocol in workflow.md)
+      </protect>
