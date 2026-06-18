@@ -515,6 +515,65 @@ export type Translation = {
       reducedMotionHint: string
     }
   }
+  landing: {
+    hero: {
+      headline: string
+      subheadline: string
+      cta: string
+    }
+    features: {
+      title: string
+      subtitle: string
+      sequentialCheckpoints: {
+        title: string
+        description: string
+      }
+      structuredFeedback: {
+        title: string
+        description: string
+      }
+      consultationTracking: {
+        title: string
+        description: string
+      }
+      deadlineManagement: {
+        title: string
+        description: string
+      }
+      bilingualSupport: {
+        title: string
+        description: string
+      }
+      roleBasedAccess: {
+        title: string
+        description: string
+      }
+    }
+    howItWorks: {
+      title: string
+      subtitle: string
+      step1: {
+        title: string
+        description: string
+      }
+      step2: {
+        title: string
+        description: string
+      }
+      step3: {
+        title: string
+        description: string
+      }
+    }
+    footer: {
+      description: string
+      links: {
+        assignments: string
+        consultations: string
+        settings: string
+      }
+    }
+  }
 }
 
 export type TranslationFunctions = Record<string, (key: string) => string>

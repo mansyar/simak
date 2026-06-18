@@ -494,6 +494,65 @@
     "rejectReason": "Rejection Reason",
     "rejectReasonPlaceholder": "Enter reason for rejection"
   },
+  "landing": {
+    "hero": {
+      "headline": "Manage Academic Assignments with Confidence",
+      "subheadline": "SIMAK helps students and instructors track progress, manage checkpoints, and ensure timely submissions through a structured workflow.",
+      "cta": "Get Started"
+    },
+    "features": {
+      "title": "Everything You Need",
+      "subtitle": "A complete platform for managing academic assignments from start to finish.",
+      "sequentialCheckpoints": {
+        "title": "Sequential Checkpoints",
+        "description": "Structured milestones that guide students through each phase of their academic work."
+      },
+      "structuredFeedback": {
+        "title": "Structured Feedback",
+        "description": "Instructors provide actionable feedback with pass or revise decisions at every checkpoint."
+      },
+      "consultationTracking": {
+        "title": "Consultation Tracking",
+        "description": "Log and verify consultation sessions to ensure students receive proper guidance."
+      },
+      "deadlineManagement": {
+        "title": "Deadline Management",
+        "description": "Clear deadlines with extension requests and escalation alerts keep everyone on track."
+      },
+      "bilingualSupport": {
+        "title": "Bilingual Support",
+        "description": "Full support for English and Bahasa Indonesia for inclusive academic environments."
+      },
+      "roleBasedAccess": {
+        "title": "Role-Based Access",
+        "description": "Tailored experiences for students, instructors, and administrators with proper permissions."
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Three simple steps to get started.",
+      "step1": {
+        "title": "Create",
+        "description": "Instructors set up templates with checkpoints and assign them to students."
+      },
+      "step2": {
+        "title": "Submit",
+        "description": "Students upload their work at each checkpoint and track their progress."
+      },
+      "step3": {
+        "title": "Review",
+        "description": "Instructors review submissions and provide feedback to guide students forward."
+      }
+    },
+    "footer": {
+      "description": "Academic Information & Management System",
+      "links": {
+        "assignments": "Assignments",
+        "consultations": "Consultations",
+        "settings": "Settings"
+      }
+    }
+  },
   "error": {
     "notFound": "Page not found",
     "forbidden": "You do not have permission to access this page",

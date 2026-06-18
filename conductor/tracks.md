@@ -19,5 +19,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Create a landing page for the SIMAK project, inspired by the BibliU landing page design**
-      _Link: [./tracks/landing-page_20260618/](./tracks/landing-page_20260618/)_
+- [~] **Track: Create a landing page for the SIMAK project, inspired by the BibliU landing page design**
+  _Link: [./tracks/landing-page_20260618/](./tracks/landing-page_20260618/)_

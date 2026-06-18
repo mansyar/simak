@@ -494,6 +494,65 @@
     "rejectReason": "Alasan Penolakan",
     "rejectReasonPlaceholder": "Masukkan alasan penolakan"
   },
+  "landing": {
+    "hero": {
+      "headline": "Kelola Tugas Akademik dengan Percaya Diri",
+      "subheadline": "SIMAK membantu mahasiswa dan dosen melacak kemajuan, mengelola checkpoint, dan memastikan pengumpulan tepat waktu melalui alur kerja yang terstruktur.",
+      "cta": "Mulai Sekarang"
+    },
+    "features": {
+      "title": "Semua yang Anda Butuhkan",
+      "subtitle": "Platform lengkap untuk mengelola tugas akademik dari awal hingga akhir.",
+      "sequentialCheckpoints": {
+        "title": "Checkpoint Berurutan",
+        "description": "Tahapan terstruktur yang memandu mahasiswa melalui setiap fase pekerjaan akademik."
+      },
+      "structuredFeedback": {
+        "title": "Umpan Balik Terstruktur",
+        "description": "Dosen memberikan umpan balik yang dapat ditindaklanjuti dengan keputusan lulus atau revisi di setiap checkpoint."
+      },
+      "consultationTracking": {
+        "title": "Pelacakan Konsultasi",
+        "description": "Catat dan verifikasi sesi konsultasi untuk memastikan mahasiswa mendapatkan bimbingan yang tepat."
+      },
+      "deadlineManagement": {
+        "title": "Manajemen Tenggat",
+        "description": "Tenggat waktu yang jelas dengan permintaan perpanjangan dan peringatan eskalasi menjaga semua orang tetap pada jalur."
+      },
+      "bilingualSupport": {
+        "title": "Dukungan Dwibahasa",
+        "description": "Dukungan penuh untuk Bahasa Indonesia dan English untuk lingkungan akademik yang inklusif."
+      },
+      "roleBasedAccess": {
+        "title": "Akses Berdasarkan Peran",
+        "description": "Pengalaman yang disesuaikan untuk mahasiswa, dosen, dan administrator dengan izin yang tepat."
+      }
+    },
+    "howItWorks": {
+      "title": "Cara Kerja",
+      "subtitle": "Tiga langkah sederhana untuk memulai.",
+      "step1": {
+        "title": "Buat",
+        "description": "Dosen menyiapkan templat dengan checkpoint dan menugaskannya ke mahasiswa."
+      },
+      "step2": {
+        "title": "Kumpulkan",
+        "description": "Mahasiswa mengunggah pekerjaan mereka di setiap checkpoint dan melacak kemajuan."
+      },
+      "step3": {
+        "title": "Review",
+        "description": "Dosen mereview pengumpulan dan memberikan umpan balik untuk memandu mahasiswa ke depan."
+      }
+    },
+    "footer": {
+      "description": "Sistem Informasi & Manajemen Akademik",
+      "links": {
+        "assignments": "Tugas",
+        "consultations": "Konsultasi",
+        "settings": "Pengaturan"
+      }
+    }
+  },
   "error": {
     "notFound": "Halaman tidak ditemukan",
     "forbidden": "Anda tidak memiliki izin untuk mengakses halaman ini",
