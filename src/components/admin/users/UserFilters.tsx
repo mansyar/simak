@@ -37,7 +37,9 @@ export function UserFilters({ search, onSearchChange, role, onRoleChange }: User
         <Select value={role} onValueChange={(val) => onRoleChange(val || 'all')}>
           <SelectTrigger>
             <span data-slot="select-value" className="flex flex-1 text-left">
-              {role && role !== 'all' ? t((roleLabels[role] || role) as TranslationKey) : t('adminUsers.allRoles')}
+              {role && role !== 'all'
+                ? t((roleLabels[role] || role) as TranslationKey)
+                : t('adminUsers.allRoles')}
             </span>
           </SelectTrigger>
           <SelectContent>

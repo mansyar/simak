@@ -84,7 +84,9 @@ try {
   en = JSON.parse(readFileSync(join(LOCALE_DIR, 'en.json'), 'utf-8'));
   id = JSON.parse(readFileSync(join(LOCALE_DIR, 'id.json'), 'utf-8'));
 } catch (err) {
-  console.error(`❌ Failed to read locale files: ${err instanceof Error ? err.message : String(err)}`);
+  console.error(
+    `❌ Failed to read locale files: ${err instanceof Error ? err.message : String(err)}`,
+  );
   process.exit(1);
 }
 
