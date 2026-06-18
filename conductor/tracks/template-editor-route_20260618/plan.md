@@ -1,7 +1,9 @@
+<protect>
 # Plan: Template Editor Route
 
 ## Phase 1: Server — Add `listTemplateAssignments` handler
 
+- [ ] Task: Read spec.md to understand requirements before implementation
 - [ ] Task: Create server stub + Zod schema for `listTemplateAssignments`
   - [ ] Add `ListTemplateAssignmentsSchema` with `templateId` param in `src/server/templates.ts`
   - [ ] Add `createServerFn` stub with dynamic import
@@ -15,6 +17,7 @@
 
 ## Phase 2: Route — `/admin/templates/$id` page
 
+- [ ] Task: Read spec.md to understand requirements before implementation
 - [ ] Task: Create route file `src/routes/_authenticated/admin/templates/$id.tsx`
   - [ ] SSR `loader`: call `getTemplate` with route param `$id`, return template data
   - [ ] `pendingComponent`: loading skeleton
@@ -36,6 +39,7 @@
 
 ## Phase 3: Update list page — remove sheet, wire navigation
 
+- [ ] Task: Read spec.md to understand requirements before implementation
 - [ ] Task: Update `TemplateCard` to navigate instead of call onEdit callback
   - [ ] Change Edit action from `onEdit(template)` to navigate to `/admin/templates/$id`
   - [ ] Remove `onEdit` prop from `TemplateCardProps` interface
@@ -50,6 +54,7 @@
 
 ## Phase 4: Cleanup
 
+- [ ] Task: Read spec.md to understand requirements before implementation
 - [ ] Task: Remove `EditTemplateSheet.tsx` component file
   - [ ] Delete `src/components/admin/templates/EditTemplateSheet.tsx`
   - [ ] Check no remaining imports reference it
@@ -61,3 +66,4 @@
   - [ ] `pnpm test -- --coverage` — all tests pass, coverage thresholds met
   - [ ] `pnpm format` — formatting clean
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Cleanup' (Protocol in workflow.md)
+      </protect>

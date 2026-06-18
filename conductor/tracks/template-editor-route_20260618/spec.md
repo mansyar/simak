@@ -1,3 +1,4 @@
+<protect>
 # Track: Template Editor Route
 
 ## Overview
@@ -95,3 +96,4 @@ Replace the slide-over `EditTemplateSheet` with a dedicated route at `/admin/tem
 - Drag-and-drop checkpoint reordering
 - Template preview (what assignments look like with these checkpoints)
 - Batch operations on checkpoints
+  </protect>
