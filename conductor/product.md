@@ -109,7 +109,7 @@ Students and instructors lack a centralized system to:
 
 - **Template management page** (`/admin/templates`) — Card-based list with search by name, type filter dropdown, pagination (20/page), and loading skeleton states
 - **Create template dialog** — Dialog with Name (text), Type (free-text), and dynamic checkpoint list (add/remove/reorder via ▲/▼ buttons); defaults to 3 checkpoint rows
-- **Edit template sheet** — Slide-in panel with pre-filled Name, Type, and checkpoint data; reuses CheckpointListEditor for checkpoint management
+- **Edit template route** — Dedicated `/admin/templates/$templateId` page with full template editor (metadata, checkpoints, linked assignments, delete)
 - **Server-side CRUD** — `createServerFn`-based functions: `createTemplate`, `listTemplates`, `getTemplate`, `updateTemplate`, `deleteTemplate`, `duplicateTemplate`
 - **Checkpoint management** — Dynamic list with add, remove (min 1 enforced), and ▲/▼ reorder buttons; order persists via sequential `order` column
 - **Soft-delete with usage check** — Templates are soft-deleted (`deletedAt`); deletion blocked with count if active assignments reference it (requires typing "DELETE")
