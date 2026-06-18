@@ -2,7 +2,7 @@ import { getEnv } from '../config/env';
 import { getDb } from '@/db/index';
 import { emailQueue } from '@/db/schema/index';
 
-export type TemplateType = 'password_reset' | 'invitation' | 'sla_alert';
+export type TemplateType = 'password_reset' | 'invitation' | 'sla_alert' | 'two_factor';
 
 const INVITATION_SUBJECT = 'Welcome to SIMAK — Set up your password';
 

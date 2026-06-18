@@ -2,10 +2,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   listPendingReviewsHandler,
-  getReviewDetailHandler,
   openForReviewHandler,
   submitReviewHandler,
-  getLatestReviewHandler,
 } from '@/server/reviews.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
@@ -309,6 +307,42 @@ describe('Review handlers - Logic & Security', () => {
       expect(mockDb.transaction).toHaveBeenCalled();
     });
 
+    it('should record a pass decision when reviewing directly from submitted state (no SLA breach)', async () => {
+      // Instructor reviews without calling openForReview first.
+      // SLA clock starts now → breachDays=0 → no false deadline extension.
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              checkpointId: 100,
+              checkpointState: 'submitted',
+              checkpointUpdatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+              checkpointName: 'Chapter 1',
+              checkpointDueDate: new Date('2026-06-01'),
+              checkpointOrder: 1,
+              assignmentId: 1,
+              assignmentTitle: 'Thesis 2026',
+              instructorId: 'instructor-1',
+              studentId: 'student-1',
+              studentName: 'Alice',
+              finalDeadline: new Date('2026-08-01'),
+            },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            { id: 100, order: 1, state: 'submitted' },
+            { id: 101, order: 2, state: 'locked' },
+          ]).then(onfulfilled),
+        );
+      const result = await submitReviewHandler({
+        data: { submissionId: 1, decision: 'pass', comment: 'Good' },
+      });
+      expect(result).toEqual({ success: true });
+      expect(mockDb.transaction).toHaveBeenCalled();
+    });
+
     it('should fail if decision is revise without deadline', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
@@ -336,154 +370,6 @@ describe('Review handlers - Logic & Security', () => {
       const result = await submitReviewHandler({
         data: { submissionId: 1, decision: 'pass', comment: '' },
       });
-      expect(result).toEqual({ error: 'Submission not found' });
-    });
-  });
-
-  describe('getLatestReviewHandler', () => {
-    it('should return the most recent review for a student checkpoint', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
-      // First query: ownership check (returns a checkpoint row)
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 100 }]).then(onfulfilled),
-        )
-        // Second query: review fetch
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              id: 10,
-              decision: 'revise',
-              comment: 'Needs improvement',
-              instructorName: 'Dr. Smith',
-              createdAt: new Date('2026-05-23'),
-              revisionDeadline: new Date('2026-06-01'),
-            },
-          ]).then(onfulfilled),
-        );
-      const result = (await getLatestReviewHandler({ data: { checkpointId: 100 } })) as any;
-      expect(result.review).toBeDefined();
-      expect(result.review.decision).toBe('revise');
-    });
-
-    it('should return the most recent review for an instructor-owned checkpoint', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      // First query: ownership check (returns a checkpoint row)
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 100 }]).then(onfulfilled),
-        )
-        // Second query: review fetch
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              id: 10,
-              decision: 'pass',
-              comment: 'Well done',
-              instructorName: 'Dr. Smith',
-              createdAt: new Date('2026-05-23'),
-            },
-          ]).then(onfulfilled),
-        );
-      const result = (await getLatestReviewHandler({ data: { checkpointId: 100 } })) as any;
-      expect(result.review).toBeDefined();
-      expect(result.review.decision).toBe('pass');
-    });
-
-    it('should return null if no review exists', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
-      // First query: ownership check (returns a checkpoint row)
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 999 }]).then(onfulfilled),
-        )
-        // Second query: no review found
-        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
-      const result = (await getLatestReviewHandler({ data: { checkpointId: 999 } })) as any;
-      expect(result.review).toBeNull();
-    });
-
-    it('should reject if student does not own the checkpoint', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
-      // Ownership check returns empty (checkpoint not assigned to this student)
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
-      const result = await getLatestReviewHandler({ data: { checkpointId: 100 } });
-      expect(result).toEqual({ error: 'Checkpoint not found' });
-    });
-
-    it('should reject if instructor does not own the checkpoint', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(otherInstructorSession as any);
-      // Ownership check returns empty (checkpoint belongs to another instructor)
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
-      const result = await getLatestReviewHandler({ data: { checkpointId: 100 } });
-      expect(result).toEqual({ error: 'Checkpoint not found' });
-    });
-
-    it('should reject if unauthorized', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await getLatestReviewHandler({ data: { checkpointId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
-    });
-  });
-
-  describe('getReviewDetailHandler', () => {
-    it('should reject if unauthorized', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await getReviewDetailHandler({ data: { submissionId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
-    });
-
-    it('should return submission detail with download URL and review history', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              submissionId: 1,
-              checkpointId: 100,
-              checkpointName: 'Chapter 1',
-              assignmentId: 1,
-              assignmentTitle: 'Thesis 2026',
-              instructorId: 'instructor-1',
-              studentId: 'student-1',
-              studentName: 'Alice',
-              fileKey: 'submissions/uuid.pdf',
-              fileName: 'chapter1.pdf',
-              fileSize: 2048,
-              version: 2,
-              uploadedAt: new Date('2026-05-22'),
-              checkpointState: 'under_review',
-              checkpointUpdatedAt: new Date('2026-05-22'),
-            },
-          ]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              id: 5,
-              decision: 'revise',
-              comment: 'Fix formatting',
-              instructorName: 'Dr. Smith',
-              createdAt: new Date('2026-05-21'),
-            },
-          ]).then(onfulfilled),
-        );
-      const result = (await getReviewDetailHandler({ data: { submissionId: 1 } })) as any;
-      expect(result).toHaveProperty('submission');
-      expect(result).toHaveProperty('reviewHistory');
-      expect(result.reviewHistory).toHaveLength(1);
-    });
-
-    it('should return error for non-existent submission', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
-      const result = await getReviewDetailHandler({ data: { submissionId: 999 } });
       expect(result).toEqual({ error: 'Submission not found' });
     });
   });

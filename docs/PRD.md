@@ -18,12 +18,12 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Instructors can assign assignments with structured checkpoints to students.
 - Students can submit work for each checkpoint.
 - Instructors can review, approve, or request revisions on submissions.
-- In-app notifications keep both parties informed of submissions, reviews, revision requests, and missed deadlines. (Email notifications are `[v2]`, except for auth invitations).
+- In-app notifications keep both parties informed of submissions, reviews, revision requests, and missed deadlines. (Email notifications are `[v2]`, except for auth-related emails: invitations, password reset, and 2FA enable/disable).
 - Checkpoints must be completed in sequential order.
 - Admins can manage users and assignment templates.
 - Both students and instructors can view and download previously submitted checkpoint files.
 - Consultation sessions (Kartu Bimbingan) are tracked as a requirement for assignment completion.
-- Admins can view system-wide analytics and audit logs. (Audit log viewer implemented at `/admin/audit-log`) `[v2]`
+- Admins can view audit logs via the viewer at `/admin/audit-log`. System-wide analytics dashboards are `[v2]`.
 - Students and instructors can request and manage deadline extensions via a configurable approval workflow.
 - Users can enable two-factor authentication (TOTP) for enhanced account security.
 - Assignment templates include estimated duration per checkpoint, allowing auto-calculation of checkpoint dueDates during assignment creation.
@@ -144,7 +144,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - In-app notification center with read/unread tracking and type-based grouping.
 - Email delivery via Resend for account invitations and password setup.
 - Users receive in-app alerts for submissions, reviews, revision requests, and consultation verifications.
-- SLA breach alerts are sent to Admins via in-app notifications.
+- SLA breach alerts are sent to Admins via in-app and email notifications.
 - Notification bell in the shared header shows the unread count with 15-second polling.
 - Clicking the bell opens a slide-over panel with grouped notifications, "Mark all read" action, and empty state.
 - Users can mark individual notifications as read or mark all as read.

@@ -195,6 +195,7 @@ describe('Two-factor server functions', () => {
         expect.objectContaining({
           recipientEmail: 'test@example.com',
           subject: 'Two-Factor Authentication Enabled',
+          templateType: 'two_factor',
         }),
       );
     });
@@ -257,6 +258,7 @@ describe('Two-factor server functions', () => {
         expect.objectContaining({
           recipientEmail: 'test@example.com',
           subject: 'Two-Factor Authentication Disabled',
+          templateType: 'two_factor',
         }),
       );
     });

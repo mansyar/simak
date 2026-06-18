@@ -8,7 +8,7 @@ export const emailQueue = pgTable(
     subject: text('subject').notNull(),
     bodyHtml: text('body_html').notNull(),
     templateType: text('template_type', {
-      enum: ['password_reset', 'invitation', 'sla_alert'],
+      enum: ['password_reset', 'invitation', 'sla_alert', 'two_factor'],
     }).notNull(),
     status: text('status', { enum: ['pending', 'sent', 'failed'] }).notNull(),
     attempts: integer('attempts').default(0),

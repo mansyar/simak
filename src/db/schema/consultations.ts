@@ -9,6 +9,11 @@ export const consultationStatus = pgEnum('consultation_status', [
   'rejected',
 ]);
 
+export const consultationSessionType = pgEnum('consultation_session_type', [
+  'internal',
+  'external',
+]);
+
 export const consultations = pgTable(
   'consultations',
   {
@@ -26,7 +31,7 @@ export const consultations = pgTable(
     status: consultationStatus('status').notNull(),
     notes: text('notes'),
     externalConsultantName: text('external_consultant_name'),
-    sessionType: text('session_type'), // 'internal' | 'external'
+    sessionType: consultationSessionType('session_type'),
     verifiedAt: timestamp('verified_at'),
     createdAt: timestamp('created_at').defaultNow(),
   },

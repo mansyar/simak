@@ -1,6 +1,8 @@
-import { pgTable, text, timestamp, serial, integer, index } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, serial, integer, index, pgEnum } from 'drizzle-orm/pg-core';
 import { users } from './users';
 import { checkpoints } from './assignments';
+
+export const reviewDecision = pgEnum('review_decision', ['pass', 'revise']);
 
 export const submissions = pgTable(
   'submissions',
@@ -34,7 +36,7 @@ export const reviews = pgTable(
     instructorId: text('instructor_id')
       .notNull()
       .references(() => users.id),
-    decision: text('decision').notNull(), // 'pass' | 'revise'
+    decision: reviewDecision('decision').notNull(),
     comment: text('comment'),
     feedbackFileKey: text('feedback_file_key'),
     revisionDeadline: timestamp('revision_deadline'),

@@ -1,4 +1,14 @@
-import { pgTable, text, timestamp, serial, integer, pgEnum, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  serial,
+  integer,
+  pgEnum,
+  index,
+  check,
+} from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { users } from './users';
 import { assignmentTemplates } from './templates';
 
@@ -30,7 +40,17 @@ export const assignments = pgTable(
     maxExtensionDays: integer('max_extension_days').default(7),
     maxTotalExtensions: integer('max_total_extensions').default(3),
   },
-  (table) => [index('assignments_instructor_id_idx').on(table.instructorId)],
+  (table) => [
+    index('assignments_instructor_id_idx').on(table.instructorId),
+    check(
+      'assignments_max_extension_days_range',
+      sql`${table.maxExtensionDays} >= 1 AND ${table.maxExtensionDays} <= 30`,
+    ),
+    check(
+      'assignments_max_total_extensions_range',
+      sql`${table.maxTotalExtensions} >= 1 AND ${table.maxTotalExtensions} <= 10`,
+    ),
+  ],
 );
 
 export const assignmentStudents = pgTable('assignment_students', {

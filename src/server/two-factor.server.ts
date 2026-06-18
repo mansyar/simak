@@ -118,7 +118,7 @@ export async function enableTwoFactorHandler(args: { data: VerifyTwoFactorInput 
               </table>
             </body>
           </html>`,
-        templateType: 'sla_alert',
+        templateType: 'two_factor',
       });
     } catch {
       // Email failure is non-fatal
@@ -197,7 +197,7 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
               </table>
             </body>
           </html>`,
-        templateType: 'sla_alert',
+        templateType: 'two_factor',
       });
     } catch {
       // Email failure is non-fatal

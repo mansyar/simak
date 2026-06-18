@@ -220,8 +220,8 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 **Notification** — in-app event log.
 **NotificationPreference** — per-user, per-event, per-channel toggle. [v2]
 **ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, subsequent checkpoints and assignment finalDeadline auto-extend.
-**AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v2]
-**EmailQueue** — background delivery queue for transactional emails. [v2]
+**AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v1] — admin viewer at `/admin/audit-log`.
+**EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, and 2FA emails; extended to event notifications in [v2].
 **TwoFactor** — TOTP configuration (secret, backup codes) managed by Better Auth's `twoFactor` plugin.
 **Session** — Better-Auth session token, FK to users, expiresAt.
 **Account** — Better-Auth credential provider entry (stores hashed password).
@@ -330,8 +330,8 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 | description        | text                                |                                                                                                         |
 | finalDeadline      | timestamp, not null                 | Soft target deadline — individual checkpoint dueDates enforce locking; finalDeadline is a display/guide |
 | instructorId       | text (FK → users)                   |                                                                                                         |
-| maxExtensionDays   | integer, default 7                  | Admin cap per request, CHECK (1–30) `[v2]`                                                              |
-| maxTotalExtensions | integer, default 3                  | Cap per assignment, CHECK (1–10) `[v2]`                                                                 |
+| maxExtensionDays   | integer, default 7                  | Admin cap per request, CHECK (1–30)                                                                     |
+| maxTotalExtensions | integer, default 3                  | Cap per assignment, CHECK (1–10)                                                                        |
 | createdAt          | timestamp                           |                                                                                                         |
 | updatedAt          | timestamp                           |                                                                                                         |
 | deletedAt          | timestamp                           | Soft delete                                                                                             |
@@ -353,6 +353,7 @@ _Note: Each row represents one student's individual participation. Group assignm
 | ---------------- | -------------------------- | --------------------------------------------------------------------------- |
 | id               | serial (PK)                |                                                                             |
 | assignmentId     | integer (FK → assignments) |                                                                             |
+| studentId        | text (FK → users)          | Per-student checkpoint state (independent progress per student)             |
 | name             | text, not null             | Copied from template                                                        |
 | order            | integer, not null          |                                                                             |
 | dueDate          | timestamp                  | Per-checkpoint deadline (auto-calculated from template `estimatedDuration`) |
@@ -376,33 +377,33 @@ _Note: Each row represents one student's individual participation. Group assignm
 
 #### reviews
 
-| Column           | Type                       | Notes                                                      |
-| ---------------- | -------------------------- | ---------------------------------------------------------- |
-| id               | serial (PK)                |                                                            |
-| submissionId     | integer (FK → submissions) |                                                            |
-| instructorId     | text (FK → users)          |                                                            |
-| decision         | text, not null             | pass \| revise                                             |
-| comment          | text                       |                                                            |
-| feedbackFileKey  | text                       | R2 key for optional feedback file                          |
-| revisionDeadline | timestamp                  | Deadline for resubmission (if revise)                      |
-| createdAt        | timestamp                  |                                                            |
-| reviewedAt       | timestamp                  | When instructor submitted the review (for SLA calculation) |
+| Column           | Type                               | Notes                                                      |
+| ---------------- | ---------------------------------- | ---------------------------------------------------------- |
+| id               | serial (PK)                        |                                                            |
+| submissionId     | integer (FK → submissions)         |                                                            |
+| instructorId     | text (FK → users)                  |                                                            |
+| decision         | pgEnum (review_decision), not null | pass \| revise                                             |
+| comment          | text                               |                                                            |
+| feedbackFileKey  | text                               | R2 key for optional feedback file                          |
+| revisionDeadline | timestamp                          | Deadline for resubmission (if revise)                      |
+| createdAt        | timestamp                          |                                                            |
+| reviewedAt       | timestamp                          | When instructor submitted the review (for SLA calculation) |
 
 #### consultations
 
-| Column                 | Type                       | Notes                                        |
-| ---------------------- | -------------------------- | -------------------------------------------- |
-| id                     | serial (PK)                |                                              |
-| assignmentId           | integer (FK → assignments) |                                              |
-| checkpointId           | integer (FK → checkpoints) | Which stage this consultation supports       |
-| studentId              | text (FK → users)          |                                              |
-| verifiedById           | text (FK → users)          | Internal instructor who verified the log     |
-| status                 | enum, not null             | pending \| verified \| rejected              |
-| notes                  | text                       | Session notes from student                   |
-| externalConsultantName | text                       | Name if session was with external supervisor |
-| sessionType            | text                       | internal \| external                         |
-| verifiedAt             | timestamp                  | When instructor verified                     |
-| createdAt              | timestamp                  |                                              |
+| Column                 | Type                               | Notes                                        |
+| ---------------------- | ---------------------------------- | -------------------------------------------- |
+| id                     | serial (PK)                        |                                              |
+| assignmentId           | integer (FK → assignments)         |                                              |
+| checkpointId           | integer (FK → checkpoints)         | Which stage this consultation supports       |
+| studentId              | text (FK → users)                  |                                              |
+| verifiedById           | text (FK → users)                  | Internal instructor who verified the log     |
+| status                 | enum, not null                     | pending \| verified \| rejected              |
+| notes                  | text                               | Session notes from student                   |
+| externalConsultantName | text                               | Name if session was with external supervisor |
+| sessionType            | pgEnum (consultation_session_type) | internal \| external                         |
+| verifiedAt             | timestamp                          | When instructor verified                     |
+| createdAt              | timestamp                          |                                              |
 
 #### notifications
 
@@ -449,7 +450,7 @@ _Note: Each row represents one student's individual participation. Group assignm
 
 Index on `(assignmentId, status)` for instructor queue queries.
 
-#### audit_log [v2]
+#### audit_log
 
 | Column     | Type              | Notes                                                                                              |
 | ---------- | ----------------- | -------------------------------------------------------------------------------------------------- |
@@ -463,38 +464,38 @@ Index on `(assignmentId, status)` for instructor queue queries.
 
 Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for type filtering. Index on `(entity_type, entity_id)` for entity-specific history.
 
-#### email_queue [v2]
+#### email_queue
 
-| Column         | Type               | Notes                                           |
-| -------------- | ------------------ | ----------------------------------------------- |
-| id             | serial (PK)        |                                                 |
-| recipientEmail | text, not null     |                                                 |
-| subject        | text, not null     |                                                 |
-| bodyHtml       | text, not null     |                                                 |
-| templateType   | text, not null     | `password_reset` \| `invitation` \| `sla_alert` |
-| status         | text, not null     | `pending` \| `sent` \| `failed`                 |
-| attempts       | integer, default 0 |                                                 |
-| lastAttemptAt  | timestamp          | NULLABLE                                        |
-| errorMessage   | text               | NULLABLE — last failure reason                  |
-| createdAt      | timestamp          | DEFAULT NOW()                                   |
+| Column         | Type               | Notes                                                           |
+| -------------- | ------------------ | --------------------------------------------------------------- |
+| id             | serial (PK)        |                                                                 |
+| recipientEmail | text, not null     |                                                                 |
+| subject        | text, not null     |                                                                 |
+| bodyHtml       | text, not null     |                                                                 |
+| templateType   | text, not null     | `password_reset` \| `invitation` \| `sla_alert` \| `two_factor` |
+| status         | text, not null     | `pending` \| `sent` \| `failed`                                 |
+| attempts       | integer, default 0 |                                                                 |
+| lastAttemptAt  | timestamp          | NULLABLE                                                        |
+| errorMessage   | text               | NULLABLE — last failure reason                                  |
+| createdAt      | timestamp          | DEFAULT NOW()                                                   |
 
 ### Database Indexes
 
-| Table                   | Column(s)                | Type             | Purpose                                      |
-| ----------------------- | ------------------------ | ---------------- | -------------------------------------------- |
-| `checkpoints`           | `assignmentId`           | b-tree           | Fetch checkpoints when loading an assignment |
-| `submissions`           | `checkpointId`           | b-tree           | Fetch submissions for a checkpoint           |
-| `submissions`           | `uploadedBy`             | b-tree           | Student's submission history                 |
-| `reviews`               | `submissionId`           | b-tree           | Fetch review for a submission                |
-| `consultations`         | `checkpointId`           | b-tree           | Count consultations for gating logic         |
-| `consultations`         | `status`                 | b-tree           | Filter pending verifications                 |
-| `notifications`         | `userId`, `read`         | composite b-tree | Notification center filtering                |
-| `password_reset_tokens` | `token`                  | unique b-tree    | Token lookup on password setup               |
-| `audit_log`             | `createdAt`              | b-tree           | Time-ordered queries (v2)                    |
-| `audit_log`             | `action`                 | b-tree           | Type filtering (v2)                          |
-| `audit_log`             | `entityType`, `entityId` | composite b-tree | Entity-specific history (v2)                 |
-| `extension_requests`    | `assignmentId`, `status` | composite b-tree | Instructor queue queries                     |
-| `email_queue`           | `status`                 | b-tree           | Pick pending emails for delivery (v2)        |
+| Table                | Column(s)                | Type             | Purpose                                      |
+| -------------------- | ------------------------ | ---------------- | -------------------------------------------- |
+| `checkpoints`        | `assignmentId`           | b-tree           | Fetch checkpoints when loading an assignment |
+| `submissions`        | `checkpointId`           | b-tree           | Fetch submissions for a checkpoint           |
+| `submissions`        | `uploadedBy`             | b-tree           | Student's submission history                 |
+| `reviews`            | `submissionId`           | b-tree           | Fetch review for a submission                |
+| `consultations`      | `checkpointId`           | b-tree           | Count consultations for gating logic         |
+| `consultations`      | `status`                 | b-tree           | Filter pending verifications                 |
+| `notifications`      | `userId`, `read`         | composite b-tree | Notification center filtering                |
+| `verification`       | `value`                  | b-tree           | Token lookup on password setup/reset         |
+| `audit_log`          | `createdAt`              | b-tree           | Time-ordered queries                         |
+| `audit_log`          | `action`                 | b-tree           | Type filtering                               |
+| `audit_log`          | `entityType`, `entityId` | composite b-tree | Entity-specific history                      |
+| `extension_requests` | `assignmentId`, `status` | composite b-tree | Instructor queue queries                     |
+| `email_queue`        | `status`                 | b-tree           | Pick pending emails for delivery             |
 
 All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migration generated with `drizzle-kit generate`.
 
@@ -516,20 +517,21 @@ Admin       (creates Instructors and Students)
 
 **Permission boundaries:**
 
-| Action                    | SuperAdmin | Admin | Instructor | Student |
-| ------------------------- | ---------- | ----- | ---------- | ------- |
-| Create Admin              | ✓          | —     | —          | —       |
-| Create Instructor/Student | —          | ✓     | —          | —       |
-| Manage templates          | —          | ✓     | —          | —       |
-| Create assignments        | —          | —     | ✓          | —       |
-| Review submissions        | —          | —     | ✓          | —       |
-| Submit checkpoint work    | —          | —     | —          | ✓       |
-| Log consultations         | —          | —     | —          | ✓       |
-| Verify consultations      | —          | —     | ✓          | —       |
-| View own progress         | —          | —     | —          | ✓       |
-| View all progress         | —          | —     | ✓          | —       |
-| View system analytics     | —          | —     | —          | —       |
-| Read audit logs           | ✓          | ✓     | —          | —       |
+| Action                              | SuperAdmin | Admin | Instructor | Student |
+| ----------------------------------- | ---------- | ----- | ---------- | ------- |
+| Create Admin                        | ✓          | —     | —          | —       |
+| Create Instructor/Student           | —          | ✓     | —          | —       |
+| Manage templates                    | —          | ✓     | —          | —       |
+| Create assignments                  | —          | —     | ✓          | —       |
+| Review submissions                  | —          | —     | ✓          | —       |
+| Submit checkpoint work              | —          | —     | —          | ✓       |
+| Log consultations                   | —          | —     | —          | ✓       |
+| Verify consultations                | —          | —     | ✓          | —       |
+| View own progress                   | —          | —     | —          | ✓       |
+| View all progress                   | —          | —     | ✓          | —       |
+| List students (assignment creation) | —          | —     | ✓          | —       |
+| View system analytics               | —          | —     | —          | —       |
+| Read audit logs                     | ✓          | ✓     | —          | —       |
 
 ### User Registration Flow [v1]
 
@@ -689,16 +691,13 @@ A checkpoint unlocks when:
 ### In-App Delivery [v1]
 
 - Notifications stored in the `notifications` table.
-- TanStack Query `refetchInterval` polls for new notifications with differentiated intervals per priority:
-  - **High priority** (submission_received, review_completed): 10s active, 60s background.
-  - **Medium priority** (deadline_approaching, deadline_missed): 30s active, 120s background.
-  - **Low priority** (consultation_verified): 60s active, 300s background.
+- TanStack Query `refetchInterval` polls for new unread notifications at a flat 15-second interval (see PRD line 148). The notification bell in the shared header reflects the unread count.
 - Notification center UI with read/unread filtering.
 - Badge indicator on the sidebar.
 
-### Email Delivery [v2]
+### Email Delivery
 
-- Sent via Resend API.
+- Sent via Resend API. [v1] for auth-related emails (invitations, password reset, 2FA enable/disable); [v2] for event notification emails (submission, review, deadline alerts).
 - Email queue (`email_queue` table) with retry logic: 3 attempts with exponential backoff (30s, 5min, 30min).
 - Dead letter after 3 failed attempts (logged, not retried).
 
@@ -771,7 +770,7 @@ A checkpoint unlocks when:
 
 - TanStack Router lazy loads route components.
 - Suspense boundaries with skeleton screens for async data.
-- TanStack Query stale times: user profile (5min), checkpoint list (30s), notifications: 10s (high), 30s (medium), 60s (low).
+- TanStack Query stale times: user profile (5min), checkpoint list (30s), notifications (15s, flat).
 - TanStack Query `gcTime`: dashboard data cached for 30 minutes in memory after the user navigates away, so returning to the dashboard is instant.
 
 ### Server-Side Caching [v2]
@@ -825,6 +824,7 @@ A checkpoint unlocks when:
 | `R2_ACCESS_KEY_ID`     | R2 API access key                  |
 | `R2_SECRET_ACCESS_KEY` | R2 API secret key                  |
 | `R2_BUCKET_NAME`       | R2 bucket for uploads              |
+| `R2_PUBLIC_URL`        | R2 public base URL for file access |
 | `RESEND_API_KEY`       | Resend API key for email delivery  |
 | `BETTER_AUTH_SECRET`   | Signing secret for auth tokens     |
 | `BETTER_AUTH_URL`      | Public URL of the app              |
@@ -955,13 +955,13 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 | Bilingual i18n (English + Indonesian)                                  | ✓        |               |
 | Vitest unit tests (gating logic, state transitions)                    | ✓        |               |
 | Group assignments                                                      |          | ✓             |
-| Two-factor authentication                                              |          | ✓             |
-| Email notifications (transactional beyond invitations)                 |          | ✓             |
+| Two-factor authentication                                              | ✓        |               |
+| Email notifications (event alerts: submission, review, deadline)       |          | ✓             |
 | Push notifications (Web Push)                                          |          | ✓             |
 | Notification preferences                                               |          | ✓             |
 | Analytics dashboards                                                   |          | ✓             |
 | Reports with scheduling and export                                     |          | ✓             |
-| Deadline extension workflow                                            |          | ✓             |
-| Audit logging                                                          |          | ✓             |
+| Deadline extension workflow                                            | ✓        |               |
+| Audit logging                                                          | ✓        |               |
 | Integration tests                                                      |          | ✓             |
 | Playwright E2E tests                                                   |          | ✓             |
