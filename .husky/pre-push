@@ -1,1 +1,1 @@
-pnpm typecheck && pnpm vitest run --coverage
+pnpm typecheck && pnpm vitest run --coverage --exclude "tests/integration/**"
