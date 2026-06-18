@@ -38,7 +38,7 @@
   - [x] Wrap `migrate()` in try/finally; release `pg_advisory_unlock` with the same id in `finally`
   - [x] Keep `postgres(connectionString, { max: 1, onnotice: () => {} })` and the existing `sql.end()` + exit behavior
   - [x] Run `CI=true pnpm test -- tests/unit/db/migrate.test.ts` and confirm all tests pass
-- [ ] Task: Conductor - User Manual Verification 'Migration Runner — Advisory Lock + Connection Fallback' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Migration Runner — Advisory Lock + Connection Fallback' (Protocol in workflow.md)
 
 ## Phase 3: Bundle Scripts & Dockerfile
 
@@ -55,7 +55,7 @@
 - [x] Task: Verify Docker build & runner image contents (AC-1)
   - [x] Run `docker build -t simak:dev -f docker/Dockerfile .`
   - [x] Run `docker run --rm simak:dev ls -la .output/server drizzle/migrations` and confirm `migrate.mjs`, `seed.mjs`, and the 10 migration SQL files + `meta/` are present
-- [ ] Task: Conductor - User Manual Verification 'Bundle Scripts & Dockerfile' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Bundle Scripts & Dockerfile' (Protocol in workflow.md)
 
 ## Phase 4: SQL Style Guide — Rollback Convention & Expand-Contract Pattern
 
@@ -83,4 +83,8 @@
   - [x] AC-5: Coolify pre-deploy abort procedure documented in spec
   - [x] AC-7: Coolify pre-deploy command documented: `node .output/server/migrate.mjs && node .output/server/seed.mjs`
 - [x] Task: Conductor - User Manual Verification 'Integration Test & Final Verification' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 5f5bb14
       </protect>
