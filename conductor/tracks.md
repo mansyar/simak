@@ -26,3 +26,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Production Database Migration Infrastructure — Coolify pre-deploy bundled migrate + seed runners, pg_advisory_lock, MIGRATE_DATABASE_URL PgBouncer bypass, Dockerfile ships migrations, rollback convention & expand-contract pattern in SQL style guide**
       _Archived: ./archive/prod_migration_20260618/_
+
+---
+
+- [ ] **Track: Template Editor Route — Dedicated /admin/templates/$id route replacing EditTemplateSheet modal**
+      _Link: [./tracks/template-editor-route_20260618/](./tracks/template-editor-route_20260618/)_
