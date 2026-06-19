@@ -251,4 +251,19 @@ Students and instructors lack a centralized system to:
 - **Server handler tests** — Unit tests for request, list, approve, reject, bulk, and audit log wiring handlers
 - **UI component tests** — Unit tests for student request form, history list, instructor queue section, and approval/rejection dialogs
 
+### Track 6.4: UI Consistency for Instructor-Facing UI (June 2026)
+
+- **6 new shared primitives** — `Textarea`, `PageHeader`, `BackLink`, `TemplateTypeBadge`, `CountBadge`, `formatDate` helpers; `EmptyState.description` made optional
+- **4 functional bug fixes** — populated the review-queue assignment filter dropdown, unified the local `SLABadge` with the shared component, split the duplicated `instructorAssignments.details.studentsProgress` i18n key, removed dead colSpan branch and redundant guard
+- **10 instructor-surface migrations to primitives** — 7 instructor pages now use `PageHeader`; back-links, template-type pills, textareas, skeletons, `Select`, `Card`, `MetricCard`, `EmptyState`, `formatDate*` helpers, and `CountBadge` all unified
+- **Design tokens + i18n cleanup** — hardcoded Tailwind palette colors replaced with `text-success`/`text-warning`/Badge variants; 9 `AssignmentWizard` validation messages, 2 `ReviewForm` upload errors, pagination page-of-total label, and `ReviewHistory` labelled date all translated EN+ID
+- **Split 446-line assignment detail page** into thin route + 5 subcomponents (`AssignmentDetailHeader`, `AssignmentOverviewTab`, `AssignmentConsultationsTab`, `AssignmentExtensionsTab`, `AssignmentDetailTabs`); route file is now 100 lines (spec required ≤120)
+- **Deduplicated pagination** — extracted shared `<Pagination>` primitive; deleted `TemplatePagination` and `ReviewQueuePagination`; admin templates + instructor reviews + assignments all use the shared primitive
+- **Extracted `<RefreshButton>` and `useRefreshSearch` hook** — adopted in 2 sites; removes fake `setTimeout` hack
+- **Systemic type fix** — root cause identified: `createServerFn({ method }).handler(async (args: { data: unknown }) => ...)` drops the input type because `TInputValidator` defaults to `undefined`. Applied `.inputValidator(Schema)` builder pattern across 20 server functions in the instructor scope; all 4 `@ts-expect-error` directives removed from instructor route loaders
+- **Created `useAssignmentTabs` hook** — extracted consultation + extension loading logic out of the assignment detail page to meet the ≤120 line constraint
+- **i18n translations** — 18+ new translation keys added in EN and ID, including `instructorAssignments.details.totalStudents`, `extensions.queue.reason`, `instructorAssignments.wizard.errors.*`, and the `common.pagination.pageOf` interpolator
+- **Test coverage** — new unit tests for every primitive, i18n regression test, and 44 test-file mock updates to support the new `.inputValidator()` server-fn pattern
+- **All 1913 tests pass, typecheck and lint clean, coverage thresholds met** (84.94% lines, 84.28% statements, 80.86% branches, 80% functions)
+
 </protect>
