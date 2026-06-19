@@ -7,6 +7,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ReviewQueueSkeletonProps {
   count?: number;
@@ -31,34 +32,22 @@ export function ReviewQueueSkeleton({ count = 5 }: ReviewQueueSkeletonProps) {
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex flex-col gap-1.5">
-                    <div
-                      data-testid="skeleton"
-                      className="h-4 w-32 rounded bg-muted animate-pulse"
-                    />
-                    <div
-                      data-testid="skeleton"
-                      className="h-3 w-24 rounded bg-muted animate-pulse"
-                    />
+                    <Skeleton data-testid="skeleton" className="h-4 w-32 rounded" />
+                    <Skeleton data-testid="skeleton" className="h-3 w-24 rounded" />
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div data-testid="skeleton" className="h-4 w-28 rounded bg-muted animate-pulse" />
+                  <Skeleton data-testid="skeleton" className="h-4 w-28 rounded" />
                 </TableCell>
                 <TableCell>
-                  <div data-testid="skeleton" className="h-4 w-16 rounded bg-muted animate-pulse" />
+                  <Skeleton data-testid="skeleton" className="h-4 w-16 rounded" />
                 </TableCell>
                 <TableCell>
-                  <div
-                    data-testid="skeleton"
-                    className="h-5 w-20 rounded-full bg-muted animate-pulse"
-                  />
+                  <Skeleton data-testid="skeleton" className="h-5 w-20 rounded-full" />
                 </TableCell>
                 <TableCell>
-                  <div data-testid="skeleton" className="h-4 w-4 rounded bg-muted animate-pulse" />
-                  <div
-                    data-testid="skeleton"
-                    className="h-8 w-16 rounded-md bg-muted animate-pulse"
-                  />
+                  <Skeleton data-testid="skeleton" className="h-4 w-4 rounded" />
+                  <Skeleton data-testid="skeleton" className="h-8 w-16 rounded-md" />
                 </TableCell>
               </TableRow>
             ))}

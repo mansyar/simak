@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useI18n } from '@/routes/__root';
 import type { TranslationKey } from '@/i18n/index';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ApproveExtensionDialog } from './ApproveExtensionDialog';
 import { RejectExtensionDialog } from './RejectExtensionDialog';
 
@@ -69,7 +70,7 @@ export function PendingExtensionsSection({
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-16 animate-pulse rounded-md bg-muted" />
+            <Skeleton key={i} className="h-16 rounded-md" />
           ))}
         </div>
       ) : (
