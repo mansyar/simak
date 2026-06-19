@@ -330,9 +330,9 @@ Goal: small polish that closes the audit's §5 low-impact list.
 
 ## Final track-closure tasks
 
-- [ ] Task: Conductor - Track closure — verify acceptance criteria
-    - [ ] Walk through every checkbox in `spec.md` §4 "Acceptance Criteria" and confirm each one is satisfied.
-    - [ ] Update `conductor/product.md` "Completed Tracks" section with a new "Track X.Y" entry summarising the work (template: copy the most recent entry from the file and replace the track number, date, and bullet list).
-    - [ ] Commit `docs(conductor): Mark Instructor UI Consistency track complete`.
-- [ ] Task: Conductor - User Manual Verification 'Track closure' (Protocol in workflow.md)
+- [x] Task: Conductor - Track closure — verify acceptance criteria
+    - [x] Walk through every checkbox in `spec.md` §4 "Acceptance Criteria" and confirm each one is satisfied.
+    - [x] Update `conductor/product.md` "Completed Tracks" section with a new "Track 6.4" entry summarising the work.
+    - [x] Commit `docs(conductor): Mark Instructor UI Consistency track complete`.
+- [x] Task: Conductor - User Manual Verification 'Track closure' (Protocol in workflow.md)
 </protect>
