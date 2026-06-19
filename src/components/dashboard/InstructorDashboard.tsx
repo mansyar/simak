@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { MetricCard } from '@/components/ui/metric-card';
+import { SLABadge } from '@/components/reviews/SLABadge';
 
 interface PendingReviewItem {
   submissionId: number;
@@ -13,7 +14,6 @@ interface PendingReviewItem {
   assignmentTitle: string;
   studentName: string;
   submittedAt: string;
-  waitTimeDays: number;
 }
 
 interface RecentSubmission {
@@ -44,17 +44,6 @@ export interface InstructorDashboardData {
 
 interface Props {
   data: InstructorDashboardData;
-}
-
-function SLABadge({ waitTimeDays }: { waitTimeDays: number }) {
-  const { t } = useI18n();
-  if (waitTimeDays < 2) {
-    return <Badge variant="success">{t('instructorReviews.slaOnTime')}</Badge>;
-  }
-  if (waitTimeDays < 3) {
-    return <Badge variant="warning">{t('instructorReviews.slaApproaching')}</Badge>;
-  }
-  return <Badge variant="error">{t('instructorReviews.slaBreached')}</Badge>;
 }
 
 function getStatusBadgeVariant(status: string) {
@@ -152,7 +141,7 @@ export function InstructorDashboard({ data }: Props) {
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0 ml-2">
-                    <SLABadge waitTimeDays={item.waitTimeDays} />
+                    <SLABadge state="under_review" updatedAt={new Date(item.submittedAt)} />
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </Link>

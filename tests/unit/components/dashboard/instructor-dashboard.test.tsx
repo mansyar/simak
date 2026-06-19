@@ -85,7 +85,6 @@ describe('InstructorDashboard component', () => {
           assignmentTitle: 'Assignment 1',
           studentName: 'John Doe',
           submittedAt: new Date().toISOString(),
-          waitTimeDays: 1,
         },
       ],
     };
@@ -130,5 +129,62 @@ describe('InstructorDashboard component', () => {
     };
     render(<InstructorDashboard data={dataWithAssignments} />);
     expect(screen.getByText('Thesis 2026')).toBeDefined();
+  });
+
+  it('should render SLABadge with success variant for on-time reviews', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const oneDayAgo = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000);
+    const dataWithItems = {
+      ...emptyData,
+      pendingReviewItems: [
+        {
+          submissionId: 1,
+          checkpointName: 'Checkpoint 1',
+          assignmentTitle: 'Assignment 1',
+          studentName: 'John Doe',
+          submittedAt: oneDayAgo.toISOString(),
+        },
+      ],
+    };
+    render(<InstructorDashboard data={dataWithItems} />);
+    expect(screen.getByText('instructorReviews.slaOnTime')).toBeDefined();
+  });
+
+  it('should render SLABadge with warning variant for approaching SLA', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const twoAndHalfDaysAgo = new Date(Date.now() - 2.5 * 24 * 60 * 60 * 1000);
+    const dataWithItems = {
+      ...emptyData,
+      pendingReviewItems: [
+        {
+          submissionId: 1,
+          checkpointName: 'Checkpoint 1',
+          assignmentTitle: 'Assignment 1',
+          studentName: 'John Doe',
+          submittedAt: twoAndHalfDaysAgo.toISOString(),
+        },
+      ],
+    };
+    render(<InstructorDashboard data={dataWithItems} />);
+    expect(screen.getByText('instructorReviews.slaApproaching')).toBeDefined();
+  });
+
+  it('should render SLABadge with destructive variant for breached SLA', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const fourDaysAgo = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000);
+    const dataWithItems = {
+      ...emptyData,
+      pendingReviewItems: [
+        {
+          submissionId: 1,
+          checkpointName: 'Checkpoint 1',
+          assignmentTitle: 'Assignment 1',
+          studentName: 'John Doe',
+          submittedAt: fourDaysAgo.toISOString(),
+        },
+      ],
+    };
+    render(<InstructorDashboard data={dataWithItems} />);
+    expect(screen.getByText('instructorReviews.slaBreached')).toBeDefined();
   });
 });
