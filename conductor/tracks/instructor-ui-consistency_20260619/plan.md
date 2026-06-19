@@ -25,10 +25,10 @@ Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTyp
     - [x] Refactor if needed; verify coverage ≥ 80%.
     - [x] Commit `feat(ui): Add Textarea primitive`.
 
-- [ ] Task: Add `PageHeader` primitive
-    - [ ] Write failing test in `tests/unit/components/ui/page-header.test.tsx` covering: title renders with canonical class, optional subtitle, optional action slot, optional back link.
-    - [ ] Implement `src/components/ui/page-header.tsx`. Renders `<h1 className="font-display text-3xl text-foreground">` and an action slot on the right; when `back` prop is provided, renders `<BackLink>` above the title.
-    - [ ] Verify coverage ≥ 80%; commit `feat(ui): Add PageHeader primitive`.
+- [x] Task: Add `PageHeader` primitive (e0409a3)
+    - [x] Write failing test in `tests/unit/components/ui/page-header.test.tsx` covering: title renders with canonical class, optional subtitle, optional action slot, optional back link.
+    - [x] Implement `src/components/ui/page-header.tsx`. Renders `<h1 className="font-display text-3xl text-foreground">` and an action slot on the right; when `back` prop is provided, renders `<BackLink>` above the title.
+    - [x] Verify coverage ≥ 80%; commit `feat(ui): Add PageHeader primitive`.
 
 - [ ] Task: Add `BackLink` primitive
     - [ ] Write failing test in `tests/unit/components/ui/back-link.test.tsx` covering: renders with `ArrowLeft` + label, navigates via `Link`, accepts `search` prop, hover colour change.
