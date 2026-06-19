@@ -37,230 +37,209 @@ import { Route as AuthenticatedInstructorAssignmentsIdRouteImport } from './rout
 import { Route as AuthenticatedAdminTemplatesTemplateIdRouteImport } from './routes/_authenticated/admin/templates/$templateId';
 import { Route as AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRouteImport } from './routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId';
 const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
-  id: '/_unauthenticated',
-  getParentRoute: () => rootRouteImport,
+    id: '/_unauthenticated',
+    getParentRoute: () => rootRouteImport,
 });
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
+    id: '/_authenticated',
+    getParentRoute: () => rootRouteImport,
 });
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
+    id: '/',
+    path: '/',
+    getParentRoute: () => rootRouteImport,
 });
 const AuthenticatedStudentRoute = AuthenticatedStudentRouteImport.update({
-  id: '/student',
-  path: '/student',
-  getParentRoute: () => AuthenticatedRoute,
+    id: '/student',
+    path: '/student',
+    getParentRoute: () => AuthenticatedRoute,
 });
 const AuthenticatedInstructorRoute = AuthenticatedInstructorRouteImport.update({
-  id: '/instructor',
-  path: '/instructor',
-  getParentRoute: () => AuthenticatedRoute,
+    id: '/instructor',
+    path: '/instructor',
+    getParentRoute: () => AuthenticatedRoute,
 });
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRoute,
+    id: '/admin',
+    path: '/admin',
+    getParentRoute: () => AuthenticatedRoute,
 });
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
+    id: '/api/auth/$',
+    path: '/api/auth/$',
+    getParentRoute: () => rootRouteImport,
 });
-const UnauthenticatedAuthVerifyBackupCodeRoute =
-  UnauthenticatedAuthVerifyBackupCodeRouteImport.update({
+const UnauthenticatedAuthVerifyBackupCodeRoute = UnauthenticatedAuthVerifyBackupCodeRouteImport.update({
     id: '/auth/verify-backup-code',
     path: '/auth/verify-backup-code',
     getParentRoute: () => UnauthenticatedRoute,
-  });
+});
 const UnauthenticatedAuthVerify2faRoute = UnauthenticatedAuthVerify2faRouteImport.update({
-  id: '/auth/verify-2fa',
-  path: '/auth/verify-2fa',
-  getParentRoute: () => UnauthenticatedRoute,
+    id: '/auth/verify-2fa',
+    path: '/auth/verify-2fa',
+    getParentRoute: () => UnauthenticatedRoute,
 });
 const UnauthenticatedAuthSetupPasswordRoute = UnauthenticatedAuthSetupPasswordRouteImport.update({
-  id: '/auth/setup-password',
-  path: '/auth/setup-password',
-  getParentRoute: () => UnauthenticatedRoute,
+    id: '/auth/setup-password',
+    path: '/auth/setup-password',
+    getParentRoute: () => UnauthenticatedRoute,
 });
 const UnauthenticatedAuthResetPasswordRoute = UnauthenticatedAuthResetPasswordRouteImport.update({
-  id: '/auth/reset-password',
-  path: '/auth/reset-password',
-  getParentRoute: () => UnauthenticatedRoute,
+    id: '/auth/reset-password',
+    path: '/auth/reset-password',
+    getParentRoute: () => UnauthenticatedRoute,
 });
 const UnauthenticatedAuthLoginRoute = UnauthenticatedAuthLoginRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
-  getParentRoute: () => UnauthenticatedRoute,
+    id: '/auth/login',
+    path: '/auth/login',
+    getParentRoute: () => UnauthenticatedRoute,
 });
 const UnauthenticatedAuthForgotPasswordRoute = UnauthenticatedAuthForgotPasswordRouteImport.update({
-  id: '/auth/forgot-password',
-  path: '/auth/forgot-password',
-  getParentRoute: () => UnauthenticatedRoute,
+    id: '/auth/forgot-password',
+    path: '/auth/forgot-password',
+    getParentRoute: () => UnauthenticatedRoute,
 });
 const AuthenticatedStudentSettingsRoute = AuthenticatedStudentSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthenticatedStudentRoute,
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedStudentRoute,
 });
 const AuthenticatedStudentDashboardRoute = AuthenticatedStudentDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedStudentRoute,
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedStudentRoute,
 });
 const AuthenticatedInstructorSettingsRoute = AuthenticatedInstructorSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthenticatedInstructorRoute,
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedInstructorRoute,
 });
 const AuthenticatedInstructorDashboardRoute = AuthenticatedInstructorDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedInstructorRoute,
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedInstructorRoute,
 });
 const AuthenticatedAdminSettingsRoute = AuthenticatedAdminSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthenticatedAdminRoute,
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
 });
 const AuthenticatedAdminDashboardRoute = AuthenticatedAdminDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedAdminRoute,
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedAdminRoute,
 });
 const AuthenticatedAdminAuditLogRoute = AuthenticatedAdminAuditLogRouteImport.update({
-  id: '/audit-log',
-  path: '/audit-log',
-  getParentRoute: () => AuthenticatedAdminRoute,
+    id: '/audit-log',
+    path: '/audit-log',
+    getParentRoute: () => AuthenticatedAdminRoute,
 });
-const AuthenticatedStudentAssignmentsIndexRoute =
-  AuthenticatedStudentAssignmentsIndexRouteImport.update({
+const AuthenticatedStudentAssignmentsIndexRoute = AuthenticatedStudentAssignmentsIndexRouteImport.update({
     id: '/assignments/',
     path: '/assignments/',
     getParentRoute: () => AuthenticatedStudentRoute,
-  });
-const AuthenticatedInstructorReviewsIndexRoute =
-  AuthenticatedInstructorReviewsIndexRouteImport.update({
+});
+const AuthenticatedInstructorReviewsIndexRoute = AuthenticatedInstructorReviewsIndexRouteImport.update({
     id: '/reviews/',
     path: '/reviews/',
     getParentRoute: () => AuthenticatedInstructorRoute,
-  });
-const AuthenticatedInstructorAssignmentsIndexRoute =
-  AuthenticatedInstructorAssignmentsIndexRouteImport.update({
+});
+const AuthenticatedInstructorAssignmentsIndexRoute = AuthenticatedInstructorAssignmentsIndexRouteImport.update({
     id: '/assignments/',
     path: '/assignments/',
     getParentRoute: () => AuthenticatedInstructorRoute,
-  });
+});
 const AuthenticatedAdminUsersIndexRoute = AuthenticatedAdminUsersIndexRouteImport.update({
-  id: '/users/',
-  path: '/users/',
-  getParentRoute: () => AuthenticatedAdminRoute,
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => AuthenticatedAdminRoute,
 });
 const AuthenticatedAdminTemplatesIndexRoute = AuthenticatedAdminTemplatesIndexRouteImport.update({
-  id: '/templates/',
-  path: '/templates/',
-  getParentRoute: () => AuthenticatedAdminRoute,
+    id: '/templates/',
+    path: '/templates/',
+    getParentRoute: () => AuthenticatedAdminRoute,
 });
 const AuthenticatedStudentAssignmentsIdRoute = AuthenticatedStudentAssignmentsIdRouteImport.update({
-  id: '/assignments/$id',
-  path: '/assignments/$id',
-  getParentRoute: () => AuthenticatedStudentRoute,
+    id: '/assignments/$id',
+    path: '/assignments/$id',
+    getParentRoute: () => AuthenticatedStudentRoute,
 });
-const AuthenticatedInstructorReviewsSubmissionIdRoute =
-  AuthenticatedInstructorReviewsSubmissionIdRouteImport.update({
+const AuthenticatedInstructorReviewsSubmissionIdRoute = AuthenticatedInstructorReviewsSubmissionIdRouteImport.update({
     id: '/reviews/$submissionId',
     path: '/reviews/$submissionId',
     getParentRoute: () => AuthenticatedInstructorRoute,
-  });
-const AuthenticatedInstructorAssignmentsNewRoute =
-  AuthenticatedInstructorAssignmentsNewRouteImport.update({
+});
+const AuthenticatedInstructorAssignmentsNewRoute = AuthenticatedInstructorAssignmentsNewRouteImport.update({
     id: '/assignments/new',
     path: '/assignments/new',
     getParentRoute: () => AuthenticatedInstructorRoute,
-  });
-const AuthenticatedInstructorAssignmentsIdRoute =
-  AuthenticatedInstructorAssignmentsIdRouteImport.update({
+});
+const AuthenticatedInstructorAssignmentsIdRoute = AuthenticatedInstructorAssignmentsIdRouteImport.update({
     id: '/assignments/$id',
     path: '/assignments/$id',
     getParentRoute: () => AuthenticatedInstructorRoute,
-  });
-const AuthenticatedAdminTemplatesTemplateIdRoute =
-  AuthenticatedAdminTemplatesTemplateIdRouteImport.update({
+});
+const AuthenticatedAdminTemplatesTemplateIdRoute = AuthenticatedAdminTemplatesTemplateIdRouteImport.update({
     id: '/templates/$templateId',
     path: '/templates/$templateId',
     getParentRoute: () => AuthenticatedAdminRoute,
-  });
-const AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute =
-  AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRouteImport.update({
+});
+const AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute = AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRouteImport.update({
     id: '/checkpoints/$checkpointId',
     path: '/checkpoints/$checkpointId',
     getParentRoute: () => AuthenticatedStudentAssignmentsIdRoute,
-  });
+});
 const AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminAuditLogRoute: AuthenticatedAdminAuditLogRoute,
-  AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
-  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
-  AuthenticatedAdminTemplatesTemplateIdRoute: AuthenticatedAdminTemplatesTemplateIdRoute,
-  AuthenticatedAdminTemplatesIndexRoute: AuthenticatedAdminTemplatesIndexRoute,
-  AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
+    AuthenticatedAdminAuditLogRoute: AuthenticatedAdminAuditLogRoute,
+    AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+    AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+    AuthenticatedAdminTemplatesTemplateIdRoute: AuthenticatedAdminTemplatesTemplateIdRoute,
+    AuthenticatedAdminTemplatesIndexRoute: AuthenticatedAdminTemplatesIndexRoute,
+    AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 };
-const AuthenticatedAdminRouteWithChildren = AuthenticatedAdminRoute._addFileChildren(
-  AuthenticatedAdminRouteChildren,
-);
+const AuthenticatedAdminRouteWithChildren = AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren);
 const AuthenticatedInstructorRouteChildren = {
-  AuthenticatedInstructorDashboardRoute: AuthenticatedInstructorDashboardRoute,
-  AuthenticatedInstructorSettingsRoute: AuthenticatedInstructorSettingsRoute,
-  AuthenticatedInstructorAssignmentsIdRoute: AuthenticatedInstructorAssignmentsIdRoute,
-  AuthenticatedInstructorAssignmentsNewRoute: AuthenticatedInstructorAssignmentsNewRoute,
-  AuthenticatedInstructorReviewsSubmissionIdRoute: AuthenticatedInstructorReviewsSubmissionIdRoute,
-  AuthenticatedInstructorAssignmentsIndexRoute: AuthenticatedInstructorAssignmentsIndexRoute,
-  AuthenticatedInstructorReviewsIndexRoute: AuthenticatedInstructorReviewsIndexRoute,
+    AuthenticatedInstructorDashboardRoute: AuthenticatedInstructorDashboardRoute,
+    AuthenticatedInstructorSettingsRoute: AuthenticatedInstructorSettingsRoute,
+    AuthenticatedInstructorAssignmentsIdRoute: AuthenticatedInstructorAssignmentsIdRoute,
+    AuthenticatedInstructorAssignmentsNewRoute: AuthenticatedInstructorAssignmentsNewRoute,
+    AuthenticatedInstructorReviewsSubmissionIdRoute: AuthenticatedInstructorReviewsSubmissionIdRoute,
+    AuthenticatedInstructorAssignmentsIndexRoute: AuthenticatedInstructorAssignmentsIndexRoute,
+    AuthenticatedInstructorReviewsIndexRoute: AuthenticatedInstructorReviewsIndexRoute,
 };
-const AuthenticatedInstructorRouteWithChildren = AuthenticatedInstructorRoute._addFileChildren(
-  AuthenticatedInstructorRouteChildren,
-);
+const AuthenticatedInstructorRouteWithChildren = AuthenticatedInstructorRoute._addFileChildren(AuthenticatedInstructorRouteChildren);
 const AuthenticatedStudentAssignmentsIdRouteChildren = {
-  AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute:
-    AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute,
+    AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute: AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute,
 };
-const AuthenticatedStudentAssignmentsIdRouteWithChildren =
-  AuthenticatedStudentAssignmentsIdRoute._addFileChildren(
-    AuthenticatedStudentAssignmentsIdRouteChildren,
-  );
+const AuthenticatedStudentAssignmentsIdRouteWithChildren = AuthenticatedStudentAssignmentsIdRoute._addFileChildren(AuthenticatedStudentAssignmentsIdRouteChildren);
 const AuthenticatedStudentRouteChildren = {
-  AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
-  AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
-  AuthenticatedStudentAssignmentsIdRoute: AuthenticatedStudentAssignmentsIdRouteWithChildren,
-  AuthenticatedStudentAssignmentsIndexRoute: AuthenticatedStudentAssignmentsIndexRoute,
+    AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
+    AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
+    AuthenticatedStudentAssignmentsIdRoute: AuthenticatedStudentAssignmentsIdRouteWithChildren,
+    AuthenticatedStudentAssignmentsIndexRoute: AuthenticatedStudentAssignmentsIndexRoute,
 };
-const AuthenticatedStudentRouteWithChildren = AuthenticatedStudentRoute._addFileChildren(
-  AuthenticatedStudentRouteChildren,
-);
+const AuthenticatedStudentRouteWithChildren = AuthenticatedStudentRoute._addFileChildren(AuthenticatedStudentRouteChildren);
 const AuthenticatedRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
-  AuthenticatedInstructorRoute: AuthenticatedInstructorRouteWithChildren,
-  AuthenticatedStudentRoute: AuthenticatedStudentRouteWithChildren,
+    AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+    AuthenticatedInstructorRoute: AuthenticatedInstructorRouteWithChildren,
+    AuthenticatedStudentRoute: AuthenticatedStudentRouteWithChildren,
 };
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-);
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(AuthenticatedRouteChildren);
 const UnauthenticatedRouteChildren = {
-  UnauthenticatedAuthForgotPasswordRoute: UnauthenticatedAuthForgotPasswordRoute,
-  UnauthenticatedAuthLoginRoute: UnauthenticatedAuthLoginRoute,
-  UnauthenticatedAuthResetPasswordRoute: UnauthenticatedAuthResetPasswordRoute,
-  UnauthenticatedAuthSetupPasswordRoute: UnauthenticatedAuthSetupPasswordRoute,
-  UnauthenticatedAuthVerify2faRoute: UnauthenticatedAuthVerify2faRoute,
-  UnauthenticatedAuthVerifyBackupCodeRoute: UnauthenticatedAuthVerifyBackupCodeRoute,
+    UnauthenticatedAuthForgotPasswordRoute: UnauthenticatedAuthForgotPasswordRoute,
+    UnauthenticatedAuthLoginRoute: UnauthenticatedAuthLoginRoute,
+    UnauthenticatedAuthResetPasswordRoute: UnauthenticatedAuthResetPasswordRoute,
+    UnauthenticatedAuthSetupPasswordRoute: UnauthenticatedAuthSetupPasswordRoute,
+    UnauthenticatedAuthVerify2faRoute: UnauthenticatedAuthVerify2faRoute,
+    UnauthenticatedAuthVerifyBackupCodeRoute: UnauthenticatedAuthVerifyBackupCodeRoute,
 };
-const UnauthenticatedRouteWithChildren = UnauthenticatedRoute._addFileChildren(
-  UnauthenticatedRouteChildren,
-);
+const UnauthenticatedRouteWithChildren = UnauthenticatedRoute._addFileChildren(UnauthenticatedRouteChildren);
 const rootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  UnauthenticatedRoute: UnauthenticatedRouteWithChildren,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
+    IndexRoute: IndexRoute,
+    AuthenticatedRoute: AuthenticatedRouteWithChildren,
+    UnauthenticatedRoute: UnauthenticatedRouteWithChildren,
+    ApiAuthSplatRoute: ApiAuthSplatRoute,
 };
-export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes();
+export const routeTree = rootRouteImport
+    ._addFileChildren(rootRouteChildren)
+    ._addFileTypes();

@@ -144,13 +144,13 @@ Goal: replace every inlined page-header, back-link, template-type pill, textarea
     - [x] Add `consultations.noPendingConsultationsDescription` to `locales/en.json` and `locales/id.json`; run `pnpm generate:i18n`.
     - [x] Verify all tests pass; commit `refactor(instructor): Migrate hand-rolled empty states to EmptyState`.
 
-- [ ] Task: Migrate date formatting to `formatDate*`
-    - [ ] Update `src/components/instructor/assignments/AssignmentCard.tsx:69`, `src/components/instructor/assignments/ReviewStep.tsx:94`, `src/routes/_authenticated/instructor/assignments/$id.tsx:257, 293`, `src/components/reviews/ReviewFilePreview.tsx:38`, `src/components/reviews/ReviewHistory.tsx:46`, and `src/components/consultations/VerificationQueueItem.tsx:35` to use the new helpers.
-    - [ ] Verify all tests pass; commit `refactor(instructor): Use formatDate helpers for locale-aware dates`.
+- [x] Task: Migrate date formatting to `formatDate*`
+    - [x] Update `src/components/instructor/assignments/AssignmentCard.tsx:69`, `src/components/instructor/assignments/ReviewStep.tsx:94`, `src/routes/_authenticated/instructor/assignments/$id.tsx:257, 293`, `src/components/reviews/ReviewFilePreview.tsx:38`, `src/components/reviews/ReviewHistory.tsx:46`, and `src/components/consultations/VerificationQueueItem.tsx:35` to use the new helpers.
+    - [x] Verify all tests pass; commit `refactor(instructor): Use formatDate helpers for locale-aware dates`.
 
-- [ ] Task: Unify count badges
-    - [ ] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:335,351` and `src/components/instructor/extensions/PendingExtensionsSection.tsx:63-66` to use `<CountBadge>`.
-    - [ ] Verify all tests pass; commit `refactor(instructor): Unify count badges with CountBadge primitive`.
+- [x] Task: Unify count badges
+    - [x] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:335,351` and `src/components/instructor/extensions/PendingExtensionsSection.tsx:63-66` to use `<CountBadge>`.
+    - [x] Verify all tests pass; commit `refactor(instructor): Unify count badges with CountBadge primitive`.
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3 — Instructor surface migration' (Protocol in workflow.md)
 

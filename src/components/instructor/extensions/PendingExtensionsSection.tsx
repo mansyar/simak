@@ -56,11 +56,7 @@ export function PendingExtensionsSection({
           <CardTitle className="text-sm">{t('extensions.queue.title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <EmptyState
-            icon={Clock}
-            title={t('extensions.queue.noPending')}
-            compact
-          />
+          <EmptyState icon={Clock} title={t('extensions.queue.noPending')} compact />
         </CardContent>
       </Card>
     );
