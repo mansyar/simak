@@ -735,6 +735,72 @@ Settings hub, notification preferences, and file preview optimization — increm
 
 ---
 
+### Track 6.4 — UI Consistency for Student-Facing UI
+
+**Description:** Focused visual consistency pass across all student-facing routes and components. The Tailwind v4 design system (CSS variables, semantic colors, Fraunces/DM Sans typography, dark mode) established in Track 6.0 was inconsistently applied across the student dashboard, assignments list, assignment detail, consultations, extensions, and shared layout components. This refactor unifies the visual treatment without adding new features or changing business logic. Scope is frontend-only.
+
+**Dependencies:** Track 6.0 (UI Redesign — design tokens and shared components). V1 student routes (assignments, checkpoints, consultations, extensions, settings).
+
+**Status:** ✅ Complete (June 2026)
+
+**Estimated Scope:**
+
+| Area                                                       | Effort |
+| ---------------------------------------------------------- | ------ |
+| Shared component foundation (`Progress` primitive, `EmptyState` `compact` prop, `CardTitle` font) | Small  |
+| Card & dashboard (template-type badge, progress bar, empty state density) | Medium |
+| Detail & checkpoint timeline (semantic colors, tab styling) | Medium |
+| Sidebar & cross-cutting routes (active-state, status badges) | Medium |
+| Tests + quality gates                                      | Medium |
+
+**Acceptance Criteria:**
+
+- [x] Template-type label looks identical in dashboard card, assignment card, and assignment detail header
+- [x] `CheckpointCard` uses only semantic color tokens; no literal Tailwind colors remain for state styling
+- [x] Progress percentage always renders as `<number>%`, never bare `%` (uses `?? 0` fallback)
+- [x] Dashboard widget empty states use the new `compact` variant — no longer dominate card height
+- [x] Assignment detail tabs have a clearly distinguishable active state (`px-3`, `rounded-t-md`, `hover:bg-muted/50`, `data-state` attribute)
+- [x] Sidebar active item is highlighted with full-width `bg-sidebar-accent`, no `border-l-[3px]` indentation
+- [x] `StudentAssignmentCard` no longer uses the rogue `violet-500` gradient accent
+- [x] `CardTitle` uses `font-sans`; page headings (`h1`–`h2`) remain Fraunces
+- [x] `ConsultationList`, `ExtensionHistoryList`, and `ExtensionRequestForm` use semantic `Badge` variants instead of inline spans
+- [x] Sidebar logout hover uses `destructive/10 destructive` instead of `red-500/10 red-400`
+- [x] `listStudentAssignmentsHandler` computes `progressPercent` per assignment via batched `inArray` query
+- [x] All existing tests pass and new component tests cover the changed UI behavior
+- [x] `pnpm typecheck`, `pnpm lint`, and `pnpm test` pass without errors
+- [x] Review cleanup: removed unused `Tabs` component + its test, removed a fake test file that asserted on hardcoded class strings, reverted an unrelated `vitest.config.ts` change, and removed a destructive `tests/integration/db/migrate.test.ts`
+
+**Actual Files Created/Modified:**
+
+| File                                                       | Action                                                                                             |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `src/components/ui/progress.tsx`                           | **New:** `Progress` component with `value` / `max` / `label` / `showValue` props                   |
+| `src/components/ui/card.tsx`                               | **Modified:** `CardTitle` `font-heading` → `font-sans`                                             |
+| `src/components/ui/empty-state.tsx`                        | **Modified:** Added `compact` prop for dashboard widget density                                    |
+| `src/components/student/assignments/StudentAssignmentCard.tsx` | **Modified:** `Badge` for template type, `Progress` for progress bar, `?? 0` fallback, removed `violet-500` |
+| `src/components/student/assignments/AssignmentDetailHeader.tsx` | **Modified:** `Badge` variant `default` → `outline`                                             |
+| `src/components/student/assignments/CheckpointCard.tsx`    | **Modified:** `stateConfig` uses semantic tokens (`border-l-success/info/warning/error/primary/border`); blocking reasons and overdue text use `text-warning` (not error) |
+| `src/components/dashboard/StudentDashboard.tsx`             | **Modified:** `Badge` outline, `Progress` component, `?? 0` fallback, `compact` on all four `EmptyState` usages |
+| `src/components/layout/{student,instructor,admin}-sidebar.tsx` | **Modified:** Removed `border-l-[3px]`, kept full-width `bg-sidebar-accent`; logout hover uses `destructive/10 destructive` |
+| `src/components/consultations/ConsultationList.tsx`         | **Modified:** Inline status spans → semantic `Badge` variants                                       |
+| `src/components/student/extensions/ExtensionHistoryList.tsx` | **Modified:** Inline status spans → semantic `Badge` variants                                      |
+| `src/components/student/extensions/ExtensionRequestForm.tsx` | **Modified:** `text-green-600` → `text-success`                                                     |
+| `src/routes/_authenticated/student/assignments/$id.tsx`     | **Modified:** Tabs strengthened (`px-3`, `rounded-t-md`, `hover:bg-muted/50`, `data-state`); `progressPercent ?? 0` |
+| `src/server/assignments-extras.server.ts`                   | **Modified:** `listStudentAssignmentsHandler` computes `progressPercent` per assignment (batched `inArray` query) |
+| `tests/integration/db/migrate.test.ts`                      | **Deleted:** 136 lines — `beforeAll` dropped all tables in `public` and `drizzle` schemas; unsafe in `pnpm test` |
+| `tests/unit/components/{progress,StudentAssignmentCard,empty-state,card,StudentDashboard,checkpoint-card,assignment-detail-header,admin-sidebar,student-sidebar,instructor-sidebar,consultations/consultation-list}.test.tsx` | **New / modified:** coverage for all changed components |
+| `vitest.config.ts`                                          | **Reverted:** `importDurations` restored to original (unrelated to track)                          |
+
+**Test Results (at time of archiving):**
+
+- 1808/1808 tests passing across 190 test files
+- TypeScript typecheck passes with no errors
+- oxlint/oxfmt pass on all files
+- All files under 500-line modularity limit
+- Pre-push gate (`pnpm typecheck && pnpm vitest run --coverage`) passes — coverage thresholds met (80% lines / 80% functions / 72% branches / 79% statements)
+
+---
+
 ## Phase 7: Testing Infrastructure
 
 Integration tests against a real PostgreSQL database, deferred from V1.
@@ -790,7 +856,7 @@ Integration tests against a real PostgreSQL database, deferred from V1.
 | 🔴 **High**      | Track 1.3 (Extensions)         | Depends on Track 1.1 + 1.2; student/instructor extension workflow        |
 | 🔴 **High**      | Track 4.1 (Email Queue)        | Removes synchronous Resend bottleneck; improves reliability              |
 | 🟠 **Medium**    | Track 2.1 (Groups)             | Largest feature request; significant scope                               |
-| 🟡 **Lower**     | Tracks 3.1, 5.1, 6.2, 6.3, 7.1 | Security, analytics, UX, testing — valuable but not blocking             |
+| 🟡 **Lower**     | Tracks 3.1, 5.1, 6.2, 6.3, 6.4, 7.1 | Security, analytics, UX polish, UI consistency, testing — valuable but not blocking |
 
 ## Implementation Strategy
 
@@ -897,11 +963,12 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 6. ✅ Track 3.1 — Two-Factor Authentication & Session Management (Complete)
 7. ✅ Track 6.0 — UI Redesign / Warm Academic Design System (Complete)
 8. ✅ Track 6.1 — Settings Hub (Complete)
-9. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
-10. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-11. [ ] Write failing tests
-12. [ ] Implement features
-13. [ ] Verify & archive
+9. ✅ Track 6.4 — UI Consistency for Student-Facing UI (Complete)
+10. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
+11. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+12. [ ] Write failing tests
+13. [ ] Implement features
+14. [ ] Verify & archive
 
 ---
 

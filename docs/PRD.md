@@ -202,7 +202,9 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - **Accessibility**: Keyboard navigation, screen reader support. WCAG 2.1 AA compliance (contrast, focus, ARIA). Touch targets minimum 44×44px.
 - **Sidebar Navigation**: Dark navy sidebar (`#1C2333`) with role-specific navigation, active state indicators (blue left border), and user card with logout.
 - **Typography**: Fraunces (serif) for display/headings, DM Sans (sans-serif) for body text. Self-hosted font files in `public/fonts/`.
-- **Empty States**: Meaningful empty states with 64px icons, dashed borders, headline/description text, and CTA buttons.
+- **Empty States**: Meaningful empty states with 64px icons, dashed borders, headline/description text, and CTA buttons. A `compact` variant is used inside dashboard cards to avoid dominating card height.
+- **Progress Display**: A shared `Progress` component is used wherever a 0–100% progress bar is rendered (student assignment cards, student dashboard widgets). The label and value display are configurable; the percentage always renders a numeric value followed by `%` (never a bare `%`).
+- **UI Consistency**: All status indicators, badges, and state colors must use the project's semantic color tokens (`text-success`, `text-warning`, `text-error`, `text-info`, `text-primary`, `text-muted`) and the shared `Badge` component. Literal Tailwind palette classes (e.g. `green-500`, `red-600`, `violet-500`) are not permitted for state styling. Card titles use the sans-serif font; page headings (`h1`–`h2`) use Fraunces. Sidebar active items use a full-width accent background (no left-border indent). Logout hover uses the `destructive` semantic token.
 
 ---
 

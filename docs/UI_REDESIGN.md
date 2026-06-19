@@ -1,8 +1,8 @@
 # SIMAK UI Redesign — Design Plan
 
-**Status:** Proposed  
+**Status:** Implemented (May 2026), with follow-up consistency pass (June 2026)  
 **Direction:** Warm Academic  
-**Date:** May 2026
+**Date:** May 2026 (initial design), June 2026 (consistency pass)
 
 ---
 
@@ -647,4 +647,24 @@ Routes (pages):
 ---
 
 _Document created: May 2026_  
-_Status: Proposed — awaiting approval before implementation_
+_Status: Implemented in Track 6.0 (May 2026). Student-facing consistency pass in Track 6.4 (June 2026) — see section 11._
+
+---
+
+## 11. Implementation Status
+
+**Phases 1–7 of the redesign shipped in Track 6.0 (May 2026)** — design tokens, sidebar/header, core UI components, and role-based page restyling. Sidebar active state uses a 3px left accent border plus tinted background, per section 5.1.
+
+**Post-redesign consistency pass — Track 6.4 (June 2026)** addressed drift in the student-facing UI and shared layout components that had accumulated between Track 6.0 and the rest of the student surface area:
+
+- **Semantic color enforcement** — `CheckpointCard` and other stateful components were using literal Tailwind colors (`green-500`, `red-600`, `blue-500`, `amber-500`, `orange-500`, `teal-500`, `gray-400`). All state styling now uses the semantic tokens from this document (section 2): `text-success` / `text-warning` / `text-error` / `text-info` / `text-primary` / `text-muted`, with matching `bg-{token}/10` tints and `border-l-{token}` accents.
+- **Gating vs. error distinction** — blocking reasons and overdue date text use `text-warning` (not `text-error`), because they describe expected gating logic (previous checkpoint not passed, consultation count not yet met), not system errors. The overdue badge stays `destructive` because it represents a real problem state.
+- **Shared `Badge` component** — inline `text-[10px] ... uppercase` spans for status / template type labels were replaced with the shared `Badge` component, using the appropriate variant (`outline`, `default`, `secondary`, `destructive`).
+- **Shared `Progress` component** — inline progress bars were replaced with a single `Progress` primitive (`value` / `max` / `label` / `showValue`), used in `StudentAssignmentCard` and on the student dashboard. The percentage label always renders as `<number>%` via a `?? 0` fallback, never as a bare `%`.
+- **Rogue gradient removal** — `StudentAssignmentCard` had a hardcoded `to-violet-500` gradient accent that no other component used. Replaced with `bg-primary` / `from-primary to-primary` for consistency.
+- **`CardTitle` typography** — changed from `font-heading` (Fraunces serif) to `font-sans` (DM Sans) to stop card titles competing with the body text in card-dense UIs. Page headings (`h1`–`h2`) remain Fraunces.
+- **Sidebar active state** — removed the `border-l-[3px]` left accent from all three sidebar variants; active items now use a full-width `bg-sidebar-accent` background. Visual result is a flush highlight instead of an indented pill. Logout hover uses `destructive/10 destructive` instead of `red-500/10 red-400`.
+- **Assignment detail tabs** — strengthened from subtle underline tabs to clearer styling with `px-3`, `rounded-t-md`, `hover:bg-muted/50`, and a `data-state` attribute. Active tab now meets WCAG 2.1 AA contrast in both light and dark modes.
+- **Empty state density** — `EmptyState` got a `compact` prop for use inside dashboard cards, so the empty placeholder no longer dominates the card height. Full-page empty states keep the original padded variant.
+
+The overall direction, palette, typography, and component specs in sections 1–9 are unchanged. The pass codified the existing rules into actual component behavior and removed the last literal-color escape hatches.
