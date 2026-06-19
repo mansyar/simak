@@ -1,22 +1,30 @@
 <protect>
 # Track: UI Consistency for Student-Facing UI — Implementation Plan
 
-## Phase 1: Shared Component Foundation
+## Phase 1: Shared Component Foundation [checkpoint: a11fb96]
 
-- [ ] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
-- [ ] Task: Audit existing shadcn/ui primitives for reusability (`Progress`, `Tabs`, `Badge` variants).
-  - [ ] Check if `src/components/ui/progress.tsx` exists; if not, scaffold a minimal `Progress` component.
-  - [ ] Check if `src/components/ui/tabs.tsx` exists and is suitable for assignment detail tabs.
-  - [ ] Verify `Badge` variants support a category-style treatment (info/outline) or add a dedicated variant.
-- [ ] Task: Update `EmptyState` component to support a compact layout.
-  - [ ] Add `compact?: boolean` prop (or `size` variant) that reduces padding and icon size.
-  - [ ] Write/update unit tests for `EmptyState` default and compact states.
-  - [ ] Implement the prop and verify className output.
-- [ ] Task: Update `CardTitle` to use sans-serif typography.
-  - [ ] Change `font-heading` to `font-sans` in `src/components/ui/card.tsx`.
-  - [ ] Write/update unit test asserting `CardTitle` does not use a serif font class.
-  - [ ] Implement the change and verify no regressions in page headings.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Shared Component Foundation' (Protocol in workflow.md)
+- [x] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
+- [x] Task: Audit existing shadcn/ui primitives for reusability (`Progress`, `Tabs`, `Badge` variants).
+  - [x] Check if `src/components/ui/progress.tsx` exists; if not, scaffold a minimal `Progress` component.
+  - [x] Check if `src/components/ui/tabs.tsx` exists and is suitable for assignment detail tabs.
+  - [x] Verify `Badge` variants support a category-style treatment (info/outline) or add a dedicated variant.
+- [x] Task: Update `EmptyState` component to support a compact layout.
+  - [x] Add `compact?: boolean` prop (or `size` variant) that reduces padding and icon size.
+  - [x] Write/update unit tests for `EmptyState` default and compact states.
+  - [x] Implement the prop and verify className output.
+- [x] Task: Update `CardTitle` to use sans-serif typography.
+  - [x] Change `font-heading` to `font-sans` in `src/components/ui/card.tsx`.
+  - [x] Write/update unit test asserting `CardTitle` does not use a serif font class.
+  - [x] Implement the change and verify no regressions in page headings.
+- [x] Task: Create Progress component (`src/components/ui/progress.tsx`).
+  - [x] Create `Progress` component with `value` (0-100), `max`, `label`, and `showValue` props.
+  - [x] Use semantic color tokens (`bg-primary`).
+  - [x] Write unit tests for default, labeled, and value display modes.
+- [x] Task: Create Tabs component (`src/components/ui/tabs.tsx`).
+  - [x] Create accessible `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` components.
+  - [x] Support controlled (`value`/`onValueChange`) and uncontrolled (`defaultValue`) modes.
+  - [x] Write unit tests for tab switching, keyboard navigation, and ARIA attributes.
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Shared Component Foundation' (Protocol in workflow.md)
 
 ## Phase 2: Assignment Card & Dashboard Cleanup
 
