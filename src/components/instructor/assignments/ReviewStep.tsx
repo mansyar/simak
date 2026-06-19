@@ -1,6 +1,7 @@
 import { useI18n } from '../../../routes/__root';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
 import { format } from 'date-fns/format';
 import { BookOpen, Clipboard, Calendar, Users } from 'lucide-react';
 
@@ -137,9 +138,7 @@ export function ReviewStep({
                 {t('instructorAssignments.selectedRoadmap')}
               </h4>
               <p className="text-base font-bold text-primary mt-1">{selectedTemplate.name}</p>
-              <span className="inline-block text-[10px] font-bold uppercase tracking-wide bg-primary/10 text-primary px-2 py-0.5 rounded-full mt-1.5">
-                {selectedTemplate.type}
-              </span>
+              <TemplateTypeBadge type={selectedTemplate.type} className="mt-1.5" />
             </div>
 
             <div className="border-t pt-3 space-y-3">

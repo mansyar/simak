@@ -3,6 +3,7 @@ import { Calendar, Users, Clipboard } from 'lucide-react';
 import { format } from 'date-fns/format';
 import { useI18n } from '../../../routes/__root';
 import { Card, CardContent } from '@/components/ui/card';
+import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
 
 export interface AssignmentRow {
   id: number;
@@ -31,9 +32,7 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
         <div className="space-y-3">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <span className="text-[10px] font-bold tracking-wider uppercase text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                {assignment.templateType}
-              </span>
+              <TemplateTypeBadge type={assignment.templateType} />
               <h3 className="mt-1.5 text-lg font-semibold text-foreground leading-snug group-hover:text-primary transition-colors">
                 {assignment.title}
               </h3>

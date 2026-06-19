@@ -10,16 +10,10 @@ import { VerificationQueueItem } from '@/components/consultations/VerificationQu
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
 import { PendingExtensionsSection } from '@/components/instructor/extensions/PendingExtensionsSection';
 import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
-import {
-  Calendar,
-  Users,
-  Clipboard,
-  Percent,
-  CheckCircle2,
-  MessageSquare,
-} from 'lucide-react';
+import { Calendar, Users, Clipboard, Percent, CheckCircle2, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns/format';
 import { Card } from '@/components/ui/card';
+import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/ui/page-header';
@@ -181,9 +175,7 @@ function AssignmentDetailPage() {
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold tracking-wider uppercase text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-              {assignment.templateType}
-            </span>
+            <TemplateTypeBadge type={assignment.templateType} />
           </div>
           {assignment.description && (
             <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-relaxed">
