@@ -33,32 +33,32 @@ const stateConfig: Record<
 > = {
   passed: {
     label: 'studentAssignments.status.passed',
-    containerClass: 'border-l-green-500 bg-green-50 dark:bg-green-950/20',
+    containerClass: 'border-l-success bg-success/10',
     badgeVariant: 'success',
   },
   submitted: {
     label: 'studentAssignments.status.submitted',
-    containerClass: 'border-l-blue-500 bg-blue-50 dark:bg-blue-950/20',
+    containerClass: 'border-l-info bg-info/10',
     badgeVariant: 'info',
   },
   under_review: {
     label: 'studentAssignments.status.under_review',
-    containerClass: 'border-l-amber-500 bg-amber-50 dark:bg-amber-950/20',
+    containerClass: 'border-l-warning bg-warning/10',
     badgeVariant: 'warning',
   },
   revise: {
     label: 'studentAssignments.status.revise',
-    containerClass: 'border-l-orange-500 bg-orange-50 dark:bg-orange-950/20',
+    containerClass: 'border-l-error bg-error/10',
     badgeVariant: 'destructive',
   },
   unlocked: {
     label: 'studentAssignments.status.unlocked',
-    containerClass: 'border-l-teal-500 bg-teal-50 dark:bg-teal-950/20',
+    containerClass: 'border-l-primary bg-primary/10',
     badgeVariant: 'default',
   },
   locked: {
     label: 'studentAssignments.status.locked',
-    containerClass: 'border-l-gray-400 bg-gray-50 dark:bg-gray-900/20',
+    containerClass: 'border-l-border bg-muted/50',
     badgeVariant: 'outline',
   },
 };
@@ -107,7 +107,7 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
           {/* Due date */}
           {checkpoint.dueDate && (
             <div
-              className={`mt-1.5 flex items-center gap-1 text-xs ${isOverdue ? 'text-red-600 dark:text-red-400 font-medium' : 'text-muted-foreground'}`}
+              className={`mt-1.5 flex items-center gap-1 text-xs ${isOverdue ? 'text-warning font-medium' : 'text-muted-foreground'}`}
             >
               <Clock className="h-3 w-3" />
               <span>{format(new Date(checkpoint.dueDate), 'MMM d, yyyy')}</span>
@@ -117,7 +117,7 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
           {/* Consultation progress */}
           {minConsults > 0 && (
             <div
-              className={`mt-1.5 flex items-center gap-1 text-xs ${isSatisfied ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}
+              className={`mt-1.5 flex items-center gap-1 text-xs ${isSatisfied ? 'text-success' : 'text-muted-foreground'}`}
             >
               <Users className="h-3 w-3" />
               <span>
@@ -137,7 +137,7 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
                 return (
                   <div
                     key={idx}
-                    className="flex items-start gap-1.5 text-xs text-red-600 dark:text-red-400"
+                    className="flex items-start gap-1.5 text-xs text-warning"
                   >
                     <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
                     <span>{translatedReason}</span>

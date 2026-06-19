@@ -49,19 +49,19 @@
 
 ## Phase 3: Assignment Detail & Checkpoint Timeline
 
-- [ ] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
-- [ ] Task: Replace hardcoded colors in `CheckpointCard.tsx` with semantic tokens.
-  - [ ] Write failing tests asserting `CheckpointCard` state containers use semantic color classes (`border-l-success`, `bg-success/10`, etc.) and not literal Tailwind colors (`green-500`, `red-600`, etc.).
-  - [ ] Update `stateConfig` to use semantic tokens for all six checkpoint states.
-  - [ ] Verify dark mode contrast for each state.
-- [ ] Task: Fix blocking-reason color semantics.
-  - [ ] Write failing test asserting blocking reasons use `text-warning` (or `text-warning/90`) instead of `text-red-600`.
-  - [ ] Replace red text on blocking reasons and consultation insufficiency with warning-colored text.
-  - [ ] Keep overdue badge as `destructive` because it represents an actual problem state.
-- [ ] Task: Improve assignment detail tab visual hierarchy.
-  - [ ] Write failing tests asserting active tab has stronger visual indicators.
-  - [ ] Replace custom underline tabs with the shadcn `Tabs` primitive if available; otherwise strengthen custom tabs with `px-3`, stronger bottom border, and hover background.
-  - [ ] Ensure active tab meets WCAG 2.1 AA contrast in both themes.
+- [x] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
+- [x] Task: Replace hardcoded colors in `CheckpointCard.tsx` with semantic tokens.
+  - [x] Write failing tests asserting `CheckpointCard` state containers use semantic color classes (`border-l-success`, `bg-success/10`, etc.) and not literal Tailwind colors (`green-500`, `red-600`, etc.).
+  - [x] Update `stateConfig` to use semantic tokens for all six checkpoint states.
+  - [x] Verify dark mode contrast for each state.
+- [x] Task: Fix blocking-reason color semantics.
+  - [x] Write failing test asserting blocking reasons use `text-warning` (or `text-warning/90`) instead of `text-red-600`.
+  - [x] Replace red text on blocking reasons and consultation insufficiency with warning-colored text.
+  - [x] Keep overdue badge as `destructive` because it represents an actual problem state.
+- [x] Task: Improve assignment detail tab visual hierarchy.
+  - [x] Write failing tests asserting active tab has stronger visual indicators.
+  - [x] Replace custom underline tabs with the shadcn `Tabs` primitive if available; otherwise strengthen custom tabs with `px-3`, stronger bottom border, and hover background.
+  - [x] Ensure active tab meets WCAG 2.1 AA contrast in both themes.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Assignment Detail & Checkpoint Timeline' (Protocol in workflow.md)
 
 ## Phase 4: Layout & Cross-Cutting Student Routes

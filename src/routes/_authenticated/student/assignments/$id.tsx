@@ -262,14 +262,15 @@ function AssignmentDetailPage() {
 
       {/* Tab Navigation */}
       <div className="border-b border-border">
-        <div className="flex gap-4">
+        <div className="flex gap-1">
           <button
             type="button"
             onClick={() => setActiveTab('timeline')}
-            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+            data-state={activeTab === 'timeline' ? 'active' : 'inactive'}
+            className={`px-3 py-2 text-sm font-medium border-b-2 rounded-t-md transition-colors ${
               activeTab === 'timeline'
                 ? 'border-primary text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
             {t('studentAssignments.checkpointTimeline')}
@@ -277,10 +278,11 @@ function AssignmentDetailPage() {
           <button
             type="button"
             onClick={() => setActiveTab('consultations')}
-            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+            data-state={activeTab === 'consultations' ? 'active' : 'inactive'}
+            className={`px-3 py-2 text-sm font-medium border-b-2 rounded-t-md transition-colors ${
               activeTab === 'consultations'
                 ? 'border-primary text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
             {t('consultations.title')}
@@ -288,10 +290,11 @@ function AssignmentDetailPage() {
           <button
             type="button"
             onClick={() => setActiveTab('extensions')}
-            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+            data-state={activeTab === 'extensions' ? 'active' : 'inactive'}
+            className={`px-3 py-2 text-sm font-medium border-b-2 rounded-t-md transition-colors ${
               activeTab === 'extensions'
                 ? 'border-primary text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
             {t('extensions.requestTitle')}
