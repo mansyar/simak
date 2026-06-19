@@ -249,10 +249,10 @@ Goal: split the 446-line assignment detail page, dedupe pagination and refresh-b
     - [x] Update `src/components/reviews/ReviewDetailHeader.tsx` to render `<PageHeader>` with back link, title (`studentName`), and inline subtitle (`assignmentTitle — checkpointName`).
     - [x] Verify all tests pass; commit `refactor(reviews): Use PageHeader in ReviewDetailHeader`.
 
-- [ ] Task: Add `<Tabs>` primitive (or adopt from existing)
-    - [ ] Check if a `<Tabs>` primitive exists in `src/components/ui/`. If yes, use it. If no, create `src/components/ui/tabs.tsx` based on the current `instructor/assignments/$id.tsx:311-357` markup; the active/inactive class strings are computed from an active index.
-    - [ ] Update `src/components/instructor/assignments/AssignmentDetailTabs.tsx` (from 5.1) to use the new `<Tabs>`.
-    - [ ] Verify all tests pass; commit `refactor(ui): Adopt Tabs primitive in assignment detail`.
+- [x] Task: Add `<Tabs>` primitive (or adopt from existing)
+    - [x] Check if a `<Tabs>` primitive exists in `src/components/ui/`. If yes, use it. If no, create `src/components/ui/tabs.tsx` based on the current `instructor/assignments/$id.tsx:311-357` markup; the active/inactive class strings are computed from an active index.
+    - [x] Update `src/components/instructor/assignments/AssignmentDetailTabs.tsx` (from 5.1) to use the new `<Tabs>`.
+    - [x] Verify all tests pass; commit `refactor(ui): Adopt Tabs primitive in assignment detail`.
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 5 — Structural cleanups' (Protocol in workflow.md)
 

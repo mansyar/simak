@@ -52,9 +52,7 @@ describe('Tabs', () => {
   });
 
   it('should hide count badge when count is zero and hideWhenZero is true', () => {
-    const tabsWithCount = [
-      { id: 'overview', label: 'Overview', count: 0 },
-    ];
+    const tabsWithCount = [{ id: 'overview', label: 'Overview', count: 0 }];
     render(<Tabs tabs={tabsWithCount} activeTab="overview" onTabChange={vi.fn()} />);
     expect(screen.queryByText('0')).toBeNull();
   });

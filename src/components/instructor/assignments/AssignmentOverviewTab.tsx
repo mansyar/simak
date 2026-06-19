@@ -1,10 +1,4 @@
-import {
-  Calendar,
-  Users,
-  Clipboard,
-  Percent,
-  CheckCircle2,
-} from 'lucide-react';
+import { Calendar, Users, Clipboard, Percent, CheckCircle2 } from 'lucide-react';
 import { formatDateShort, formatDateTimeShort } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MetricCard } from '@/components/ui/metric-card';

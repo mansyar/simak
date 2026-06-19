@@ -55,7 +55,9 @@ function AssignmentDetailPage() {
       }) => Promise<{ items: ExtensionRequestItem[] }>;
       const [consultResult, extResult] = await Promise.all([
         listPendingFn({ data: { assignmentId: assignment.id } }),
-        listExtensionsFn({ data: { assignmentId: assignment.id, status: 'pending', page: 1, limit: 50 } }),
+        listExtensionsFn({
+          data: { assignmentId: assignment.id, status: 'pending', page: 1, limit: 50 },
+        }),
       ]);
       if (consultResult.consultations) setPendingConsultations(consultResult.consultations);
       if ('items' in extResult) setExtensionRequests(extResult.items);
@@ -94,8 +96,16 @@ function AssignmentDetailPage() {
 
   if (!assignment) {
     return (
-      <EmptyState icon={FileX} title={t('error.notFound')} description={t('error.assignmentNotFound')}>
-        <Link to="/instructor/assignments" search={{ page: 1, limit: 20, search: '' }} className="text-primary hover:underline text-sm">
+      <EmptyState
+        icon={FileX}
+        title={t('error.notFound')}
+        description={t('error.assignmentNotFound')}
+      >
+        <Link
+          to="/instructor/assignments"
+          search={{ page: 1, limit: 20, search: '' }}
+          className="text-primary hover:underline text-sm"
+        >
           {t('common.back')}
         </Link>
       </EmptyState>
