@@ -156,7 +156,7 @@ Goal: replace every inlined page-header, back-link, template-type pill, textarea
 
 ---
 
-## Phase 4 — Design system and i18n cleanup
+## Phase 4 — Design system and i18n cleanup [checkpoint: 2ce73be]
 
 Goal: replace hardcoded Tailwind palette colours with design tokens, remove redundant className on default-variant buttons, and translate all hardcoded English strings.
 
