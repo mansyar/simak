@@ -135,10 +135,7 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
               {checkpoint.blockingReasons.map((reason, idx) => {
                 const translatedReason = getTranslatedBlockingReason(reason, t);
                 return (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-1.5 text-xs text-warning"
-                  >
+                  <div key={idx} className="flex items-start gap-1.5 text-xs text-warning">
                     <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
                     <span>{translatedReason}</span>
                   </div>
