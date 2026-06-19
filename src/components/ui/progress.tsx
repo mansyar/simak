@@ -34,7 +34,9 @@ function Progress({
       {(label || showValue) && (
         <div className="mb-1.5 flex items-center justify-between text-xs">
           {label && <span className="text-muted-foreground">{label}</span>}
-          {showValue && <span className="font-semibold text-foreground">{Math.round(percentage)}%</span>}
+          {showValue && (
+            <span className="font-semibold text-foreground">{Math.round(percentage)}%</span>
+          )}
         </div>
       )}
       <div className="h-2 w-full overflow-hidden rounded-full bg-muted">

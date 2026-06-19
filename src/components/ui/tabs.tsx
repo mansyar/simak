@@ -31,7 +31,14 @@ interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   onValueChange?: (value: string) => void;
 }
 
-function Tabs({ className, value: controlledValue, defaultValue, onValueChange, children, ...props }: TabsProps) {
+function Tabs({
+  className,
+  value: controlledValue,
+  defaultValue,
+  onValueChange,
+  children,
+  ...props
+}: TabsProps) {
   const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue ?? '');
   const isControlled = controlledValue !== undefined;
   const currentValue = isControlled ? controlledValue : uncontrolledValue;
@@ -132,4 +139,13 @@ function TabsContent({ className, value, ...props }: TabsContentProps) {
   );
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent, type TabsProps, type TabsListProps, type TabsTriggerProps, type TabsContentProps };
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  type TabsProps,
+  type TabsListProps,
+  type TabsTriggerProps,
+  type TabsContentProps,
+};
