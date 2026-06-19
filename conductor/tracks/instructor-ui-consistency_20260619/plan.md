@@ -152,7 +152,7 @@ Goal: replace every inlined page-header, back-link, template-type pill, textarea
     - [x] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:335,351` and `src/components/instructor/extensions/PendingExtensionsSection.tsx:63-66` to use `<CountBadge>`.
     - [x] Verify all tests pass; commit `refactor(instructor): Unify count badges with CountBadge primitive`.
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3 — Instructor surface migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3 — Instructor surface migration' (Protocol in workflow.md)
 
 ---
 
