@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 interface EmptyStateProps {
   icon: React.ElementType;
   title: string;
-  description: string;
+  description?: string;
   children?: React.ReactNode;
   className?: string;
   compact?: boolean;
@@ -34,7 +34,7 @@ export function EmptyState({
         <Icon className={cn('text-muted-foreground', compact ? 'size-5' : 'size-7')} />
       </div>
       <h3 className="text-[0.9375rem] font-semibold text-foreground">{title}</h3>
-      <p className="mt-1 text-[0.8125rem] text-muted-foreground">{description}</p>
+      {description && <p className="mt-1 text-[0.8125rem] text-muted-foreground">{description}</p>}
       {children && <div className="mt-4">{children}</div>}
     </div>
   );

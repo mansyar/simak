@@ -61,6 +61,12 @@ describe('EmptyState', () => {
     expect(paragraphs.length).toBe(1);
   });
 
+  it('does not render empty p when description is omitted', () => {
+    const { container } = render(<EmptyState icon={FileQuestion} title="No items" />);
+    const paragraphs = container.querySelectorAll('p');
+    expect(paragraphs.length).toBe(0);
+  });
+
   it('applies custom className', () => {
     const { container } = render(<EmptyState {...defaultProps} className="custom-class" />);
     const root = container.firstChild as HTMLElement;
