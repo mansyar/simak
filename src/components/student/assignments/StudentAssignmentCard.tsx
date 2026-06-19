@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Calendar, Clipboard } from 'lucide-react';
 import { format } from 'date-fns/format';
 import { useI18n } from '../../../routes/__root';
+import { Progress } from '../../ui/progress';
 
 export interface StudentAssignmentRow {
   id: number;
@@ -45,17 +46,12 @@ export function StudentAssignmentCard({ assignment }: StudentAssignmentCardProps
       </div>
 
       {/* Progress bar */}
-      <div className="mt-4 space-y-1.5">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">{t('studentAssignments.progress')}</span>
-          <span className="font-semibold text-foreground">{assignment.progressPercent}%</span>
-        </div>
-        <div className="h-2 w-full rounded-full bg-muted">
-          <div
-            className="h-2 rounded-full bg-gradient-to-r from-primary to-violet-500 transition-all duration-500"
-            style={{ width: `${assignment.progressPercent}%` }}
-          />
-        </div>
+      <div className="mt-4">
+        <Progress
+          value={assignment.progressPercent}
+          label={t('studentAssignments.progress')}
+          showValue
+        />
       </div>
 
       <div className="mt-4 flex items-center justify-between border-t pt-3 text-xs text-muted-foreground">

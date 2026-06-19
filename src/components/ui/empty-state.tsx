@@ -6,6 +6,7 @@ interface EmptyStateProps {
   description: string;
   children?: React.ReactNode;
   className?: string;
+  compact?: boolean;
 }
 
 export function EmptyState({
@@ -14,17 +15,23 @@ export function EmptyState({
   description,
   children,
   className,
+  compact = false,
 }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center rounded-lg border border-dashed bg-card p-8 text-center shadow-sm',
-        'py-12',
+        'flex flex-col items-center justify-center rounded-lg border border-dashed bg-card text-center shadow-sm',
+        compact ? 'p-4 py-6' : 'p-8 py-12',
         className,
       )}
     >
-      <div className="mb-5 flex size-16 items-center justify-center rounded-full border border-dashed">
-        <Icon className="size-7 text-muted-foreground" />
+      <div
+        className={cn(
+          'mb-5 flex items-center justify-center rounded-full border border-dashed',
+          compact ? 'size-12' : 'size-16',
+        )}
+      >
+        <Icon className={cn('text-muted-foreground', compact ? 'size-5' : 'size-7')} />
       </div>
       <h3 className="text-[0.9375rem] font-semibold text-foreground">{title}</h3>
       <p className="mt-1 text-[0.8125rem] text-muted-foreground">{description}</p>

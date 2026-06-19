@@ -51,7 +51,7 @@ describe('CardHeader', () => {
 });
 
 describe('CardTitle', () => {
-  it('renders with font-heading class', () => {
+  it('renders with font-sans class', () => {
     const { container } = render(
       <Card>
         <CardHeader>
@@ -61,6 +61,8 @@ describe('CardTitle', () => {
     );
     const title = container.querySelector('[data-slot="card-title"]');
     expect(title).toBeDefined();
+    expect(title?.className).toContain('font-sans');
+    expect(title?.className).not.toContain('font-heading');
   });
 });
 

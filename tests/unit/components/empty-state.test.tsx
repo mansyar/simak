@@ -88,4 +88,43 @@ describe('EmptyState', () => {
     expect(iconContainer).toBeDefined();
     expect(iconContainer?.className).toContain('rounded-full');
   });
+
+  describe('compact prop', () => {
+    it('renders with default padding when compact is false', () => {
+      const { container } = render(<EmptyState {...defaultProps} compact={false} />);
+      const root = container.firstChild as HTMLElement;
+      expect(root.className).toContain('p-8');
+      expect(root.className).toContain('py-12');
+    });
+
+    it('renders with reduced padding when compact is true', () => {
+      const { container } = render(<EmptyState {...defaultProps} compact />);
+      const root = container.firstChild as HTMLElement;
+      expect(root.className).toContain('p-4');
+      expect(root.className).toContain('py-6');
+    });
+
+    it('renders with smaller icon container when compact is true', () => {
+      const { container } = render(<EmptyState {...defaultProps} compact />);
+      const iconContainer = container.querySelector('.size-12');
+      expect(iconContainer).toBeDefined();
+    });
+
+    it('renders with smaller icon size when compact is true', () => {
+      const { container } = render(<EmptyState {...defaultProps} compact />);
+      const iconContainer = container.querySelector('.size-12');
+      const svg = iconContainer?.querySelector('svg');
+      expect(svg).toBeDefined();
+      expect(svg?.getAttribute('class')).toContain('size-5');
+    });
+
+    it('renders with smaller margin when compact is true', () => {
+      const { container } = render(<EmptyState {...defaultProps} compact />);
+      const heading = container.querySelector('h3');
+      expect(heading).toBeDefined();
+      // Should have smaller top margin
+      const description = container.querySelector('p');
+      expect(description).toBeDefined();
+    });
+  });
 });
