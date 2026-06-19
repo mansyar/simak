@@ -114,4 +114,4 @@ The active item in the student sidebar uses a rounded pill with a 3px left borde
 - Instructor or admin functionality beyond shared components and sidebar styling.
 - Changes to the design token values themselves (only how components use existing tokens).
 - Landing page or auth pages.
-</protect>
+  </protect>

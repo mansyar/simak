@@ -19,9 +19,17 @@ export function ReviewQueueFilters({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
       <div className="w-full sm:w-[240px]">
-        <Select value={value} onValueChange={(val) => onAssignmentChange(val === 'all' ? null : Number(val))}>
+        <Select
+          value={value}
+          onValueChange={(val) => onAssignmentChange(val === 'all' ? null : Number(val))}
+        >
           <SelectTrigger data-testid="assignment-filter">
-            <span>{value === 'all' ? t('instructorReviews.allAssignments') : assignments.find((a) => a.id === Number(value))?.title ?? t('instructorReviews.allAssignments')}</span>
+            <span>
+              {value === 'all'
+                ? t('instructorReviews.allAssignments')
+                : (assignments.find((a) => a.id === Number(value))?.title ??
+                  t('instructorReviews.allAssignments'))}
+            </span>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('instructorReviews.allAssignments')}</SelectItem>

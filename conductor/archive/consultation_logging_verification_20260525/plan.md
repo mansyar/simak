@@ -111,4 +111,5 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 8: Admin Template UI — minConsultations Field' (Protocol in workflow.md)
 
 ## Phase: Review Fixes
+
 - [x] Task: Apply review suggestions (e8e4c6e)

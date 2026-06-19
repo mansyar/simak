@@ -103,46 +103,46 @@ Goal: replace every inlined page-header, back-link, template-type pill, textarea
 - [ ] Task: Read spec.md and workflow.md
     - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
     - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
-- [ ] Task: Migrate 7 instructor pages to `<PageHeader>`
-    - [ ] Write/extend a smoke test in `tests/unit/routes/instructor-page-headers.test.tsx` asserting that each of the 7 pages renders an `<h1>` with the canonical class string `font-display text-3xl text-foreground`.
-    - [ ] Update each of the 7 files listed in `spec.md` §3.1 to use `<PageHeader>`; remove the inlined `<h1>` markup; remove redundant `text-foreground` ad-hoc adds.
-    - [ ] Verify all tests pass; commit `refactor(instructor): Adopt PageHeader primitive across 7 pages`.
+- [x] Task: Migrate 7 instructor pages to `<PageHeader>`
+    - [x] Write/extend a smoke test in `tests/unit/routes/instructor-page-headers.test.tsx` asserting that each of the 7 pages renders an `<h1>` with the canonical class string `font-display text-3xl text-foreground`.
+    - [x] Update each of the 7 files listed in `spec.md` §3.1 to use `<PageHeader>`; remove the inlined `<h1>` markup; remove redundant `text-foreground` ad-hoc adds.
+    - [x] Verify all tests pass; commit `refactor(instructor): Adopt PageHeader primitive across 7 pages`.
 
-- [ ] Task: Migrate back-links to `<BackLink>`
-    - [ ] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:173-181` and `src/routes/_authenticated/instructor/assignments/new.tsx:17-26` to use `<BackLink>`.
-    - [ ] Update `src/components/reviews/ReviewDetailHeader.tsx:22-27` to use `<BackLink>` (or pass the `back` prop to the new `<PageHeader>` if 3.4 changes the structure).
-    - [ ] Verify all tests pass; commit `refactor(instructor): Adopt BackLink primitive in 3 sites`.
+- [x] Task: Migrate back-links to `<BackLink>`
+    - [x] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:173-181` and `src/routes/_authenticated/instructor/assignments/new.tsx:17-26` to use `<BackLink>`.
+    - [x] Update `src/components/reviews/ReviewDetailHeader.tsx:22-27` to use `<BackLink>` (or pass the `back` prop to the new `<PageHeader>` if 3.4 changes the structure).
+    - [x] Verify all tests pass; commit `refactor(instructor): Adopt BackLink primitive in 3 sites`.
 
-- [ ] Task: Migrate template-type pills to `<TemplateTypeBadge>`
-    - [ ] Update `src/components/instructor/assignments/AssignmentCard.tsx:34`, `src/routes/_authenticated/instructor/assignments/$id.tsx:187`, and `src/components/instructor/assignments/ReviewStep.tsx:140` to use `<TemplateTypeBadge>`.
-    - [ ] Verify all tests pass; commit `refactor(instructor): Adopt TemplateTypeBadge primitive in 3 sites`.
+- [x] Task: Migrate template-type pills to `<TemplateTypeBadge>`
+    - [x] Update `src/components/instructor/assignments/AssignmentCard.tsx:34`, `src/routes/_authenticated/instructor/assignments/$id.tsx:187`, and `src/components/instructor/assignments/ReviewStep.tsx:140` to use `<TemplateTypeBadge>`.
+    - [x] Verify all tests pass; commit `refactor(instructor): Adopt TemplateTypeBadge primitive in 3 sites`.
 
-- [ ] Task: Migrate textareas to `<Textarea>`
-    - [ ] Update `src/components/reviews/ReviewForm.tsx:154-161`, `src/components/instructor/assignments/AssignmentDetailsForm.tsx:74-85`, `src/components/instructor/extensions/ApproveExtensionDialog.tsx:85-93`, and `src/components/instructor/extensions/RejectExtensionDialog.tsx:90-97` to use `<Textarea>` (with appropriate `size` and `minHeight` overrides).
-    - [ ] Verify all tests pass; commit `refactor(instructor): Adopt Textarea primitive in 4 sites`.
+- [x] Task: Migrate textareas to `<Textarea>`
+    - [x] Update `src/components/reviews/ReviewForm.tsx:154-161`, `src/components/instructor/assignments/AssignmentDetailsForm.tsx:74-85`, `src/components/instructor/extensions/ApproveExtensionDialog.tsx:85-93`, and `src/components/instructor/extensions/RejectExtensionDialog.tsx:90-97` to use `<Textarea>` (with appropriate `size` and `minHeight` overrides).
+    - [x] Verify all tests pass; commit `refactor(instructor): Adopt Textarea primitive in 4 sites`.
 
-- [ ] Task: Migrate skeletons to `<Skeleton>`
-    - [ ] Update `src/components/instructor/assignments/AssignmentLoadingSkeleton.tsx`, `src/components/reviews/ReviewQueueSkeleton.tsx`, and `src/components/instructor/extensions/PendingExtensionsSection.tsx:72` to use `<Skeleton>`.
-    - [ ] Verify all tests pass; commit `refactor(instructor): Adopt Skeleton primitive in 3 files`.
+- [x] Task: Migrate skeletons to `<Skeleton>`
+    - [x] Update `src/components/instructor/assignments/AssignmentLoadingSkeleton.tsx`, `src/components/reviews/ReviewQueueSkeleton.tsx`, and `src/components/instructor/extensions/PendingExtensionsSection.tsx:72` to use `<Skeleton>`.
+    - [x] Verify all tests pass; commit `refactor(instructor): Adopt Skeleton primitive in 3 files`.
 
-- [ ] Task: Migrate `ReviewQueueFilters` to `<Select>`
-    - [ ] Update `src/components/reviews/ReviewQueueFilters.tsx` to render `<Select>` (from `src/components/ui/select.tsx`) with the loaded assignments. Add a unit test that the trigger renders the correct count and that selecting an option fires `onAssignmentChange`.
-    - [ ] Verify all tests pass; commit `refactor(reviews): Adopt Select primitive in ReviewQueueFilters`.
+- [x] Task: Migrate `ReviewQueueFilters` to `<Select>`
+    - [x] Update `src/components/reviews/ReviewQueueFilters.tsx` to render `<Select>` (from `src/components/ui/select.tsx`) with the loaded assignments. Add a unit test that the trigger renders the correct count and that selecting an option fires `onAssignmentChange`.
+    - [x] Verify all tests pass; commit `refactor(reviews): Adopt Select primitive in ReviewQueueFilters`.
 
-- [ ] Task: Migrate hand-rolled card wrappers to `<Card>`
-    - [ ] Update `src/components/instructor/assignments/ProgressTable.tsx:117`, `src/components/reviews/ReviewFilePreview.tsx:23`, `src/components/reviews/ReviewHistory.tsx:23`, `src/components/reviews/ReviewForm.tsx:118`, and `src/components/instructor/extensions/PendingExtensionsSection.tsx:49, 59` to use `<Card>` + `<CardHeader>` + `<CardContent>` as appropriate.
-    - [ ] Verify all tests pass; commit `refactor(instructor): Adopt Card primitive across 6 files`.
+- [x] Task: Migrate hand-rolled card wrappers to `<Card>`
+    - [x] Update `src/components/instructor/assignments/ProgressTable.tsx:117`, `src/components/reviews/ReviewFilePreview.tsx:23`, `src/components/reviews/ReviewHistory.tsx:23`, `src/components/reviews/ReviewForm.tsx:118`, and `src/components/instructor/extensions/PendingExtensionsSection.tsx:49, 59` to use `<Card>` + `<CardHeader>` + `<CardContent>` as appropriate.
+    - [x] Verify all tests pass; commit `refactor(instructor): Adopt Card primitive across 6 files`.
 
-- [ ] Task: Replace 4 overview cards with `<MetricCard>`
-    - [ ] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:202-262` to render `<MetricCard>` for total students, average progress, completed cohort, and deadline.
-    - [ ] Update the "Details Meta Block" (lines 265-298) to use `<Card>` + `<CardHeader>` + `<CardContent>`.
-    - [ ] Verify all tests pass; commit `refactor(assignments): Replace 4 overview tiles with MetricCard`.
+- [x] Task: Replace 4 overview cards with `<MetricCard>`
+    - [x] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:202-262` to render `<MetricCard>` for total students, average progress, completed cohort, and deadline.
+    - [x] Update the "Details Meta Block" (lines 265-298) to use `<Card>` + `<CardHeader>` + `<CardContent>`.
+    - [x] Verify all tests pass; commit `refactor(assignments): Replace 4 overview tiles with MetricCard`.
 
-- [ ] Task: Migrate hand-rolled empty-states to `<EmptyState>`
-    - [ ] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:138-152` (not-found) and `src/components/instructor/extensions/PendingExtensionsSection.tsx:48-55` (empty queue) to use `<EmptyState>`.
-    - [ ] Fix the duplicate i18n-key bug on `src/routes/_authenticated/instructor/assignments/$id.tsx:396-400` (currently uses `t('consultations.noPendingConsultations')` for both `title` and `description`).
-    - [ ] Add `consultations.noPendingConsultationsDescription` to `locales/en.json` and `locales/id.json`; run `pnpm generate:i18n`.
-    - [ ] Verify all tests pass; commit `refactor(instructor): Migrate hand-rolled empty states to EmptyState`.
+- [x] Task: Migrate hand-rolled empty-states to `<EmptyState>`
+    - [x] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:138-152` (not-found) and `src/components/instructor/extensions/PendingExtensionsSection.tsx:48-55` (empty queue) to use `<EmptyState>`.
+    - [x] Fix the duplicate i18n-key bug on `src/routes/_authenticated/instructor/assignments/$id.tsx:396-400` (currently uses `t('consultations.noPendingConsultations')` for both `title` and `description`).
+    - [x] Add `consultations.noPendingConsultationsDescription` to `locales/en.json` and `locales/id.json`; run `pnpm generate:i18n`.
+    - [x] Verify all tests pass; commit `refactor(instructor): Migrate hand-rolled empty states to EmptyState`.
 
 - [ ] Task: Migrate date formatting to `formatDate*`
     - [ ] Update `src/components/instructor/assignments/AssignmentCard.tsx:69`, `src/components/instructor/assignments/ReviewStep.tsx:94`, `src/routes/_authenticated/instructor/assignments/$id.tsx:257, 293`, `src/components/reviews/ReviewFilePreview.tsx:38`, `src/components/reviews/ReviewHistory.tsx:46`, and `src/components/consultations/VerificationQueueItem.tsx:35` to use the new helpers.

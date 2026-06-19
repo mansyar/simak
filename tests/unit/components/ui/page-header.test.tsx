@@ -34,10 +34,7 @@ describe('PageHeader', () => {
 
   it('renders action slot on the right', () => {
     render(
-      <PageHeader
-        title="Assignments"
-        action={<button data-testid="action-btn">Create</button>}
-      />,
+      <PageHeader title="Assignments" action={<button data-testid="action-btn">Create</button>} />,
     );
     expect(screen.getByTestId('action-btn')).toBeInTheDocument();
     expect(screen.getByText('Create')).toBeInTheDocument();

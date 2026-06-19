@@ -10,7 +10,7 @@ import { VerificationQueueItem } from '@/components/consultations/VerificationQu
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
 import { PendingExtensionsSection } from '@/components/instructor/extensions/PendingExtensionsSection';
 import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
-import { Calendar, Users, Clipboard, Percent, CheckCircle2, MessageSquare } from 'lucide-react';
+import { Calendar, Users, Clipboard, Percent, CheckCircle2, MessageSquare, FileX } from 'lucide-react';
 import { format } from 'date-fns/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MetricCard } from '@/components/ui/metric-card';
@@ -132,17 +132,19 @@ function AssignmentDetailPage() {
 
   if (!assignment) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <h2 className="text-xl font-semibold mb-2">{t('error.notFound')}</h2>
-        <p className="text-muted-foreground mb-4">{t('error.assignmentNotFound')}</p>
+      <EmptyState
+        icon={FileX}
+        title={t('error.notFound')}
+        description={t('error.assignmentNotFound')}
+      >
         <Link
           to="/instructor/assignments"
           search={{ page: 1, limit: 20, search: '' }}
-          className="text-primary hover:underline"
+          className="text-primary hover:underline text-sm"
         >
           {t('common.back')}
         </Link>
-      </div>
+      </EmptyState>
     );
   }
 
@@ -352,7 +354,7 @@ function AssignmentDetailPage() {
             <EmptyState
               icon={MessageSquare}
               title={t('consultations.noPendingConsultations')}
-              description={t('consultations.noPendingConsultations')}
+              description={t('consultations.noPendingConsultationsDescription')}
             />
           ) : (
             <div className="space-y-3">

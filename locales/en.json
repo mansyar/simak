@@ -524,6 +524,7 @@
     "verified": "verified",
     "pendingVerification": "Pending Verification",
     "noPendingConsultations": "No consultations pending verification",
+    "noPendingConsultationsDescription": "All consultations have been verified.",
     "consultationDetail": "Consultation Detail",
     "student": "Student",
     "date": "Date",

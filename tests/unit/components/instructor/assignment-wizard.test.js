@@ -1,0 +1,444 @@
+import { jsx as _jsx, jsxs as _jsxs } from 'react/jsx-runtime';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { AssignmentWizard } from '@/components/instructor/assignments/AssignmentWizard';
+// Mock navigation
+const mockNavigate = vi.fn();
+vi.mock('@tanstack/react-router', () => ({
+  useNavigate: () => mockNavigate,
+  Link: ({ children, to }) => _jsx('a', { href: to, children: children }),
+}));
+// Mock i18n
+vi.mock('@/routes/__root', () => ({
+  useI18n: () => ({
+    t: (key, params) => {
+      const translations = {
+        'instructorAssignments.wizard.stepTemplate': 'Select Template',
+        'instructorAssignments.wizard.stepDetails': 'Step 2: Assignment Details',
+        'instructorAssignments.wizard.stepStudents': 'Assign Students',
+        'instructorAssignments.wizard.stepDueDates': 'Due Dates',
+        'instructorAssignments.wizard.stepConfirm': 'Review & Confirm',
+        'instructorAssignments.wizard.reviewPrompt': 'Please review before submitting',
+        'instructorAssignments.wizard.dueDatesPrompt': 'Review and adjust due dates',
+        'instructorAssignments.wizard.next': 'Next',
+        'instructorAssignments.wizard.prev': 'Back',
+        'instructorAssignments.wizard.submit': 'Create Assignment',
+        'instructorAssignments.wizard.submitting': 'Creating...',
+        'instructorAssignments.details.description': 'Description',
+        'instructorAssignments.details.deadline': 'Deadline',
+        'common.cancel': 'Cancel',
+      };
+      let text = translations[key] || key;
+      if (params) {
+        Object.entries(params).forEach(([k, v]) => {
+          text = text.replace(`{${k}}`, v);
+        });
+      }
+      return text;
+    },
+  }),
+}));
+// Mock server functions
+vi.mock('@/server/assignments', () => ({
+  createAssignment: vi.fn(),
+}));
+vi.mock('@/server/templates', () => ({
+  getTemplate: vi.fn(),
+}));
+vi.mock('@/server/users', () => ({
+  listUsers: vi.fn(),
+}));
+vi.mock('@/components/instructor/assignments/DueDatePreview', () => ({
+  DueDatePreview: ({ checkpoints, onOverride }) =>
+    _jsxs('div', {
+      'data-testid': 'due-date-preview',
+      children: [
+        checkpoints.map((cp) =>
+          _jsx('span', { 'data-testid': `checkpoint-${cp.order}`, children: cp.name }, cp.order),
+        ),
+        _jsx('button', {
+          'data-testid': 'set-override',
+          onClick: () => onOverride([{ checkpointOrder: 1, dueDate: '2027-06-15T12:00:00.000Z' }]),
+          children: 'Set Override',
+        }),
+      ],
+    }),
+}));
+// Helper: navigate through all 4 steps to reach Step 5 (Review) or trigger validation on Step 3
+function navigateToStep5({ selectStudents = true } = {}) {
+  fireEvent.click(screen.getByTestId('select-thesis-template'));
+  fireEvent.click(screen.getByText('Next'));
+  fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
+  const fd = new Date();
+  fd.setFullYear(fd.getFullYear() + 1);
+  fireEvent.change(screen.getByTestId('input-deadline'), {
+    target: { value: fd.toISOString().slice(0, 16) },
+  });
+  fireEvent.click(screen.getByText('Next'));
+  if (selectStudents) {
+    fireEvent.click(screen.getByTestId('toggle-student-1'));
+    fireEvent.click(screen.getByTestId('toggle-student-2'));
+  }
+  fireEvent.click(screen.getByText('Next'));
+  // Step 4 (DueDatePreview) - no validation needed, advance to Step 5
+  if (selectStudents) {
+    fireEvent.click(screen.getByText('Next'));
+  }
+}
+// Mock child components to simplify tests
+const mockTemplate = {
+  id: 1,
+  name: 'Thesis Template',
+  type: 'Thesis',
+  checkpoints: ['Proposal', 'Drafting', 'Defense'],
+};
+vi.mock('@/components/instructor/assignments/TemplatePicker', () => ({
+  TemplatePicker: ({ selectedTemplateId, onSelectTemplate }) =>
+    _jsxs('div', {
+      'data-testid': 'template-picker',
+      children: [
+        _jsx('span', {
+          'data-testid': 'selected-template-id',
+          children: selectedTemplateId === null ? 'none' : String(selectedTemplateId),
+        }),
+        _jsx('button', {
+          'data-testid': 'select-thesis-template',
+          onClick: () => onSelectTemplate(mockTemplate),
+          children: 'Select Thesis Template',
+        }),
+      ],
+    }),
+}));
+vi.mock('@/components/instructor/assignments/AssignmentDetailsForm', () => ({
+  AssignmentDetailsForm: ({
+    title,
+    onChangeTitle,
+    description,
+    onChangeDescription,
+    finalDeadline,
+    onChangeDeadline,
+    errors,
+  }) =>
+    _jsxs('div', {
+      'data-testid': 'details-form',
+      children: [
+        _jsx('input', {
+          'data-testid': 'input-title',
+          value: title,
+          onChange: (e) => onChangeTitle(e.target.value),
+          placeholder: 'Assignment title',
+        }),
+        _jsx('input', {
+          'data-testid': 'input-description',
+          value: description,
+          onChange: (e) => onChangeDescription(e.target.value),
+          placeholder: 'Assignment description',
+        }),
+        _jsx('input', {
+          'data-testid': 'input-deadline',
+          value: finalDeadline,
+          onChange: (e) => onChangeDeadline(e.target.value),
+          placeholder: 'Deadline',
+        }),
+        errors.title && _jsx('span', { 'data-testid': 'error-title', children: errors.title }),
+        errors.finalDeadline &&
+          _jsx('span', { 'data-testid': 'error-deadline', children: errors.finalDeadline }),
+      ],
+    }),
+}));
+vi.mock('@/components/instructor/assignments/StudentPicker', () => ({
+  StudentPicker: ({ selectedStudentIds, onToggleStudent, onSelectAll, onDeselectAll, errors }) =>
+    _jsxs('div', {
+      'data-testid': 'student-picker',
+      children: [
+        _jsx('span', { 'data-testid': 'selected-count', children: selectedStudentIds.length }),
+        _jsx('button', {
+          'data-testid': 'toggle-student-1',
+          onClick: () => onToggleStudent('student-1'),
+          children: 'Toggle Alice',
+        }),
+        _jsx('button', {
+          'data-testid': 'toggle-student-2',
+          onClick: () => onToggleStudent('student-2'),
+          children: 'Toggle Bob',
+        }),
+        _jsx('button', {
+          'data-testid': 'select-all',
+          onClick: () => onSelectAll(['student-1', 'student-2']),
+          children: 'Select All',
+        }),
+        _jsx('button', {
+          'data-testid': 'deselect-all',
+          onClick: () => onDeselectAll(),
+          children: 'Deselect All',
+        }),
+        errors.studentIds &&
+          _jsx('span', { 'data-testid': 'error-students', children: errors.studentIds }),
+      ],
+    }),
+}));
+vi.mock('@/components/ui/card', () => ({
+  Card: ({ children, className }) => _jsx('div', { className: className, children: children }),
+}));
+vi.mock('@/components/ui/button', () => ({
+  Button: ({ children, onClick, disabled, className }) =>
+    _jsx('button', {
+      onClick: onClick,
+      disabled: disabled,
+      className: className,
+      children: children,
+    }),
+}));
+vi.mock('@/components/ui/badge', () => ({
+  Badge: ({ children, variant }) => _jsx('span', { 'data-variant': variant, children: children }),
+}));
+import * as assignmentsApi from '@/server/assignments';
+import * as templatesApi from '@/server/templates';
+import * as usersApi from '@/server/users';
+describe('AssignmentWizard', () => {
+  const mockStudents = [
+    { id: 'student-1', name: 'Alice Cooper', email: 'alice@test.com' },
+    { id: 'student-2', name: 'Bob Marley', email: 'bob@test.com' },
+  ];
+  const mockTemplateDetails = {
+    id: 1,
+    checkpoints: [
+      { name: 'Proposal', order: 1, estimatedDuration: 14 },
+      { name: 'Drafting', order: 2, estimatedDuration: 30 },
+      { name: 'Defense', order: 3, estimatedDuration: 7 },
+    ],
+  };
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockStudents, total: 2 });
+    vi.mocked(templatesApi.getTemplate).mockResolvedValue(mockTemplateDetails);
+  });
+  describe('Initial Render and Step Navigation', () => {
+    it('should render all 5 wizard steps in the progress bar', () => {
+      render(_jsx(AssignmentWizard, {}));
+      expect(screen.getByText('Select Template')).toBeDefined();
+      expect(screen.getByText('Step 2: Assignment Details')).toBeDefined();
+      expect(screen.getByText('Assign Students')).toBeDefined();
+      expect(screen.getByText('Due Dates')).toBeDefined();
+      expect(screen.getByText('Review & Confirm')).toBeDefined();
+    });
+    it('should start on step 1 (TemplatePicker)', () => {
+      render(_jsx(AssignmentWizard, {}));
+      expect(screen.getByTestId('template-picker')).toBeDefined();
+      expect(screen.queryByTestId('details-form')).toBeNull();
+      expect(screen.queryByTestId('student-picker')).toBeNull();
+    });
+    it('should show Cancel button on step 1 and navigate back on click', () => {
+      render(_jsx(AssignmentWizard, {}));
+      fireEvent.click(screen.getByText('Cancel'));
+      expect(mockNavigate).toHaveBeenCalledWith({ to: '/instructor/assignments' });
+    });
+    it('should advance to step 2 when Next is clicked with template selected', () => {
+      render(_jsx(AssignmentWizard, {}));
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      expect(screen.getByTestId('details-form')).toBeDefined();
+      expect(screen.queryByTestId('template-picker')).toBeNull();
+    });
+    it('should prevent advancing past step 1 without selecting a template', () => {
+      render(_jsx(AssignmentWizard, {}));
+      fireEvent.click(screen.getByText('Next'));
+      expect(screen.getByTestId('template-picker')).toBeDefined();
+      expect(screen.queryByTestId('details-form')).toBeNull();
+    });
+    it('should navigate back from step 2 to step 1', () => {
+      render(_jsx(AssignmentWizard, {}));
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      expect(screen.getByTestId('details-form')).toBeDefined();
+      fireEvent.click(screen.getByText('Back'));
+      expect(screen.getByTestId('template-picker')).toBeDefined();
+      expect(screen.queryByTestId('details-form')).toBeNull();
+    });
+    it('should auto-fill title with template name when selecting a template', () => {
+      render(_jsx(AssignmentWizard, {}));
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      const titleInput = screen.getByTestId('input-title');
+      expect(titleInput.value).toContain('Thesis Template');
+    });
+    it('should load students on mount', async () => {
+      render(_jsx(AssignmentWizard, {}));
+      await waitFor(() => {
+        expect(usersApi.listUsers).toHaveBeenCalledWith({
+          data: { page: 1, limit: 200, search: '', role: 'student' },
+        });
+      });
+    });
+  });
+  describe('Step 2 - Assignment Details Validation', () => {
+    it('should show title error when Next is clicked without entering a title', () => {
+      render(_jsx(AssignmentWizard, {}));
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.change(screen.getByTestId('input-title'), { target: { value: '' } });
+      fireEvent.click(screen.getByText('Next'));
+      expect(screen.getByTestId('details-form')).toBeDefined();
+      expect(screen.getByTestId('error-title').textContent).toBe('Title is required');
+    });
+    it('should show deadline error when Next is clicked without a deadline', () => {
+      render(_jsx(AssignmentWizard, {}));
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'My Assignment' } });
+      fireEvent.click(screen.getByText('Next'));
+      expect(screen.getByTestId('error-deadline').textContent).toBe('Deadline is required');
+    });
+    it('should fill details and advance to step 3', () => {
+      render(_jsx(AssignmentWizard, {}));
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
+      fireEvent.change(screen.getByTestId('input-description'), {
+        target: { value: 'Complete your final thesis' },
+      });
+      const fd = new Date();
+      fd.setFullYear(fd.getFullYear() + 1);
+      fireEvent.change(screen.getByTestId('input-deadline'), {
+        target: { value: fd.toISOString().slice(0, 16) },
+      });
+      fireEvent.click(screen.getByText('Next'));
+      expect(screen.getByTestId('student-picker')).toBeDefined();
+    });
+  });
+  describe('Step 3 - Student Selection Validation', () => {
+    it('should show error when Next is clicked without selecting students', () => {
+      render(_jsx(AssignmentWizard, {}));
+      navigateToStep5({ selectStudents: false });
+      expect(screen.getByTestId('error-students').textContent).toBe(
+        'Please select at least one student',
+      );
+    });
+  });
+  describe('Step 4 - Due Date Preview', () => {
+    it('should show due date preview step with checkpoint names', () => {
+      render(_jsx(AssignmentWizard, {}));
+      // Navigate to step 4 (skip step 3 validation by selecting students)
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
+      const fd = new Date();
+      fd.setFullYear(fd.getFullYear() + 1);
+      fireEvent.change(screen.getByTestId('input-deadline'), {
+        target: { value: fd.toISOString().slice(0, 16) },
+      });
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.click(screen.getByTestId('toggle-student-1'));
+      fireEvent.click(screen.getByText('Next'));
+      expect(screen.getByTestId('due-date-preview')).toBeDefined();
+    });
+  });
+  describe('DueDatePreview step renders', () => {
+    it('should render DueDatePreview on step 4 with checkpoint names', async () => {
+      render(_jsx(AssignmentWizard, {}));
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      // Wait for async getTemplate to resolve and set checkpointDetails
+      await waitFor(() => {
+        expect(screen.getByTestId('selected-template-id').textContent).toBe('1');
+      });
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
+      const fd = new Date();
+      fd.setFullYear(fd.getFullYear() + 1);
+      fireEvent.change(screen.getByTestId('input-deadline'), {
+        target: { value: fd.toISOString().slice(0, 16) },
+      });
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.click(screen.getByTestId('toggle-student-1'));
+      fireEvent.click(screen.getByText('Next'));
+      await waitFor(() => {
+        expect(screen.getByTestId('due-date-preview')).toBeDefined();
+        expect(screen.getByTestId('checkpoint-1')).toBeDefined();
+      });
+      expect(screen.getByTestId('checkpoint-1').textContent).toBe('Proposal');
+      expect(screen.getByTestId('checkpoint-2').textContent).toBe('Drafting');
+      expect(screen.getByTestId('checkpoint-3').textContent).toBe('Defense');
+    });
+  });
+  describe('Step 5 - Review and Submit', () => {
+    beforeEach(() => {
+      vi.mocked(assignmentsApi.createAssignment).mockResolvedValue({
+        success: true,
+        assignmentId: 42,
+      });
+    });
+    it('should show review screen with all details after completing steps', async () => {
+      render(_jsx(AssignmentWizard, {}));
+      navigateToStep5();
+      await waitFor(() => {
+        expect(screen.getAllByText('Review & Confirm').length).toBeGreaterThanOrEqual(2);
+        expect(screen.getByText('Please review before submitting')).toBeDefined();
+        expect(screen.getByText('Final Thesis')).toBeDefined();
+        expect(screen.getByText('Thesis Template')).toBeDefined();
+        expect(screen.getByText('Create Assignment')).toBeDefined();
+      });
+    });
+    it('should call createAssignment and navigate on successful submit', async () => {
+      render(_jsx(AssignmentWizard, {}));
+      navigateToStep5();
+      await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
+      fireEvent.click(screen.getByText('Create Assignment'));
+      await waitFor(() => expect(assignmentsApi.createAssignment).toHaveBeenCalledOnce());
+      const callArg = vi.mocked(assignmentsApi.createAssignment).mock.calls[0][0];
+      expect(callArg.data.title).toBe('Final Thesis');
+      expect(callArg.data.templateId).toBe(1);
+      expect(callArg.data.studentIds).toEqual(['student-1', 'student-2']);
+      expect(mockNavigate).toHaveBeenCalledWith({ to: '/instructor/assignments/42' });
+    });
+    it('should show override button on due date step and submit without overrideDueDates when none set', async () => {
+      render(_jsx(AssignmentWizard, {}));
+      // Navigate to step 4
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
+      const future = new Date();
+      future.setFullYear(future.getFullYear() + 1);
+      fireEvent.change(screen.getByTestId('input-deadline'), {
+        target: { value: future.toISOString().slice(0, 16) },
+      });
+      fireEvent.click(screen.getByText('Next'));
+      fireEvent.click(screen.getByTestId('toggle-student-1'));
+      fireEvent.click(screen.getByText('Next'));
+      // Verify override button exists on Step 4
+      expect(screen.getByTestId('set-override')).toBeDefined();
+      // Advance to Step 5 and submit without setting any override
+      fireEvent.click(screen.getByText('Next'));
+      await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
+      fireEvent.click(screen.getByText('Create Assignment'));
+      await waitFor(() => expect(assignmentsApi.createAssignment).toHaveBeenCalledOnce());
+      const callArg = vi.mocked(assignmentsApi.createAssignment).mock.calls[0][0];
+      expect(callArg.data.title).toBe('Final Thesis');
+      // When no override is set, overrideDueDates should not be sent
+      expect(callArg.data.overrideDueDates).toBeUndefined();
+    });
+    it('should show submit error when creation fails', async () => {
+      vi.mocked(assignmentsApi.createAssignment).mockResolvedValue({
+        success: false,
+        error: 'Template is no longer available',
+      });
+      render(_jsx(AssignmentWizard, {}));
+      navigateToStep5();
+      await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
+      fireEvent.click(screen.getByText('Create Assignment'));
+      await waitFor(() =>
+        expect(screen.getByText('Template is no longer available')).toBeDefined(),
+      );
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+    it('should show network error message on exception', async () => {
+      vi.mocked(assignmentsApi.createAssignment).mockRejectedValue(new Error('Network failure'));
+      render(_jsx(AssignmentWizard, {}));
+      navigateToStep5();
+      await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
+      fireEvent.click(screen.getByText('Create Assignment'));
+      await waitFor(() =>
+        expect(screen.getByText('A network error occurred. Please try again.')).toBeDefined(),
+      );
+    });
+  });
+});

@@ -23,9 +23,7 @@ export function ReviewFilePreview({
   return (
     <Card className="shadow-sm">
       <CardHeader>
-        <CardTitle className="text-sm">
-          {t('instructorReviews.submittedFile')}
-        </CardTitle>
+        <CardTitle className="text-sm">{t('instructorReviews.submittedFile')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="space-y-2 text-sm text-muted-foreground">

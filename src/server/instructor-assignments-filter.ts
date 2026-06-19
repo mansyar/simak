@@ -5,8 +5,7 @@ import { createServerFn } from '@tanstack/react-start';
 export const listInstructorAssignmentsForFilter = createServerFn({
   method: 'GET',
 }).handler(async () => {
-  const { listInstructorAssignmentsForFilterHandler } = await import(
-    './instructor-assignments-filter.server'
-  );
+  const { listInstructorAssignmentsForFilterHandler } =
+    await import('./instructor-assignments-filter.server');
   return listInstructorAssignmentsForFilterHandler();
 });

@@ -37,7 +37,8 @@ vi.mock('@/server/reviews', () => ({
 
 const mockListInstructorAssignmentsForFilter = vi.fn();
 vi.mock('@/server/instructor-assignments-filter', () => ({
-  listInstructorAssignmentsForFilter: (...args: any[]) => mockListInstructorAssignmentsForFilter(...args),
+  listInstructorAssignmentsForFilter: (...args: any[]) =>
+    mockListInstructorAssignmentsForFilter(...args),
 }));
 
 // Mock __root

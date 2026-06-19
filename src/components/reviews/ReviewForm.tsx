@@ -123,94 +123,96 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Pass/Revise radio */}
-      <div className="flex gap-4">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="radio"
-            name="decision"
-            value="pass"
-            checked={decision === 'pass'}
-            onChange={() => setDecision('pass')}
-            className="accent-green-500"
-          />
-          <span className="text-sm font-medium text-green-600 dark:text-green-400">
-            {t('instructorReviews.pass')}
-          </span>
-        </label>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="radio"
-            name="decision"
-            value="revise"
-            checked={decision === 'revise'}
-            onChange={() => setDecision('revise')}
-            className="accent-orange-500"
-          />
-          <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
-            {t('instructorReviews.revise')}
-          </span>
-        </label>
-      </div>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="decision"
+              value="pass"
+              checked={decision === 'pass'}
+              onChange={() => setDecision('pass')}
+              className="accent-green-500"
+            />
+            <span className="text-sm font-medium text-green-600 dark:text-green-400">
+              {t('instructorReviews.pass')}
+            </span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="decision"
+              value="revise"
+              checked={decision === 'revise'}
+              onChange={() => setDecision('revise')}
+              className="accent-orange-500"
+            />
+            <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
+              {t('instructorReviews.revise')}
+            </span>
+          </label>
+        </div>
 
-      {/* Comment textarea */}
-      <div className="space-y-1.5">
-        <Label htmlFor="comment">{t('instructorReviews.comment')}</Label>
-        <Textarea
-          id="comment"
-          placeholder={t('instructorReviews.commentPlaceholder')}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          rows={3}
-        />
-      </div>
-
-      {/* Feedback file upload */}
-      <div className="space-y-1.5">
-        <Label>{t('instructorReviews.feedbackFile')}</Label>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="file"
-            accept=".pdf,.docx"
-            onChange={handleFeedbackFileChange}
-            className="hidden"
-            disabled={isUploadingFeedback}
-          />
-          <div className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent transition-colors">
-            {isUploadingFeedback ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Upload className="h-4 w-4" />
-            )}
-            <span>{feedbackFile ? feedbackFile.name : t('instructorReviews.uploadFeedback')}</span>
-          </div>
-        </label>
-      </div>
-
-      {/* Revision deadline (only when revise selected) */}
-      {decision === 'revise' && (
+        {/* Comment textarea */}
         <div className="space-y-1.5">
-          <Label htmlFor="revisionDeadline">{t('instructorReviews.revisionDeadline')}</Label>
-          <input
-            id="revisionDeadline"
-            type="date"
-            value={revisionDeadline}
-            onChange={(e) => setRevisionDeadline(e.target.value)}
-            className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          <Label htmlFor="comment">{t('instructorReviews.comment')}</Label>
+          <Textarea
+            id="comment"
+            placeholder={t('instructorReviews.commentPlaceholder')}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={3}
           />
         </div>
-      )}
 
-      {/* Submit */}
-      <Button onClick={handleSubmit} disabled={!decision || isSubmitting} className="w-full">
-        {isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            {t('instructorReviews.submitting')}
-          </>
-        ) : (
-          t('instructorReviews.submitReview')
+        {/* Feedback file upload */}
+        <div className="space-y-1.5">
+          <Label>{t('instructorReviews.feedbackFile')}</Label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="file"
+              accept=".pdf,.docx"
+              onChange={handleFeedbackFileChange}
+              className="hidden"
+              disabled={isUploadingFeedback}
+            />
+            <div className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent transition-colors">
+              {isUploadingFeedback ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              <span>
+                {feedbackFile ? feedbackFile.name : t('instructorReviews.uploadFeedback')}
+              </span>
+            </div>
+          </label>
+        </div>
+
+        {/* Revision deadline (only when revise selected) */}
+        {decision === 'revise' && (
+          <div className="space-y-1.5">
+            <Label htmlFor="revisionDeadline">{t('instructorReviews.revisionDeadline')}</Label>
+            <input
+              id="revisionDeadline"
+              type="date"
+              value={revisionDeadline}
+              onChange={(e) => setRevisionDeadline(e.target.value)}
+              className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            />
+          </div>
         )}
-      </Button>
+
+        {/* Submit */}
+        <Button onClick={handleSubmit} disabled={!decision || isSubmitting} className="w-full">
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {t('instructorReviews.submitting')}
+            </>
+          ) : (
+            t('instructorReviews.submitReview')
+          )}
+        </Button>
       </CardContent>
     </Card>
   );

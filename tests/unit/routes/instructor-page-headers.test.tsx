@@ -44,9 +44,7 @@ vi.mock('@tanstack/react-router', () => ({
     };
     return {
       ...config,
-      useLoaderData: vi.fn().mockReturnValue(
-        config.__mockData ?? defaultMockData[_path] ?? {},
-      ),
+      useLoaderData: vi.fn().mockReturnValue(config.__mockData ?? defaultMockData[_path] ?? {}),
       useSearch: vi.fn().mockReturnValue({ page: 1, limit: 20, search: '' }),
       useNavigate: vi.fn().mockReturnValue(vi.fn()),
       useParams: vi.fn().mockReturnValue({ id: '1', submissionId: '1' }),

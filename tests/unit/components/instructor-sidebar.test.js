@@ -1,0 +1,128 @@
+import { jsx as _jsx } from 'react/jsx-runtime';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+// Mock authClient to prevent real API calls
+const { mockSignOut, mockUseSession } = vi.hoisted(() => ({
+  mockSignOut: vi.fn().mockResolvedValue({}),
+  mockUseSession: vi.fn(),
+}));
+vi.mock('@/lib/auth-client', () => ({
+  authClient: {
+    signOut: mockSignOut,
+    useSession: mockUseSession,
+  },
+}));
+// Mock the useLocation and useRouter hooks from TanStack Router
+const { mockLocation, mockInvalidate } = vi.hoisted(() => ({
+  mockLocation: vi.fn(),
+  mockInvalidate: vi.fn(),
+}));
+vi.mock('@tanstack/react-router', () => ({
+  useLocation: () => mockLocation(),
+  useRouter: () => ({ invalidate: mockInvalidate }),
+  Link: ({ to, children, className, onClick }) =>
+    _jsx('a', {
+      href: to,
+      className: className,
+      'data-testid': `sidebar-link-${to}`,
+      onClick: onClick,
+      children: children,
+    }),
+}));
+// Mock the useI18n hook
+vi.mock('@/routes/__root', () => ({
+  useI18n: () => ({
+    t: (key) => key,
+  }),
+}));
+import { InstructorSidebar } from '@/components/layout/instructor-sidebar';
+describe('InstructorSidebar', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseSession.mockReturnValue({
+      data: {
+        user: { name: 'Instructor User', email: 'instructor@example.com', role: 'instructor' },
+        session: {},
+      },
+      isPending: false,
+    });
+  });
+  it('should render dashboard link', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(_jsx(InstructorSidebar, { isOpen: true, onClose: vi.fn() }));
+    const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
+    expect(dashboardLink).toBeDefined();
+    expect(dashboardLink.textContent).toBe('instructorSidebar.dashboard');
+  });
+  it('should render assignments link', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(_jsx(InstructorSidebar, { isOpen: true, onClose: vi.fn() }));
+    const assignmentsLink = screen.getByTestId('sidebar-link-/instructor/assignments');
+    expect(assignmentsLink).toBeDefined();
+    expect(assignmentsLink.textContent).toBe('instructorSidebar.assignments');
+  });
+  it('should render reviews link', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(_jsx(InstructorSidebar, { isOpen: true, onClose: vi.fn() }));
+    const reviewsLink = screen.getByTestId('sidebar-link-/instructor/reviews');
+    expect(reviewsLink).toBeDefined();
+    expect(reviewsLink.textContent).toBe('instructorSidebar.reviews');
+  });
+  it('should highlight the currently active route', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(_jsx(InstructorSidebar, { isOpen: true, onClose: vi.fn() }));
+    const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
+    expect(dashboardLink.className).toContain('bg-sidebar-accent');
+    expect(dashboardLink.className).toContain('text-sidebar-primary-foreground');
+    expect(dashboardLink.className).not.toContain('border-l-[3px]');
+  });
+  it('should not apply the active class to inactive routes', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/reviews' });
+    render(_jsx(InstructorSidebar, { isOpen: true, onClose: vi.fn() }));
+    const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
+    expect(dashboardLink.className).not.toMatch(/(?<!:)bg-sidebar-accent(?= |$)/);
+  });
+  it('should render logout button', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(_jsx(InstructorSidebar, { isOpen: true, onClose: vi.fn() }));
+    const logoutButton = screen.getByText('auth.logout');
+    expect(logoutButton).toBeDefined();
+  });
+  it('should call signOut and invalidate on logout', async () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(_jsx(InstructorSidebar, { isOpen: true, onClose: vi.fn() }));
+    const logoutButton = screen.getByText('auth.logout');
+    fireEvent.click(logoutButton);
+    // Wait for async logout to complete
+    await vi.waitFor(() => {
+      expect(mockSignOut).toHaveBeenCalled();
+    });
+    expect(mockInvalidate).toHaveBeenCalled();
+  });
+  it('should call onClose when a link is clicked', () => {
+    const mockOnClose = vi.fn();
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(_jsx(InstructorSidebar, { isOpen: true, onClose: mockOnClose }));
+    const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
+    fireEvent.click(dashboardLink);
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+  it('should call onClose when overlay is clicked', () => {
+    const mockOnClose = vi.fn();
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(_jsx(InstructorSidebar, { isOpen: true, onClose: mockOnClose }));
+    const overlay = document.querySelector('.fixed.inset-0.z-40');
+    if (overlay) {
+      fireEvent.click(overlay);
+      expect(mockOnClose).toHaveBeenCalled();
+    }
+  });
+  it('should call onClose when close button is clicked', () => {
+    const mockOnClose = vi.fn();
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(_jsx(InstructorSidebar, { isOpen: true, onClose: mockOnClose }));
+    const closeButton = screen.getByLabelText('common.closeMenu');
+    fireEvent.click(closeButton);
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+});

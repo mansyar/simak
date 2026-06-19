@@ -524,6 +524,7 @@
     "verified": "terverifikasi",
     "pendingVerification": "Menunggu Verifikasi",
     "noPendingConsultations": "Tidak ada konsultasi yang menunggu verifikasi",
+    "noPendingConsultationsDescription": "Semua konsultasi telah terverifikasi.",
     "consultationDetail": "Detail Konsultasi",
     "student": "Mahasiswa",
     "date": "Tanggal",

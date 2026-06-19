@@ -529,6 +529,7 @@ export type Translation = {
     verified: string
     pendingVerification: string
     noPendingConsultations: string
+    noPendingConsultationsDescription: string
     consultationDetail: string
     student: string
     date: string

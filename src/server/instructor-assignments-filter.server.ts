@@ -5,9 +5,7 @@ import { assignments } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
 import type { NonNullableSession } from '../lib/types';
 
-function isInstructor(
-  session: NonNullableSession | null,
-): session is NonNullableSession {
+function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
 }
 
@@ -22,12 +20,7 @@ export async function listInstructorAssignmentsForFilterHandler() {
   const results = await db
     .select({ id: assignments.id, title: assignments.title })
     .from(assignments)
-    .where(
-      and(
-        eq(assignments.instructorId, session.user.id),
-        isNull(assignments.deletedAt),
-      ),
-    )
+    .where(and(eq(assignments.instructorId, session.user.id), isNull(assignments.deletedAt)))
     .orderBy(desc(assignments.createdAt));
 
   return { success: true, assignments: results };
