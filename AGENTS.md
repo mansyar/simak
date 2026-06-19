@@ -11,10 +11,10 @@
 | ---------------------------------------------- | ----------------------------------------------- |
 | `pnpm dev`                                     | Start dev server (auto-runs i18n codegen first) |
 | `pnpm build`                                   | Production build (auto-runs i18n codegen first) |
-| `pnpm test`                                    | Run all tests (Vitest)                          |
-| `pnpm test --reporter=verbose`                 | Run tests with full names                       |
-| `pnpm test tests/unit/path/to/file.test.ts`    | Single test file                                |
-| `pnpm test --coverage`                         | Test + coverage report                          |
+| `pnpm vitest run`                                    | Run all tests (Vitest)                          |
+| `pnpm vitest run --reporter=verbose`                 | Run tests with full names                       |
+| `pnpm vitest run tests/unit/path/to/file.test.ts`    | Single test file                                |
+| `pnpm vitest run --coverage`                         | Test + coverage report                          |
 | `pnpm typecheck`                               | TypeScript check (`tsc --noEmit`)               |
 | `pnpm lint`                                    | ESLint on everything                            |
 | `pnpm format`                                  | Prettier on `src/` and `tests/` sources         |
