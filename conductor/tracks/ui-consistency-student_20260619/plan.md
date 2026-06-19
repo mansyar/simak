@@ -26,7 +26,7 @@
   - [x] Write unit tests for tab switching, keyboard navigation, and ARIA attributes.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Shared Component Foundation' (Protocol in workflow.md)
 
-## Phase 2: Assignment Card & Dashboard Cleanup
+## Phase 2: Assignment Card & Dashboard Cleanup [checkpoint: 654ff93]
 
 - [x] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
 - [x] Task: Unify the template-type badge across student assignment surfaces.
