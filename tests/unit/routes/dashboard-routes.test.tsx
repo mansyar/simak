@@ -9,6 +9,7 @@ vi.mock('@tanstack/react-start/server', () => ({
 // Mock @tanstack/react-start
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: vi.fn().mockReturnValue({
+    inputValidator: vi.fn().mockReturnThis(),
     handler: vi.fn().mockImplementation((fn) => fn),
   }),
 }));

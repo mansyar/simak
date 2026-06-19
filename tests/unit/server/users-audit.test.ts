@@ -22,6 +22,7 @@ vi.mock('@/lib/audit', () => ({
 
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: vi.fn().mockReturnValue({
+    inputValidator: vi.fn().mockReturnThis(),
     handler: vi.fn().mockImplementation((fn) => fn),
   }),
 }));
