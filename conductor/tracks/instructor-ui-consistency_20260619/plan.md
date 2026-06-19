@@ -80,11 +80,11 @@ Goal: fix the only real user-visible bugs in the instructor surface and clean up
     - [x] Update any callers that depended on the local SLABadge's `variant="error"` to use `variant="destructive"` (verify no other instructor file still imports the deleted symbol).
     - [x] Verify all tests pass; commit `refactor(dashboard): Unify SLA badge with shared component`.
 
-- [ ] Task: Split the duplicated `instructorAssignments.details.studentsProgress` i18n key
-    - [ ] Add `instructorAssignments.details.totalStudents` to `locales/en.json` and `locales/id.json`.
-    - [ ] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:210` to use the new key.
-    - [ ] Update i18n codegen: `pnpm generate:i18n`; commit the regenerated files as part of this task.
-    - [ ] Verify `pnpm typecheck` and tests pass; commit `refactor(i18n): Split duplicated studentsProgress i18n key`.
+- [x] Task: Split the duplicated `instructorAssignments.details.studentsProgress` i18n key (ffea4c5)
+    - [x] Add `instructorAssignments.details.totalStudents` to `locales/en.json` and `locales/id.json`.
+    - [x] Update `src/routes/_authenticated/instructor/assignments/$id.tsx:210` to use the new key.
+    - [x] Update i18n codegen: `pnpm generate:i18n`; commit the regenerated files as part of this task.
+    - [x] Verify `pnpm typecheck` and tests pass; commit `refactor(i18n): Split duplicated studentsProgress i18n key`.
 
 - [ ] Task: Remove dead/redundant code in review components
     - [ ] Delete the inline colSpan empty-state branch in `src/components/reviews/ReviewQueueTable.tsx` (lines 131-140).
