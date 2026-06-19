@@ -1,0 +1,8 @@
+{
+  "track_id": "instructor-ui-consistency_20260619",
+  "type": "refactor",
+  "status": "new",
+  "created_at": "2026-06-19T02:04:39Z",
+  "updated_at": "2026-06-19T02:04:39Z",
+  "description": "UI consistency for instructor facing UI (Tier D — full audit scope; instructor only; EN+ID; systemic type fix with no regression)"
+}
