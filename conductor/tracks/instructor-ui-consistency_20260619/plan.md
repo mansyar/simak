@@ -30,10 +30,10 @@ Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTyp
     - [x] Implement `src/components/ui/page-header.tsx`. Renders `<h1 className="font-display text-3xl text-foreground">` and an action slot on the right; when `back` prop is provided, renders `<BackLink>` above the title.
     - [x] Verify coverage ≥ 80%; commit `feat(ui): Add PageHeader primitive`.
 
-- [ ] Task: Add `BackLink` primitive
-    - [ ] Write failing test in `tests/unit/components/ui/back-link.test.tsx` covering: renders with `ArrowLeft` + label, navigates via `Link`, accepts `search` prop, hover colour change.
-    - [ ] Implement `src/components/ui/back-link.tsx`. Class: `inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors`.
-    - [ ] Verify coverage ≥ 80%; commit `feat(ui): Add BackLink primitive`.
+- [x] Task: Add `BackLink` primitive (a3ade1a)
+    - [x] Write failing test in `tests/unit/components/ui/back-link.test.tsx` covering: renders with `ArrowLeft` + label, navigates via `Link`, accepts `search` prop, hover colour change.
+    - [x] Implement `src/components/ui/back-link.tsx`. Class: `inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors`.
+    - [x] Verify coverage ≥ 80%; commit `feat(ui): Add BackLink primitive`.
 
 - [ ] Task: Add `TemplateTypeBadge` primitive
     - [ ] Write failing test in `tests/unit/components/ui/template-type-badge.test.tsx` covering: renders the type string, applies the canonical pill class string.
