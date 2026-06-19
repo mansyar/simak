@@ -60,7 +60,7 @@ Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTyp
 
 ---
 
-## Phase 2 — Functional bug fixes
+## Phase 2 — Functional bug fixes [checkpoint: f6d46d7]
 
 Goal: fix the only real user-visible bugs in the instructor surface and clean up small dead/redundant code.
 
@@ -92,7 +92,7 @@ Goal: fix the only real user-visible bugs in the instructor surface and clean up
     - [x] Add a regression test for `ReviewQueueTable` asserting that an empty `data` array still renders the header but no body rows.
     - [x] Commit `refactor(reviews): Remove dead colSpan branch and redundant guard`.
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2 — Functional bug fixes' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2 — Functional bug fixes' (Protocol in workflow.md)
 
 ---
 
