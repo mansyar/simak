@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useI18n } from '../../routes/__root';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { submitReview } from '@/server/reviews';
@@ -116,10 +117,12 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
   }, [decision, revisionDeadline, comment, feedbackFileKey, submissionId, onComplete, onError, t]);
 
   return (
-    <div className="space-y-4 rounded-lg border bg-card p-4 shadow-sm">
-      <h3 className="text-sm font-semibold text-foreground">{t('instructorReviews.decision')}</h3>
-
-      {/* Pass/Revise radio */}
+    <Card className="shadow-sm">
+      <CardHeader>
+        <CardTitle className="text-sm">{t('instructorReviews.decision')}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Pass/Revise radio */}
       <div className="flex gap-4">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
@@ -208,6 +211,7 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
           t('instructorReviews.submitReview')
         )}
       </Button>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -8,6 +8,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { useI18n } from '../../../routes/__root';
 
 export type StudentProgress = {
@@ -114,7 +115,7 @@ export function ProgressTable({ students }: ProgressTableProps) {
   });
 
   return (
-    <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+    <Card className="shadow-sm overflow-hidden">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -152,6 +153,6 @@ export function ProgressTable({ students }: ProgressTableProps) {
           )}
         </TableBody>
       </Table>
-    </div>
+    </Card>
   );
 }

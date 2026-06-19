@@ -1,5 +1,6 @@
 import { useI18n } from '../../routes/__root';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, RefreshCcw, User, MessageSquare, Clock } from 'lucide-react';
 
 interface ReviewHistoryEntry {
@@ -20,11 +21,14 @@ export function ReviewHistory({ reviews }: ReviewHistoryProps) {
   if (reviews.length === 0) return null;
 
   return (
-    <div className="space-y-3 rounded-lg border bg-card p-4 shadow-sm">
-      <h3 className="text-sm font-semibold text-foreground">
-        {t('instructorReviews.reviewHistory')}
-      </h3>
-      <div className="space-y-3">
+    <Card className="shadow-sm">
+      <CardHeader>
+        <CardTitle className="text-sm">
+          {t('instructorReviews.reviewHistory')}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
         {reviews.map((review) => (
           <div key={review.id} className="flex items-start gap-3 rounded-md border bg-muted/20 p-3">
             <div className="mt-0.5">
@@ -59,7 +63,8 @@ export function ReviewHistory({ reviews }: ReviewHistoryProps) {
             </div>
           </div>
         ))}
-      </div>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

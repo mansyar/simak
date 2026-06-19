@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useI18n } from '@/routes/__root';
 import type { TranslationKey } from '@/i18n/index';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CountBadge } from '@/components/ui/count-badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApproveExtensionDialog } from './ApproveExtensionDialog';
 import { RejectExtensionDialog } from './RejectExtensionDialog';
@@ -47,25 +49,26 @@ export function PendingExtensionsSection({
 
   if (!loading && pendingCount === 0) {
     return (
-      <div className="rounded-lg border bg-card p-5 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <h3 className="text-sm font-semibold">{t('extensions.queue.title')}</h3>
-        </div>
-        <p className="text-sm text-muted-foreground">{t('extensions.queue.noPending')}</p>
-      </div>
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-sm">{t('extensions.queue.title')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">{t('extensions.queue.noPending')}</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-lg border bg-card p-5 shadow-sm">
-      <div className="flex items-center gap-2 mb-4">
-        <h3 className="text-sm font-semibold">{t('extensions.queue.title')}</h3>
-        {pendingCount > 0 && (
-          <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-primary text-primary-foreground">
-            {pendingCount}
-          </span>
-        )}
-      </div>
+    <Card className="shadow-sm">
+      <CardHeader>
+        <CardTitle className="text-sm flex items-center gap-2">
+          {t('extensions.queue.title')}
+          <CountBadge count={pendingCount} />
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
 
       {loading ? (
         <div className="space-y-3">
@@ -150,6 +153,7 @@ export function PendingExtensionsSection({
           }}
         />
       )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }
