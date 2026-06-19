@@ -211,7 +211,7 @@ Goal: replace hardcoded Tailwind palette colours with design tokens, remove redu
     - [x] Add `tests/unit/i18n/instructor-keys.test.ts` that asserts every new i18n key added by this track is present in both `locales/en.json` and `locales/id.json`.
     - [x] Commit `test(i18n): Add regression test for new instructor translation keys`.
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4 — Design system and i18n cleanup' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4 — Design system and i18n cleanup' (Protocol in workflow.md)
 
 ---
 
@@ -219,9 +219,9 @@ Goal: replace hardcoded Tailwind palette colours with design tokens, remove redu
 
 Goal: split the 446-line assignment detail page, dedupe pagination and refresh-button, and replace the hand-rolled section heading styles.
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
-    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
+- [x] Task: Read spec.md and workflow.md
+    - [x] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [x] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
 - [x] Task: Split `instructor/assignments/$id.tsx` into thin route + subcomponents
     - [x] Create `src/components/instructor/assignments/AssignmentDetailHeader.tsx` (uses `<PageHeader>` with back link, title, description, `<TemplateTypeBadge>`).
     - [x] Create `src/components/instructor/assignments/AssignmentOverviewTab.tsx` (the 4 `<MetricCard>` tiles + the meta block + the `<DeadlineManager>`).
@@ -308,7 +308,7 @@ Goal: remove `// @ts-expect-error - handler type inference limitation` from ever
     - [x] If any check fails, halt and report. Maximum 2 fix attempts; if still failing, roll back the type-fix commit, document the blocker, and ship Phases 1–5 without Phase 6 (per spec §6.5).
     - [x] Commit `chore(conductor): Phase 6 no-regression gate passed` (an empty commit if needed for the checkpoint).
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 6 — Systemic type fix' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 6 — Systemic type fix' (Protocol in workflow.md)
 
 ---
 
@@ -316,15 +316,15 @@ Goal: remove `// @ts-expect-error - handler type inference limitation` from ever
 
 Goal: small polish that closes the audit's §5 low-impact list.
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
-    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
-- [ ] Task: Adopt `<Tabs>` in `AssignmentDetailTabs.tsx`
-    - [ ] Already partially addressed in Phase 5 §5.5; verify the visual matches the audit's spec and the active/inactive class strings are now computed from the active index.
-    - [ ] If a shared `<Tabs>` primitive was added in Phase 5, this task is a no-op confirmation. If not, complete it now.
-    - [ ] Commit `refactor(instructor): Confirm Tabs primitive adoption`.
+- [x] Task: Read spec.md and workflow.md
+    - [x] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [x] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
+- [x] Task: Adopt `<Tabs>` in `AssignmentDetailTabs.tsx`
+    - [x] Already partially addressed in Phase 5 §5.5; verify the visual matches the audit's spec and the active/inactive class strings are now computed from the active index.
+    - [x] If a shared `<Tabs>` primitive was added in Phase 5, this task is a no-op confirmation. If not, complete it now.
+    - [x] No-op confirmation: shared `<Tabs>` primitive was added in Phase 5 (`e87893b refactor(ui): Add shared Tabs primitive and adopt in AssignmentDetailTabs`) and is in use in `AssignmentDetailTabs.tsx`.
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 7 — Nice-to-haves' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 7 — Nice-to-haves' (Protocol in workflow.md)
 
 ---
 
