@@ -275,7 +275,8 @@
     "backToQueue": "Back to Review Queue",
     "errors": {
       "feedbackUploadFailed": "Failed to upload feedback file"
-    }
+    },
+    "reviewDateLabel": "Reviewed on {date}"
   },
   "instructorAssignments": {
     "title": "Assignments",

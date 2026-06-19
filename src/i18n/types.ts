@@ -281,6 +281,7 @@ export type Translation = {
     errors: {
       feedbackUploadFailed: string
     }
+    reviewDateLabel: string
   }
   instructorAssignments: {
     title: string

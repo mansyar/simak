@@ -275,7 +275,8 @@
     "backToQueue": "Kembali ke Antrean Review",
     "errors": {
       "feedbackUploadFailed": "Gagal mengunggah file umpan balik"
-    }
+    },
+    "reviewDateLabel": "Direview pada {date}"
   },
   "instructorAssignments": {
     "title": "Tugas",
