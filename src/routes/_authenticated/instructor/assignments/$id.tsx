@@ -12,7 +12,8 @@ import { PendingExtensionsSection } from '@/components/instructor/extensions/Pen
 import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
 import { Calendar, Users, Clipboard, Percent, CheckCircle2, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns/format';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MetricCard } from '@/components/ui/metric-card';
 import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -185,75 +186,43 @@ function AssignmentDetailPage() {
         </div>
       </div>
 
-      {/* Overview Cards */}
+      {/* Overview Metrics */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="relative overflow-hidden rounded-md border bg-card p-5 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="rounded-lg bg-primary/10 p-2.5 text-primary">
-              <Users className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t('instructorAssignments.details.totalStudents')}
-              </p>
-              <h3 className="text-2xl font-bold text-foreground mt-1">{totalStudents}</h3>
-            </div>
-          </div>
-        </div>
+        <MetricCard
+          label={t('instructorAssignments.details.totalStudents')}
+          value={totalStudents}
+          icon={Users}
+          color="primary"
+        />
 
-        <div className="relative overflow-hidden rounded-md border bg-card p-5 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="rounded-lg bg-primary/10 p-2.5 text-primary">
-              <Percent className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t('instructorAssignments.averageProgress')}
-              </p>
-              <h3 className="text-2xl font-bold text-foreground mt-1">{avgProgress}%</h3>
-            </div>
-          </div>
-        </div>
+        <MetricCard
+          label={t('instructorAssignments.averageProgress')}
+          value={`${avgProgress}%`}
+          icon={Percent}
+          color="info"
+        />
 
-        <div className="relative overflow-hidden rounded-md border bg-card p-5 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="rounded-lg bg-emerald-500/10 p-2.5 text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t('instructorAssignments.completedCohort')}
-              </p>
-              <h3 className="text-2xl font-bold text-foreground mt-1">
-                {completedStudents} / {totalStudents}
-              </h3>
-            </div>
-          </div>
-        </div>
+        <MetricCard
+          label={t('instructorAssignments.completedCohort')}
+          value={`${completedStudents} / ${totalStudents}`}
+          icon={CheckCircle2}
+          color="success"
+        />
 
-        <div className="relative overflow-hidden rounded-md border bg-card p-5 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="rounded-lg bg-primary/10 p-2.5 text-primary">
-              <Calendar className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t('instructorAssignments.details.deadline')}
-              </p>
-              <h3 className="text-sm font-bold text-foreground mt-1.5">
-                {format(new Date(assignment.finalDeadline), 'MMM d, yyyy')}
-              </h3>
-            </div>
-          </div>
-        </div>
+        <MetricCard
+          label={t('instructorAssignments.details.deadline')}
+          value={format(new Date(assignment.finalDeadline), 'MMM d, yyyy')}
+          icon={Calendar}
+          color="warning"
+        />
       </div>
 
       {/* Details Meta Block */}
       <Card>
-        <div className="p-5 space-y-4">
-          <h3 className="text-base font-semibold text-foreground border-b pb-2">
-            {t('instructorAssignments.details.overview')}
-          </h3>
+        <CardHeader>
+          <CardTitle>{t('instructorAssignments.details.overview')}</CardTitle>
+        </CardHeader>
+        <CardContent>
           <div className="grid gap-4 sm:grid-cols-3 text-sm">
             <div className="space-y-1">
               <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
@@ -281,7 +250,7 @@ function AssignmentDetailPage() {
               </div>
             </div>
           </div>
-        </div>
+        </CardContent>
       </Card>
 
       {/* Progress Table */}

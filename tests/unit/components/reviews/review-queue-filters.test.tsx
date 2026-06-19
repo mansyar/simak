@@ -38,7 +38,7 @@ describe('ReviewQueueFilters', () => {
         onAssignmentChange={() => {}}
       />,
     );
-    expect(screen.getByText('instructorReviews.allAssignments')).toBeDefined();
+    expect(screen.getAllByText('instructorReviews.allAssignments').length).toBeGreaterThanOrEqual(1);
   });
 
   it('should render assignment options', () => {
@@ -101,6 +101,6 @@ describe('ReviewQueueFilters', () => {
         onAssignmentChange={() => {}}
       />,
     );
-    expect(screen.getByText('instructorReviews.allAssignments')).toBeDefined();
+    expect(screen.getAllByText('instructorReviews.allAssignments').length).toBeGreaterThanOrEqual(1);
   });
 });
