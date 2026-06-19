@@ -222,32 +222,32 @@ Goal: split the 446-line assignment detail page, dedupe pagination and refresh-b
 - [ ] Task: Read spec.md and workflow.md
     - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
     - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
-- [ ] Task: Split `instructor/assignments/$id.tsx` into thin route + subcomponents
-    - [ ] Create `src/components/instructor/assignments/AssignmentDetailHeader.tsx` (uses `<PageHeader>` with back link, title, description, `<TemplateTypeBadge>`).
-    - [ ] Create `src/components/instructor/assignments/AssignmentOverviewTab.tsx` (the 4 `<MetricCard>` tiles + the meta block + the `<DeadlineManager>`).
-    - [ ] Create `src/components/instructor/assignments/AssignmentConsultationsTab.tsx` (the verification queue and dialog).
-    - [ ] Create `src/components/instructor/assignments/AssignmentExtensionsTab.tsx` (wraps `<PendingExtensionsSection>`).
-    - [ ] Create `src/components/instructor/assignments/AssignmentDetailTabs.tsx` (the 3-tab navigation; uses `<CountBadge>` for counts).
-    - [ ] Rewrite `src/routes/_authenticated/instructor/assignments/$id.tsx` to ≤120 lines: imports, route declaration, loader, tab state, composition only.
-    - [ ] Verify all tests pass; commit `refactor(assignments): Split detail page into thin route and 5 subcomponents`.
+- [x] Task: Split `instructor/assignments/$id.tsx` into thin route + subcomponents
+    - [x] Create `src/components/instructor/assignments/AssignmentDetailHeader.tsx` (uses `<PageHeader>` with back link, title, description, `<TemplateTypeBadge>`).
+    - [x] Create `src/components/instructor/assignments/AssignmentOverviewTab.tsx` (the 4 `<MetricCard>` tiles + the meta block + the `<DeadlineManager>`).
+    - [x] Create `src/components/instructor/assignments/AssignmentConsultationsTab.tsx` (the verification queue and dialog).
+    - [x] Create `src/components/instructor/assignments/AssignmentExtensionsTab.tsx` (wraps `<PendingExtensionsSection>`).
+    - [x] Create `src/components/instructor/assignments/AssignmentDetailTabs.tsx` (the 3-tab navigation; uses `<CountBadge>` for counts).
+    - [x] Rewrite `src/routes/_authenticated/instructor/assignments/$id.tsx` to ≤120 lines: imports, route declaration, loader, tab state, composition only.
+    - [x] Verify all tests pass; commit `refactor(assignments): Split detail page into thin route and 5 subcomponents`.
 
-- [ ] Task: Extract `<Pagination>` primitive and dedupe
-    - [ ] Write failing test in `tests/unit/components/ui/pagination.test.tsx` covering: renders current/total label, prev/next buttons, disabled state, `aria-label`s (`common.previousPage`, `common.nextPage`), `onPageChange` fires with correct page.
-    - [ ] Implement `src/components/ui/pagination.tsx` (use the `TemplatePagination` body — it already has the `aria-label`s).
-    - [ ] Delete `src/components/admin/templates/TemplatePagination.tsx` and `src/components/reviews/ReviewQueuePagination.tsx`.
-    - [ ] Update `src/routes/_authenticated/admin/templates/index.tsx` to use `<Pagination>` (mechanical change in scope per spec §5 §5.3).
-    - [ ] Update `src/routes/_authenticated/instructor/assignments/index.tsx` and `src/routes/_authenticated/instructor/reviews/index.tsx` to use `<Pagination>`.
-    - [ ] Verify all tests pass; commit `refactor(ui): Extract shared Pagination primitive and dedupe 2 implementations`.
+- [x] Task: Extract `<Pagination>` primitive and dedupe
+    - [x] Write failing test in `tests/unit/components/ui/pagination.test.tsx` covering: renders current/total label, prev/next buttons, disabled state, `aria-label`s (`common.previousPage`, `common.nextPage`), `onPageChange` fires with correct page.
+    - [x] Implement `src/components/ui/pagination.tsx` (use the `TemplatePagination` body — it already has the `aria-label`s).
+    - [x] Delete `src/components/admin/templates/TemplatePagination.tsx` and `src/components/reviews/ReviewQueuePagination.tsx`.
+    - [x] Update `src/routes/_authenticated/admin/templates/index.tsx` to use `<Pagination>` (mechanical change in scope per spec §5 §5.3).
+    - [x] Update `src/routes/_authenticated/instructor/assignments/index.tsx` and `src/routes/_authenticated/instructor/reviews/index.tsx` to use `<Pagination>`.
+    - [x] Verify all tests pass; commit `refactor(ui): Extract shared Pagination primitive and dedupe 2 implementations`.
 
-- [ ] Task: Extract `<RefreshButton>` and `useRefreshSearch` hook
-    - [ ] Write failing tests in `tests/unit/components/ui/refresh-button.test.tsx` and `tests/unit/hooks/use-refresh-search.test.ts` covering: button click, disabled state, `aria-label`, navigate behaviour, no fake `setTimeout`.
-    - [ ] Implement `src/components/ui/refresh-button.tsx` and `src/hooks/use-refresh-search.ts`.
-    - [ ] Update `src/routes/_authenticated/instructor/assignments/index.tsx:91-103` and `src/routes/_authenticated/instructor/reviews/index.tsx:68-80` to use the new components.
-    - [ ] Verify all tests pass; commit `refactor(instructor): Extract RefreshButton and useRefreshSearch`.
+- [x] Task: Extract `<RefreshButton>` and `useRefreshSearch` hook
+    - [x] Write failing tests in `tests/unit/components/ui/refresh-button.test.tsx` and `tests/unit/hooks/use-refresh-search.test.ts` covering: button click, disabled state, `aria-label`, navigate behaviour, no fake `setTimeout`.
+    - [x] Implement `src/components/ui/refresh-button.tsx` and `src/hooks/use-refresh-search.ts`.
+    - [x] Update `src/routes/_authenticated/instructor/assignments/index.tsx:91-103` and `src/routes/_authenticated/instructor/reviews/index.tsx:68-80` to use the new components.
+    - [x] Verify all tests pass; commit `refactor(instructor): Extract RefreshButton and useRefreshSearch`.
 
-- [ ] Task: Adopt `<PageHeader>` in `ReviewDetailHeader`
-    - [ ] Update `src/components/reviews/ReviewDetailHeader.tsx` to render `<PageHeader>` with back link, title (`studentName`), and inline subtitle (`assignmentTitle — checkpointName`).
-    - [ ] Verify all tests pass; commit `refactor(reviews): Use PageHeader in ReviewDetailHeader`.
+- [x] Task: Adopt `<PageHeader>` in `ReviewDetailHeader`
+    - [x] Update `src/components/reviews/ReviewDetailHeader.tsx` to render `<PageHeader>` with back link, title (`studentName`), and inline subtitle (`assignmentTitle — checkpointName`).
+    - [x] Verify all tests pass; commit `refactor(reviews): Use PageHeader in ReviewDetailHeader`.
 
 - [ ] Task: Add `<Tabs>` primitive (or adopt from existing)
     - [ ] Check if a `<Tabs>` primitive exists in `src/components/ui/`. If yes, use it. If no, create `src/components/ui/tabs.tsx` based on the current `instructor/assignments/$id.tsx:311-357` markup; the active/inactive class strings are computed from an active index.
