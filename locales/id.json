@@ -313,6 +313,7 @@
     "details": {
       "title": "Detail Tugas",
       "overview": "Ikhtisar",
+      "totalStudents": "Total Mahasiswa",
       "studentsProgress": "Progres Mahasiswa",
       "template": "Templat",
       "type": "Tipe",

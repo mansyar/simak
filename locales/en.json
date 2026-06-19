@@ -313,6 +313,7 @@
     "details": {
       "title": "Assignment Details",
       "overview": "Overview",
+      "totalStudents": "Total Students",
       "studentsProgress": "Students Progress",
       "template": "Template",
       "type": "Type",

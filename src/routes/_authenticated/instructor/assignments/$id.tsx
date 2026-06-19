@@ -207,7 +207,7 @@ function AssignmentDetailPage() {
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t('instructorAssignments.details.studentsProgress')}
+                {t('instructorAssignments.details.totalStudents')}
               </p>
               <h3 className="text-2xl font-bold text-foreground mt-1">{totalStudents}</h3>
             </div>

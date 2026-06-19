@@ -318,6 +318,7 @@ export type Translation = {
     details: {
       title: string
       overview: string
+      totalStudents: string
       studentsProgress: string
       template: string
       type: string

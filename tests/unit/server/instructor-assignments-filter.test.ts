@@ -15,11 +15,25 @@ vi.mock('@/db/index', () => ({
 describe('listInstructorAssignmentsForFilterHandler', () => {
   let mockDb: any;
   const instructorSession = {
-    user: { id: 'instructor-1', role: 'instructor' as const },
+    user: {
+      id: 'instructor-1',
+      name: 'Instructor One',
+      email: 'instructor1@test.com',
+      role: 'instructor' as const,
+      locale: 'en',
+      emailVerified: true,
+    },
     session: {} as any,
   };
   const studentSession = {
-    user: { id: 'student-1', role: 'student' as const },
+    user: {
+      id: 'student-1',
+      name: 'Student One',
+      email: 'student1@test.com',
+      role: 'student' as const,
+      locale: 'en',
+      emailVerified: true,
+    },
     session: {} as any,
   };
 
@@ -69,9 +83,7 @@ describe('listInstructorAssignmentsForFilterHandler', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
 
     mockDb.then.mockImplementation((onfulfilled: any) =>
-      Promise.resolve([{ id: 1, title: 'Active Assignment' }]).then(
-        onfulfilled,
-      ),
+      Promise.resolve([{ id: 1, title: 'Active Assignment' }]).then(onfulfilled),
     );
 
     await listInstructorAssignmentsForFilterHandler();
@@ -83,9 +95,7 @@ describe('listInstructorAssignmentsForFilterHandler', () => {
   it('should order assignments by created_at desc', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
 
-    mockDb.then.mockImplementation((onfulfilled: any) =>
-      Promise.resolve([]).then(onfulfilled),
-    );
+    mockDb.then.mockImplementation((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
     await listInstructorAssignmentsForFilterHandler();
 
