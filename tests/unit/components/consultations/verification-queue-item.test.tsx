@@ -40,7 +40,7 @@ describe('VerificationQueueItem', () => {
 
   it('should render date', () => {
     render(<VerificationQueueItem consultation={baseConsultation} onClick={onClick} />);
-    expect(screen.getByText(/20\/05\/2026/)).toBeDefined();
+    expect(screen.getByText(/May 20, 2026/)).toBeDefined();
   });
 
   it('should render checkpoint name', () => {

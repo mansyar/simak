@@ -2,6 +2,7 @@ import { useI18n } from '../../routes/__root';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, RefreshCcw, User, MessageSquare, Clock } from 'lucide-react';
+import { formatDateShort } from '@/lib/format';
 
 interface ReviewHistoryEntry {
   id: number;
@@ -48,7 +49,7 @@ export function ReviewHistory({ reviews }: ReviewHistoryProps) {
                   </Badge>
                   <span className="text-xs text-muted-foreground">
                     <Clock className="inline h-3 w-3 mr-1" />
-                    {new Date(review.createdAt).toLocaleDateString()}
+                    {formatDateShort(review.createdAt)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">

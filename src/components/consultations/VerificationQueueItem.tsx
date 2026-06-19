@@ -1,4 +1,5 @@
 import { useI18n } from '../../routes/__root';
+import { formatDateShort } from '@/lib/format';
 
 interface PendingConsultation {
   id: number;
@@ -32,7 +33,7 @@ export function VerificationQueueItem({ consultation, onClick }: VerificationQue
       <div className="flex items-center justify-between">
         <span className="font-medium text-sm text-foreground">{consultation.studentName}</span>
         <span className="text-xs text-muted-foreground">
-          {new Date(consultation.createdAt).toLocaleDateString()}
+          {formatDateShort(consultation.createdAt)}
         </span>
       </div>
       <div className="text-xs text-muted-foreground">

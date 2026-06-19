@@ -2,7 +2,7 @@ import { useI18n } from '../../../routes/__root';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
-import { format } from 'date-fns/format';
+import { formatDateTimeShort } from '@/lib/format';
 import { BookOpen, Clipboard, Calendar, Users } from 'lucide-react';
 
 interface Student {
@@ -92,7 +92,7 @@ export function ReviewStep({
                   {t('instructorAssignments.details.deadline')}
                 </h4>
                 <p className="text-sm font-bold text-foreground mt-0.5">
-                  {format(new Date(finalDeadline), 'MMMM d, yyyy h:mm a')}
+                  {formatDateTimeShort(finalDeadline)}
                 </p>
               </div>
             </div>

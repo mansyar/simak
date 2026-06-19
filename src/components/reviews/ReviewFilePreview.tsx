@@ -1,5 +1,6 @@
 import { FileText, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatDateShort } from '@/lib/format';
 import { useI18n } from '../../routes/__root';
 
 interface ReviewFilePreviewProps {
@@ -36,7 +37,7 @@ export function ReviewFilePreview({
               {t('instructorReviews.versionLabel')}: {version}
             </span>
             <span>{formatFileSize(fileSize)}</span>
-            <span>{new Date(uploadedAt).toLocaleDateString()}</span>
+            <span>{formatDateShort(uploadedAt)}</span>
           </div>
         </div>
 

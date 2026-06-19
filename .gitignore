@@ -11,4 +11,6 @@ coverage/
 */tmp/*
 .vitest-cache/
 .vitest-reports/
-*.tsbuildinfo
+# Compiled .js output (keep only .ts/.tsx source)
+src/**/*.js
+tests/**/*.js

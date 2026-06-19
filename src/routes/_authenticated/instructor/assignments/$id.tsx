@@ -10,8 +10,16 @@ import { VerificationQueueItem } from '@/components/consultations/VerificationQu
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
 import { PendingExtensionsSection } from '@/components/instructor/extensions/PendingExtensionsSection';
 import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
-import { Calendar, Users, Clipboard, Percent, CheckCircle2, MessageSquare, FileX } from 'lucide-react';
-import { format } from 'date-fns/format';
+import {
+  Calendar,
+  Users,
+  Clipboard,
+  Percent,
+  CheckCircle2,
+  MessageSquare,
+  FileX,
+} from 'lucide-react';
+import { formatDateShort, formatDateTimeShort } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MetricCard } from '@/components/ui/metric-card';
 import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
@@ -213,7 +221,7 @@ function AssignmentDetailPage() {
 
         <MetricCard
           label={t('instructorAssignments.details.deadline')}
-          value={format(new Date(assignment.finalDeadline), 'MMM d, yyyy')}
+          value={formatDateShort(assignment.finalDeadline)}
           icon={Calendar}
           color="warning"
         />
@@ -248,7 +256,7 @@ function AssignmentDetailPage() {
                 {t('instructorAssignments.details.created')}
               </span>
               <div className="font-medium text-foreground">
-                {format(new Date(assignment.createdAt), 'MMM d, yyyy HH:mm')}
+                {formatDateTimeShort(assignment.createdAt)}
               </div>
             </div>
           </div>

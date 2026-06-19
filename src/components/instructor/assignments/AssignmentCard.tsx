@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Calendar, Users, Clipboard } from 'lucide-react';
-import { format } from 'date-fns/format';
+import { formatDateShort } from '@/lib/format';
 import { useI18n } from '../../../routes/__root';
 import { Card, CardContent } from '@/components/ui/card';
 import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
@@ -65,7 +65,7 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
               <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
               <span>
                 {t('instructorAssignments.finalDeadline', {
-                  date: format(new Date(assignment.finalDeadline), 'MMM d, yyyy'),
+                  date: formatDateShort(assignment.finalDeadline),
                 })}
               </span>
             </div>
