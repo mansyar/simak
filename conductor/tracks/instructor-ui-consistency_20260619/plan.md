@@ -160,56 +160,56 @@ Goal: replace every inlined page-header, back-link, template-type pill, textarea
 
 Goal: replace hardcoded Tailwind palette colours with design tokens, remove redundant className on default-variant buttons, and translate all hardcoded English strings.
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
-    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
-- [ ] Task: Replace hardcoded colours with design tokens
-    - [ ] Update `src/components/instructor/assignments/AssignmentCard.tsx:28` — drop the `to-violet-500` gradient (keep the 1px accent bar as `border-t-[3px] border-primary` to match `<MetricCard>`).
-    - [ ] Update `src/components/reviews/ReviewForm.tsx:132, 145` — `text-green-600 dark:text-green-400` → `text-success`; `text-orange-600 dark:text-orange-400` → `text-warning`.
-    - [ ] Update `src/components/reviews/ReviewHistory.tsx:32, 34` — `text-green-500` → `text-success`; `text-orange-500` → `text-warning`.
-    - [ ] Update `src/routes/_authenticated/instructor/reviews/$submissionId.tsx:95` — `text-green-500` → `text-success`.
-    - [ ] Update `src/components/instructor/extensions/PendingExtensionsSection.tsx:29-32` — replace the 4 hand-rolled category-colour pairs with `Badge variant="info" | "secondary" | "success" | "outline"` (or new design tokens if product wants distinct category colours).
-    - [ ] Verify all tests pass; commit `refactor(design-tokens): Replace hardcoded Tailwind palette with design tokens in instructor surface`.
+- [x] Task: Read spec.md and workflow.md
+    - [x] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [x] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
+- [x] Task: Replace hardcoded colours with design tokens
+    - [x] Update `src/components/instructor/assignments/AssignmentCard.tsx:28` — drop the `to-violet-500` gradient (keep the 1px accent bar as `border-t-[3px] border-primary` to match `<MetricCard>`).
+    - [x] Update `src/components/reviews/ReviewForm.tsx:132, 145` — `text-green-600 dark:text-green-400` → `text-success`; `text-orange-600 dark:text-orange-400` → `text-warning`.
+    - [x] Update `src/components/reviews/ReviewHistory.tsx:32, 34` — `text-green-500` → `text-success`; `text-orange-500` → `text-warning`.
+    - [x] Update `src/routes/_authenticated/instructor/reviews/$submissionId.tsx:95` — `text-green-500` → `text-success`.
+    - [x] Update `src/components/instructor/extensions/PendingExtensionsSection.tsx:29-32` — replace the 4 hand-rolled category-colour pairs with `Badge variant="info" | "secondary" | "success" | "outline"` (or new design tokens if product wants distinct category colours).
+    - [x] Verify all tests pass; commit `refactor(design-tokens): Replace hardcoded Tailwind palette with design tokens in instructor surface`.
 
-- [ ] Task: Add oxlint rule for raw palette colours (optional but recommended)
-    - [ ] Evaluate if `oxlint` supports a no-restricted-syntax rule for class strings matching the palette regex. If yes, add the rule scoped to `src/components/instructor/**` and `src/components/dashboard/InstructorDashboard.tsx`. If no, document the recommendation in the audit follow-up.
-    - [ ] Commit `chore(lint): Forbid raw Tailwind palette in instructor surface` (only if the rule is implementable).
+- [x] Task: Add oxlint rule for raw palette colours (optional but recommended)
+    - [x] Evaluate if `oxlint` supports a no-restricted-syntax rule for class strings matching the palette regex. If yes, add the rule scoped to `src/components/instructor/**` and `src/components/dashboard/InstructorDashboard.tsx`. If no, document the recommendation in the audit follow-up.
+    - [x] Commit `chore(lint): Forbid raw Tailwind palette in instructor surface` (only if the rule is implementable).
 
-- [ ] Task: Remove redundant className on default-variant buttons
-    - [ ] Update `src/routes/_authenticated/instructor/assignments/index.tsx:106` and `src/components/instructor/assignments/AssignmentWizard.tsx:355, 365` — remove the `className="bg-primary hover:bg-primary/95 text-primary-foreground font-semibold"` overrides.
-    - [ ] Verify all tests pass; commit `refactor(instructor): Remove redundant className on default-variant buttons`.
+- [x] Task: Remove redundant className on default-variant buttons
+    - [x] Update `src/routes/_authenticated/instructor/assignments/index.tsx:106` and `src/components/instructor/assignments/AssignmentWizard.tsx:355, 365` — remove the `className="bg-primary hover:bg-primary/95 text-primary-foreground font-semibold"` overrides.
+    - [x] Verify all tests pass; commit `refactor(instructor): Remove redundant className on default-variant buttons`.
 
-- [ ] Task: i18n the 9 hardcoded validation messages in `AssignmentWizard`
-    - [ ] Add new keys: `instructorAssignments.wizard.errors.templateRequired`, `errors.titleRequired`, `errors.titleMinLength`, `errors.deadlineRequired`, `errors.deadlineInvalid`, `errors.deadlineInPast`, `errors.studentsRequired`, `errors.dueDatesInPast`, `errors.submitFailed`, `errors.networkError` to `locales/en.json` and `locales/id.json`.
-    - [ ] Update `src/components/instructor/assignments/AssignmentWizard.tsx:131-159, 212, 216` to use the new keys.
-    - [ ] Run `pnpm generate:i18n`; verify `src/i18n/types.ts` accepts the new keys.
-    - [ ] Add a unit test asserting each wizard step's validation error message is translated.
-    - [ ] Commit `refactor(i18n): Translate AssignmentWizard validation messages (EN+ID)`.
+- [x] Task: i18n the 9 hardcoded validation messages in `AssignmentWizard`
+    - [x] Add new keys: `instructorAssignments.wizard.errors.templateRequired`, `errors.titleRequired`, `errors.titleMinLength`, `errors.deadlineRequired`, `errors.deadlineInvalid`, `errors.deadlineInPast`, `errors.studentsRequired`, `errors.dueDatesInPast`, `errors.submitFailed`, `errors.networkError` to `locales/en.json` and `locales/id.json`.
+    - [x] Update `src/components/instructor/assignments/AssignmentWizard.tsx:131-159, 212, 216` to use the new keys.
+    - [x] Run `pnpm generate:i18n`; verify `src/i18n/types.ts` accepts the new keys.
+    - [x] Add a unit test asserting each wizard step's validation error message is translated.
+    - [x] Commit `refactor(i18n): Translate AssignmentWizard validation messages (EN+ID)`.
 
-- [ ] Task: i18n the 2 hardcoded `ReviewForm` upload errors
-    - [ ] Add `instructorReviews.errors.feedbackUploadFailed` to both locales.
-    - [ ] Update `src/components/reviews/ReviewForm.tsx:59, 66`.
-    - [ ] Run `pnpm generate:i18n`; verify and commit.
+- [x] Task: i18n the 2 hardcoded `ReviewForm` upload errors
+    - [x] Add `instructorReviews.errors.feedbackUploadFailed` to both locales.
+    - [x] Update `src/components/reviews/ReviewForm.tsx:59, 66`.
+    - [x] Run `pnpm generate:i18n`; verify and commit.
 
-- [ ] Task: i18n the page-of-total pagination label
-    - [ ] Add `common.pagination.pageOf` (with `current` and `total` interpolators) to both locales.
-    - [ ] Update the new shared `<Pagination>` primitive (created in Phase 5) to use it.
-    - [ ] Commit `refactor(i18n): Translate pagination page-of-total label`.
+- [x] Task: i18n the page-of-total pagination label
+    - [x] Add `common.pagination.pageOf` (with `current` and `total` interpolators) to both locales.
+    - [x] Update the new shared `<Pagination>` primitive (created in Phase 5) to use it.
+    - [x] Commit `refactor(i18n): Translate pagination page-of-total label`.
 
-- [ ] Task: i18n the `ReviewHistory` labelled date
-    - [ ] Add `instructorReviews.reviewHistoryItem` (or similar) key with the colon-separated format.
-    - [ ] Update `src/components/reviews/ReviewHistory.tsx:35`.
-    - [ ] Commit `refactor(i18n): Translate ReviewHistory labelled date`.
+- [x] Task: i18n the `ReviewHistory` labelled date
+    - [x] Add `instructorReviews.reviewHistoryItem` (or similar) key with the colon-separated format.
+    - [x] Update `src/components/reviews/ReviewHistory.tsx:35`.
+    - [x] Commit `refactor(i18n): Translate ReviewHistory labelled date`.
 
-- [ ] Task: Add the missing `extensions.queue.reason` key
-    - [ ] Add `extensions.queue.reason` to `locales/en.json` and `locales/id.json`.
-    - [ ] Remove the `as TranslationKey` cast in `src/components/instructor/extensions/ApproveExtensionDialog.tsx:77` and `RejectExtensionDialog.tsx:82`.
-    - [ ] Run `pnpm generate:i18n`.
-    - [ ] Commit `fix(i18n): Add missing extensions.queue.reason translation key`.
+- [x] Task: Add the missing `extensions.queue.reason` key
+    - [x] Add `extensions.queue.reason` to `locales/en.json` and `locales/id.json`.
+    - [x] Remove the `as TranslationKey` cast in `src/components/instructor/extensions/ApproveExtensionDialog.tsx:77` and `RejectExtensionDialog.tsx:82`.
+    - [x] Run `pnpm generate:i18n`.
+    - [x] Commit `fix(i18n): Add missing extensions.queue.reason translation key`.
 
-- [ ] Task: Add i18n regression test
-    - [ ] Add `tests/unit/i18n/instructor-keys.test.ts` that asserts every new i18n key added by this track is present in both `locales/en.json` and `locales/id.json`.
-    - [ ] Commit `test(i18n): Add regression test for new instructor translation keys`.
+- [x] Task: Add i18n regression test
+    - [x] Add `tests/unit/i18n/instructor-keys.test.ts` that asserts every new i18n key added by this track is present in both `locales/en.json` and `locales/id.json`.
+    - [x] Commit `test(i18n): Add regression test for new instructor translation keys`.
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4 — Design system and i18n cleanup' (Protocol in workflow.md)
 
