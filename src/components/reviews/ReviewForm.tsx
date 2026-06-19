@@ -131,9 +131,9 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
               value="pass"
               checked={decision === 'pass'}
               onChange={() => setDecision('pass')}
-              className="accent-green-500"
+              className="accent-success"
             />
-            <span className="text-sm font-medium text-green-600 dark:text-green-400">
+            <span className="text-sm font-medium text-success">
               {t('instructorReviews.pass')}
             </span>
           </label>
@@ -144,9 +144,9 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
               value="revise"
               checked={decision === 'revise'}
               onChange={() => setDecision('revise')}
-              className="accent-orange-500"
+              className="accent-warning"
             />
-            <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
+            <span className="text-sm font-medium text-warning">
               {t('instructorReviews.revise')}
             </span>
           </label>

@@ -35,9 +35,9 @@ export function ReviewHistory({ reviews }: ReviewHistoryProps) {
             >
               <div className="mt-0.5">
                 {review.decision === 'pass' ? (
-                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  <CheckCircle2 className="h-4 w-4 text-success" />
                 ) : (
-                  <RefreshCcw className="h-4 w-4 text-orange-500" />
+                  <RefreshCcw className="h-4 w-4 text-warning" />
                 )}
               </div>
               <div className="flex-1 space-y-1">

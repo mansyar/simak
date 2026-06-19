@@ -92,7 +92,7 @@ function ReviewDetailPage() {
   if (success) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
-        <CheckCircle2 className="h-12 w-12 text-green-500" />
+        <CheckCircle2 className="h-12 w-12 text-success" />
         <h2 className="text-xl font-semibold">{t('instructorReviews.reviewSubmitted')}</h2>
         <button
           onClick={() => navigate({ to: '/instructor/reviews', search: { page: 1, limit: 20 } })}

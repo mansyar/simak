@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useI18n } from '@/routes/__root';
 import type { TranslationKey } from '@/i18n/index';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CountBadge } from '@/components/ui/count-badge';
@@ -30,11 +31,11 @@ interface PendingExtensionsSectionProps {
   onReject: (requestId: number, reason: string) => void;
 }
 
-const categoryColors: Record<string, string> = {
-  personal: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  research: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-  health: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  other: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+const categoryVariantMap: Record<string, 'info' | 'secondary' | 'success' | 'outline'> = {
+  personal: 'info',
+  research: 'secondary',
+  health: 'success',
+  other: 'outline',
 };
 
 export function PendingExtensionsSection({
@@ -87,11 +88,9 @@ export function PendingExtensionsSection({
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-medium">{req.studentName}</span>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase ${categoryColors[req.category] ?? categoryColors.other}`}
-                    >
+                    <Badge variant={categoryVariantMap[req.category] ?? 'outline'}>
                       {t(`extensions.category.${req.category}` as TranslationKey)}
-                    </span>
+                    </Badge>
                     <span className="text-[10px] text-muted-foreground">
                       {t('extensions.queue.durationDays', { count: String(req.extensionDays) })}
                     </span>

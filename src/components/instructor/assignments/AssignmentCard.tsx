@@ -25,8 +25,8 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
 
   return (
     <Card className="group relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-primary/30">
-      {/* Decorative gradient top bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-violet-500 opacity-80" />
+      {/* Decorative accent bar */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-primary opacity-80" />
 
       <CardContent className="flex flex-col justify-between pt-4">
         <div className="space-y-3">
