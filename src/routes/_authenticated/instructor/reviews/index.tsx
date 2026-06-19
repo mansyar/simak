@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { listPendingReviews } from '@/server/reviews';
+import { listInstructorAssignmentsForFilter } from '@/server/instructor-assignments-filter';
 import type { ReviewQueueItemData } from '@/components/reviews/ReviewQueueItem';
 import { ReviewQueueTable } from '@/components/reviews/ReviewQueueTable';
 import { ReviewQueueFilters } from '@/components/reviews/ReviewQueueFilters';
@@ -27,7 +28,16 @@ export const Route = createFileRoute('/_authenticated/instructor/reviews/')({
   }),
   loader: async ({ deps }) => {
     // @ts-expect-error - handler type inference limitation
-    return listPendingReviews({ data: deps });
+    const reviewsResult = await listPendingReviews({ data: deps });
+    const assignmentsResult = await listInstructorAssignmentsForFilter();
+
+    return {
+      ...reviewsResult,
+      assignments:
+        assignmentsResult && 'assignments' in assignmentsResult
+          ? assignmentsResult.assignments
+          : [],
+    };
   },
   pendingComponent: () => <ReviewQueueSkeleton />,
   component: ReviewsPage,
@@ -38,6 +48,8 @@ function ReviewsPage() {
   const data = Route.useLoaderData();
   const items = (data as { items?: ReviewQueueItemData[] })?.items ?? [];
   const total = (data as { total?: number })?.total ?? 0;
+  const assignments =
+    (data as { assignments?: { id: number; title: string }[] })?.assignments ?? [];
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -82,7 +94,7 @@ function ReviewsPage() {
       </div>
 
       <ReviewQueueFilters
-        assignments={[]}
+        assignments={assignments}
         selectedAssignmentId={searchParams.assignmentId ?? null}
         onAssignmentChange={handleAssignmentChange}
       />
