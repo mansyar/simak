@@ -35,10 +35,10 @@ Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTyp
     - [x] Implement `src/components/ui/back-link.tsx`. Class: `inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors`.
     - [x] Verify coverage ≥ 80%; commit `feat(ui): Add BackLink primitive`.
 
-- [ ] Task: Add `TemplateTypeBadge` primitive
-    - [ ] Write failing test in `tests/unit/components/ui/template-type-badge.test.tsx` covering: renders the type string, applies the canonical pill class string.
-    - [ ] Implement `src/components/ui/template-type-badge.tsx`. Canonical class: `text-[10px] font-bold tracking-wider uppercase text-primary bg-primary/10 px-2 py-0.5 rounded-full`.
-    - [ ] Verify coverage ≥ 80%; commit `feat(ui): Add TemplateTypeBadge primitive`.
+- [x] Task: Add `TemplateTypeBadge` primitive (1bad6af)
+    - [x] Write failing test in `tests/unit/components/ui/template-type-badge.test.tsx` covering: renders the type string, applies the canonical pill class string.
+    - [x] Implement `src/components/ui/template-type-badge.tsx`. Canonical class: `text-[10px] font-bold tracking-wider uppercase text-primary bg-primary/10 px-2 py-0.5 rounded-full`.
+    - [x] Verify coverage ≥ 80%; commit `feat(ui): Add TemplateTypeBadge primitive`.
 
 - [ ] Task: Add `formatDate` helper
     - [ ] Write failing tests in `tests/unit/lib/format.test.ts` covering: `formatDateShort` (EN, ID), `formatDateLong` (EN, ID), `formatDateTimeShort` (EN, ID); accepts `Date` and ISO string; handles invalid input gracefully.
