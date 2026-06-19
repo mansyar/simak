@@ -16,14 +16,14 @@
 
 Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTypeBadge`, `formatDate`, `CountBadge`) and a non-breaking change to `EmptyState` so Phases 2–7 can adopt them. **No instructor page is modified in this phase.**
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
-    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
-- [ ] Task: Add `Textarea` primitive
-    - [ ] Write failing test in `tests/unit/components/ui/textarea.test.tsx` covering: renders, `size` variant, focus-visible ring, disabled state, `aria-invalid` styling, controlled value/onChange, default height.
-    - [ ] Implement `src/components/ui/textarea.tsx` (Base UI wrapper, `data-slot="textarea"`, `size: 'default' | 'sm'`, focus ring, invalid ring — model on `src/components/ui/input.tsx`).
-    - [ ] Refactor if needed; verify coverage ≥ 80%.
-    - [ ] Commit `feat(ui): Add Textarea primitive`.
+- [x] Task: Read spec.md and workflow.md
+    - [x] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [x] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
+- [x] Task: Add `Textarea` primitive (2117062)
+    - [x] Write failing test in `tests/unit/components/ui/textarea.test.tsx` covering: renders, `size` variant, focus-visible ring, disabled state, `aria-invalid` styling, controlled value/onChange, default height.
+    - [x] Implement `src/components/ui/textarea.tsx` (Base UI wrapper, `data-slot="textarea"`, `size: 'default' | 'sm'`, focus ring, invalid ring — model on `src/components/ui/input.tsx`).
+    - [x] Refactor if needed; verify coverage ≥ 80%.
+    - [x] Commit `feat(ui): Add Textarea primitive`.
 
 - [ ] Task: Add `PageHeader` primitive
     - [ ] Write failing test in `tests/unit/components/ui/page-header.test.tsx` covering: title renders with canonical class, optional subtitle, optional action slot, optional back link.
