@@ -352,7 +352,7 @@ export function AssignmentWizard() {
           <Button
             type="button"
             onClick={handleNext}
-            className="bg-primary hover:bg-primary/95 font-semibold text-primary-foreground"
+            className="font-semibold"
           >
             {t('instructorAssignments.wizard.next')}
             <ChevronRight className="ml-1.5 h-4 w-4" />
@@ -362,7 +362,7 @@ export function AssignmentWizard() {
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="bg-primary hover:bg-primary/95 font-bold text-primary-foreground min-w-[140px]"
+            className="font-bold min-w-[140px]"
           >
             {isSubmitting ? (
               <>

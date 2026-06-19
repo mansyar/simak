@@ -99,7 +99,6 @@ function AssignmentsPage() {
             </Button>
             <Button
               onClick={handleCreateNew}
-              className="bg-primary hover:bg-primary/95 text-primary-foreground font-semibold"
             >
               <Plus className="mr-2 h-4 w-4" />
               {t('instructorAssignments.newAssignment')}
