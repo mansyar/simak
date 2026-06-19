@@ -215,7 +215,7 @@ Goal: replace hardcoded Tailwind palette colours with design tokens, remove redu
 
 ---
 
-## Phase 5 — Structural cleanups
+## Phase 5 — Structural cleanups [checkpoint: bcfbe3e]
 
 Goal: split the 446-line assignment detail page, dedupe pagination and refresh-button, and replace the hand-rolled section heading styles.
 
