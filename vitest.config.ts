@@ -24,10 +24,11 @@ export default defineConfig({
     // Performance: persist transform cache between runs
     experimental: {
       fsModuleCache: true,
-      importDurations: {
-        print: 'on-warn',
-        thresholds: { warn: 200, danger: 1000 },
-      },
+      //Only enable importsDuration on debugging
+      // importDurations: {
+      //   print: 'on-warn',
+      //   thresholds: { warn: 200, danger: 1000 },
+      // },
     },
 
     // Suppress console noise in test output
