@@ -64,15 +64,15 @@ Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTyp
 
 Goal: fix the only real user-visible bugs in the instructor surface and clean up small dead/redundant code.
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
-    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
-- [ ] Task: Fix review-queue filter dropdown
-    - [ ] Write failing server test in `tests/unit/server/instructor-assignments-filter.test.ts` for new `listInstructorAssignmentsForFilter` (returns `{ id: number; title: string }[]` for the current instructor; respects ownership).
-    - [ ] Add the server function: `src/server/instructor-assignments-filter.ts` (Zod schema + client stub) and `src/server/instructor-assignments-filter.server.ts` (handler, ownership-verified).
-    - [ ] Write failing route test asserting `<ReviewQueueFilters>` receives a non-empty `assignments` prop.
-    - [ ] Update `src/routes/_authenticated/instructor/reviews/index.tsx`: load `listInstructorAssignmentsForFilter()` in the loader; pass to `<ReviewQueueFilters>`.
-    - [ ] Verify all tests pass; commit `fix(reviews): Populate review-queue assignment filter dropdown`.
+- [~] Task: Read spec.md and workflow.md
+    - [x] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [x] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
+- [x] Task: Fix review-queue filter dropdown (4ebfb25)
+    - [x] Write failing server test in `tests/unit/server/instructor-assignments-filter.test.ts` for new `listInstructorAssignmentsForFilter` (returns `{ id: number; title: string }[]` for the current instructor; respects ownership).
+    - [x] Add the server function: `src/server/instructor-assignments-filter.ts` (Zod schema + client stub) and `src/server/instructor-assignments-filter.server.ts` (handler, ownership-verified).
+    - [x] Write failing route test asserting `<ReviewQueueFilters>` receives a non-empty `assignments` prop.
+    - [x] Update `src/routes/_authenticated/instructor/reviews/index.tsx`: load `listInstructorAssignmentsForFilter()` in the loader; pass to `<ReviewQueueFilters>`.
+    - [x] Verify all tests pass; commit `fix(reviews): Populate review-queue assignment filter dropdown`.
 
 - [ ] Task: Unify the SLA badge
     - [ ] Write failing test in `tests/unit/components/dashboard/instructor-dashboard.test.tsx` (extend existing) asserting that the "Pending Review Queue" widget renders the shared `SLABadge` with the correct variant for each wait time bucket.
