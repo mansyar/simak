@@ -86,11 +86,11 @@ Goal: fix the only real user-visible bugs in the instructor surface and clean up
     - [x] Update i18n codegen: `pnpm generate:i18n`; commit the regenerated files as part of this task.
     - [x] Verify `pnpm typecheck` and tests pass; commit `refactor(i18n): Split duplicated studentsProgress i18n key`.
 
-- [ ] Task: Remove dead/redundant code in review components
-    - [ ] Delete the inline colSpan empty-state branch in `src/components/reviews/ReviewQueueTable.tsx` (lines 131-140).
-    - [ ] Remove the redundant outer guard `reviewHistory && reviewHistory.length > 0 && ...` in `src/routes/_authenticated/instructor/reviews/$submissionId.tsx:134` (the inner `<ReviewHistory>` already returns `null` for empty).
-    - [ ] Add a regression test for `ReviewQueueTable` asserting that an empty `data` array still renders the header but no body rows.
-    - [ ] Commit `refactor(reviews): Remove dead colSpan branch and redundant guard`.
+- [x] Task: Remove dead/redundant code in review components (f6e827f)
+    - [x] Delete the inline colSpan empty-state branch in `src/components/reviews/ReviewQueueTable.tsx` (lines 131-140).
+    - [x] Remove the redundant outer guard `reviewHistory && reviewHistory.length > 0 && ...` in `src/routes/_authenticated/instructor/reviews/$submissionId.tsx:134` (the inner `<ReviewHistory>` already returns `null` for empty).
+    - [x] Add a regression test for `ReviewQueueTable` asserting that an empty `data` array still renders the header but no body rows.
+    - [x] Commit `refactor(reviews): Remove dead colSpan branch and redundant guard`.
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2 — Functional bug fixes' (Protocol in workflow.md)
 
