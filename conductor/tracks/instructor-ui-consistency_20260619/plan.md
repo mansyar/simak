@@ -40,10 +40,10 @@ Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTyp
     - [x] Implement `src/components/ui/template-type-badge.tsx`. Canonical class: `text-[10px] font-bold tracking-wider uppercase text-primary bg-primary/10 px-2 py-0.5 rounded-full`.
     - [x] Verify coverage ≥ 80%; commit `feat(ui): Add TemplateTypeBadge primitive`.
 
-- [ ] Task: Add `formatDate` helper
-    - [ ] Write failing tests in `tests/unit/lib/format.test.ts` covering: `formatDateShort` (EN, ID), `formatDateLong` (EN, ID), `formatDateTimeShort` (EN, ID); accepts `Date` and ISO string; handles invalid input gracefully.
-    - [ ] Implement `src/lib/format.ts` using `date-fns/format` with `date-fns/locale/{en,id}`.
-    - [ ] Verify coverage ≥ 80%; commit `feat(lib): Add formatDate helpers with locale support`.
+- [x] Task: Add `formatDate` helper (10b788a)
+    - [x] Write failing tests in `tests/unit/lib/format.test.ts` covering: `formatDateShort` (EN, ID), `formatDateLong` (EN, ID), `formatDateTimeShort` (EN, ID); accepts `Date` and ISO string; handles invalid input gracefully.
+    - [x] Implement `src/lib/format.ts` using `date-fns/format` with `date-fns/locale/{en,id}`.
+    - [x] Verify coverage ≥ 80%; commit `feat(lib): Add formatDate helpers with locale support`.
 
 - [ ] Task: Add `CountBadge` primitive
     - [ ] Write failing test in `tests/unit/components/ui/count-badge.test.tsx` covering: renders count, hides at 0 (when `hideWhenZero` prop), default colour uses design token.
