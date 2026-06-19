@@ -8,6 +8,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { useI18n } from '@/routes/__root';
 import type { TranslationKey } from '@/i18n/index';
 
@@ -87,12 +88,11 @@ export function RejectExtensionDialog({
             <label htmlFor="reject-reason" className="text-sm font-medium text-muted-foreground">
               {t('extensions.dialog.reject.reason')}
             </label>
-            <textarea
+            <Textarea
               id="reject-reason"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               rows={3}
-              className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               placeholder={t('extensions.dialog.reject.reasonPlaceholder')}
             />
             <p className="text-xs text-muted-foreground text-right">

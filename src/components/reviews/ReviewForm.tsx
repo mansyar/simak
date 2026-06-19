@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useI18n } from '../../routes/__root';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { submitReview } from '@/server/reviews';
 import { getPresignedReviewFeedbackUploadUrl } from '@/server/files';
 import { Loader2, Upload } from 'lucide-react';
@@ -151,13 +152,12 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
       {/* Comment textarea */}
       <div className="space-y-1.5">
         <Label htmlFor="comment">{t('instructorReviews.comment')}</Label>
-        <textarea
+        <Textarea
           id="comment"
           placeholder={t('instructorReviews.commentPlaceholder')}
           value={comment}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
+          onChange={(e) => setComment(e.target.value)}
           rows={3}
-          className="flex w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         />
       </div>
 

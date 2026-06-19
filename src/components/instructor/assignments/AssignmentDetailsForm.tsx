@@ -2,6 +2,7 @@ import { useI18n } from '../../../routes/__root';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface AssignmentDetailsFormProps {
   title: string;
@@ -71,17 +72,14 @@ export function AssignmentDetailsForm({
           <Label htmlFor="assignment-desc" className="text-sm font-semibold text-foreground">
             {t('instructorAssignments.wizard.descriptionLabel')}
           </Label>
-          <textarea
+          <Textarea
             id="assignment-desc"
             placeholder={t('instructorAssignments.wizard.descriptionPlaceholder')}
             value={description}
             onChange={(e) => onChangeDescription(e.target.value)}
             rows={5}
-            className={`flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 min-h-[120px] resize-y ${
-              errors.description
-                ? 'border-destructive focus-visible:ring-destructive'
-                : 'focus-visible:ring-primary'
-            }`}
+            className={`resize-y ${errors.description ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+            aria-invalid={!!errors.description || undefined}
           />
           {errors.description && (
             <p className="text-xs font-semibold text-destructive mt-1">{errors.description}</p>

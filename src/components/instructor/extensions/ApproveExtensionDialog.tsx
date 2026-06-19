@@ -8,6 +8,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { useI18n } from '@/routes/__root';
 import type { TranslationKey } from '@/i18n/index';
 
@@ -82,13 +83,13 @@ export function ApproveExtensionDialog({
             <label htmlFor="approve-comment" className="text-sm font-medium text-muted-foreground">
               {t('extensions.dialog.approve.comment')}
             </label>
-            <textarea
+            <Textarea
               id="approve-comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              rows={2}
-              className="mt-1 flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              size="sm"
               placeholder={t('extensions.dialog.approve.commentPlaceholder')}
+              className="mt-1"
             />
           </div>
         </div>
