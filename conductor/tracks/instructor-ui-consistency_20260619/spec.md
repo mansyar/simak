@@ -1,3 +1,4 @@
+<protect>
 # Track: Instructor UI Consistency
 
 **Type:** refactor
@@ -318,3 +319,4 @@ This track is **complete** when **all** of the following are true:
 - i18n codegen: `pnpm generate:i18n` (per `AGENTS.md`).
 - File size rule: `AGENTS.md` — max 500 lines per file in `src/`, `tests/`, `scripts/`.
 - Existing primitives: `src/components/ui/{card,badge,button,empty-state,input,label,select,skeleton,metric-card,status-dot,dialog,dropdown-menu,sheet,form,table,progress}.tsx`.
+</protect>

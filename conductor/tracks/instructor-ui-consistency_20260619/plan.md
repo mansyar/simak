@@ -1,3 +1,4 @@
+<protect>
 # Track: Instructor UI Consistency — Implementation Plan
 
 **Type:** refactor
@@ -15,6 +16,9 @@
 
 Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTypeBadge`, `formatDate`, `CountBadge`) and a non-breaking change to `EmptyState` so Phases 2–7 can adopt them. **No instructor page is modified in this phase.**
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
 - [ ] Task: Add `Textarea` primitive
     - [ ] Write failing test in `tests/unit/components/ui/textarea.test.tsx` covering: renders, `size` variant, focus-visible ring, disabled state, `aria-invalid` styling, controlled value/onChange, default height.
     - [ ] Implement `src/components/ui/textarea.tsx` (Base UI wrapper, `data-slot="textarea"`, `size: 'default' | 'sm'`, focus ring, invalid ring — model on `src/components/ui/input.tsx`).
@@ -60,6 +64,9 @@ Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTyp
 
 Goal: fix the only real user-visible bugs in the instructor surface and clean up small dead/redundant code.
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
 - [ ] Task: Fix review-queue filter dropdown
     - [ ] Write failing server test in `tests/unit/server/instructor-assignments-filter.test.ts` for new `listInstructorAssignmentsForFilter` (returns `{ id: number; title: string }[]` for the current instructor; respects ownership).
     - [ ] Add the server function: `src/server/instructor-assignments-filter.ts` (Zod schema + client stub) and `src/server/instructor-assignments-filter.server.ts` (handler, ownership-verified).
@@ -93,6 +100,9 @@ Goal: fix the only real user-visible bugs in the instructor surface and clean up
 
 Goal: replace every inlined page-header, back-link, template-type pill, textarea, skeleton, raw `<select>`, hand-rolled `bg-card` wrapper, and hand-rolled empty state in the instructor surface with the corresponding primitive. No behavioural changes.
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
 - [ ] Task: Migrate 7 instructor pages to `<PageHeader>`
     - [ ] Write/extend a smoke test in `tests/unit/routes/instructor-page-headers.test.tsx` asserting that each of the 7 pages renders an `<h1>` with the canonical class string `font-display text-3xl text-foreground`.
     - [ ] Update each of the 7 files listed in `spec.md` §3.1 to use `<PageHeader>`; remove the inlined `<h1>` markup; remove redundant `text-foreground` ad-hoc adds.
@@ -150,6 +160,9 @@ Goal: replace every inlined page-header, back-link, template-type pill, textarea
 
 Goal: replace hardcoded Tailwind palette colours with design tokens, remove redundant className on default-variant buttons, and translate all hardcoded English strings.
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
 - [ ] Task: Replace hardcoded colours with design tokens
     - [ ] Update `src/components/instructor/assignments/AssignmentCard.tsx:28` — drop the `to-violet-500` gradient (keep the 1px accent bar as `border-t-[3px] border-primary` to match `<MetricCard>`).
     - [ ] Update `src/components/reviews/ReviewForm.tsx:132, 145` — `text-green-600 dark:text-green-400` → `text-success`; `text-orange-600 dark:text-orange-400` → `text-warning`.
@@ -206,6 +219,9 @@ Goal: replace hardcoded Tailwind palette colours with design tokens, remove redu
 
 Goal: split the 446-line assignment detail page, dedupe pagination and refresh-button, and replace the hand-rolled section heading styles.
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
 - [ ] Task: Split `instructor/assignments/$id.tsx` into thin route + subcomponents
     - [ ] Create `src/components/instructor/assignments/AssignmentDetailHeader.tsx` (uses `<PageHeader>` with back link, title, description, `<TemplateTypeBadge>`).
     - [ ] Create `src/components/instructor/assignments/AssignmentOverviewTab.tsx` (the 4 `<MetricCard>` tiles + the meta block + the `<DeadlineManager>`).
@@ -246,6 +262,9 @@ Goal: split the 446-line assignment detail page, dedupe pagination and refresh-b
 
 Goal: remove `// @ts-expect-error - handler type inference limitation` from every route loader without introducing any regression.
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
 - [ ] Task: Investigate root cause
     - [ ] Read `src/server/<feature>.ts` and `src/server/<feature>.server.ts` for at least 3 features to identify the common typing gap. Document the root cause in this task's git note (a one-paragraph description: where in the chain the type is lost).
     - [ ] Read `conductor/workflow.md` to confirm the server-function pattern requirements.
@@ -293,6 +312,9 @@ Goal: remove `// @ts-expect-error - handler type inference limitation` from ever
 
 Goal: small polish that closes the audit's §5 low-impact list.
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
 - [ ] Task: Adopt `<Tabs>` in `AssignmentDetailTabs.tsx`
     - [ ] Already partially addressed in Phase 5 §5.5; verify the visual matches the audit's spec and the active/inactive class strings are now computed from the active index.
     - [ ] If a shared `<Tabs>` primitive was added in Phase 5, this task is a no-op confirmation. If not, complete it now.
@@ -309,3 +331,4 @@ Goal: small polish that closes the audit's §5 low-impact list.
     - [ ] Update `conductor/product.md` "Completed Tracks" section with a new "Track X.Y" entry summarising the work (template: copy the most recent entry from the file and replace the track number, date, and bullet list).
     - [ ] Commit `docs(conductor): Mark Instructor UI Consistency track complete`.
 - [ ] Task: Conductor - User Manual Verification 'Track closure' (Protocol in workflow.md)
+</protect>
