@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
 import { listInstructorAssignments } from '@/server/assignments';
 import { AssignmentCard } from '@/components/instructor/assignments/AssignmentCard';
 import { AssignmentFilters } from '@/components/instructor/assignments/AssignmentFilters';
@@ -7,8 +6,10 @@ import { AssignmentEmptyState } from '@/components/instructor/assignments/Assign
 import { AssignmentLoadingSkeleton } from '@/components/instructor/assignments/AssignmentLoadingSkeleton';
 import { Pagination } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
+import { RefreshButton } from '@/components/ui/refresh-button';
+import { useRefreshSearch } from '@/hooks/use-refresh-search';
 import { PageHeader } from '@/components/ui/page-header';
-import { Plus, RefreshCcw } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
 
@@ -54,7 +55,7 @@ function AssignmentsPage() {
   const total = (data as unknown as { total?: number })?.total ?? 0;
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { isRefreshing, refresh } = useRefreshSearch();
 
   const handleSearchChange = (value: string) => {
     navigate({
@@ -85,18 +86,14 @@ function AssignmentsPage() {
         subtitle={t('instructorAssignments.subtitle')}
         action={
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => {
-                setIsRefreshing(true);
-                navigate({ search: (prev: z.infer<typeof AssignmentSearchSchema>) => prev });
-                setTimeout(() => setIsRefreshing(false), 1000);
-              }}
-              disabled={isRefreshing}
-            >
-              <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            </Button>
+            <RefreshButton
+              isRefreshing={isRefreshing}
+              onClick={() =>
+                refresh(() =>
+                  navigate({ search: (prev: z.infer<typeof AssignmentSearchSchema>) => prev }),
+                )
+              }
+            />
             <Button onClick={handleCreateNew}>
               <Plus className="mr-2 h-4 w-4" />
               {t('instructorAssignments.newAssignment')}

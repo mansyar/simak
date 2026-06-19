@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
 import { listPendingReviews } from '@/server/reviews';
 import { listInstructorAssignmentsForFilter } from '@/server/instructor-assignments-filter';
 import type { ReviewQueueItemData } from '@/components/reviews/ReviewQueueItem';
@@ -8,9 +7,9 @@ import { ReviewQueueFilters } from '@/components/reviews/ReviewQueueFilters';
 import { ReviewQueueEmptyState } from '@/components/reviews/ReviewQueueEmptyState';
 import { ReviewQueueSkeleton } from '@/components/reviews/ReviewQueueSkeleton';
 import { Pagination } from '@/components/ui/pagination';
-import { RefreshCcw } from 'lucide-react';
+import { RefreshButton } from '@/components/ui/refresh-button';
+import { useRefreshSearch } from '@/hooks/use-refresh-search';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { useI18n } from '../../../__root';
 
@@ -53,7 +52,7 @@ function ReviewsPage() {
     (data as { assignments?: { id: number; title: string }[] })?.assignments ?? [];
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { isRefreshing, refresh } = useRefreshSearch();
 
   const handleAssignmentChange = (assignmentId: number | null) => {
     navigate({
@@ -77,18 +76,10 @@ function ReviewsPage() {
         title={t('instructorReviews.title')}
         subtitle={t('instructorReviews.subtitle')}
         action={
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={async () => {
-              setIsRefreshing(true);
-              await navigate({ search: searchParams });
-              setIsRefreshing(false);
-            }}
-            disabled={isRefreshing}
-          >
-            <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </Button>
+          <RefreshButton
+            isRefreshing={isRefreshing}
+            onClick={() => refresh(() => navigate({ search: searchParams }))}
+          />
         }
       />
 
