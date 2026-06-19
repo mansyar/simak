@@ -118,7 +118,7 @@ export function ReviewQueueTable({ data }: ReviewQueueTableProps) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length &&
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
@@ -127,17 +127,7 @@ export function ReviewQueueTable({ data }: ReviewQueueTableProps) {
                     </TableCell>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  {t('instructorReviews.empty')}
-                </TableCell>
-              </TableRow>
-            )}
+              ))}
           </TableBody>
         </Table>
       </CardContent>

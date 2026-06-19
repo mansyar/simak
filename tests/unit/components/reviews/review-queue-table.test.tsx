@@ -107,8 +107,12 @@ describe('ReviewQueueTable', () => {
     expect(links[1].getAttribute('href')).toContain('/instructor/reviews/11');
   });
 
-  it('should render empty state when no data', () => {
+  it('should render headers but no body rows when data is empty', () => {
     render(<ReviewQueueTable data={[]} />);
-    expect(screen.getByText('instructorReviews.empty')).toBeDefined();
+    expect(screen.getByText('instructorReviews.table.student')).toBeDefined();
+    expect(screen.getByText('instructorReviews.table.assignment')).toBeDefined();
+    expect(screen.getByText('instructorReviews.table.waitTime')).toBeDefined();
+    expect(screen.getByText('instructorReviews.table.status')).toBeDefined();
+    expect(screen.queryByTestId('review-queue-link')).toBeNull();
   });
 });

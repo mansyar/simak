@@ -131,7 +131,7 @@ function ReviewDetailPage() {
       />
 
       {/* Review history */}
-      {reviewHistory && reviewHistory.length > 0 && <ReviewHistory reviews={reviewHistory} />}
+      <ReviewHistory reviews={reviewHistory ?? []} />
 
       {/* Review form */}
       <ReviewForm
