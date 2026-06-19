@@ -128,35 +128,34 @@ export function AssignmentWizard() {
 
     if (step === 1) {
       if (!selectedTemplate) {
-        newErrors.templateId = 'Please select a template';
+        newErrors.templateId = t('instructorAssignments.wizard.errors.templateRequired');
       }
     } else if (step === 2) {
       if (!title.trim()) {
-        newErrors.title = 'Title is required';
+        newErrors.title = t('instructorAssignments.wizard.errors.titleRequired');
       } else if (title.length < 3) {
-        newErrors.title = 'Title must be at least 3 characters';
+        newErrors.title = t('instructorAssignments.wizard.errors.titleMinLength');
       }
       if (!finalDeadline) {
-        newErrors.finalDeadline = 'Deadline is required';
+        newErrors.finalDeadline = t('instructorAssignments.wizard.errors.deadlineRequired');
       } else {
         const dateVal = new Date(finalDeadline);
         if (isNaN(dateVal.getTime())) {
-          newErrors.finalDeadline = 'Invalid deadline date';
+          newErrors.finalDeadline = t('instructorAssignments.wizard.errors.deadlineInvalid');
         } else if (dateVal <= new Date()) {
-          newErrors.finalDeadline = 'Final deadline must be in the future';
+          newErrors.finalDeadline = t('instructorAssignments.wizard.errors.deadlineInPast');
         }
       }
     } else if (step === 3) {
       if (selectedStudentIds.length === 0) {
-        newErrors.studentIds = 'Please select at least one student';
+        newErrors.studentIds = t('instructorAssignments.wizard.errors.studentsRequired');
       }
     } else if (step === 4) {
       // Client-side due date validation: overridden dates should not be in the past
       for (const override of dueDateOverrides) {
         const overrideDate = new Date(override.dueDate);
         if (overrideDate <= new Date()) {
-          newErrors.dueDates =
-            'Override due dates must be in the future. Please check checkpoint dates.';
+          newErrors.dueDates = t('instructorAssignments.wizard.errors.dueDatesInPast');
           break;
         }
       }
@@ -209,11 +208,11 @@ export function AssignmentWizard() {
       if (res && res.success) {
         navigate({ to: ('/instructor/assignments/' + res.assignmentId) as never });
       } else {
-        setErrors({ submit: res?.error || 'Failed to create assignment' });
+        setErrors({ submit: res?.error || t('instructorAssignments.wizard.errors.submitFailed') });
       }
     } catch (err) {
       console.error(err);
-      setErrors({ submit: 'A network error occurred. Please try again.' });
+      setErrors({ submit: t('instructorAssignments.wizard.errors.networkError') });
     } finally {
       setIsSubmitting(false);
     }
@@ -349,11 +348,7 @@ export function AssignmentWizard() {
         </Button>
 
         {currentStep < steps.length ? (
-          <Button
-            type="button"
-            onClick={handleNext}
-            className="font-semibold"
-          >
+          <Button type="button" onClick={handleNext} className="font-semibold">
             {t('instructorAssignments.wizard.next')}
             <ChevronRight className="ml-1.5 h-4 w-4" />
           </Button>

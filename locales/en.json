@@ -349,7 +349,19 @@
       "dueDateFor": "Due date for",
       "searchStudents": "Search students by name or email...",
       "successMessage": "Assignment created successfully!",
-      "errorMessage": "Failed to create assignment. Please try again."
+      "errorMessage": "Failed to create assignment. Please try again.",
+      "errors": {
+        "templateRequired": "Please select a template",
+        "titleRequired": "Title is required",
+        "titleMinLength": "Title must be at least 3 characters",
+        "deadlineRequired": "Deadline is required",
+        "deadlineInvalid": "Invalid deadline date",
+        "deadlineInPast": "Final deadline must be in the future",
+        "studentsRequired": "Please select at least one student",
+        "dueDatesInPast": "Override due dates must be in the future. Please check checkpoint dates.",
+        "submitFailed": "Failed to create assignment",
+        "networkError": "A network error occurred. Please try again."
+      }
     },
     "completedCohort": "Completed Cohort",
     "noStudentsAssigned": "No students assigned.",

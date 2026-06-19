@@ -288,7 +288,7 @@ describe('AssignmentWizard', () => {
       fireEvent.change(screen.getByTestId('input-title'), { target: { value: '' } });
       fireEvent.click(screen.getByText('Next'));
       expect(screen.getByTestId('details-form')).toBeDefined();
-      expect(screen.getByTestId('error-title').textContent).toBe('Title is required');
+      expect(screen.getByTestId('error-title').textContent).toBe('instructorAssignments.wizard.errors.titleRequired');
     });
 
     it('should show deadline error when Next is clicked without a deadline', () => {
@@ -297,7 +297,7 @@ describe('AssignmentWizard', () => {
       fireEvent.click(screen.getByText('Next'));
       fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'My Assignment' } });
       fireEvent.click(screen.getByText('Next'));
-      expect(screen.getByTestId('error-deadline').textContent).toBe('Deadline is required');
+      expect(screen.getByTestId('error-deadline').textContent).toBe('instructorAssignments.wizard.errors.deadlineRequired');
     });
 
     it('should fill details and advance to step 3', () => {
@@ -323,7 +323,7 @@ describe('AssignmentWizard', () => {
       render(<AssignmentWizard />);
       navigateToStep5({ selectStudents: false });
       expect(screen.getByTestId('error-students').textContent).toBe(
-        'Please select at least one student',
+        'instructorAssignments.wizard.errors.studentsRequired',
       );
     });
   });
@@ -457,7 +457,7 @@ describe('AssignmentWizard', () => {
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));
       await waitFor(() =>
-        expect(screen.getByText('A network error occurred. Please try again.')).toBeDefined(),
+        expect(screen.getByText('instructorAssignments.wizard.errors.networkError')).toBeDefined(),
       );
     });
   });

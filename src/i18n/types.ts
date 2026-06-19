@@ -355,6 +355,18 @@ export type Translation = {
       searchStudents: string
       successMessage: string
       errorMessage: string
+      errors: {
+        templateRequired: string
+        titleRequired: string
+        titleMinLength: string
+        deadlineRequired: string
+        deadlineInvalid: string
+        deadlineInPast: string
+        studentsRequired: string
+        dueDatesInPast: string
+        submitFailed: string
+        networkError: string
+      }
     }
     completedCohort: string
     noStudentsAssigned: string

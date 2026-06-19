@@ -349,7 +349,19 @@
       "dueDateFor": "Tenggat waktu untuk",
       "searchStudents": "Cari mahasiswa berdasarkan nama atau email...",
       "successMessage": "Tugas berhasil dibuat!",
-      "errorMessage": "Gagal membuat tugas. Silakan coba lagi."
+      "errorMessage": "Gagal membuat tugas. Silakan coba lagi.",
+      "errors": {
+        "templateRequired": "Silakan pilih templat",
+        "titleRequired": "Judul wajib diisi",
+        "titleMinLength": "Judul harus minimal 3 karakter",
+        "deadlineRequired": "Tenggat waktu wajib diisi",
+        "deadlineInvalid": "Tanggal tenggat tidak valid",
+        "deadlineInPast": "Tenggat akhir harus di masa depan",
+        "studentsRequired": "Silakan pilih minimal satu mahasiswa",
+        "dueDatesInPast": "Tenggat waktu yang diubah harus di masa depan. Silakan periksa tanggal tahapan.",
+        "submitFailed": "Gagal membuat tugas",
+        "networkError": "Terjadi kesalahan jaringan. Silakan coba lagi."
+      }
     },
     "completedCohort": "Kohort Selesai",
     "noStudentsAssigned": "Belum ada mahasiswa yang ditugaskan.",
