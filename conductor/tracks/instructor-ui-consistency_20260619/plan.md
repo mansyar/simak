@@ -96,7 +96,7 @@ Goal: fix the only real user-visible bugs in the instructor surface and clean up
 
 ---
 
-## Phase 3 — Instructor surface migration to primitives
+## Phase 3 — Instructor surface migration to primitives [checkpoint: 34441e9]
 
 Goal: replace every inlined page-header, back-link, template-type pill, textarea, skeleton, raw `<select>`, hand-rolled `bg-card` wrapper, and hand-rolled empty state in the instructor surface with the corresponding primitive. No behavioural changes.
 
