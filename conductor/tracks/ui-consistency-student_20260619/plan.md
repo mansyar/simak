@@ -47,7 +47,7 @@
   - [x] Verify visually that empty dashboard widgets no longer dominate card height.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Assignment Card & Dashboard Cleanup' (Protocol in workflow.md)
 
-## Phase 3: Assignment Detail & Checkpoint Timeline
+## Phase 3: Assignment Detail & Checkpoint Timeline [checkpoint: 74d1e08]
 
 - [x] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
 - [x] Task: Replace hardcoded colors in `CheckpointCard.tsx` with semantic tokens.
