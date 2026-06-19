@@ -86,7 +86,8 @@
     "templateTypePlaceholder": "e.g., Thesis, Research Paper",
     "saving": "Saving...",
     "previousPage": "Previous",
-    "nextPage": "Next"
+    "nextPage": "Next",
+    "pageOf": "Page {current} of {total}"
   },
   "theme": {
     "light": "Light Mode",

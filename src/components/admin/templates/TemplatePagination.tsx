@@ -18,7 +18,7 @@ export function TemplatePagination({
   return (
     <div className="flex items-center justify-between py-4">
       <p className="text-sm text-muted-foreground">
-        {t('common.page')} {currentPage} of {totalPages}
+        {t('common.pageOf', { current: String(currentPage), total: String(totalPages) })}
       </p>
       <div className="flex items-center gap-2">
         <Button

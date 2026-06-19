@@ -92,6 +92,7 @@ export type Translation = {
     saving: string
     previousPage: string
     nextPage: string
+    pageOf: string
   }
   theme: {
     light: string

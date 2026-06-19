@@ -4,11 +4,12 @@ import { TemplatePagination } from '@/components/admin/templates/TemplatePaginat
 
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
-    t: (key: string) => {
+    t: (key: string, params?: Record<string, string>) => {
       const translations: Record<string, string> = {
         'common.next': 'Next',
         'common.back': 'Back',
         'common.page': 'Page',
+        'common.pageOf': `Page ${params?.current ?? '?'} of ${params?.total ?? '?'}`,
       };
       return translations[key] || key;
     },

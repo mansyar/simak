@@ -4,14 +4,19 @@ import { ReviewQueuePagination } from '@/components/reviews/ReviewQueuePaginatio
 
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string, params?: Record<string, string>) => {
+      if (key === 'common.pageOf') {
+        return `Page ${params?.current ?? '?'} of ${params?.total ?? '?'}`;
+      }
+      return key;
+    },
   }),
 }));
 
 describe('ReviewQueuePagination', () => {
   it('should render page indicator', () => {
     render(<ReviewQueuePagination currentPage={1} totalPages={5} onPageChange={() => {}} />);
-    expect(screen.getByText(/page 1 of 5/i)).toBeDefined();
+    expect(screen.getByText('Page 1 of 5')).toBeDefined();
   });
 
   it('should disable prev button on first page', () => {
@@ -48,6 +53,6 @@ describe('ReviewQueuePagination', () => {
 
   it('should show correct text for page with long label', () => {
     render(<ReviewQueuePagination currentPage={2} totalPages={3} onPageChange={() => {}} />);
-    expect(screen.getByText(/2 of 3/)).toBeDefined();
+    expect(screen.getByText('Page 2 of 3')).toBeDefined();
   });
 });

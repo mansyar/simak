@@ -86,7 +86,8 @@
     "templateTypePlaceholder": "misal, Skripsi, Makalah Penelitian",
     "saving": "Menyimpan...",
     "previousPage": "Sebelumnya",
-    "nextPage": "Selanjutnya"
+    "nextPage": "Selanjutnya",
+    "pageOf": "Halaman {current} dari {total}"
   },
   "theme": {
     "light": "Mode Terang",
