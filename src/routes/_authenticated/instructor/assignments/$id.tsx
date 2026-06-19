@@ -23,7 +23,7 @@ import { formatDateShort, formatDateTimeShort } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MetricCard } from '@/components/ui/metric-card';
 import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
-import { Badge } from '@/components/ui/badge';
+import { CountBadge } from '@/components/ui/count-badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/ui/page-header';
 import { useI18n } from '../../../__root';
@@ -297,11 +297,7 @@ function AssignmentDetailPage() {
             }`}
           >
             {t('consultations.title')}
-            {pendingConsultations.length > 0 && (
-              <Badge variant="default" className="ml-1.5">
-                {pendingConsultations.length}
-              </Badge>
-            )}
+            <CountBadge count={pendingConsultations.length} hideWhenZero className="ml-1.5" />
           </button>
           <button
             type="button"
@@ -313,11 +309,7 @@ function AssignmentDetailPage() {
             }`}
           >
             {t('extensions.queueTitle')}
-            {extensionRequests.length > 0 && (
-              <Badge variant="default" className="ml-1.5">
-                {extensionRequests.length}
-              </Badge>
-            )}
+            <CountBadge count={extensionRequests.length} hideWhenZero className="ml-1.5" />
           </button>
         </div>
       </div>
