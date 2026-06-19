@@ -2,6 +2,22 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ReviewQueueFilters } from '@/components/reviews/ReviewQueueFilters';
 
+vi.mock('@/components/ui/select', () => ({
+  Select: ({ children, onValueChange, value }: any) => (
+    <select
+      data-testid="assignment-filter"
+      value={value}
+      onChange={(e) => onValueChange?.(e.target.value)}
+    >
+      {children}
+    </select>
+  ),
+  SelectContent: ({ children }: any) => <>{children}</>,
+  SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
+  SelectTrigger: ({ children }: any) => <div>{children}</div>,
+  SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
+}));
+
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
     t: (key: string) => key,
@@ -61,7 +77,7 @@ describe('ReviewQueueFilters', () => {
       />,
     );
     const select = screen.getByTestId('assignment-filter');
-    fireEvent.change(select, { target: { value: '' } });
+    fireEvent.change(select, { target: { value: 'all' } });
     expect(onAssignmentChange).toHaveBeenCalledWith(null);
   });
 
@@ -77,7 +93,7 @@ describe('ReviewQueueFilters', () => {
     expect(select.value).toBe('1');
   });
 
-  it('should show empty string when no assignment selected', () => {
+  it('should show all when no assignment selected', () => {
     render(
       <ReviewQueueFilters
         assignments={assignments}
@@ -85,7 +101,6 @@ describe('ReviewQueueFilters', () => {
         onAssignmentChange={() => {}}
       />,
     );
-    const select = screen.getByTestId('assignment-filter') as HTMLSelectElement;
-    expect(select.value).toBe('');
+    expect(screen.getByText('instructorReviews.allAssignments')).toBeDefined();
   });
 });

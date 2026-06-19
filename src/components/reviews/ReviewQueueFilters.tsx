@@ -1,4 +1,5 @@
 import { useI18n } from '../../routes/__root';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 
 interface ReviewQueueFiltersProps {
   assignments: { id: number; title: string }[];
@@ -13,22 +14,24 @@ export function ReviewQueueFilters({
 }: ReviewQueueFiltersProps) {
   const { t } = useI18n();
 
+  const value = selectedAssignmentId !== null ? String(selectedAssignmentId) : 'all';
+
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-      <div className="relative flex-1">
-        <select
-          value={selectedAssignmentId ?? ''}
-          onChange={(e) => onAssignmentChange(e.target.value ? Number(e.target.value) : null)}
-          className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          data-testid="assignment-filter"
-        >
-          <option value="">{t('instructorReviews.allAssignments')}</option>
-          {assignments.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.title}
-            </option>
-          ))}
-        </select>
+      <div className="w-full sm:w-[240px]">
+        <Select value={value} onValueChange={(val) => onAssignmentChange(val === 'all' ? null : Number(val))}>
+          <SelectTrigger data-testid="assignment-filter">
+            <span>{value === 'all' ? t('instructorReviews.allAssignments') : assignments.find((a) => a.id === Number(value))?.title ?? t('instructorReviews.allAssignments')}</span>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('instructorReviews.allAssignments')}</SelectItem>
+            {assignments.map((a) => (
+              <SelectItem key={a.id} value={String(a.id)}>
+                {a.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
