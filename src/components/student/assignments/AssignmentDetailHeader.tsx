@@ -22,7 +22,7 @@ export function AssignmentDetailHeader({ detail }: AssignmentDetailHeaderProps) 
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-2">
-        <Badge variant="default">{detail.templateType}</Badge>
+        <Badge variant="outline">{detail.templateType}</Badge>
       </div>
 
       <div>

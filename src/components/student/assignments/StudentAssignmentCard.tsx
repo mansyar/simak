@@ -3,6 +3,7 @@ import { Calendar, Clipboard } from 'lucide-react';
 import { format } from 'date-fns/format';
 import { useI18n } from '../../../routes/__root';
 import { Progress } from '../../ui/progress';
+import { Badge } from '../../ui/badge';
 
 export interface StudentAssignmentRow {
   id: number;
@@ -22,15 +23,10 @@ export function StudentAssignmentCard({ assignment }: StudentAssignmentCardProps
 
   return (
     <div className="group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-primary/30">
-      {/* Decorative gradient top bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-violet-500 opacity-80" />
-
       <div>
         <div className="flex items-start justify-between gap-2">
           <div>
-            <span className="text-[10px] font-bold tracking-wider uppercase text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-              {assignment.templateType}
-            </span>
+            <Badge variant="outline">{assignment.templateType}</Badge>
             <h3 className="mt-1.5 text-lg font-semibold text-foreground leading-snug group-hover:text-primary transition-colors">
               {assignment.title}
             </h3>

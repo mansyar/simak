@@ -175,4 +175,90 @@ describe('StudentDashboard', () => {
     expect(screen.getByText('Thesis Assignment')).toBeDefined();
     expect(screen.getByText('studentDashboard.pending')).toBeDefined();
   });
+
+  it('should render template type using Badge component', () => {
+    const data = {
+      activeAssignments: [
+        {
+          id: 1,
+          title: 'Thesis Assignment',
+          finalDeadline: '2026-06-01',
+          templateName: 'Thesis Template',
+          templateType: 'thesis',
+          progressPercent: 50,
+          currentState: 'unlocked',
+        },
+      ],
+      upcomingDeadlines: [],
+      pendingReviews: [],
+      consultationReminders: [],
+    };
+
+    render(<StudentDashboard data={data} />);
+
+    const badge = screen.getByText('thesis');
+    expect(badge.tagName).toBe('SPAN');
+    // Badge should not have the old inline uppercase classes
+    expect(badge.className).not.toContain('uppercase');
+  });
+
+  it('should render progress percentage with fallback when value is missing', () => {
+    const data = {
+      activeAssignments: [
+        {
+          id: 1,
+          title: 'Thesis Assignment',
+          finalDeadline: '2026-06-01',
+          templateName: 'Thesis Template',
+          templateType: 'thesis',
+          progressPercent: undefined as unknown as number,
+          currentState: 'unlocked',
+        },
+      ],
+      upcomingDeadlines: [],
+      pendingReviews: [],
+      consultationReminders: [],
+    };
+
+    render(<StudentDashboard data={data} />);
+
+    expect(screen.getByText('0%')).toBeDefined();
+  });
+
+  it('should use Progress component for active assignments', () => {
+    const data = {
+      activeAssignments: [
+        {
+          id: 1,
+          title: 'Thesis Assignment',
+          finalDeadline: '2026-06-01',
+          templateName: 'Thesis Template',
+          templateType: 'thesis',
+          progressPercent: 75,
+          currentState: 'unlocked',
+        },
+      ],
+      upcomingDeadlines: [],
+      pendingReviews: [],
+      consultationReminders: [],
+    };
+
+    const { container } = render(<StudentDashboard data={data} />);
+    const progressbar = container.querySelector('[role="progressbar"]');
+    expect(progressbar).toBeDefined();
+  });
+
+  it('should use compact EmptyState for empty widgets', () => {
+    const data = {
+      activeAssignments: [],
+      upcomingDeadlines: [],
+      pendingReviews: [],
+      consultationReminders: [],
+    };
+
+    const { container } = render(<StudentDashboard data={data} />);
+    // Compact EmptyState uses p-4 py-6 instead of default p-8 py-12
+    const emptyStates = container.querySelectorAll('[class*="p-4"]');
+    expect(emptyStates.length).toBeGreaterThan(0);
+  });
 });

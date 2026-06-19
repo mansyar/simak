@@ -42,6 +42,14 @@ describe('AssignmentDetailHeader', () => {
     expect(screen.getByText('Thesis')).toBeDefined();
   });
 
+  it('should render template type using outline Badge variant', () => {
+    render(<AssignmentDetailHeader detail={detail} />);
+    const badge = screen.getByText('Thesis');
+    expect(badge.tagName).toBe('SPAN');
+    // Should not have the old default variant class (bg-primary text-primary-foreground)
+    expect(badge.className).not.toContain('bg-primary');
+  });
+
   it('should render the deadline', () => {
     render(<AssignmentDetailHeader detail={detail} />);
     expect(screen.getByText(/Jun/)).toBeDefined();

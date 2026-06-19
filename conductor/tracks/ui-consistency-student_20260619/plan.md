@@ -28,23 +28,23 @@
 
 ## Phase 2: Assignment Card & Dashboard Cleanup
 
-- [ ] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
-- [ ] Task: Unify the template-type badge across student assignment surfaces.
-  - [ ] Write failing tests for `StudentAssignmentCard`, `StudentDashboard`, and `AssignmentDetailHeader` asserting the badge uses a shared `Badge` variant.
-  - [ ] Replace inline template-type spans with the shared `Badge` variant in all three components.
-  - [ ] Add or update i18n keys if badge labels need translation.
-- [ ] Task: Fix progress percentage display and standardize the progress bar.
-  - [ ] Write failing tests asserting progress renders as `<number>%` even when the value is missing.
-  - [ ] Update `StudentAssignmentCard.tsx` to use `{assignment.progressPercent ?? 0}%`.
-  - [ ] Update `/student/assignments/$id.tsx` to use `{data.progressPercent ?? 0}%`.
-  - [ ] Replace inline progress bars with the shared `Progress` component in `StudentAssignmentCard.tsx` and `StudentDashboard.tsx`.
-- [ ] Task: Remove the rogue `violet-500` gradient accent.
-  - [ ] Write failing test asserting `StudentAssignmentCard` does not contain `violet-500` or `to-violet-500` classes.
-  - [ ] Replace gradient top bar and progress bar with `bg-primary` / `from-primary to-primary`.
-  - [ ] Implement the change.
-- [ ] Task: Apply compact `EmptyState` to dashboard widgets.
-  - [ ] Update `StudentDashboard.tsx` to pass the compact prop to all four `EmptyState` usages.
-  - [ ] Verify visually that empty dashboard widgets no longer dominate card height.
+- [x] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
+- [x] Task: Unify the template-type badge across student assignment surfaces.
+  - [x] Write failing tests for `StudentAssignmentCard`, `StudentDashboard`, and `AssignmentDetailHeader` asserting the badge uses a shared `Badge` variant.
+  - [x] Replace inline template-type spans with the shared `Badge` variant in all three components.
+  - [x] Add or update i18n keys if badge labels need translation.
+- [x] Task: Fix progress percentage display and standardize the progress bar.
+  - [x] Write failing tests asserting progress renders as `<number>%` even when the value is missing.
+  - [x] Update `StudentAssignmentCard.tsx` to use `{assignment.progressPercent ?? 0}%`.
+  - [x] Update `/student/assignments/$id.tsx` to use `{data.progressPercent ?? 0}%`.
+  - [x] Replace inline progress bars with the shared `Progress` component in `StudentAssignmentCard.tsx` and `StudentDashboard.tsx`.
+- [x] Task: Remove the rogue `violet-500` gradient accent.
+  - [x] Write failing test asserting `StudentAssignmentCard` does not contain `violet-500` or `to-violet-500` classes.
+  - [x] Replace gradient top bar and progress bar with `bg-primary` / `from-primary to-primary`.
+  - [x] Implement the change.
+- [x] Task: Apply compact `EmptyState` to dashboard widgets.
+  - [x] Update `StudentDashboard.tsx` to pass the compact prop to all four `EmptyState` usages.
+  - [x] Verify visually that empty dashboard widgets no longer dominate card height.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Assignment Card & Dashboard Cleanup' (Protocol in workflow.md)
 
 ## Phase 3: Assignment Detail & Checkpoint Timeline

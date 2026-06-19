@@ -4,6 +4,7 @@ import { Clock, FileText, MessageSquare, ClipboardList } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Progress } from '@/components/ui/progress';
 
 interface ActiveAssignment {
   id: number;
@@ -77,6 +78,7 @@ export function StudentDashboard({ data }: Props) {
               icon={ClipboardList}
               title={t('studentDashboard.noActiveAssignments')}
               description=""
+              compact
             />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -87,20 +89,13 @@ export function StudentDashboard({ data }: Props) {
                   className="block rounded-lg border bg-card p-4 hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      {assignment.templateType}
-                    </span>
+                    <Badge variant="outline">{assignment.templateType}</Badge>
                     <span className="text-xs text-muted-foreground">
-                      {assignment.progressPercent}%
+                      {assignment.progressPercent ?? 0}%
                     </span>
                   </div>
                   <h3 className="font-medium text-foreground truncate mb-2">{assignment.title}</h3>
-                  <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-primary h-full rounded-full transition-all"
-                      style={{ width: `${assignment.progressPercent}%` }}
-                    />
-                  </div>
+                  <Progress value={assignment.progressPercent ?? 0} />
                 </Link>
               ))}
             </div>
@@ -119,6 +114,7 @@ export function StudentDashboard({ data }: Props) {
               icon={Clock}
               title={t('studentDashboard.noUpcomingDeadlines')}
               description=""
+              compact
             />
           ) : (
             <ul className="space-y-3">
@@ -169,6 +165,7 @@ export function StudentDashboard({ data }: Props) {
               icon={FileText}
               title={t('studentDashboard.noPendingReviews')}
               description=""
+              compact
             />
           ) : (
             <ul className="space-y-3">
@@ -205,6 +202,7 @@ export function StudentDashboard({ data }: Props) {
               icon={MessageSquare}
               title={t('studentDashboard.noConsultationReminders')}
               description=""
+              compact
             />
           ) : (
             <ul className="space-y-3">

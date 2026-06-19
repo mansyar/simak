@@ -1,5 +1,5 @@
 // Server-only handlers for student assignment views and deadline management
-import { eq, and, isNull, sql } from 'drizzle-orm';
+import { eq, and, isNull, sql, inArray } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
 import { assignmentTemplates } from '../db/schema/templates';
@@ -172,6 +172,37 @@ export async function listStudentAssignmentsHandler(args: { data: ListStudentAss
     .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
     .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions));
 
+  // Calculate progress per assignment from checkpoint states
+  const assignmentIds = rawAssignments.map((a) => a.id);
+  const progressMap = new Map<number, number>();
+
+  if (assignmentIds.length > 0) {
+    const allCheckpoints = await db
+      .select({
+        assignmentId: checkpoints.assignmentId,
+        state: checkpoints.state,
+      })
+      .from(checkpoints)
+      .where(
+        and(
+          inArray(checkpoints.assignmentId, assignmentIds),
+          eq(checkpoints.studentId, session.user.id),
+        ),
+      );
+
+    const countsByAssignment = new Map<number, { total: number; passed: number }>();
+    for (const cp of allCheckpoints) {
+      const existing = countsByAssignment.get(cp.assignmentId) ?? { total: 0, passed: 0 };
+      existing.total++;
+      if (cp.state === 'passed') existing.passed++;
+      countsByAssignment.set(cp.assignmentId, existing);
+    }
+
+    for (const [id, counts] of countsByAssignment) {
+      progressMap.set(id, counts.total > 0 ? Math.round((counts.passed / counts.total) * 100) : 0);
+    }
+  }
+
   return {
     assignments: rawAssignments.map((a) => ({
       id: a.id,
@@ -181,6 +212,7 @@ export async function listStudentAssignmentsHandler(args: { data: ListStudentAss
       createdAt: a.createdAt,
       templateName: a.templateName,
       templateType: a.templateType,
+      progressPercent: progressMap.get(a.id) ?? 0,
     })),
     total: Number(count),
   };
