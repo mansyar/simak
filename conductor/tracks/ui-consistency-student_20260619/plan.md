@@ -64,7 +64,7 @@
   - [x] Ensure active tab meets WCAG 2.1 AA contrast in both themes.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Assignment Detail & Checkpoint Timeline' (Protocol in workflow.md)
 
-## Phase 4: Layout & Cross-Cutting Student Routes
+## Phase 4: Layout & Cross-Cutting Student Routes [checkpoint: 85106ed]
 
 - [x] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
 - [x] Task: Refine sidebar active-state styling.
