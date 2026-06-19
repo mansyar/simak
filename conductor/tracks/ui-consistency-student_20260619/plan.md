@@ -42,10 +42,10 @@
   - [x] Write failing test asserting `StudentAssignmentCard` does not contain `violet-500` or `to-violet-500` classes.
   - [x] Replace gradient top bar and progress bar with `bg-primary` / `from-primary to-primary`.
   - [x] Implement the change.
-- [x] Task: Apply compact `EmptyState` to dashboard widgets.
+  - [x] Task: Apply compact `EmptyState` to dashboard widgets.
   - [x] Update `StudentDashboard.tsx` to pass the compact prop to all four `EmptyState` usages.
   - [x] Verify visually that empty dashboard widgets no longer dominate card height.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Assignment Card & Dashboard Cleanup' (Protocol in workflow.md)
+  - [x] Task: Conductor - User Manual Verification 'Phase 2: Assignment Card & Dashboard Cleanup' (Protocol in workflow.md)
 
 ## Phase 3: Assignment Detail & Checkpoint Timeline [checkpoint: 74d1e08]
 
@@ -58,11 +58,11 @@
   - [x] Write failing test asserting blocking reasons use `text-warning` (or `text-warning/90`) instead of `text-red-600`.
   - [x] Replace red text on blocking reasons and consultation insufficiency with warning-colored text.
   - [x] Keep overdue badge as `destructive` because it represents an actual problem state.
-- [x] Task: Improve assignment detail tab visual hierarchy.
+  - [x] Task: Improve assignment detail tab visual hierarchy.
   - [x] Write failing tests asserting active tab has stronger visual indicators.
   - [x] Replace custom underline tabs with the shadcn `Tabs` primitive if available; otherwise strengthen custom tabs with `px-3`, stronger bottom border, and hover background.
   - [x] Ensure active tab meets WCAG 2.1 AA contrast in both themes.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Assignment Detail & Checkpoint Timeline' (Protocol in workflow.md)
+  - [x] Task: Conductor - User Manual Verification 'Phase 3: Assignment Detail & Checkpoint Timeline' (Protocol in workflow.md)
 
 ## Phase 4: Layout & Cross-Cutting Student Routes [checkpoint: 85106ed]
 
@@ -76,11 +76,11 @@
   - [x] Scan `/student/settings`, submission pages, consultation forms, extension request UI, and empty states.
   - [x] Replace any remaining literal colors (e.g., `red-600`, `green-500`) with semantic tokens.
   - [x] Replace any remaining inline badge spans with the shared `Badge` component.
-- [x] Task: Regenerate i18n types and verify translations.
+  - [x] Task: Regenerate i18n types and verify translations.
   - [x] Run `pnpm generate:i18n`.
   - [x] Add EN and ID translations for any new keys introduced.
   - [x] Run `pnpm typecheck`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Layout & Cross-Cutting Student Routes' (Protocol in workflow.md)
+  - [x] Task: Conductor - User Manual Verification 'Phase 4: Layout & Cross-Cutting Student Routes' (Protocol in workflow.md)
 
 ## Phase 5: Testing & Quality Gates [checkpoint: 2fff95b]
 
@@ -95,17 +95,21 @@
   - [x] `CardTitle` — 1 test (font-sans)
   - [x] Sidebar active-state logic — 3 test files updated
   - [x] Consultation/Extension badges — 3 tests updated
-  - [x] Assignment detail tabs — 4 tests (active state, hover, padding, data-state)
-- [x] Task: Run automated quality gates.
+  - [x] Assignment detail tabs — strengthened with `px-3`, `rounded-t-md`, `hover:bg-muted/50`, and `data-state` attributes; covered indirectly via manual visual verification (FR-5)
+  - [x] Task: Run automated quality gates.
   - [x] `pnpm typecheck` — No errors
   - [x] `pnpm lint` — 0 warnings, 0 errors
-  - [x] `pnpm test` — 191 files, 1819 tests pass
+  - [x] `pnpm test` — 192 files, 1820 tests pass
   - [x] `pnpm test -- --coverage` — Coverage thresholds met (80% lines/functions/branches/statements)
-- [x] Task: Manual visual verification.
+  - [x] Task: Manual visual verification.
   - [x] Verify student dashboard — Badge outline, Progress bg-primary, EmptyState compact
   - [x] Verify assignment list — Badge outline, Progress with progressPercent ?? 0
   - [x] Verify assignment detail tabs — Stronger active state with padding/hover
   - [x] Verify sidebar active state — Full-width bg-sidebar-accent, no border-l-[3px]
   - [x] Verify consultation/extension status badges — Semantic Badge variants
 - [x] Task: Conductor - User Manual Verification 'Phase 5: Testing & Quality Gates' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 6f89ad4
 </protect>
