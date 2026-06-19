@@ -254,7 +254,7 @@ Goal: split the 446-line assignment detail page, dedupe pagination and refresh-b
     - [x] Update `src/components/instructor/assignments/AssignmentDetailTabs.tsx` (from 5.1) to use the new `<Tabs>`.
     - [x] Verify all tests pass; commit `refactor(ui): Adopt Tabs primitive in assignment detail`.
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 5 — Structural cleanups' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 5 — Structural cleanups' (Protocol in workflow.md)
 
 ---
 
