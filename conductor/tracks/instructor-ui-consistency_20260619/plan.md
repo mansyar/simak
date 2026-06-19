@@ -262,10 +262,10 @@ Goal: split the 446-line assignment detail page, dedupe pagination and refresh-b
 
 Goal: remove `// @ts-expect-error - handler type inference limitation` from every route loader without introducing any regression.
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
-    - [ ] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
-- [ ] Task: Investigate root cause
+- [~] Task: Read spec.md and workflow.md
+    - [x] Read `spec.md` to confirm scope, requirements, and acceptance criteria for this phase
+    - [x] Read `workflow.md` to confirm TDD lifecycle, quality gates, and git-notes protocol
+- [~] Task: Investigate root cause
     - [ ] Read `src/server/<feature>.ts` and `src/server/<feature>.server.ts` for at least 3 features to identify the common typing gap. Document the root cause in this task's git note (a one-paragraph description: where in the chain the type is lost).
     - [ ] Read `conductor/workflow.md` to confirm the server-function pattern requirements.
     - [ ] Identify the minimal typing change that closes the gap. Options to evaluate (in order of preference): (a) tighten the `createServerFn` wrapper generic, (b) adjust the `data` argument type in client stubs, (c) change the loader's `loaderDeps` to derive the search type from `validateSearch` (currently Zod-validated but the `loaderDeps` function may not narrow it correctly).
