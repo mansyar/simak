@@ -277,6 +277,9 @@ export type Translation = {
     submitError: string
     reviewSubmitted: string
     backToQueue: string
+    errors: {
+      feedbackUploadFailed: string
+    }
   }
   instructorAssignments: {
     title: string

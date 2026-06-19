@@ -271,7 +271,10 @@
     "revisionDeadlineRequired": "Revision deadline is required for revise decision",
     "submitError": "Failed to submit review. Please try again.",
     "reviewSubmitted": "Review submitted successfully!",
-    "backToQueue": "Back to Review Queue"
+    "backToQueue": "Back to Review Queue",
+    "errors": {
+      "feedbackUploadFailed": "Failed to upload feedback file"
+    }
   },
   "instructorAssignments": {
     "title": "Assignments",

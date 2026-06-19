@@ -58,14 +58,14 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
         });
 
         if (!response.ok) {
-          onError('Failed to upload feedback file');
+          onError(t('instructorReviews.errors.feedbackUploadFailed'));
           return;
         }
 
         setFeedbackFile(file);
         setFeedbackFileKey(uploadData.fileKey);
       } catch {
-        onError('Failed to upload feedback file');
+        onError(t('instructorReviews.errors.feedbackUploadFailed'));
       } finally {
         setIsUploadingFeedback(false);
       }
@@ -133,9 +133,7 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
               onChange={() => setDecision('pass')}
               className="accent-success"
             />
-            <span className="text-sm font-medium text-success">
-              {t('instructorReviews.pass')}
-            </span>
+            <span className="text-sm font-medium text-success">{t('instructorReviews.pass')}</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input

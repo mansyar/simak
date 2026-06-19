@@ -271,7 +271,10 @@
     "revisionDeadlineRequired": "Tenggat revisi wajib diisi untuk keputusan revisi",
     "submitError": "Gagal mengirim review. Silakan coba lagi.",
     "reviewSubmitted": "Review berhasil dikirim!",
-    "backToQueue": "Kembali ke Antrean Review"
+    "backToQueue": "Kembali ke Antrean Review",
+    "errors": {
+      "feedbackUploadFailed": "Gagal mengunggah file umpan balik"
+    }
   },
   "instructorAssignments": {
     "title": "Tugas",
