@@ -6,6 +6,8 @@ export default defineConfig({
     alias: {
       '@': '/src',
     },
+    // Prefer .ts/.tsx source over stale compiled .js files
+    extensions: ['.ts', '.tsx', '.mjs', '.js', '.jsx', '.json'],
   },
   test: {
     globals: true,
