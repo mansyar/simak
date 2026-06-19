@@ -10,7 +10,7 @@ import {
 } from '@/server/templates';
 import { TemplateCard, TemplateRow } from '@/components/admin/templates/TemplateCard';
 import { TemplateFilters } from '@/components/admin/templates/TemplateFilters';
-import { TemplatePagination } from '@/components/admin/templates/TemplatePagination';
+import { Pagination } from '@/components/ui/pagination';
 import { TemplateEmptyState } from '@/components/admin/templates/TemplateEmptyState';
 import { TemplateLoadingSkeleton } from '@/components/admin/templates/TemplateLoadingSkeleton';
 import { CreateTemplateDialog } from '@/components/admin/templates/CreateTemplateDialog';
@@ -203,7 +203,7 @@ function TemplatesPage() {
       )}
 
       {templates.length > 0 && (
-        <TemplatePagination
+        <Pagination
           currentPage={searchParams.page}
           totalPages={Math.max(1, Math.ceil(total / searchParams.limit))}
           onPageChange={handlePageChange}

@@ -8,7 +8,7 @@ import {
 import { StudentAssignmentFilters } from '@/components/student/assignments/StudentAssignmentFilters';
 import { StudentAssignmentEmptyState } from '@/components/student/assignments/StudentAssignmentEmptyState';
 import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
-import { TemplatePagination } from '@/components/admin/templates/TemplatePagination';
+import { Pagination } from '@/components/ui/pagination';
 import { RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { z } from 'zod';
@@ -96,7 +96,7 @@ function AssignmentsPage() {
       )}
 
       {assignments.length > 0 && (
-        <TemplatePagination
+        <Pagination
           currentPage={searchParams.page}
           totalPages={Math.max(1, Math.ceil(total / searchParams.limit))}
           onPageChange={handlePageChange}

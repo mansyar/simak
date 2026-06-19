@@ -5,7 +5,7 @@ import { AssignmentCard } from '@/components/instructor/assignments/AssignmentCa
 import { AssignmentFilters } from '@/components/instructor/assignments/AssignmentFilters';
 import { AssignmentEmptyState } from '@/components/instructor/assignments/AssignmentEmptyState';
 import { AssignmentLoadingSkeleton } from '@/components/instructor/assignments/AssignmentLoadingSkeleton';
-import { TemplatePagination } from '@/components/admin/templates/TemplatePagination'; // reuse
+import { Pagination } from '@/components/ui/pagination';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { Plus, RefreshCcw } from 'lucide-react';
@@ -97,9 +97,7 @@ function AssignmentsPage() {
             >
               <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             </Button>
-            <Button
-              onClick={handleCreateNew}
-            >
+            <Button onClick={handleCreateNew}>
               <Plus className="mr-2 h-4 w-4" />
               {t('instructorAssignments.newAssignment')}
             </Button>
@@ -120,7 +118,7 @@ function AssignmentsPage() {
       )}
 
       {assignments.length > 0 && (
-        <TemplatePagination
+        <Pagination
           currentPage={searchParams.page}
           totalPages={Math.max(1, Math.ceil(total / searchParams.limit))}
           onPageChange={handlePageChange}

@@ -7,7 +7,7 @@ import { ReviewQueueTable } from '@/components/reviews/ReviewQueueTable';
 import { ReviewQueueFilters } from '@/components/reviews/ReviewQueueFilters';
 import { ReviewQueueEmptyState } from '@/components/reviews/ReviewQueueEmptyState';
 import { ReviewQueueSkeleton } from '@/components/reviews/ReviewQueueSkeleton';
-import { ReviewQueuePagination } from '@/components/reviews/ReviewQueuePagination';
+import { Pagination } from '@/components/ui/pagination';
 import { RefreshCcw } from 'lucide-react';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -101,7 +101,7 @@ function ReviewsPage() {
       {items.length === 0 ? <ReviewQueueEmptyState /> : <ReviewQueueTable data={items} />}
 
       {items.length > 0 && (
-        <ReviewQueuePagination
+        <Pagination
           currentPage={searchParams.page}
           totalPages={Math.max(1, Math.ceil(total / searchParams.limit))}
           onPageChange={handlePageChange}
