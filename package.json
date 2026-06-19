@@ -25,7 +25,7 @@
     "generate:i18n": "tsx scripts/generate-i18n-types.ts",
     "check:i18n": "node scripts/check-i18n-keys.js",
     "check:i18n:unused": "node scripts/check-i18n-keys.js --show-unused",
-    "prepare": "husky"
+    "prepare": "lefthook install"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1052.0",
@@ -71,7 +71,7 @@
     "@vitest/coverage-v8": "^4.1.6",
     "drizzle-kit": "0.31.10",
     "happy-dom": "^20.9.0",
-    "husky": "^9.1.0",
+    "lefthook": "^2.1.9",
     "jsdom": "^26.0.0",
     "oxfmt": "^0.55.0",
     "oxlint": "^1.70.0",

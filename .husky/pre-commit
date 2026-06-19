@@ -1,3 +1,0 @@
-#!/bin/sh
-npx oxlint --fix .
-npx oxfmt --write src/ tests/ scripts/
