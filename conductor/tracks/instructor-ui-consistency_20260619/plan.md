@@ -45,10 +45,10 @@ Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTyp
     - [x] Implement `src/lib/format.ts` using `date-fns/format` with `date-fns/locale/{en,id}`.
     - [x] Verify coverage ≥ 80%; commit `feat(lib): Add formatDate helpers with locale support`.
 
-- [ ] Task: Add `CountBadge` primitive
-    - [ ] Write failing test in `tests/unit/components/ui/count-badge.test.tsx` covering: renders count, hides at 0 (when `hideWhenZero` prop), default colour uses design token.
-    - [ ] Implement `src/components/ui/count-badge.tsx`. Canonical: `inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-primary text-primary-foreground`.
-    - [ ] Verify coverage ≥ 80%; commit `feat(ui): Add CountBadge primitive`.
+- [x] Task: Add `CountBadge` primitive (6cdba6b)
+    - [x] Write failing test in `tests/unit/components/ui/count-badge.test.tsx` covering: renders count, hides at 0 (when `hideWhenZero` prop), default colour uses design token.
+    - [x] Implement `src/components/ui/count-badge.tsx`. Canonical: `inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-primary text-primary-foreground`.
+    - [x] Verify coverage ≥ 80%; commit `feat(ui): Add CountBadge primitive`.
 
 - [ ] Task: Make `EmptyState.description` optional
     - [ ] Update `src/components/ui/empty-state.tsx`: change `description: string` to `description?: string`; render the `<p>` only when `description` is a non-empty string.
