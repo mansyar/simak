@@ -102,7 +102,7 @@ export function ExtensionRequestForm({
   if (success) {
     return (
       <div className="rounded-lg border bg-card p-5 shadow-sm">
-        <p className="text-sm text-green-600 font-medium">{t('extensions.successMessage')}</p>
+        <p className="text-sm text-success font-medium">{t('extensions.successMessage')}</p>
       </div>
     );
   }

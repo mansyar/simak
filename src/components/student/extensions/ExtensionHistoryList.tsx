@@ -1,5 +1,6 @@
 import { useI18n } from '../../../routes/__root';
 import type { TranslationKey } from '../../../i18n/index';
+import { Badge } from '@/components/ui/badge';
 
 interface ExtensionHistoryItem {
   id: number;
@@ -17,16 +18,16 @@ interface ExtensionHistoryListProps {
   items: ExtensionHistoryItem[];
 }
 
-function getStatusBadgeClass(status: string): string {
+function getStatusBadgeVariant(status: string): 'warning' | 'success' | 'destructive' | 'outline' {
   switch (status) {
     case 'pending':
-      return 'text-yellow-700 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30';
+      return 'warning';
     case 'approved':
-      return 'text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
+      return 'success';
     case 'rejected':
-      return 'text-red-700 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
+      return 'destructive';
     default:
-      return 'text-muted-foreground bg-muted';
+      return 'outline';
   }
 }
 
@@ -93,13 +94,11 @@ export function ExtensionHistoryList({ items }: ExtensionHistoryListProps) {
                 </td>
                 <td className="py-3 pr-4 text-foreground">{item.extensionDays} days</td>
                 <td className="py-3 pr-4">
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(item.status)}`}
-                  >
+                  <Badge variant={getStatusBadgeVariant(item.status)}>
                     {t(
                       `extensions.status${item.status.charAt(0).toUpperCase() + item.status.slice(1)}` as TranslationKey,
                     )}
-                  </span>
+                  </Badge>
                 </td>
                 <td className="py-3 text-foreground">{item.resolutionReason ?? '-'}</td>
               </tr>

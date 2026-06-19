@@ -75,14 +75,14 @@ describe('StudentSidebar', () => {
     expect(assignmentsLink.textContent).toContain('studentSidebar.assignments');
   });
 
-  it('should highlight the currently active route with sidebar accent classes', () => {
+  it('should highlight the currently active route with background accent', () => {
     mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
     render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/student/dashboard');
-    expect(dashboardLink.className).toContain('border-sidebar-primary');
     expect(dashboardLink.className).toContain('bg-sidebar-accent');
     expect(dashboardLink.className).toContain('text-sidebar-primary-foreground');
+    expect(dashboardLink.className).not.toContain('border-l-[3px]');
   });
 
   it('should highlight active route with sub-paths', () => {
@@ -90,7 +90,6 @@ describe('StudentSidebar', () => {
     render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/student/assignments');
-    expect(assignmentsLink.className).toContain('border-sidebar-primary');
     expect(assignmentsLink.className).toContain('bg-sidebar-accent');
     expect(assignmentsLink.className).toContain('text-sidebar-primary-foreground');
   });
@@ -100,7 +99,7 @@ describe('StudentSidebar', () => {
     render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);
 
     const assignmentsLink = screen.getByTestId('sidebar-link-/student/assignments');
-    expect(assignmentsLink.className).not.toContain('border-sidebar-primary');
+    expect(assignmentsLink.className).not.toMatch(/(?<!:)bg-sidebar-accent(?= |$)/);
     expect(assignmentsLink.className).toContain('text-sidebar-foreground');
   });
 

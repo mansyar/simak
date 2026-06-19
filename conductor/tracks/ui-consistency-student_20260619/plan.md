@@ -66,20 +66,20 @@
 
 ## Phase 4: Layout & Cross-Cutting Student Routes
 
-- [ ] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
-- [ ] Task: Refine sidebar active-state styling.
-  - [ ] Write failing tests asserting active nav item does not rely on a left border indent.
-  - [ ] Update `student-sidebar.tsx` active item to use full-width background highlight without `border-l-[3px]`.
-  - [ ] Apply the same pattern to `instructor-sidebar.tsx` and `admin-sidebar.tsx` if the identical style exists.
-  - [ ] Ensure hover and focus-visible states remain accessible.
-- [ ] Task: Audit remaining student routes for hardcoded colors and token misuse.
-  - [ ] Scan `/student/settings`, submission pages, consultation forms, extension request UI, and empty states.
-  - [ ] Replace any remaining literal colors (e.g., `red-600`, `green-500`) with semantic tokens.
-  - [ ] Replace any remaining inline badge spans with the shared `Badge` component.
-- [ ] Task: Regenerate i18n types and verify translations.
-  - [ ] Run `pnpm generate:i18n`.
-  - [ ] Add EN and ID translations for any new keys introduced.
-  - [ ] Run `pnpm typecheck`.
+- [x] Task: Read `spec.md` for this track to confirm scope and acceptance criteria before starting implementation.
+- [x] Task: Refine sidebar active-state styling.
+  - [x] Write failing tests asserting active nav item does not rely on a left border indent.
+  - [x] Update `student-sidebar.tsx` active item to use full-width background highlight without `border-l-[3px]`.
+  - [x] Apply the same pattern to `instructor-sidebar.tsx` and `admin-sidebar.tsx` if the identical style exists.
+  - [x] Ensure hover and focus-visible states remain accessible.
+- [x] Task: Audit remaining student routes for hardcoded colors and token misuse.
+  - [x] Scan `/student/settings`, submission pages, consultation forms, extension request UI, and empty states.
+  - [x] Replace any remaining literal colors (e.g., `red-600`, `green-500`) with semantic tokens.
+  - [x] Replace any remaining inline badge spans with the shared `Badge` component.
+- [x] Task: Regenerate i18n types and verify translations.
+  - [x] Run `pnpm generate:i18n`.
+  - [x] Add EN and ID translations for any new keys introduced.
+  - [x] Run `pnpm typecheck`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Layout & Cross-Cutting Student Routes' (Protocol in workflow.md)
 
 ## Phase 5: Testing & Quality Gates

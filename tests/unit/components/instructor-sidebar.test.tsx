@@ -91,9 +91,9 @@ describe('InstructorSidebar', () => {
     render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
-    expect(dashboardLink.className).toContain('border-sidebar-primary');
     expect(dashboardLink.className).toContain('bg-sidebar-accent');
     expect(dashboardLink.className).toContain('text-sidebar-primary-foreground');
+    expect(dashboardLink.className).not.toContain('border-l-[3px]');
   });
 
   it('should not apply the active class to inactive routes', () => {
@@ -101,7 +101,7 @@ describe('InstructorSidebar', () => {
     render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
 
     const dashboardLink = screen.getByTestId('sidebar-link-/instructor/dashboard');
-    expect(dashboardLink.className).not.toContain('border-sidebar-primary');
+    expect(dashboardLink.className).not.toMatch(/(?<!:)bg-sidebar-accent(?= |$)/);
   });
 
   it('should render logout button', () => {

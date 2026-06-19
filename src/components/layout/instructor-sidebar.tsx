@@ -88,10 +88,10 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
                 key={link.to}
                 to={link.to as unknown as '.'}
                 onClick={handleLinkClick}
-                className={`flex items-center gap-3 rounded-lg border-l-[3px] px-3 py-2.5 text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
-                    ? 'border-sidebar-primary bg-sidebar-accent text-sidebar-primary-foreground'
-                    : 'border-transparent text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary-foreground'
+                    ? 'bg-sidebar-accent text-sidebar-primary-foreground'
+                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary-foreground'
                 }`}
               >
                 <Icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
@@ -112,10 +112,10 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
                 key={link.to}
                 to={link.to as unknown as '.'}
                 onClick={handleLinkClick}
-                className={`flex items-center gap-3 rounded-lg border-l-[3px] px-3 py-2.5 text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
-                    ? 'border-sidebar-primary bg-sidebar-accent text-sidebar-primary-foreground'
-                    : 'border-transparent text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary-foreground'
+                    ? 'bg-sidebar-accent text-sidebar-primary-foreground'
+                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-primary-foreground'
                 }`}
               >
                 <Icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
@@ -146,7 +146,7 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
         <div className="border-t border-sidebar-border p-4">
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-all hover:bg-red-500/10 hover:text-red-400"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-all hover:bg-destructive/10 hover:text-destructive"
           >
             <LogOut className="h-4 w-4" />
             {t('auth.logout')}

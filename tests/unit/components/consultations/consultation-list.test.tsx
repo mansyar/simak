@@ -44,22 +44,25 @@ describe('ConsultationList', () => {
     expect(screen.getByText('Student discussed topic selection.')).toBeDefined();
   });
 
-  it('should render pending status badge', () => {
+  it('should render pending status badge with warning variant', () => {
     render(<ConsultationList consultations={[baseConsultation]} />);
     const badge = screen.getByText('Pending');
-    expect(badge.className).toContain('yellow');
+    expect(badge.className).toContain('bg-warning');
+    expect(badge.className).toContain('text-warning');
   });
 
-  it('should render verified status badge', () => {
+  it('should render verified status badge with success variant', () => {
     render(<ConsultationList consultations={[{ ...baseConsultation, status: 'verified' }]} />);
     const badge = screen.getByText('Verified');
-    expect(badge.className).toContain('green');
+    expect(badge.className).toContain('bg-success');
+    expect(badge.className).toContain('text-success');
   });
 
-  it('should render rejected status badge', () => {
+  it('should render rejected status badge with destructive variant', () => {
     render(<ConsultationList consultations={[{ ...baseConsultation, status: 'rejected' }]} />);
     const badge = screen.getByText('Rejected');
-    expect(badge.className).toContain('red');
+    expect(badge.className).toContain('bg-destructive');
+    expect(badge.className).toContain('text-destructive');
   });
 
   it('should render internal session type', () => {
