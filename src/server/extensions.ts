@@ -47,50 +47,44 @@ export const BulkExtendSchema = z.object({
 
 // ---- Server Function Stubs ----
 
-export const requestExtension = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const requestExtension = createServerFn({ method: 'POST' })
+  .inputValidator(RequestExtensionSchema)
+  .handler(async ({ data }) => {
     const { requestExtensionHandler } = await import('./extensions.server');
-    const data = RequestExtensionSchema.parse(args.data);
     return requestExtensionHandler({ data });
-  },
-);
+  });
 
-export const listExtensionRequests = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listExtensionRequests = createServerFn({ method: 'GET' })
+  .inputValidator(ListExtensionRequestsSchema)
+  .handler(async ({ data }) => {
     const { listExtensionRequestsHandler } = await import('./extensions.server');
-    const data = ListExtensionRequestsSchema.parse(args.data);
     return listExtensionRequestsHandler({ data });
-  },
-);
+  });
 
-export const listMyExtensionRequests = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listMyExtensionRequests = createServerFn({ method: 'GET' })
+  .inputValidator(ListMyExtensionsSchema)
+  .handler(async ({ data }) => {
     const { listMyExtensionRequestsHandler } = await import('./extensions.server');
-    const data = ListMyExtensionsSchema.parse(args.data);
     return listMyExtensionRequestsHandler({ data });
-  },
-);
+  });
 
-export const approveExtension = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const approveExtension = createServerFn({ method: 'POST' })
+  .inputValidator(ApproveExtensionSchema)
+  .handler(async ({ data }) => {
     const { approveExtensionHandler } = await import('./extensions.server');
-    const data = ApproveExtensionSchema.parse(args.data);
     return approveExtensionHandler({ data });
-  },
-);
+  });
 
-export const rejectExtension = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const rejectExtension = createServerFn({ method: 'POST' })
+  .inputValidator(RejectExtensionSchema)
+  .handler(async ({ data }) => {
     const { rejectExtensionHandler } = await import('./extensions.server');
-    const data = RejectExtensionSchema.parse(args.data);
     return rejectExtensionHandler({ data });
-  },
-);
+  });
 
-export const bulkExtend = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const bulkExtend = createServerFn({ method: 'POST' })
+  .inputValidator(BulkExtendSchema)
+  .handler(async ({ data }) => {
     const { bulkExtendHandler } = await import('./extensions.server');
-    const data = BulkExtendSchema.parse(args.data);
     return bulkExtendHandler({ data });
-  },
-);
+  });

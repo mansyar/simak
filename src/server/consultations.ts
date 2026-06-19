@@ -38,58 +38,51 @@ export const ListVerifiedCountsSchema = z.object({
   assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
 });
 
-export const logConsultation = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const logConsultation = createServerFn({ method: 'POST' })
+  .inputValidator(LogConsultationSchema)
+  .handler(async ({ data }) => {
     const { logConsultationHandler } = await import('./consultations.server');
-    const data = LogConsultationSchema.parse(args.data);
     return logConsultationHandler({ data });
-  },
-);
+  });
 
-export const listConsultations = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listConsultations = createServerFn({ method: 'GET' })
+  .inputValidator(ListConsultationsSchema)
+  .handler(async ({ data }) => {
     const { listConsultationsHandler } = await import('./consultations.server');
-    const data = ListConsultationsSchema.parse(args.data);
     return listConsultationsHandler({ data });
-  },
-);
+  });
 
-export const listPendingConsultations = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listPendingConsultations = createServerFn({ method: 'GET' })
+  .inputValidator(ListPendingConsultationsSchema)
+  .handler(async ({ data }) => {
     const { listPendingConsultationsHandler } = await import('./consultations.server');
-    const data = ListPendingConsultationsSchema.parse(args.data);
     return listPendingConsultationsHandler({ data });
-  },
-);
+  });
 
-export const verifyConsultation = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const verifyConsultation = createServerFn({ method: 'POST' })
+  .inputValidator(VerifyConsultationSchema)
+  .handler(async ({ data }) => {
     const { verifyConsultationHandler } = await import('./consultations.server');
-    const data = VerifyConsultationSchema.parse(args.data);
     return verifyConsultationHandler({ data });
-  },
-);
+  });
 
-export const rejectConsultation = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const rejectConsultation = createServerFn({ method: 'POST' })
+  .inputValidator(RejectConsultationSchema)
+  .handler(async ({ data }) => {
     const { rejectConsultationHandler } = await import('./consultations.server');
-    const data = RejectConsultationSchema.parse(args.data);
     return rejectConsultationHandler({ data });
-  },
-);
+  });
 
-export const getConsultationDetail = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const getConsultationDetail = createServerFn({ method: 'GET' })
+  .inputValidator(GetConsultationDetailSchema)
+  .handler(async ({ data }) => {
     const { getConsultationDetailHandler } = await import('./consultations.server');
-    const data = GetConsultationDetailSchema.parse(args.data);
     return getConsultationDetailHandler({ data });
-  },
-);
+  });
 
-export const listVerifiedCounts = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listVerifiedCounts = createServerFn({ method: 'GET' })
+  .inputValidator(ListVerifiedCountsSchema)
+  .handler(async ({ data }) => {
     const { listVerifiedCountsHandler } = await import('./consultations.server');
-    const data = ListVerifiedCountsSchema.parse(args.data);
     return listVerifiedCountsHandler({ data });
-  },
-);
+  });

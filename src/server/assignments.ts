@@ -39,21 +39,19 @@ export const createAssignment = createServerFn({ method: 'POST' }).handler(
   },
 );
 
-export const listInstructorAssignments = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listInstructorAssignments = createServerFn({ method: 'GET' })
+  .inputValidator(ListInstructorAssignmentsSchema)
+  .handler(async ({ data }) => {
     const { listInstructorAssignmentsHandler } = await import('./assignments.server');
-    const data = ListInstructorAssignmentsSchema.parse(args.data);
     return listInstructorAssignmentsHandler({ data });
-  },
-);
+  });
 
-export const getAssignmentDetail = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const getAssignmentDetail = createServerFn({ method: 'GET' })
+  .inputValidator(AssignmentIdParamSchema)
+  .handler(async ({ data }) => {
     const { getAssignmentDetailHandler } = await import('./assignments.server');
-    const data = AssignmentIdParamSchema.parse(args.data);
     return getAssignmentDetailHandler({ data });
-  },
-);
+  });
 
 // ---- Student Assignment Schemas ----
 
