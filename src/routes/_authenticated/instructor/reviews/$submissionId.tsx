@@ -10,34 +10,11 @@ import { useI18n } from '../../../__root';
 import { AlertCircle, CheckCircle2, SearchX } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 
-interface ReviewDetailLoaderData {
-  submission?: {
-    studentName: string;
-    assignmentTitle: string;
-    checkpointName: string;
-    fileName: string;
-    fileSize: number;
-    version: number;
-    uploadedAt: Date;
-    downloadUrl: string;
-    checkpointState: string;
-  };
-  reviewHistory?: Array<{
-    id: number;
-    decision: 'pass' | 'revise';
-    comment?: string | null;
-    instructorName: string;
-    createdAt: Date;
-  }>;
-  error?: string;
-}
-
 export const Route = createFileRoute('/_authenticated/instructor/reviews/$submissionId')({
-  loader: async ({ params }): Promise<ReviewDetailLoaderData> => {
+  loader: async ({ params }) => {
     try {
-      // @ts-expect-error - handler type inference limitation
       const data = await getReviewDetail({ data: { submissionId: Number(params.submissionId) } });
-      return data as ReviewDetailLoaderData;
+      return data;
     } catch {
       return { error: 'Failed to load review detail' };
     }
@@ -52,7 +29,7 @@ export const Route = createFileRoute('/_authenticated/instructor/reviews/$submis
 
 function ReviewDetailPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as ReviewDetailLoaderData;
+  const data = Route.useLoaderData();
   const params = Route.useParams();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -65,10 +42,7 @@ function ReviewDetailPage() {
       setTransitioned(true);
       let cancelled = false;
       (async () => {
-        const openFn = openForReview as unknown as (args: {
-          data: { submissionId: number };
-        }) => Promise<unknown>;
-        await openFn({ data: { submissionId: Number(params.submissionId) } });
+        await openForReview({ data: { submissionId: Number(params.submissionId) } });
         if (cancelled) return;
         // Re-fetch detail after transition by navigating to self
         navigate({ replace: true });
@@ -125,13 +99,18 @@ function ReviewDetailPage() {
       <ReviewFilePreview
         fileName={submission.fileName}
         fileSize={submission.fileSize}
-        version={submission.version}
-        uploadedAt={submission.uploadedAt}
+        version={submission.version ?? 0}
+        uploadedAt={submission.uploadedAt ?? new Date()}
         downloadUrl={submission.downloadUrl}
       />
 
       {/* Review history */}
-      <ReviewHistory reviews={reviewHistory ?? []} />
+      <ReviewHistory
+        reviews={(reviewHistory ?? []).map((r) => ({
+          ...r,
+          createdAt: r.createdAt ?? new Date(),
+        }))}
+      />
 
       {/* Review form */}
       <ReviewForm

@@ -27,7 +27,6 @@ export const Route = createFileRoute('/_authenticated/instructor/reviews/')({
     assignmentId: search.assignmentId,
   }),
   loader: async ({ deps }) => {
-    // @ts-expect-error - handler type inference limitation
     const reviewsResult = await listPendingReviews({ data: deps });
     const assignmentsResult = await listInstructorAssignmentsForFilter();
 

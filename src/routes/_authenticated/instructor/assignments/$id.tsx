@@ -17,7 +17,6 @@ import { useI18n } from '../../../__root';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id')({
   loader: async ({ params }) => {
-    // @ts-expect-error - handler type inference limitation
     return getAssignmentDetail({ data: { id: Number(params.id) } });
   },
   component: AssignmentDetailPage,
@@ -47,6 +46,9 @@ function AssignmentDetailPage() {
   useEffect(() => {
     if (!assignment) return;
     const load = async () => {
+      // as unknown as casts required: handler return types include Date | null
+      // fields that PendingConsultation/ExtensionRequestItem do not accept. This is
+      // a pre-existing data shape mismatch unrelated to the createServerFn typing fix.
       const listPendingFn = listPendingConsultations as unknown as (args: {
         data: { assignmentId: number };
       }) => Promise<{ consultations: PendingConsultation[] }>;
