@@ -74,11 +74,11 @@ Goal: fix the only real user-visible bugs in the instructor surface and clean up
     - [x] Update `src/routes/_authenticated/instructor/reviews/index.tsx`: load `listInstructorAssignmentsForFilter()` in the loader; pass to `<ReviewQueueFilters>`.
     - [x] Verify all tests pass; commit `fix(reviews): Populate review-queue assignment filter dropdown`.
 
-- [ ] Task: Unify the SLA badge
-    - [ ] Write failing test in `tests/unit/components/dashboard/instructor-dashboard.test.tsx` (extend existing) asserting that the "Pending Review Queue" widget renders the shared `SLABadge` with the correct variant for each wait time bucket.
-    - [ ] Update `src/components/dashboard/InstructorDashboard.tsx`: delete the local `SLABadge` (lines 49-58); convert `waitTimeDays` to a `Date` in the data shape (`submittedAt ?? new Date(...)`); use the shared `SLABadge` from `@/components/reviews/SLABadge`. Remove the `getStatusBadgeVariant` function's `case 'Submitted': return 'info'` mapping if it is no longer needed.
-    - [ ] Update any callers that depended on the local SLABadge's `variant="error"` to use `variant="destructive"` (verify no other instructor file still imports the deleted symbol).
-    - [ ] Verify all tests pass; commit `refactor(dashboard): Unify SLA badge with shared component`.
+- [x] Task: Unify the SLA badge (d16813f)
+    - [x] Write failing test in `tests/unit/components/dashboard/instructor-dashboard.test.tsx` (extend existing) asserting that the "Pending Review Queue" widget renders the shared `SLABadge` with the correct variant for each wait time bucket.
+    - [x] Update `src/components/dashboard/InstructorDashboard.tsx`: delete the local `SLABadge` (lines 49-58); convert `waitTimeDays` to a `Date` in the data shape (`submittedAt ?? new Date(...)`); use the shared `SLABadge` from `@/components/reviews/SLABadge`. Remove the `getStatusBadgeVariant` function's `case 'Submitted': return 'info'` mapping if it is no longer needed.
+    - [x] Update any callers that depended on the local SLABadge's `variant="error"` to use `variant="destructive"` (verify no other instructor file still imports the deleted symbol).
+    - [x] Verify all tests pass; commit `refactor(dashboard): Unify SLA badge with shared component`.
 
 - [ ] Task: Split the duplicated `instructorAssignments.details.studentsProgress` i18n key
     - [ ] Add `instructorAssignments.details.totalStudents` to `locales/en.json` and `locales/id.json`.
