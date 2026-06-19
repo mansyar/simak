@@ -5,6 +5,7 @@ import {
   InstructorDashboard,
   type InstructorDashboardData,
 } from '@/components/dashboard/InstructorDashboard';
+import { PageHeader } from '@/components/ui/page-header';
 
 export const Route = createFileRoute('/_authenticated/instructor/dashboard')({
   loader: async () => {
@@ -19,10 +20,10 @@ function InstructorDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-4xl">{t('instructorDashboard.title')}</h1>
-        <p className="text-sm text-muted-foreground mt-1">{t('instructorDashboard.subtitle')}</p>
-      </div>
+      <PageHeader
+        title={t('instructorDashboard.title')}
+        subtitle={t('instructorDashboard.subtitle')}
+      />
       <InstructorDashboard data={data} />
     </div>
   );

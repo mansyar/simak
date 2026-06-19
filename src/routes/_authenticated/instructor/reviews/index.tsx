@@ -11,6 +11,7 @@ import { ReviewQueuePagination } from '@/components/reviews/ReviewQueuePaginatio
 import { RefreshCcw } from 'lucide-react';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
 import { useI18n } from '../../../__root';
 
 const ReviewSearchSchema = z.object({
@@ -72,12 +73,10 @@ function ReviewsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="font-display text-4xl">{t('instructorReviews.title')}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{t('instructorReviews.subtitle')}</p>
-        </div>
-        <div className="flex items-center gap-2">
+      <PageHeader
+        title={t('instructorReviews.title')}
+        subtitle={t('instructorReviews.subtitle')}
+        action={
           <Button
             variant="outline"
             size="icon"
@@ -90,8 +89,8 @@ function ReviewsPage() {
           >
             <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       <ReviewQueueFilters
         assignments={assignments}

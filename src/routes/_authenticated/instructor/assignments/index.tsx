@@ -7,6 +7,7 @@ import { AssignmentEmptyState } from '@/components/instructor/assignments/Assign
 import { AssignmentLoadingSkeleton } from '@/components/instructor/assignments/AssignmentLoadingSkeleton';
 import { TemplatePagination } from '@/components/admin/templates/TemplatePagination'; // reuse
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/ui/page-header';
 import { Plus, RefreshCcw } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
@@ -79,37 +80,33 @@ function AssignmentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="font-display text-4xl text-foreground">
-            {t('instructorAssignments.title')}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t('instructorAssignments.subtitle')}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              setIsRefreshing(true);
-              navigate({ search: (prev: z.infer<typeof AssignmentSearchSchema>) => prev });
-              setTimeout(() => setIsRefreshing(false), 1000);
-            }}
-            disabled={isRefreshing}
-          >
-            <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </Button>
-          <Button
-            onClick={handleCreateNew}
-            className="bg-primary hover:bg-primary/95 text-primary-foreground font-semibold"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t('instructorAssignments.newAssignment')}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('instructorAssignments.title')}
+        subtitle={t('instructorAssignments.subtitle')}
+        action={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                setIsRefreshing(true);
+                navigate({ search: (prev: z.infer<typeof AssignmentSearchSchema>) => prev });
+                setTimeout(() => setIsRefreshing(false), 1000);
+              }}
+              disabled={isRefreshing}
+            >
+              <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button
+              onClick={handleCreateNew}
+              className="bg-primary hover:bg-primary/95 text-primary-foreground font-semibold"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              {t('instructorAssignments.newAssignment')}
+            </Button>
+          </div>
+        }
+      />
 
       <AssignmentFilters search={searchParams.search} onSearchChange={handleSearchChange} />
 

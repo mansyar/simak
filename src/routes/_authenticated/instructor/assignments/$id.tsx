@@ -14,7 +14,6 @@ import {
   Calendar,
   Users,
   Clipboard,
-  ArrowLeft,
   Percent,
   CheckCircle2,
   MessageSquare,
@@ -23,6 +22,7 @@ import { format } from 'date-fns/format';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/ui/page-header';
 import { useI18n } from '../../../__root';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id')({
@@ -169,32 +169,27 @@ function AssignmentDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header and Back Link */}
-      <div className="flex flex-col gap-4">
-        <div>
-          <Link
-            to="/instructor/assignments"
-            search={{ page: 1, limit: 20, search: '' }}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            {t('common.back')}
-          </Link>
-        </div>
+      <PageHeader
+        title={assignment.title}
+        back={{
+          to: '/instructor/assignments',
+          label: t('common.back'),
+          search: { page: 1, limit: 20, search: '' },
+        }}
+      />
 
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold tracking-wider uppercase text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                {assignment.templateType}
-              </span>
-            </div>
-            <h1 className="font-display text-4xl text-foreground mt-2">{assignment.title}</h1>
-            {assignment.description && (
-              <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-relaxed">
-                {assignment.description}
-              </p>
-            )}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold tracking-wider uppercase text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              {assignment.templateType}
+            </span>
           </div>
+          {assignment.description && (
+            <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-relaxed">
+              {assignment.description}
+            </p>
+          )}
         </div>
       </div>
 

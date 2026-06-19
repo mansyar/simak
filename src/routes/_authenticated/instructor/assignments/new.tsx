@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { AssignmentWizard } from '@/components/instructor/assignments/AssignmentWizard';
-import { ArrowLeft } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
 import { useI18n } from '../../../__root';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/new')({
@@ -12,28 +12,15 @@ function NewAssignmentPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header and Back navigation */}
-      <div className="flex flex-col gap-3">
-        <div>
-          <Link
-            to="/instructor/assignments"
-            search={{ page: 1, limit: 20, search: '' }}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            {t('common.back')}
-          </Link>
-        </div>
-
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            {t('instructorAssignments.newAssignment')}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t('instructorAssignments.newAssignmentSubtitle')}
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title={t('instructorAssignments.newAssignment')}
+        subtitle={t('instructorAssignments.newAssignmentSubtitle')}
+        back={{
+          to: '/instructor/assignments',
+          label: t('common.back'),
+          search: { page: 1, limit: 20, search: '' },
+        }}
+      />
 
       {/* Multi-step Wizard wrapper */}
       <div className="rounded-xl border bg-card p-6 shadow-sm">
