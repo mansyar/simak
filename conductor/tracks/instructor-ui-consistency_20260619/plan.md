@@ -12,7 +12,7 @@
 
 ---
 
-## Phase 1 — Foundational primitives (extraction only)
+## Phase 1 — Foundational primitives (extraction only) [checkpoint: 20bb157]
 
 Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTypeBadge`, `formatDate`, `CountBadge`) and a non-breaking change to `EmptyState` so Phases 2–7 can adopt them. **No instructor page is modified in this phase.**
 
@@ -56,7 +56,7 @@ Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTyp
     - [x] Verify existing empty-state tests still pass.
     - [x] Commit `refactor(ui): Make EmptyState description prop optional`.
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1 — Foundational primitives' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1 — Foundational primitives' (Protocol in workflow.md)
 
 ---
 
