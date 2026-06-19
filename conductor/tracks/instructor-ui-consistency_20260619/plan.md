@@ -50,11 +50,11 @@ Goal: add the new primitives (`Textarea`, `PageHeader`, `BackLink`, `TemplateTyp
     - [x] Implement `src/components/ui/count-badge.tsx`. Canonical: `inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold rounded-full bg-primary text-primary-foreground`.
     - [x] Verify coverage ≥ 80%; commit `feat(ui): Add CountBadge primitive`.
 
-- [ ] Task: Make `EmptyState.description` optional
-    - [ ] Update `src/components/ui/empty-state.tsx`: change `description: string` to `description?: string`; render the `<p>` only when `description` is a non-empty string.
-    - [ ] Add a regression test in `tests/unit/components/empty-state.test.tsx` asserting that omitting `description` does not render an empty `<p>`.
-    - [ ] Verify existing empty-state tests still pass.
-    - [ ] Commit `refactor(ui): Make EmptyState description prop optional`.
+- [x] Task: Make `EmptyState.description` optional (1fbeda9)
+    - [x] Update `src/components/ui/empty-state.tsx`: change `description: string` to `description?: string`; render the `<p>` only when `description` is a non-empty string.
+    - [x] Add a regression test in `tests/unit/components/empty-state.test.tsx` asserting that omitting `description` does not render an empty `<p>`.
+    - [x] Verify existing empty-state tests still pass.
+    - [x] Commit `refactor(ui): Make EmptyState description prop optional`.
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1 — Foundational primitives' (Protocol in workflow.md)
 
