@@ -263,12 +263,15 @@ describe('TemplateDetailPage', () => {
     expect(screen.getByText('admin-1')).toBeTruthy();
   });
 
-  it('should use Skeleton primitive for linked-assignments loading state', () => {
-    mockAssignmentsFn.mockImplementation(() => new Promise(() => {}));
-    const { container } = render(<TemplateDetailPage template={mockTemplate} />);
-    const skeletons = container.querySelectorAll('[data-slot="skeleton"]');
-    expect(skeletons.length).toBe(2);
-    mockAssignmentsFn.mockResolvedValue({ assignments: [] });
+  it('should render assignments from props (route loader)', () => {
+    const mockAssignments = [
+      { id: 1, title: 'Assignment 1', instructorName: 'Dr. Smith', studentCount: 5, createdAt: new Date() },
+      { id: 2, title: 'Assignment 2', instructorName: 'Dr. Jones', studentCount: 3, createdAt: new Date() },
+    ];
+    render(<TemplateDetailPage template={mockTemplate} assignments={mockAssignments} />);
+    expect(screen.getByText('Assignment 1')).toBeTruthy();
+    expect(screen.getByText('Assignment 2')).toBeTruthy();
+    expect(screen.getByText(/Dr\. Smith/)).toBeTruthy();
   });
 
   it('should use AlertBanner for success message after save', async () => {

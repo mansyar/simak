@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
-import { updateTemplate, deleteTemplate, listTemplateAssignments } from '@/server/templates';
+import { updateTemplate, deleteTemplate } from '@/server/templates';
 import { CheckpointListEditor } from './CheckpointListEditor';
 import { DeleteTemplateDialog } from './DeleteTemplateDialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,12 +38,12 @@ interface AssignmentData {
   title: string;
   instructorName: string;
   studentCount: number;
-  createdAt: Date;
+  createdAt: Date | null;
 }
 
 const defaultCheckpoint = () => ({ name: '', minConsultations: 0, estimatedDuration: 7 });
 
-export function TemplateDetailPage({ template }: { template: TemplateData | null }) {
+export function TemplateDetailPage({ template, assignments: initialAssignments }: { template: TemplateData | null; assignments?: AssignmentData[] }) {
   const { t, locale } = useI18n();
   const navigate = useNavigate();
 
@@ -59,33 +59,12 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [assignments, setAssignments] = useState<AssignmentData[]>([]);
-  const [assignmentsLoading, setAssignmentsLoading] = useState(true);
+  const assignments = initialAssignments ?? [];
+  const [assignmentsLoading] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const updateTemplateFn = useServerFn(updateTemplate);
   const deleteTemplateFn = useServerFn(deleteTemplate);
-  const listAssignmentsFn = useServerFn(listTemplateAssignments);
-
-  // Load linked assignments client-side
-  useEffect(() => {
-    if (!template) return;
-    setAssignmentsLoading(true);
-    (
-      listAssignmentsFn as unknown as (args: {
-        data: { templateId: number };
-      }) => Promise<{ assignments: AssignmentData[] }>
-    )({ data: { templateId: template.id } })
-      .then((result) => {
-        setAssignments(result?.assignments ?? []);
-      })
-      .catch(() => {
-        setAssignments([]);
-      })
-      .finally(() => {
-        setAssignmentsLoading(false);
-      });
-  }, [template, listAssignmentsFn]);
 
   // Checkpoint handlers
   const handleAddCheckpoint = useCallback(() => {
