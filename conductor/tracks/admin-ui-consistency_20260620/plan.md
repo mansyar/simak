@@ -237,10 +237,10 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: visual check; design tokens in use
     - [x] Commit: `style(admin): replace hardcoded colors with design tokens in template detail`
 
-- [ ] Task: Replace hardcoded colors in `AdminDashboard.tsx` (FR-23.3)
-    - [ ] Replace `bg-error text-white` (line 197) with design-token pair
-    - [ ] Verify: visual check
-    - [ ] Commit: `style(admin): replace hardcoded colors with design tokens in dashboard`
+- [x] Task: Replace hardcoded colors in `AdminDashboard.tsx` (FR-23.3) — commit `04f2ae4`
+    - [x] Replace `bg-error text-white` (line 184) with `bg-error text-foreground` design-token pair
+    - [x] Verify: visual check
+    - [x] Commit: `style(admin): replace hardcoded colors with design tokens in dashboard`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3 — Pagination, Select, Card' (Protocol in workflow.md)
     - [ ] Run pre-push gate
