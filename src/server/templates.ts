@@ -36,60 +36,51 @@ export const ListTemplateAssignmentsSchema = z.object({
   templateId: z.coerce.number().int().positive('Template ID must be a positive integer'),
 });
 
-export const listTemplates = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listTemplates = createServerFn({ method: 'GET' })
+  .inputValidator(ListTemplatesSchema)
+  .handler(async ({ data }) => {
     const { listTemplatesHandler } = await import('./templates.server');
-    const data = ListTemplatesSchema.parse(args.data);
     return listTemplatesHandler({ data });
-  },
-);
+  });
 
-export const getTemplate = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const getTemplate = createServerFn({ method: 'GET' })
+  .inputValidator(TemplateIdParamSchema)
+  .handler(async ({ data }) => {
     const { getTemplateHandler } = await import('./templates.server');
-    const data = TemplateIdParamSchema.parse(args.data);
     return getTemplateHandler({ data });
-  },
-);
+  });
 
-export const createTemplate = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const createTemplate = createServerFn({ method: 'POST' })
+  .inputValidator(CreateTemplateSchema)
+  .handler(async ({ data }) => {
     const { createTemplateHandler } = await import('./templates.server');
-    const data = CreateTemplateSchema.parse(args.data);
     return createTemplateHandler({ data });
-  },
-);
+  });
 
-export const updateTemplate = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const updateTemplate = createServerFn({ method: 'POST' })
+  .inputValidator(UpdateTemplateSchema.extend({ id: z.coerce.number().int().positive() }))
+  .handler(async ({ data }) => {
     const { updateTemplateHandler } = await import('./templates.server');
-    const data = UpdateTemplateSchema.extend({ id: z.coerce.number().int().positive() }).parse(
-      args.data,
-    );
     return updateTemplateHandler({ data });
-  },
-);
+  });
 
-export const deleteTemplate = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const deleteTemplate = createServerFn({ method: 'POST' })
+  .inputValidator(TemplateIdParamSchema)
+  .handler(async ({ data }) => {
     const { deleteTemplateHandler } = await import('./templates.server');
-    const data = TemplateIdParamSchema.parse(args.data);
     return deleteTemplateHandler({ data });
-  },
-);
+  });
 
-export const duplicateTemplate = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const duplicateTemplate = createServerFn({ method: 'POST' })
+  .inputValidator(TemplateIdParamSchema)
+  .handler(async ({ data }) => {
     const { duplicateTemplateHandler } = await import('./templates.server');
-    const data = TemplateIdParamSchema.parse(args.data);
     return duplicateTemplateHandler({ data });
-  },
-);
+  });
 
-export const listTemplateAssignments = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listTemplateAssignments = createServerFn({ method: 'GET' })
+  .inputValidator(ListTemplateAssignmentsSchema)
+  .handler(async ({ data }) => {
     const { listTemplateAssignmentsHandler } = await import('./templates.server');
-    const data = ListTemplateAssignmentsSchema.parse(args.data);
     return listTemplateAssignmentsHandler({ data });
-  },
-);
+  });

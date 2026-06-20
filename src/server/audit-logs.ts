@@ -16,18 +16,16 @@ export const GetAuditLogDetailSchema = z.object({
   id: z.coerce.number().int().min(1),
 });
 
-export const listAuditLogs = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listAuditLogs = createServerFn({ method: 'GET' })
+  .inputValidator(ListAuditLogsSchema)
+  .handler(async ({ data }) => {
     const { listAuditLogsHandler } = await import('./audit-logs.server');
-    const data = ListAuditLogsSchema.parse(args.data);
     return listAuditLogsHandler({ data });
-  },
-);
+  });
 
-export const getAuditLogDetail = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const getAuditLogDetail = createServerFn({ method: 'GET' })
+  .inputValidator(GetAuditLogDetailSchema)
+  .handler(async ({ data }) => {
     const { getAuditLogDetailHandler } = await import('./audit-logs.server');
-    const data = GetAuditLogDetailSchema.parse(args.data);
     return getAuditLogDetailHandler({ data });
-  },
-);
+  });

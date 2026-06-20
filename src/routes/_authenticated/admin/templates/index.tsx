@@ -7,6 +7,7 @@ import {
   getTemplate,
   deleteTemplate,
   duplicateTemplate,
+  CreateTemplateSchema,
 } from '@/server/templates';
 import { TemplateCard, TemplateRow } from '@/components/admin/templates/TemplateCard';
 import { TemplateFilters } from '@/components/admin/templates/TemplateFilters';
@@ -38,7 +39,6 @@ export const Route = createFileRoute('/_authenticated/admin/templates/')({
     type: search.type,
   }),
   loader: async ({ deps }) => {
-    // @ts-expect-error - listTemplates handler type inference limitation
     return listTemplates({ data: deps });
   },
   pendingComponent: () => <TemplateLoadingSkeleton />,
@@ -97,8 +97,7 @@ function TemplatesPage() {
     });
   };
 
-  const handleCreateTemplate = async (values: Record<string, unknown>) => {
-    // @ts-expect-error - useServerFn type inference limitation
+  const handleCreateTemplate = async (values: z.infer<typeof CreateTemplateSchema>) => {
     const result = await createTemplateFn({ data: values });
     return result;
   };
@@ -117,7 +116,6 @@ function TemplatesPage() {
 
   const handleDelete = async (template: TemplateRow) => {
     // First check if template is in use
-    // @ts-expect-error - useServerFn type inference limitation
     const fullTemplate = await getTemplateFn({ data: { id: template.id } });
     const usageCount = (fullTemplate as { assignmentCount?: number })?.assignmentCount ?? 0;
     setDeletingTemplate({ id: template.id, usageCount });
@@ -126,7 +124,6 @@ function TemplatesPage() {
 
   const handleConfirmDelete = async () => {
     if (!deletingTemplate) return;
-    // @ts-expect-error - useServerFn type inference limitation
     const result = await deleteTemplateFn({ data: { id: deletingTemplate.id } });
     if (
       (result as { success?: boolean; error?: string }).success ||
@@ -137,7 +134,6 @@ function TemplatesPage() {
   };
 
   const handleDuplicate = async (template: TemplateRow) => {
-    // @ts-expect-error - useServerFn type inference limitation
     const result = await duplicateTemplateFn({ data: { id: template.id } });
     if ((result as { template?: unknown }).template) {
       navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh

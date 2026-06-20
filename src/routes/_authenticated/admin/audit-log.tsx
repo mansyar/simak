@@ -58,7 +58,6 @@ export const Route = createFileRoute('/_authenticated/admin/audit-log')({
     search: search.search,
   }),
   loader: async ({ deps }) => {
-    // @ts-expect-error - listAuditLogs handler type inference limitation
     return listAuditLogs({ data: deps });
   },
   component: AuditLogPage,

@@ -28,50 +28,44 @@ export const UserIdParamSchema = z.object({
   id: z.string().min(1, 'User ID is required'),
 });
 
-export const listUsers = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listUsers = createServerFn({ method: 'GET' })
+  .inputValidator(ListUsersSchema)
+  .handler(async ({ data }) => {
     const { listUsersHandler } = await import('./users.server');
-    const data = ListUsersSchema.parse(args.data);
     return listUsersHandler({ data });
-  },
-);
+  });
 
-export const getUser = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const getUser = createServerFn({ method: 'GET' })
+  .inputValidator(UserIdParamSchema)
+  .handler(async ({ data }) => {
     const { getUserHandler } = await import('./users.server');
-    const data = UserIdParamSchema.parse(args.data);
     return getUserHandler({ data });
-  },
-);
+  });
 
-export const createUser = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const createUser = createServerFn({ method: 'POST' })
+  .inputValidator(CreateUserSchema)
+  .handler(async ({ data }) => {
     const { createUserHandler } = await import('./users.server');
-    const data = CreateUserSchema.parse(args.data);
     return createUserHandler({ data });
-  },
-);
+  });
 
-export const updateUser = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const updateUser = createServerFn({ method: 'POST' })
+  .inputValidator(UpdateUserSchema.extend({ id: z.string() }))
+  .handler(async ({ data }) => {
     const { updateUserHandler } = await import('./users.server');
-    const data = UpdateUserSchema.extend({ id: z.string() }).parse(args.data);
     return updateUserHandler({ data });
-  },
-);
+  });
 
-export const deleteUser = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const deleteUser = createServerFn({ method: 'POST' })
+  .inputValidator(UserIdParamSchema)
+  .handler(async ({ data }) => {
     const { deleteUserHandler } = await import('./users.server');
-    const data = UserIdParamSchema.parse(args.data);
     return deleteUserHandler({ data });
-  },
-);
+  });
 
-export const generateSetupLink = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const generateSetupLink = createServerFn({ method: 'POST' })
+  .inputValidator(UserIdParamSchema)
+  .handler(async ({ data }) => {
     const { generateSetupLinkHandler } = await import('./users.server');
-    const data = UserIdParamSchema.parse(args.data);
     return generateSetupLinkHandler({ data });
-  },
-);
+  });

@@ -1,7 +1,7 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
-import { listUsers, deleteUser, generateSetupLink, createUser, updateUser } from '@/server/users';
+import { listUsers, deleteUser, generateSetupLink, createUser, updateUser, CreateUserSchema, UpdateUserSchema } from '@/server/users';
 import { UserTable, UserRow } from '@/components/admin/users/UserTable';
 import { UserFilters } from '@/components/admin/users/UserFilters';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
@@ -34,7 +34,6 @@ export const Route = createFileRoute('/_authenticated/admin/users/')({
   }),
   loader: async ({ deps }) => {
     // Static import is safe - users.ts only has createServerFn stubs + Zod schemas (no server-only deps)
-    // @ts-expect-error - listUsers handler type inference limitation
     return listUsers({ data: deps });
   },
   component: UsersPage,
@@ -93,13 +92,11 @@ function UsersPage() {
   };
 
   const handleDelete = async (user: UserRow) => {
-    // @ts-expect-error - useServerFn type inference limitation
     await deleteUserFn({ data: { id: user.id } });
     navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
   };
 
   const handleGenerateLink = async (user: UserRow) => {
-    // @ts-expect-error - useServerFn type inference limitation
     const result = await generateSetupLinkFn({ data: { id: user.id } });
     if ('url' in result) {
       setSetupLinkUrl(result.url ?? '');
@@ -109,8 +106,7 @@ function UsersPage() {
     }
   };
 
-  const handleCreateUser = async (values: Record<string, unknown>) => {
-    // @ts-expect-error - useServerFn type inference limitation
+  const handleCreateUser = async (values: z.infer<typeof CreateUserSchema>) => {
     const result = await createUserFn({ data: values });
     if (result.error) {
       setInlineError(`${t('common.error')}: ${result.error}`);
@@ -119,8 +115,7 @@ function UsersPage() {
     }
   };
 
-  const handleUpdateUser = async (id: string, values: Record<string, unknown>) => {
-    // @ts-expect-error - useServerFn type inference limitation
+  const handleUpdateUser = async (id: string, values: z.infer<typeof UpdateUserSchema>) => {
     const result = await updateUserFn({ data: { ...values, id } });
     if (result.error) {
       setInlineError(`${t('common.error')}: ${result.error}`);
