@@ -26,8 +26,8 @@ vi.mock('@/components/ui/input', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, disabled, ...props }: any) => (
-    <button onClick={onClick} disabled={disabled} {...props}>
+  Button: ({ children, onClick, disabled, variant, size, ...props }: any) => (
+    <button onClick={onClick} disabled={disabled} data-slot="button" data-variant={variant} data-size={size} {...props}>
       {children}
     </button>
   ),
@@ -123,5 +123,18 @@ describe('CheckpointListEditor', () => {
   it('should render Add Checkpoint button', () => {
     render(<CheckpointListEditor {...defaultProps} />);
     expect(screen.getByText('Add Checkpoint')).toBeDefined();
+  });
+
+  it('should use Button component for move buttons', () => {
+    const { container } = render(<CheckpointListEditor {...defaultProps} />);
+    const moveButtons = container.querySelectorAll('[data-slot="button"][aria-label]');
+    const moveUpBtns = Array.from(moveButtons).filter((btn) =>
+      btn.getAttribute('aria-label')?.includes('Move Up'),
+    );
+    const moveDownBtns = Array.from(moveButtons).filter((btn) =>
+      btn.getAttribute('aria-label')?.includes('Move Down'),
+    );
+    expect(moveUpBtns.length).toBeGreaterThan(0);
+    expect(moveDownBtns.length).toBeGreaterThan(0);
   });
 });

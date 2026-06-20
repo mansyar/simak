@@ -60,7 +60,9 @@ export function CheckpointListEditor({
         {checkpoints.map((checkpoint, index) => (
           <div key={index} className="flex items-start gap-2">
             <div className="flex flex-col pt-1.5">
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 type="button"
                 onClick={() => onMoveUp(index)}
                 disabled={index === 0}
@@ -68,8 +70,10 @@ export function CheckpointListEditor({
                 aria-label={t('adminTemplates.form.moveUp')}
               >
                 <ChevronUp className="h-3 w-3" />
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
                 type="button"
                 onClick={() => onMoveDown(index)}
                 disabled={index === checkpoints.length - 1}
@@ -77,7 +81,7 @@ export function CheckpointListEditor({
                 aria-label={t('adminTemplates.form.moveDown')}
               >
                 <ChevronDown className="h-3 w-3" />
-              </button>
+              </Button>
             </div>
             <div className="flex-1 space-y-1">
               <Input
