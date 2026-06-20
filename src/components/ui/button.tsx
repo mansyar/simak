@@ -58,7 +58,7 @@ function Button({
       disabled={disabled || loading}
       {...props}
     >
-      {loading && <RefreshCcw className="mr-2 h-4 w-4 animate-spin" />}
+      {loading && <RefreshCcw className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
       {children}
     </ButtonPrimitive>
   );

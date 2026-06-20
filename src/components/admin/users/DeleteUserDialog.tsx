@@ -35,7 +35,7 @@ export function DeleteUserDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
+            <AlertTriangle className="h-5 w-5 text-destructive" aria-hidden="true" />
             {t('adminUsers.deleteTitle')}
           </DialogTitle>
           <DialogDescription>{t('adminUsers.deleteConfirm', { name: userName })}</DialogDescription>

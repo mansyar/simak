@@ -62,7 +62,7 @@ export function MetricCard({
           colors.iconColor,
         )}
       >
-        <Icon className="size-[22px]" />
+        <Icon className="size-[22px]" aria-hidden="true" />
       </div>
       <div className="font-display text-[2.25rem] font-bold leading-none text-foreground">
         {value}

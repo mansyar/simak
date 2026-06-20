@@ -52,7 +52,7 @@ export function DeleteTemplateDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {isInUse && <AlertTriangle className="h-5 w-5 text-destructive" />}
+            {isInUse && <AlertTriangle className="h-5 w-5 text-destructive" aria-hidden="true" />}
             {t('adminTemplates.deleteConfirm')}
           </DialogTitle>
           <DialogDescription>

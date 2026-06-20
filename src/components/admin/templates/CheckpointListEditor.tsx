@@ -37,19 +37,19 @@ export function CheckpointListEditor({
   return (
     <div className="space-y-3">
       {/* Column headers */}
-      <div className="flex items-start gap-2 px-1">
+      <div className="flex items-start gap-2 px-1" role="row">
         <div className="w-[52px] shrink-0" /> {/* spacer for reorder buttons */}
-        <div className="flex-1">
+        <div className="flex-1" role="columnheader">
           <span className="text-xs font-medium text-muted-foreground">
             {t('adminTemplates.form.checkpointName')}
           </span>
         </div>
-        <div className="w-28">
+        <div className="w-28" role="columnheader">
           <span className="text-xs font-medium text-muted-foreground">
             {t('adminTemplates.form.minConsultations')}
           </span>
         </div>
-        <div className="w-24">
+        <div className="w-24" role="columnheader">
           <span className="text-xs font-medium text-muted-foreground">
             {t('adminTemplates.form.estimatedDuration')}
           </span>
@@ -69,7 +69,7 @@ export function CheckpointListEditor({
                 className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label={t('adminTemplates.form.moveUp')}
               >
-                <ChevronUp className="h-3 w-3" />
+                <ChevronUp className="h-3 w-3" aria-hidden="true" />
               </Button>
               <Button
                 variant="ghost"
@@ -80,7 +80,7 @@ export function CheckpointListEditor({
                 className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
                 aria-label={t('adminTemplates.form.moveDown')}
               >
-                <ChevronDown className="h-3 w-3" />
+                <ChevronDown className="h-3 w-3" aria-hidden="true" />
               </Button>
             </div>
             <div className="flex-1 space-y-1">
@@ -133,13 +133,13 @@ export function CheckpointListEditor({
               className="mt-1"
               aria-label={t('adminTemplates.form.removeCheckpoint')}
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4" aria-hidden="true" />
             </Button>
           </div>
         ))}
       </div>
       <Button type="button" variant="outline" size="sm" onClick={onAdd} className="w-full">
-        <Plus className="mr-2 h-4 w-4" />
+        <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
         {t('adminTemplates.form.addCheckpoint')}
       </Button>
     </div>

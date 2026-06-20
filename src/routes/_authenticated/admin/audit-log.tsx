@@ -210,6 +210,8 @@ function AuditLogPage() {
                           <button
                             onClick={() => toggleDetails(entry.id)}
                             className="text-primary hover:underline"
+                            aria-expanded={expandedId === entry.id}
+                            aria-controls={`details-${entry.id}`}
                           >
                             {expandedId === entry.id ? t('common.hide') : t('common.view')}
                           </button>
@@ -217,7 +219,7 @@ function AuditLogPage() {
                           <span className="text-muted-foreground">-</span>
                         )}
                         {expandedId === entry.id && entry.details && (
-                          <pre className="mt-2 rounded bg-muted p-2 text-xs overflow-x-auto">
+                          <pre className="mt-2 rounded bg-muted p-2 text-xs overflow-x-auto" id={`details-${entry.id}`}>
                             {JSON.stringify(entry.details, null, 2)}
                           </pre>
                         )}

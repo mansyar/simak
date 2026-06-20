@@ -127,14 +127,18 @@ function TemplatesPage() {
 
   const handleConfirmDelete = async () => {
     if (!deletingTemplate) return;
-    const result = (await deleteTemplateFn({ data: { id: deletingTemplate.id } })) as DeleteTemplateResult;
+    const result = (await deleteTemplateFn({
+      data: { id: deletingTemplate.id },
+    })) as DeleteTemplateResult;
     if ('success' in result || ('error' in result && result.error === 'in_use')) {
       navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
     }
   };
 
   const handleDuplicate = async (template: TemplateRow) => {
-    const result = (await duplicateTemplateFn({ data: { id: template.id } })) as DuplicateTemplateResult;
+    const result = (await duplicateTemplateFn({
+      data: { id: template.id },
+    })) as DuplicateTemplateResult;
     if ('template' in result && result.template) {
       navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
     }
@@ -149,7 +153,7 @@ function TemplatesPage() {
           <div className="flex items-center gap-2">
             <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
             <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
               {t('adminTemplates.newTemplate')}
             </Button>
           </div>

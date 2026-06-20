@@ -19,7 +19,7 @@ function BackLink({ to, label, search, className }: BackLinkProps) {
         className,
       )}
     >
-      <ArrowLeft className="h-4 w-4" />
+      <ArrowLeft className="h-4 w-4" aria-hidden="true" />
       {label}
     </Link>
   );

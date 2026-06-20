@@ -23,16 +23,14 @@ export function TemplateDangerZone({ assignmentCount, onDelete }: TemplateDanger
               <h3 className="text-sm font-medium text-foreground">
                 {t('adminTemplates.actions.delete')}
               </h3>
-              <p className="text-xs text-muted-foreground">
-                {t('adminTemplates.deleteConfirm')}
-              </p>
+              <p className="text-xs text-muted-foreground">{t('adminTemplates.deleteConfirm')}</p>
             </div>
             <Button
               variant="destructive"
               onClick={() => setIsDeleteOpen(true)}
               data-testid="delete-template"
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
               {t('adminTemplates.actions.delete')}
             </Button>
           </div>

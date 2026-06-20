@@ -18,7 +18,7 @@ export function RefreshButton({ isRefreshing, onClick }: RefreshButtonProps) {
       disabled={isRefreshing}
       aria-label={t('common.refresh')}
     >
-      <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+      <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} aria-hidden="true" />
     </Button>
   );
 }

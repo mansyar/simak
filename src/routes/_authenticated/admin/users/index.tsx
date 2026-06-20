@@ -1,7 +1,15 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
-import { listUsers, deleteUser, generateSetupLink, createUser, updateUser, CreateUserSchema, UpdateUserSchema } from '@/server/users';
+import {
+  listUsers,
+  deleteUser,
+  generateSetupLink,
+  createUser,
+  updateUser,
+  CreateUserSchema,
+  UpdateUserSchema,
+} from '@/server/users';
 import { UserTable, UserRow } from '@/components/admin/users/UserTable';
 import { UserFilters } from '@/components/admin/users/UserFilters';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
@@ -133,7 +141,7 @@ function UsersPage() {
           <div className="flex items-center gap-2">
             <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
             <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
               {t('adminUsers.newUser')}
             </Button>
           </div>

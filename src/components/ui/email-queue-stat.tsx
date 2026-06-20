@@ -35,7 +35,7 @@ function EmailQueueStat({ icon: Icon, color, label, value, className }: EmailQue
           colors.iconBg,
         )}
       >
-        <Icon className="size-5" />
+        <Icon className="size-5" aria-hidden="true" />
       </div>
       <div className="font-display text-[1.75rem] font-bold leading-none text-foreground">
         {value}
