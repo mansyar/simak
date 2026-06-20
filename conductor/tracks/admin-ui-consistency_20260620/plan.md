@@ -266,12 +266,12 @@ Goal: kill the remaining inline-style code, fix the UI-level bugs, dedupe role c
     - [x] Verify: tests pass; no `as TranslationKey` remains in admin user-management
     - [x] Commit: `refactor(admin): dedupe role config via ROLES module`
 
-- [ ] Task: Unify audit-event color helper (FR-17.1, FR-17.2, FR-17.3)
-    - [ ] Add `getActionVisualProps(type)` to `src/lib/admin/audit-actions.ts` (the new module from Phase 4 below) — returns `{ dotVariant, badgeVariant, color }`
-    - [ ] Write failing test covering: returns the right combo for "created", "passed", "verified", "updated", "extended", "deleted", "rejected", "revised"
-    - [ ] Replace `getActivityDotColor` in `AdminDashboard.tsx` and `getActionBadgeVariant` in `audit-log.tsx` with the unified helper
-    - [ ] Verify: tests pass; the dashboard recent-activity dot color matches the audit-log badge color for the same event
-    - [ ] Commit: `refactor(admin): unify audit event color helper`
+- [x] Task: Unify audit-event color helper (FR-17.1, FR-17.2, FR-17.3) — commit `09eeeb2`
+    - [x] Add `getActionVisualProps(type)` to `src/lib/admin/audit-actions.ts` (the new module from Phase 4 below) — returns `{ dotVariant, badgeVariant, color }`
+    - [x] Write failing test covering: returns the right combo for "created", "passed", "verified", "updated", "extended", "deleted", "rejected", "revised"
+    - [x] Replace `getActivityDotColor` in `AdminDashboard.tsx` and `getActionBadgeVariant` in `audit-log.tsx` with the unified helper
+    - [x] Verify: tests pass; the dashboard recent-activity dot color matches the audit-log badge color for the same event
+    - [x] Commit: `refactor(admin): unify audit event color helper`
 
 - [ ] Task: Source-of-truth `ACTION_TYPES` (FR-18.1, FR-18.2, FR-18.3)
     - [ ] Move `ACTION_TYPES` to `src/lib/admin/audit-actions.ts`
