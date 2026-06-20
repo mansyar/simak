@@ -131,11 +131,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes; `bg-muted animate-pulse` is gone from the file
     - [x] Commit: `refactor(admin): adopt Skeleton in templates list skeleton`
 
-- [ ] Task: Adopt `<Skeleton>` in `TemplateDetailSkeleton.tsx` (FR-4.1, FR-4.2)
-    - [ ] Write failing test covering: back/metadata/checkpoint skeletons render
-    - [ ] Replace 13 hand-rolled divs with `<Skeleton>`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt Skeleton in template detail skeleton`
+- [x] Task: Adopt `<Skeleton>` in `TemplateDetailSkeleton.tsx` (FR-4.1, FR-4.2) — commit `3363382`
+    - [x] Write failing test covering: back/metadata/checkpoint skeletons render
+    - [x] Replace 18 hand-rolled divs with `<Skeleton>`
+    - [x] Verify: test passes; `bg-muted animate-pulse` is gone from the file
+    - [x] Commit: `refactor(admin): adopt Skeleton in template detail skeleton`
 
 - [ ] Task: Adopt `<Skeleton>` in `TemplateDetailPage.tsx` inline loading (FR-4.1, FR-4.2)
     - [ ] Write failing test covering: linked-assignments loading state uses Skeleton
