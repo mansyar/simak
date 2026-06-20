@@ -120,5 +120,22 @@ describe('Admin Users index page', () => {
       const refreshButton = screen.getByRole('button', { name: 'common.refresh' });
       expect(refreshButton.textContent?.trim()).toBe('');
     });
+
+    it('should use Pagination component with common.back/common.next buttons and common.pageOf counter', async () => {
+      const Component = await getComponent();
+      render(<Component />);
+      // Pagination renders common.back and common.next as button text
+      expect(screen.getByText('common.back')).toBeInTheDocument();
+      expect(screen.getByText('common.next')).toBeInTheDocument();
+      // The new counter text should be present
+      expect(screen.getByText('common.pageOf')).toBeInTheDocument();
+    });
+
+    it('should use Pagination counter instead of adminUsers.showing', async () => {
+      const Component = await getComponent();
+      render(<Component />);
+      // The old counter text should be gone
+      expect(screen.queryByText('adminUsers.showing')).not.toBeInTheDocument();
+    });
   });
 });

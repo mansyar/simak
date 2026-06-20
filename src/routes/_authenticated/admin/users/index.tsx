@@ -8,6 +8,7 @@ import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 import { EditUserSheet } from '@/components/admin/users/EditUserSheet';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
+import { Pagination } from '@/components/ui/pagination';
 import { RefreshButton } from '@/components/ui/refresh-button';
 import { Plus } from 'lucide-react';
 import { z } from 'zod';
@@ -165,40 +166,14 @@ function UsersPage() {
         onGenerateLink={handleGenerateLink}
       />
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          {t('adminUsers.showing', { count: String(users.length), total: String(total) })}
-        </p>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              navigate({
-                search: (prev: UserSearchParams) => ({
-                  ...prev,
-                  page: Math.max(1, (prev.page || 1) - 1),
-                }),
-              })
-            }
-            disabled={searchParams.page <= 1}
-          >
-            {t('common.back')}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              navigate({
-                search: (prev: UserSearchParams) => ({ ...prev, page: (prev.page || 1) + 1 }),
-              })
-            }
-            disabled={searchParams.page * searchParams.limit >= total}
-          >
-            {t('common.next')}
-          </Button>
-        </div>
-      </div>
+      <Pagination
+        currentPage={searchParams.page || 1}
+        totalPages={Math.ceil(total / searchParams.limit)}
+        onPageChange={(page) =>
+          navigate({ search: (prev: UserSearchParams) => ({ ...prev, page }) })
+        }
+        showCounter
+      />
     </div>
   );
 }
