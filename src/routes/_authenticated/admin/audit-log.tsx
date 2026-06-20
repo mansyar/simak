@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { z } from 'zod';
-import { getActionVisualProps } from '@/lib/admin/audit-actions';
+import { getActionVisualProps, ACTION_TYPES } from '@/lib/admin/audit-actions';
 
 interface AuditLogEntry {
   id: number;
@@ -45,21 +45,6 @@ const AuditLogSearchSchema = z.object({
   dateTo: z.string().optional().default(''),
   search: z.string().optional().default(''),
 });
-
-const ACTION_TYPES = [
-  { value: 'user.created', label: 'adminAuditLog.actionLabels.userCreated' },
-  { value: 'user.deleted', label: 'adminAuditLog.actionLabels.userDeleted' },
-  { value: 'template.created', label: 'adminAuditLog.actionLabels.templateCreated' },
-  { value: 'template.updated', label: 'adminAuditLog.actionLabels.templateUpdated' },
-  { value: 'template.deleted', label: 'adminAuditLog.actionLabels.templateDeleted' },
-  { value: 'assignment.created', label: 'adminAuditLog.actionLabels.assignmentCreated' },
-  { value: 'review.passed', label: 'adminAuditLog.actionLabels.reviewPassed' },
-  { value: 'review.revised', label: 'adminAuditLog.actionLabels.reviewRevised' },
-  { value: 'checkpoint.unlocked', label: 'adminAuditLog.actionLabels.checkpointUnlocked' },
-  { value: 'deadline.extended', label: 'adminAuditLog.actionLabels.deadlineExtended' },
-  { value: 'consultation.verified', label: 'adminAuditLog.actionLabels.consultationVerified' },
-  { value: 'consultation.rejected', label: 'adminAuditLog.actionLabels.consultationRejected' },
-] as const;
 
 export const Route = createFileRoute('/_authenticated/admin/audit-log')({
   validateSearch: (search) => AuditLogSearchSchema.parse(search),
@@ -213,7 +198,9 @@ function AuditLogPage() {
                         {formatTimestamp(entry.createdAt)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getActionVisualProps(entry.action).badgeVariant}>{entry.action}</Badge>
+                        <Badge variant={getActionVisualProps(entry.action).badgeVariant}>
+                          {entry.action}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-xs">{entry.actorId}</TableCell>
                       <TableCell className="text-xs">{entry.entityType}</TableCell>
