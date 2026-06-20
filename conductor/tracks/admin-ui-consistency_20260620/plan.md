@@ -273,13 +273,13 @@ Goal: kill the remaining inline-style code, fix the UI-level bugs, dedupe role c
     - [x] Verify: tests pass; the dashboard recent-activity dot color matches the audit-log badge color for the same event
     - [x] Commit: `refactor(admin): unify audit event color helper`
 
-- [ ] Task: Source-of-truth `ACTION_TYPES` (FR-18.1, FR-18.2, FR-18.3)
-    - [ ] Move `ACTION_TYPES` to `src/lib/admin/audit-actions.ts`
-    - [ ] Add the missing `extensionApproved` and `extensionRejected` entries (closing the gap with the locale file)
-    - [ ] Import from the central module in `audit-log.tsx`
-    - [ ] Write failing test covering: all 14 action labels are present and reachable
-    - [ ] Verify: test passes; the const matches the locale keys
-    - [ ] Commit: `refactor(admin): source-of-truth ACTION_TYPES in audit-actions module`
+- [x] Task: Source-of-truth `ACTION_TYPES` (FR-18.1, FR-18.2, FR-18.3) — commit `0f7952d`
+    - [x] Move `ACTION_TYPES` to `src/lib/admin/audit-actions.ts`
+    - [x] Add the missing `extensionApproved` and `extensionRejected` entries (closing the gap with the locale file)
+    - [x] Import from the central module in `audit-log.tsx`
+    - [x] Write failing test covering: all 14 action labels are present and reachable
+    - [x] Verify: test passes; the const matches the locale keys
+    - [x] Commit: `refactor(admin): source-of-truth ACTION_TYPES in audit-actions module`
 
 - [ ] Task: Replace raw `<label>` in `TemplateDetailPage.tsx` with `<Label>` (FR-19.1)
     - [ ] Write failing test covering: metadata inputs are labeled with `<Label>` (htmlFor association)
