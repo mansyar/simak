@@ -1,10 +1,17 @@
 pre-commit:
-  parallel: true
+  parallel: false
   commands:
     lint:
-      run: pnpm exec oxlint --fix .
+      glob: "*.{js,jsx,ts,tsx}"
+      run: pnpm exec oxlint --fix {staged_files}
+      stage_fixed: true
     format:
-      run: pnpm exec oxfmt --write src/ tests/ scripts/
+      glob: "*.{js,jsx,ts,tsx}"
+      run: pnpm exec oxfmt --write {staged_files}
+      stage_fixed: true
+    modularity:
+      glob: "*.{js,jsx,ts,tsx}"
+      run: node scripts/check-modularity.js {staged_files}
 
 pre-push:
   commands:
