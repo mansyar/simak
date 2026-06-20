@@ -107,11 +107,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes; no `setTimeout` in the file
     - [x] Commit: `refactor(admin): adopt PageHeader and RefreshButton on users list (B5)`
 
-- [ ] Task: Adopt `<PageHeader>` + `<RefreshButton>` in `admin/templates/index.tsx` (FR-1.1, FR-2.1, FR-2.2, FR-2.3) — fixes B5
-    - [ ] Write failing test covering: page title, subtitle, refresh uses `router.invalidate`
-    - [ ] Replace inline header; replace inline refresh; remove `setTimeout`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt PageHeader and RefreshButton on templates list (B5)`
+- [x] Task: Adopt `<PageHeader>` + `<RefreshButton>` in `admin/templates/index.tsx` (FR-1.1, FR-2.1, FR-2.2, FR-2.3) — fixes B5 [713df2c]
+    - [x] Write failing test covering: page title, subtitle, refresh uses `router.invalidate`
+    - [x] Replace inline header; replace inline refresh; remove `setTimeout`
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt PageHeader and RefreshButton on templates list (B5)`
 
 - [ ] Task: Adopt `<BackLink>` in `TemplateDetailPage.tsx` (FR-3.1, FR-3.2)
     - [ ] Write failing test covering: back link points to `/admin/templates` with the correct search params
