@@ -119,11 +119,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt BackLink in template detail`
 
-- [ ] Task: Adopt `<BackLink>` in `TemplateNotFound.tsx` (FR-3.1)
-    - [ ] Write failing test covering: not-found page shows the back link
-    - [ ] Replace inline `<Link to="..."><Button variant="outline">` with `<BackLink>`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt BackLink in template not-found`
+- [x] Task: Adopt `<BackLink>` in `TemplateNotFound.tsx` (FR-3.1) — commit `658bd3b`
+    - [x] Write failing test covering: not-found page shows the back link
+    - [x] Replace inline `<Link to="..."><Button variant="outline">` with `<BackLink>`
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt BackLink in template not-found`
 
 - [ ] Task: Adopt `<Skeleton>` in `TemplateLoadingSkeleton.tsx` (FR-4.1, FR-4.2)
     - [ ] Write failing test covering: 6 cards render with skeleton placeholders
