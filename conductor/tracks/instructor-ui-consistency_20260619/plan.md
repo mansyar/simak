@@ -335,4 +335,15 @@ Goal: small polish that closes the audit's §5 low-impact list.
     - [x] Update `conductor/product.md` "Completed Tracks" section with a new "Track 6.4" entry summarising the work.
     - [x] Commit `docs(conductor): Mark Instructor UI Consistency track complete`.
 - [x] Task: Conductor - User Manual Verification 'Track closure' (Protocol in workflow.md)
+
+---
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 0ceb049
+    - [x] Add `.inputValidator()` to 5 functions in `src/server/assignments.ts` (`createAssignment`, `listStudentAssignments`, `getStudentAssignmentDetail`, `unlockCheckpoint`, `extendDeadline`) that still used the old `args: { data: unknown }` pattern.
+    - [x] Remove 3 now-redundant `// @ts-expect-error` directives from student route loaders that became unused after the inputValidator fix.
+    - [x] Add inline `// TODO: data shape mismatch` comments to the 5 remaining `as unknown as` casts in instructor route loaders and 2 subcomponents (spec §3.9 requires inline justification; `use-assignment-tabs.ts` already had the comments, these did not).
+    - [x] Fix fragile relative imports `'../../../routes/__root'` in 3 new subcomponents → use `@/routes/__root` alias.
+    - [x] Drop `description=""` workarounds in `instructor/reviews/$submissionId.tsx` EmptyState calls (description is now optional after Phase 1).
+    - [x] Add `noEmit` and `incremental` to `tsconfig.json` to prevent `.js` compiled artifacts from being emitted into `src/` and `tests/` directories.
 </protect>
