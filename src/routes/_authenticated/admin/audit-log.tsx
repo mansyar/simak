@@ -2,7 +2,6 @@ import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { listAuditLogs } from '@/server/audit-logs';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -15,6 +14,7 @@ import {
 import { useI18n } from '../../__root';
 import { PageHeader } from '@/components/ui/page-header';
 import { RefreshButton } from '@/components/ui/refresh-button';
+import { Pagination } from '@/components/ui/pagination';
 import { Search } from 'lucide-react';
 import { z } from 'zod';
 
@@ -246,47 +246,14 @@ function AuditLogPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t p-3">
-            <span className="text-xs text-muted-foreground">
-              {t('adminAuditLog.showing', {
-                from: String((searchParams.page - 1) * searchParams.limit + 1),
-                to: String(Math.min(searchParams.page * searchParams.limit, total)),
-                total: String(total),
-              })}
-            </span>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={searchParams.page <= 1}
-                onClick={() => goToPage(searchParams.page - 1)}
-              >
-                {t('common.previous')}
-              </Button>
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                const start = Math.max(1, Math.min(searchParams.page - 2, totalPages - 4));
-                const pageNum = start + i;
-                if (pageNum > totalPages) return null;
-                return (
-                  <Button
-                    key={pageNum}
-                    variant={pageNum === searchParams.page ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => goToPage(pageNum)}
-                  >
-                    {pageNum}
-                  </Button>
-                );
-              })}
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={searchParams.page >= totalPages}
-                onClick={() => goToPage(searchParams.page + 1)}
-              >
-                {t('common.next')}
-              </Button>
-            </div>
+          <div className="border-t p-3">
+            <Pagination
+              currentPage={searchParams.page || 1}
+              totalPages={totalPages}
+              onPageChange={(page) => goToPage(page)}
+              showCounter
+              showPageNumbers
+            />
           </div>
         )}
       </div>

@@ -30,7 +30,7 @@ vi.mock('@tanstack/react-router', () => ({
     ...config,
     useLoaderData: vi.fn().mockReturnValue({
       entries: [],
-      total: 0,
+      total: 100,
       page: 1,
       limit: 50,
     }),
@@ -116,6 +116,20 @@ describe('Admin Audit Log page', () => {
       render(<Component />);
       const refreshButton = screen.getByRole('button', { name: 'common.refresh' });
       expect(refreshButton.textContent?.trim()).toBe('');
+    });
+
+    it('should use Pagination component with common.back/common.next buttons and common.pageOf counter', async () => {
+      const Component = await getComponent();
+      render(<Component />);
+      // Pagination renders common.back for prev (not common.previous)
+      expect(screen.getByText('common.back')).toBeInTheDocument();
+      // Pagination renders common.next for next
+      expect(screen.getByText('common.next')).toBeInTheDocument();
+      // Pagination renders common.pageOf for counter (not adminAuditLog.showing)
+      expect(screen.getByText('common.pageOf')).toBeInTheDocument();
+      // Old hand-rolled text should be gone
+      expect(screen.queryByText('common.previous')).not.toBeInTheDocument();
+      expect(screen.queryByText('adminAuditLog.showing')).not.toBeInTheDocument();
     });
   });
 });
