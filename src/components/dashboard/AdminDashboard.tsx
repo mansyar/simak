@@ -19,6 +19,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { StatusDot } from '@/components/ui/status-dot';
 import { QuickActionCard } from '@/components/ui/quick-action-card';
+import { EmailQueueStat } from '@/components/ui/email-queue-stat';
 
 interface SystemMetrics {
   totalUsers: number;
@@ -135,39 +136,24 @@ export function AdminDashboard({ data }: Props) {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-lg bg-card p-5 text-center">
-                <div className="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Mail className="size-5" />
-                </div>
-                <div className="font-display text-[1.75rem] font-bold leading-none text-foreground">
-                  {d.emailQueueCounts?.pending ?? 0}
-                </div>
-                <p className="mt-1 text-[0.8125rem] font-medium text-primary">
-                  {t('adminDashboard.emailQueue.pending')}
-                </p>
-              </div>
-              <div className="rounded-lg bg-card p-5 text-center">
-                <div className="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-success/10 text-success">
-                  <MailCheck className="size-5" />
-                </div>
-                <div className="font-display text-[1.75rem] font-bold leading-none text-foreground">
-                  {d.emailQueueCounts?.sent ?? 0}
-                </div>
-                <p className="mt-1 text-[0.8125rem] font-medium text-success">
-                  {t('adminDashboard.emailQueue.sent')}
-                </p>
-              </div>
-              <div className="rounded-lg bg-card p-5 text-center">
-                <div className="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-error/10 text-error">
-                  <MailX className="size-5" />
-                </div>
-                <div className="font-display text-[1.75rem] font-bold leading-none text-foreground">
-                  {d.emailQueueCounts?.failed ?? 0}
-                </div>
-                <p className="mt-1 text-[0.8125rem] font-medium text-error">
-                  {t('adminDashboard.emailQueue.failed')}
-                </p>
-              </div>
+              <EmailQueueStat
+                icon={Mail}
+                color="primary"
+                label={t('adminDashboard.emailQueue.pending')}
+                value={d.emailQueueCounts?.pending ?? 0}
+              />
+              <EmailQueueStat
+                icon={MailCheck}
+                color="success"
+                label={t('adminDashboard.emailQueue.sent')}
+                value={d.emailQueueCounts?.sent ?? 0}
+              />
+              <EmailQueueStat
+                icon={MailX}
+                color="error"
+                label={t('adminDashboard.emailQueue.failed')}
+                value={d.emailQueueCounts?.failed ?? 0}
+              />
             </div>
           </CardContent>
         </Card>

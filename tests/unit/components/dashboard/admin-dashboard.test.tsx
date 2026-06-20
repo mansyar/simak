@@ -23,6 +23,16 @@ vi.mock('../../../src/routes/__root', () => ({
   }),
 }));
 
+vi.mock('@/components/ui/email-queue-stat', () => ({
+  EmailQueueStat: ({ icon: Icon, color, label, value }: any) => (
+    <div data-testid="email-queue-stat" data-color={color} data-label={label}>
+      <Icon data-testid="email-queue-icon" />
+      <span>{value}</span>
+      <p>{label}</p>
+    </div>
+  ),
+}));
+
 vi.mock('@/components/ui/quick-action-card', () => ({
   QuickActionCard: ({ to, label, description, color }: any) => (
     <a data-testid="quick-action-card" href={to} data-color={color}>
@@ -90,6 +100,16 @@ describe('AdminDashboard component', () => {
     expect(screen.getByText('3')).toBeDefined();
     expect(screen.getByText('15')).toBeDefined();
     expect(screen.getByText('1')).toBeDefined();
+  });
+
+  it('should use EmailQueueStat for email queue stats', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    render(<AdminDashboard data={emptyData} />);
+    const stats = screen.getAllByTestId('email-queue-stat');
+    expect(stats.length).toBe(3);
+    expect(stats[0]).toHaveAttribute('data-color', 'primary');
+    expect(stats[1]).toHaveAttribute('data-color', 'success');
+    expect(stats[2]).toHaveAttribute('data-color', 'error');
   });
 
   it('should show error state when data has error', async () => {
