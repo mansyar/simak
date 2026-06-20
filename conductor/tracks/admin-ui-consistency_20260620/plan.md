@@ -1,3 +1,4 @@
+<protect>
 # Admin UI Consistency — Implementation Plan
 
 **Track ID:** `admin-ui-consistency_20260620`
@@ -11,6 +12,11 @@
 ## Phase 1 — Foundation: new primitives, i18n keys, date helper, role config
 
 Goal: establish the building blocks that every later phase depends on. No behavior change in this phase — only additions and one shared config.
+
+- [ ] Task: Read track context (spec.md and workflow.md)
+    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [ ] Confirm understanding before starting any task in this phase
 
 - [ ] Task: Add missing i18n keys to `locales/en.json` and `locales/id.json` (FR-22.1, FR-22.3)
     - [ ] Add `adminUsers.table.emailVerified` (en + id) — used by UserTable (fixes B7)
@@ -70,6 +76,11 @@ Goal: establish the building blocks that every later phase depends on. No behavi
 ## Phase 2 — Page header, refresh, back link, skeleton, empty state adoptions
 
 Goal: the highest-leverage UX changes — every admin page uses the shared header / refresh / back / skeleton / empty-state primitives.
+
+- [ ] Task: Read track context (spec.md and workflow.md)
+    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [ ] Confirm understanding before starting any task in this phase
 
 - [ ] Task: Adopt `<PageHeader>` in `admin/dashboard.tsx` (FR-1.1)
     - [ ] Write failing test `tests/unit/routes/admin-dashboard.test.tsx` covering: page title from `t('adminDashboard.title')`, subtitle from `t('adminDashboard.subtitle')`
@@ -155,6 +166,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
 
 Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, design tokens).
 
+- [ ] Task: Read track context (spec.md and workflow.md)
+    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [ ] Confirm understanding before starting any task in this phase
+
 - [ ] Task: Extend `<Pagination>` primitive with `showPageNumbers` and `showCounter` props (FR-6.1)
     - [ ] Write failing test covering: default (prev/next only), `showPageNumbers` (up to 5), `showCounter` ("Page X of Y")
     - [ ] Extend the existing component
@@ -237,6 +253,11 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
 
 Goal: kill the remaining inline-style code, fix the UI-level bugs, dedupe role config.
 
+- [ ] Task: Read track context (spec.md and workflow.md)
+    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [ ] Confirm understanding before starting any task in this phase
+
 - [ ] Task: Adopt `ROLES` config in `UserTable.tsx`, `UserFilters.tsx`, `CreateUserDialog.tsx` (FR-16.2, FR-16.3)
     - [ ] Write failing test covering: each component looks up role label and variant from the central `ROLES` config (no inline maps)
     - [ ] Replace inline `roleVariants` and `roleLabels` maps with `ROLES` lookups
@@ -288,6 +309,11 @@ Goal: kill the remaining inline-style code, fix the UI-level bugs, dedupe role c
 ## Phase 5 — Native dialogs replaced in users page, type-filter fix, i18n adoption
 
 Goal: replace `window.confirm` / `window.alert` with proper `Dialog` / `Sheet`; fix the type-filter server contract; complete i18n adoption.
+
+- [ ] Task: Read track context (spec.md and workflow.md)
+    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [ ] Confirm understanding before starting any task in this phase
 
 - [ ] Task: Create `<DeleteUserDialog>` in `src/components/admin/users/` (FR-9.1) — fixes B2
     - [ ] Write failing test covering: dialog shows the user name, requires confirmation
@@ -347,6 +373,11 @@ Goal: replace `window.confirm` / `window.alert` with proper `Dialog` / `Sheet`; 
 ## Phase 6 — TemplateDetailPage restructure, TypeScript types, CountBadge, a11y polish, final gate
 
 Goal: the deep structural refactor; the type-system cleanup; the final accessibility passes; pre-push gate.
+
+- [ ] Task: Read track context (spec.md and workflow.md)
+    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [ ] Confirm understanding before starting any task in this phase
 
 - [ ] Task: Migrate `listTemplateAssignments` to the route loader (FR-25.2) — fixes B8
     - [ ] Write failing test covering: the route loader returns `{ template, assignments }`
@@ -427,3 +458,5 @@ Goal: the deep structural refactor; the type-system cleanup; the final accessibi
 ---
 
 **Coverage note:** each phase ends with a Phase Completion Checkpoint per `conductor/workflow.md` §103-171. Between phases, the plan status will be updated with short SHAs from the checkpoint commits.
+
+</protect>

@@ -1,3 +1,4 @@
+<protect>
 # Admin UI Consistency — Specification
 
 **Track ID:** `admin-ui-consistency_20260620`
@@ -237,3 +238,5 @@ Each requirement references the audit finding (B = bug, §X.Y = section in the a
 - `src/components/ui/{page-header, back-link, empty-state, skeleton, refresh-button, card, badge, button, table, pagination, status-dot, count-badge, template-type-badge, select, form, input, label, dialog, sheet, dropdown-menu, metric-card}.tsx`: the existing primitives this track adopts.
 - `conductor/workflow.md`: TDD protocol, phase-completion checkpointing, commit format.
 - `AGENTS.md`: 500-line file limit, server function split, no new dependencies.
+
+</protect>
