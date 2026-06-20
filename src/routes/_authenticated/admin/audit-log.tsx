@@ -13,6 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useI18n } from '../../__root';
+import type { TranslationKey } from '@/i18n/index';
 import { PageHeader } from '@/components/ui/page-header';
 import { RefreshButton } from '@/components/ui/refresh-button';
 import { Pagination } from '@/components/ui/pagination';
@@ -31,6 +32,7 @@ import { formatDate } from '@/lib/format-date';
 interface AuditLogEntry {
   id: number;
   actorId: string;
+  actorName: string;
   action: string;
   entityType: string;
   entityId: string;
@@ -199,10 +201,10 @@ function AuditLogPage() {
                       </TableCell>
                       <TableCell>
                         <Badge variant={getActionVisualProps(entry.action).badgeVariant}>
-                          {entry.action}
+                          {t(entry.action as TranslationKey)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs">{entry.actorId}</TableCell>
+                      <TableCell className="text-xs">{entry.actorName ?? entry.actorId}</TableCell>
                       <TableCell className="text-xs">{entry.entityType}</TableCell>
                       <TableCell className="text-xs font-mono">{entry.entityId}</TableCell>
                       <TableCell className="text-xs">

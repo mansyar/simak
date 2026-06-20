@@ -96,6 +96,7 @@ describe('Audit log handlers', () => {
     {
       id: 1,
       actorId: 'admin-1',
+      actorName: 'Admin',
       action: 'user.created',
       entityType: 'user',
       entityId: 'student-1',
@@ -105,6 +106,7 @@ describe('Audit log handlers', () => {
     {
       id: 2,
       actorId: 'admin-1',
+      actorName: 'Admin',
       action: 'template.created',
       entityType: 'template',
       entityId: '42',
@@ -114,6 +116,7 @@ describe('Audit log handlers', () => {
     {
       id: 3,
       actorId: 'instructor-1',
+      actorName: 'Dr. Smith',
       action: 'review.passed',
       entityType: 'review',
       entityId: '99',
@@ -152,6 +155,7 @@ describe('Audit log handlers', () => {
     mockDb = {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
+      leftJoin: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       offset: vi.fn().mockReturnThis(),

@@ -2,6 +2,7 @@
 import { getSessionFromHeaders } from './auth';
 import { getDb } from '@/db/index';
 import { auditLog } from '@/db/schema/audit-log';
+import { users } from '@/db/schema/users';
 import { count, desc, sql, and, gte, lte, or, like, type SQL } from 'drizzle-orm';
 
 const ADMIN_ROLES = ['superadmin', 'admin'] as const;
@@ -64,8 +65,18 @@ export async function listAuditLogsHandler(input: ListAuditLogsInput) {
   // Get total count
   const countQuery = db.select({ total: count() }).from(auditLog);
   const dataQuery = db
-    .select()
+    .select({
+      id: auditLog.id,
+      actorId: auditLog.actorId,
+      actorName: users.name,
+      action: auditLog.action,
+      entityType: auditLog.entityType,
+      entityId: auditLog.entityId,
+      details: auditLog.details,
+      createdAt: auditLog.createdAt,
+    })
     .from(auditLog)
+    .leftJoin(users, sql`${auditLog.actorId} = ${users.id}`)
     .orderBy(desc(auditLog.createdAt))
     .limit(limit)
     .offset(offset);
@@ -84,6 +95,7 @@ export async function listAuditLogsHandler(input: ListAuditLogsInput) {
     entries: entries.map((entry) => ({
       id: entry.id,
       actorId: entry.actorId,
+      actorName: entry.actorName ?? entry.actorId,
       action: entry.action,
       entityType: entry.entityType,
       entityId: entry.entityId,
