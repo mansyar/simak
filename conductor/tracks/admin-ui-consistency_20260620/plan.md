@@ -401,16 +401,16 @@ Goal: the deep structural refactor; the type-system cleanup; the final accessibi
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): use CountBadge in template detail`
 
-- [ ] Task: Fix `createServerFn` stub pattern (FR-24.1) — cross-cutting
-    - [ ] Identify the root cause: `src/server/<feature>.ts` declares `createServerFn` stubs that don't infer handler types
-    - [ ] Update the pattern in `src/server/users.ts`, `src/server/templates.ts`, `src/server/audit-logs.ts` (and any other affected) so the handler return type is propagated
-    - [ ] Verify: `pnpm typecheck` passes
-    - [ ] Commit: `refactor(server): fix createServerFn type inference`
+- [x] Task: Fix `createServerFn` stub pattern (FR-24.1) — cross-cutting — commit `1f94b00`
+    - [x] Identify the root cause: admin stubs use `args: { data: unknown }` with manual `.parse()` instead of `.inputValidator()` which properly types the data argument
+    - [x] Update the pattern in `src/server/users.ts`, `src/server/templates.ts`, `src/server/audit-logs.ts` to use `.inputValidator()` so the handler return type is propagated
+    - [x] Verify: `pnpm typecheck` passes
+    - [x] Commit: `refactor(server): fix createServerFn type inference and remove @ts-expect-error from admin routes`
 
-- [ ] Task: Remove all `// @ts-expect-error` in admin routes (FR-24.2) — fixes the systemic type issue
-    - [ ] Remove 12 `// @ts-expect-error - handler type inference limitation` comments in `admin/audit-log.tsx`, `admin/users/index.tsx`, `admin/templates/index.tsx`, `admin/templates/$templateId.tsx`
-    - [ ] Verify: `pnpm typecheck` passes with no `// @ts-expect-error` in admin routes
-    - [ ] Commit: `refactor(admin): remove // @ts-expect-error from admin routes`
+- [x] Task: Remove all `// @ts-expect-error` in admin routes (FR-24.2) — commit `1f94b00`
+    - [x] Remove 13 `// @ts-expect-error` comments across admin routes
+    - [x] Verify: `pnpm typecheck` passes with no `// @ts-expect-error` in admin routes
+    - [x] Commit: `refactor(server): fix createServerFn type inference and remove @ts-expect-error from admin routes`
 
 - [ ] Task: Remove ad-hoc `as { ... }` result-shape casts (FR-24.3)
     - [ ] `admin/templates/index.tsx` (lines 112, 121-123, 132) and `TemplateDetailPage.tsx` (lines 71, 144, 166) — replace with proper types
