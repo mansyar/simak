@@ -15,7 +15,11 @@ vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: any) => <div data-testid="card">{children}</div>,
   CardHeader: ({ children }: any) => <div data-testid="card-header">{children}</div>,
   CardTitle: ({ children }: any) => <div data-testid="card-title">{children}</div>,
-  CardContent: ({ children, ...props }: any) => <div data-testid="card-content" {...props}>{children}</div>,
+  CardContent: ({ children, ...props }: any) => (
+    <div data-testid="card-content" {...props}>
+      {children}
+    </div>
+  ),
 }));
 
 vi.mock('@/components/ui/list-row', () => ({
@@ -28,13 +32,26 @@ vi.mock('@/components/ui/list-row', () => ({
 }));
 
 const assignments = [
-  { id: 1, title: 'Assignment 1', instructorName: 'Dr. Smith', studentCount: 5, createdAt: new Date('2026-01-15') },
-  { id: 2, title: 'Assignment 2', instructorName: 'Dr. Jones', studentCount: 3, createdAt: new Date('2026-02-10') },
+  {
+    id: 1,
+    title: 'Assignment 1',
+    instructorName: 'Dr. Smith',
+    studentCount: 5,
+    createdAt: new Date('2026-01-15'),
+  },
+  {
+    id: 2,
+    title: 'Assignment 2',
+    instructorName: 'Dr. Jones',
+    studentCount: 3,
+    createdAt: new Date('2026-02-10'),
+  },
 ];
 
 describe('TemplateLinkedAssignments', () => {
   it('should render assignments using ListRow primitive', async () => {
-    const { TemplateLinkedAssignments } = await import('@/components/admin/templates/TemplateLinkedAssignments');
+    const { TemplateLinkedAssignments } =
+      await import('@/components/admin/templates/TemplateLinkedAssignments');
     render(<TemplateLinkedAssignments assignments={assignments} />);
     expect(screen.getAllByTestId('list-row')).toHaveLength(2);
     expect(screen.getByText('Assignment 1')).toBeInTheDocument();
@@ -42,13 +59,15 @@ describe('TemplateLinkedAssignments', () => {
   });
 
   it('should render no-assignments message when empty', async () => {
-    const { TemplateLinkedAssignments } = await import('@/components/admin/templates/TemplateLinkedAssignments');
+    const { TemplateLinkedAssignments } =
+      await import('@/components/admin/templates/TemplateLinkedAssignments');
     render(<TemplateLinkedAssignments assignments={[]} />);
     expect(screen.getByText('adminTemplates.detail.noAssignments')).toBeInTheDocument();
   });
 
   it('should render instructor names', async () => {
-    const { TemplateLinkedAssignments } = await import('@/components/admin/templates/TemplateLinkedAssignments');
+    const { TemplateLinkedAssignments } =
+      await import('@/components/admin/templates/TemplateLinkedAssignments');
     render(<TemplateLinkedAssignments assignments={assignments} />);
     expect(screen.getByText(/Dr\. Smith/)).toBeInTheDocument();
     expect(screen.getByText(/Dr\. Jones/)).toBeInTheDocument();

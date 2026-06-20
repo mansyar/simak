@@ -168,9 +168,7 @@ export function TemplateDetailPage({
         <AlertBanner variant="success" title={t('adminTemplates.detail.saveSuccess')} />
       )}
 
-      {saveError && (
-        <AlertBanner variant="error" title={`${t('common.error')}: ${saveError}`} />
-      )}
+      {saveError && <AlertBanner variant="error" title={`${t('common.error')}: ${saveError}`} />}
 
       <TemplateMetadata
         template={template}

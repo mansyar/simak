@@ -12,12 +12,24 @@ vi.mock('@/routes/__root', () => ({
 }));
 
 vi.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...props }: any) => <div data-testid="card" {...props}>{children}</div>,
-  CardContent: ({ children, ...props }: any) => <div data-testid="card-content" {...props}>{children}</div>,
+  Card: ({ children, ...props }: any) => (
+    <div data-testid="card" {...props}>
+      {children}
+    </div>
+  ),
+  CardContent: ({ children, ...props }: any) => (
+    <div data-testid="card-content" {...props}>
+      {children}
+    </div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: any) => <button data-variant={props.variant} data-testid="btn" {...props}>{children}</button>,
+  Button: ({ children, ...props }: any) => (
+    <button data-variant={props.variant} data-testid="btn" {...props}>
+      {children}
+    </button>
+  ),
 }));
 
 vi.mock('@/components/admin/templates/DeleteTemplateDialog', () => ({

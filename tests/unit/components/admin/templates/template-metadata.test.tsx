@@ -40,7 +40,9 @@ vi.mock('@/components/ui/alert-banner', () => ({
 
 vi.mock('@/components/ui/count-badge', () => ({
   CountBadge: ({ count, ...props }: any) => (
-    <span data-testid="count-badge" {...props}>{count}</span>
+    <span data-testid="count-badge" {...props}>
+      {count}
+    </span>
   ),
 }));
 

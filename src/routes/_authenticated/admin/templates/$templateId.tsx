@@ -1,5 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getTemplate, listTemplateAssignments, type GetTemplateResult, type TemplateAssignment } from '@/server/templates';
+import {
+  getTemplate,
+  listTemplateAssignments,
+  type GetTemplateResult,
+  type TemplateAssignment,
+} from '@/server/templates';
 import { TemplateDetailPage } from '@/components/admin/templates/TemplateDetailPage';
 import { TemplateDetailSkeleton } from '@/components/admin/templates/TemplateDetailSkeleton';
 import { TemplateNotFound } from '@/components/admin/templates/TemplateNotFound';

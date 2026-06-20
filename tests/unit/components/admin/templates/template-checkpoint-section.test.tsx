@@ -27,11 +27,19 @@ vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: any) => <div data-testid="card">{children}</div>,
   CardHeader: ({ children }: any) => <div data-testid="card-header">{children}</div>,
   CardTitle: ({ children }: any) => <div data-testid="card-title">{children}</div>,
-  CardContent: ({ children, ...props }: any) => <div data-testid="card-content" {...props}>{children}</div>,
+  CardContent: ({ children, ...props }: any) => (
+    <div data-testid="card-content" {...props}>
+      {children}
+    </div>
+  ),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, ...props }: any) => <button data-variant={props.variant} {...props}>{children}</button>,
+  Button: ({ children, ...props }: any) => (
+    <button data-variant={props.variant} {...props}>
+      {children}
+    </button>
+  ),
 }));
 
 vi.mock('@/components/admin/templates/CheckpointListEditor', () => ({
@@ -45,7 +53,8 @@ const checkpoints = [
 
 describe('TemplateCheckpointSection', () => {
   it('should render the CheckpointListEditor', async () => {
-    const { TemplateCheckpointSection } = await import('@/components/admin/templates/TemplateCheckpointSection');
+    const { TemplateCheckpointSection } =
+      await import('@/components/admin/templates/TemplateCheckpointSection');
     render(
       <TemplateCheckpointSection
         checkpoints={checkpoints}
@@ -64,7 +73,8 @@ describe('TemplateCheckpointSection', () => {
   });
 
   it('should render save and cancel buttons', async () => {
-    const { TemplateCheckpointSection } = await import('@/components/admin/templates/TemplateCheckpointSection');
+    const { TemplateCheckpointSection } =
+      await import('@/components/admin/templates/TemplateCheckpointSection');
     render(
       <TemplateCheckpointSection
         checkpoints={checkpoints}
@@ -84,7 +94,8 @@ describe('TemplateCheckpointSection', () => {
   });
 
   it('should show saving text when isSaving', async () => {
-    const { TemplateCheckpointSection } = await import('@/components/admin/templates/TemplateCheckpointSection');
+    const { TemplateCheckpointSection } =
+      await import('@/components/admin/templates/TemplateCheckpointSection');
     render(
       <TemplateCheckpointSection
         checkpoints={checkpoints}

@@ -31,7 +31,10 @@ export function EmptyState({
           compact ? 'size-12' : 'size-16',
         )}
       >
-        <Icon className={cn('text-muted-foreground', compact ? 'size-5' : 'size-7')} aria-hidden="true" />
+        <Icon
+          className={cn('text-muted-foreground', compact ? 'size-5' : 'size-7')}
+          aria-hidden="true"
+        />
       </div>
       <h3 className="text-[0.9375rem] font-semibold text-foreground">{title}</h3>
       {description && <p className="mt-1 text-[0.8125rem] text-muted-foreground">{description}</p>}

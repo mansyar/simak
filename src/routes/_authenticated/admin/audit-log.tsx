@@ -219,7 +219,10 @@ function AuditLogPage() {
                           <span className="text-muted-foreground">-</span>
                         )}
                         {expandedId === entry.id && entry.details && (
-                          <pre className="mt-2 rounded bg-muted p-2 text-xs overflow-x-auto" id={`details-${entry.id}`}>
+                          <pre
+                            className="mt-2 rounded bg-muted p-2 text-xs overflow-x-auto"
+                            id={`details-${entry.id}`}
+                          >
                             {JSON.stringify(entry.details, null, 2)}
                           </pre>
                         )}

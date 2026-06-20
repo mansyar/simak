@@ -128,10 +128,6 @@ export type GetTemplateResult = TemplateDetail | null;
 
 export type DeleteTemplateResult = { error: string; count?: number } | { success: true };
 
-export type DuplicateTemplateResult =
-  | { error: string }
-  | { template: GetTemplateResult };
+export type DuplicateTemplateResult = { error: string } | { template: GetTemplateResult };
 
-export type CreateTemplateResult =
-  | { error: string }
-  | { template: GetTemplateResult };
+export type CreateTemplateResult = { error: string } | { template: GetTemplateResult };
