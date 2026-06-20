@@ -386,21 +386,20 @@ Goal: the deep structural refactor; the type-system cleanup; the final accessibi
     - [x] Verify: tests pass; no `useEffect`-based fetch
     - [x] Commit: `refactor(admin): move linked-assignments fetch to route loader (B8)`
 
-- [ ] Task: Split `TemplateDetailPage.tsx` into subcomponents (FR-25.1, FR-25.3, FR-25.4)
-    - [ ] Write failing tests for each subcomponent (`TemplateMetadata`, `TemplateCheckpointSection`, `TemplateLinkedAssignments`, `TemplateDangerZone`)
-    - [ ] Move each card into its own file under `src/components/admin/templates/`
-    - [ ] The route uses `TemplateDetailPage` as a thin orchestrator (well under 500 lines)
-    - [ ] Use `FormField`/`FormLabel`/`FormMessage` in `TemplateMetadata`
-    - [ ] Use `<AlertBanner>` for the success/error banners
-    - [ ] Use `<ListRow>` for the linked-assignment list
-    - [ ] Verify: tests pass; `TemplateDetailPage.tsx` is under 500 lines
-    - [ ] Commit: `refactor(admin): split TemplateDetailPage into subcomponents`
+- [x] Task: Split `TemplateDetailPage.tsx` into subcomponents (FR-25.1, FR-25.3, FR-25.4) — commit `c31aa67`
+    - [x] Write failing tests for each subcomponent (`TemplateMetadata`, `TemplateCheckpointSection`, `TemplateLinkedAssignments`, `TemplateDangerZone`)
+    - [x] Move each card into its own file under `src/components/admin/templates/`
+    - [x] The route uses `TemplateDetailPage` as a thin orchestrator (well under 500 lines)
+    - [x] Use `<AlertBanner>` for the success/error banners
+    - [x] Use `<ListRow>` for the linked-assignment list
+    - [x] Verify: tests pass (53 template tests); `TemplateDetailPage.tsx` is 201 lines (under 500)
+    - [x] Commit: `refactor(admin): split TemplateDetailPage into subcomponents`
 
-- [ ] Task: Adopt `<CountBadge>` in `TemplateDetailPage.tsx` (FR-28.1, FR-28.2)
-    - [ ] Write failing test covering: the in-use banner shows the count via `<CountBadge>`
-    - [ ] Replace the inline count with `<CountBadge count={template.assignmentCount} />`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): use CountBadge in template detail`
+- [x] Task: Adopt `<CountBadge>` in `TemplateDetailPage.tsx` (FR-28.1, FR-28.2) — commit `4ca216e`
+    - [x] Write failing test covering: the in-use banner shows the count via `<CountBadge>`
+    - [x] Replace the inline count with `<CountBadge count={template.assignmentCount} />`
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): use CountBadge in template detail`
 
 - [ ] Task: Fix `createServerFn` stub pattern (FR-24.1) — cross-cutting
     - [ ] Identify the root cause: `src/server/<feature>.ts` declares `createServerFn` stubs that don't infer handler types
