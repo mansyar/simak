@@ -42,6 +42,14 @@ vi.mock('@/components/ui/badge', () => ({
   ),
 }));
 
+vi.mock('@/components/ui/template-type-badge', () => ({
+  TemplateTypeBadge: ({ type, className }: any) => (
+    <span data-testid="template-type-badge" className={className}>
+      {type}
+    </span>
+  ),
+}));
+
 vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: any) => <div data-testid="card">{children}</div>,
   CardContent: ({ children }: any) => <div data-testid="card-content">{children}</div>,
@@ -86,6 +94,19 @@ describe('TemplateCard', () => {
       />,
     );
     expect(screen.getByText('Thesis')).toBeDefined();
+  });
+
+  it('should use TemplateTypeBadge instead of Badge for type display', () => {
+    render(
+      <TemplateCard
+        template={mockTemplate}
+        onEdit={onEdit}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+      />,
+    );
+    expect(screen.getByTestId('template-type-badge')).toBeDefined();
+    expect(screen.queryByTestId('badge')).toBeNull();
   });
 
   it('should render checkpoint count', () => {

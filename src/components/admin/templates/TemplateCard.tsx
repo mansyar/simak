@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
@@ -36,7 +36,7 @@ export function TemplateCard({ template, onEdit, onDuplicate, onDelete }: Templa
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-lg">{template.name}</h3>
-              <Badge variant="secondary">{template.type}</Badge>
+              <TemplateTypeBadge type={template.type} />
             </div>
             <p className="text-sm text-muted-foreground">
               {t('adminTemplates.checkpointCount', { count: String(template.checkpointCount) })}
