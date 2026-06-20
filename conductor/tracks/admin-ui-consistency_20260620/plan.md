@@ -417,29 +417,29 @@ Goal: the deep structural refactor; the type-system cleanup; the final accessibi
     - [x] Verify: `pnpm typecheck` passes
     - [x] Commit: `refactor(admin): remove ad-hoc result-shape casts`
 
-- [ ] Task: Accessibility polish (FR-29.1 through FR-29.5) — completes A1–A6
-    - [ ] A1: Refresh buttons in users/templates pages get `aria-label` (subsumed by `<RefreshButton>` adoption in Phase 2)
-    - [ ] A2: `DeleteTemplateDialog.tsx` typed-DELETE input has a Label (FR-29.1 — done in Phase 4)
-    - [ ] A3: `TemplateDetailPage.tsx` raw `<label>` have `htmlFor` (FR-19.1 — done in Phase 4)
-    - [ ] A4: Decorative icons (AlertTriangle, Mail, MailCheck, MailX, etc.) get `aria-hidden="true"`
-    - [ ] A5: `CheckpointListEditor.tsx` column headers get screen-reader-friendly structure
-    - [ ] A6: `audit-log.tsx` view/hide button gets `aria-expanded` and `aria-controls`
-    - [ ] Verify: manual a11y check on /admin/dashboard, /admin/users, /admin/templates, /admin/templates/123, /admin/audit-log
-    - [ ] Commit: `a11y(admin): close audit-flagged accessibility gaps (A1–A6)`
+- [x] Task: Accessibility polish (FR-29.1 through FR-29.5) — completes A1–A6 — commit `4b04df5`
+    - [x] A1: Refresh buttons in users/templates pages get `aria-label` (subsumed by `<RefreshButton>` adoption in Phase 2)
+    - [x] A2: `DeleteTemplateDialog.tsx` typed-DELETE input has a Label (FR-29.1 — done in Phase 4)
+    - [x] A3: `TemplateDetailPage.tsx` raw `<label>` have `htmlFor` (FR-19.1 — done in Phase 4)
+    - [x] A4: Decorative icons (AlertTriangle, Mail, MailCheck, MailX, etc.) get `aria-hidden="true"`
+    - [x] A5: `CheckpointListEditor.tsx` column headers get screen-reader-friendly structure
+    - [x] A6: `audit-log.tsx` view/hide button gets `aria-expanded` and `aria-controls`
+    - [x] Verify: manual a11y check on /admin/dashboard, /admin/users, /admin/templates, /admin/templates/123, /admin/audit-log
+    - [x] Commit: `a11y(admin): close audit-flagged accessibility gaps (A1–A6)`
 
-- [ ] Task: Final test coverage + pre-push gate
-    - [ ] Run `pnpm typecheck` — must pass
-    - [ ] Run `pnpm vitest run --coverage` — must meet thresholds (80/80/72/79)
-    - [ ] Run `pnpm lint` — must pass
-    - [ ] Run `node scripts/check-modularity.js` — no file > 500 lines in scope
-    - [ ] Run pre-push gate: `pnpm typecheck && pnpm vitest run --coverage`
-    - [ ] Final manual visual check on all 6 admin pages
-    - [ ] Commit: `chore(admin): final coverage and gate pass`
+- [x] Task: Final test coverage + pre-push gate
+    - [x] Run `pnpm typecheck` — must pass ✅
+    - [x] Run `pnpm vitest run --coverage` — must meet thresholds (80/80/72/79) ✅ (85.48/81.62/80.99/86.19)
+    - [x] Run `pnpm lint` — must pass ✅ (only pre-existing warning)
+    - [x] Run `node scripts/check-modularity.js` — no file > 500 lines in scope ✅
+    - [x] Run pre-push gate: `pnpm typecheck && pnpm vitest run --coverage` ✅
+    - [x] Final manual visual check on all 6 admin pages — user verified
+    - [x] Commit: `chore(admin): final coverage and gate pass`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 6 — Structural, types, a11y, final gate' (Protocol in workflow.md)
-    - [ ] Run pre-push gate one final time
-    - [ ] Manual verification: end-to-end admin flows (CRUD user, create template, edit template, delete template, view audit log, change role); all keyboard-navigable; all strings i18n'd
-    - [ ] Create final checkpoint commit, attach git note, update plan with checkpoint SHA
+- [~] Task: Conductor - User Manual Verification 'Phase 6 — Structural, types, a11y, final gate' (Protocol in workflow.md)
+    - [x] Run pre-push gate one final time (typecheck ✅, 2070 tests ✅, coverage ✅, lint ✅, modularity ✅)
+    - [x] Manual verification: end-to-end admin flows (CRUD user, create template, edit template, delete template, view audit log, change role); all keyboard-navigable; all strings i18n'd
+    - [~] Create final checkpoint commit, attach git note, update plan with checkpoint SHA
     - [ ] Move track to `completed` status; archive per the workflow
 
 ---
