@@ -219,11 +219,11 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: test passes; the visual treatment matches instructor AssignmentCard
     - [x] Commit: `refactor(admin): adopt TemplateTypeBadge in template card (B1)`
 
-- [ ] Task: Adopt `<QuickActionCard>` in `AdminDashboard.tsx` (FR-10.2, FR-12.2)
-    - [ ] Write failing test covering: two quick-action cards render (Manage Users, Manage Templates)
-    - [ ] Replace the 2 hand-rolled link blocks
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt QuickActionCard in dashboard`
+- [x] Task: Adopt `<QuickActionCard>` in `AdminDashboard.tsx` (FR-10.2, FR-12.2) — commit `4117cbb`
+    - [x] Write failing test covering: two quick-action cards render (Manage Users, Manage Templates)
+    - [x] Replace the 2 hand-rolled link blocks
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt QuickActionCard in dashboard`
 
 - [ ] Task: Adopt `<EmailQueueStat>` in `AdminDashboard.tsx` (FR-10.3, FR-13.2)
     - [ ] Write failing test covering: 3 email-queue stats (pending, sent, failed)
