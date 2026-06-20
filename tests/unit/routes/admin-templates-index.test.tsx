@@ -130,8 +130,6 @@ describe('Admin Templates Index Route', () => {
   it('should render the "New Template" button', async () => {
     const Component = await getComponent();
     render(<Component />);
-    expect(
-      screen.getByRole('button', { name: /adminTemplates.newTemplate/ }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /adminTemplates.newTemplate/ })).toBeInTheDocument();
   });
 });

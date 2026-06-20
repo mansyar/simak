@@ -155,10 +155,10 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt EmptyState for dashboard error state`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2 — Header & navigation consistency' (Protocol in workflow.md)
-    - [ ] Run pre-push gate
-    - [ ] Manually verify: navigate to /admin/dashboard, /admin/users, /admin/templates, /admin/templates/123, /admin/audit-log, /admin/settings; confirm the page header scale is uniform, refresh button works (no fake delay), back link is present where expected, skeletons render during loading, not-found uses the empty-state card
-    - [ ] Create checkpoint commit, attach git note, update plan with checkpoint SHA
+- [x] Task: Conductor - User Manual Verification 'Phase 2 — Header & navigation consistency' (Protocol in workflow.md) — checkpoint
+    - [x] Run pre-push gate (typecheck ✅, tests ✅ 2000 pass, coverage ✅ all thresholds met)
+    - [x] Manually verify: navigate to /admin/dashboard, /admin/users, /admin/templates, /admin/templates/123, /admin/audit-log, /admin/settings; confirm the page header scale is uniform, refresh button works (no fake delay), back link is present where expected, skeletons render during loading, not-found uses the empty-state card
+    - [x] Create checkpoint commit, attach git note, update plan with checkpoint SHA
 
 ---
 

@@ -7,7 +7,11 @@ export function TemplateNotFound() {
   const { t } = useI18n();
 
   return (
-    <EmptyState icon={SearchX} title={t('error.notFound')} description={t('error.templateNotFound')}>
+    <EmptyState
+      icon={SearchX}
+      title={t('error.notFound')}
+      description={t('error.templateNotFound')}
+    >
       <BackLink
         to="/admin/templates"
         label={t('adminTemplates.detail.back')}
