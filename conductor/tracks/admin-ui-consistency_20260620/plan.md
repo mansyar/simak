@@ -149,11 +149,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt EmptyState in template not-found`
 
-- [ ] Task: Adopt `<EmptyState>` for dashboard error state (FR-5.1, FR-5.2) — fixes B12 partially
-    - [ ] Write failing test covering: dashboard error uses EmptyState
-    - [ ] Replace `<div className="flex items-center justify-center py-12" aria-live="polite">` with `<EmptyState icon={AlertCircle} title={t('common.error')} />`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt EmptyState for dashboard error state`
+- [x] Task: Adopt `<EmptyState>` for dashboard error state (FR-5.1, FR-5.2) — fixes B12 partially — commit `eb11e76`
+    - [x] Write failing test covering: dashboard error uses EmptyState
+    - [x] Replace `<div className="flex items-center justify-center py-12" aria-live="polite">` with `<EmptyState icon={AlertCircle} title={t('common.error')} />`
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt EmptyState for dashboard error state`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2 — Header & navigation consistency' (Protocol in workflow.md)
     - [ ] Run pre-push gate
