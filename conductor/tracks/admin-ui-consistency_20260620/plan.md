@@ -125,11 +125,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt BackLink in template not-found`
 
-- [ ] Task: Adopt `<Skeleton>` in `TemplateLoadingSkeleton.tsx` (FR-4.1, FR-4.2)
-    - [ ] Write failing test covering: 6 cards render with skeleton placeholders
-    - [ ] Replace 3 hand-rolled `bg-muted animate-pulse` divs per card with `<Skeleton className="h-X w-Y" />`
-    - [ ] Verify: test passes; `bg-muted animate-pulse` is gone from the file
-    - [ ] Commit: `refactor(admin): adopt Skeleton in templates list skeleton`
+- [x] Task: Adopt `<Skeleton>` in `TemplateLoadingSkeleton.tsx` (FR-4.1, FR-4.2) — commit `715f605`
+    - [x] Write failing test covering: 6 cards render with skeleton placeholders
+    - [x] Replace 3 hand-rolled `bg-muted animate-pulse` divs per card with `<Skeleton className="h-X w-Y" />`
+    - [x] Verify: test passes; `bg-muted animate-pulse` is gone from the file
+    - [x] Commit: `refactor(admin): adopt Skeleton in templates list skeleton`
 
 - [ ] Task: Adopt `<Skeleton>` in `TemplateDetailSkeleton.tsx` (FR-4.1, FR-4.2)
     - [ ] Write failing test covering: back/metadata/checkpoint skeletons render
