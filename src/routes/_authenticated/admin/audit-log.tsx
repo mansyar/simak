@@ -2,6 +2,7 @@ import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { listAuditLogs } from '@/server/audit-logs';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -199,8 +200,9 @@ function AuditLogPage() {
       </div>
 
       {/* Audit Log Table */}
-      <div className="rounded-lg border bg-card">
-        <div className="overflow-x-auto">
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -267,7 +269,8 @@ function AuditLogPage() {
             />
           </div>
         )}
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

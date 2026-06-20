@@ -141,5 +141,16 @@ describe('Admin Audit Log page', () => {
       // Raw <select> should not be present
       expect(container.querySelector('select')).toBeNull();
     });
+
+    it('should wrap the audit log table in a Card primitive', async () => {
+      const Component = await getComponent();
+      const { container } = render(<Component />);
+      // Card renders data-slot="card"
+      const card = container.querySelector('[data-slot="card"]');
+      expect(card).toBeTruthy();
+      // The table should be inside the card
+      const table = card?.querySelector('table');
+      expect(table).toBeTruthy();
+    });
   });
 });
