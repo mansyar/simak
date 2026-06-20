@@ -9,14 +9,14 @@
 
 ---
 
-## Phase 1 — Foundation: new primitives, i18n keys, date helper, role config
+## Phase 1 — Foundation: new primitives, i18n keys, date helper, role config [checkpoint: 86e0cb5]
 
 Goal: establish the building blocks that every later phase depends on. No behavior change in this phase — only additions and one shared config.
 
-- [ ] Task: Read track context (spec.md and workflow.md)
-    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
-    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
-    - [ ] Confirm understanding before starting any task in this phase
+- [x] Task: Read track context (spec.md and workflow.md)
+    - [x] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [x] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [x] Confirm understanding before starting any task in this phase
 
 - [x] Task: Add missing i18n keys to `locales/en.json` and `locales/id.json` (FR-22.1, FR-22.3)
     - [ ] Add `adminUsers.table.emailVerified` (en + id) — used by UserTable (fixes B7)
@@ -66,10 +66,10 @@ Goal: establish the building blocks that every later phase depends on. No behavi
     - [ ] Verify: test passes
     - [ ] Commit: `feat(lib): add locale-aware formatDate helper`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1 — Foundation' (Protocol in workflow.md)
-    - [ ] Run pre-push gate: `pnpm typecheck && pnpm vitest run --coverage`
-    - [ ] Manually verify: the 5 new primitives render correctly in a scratch `tests/integration/admin-phase1-smoke.test.tsx` page (or a Storybook-like render); `ROLES` config is consumable; `formatDate` produces locale-aware output for `id` and `en`
-    - [ ] Create checkpoint commit, attach git note, update plan with checkpoint SHA
+- [x] Task: Conductor - User Manual Verification 'Phase 1 — Foundation' (Protocol in workflow.md)
+    - [x] Run pre-push gate: `pnpm typecheck && pnpm vitest run --coverage`
+    - [x] Manually verify: the 5 new primitives render correctly in a scratch `tests/integration/admin-phase1-smoke.test.tsx` page (or a Storybook-like render); `ROLES` config is consumable; `formatDate` produces locale-aware output for `id` and `en`
+    - [x] Create checkpoint commit, attach git note, update plan with checkpoint SHA
 
 ---
 
