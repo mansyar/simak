@@ -7,6 +7,7 @@ import {
   MessageSquare,
   Bell,
   AlertTriangle,
+  AlertCircle,
   UserPlus,
   FileType,
   Mail,
@@ -75,8 +76,8 @@ export function AdminDashboard({ data }: Props) {
 
   if (data?.error) {
     return (
-      <div className="flex items-center justify-center py-12" aria-live="polite">
-        <p className="text-destructive">{t('common.error')}</p>
+      <div aria-live="polite">
+        <EmptyState icon={AlertCircle} title={t('common.error')} />
       </div>
     );
   }

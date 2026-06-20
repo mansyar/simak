@@ -88,6 +88,18 @@ describe('AdminDashboard component', () => {
     expect(screen.getByText('common.error')).toBeDefined();
   });
 
+  it('should use EmptyState primitive (border-dashed container + h3) for error', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    const { container } = render(<AdminDashboard data={{ error: 'Unauthorized' } as any} />);
+    // EmptyState renders an h3 title, not a p
+    const heading = container.querySelector('h3');
+    expect(heading).toBeTruthy();
+    expect(heading?.textContent).toBe('common.error');
+    // EmptyState container has border-dashed class
+    const emptyStateContainer = container.querySelector('.border-dashed');
+    expect(emptyStateContainer).toBeTruthy();
+  });
+
   it('should render metric values', async () => {
     const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
     const dataWithMetrics = {
