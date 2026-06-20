@@ -137,11 +137,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes; `bg-muted animate-pulse` is gone from the file
     - [x] Commit: `refactor(admin): adopt Skeleton in template detail skeleton`
 
-- [ ] Task: Adopt `<Skeleton>` in `TemplateDetailPage.tsx` inline loading (FR-4.1, FR-4.2)
-    - [ ] Write failing test covering: linked-assignments loading state uses Skeleton
-    - [ ] Replace 2 inline `<div className="h-10 rounded bg-muted animate-pulse" />` with `<Skeleton className="h-10" />`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt Skeleton for inline loading state`
+- [x] Task: Adopt `<Skeleton>` in `TemplateDetailPage.tsx` inline loading (FR-4.1, FR-4.2) — commit `598cd80`
+    - [x] Write failing test covering: linked-assignments loading state uses Skeleton
+    - [x] Replace 2 inline `<div className="h-10 rounded bg-muted animate-pulse" />` with `<Skeleton className="h-10" />`
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt Skeleton for inline loading state`
 
 - [ ] Task: Adopt `<EmptyState>` in `TemplateNotFound.tsx` (FR-5.1, FR-5.2)
     - [ ] Write failing test covering: not-found uses EmptyState with the right icon + title
