@@ -38,7 +38,7 @@ function isInstructorOrAdmin(session: NonNullableSession | null): session is Non
 export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructorOrAdmin(session)) {
-    return { templates: [], total: 0 };
+    return { templates: [], total: 0, allTypes: [] as string[] };
   }
 
   const { search, type, page, limit } = args.data;
@@ -113,9 +113,17 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
     .from(assignmentTemplates)
     .where(and(...conditions));
 
+  // All distinct types (for filter dropdown)
+  const typeRows = await db
+    .select({ type: assignmentTemplates.type })
+    .from(assignmentTemplates)
+    .where(isNull(assignmentTemplates.deletedAt))
+    .groupBy(assignmentTemplates.type);
+
   return {
     templates: templatesWithCounts,
     total: Number(count),
+    allTypes: typeRows.map((r) => r.type),
   };
 }
 

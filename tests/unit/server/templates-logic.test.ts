@@ -217,7 +217,33 @@ describe('Template server functions - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
 
       const result = await listTemplatesHandler({ data: listData });
-      expect(result).toEqual({ templates: [], total: 0 });
+      expect(result).toEqual({ templates: [], total: 0, allTypes: [] });
+    });
+
+    it('should return allTypes array of distinct types', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, name: 'Proposal', order: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ type: 'Thesis' }, { type: 'Project' }]).then(onfulfilled),
+        );
+
+      const result = await listTemplatesHandler({ data: listData });
+
+      expect(result.allTypes).toBeDefined();
+      expect(result.allTypes).toEqual(['Thesis', 'Project']);
     });
   });
 
