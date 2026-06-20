@@ -66,7 +66,6 @@ interface Props {
   data: AdminDashboardData;
 }
 
-
 export function AdminDashboard({ data }: Props) {
   const { t } = useI18n();
 
@@ -163,7 +162,7 @@ export function AdminDashboard({ data }: Props) {
               <EmptyState
                 icon={Clock}
                 title={t('adminDashboard.noEscalationAlerts')}
-                description="All assignments are on track"
+                description={t('adminDashboard.allOnTrack')}
               />
             ) : (
               <ul className="space-y-3">
@@ -226,7 +225,10 @@ export function AdminDashboard({ data }: Props) {
                     key={event.id}
                     className="flex items-start gap-3 border-b border-border/50 pb-3 last:border-b-0 last:pb-0"
                   >
-                    <StatusDot variant={getActionVisualProps(event.type).dotVariant} className="mt-[6px]" />
+                    <StatusDot
+                      variant={getActionVisualProps(event.type).dotVariant}
+                      className="mt-[6px]"
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm text-foreground">{event.title}</p>
                       {event.message && (

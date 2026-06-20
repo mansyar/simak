@@ -158,7 +158,7 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
         setTimeout(() => setSaveSuccess(false), 3000);
       }
     } catch {
-      setSaveError('Failed to save template');
+      setSaveError(t('adminTemplates.detail.saveError'));
     } finally {
       setIsSaving(false);
     }
@@ -309,7 +309,7 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
                   <div>
                     <div className="font-medium text-foreground">{a.title}</div>
                     <div className="text-muted-foreground">
-                      {a.instructorName} &middot; {a.studentCount} students
+                      {a.instructorName} &middot; {t('adminTemplates.studentsCount', { count: String(a.studentCount) })}
                     </div>
                   </div>
                   <div className="text-xs text-muted-foreground">

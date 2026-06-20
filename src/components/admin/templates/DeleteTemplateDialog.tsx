@@ -30,7 +30,7 @@ export function DeleteTemplateDialog({
   const [deleteText, setDeleteText] = useState('');
 
   const isInUse = usageCount > 0;
-  const canConfirm = !isInUse || deleteText === 'DELETE';
+  const canConfirm = !isInUse || deleteText === t('common.deleteConfirmationWord');
 
   const handleConfirm = () => {
     if (canConfirm) {
@@ -68,9 +68,7 @@ export function DeleteTemplateDialog({
 
         {isInUse && (
           <div className="py-2 space-y-2">
-            <Label htmlFor="delete-confirm-input">
-              {t('common.typeDeleteToConfirm')}
-            </Label>
+            <Label htmlFor="delete-confirm-input">{t('common.typeDeleteToConfirm')}</Label>
             <Input
               id="delete-confirm-input"
               value={deleteText}

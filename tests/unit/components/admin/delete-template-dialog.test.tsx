@@ -25,7 +25,9 @@ vi.mock('@/components/ui/button', () => ({
 
 vi.mock('@/components/ui/label', () => ({
   Label: ({ children, ...props }: any) => (
-    <label data-slot="label" {...props}>{children}</label>
+    <label data-slot="label" {...props}>
+      {children}
+    </label>
   ),
 }));
 
@@ -39,6 +41,7 @@ vi.mock('@/routes/__root', () => ({
           : key,
         'adminTemplates.actions.delete': 'Delete',
         'common.cancel': 'Cancel',
+        'common.deleteConfirmationWord': 'DELETE',
       };
       return translations[key] || key;
     },
