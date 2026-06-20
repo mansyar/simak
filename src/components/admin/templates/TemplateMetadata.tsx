@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertBanner } from '@/components/ui/alert-banner';
+import { CountBadge } from '@/components/ui/count-badge';
 import { formatDate } from '@/lib/format-date';
 import { useI18n } from '../../../routes/__root';
 
@@ -71,10 +72,13 @@ export function TemplateMetadata({
         </div>
 
         {template.assignmentCount > 0 && (
-          <AlertBanner
-            variant="warning"
-            title={t('adminTemplates.inUseBanner', { count: String(template.assignmentCount) })}
-          />
+          <div className="flex items-center gap-2">
+            <AlertBanner
+              variant="warning"
+              title={t('adminTemplates.inUseBanner', { count: String(template.assignmentCount) })}
+            />
+            <CountBadge count={template.assignmentCount} />
+          </div>
         )}
       </CardContent>
     </Card>

@@ -15,7 +15,11 @@ vi.mock('@/components/ui/card', () => ({
   Card: ({ children }: any) => <div data-testid="card">{children}</div>,
   CardHeader: ({ children }: any) => <div data-testid="card-header">{children}</div>,
   CardTitle: ({ children }: any) => <div data-testid="card-title">{children}</div>,
-  CardContent: ({ children, ...props }: any) => <div data-testid="card-content" {...props}>{children}</div>,
+  CardContent: ({ children, ...props }: any) => (
+    <div data-testid="card-content" {...props}>
+      {children}
+    </div>
+  ),
 }));
 
 vi.mock('@/components/ui/input', () => ({
@@ -27,7 +31,17 @@ vi.mock('@/components/ui/label', () => ({
 }));
 
 vi.mock('@/components/ui/alert-banner', () => ({
-  AlertBanner: (props: any) => <div data-testid="alert-banner" data-variant={props.variant}>{props.title}</div>,
+  AlertBanner: (props: any) => (
+    <div data-testid="alert-banner" data-variant={props.variant}>
+      {props.title}
+    </div>
+  ),
+}));
+
+vi.mock('@/components/ui/count-badge', () => ({
+  CountBadge: ({ count, ...props }: any) => (
+    <span data-testid="count-badge" {...props}>{count}</span>
+  ),
 }));
 
 const template = {
@@ -42,31 +56,99 @@ const template = {
 describe('TemplateMetadata', () => {
   it('should render the name input with current value', async () => {
     const { TemplateMetadata } = await import('@/components/admin/templates/TemplateMetadata');
-    render(<TemplateMetadata template={template} name="Thesis Template" onNameChange={() => {}} type="Thesis" onTypeChange={() => {}} />);
+    render(
+      <TemplateMetadata
+        template={template}
+        name="Thesis Template"
+        onNameChange={() => {}}
+        type="Thesis"
+        onTypeChange={() => {}}
+      />,
+    );
     expect(screen.getByTestId('template-name')).toHaveValue('Thesis Template');
   });
 
   it('should render the type input with current value', async () => {
     const { TemplateMetadata } = await import('@/components/admin/templates/TemplateMetadata');
-    render(<TemplateMetadata template={template} name="Thesis Template" onNameChange={() => {}} type="Thesis" onTypeChange={() => {}} />);
+    render(
+      <TemplateMetadata
+        template={template}
+        name="Thesis Template"
+        onNameChange={() => {}}
+        type="Thesis"
+        onTypeChange={() => {}}
+      />,
+    );
     expect(screen.getByTestId('template-type')).toHaveValue('Thesis');
   });
 
   it('should render created by info', async () => {
     const { TemplateMetadata } = await import('@/components/admin/templates/TemplateMetadata');
-    render(<TemplateMetadata template={template} name="Thesis Template" onNameChange={() => {}} type="Thesis" onTypeChange={() => {}} />);
+    render(
+      <TemplateMetadata
+        template={template}
+        name="Thesis Template"
+        onNameChange={() => {}}
+        type="Thesis"
+        onTypeChange={() => {}}
+      />,
+    );
     expect(screen.getByText('Dr. Smith')).toBeInTheDocument();
   });
 
   it('should show in-use banner when assignmentCount > 0', async () => {
     const { TemplateMetadata } = await import('@/components/admin/templates/TemplateMetadata');
-    render(<TemplateMetadata template={template} name="Thesis Template" onNameChange={() => {}} type="Thesis" onTypeChange={() => {}} />);
+    render(
+      <TemplateMetadata
+        template={template}
+        name="Thesis Template"
+        onNameChange={() => {}}
+        type="Thesis"
+        onTypeChange={() => {}}
+      />,
+    );
     expect(screen.getByTestId('alert-banner')).toHaveAttribute('data-variant', 'warning');
   });
 
   it('should not show in-use banner when assignmentCount is 0', async () => {
     const { TemplateMetadata } = await import('@/components/admin/templates/TemplateMetadata');
-    render(<TemplateMetadata template={{ ...template, assignmentCount: 0 }} name="Thesis Template" onNameChange={() => {}} type="Thesis" onTypeChange={() => {}} />);
+    render(
+      <TemplateMetadata
+        template={{ ...template, assignmentCount: 0 }}
+        name="Thesis Template"
+        onNameChange={() => {}}
+        type="Thesis"
+        onTypeChange={() => {}}
+      />,
+    );
     expect(screen.queryByTestId('alert-banner')).not.toBeInTheDocument();
+  });
+
+  it('should use CountBadge to show assignment count in the in-use banner', async () => {
+    const { TemplateMetadata } = await import('@/components/admin/templates/TemplateMetadata');
+    render(
+      <TemplateMetadata
+        template={template}
+        name="Thesis Template"
+        onNameChange={() => {}}
+        type="Thesis"
+        onTypeChange={() => {}}
+      />,
+    );
+    expect(screen.getByTestId('count-badge')).toHaveTextContent('3');
+  });
+
+  it('should not render CountBadge when assignmentCount is 0', async () => {
+    const { TemplateMetadata } = await import('@/components/admin/templates/TemplateMetadata');
+    render(
+      <TemplateMetadata
+        template={{ ...template, assignmentCount: 0 }}
+        name="Thesis Template"
+        onNameChange={() => {}}
+        type="Thesis"
+        onTypeChange={() => {}}
+      />,
+    );
+    expect(screen.queryByTestId('count-badge')).not.toBeInTheDocument();
   });
 });
