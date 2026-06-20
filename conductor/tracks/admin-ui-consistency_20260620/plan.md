@@ -189,11 +189,11 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt Pagination primitive on audit log`
 
-- [ ] Task: Adopt `<Select>` in `admin/audit-log.tsx` action filter (FR-7.1)
-    - [ ] Write failing test covering: action filter uses `Select` with the action list
-    - [ ] Replace raw `<select>` with `Select`/`SelectTrigger`/`SelectContent`/`SelectItem`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt Select primitive in audit log filter`
+- [x] Task: Adopt `<Select>` in `admin/audit-log.tsx` action filter (FR-7.1) — commit `d634b78`
+    - [x] Write failing test covering: action filter uses `Select` with the action list
+    - [x] Replace raw `<select>` with `Select`/`SelectTrigger`/`SelectContent`/`SelectItem`
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt Select primitive in audit log filter`
 
 - [ ] Task: Fix `data-slot="select-value"` workaround (FR-7.2)
     - [ ] Write failing test covering: `Select` renders the selected value without the `data-slot` workaround
