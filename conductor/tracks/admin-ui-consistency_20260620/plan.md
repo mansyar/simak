@@ -183,11 +183,11 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt Pagination primitive on users list`
 
-- [ ] Task: Adopt extended `<Pagination>` in `admin/audit-log.tsx` (FR-6.2, FR-6.3)
-    - [ ] Write failing test covering: prev/next, page numbers (up to 5), counter; all use design tokens
-    - [ ] Replace hand-rolled pagination
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt Pagination primitive on audit log`
+- [x] Task: Adopt extended `<Pagination>` in `admin/audit-log.tsx` (FR-6.2, FR-6.3) — commit `80b64d1`
+    - [x] Write failing test covering: prev/next, page numbers (up to 5), counter; all use design tokens
+    - [x] Replace hand-rolled pagination
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt Pagination primitive on audit log`
 
 - [ ] Task: Adopt `<Select>` in `admin/audit-log.tsx` action filter (FR-7.1)
     - [ ] Write failing test covering: action filter uses `Select` with the action list
