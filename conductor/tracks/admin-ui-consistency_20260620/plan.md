@@ -202,10 +202,10 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: existing tests pass; the workaround is gone
     - [x] Commit: `refactor(ui): fix Select.Value workaround in admin filters`
 
-- [ ] Task: Unify search input padding (FR-8.1)
-    - [ ] Change `audit-log.tsx:158` from `pl-8` to `pl-9`
-    - [ ] Verify: all admin search inputs use `pl-9`
-    - [ ] Commit: `style(admin): unify search input padding to pl-9`
+- [x] Task: Unify search input padding (FR-8.1) — commit `a57fccf`
+    - [x] Change `audit-log.tsx:158` from `pl-8` to `pl-9`
+    - [x] Verify: all admin search inputs use `pl-9`
+    - [x] Commit: `style(admin): unify search input padding to pl-9`
 
 - [ ] Task: Adopt `<Card>` in `audit-log.tsx` table wrapper (FR-10.1)
     - [ ] Write failing test covering: the audit-log table is wrapped in a Card
