@@ -363,10 +363,10 @@ Goal: replace `window.confirm` / `window.alert` with proper `Dialog` / `Sheet`; 
     - [x] Verify: tests pass; `AdminDashboard.tsx:254` no longer uses `toLocaleDateString`
     - [x] Commit: `refactor(admin): use formatDate helper consistently`
 
-- [~] Task: Conductor - User Manual Verification 'Phase 5 — Native dialogs, type filter, i18n' (Protocol in workflow.md)
-    - [~] Run pre-push gate
-    - [ ] Manually verify: deleting a user shows a proper dialog; generating a setup link opens a sheet with a copy button; create/update errors are inline; the type filter on /admin/templates shows all types (try paging + filter); all hardcoded English strings are gone
-    - [ ] Create checkpoint commit, attach git note, update plan with checkpoint SHA
+- [x] Task: Conductor - User Manual Verification 'Phase 5 — Native dialogs, type filter, i18n' (Protocol in workflow.md) — checkpoint: `b56bfd9`
+    - [x] Run pre-push gate (typecheck ✅, 2054/2054 tests ✅)
+    - [x] Manually verify: deleting a user shows a proper dialog; generating a setup link opens a sheet with a copy button; create/update errors are inline; the type filter on /admin/templates shows all types (try paging + filter); all hardcoded English strings are gone
+    - [x] Create checkpoint commit, attach git note, update plan with checkpoint SHA
 
 ---
 
