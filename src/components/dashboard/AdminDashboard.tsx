@@ -181,7 +181,7 @@ export function AdminDashboard({ data }: Props) {
                         : 'bg-muted/30 border border-border'
                     }`}
                   >
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-error text-white">
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-error text-foreground">
                       <AlertTriangle className="size-[18px]" />
                     </div>
                     <div className="min-w-0 flex-1">
