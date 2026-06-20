@@ -801,6 +801,57 @@ Settings hub, notification preferences, and file preview optimization — increm
 
 ---
 
+### Track 6.5 — UI Consistency for Instructor-Facing UI
+
+**Description:** Refactor pass on the instructor surface to extract missing shared primitives, fix functional UI bugs, unify duplicated styling, and close a systemic `createServerFn` type-gap that forced `// @ts-expect-error` on every instructor route loader. The audit identified 23 issues (5 functional, 10 high-impact visual, 5 medium, 3 low). This track is a refactor — no new product features, no business-logic changes. Scope is the instructor surface only (`src/routes/_authenticated/instructor/**`, `src/components/instructor/**`, `src/components/dashboard/InstructorDashboard.tsx`, and new shared primitives under `src/components/ui/` + `src/lib/` + `src/hooks/`). The single mechanical change in `admin/templates/index.tsx` was included to delete the duplicate `TemplatePagination` component.
+
+**Dependencies:** Track 6.0 (UI Redesign — design tokens and shared components). Track 6.4 (Student-Facing UI Consistency — established the pattern this track follows). V1 instructor routes (assignments, reviews, extensions, settings).
+
+**Status:** ✅ Complete (June 2026)
+
+**Estimated Scope:**
+
+| Area                                                                                                          | Effort |
+| ------------------------------------------------------------------------------------------------------------- | ------ |
+| Foundational primitives — `Textarea`, `PageHeader`, `BackLink`, `TemplateTypeBadge`, `CountBadge`, `formatDate` | Medium |
+| Functional bug fixes — review-queue filter, SLA badge unification, i18n key split, dead-code removal            | Small  |
+| Surface migration — 7 pages to `<PageHeader>`, 3 sites to `<BackLink>`, 3 to `<TemplateTypeBadge>`, 4 to `<Textarea>`, 3 to `<Skeleton>`, etc. | Large |
+| Design system cleanup — hardcoded Tailwind palette → design tokens; redundant `Button` className removed; 9 wizard + 2 review-form hardcoded English strings → i18n | Medium |
+| Structural cleanups — split 446-line assignment detail page into thin route + 5 subcomponents; dedupe `Pagination` + `RefreshButton`; add `<Tabs>` primitive | Large |
+| Systemic type fix — apply `.inputValidator(Schema)` builder pattern across 20 server functions; remove `// @ts-expect-error` from all instructor loaders | Large (gated) |
+
+**Acceptance Criteria:**
+
+- [x] Review-queue assignment filter dropdown is populated with the instructor's assignments
+- [x] Instructor dashboard "Pending Review Queue" widget and the review-queue "Status" column render identical SLA badges (same `SLABadge` component, same variants)
+- [x] All 7 instructor pages use `<PageHeader>` and render the same canonical heading (`font-display text-3xl text-foreground`)
+- [x] All 3 inlined template-type pills use `<TemplateTypeBadge>`; all 4 raw `<textarea>` use `<Textarea>`; all 3 hand-rolled skeletons use `<Skeleton>`; `ReviewQueueFilters` uses `<Select>` and is populated
+- [x] All 6+ hand-rolled `bg-card` wrappers in the instructor surface use `<Card>`; 4 overview cards on the assignment detail page use `<MetricCard>`
+- [x] All date strings in the instructor surface are formatted via `formatDateShort` / `formatDateLong` / `formatDateTimeShort` (locale-aware EN+ID)
+- [x] The duplicated `instructorAssignments.details.studentsProgress` key is split into two distinct keys (`totalStudents` and `studentsProgress`); the dead `colSpan` branch in `ReviewQueueTable` is removed; the redundant outer guard in `$submissionId.tsx:134` is removed
+- [x] The local `SLABadge` in `InstructorDashboard.tsx` is deleted; the shared `SLABadge` is reused
+- [x] `instructor/assignments/$id.tsx` is ≤120 lines and is composed of `<PageHeader>` + 4 tab subcomponents
+- [x] Both refresh buttons use `<RefreshButton>` + `useRefreshSearch`; both paginations (admin templates, instructor reviews + assignments) use the shared `<Pagination>` primitive (2 duplicates deleted)
+- [x] All hardcoded Tailwind palette colours (`green-*`, `orange-*`, `violet-500`, `blue-100`, etc.) in the instructor surface are replaced with design tokens (`text-success`, `text-warning`, `Badge` variants)
+- [x] All 9 hardcoded English validation messages in `AssignmentWizard`, 2 in `ReviewForm`, the pagination page-of-total label, and `ReviewHistory`'s labelled date are replaced with i18n keys
+- [x] The `as TranslationKey` cast in extension dialogs is removed (the missing `extensions.queue.reason` key is added)
+- [x] `pnpm generate:i18n` succeeds; every new key exists in both `locales/en.json` and `locales/id.json`; an i18n regression test guards new keys
+- [x] No `// @ts-expect-error` remains in any instructor route loader (or student loader that benefits from the systemic type fix)
+- [x] `pnpm typecheck`, `pnpm lint`, and `pnpm vitest run` all pass; coverage thresholds met (80% lines / 80% functions / 72% branches / 79% statements)
+- [x] Review fixes applied: `.inputValidator()` completed in `src/server/assignments.ts` (5 additional functions), 3 unused `@ts-expect-error` directives removed from student routes, inline `// TODO` comments added to the 5 remaining `as unknown as` casts (data-shape mismatch follow-up), fragile relative imports in 3 new subcomponents fixed to `@/` alias, `description=""` workarounds dropped now that `EmptyState.description` is optional
+
+**Test Results (at time of archiving):**
+
+- 1913/1913 tests passing across 199 test files
+- TypeScript typecheck passes with no errors
+- oxlint passes with 0 errors (1 pre-existing warning in `ReviewForm.tsx:61`)
+- All files under 500-line modularity limit
+- Pre-push gate (`pnpm typecheck && pnpm vitest run --coverage`) passes — coverage thresholds met (84.94% lines, 84.28% statements, 80.86% branches, 80% functions)
+- New unit tests for every primitive, i18n regression test, 44 test-file mock updates to support the new `.inputValidator()` server-fn pattern
+- Reference: audit `conductor/audits/instructor-ui-consistency-2026-06-19.md`; track plan `conductor/tracks/instructor-ui-consistency_20260619/plan.md` (now archived)
+
+---
+
 ## Phase 7: Testing Infrastructure
 
 Integration tests against a real PostgreSQL database, deferred from V1.
@@ -856,7 +907,7 @@ Integration tests against a real PostgreSQL database, deferred from V1.
 | 🔴 **High**      | Track 1.3 (Extensions)         | Depends on Track 1.1 + 1.2; student/instructor extension workflow        |
 | 🔴 **High**      | Track 4.1 (Email Queue)        | Removes synchronous Resend bottleneck; improves reliability              |
 | 🟠 **Medium**    | Track 2.1 (Groups)             | Largest feature request; significant scope                               |
-| 🟡 **Lower**     | Tracks 3.1, 5.1, 6.2, 6.3, 6.4, 7.1 | Security, analytics, UX polish, UI consistency, testing — valuable but not blocking |
+| 🟡 **Lower**     | Tracks 3.1, 5.1, 6.2, 6.3, 6.4, 6.5, 7.1 | Security, analytics, UX polish, UI consistency, testing — valuable but not blocking |
 
 ## Implementation Strategy
 
@@ -964,11 +1015,12 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 7. ✅ Track 6.0 — UI Redesign / Warm Academic Design System (Complete)
 8. ✅ Track 6.1 — Settings Hub (Complete)
 9. ✅ Track 6.4 — UI Consistency for Student-Facing UI (Complete)
-10. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
-11. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-12. [ ] Write failing tests
-13. [ ] Implement features
-14. [ ] Verify & archive
+10. ✅ Track 6.5 — UI Consistency for Instructor-Facing UI (Complete)
+11. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
+12. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+13. [ ] Write failing tests
+14. [ ] Implement features
+15. [ ] Verify & archive
 
 ---
 
