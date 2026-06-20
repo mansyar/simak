@@ -41,7 +41,7 @@ interface UserTableProps {
 }
 
 import { useI18n } from '../../../routes/__root';
-import type { TranslationKey } from '../../../i18n/index';
+import { getRoleConfig } from '@/lib/admin/roles';
 
 export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableProps) {
   const { t } = useI18n();
@@ -62,33 +62,10 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
       header: t('adminUsers.table.role'),
       cell: ({ row }) => {
         const role = row.original.role;
-        const roleVariants: Record<
-          'superadmin' | 'admin' | 'instructor' | 'student',
-          | 'default'
-          | 'secondary'
-          | 'destructive'
-          | 'outline'
-          | 'success'
-          | 'warning'
-          | 'error'
-          | 'info'
-          | 'ghost'
-          | 'link'
-        > = {
-          superadmin: 'default',
-          admin: 'warning',
-          instructor: 'info',
-          student: 'secondary',
-        };
-        const roleLabels: Record<string, string> = {
-          superadmin: 'adminUsers.role_superadmin',
-          admin: 'adminUsers.role_admin',
-          instructor: 'adminUsers.role_instructor',
-          student: 'adminUsers.role_student',
-        };
+        const roleConfig = getRoleConfig(role);
         return (
-          <Badge variant={roleVariants[role] || 'outline'} className="capitalize">
-            {t((roleLabels[role] || role) as TranslationKey)}
+          <Badge variant={roleConfig?.badgeVariant || 'outline'} className="capitalize">
+            {t(roleConfig?.labelKey ?? 'adminUsers.role_student')}
           </Badge>
         );
       },

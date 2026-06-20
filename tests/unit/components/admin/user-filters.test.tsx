@@ -1,6 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { UserFilters } from '@/components/admin/users/UserFilters';
+import { ROLES } from '@/lib/admin/roles';
+
+vi.mock('@/lib/admin/roles', () => ({
+  ROLES: [
+    { value: 'admin', labelKey: 'adminUsers.role_admin_custom', badgeVariant: 'destructive' },
+    { value: 'instructor', labelKey: 'adminUsers.role_instructor_custom', badgeVariant: 'destructive' },
+    { value: 'student', labelKey: 'adminUsers.role_student_custom', badgeVariant: 'destructive' },
+  ],
+  getRoleConfig: vi.fn(),
+}));
 
 vi.mock('@/components/ui/input', () => ({
   Input: (props: any) => <input data-testid="search-input" {...props} />,
@@ -19,7 +29,9 @@ vi.mock('@/components/ui/select', () => ({
   SelectContent: ({ children }: any) => <>{children}</>,
   SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
   SelectTrigger: ({ children }: any) => <div>{children}</div>,
-  SelectValue: ({ placeholder }: any) => <span data-testid="select-value-component">{placeholder}</span>,
+  SelectValue: ({ placeholder }: any) => (
+    <span data-testid="select-value-component">{placeholder}</span>
+  ),
 }));
 
 vi.mock('@/routes/__root', () => ({
@@ -144,5 +156,20 @@ describe('UserFilters', () => {
       />,
     );
     expect(screen.getByTestId('select-value-component')).toBeDefined();
+  });
+
+  it('should use ROLES config for role filter options', () => {
+    render(
+      <UserFilters
+        search=""
+        onSearchChange={onSearchChange}
+        role="all"
+        onRoleChange={onRoleChange}
+      />,
+    );
+    // If ROLES config is used, options should have custom labels
+    // If inline roleLabels is used, options should have original labels
+    expect(screen.getByText('adminUsers.role_admin_custom')).toBeDefined();
+    expect(screen.queryByText('adminUsers.role_admin')).toBeNull();
   });
 });

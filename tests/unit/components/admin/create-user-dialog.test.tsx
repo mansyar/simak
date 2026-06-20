@@ -2,6 +2,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 import { CreateUserSchema } from '@/server/users';
+import { ROLES } from '@/lib/admin/roles';
+
+vi.mock('@/lib/admin/roles', () => ({
+  ROLES: [
+    { value: 'admin', labelKey: 'adminUsers.role_admin_custom', badgeVariant: 'destructive' },
+    { value: 'instructor', labelKey: 'adminUsers.role_instructor_custom', badgeVariant: 'destructive' },
+    { value: 'student', labelKey: 'adminUsers.role_student_custom', badgeVariant: 'destructive' },
+  ],
+  getRoleConfig: vi.fn(),
+}));
 
 // Mock react-hook-form to bypass validation and submit with mock values
 vi.mock('react-hook-form', () => ({
@@ -96,7 +106,9 @@ vi.mock('@/components/ui/select', () => ({
   SelectContent: ({ children }: any) => <div>{children}</div>,
   SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
   SelectTrigger: ({ children }: any) => <div>{children}</div>,
-  SelectValue: ({ placeholder }: any) => <span data-testid="select-value-component">{placeholder}</span>,
+  SelectValue: ({ placeholder }: any) => (
+    <span data-testid="select-value-component">{placeholder}</span>
+  ),
 }));
 
 vi.mock('@/components/ui/input', () => ({
@@ -244,5 +256,13 @@ describe('CreateUserDialog', () => {
   it('should use SelectValue component for display (data-testid="select-value-component")', () => {
     render(<CreateUserDialog open={true} onOpenChange={vi.fn()} onSubmit={onSubmit} />);
     expect(screen.getByTestId('select-value-component')).toBeDefined();
+  });
+
+  it('should use ROLES config for role select options', () => {
+    render(<CreateUserDialog open={true} onOpenChange={vi.fn()} onSubmit={onSubmit} />);
+    // If ROLES config is used, options should have custom labels
+    // If inline SelectItem values are used, options should have original labels
+    expect(screen.getByText('adminUsers.role_admin_custom')).toBeDefined();
+    expect(screen.queryByText('adminUsers.role_admin')).toBeNull();
   });
 });

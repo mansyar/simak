@@ -1,10 +1,11 @@
 import type { Badge } from '@/components/ui/badge';
+import type { TranslationKey } from '@/i18n/index';
 
 type BadgeVariant = React.ComponentProps<typeof Badge>['variant'];
 
 interface RoleConfig {
   value: string;
-  labelKey: string;
+  labelKey: TranslationKey;
   badgeVariant: BadgeVariant;
 }
 

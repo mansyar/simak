@@ -1,8 +1,14 @@
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
-import type { TranslationKey } from '../../../i18n/index';
+import { ROLES } from '@/lib/admin/roles';
 
 interface UserFiltersProps {
   search: string;
@@ -10,14 +16,6 @@ interface UserFiltersProps {
   role: string;
   onRoleChange: (value: string) => void;
 }
-
-const roleLabels: Record<string, string> = {
-  all: 'adminUsers.allRoles',
-  superadmin: 'adminUsers.role_superadmin',
-  admin: 'adminUsers.role_admin',
-  instructor: 'adminUsers.role_instructor',
-  student: 'adminUsers.role_student',
-};
 
 export function UserFilters({ search, onSearchChange, role, onRoleChange }: UserFiltersProps) {
   const { t } = useI18n();
@@ -39,9 +37,10 @@ export function UserFilters({ search, onSearchChange, role, onRoleChange }: User
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(roleLabels).map(([value, labelKey]) => (
-              <SelectItem key={value} value={value}>
-                {t(labelKey as TranslationKey)}
+            <SelectItem value="all">{t('adminUsers.allRoles')}</SelectItem>
+            {ROLES.map((r) => (
+              <SelectItem key={r.value} value={r.value}>
+                {t(r.labelKey)}
               </SelectItem>
             ))}
           </SelectContent>

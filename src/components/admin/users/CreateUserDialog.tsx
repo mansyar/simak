@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/select';
 import { CreateUserSchema } from '@/server/users';
 import { useI18n } from '../../../routes/__root';
+import { ROLES } from '@/lib/admin/roles';
 
 type CreateUserFormValues = z.infer<typeof CreateUserSchema>;
 
@@ -102,9 +103,11 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="admin">{t('adminUsers.role_admin')}</SelectItem>
-                      <SelectItem value="instructor">{t('adminUsers.role_instructor')}</SelectItem>
-                      <SelectItem value="student">{t('adminUsers.role_student')}</SelectItem>
+                      {ROLES.filter((r) => r.value !== 'superadmin').map((r) => (
+                        <SelectItem key={r.value} value={r.value}>
+                          {t(r.labelKey)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

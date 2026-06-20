@@ -1,6 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { UserTable, UserRow } from '@/components/admin/users/UserTable';
+import { getRoleConfig } from '@/lib/admin/roles';
+import type { RoleConfig } from '@/lib/admin/roles';
+import type { TranslationKey } from '@/i18n/index';
+
+vi.mock('@/lib/admin/roles', () => ({
+  getRoleConfig: vi.fn().mockImplementation((value: string) => {
+    const configs: Record<string, RoleConfig> = {
+      superadmin: { value: 'superadmin', labelKey: 'adminUsers.role_superadmin' as TranslationKey, badgeVariant: 'default' },
+      admin: { value: 'admin', labelKey: 'adminUsers.role_admin' as TranslationKey, badgeVariant: 'warning' },
+      instructor: { value: 'instructor', labelKey: 'adminUsers.role_instructor' as TranslationKey, badgeVariant: 'info' },
+      student: { value: 'student', labelKey: 'adminUsers.role_student' as TranslationKey, badgeVariant: 'secondary' },
+    };
+    return configs[value];
+  }),
+  ROLES: [],
+}));
 
 vi.mock('@/components/ui/dropdown-menu', () => ({
   DropdownMenu: ({ children }: any) => <div data-testid="dropdown-menu">{children}</div>,
@@ -241,5 +257,39 @@ describe('UserTable', () => {
     const deleteItems = screen.getAllByText('common.delete');
     fireEvent.click(deleteItems[0]);
     expect(deleteSpy).toHaveBeenCalledWith(unverifiedUser);
+  });
+
+  it('should use ROLES config for role label and badge variant', () => {
+    // Override the mock to return different labels — this verifies the component
+    // uses getRoleConfig from ROLES module (not inline maps)
+    vi.mocked(getRoleConfig).mockImplementation((value: string) => {
+      const configs: Record<string, RoleConfig> = {
+        admin: { value: 'admin', labelKey: 'adminUsers.role_admin_custom' as TranslationKey, badgeVariant: 'destructive' },
+        student: { value: 'student', labelKey: 'adminUsers.role_student_custom' as TranslationKey, badgeVariant: 'destructive' },
+      };
+      return configs[value];
+    });
+    render(
+      <UserTable
+        data={mockUsers}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onGenerateLink={onGenerateLink}
+      />,
+    );
+    // If ROLES config is used, admin badge should show 'adminUsers.role_admin_custom'
+    // If inline maps are used, admin badge should show 'adminUsers.role_admin'
+    expect(screen.getByText('adminUsers.role_admin_custom')).toBeDefined();
+    expect(screen.queryByText('adminUsers.role_admin')).toBeNull();
+    // Restore default mock
+    vi.mocked(getRoleConfig).mockImplementation((value: string) => {
+      const configs: Record<string, RoleConfig> = {
+        superadmin: { value: 'superadmin', labelKey: 'adminUsers.role_superadmin' as TranslationKey, badgeVariant: 'default' },
+        admin: { value: 'admin', labelKey: 'adminUsers.role_admin' as TranslationKey, badgeVariant: 'warning' },
+        instructor: { value: 'instructor', labelKey: 'adminUsers.role_instructor' as TranslationKey, badgeVariant: 'info' },
+        student: { value: 'student', labelKey: 'adminUsers.role_student' as TranslationKey, badgeVariant: 'secondary' },
+      };
+      return configs[value];
+    });
   });
 });
