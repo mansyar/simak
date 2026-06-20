@@ -88,11 +88,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes; visual scale matches instructor dashboard
     - [x] Commit: `refactor(admin): adopt PageHeader on admin dashboard`
 
-- [ ] Task: Adopt `<PageHeader>` in `admin/settings.tsx` (FR-1.1)
-    - [ ] Write failing test covering: page title from `t('settings.title')`
-    - [ ] Replace inline header; settings title is shared across roles — confirm no role-specific subtitle
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt PageHeader on admin settings`
+- [x] Task: Adopt `<PageHeader>` in `admin/settings.tsx` (FR-1.1) `860569a`
+    - [x] Write failing test covering: page title from `t('settings.title')`
+    - [x] Replace inline header; settings title is shared across roles — confirm no role-specific subtitle
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt PageHeader on admin settings`
 
 - [ ] Task: Adopt `<PageHeader>` + `<RefreshButton>` in `admin/audit-log.tsx` (FR-1.1, FR-2.1, FR-2.2, FR-2.3)
     - [ ] Write failing test covering: page title, subtitle, refresh button calls `router.invalidate` (no `setTimeout`)
