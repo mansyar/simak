@@ -131,5 +131,15 @@ describe('Admin Audit Log page', () => {
       expect(screen.queryByText('common.previous')).not.toBeInTheDocument();
       expect(screen.queryByText('adminAuditLog.showing')).not.toBeInTheDocument();
     });
+
+    it('should use Select primitive for action filter (data-slot="select-trigger")', async () => {
+      const Component = await getComponent();
+      const { container } = render(<Component />);
+      // SelectTrigger renders data-slot="select-trigger"
+      const selectTrigger = container.querySelector('[data-slot="select-trigger"]');
+      expect(selectTrigger).toBeTruthy();
+      // Raw <select> should not be present
+      expect(container.querySelector('select')).toBeNull();
+    });
   });
 });

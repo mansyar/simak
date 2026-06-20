@@ -15,6 +15,13 @@ import { useI18n } from '../../__root';
 import { PageHeader } from '@/components/ui/page-header';
 import { RefreshButton } from '@/components/ui/refresh-button';
 import { Pagination } from '@/components/ui/pagination';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { z } from 'zod';
 
@@ -156,18 +163,22 @@ function AuditLogPage() {
             />
           </div>
         </div>
-        <select
-          value={searchParams.action}
-          onChange={(e) => handleActionFilter(e.target.value)}
-          className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+        <Select
+          value={searchParams.action || 'all'}
+          onValueChange={(value) => handleActionFilter(value === 'all' ? '' : (value ?? ''))}
         >
-          <option value="">{t('adminAuditLog.allActions')}</option>
-          {ACTION_TYPES.map((action) => (
-            <option key={action.value} value={action.value}>
-              {t(action.label)}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('adminAuditLog.allActions')}</SelectItem>
+            {ACTION_TYPES.map((action) => (
+              <SelectItem key={action.value} value={action.value}>
+                {t(action.label)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="flex items-center gap-2">
           <Input
             type="date"
