@@ -458,4 +458,10 @@ Goal: the deep structural refactor; the type-system cleanup; the final accessibi
 
 **Coverage note:** each phase ends with a Phase Completion Checkpoint per `conductor/workflow.md` §103-171. Between phases, the plan status will be updated with short SHAs from the checkpoint commits.
 
+---
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 7196c2c
+
 </protect>
