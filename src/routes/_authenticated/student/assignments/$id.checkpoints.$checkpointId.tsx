@@ -19,7 +19,6 @@ export const Route = createFileRoute(
   loader: async ({ params }) => {
     try {
       const { id, checkpointId } = params;
-      // @ts-expect-error - handler type inference limitation
       const assignmentData = await getStudentAssignmentDetail({ data: { id: Number(id) } });
 
       if (!assignmentData) return null;

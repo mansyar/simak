@@ -36,6 +36,9 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/')(
 function AssignmentsPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData();
+  // TODO: data shape mismatch — loader returns the raw handler output; the
+  // server function's union return cannot be narrowed without a discriminator.
+  // Follow-up to the type-fix track.
   const assignments =
     (
       data as unknown as {
@@ -51,6 +54,7 @@ function AssignmentsPage() {
         }[];
       }
     )?.assignments ?? [];
+  // TODO: data shape mismatch — see comment on `assignments` above.
   const total = (data as unknown as { total?: number })?.total ?? 0;
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();

@@ -1,6 +1,6 @@
 import { PageHeader } from '@/components/ui/page-header';
 import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
-import { useI18n } from '../../../routes/__root';
+import { useI18n } from '@/routes/__root';
 
 interface AssignmentDetailHeaderProps {
   title: string;

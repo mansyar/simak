@@ -21,6 +21,9 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/$id
 
 function AssignmentDetailPage() {
   const { t } = useI18n();
+  // TODO: data shape mismatch — loader returns the raw handler output; the
+  // server function's union return (data | null) cannot be narrowed without a
+  // discriminator. Follow-up to the type-fix track.
   const assignment = Route.useLoaderData() as unknown as {
     id: number;
     title: string;

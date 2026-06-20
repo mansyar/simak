@@ -31,13 +31,12 @@ export const AssignmentIdParamSchema = z.object({
 
 export const CreateAssignmentInputSchema = CreateAssignmentSchema;
 
-export const createAssignment = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const createAssignment = createServerFn({ method: 'POST' })
+  .inputValidator(CreateAssignmentSchema)
+  .handler(async ({ data }) => {
     const { createAssignmentHandler } = await import('./assignments.server');
-    const data = CreateAssignmentSchema.parse(args.data);
     return createAssignmentHandler({ data });
-  },
-);
+  });
 
 export const listInstructorAssignments = createServerFn({ method: 'GET' })
   .inputValidator(ListInstructorAssignmentsSchema)
@@ -67,21 +66,19 @@ export const StudentAssignmentIdParamSchema = z.object({
 
 // ---- Student Assignment Server Function Stubs ----
 
-export const listStudentAssignments = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const listStudentAssignments = createServerFn({ method: 'GET' })
+  .inputValidator(ListStudentAssignmentsSchema)
+  .handler(async ({ data }) => {
     const { listStudentAssignmentsHandler } = await import('./assignments.server');
-    const data = ListStudentAssignmentsSchema.parse(args.data);
     return listStudentAssignmentsHandler({ data });
-  },
-);
+  });
 
-export const getStudentAssignmentDetail = createServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
+export const getStudentAssignmentDetail = createServerFn({ method: 'GET' })
+  .inputValidator(StudentAssignmentIdParamSchema)
+  .handler(async ({ data }) => {
     const { getStudentAssignmentDetailHandler } = await import('./assignments.server');
-    const data = StudentAssignmentIdParamSchema.parse(args.data);
     return getStudentAssignmentDetailHandler({ data });
-  },
-);
+  });
 
 // ---- Manual Deadline Management Schemas ----
 
@@ -89,13 +86,12 @@ export const UnlockCheckpointSchema = z.object({
   checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),
 });
 
-export const unlockCheckpoint = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const unlockCheckpoint = createServerFn({ method: 'POST' })
+  .inputValidator(UnlockCheckpointSchema)
+  .handler(async ({ data }) => {
     const { unlockCheckpointHandler } = await import('./assignments.server');
-    const data = UnlockCheckpointSchema.parse(args.data);
     return unlockCheckpointHandler({ data });
-  },
-);
+  });
 
 export const ExtendDeadlineSchema = z.object({
   checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),
@@ -104,10 +100,9 @@ export const ExtendDeadlineSchema = z.object({
   }),
 });
 
-export const extendDeadline = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
+export const extendDeadline = createServerFn({ method: 'POST' })
+  .inputValidator(ExtendDeadlineSchema)
+  .handler(async ({ data }) => {
     const { extendDeadlineHandler } = await import('./assignments.server');
-    const data = ExtendDeadlineSchema.parse(args.data);
     return extendDeadlineHandler({ data });
-  },
-);
+  });

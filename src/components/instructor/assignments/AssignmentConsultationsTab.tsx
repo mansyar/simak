@@ -3,7 +3,7 @@ import { VerificationQueueItem } from '@/components/consultations/VerificationQu
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
 import { EmptyState } from '@/components/ui/empty-state';
 import { listPendingConsultations } from '@/server/consultations';
-import { useI18n } from '../../../routes/__root';
+import { useI18n } from '@/routes/__root';
 
 export interface PendingConsultation {
   id: number;
@@ -69,6 +69,9 @@ export function AssignmentConsultationsTab({
         onOpenChange={setDialogOpen}
         onActionComplete={async () => {
           // Refresh pending queue
+          // TODO: data shape mismatch — handler returns fields with Date | null
+          // that PendingConsultation does not accept. Same root cause as
+          // use-assignment-tabs.ts; fix in a follow-up.
           const listPendingFn = listPendingConsultations as unknown as (args: {
             data: { assignmentId: number };
           }) => Promise<{ consultations: PendingConsultation[] }>;

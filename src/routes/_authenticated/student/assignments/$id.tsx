@@ -17,7 +17,6 @@ import { useI18n } from '../../../__root';
 
 export const Route = createFileRoute('/_authenticated/student/assignments/$id')({
   loader: async ({ params }) => {
-    // @ts-expect-error - getStudentAssignmentDetail handler type inference limitation
     return getStudentAssignmentDetail({ data: { id: Number(params.id) } });
   },
   pendingComponent: () => (

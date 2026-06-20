@@ -5,7 +5,7 @@ import { MetricCard } from '@/components/ui/metric-card';
 import { ProgressTable } from '@/components/instructor/assignments/ProgressTable';
 import type { StudentProgress } from '@/components/instructor/assignments/ProgressTable';
 import { DeadlineManager } from '@/components/reviews/DeadlineManager';
-import { useI18n } from '../../../routes/__root';
+import { useI18n } from '@/routes/__root';
 
 interface AssignmentOverviewTabProps {
   assignment: {
@@ -119,6 +119,9 @@ export function AssignmentOverviewTab({ assignment }: AssignmentOverviewTabProps
 
       {/* Deadline Manager */}
       <DeadlineManager
+        // TODO: data shape mismatch — DeadlineManager expects `id: string` for
+        // students, but the loader returns `id: number` (DB row id). The cast
+        // is unavoidable until the loader normalises the shape.
         students={
           assignment.students as unknown as {
             id: string;

@@ -28,7 +28,6 @@ export const Route = createFileRoute('/_authenticated/student/assignments/')({
     search: search.search,
   }),
   loader: async ({ deps }) => {
-    // @ts-expect-error - listStudentAssignments handler type inference limitation
     return listStudentAssignments({ data: deps });
   },
   pendingComponent: () => <StudentAssignmentLoadingSkeleton />,

@@ -16,6 +16,9 @@ export const Route = createFileRoute('/_authenticated/instructor/dashboard')({
 
 function InstructorDashboardPage() {
   const { t } = useI18n();
+  // TODO: data shape mismatch — loader returns the raw handler output; replace
+  // with a properly typed loader once the server function returns a discriminated
+  // Result. Tracked as a follow-up to the type-fix track.
   const data = Route.useLoaderData() as unknown as InstructorDashboardData;
 
   return (

@@ -54,11 +54,11 @@ function ReviewDetailPage() {
   }, [data, params.submissionId, transitioned, navigate]);
 
   if (data?.error) {
-    return <EmptyState icon={AlertCircle} title={data.error} description="" />;
+    return <EmptyState icon={AlertCircle} title={data.error} />;
   }
 
   if (!data?.submission) {
-    return <EmptyState icon={SearchX} title={t('common.noResults')} description="" />;
+    return <EmptyState icon={SearchX} title={t('common.noResults')} />;
   }
 
   const { submission, reviewHistory } = data;
