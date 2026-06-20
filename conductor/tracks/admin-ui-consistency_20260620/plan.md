@@ -258,13 +258,13 @@ Goal: kill the remaining inline-style code, fix the UI-level bugs, dedupe role c
     - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
     - [ ] Confirm understanding before starting any task in this phase
 
-- [ ] Task: Adopt `ROLES` config in `UserTable.tsx`, `UserFilters.tsx`, `CreateUserDialog.tsx` (FR-16.2, FR-16.3)
-    - [ ] Write failing test covering: each component looks up role label and variant from the central `ROLES` config (no inline maps)
-    - [ ] Replace inline `roleVariants` and `roleLabels` maps with `ROLES` lookups
-    - [ ] Remove the `as TranslationKey` casts (`UserTable:91`, `UserFilters:41, 48`, `CreateUserDialog:98`)
-    - [ ] Move `roleVariants` allocation out of the cell renderer (small perf win)
-    - [ ] Verify: tests pass; no `as TranslationKey` remains in admin user-management
-    - [ ] Commit: `refactor(admin): dedupe role config via ROLES module`
+- [x] Task: Adopt `ROLES` config in `UserTable.tsx`, `UserFilters.tsx`, `CreateUserDialog.tsx` (FR-16.2, FR-16.3) — commit `5e0d203`
+    - [x] Write failing test covering: each component looks up role label and variant from the central `ROLES` config (no inline maps)
+    - [x] Replace inline `roleVariants` and `roleLabels` maps with `ROLES` lookups
+    - [x] Remove the `as TranslationKey` casts (`UserTable:91`, `UserFilters:41, 48`, `CreateUserDialog:98`)
+    - [x] Move `roleVariants` allocation out of the cell renderer (small perf win)
+    - [x] Verify: tests pass; no `as TranslationKey` remains in admin user-management
+    - [x] Commit: `refactor(admin): dedupe role config via ROLES module`
 
 - [ ] Task: Unify audit-event color helper (FR-17.1, FR-17.2, FR-17.3)
     - [ ] Add `getActionVisualProps(type)` to `src/lib/admin/audit-actions.ts` (the new module from Phase 4 below) — returns `{ dotVariant, badgeVariant, color }`
