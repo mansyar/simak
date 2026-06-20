@@ -77,16 +77,16 @@ Goal: establish the building blocks that every later phase depends on. No behavi
 
 Goal: the highest-leverage UX changes — every admin page uses the shared header / refresh / back / skeleton / empty-state primitives.
 
-- [ ] Task: Read track context (spec.md and workflow.md)
-    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
-    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
-    - [ ] Confirm understanding before starting any task in this phase
+- [x] Task: Read track context (spec.md and workflow.md) `042bdbc`
+    - [x] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [x] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [x] Confirm understanding before starting any task in this phase
 
-- [ ] Task: Adopt `<PageHeader>` in `admin/dashboard.tsx` (FR-1.1)
-    - [ ] Write failing test `tests/unit/routes/admin-dashboard.test.tsx` covering: page title from `t('adminDashboard.title')`, subtitle from `t('adminDashboard.subtitle')`
-    - [ ] Replace inline header with `<PageHeader title={t('adminDashboard.title')} subtitle={t('adminDashboard.subtitle')} />`
-    - [ ] Verify: test passes; visual scale matches instructor dashboard
-    - [ ] Commit: `refactor(admin): adopt PageHeader on admin dashboard`
+- [x] Task: Adopt `<PageHeader>` in `admin/dashboard.tsx` (FR-1.1) `e2e6fc1`
+    - [x] Write failing test `tests/unit/routes/admin-dashboard.test.tsx` covering: page title from `t('adminDashboard.title')`, subtitle from `t('adminDashboard.subtitle')`
+    - [x] Replace inline header with `<PageHeader title={t('adminDashboard.title')} subtitle={t('adminDashboard.subtitle')} />`
+    - [x] Verify: test passes; visual scale matches instructor dashboard
+    - [x] Commit: `refactor(admin): adopt PageHeader on admin dashboard`
 
 - [ ] Task: Adopt `<PageHeader>` in `admin/settings.tsx` (FR-1.1)
     - [ ] Write failing test covering: page title from `t('settings.title')`
