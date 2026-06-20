@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { listUsers, deleteUser, generateSetupLink, createUser, updateUser } from '@/server/users';
@@ -7,7 +7,9 @@ import { UserFilters } from '@/components/admin/users/UserFilters';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 import { EditUserSheet } from '@/components/admin/users/EditUserSheet';
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCcw } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
+import { RefreshButton } from '@/components/ui/refresh-button';
+import { Plus } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
 
@@ -39,6 +41,7 @@ function UsersPage() {
   const { users, total } = Route.useLoaderData();
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
+  const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
@@ -50,6 +53,12 @@ function UsersPage() {
   const updateUserFn = useServerFn(updateUser);
 
   type UserSearchParams = z.infer<typeof UserSearchSchema>;
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await router.invalidate();
+    setIsRefreshing(false);
+  };
 
   const handleSearchChange = (value: string) => {
     navigate({
@@ -115,30 +124,19 @@ function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-4xl">{t('adminUsers.title')}</h1>
-          <p className="text-muted-foreground">{t('adminUsers.subtitle')}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              setIsRefreshing(true);
-              navigate({ search: (prev: UserSearchParams) => prev });
-              setTimeout(() => setIsRefreshing(false), 1500);
-            }}
-            disabled={isRefreshing}
-          >
-            <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </Button>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t('adminUsers.newUser')}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('adminUsers.title')}
+        subtitle={t('adminUsers.subtitle')}
+        action={
+          <div className="flex items-center gap-2">
+            <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              {t('adminUsers.newUser')}
+            </Button>
+          </div>
+        }
+      />
 
       <CreateUserDialog
         open={isCreateDialogOpen}
