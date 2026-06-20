@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Copy, Pencil, Trash } from 'lucide-react';
-import { format } from 'date-fns/format';
+import { formatDate } from '@/lib/format-date';
 import { useI18n } from '../../../routes/__root';
 
 export type TemplateRow = {
@@ -27,7 +27,7 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({ template, onEdit, onDuplicate, onDelete }: TemplateCardProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   return (
     <Card>
@@ -42,7 +42,7 @@ export function TemplateCard({ template, onEdit, onDuplicate, onDelete }: Templa
               {t('adminTemplates.checkpointCount', { count: String(template.checkpointCount) })}
             </p>
             <p className="text-xs text-muted-foreground">
-              {template.createdAt ? format(new Date(template.createdAt), 'MMM d, yyyy') : ''}
+              {formatDate(template.createdAt, locale, 'short')}
             </p>
           </div>
           <DropdownMenu>

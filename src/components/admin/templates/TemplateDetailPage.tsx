@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlertBanner } from '@/components/ui/alert-banner';
 import { Label } from '@/components/ui/label';
 import { AlertTriangle, Trash2 } from 'lucide-react';
-import { format } from 'date-fns/format';
+import { formatDate } from '@/lib/format-date';
 import { useI18n } from '../../../routes/__root';
 
 interface TemplateData {
@@ -44,7 +44,7 @@ interface AssignmentData {
 const defaultCheckpoint = () => ({ name: '', minConsultations: 0, estimatedDuration: 7 });
 
 export function TemplateDetailPage({ template }: { template: TemplateData | null }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
 
   const [name, setName] = useState(template?.name ?? '');
@@ -232,7 +232,7 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
           <div className="grid gap-4 sm:grid-cols-2 text-sm text-muted-foreground">
             <div>
               <span className="font-medium">{t('adminTemplates.detail.created')}:</span>{' '}
-              {format(new Date(template.createdAt ?? new Date()), 'MMM d, yyyy HH:mm')}
+              {formatDate(template.createdAt ?? new Date(), locale, 'time')}
             </div>
             <div>
               <span className="font-medium">{t('adminTemplates.detail.createdBy')}:</span>{' '}
@@ -309,11 +309,12 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
                   <div>
                     <div className="font-medium text-foreground">{a.title}</div>
                     <div className="text-muted-foreground">
-                      {a.instructorName} &middot; {t('adminTemplates.studentsCount', { count: String(a.studentCount) })}
+                      {a.instructorName} &middot;{' '}
+                      {t('adminTemplates.studentsCount', { count: String(a.studentCount) })}
                     </div>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {format(new Date(a.createdAt ?? new Date()), 'MMM d, yyyy')}
+                    {formatDate(a.createdAt ?? new Date(), locale, 'short')}
                   </div>
                 </Link>
               ))}

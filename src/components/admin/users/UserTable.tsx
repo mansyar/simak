@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, Pencil, Trash, Link as LinkIcon, Users } from 'lucide-react';
-import { format } from 'date-fns/format';
+import { formatDate } from '@/lib/format-date';
 
 export type UserRow = {
   id: string;
@@ -44,7 +44,7 @@ import { useI18n } from '../../../routes/__root';
 import { getRoleConfig } from '@/lib/admin/roles';
 
 export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const columns: ColumnDef<UserRow>[] = [
     {
@@ -88,7 +88,7 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
       header: t('adminUsers.table.createdAt'),
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground">
-          {format(new Date(row.original.createdAt), 'MMM d, yyyy')}
+          {formatDate(row.original.createdAt, locale, 'short')}
         </span>
       ),
     },

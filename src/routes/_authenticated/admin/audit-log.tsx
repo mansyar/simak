@@ -26,6 +26,7 @@ import {
 import { Search } from 'lucide-react';
 import { z } from 'zod';
 import { getActionVisualProps, ACTION_TYPES } from '@/lib/admin/audit-actions';
+import { formatDate } from '@/lib/format-date';
 
 interface AuditLogEntry {
   id: number;
@@ -110,7 +111,7 @@ function AuditLogPage() {
 
   const formatTimestamp = (date: Date | string | null) => {
     if (!date) return '-';
-    return new Date(date).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US');
+    return formatDate(date, locale, 'time');
   };
 
   return (

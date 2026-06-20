@@ -1,4 +1,5 @@
 import { useI18n } from '../../routes/__root';
+import { formatDate } from '@/lib/format-date';
 import {
   Users,
   ClipboardList,
@@ -67,7 +68,7 @@ interface Props {
 }
 
 export function AdminDashboard({ data }: Props) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   if (data?.error) {
     return (
@@ -235,7 +236,7 @@ export function AdminDashboard({ data }: Props) {
                         <p className="text-xs text-muted-foreground truncate">{event.message}</p>
                       )}
                       <p className="text-[10px] text-muted-foreground mt-0.5">
-                        {event.createdAt ? new Date(event.createdAt).toLocaleDateString() : ''}
+                        {formatDate(event.createdAt, locale, 'short')}
                       </p>
                     </div>
                   </li>
