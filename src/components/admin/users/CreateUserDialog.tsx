@@ -19,10 +19,15 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { CreateUserSchema } from '@/server/users';
 import { useI18n } from '../../../routes/__root';
-import type { TranslationKey } from '../../../i18n/index';
 
 type CreateUserFormValues = z.infer<typeof CreateUserSchema>;
 
