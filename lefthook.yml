@@ -11,4 +11,4 @@ pre-push:
     typecheck:
       run: pnpm typecheck
     test:
-      run: pnpm vitest run --coverage --exclude "tests/integration/**"
+      run: pnpm vitest run --coverage
