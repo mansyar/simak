@@ -242,8 +242,8 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: visual check
     - [x] Commit: `style(admin): replace hardcoded colors with design tokens in dashboard`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3 — Pagination, Select, Card' (Protocol in workflow.md)
-    - [ ] Run pre-push gate
+- [~] Task: Conductor - User Manual Verification 'Phase 3 — Pagination, Select, Card' (Protocol in workflow.md)
+    - [x] Run pre-push gate (typecheck ✅, tests ✅ 2023/2023 pass)
     - [ ] Manually verify: audit-log pagination shows page numbers + counter; users list shows counter; action filter opens as a proper dropdown; template cards show the uppercase primary-color badge; dashboard quick-action cards and email-queue stats look unified
     - [ ] Create checkpoint commit, attach git note, update plan with checkpoint SHA
 
