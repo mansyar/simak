@@ -231,11 +231,11 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt EmailQueueStat in dashboard`
 
-- [ ] Task: Replace hardcoded colors in `TemplateDetailPage.tsx` (FR-23.1, FR-23.2)
-    - [ ] Replace `text-amber-500` AlertTriangle with `text-warning` (line 247)
-    - [ ] Use `<AlertBanner variant="success">` for the success banner (line 191); this is also Phase 4 prep
-    - [ ] Verify: visual check; design tokens in use
-    - [ ] Commit: `style(admin): replace hardcoded colors with design tokens in template detail`
+- [x] Task: Replace hardcoded colors in `TemplateDetailPage.tsx` (FR-23.1, FR-23.2) — commit `ebc1ca6`
+    - [x] Replace `text-amber-500` AlertTriangle with `text-warning` (line 247)
+    - [x] Use `<AlertBanner variant="success">` for the success banner (line 191); this is also Phase 4 prep
+    - [x] Verify: visual check; design tokens in use
+    - [x] Commit: `style(admin): replace hardcoded colors with design tokens in template detail`
 
 - [ ] Task: Replace hardcoded colors in `AdminDashboard.tsx` (FR-23.3)
     - [ ] Replace `bg-error text-white` (line 197) with design-token pair
