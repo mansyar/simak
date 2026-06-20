@@ -358,10 +358,10 @@ Goal: replace `window.confirm` / `window.alert` with proper `Dialog` / `Sheet`; 
     - [x] Verify: tests pass; `pnpm generate:i18n` and `pnpm typecheck` pass
     - [x] Commit: `i18n(admin): adopt i18n for previously hardcoded strings (B7, B9, B10, B11, B12)`
 
-- [ ] Task: Use `formatDate` in admin components (FR-21.2, FR-21.3, FR-21.4)
-    - [ ] `UserTable.tsx`, `TemplateCard.tsx`, `TemplateDetailPage.tsx` (×2), `AdminDashboard.tsx`, `audit-log.tsx` — replace date-fns / `toLocaleDateString` with the helper
-    - [ ] Verify: tests pass; `AdminDashboard.tsx:254` no longer uses `toLocaleDateString`
-    - [ ] Commit: `refactor(admin): use formatDate helper consistently`
+- [x] Task: Use `formatDate` in admin components (FR-21.2, FR-21.3, FR-21.4) — commit `131048f`
+    - [x] `UserTable.tsx`, `TemplateCard.tsx`, `TemplateDetailPage.tsx` (×2), `AdminDashboard.tsx`, `audit-log.tsx` — replace date-fns / `toLocaleDateString` with the helper
+    - [x] Verify: tests pass; `AdminDashboard.tsx:254` no longer uses `toLocaleDateString`
+    - [x] Commit: `refactor(admin): use formatDate helper consistently`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 5 — Native dialogs, type filter, i18n' (Protocol in workflow.md)
     - [ ] Run pre-push gate
