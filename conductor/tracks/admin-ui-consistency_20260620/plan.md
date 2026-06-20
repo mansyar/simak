@@ -113,11 +113,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt PageHeader and RefreshButton on templates list (B5)`
 
-- [ ] Task: Adopt `<BackLink>` in `TemplateDetailPage.tsx` (FR-3.1, FR-3.2)
-    - [ ] Write failing test covering: back link points to `/admin/templates` with the correct search params
-    - [ ] Replace inline `<Link className="inline-flex items-center gap-1.5 ...">` with `<BackLink to="/admin/templates" label={t('adminTemplates.detail.back')} search={{ page: 1, limit: 20, search: '', type: '' }} />`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt BackLink in template detail`
+- [x] Task: Adopt `<BackLink>` in `TemplateDetailPage.tsx` (FR-3.1, FR-3.2) [commit: bcc6b51]
+    - [x] Write failing test covering: back link points to `/admin/templates` with the correct search params
+    - [x] Replace inline `<Link className="inline-flex items-center gap-1.5 ...">` with `<BackLink to="/admin/templates" label={t('adminTemplates.detail.back')} search={{ page: 1, limit: 20, search: '', type: '' }} />`
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt BackLink in template detail`
 
 - [ ] Task: Adopt `<BackLink>` in `TemplateNotFound.tsx` (FR-3.1)
     - [ ] Write failing test covering: not-found page shows the back link
