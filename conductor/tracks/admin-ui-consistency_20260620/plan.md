@@ -143,11 +143,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt Skeleton for inline loading state`
 
-- [ ] Task: Adopt `<EmptyState>` in `TemplateNotFound.tsx` (FR-5.1, FR-5.2)
-    - [ ] Write failing test covering: not-found uses EmptyState with the right icon + title
-    - [ ] Replace hand-rolled div + icon + h2 + p with `<EmptyState icon={SearchX} title={t('error.notFound')} description={t('error.templateNotFound')} children={<Link><Button>{t('adminTemplates.detail.back')}</Button></Link>} />`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt EmptyState in template not-found`
+- [x] Task: Adopt `<EmptyState>` in `TemplateNotFound.tsx` (FR-5.1, FR-5.2) — commit `1b7fba5`
+    - [x] Write failing test covering: not-found uses EmptyState with the right icon + title
+    - [x] Replace hand-rolled div + icon + h2 + p with `<EmptyState icon={SearchX} title={t('error.notFound')} description={t('error.templateNotFound')} children={<Link><Button>{t('adminTemplates.detail.back')}</Button></Link>} />`
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt EmptyState in template not-found`
 
 - [ ] Task: Adopt `<EmptyState>` for dashboard error state (FR-5.1, FR-5.2) — fixes B12 partially
     - [ ] Write failing test covering: dashboard error uses EmptyState
