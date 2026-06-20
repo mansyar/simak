@@ -207,11 +207,11 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: all admin search inputs use `pl-9`
     - [x] Commit: `style(admin): unify search input padding to pl-9`
 
-- [ ] Task: Adopt `<Card>` in `audit-log.tsx` table wrapper (FR-10.1)
-    - [ ] Write failing test covering: the audit-log table is wrapped in a Card
-    - [ ] Replace `<div className="rounded-lg border bg-card">` with `<Card><CardContent className="p-0">`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): wrap audit log table in Card`
+- [x] Task: Adopt `<Card>` in `audit-log.tsx` table wrapper (FR-10.1) — commit `c8d2424`
+    - [x] Write failing test covering: the audit-log table is wrapped in a Card
+    - [x] Replace `<div className="rounded-lg border bg-card">` with `<Card><CardContent className="p-0">`
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): wrap audit log table in Card`
 
 - [ ] Task: Adopt `<TemplateTypeBadge>` in `TemplateCard.tsx` (FR-14.1, B1)
     - [ ] Write failing test covering: template card uses `TemplateTypeBadge`
