@@ -341,12 +341,12 @@ Goal: replace `window.confirm` / `window.alert` with proper `Dialog` / `Sheet`; 
     - [x] Verify: test passes
     - [x] Commit: `fix(server): listTemplates returns full type list (B6)`
 
-- [ ] Task: Adopt the type list in `admin/templates/index.tsx` (FR-27.2, FR-27.3)
-    - [ ] Write failing test covering: the route loader returns the full type list; `TemplateFilters` shows all types
-    - [ ] Update the loader to pass `allTypes` to `TemplateFilters`
-    - [ ] Remove the in-page `const allTypes = [...new Set(templates.map(t => t.type))]` (line 138)
-    - [ ] Verify: test passes
-    - [ ] Commit: `fix(admin): type filter shows all template types (B6)`
+- [x] Task: Adopt the type list in `admin/templates/index.tsx` (FR-27.2, FR-27.3) — commit `a29738b`
+    - [x] Write failing test covering: the route loader returns the full type list; `TemplateFilters` shows all types
+    - [x] Update the loader to pass `allTypes` to `TemplateFilters`
+    - [x] Remove the in-page `const allTypes = [...new Set(templates.map(t => t.type))]` (line 138)
+    - [x] Verify: test passes
+    - [x] Commit: `fix(admin): type filter shows all template types (B6)`
 
 - [ ] Task: Adopt i18n for hardcoded strings (FR-22.4) — fixes B7, B9, B11
     - [ ] `UserTable.tsx:98` — use `t('adminUsers.table.emailVerified')` (B7)
