@@ -293,11 +293,11 @@ Goal: kill the remaining inline-style code, fix the UI-level bugs, dedupe role c
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): use Button primitive for checkpoint move buttons`
 
-- [ ] Task: Use `<Label>` for typed-DELETE input in `DeleteTemplateDialog.tsx` (FR-29.1)
-    - [ ] Write failing test covering: the input has an accessible label
-    - [ ] Add `<Label>` (or `aria-label`) to the input
-    - [ ] Verify: test passes
-    - [ ] Commit: `a11y(admin): label the typed-DELETE input`
+- [x] Task: Use `<Label>` for typed-DELETE input in `DeleteTemplateDialog.tsx` (FR-29.1) — commit `a2be4bd`
+    - [x] Write failing test covering: the input has an accessible label
+    - [x] Add `<Label>` (or `aria-label`) to the input
+    - [x] Verify: test passes
+    - [x] Commit: `a11y(admin): label the typed-DELETE input`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4 — Inline code, role config, bug fixes' (Protocol in workflow.md)
     - [ ] Run pre-push gate
