@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { BackLink } from '@/components/ui/back-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertBanner } from '@/components/ui/alert-banner';
+import { Label } from '@/components/ui/label';
 import { AlertTriangle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns/format';
 import { useI18n } from '../../../routes/__root';
@@ -206,9 +207,9 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
+              <Label className="text-sm font-medium text-foreground">
                 {t('adminTemplates.form.name')}
-              </label>
+              </Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -217,9 +218,9 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
+              <Label className="text-sm font-medium text-foreground">
                 {t('adminTemplates.form.type')}
-              </label>
+              </Label>
               <Input
                 value={type}
                 onChange={(e) => setType(e.target.value)}

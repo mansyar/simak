@@ -105,6 +105,12 @@ vi.mock('@/components/ui/alert-banner', () => ({
   ),
 }));
 
+vi.mock('@/components/ui/label', () => ({
+  Label: ({ children, ...props }: any) => (
+    <label data-slot="label" {...props}>{children}</label>
+  ),
+}));
+
 vi.mock('lucide-react', () => ({
   AlertTriangle: () => <span data-testid="icon-alert" />,
   ArrowLeft: () => <span data-testid="icon-arrow-left" />,
@@ -273,5 +279,11 @@ describe('TemplateDetailPage', () => {
       expect(banner.getAttribute('data-variant')).toBe('success');
     });
     mockAssignmentsFn.mockResolvedValue({ assignments: [] });
+  });
+
+  it('should use Label component for metadata fields', () => {
+    const { container } = render(<TemplateDetailPage template={mockTemplate} />);
+    const labels = container.querySelectorAll('[data-slot="label"]');
+    expect(labels.length).toBe(2);
   });
 });
