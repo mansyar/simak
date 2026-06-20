@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import {
@@ -16,7 +16,9 @@ import { TemplateLoadingSkeleton } from '@/components/admin/templates/TemplateLo
 import { CreateTemplateDialog } from '@/components/admin/templates/CreateTemplateDialog';
 import { DeleteTemplateDialog } from '@/components/admin/templates/DeleteTemplateDialog';
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCcw } from 'lucide-react';
+import { Plus } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
+import { RefreshButton } from '@/components/ui/refresh-button';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
 
@@ -45,6 +47,7 @@ export const Route = createFileRoute('/_authenticated/admin/templates/')({
 
 function TemplatesPage() {
   const { t } = useI18n();
+  const router = useRouter();
   const data = Route.useLoaderData();
   const templates: TemplateRow[] = data?.templates ?? [];
   const total = data?.total ?? 0;
@@ -64,6 +67,12 @@ function TemplatesPage() {
   const getTemplateFn = useServerFn(getTemplate);
 
   type TemplateSearchParams = z.infer<typeof TemplateSearchSchema>;
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await router.invalidate();
+    setIsRefreshing(false);
+  };
 
   const handleSearchChange = (value: string) => {
     navigate({
@@ -139,30 +148,19 @@ function TemplatesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-4xl">{t('adminTemplates.title')}</h1>
-          <p className="text-muted-foreground">{t('adminTemplates.subtitle')}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              setIsRefreshing(true);
-              navigate({ search: (prev) => prev });
-              setTimeout(() => setIsRefreshing(false), 1500);
-            }}
-            disabled={isRefreshing}
-          >
-            <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </Button>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t('adminTemplates.newTemplate')}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('adminTemplates.title')}
+        subtitle={t('adminTemplates.subtitle')}
+        action={
+          <div className="flex items-center gap-2">
+            <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              {t('adminTemplates.newTemplate')}
+            </Button>
+          </div>
+        }
+      />
 
       <CreateTemplateDialog
         open={isCreateDialogOpen}
