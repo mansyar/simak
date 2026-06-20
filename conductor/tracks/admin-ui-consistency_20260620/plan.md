@@ -327,13 +327,13 @@ Goal: replace `window.confirm` / `window.alert` with proper `Dialog` / `Sheet`; 
     - [x] Verify: test passes
     - [x] Commit: `feat(admin): add SetupLinkSheet for password setup links (B3)`
 
-- [ ] Task: Refactor `users/index.tsx` to use `DeleteUserDialog` and `SetupLinkSheet` (FR-9.1, FR-9.3) — fixes B2, B3, B4
-    - [ ] Write failing test covering: delete uses `DeleteUserDialog`; setup-link uses `SetupLinkSheet`; create/update errors are surfaced inline
-    - [ ] Replace `confirm(...)` with `DeleteUserDialog` open/close
-    - [ ] Replace `alert(\`Setup Link: ${url}\`)` with `SetupLinkSheet` open/close
-    - [ ] Replace `alert(\`Error: ${err}\`)` calls with inline error UI
-    - [ ] Verify: tests pass; no `window.confirm` / `window.alert` in the file
-    - [ ] Commit: `refactor(admin): replace native dialogs in users page (B2, B3, B4)`
+- [x] Task: Refactor `users/index.tsx` to use `DeleteUserDialog` and `SetupLinkSheet` (FR-9.1, FR-9.3) — fixes B2, B3, B4 — commit `ad3ab9a`
+    - [x] Write failing test covering: delete uses `DeleteUserDialog`; setup-link uses `SetupLinkSheet`; create/update errors are surfaced inline
+    - [x] Replace `confirm(...)` with `DeleteUserDialog` open/close
+    - [x] Replace `alert(\`Setup Link: ${url}\`)` with `SetupLinkSheet` open/close
+    - [x] Replace `alert(\`Error: ${err}\`)` calls with inline error UI
+    - [x] Verify: tests pass; no `window.confirm` / `window.alert` in the file
+    - [x] Commit: `refactor(admin): replace native dialogs in users page (B2, B3, B4)`
 
 - [ ] Task: Update `listTemplates` server function to return all types (FR-27.1) — fixes B6
     - [ ] Write failing test (in `tests/unit/server/templates.test.ts`) covering: server returns `{ templates, total, allTypes }`
