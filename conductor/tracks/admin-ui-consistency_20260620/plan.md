@@ -94,12 +94,12 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt PageHeader on admin settings`
 
-- [ ] Task: Adopt `<PageHeader>` + `<RefreshButton>` in `admin/audit-log.tsx` (FR-1.1, FR-2.1, FR-2.2, FR-2.3)
-    - [ ] Write failing test covering: page title, subtitle, refresh button calls `router.invalidate` (no `setTimeout`)
-    - [ ] Replace inline header with `<PageHeader title={...} subtitle={...} action={<RefreshButton isRefreshing onClick={handleRefresh} />} />`
-    - [ ] Replace inline refresh `<Button variant="outline" size="sm">` with `<RefreshButton>` (or text+icon variant; pick one and document)
-    - [ ] Verify: test passes; no `setTimeout` in the file
-    - [ ] Commit: `refactor(admin): adopt PageHeader and RefreshButton on audit log`
+- [x] Task: Adopt `<PageHeader>` + `<RefreshButton>` in `admin/audit-log.tsx` (FR-1.1, FR-2.1, FR-2.2, FR-2.3) `afce208`
+    - [x] Write failing test covering: page title, subtitle, refresh button calls `router.invalidate` (no `setTimeout`)
+    - [x] Replace inline header with `<PageHeader title={...} subtitle={...} action={<RefreshButton isRefreshing onClick={handleRefresh} />} />`
+    - [x] Replace inline refresh `<Button variant="outline" size="sm">` with `<RefreshButton>` (icon-only; shared primitive standard)
+    - [x] Verify: test passes; no `setTimeout` in the file
+    - [x] Commit: `refactor(admin): adopt PageHeader and RefreshButton on audit log`
 
 - [ ] Task: Adopt `<PageHeader>` + `<RefreshButton>` in `admin/users/index.tsx` (FR-1.1, FR-2.1, FR-2.2, FR-2.3) — fixes B5
     - [ ] Write failing test covering: page title, subtitle, refresh button uses `router.invalidate` not `setTimeout`
