@@ -107,7 +107,9 @@ vi.mock('@/components/ui/alert-banner', () => ({
 
 vi.mock('@/components/ui/label', () => ({
   Label: ({ children, ...props }: any) => (
-    <label data-slot="label" {...props}>{children}</label>
+    <label data-slot="label" {...props}>
+      {children}
+    </label>
   ),
 }));
 

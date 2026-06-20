@@ -174,7 +174,9 @@ function UsersPage() {
 
       <DeleteUserDialog
         open={deletingUser !== null}
-        onOpenChange={(open) => { if (!open) setDeletingUser(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeletingUser(null);
+        }}
         onConfirm={async () => {
           if (deletingUser) {
             await handleDelete(deletingUser);
@@ -186,16 +188,16 @@ function UsersPage() {
 
       <SetupLinkSheet
         open={setupLinkUser !== null}
-        onOpenChange={(open) => { if (!open) { setSetupLinkUser(null); setSetupLinkUrl(''); } }}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSetupLinkUser(null);
+            setSetupLinkUrl('');
+          }
+        }}
         url={setupLinkUrl}
       />
 
-      {inlineError && (
-        <AlertBanner
-          variant="error"
-          title={inlineError}
-        />
-      )}
+      {inlineError && <AlertBanner variant="error" title={inlineError} />}
 
       <Pagination
         currentPage={searchParams.page || 1}

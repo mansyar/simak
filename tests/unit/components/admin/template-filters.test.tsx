@@ -31,7 +31,9 @@ vi.mock('@/components/ui/select', () => ({
   SelectContent: ({ children }: any) => <>{children}</>,
   SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
   SelectTrigger: ({ children }: any) => <div>{children}</div>,
-  SelectValue: ({ placeholder }: any) => <span data-testid="select-value-component">{placeholder}</span>,
+  SelectValue: ({ placeholder }: any) => (
+    <span data-testid="select-value-component">{placeholder}</span>
+  ),
 }));
 
 describe('TemplateFilters', () => {

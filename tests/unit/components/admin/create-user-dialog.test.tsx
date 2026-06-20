@@ -7,7 +7,11 @@ import { ROLES } from '@/lib/admin/roles';
 vi.mock('@/lib/admin/roles', () => ({
   ROLES: [
     { value: 'admin', labelKey: 'adminUsers.role_admin_custom', badgeVariant: 'destructive' },
-    { value: 'instructor', labelKey: 'adminUsers.role_instructor_custom', badgeVariant: 'destructive' },
+    {
+      value: 'instructor',
+      labelKey: 'adminUsers.role_instructor_custom',
+      badgeVariant: 'destructive',
+    },
     { value: 'student', labelKey: 'adminUsers.role_student_custom', badgeVariant: 'destructive' },
   ],
   getRoleConfig: vi.fn(),

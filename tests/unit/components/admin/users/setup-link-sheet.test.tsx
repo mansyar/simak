@@ -12,10 +12,11 @@ vi.mock('@/routes/__root', () => ({
 }));
 
 vi.mock('@/components/ui/sheet', () => {
-  const SheetContent = ({
-    children,
-    'data-testid': testId,
-  }: any) => <div data-slot="sheet-content" data-testid={testId}>{children}</div>;
+  const SheetContent = ({ children, 'data-testid': testId }: any) => (
+    <div data-slot="sheet-content" data-testid={testId}>
+      {children}
+    </div>
+  );
   return {
     Sheet: ({ children, open }: any) => (open ? <div data-slot="sheet">{children}</div> : null),
     SheetContent,

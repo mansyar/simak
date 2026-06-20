@@ -34,10 +34,7 @@ function QuickActionCard({
       )}
     >
       <div
-        className={cn(
-          'flex size-9 items-center justify-center rounded-md',
-          colorClasses[color],
-        )}
+        className={cn('flex size-9 items-center justify-center rounded-md', colorClasses[color])}
       >
         <Icon className="size-[18px]" />
       </div>

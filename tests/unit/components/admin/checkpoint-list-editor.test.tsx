@@ -27,7 +27,14 @@ vi.mock('@/components/ui/input', () => ({
 
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, disabled, variant, size, ...props }: any) => (
-    <button onClick={onClick} disabled={disabled} data-slot="button" data-variant={variant} data-size={size} {...props}>
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      data-slot="button"
+      data-variant={variant}
+      data-size={size}
+      {...props}
+    >
       {children}
     </button>
   ),

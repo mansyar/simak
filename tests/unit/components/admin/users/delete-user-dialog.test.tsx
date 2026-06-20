@@ -22,7 +22,9 @@ vi.mock('@/components/ui/dialog', () => ({
   Dialog: ({ open, onOpenChange, children }: any) =>
     open ? <div data-testid="dialog">{children}</div> : null,
   DialogContent: ({ children, ...props }: any) => (
-    <div data-testid="dialog-content" {...props}>{children}</div>
+    <div data-testid="dialog-content" {...props}>
+      {children}
+    </div>
   ),
   DialogHeader: ({ children }: any) => <div data-testid="dialog-header">{children}</div>,
   DialogTitle: ({ children }: any) => <h2 data-testid="dialog-title">{children}</h2>,
@@ -32,7 +34,9 @@ vi.mock('@/components/ui/dialog', () => ({
 
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, variant, ...props }: any) => (
-    <button data-testid="button" data-variant={variant} onClick={onClick} {...props}>{children}</button>
+    <button data-testid="button" data-variant={variant} onClick={onClick} {...props}>
+      {children}
+    </button>
   ),
 }));
 

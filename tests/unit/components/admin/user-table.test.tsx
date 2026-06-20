@@ -8,10 +8,26 @@ import type { TranslationKey } from '@/i18n/index';
 vi.mock('@/lib/admin/roles', () => ({
   getRoleConfig: vi.fn().mockImplementation((value: string) => {
     const configs: Record<string, RoleConfig> = {
-      superadmin: { value: 'superadmin', labelKey: 'adminUsers.role_superadmin' as TranslationKey, badgeVariant: 'default' },
-      admin: { value: 'admin', labelKey: 'adminUsers.role_admin' as TranslationKey, badgeVariant: 'warning' },
-      instructor: { value: 'instructor', labelKey: 'adminUsers.role_instructor' as TranslationKey, badgeVariant: 'info' },
-      student: { value: 'student', labelKey: 'adminUsers.role_student' as TranslationKey, badgeVariant: 'secondary' },
+      superadmin: {
+        value: 'superadmin',
+        labelKey: 'adminUsers.role_superadmin' as TranslationKey,
+        badgeVariant: 'default',
+      },
+      admin: {
+        value: 'admin',
+        labelKey: 'adminUsers.role_admin' as TranslationKey,
+        badgeVariant: 'warning',
+      },
+      instructor: {
+        value: 'instructor',
+        labelKey: 'adminUsers.role_instructor' as TranslationKey,
+        badgeVariant: 'info',
+      },
+      student: {
+        value: 'student',
+        labelKey: 'adminUsers.role_student' as TranslationKey,
+        badgeVariant: 'secondary',
+      },
     };
     return configs[value];
   }),
@@ -264,8 +280,16 @@ describe('UserTable', () => {
     // uses getRoleConfig from ROLES module (not inline maps)
     vi.mocked(getRoleConfig).mockImplementation((value: string) => {
       const configs: Record<string, RoleConfig> = {
-        admin: { value: 'admin', labelKey: 'adminUsers.role_admin_custom' as TranslationKey, badgeVariant: 'destructive' },
-        student: { value: 'student', labelKey: 'adminUsers.role_student_custom' as TranslationKey, badgeVariant: 'destructive' },
+        admin: {
+          value: 'admin',
+          labelKey: 'adminUsers.role_admin_custom' as TranslationKey,
+          badgeVariant: 'destructive',
+        },
+        student: {
+          value: 'student',
+          labelKey: 'adminUsers.role_student_custom' as TranslationKey,
+          badgeVariant: 'destructive',
+        },
       };
       return configs[value];
     });
@@ -284,10 +308,26 @@ describe('UserTable', () => {
     // Restore default mock
     vi.mocked(getRoleConfig).mockImplementation((value: string) => {
       const configs: Record<string, RoleConfig> = {
-        superadmin: { value: 'superadmin', labelKey: 'adminUsers.role_superadmin' as TranslationKey, badgeVariant: 'default' },
-        admin: { value: 'admin', labelKey: 'adminUsers.role_admin' as TranslationKey, badgeVariant: 'warning' },
-        instructor: { value: 'instructor', labelKey: 'adminUsers.role_instructor' as TranslationKey, badgeVariant: 'info' },
-        student: { value: 'student', labelKey: 'adminUsers.role_student' as TranslationKey, badgeVariant: 'secondary' },
+        superadmin: {
+          value: 'superadmin',
+          labelKey: 'adminUsers.role_superadmin' as TranslationKey,
+          badgeVariant: 'default',
+        },
+        admin: {
+          value: 'admin',
+          labelKey: 'adminUsers.role_admin' as TranslationKey,
+          badgeVariant: 'warning',
+        },
+        instructor: {
+          value: 'instructor',
+          labelKey: 'adminUsers.role_instructor' as TranslationKey,
+          badgeVariant: 'info',
+        },
+        student: {
+          value: 'student',
+          labelKey: 'adminUsers.role_student' as TranslationKey,
+          badgeVariant: 'secondary',
+        },
       };
       return configs[value];
     });
