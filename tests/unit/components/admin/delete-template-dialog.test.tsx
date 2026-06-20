@@ -23,6 +23,12 @@ vi.mock('@/components/ui/button', () => ({
   ),
 }));
 
+vi.mock('@/components/ui/label', () => ({
+  Label: ({ children, ...props }: any) => (
+    <label data-slot="label" {...props}>{children}</label>
+  ),
+}));
+
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
@@ -194,5 +200,18 @@ describe('DeleteTemplateDialog', () => {
     const cancelBtn = buttons.find((btn) => btn.textContent === 'Cancel');
     fireEvent.click(cancelBtn!);
     expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it('should use Label component for the DELETE confirmation input', () => {
+    const { container } = render(
+      <DeleteTemplateDialog
+        open={true}
+        onOpenChange={vi.fn()}
+        onConfirm={onConfirm}
+        usageCount={3}
+      />,
+    );
+    const labels = container.querySelectorAll('[data-slot="label"]');
+    expect(labels.length).toBe(1);
   });
 });

@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { AlertTriangle } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
 
@@ -66,8 +67,12 @@ export function DeleteTemplateDialog({
         </DialogHeader>
 
         {isInUse && (
-          <div className="py-2">
+          <div className="py-2 space-y-2">
+            <Label htmlFor="delete-confirm-input">
+              {t('common.typeDeleteToConfirm')}
+            </Label>
             <Input
+              id="delete-confirm-input"
               value={deleteText}
               onChange={(e) => setDeleteText(e.target.value)}
               placeholder={t('common.typeDeleteToConfirm')}
