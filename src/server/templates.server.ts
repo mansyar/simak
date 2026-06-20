@@ -38,7 +38,7 @@ function isInstructorOrAdmin(session: NonNullableSession | null): session is Non
 export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructorOrAdmin(session)) {
-    return { templates: [], total: 0, allTypes: [] as string[] };
+    return { templates: [], total: 0, allTypes: [] };
   }
 
   const { search, type, page, limit } = args.data;

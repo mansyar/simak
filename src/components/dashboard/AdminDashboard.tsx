@@ -1,5 +1,6 @@
 import { useI18n } from '../../routes/__root';
 import { formatDate } from '@/lib/format-date';
+import { cn } from '@/lib/utils';
 import {
   Users,
   ClipboardList,
@@ -168,35 +169,38 @@ export function AdminDashboard({ data }: Props) {
             ) : (
               <ul className="space-y-3">
                 {d.escalationAlerts.map((alert) => (
-                  <li
-                    key={alert.submissionId}
-                    className={`flex items-start gap-4 rounded-lg p-4 ${
-                      alert.daysOverdue > 3
-                        ? 'bg-error/5 border border-error/20'
-                        : 'bg-muted/30 border border-border'
-                    }`}
-                  >
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-error text-foreground">
-                      <AlertTriangle className="size-[18px]" aria-hidden="true" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-foreground truncate">
-                        {alert.instructorName}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {alert.assignmentTitle} — {alert.checkpointName}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {t('adminDashboard.student')}: {alert.studentName}
-                      </p>
-                      <p
-                        className={`text-xs mt-0.5 ${
-                          alert.daysOverdue > 3 ? 'text-error font-medium' : 'text-muted-foreground'
-                        }`}
-                      >
-                        {alert.daysOverdue} {t('adminDashboard.daysOverdue')}
-                      </p>
-                    </div>
+                  <li key={alert.submissionId}>
+                    <Card
+                      className={cn(
+                        'flex items-start gap-4 p-4',
+                        alert.daysOverdue > 3 && 'border-error/20 bg-error/5',
+                      )}
+                    >
+                      <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-error text-foreground">
+                        <AlertTriangle className="size-[18px]" aria-hidden="true" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {alert.instructorName}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {alert.assignmentTitle} — {alert.checkpointName}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {t('adminDashboard.student')}: {alert.studentName}
+                        </p>
+                        <p
+                          className={cn(
+                            'text-xs mt-0.5',
+                            alert.daysOverdue > 3
+                              ? 'text-error font-medium'
+                              : 'text-muted-foreground',
+                          )}
+                        >
+                          {alert.daysOverdue} {t('adminDashboard.daysOverdue')}
+                        </p>
+                      </div>
+                    </Card>
                   </li>
                 ))}
               </ul>
