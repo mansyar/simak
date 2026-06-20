@@ -4,6 +4,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: ui consistency for admin facing UI**
+- [x] **Track: ui consistency for admin facing UI**
 *Link: [./admin-ui-consistency_20260620/](./admin-ui-consistency_20260620/)*
 
