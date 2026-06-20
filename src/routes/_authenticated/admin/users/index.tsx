@@ -6,10 +6,13 @@ import { UserTable, UserRow } from '@/components/admin/users/UserTable';
 import { UserFilters } from '@/components/admin/users/UserFilters';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 import { EditUserSheet } from '@/components/admin/users/EditUserSheet';
+import { DeleteUserDialog } from '@/components/admin/users/DeleteUserDialog';
+import { SetupLinkSheet } from '@/components/admin/users/SetupLinkSheet';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { Pagination } from '@/components/ui/pagination';
 import { RefreshButton } from '@/components/ui/refresh-button';
+import { AlertBanner } from '@/components/ui/alert-banner';
 import { Plus } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
@@ -47,6 +50,10 @@ function UsersPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | null>(null);
+  const [deletingUser, setDeletingUser] = useState<UserRow | null>(null);
+  const [setupLinkUser, setSetupLinkUser] = useState<UserRow | null>(null);
+  const [setupLinkUrl, setSetupLinkUrl] = useState('');
+  const [inlineError, setInlineError] = useState('');
 
   const deleteUserFn = useServerFn(deleteUser);
   const generateSetupLinkFn = useServerFn(generateSetupLink);
@@ -86,20 +93,19 @@ function UsersPage() {
   };
 
   const handleDelete = async (user: UserRow) => {
-    if (confirm(t('adminUsers.deleteConfirm', { name: user.name }))) {
-      // @ts-expect-error - useServerFn type inference limitation
-      await deleteUserFn({ data: { id: user.id } });
-      navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
-    }
+    // @ts-expect-error - useServerFn type inference limitation
+    await deleteUserFn({ data: { id: user.id } });
+    navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
   };
 
   const handleGenerateLink = async (user: UserRow) => {
     // @ts-expect-error - useServerFn type inference limitation
     const result = await generateSetupLinkFn({ data: { id: user.id } });
     if ('url' in result) {
-      alert(`Setup Link: ${result.url}`);
+      setSetupLinkUrl(result.url ?? '');
+      setSetupLinkUser(user);
     } else {
-      alert(`Error: ${result.error}`);
+      setInlineError(result.error ?? t('common.error'));
     }
   };
 
@@ -107,7 +113,7 @@ function UsersPage() {
     // @ts-expect-error - useServerFn type inference limitation
     const result = await createUserFn({ data: values });
     if (result.error) {
-      alert(`${t('common.error')}: ${result.error}`);
+      setInlineError(`${t('common.error')}: ${result.error}`);
     } else {
       navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
     }
@@ -117,7 +123,7 @@ function UsersPage() {
     // @ts-expect-error - useServerFn type inference limitation
     const result = await updateUserFn({ data: { ...values, id } });
     if (result.error) {
-      alert(`${t('common.error')}: ${result.error}`);
+      setInlineError(`${t('common.error')}: ${result.error}`);
     } else {
       navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
     }
@@ -162,9 +168,34 @@ function UsersPage() {
       <UserTable
         data={users as UserRow[]}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        onDelete={(user) => setDeletingUser(user)}
         onGenerateLink={handleGenerateLink}
       />
+
+      <DeleteUserDialog
+        open={deletingUser !== null}
+        onOpenChange={(open) => { if (!open) setDeletingUser(null); }}
+        onConfirm={async () => {
+          if (deletingUser) {
+            await handleDelete(deletingUser);
+            setDeletingUser(null);
+          }
+        }}
+        userName={deletingUser?.name ?? ''}
+      />
+
+      <SetupLinkSheet
+        open={setupLinkUser !== null}
+        onOpenChange={(open) => { if (!open) { setSetupLinkUser(null); setSetupLinkUrl(''); } }}
+        url={setupLinkUrl}
+      />
+
+      {inlineError && (
+        <AlertBanner
+          variant="error"
+          title={inlineError}
+        />
+      )}
 
       <Pagination
         currentPage={searchParams.page || 1}

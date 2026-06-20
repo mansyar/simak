@@ -64,6 +64,20 @@ vi.mock('@/components/admin/users/CreateUserDialog', () => ({
 vi.mock('@/components/admin/users/EditUserSheet', () => ({
   EditUserSheet: () => null,
 }));
+vi.mock('@/components/admin/users/DeleteUserDialog', () => ({
+  DeleteUserDialog: (props: any) => (
+    <div data-testid="delete-user-dialog" data-open={props.open}>
+      DeleteUserDialog
+    </div>
+  ),
+}));
+vi.mock('@/components/admin/users/SetupLinkSheet', () => ({
+  SetupLinkSheet: (props: any) => (
+    <div data-testid="setup-link-sheet" data-open={props.open}>
+      SetupLinkSheet
+    </div>
+  ),
+}));
 
 async function getComponent(): Promise<ComponentType> {
   const mod = await import('@/routes/_authenticated/admin/users/index');
@@ -136,6 +150,18 @@ describe('Admin Users index page', () => {
       render(<Component />);
       // The old counter text should be gone
       expect(screen.queryByText('adminUsers.showing')).not.toBeInTheDocument();
+    });
+
+    it('should render DeleteUserDialog (not use window.confirm)', async () => {
+      const Component = await getComponent();
+      render(<Component />);
+      expect(screen.getByTestId('delete-user-dialog')).toBeInTheDocument();
+    });
+
+    it('should render SetupLinkSheet (not use window.alert)', async () => {
+      const Component = await getComponent();
+      render(<Component />);
+      expect(screen.getByTestId('setup-link-sheet')).toBeInTheDocument();
     });
   });
 });
