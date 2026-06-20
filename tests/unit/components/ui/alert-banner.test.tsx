@@ -66,9 +66,7 @@ describe('AlertBanner', () => {
   });
 
   it('applies custom className', () => {
-    render(
-      <AlertBanner variant="info" title="Title" className="custom-class" />,
-    );
+    render(<AlertBanner variant="info" title="Title" className="custom-class" />);
     expect(screen.getByRole('alert')).toHaveClass('custom-class');
   });
 

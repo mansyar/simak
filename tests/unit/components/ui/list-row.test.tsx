@@ -11,9 +11,7 @@ describe('ListRow', () => {
   });
 
   it('renders right content', () => {
-    render(
-      <ListRow left={<span>Left</span>} right={<span>Right</span>} />,
-    );
+    render(<ListRow left={<span>Left</span>} right={<span>Right</span>} />);
     expect(screen.getByText('Right')).toBeInTheDocument();
   });
 

@@ -29,10 +29,17 @@ function EmailQueueStat({ icon: Icon, color, label, value, className }: EmailQue
 
   return (
     <div className={cn('rounded-lg bg-card p-5 text-center', className)}>
-      <div className={cn('mx-auto mb-3 flex size-10 items-center justify-center rounded-full', colors.iconBg)}>
+      <div
+        className={cn(
+          'mx-auto mb-3 flex size-10 items-center justify-center rounded-full',
+          colors.iconBg,
+        )}
+      >
         <Icon className="size-5" />
       </div>
-      <div className="font-display text-[1.75rem] font-bold leading-none text-foreground">{value}</div>
+      <div className="font-display text-[1.75rem] font-bold leading-none text-foreground">
+        {value}
+      </div>
       <p className={cn('mt-1 text-[0.8125rem] font-medium', colors.label)}>{label}</p>
     </div>
   );

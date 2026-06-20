@@ -18,7 +18,7 @@ Goal: establish the building blocks that every later phase depends on. No behavi
     - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
     - [ ] Confirm understanding before starting any task in this phase
 
-- [ ] Task: Add missing i18n keys to `locales/en.json` and `locales/id.json` (FR-22.1, FR-22.3)
+- [x] Task: Add missing i18n keys to `locales/en.json` and `locales/id.json` (FR-22.1, FR-22.3)
     - [ ] Add `adminUsers.table.emailVerified` (en + id) — used by UserTable (fixes B7)
     - [ ] Add `adminTemplates.detail.saveError` for the failed-save message (fixes B9)
     - [ ] Add `adminTemplates.studentsCount` (or `{count} students` shape) for the linked-assignment line (fixes B11)
@@ -29,38 +29,38 @@ Goal: establish the building blocks that every later phase depends on. No behavi
     - [ ] Verify: `pnpm typecheck` passes
     - [ ] Commit: `chore(i18n): add admin audit-related i18n keys`
 
-- [ ] Task: Extract `src/components/ui/alert-banner.tsx` (FR-11.1)
+- [x] Task: Extract `src/components/ui/alert-banner.tsx` (FR-11.1)
     - [ ] Write failing test `tests/unit/components/ui/alert-banner.test.tsx` covering: renders each variant (success/error/info/warning), uses design tokens, accepts `title` + optional `description`, accepts `children`
     - [ ] Implement `AlertBanner` with `variant: 'success' | 'error' | 'info' | 'warning'` mapped to design tokens
     - [ ] Verify: test passes; no design-token regression (success uses `bg-success/10 text-success`, etc.)
     - [ ] Commit: `feat(ui): add AlertBanner primitive`
 
-- [ ] Task: Extract `src/components/ui/quick-action-card.tsx` (FR-12.1)
+- [x] Task: Extract `src/components/ui/quick-action-card.tsx` (FR-12.1)
     - [ ] Write failing test covering: renders icon, label, description, link target; hover effect
     - [ ] Implement `<QuickActionCard icon label description to />` matching the existing AdminDashboard markup
     - [ ] Verify: test passes
     - [ ] Commit: `feat(ui): add QuickActionCard primitive`
 
-- [ ] Task: Extract `src/components/ui/email-queue-stat.tsx` (FR-13.1)
+- [x] Task: Extract `src/components/ui/email-queue-stat.tsx` (FR-13.1)
     - [ ] Write failing test covering: renders icon, color, label, value
     - [ ] Implement `<EmailQueueStat icon color label value />` with the 3 bubble variants
     - [ ] Verify: test passes
     - [ ] Commit: `feat(ui): add EmailQueueStat primitive`
 
-- [ ] Task: Extract `src/components/ui/list-row.tsx` (FR-15.1)
+- [x] Task: Extract `src/components/ui/list-row.tsx` (FR-15.1)
     - [ ] Write failing test covering: renders left content, optional right content, optional onClick
     - [ ] Implement `<ListRow left right? onClick? />` with the `flex items-center justify-between rounded-md border p-3 text-sm hover:bg-accent` baseline
     - [ ] Verify: test passes
     - [ ] Commit: `feat(ui): add ListRow primitive`
 
-- [ ] Task: Add `src/lib/admin/roles.ts` config module (FR-16.1)
+- [x] Task: Add `src/lib/admin/roles.ts` config module (FR-16.1)
     - [ ] Write failing test `tests/unit/lib/admin/roles.test.ts` covering: `ROLES` array contains all 4 roles, each role has `value`, `labelKey`, `badgeVariant`
     - [ ] Implement `ROLES: ReadonlyArray<{ value, labelKey, badgeVariant }>` typed against `TranslationKey` (no more `as` casts)
     - [ ] Add helper `getRoleConfig(value: string)` returning the typed role
     - [ ] Verify: test passes
     - [ ] Commit: `feat(admin): add roles config module`
 
-- [ ] Task: Add `src/lib/format-date.ts` helper (FR-21.1)
+- [x] Task: Add `src/lib/format-date.ts` helper (FR-21.1)
     - [ ] Write failing test covering: locale-aware short / long / time styles; handles `Date | string | null`
     - [ ] Implement `formatDate(date, locale, style)` using `date-fns` (or `Intl.DateTimeFormat` — pick one and document)
     - [ ] Verify: test passes

@@ -20,11 +20,7 @@ function AlertBanner({ variant, title, description, children, className }: Alert
   return (
     <div
       role="alert"
-      className={cn(
-        'rounded-md border p-3 text-sm',
-        variantStyles[variant],
-        className,
-      )}
+      className={cn('rounded-md border p-3 text-sm', variantStyles[variant], className)}
     >
       <p className="font-medium">{title}</p>
       {description && <p className="mt-1 opacity-90">{description}</p>}
