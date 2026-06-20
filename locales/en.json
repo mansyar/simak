@@ -81,6 +81,7 @@
     "verify": "Verify",
     "searchByName": "Search templates by name or type...",
     "noSearchResults": "No {items} found matching your search.",
+    "deleteConfirmationWord": "DELETE",
     "typeDeleteToConfirm": "Type DELETE to confirm",
     "templateNamePlaceholder": "e.g., Thesis Template",
     "templateTypePlaceholder": "e.g., Thesis, Research Paper",
@@ -161,7 +162,8 @@
       "email": "Email",
       "role": "Role",
       "createdAt": "Created At",
-      "actions": "Actions"
+      "actions": "Actions",
+      "emailVerified": "Email Verified"
     },
     "empty": "No users found",
     "emptyPrompt": "Get started by adding a new user",
@@ -225,6 +227,7 @@
     "deleteConfirm": "Delete this template?",
     "deleteInUse": "This template is used by {count} assignment(s). Type DELETE to confirm.",
     "deleteSuccess": "Template deleted successfully",
+    "studentsCount": "{count} students",
     "inUseBanner": "This template is used by {count} assignment(s). Changes will affect future assignment creation.",
     "detail": {
       "back": "Back to Templates",
@@ -234,7 +237,8 @@
       "noAssignments": "No assignments yet",
       "saveSuccess": "Template saved",
       "created": "Created",
-      "createdBy": "Created by"
+      "createdBy": "Created by",
+      "saveError": "Failed to save template"
     }
   },
   "instructorReviews": {
@@ -462,6 +466,7 @@
     "recentActivity": "Recent Activity",
     "noRecentActivity": "No recent activity in the last 7 days",
     "escalationAlerts": "Deadline Escalation Alerts",
+    "allOnTrack": "All assignments are on track",
     "noEscalationAlerts": "No active escalation alerts",
     "quickActions": "Quick Actions",
     "manageUsers": "Manage Users",

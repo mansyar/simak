@@ -86,6 +86,7 @@ export type Translation = {
     verify: string
     searchByName: string
     noSearchResults: string
+    deleteConfirmationWord: string
     typeDeleteToConfirm: string
     templateNamePlaceholder: string
     templateTypePlaceholder: string
@@ -167,6 +168,7 @@ export type Translation = {
       role: string
       createdAt: string
       actions: string
+      emailVerified: string
     }
     empty: string
     emptyPrompt: string
@@ -230,6 +232,7 @@ export type Translation = {
     deleteConfirm: string
     deleteInUse: string
     deleteSuccess: string
+    studentsCount: string
     inUseBanner: string
     detail: {
       back: string
@@ -240,6 +243,7 @@ export type Translation = {
       saveSuccess: string
       created: string
       createdBy: string
+      saveError: string
     }
   }
   instructorReviews: {
@@ -467,6 +471,7 @@ export type Translation = {
     recentActivity: string
     noRecentActivity: string
     escalationAlerts: string
+    allOnTrack: string
     noEscalationAlerts: string
     quickActions: string
     manageUsers: string
