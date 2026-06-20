@@ -348,15 +348,15 @@ Goal: replace `window.confirm` / `window.alert` with proper `Dialog` / `Sheet`; 
     - [x] Verify: test passes
     - [x] Commit: `fix(admin): type filter shows all template types (B6)`
 
-- [ ] Task: Adopt i18n for hardcoded strings (FR-22.4) — fixes B7, B9, B11
-    - [ ] `UserTable.tsx:98` — use `t('adminUsers.table.emailVerified')` (B7)
-    - [ ] `TemplateDetailPage.tsx:157` — use `t('adminTemplates.detail.saveError')` (B9)
-    - [ ] `TemplateDetailPage.tsx:313` — use `t('adminTemplates.studentsCount', { count })` (B11)
-    - [ ] `AdminDashboard.tsx:184` — use `t('adminDashboard.allOnTrack')` (B12 part 1)
-    - [ ] `AdminDashboard.tsx:238` — use a new i18n key (or fall through) (B12 part 2)
-    - [ ] `DeleteTemplateDialog.tsx:32` — use `t('common.deleteConfirmationWord')` (B10)
-    - [ ] Verify: tests pass; `pnpm generate:i18n` and `pnpm typecheck` pass
-    - [ ] Commit: `i18n(admin): adopt i18n for previously hardcoded strings (B7, B9, B10, B11, B12)`
+- [x] Task: Adopt i18n for hardcoded strings (FR-22.4) — fixes B7, B9, B11 — commit `31ad9ce`
+    - [x] `UserTable.tsx:98` — use `t('adminUsers.table.emailVerified')` (B7) — already using i18n
+    - [x] `TemplateDetailPage.tsx:157` — use `t('adminTemplates.detail.saveError')` (B9)
+    - [x] `TemplateDetailPage.tsx:313` — use `t('adminTemplates.studentsCount', { count })` (B11)
+    - [x] `AdminDashboard.tsx:184` — use `t('adminDashboard.allOnTrack')` (B12 part 1)
+    - [x] `AdminDashboard.tsx:238` — use a new i18n key (or fall through) (B12 part 2) — deferred to formatDate task
+    - [x] `DeleteTemplateDialog.tsx:32` — use `t('common.deleteConfirmationWord')` (B10)
+    - [x] Verify: tests pass; `pnpm generate:i18n` and `pnpm typecheck` pass
+    - [x] Commit: `i18n(admin): adopt i18n for previously hardcoded strings (B7, B9, B10, B11, B12)`
 
 - [ ] Task: Use `formatDate` in admin components (FR-21.2, FR-21.3, FR-21.4)
     - [ ] `UserTable.tsx`, `TemplateCard.tsx`, `TemplateDetailPage.tsx` (×2), `AdminDashboard.tsx`, `audit-log.tsx` — replace date-fns / `toLocaleDateString` with the helper
