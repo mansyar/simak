@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
 import { TemplateLoadingSkeleton } from '@/components/admin/templates/TemplateLoadingSkeleton';
 
 vi.mock('@/components/ui/card', () => ({
@@ -12,7 +13,7 @@ describe('TemplateLoadingSkeleton', () => {
     const { container } = render(<TemplateLoadingSkeleton count={3} />);
     const cards = container.querySelectorAll('[data-testid="card"]');
     expect(cards.length).toBe(3);
-    const skeletonElements = container.querySelectorAll('[data-testid="skeleton"]');
+    const skeletonElements = container.querySelectorAll('[data-slot="skeleton"]');
     expect(skeletonElements.length).toBeGreaterThan(0);
   });
 
@@ -26,5 +27,17 @@ describe('TemplateLoadingSkeleton', () => {
     const { container } = render(<TemplateLoadingSkeleton count={3} />);
     const cards = container.querySelectorAll('[data-testid="card"]');
     expect(cards.length).toBe(3);
+  });
+
+  it('should use Skeleton primitive (data-slot) with exactly 3 placeholders per card', () => {
+    const { container } = render(<TemplateLoadingSkeleton count={1} />);
+    const skeletonPrimitives = container.querySelectorAll('[data-slot="skeleton"]');
+    expect(skeletonPrimitives.length).toBe(3);
+  });
+
+  it('should render 18 skeleton placeholders for 6 cards', () => {
+    const { container } = render(<TemplateLoadingSkeleton />);
+    const skeletonPrimitives = container.querySelectorAll('[data-slot="skeleton"]');
+    expect(skeletonPrimitives.length).toBe(18);
   });
 });
