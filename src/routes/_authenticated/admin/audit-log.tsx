@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { z } from 'zod';
+import { getActionVisualProps } from '@/lib/admin/audit-actions';
 
 interface AuditLogEntry {
   id: number;
@@ -76,22 +77,6 @@ export const Route = createFileRoute('/_authenticated/admin/audit-log')({
   },
   component: AuditLogPage,
 });
-
-function getActionBadgeVariant(
-  action: string,
-): 'default' | 'success' | 'warning' | 'error' | 'info' | 'secondary' {
-  if (
-    action.includes('created') ||
-    action.includes('passed') ||
-    action.includes('verified') ||
-    action.includes('unlocked')
-  )
-    return 'success';
-  if (action.includes('updated') || action.includes('extended')) return 'warning';
-  if (action.includes('deleted') || action.includes('rejected') || action.includes('revised'))
-    return 'error';
-  return 'info';
-}
 
 function AuditLogPage() {
   const { t, locale } = useI18n();
@@ -203,72 +188,72 @@ function AuditLogPage() {
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('adminAuditLog.auditTable.timestamp')}</TableHead>
-                <TableHead>{t('adminAuditLog.auditTable.action')}</TableHead>
-                <TableHead>{t('adminAuditLog.auditTable.actor')}</TableHead>
-                <TableHead>{t('adminAuditLog.auditTable.entityType')}</TableHead>
-                <TableHead>{t('adminAuditLog.auditTable.entityId')}</TableHead>
-                <TableHead>{t('adminAuditLog.auditTable.details')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {entries.length === 0 ? (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="p-8 text-center text-muted-foreground">
-                    {t('adminAuditLog.empty')}
-                  </TableCell>
+                  <TableHead>{t('adminAuditLog.auditTable.timestamp')}</TableHead>
+                  <TableHead>{t('adminAuditLog.auditTable.action')}</TableHead>
+                  <TableHead>{t('adminAuditLog.auditTable.actor')}</TableHead>
+                  <TableHead>{t('adminAuditLog.auditTable.entityType')}</TableHead>
+                  <TableHead>{t('adminAuditLog.auditTable.entityId')}</TableHead>
+                  <TableHead>{t('adminAuditLog.auditTable.details')}</TableHead>
                 </TableRow>
-              ) : (
-                entries.map((entry: AuditLogEntry) => (
-                  <TableRow key={entry.id}>
-                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatTimestamp(entry.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getActionBadgeVariant(entry.action)}>{entry.action}</Badge>
-                    </TableCell>
-                    <TableCell className="text-xs">{entry.actorId}</TableCell>
-                    <TableCell className="text-xs">{entry.entityType}</TableCell>
-                    <TableCell className="text-xs font-mono">{entry.entityId}</TableCell>
-                    <TableCell className="text-xs">
-                      {entry.details ? (
-                        <button
-                          onClick={() => toggleDetails(entry.id)}
-                          className="text-primary hover:underline"
-                        >
-                          {expandedId === entry.id ? t('common.hide') : t('common.view')}
-                        </button>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                      {expandedId === entry.id && entry.details && (
-                        <pre className="mt-2 rounded bg-muted p-2 text-xs overflow-x-auto">
-                          {JSON.stringify(entry.details, null, 2)}
-                        </pre>
-                      )}
+              </TableHeader>
+              <TableBody>
+                {entries.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="p-8 text-center text-muted-foreground">
+                      {t('adminAuditLog.empty')}
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="border-t p-3">
-            <Pagination
-              currentPage={searchParams.page || 1}
-              totalPages={totalPages}
-              onPageChange={(page) => goToPage(page)}
-              showCounter
-              showPageNumbers
-            />
+                ) : (
+                  entries.map((entry: AuditLogEntry) => (
+                    <TableRow key={entry.id}>
+                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                        {formatTimestamp(entry.createdAt)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getActionVisualProps(entry.action).badgeVariant}>{entry.action}</Badge>
+                      </TableCell>
+                      <TableCell className="text-xs">{entry.actorId}</TableCell>
+                      <TableCell className="text-xs">{entry.entityType}</TableCell>
+                      <TableCell className="text-xs font-mono">{entry.entityId}</TableCell>
+                      <TableCell className="text-xs">
+                        {entry.details ? (
+                          <button
+                            onClick={() => toggleDetails(entry.id)}
+                            className="text-primary hover:underline"
+                          >
+                            {expandedId === entry.id ? t('common.hide') : t('common.view')}
+                          </button>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                        {expandedId === entry.id && entry.details && (
+                          <pre className="mt-2 rounded bg-muted p-2 text-xs overflow-x-auto">
+                            {JSON.stringify(entry.details, null, 2)}
+                          </pre>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
-        )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="border-t p-3">
+              <Pagination
+                currentPage={searchParams.page || 1}
+                totalPages={totalPages}
+                onPageChange={(page) => goToPage(page)}
+                showCounter
+                showPageNumbers
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

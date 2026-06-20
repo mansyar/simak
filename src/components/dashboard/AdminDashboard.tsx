@@ -20,6 +20,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { StatusDot } from '@/components/ui/status-dot';
 import { QuickActionCard } from '@/components/ui/quick-action-card';
 import { EmailQueueStat } from '@/components/ui/email-queue-stat';
+import { getActionVisualProps } from '@/lib/admin/audit-actions';
 
 interface SystemMetrics {
   totalUsers: number;
@@ -65,12 +66,6 @@ interface Props {
   data: AdminDashboardData;
 }
 
-function getActivityDotColor(type: string) {
-  if (type.includes('created') || type.includes('passed') || type.includes('verified')) {
-    return 'verified' as const;
-  }
-  return 'inactive' as const;
-}
 
 export function AdminDashboard({ data }: Props) {
   const { t } = useI18n();
@@ -231,7 +226,7 @@ export function AdminDashboard({ data }: Props) {
                     key={event.id}
                     className="flex items-start gap-3 border-b border-border/50 pb-3 last:border-b-0 last:pb-0"
                   >
-                    <StatusDot variant={getActivityDotColor(event.type)} className="mt-[6px]" />
+                    <StatusDot variant={getActionVisualProps(event.type).dotVariant} className="mt-[6px]" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm text-foreground">{event.title}</p>
                       {event.message && (
