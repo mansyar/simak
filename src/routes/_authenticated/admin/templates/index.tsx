@@ -8,6 +8,9 @@ import {
   deleteTemplate,
   duplicateTemplate,
   CreateTemplateSchema,
+  type GetTemplateResult,
+  type DeleteTemplateResult,
+  type DuplicateTemplateResult,
 } from '@/server/templates';
 import { TemplateCard, TemplateRow } from '@/components/admin/templates/TemplateCard';
 import { TemplateFilters } from '@/components/admin/templates/TemplateFilters';
@@ -116,26 +119,23 @@ function TemplatesPage() {
 
   const handleDelete = async (template: TemplateRow) => {
     // First check if template is in use
-    const fullTemplate = await getTemplateFn({ data: { id: template.id } });
-    const usageCount = (fullTemplate as { assignmentCount?: number })?.assignmentCount ?? 0;
+    const fullTemplate = (await getTemplateFn({ data: { id: template.id } })) as GetTemplateResult;
+    const usageCount = fullTemplate?.assignmentCount ?? 0;
     setDeletingTemplate({ id: template.id, usageCount });
     setIsDeleteDialogOpen(true);
   };
 
   const handleConfirmDelete = async () => {
     if (!deletingTemplate) return;
-    const result = await deleteTemplateFn({ data: { id: deletingTemplate.id } });
-    if (
-      (result as { success?: boolean; error?: string }).success ||
-      (result as { error?: string }).error === 'in_use'
-    ) {
+    const result = (await deleteTemplateFn({ data: { id: deletingTemplate.id } })) as DeleteTemplateResult;
+    if ('success' in result || ('error' in result && result.error === 'in_use')) {
       navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
     }
   };
 
   const handleDuplicate = async (template: TemplateRow) => {
-    const result = await duplicateTemplateFn({ data: { id: template.id } });
-    if ((result as { template?: unknown }).template) {
+    const result = (await duplicateTemplateFn({ data: { id: template.id } })) as DuplicateTemplateResult;
+    if ('template' in result && result.template) {
       navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
     }
   };

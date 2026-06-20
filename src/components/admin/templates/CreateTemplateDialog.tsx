@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { CheckpointListEditor } from './CheckpointListEditor';
-import { CreateTemplateSchema } from '@/server/templates';
+import { CreateTemplateSchema, type CreateTemplateResult } from '@/server/templates';
 import { useI18n } from '../../../routes/__root';
 
 type CreateTemplateFormValues = z.infer<typeof CreateTemplateSchema>;
@@ -29,10 +29,7 @@ type CreateTemplateFormValues = z.infer<typeof CreateTemplateSchema>;
 interface CreateTemplateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (values: CreateTemplateFormValues) => Promise<{
-    error?: string;
-    template?: { id?: number } | unknown;
-  }>;
+  onSubmit: (values: CreateTemplateFormValues) => Promise<CreateTemplateResult>;
   onSuccess: (templateId?: number) => void;
 }
 
@@ -131,10 +128,13 @@ export function CreateTemplateDialog({
   const handleFormSubmit = async (values: CreateTemplateFormValues) => {
     setServerError(null);
     const result = await onSubmit(values);
-    if (result?.error) {
+    if (!result || typeof result !== 'object') {
+      return;
+    }
+    if ('error' in result && result.error) {
       setServerError(result.error);
-    } else {
-      const templateId = (result?.template as { id?: number })?.id;
+    } else if ('template' in result && result.template) {
+      const templateId = result.template.id;
       form.reset();
       onOpenChange(false);
       onSuccess(templateId);

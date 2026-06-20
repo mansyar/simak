@@ -84,3 +84,54 @@ export const listTemplateAssignments = createServerFn({ method: 'GET' })
     const { listTemplateAssignmentsHandler } = await import('./templates.server');
     return listTemplateAssignmentsHandler({ data });
   });
+
+// ── Return types (for consumers that call via useServerFn) ───────────
+
+export interface TemplateListItem {
+  id: number;
+  name: string;
+  type: string;
+  createdBy: string | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  checkpointCount: number;
+  checkpoints: string[];
+}
+
+export interface TemplateDetail {
+  id: number;
+  name: string;
+  type: string;
+  createdBy: string | null;
+  createdByName: string | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  checkpoints: {
+    id: number;
+    name: string;
+    order: number;
+    minConsultations: number | null;
+    estimatedDuration: number | null;
+  }[];
+  assignmentCount: number;
+}
+
+export interface TemplateAssignment {
+  id: number;
+  title: string;
+  instructorName: string;
+  studentCount: number;
+  createdAt: Date | null;
+}
+
+export type GetTemplateResult = TemplateDetail | null;
+
+export type DeleteTemplateResult = { error: string; count?: number } | { success: true };
+
+export type DuplicateTemplateResult =
+  | { error: string }
+  | { template: GetTemplateResult };
+
+export type CreateTemplateResult =
+  | { error: string }
+  | { template: GetTemplateResult };
