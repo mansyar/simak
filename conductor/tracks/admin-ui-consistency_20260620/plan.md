@@ -281,11 +281,11 @@ Goal: kill the remaining inline-style code, fix the UI-level bugs, dedupe role c
     - [x] Verify: test passes; the const matches the locale keys
     - [x] Commit: `refactor(admin): source-of-truth ACTION_TYPES in audit-actions module`
 
-- [ ] Task: Replace raw `<label>` in `TemplateDetailPage.tsx` with `<Label>` (FR-19.1)
-    - [ ] Write failing test covering: metadata inputs are labeled with `<Label>` (htmlFor association)
-    - [ ] Replace raw `<label>` elements (lines 211-213, 222-224) with `<Label htmlFor={...}>` (or wrap in `FormField`)
-    - [ ] Verify: test passes; a11y lint passes
-    - [ ] Commit: `a11y(admin): use Label primitive in template detail metadata`
+- [x] Task: Replace raw `<label>` in `TemplateDetailPage.tsx` with `<Label>` (FR-19.1) — commit `644879e`
+    - [x] Write failing test covering: metadata inputs are labeled with `<Label>` (htmlFor association)
+    - [x] Replace raw `<label>` elements (lines 211-213, 222-224) with `<Label htmlFor={...}>` (or wrap in `FormField`)
+    - [x] Verify: test passes; a11y lint passes
+    - [x] Commit: `a11y(admin): use Label primitive in template detail metadata`
 
 - [ ] Task: Replace raw move buttons in `CheckpointListEditor.tsx` (FR-20.1)
     - [ ] Write failing test covering: move-up / move-down use `Button` variant ghost size icon-xs
