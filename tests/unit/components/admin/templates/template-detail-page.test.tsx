@@ -2,8 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TemplateDetailPage } from '@/components/admin/templates/TemplateDetailPage';
 
+const mockAssignmentsFn = vi.hoisted(() => vi.fn().mockResolvedValue({ assignments: [] }));
+
 vi.mock('@tanstack/react-start', () => ({
-  useServerFn: vi.fn(() => vi.fn().mockResolvedValue({ assignments: [] })),
+  useServerFn: vi.fn(() => mockAssignmentsFn),
 }));
 
 vi.mock('@tanstack/react-router', () => ({
@@ -242,5 +244,13 @@ describe('TemplateDetailPage', () => {
     const template = { ...mockTemplate, createdByName: null };
     render(<TemplateDetailPage template={template} />);
     expect(screen.getByText('admin-1')).toBeTruthy();
+  });
+
+  it('should use Skeleton primitive for linked-assignments loading state', () => {
+    mockAssignmentsFn.mockImplementation(() => new Promise(() => {}));
+    const { container } = render(<TemplateDetailPage template={mockTemplate} />);
+    const skeletons = container.querySelectorAll('[data-slot="skeleton"]');
+    expect(skeletons.length).toBe(2);
+    mockAssignmentsFn.mockResolvedValue({ assignments: [] });
   });
 });

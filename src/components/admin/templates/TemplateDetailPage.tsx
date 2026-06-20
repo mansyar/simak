@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BackLink } from '@/components/ui/back-link';
+import { Skeleton } from '@/components/ui/skeleton';
 import { AlertTriangle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns/format';
 import { useI18n } from '../../../routes/__root';
@@ -289,7 +290,7 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
           {assignmentsLoading ? (
             <div className="space-y-2">
               {[1, 2].map((n) => (
-                <div key={n} className="h-10 rounded bg-muted animate-pulse" />
+                <Skeleton key={n} className="h-10" />
               ))}
             </div>
           ) : assignments.length === 0 ? (
