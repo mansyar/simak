@@ -96,7 +96,7 @@ vi.mock('@/components/ui/select', () => ({
   SelectContent: ({ children }: any) => <div>{children}</div>,
   SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
   SelectTrigger: ({ children }: any) => <div>{children}</div>,
-  SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
+  SelectValue: ({ placeholder }: any) => <span data-testid="select-value-component">{placeholder}</span>,
 }));
 
 vi.mock('@/components/ui/input', () => ({
@@ -239,5 +239,10 @@ describe('CreateUserDialog', () => {
       role: 'superadmin',
     });
     expect(invalidRole.success).toBe(false);
+  });
+
+  it('should use SelectValue component for display (data-testid="select-value-component")', () => {
+    render(<CreateUserDialog open={true} onOpenChange={vi.fn()} onSubmit={onSubmit} />);
+    expect(screen.getByTestId('select-value-component')).toBeDefined();
   });
 });

@@ -1,5 +1,5 @@
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
 
@@ -34,9 +34,7 @@ export function TemplateFilters({
       <div className="w-full sm:w-[180px]">
         <Select value={type} onValueChange={(val) => onTypeChange(val || 'all')}>
           <SelectTrigger>
-            <span data-slot="select-value" className="flex flex-1 text-left">
-              {type !== 'all' ? type : t('adminTemplates.filterByType')}
-            </span>
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('adminTemplates.filterByType')}</SelectItem>

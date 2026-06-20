@@ -31,7 +31,7 @@ vi.mock('@/components/ui/select', () => ({
   SelectContent: ({ children }: any) => <>{children}</>,
   SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
   SelectTrigger: ({ children }: any) => <div>{children}</div>,
-  SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
+  SelectValue: ({ placeholder }: any) => <span data-testid="select-value-component">{placeholder}</span>,
 }));
 
 describe('TemplateFilters', () => {
@@ -170,9 +170,11 @@ describe('TemplateFilters', () => {
         onTypeChange={onTypeChange}
       />,
     );
-    const selectTrigger = document.querySelector('[data-slot="select-value"]');
-    expect(selectTrigger).toBeDefined();
-    expect(selectTrigger?.textContent).toBe('Thesis');
+    // SelectValue component handles display; verify it's rendered
+    expect(screen.getByTestId('select-value-component')).toBeDefined();
+    // The selected value is shown via the Select's value prop
+    const selectEl = screen.getByTestId('type-select') as HTMLSelectElement;
+    expect(selectEl.value).toBe('Thesis');
   });
 
   it('should display placeholder in filter trigger when type is "all"', () => {
@@ -185,9 +187,10 @@ describe('TemplateFilters', () => {
         onTypeChange={onTypeChange}
       />,
     );
-    const selectTrigger = document.querySelector('[data-slot="select-value"]');
-    expect(selectTrigger).toBeDefined();
-    expect(selectTrigger?.textContent).toBe('All Types');
+    // SelectValue component handles display; verify it's rendered
+    expect(screen.getByTestId('select-value-component')).toBeDefined();
+    const selectEl = screen.getByTestId('type-select') as HTMLSelectElement;
+    expect(selectEl.value).toBe('all');
   });
 
   it('should fallback to "all" when onTypeChange receives empty value', () => {
@@ -218,5 +221,18 @@ describe('TemplateFilters', () => {
     const select = screen.getByTestId('type-select');
     fireEvent.change(select, { target: { value: '' } });
     expect(onTypeChange).toHaveBeenCalledWith('all');
+  });
+
+  it('should use SelectValue component for display (data-testid="select-value-component")', () => {
+    render(
+      <TemplateFilters
+        search=""
+        onSearchChange={onSearchChange}
+        type="all"
+        types={['Thesis', 'Research Paper']}
+        onTypeChange={onTypeChange}
+      />,
+    );
+    expect(screen.getByTestId('select-value-component')).toBeDefined();
   });
 });

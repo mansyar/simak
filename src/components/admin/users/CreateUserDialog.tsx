@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreateUserSchema } from '@/server/users';
 import { useI18n } from '../../../routes/__root';
 import type { TranslationKey } from '../../../i18n/index';
@@ -93,11 +93,7 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
-                        <span data-slot="select-value" className="flex flex-1 text-left">
-                          {field.value
-                            ? t(('adminUsers.role_' + field.value) as TranslationKey)
-                            : t('adminUsers.table.role')}
-                        </span>
+                        <SelectValue placeholder={t('adminUsers.table.role')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>

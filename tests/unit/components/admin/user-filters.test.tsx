@@ -19,7 +19,7 @@ vi.mock('@/components/ui/select', () => ({
   SelectContent: ({ children }: any) => <>{children}</>,
   SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
   SelectTrigger: ({ children }: any) => <div>{children}</div>,
-  SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
+  SelectValue: ({ placeholder }: any) => <span data-testid="select-value-component">{placeholder}</span>,
 }));
 
 vi.mock('@/routes/__root', () => ({
@@ -132,5 +132,17 @@ describe('UserFilters', () => {
       'Search users by name or email...',
     ) as HTMLInputElement;
     expect(searchInput.value).toBe('test');
+  });
+
+  it('should use SelectValue component for display (data-testid="select-value-component")', () => {
+    render(
+      <UserFilters
+        search=""
+        onSearchChange={onSearchChange}
+        role="all"
+        onRoleChange={onRoleChange}
+      />,
+    );
+    expect(screen.getByTestId('select-value-component')).toBeDefined();
   });
 });
