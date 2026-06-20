@@ -177,11 +177,11 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: existing tests still pass
     - [x] Commit: `feat(ui): extend Pagination with page numbers and counter`
 
-- [ ] Task: Adopt extended `<Pagination>` in `admin/users/index.tsx` (FR-6.2, FR-6.3)
-    - [ ] Write failing test covering: prev/next buttons use `common.back` / `common.next`; "Showing X of Y" counter
-    - [ ] Replace hand-rolled pagination with `<Pagination currentPage totalPages onPageChange showCounter />`
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt Pagination primitive on users list`
+- [x] Task: Adopt extended `<Pagination>` in `admin/users/index.tsx` (FR-6.2, FR-6.3) — commit `4a7f9e9`
+    - [x] Write failing test covering: prev/next buttons use `common.back` / `common.next`; "Showing X of Y" counter
+    - [x] Replace hand-rolled pagination with `<Pagination currentPage totalPages onPageChange showCounter />`
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt Pagination primitive on users list`
 
 - [ ] Task: Adopt extended `<Pagination>` in `admin/audit-log.tsx` (FR-6.2, FR-6.3)
     - [ ] Write failing test covering: prev/next, page numbers (up to 5), counter; all use design tokens
