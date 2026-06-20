@@ -374,17 +374,17 @@ Goal: replace `window.confirm` / `window.alert` with proper `Dialog` / `Sheet`; 
 
 Goal: the deep structural refactor; the type-system cleanup; the final accessibility passes; pre-push gate.
 
-- [ ] Task: Read track context (spec.md and workflow.md)
-    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
-    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
-    - [ ] Confirm understanding before starting any task in this phase
+- [x] Task: Read track context (spec.md and workflow.md)
+    - [x] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [x] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [x] Confirm understanding before starting any task in this phase
 
-- [ ] Task: Migrate `listTemplateAssignments` to the route loader (FR-25.2) — fixes B8
-    - [ ] Write failing test covering: the route loader returns `{ template, assignments }`
-    - [ ] Update the loader at `routes/_authenticated/admin/templates/$templateId.tsx` to call `listTemplateAssignments` and return both
-    - [ ] Remove the `useEffect` in `TemplateDetailPage` (lines 67-84)
-    - [ ] Verify: tests pass; no `useEffect`-based fetch
-    - [ ] Commit: `refactor(admin): move linked-assignments fetch to route loader (B8)`
+- [x] Task: Migrate `listTemplateAssignments` to the route loader (FR-25.2) — fixes B8 — commit `23746b9`
+    - [x] Write failing test covering: the route loader returns `{ template, assignments }`
+    - [x] Update the loader at `routes/_authenticated/admin/templates/$templateId.tsx` to call `listTemplateAssignments` and return both
+    - [x] Remove the `useEffect` in `TemplateDetailPage` (lines 67-84)
+    - [x] Verify: tests pass; no `useEffect`-based fetch
+    - [x] Commit: `refactor(admin): move linked-assignments fetch to route loader (B8)`
 
 - [ ] Task: Split `TemplateDetailPage.tsx` into subcomponents (FR-25.1, FR-25.3, FR-25.4)
     - [ ] Write failing tests for each subcomponent (`TemplateMetadata`, `TemplateCheckpointSection`, `TemplateLinkedAssignments`, `TemplateDangerZone`)
