@@ -79,6 +79,7 @@ export type Translation = {
     openMenu: string
     closeMenu: string
     close: string
+    copy: string
     skipToContent: string
     goToDashboard: string
     emailPlaceholder: string
@@ -181,6 +182,8 @@ export type Translation = {
     updateSuccess: string
     linkGenerated: string
     linkCopied: string
+    setupLinkTitle: string
+    setupLinkDescription: string
     generateLink: string
     edit: string
     role_superadmin: string
