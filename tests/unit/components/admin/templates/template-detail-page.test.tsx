@@ -265,8 +265,20 @@ describe('TemplateDetailPage', () => {
 
   it('should render assignments from props (route loader)', () => {
     const mockAssignments = [
-      { id: 1, title: 'Assignment 1', instructorName: 'Dr. Smith', studentCount: 5, createdAt: new Date() },
-      { id: 2, title: 'Assignment 2', instructorName: 'Dr. Jones', studentCount: 3, createdAt: new Date() },
+      {
+        id: 1,
+        title: 'Assignment 1',
+        instructorName: 'Dr. Smith',
+        studentCount: 5,
+        createdAt: new Date(),
+      },
+      {
+        id: 2,
+        title: 'Assignment 2',
+        instructorName: 'Dr. Jones',
+        studentCount: 3,
+        createdAt: new Date(),
+      },
     ];
     render(<TemplateDetailPage template={mockTemplate} assignments={mockAssignments} />);
     expect(screen.getByText('Assignment 1')).toBeTruthy();
@@ -279,9 +291,9 @@ describe('TemplateDetailPage', () => {
     render(<TemplateDetailPage template={mockTemplate} />);
     fireEvent.click(screen.getByText('Save'));
     await waitFor(() => {
-      const banner = screen.getByTestId('alert-banner');
-      expect(banner).toBeTruthy();
-      expect(banner.getAttribute('data-variant')).toBe('success');
+      const banners = screen.getAllByTestId('alert-banner');
+      const successBanner = banners.find((b) => b.getAttribute('data-variant') === 'success');
+      expect(successBanner).toBeTruthy();
     });
     mockAssignmentsFn.mockResolvedValue({ assignments: [] });
   });

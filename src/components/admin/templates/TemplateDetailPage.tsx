@@ -1,18 +1,13 @@
 import { useState, useCallback } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { updateTemplate, deleteTemplate } from '@/server/templates';
-import { CheckpointListEditor } from './CheckpointListEditor';
-import { DeleteTemplateDialog } from './DeleteTemplateDialog';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { TemplateMetadata } from './TemplateMetadata';
+import { TemplateCheckpointSection } from './TemplateCheckpointSection';
+import { TemplateLinkedAssignments } from './TemplateLinkedAssignments';
+import { TemplateDangerZone } from './TemplateDangerZone';
 import { BackLink } from '@/components/ui/back-link';
-import { Skeleton } from '@/components/ui/skeleton';
 import { AlertBanner } from '@/components/ui/alert-banner';
-import { Label } from '@/components/ui/label';
-import { AlertTriangle, Trash2 } from 'lucide-react';
-import { formatDate } from '@/lib/format-date';
 import { useI18n } from '../../../routes/__root';
 
 interface TemplateData {
@@ -43,8 +38,14 @@ interface AssignmentData {
 
 const defaultCheckpoint = () => ({ name: '', minConsultations: 0, estimatedDuration: 7 });
 
-export function TemplateDetailPage({ template, assignments: initialAssignments }: { template: TemplateData | null; assignments?: AssignmentData[] }) {
-  const { t, locale } = useI18n();
+export function TemplateDetailPage({
+  template,
+  assignments: initialAssignments,
+}: {
+  template: TemplateData | null;
+  assignments?: AssignmentData[];
+}) {
+  const { t } = useI18n();
   const navigate = useNavigate();
 
   const [name, setName] = useState(template?.name ?? '');
@@ -60,8 +61,6 @@ export function TemplateDetailPage({ template, assignments: initialAssignments }
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const assignments = initialAssignments ?? [];
-  const [assignmentsLoading] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const updateTemplateFn = useServerFn(updateTemplate);
   const deleteTemplateFn = useServerFn(deleteTemplate);
@@ -159,177 +158,44 @@ export function TemplateDetailPage({ template, assignments: initialAssignments }
 
   return (
     <div className="space-y-6">
-      {/* Back navigation */}
       <BackLink
         to="/admin/templates"
         label={t('adminTemplates.detail.back')}
         search={{ page: 1, limit: 20, search: '', type: '' }}
       />
 
-      {/* Success banner */}
       {saveSuccess && (
         <AlertBanner variant="success" title={t('adminTemplates.detail.saveSuccess')} />
       )}
 
-      {/* Error banner */}
       {saveError && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-          {t('common.error')}: {saveError}
-        </div>
+        <AlertBanner variant="error" title={`${t('common.error')}: ${saveError}`} />
       )}
 
-      {/* Metadata Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('adminTemplates.detail.metadata')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">
-                {t('adminTemplates.form.name')}
-              </Label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={t('adminTemplates.form.namePlaceholder')}
-                data-testid="template-name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-foreground">
-                {t('adminTemplates.form.type')}
-              </Label>
-              <Input
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                placeholder={t('adminTemplates.form.typePlaceholder')}
-                data-testid="template-type"
-              />
-            </div>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 text-sm text-muted-foreground">
-            <div>
-              <span className="font-medium">{t('adminTemplates.detail.created')}:</span>{' '}
-              {formatDate(template.createdAt ?? new Date(), locale, 'time')}
-            </div>
-            <div>
-              <span className="font-medium">{t('adminTemplates.detail.createdBy')}:</span>{' '}
-              {template.createdByName ?? template.createdBy}
-            </div>
-          </div>
-
-          {/* In-use banner */}
-          {template.assignmentCount > 0 && (
-            <div className="flex items-start gap-2 rounded-md bg-muted p-3 text-sm">
-              <AlertTriangle className="h-4 w-4 mt-0.5 text-warning shrink-0" />
-              <span className="text-muted-foreground">
-                {t('adminTemplates.inUseBanner', { count: String(template.assignmentCount) })}
-              </span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Checkpoint Editor */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('adminTemplates.detail.checkpoints')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <CheckpointListEditor
-            checkpoints={checkpoints}
-            onAdd={handleAddCheckpoint}
-            onRemove={handleRemoveCheckpoint}
-            onChange={handleCheckpointChange}
-            onMinConsultationsChange={handleMinConsultationsChange}
-            onEstimatedDurationChange={handleEstimatedDurationChange}
-            onMoveUp={handleMoveUp}
-            onMoveDown={handleMoveDown}
-          />
-          <div className="flex gap-2 pt-2">
-            <Button onClick={handleSave} disabled={isSaving} data-testid="save-template">
-              {isSaving ? t('common.saving') : t('common.save')}
-            </Button>
-            <Link to="/admin/templates" search={{ page: 1, limit: 20, search: '', type: '' }}>
-              <Button variant="outline" type="button">
-                {t('common.cancel')}
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Linked Assignments */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('adminTemplates.detail.assignments')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {assignmentsLoading ? (
-            <div className="space-y-2">
-              {[1, 2].map((n) => (
-                <Skeleton key={n} className="h-10" />
-              ))}
-            </div>
-          ) : assignments.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              {t('adminTemplates.detail.noAssignments')}
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {assignments.map((a) => (
-                <Link
-                  key={a.id}
-                  to="/instructor/assignments/$id"
-                  params={{ id: String(a.id) }}
-                  className="flex items-center justify-between rounded-md border p-3 text-sm hover:bg-accent transition-colors"
-                >
-                  <div>
-                    <div className="font-medium text-foreground">{a.title}</div>
-                    <div className="text-muted-foreground">
-                      {a.instructorName} &middot;{' '}
-                      {t('adminTemplates.studentsCount', { count: String(a.studentCount) })}
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {formatDate(a.createdAt ?? new Date(), locale, 'short')}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Delete Section */}
-      <Card className="border-destructive/20">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-medium text-foreground">
-                {t('adminTemplates.actions.delete')}
-              </h3>
-              <p className="text-xs text-muted-foreground">{t('adminTemplates.deleteConfirm')}</p>
-            </div>
-            <Button
-              variant="destructive"
-              onClick={() => setIsDeleteOpen(true)}
-              data-testid="delete-template"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t('adminTemplates.actions.delete')}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <DeleteTemplateDialog
-        open={isDeleteOpen}
-        onOpenChange={setIsDeleteOpen}
-        onConfirm={handleDelete}
-        usageCount={template.assignmentCount}
+      <TemplateMetadata
+        template={template}
+        name={name}
+        onNameChange={setName}
+        type={type}
+        onTypeChange={setType}
       />
+
+      <TemplateCheckpointSection
+        checkpoints={checkpoints}
+        onAdd={handleAddCheckpoint}
+        onRemove={handleRemoveCheckpoint}
+        onChange={handleCheckpointChange}
+        onMinConsultationsChange={handleMinConsultationsChange}
+        onEstimatedDurationChange={handleEstimatedDurationChange}
+        onMoveUp={handleMoveUp}
+        onMoveDown={handleMoveDown}
+        onSave={handleSave}
+        isSaving={isSaving}
+      />
+
+      <TemplateLinkedAssignments assignments={assignments} />
+
+      <TemplateDangerZone assignmentCount={template.assignmentCount} onDelete={handleDelete} />
     </div>
   );
 }
