@@ -201,7 +201,10 @@ function AuditLogPage() {
                       </TableCell>
                       <TableCell>
                         <Badge variant={getActionVisualProps(entry.action).badgeVariant}>
-                          {t((ACTION_TYPES.find((a) => a.value === entry.action)?.label ?? entry.action) as TranslationKey)}
+                          {t(
+                            (ACTION_TYPES.find((a) => a.value === entry.action)?.label ??
+                              entry.action) as TranslationKey,
+                          )}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-xs">{entry.actorName ?? entry.actorId}</TableCell>
