@@ -96,6 +96,15 @@ vi.mock('@/components/ui/back-link', () => ({
   ),
 }));
 
+vi.mock('@/components/ui/alert-banner', () => ({
+  AlertBanner: ({ variant, title, description }: any) => (
+    <div data-testid="alert-banner" data-variant={variant}>
+      <p>{title}</p>
+      {description && <p>{description}</p>}
+    </div>
+  ),
+}));
+
 vi.mock('lucide-react', () => ({
   AlertTriangle: () => <span data-testid="icon-alert" />,
   ArrowLeft: () => <span data-testid="icon-arrow-left" />,
@@ -251,6 +260,18 @@ describe('TemplateDetailPage', () => {
     const { container } = render(<TemplateDetailPage template={mockTemplate} />);
     const skeletons = container.querySelectorAll('[data-slot="skeleton"]');
     expect(skeletons.length).toBe(2);
+    mockAssignmentsFn.mockResolvedValue({ assignments: [] });
+  });
+
+  it('should use AlertBanner for success message after save', async () => {
+    mockAssignmentsFn.mockResolvedValue({});
+    render(<TemplateDetailPage template={mockTemplate} />);
+    fireEvent.click(screen.getByText('Save'));
+    await waitFor(() => {
+      const banner = screen.getByTestId('alert-banner');
+      expect(banner).toBeTruthy();
+      expect(banner.getAttribute('data-variant')).toBe('success');
+    });
     mockAssignmentsFn.mockResolvedValue({ assignments: [] });
   });
 });

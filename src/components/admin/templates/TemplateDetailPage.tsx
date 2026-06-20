@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BackLink } from '@/components/ui/back-link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlertBanner } from '@/components/ui/alert-banner';
 import { AlertTriangle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns/format';
 import { useI18n } from '../../../routes/__root';
@@ -187,9 +188,7 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
 
       {/* Success banner */}
       {saveSuccess && (
-        <div className="rounded-md bg-green-50 dark:bg-green-950/20 p-3 text-sm text-green-700 dark:text-green-400">
-          {t('adminTemplates.detail.saveSuccess')}
-        </div>
+        <AlertBanner variant="success" title={t('adminTemplates.detail.saveSuccess')} />
       )}
 
       {/* Error banner */}
@@ -243,7 +242,7 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
           {/* In-use banner */}
           {template.assignmentCount > 0 && (
             <div className="flex items-start gap-2 rounded-md bg-muted p-3 text-sm">
-              <AlertTriangle className="h-4 w-4 mt-0.5 text-amber-500 shrink-0" />
+              <AlertTriangle className="h-4 w-4 mt-0.5 text-warning shrink-0" />
               <span className="text-muted-foreground">
                 {t('adminTemplates.inUseBanner', { count: String(template.assignmentCount) })}
               </span>
