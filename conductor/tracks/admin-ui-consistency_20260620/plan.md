@@ -213,11 +213,11 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): wrap audit log table in Card`
 
-- [ ] Task: Adopt `<TemplateTypeBadge>` in `TemplateCard.tsx` (FR-14.1, B1)
-    - [ ] Write failing test covering: template card uses `TemplateTypeBadge`
-    - [ ] Replace `<Badge variant="secondary">{template.type}</Badge>` with `<TemplateTypeBadge type={template.type} />`
-    - [ ] Verify: test passes; the visual treatment matches instructor AssignmentCard
-    - [ ] Commit: `refactor(admin): adopt TemplateTypeBadge in template card (B1)`
+- [x] Task: Adopt `<TemplateTypeBadge>` in `TemplateCard.tsx` (FR-14.1, B1) — commit `32ca544`
+    - [x] Write failing test covering: template card uses `TemplateTypeBadge`
+    - [x] Replace `<Badge variant="secondary">{template.type}</Badge>` with `<TemplateTypeBadge type={template.type} />`
+    - [x] Verify: test passes; the visual treatment matches instructor AssignmentCard
+    - [x] Commit: `refactor(admin): adopt TemplateTypeBadge in template card (B1)`
 
 - [ ] Task: Adopt `<QuickActionCard>` in `AdminDashboard.tsx` (FR-10.2, FR-12.2)
     - [ ] Write failing test covering: two quick-action cards render (Manage Users, Manage Templates)
