@@ -51,6 +51,7 @@ function TemplatesPage() {
   const data = Route.useLoaderData();
   const templates: TemplateRow[] = data?.templates ?? [];
   const total = data?.total ?? 0;
+  const allTypes: string[] = data?.allTypes ?? [];
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -142,9 +143,6 @@ function TemplatesPage() {
       navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
     }
   };
-
-  // Unique template types for filter dropdown
-  const allTypes = [...new Set(templates.map((t) => t.type))];
 
   return (
     <div className="space-y-6">

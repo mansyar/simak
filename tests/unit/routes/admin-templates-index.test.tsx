@@ -5,13 +5,18 @@ import '@testing-library/jest-dom/vitest';
 // Hoisted mock for router
 const mockRouter = vi.hoisted(() => ({ invalidate: vi.fn() }));
 
+// Hoisted mock for loader data (changeable per test)
+const mockLoaderData = vi.hoisted(() => ({
+  current: { templates: [] as any[], total: 0, allTypes: [] as string[] } as any,
+}));
+
 // Mock @tanstack/react-router
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: vi
     .fn()
     .mockImplementation((_path: string) => (config: Record<string, unknown>) => ({
       ...config,
-      useLoaderData: vi.fn().mockReturnValue({ templates: [], total: 0 }),
+      useLoaderData: vi.fn().mockImplementation(() => mockLoaderData.current),
       useSearch: vi.fn().mockReturnValue({ page: 1, limit: 20, search: '', type: '' }),
       useNavigate: vi.fn().mockReturnValue(vi.fn()),
     })),
@@ -47,7 +52,9 @@ vi.mock('@/components/admin/templates/TemplateCard', () => ({
 }));
 
 vi.mock('@/components/admin/templates/TemplateFilters', () => ({
-  TemplateFilters: () => null,
+  TemplateFilters: (props: any) => (
+    <div data-testid="template-filters" data-types={JSON.stringify(props.types)} />
+  ),
 }));
 
 vi.mock('@/components/ui/pagination', () => ({
@@ -131,5 +138,22 @@ describe('Admin Templates Index Route', () => {
     const Component = await getComponent();
     render(<Component />);
     expect(screen.getByRole('button', { name: /adminTemplates.newTemplate/ })).toBeInTheDocument();
+  });
+
+  it('should pass allTypes from server to TemplateFilters (not computed from templates)', async () => {
+    // Server returns 3 types but only 1 template (with only 1 type)
+    mockLoaderData.current = {
+      templates: [{ type: 'Thesis' }],
+      total: 1,
+      allTypes: ['Thesis', 'Project', 'Dissertation'],
+    };
+    const Component = await getComponent();
+    render(<Component />);
+    const filters = screen.getByTestId('template-filters');
+    const types = JSON.parse(filters.getAttribute('data-types') || '[]');
+    // Should receive all 3 types from server, not just 1 from templates array
+    expect(types).toEqual(['Thesis', 'Project', 'Dissertation']);
+    // Reset
+    mockLoaderData.current = { templates: [], total: 0, allTypes: [] };
   });
 });
