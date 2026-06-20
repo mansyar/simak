@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertTriangle } from 'lucide-react';
 import { AlertBanner } from '@/components/ui/alert-banner';
 import { formatDate } from '@/lib/format-date';
 import { useI18n } from '../../../routes/__root';
