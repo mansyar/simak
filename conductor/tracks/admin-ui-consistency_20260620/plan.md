@@ -310,22 +310,22 @@ Goal: kill the remaining inline-style code, fix the UI-level bugs, dedupe role c
 
 Goal: replace `window.confirm` / `window.alert` with proper `Dialog` / `Sheet`; fix the type-filter server contract; complete i18n adoption.
 
-- [ ] Task: Read track context (spec.md and workflow.md)
-    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
-    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
-    - [ ] Confirm understanding before starting any task in this phase
+- [x] Task: Read track context (spec.md and workflow.md)
+    - [x] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [x] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [x] Confirm understanding before starting any task in this phase
 
-- [ ] Task: Create `<DeleteUserDialog>` in `src/components/admin/users/` (FR-9.1) — fixes B2
-    - [ ] Write failing test covering: dialog shows the user name, requires confirmation
-    - [ ] Implement the dialog mirroring `DeleteTemplateDialog` (no typed-DELETE for users — they're not blocking other users)
-    - [ ] Verify: test passes
-    - [ ] Commit: `feat(admin): add DeleteUserDialog`
+- [x] Task: Create `<DeleteUserDialog>` in `src/components/admin/users/` (FR-9.1) — fixes B2 — commit `d0b3a3d`
+    - [x] Write failing test covering: dialog shows the user name, requires confirmation
+    - [x] Implement the dialog mirroring `DeleteTemplateDialog` (no typed-DELETE for users — they're not blocking other users)
+    - [x] Verify: test passes
+    - [x] Commit: `feat(admin): add DeleteUserDialog`
 
-- [ ] Task: Create `<SetupLinkSheet>` in `src/components/admin/users/` (FR-9.3, FR-26.1, FR-26.2) — fixes B3
-    - [ ] Write failing test covering: the sheet renders the URL, the copy button shows `t('adminUsers.linkCopied')` feedback
-    - [ ] Implement the sheet with a copy-to-clipboard button
-    - [ ] Verify: test passes
-    - [ ] Commit: `feat(admin): add SetupLinkSheet for password setup links (B3)`
+- [x] Task: Create `<SetupLinkSheet>` in `src/components/admin/users/` (FR-9.3, FR-26.1, FR-26.2) — fixes B3 — commit `c8e958c`
+    - [x] Write failing test covering: the sheet renders the URL, the copy button shows `t('adminUsers.linkCopied')` feedback
+    - [x] Implement the sheet with a copy-to-clipboard button
+    - [x] Verify: test passes
+    - [x] Commit: `feat(admin): add SetupLinkSheet for password setup links (B3)`
 
 - [ ] Task: Refactor `users/index.tsx` to use `DeleteUserDialog` and `SetupLinkSheet` (FR-9.1, FR-9.3) — fixes B2, B3, B4
     - [ ] Write failing test covering: delete uses `DeleteUserDialog`; setup-link uses `SetupLinkSheet`; create/update errors are surfaced inline
