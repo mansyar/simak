@@ -13,7 +13,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useI18n } from '../../__root';
-import { RefreshCcw, Search } from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
+import { RefreshButton } from '@/components/ui/refresh-button';
+import { Search } from 'lucide-react';
 import { z } from 'zod';
 
 interface AuditLogEntry {
@@ -135,16 +137,11 @@ function AuditLogPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-4xl">{t('adminAuditLog.title')}</h1>
-          <p className="text-sm text-muted-foreground">{t('adminAuditLog.subtitle')}</p>
-        </div>
-        <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
-          <RefreshCcw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-          {t('common.refresh')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('adminAuditLog.title')}
+        subtitle={t('adminAuditLog.subtitle')}
+        action={<RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />}
+      />
 
       {/* Filters */}
       <div className="flex flex-wrap gap-4">
