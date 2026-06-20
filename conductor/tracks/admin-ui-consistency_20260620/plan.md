@@ -195,12 +195,12 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt Select primitive in audit log filter`
 
-- [ ] Task: Fix `data-slot="select-value"` workaround (FR-7.2)
-    - [ ] Write failing test covering: `Select` renders the selected value without the `data-slot` workaround
-    - [ ] Investigate the `Select` primitive; ensure `SelectValue` renders automatically
-    - [ ] Remove the `<span data-slot="select-value">` workaround in `UserFilters.tsx:39`, `TemplateFilters.tsx:37`, `CreateUserDialog.tsx:96`
-    - [ ] Verify: existing tests pass; the workaround is gone
-    - [ ] Commit: `refactor(ui): fix Select.Value workaround in admin filters`
+- [x] Task: Fix `data-slot="select-value"` workaround (FR-7.2) — commit `f0a1046`
+    - [x] Write failing test covering: `Select` renders the selected value without the `data-slot` workaround
+    - [x] Investigate the `Select` primitive; ensure `SelectValue` renders automatically
+    - [x] Remove the `<span data-slot="select-value">` workaround in `UserFilters.tsx:39`, `TemplateFilters.tsx:37`, `CreateUserDialog.tsx:96`
+    - [x] Verify: existing tests pass; the workaround is gone
+    - [x] Commit: `refactor(ui): fix Select.Value workaround in admin filters`
 
 - [ ] Task: Unify search input padding (FR-8.1)
     - [ ] Change `audit-log.tsx:158` from `pl-8` to `pl-9`
