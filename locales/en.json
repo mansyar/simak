@@ -169,6 +169,7 @@
     "emptyPrompt": "Get started by adding a new user",
     "createPrompt": "Create your first user",
     "deleteConfirm": "Are you sure you want to delete {name}?",
+    "deleteTitle": "Delete User",
     "deleteSuccess": "User deleted successfully",
     "createSuccess": "User created successfully. Invitation email sent.",
     "createSuccessNoEmail": "User created but invitation email failed to send.",

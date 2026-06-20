@@ -169,6 +169,7 @@
     "emptyPrompt": "Mulai dengan menambahkan pengguna baru",
     "createPrompt": "Buat pengguna pertama Anda",
     "deleteConfirm": "Apakah Anda yakin ingin menghapus {name}?",
+    "deleteTitle": "Hapus Pengguna",
     "deleteSuccess": "Pengguna berhasil dihapus",
     "createSuccess": "Pengguna berhasil dibuat. Email undangan terkirim.",
     "createSuccessNoEmail": "Pengguna berhasil dibuat tetapi email undangan gagal dikirim.",

@@ -174,6 +174,7 @@ export type Translation = {
     emptyPrompt: string
     createPrompt: string
     deleteConfirm: string
+    deleteTitle: string
     deleteSuccess: string
     createSuccess: string
     createSuccessNoEmail: string
