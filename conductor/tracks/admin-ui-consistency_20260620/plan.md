@@ -287,11 +287,11 @@ Goal: kill the remaining inline-style code, fix the UI-level bugs, dedupe role c
     - [x] Verify: test passes; a11y lint passes
     - [x] Commit: `a11y(admin): use Label primitive in template detail metadata`
 
-- [ ] Task: Replace raw move buttons in `CheckpointListEditor.tsx` (FR-20.1)
-    - [ ] Write failing test covering: move-up / move-down use `Button` variant ghost size icon-xs
-    - [ ] Replace raw `<button>` elements (lines 63-80)
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): use Button primitive for checkpoint move buttons`
+- [x] Task: Replace raw move buttons in `CheckpointListEditor.tsx` (FR-20.1) — commit `d1b3d08`
+    - [x] Write failing test covering: move-up / move-down use `Button` variant ghost size icon-xs
+    - [x] Replace raw `<button>` elements (lines 63-80)
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): use Button primitive for checkpoint move buttons`
 
 - [ ] Task: Use `<Label>` for typed-DELETE input in `DeleteTemplateDialog.tsx` (FR-29.1)
     - [ ] Write failing test covering: the input has an accessible label
