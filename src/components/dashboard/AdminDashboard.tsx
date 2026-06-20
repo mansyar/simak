@@ -1,5 +1,4 @@
 import { useI18n } from '../../routes/__root';
-import { Link } from '@tanstack/react-router';
 import {
   Users,
   ClipboardList,
@@ -19,6 +18,7 @@ import { MetricCard } from '@/components/ui/metric-card';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { StatusDot } from '@/components/ui/status-dot';
+import { QuickActionCard } from '@/components/ui/quick-action-card';
 
 interface SystemMetrics {
   totalUsers: number;
@@ -269,38 +269,20 @@ export function AdminDashboard({ data }: Props) {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-3">
-              <Link
-                to={'/admin/users' as never}
-                className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-md"
-              >
-                <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
-                  <UserPlus className="size-[18px]" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">
-                    {t('adminDashboard.manageUsers')}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {t('adminDashboard.manageUsersDesc')}
-                  </p>
-                </div>
-              </Link>
-              <Link
-                to={'/admin/templates' as never}
-                className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-md"
-              >
-                <div className="flex size-9 items-center justify-center rounded-md bg-success/10 text-success">
-                  <FileType className="size-[18px]" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">
-                    {t('adminDashboard.manageTemplates')}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {t('adminDashboard.manageTemplatesDesc')}
-                  </p>
-                </div>
-              </Link>
+              <QuickActionCard
+                to="/admin/users"
+                label={t('adminDashboard.manageUsers')}
+                description={t('adminDashboard.manageUsersDesc')}
+                icon={UserPlus}
+                color="primary"
+              />
+              <QuickActionCard
+                to="/admin/templates"
+                label={t('adminDashboard.manageTemplates')}
+                description={t('adminDashboard.manageTemplatesDesc')}
+                icon={FileType}
+                color="success"
+              />
             </div>
           </CardContent>
         </Card>

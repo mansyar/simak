@@ -1,6 +1,7 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
 
 vi.mock('@tanstack/react-router', async () => {
   const actual = await vi.importActual('@tanstack/react-router');
@@ -20,6 +21,15 @@ vi.mock('../../../src/routes/__root', () => ({
     locale: 'en' as const,
     setLocale: vi.fn(),
   }),
+}));
+
+vi.mock('@/components/ui/quick-action-card', () => ({
+  QuickActionCard: ({ to, label, description, color }: any) => (
+    <a data-testid="quick-action-card" href={to} data-color={color}>
+      <span>{label}</span>
+      <span>{description}</span>
+    </a>
+  ),
 }));
 
 const emptyData = {
@@ -164,5 +174,14 @@ describe('AdminDashboard component', () => {
     const { container } = render(<AdminDashboard data={emptyData} />);
     const fontDisplayEls = container.querySelectorAll('.font-display');
     expect(fontDisplayEls.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it('should use QuickActionCard for quick actions (Manage Users + Manage Templates)', async () => {
+    const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+    render(<AdminDashboard data={emptyData} />);
+    const cards = screen.getAllByTestId('quick-action-card');
+    expect(cards.length).toBe(2);
+    expect(cards[0]).toHaveAttribute('href', '/admin/users');
+    expect(cards[1]).toHaveAttribute('href', '/admin/templates');
   });
 });

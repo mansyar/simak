@@ -1,16 +1,30 @@
 import { Link } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
-import type { LucideIcon } from 'lucide-react';
 
 interface QuickActionCardProps {
-  icon: LucideIcon;
+  to: string;
   label: string;
   description: string;
-  to: string;
+  icon: React.ElementType;
+  color?: 'primary' | 'success' | 'warning' | 'destructive';
   className?: string;
 }
 
-function QuickActionCard({ icon: Icon, label, description, to, className }: QuickActionCardProps) {
+const colorClasses = {
+  primary: 'bg-primary/10 text-primary',
+  success: 'bg-success/10 text-success',
+  warning: 'bg-warning/10 text-warning',
+  destructive: 'bg-destructive/10 text-destructive',
+} as const;
+
+function QuickActionCard({
+  to,
+  label,
+  description,
+  icon: Icon,
+  color = 'primary',
+  className,
+}: QuickActionCardProps) {
   return (
     <Link
       to={to as never}
@@ -19,7 +33,12 @@ function QuickActionCard({ icon: Icon, label, description, to, className }: Quic
         className,
       )}
     >
-      <div className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
+      <div
+        className={cn(
+          'flex size-9 items-center justify-center rounded-md',
+          colorClasses[color],
+        )}
+      >
         <Icon className="size-[18px]" />
       </div>
       <div>
