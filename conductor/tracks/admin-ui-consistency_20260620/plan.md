@@ -166,16 +166,16 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
 
 Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, design tokens).
 
-- [ ] Task: Read track context (spec.md and workflow.md)
-    - [ ] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
-    - [ ] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
-    - [ ] Confirm understanding before starting any task in this phase
+- [x] Task: Read track context (spec.md and workflow.md)
+    - [x] Read `conductor/tracks/admin-ui-consistency_20260620/spec.md` to confirm scope and acceptance criteria
+    - [x] Read `conductor/workflow.md` to confirm TDD protocol, commit format, and phase-completion checkpoint procedure
+    - [x] Confirm understanding before starting any task in this phase
 
-- [ ] Task: Extend `<Pagination>` primitive with `showPageNumbers` and `showCounter` props (FR-6.1)
-    - [ ] Write failing test covering: default (prev/next only), `showPageNumbers` (up to 5), `showCounter` ("Page X of Y")
-    - [ ] Extend the existing component
-    - [ ] Verify: existing tests still pass
-    - [ ] Commit: `feat(ui): extend Pagination with page numbers and counter`
+- [x] Task: Extend `<Pagination>` primitive with `showPageNumbers` and `showCounter` props (FR-6.1) — commit `04e7ff9`
+    - [x] Write failing test covering: default (prev/next only), `showPageNumbers` (up to 5), `showCounter` ("Page X of Y")
+    - [x] Extend the existing component
+    - [x] Verify: existing tests still pass
+    - [x] Commit: `feat(ui): extend Pagination with page numbers and counter`
 
 - [ ] Task: Adopt extended `<Pagination>` in `admin/users/index.tsx` (FR-6.2, FR-6.3)
     - [ ] Write failing test covering: prev/next buttons use `common.back` / `common.next`; "Showing X of Y" counter
