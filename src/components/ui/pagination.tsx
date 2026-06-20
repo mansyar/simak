@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useI18n } from '@/routes/__root';
-import { cn } from '@/lib/utils';
 
 interface PaginationProps {
   currentPage: number;
@@ -41,11 +40,7 @@ export function Pagination({
 
   return (
     <div className="flex items-center justify-between py-4">
-      {showCounter ? (
-        <p className="text-sm text-muted-foreground">{counterText}</p>
-      ) : (
-        <div />
-      )}
+      {showCounter ? <p className="text-sm text-muted-foreground">{counterText}</p> : <div />}
       <div className="flex items-center gap-1">
         <Button
           variant="outline"
