@@ -101,11 +101,11 @@ Goal: the highest-leverage UX changes — every admin page uses the shared heade
     - [x] Verify: test passes; no `setTimeout` in the file
     - [x] Commit: `refactor(admin): adopt PageHeader and RefreshButton on audit log`
 
-- [ ] Task: Adopt `<PageHeader>` + `<RefreshButton>` in `admin/users/index.tsx` (FR-1.1, FR-2.1, FR-2.2, FR-2.3) — fixes B5
-    - [ ] Write failing test covering: page title, subtitle, refresh button uses `router.invalidate` not `setTimeout`
-    - [ ] Replace inline header with `<PageHeader>`; replace inline refresh with `<RefreshButton>` (and fix the fake delay)
-    - [ ] Verify: test passes; no `setTimeout` in the file
-    - [ ] Commit: `refactor(admin): adopt PageHeader and RefreshButton on users list (B5)`
+- [x] Task: Adopt `<PageHeader>` + `<RefreshButton>` in `admin/users/index.tsx` (FR-1.1, FR-2.1, FR-2.2, FR-2.3) — fixes B5 [eaa855a]
+    - [x] Write failing test covering: page title, subtitle, refresh button uses `router.invalidate` not `setTimeout`
+    - [x] Replace inline header with `<PageHeader>`; replace inline refresh with `<RefreshButton>` (and fix the fake delay)
+    - [x] Verify: test passes; no `setTimeout` in the file
+    - [x] Commit: `refactor(admin): adopt PageHeader and RefreshButton on users list (B5)`
 
 - [ ] Task: Adopt `<PageHeader>` + `<RefreshButton>` in `admin/templates/index.tsx` (FR-1.1, FR-2.1, FR-2.2, FR-2.3) — fixes B5
     - [ ] Write failing test covering: page title, subtitle, refresh uses `router.invalidate`
