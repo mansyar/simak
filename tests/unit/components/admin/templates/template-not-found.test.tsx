@@ -16,9 +16,7 @@ vi.mock('@/components/ui/back-link', () => ({
 
 describe('TemplateNotFound', () => {
   it('should render the not-found message', async () => {
-    const { TemplateNotFound } = await import(
-      '@/components/admin/templates/TemplateNotFound'
-    );
+    const { TemplateNotFound } = await import('@/components/admin/templates/TemplateNotFound');
     render(<TemplateNotFound />);
 
     expect(screen.getByText('error.notFound')).toBeInTheDocument();
@@ -26,9 +24,7 @@ describe('TemplateNotFound', () => {
   });
 
   it('should render BackLink primitive pointing to /admin/templates with search params', async () => {
-    const { TemplateNotFound } = await import(
-      '@/components/admin/templates/TemplateNotFound'
-    );
+    const { TemplateNotFound } = await import('@/components/admin/templates/TemplateNotFound');
     render(<TemplateNotFound />);
 
     const backLink = screen.getByTestId('back-link');
@@ -38,5 +34,18 @@ describe('TemplateNotFound', () => {
     expect(backLink.getAttribute('data-search')).toBe(
       JSON.stringify({ page: 1, limit: 20, search: '', type: '' }),
     );
+  });
+
+  it('should use EmptyState primitive with h3 title and border-dashed container', async () => {
+    const { TemplateNotFound } = await import('@/components/admin/templates/TemplateNotFound');
+    const { container } = render(<TemplateNotFound />);
+
+    // EmptyState uses h3, not h2
+    const heading = screen.getByRole('heading', { level: 3 });
+    expect(heading.textContent).toBe('error.notFound');
+
+    // EmptyState container has border-dashed
+    const dashedContainer = container.querySelector('.border-dashed');
+    expect(dashedContainer).toBeTruthy();
   });
 });
