@@ -159,7 +159,7 @@ function AuditLogPage() {
               placeholder={t('adminAuditLog.searchPlaceholder')}
               value={searchParams.search}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-8"
+              className="pl-9"
             />
           </div>
         </div>
