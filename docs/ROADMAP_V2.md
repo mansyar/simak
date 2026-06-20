@@ -852,6 +852,48 @@ Settings hub, notification preferences, and file preview optimization — increm
 
 ---
 
+### Track 6.6 — UI Consistency for Admin-Facing UI
+
+**Description:** Refactor pass on the admin surface to adopt shared UI primitives (`PageHeader`, `RefreshButton`, `BackLink`, `Skeleton`, `EmptyState`, `Pagination`, `Select`, `Card`), extract new primitives (`AlertBanner`, `QuickActionCard`, `EmailQueueStat`, `ListRow`), fix 12 audit-identified bugs (native dialog replacement, type-filter missing types, setup-link security, hardcoded colors, i18n gaps), unify role config and audit-event colors, and close the `createServerFn` type-gap with `.inputValidator()` across admin server functions. The audit identified 31 findings + 12 bugs. This track is a refactor — no new product features, no business-logic changes. Scope is the admin surface only (`src/routes/_authenticated/admin/**`, `src/components/admin/**`, `src/components/dashboard/AdminDashboard.tsx`, and new shared primitives under `src/components/ui/` + `src/lib/`).
+
+**Dependencies:** Track 6.0 (UI Redesign — design tokens and shared components). Track 6.4 (Student-Facing UI Consistency — established the pattern). Track 6.5 (Instructor-Facing UI Consistency — `.inputValidator()` pattern, `formatDate` helper, `TemplateTypeBadge`).
+
+**Status:** ✅ Complete (June 2026)
+
+**Estimated Scope:**
+
+| Area                                                                                                          | Effort |
+| ------------------------------------------------------------------------------------------------------------- | ------ |
+| Foundational primitives — `AlertBanner`, `QuickActionCard`, `EmailQueueStat`, `ListRow`, `ROLES` config, `audit-actions` module, `formatDate` helper | Medium |
+| Bug fixes — native dialog replacement (`DeleteUserDialog`, `SetupLinkSheet`), type-filter full type list, i18n gaps, hardcoded colors | Small  |
+| Surface migration — 5 pages to `<PageHeader>`, 3 sites to `<RefreshButton>`, 2 to `<BackLink>`, 3 to `<Skeleton>`, 2 to `<EmptyState>`, 2 to `<Pagination>`, 1 to `<Select>`, 1 to `<Card>`, 1 to `<TemplateTypeBadge>`, 2 to `<QuickActionCard>`, 3 to `<EmailQueueStat>` | Large  |
+| Design system cleanup — `text-amber-500` → `text-warning`; `bg-error text-white` → `bg-error text-foreground`; `bg-muted animate-pulse` → `<Skeleton>`; `data-slot="select-value"` workaround removed | Medium |
+| Structural cleanups — split 356-line `TemplateDetailPage` into thin route + 4 subcomponents; dedupe `ROLES` config; unify `getActionVisualProps` + `ACTION_TYPES` source-of-truth | Large  |
+| Systemic type fix — apply `.inputValidator(Schema)` to admin server functions; remove `// @ts-expect-error` from all admin routes; remove ad-hoc `as` result-shape casts | Large (gated) |
+
+**Acceptance Criteria:**
+
+- [x] All 5 admin pages render headers via `<PageHeader>` at `text-3xl` scale
+- [x] All refresh buttons use `<RefreshButton>` with `router.invalidate()` (no `setTimeout` fake delays)
+- [x] `TemplateDetailPage` and `TemplateNotFound` use `<BackLink>`; all skeletons use `<Skeleton>`; all empty states use `<EmptyState>`
+- [x] `admin/audit-log.tsx` action filter uses `<Select>` (not raw `<select>`); `data-slot="select-value"` workaround removed from 3 admin filter components
+- [x] `admin/users/index.tsx` delete uses `<DeleteUserDialog>` (not `window.confirm`); setup-link uses `<SetupLinkSheet>` (not `window.alert`); errors are inline
+- [x] `listTemplates` server function returns `allTypes` (full distinct type list); type filter shows all types, not just current-page types
+- [x] All hardcoded colors replaced with design tokens; `bg-muted animate-pulse` eliminated from admin surface
+- [x] `ROLES` config module deduplicates role labels/variants across `UserTable`, `UserFilters`, `CreateUserDialog`; no `as TranslationKey` casts remain
+- [x] `ACTION_TYPES` centralized in `src/lib/admin/audit-actions.ts`; `getActionVisualProps` unifies dashboard + audit-log colors
+- [x] `formatDate` helper used consistently across all admin date displays
+- [x] `TemplateDetailPage.tsx` split to 201 lines (under 500-line limit); 4 subcomponents extracted
+- [x] `createServerFn` stubs use `.inputValidator()`; all `// @ts-expect-error` removed from admin routes; ad-hoc `as` result-shape casts removed
+- [x] a11y gaps closed: `aria-label` on refresh buttons, `Label` on typed-DELETE input, `htmlFor` on metadata labels, `aria-hidden` on decorative icons, `aria-expanded`/`aria-controls` on audit-log view/hide, `role="columnheader"` on checkpoint editor headers
+- [x] Escalation alert items wrapped in `<Card>` (review fix)
+- [x] All existing tests pass (2070/2070); coverage thresholds met (85.48% lines, 81.62% functions, 80.99% branches, 86.19% statements)
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm vitest run --coverage` all pass
+- [x] Review fixes applied: escalation alert items wrapped in `<Card>` (FR-10.4), `as *Result` type assertions removed from `templates/index.tsx` (FR-24.3), `[] as string[]` assertion removed from `templates.server.ts`
+- Reference: track plan `conductor/archive/admin-ui-consistency_20260620/plan.md`
+
+---
+
 ## Phase 7: Testing Infrastructure
 
 Integration tests against a real PostgreSQL database, deferred from V1.
@@ -1016,11 +1058,12 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 8. ✅ Track 6.1 — Settings Hub (Complete)
 9. ✅ Track 6.4 — UI Consistency for Student-Facing UI (Complete)
 10. ✅ Track 6.5 — UI Consistency for Instructor-Facing UI (Complete)
-11. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
-12. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-13. [ ] Write failing tests
-14. [ ] Implement features
-15. [ ] Verify & archive
+11. ✅ Track 6.6 — UI Consistency for Admin-Facing UI (Complete)
+12. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
+13. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+14. [ ] Write failing tests
+15. [ ] Implement features
+16. [ ] Verify & archive
 
 ---
 

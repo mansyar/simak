@@ -865,7 +865,7 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 | **Feedback**     | Alert, Progress, Dialog, Popover, Toast, Sheet            |
 | **Charts**       | Recharts-based components                                 |
 | **Overlay**      | Dialog, Sheet, Dropdown Menu                              |
-| **Custom**       | MetricCard, EmptyState, LanguageToggle (project-specific) |
+| **Custom**       | MetricCard, EmptyState, LanguageToggle, AlertBanner, QuickActionCard, EmailQueueStat, ListRow, PageHeader, BackLink, RefreshButton, Skeleton, Pagination, CountBadge, TemplateTypeBadge, StatusDot (project-specific) |
 
 ### Theme
 
