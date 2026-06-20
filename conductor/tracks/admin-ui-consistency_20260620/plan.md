@@ -225,11 +225,11 @@ Goal: the remaining UX adoptions and the visual-style fixes (Card wrapping, desi
     - [x] Verify: test passes
     - [x] Commit: `refactor(admin): adopt QuickActionCard in dashboard`
 
-- [ ] Task: Adopt `<EmailQueueStat>` in `AdminDashboard.tsx` (FR-10.3, FR-13.2)
-    - [ ] Write failing test covering: 3 email-queue stats (pending, sent, failed)
-    - [ ] Replace the 3 hand-rolled bubble blocks
-    - [ ] Verify: test passes
-    - [ ] Commit: `refactor(admin): adopt EmailQueueStat in dashboard`
+- [x] Task: Adopt `<EmailQueueStat>` in `AdminDashboard.tsx` (FR-10.3, FR-13.2) — commit `4883c84`
+    - [x] Write failing test covering: 3 email-queue stats (pending, sent, failed)
+    - [x] Replace the 3 hand-rolled bubble blocks
+    - [x] Verify: test passes
+    - [x] Commit: `refactor(admin): adopt EmailQueueStat in dashboard`
 
 - [ ] Task: Replace hardcoded colors in `TemplateDetailPage.tsx` (FR-23.1, FR-23.2)
     - [ ] Replace `text-amber-500` AlertTriangle with `text-warning` (line 247)
