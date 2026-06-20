@@ -412,10 +412,10 @@ Goal: the deep structural refactor; the type-system cleanup; the final accessibi
     - [x] Verify: `pnpm typecheck` passes with no `// @ts-expect-error` in admin routes
     - [x] Commit: `refactor(server): fix createServerFn type inference and remove @ts-expect-error from admin routes`
 
-- [ ] Task: Remove ad-hoc `as { ... }` result-shape casts (FR-24.3)
-    - [ ] `admin/templates/index.tsx` (lines 112, 121-123, 132) and `TemplateDetailPage.tsx` (lines 71, 144, 166) — replace with proper types
-    - [ ] Verify: `pnpm typecheck` passes
-    - [ ] Commit: `refactor(admin): remove ad-hoc result-shape casts`
+- [x] Task: Remove ad-hoc `as { ... }` result-shape casts (FR-24.3) — commit `c930787`
+    - [x] `admin/templates/index.tsx` (lines 112, 121-123, 132) and `TemplateDetailPage.tsx` (lines 71, 144, 166) — replace with proper types
+    - [x] Verify: `pnpm typecheck` passes
+    - [x] Commit: `refactor(admin): remove ad-hoc result-shape casts`
 
 - [ ] Task: Accessibility polish (FR-29.1 through FR-29.5) — completes A1–A6
     - [ ] A1: Refresh buttons in users/templates pages get `aria-label` (subsumed by `<RefreshButton>` adoption in Phase 2)
