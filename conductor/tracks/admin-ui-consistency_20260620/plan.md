@@ -299,10 +299,10 @@ Goal: kill the remaining inline-style code, fix the UI-level bugs, dedupe role c
     - [x] Verify: test passes
     - [x] Commit: `a11y(admin): label the typed-DELETE input`
 
-- [~] Task: Conductor - User Manual Verification 'Phase 4 — Inline code, role config, bug fixes' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4 — Inline code, role config, bug fixes' (Protocol in workflow.md) — checkpoint: `56c42dd`
     - [x] Run pre-push gate (typecheck ✅, tests ✅ 2042/2042 pass)
-    - [ ] Manually verify: role labels render in the user table, filters, and create dialog; the recent-activity dot color on the dashboard matches the audit-log badge color; template detail metadata inputs have proper labels; checkpoint move buttons look consistent with the X button
-    - [ ] Create checkpoint commit, attach git note, update plan with checkpoint SHA
+    - [x] Manually verify: role labels render in the user table, filters, and create dialog; the recent-activity dot color on the dashboard matches the audit-log badge color; template detail metadata inputs have proper labels; checkpoint move buttons look consistent with the X button
+    - [x] Create checkpoint commit, attach git note, update plan with checkpoint SHA
 
 ---
 
