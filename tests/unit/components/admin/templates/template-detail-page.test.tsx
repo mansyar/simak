@@ -86,6 +86,14 @@ vi.mock('@/components/ui/button', () => ({
   ),
 }));
 
+vi.mock('@/components/ui/back-link', () => ({
+  BackLink: ({ to, label, search }: any) => (
+    <a href={to as string} data-testid="back-link" data-search={JSON.stringify(search)}>
+      {label}
+    </a>
+  ),
+}));
+
 vi.mock('lucide-react', () => ({
   AlertTriangle: () => <span data-testid="icon-alert" />,
   ArrowLeft: () => <span data-testid="icon-arrow-left" />,
@@ -206,6 +214,17 @@ describe('TemplateDetailPage', () => {
   it('should render back link', () => {
     render(<TemplateDetailPage template={mockTemplate} />);
     expect(screen.getByText('Back to Templates')).toBeTruthy();
+  });
+
+  it('should render BackLink primitive pointing to /admin/templates with search params', () => {
+    render(<TemplateDetailPage template={mockTemplate} />);
+    const backLink = screen.getByTestId('back-link');
+    expect(backLink).toBeTruthy();
+    expect(backLink.getAttribute('href')).toBe('/admin/templates');
+    expect(backLink.textContent).toBe('Back to Templates');
+    expect(backLink.getAttribute('data-search')).toBe(
+      JSON.stringify({ page: 1, limit: 20, search: '', type: '' }),
+    );
   });
 
   it('should render null when template is null', () => {

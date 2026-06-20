@@ -7,7 +7,8 @@ import { DeleteTemplateDialog } from './DeleteTemplateDialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { AlertTriangle, ArrowLeft, Trash2 } from 'lucide-react';
+import { BackLink } from '@/components/ui/back-link';
+import { AlertTriangle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns/format';
 import { useI18n } from '../../../routes/__root';
 
@@ -177,14 +178,11 @@ export function TemplateDetailPage({ template }: { template: TemplateData | null
   return (
     <div className="space-y-6">
       {/* Back navigation */}
-      <Link
+      <BackLink
         to="/admin/templates"
+        label={t('adminTemplates.detail.back')}
         search={{ page: 1, limit: 20, search: '', type: '' }}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        {t('adminTemplates.detail.back')}
-      </Link>
+      />
 
       {/* Success banner */}
       {saveSuccess && (
