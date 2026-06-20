@@ -335,11 +335,11 @@ Goal: replace `window.confirm` / `window.alert` with proper `Dialog` / `Sheet`; 
     - [x] Verify: tests pass; no `window.confirm` / `window.alert` in the file
     - [x] Commit: `refactor(admin): replace native dialogs in users page (B2, B3, B4)`
 
-- [ ] Task: Update `listTemplates` server function to return all types (FR-27.1) — fixes B6
-    - [ ] Write failing test (in `tests/unit/server/templates.test.ts`) covering: server returns `{ templates, total, allTypes }`
-    - [ ] Modify the server function to return the full distinct type list
-    - [ ] Verify: test passes
-    - [ ] Commit: `fix(server): listTemplates returns full type list (B6)`
+- [x] Task: Update `listTemplates` server function to return all types (FR-27.1) — fixes B6 — commit `ba2ba29`
+    - [x] Write failing test (in `tests/unit/server/templates.test.ts`) covering: server returns `{ templates, total, allTypes }`
+    - [x] Modify the server function to return the full distinct type list
+    - [x] Verify: test passes
+    - [x] Commit: `fix(server): listTemplates returns full type list (B6)`
 
 - [ ] Task: Adopt the type list in `admin/templates/index.tsx` (FR-27.2, FR-27.3)
     - [ ] Write failing test covering: the route loader returns the full type list; `TemplateFilters` shows all types
