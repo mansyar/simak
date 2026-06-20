@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getAdminDashboardData } from '@/server/dashboard';
 import { useI18n } from '../../__root';
 import { AdminDashboard, type AdminDashboardData } from '@/components/dashboard/AdminDashboard';
+import { PageHeader } from '@/components/ui/page-header';
 
 export const Route = createFileRoute('/_authenticated/admin/dashboard')({
   loader: async () => {
@@ -16,12 +17,7 @@ function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-4xl font-bold tracking-tight text-foreground">
-          {t('adminDashboard.title')}
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">{t('adminDashboard.subtitle')}</p>
-      </div>
+      <PageHeader title={t('adminDashboard.title')} subtitle={t('adminDashboard.subtitle')} />
       <AdminDashboard data={data} />
     </div>
   );
