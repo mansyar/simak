@@ -1,6 +1,6 @@
-import { execSync } from 'node:child_process';
 import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { sql } from 'drizzle-orm';
 
 export const ADVISORY_LOCK_ID = 789123;
@@ -22,8 +22,8 @@ export async function runMigrations() {
   await db.execute(sql`SELECT pg_advisory_lock(${sql.raw(String(ADVISORY_LOCK_ID))})`);
 
   try {
-    console.log('Running migrations via drizzle-kit...');
-    execSync('npx drizzle-kit migrate', { stdio: 'inherit' });
+    console.log('Running migrations...');
+    await migrate(db, { migrationsFolder: './drizzle/migrations' });
     console.log('Migrations complete.');
   } finally {
     console.log('Releasing advisory lock...');
