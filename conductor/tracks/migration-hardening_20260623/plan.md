@@ -76,8 +76,8 @@
     - [ ] Run `pnpm build` and confirm `.output/server/migrate.mjs` is produced
     - [ ] Confirm `migrate.mjs` does not contain `execSync` or `npx` references
 
-- [ ] Task: Run typecheck
-    - [ ] Run `pnpm typecheck` and confirm no errors
+- [x] Task: Run typecheck
+    - [x] Run `pnpm typecheck` and confirm no errors
 
 - [ ] Task: Run full test suite with coverage
     - [ ] Run `CI=true pnpm vitest run --coverage` and confirm all tests pass
