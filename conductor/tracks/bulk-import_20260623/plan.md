@@ -31,17 +31,17 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 ## Phase 3: Client-Side Parsing, Validation & Sample Generation (Tests) [checkpoint: 6d7379a]
 
-- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
-- [ ] Task: User .xlsx parser + validator — TDD
-    - [ ] Write failing tests in `tests/unit/lib/parse-users-xlsx.test.ts` covering: header validation (exact `name|email|role`), trim whitespace, lowercase email/role, per-row validation statuses, row-limit enforcement, empty-sheet handling
-    - [ ] Implement `parseUsersXlsx(file)` + `validateUserRow(row, actorRole)` in `src/lib/bulk-import/parse-users.ts`
-- [ ] Task: Template .xlsx parser/grouper + validator — TDD
-    - [ ] Write failing tests in `tests/unit/lib/parse-templates-xlsx.test.ts` covering: header validation, group-by-`templateName`, type-consistency within group, checkpoint name non-empty, `minConsultations` default 0 / `estimatedDuration` default 7, numeric validation, per-group validity status, row-limit
-    - [ ] Implement `parseTemplatesXlsx(file)` + `groupByTemplate(rows)` + `validateTemplateGroup(group)` in `src/lib/bulk-import/parse-templates.ts`
-- [ ] Task: Sample-file generators — TDD
-    - [ ] Write failing tests in `tests/unit/lib/sample-generators.test.ts` covering: user sample has headers + 1 example row; template sample has headers + example checkpoint rows; output is a valid .xlsx blob
-    - [ ] Implement `generateUserSampleXlsx()` + `generateTemplateSampleXlsx()` in `src/lib/bulk-import/samples.ts` (SheetJS `write` → Blob; no server round-trip)
-- [ ] Task: Conductor - User Manual Verification 'Client-Side Parsing, Validation & Sample Generation' (Protocol in workflow.md)
+- [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
+- [~] Task: User .xlsx parser + validator — TDD
+    - [x] Write failing tests in `tests/unit/lib/parse-users-xlsx.test.ts` covering: header validation (exact `name|email|role`), trim whitespace, lowercase email/role, per-row validation statuses, row-limit enforcement, empty-sheet handling
+    - [x] Implement `parseUsersXlsx(file)` + `validateUserRow(row, actorRole)` in `src/lib/bulk-import/parse-users.ts`
+- [x] Task: Template .xlsx parser/grouper + validator — TDD
+    - [x] Write failing tests in `tests/unit/lib/parse-templates-xlsx.test.ts` covering: header validation, group-by-`templateName`, type-consistency within group, checkpoint name non-empty, `minConsultations` default 0 / `estimatedDuration` default 7, numeric validation, per-group validity status, row-limit
+    - [x] Implement `parseTemplatesXlsx(file)` + `groupByTemplate(rows)` + `validateTemplateGroup(group)` in `src/lib/bulk-import/parse-templates.ts`
+- [~] Task: Sample-file generators — TDD
+    - [x] Write failing tests in `tests/unit/lib/sample-generators.test.ts` covering: user sample has headers + 1 example row; template sample has headers + example checkpoint rows; output is a valid .xlsx blob
+    - [x] Implement `generateUserSampleXlsx()` + `generateTemplateSampleXlsx()` in `src/lib/bulk-import/samples.ts` (SheetJS `write` → Blob; no server round-trip)
+- [~] Task: Conductor - User Manual Verification 'Client-Side Parsing, Validation & Sample Generation' (Protocol in workflow.md)
 
 ## Phase 4: Bulk User Import UI
 
