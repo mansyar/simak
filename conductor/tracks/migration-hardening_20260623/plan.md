@@ -43,9 +43,9 @@
 
 ## Phase 2: Update Dockerfile
 
-- [ ] Task: Read spec.md and workflow.md before starting this phase
-    - [ ] Review the spec's functional requirements (FR2, FR3) and NFR1, NFR2
-    - [ ] Review the workflow's Phase Completion Verification protocol
+- [x] Task: Read spec.md and workflow.md before starting this phase
+    - [x] Review the spec's functional requirements (FR2, FR3) and NFR1, NFR2
+    - [x] Review the workflow's Phase Completion Verification protocol
 
 - [ ] Task: Update Dockerfile CMD to use migrate.mjs
     - [ ] Change CMD from `["sh", "-c", "drizzle-kit migrate && node .output/server/index.mjs"]` to `["sh", "-c", "node .output/server/migrate.mjs && node .output/server/index.mjs"]`
