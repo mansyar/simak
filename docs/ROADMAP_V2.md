@@ -1059,11 +1059,12 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 9. ✅ Track 6.4 — UI Consistency for Student-Facing UI (Complete)
 10. ✅ Track 6.5 — UI Consistency for Instructor-Facing UI (Complete)
 11. ✅ Track 6.6 — UI Consistency for Admin-Facing UI (Complete)
-12. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
-13. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-14. [ ] Write failing tests
-15. [ ] Implement features
-16. [ ] Verify & archive
+12. ✅ Production Migration Hardening — Dockerfile executes bundled `migrate.mjs` (advisory-locked, PgBouncer bypass via `MIGRATE_DATABASE_URL`); `drizzle-kit` removed from production image (Complete)
+13. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
+14. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+15. [ ] Write failing tests
+16. [ ] Implement features
+17. [ ] Verify & archive
 
 ---
 
