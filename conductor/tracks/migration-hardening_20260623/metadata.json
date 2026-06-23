@@ -1,0 +1,8 @@
+{
+  "track_id": "migration-hardening_20260623",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-06-23T16:21:26Z",
+  "updated_at": "2026-06-23T16:21:26Z",
+  "description": "Rewire the production migration path so the Dockerfile executes the tested, advisory-locked migrate.mjs bundle instead of the raw drizzle-kit migrate CLI — replacing the execSync('npx drizzle-kit migrate') shell-out with Drizzle's programmatic migrate() API so the bundle is fully self-contained and no longer needs drizzle-kit or npx at runtime, then stripping the global drizzle-kit install and drizzle.config.ts copy from the runner stage to shrink the image, wiring MIGRATE_DATABASE_URL through drizzle.config.ts for dev parity, and updating the unit tests to match the programmatic migrator instead of the execSync mock — all targeting a Coolify auto-deploy-on-push model where the advisory lock is the sole concurrency guard during rolling deploys and no CI pipeline exists."
+}
