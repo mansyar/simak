@@ -1,3 +1,5 @@
+<protect>
+
 # Track: Bulk Import for Users & Templates
 
 ## Overview
@@ -74,3 +76,5 @@ Each import follows the same lifecycle: **Upload .xlsx → client-side parse + v
 - Bulk assignment creation (only users and templates).
 - A single combined workbook importing users + templates together (two separate imports).
 - Email content customization for bulk-created users (uses existing invitation template).
+
+</protect>

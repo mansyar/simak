@@ -1,9 +1,12 @@
+<protect>
+
 # Implementation Plan: Bulk Import for Users & Templates
 
 Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → Implement → Verify coverage) for each task. Each phase ends with the Phase Completion Verification & Checkpointing Protocol.
 
 ## Phase 1: Foundation — Tech Stack & Dependency Setup
 
+- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [ ] Task: Document SheetJS dependency in `conductor/tech-stack.md`
     - [ ] Add SheetJS (`xlsx`) row to the Frontend table (purpose: client-side .xlsx parsing + sample-file generation) with a dated note, per workflow rule "tech-stack changes documented before implementation"
 - [ ] Task: Install SheetJS dependency
@@ -13,6 +16,7 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 ## Phase 2: Bulk-Import Server Functions (Schemas + Handlers + Tests)
 
+- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [ ] Task: Bulk user import handler — TDD
     - [ ] Write failing tests in `tests/unit/server/bulk-import-users.test.ts` covering: all-valid success, partial-failure (invalid rows skipped), email uniqueness (excluding soft-deleted), role-permission rules (Admin cannot create `admin`; `superadmin` never creatable), row-limit (>500 rejected), invitation email enqueue via existing queue, audit log `user.bulk_created` written, session/role verified
     - [ ] Implement `BulkUserRowSchema` + `BulkCreateUsersSchema` (Zod) and `bulkCreateUsers` server-fn stub in `src/server/bulk-import.ts`
@@ -27,6 +31,7 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 ## Phase 3: Client-Side Parsing, Validation & Sample Generation (Tests)
 
+- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [ ] Task: User .xlsx parser + validator — TDD
     - [ ] Write failing tests in `tests/unit/lib/parse-users-xlsx.test.ts` covering: header validation (exact `name|email|role`), trim whitespace, lowercase email/role, per-row validation statuses, row-limit enforcement, empty-sheet handling
     - [ ] Implement `parseUsersXlsx(file)` + `validateUserRow(row, actorRole)` in `src/lib/bulk-import/parse-users.ts`
@@ -40,6 +45,7 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 ## Phase 4: Bulk User Import UI
 
+- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [ ] Task: User import route + dropzone — TDD
     - [ ] Write failing component tests in `tests/unit/routes/admin-users-import.test.tsx` covering: only `.xlsx` accepted, 5MB size guard, non-xlsx rejected at dropzone with message, row-limit rejection message
     - [ ] Implement `/admin/users/import` route + `BulkUserDropzone` component (reuse existing `FileUploader` patterns where applicable; xlsx-only accept)
@@ -53,6 +59,7 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 ## Phase 5: Bulk Template Import UI
 
+- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [ ] Task: Template import route + dropzone — TDD
     - [ ] Write failing component tests in `tests/unit/routes/admin-templates-import.test.tsx` covering: xlsx-only acceptance, 5MB guard, row-limit rejection
     - [ ] Implement `/admin/templates/import` route + `BulkTemplateDropzone` component
@@ -66,6 +73,7 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 ## Phase 6: i18n, Quality Gates & Final Verification
 
+- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [ ] Task: Add i18n keys + EN/ID values — TDD
     - [ ] Write failing i18n regression test (all new bulk-import keys present in both `locales/en.json` and `locales/id.json`)
     - [ ] Add keys to `scripts/generate-i18n-types.ts`, values to both locale files, run `pnpm generate:i18n`
@@ -75,3 +83,5 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
     - [ ] Run `pnpm vitest run --coverage` — all tests pass; thresholds met (lines 80%, functions 80%, branches 72%, statements 79%)
     - [ ] Run modularity check (`node scripts/check-modularity.js`) — no file >500 lines
 - [ ] Task: Conductor - User Manual Verification 'i18n, Quality Gates & Final Verification' (Protocol in workflow.md)
+
+</protect>
