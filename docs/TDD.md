@@ -836,7 +836,7 @@ A checkpoint unlocks when:
 
 - Drizzle Kit for migration generation and execution.
 - `drizzle-kit push` for development; `drizzle-kit migrate` for local CLI use.
-- **Production migration runner**: Bundled `migrate.mjs` via Coolify pre-deploy hook.
+- **Production migration runner**: Bundled `migrate.mjs` executed via Dockerfile CMD before app start.
 - **PgBouncer bypass**: Use `MIGRATE_DATABASE_URL` to connect directly to PostgreSQL (port 5432) during migrations, bypassing PgBouncer's transaction-mode pooling which breaks Drizzle's prepared statements.
 - **Concurrency guard**: `pg_advisory_lock` (ID: 789123) serializes concurrent migration runs to prevent corruption.
 - **Seed runner**: `seed.mjs` chained after migrations; idempotent (skips existing SuperAdmin).
