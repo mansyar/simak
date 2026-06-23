@@ -55,9 +55,9 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
     - [x] Wire "Download sample" link calling `generateUserSampleXlsx()`
 - [~] Task: Wire entry point on `/admin/users`
     - [x] Add "Bulk Import" button to the users page header linking to `/admin/users/import`
-- [~] Task: Conductor - User Manual Verification 'Bulk User Import UI' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Bulk User Import UI' (Protocol in workflow.md)
 
-## Phase 5: Bulk Template Import UI
+## Phase 5: Bulk Template Import UI [checkpoint: 047b6fc]
 
 - [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [ ] Task: Template import route + dropzone — TDD
