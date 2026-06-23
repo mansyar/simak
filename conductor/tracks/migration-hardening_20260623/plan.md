@@ -51,6 +51,7 @@
 - [x] Task: Update Dockerfile CMD to use migrate.mjs
     - [x] Change CMD from `["sh", "-c", "drizzle-kit migrate && node .output/server/index.mjs"]` to `["sh", "-c", "node .output/server/migrate.mjs && node .output/server/index.mjs"]`
     - [x] Verify `drizzle/migrations` COPY line is still present (programmatic migrator needs SQL files at runtime)
+    commit: c5c3f5b
 
 - [ ] Task: Remove drizzle-kit from runner stage
     - [ ] Remove `RUN npm install -g drizzle-kit@0.31.10` and the preceding `USER root` / `USER simak` lines
