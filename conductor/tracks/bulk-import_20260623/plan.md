@@ -17,17 +17,17 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 ## Phase 2: Bulk-Import Server Functions (Schemas + Handlers + Tests)
 
 - [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
-- [~] Task: Bulk user import handler — TDD
-    - [ ] Write failing tests in `tests/unit/server/bulk-import-users.test.ts` covering: all-valid success, partial-failure (invalid rows skipped), email uniqueness (excluding soft-deleted), role-permission rules (Admin cannot create `admin`; `superadmin` never creatable), row-limit (>500 rejected), invitation email enqueue via existing queue, audit log `user.bulk_created` written, session/role verified
-    - [ ] Implement `BulkUserRowSchema` + `BulkCreateUsersSchema` (Zod) and `bulkCreateUsers` server-fn stub in `src/server/bulk-import.ts`
-    - [ ] Implement `bulkCreateUsersHandler` in `src/server/bulk-import.server.ts` (reuse existing `createUserHandler` validation/creation logic — extract shared helper if needed to avoid duplication; enqueue invitation emails; write audit log; return `{ created, skipped, errors }`)
-    - [ ] Run tests green; verify coverage >80% for the handler
-- [ ] Task: Bulk template import handler — TDD
-    - [ ] Write failing tests in `tests/unit/server/bulk-import-templates.test.ts` covering: all-valid success, per-group atomicity (one bad checkpoint skips whole template, others import), invalid group (missing/duplicate name, inconsistent type, <1 checkpoint), row-limit, audit log `template.bulk_created`, session/role verified
-    - [ ] Implement `BulkTemplateRowSchema` + `BulkCreateTemplatesSchema` (Zod, with grouping shape) and `bulkCreateTemplates` server-fn stub in `src/server/bulk-import.ts`
-    - [ ] Implement `bulkCreateTemplatesHandler` in `src/server/bulk-import.server.ts` (group rows by `templateName`, validate each group against `CreateTemplateSchema`, create template + checkpoints in a transaction reusing the `createTemplateHandler` pattern; write audit log; return `{ created, skipped, errors }`)
-    - [ ] Run tests green; verify coverage >80% for the handler
-- [ ] Task: Conductor - User Manual Verification 'Bulk-Import Server Functions' (Protocol in workflow.md)
+- [x] Task: Bulk user import handler — TDD c73eb63
+    - [x] Write failing tests in `tests/unit/server/bulk-import-users.test.ts` covering: all-valid success, partial-failure (invalid rows skipped), email uniqueness (excluding soft-deleted), role-permission rules (Admin cannot create `admin`; `superadmin` never creatable), row-limit (>500 rejected), invitation email enqueue via existing queue, audit log `user.bulk_created` written, session/role verified
+    - [x] Implement `BulkUserRowSchema` + `BulkCreateUsersSchema` (Zod) and `bulkCreateUsers` server-fn stub in `src/server/bulk-import.ts`
+    - [x] Implement `bulkCreateUsersHandler` in `src/server/bulk-import.server.ts` (reuse existing `createUserHandler` validation/creation logic — extract shared helper if needed to avoid duplication; enqueue invitation emails; write audit log; return `{ created, skipped, errors }`)
+    - [x] Run tests green; verify coverage >80% for the handler
+- [x] Task: Bulk template import handler — TDD
+    - [x] Write failing tests in `tests/unit/server/bulk-import-templates.test.ts` covering: all-valid success, per-group atomicity (one bad checkpoint skips whole template, others import), invalid group (missing/duplicate name, inconsistent type, <1 checkpoint), row-limit, audit log `template.bulk_created`, session/role verified
+    - [x] Implement `BulkTemplateRowSchema` + `BulkCreateTemplatesSchema` (Zod, with grouping shape) and `bulkCreateTemplates` server-fn stub in `src/server/bulk-import.ts`
+    - [x] Implement `bulkCreateTemplatesHandler` in `src/server/bulk-import.server.ts` (group rows by `templateName`, validate each group against `CreateTemplateSchema`, create template + checkpoints in a transaction reusing the `createTemplateHandler` pattern; write audit log; return `{ created, skipped, errors }`)
+    - [x] Run tests green; verify coverage >80% for the handler
+- [~] Task: Conductor - User Manual Verification 'Bulk-Import Server Functions' (Protocol in workflow.md)
 
 ## Phase 3: Client-Side Parsing, Validation & Sample Generation (Tests)
 

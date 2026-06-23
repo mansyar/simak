@@ -151,7 +151,7 @@ describe('Bulk user import handler', () => {
         data: {
           rows: [{ name: 'New SuperAdmin', email: 'super@test.com', role: 'superadmin' }],
         },
-      })) as any;
+      } as any)) as any;
 
       expect(result.created).toBe(0);
       expect(result.skipped).toBe(1);
