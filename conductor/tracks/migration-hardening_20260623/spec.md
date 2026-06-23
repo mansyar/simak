@@ -1,3 +1,4 @@
+<protect>
 # Track: Production Migration Hardening
 
 ## Overview
@@ -81,3 +82,4 @@ Current state (problems being fixed):
 - **Coolify pre-deployment command:** The Dockerfile CMD approach is sufficient. Separating migration into a Coolify pre-deploy step is a future optimization.
 - **Schema drift / backward-compatible migration patterns:** Expand-then-contract migration strategy is a separate concern.
 - **Integration tests against a real PostgreSQL:** Only unit tests are updated in this track.
+</protect>

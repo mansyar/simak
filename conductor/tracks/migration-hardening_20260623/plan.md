@@ -1,6 +1,11 @@
+<protect>
 # Implementation Plan: Production Migration Hardening
 
 ## Phase 1: Rewrite Migration Runner (TDD)
+
+- [ ] Task: Read spec.md and workflow.md before starting this phase
+    - [ ] Review the spec's functional requirements (FR1, FR4, FR5, FR6)
+    - [ ] Review the workflow's TDD lifecycle and Phase Completion Verification protocol
 
 - [ ] Task: Write failing tests for programmatic migrator (Red)
     - [ ] Remove `vi.mock('node:child_process')` and `mockExecSync` from test setup
@@ -32,6 +37,10 @@
 
 ## Phase 2: Update Dockerfile
 
+- [ ] Task: Read spec.md and workflow.md before starting this phase
+    - [ ] Review the spec's functional requirements (FR2, FR3) and NFR1, NFR2
+    - [ ] Review the workflow's Phase Completion Verification protocol
+
 - [ ] Task: Update Dockerfile CMD to use migrate.mjs
     - [ ] Change CMD from `["sh", "-c", "drizzle-kit migrate && node .output/server/index.mjs"]` to `["sh", "-c", "node .output/server/migrate.mjs && node .output/server/index.mjs"]`
     - [ ] Verify `drizzle/migrations` COPY line is still present (programmatic migrator needs SQL files at runtime)
@@ -45,6 +54,10 @@
 
 ## Phase 3: Build & Full Verification
 
+- [ ] Task: Read spec.md and workflow.md before starting this phase
+    - [ ] Review the spec's acceptance criteria (items 8-10)
+    - [ ] Review the workflow's Phase Completion Verification protocol
+
 - [ ] Task: Verify production build produces migrate.mjs
     - [ ] Run `pnpm build` and confirm `.output/server/migrate.mjs` is produced
     - [ ] Confirm `migrate.mjs` does not contain `execSync` or `npx` references
@@ -57,3 +70,4 @@
     - [ ] Confirm coverage thresholds met (lines 80%, functions 80%, branches 72%, statements 79%)
 
 - [ ] Task: Conductor - User Manual Verification 'Build & Full Verification' (Protocol in workflow.md)
+</protect>
