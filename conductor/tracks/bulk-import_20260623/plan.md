@@ -75,8 +75,8 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 ## Phase 6: i18n, Quality Gates & Final Verification [checkpoint: 1e2bf04]
 
-- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
-- [ ] Task: Add i18n keys + EN/ID values — TDD
+- [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
+- [~] Task: Add i18n keys + EN/ID values — TDD
     - [ ] Write failing i18n regression test (all new bulk-import keys present in both `locales/en.json` and `locales/id.json`)
     - [ ] Add keys to `scripts/generate-i18n-types.ts`, values to both locale files, run `pnpm generate:i18n`
 - [ ] Task: Full quality gate

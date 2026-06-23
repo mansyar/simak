@@ -807,6 +807,48 @@ export type Translation = {
       reducedMotionHint: string
     }
   }
+  bulkImport: {
+    common: {
+      dropzoneText: string
+      dropzoneHint: string
+      downloadSample: string
+      error: string
+      validationErrors: string
+      validationErrorsFound: string
+      validationErrorsFoundGroups: string
+      invalidFormat: string
+      fileTooLarge: string
+      parseFailed: string
+      importFailed: string
+      importComplete: string
+      valid: string
+      invalid: string
+      row: string
+      reason: string
+      status: string
+    }
+    users: {
+      title: string
+      subtitle: string
+      button: string
+      name: string
+      email: string
+      role: string
+      importButton: string
+      createdSkipped: string
+    }
+    templates: {
+      title: string
+      subtitle: string
+      button: string
+      templateName: string
+      type: string
+      checkpoints: string
+      minEst: string
+      importButton: string
+      createdSkipped: string
+    }
+  }
 }
 
 export type TranslationFunctions = Record<string, (key: string) => string>

@@ -801,5 +801,47 @@
       "reducedMotionLabel": "Reduced Motion",
       "reducedMotionHint": "Reduce animations and transitions throughout the app"
     }
+  },
+  "bulkImport": {
+    "common": {
+      "dropzoneText": "Drag & drop an .xlsx file here, or click to browse",
+      "dropzoneHint": "Maximum 500 rows, 5MB file size",
+      "downloadSample": "Download Sample File",
+      "error": "Error",
+      "validationErrors": "Validation Errors",
+      "validationErrorsFound": "validation error(s) found. Invalid rows will be skipped.",
+      "validationErrorsFoundGroups": "validation error(s) found. Invalid groups will be skipped.",
+      "invalidFormat": "Only .xlsx files are accepted",
+      "fileTooLarge": "File size must be under 5MB",
+      "parseFailed": "Failed to parse xlsx file",
+      "importFailed": "Import failed. Please try again.",
+      "importComplete": "Import Complete",
+      "valid": "Valid",
+      "invalid": "Invalid",
+      "row": "Row",
+      "reason": "Reason",
+      "status": "Status"
+    },
+    "users": {
+      "title": "Bulk Import Users",
+      "subtitle": "Upload an .xlsx file to import users in bulk",
+      "button": "Bulk Import",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "importButton": "Import {{count}} Users",
+      "createdSkipped": "{{created}} created, {{skipped}} skipped."
+    },
+    "templates": {
+      "title": "Bulk Import Templates",
+      "subtitle": "Upload an .xlsx file to import templates in bulk",
+      "button": "Bulk Import",
+      "templateName": "Template Name",
+      "type": "Type",
+      "checkpoints": "Checkpoints",
+      "minEst": "Min: {{min}}, Est: {{est}}d",
+      "importButton": "Import {{count}} Templates",
+      "createdSkipped": "{{created}} created, {{skipped}} skipped."
+    }
   }
 }

@@ -44,16 +44,19 @@ function BulkTemplateImportPage() {
   const [result, setResult] = useState<ImportResult | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
-  const validateFile = useCallback((file: File): string | null => {
-    const extension = '.' + file.name.split('.').pop()?.toLowerCase();
-    if (extension !== '.xlsx') {
-      return 'Only .xlsx files are accepted';
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      return 'File size must be under 5MB';
-    }
-    return null;
-  }, []);
+  const validateFile = useCallback(
+    (file: File): string | null => {
+      const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+      if (extension !== '.xlsx') {
+        return t('bulkImport.common.invalidFormat');
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        return t('bulkImport.common.fileTooLarge');
+      }
+      return null;
+    },
+    [t],
+  );
 
   const processFile = useCallback(
     async (file: File) => {
@@ -75,7 +78,7 @@ function BulkTemplateImportPage() {
 
         setParsedGroups(parsed.groups);
       } catch {
-        setValidationError('Failed to parse xlsx file');
+        setValidationError(t('bulkImport.common.parseFailed'));
       }
     },
     [validateFile],
@@ -152,7 +155,7 @@ function BulkTemplateImportPage() {
         setResult(response as unknown as ImportResult);
       }
     } catch {
-      setValidationError('Import failed. Please try again.');
+      setValidationError(t('bulkImport.common.importFailed'));
     } finally {
       setIsCommitting(false);
     }
@@ -164,15 +167,15 @@ function BulkTemplateImportPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Bulk Import Templates"
-        subtitle="Upload an .xlsx file to import templates in bulk"
+        title={t('bulkImport.templates.title')}
+        subtitle={t('bulkImport.templates.subtitle')}
       />
 
       {/* Download sample */}
       <div>
         <Button variant="outline" size="sm" onClick={handleDownloadSample}>
           <Download className="mr-2 h-4 w-4" />
-          Download Sample File
+          {t('bulkImport.common.downloadSample')}
         </Button>
       </div>
 
@@ -196,23 +199,21 @@ function BulkTemplateImportPage() {
           onChange={handleFileChange}
         />
         <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-        <p className="mt-2 text-sm text-muted-foreground">
-          Drag & drop an .xlsx file here, or click to browse
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">Maximum 500 rows, 5MB file size</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t('bulkImport.common.dropzoneText')}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{t('bulkImport.common.dropzoneHint')}</p>
       </div>
 
       {/* Validation error */}
       {validationError && (
-        <AlertBanner variant="error" title="Error">
+        <AlertBanner variant="error" title={t('bulkImport.common.error')}>
           {validationError}
         </AlertBanner>
       )}
 
       {/* Parse errors */}
       {parseErrors.length > 0 && (
-        <AlertBanner variant="warning" title="Validation Errors">
-          {parseErrors.length} validation error(s) found. Invalid groups will be skipped.
+        <AlertBanner variant="warning" title={t('bulkImport.common.validationErrors')}>
+          {parseErrors.length} {t('bulkImport.common.validationErrorsFoundGroups')}
         </AlertBanner>
       )}
 
@@ -229,10 +230,10 @@ function BulkTemplateImportPage() {
               <thead className="bg-muted sticky top-0">
                 <tr>
                   <th className="p-2 text-left w-8"></th>
-                  <th className="p-2 text-left">Template Name</th>
-                  <th className="p-2 text-left">Type</th>
-                  <th className="p-2 text-left">Checkpoints</th>
-                  <th className="p-2 text-left">Status</th>
+                  <th className="p-2 text-left">{t('bulkImport.templates.templateName')}</th>
+                  <th className="p-2 text-left">{t('bulkImport.templates.type')}</th>
+                  <th className="p-2 text-left">{t('bulkImport.templates.checkpoints')}</th>
+                  <th className="p-2 text-left">{t('bulkImport.common.status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -257,7 +258,9 @@ function BulkTemplateImportPage() {
                           data-testid={`group-status-${i}`}
                           className={group.status === 'valid' ? 'text-green-600' : 'text-red-600'}
                         >
-                          {group.status === 'valid' ? 'Valid' : 'Invalid'}
+                          {group.status === 'valid'
+                            ? t('bulkImport.common.valid')
+                            : t('bulkImport.common.invalid')}
                           {group.error ? ` — ${group.error}` : ''}
                         </span>
                       </td>
@@ -270,7 +273,9 @@ function BulkTemplateImportPage() {
                             {cp.name}
                           </td>
                           <td className="p-2">
-                            Min: {cp.minConsultations}, Est: {cp.estimatedDuration}d
+                            {t('bulkImport.templates.minEst')
+                              .replace('{{min}}', String(cp.minConsultations))
+                              .replace('{{est}}', String(cp.estimatedDuration))}
                           </td>
                           <td className="p-2"></td>
                         </tr>
@@ -287,7 +292,7 @@ function BulkTemplateImportPage() {
             disabled={validCount === 0 || isCommitting}
             loading={isCommitting}
           >
-            Import {validCount} Templates
+            {t('bulkImport.templates.importButton').replace('{{count}}', String(validCount))}
           </Button>
         </div>
       )}
@@ -295,8 +300,10 @@ function BulkTemplateImportPage() {
       {/* Result report */}
       {result && (
         <div className="space-y-4">
-          <AlertBanner variant="success" title="Import Complete">
-            {result.created} created, {result.skipped} skipped.
+          <AlertBanner variant="success" title={t('bulkImport.common.importComplete')}>
+            {t('bulkImport.templates.createdSkipped')
+              .replace('{{created}}', String(result.created))
+              .replace('{{skipped}}', String(result.skipped))}
           </AlertBanner>
 
           {result.errors.length > 0 && (
@@ -304,9 +311,9 @@ function BulkTemplateImportPage() {
               <table className="w-full text-sm">
                 <thead className="bg-muted">
                   <tr>
-                    <th className="p-2 text-left">Row</th>
-                    <th className="p-2 text-left">Template Name</th>
-                    <th className="p-2 text-left">Reason</th>
+                    <th className="p-2 text-left">{t('bulkImport.common.row')}</th>
+                    <th className="p-2 text-left">{t('bulkImport.templates.templateName')}</th>
+                    <th className="p-2 text-left">{t('bulkImport.common.reason')}</th>
                   </tr>
                 </thead>
                 <tbody>

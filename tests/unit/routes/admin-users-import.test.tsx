@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import type { ComponentType } from 'react';
@@ -73,6 +73,10 @@ async function getComponent(): Promise<ComponentType> {
 }
 
 describe('Admin Users Import page', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should export a route component', async () => {
     const mod = await import('@/routes/_authenticated/admin/users/import');
     expect(mod).toBeDefined();
@@ -139,7 +143,7 @@ describe('Admin Users Import page', () => {
       await new Promise((r) => setTimeout(r, 10));
 
       expect(screen.getByTestId('alert-banner')).toBeInTheDocument();
-      expect(screen.getByText(/validation error\(s\) found/)).toBeInTheDocument();
+      expect(screen.getByText(/bulkImport\.common\.validationErrors/)).toBeInTheDocument();
     });
   });
 
@@ -173,14 +177,14 @@ describe('Admin Users Import page', () => {
       await new Promise((r) => setTimeout(r, 10));
 
       // Should show preview table
-      expect(screen.getByText('Name')).toBeInTheDocument();
-      expect(screen.getByText('Email')).toBeInTheDocument();
-      expect(screen.getByText('Role')).toBeInTheDocument();
-      expect(screen.getByText('Status')).toBeInTheDocument();
+      expect(screen.getByText('bulkImport.users.name')).toBeInTheDocument();
+      expect(screen.getByText('bulkImport.users.email')).toBeInTheDocument();
+      expect(screen.getByText('bulkImport.users.role')).toBeInTheDocument();
+      expect(screen.getByText('bulkImport.common.status')).toBeInTheDocument();
 
       // Should show valid/invalid status
-      expect(screen.getByTestId('row-status-0')).toHaveTextContent('Valid');
-      expect(screen.getByTestId('row-status-1')).toHaveTextContent('Invalid');
+      expect(screen.getByTestId('row-status-0')).toHaveTextContent('bulkImport.common.valid');
+      expect(screen.getByTestId('row-status-1')).toHaveTextContent('bulkImport.common.invalid');
 
       // Should show row data
       expect(screen.getByText('Alice')).toBeInTheDocument();
@@ -241,7 +245,9 @@ describe('Admin Users Import page', () => {
       fireEvent.change(input);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Import 1 Users/ })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /bulkImport.users.importButton/ }),
+        ).toBeInTheDocument();
       });
     });
 
@@ -265,7 +271,9 @@ describe('Admin Users Import page', () => {
       fireEvent.change(input);
 
       await waitFor(() => {
-        expect(screen.getByText('1 invalid')).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /bulkImport.users.importButton/ }),
+        ).toBeDisabled();
       });
     });
   });
@@ -275,7 +283,7 @@ describe('Admin Users Import page', () => {
       const Component = await getComponent();
       render(<Component />);
 
-      expect(screen.getByText('Download Sample File')).toBeInTheDocument();
+      expect(screen.getByText('bulkImport.common.downloadSample')).toBeInTheDocument();
     });
   });
 });

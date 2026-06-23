@@ -801,5 +801,47 @@
       "reducedMotionLabel": "Gerakan Dikurangi",
       "reducedMotionHint": "Kurangi animasi dan transisi di seluruh aplikasi"
     }
+  },
+  "bulkImport": {
+    "common": {
+      "dropzoneText": "Seret & lepas file .xlsx di sini, atau klik untuk menjelajahi",
+      "dropzoneHint": "Maksimal 500 baris, ukuran file 5MB",
+      "downloadSample": "Unduh File Contoh",
+      "error": "Kesalahan",
+      "validationErrors": "Kesalahan Validasi",
+      "validationErrorsFound": "ditemukan kesalahan validasi. Baris yang tidak valid akan dilewati.",
+      "validationErrorsFoundGroups": "ditemukan kesalahan validasi. Grup yang tidak valid akan dilewati.",
+      "invalidFormat": "Hanya file .xlsx yang diterima",
+      "fileTooLarge": "Ukuran file harus kurang dari 5MB",
+      "parseFailed": "Gagal mengurai file xlsx",
+      "importFailed": "Gagal mengimpor. Silakan coba lagi.",
+      "importComplete": "Impor Selesai",
+      "valid": "Valid",
+      "invalid": "Tidak Valid",
+      "row": "Baris",
+      "reason": "Alasan",
+      "status": "Status"
+    },
+    "users": {
+      "title": "Impor Massal Pengguna",
+      "subtitle": "Unggah file .xlsx untuk mengimpor pengguna secara massal",
+      "button": "Impor Massal",
+      "name": "Nama",
+      "email": "Email",
+      "role": "Peran",
+      "importButton": "Impor {{count}} Pengguna",
+      "createdSkipped": "{{created}} dibuat, {{skipped}} dilewati."
+    },
+    "templates": {
+      "title": "Impor Massal Template",
+      "subtitle": "Unggah file .xlsx untuk mengimpor template secara massal",
+      "button": "Impor Massal",
+      "templateName": "Nama Template",
+      "type": "Tipe",
+      "checkpoints": "Titik Pemeriksaan",
+      "minEst": "Min: {{min}}, Est: {{est}}h",
+      "importButton": "Impor {{count}} Template",
+      "createdSkipped": "{{created}} dibuat, {{skipped}} dilewati."
+    }
   }
 }

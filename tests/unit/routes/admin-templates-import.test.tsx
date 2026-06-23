@@ -71,7 +71,7 @@ describe('BulkTemplateImportPage', () => {
     const Component = await getComponent();
     render(<Component />);
     expect(screen.getByTestId('bulk-import-dropzone')).toBeInTheDocument();
-    expect(screen.getByText(/Drag & drop an \.xlsx file/)).toBeInTheDocument();
+    expect(screen.getByText(/bulkImport\.common\.dropzoneText/)).toBeInTheDocument();
   });
 
   it('should accept only .xlsx files', async () => {
@@ -95,7 +95,7 @@ describe('BulkTemplateImportPage', () => {
     Object.defineProperty(bigFile, 'size', { value: 6 * 1024 * 1024 });
     fireEvent.change(input, { target: { files: [bigFile] } });
     await waitFor(() => {
-      expect(screen.getByText(/File size must be under 5MB/)).toBeInTheDocument();
+      expect(screen.getByText(/bulkImport\.common\.fileTooLarge/)).toBeInTheDocument();
     });
   });
 
@@ -116,7 +116,7 @@ describe('BulkTemplateImportPage', () => {
     ]);
     fireEvent.change(input, { target: { files: [file] } });
     await waitFor(() => {
-      expect(screen.getAllByText(/validation error/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/bulkImport\.common\.validationErrors/).length).toBeGreaterThan(0);
     });
   });
 
@@ -207,7 +207,7 @@ describe('BulkTemplateImportPage', () => {
     ]);
     fireEvent.change(input, { target: { files: [file] } });
     await waitFor(() => {
-      const btn = screen.getByRole('button', { name: /Import/ });
+      const btn = screen.getByRole('button', { name: /bulkImport\.templates\.importButton/ });
       expect(btn).toBeDisabled();
     });
   });
@@ -221,7 +221,7 @@ describe('BulkTemplateImportPage', () => {
     });
     const Component = await getComponent();
     render(<Component />);
-    const downloadBtn = screen.getByText(/Download Sample/);
+    const downloadBtn = screen.getByText(/bulkImport\.common\.downloadSample/);
     fireEvent.click(downloadBtn);
     expect(clickSpy).toHaveBeenCalled();
     vi.restoreAllMocks();

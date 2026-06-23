@@ -38,6 +38,8 @@ import { Route as AuthenticatedStudentAssignmentsIdRouteImport } from './routes/
 import { Route as AuthenticatedInstructorReviewsSubmissionIdRouteImport } from './routes/_authenticated/instructor/reviews/$submissionId'
 import { Route as AuthenticatedInstructorAssignmentsNewRouteImport } from './routes/_authenticated/instructor/assignments/new'
 import { Route as AuthenticatedInstructorAssignmentsIdRouteImport } from './routes/_authenticated/instructor/assignments/$id'
+import { Route as AuthenticatedAdminUsersImportRouteImport } from './routes/_authenticated/admin/users/import'
+import { Route as AuthenticatedAdminTemplatesImportRouteImport } from './routes/_authenticated/admin/templates/import'
 import { Route as AuthenticatedAdminTemplatesTemplateIdRouteImport } from './routes/_authenticated/admin/templates/$templateId'
 import { Route as AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRouteImport } from './routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId'
 
@@ -206,6 +208,18 @@ const AuthenticatedInstructorAssignmentsIdRoute =
     path: '/assignments/$id',
     getParentRoute: () => AuthenticatedInstructorRoute,
   } as any)
+const AuthenticatedAdminUsersImportRoute =
+  AuthenticatedAdminUsersImportRouteImport.update({
+    id: '/users/import',
+    path: '/users/import',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminTemplatesImportRoute =
+  AuthenticatedAdminTemplatesImportRouteImport.update({
+    id: '/templates/import',
+    path: '/templates/import',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminTemplatesTemplateIdRoute =
   AuthenticatedAdminTemplatesTemplateIdRouteImport.update({
     id: '/templates/$templateId',
@@ -239,6 +253,8 @@ export interface FileRoutesByFullPath {
   '/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
+  '/admin/templates/import': typeof AuthenticatedAdminTemplatesImportRoute
+  '/admin/users/import': typeof AuthenticatedAdminUsersImportRoute
   '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/instructor/reviews/$submissionId': typeof AuthenticatedInstructorReviewsSubmissionIdRoute
@@ -270,6 +286,8 @@ export interface FileRoutesByTo {
   '/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
+  '/admin/templates/import': typeof AuthenticatedAdminTemplatesImportRoute
+  '/admin/users/import': typeof AuthenticatedAdminUsersImportRoute
   '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/instructor/reviews/$submissionId': typeof AuthenticatedInstructorReviewsSubmissionIdRoute
@@ -304,6 +322,8 @@ export interface FileRoutesById {
   '/_unauthenticated/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
+  '/_authenticated/admin/templates/import': typeof AuthenticatedAdminTemplatesImportRoute
+  '/_authenticated/admin/users/import': typeof AuthenticatedAdminUsersImportRoute
   '/_authenticated/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
   '/_authenticated/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/_authenticated/instructor/reviews/$submissionId': typeof AuthenticatedInstructorReviewsSubmissionIdRoute
@@ -337,6 +357,8 @@ export interface FileRouteTypes {
     | '/auth/verify-backup-code'
     | '/api/auth/$'
     | '/admin/templates/$templateId'
+    | '/admin/templates/import'
+    | '/admin/users/import'
     | '/instructor/assignments/$id'
     | '/instructor/assignments/new'
     | '/instructor/reviews/$submissionId'
@@ -368,6 +390,8 @@ export interface FileRouteTypes {
     | '/auth/verify-backup-code'
     | '/api/auth/$'
     | '/admin/templates/$templateId'
+    | '/admin/templates/import'
+    | '/admin/users/import'
     | '/instructor/assignments/$id'
     | '/instructor/assignments/new'
     | '/instructor/reviews/$submissionId'
@@ -401,6 +425,8 @@ export interface FileRouteTypes {
     | '/_unauthenticated/auth/verify-backup-code'
     | '/api/auth/$'
     | '/_authenticated/admin/templates/$templateId'
+    | '/_authenticated/admin/templates/import'
+    | '/_authenticated/admin/users/import'
     | '/_authenticated/instructor/assignments/$id'
     | '/_authenticated/instructor/assignments/new'
     | '/_authenticated/instructor/reviews/$submissionId'
@@ -625,6 +651,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInstructorAssignmentsIdRouteImport
       parentRoute: typeof AuthenticatedInstructorRoute
     }
+    '/_authenticated/admin/users/import': {
+      id: '/_authenticated/admin/users/import'
+      path: '/users/import'
+      fullPath: '/admin/users/import'
+      preLoaderRoute: typeof AuthenticatedAdminUsersImportRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/templates/import': {
+      id: '/_authenticated/admin/templates/import'
+      path: '/templates/import'
+      fullPath: '/admin/templates/import'
+      preLoaderRoute: typeof AuthenticatedAdminTemplatesImportRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/templates/$templateId': {
       id: '/_authenticated/admin/templates/$templateId'
       path: '/templates/$templateId'
@@ -647,6 +687,8 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminTemplatesTemplateIdRoute: typeof AuthenticatedAdminTemplatesTemplateIdRoute
+  AuthenticatedAdminTemplatesImportRoute: typeof AuthenticatedAdminTemplatesImportRoute
+  AuthenticatedAdminUsersImportRoute: typeof AuthenticatedAdminUsersImportRoute
   AuthenticatedAdminTemplatesIndexRoute: typeof AuthenticatedAdminTemplatesIndexRoute
   AuthenticatedAdminUsersIndexRoute: typeof AuthenticatedAdminUsersIndexRoute
 }
@@ -657,6 +699,9 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminTemplatesTemplateIdRoute:
     AuthenticatedAdminTemplatesTemplateIdRoute,
+  AuthenticatedAdminTemplatesImportRoute:
+    AuthenticatedAdminTemplatesImportRoute,
+  AuthenticatedAdminUsersImportRoute: AuthenticatedAdminUsersImportRoute,
   AuthenticatedAdminTemplatesIndexRoute: AuthenticatedAdminTemplatesIndexRoute,
   AuthenticatedAdminUsersIndexRoute: AuthenticatedAdminUsersIndexRoute,
 }

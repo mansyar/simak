@@ -36,16 +36,19 @@ function BulkUserImportPage() {
   const [isCommitting, setIsCommitting] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
 
-  const validateFile = useCallback((file: File): string | null => {
-    const extension = '.' + file.name.split('.').pop()?.toLowerCase();
-    if (extension !== '.xlsx') {
-      return 'Only .xlsx files are accepted';
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      return 'File size must be under 5MB';
-    }
-    return null;
-  }, []);
+  const validateFile = useCallback(
+    (file: File): string | null => {
+      const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+      if (extension !== '.xlsx') {
+        return t('bulkImport.common.invalidFormat');
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        return t('bulkImport.common.fileTooLarge');
+      }
+      return null;
+    },
+    [t],
+  );
 
   const processFile = useCallback(
     async (file: File) => {
@@ -67,7 +70,7 @@ function BulkUserImportPage() {
 
         setParsedRows(parsed.rows);
       } catch {
-        setValidationError('Failed to parse xlsx file');
+        setValidationError(t('bulkImport.common.parseFailed'));
       }
     },
     [validateFile],
@@ -130,7 +133,7 @@ function BulkUserImportPage() {
         setResult(response as unknown as ImportResult);
       }
     } catch {
-      setValidationError('Import failed. Please try again.');
+      setValidationError(t('bulkImport.common.importFailed'));
     } finally {
       setIsCommitting(false);
     }
@@ -141,16 +144,13 @@ function BulkUserImportPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Bulk Import Users"
-        subtitle="Upload an .xlsx file to import users in bulk"
-      />
+      <PageHeader title={t('bulkImport.users.title')} subtitle={t('bulkImport.users.subtitle')} />
 
       {/* Download sample */}
       <div>
         <Button variant="outline" size="sm" onClick={handleDownloadSample}>
           <Download className="mr-2 h-4 w-4" />
-          Download Sample File
+          {t('bulkImport.common.downloadSample')}
         </Button>
       </div>
 
@@ -174,23 +174,21 @@ function BulkUserImportPage() {
           onChange={handleFileChange}
         />
         <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-        <p className="mt-2 text-sm text-muted-foreground">
-          Drag & drop an .xlsx file here, or click to browse
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">Maximum 500 rows, 5MB file size</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t('bulkImport.common.dropzoneText')}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{t('bulkImport.common.dropzoneHint')}</p>
       </div>
 
       {/* Validation error */}
       {validationError && (
-        <AlertBanner variant="error" title="Error">
+        <AlertBanner variant="error" title={t('bulkImport.common.error')}>
           {validationError}
         </AlertBanner>
       )}
 
       {/* Parse errors */}
       {parseErrors.length > 0 && (
-        <AlertBanner variant="warning" title="Validation Errors">
-          {parseErrors.length} validation error(s) found. Invalid rows will be skipped.
+        <AlertBanner variant="warning" title={t('bulkImport.common.validationErrors')}>
+          {parseErrors.length} {t('bulkImport.common.validationErrorsFound')}
         </AlertBanner>
       )}
 
@@ -207,10 +205,10 @@ function BulkUserImportPage() {
               <thead className="bg-muted sticky top-0">
                 <tr>
                   <th className="p-2 text-left">#</th>
-                  <th className="p-2 text-left">Name</th>
-                  <th className="p-2 text-left">Email</th>
-                  <th className="p-2 text-left">Role</th>
-                  <th className="p-2 text-left">Status</th>
+                  <th className="p-2 text-left">{t('bulkImport.users.name')}</th>
+                  <th className="p-2 text-left">{t('bulkImport.users.email')}</th>
+                  <th className="p-2 text-left">{t('bulkImport.users.role')}</th>
+                  <th className="p-2 text-left">{t('bulkImport.common.status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -225,7 +223,9 @@ function BulkUserImportPage() {
                         data-testid={`row-status-${i}`}
                         className={row.status === 'valid' ? 'text-green-600' : 'text-red-600'}
                       >
-                        {row.status === 'valid' ? 'Valid' : 'Invalid'}
+                        {row.status === 'valid'
+                          ? t('bulkImport.common.valid')
+                          : t('bulkImport.common.invalid')}
                       </span>
                     </td>
                   </tr>
@@ -239,7 +239,7 @@ function BulkUserImportPage() {
             disabled={validCount === 0 || isCommitting}
             loading={isCommitting}
           >
-            Import {validCount} Users
+            {t('bulkImport.users.importButton').replace('{{count}}', String(validCount))}
           </Button>
         </div>
       )}
@@ -247,8 +247,10 @@ function BulkUserImportPage() {
       {/* Result report */}
       {result && (
         <div className="space-y-4">
-          <AlertBanner variant="success" title="Import Complete">
-            {result.created} created, {result.skipped} skipped.
+          <AlertBanner variant="success" title={t('bulkImport.common.importComplete')}>
+            {t('bulkImport.users.createdSkipped')
+              .replace('{{created}}', String(result.created))
+              .replace('{{skipped}}', String(result.skipped))}
           </AlertBanner>
 
           {result.errors.length > 0 && (
@@ -256,9 +258,9 @@ function BulkUserImportPage() {
               <table className="w-full text-sm">
                 <thead className="bg-muted">
                   <tr>
-                    <th className="p-2 text-left">Row</th>
-                    <th className="p-2 text-left">Email</th>
-                    <th className="p-2 text-left">Reason</th>
+                    <th className="p-2 text-left">{t('bulkImport.common.row')}</th>
+                    <th className="p-2 text-left">{t('bulkImport.users.email')}</th>
+                    <th className="p-2 text-left">{t('bulkImport.common.reason')}</th>
                   </tr>
                 </thead>
                 <tbody>
