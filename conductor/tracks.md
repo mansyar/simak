@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Bulk Import for Users & Templates**
+- [~] **Track: Bulk Import for Users & Templates**
 *Link: [./tracks/bulk-import_20260623/](./tracks/bulk-import_20260623/)*

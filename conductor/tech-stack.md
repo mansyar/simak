@@ -18,6 +18,7 @@
 | **Styling**    | Tailwind CSS v4       | Utility-first CSS with design system integration                |
 | **Forms**      | React Hook Form + Zod | Performant forms with Zod validation resolver                   |
 | **i18n**       | typesafe-i18n         | Type-safe translations with compile-time checks                 |
+| **Client-Side XLSX** | SheetJS (`xlsx`) | Client-side .xlsx parsing + sample-file generation |
 
 ## Backend & Data
 
