@@ -16,8 +16,8 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 ## Phase 2: Bulk-Import Server Functions (Schemas + Handlers + Tests)
 
-- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
-- [ ] Task: Bulk user import handler — TDD
+- [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
+- [~] Task: Bulk user import handler — TDD
     - [ ] Write failing tests in `tests/unit/server/bulk-import-users.test.ts` covering: all-valid success, partial-failure (invalid rows skipped), email uniqueness (excluding soft-deleted), role-permission rules (Admin cannot create `admin`; `superadmin` never creatable), row-limit (>500 rejected), invitation email enqueue via existing queue, audit log `user.bulk_created` written, session/role verified
     - [ ] Implement `BulkUserRowSchema` + `BulkCreateUsersSchema` (Zod) and `bulkCreateUsers` server-fn stub in `src/server/bulk-import.ts`
     - [ ] Implement `bulkCreateUsersHandler` in `src/server/bulk-import.server.ts` (reuse existing `createUserHandler` validation/creation logic — extract shared helper if needed to avoid duplication; enqueue invitation emails; write audit log; return `{ created, skipped, errors }`)
