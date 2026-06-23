@@ -67,6 +67,10 @@
 - [x] Task: Read spec.md and workflow.md before starting this phase
     - [x] Review the spec's acceptance criteria (items 8-10)
     - [x] Review the workflow's Phase Completion Verification protocol
+    commit: d7af0d1
+- [x] Task: Verify production build produces migrate.mjs
+    - [x] Run `pnpm build` and confirm `.output/server/migrate.mjs` is produced
+    - [x] Confirm `migrate.mjs` does not contain `execSync` or `npx` references (2 `drizzle-kit` matches are JSDoc text inside bundled drizzle-orm, not runtime calls)
 
 - [ ] Task: Verify production build produces migrate.mjs
     - [ ] Run `pnpm build` and confirm `.output/server/migrate.mjs` is produced
