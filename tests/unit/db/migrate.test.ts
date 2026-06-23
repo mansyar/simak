@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-const mockMigrate = vi.fn().mockResolvedValue(undefined);
+const mockMigrate = vi.fn().mockImplementation(() => {
+  sequence.push('migrate');
+  return Promise.resolve();
+});
 const sequence: string[] = [];
 let executeCallNum = 0;
 
@@ -40,7 +43,10 @@ describe('Migration Runner', () => {
     sequence.length = 0;
 
     mockMigrate.mockReset();
-    mockMigrate.mockResolvedValue(undefined);
+    mockMigrate.mockImplementation(() => {
+      sequence.push('migrate');
+      return Promise.resolve();
+    });
 
     mockDbExecute.mockReset();
     mockDbExecute.mockImplementation(() => {
