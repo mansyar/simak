@@ -1,0 +1,8 @@
+{
+  "track_id": "bulk-import_20260623",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-06-23T22:12:44Z",
+  "updated_at": "2026-06-23T22:12:44Z",
+  "description": "Bulk create users and templates via .xlsx file upload (client-side parse + preview + partial-success report)."
+}
