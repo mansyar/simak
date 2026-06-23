@@ -20,12 +20,6 @@ RUN adduser --system --uid 1001 simak
 COPY --from=builder --chown=simak:nodejs /app/.output /app/.output
 COPY --from=builder --chown=simak:nodejs /app/package.json /app/package.json
 COPY --from=builder --chown=simak:nodejs /app/drizzle/migrations /app/drizzle/migrations
-COPY --from=builder --chown=simak:nodejs /app/drizzle.config.ts /app/drizzle.config.ts
-
-# Install drizzle-kit for running migrations in production
-USER root
-RUN npm install -g drizzle-kit@0.31.10
-USER simak
 
 ENV NODE_ENV=production
 EXPOSE 3000

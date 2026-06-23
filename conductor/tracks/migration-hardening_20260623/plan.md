@@ -53,10 +53,10 @@
     - [x] Verify `drizzle/migrations` COPY line is still present (programmatic migrator needs SQL files at runtime)
     commit: c5c3f5b
 
-- [ ] Task: Remove drizzle-kit from runner stage
-    - [ ] Remove `RUN npm install -g drizzle-kit@0.31.10` and the preceding `USER root` / `USER simak` lines
-    - [ ] Remove `COPY --from=builder ... drizzle.config.ts ...` line
-    - [ ] Verify `COPY --from=builder ... drizzle/migrations ...` line is still present
+- [x] Task: Remove drizzle-kit from runner stage
+    - [x] Remove `RUN npm install -g drizzle-kit@0.31.10` and the preceding `USER root` / `USER simak` lines
+    - [x] Remove `COPY --from=builder ... drizzle.config.ts ...` line
+    - [x] Verify `COPY --from=builder ... drizzle/migrations ...` line is still present
 
 - [ ] Task: Conductor - User Manual Verification 'Update Dockerfile' (Protocol in workflow.md)
 
