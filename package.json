@@ -19,7 +19,6 @@
     "format": "oxfmt --write \"src/**/*.{ts,tsx,css}\"",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:migrate:prod": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:seed": "node --env-file=.env --import=tsx src/db/seed.ts",
     "generate:i18n": "tsx scripts/generate-i18n-types.ts",
