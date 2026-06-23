@@ -31,4 +31,4 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 # Run migrations before starting the app
-CMD ["sh", "-c", "drizzle-kit migrate && node .output/server/index.mjs"]
+CMD ["sh", "-c", "node .output/server/migrate.mjs && node .output/server/index.mjs"]

@@ -46,10 +46,11 @@
 - [x] Task: Read spec.md and workflow.md before starting this phase
     - [x] Review the spec's functional requirements (FR2, FR3) and NFR1, NFR2
     - [x] Review the workflow's Phase Completion Verification protocol
+    commit: d385bee
 
-- [ ] Task: Update Dockerfile CMD to use migrate.mjs
-    - [ ] Change CMD from `["sh", "-c", "drizzle-kit migrate && node .output/server/index.mjs"]` to `["sh", "-c", "node .output/server/migrate.mjs && node .output/server/index.mjs"]`
-    - [ ] Verify `drizzle/migrations` COPY line is still present (programmatic migrator needs SQL files at runtime)
+- [x] Task: Update Dockerfile CMD to use migrate.mjs
+    - [x] Change CMD from `["sh", "-c", "drizzle-kit migrate && node .output/server/index.mjs"]` to `["sh", "-c", "node .output/server/migrate.mjs && node .output/server/index.mjs"]`
+    - [x] Verify `drizzle/migrations` COPY line is still present (programmatic migrator needs SQL files at runtime)
 
 - [ ] Task: Remove drizzle-kit from runner stage
     - [ ] Remove `RUN npm install -g drizzle-kit@0.31.10` and the preceding `USER root` / `USER simak` lines
