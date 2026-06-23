@@ -79,9 +79,9 @@
 - [x] Task: Run typecheck
     - [x] Run `pnpm typecheck` and confirm no errors
 
-- [ ] Task: Run full test suite with coverage
-    - [ ] Run `CI=true pnpm vitest run --coverage` and confirm all tests pass
-    - [ ] Confirm coverage thresholds met (lines 80%, functions 80%, branches 72%, statements 79%)
+- [x] Task: Run full test suite with coverage
+    - [x] Run `CI=true pnpm vitest run --coverage` and confirm all tests pass (219 files, 2070 tests pass)
+    - [x] Confirm coverage thresholds met (lines 85.48%, functions 81.64%, branches 80.99%, statements 86.19%; thresholds 80/80/72/79)
 
 - [ ] Task: Conductor - User Manual Verification 'Build & Full Verification' (Protocol in workflow.md)
 </protect>
