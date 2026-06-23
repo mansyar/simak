@@ -6,18 +6,20 @@
 - [x] Task: Read spec.md and workflow.md before starting this phase
     - [x] Review the spec's functional requirements (FR1, FR4, FR5, FR6)
     - [x] Review the workflow's TDD lifecycle and Phase Completion Verification protocol
+    - commit: b98ea45
 
-- [ ] Task: Write failing tests for programmatic migrator (Red)
-    - [ ] Remove `vi.mock('node:child_process')` and `mockExecSync` from test setup
-    - [ ] Add `vi.mock('drizzle-orm/postgres-js/migrator')` with a mocked `migrate` function
-    - [ ] Write test: advisory lock (`pg_advisory_lock`) is acquired before `migrate()` is called
-    - [ ] Write test: advisory lock (`pg_advisory_unlock`) is released in `finally` on success
-    - [ ] Write test: advisory lock is released in `finally` even when `migrate()` throws
-    - [ ] Write test: `MIGRATE_DATABASE_URL` takes precedence over `DATABASE_URL`
-    - [ ] Write test: falls back to `DATABASE_URL` when `MIGRATE_DATABASE_URL` is unset
-    - [ ] Write test: exits with error when neither env var is set
-    - [ ] Write test: `migrate()` is called with `{ migrationsFolder: './drizzle/migrations' }`
-    - [ ] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm tests fail (Red)
+- [x] Task: Write failing tests for programmatic migrator (Red)
+    - [x] Remove `vi.mock('node:child_process')` and `mockExecSync` from test setup
+    - [x] Add `vi.mock('drizzle-orm/postgres-js/migrator')` with a mocked `migrate` function
+    - [x] Write test: advisory lock (`pg_advisory_lock`) is acquired before `migrate()` is called
+    - [x] Write test: advisory lock (`pg_advisory_unlock`) is released in `finally` on success
+    - [x] Write test: advisory lock is released in `finally` even when `migrate()` throws
+    - [x] Write test: `MIGRATE_DATABASE_URL` takes precedence over `DATABASE_URL`
+    - [x] Write test: falls back to `DATABASE_URL` when `MIGRATE_DATABASE_URL` is unset
+    - [x] Write test: exits with error when neither env var is set
+    - [x] Write test: `migrate()` is called with `{ migrationsFolder: './drizzle/migrations' }`
+    - [x] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm tests fail (Red)
+    - commit: 85598e9
 
 - [ ] Task: Implement programmatic migrator (Green)
     - [ ] Remove `import { execSync } from 'node:child_process'` from `src/db/migrate.ts`
