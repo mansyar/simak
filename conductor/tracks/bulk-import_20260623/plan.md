@@ -27,9 +27,9 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
     - [x] Implement `BulkTemplateRowSchema` + `BulkCreateTemplatesSchema` (Zod, with grouping shape) and `bulkCreateTemplates` server-fn stub in `src/server/bulk-import.ts`
     - [x] Implement `bulkCreateTemplatesHandler` in `src/server/bulk-import.server.ts` (group rows by `templateName`, validate each group against `CreateTemplateSchema`, create template + checkpoints in a transaction reusing the `createTemplateHandler` pattern; write audit log; return `{ created, skipped, errors }`)
     - [x] Run tests green; verify coverage >80% for the handler
-- [~] Task: Conductor - User Manual Verification 'Bulk-Import Server Functions' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Bulk-Import Server Functions' (Protocol in workflow.md) 6d7379a
 
-## Phase 3: Client-Side Parsing, Validation & Sample Generation (Tests)
+## Phase 3: Client-Side Parsing, Validation & Sample Generation (Tests) [checkpoint: 6d7379a]
 
 - [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [ ] Task: User .xlsx parser + validator — TDD
