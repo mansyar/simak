@@ -28,9 +28,10 @@
     - [x] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm tests pass (Green)
     - commits: e393d8d (test mock fix), 516c1cf (implementation)
 
-- [ ] Task: Wire MIGRATE_DATABASE_URL in drizzle.config.ts
-    - [ ] Change `url: process.env.DATABASE_URL!` to `url: process.env.MIGRATE_DATABASE_URL ?? process.env.DATABASE_URL!`
-    - [ ] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm still passing
+- [x] Task: Wire MIGRATE_DATABASE_URL in drizzle.config.ts
+    - [x] Change `url: process.env.DATABASE_URL!` to `url: process.env.MIGRATE_DATABASE_URL ?? process.env.DATABASE_URL!`
+    - [x] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm still passing
+    - commit: d327ba2
 
 - [ ] Task: Delete db:migrate:prod script from package.json
     - [ ] Remove the `db:migrate:prod` entry from the `scripts` section in `package.json`
