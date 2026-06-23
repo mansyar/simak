@@ -33,9 +33,10 @@
     - [x] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm still passing
     - commit: d327ba2
 
-- [ ] Task: Delete db:migrate:prod script from package.json
-    - [ ] Remove the `db:migrate:prod` entry from the `scripts` section in `package.json`
-    - [ ] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm still passing
+- [x] Task: Delete db:migrate:prod script from package.json
+    - [x] Remove the `db:migrate:prod` entry from the `scripts` section in `package.json`
+    - [x] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm still passing
+    - commit: dcb6caa
 
 - [ ] Task: Conductor - User Manual Verification 'Rewrite Migration Runner' (Protocol in workflow.md)
 
