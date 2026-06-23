@@ -59,7 +59,8 @@
     - [x] Verify `COPY --from=builder ... drizzle/migrations ...` line is still present
     commit: f65e519
 
-- [ ] Task: Conductor - User Manual Verification 'Update Dockerfile' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Update Dockerfile' (Protocol in workflow.md)
+    - checkpoint: <sha-pending>
 
 ## Phase 3: Build & Full Verification
 
