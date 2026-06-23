@@ -83,5 +83,6 @@
     - [x] Run `CI=true pnpm vitest run --coverage` and confirm all tests pass (219 files, 2070 tests pass)
     - [x] Confirm coverage thresholds met (lines 85.48%, functions 81.64%, branches 80.99%, statements 86.19%; thresholds 80/80/72/79)
 
-- [ ] Task: Conductor - User Manual Verification 'Build & Full Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Build & Full Verification' (Protocol in workflow.md)
+    - checkpoint: 6fa0db5
 </protect>
