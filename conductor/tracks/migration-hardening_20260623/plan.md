@@ -38,7 +38,8 @@
     - [x] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm still passing
     - commit: dcb6caa
 
-- [ ] Task: Conductor - User Manual Verification 'Rewrite Migration Runner' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Rewrite Migration Runner' (Protocol in workflow.md)
+    - checkpoint: d734b7b
 
 ## Phase 2: Update Dockerfile
 
