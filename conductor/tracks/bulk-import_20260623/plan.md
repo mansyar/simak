@@ -60,18 +60,20 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 ## Phase 5: Bulk Template Import UI [checkpoint: 047b6fc]
 
 - [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
-- [~] Task: Template import route + dropzone — TDD
-    - [ ] Write failing component tests in `tests/unit/routes/admin-templates-import.test.tsx` covering: xlsx-only acceptance, 5MB guard, row-limit rejection
-    - [ ] Implement `/admin/templates/import` route + `BulkTemplateDropzone` component
-- [ ] Task: Grouped preview + commit + result report — TDD
-    - [ ] Write failing component tests covering: preview grouped by template with expandable rows showing checkpoints, per-template Valid/Invalid status, commit calls `bulkCreateTemplates`, loading state, result summary + error table (templateName/reason)
-    - [ ] Implement `BulkTemplatePreviewTable` (expandable per-template rows), commit handler (TanStack Query mutation), `BulkImportResult` reuse
-    - [ ] Wire "Download sample" link calling `generateTemplateSampleXlsx()`
-- [ ] Task: Wire entry point on `/admin/templates`
-    - [ ] Add "Bulk Import" button to the templates page header linking to `/admin/templates/import`
-- [ ] Task: Conductor - User Manual Verification 'Bulk Template Import UI' (Protocol in workflow.md)
+- [x] Task: Template import route + dropzone — TDD
+    - [x] Write failing component tests in `tests/unit/routes/admin-templates-import.test.tsx` covering: xlsx-only acceptance, 5MB guard, row-limit rejection
+    - [x] Implement `/admin/templates/import` route + `BulkTemplateDropzone` component
+- [x] Task: Grouped preview + commit + result report — TDD
+    - [x] Write failing component tests covering: preview grouped by template with expandable rows showing checkpoints, per-template Valid/Invalid status, commit calls `bulkCreateTemplates`, loading state, result summary + error table (templateName/reason)
+    - [x] Implement `BulkTemplatePreviewTable` (expandable per-template rows), commit handler (TanStack Query mutation), `BulkImportResult` reuse
+    - [x] Wire "Download sample" link calling `generateTemplateSampleXlsx()`
+- [x] Task: Wire entry point on `/admin/templates`
+    - [x] Add "Bulk Import" button to the templates page header linking to `/admin/templates/import`
+- [x] Task: Conductor - User Manual Verification 'Bulk Template Import UI' (Protocol in workflow.md)
+  - Commit SHA: 1e2bf04
+  - 8 tests passed, 2138 full suite, TypeScript clean, 0 errors
 
-## Phase 6: i18n, Quality Gates & Final Verification
+## Phase 6: i18n, Quality Gates & Final Verification [checkpoint: 1e2bf04]
 
 - [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [ ] Task: Add i18n keys + EN/ID values — TDD
