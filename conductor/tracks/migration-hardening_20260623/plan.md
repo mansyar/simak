@@ -60,7 +60,7 @@
     commit: f65e519
 
 - [x] Task: Conductor - User Manual Verification 'Update Dockerfile' (Protocol in workflow.md)
-    - checkpoint: <sha-pending>
+    - checkpoint: 30eea43
 
 ## Phase 3: Build & Full Verification
 
