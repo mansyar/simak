@@ -73,7 +73,7 @@ function BulkUserImportPage() {
         setValidationError(t('bulkImport.common.parseFailed'));
       }
     },
-    [validateFile],
+    [validateFile, t],
   );
 
   const handleFileChange = useCallback(
@@ -117,7 +117,7 @@ function BulkUserImportPage() {
   const handleCommit = useCallback(async () => {
     const validRows = parsedRows
       .filter((r) => r.status === 'valid')
-      .map(({ status, error: _error, ...row }) => ({
+      .map(({ status: _status, error: _error, ...row }) => ({
         ...row,
         role: row.role as 'admin' | 'instructor' | 'student',
       }));
@@ -137,7 +137,7 @@ function BulkUserImportPage() {
     } finally {
       setIsCommitting(false);
     }
-  }, [parsedRows, bulkCreateUsersFn]);
+  }, [parsedRows, bulkCreateUsersFn, t]);
 
   const validCount = parsedRows.filter((r) => r.status === 'valid').length;
   const invalidCount = parsedRows.filter((r) => r.status === 'invalid').length;

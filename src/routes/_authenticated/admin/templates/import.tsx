@@ -81,7 +81,7 @@ function BulkTemplateImportPage() {
         setValidationError(t('bulkImport.common.parseFailed'));
       }
     },
-    [validateFile],
+    [validateFile, t],
   );
 
   const handleFileChange = useCallback(
@@ -159,7 +159,7 @@ function BulkTemplateImportPage() {
     } finally {
       setIsCommitting(false);
     }
-  }, [parsedGroups, bulkCreateTemplatesFn]);
+  }, [parsedGroups, bulkCreateTemplatesFn, t]);
 
   const validCount = parsedGroups.filter((g) => g.status === 'valid').length;
   const invalidCount = parsedGroups.filter((g) => g.status === 'invalid').length;
