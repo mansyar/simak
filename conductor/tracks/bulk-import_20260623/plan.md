@@ -45,17 +45,17 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 ## Phase 4: Bulk User Import UI [checkpoint: f663787]
 
-- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
-- [ ] Task: User import route + dropzone — TDD
-    - [ ] Write failing component tests in `tests/unit/routes/admin-users-import.test.tsx` covering: only `.xlsx` accepted, 5MB size guard, non-xlsx rejected at dropzone with message, row-limit rejection message
-    - [ ] Implement `/admin/users/import` route + `BulkUserDropzone` component (reuse existing `FileUploader` patterns where applicable; xlsx-only accept)
-- [ ] Task: Preview table + commit + result report — TDD
-    - [ ] Write failing component tests covering: preview renders parsed rows with per-row Valid/Invalid status, commit calls `bulkCreateUsers`, loading state, result summary card (created/skipped) + error table with row/email/reason
-    - [ ] Implement `BulkUserPreviewTable`, commit handler (TanStack Query mutation), and `BulkImportResult` report card
-    - [ ] Wire "Download sample" link calling `generateUserSampleXlsx()`
-- [ ] Task: Wire entry point on `/admin/users`
-    - [ ] Add "Bulk Import" button to the users page header linking to `/admin/users/import`
-- [ ] Task: Conductor - User Manual Verification 'Bulk User Import UI' (Protocol in workflow.md)
+- [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
+- [~] Task: User import route + dropzone — TDD
+    - [x] Write failing component tests in `tests/unit/routes/admin-users-import.test.tsx` covering: only `.xlsx` accepted, 5MB size guard, non-xlsx rejected at dropzone with message, row-limit rejection message
+    - [x] Implement `/admin/users/import` route + `BulkUserDropzone` component (reuse existing `FileUploader` patterns where applicable; xlsx-only accept)
+- [~] Task: Preview table + commit + result report — TDD
+    - [x] Write failing component tests covering: preview renders parsed rows with per-row Valid/Invalid status, commit calls `bulkCreateUsers`, loading state, result summary card (created/skipped) + error table with row/email/reason
+    - [x] Implement `BulkUserPreviewTable`, commit handler (TanStack Query mutation), and `BulkImportResult` report card
+    - [x] Wire "Download sample" link calling `generateUserSampleXlsx()`
+- [~] Task: Wire entry point on `/admin/users`
+    - [x] Add "Bulk Import" button to the users page header linking to `/admin/users/import`
+- [~] Task: Conductor - User Manual Verification 'Bulk User Import UI' (Protocol in workflow.md)
 
 ## Phase 5: Bulk Template Import UI
 

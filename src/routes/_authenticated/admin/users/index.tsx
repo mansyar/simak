@@ -21,7 +21,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Pagination } from '@/components/ui/pagination';
 import { RefreshButton } from '@/components/ui/refresh-button';
 import { AlertBanner } from '@/components/ui/alert-banner';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
 
@@ -140,6 +140,10 @@ function UsersPage() {
         action={
           <div className="flex items-center gap-2">
             <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
+            <Button variant="outline" onClick={() => navigate({ to: '/admin/users/import' })}>
+              <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
+              Bulk Import
+            </Button>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
               {t('adminUsers.newUser')}
