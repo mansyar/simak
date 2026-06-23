@@ -64,9 +64,9 @@
 
 ## Phase 3: Build & Full Verification
 
-- [ ] Task: Read spec.md and workflow.md before starting this phase
-    - [ ] Review the spec's acceptance criteria (items 8-10)
-    - [ ] Review the workflow's Phase Completion Verification protocol
+- [x] Task: Read spec.md and workflow.md before starting this phase
+    - [x] Review the spec's acceptance criteria (items 8-10)
+    - [x] Review the workflow's Phase Completion Verification protocol
 
 - [ ] Task: Verify production build produces migrate.mjs
     - [ ] Run `pnpm build` and confirm `.output/server/migrate.mjs` is produced
