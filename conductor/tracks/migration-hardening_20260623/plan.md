@@ -3,9 +3,9 @@
 
 ## Phase 1: Rewrite Migration Runner (TDD)
 
-- [ ] Task: Read spec.md and workflow.md before starting this phase
-    - [ ] Review the spec's functional requirements (FR1, FR4, FR5, FR6)
-    - [ ] Review the workflow's TDD lifecycle and Phase Completion Verification protocol
+- [x] Task: Read spec.md and workflow.md before starting this phase
+    - [x] Review the spec's functional requirements (FR1, FR4, FR5, FR6)
+    - [x] Review the workflow's TDD lifecycle and Phase Completion Verification protocol
 
 - [ ] Task: Write failing tests for programmatic migrator (Red)
     - [ ] Remove `vi.mock('node:child_process')` and `mockExecSync` from test setup
