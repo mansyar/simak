@@ -17,7 +17,7 @@ import { TemplateLoadingSkeleton } from '@/components/admin/templates/TemplateLo
 import { CreateTemplateDialog } from '@/components/admin/templates/CreateTemplateDialog';
 import { DeleteTemplateDialog } from '@/components/admin/templates/DeleteTemplateDialog';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
 import { RefreshButton } from '@/components/ui/refresh-button';
 import { z } from 'zod';
@@ -149,6 +149,10 @@ function TemplatesPage() {
         action={
           <div className="flex items-center gap-2">
             <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
+            <Button variant="outline" onClick={() => navigate({ to: '/admin/templates/import' })}>
+              <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
+              Bulk Import
+            </Button>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
               {t('adminTemplates.newTemplate')}

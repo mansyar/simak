@@ -59,8 +59,8 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 ## Phase 5: Bulk Template Import UI [checkpoint: 047b6fc]
 
-- [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
-- [ ] Task: Template import route + dropzone — TDD
+- [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
+- [~] Task: Template import route + dropzone — TDD
     - [ ] Write failing component tests in `tests/unit/routes/admin-templates-import.test.tsx` covering: xlsx-only acceptance, 5MB guard, row-limit rejection
     - [ ] Implement `/admin/templates/import` route + `BulkTemplateDropzone` component
 - [ ] Task: Grouped preview + commit + result report — TDD
