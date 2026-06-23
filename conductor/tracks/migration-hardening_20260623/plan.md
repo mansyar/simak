@@ -21,11 +21,12 @@
     - [x] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm tests fail (Red)
     - commit: 85598e9
 
-- [ ] Task: Implement programmatic migrator (Green)
-    - [ ] Remove `import { execSync } from 'node:child_process'` from `src/db/migrate.ts`
-    - [ ] Add `import { migrate } from 'drizzle-orm/postgres-js/migrator'` to `src/db/migrate.ts`
-    - [ ] Replace `execSync('npx drizzle-kit migrate', { stdio: 'inherit' })` with `await migrate(db, { migrationsFolder: './drizzle/migrations' })`
-    - [ ] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm tests pass (Green)
+- [x] Task: Implement programmatic migrator (Green)
+    - [x] Remove `import { execSync } from 'node:child_process'` from `src/db/migrate.ts`
+    - [x] Add `import { migrate } from 'drizzle-orm/postgres-js/migrator'` to `src/db/migrate.ts`
+    - [x] Replace `execSync('npx drizzle-kit migrate', { stdio: 'inherit' })` with `await migrate(db, { migrationsFolder: './drizzle/migrations' })`
+    - [x] Run `CI=true pnpm vitest run tests/unit/db/migrate.test.ts` and confirm tests pass (Green)
+    - commits: e393d8d (test mock fix), 516c1cf (implementation)
 
 - [ ] Task: Wire MIGRATE_DATABASE_URL in drizzle.config.ts
     - [ ] Change `url: process.env.DATABASE_URL!` to `url: process.env.MIGRATE_DATABASE_URL ?? process.env.DATABASE_URL!`
