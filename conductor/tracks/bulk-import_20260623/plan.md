@@ -41,9 +41,9 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 - [~] Task: Sample-file generators — TDD
     - [x] Write failing tests in `tests/unit/lib/sample-generators.test.ts` covering: user sample has headers + 1 example row; template sample has headers + example checkpoint rows; output is a valid .xlsx blob
     - [x] Implement `generateUserSampleXlsx()` + `generateTemplateSampleXlsx()` in `src/lib/bulk-import/samples.ts` (SheetJS `write` → Blob; no server round-trip)
-- [~] Task: Conductor - User Manual Verification 'Client-Side Parsing, Validation & Sample Generation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Client-Side Parsing, Validation & Sample Generation' (Protocol in workflow.md) f663787
 
-## Phase 4: Bulk User Import UI
+## Phase 4: Bulk User Import UI [checkpoint: f663787]
 
 - [ ] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [ ] Task: User import route + dropzone — TDD
