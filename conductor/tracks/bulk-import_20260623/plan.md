@@ -4,7 +4,7 @@
 
 Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → Implement → Verify coverage) for each task. Each phase ends with the Phase Completion Verification & Checkpointing Protocol.
 
-## Phase 1: Foundation — Tech Stack & Dependency Setup
+## Phase 1: Foundation — Tech Stack & Dependency Setup [checkpoint: 8713e3f]
 
 - [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [x] Task: Document SheetJS dependency in `conductor/tech-stack.md`
@@ -12,7 +12,7 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 - [x] Task: Install SheetJS dependency
     - [ ] Run `pnpm add xlsx` and verify import works (`import * as XLSX from 'xlsx'`)
     - [ ] Confirm no client/server split violation (SheetJS is client-only; never imported by `.server.ts` files)
-- [~] Task: Conductor - User Manual Verification 'Foundation — Tech Stack & Dependency Setup' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Foundation — Tech Stack & Dependency Setup' (Protocol in workflow.md)
 
 ## Phase 2: Bulk-Import Server Functions (Schemas + Handlers + Tests)
 
