@@ -835,7 +835,7 @@ A checkpoint unlocks when:
 ### Database Migrations [v1]
 
 - Drizzle Kit for migration generation and execution.
-- `drizzle-kit push` for development; `drizzle-kit migrate` for production.
+- `drizzle-kit push` for development; `drizzle-kit migrate` for local CLI use.
 - **Production migration runner**: Bundled `migrate.mjs` via Coolify pre-deploy hook.
 - **PgBouncer bypass**: Use `MIGRATE_DATABASE_URL` to connect directly to PostgreSQL (port 5432) during migrations, bypassing PgBouncer's transaction-mode pooling which breaks Drizzle's prepared statements.
 - **Concurrency guard**: `pg_advisory_lock` (ID: 789123) serializes concurrent migration runs to prevent corruption.
