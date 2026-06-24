@@ -225,7 +225,7 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 **NotificationPreference** — per-user, per-event, per-channel toggle. [v2]
 **ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, subsequent checkpoints and assignment finalDeadline auto-extend.
 **AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v1] — admin viewer at `/admin/audit-log`.
-**EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, and 2FA emails; extended to event notifications in [v2].
+**EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, and 2FA emails; extended to event notifications in [v2]. Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS.
 **TwoFactor** — TOTP configuration (secret, backup codes) managed by Better Auth's `twoFactor` plugin.
 **Session** — Better-Auth session token, FK to users, expiresAt.
 **Account** — Better-Auth credential provider entry (stores hashed password).
@@ -477,7 +477,7 @@ Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for t
 | subject        | text, not null     |                                                                 |
 | bodyHtml       | text, not null     |                                                                 |
 | templateType   | text, not null     | `password_reset` \| `invitation` \| `sla_alert` \| `two_factor` |
-| status         | text, not null     | `pending` \| `sent` \| `failed`                                 |
+| status         | text, not null     | `pending` \| `processing` \| `sent` \| `failed`                 |
 | attempts       | integer, default 0 |                                                                 |
 | lastAttemptAt  | timestamp          | NULLABLE                                                        |
 | errorMessage   | text               | NULLABLE — last failure reason                                  |
@@ -704,6 +704,8 @@ A checkpoint unlocks when:
 - Sent via Resend API. [v1] for auth-related emails (invitations, password reset, 2FA enable/disable); [v2] for event notification emails (submission, review, deadline alerts).
 - Email queue (`email_queue` table) with retry logic: 3 attempts with exponential backoff (30s, 5min, 30min).
 - Dead letter after 3 failed attempts (logged, not retried).
+- **Concurrency hardening:** rows are claimed inside a transaction using `FOR UPDATE SKIP LOCKED` and marked `processing`; the Resend send occurs **outside** the transaction so no long-lived lock is held. An in-process `isRunning` guard prevents overlapping ticks. Rows stuck in `processing` for > 5 minutes are reclaimed to `pending` at the start of each tick, preventing lockup on worker crash.
+- **XSS hardening:** all user-derived interpolations in email bodies are passed through an `escapeHtml` helper before rendering, preventing stored-XSS via user-controlled fields (name, email, subject context).
 
 ### Preferences [v2]
 
@@ -720,7 +722,7 @@ A checkpoint unlocks when:
 | --------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | **Server functions**  | Validate inputs with Zod before processing. Return typed error responses. Never expose stack traces to the client. |
 | **File upload**       | Server-side MIME validation. R2 failures surface as upload errors with retry guidance to the user.                 |
-| **Email delivery**    | Queue-based with retry. Transient failures are retried; permanent failures are logged.                             |
+| **Email delivery**    | Queue-based with retry. Transient failures are retried; permanent failures are logged. Rows claimed transactionally (`FOR UPDATE SKIP LOCKED`); stale `processing` rows (> 5 min) are reclaimed to prevent lockup. |
 | **Database**          | Drizzle query errors caught and mapped to user-friendly messages (e.g. "Failed to load assignments").              |
 | **Client**            | TanStack Query `onError` callbacks show toast notifications. Form errors displayed inline per field.               |
 | **Unexpected errors** | A global error boundary catches render crashes and shows a fallback UI with a reload option.                       |

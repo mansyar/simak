@@ -489,6 +489,74 @@ Index on `(status, created_at ASC)` for efficient dequeuing.
 
 ---
 
+### Track 4.2 — Email Pipeline Hardening
+
+**Description:** Harden the background email queue against concurrent duplicate delivery and stale-row lockup, and eliminate stored-XSS vectors in email bodies. Adds a `processing` status, transactional claim with `FOR UPDATE SKIP LOCKED`, an in-process `isRunning` guard, stale-row reclaim (rows stuck in `processing` > 5 min), and HTML-escaping of all user-derived interpolations in email templates.
+
+**Dependencies:** Track 4.1 (`email_queue` table, processor, enqueue helpers).
+
+**Status:** ✅ Complete (June 2026)
+
+**Estimated Scope:**
+
+| Area                                                | Effort |
+| --------------------------------------------------- | ------ |
+| Schema — `processing` status enum value              | Small  |
+| Transactional claim (`FOR UPDATE SKIP LOCKED`)       | Medium |
+| `isRunning` re-entrancy guard                        | Small  |
+| Stale-row reclaim (> 5 min threshold)                | Small  |
+| `escapeHtml` helper + apply to email templates       | Small  |
+| Tests (unit + integration)                           | Medium |
+
+**Database Schema Changes:**
+
+**Modified Table: `email_queue`** — `status` enum extended from `pending | sent | failed` to `pending | processing | sent | failed`. Migration `0001_email_queue_processing_status.sql` adds the `email_queue_status_check` CHECK constraint and a companion rollback file at `drizzle/migrations/rollback/0001_email_queue_processing_status.rollback.sql` (per SQL styleguide §5.1).
+
+**Acceptance Criteria:**
+
+- [x] `processing` status added to `email_queue.status` enum (migration 0001)
+- [x] Processor claims rows in a transaction using `FOR UPDATE SKIP LOCKED`; marks `processing` inside the tx; sends via Resend **outside** the tx (no long-lived locks)
+- [x] `isRunning` guard prevents overlapping processor ticks within a single process
+- [x] Rows stuck in `processing` for > 5 minutes are reclaimed to `pending` at the start of each tick
+- [x] `escapeHtml` helper introduced; applied to all user-derived interpolations in `src/lib/email.ts` (3 functions) and `src/server/two-factor.server.ts` (2 emails)
+- [x] No regression in email content or formatting (NFR-1)
+- [x] Multiple concurrent workers do not produce duplicate deliveries (NFR-2, integration-tested)
+- [x] i18n unaffected (NFR-3)
+
+**Actual Files Created/Modified:**
+
+| File                                                         | Purpose                                                                                                          |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `drizzle/migrations/0001_email_queue_processing_status.sql`  | Migration — add `processing` to status enum + `email_queue_status_check` CHECK constraint                       |
+| `drizzle/migrations/rollback/0001_email_queue_processing_status.rollback.sql` | **New:** Companion rollback file (drops the CHECK constraint), per SQL styleguide §5.1            |
+| `src/db/schema/email-queue.ts`                               | **Modified:** Added `processing` to the status enum                                                              |
+| `src/lib/email-queue-processor.ts`                           | **Modified:** Stale reclaim, transactional `SKIP LOCKED` claim, `isRunning` guard, send-outside-tx              |
+| `src/lib/email-queue-init.ts`                                | **Modified:** Init wiring for the hardened processor                                                             |
+| `src/lib/email.ts`                                           | **Modified:** `escapeHtml` applied to user-derived fields in `sendPasswordResetEmail`, `sendInvitationEmail`, `sendSLAAlertEmail` |
+| `src/server/two-factor.server.ts`                            | **Modified:** `escapeHtml` applied to user name in 2FA enable/disable emails                                     |
+| `tests/unit/server/email-queue-processor.test.ts`            | **Modified:** Coverage for stale reclaim, SKIP LOCKED claim, isRunning guard, send-outside-tx                    |
+| `tests/integration/lib/email-queue-processor.test.ts`        | **New:** Multi-worker duplicate-delivery prevention against live PostgreSQL (opt-in, not in pre-push)           |
+
+**Test Plan:**
+
+| Area                    | Approach                                                                                  |
+| ----------------------- | ----------------------------------------------------------------------------------------- |
+| Stale reclaim            | Unit test — `processing` rows older than 5 min reset to `pending`                         |
+| Transactional claim     | Unit test — `FOR UPDATE SKIP LOCKED` claim marks `processing` inside tx; Resend called outside |
+| isRunning guard          | Unit test — overlapping ticks are skipped                                                 |
+| escapeHtml              | Unit test — user-derived fields are escaped before interpolation                          |
+| Multi-worker no-dup      | Integration test — two workers against live PostgreSQL claim disjoint rows, no duplicates |
+
+**Test Results (at time of archiving):**
+
+- 2183/2183 unit tests passing across 229 test files
+- TypeScript typecheck passes with no errors
+- oxlint passes (0 errors; 1 pre-existing unrelated warning)
+- Integration test passes against live PostgreSQL (run via `pnpm test:integration`)
+- Review fixes applied: restored pre-push coverage gate to `pnpm test:coverage` (excludes integration), added missing migration rollback file
+
+---
+
 ## Phase 5: Analytics & Export
 
 Role-based analytics dashboards with performance metrics and CSV/PDF export capabilities. Builds on V1 dashboard widgets.
