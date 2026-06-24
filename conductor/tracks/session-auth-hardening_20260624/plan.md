@@ -42,9 +42,9 @@
 
 ## Phase 3: HIGH — Rate Limiting & trustedOrigins [checkpoint: e0ceb73]
 
-- [x] Task: Add Better Auth `rateLimit` plugin to `src/auth/config.ts` `ce3c69f`
-    - [x] Write tests: `tests/unit/auth/config.test.ts` — config includes `rateLimit` plugin with `{ window: 60, max: 10 }`; 11th request within window is rejected with 429 (mock Better Auth rate limit behavior)
-    - [x] Implement: Import `rateLimit` from `better-auth/plugins`; add to `plugins` array with `{ window: 60, max: 10 }`
+- [x] Task: Add Better Auth built-in `rateLimit` config to `src/auth/config.ts` `ce3c69f`
+    - [x] Write tests: `tests/unit/auth/config.test.ts` — config includes built-in `rateLimit` with `{ window: 60, max: 10 }`; 11th request within window is rejected with 429 (mock Better Auth rate limit behavior)
+    - [x] Implement: Add top-level `rateLimit: { window: 60, max: 10 }` to betterAuth config (built-in option, not a plugin)
     - [x] Verify: tests pass, auth config loads without error
     - [x] Commit: `feat(auth): Add global rate limiting (60s window, max 10 requests)`
 

@@ -12,9 +12,18 @@ vi.mock('@/lib/audit', () => ({
   logAuditEvent: vi.fn(),
 }));
 
+vi.mock('drizzle-orm', async (importActual) => {
+  const actual = await importActual<typeof import('drizzle-orm')>();
+  return {
+    ...actual,
+    gt: vi.fn(actual.gt),
+  };
+});
+
 import { getSessionFromHeaders } from '@/server/auth';
 import { getDb } from '@/db/index';
 import { logAuditEvent } from '@/lib/audit';
+import { gt } from 'drizzle-orm';
 import {
   listActiveSessionsHandler,
   revokeSessionHandler,
@@ -24,6 +33,7 @@ import {
 const mockGetSessionFromHeaders = vi.mocked(getSessionFromHeaders);
 const mockGetDb = vi.mocked(getDb);
 const mockLogAuditEvent = vi.mocked(logAuditEvent);
+const mockGt = vi.mocked(gt);
 
 function createMockSession(overrides?: { id?: string }) {
   return {
@@ -273,6 +283,21 @@ describe('listActiveSessionsHandler', () => {
     expect(mockWhere).toHaveBeenCalled();
     const whereArg = mockWhere.mock.calls[0][0];
     expect(whereArg).toBeDefined();
+  });
+
+  it('should filter sessions by expiresAt greater than now', async () => {
+    mockGetSessionFromHeaders.mockResolvedValue(createMockSession());
+    const mockOrderBy = vi.fn().mockResolvedValue([]);
+    const mockWhere = vi.fn().mockReturnValue({ orderBy: mockOrderBy });
+    const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = vi.fn().mockReturnValue({ from: mockFrom });
+    mockGetDb.mockReturnValue({ select: mockSelect } as any);
+
+    await listActiveSessionsHandler();
+
+    // Verify the where clause uses gt() for expiresAt filtering (FR-5)
+    expect(mockGt).toHaveBeenCalled();
+    expect(mockGt.mock.calls[0][1]).toBeInstanceOf(Date);
   });
 });
 

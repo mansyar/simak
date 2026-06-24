@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
-import { getDb } from '@/db/index';
-import { session } from '@/db/schema/index';
-import { logAuditEvent } from '@/lib/audit';
+import { getDb } from '../db/index';
+import { session } from '../db/schema/index';
+import { logAuditEvent } from './audit';
 
 /**
  * Revokes all active sessions for a user and logs the event.
