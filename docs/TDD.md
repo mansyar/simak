@@ -138,7 +138,9 @@ simak/
 │   │   ├── dashboard.server.ts → Re-exports from per-role handler files
 │   │   ├── dashboard-student.server.ts → Student dashboard handler
 │   │   ├── dashboard-instructor.server.ts → Instructor dashboard handler
-│   │   └── dashboard-admin.server.ts → Admin dashboard handler
+    │   │   └── dashboard-admin.server.ts → Admin dashboard handler
+    │   │   ├── bulk-import.ts      → Bulk import server fn stubs + Zod schemas (users, templates)
+    │   │   └── bulk-import.server.ts → Server-only bulk import handlers (parse, validate, insert)
 │   ├── db/
 │   │   ├── schema/           → Drizzle schema (split by domain)
 │   │   ├── index.ts          → Database client
@@ -149,8 +151,10 @@ simak/
 │   ├── lib/
 │   │   ├── email.ts          → Resend client
 │   │   ├── storage.ts        → R2 client
-│   │   ├── route-utils.ts    → Role-based dashboard routing utility
-│   │   └── utils.ts          → Shared utilities
+    │   │   ├── route-utils.ts    → Role-based dashboard routing utility
+    │   │   ├── role-permissions.ts → Canonical CREATION_ALLOWED_ROLES (shared by user creation + bulk import)
+    │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
+    │   │   └── utils.ts          → Shared utilities
 │   └── config/
 │       └── env.ts            → Validated environment variables
 ├── locales/                  → typesafe-i18n translation files
@@ -744,6 +748,7 @@ A checkpoint unlocks when:
 | **State transitions** | Valid and invalid checkpoint state transitions (e.g. can't go from LOCKED to PASSED). |
 | **Validation**        | Zod schema tests for all input types (assignment creation, submission upload, etc.).  |
 | **Permission checks** | Role-based access logic unit tests.                                                   |
+| **Bulk import**       | Xlsx parsing, role-permission validation, email uniqueness (excluding soft-deleted), transaction rollback, audit logging. |                                                   |
 
 ### Integration Tests (Vitest) [v2]
 

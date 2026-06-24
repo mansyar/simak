@@ -21,6 +21,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - In-app notifications keep both parties informed of submissions, reviews, revision requests, and missed deadlines. (Email notifications are `[v2]`, except for auth-related emails: invitations, password reset, and 2FA enable/disable).
 - Checkpoints must be completed in sequential order.
 - Admins can manage users and assignment templates.
+- Admins can bulk import users and assignment templates via Excel (.xlsx) files with client-side preview and server-side re-validation.
 - Both students and instructors can view and download previously submitted checkpoint files.
 - Consultation sessions (Kartu Bimbingan) are tracked as a requirement for assignment completion.
 - Admins can view audit logs via the viewer at `/admin/audit-log`. System-wide analytics dashboards are `[v2]`.
@@ -180,6 +181,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - User CRUD with filtering and bulk operations.
 - Role assignment: SuperAdmin creates Admin; Admin creates Instructor and Student.
 - Email-based password setup on account creation.
+- **Bulk Import**: Admins can upload `.xlsx` files to create multiple users (columns: `name`, `email`, `role`) or assignment templates (columns: `templateName`, `type`, `checkpointName`, `minConsultations`, `estimatedDuration`). Client-side parsing via SheetJS provides a preview table with validation badges. Server re-validates all rows (role permissions, email uniqueness excluding soft-deleted users, row/size limits). Partial success is supported — invalid rows are skipped with per-row error reasons. Template groups are inserted atomically per group via `db.transaction()`. All actions are audit-logged. Bilingual (EN/ID) throughout. Limits: 500 rows / 5 MB per file.
 
 ---
 

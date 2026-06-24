@@ -950,6 +950,7 @@ Integration tests against a real PostgreSQL database, deferred from V1.
 | 🔴 **High**      | Track 4.1 (Email Queue)        | Removes synchronous Resend bottleneck; improves reliability              |
 | 🟠 **Medium**    | Track 2.1 (Groups)             | Largest feature request; significant scope                               |
 | 🟡 **Lower**     | Tracks 3.1, 5.1, 6.2, 6.3, 6.4, 6.5, 7.1 | Security, analytics, UX polish, UI consistency, testing — valuable but not blocking |
+| ✅ **Completed** | Bulk Import (Users & Templates) | Ad-hoc track: Excel bulk import for users and templates with client preview, server re-validation, per-group atomicity, audit logging, bilingual i18n |
 
 ## Implementation Strategy
 
@@ -1060,7 +1061,8 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 10. ✅ Track 6.5 — UI Consistency for Instructor-Facing UI (Complete)
 11. ✅ Track 6.6 — UI Consistency for Admin-Facing UI (Complete)
 12. ✅ Production Migration Hardening — Dockerfile executes bundled `migrate.mjs` (advisory-locked, PgBouncer bypass via `MIGRATE_DATABASE_URL`); `drizzle-kit` removed from production image (Complete)
-13. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
+13. ✅ Bulk Import for Users & Templates — Excel (.xlsx) bulk import with client-side preview (SheetJS), server-side re-validation, per-group atomicity for templates, audit logging, bilingual i18n, 500 row/5 MB limits (Complete)
+14. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
 14. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
 15. [ ] Write failing tests
 16. [ ] Implement features
