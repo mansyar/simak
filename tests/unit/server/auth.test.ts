@@ -54,6 +54,7 @@ vi.mock('@/db/schema/users', () => ({
     id: 'id',
     role: 'role',
     locale: 'locale',
+    deletedAt: 'deletedAt',
   },
 }));
 
@@ -84,6 +85,8 @@ function createMockSession(
       updatedAt: now,
       name: overrides.userName ?? 'Test User',
       email: overrides.userEmail ?? 'test@example.com',
+      role: overrides.userRole ?? undefined,
+      locale: overrides.userLocale ?? undefined,
       emailVerified: overrides.emailVerified ?? true,
       image: overrides.image ?? null,
       twoFactorEnabled: false,
@@ -157,7 +160,7 @@ describe('Server auth module', () => {
       });
     });
 
-    it('should default to student role when user record not found', async () => {
+    it('should return null when user record is not found or soft-deleted', async () => {
       const mockSession = createMockSession({
         userId: 'user-456',
         userName: 'New User',
@@ -166,29 +169,14 @@ describe('Server auth module', () => {
         image: 'https://example.com/avatar.png',
       });
 
-      const mockDb = createMockDb(null); // No user record found
+      const mockDb = createMockDb(null); // No active user record found
 
       vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
       vi.mocked(getDb).mockReturnValue(mockDb as any);
 
       const result = await getSessionFromHeaders();
 
-      expect(result).toEqual({
-        user: {
-          id: 'user-456',
-          name: 'New User',
-          email: 'new@example.com',
-          role: 'student', // Default role
-          locale: 'en', // Default locale
-          emailVerified: false,
-          image: 'https://example.com/avatar.png',
-        },
-        session: {
-          id: 'session-123',
-          token: 'token-abc',
-          expiresAt: expect.any(Date),
-        },
-      });
+      expect(result).toBeNull();
     });
 
     it('should handle emailVerified as truthy value', async () => {
@@ -226,6 +214,49 @@ describe('Server auth module', () => {
       expect(mockSelect).toHaveBeenCalled();
       expect(mockFrom).toHaveBeenCalled();
       expect(mockWhere).toHaveBeenCalled();
+    });
+
+    it('should return null when user is soft-deleted', async () => {
+      const mockSession = createMockSession({ userId: 'deleted-user' });
+      const mockDb = createMockDb(null);
+
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(getDb).mockReturnValue(mockDb as any);
+
+      const result = await getSessionFromHeaders();
+
+      expect(result).toBeNull();
+    });
+
+    it('should use role/locale from session payload when present', async () => {
+      const mockSession = createMockSession({
+        userId: 'user-123',
+        userRole: 'admin',
+        userLocale: 'id',
+      });
+
+      const mockDb = createMockDb({ role: 'student', locale: 'en' });
+
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(getDb).mockReturnValue(mockDb as any);
+
+      const result = await getSessionFromHeaders();
+
+      expect(result?.user.role).toBe('admin');
+      expect(result?.user.locale).toBe('id');
+    });
+
+    it('should fall back to DB role/locale when payload is missing', async () => {
+      const mockSession = createMockSession({ userId: 'user-123' });
+      const mockDb = createMockDb({ role: 'instructor', locale: 'id' });
+
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+      vi.mocked(getDb).mockReturnValue(mockDb as any);
+
+      const result = await getSessionFromHeaders();
+
+      expect(result?.user.role).toBe('instructor');
+      expect(result?.user.locale).toBe('id');
     });
   });
 

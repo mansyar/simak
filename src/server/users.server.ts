@@ -5,6 +5,7 @@ import { getDb } from '../db/index';
 import { users, verification } from '../db/schema/index';
 import { sendInvitationEmail } from '../lib/email';
 import { logAuditEvent } from '../lib/audit';
+import { revokeUserSessions } from '../lib/auth-session';
 import { getSessionFromHeaders } from './auth';
 import type { z } from 'zod';
 import type {
@@ -237,6 +238,11 @@ export async function deleteUserHandler(args: { data: UserIdParam }) {
   }
 
   const db = getDb();
+
+  // Revoke all sessions for the user before soft-deleting, so they are
+  // immediately logged out on every device.
+  await revokeUserSessions(args.data.id, session.user.id);
+
   await db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, args.data.id));
 
   await logAuditEvent({
@@ -267,6 +273,11 @@ export async function generateSetupLinkHandler(args: { data: UserIdParam }) {
   }
 
   const token = crypto.randomUUID();
+
+  // Invalidate any existing setup/verification tokens for this email
+  // before issuing a new one.
+  await db.delete(verification).where(eq(verification.identifier, user.email));
+
   await db.insert(verification).values({
     id: crypto.randomUUID(),
     identifier: user.email,

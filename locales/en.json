@@ -33,7 +33,8 @@
     "backupCode": "Backup Code",
     "invalidBackupCode": "Invalid backup code. Please try again.",
     "useTotpCode": "Use an authenticator code instead",
-    "backupCodePlaceholder": "xxxx-xxxx-xxxx"
+    "backupCodePlaceholder": "xxxx-xxxx-xxxx",
+    "rateLimit": "Too many requests. Please try again later."
   },
   "nav": {
     "dashboard": "Dashboard",

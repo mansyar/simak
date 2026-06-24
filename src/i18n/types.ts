@@ -39,6 +39,7 @@ export type Translation = {
     invalidBackupCode: string
     useTotpCode: string
     backupCodePlaceholder: string
+    rateLimit: string
   }
   nav: {
     dashboard: string

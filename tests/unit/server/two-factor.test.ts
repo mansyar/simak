@@ -11,6 +11,7 @@ import * as authMod from '@/server/auth';
 import * as dbMod from '@/db/index';
 import * as auditMod from '@/lib/audit';
 import * as emailMod from '@/lib/email';
+import * as authSessionMod from '@/lib/auth-session';
 import { auth } from '@/auth/config';
 
 vi.mock('@/server/auth', () => ({
@@ -42,6 +43,10 @@ vi.mock('@/lib/audit', () => ({
 
 vi.mock('@/lib/email', () => ({
   enqueueEmail: vi.fn(),
+}));
+
+vi.mock('@/lib/auth-session', () => ({
+  revokeUserSessions: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('@/config/env', () => ({
@@ -272,6 +277,25 @@ describe('Two-factor server functions', () => {
       });
 
       expect(result).toEqual({ error: 'Wrong password' });
+    });
+
+    it('should revoke all user sessions after disabling 2FA', async () => {
+      vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.disableTwoFactor).mockResolvedValue({} as any);
+
+      const mockUpdateSet = vi.fn().mockResolvedValue(undefined);
+      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
+      mockDb.update.mockReturnValue({ set: mockUpdateSet } as any);
+      mockUpdateSet.mockReturnValue({ where: mockUpdateWhere } as any);
+
+      const mockDeleteWhere = vi.fn().mockResolvedValue(undefined);
+      mockDb.delete.mockReturnValue({ where: mockDeleteWhere } as any);
+
+      await disableTwoFactorHandler({
+        data: { password: 'testpass123' },
+      });
+
+      expect(authSessionMod.revokeUserSessions).toHaveBeenCalledWith('user-123', 'user-123');
     });
   });
 

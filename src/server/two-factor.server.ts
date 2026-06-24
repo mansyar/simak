@@ -7,6 +7,7 @@ import { users, twoFactor } from '../db/schema/index';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { enqueueEmail } from '../lib/email';
+import { revokeUserSessions } from '../lib/auth-session';
 import type { z } from 'zod';
 import type {
   EnableTwoFactorSchema,
@@ -157,6 +158,9 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
 
     // Delete the two-factor record
     await db.delete(twoFactor).where(eq(twoFactor.userId, session.user.id));
+
+    // Revoke all sessions so the password change takes effect everywhere
+    await revokeUserSessions(session.user.id, session.user.id);
 
     // Log audit event
     await logAuditEvent({

@@ -11,6 +11,7 @@ import {
 } from '@/server/users.server';
 import * as auth from '@/server/auth';
 import * as email from '@/lib/email';
+import * as authSession from '@/lib/auth-session';
 import * as dbMod from '@/db/index';
 
 vi.mock('@/server/auth', () => ({
@@ -19,6 +20,10 @@ vi.mock('@/server/auth', () => ({
 
 vi.mock('@/lib/email', () => ({
   sendInvitationEmail: vi.fn(),
+}));
+
+vi.mock('@/lib/auth-session', () => ({
+  revokeUserSessions: vi.fn(),
 }));
 
 vi.mock('@/db/index', () => ({
@@ -44,6 +49,7 @@ describe('User server functions - Logic & Security', () => {
     values: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
     // Simple mock for Drizzle's thenable queries
     then: vi.fn(function (onfulfilled) {
       return Promise.resolve([]).then(onfulfilled);
@@ -295,6 +301,17 @@ describe('User server functions - Logic & Security', () => {
       const result = await deleteUserHandler({ data: { id: 'user-1' } });
       expect(result).toEqual({ error: 'Unauthorized' });
     });
+
+    it('should call revokeUserSessions before soft-deleting', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+
+      await deleteUserHandler({ data: { id: 'user-1' } });
+
+      expect(authSession.revokeUserSessions).toHaveBeenCalledWith('user-1', 'admin-1');
+    });
   });
 
   describe('getUser', () => {
@@ -415,6 +432,26 @@ describe('User server functions - Logic & Security', () => {
       const result = await generateSetupLinkHandler({ data: { id: 'user-1' } });
       expect(result).toHaveProperty('url');
       expect(result?.url).toContain('/auth/setup-password?token=');
+    });
+
+    it('should clear existing verification tokens before generating a new link', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ email: 'user@test.com' }]).then(fn),
+      );
+
+      const mockDeleteWhere = vi.fn().mockResolvedValue(undefined);
+      const originalDelete = mockDb.delete;
+      mockDb.delete = vi.fn().mockReturnValue({ where: mockDeleteWhere } as any);
+
+      await generateSetupLinkHandler({ data: { id: 'user-1' } });
+
+      expect(mockDb.delete).toHaveBeenCalled();
+      expect(mockDeleteWhere).toHaveBeenCalled();
+      mockDb.delete = originalDelete;
     });
   });
 });

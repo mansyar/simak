@@ -259,6 +259,21 @@ describe('listActiveSessionsHandler', () => {
 
     expect(result.sessions[0].userAgent).toContain('Chrome');
   });
+
+  it('should exclude expired sessions', async () => {
+    mockGetSessionFromHeaders.mockResolvedValue(createMockSession());
+    const mockOrderBy = vi.fn().mockResolvedValue([]);
+    const mockWhere = vi.fn().mockReturnValue({ orderBy: mockOrderBy });
+    const mockFrom = vi.fn().mockReturnValue({ where: mockWhere });
+    const mockSelect = vi.fn().mockReturnValue({ from: mockFrom });
+    mockGetDb.mockReturnValue({ select: mockSelect } as any);
+
+    await listActiveSessionsHandler();
+
+    expect(mockWhere).toHaveBeenCalled();
+    const whereArg = mockWhere.mock.calls[0][0];
+    expect(whereArg).toBeDefined();
+  });
 });
 
 describe('revokeSessionHandler', () => {

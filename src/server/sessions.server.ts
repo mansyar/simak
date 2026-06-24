@@ -1,5 +1,5 @@
 // Server-only handlers for session management (not imported by client code)
-import { eq, and, ne } from 'drizzle-orm';
+import { eq, and, ne, gt } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { session as sessionTable } from '../db/schema/index';
 import { logAuditEvent } from '../lib/audit';
@@ -46,10 +46,11 @@ export async function listActiveSessionsHandler() {
   }
 
   const db = getDb();
+  const now = new Date();
   const sessions = await db
     .select()
     .from(sessionTable)
-    .where(eq(sessionTable.userId, session_.user.id))
+    .where(and(eq(sessionTable.userId, session_.user.id), gt(sessionTable.expiresAt, now)))
     .orderBy(sessionTable.createdAt);
 
   const enriched = sessions.map((s) => ({

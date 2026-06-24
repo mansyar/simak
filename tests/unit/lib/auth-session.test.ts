@@ -64,4 +64,20 @@ describe('revokeUserSessions', () => {
     await expect(revokeUserSessions('user-no-sessions')).resolves.toBeUndefined();
     expect(mockDb.delete).toHaveBeenCalled();
   });
+
+  it('should use provided actorId in audit event', async () => {
+    const mockDb = createMockDb();
+    mockGetDb.mockReturnValue(mockDb as any);
+
+    await revokeUserSessions('user-123', 'admin-1');
+
+    expect(mockLogAuditEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: 'admin-1',
+        action: 'session.revoked',
+        entityType: 'user',
+        entityId: 'user-123',
+      }),
+    );
+  });
 });

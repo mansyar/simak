@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { revokeUserSessions } from '@/lib/auth-session';
 
 // Mock database before any imports
 vi.mock('@/db/index', () => ({
@@ -16,9 +17,17 @@ vi.mock('@/db/index', () => ({
   },
 }));
 
-// Mock email module
+// Mock email and auth session modules
 vi.mock('@/lib/email', () => ({
   sendPasswordResetEmail: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/auth-session', () => ({
+  revokeUserSessions: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/config/env', () => ({
+  getEnv: vi.fn().mockReturnValue({ BETTER_AUTH_URL: 'http://localhost:3000' }),
 }));
 
 describe('Auth server configuration', () => {
@@ -66,6 +75,46 @@ describe('Auth server configuration', () => {
     >;
     expect(emailPw.enabled).toBe(true);
     expect(typeof emailPw.sendResetPassword).toBe('function');
+  });
+
+  it('should configure additionalFields with role and locale', async () => {
+    const { auth } = await import('@/auth/config');
+    const opts = auth.options as { additionalFields?: Record<string, unknown> };
+    expect(opts.additionalFields).toBeDefined();
+    expect(opts.additionalFields).toHaveProperty('role');
+    expect(opts.additionalFields).toHaveProperty('locale');
+  });
+
+  it('should set trustedOrigins to BETTER_AUTH_URL', async () => {
+    const { auth } = await import('@/auth/config');
+    const opts = auth.options as { trustedOrigins?: string[] };
+    expect(opts.trustedOrigins).toEqual(['http://localhost:3000']);
+  });
+
+  it('should configure built-in rateLimit', async () => {
+    const { auth } = await import('@/auth/config');
+    const opts = auth.options as { rateLimit?: { window: number; max: number } };
+    expect(opts.rateLimit).toBeDefined();
+    expect(opts.rateLimit?.window).toBe(60);
+    expect(opts.rateLimit?.max).toBe(10);
+  });
+
+  it('should call revokeUserSessions from onPasswordReset callback', async () => {
+    const { auth } = await import('@/auth/config');
+    const { revokeUserSessions } = await import('@/lib/auth-session');
+    const emailPw = (auth.options as Record<string, unknown>).emailAndPassword as Record<
+      string,
+      unknown
+    >;
+    const onPasswordReset = emailPw.onPasswordReset as ({
+      user,
+    }: {
+      user: { id: string };
+    }) => Promise<void>;
+
+    await onPasswordReset({ user: { id: 'user-123' } });
+
+    expect(revokeUserSessions).toHaveBeenCalledWith('user-123');
   });
 });
 

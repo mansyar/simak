@@ -4,6 +4,8 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { twoFactor } from 'better-auth/plugins';
 import { getDb } from '../db/index';
 import { sendPasswordResetEmail } from '../lib/email';
+import { revokeUserSessions } from '../lib/auth-session';
+import { getEnv } from '../config/env';
 import * as schema from '../db/schema/index';
 
 export const auth = betterAuth({
@@ -28,6 +30,11 @@ export const auth = betterAuth({
         token,
       });
     },
+    onPasswordReset: async ({ user }) => {
+      // After a successful password reset, invalidate all existing sessions so
+      // old credentials cannot be used on other devices.
+      await revokeUserSessions(user.id);
+    },
   },
   additionalFields: {
     role: {
@@ -40,6 +47,11 @@ export const auth = betterAuth({
       required: false,
       defaultValue: 'en',
     },
+  },
+  trustedOrigins: [getEnv().BETTER_AUTH_URL],
+  rateLimit: {
+    window: 60,
+    max: 10,
   },
   plugins: [
     tanstackStartCookies(),

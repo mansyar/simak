@@ -33,7 +33,8 @@
     "backupCode": "Kode Cadangan",
     "invalidBackupCode": "Kode cadangan tidak valid. Silakan coba lagi.",
     "useTotpCode": "Gunakan kode autentikator",
-    "backupCodePlaceholder": "xxxx-xxxx-xxxx"
+    "backupCodePlaceholder": "xxxx-xxxx-xxxx",
+    "rateLimit": "Terlalu banyak permintaan. Silakan coba lagi nanti."
   },
   "nav": {
     "dashboard": "Dasbor",
