@@ -78,7 +78,7 @@ Files go **directly to Cloudflare R2** via presigned URLs — the server never s
   vi.mock('@/server/auth', () => ({ getSessionFromHeaders: vi.fn() }));
   vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
   ```
-- Coverage thresholds: lines 80%, functions 80%, branches 72%, statements 79%.
+- Coverage thresholds: lines 80%, functions 80%, branches 80%, statements 80%.
 
 ## Formatting Quirks
 
