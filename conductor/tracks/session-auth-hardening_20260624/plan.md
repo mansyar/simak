@@ -14,7 +14,7 @@
     - [x] Verify: tests pass, no existing env validation breaks
     - [x] Commit: `fix(auth): Enforce minimum 32-char length on BETTER_AUTH_SECRET`
 
-## Phase 2: CRITICAL — Deleted-User Session Bypass & Session Revocation Wiring [checkpoint: ce3c69f]
+## Phase 2: CRITICAL — Deleted-User Session Bypass & Session Revocation Wiring [checkpoint: e0ceb73]
 
 - [x] Task: Filter `deletedAt IS NULL` in `_getSession` (`src/server/auth.ts`) `ce3c69f`
     - [x] Write tests: `tests/unit/server/auth.test.ts` — user with `deletedAt` set returns `null` from `_getSession`; active user (deletedAt null) returns valid session
@@ -40,7 +40,7 @@
     - [x] Verify: tests pass, existing 2FA tests still pass
     - [x] Commit: `fix(auth): Revoke sessions on 2FA disable and log to audit`
 
-## Phase 3: HIGH — Rate Limiting & trustedOrigins [checkpoint: ce3c69f]
+## Phase 3: HIGH — Rate Limiting & trustedOrigins [checkpoint: e0ceb73]
 
 - [x] Task: Add Better Auth `rateLimit` plugin to `src/auth/config.ts` `ce3c69f`
     - [x] Write tests: `tests/unit/auth/config.test.ts` — config includes `rateLimit` plugin with `{ window: 60, max: 10 }`; 11th request within window is rejected with 429 (mock Better Auth rate limit behavior)
@@ -54,7 +54,7 @@
     - [x] Verify: tests pass, config loads with valid env
     - [x] Commit: `feat(auth): Set trustedOrigins from BETTER_AUTH_URL env var`
 
-## Phase 4: MEDIUM — Session Enrichment [checkpoint: ce3c69f]
+## Phase 4: MEDIUM — Session Enrichment [checkpoint: e0ceb73]
 
 - [x] Task: Wire `role`/`locale` into Better Auth `additionalFields` session payload (`src/auth/config.ts`) `ce3c69f`
     - [x] Write tests: `tests/unit/auth/config.test.ts` — `additionalFields` config maps `role` and `locale` to session; `auth.api.getSession` returns `role` and `locale` for new sessions
@@ -68,7 +68,7 @@
     - [x] Verify: tests pass, existing auth tests still pass (fallback path)
     - [x] Commit: `perf(auth): Use enriched session payload with DB fallback for role/locale`
 
-## Phase 5: LOW — Token Cleanup & Expired Session Filtering [checkpoint: ce3c69f]
+## Phase 5: LOW — Token Cleanup & Expired Session Filtering [checkpoint: e0ceb73]
 
 - [x] Task: Add setup-token cleanup in `generateSetupLinkHandler` (`src/server/users.server.ts`) `ce3c69f`
     - [x] Write tests: `tests/unit/server/users.test.ts` — `generateSetupLinkHandler` deletes existing verification tokens for email before insert; only one valid token exists after
@@ -82,7 +82,7 @@
     - [x] Verify: tests pass, existing sessions tests still pass
     - [x] Commit: `fix(auth): Filter out expired sessions from active sessions list`
 
-## Phase 6: i18n & Final Regression [checkpoint: ce3c69f]
+## Phase 6: i18n & Final Regression [checkpoint: e0ceb73]
 
 - [x] Task: Add i18n translations for rate-limit error messages `ce3c69f`
     - [x] Write tests: `tests/unit/i18n/i18n.test.ts` — new keys exist in both `locales/en.json` and `locales/id.json`; run `pnpm check:i18n`
