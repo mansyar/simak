@@ -8,10 +8,10 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 
 - [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
 - [x] Task: Document SheetJS dependency in `conductor/tech-stack.md`
-    - [ ] Add SheetJS (`xlsx`) row to the Frontend table (purpose: client-side .xlsx parsing + sample-file generation) with a dated note, per workflow rule "tech-stack changes documented before implementation"
+    - [x] Add SheetJS (`xlsx`) row to the Frontend table (purpose: client-side .xlsx parsing + sample-file generation) with a dated note, per workflow rule "tech-stack changes documented before implementation"
 - [x] Task: Install SheetJS dependency
-    - [ ] Run `pnpm add xlsx` and verify import works (`import * as XLSX from 'xlsx'`)
-    - [ ] Confirm no client/server split violation (SheetJS is client-only; never imported by `.server.ts` files)
+    - [x] Run `pnpm add xlsx` and verify import works (`import * as XLSX from 'xlsx'`)
+    - [x] Confirm no client/server split violation (SheetJS is client-only; never imported by `.server.ts` files)
 - [x] Task: Conductor - User Manual Verification 'Foundation — Tech Stack & Dependency Setup' (Protocol in workflow.md)
 
 ## Phase 2: Bulk-Import Server Functions (Schemas + Handlers + Tests)
@@ -32,13 +32,13 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 ## Phase 3: Client-Side Parsing, Validation & Sample Generation (Tests) [checkpoint: 6d7379a]
 
 - [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
-- [~] Task: User .xlsx parser + validator — TDD
+- [x] Task: User .xlsx parser + validator — TDD
     - [x] Write failing tests in `tests/unit/lib/parse-users-xlsx.test.ts` covering: header validation (exact `name|email|role`), trim whitespace, lowercase email/role, per-row validation statuses, row-limit enforcement, empty-sheet handling
     - [x] Implement `parseUsersXlsx(file)` + `validateUserRow(row, actorRole)` in `src/lib/bulk-import/parse-users.ts`
 - [x] Task: Template .xlsx parser/grouper + validator — TDD
     - [x] Write failing tests in `tests/unit/lib/parse-templates-xlsx.test.ts` covering: header validation, group-by-`templateName`, type-consistency within group, checkpoint name non-empty, `minConsultations` default 0 / `estimatedDuration` default 7, numeric validation, per-group validity status, row-limit
     - [x] Implement `parseTemplatesXlsx(file)` + `groupByTemplate(rows)` + `validateTemplateGroup(group)` in `src/lib/bulk-import/parse-templates.ts`
-- [~] Task: Sample-file generators — TDD
+- [x] Task: Sample-file generators — TDD
     - [x] Write failing tests in `tests/unit/lib/sample-generators.test.ts` covering: user sample has headers + 1 example row; template sample has headers + example checkpoint rows; output is a valid .xlsx blob
     - [x] Implement `generateUserSampleXlsx()` + `generateTemplateSampleXlsx()` in `src/lib/bulk-import/samples.ts` (SheetJS `write` → Blob; no server round-trip)
 - [x] Task: Conductor - User Manual Verification 'Client-Side Parsing, Validation & Sample Generation' (Protocol in workflow.md) f663787
@@ -46,14 +46,14 @@ Tracks the TDD lifecycle from `conductor/workflow.md` (Write failing tests → I
 ## Phase 4: Bulk User Import UI [checkpoint: f663787]
 
 - [x] Task: Read `spec.md` (track requirements) and `conductor/workflow.md` (TDD, commit format, verification protocol) before starting this phase
-- [~] Task: User import route + dropzone — TDD
+- [x] Task: User import route + dropzone — TDD
     - [x] Write failing component tests in `tests/unit/routes/admin-users-import.test.tsx` covering: only `.xlsx` accepted, 5MB size guard, non-xlsx rejected at dropzone with message, row-limit rejection message
     - [x] Implement `/admin/users/import` route + `BulkUserDropzone` component (reuse existing `FileUploader` patterns where applicable; xlsx-only accept)
-- [~] Task: Preview table + commit + result report — TDD
+- [x] Task: Preview table + commit + result report — TDD
     - [x] Write failing component tests covering: preview renders parsed rows with per-row Valid/Invalid status, commit calls `bulkCreateUsers`, loading state, result summary card (created/skipped) + error table with row/email/reason
     - [x] Implement `BulkUserPreviewTable`, commit handler (TanStack Query mutation), and `BulkImportResult` report card
     - [x] Wire "Download sample" link calling `generateUserSampleXlsx()`
-- [~] Task: Wire entry point on `/admin/users`
+- [x] Task: Wire entry point on `/admin/users`
     - [x] Add "Bulk Import" button to the users page header linking to `/admin/users/import`
 - [x] Task: Conductor - User Manual Verification 'Bulk User Import UI' (Protocol in workflow.md)
 

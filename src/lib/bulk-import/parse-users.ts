@@ -1,13 +1,5 @@
 import { read, utils } from 'xlsx';
-
-/**
- * Allowed roles per actor — mirrors CREATION_ALLOWED_ROLES in users.server.ts.
- * superadmin is never creatable via import (per spec FR-1).
- */
-const CREATION_ALLOWED_ROLES: Record<string, readonly string[]> = {
-  superadmin: ['admin'],
-  admin: ['instructor', 'student'],
-};
+import { CREATION_ALLOWED_ROLES } from '../role-permissions';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const VALID_ROLES = ['admin', 'instructor', 'student'] as const;

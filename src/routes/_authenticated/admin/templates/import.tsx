@@ -20,7 +20,7 @@ export const Route = createFileRoute('/_authenticated/admin/templates/import')({
 interface ImportResult {
   created: number;
   skipped: number;
-  errors: { row: number; templateName: string; reason: string }[];
+  errors: { templateName: string; reason: string }[];
 }
 
 interface TemplateGroup {
@@ -152,6 +152,7 @@ function BulkTemplateImportPage() {
       if (response.error) {
         setValidationError(String(response.error));
       } else {
+        // Cast needed: TanStack Start wraps server fn return type; shape matches ImportResult
         setResult(response as unknown as ImportResult);
       }
     } catch {
@@ -221,8 +222,12 @@ function BulkTemplateImportPage() {
       {parsedGroups.length > 0 && !result && (
         <div className="space-y-4">
           <div className="flex items-center gap-4 text-sm">
-            <span className="text-green-600">{validCount} valid</span>
-            <span className="text-red-600">{invalidCount} invalid</span>
+            <span className="text-green-600">
+              {validCount} {t('bulkImport.common.valid')}
+            </span>
+            <span className="text-red-600">
+              {invalidCount} {t('bulkImport.common.invalid')}
+            </span>
           </div>
 
           <div className="border rounded-lg overflow-auto max-h-96">
@@ -273,9 +278,10 @@ function BulkTemplateImportPage() {
                             {cp.name}
                           </td>
                           <td className="p-2">
-                            {t('bulkImport.templates.minEst')
-                              .replace('{{min}}', String(cp.minConsultations))
-                              .replace('{{est}}', String(cp.estimatedDuration))}
+                            {t('bulkImport.templates.minEst', {
+                              min: String(cp.minConsultations),
+                              est: String(cp.estimatedDuration),
+                            })}
                           </td>
                           <td className="p-2"></td>
                         </tr>
@@ -292,7 +298,7 @@ function BulkTemplateImportPage() {
             disabled={validCount === 0 || isCommitting}
             loading={isCommitting}
           >
-            {t('bulkImport.templates.importButton').replace('{{count}}', String(validCount))}
+            {t('bulkImport.templates.importButton', { count: String(validCount) })}
           </Button>
         </div>
       )}
@@ -301,9 +307,10 @@ function BulkTemplateImportPage() {
       {result && (
         <div className="space-y-4">
           <AlertBanner variant="success" title={t('bulkImport.common.importComplete')}>
-            {t('bulkImport.templates.createdSkipped')
-              .replace('{{created}}', String(result.created))
-              .replace('{{skipped}}', String(result.skipped))}
+            {t('bulkImport.templates.createdSkipped', {
+              created: String(result.created),
+              skipped: String(result.skipped),
+            })}
           </AlertBanner>
 
           {result.errors.length > 0 && (
@@ -311,7 +318,6 @@ function BulkTemplateImportPage() {
               <table className="w-full text-sm">
                 <thead className="bg-muted">
                   <tr>
-                    <th className="p-2 text-left">{t('bulkImport.common.row')}</th>
                     <th className="p-2 text-left">{t('bulkImport.templates.templateName')}</th>
                     <th className="p-2 text-left">{t('bulkImport.common.reason')}</th>
                   </tr>
@@ -319,7 +325,6 @@ function BulkTemplateImportPage() {
                 <tbody>
                   {result.errors.map((err, i) => (
                     <tr key={i} className="border-t">
-                      <td className="p-2">{err.row}</td>
                       <td className="p-2">{err.templateName}</td>
                       <td className="p-2">{err.reason}</td>
                     </tr>

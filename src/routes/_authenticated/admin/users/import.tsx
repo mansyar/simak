@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState, useRef, useCallback, type ChangeEvent, type DragEvent } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { bulkCreateUsers } from '@/server/bulk-import';
+import { getSessionFromHeaders } from '@/server/auth';
 import { parseUsersXlsx } from '@/lib/bulk-import/parse-users';
 import { generateUserSampleXlsx } from '@/lib/bulk-import/samples';
 import { PageHeader } from '@/components/ui/page-header';
@@ -14,6 +15,10 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export const Route = createFileRoute('/_authenticated/admin/users/import')({
   component: BulkUserImportPage,
+  loader: async () => {
+    const session = await getSessionFromHeaders();
+    return { userRole: session?.user.role ?? 'admin' };
+  },
 });
 
 interface ImportResult {
@@ -24,6 +29,7 @@ interface ImportResult {
 
 function BulkUserImportPage() {
   const { t } = useI18n();
+  const { userRole } = Route.useLoaderData();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bulkCreateUsersFn = useServerFn(bulkCreateUsers);
 
@@ -62,7 +68,7 @@ function BulkUserImportPage() {
       setValidationError(null);
 
       try {
-        const parsed = await parseUsersXlsx(file, 'admin');
+        const parsed = await parseUsersXlsx(file, userRole);
 
         if (parsed.errors.length > 0) {
           setParseErrors(parsed.errors);
@@ -73,7 +79,7 @@ function BulkUserImportPage() {
         setValidationError(t('bulkImport.common.parseFailed'));
       }
     },
-    [validateFile, t],
+    [validateFile, t, userRole],
   );
 
   const handleFileChange = useCallback(
@@ -130,6 +136,7 @@ function BulkUserImportPage() {
       if (response.error) {
         setValidationError(String(response.error));
       } else {
+        // Cast needed: TanStack Start wraps server fn return type; shape matches ImportResult
         setResult(response as unknown as ImportResult);
       }
     } catch {
@@ -196,8 +203,12 @@ function BulkUserImportPage() {
       {parsedRows.length > 0 && !result && (
         <div className="space-y-4">
           <div className="flex items-center gap-4 text-sm">
-            <span className="text-green-600">{validCount} valid</span>
-            <span className="text-red-600">{invalidCount} invalid</span>
+            <span className="text-green-600">
+              {validCount} {t('bulkImport.common.valid')}
+            </span>
+            <span className="text-red-600">
+              {invalidCount} {t('bulkImport.common.invalid')}
+            </span>
           </div>
 
           <div className="border rounded-lg overflow-auto max-h-96">
@@ -239,7 +250,7 @@ function BulkUserImportPage() {
             disabled={validCount === 0 || isCommitting}
             loading={isCommitting}
           >
-            {t('bulkImport.users.importButton').replace('{{count}}', String(validCount))}
+            {t('bulkImport.users.importButton', { count: String(validCount) })}
           </Button>
         </div>
       )}
@@ -248,9 +259,10 @@ function BulkUserImportPage() {
       {result && (
         <div className="space-y-4">
           <AlertBanner variant="success" title={t('bulkImport.common.importComplete')}>
-            {t('bulkImport.users.createdSkipped')
-              .replace('{{created}}', String(result.created))
-              .replace('{{skipped}}', String(result.skipped))}
+            {t('bulkImport.users.createdSkipped', {
+              created: String(result.created),
+              skipped: String(result.skipped),
+            })}
           </AlertBanner>
 
           {result.errors.length > 0 && (

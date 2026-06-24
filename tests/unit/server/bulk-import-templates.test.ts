@@ -37,6 +37,7 @@ describe('Bulk template import handler', () => {
     then: vi.fn(function (onfulfilled: any) {
       return Promise.resolve([]).then(onfulfilled);
     }),
+    transaction: vi.fn(async (callback: any) => callback(mockDb)),
   };
 
   function mockReturning(data: any) {
@@ -129,6 +130,30 @@ describe('Bulk template import handler', () => {
       expect(result.skipped).toBe(1);
       expect(result.errors).toHaveLength(1);
       expect(result.errors[0].templateName).toBe('Template A');
+    });
+
+    it('should report error and skip if DB transaction fails (rollback)', async () => {
+      // Simulate checkpoint insert failure inside the transaction
+      mockDb.transaction.mockRejectedValueOnce(new Error('DB error'));
+
+      const result = (await bulkCreateTemplatesHandler({
+        data: {
+          rows: [
+            {
+              templateName: 'Template A',
+              type: 'assignment',
+              checkpointName: 'CP1',
+              minConsultations: 0,
+              estimatedDuration: 7,
+            },
+          ],
+        },
+      })) as any;
+
+      expect(result.created).toBe(0);
+      expect(result.skipped).toBe(1);
+      expect(result.errors[0].templateName).toBe('Template A');
+      expect(result.errors[0].reason).toBe('Failed to create template');
     });
   });
 

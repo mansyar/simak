@@ -9,6 +9,7 @@ vi.mock('@tanstack/react-router', () => ({
   createFileRoute: vi.fn().mockReturnValue((config: any) => ({
     ...config,
     useNavigate: vi.fn().mockReturnValue(vi.fn()),
+    useLoaderData: vi.fn().mockReturnValue({ userRole: 'admin' }),
   })),
   useRouter: vi.fn().mockReturnValue({ invalidate: vi.fn() }),
 }));
@@ -16,6 +17,11 @@ vi.mock('@tanstack/react-router', () => ({
 // Mock @tanstack/react-start
 vi.mock('@tanstack/react-start', () => ({
   useServerFn: vi.fn().mockImplementation((fn) => fn),
+}));
+
+// Mock server auth (avoids loading auth.ts which uses createServerFn)
+vi.mock('@/server/auth', () => ({
+  getSessionFromHeaders: vi.fn(),
 }));
 
 // Mock server functions
@@ -221,8 +227,8 @@ describe('Admin Users Import page', () => {
 
       await new Promise((r) => setTimeout(r, 10));
 
-      expect(screen.getByText('2 valid')).toBeInTheDocument();
-      expect(screen.getByText('1 invalid')).toBeInTheDocument();
+      expect(screen.getByText(/2 bulkImport\.common\.valid/)).toBeInTheDocument();
+      expect(screen.getByText(/1 bulkImport\.common\.invalid/)).toBeInTheDocument();
     });
   });
 

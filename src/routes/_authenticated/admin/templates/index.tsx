@@ -151,7 +151,7 @@ function TemplatesPage() {
             <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
             <Button variant="outline" onClick={() => navigate({ to: '/admin/templates/import' })}>
               <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
-              Bulk Import
+              {t('bulkImport.templates.button')}
             </Button>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" />

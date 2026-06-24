@@ -106,8 +106,8 @@ describe('Bulk user import handler', () => {
   });
 
   describe('Email uniqueness', () => {
-    it('should reject emails that exist (including soft-deleted)', async () => {
-      // Mock email exists
+    it('should reject emails that exist for active users (excluding soft-deleted)', async () => {
+      // Mock email exists (active user found — isNull(deletedAt) filters out soft-deleted)
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ id: 'existing' }]).then(onfulfilled),
       );
@@ -121,6 +121,22 @@ describe('Bulk user import handler', () => {
       expect(result.created).toBe(0);
       expect(result.skipped).toBe(1);
       expect(result.errors[0].reason).toBe('Email already in use');
+    });
+
+    it('should allow emails that match only soft-deleted users', async () => {
+      // Mock: query with isNull(deletedAt) returns no rows (only soft-deleted match exists)
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = (await bulkCreateUsersHandler({
+        data: {
+          rows: [{ name: 'Reuse Email', email: 'deleted@test.com', role: 'student' }],
+        },
+      })) as any;
+
+      expect(result.created).toBe(1);
+      expect(result.skipped).toBe(0);
     });
   });
 
@@ -156,6 +172,27 @@ describe('Bulk user import handler', () => {
       expect(result.created).toBe(0);
       expect(result.skipped).toBe(1);
       expect(result.errors[0].reason).toContain('Invalid role');
+    });
+
+    it('should allow superadmin to create admin via bulk import', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'superadmin-123', role: 'superadmin' },
+      } as any);
+
+      // Mock email uniqueness check - no existing user
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = (await bulkCreateUsersHandler({
+        data: {
+          rows: [{ name: 'New Admin', email: 'newadmin@test.com', role: 'admin' }],
+        },
+      })) as any;
+
+      expect(result.created).toBe(1);
+      expect(result.skipped).toBe(0);
+      expect(result.errors).toHaveLength(0);
     });
   });
 

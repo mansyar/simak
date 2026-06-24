@@ -148,7 +148,7 @@ describe('BulkTemplateImportPage', () => {
     fireEvent.change(input, { target: { files: [file] } });
     await waitFor(() => {
       expect(screen.getByText('Assignment')).toBeInTheDocument();
-      expect(screen.getByText(/1 valid/)).toBeInTheDocument();
+      expect(screen.getByText(/1 bulkImport\.common\.valid/)).toBeInTheDocument();
     });
   });
 
@@ -178,7 +178,7 @@ describe('BulkTemplateImportPage', () => {
     fireEvent.change(input, { target: { files: [file] } });
     await waitFor(() => {
       expect(screen.getByText('Bad Template')).toBeInTheDocument();
-      expect(screen.getByText(/1 invalid/)).toBeInTheDocument();
+      expect(screen.getByText(/1 bulkImport\.common\.invalid/)).toBeInTheDocument();
     });
   });
 

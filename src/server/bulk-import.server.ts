@@ -1,11 +1,12 @@
 // Server-only helpers (not imported by client code)
-import { eq } from 'drizzle-orm';
+import { eq, and, isNull } from 'drizzle-orm';
 import crypto from 'node:crypto';
 import { getDb } from '../db/index';
 import { users, verification, assignmentTemplates, templateCheckpoints } from '../db/schema/index';
 import { sendInvitationEmail } from '../lib/email';
 import { logAuditEvent } from '../lib/audit';
 import { getSessionFromHeaders } from './auth';
+import { CREATION_ALLOWED_ROLES } from '../lib/role-permissions';
 import type { z } from 'zod';
 import type { BulkCreateUsersSchema, BulkCreateTemplatesSchema } from './bulk-import';
 
@@ -13,11 +14,6 @@ type BulkCreateUsersInput = z.infer<typeof BulkCreateUsersSchema>;
 type BulkCreateTemplatesInput = z.infer<typeof BulkCreateTemplatesSchema>;
 
 const BULK_USER_ROW_LIMIT = 500;
-
-const CREATION_ALLOWED_ROLES: Record<string, readonly string[]> = {
-  superadmin: ['admin', 'instructor', 'student'],
-  admin: ['instructor', 'student'],
-};
 
 export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput }) {
   const session = await getSessionFromHeaders();
@@ -67,11 +63,11 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
       continue;
     }
 
-    // Email uniqueness check (including soft-deleted)
+    // Email uniqueness check (excluding soft-deleted users per spec FR-1)
     const existingUser = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.email, row.email))
+      .where(and(eq(users.email, row.email), isNull(users.deletedAt)))
       .limit(1)
       .then((rows) => rows[0]);
 
@@ -90,6 +86,7 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
       id: userId,
       name: row.name,
       email: row.email,
+      // Safe: Zod schema already validated role is one of 'admin' | 'instructor' | 'student'
       role: row.role as 'admin' | 'instructor' | 'student',
       locale: session.user.locale || 'en',
     });
@@ -201,27 +198,29 @@ export async function bulkCreateTemplatesHandler(args: { data: BulkCreateTemplat
 
     const type = groupRows[0].type;
 
-    // Create template + checkpoints in a transaction pattern
+    // Create template + checkpoints in a single transaction (per-group atomicity)
     try {
-      const [inserted] = await db
-        .insert(assignmentTemplates)
-        .values({
-          name: templateName,
-          type,
-          createdBy: session.user.id,
-        })
-        .returning({ id: assignmentTemplates.id })
-        .then((rows) => rows);
+      await db.transaction(async (tx) => {
+        const [inserted] = await tx
+          .insert(assignmentTemplates)
+          .values({
+            name: templateName,
+            type,
+            createdBy: session.user.id,
+          })
+          .returning({ id: assignmentTemplates.id })
+          .then((rows) => rows);
 
-      const checkpointRows = groupRows.map((cp, index) => ({
-        templateId: inserted.id,
-        name: cp.checkpointName,
-        order: index + 1,
-        minConsultations: cp.minConsultations ?? 0,
-        estimatedDuration: cp.estimatedDuration ?? 7,
-      }));
+        const checkpointRows = groupRows.map((cp, index) => ({
+          templateId: inserted.id,
+          name: cp.checkpointName,
+          order: index + 1,
+          minConsultations: cp.minConsultations ?? 0,
+          estimatedDuration: cp.estimatedDuration ?? 7,
+        }));
 
-      await db.insert(templateCheckpoints).values(checkpointRows);
+        await tx.insert(templateCheckpoints).values(checkpointRows);
+      });
 
       createdCount++;
     } catch {

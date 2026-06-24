@@ -119,13 +119,8 @@ export async function getUserHandler(args: { data: UserIdParam }) {
   return user;
 }
 
-// Role-based creation allowlist (TDD §4 Permissions):
-//   superadmin → admin only
-//   admin      → instructor, student only
-const CREATION_ALLOWED_ROLES: Record<string, readonly string[]> = {
-  superadmin: ['admin'],
-  admin: ['instructor', 'student'],
-};
+// Role-based creation allowlist — imported from shared module (canonical source of truth)
+import { CREATION_ALLOWED_ROLES } from '../lib/role-permissions';
 
 export async function createUserHandler(args: { data: CreateUserInput }) {
   const session = await getSessionFromHeaders();

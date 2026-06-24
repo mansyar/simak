@@ -142,7 +142,7 @@ function UsersPage() {
             <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
             <Button variant="outline" onClick={() => navigate({ to: '/admin/users/import' })}>
               <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
-              Bulk Import
+              {t('bulkImport.users.button')}
             </Button>
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
