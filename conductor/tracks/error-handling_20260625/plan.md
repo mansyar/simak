@@ -1,9 +1,13 @@
+<protect>
 # Implementation Plan: Error Boundary & Error Message Improvements
 
 ## Phase 1: Server Error Utilities
 
 **Objective:** Create the foundational server-side error module (`src/lib/errors.ts`) with typed error codes, a `serverError()` factory, and a structured `logError()` logger.
 
+- [ ] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
+    - [ ] Re-read the track specification for requirements context
+    - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
 - [ ] Task: Write failing tests for `src/lib/errors.ts` (Red Phase)
     - [ ] Create `tests/unit/lib/errors.test.ts`
     - [ ] Test `ErrorCode` union includes: UNAUTHORIZED, FORBIDDEN, NOT_FOUND, VALIDATION, CONFLICT, INTERNAL
@@ -26,6 +30,9 @@
 
 **Objective:** Add bilingual error message keys, install sonner, mount the global `<Toaster />`, and build the client `showErrorToast()` helper plus a response-shape-tolerant parser.
 
+- [ ] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
+    - [ ] Re-read the track specification for requirements context
+    - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
 - [ ] Task: Add error i18n keys to both locales
     - [ ] Extend the existing `error` namespace in `locales/en.json` (camelCase convention; reuse existing `error.notFound`): add `unauthorized`, `forbidden`, `validation`, `conflict`, `internal`, `network`, `default`, `somethingWentWrong`, `reload`
     - [ ] Add matching Indonesian translations to `locales/id.json`
@@ -56,6 +63,9 @@
 
 **Objective:** Add a TanStack Router `errorComponent` to `__root.tsx` that catches render crashes and shows a bilingual fallback with reload + dashboard links.
 
+- [ ] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
+    - [ ] Re-read the track specification for requirements context
+    - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
 - [ ] Task: Write failing tests for the error boundary (Red Phase)
     - [ ] Create `tests/unit/components/error-boundary.test.tsx`
     - [ ] Test the fallback renders "Something went wrong" heading + reassurance via i18n
@@ -76,6 +86,9 @@
 
 **Objective:** Migrate all 24 server handlers from `{ error: '<string>' }` to `serverError(code, message, context?)`, wrap uncaught DB ops in try/catch, and update their unit tests.
 
+- [ ] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
+    - [ ] Re-read the track specification for requirements context
+    - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
 - [ ] Task: Migrate handlers and update tests (per file)
     - [ ] `src/server/users.server.ts` + its test - map Unauthorized->UNAUTHORIZED, not-found->NOT_FOUND, DB errors->INTERNAL
     - [ ] `src/server/templates.server.ts` + test
@@ -103,6 +116,9 @@
 
 **Objective:** Wire client mutation hooks (and any inline `useMutation` sites in routes) to call `showErrorToast(code, t)` on server errors, replacing the `throw new Error(res.error)` pattern.
 
+- [ ] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
+    - [ ] Re-read the track specification for requirements context
+    - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
 - [ ] Task: Update client hooks
     - [ ] `src/hooks/use-notifications.ts` - replace 4x `throw new Error(res.error)` with `parseServerError` + `showErrorToast`; update hook tests to mock the new error shape
     - [ ] `src/hooks/use-assignment-tabs.ts` - replace `if (!result.error)` checks with the typed flow + toast; update test
@@ -113,3 +129,4 @@
     - [ ] Run `pnpm typecheck` and `pnpm lint`; confirm clean
     - [ ] Run `pnpm test:coverage`; confirm no regression below thresholds
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Mutation Hook Wiring' (Protocol in workflow.md)
+</protect>

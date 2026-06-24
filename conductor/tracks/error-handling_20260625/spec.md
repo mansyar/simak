@@ -1,3 +1,4 @@
+<protect>
 # Track — Error Boundary & Error Message Improvements
 
 ## Overview
@@ -80,3 +81,4 @@ All prior tracks (server functions and mutation hooks exist across the app). No 
 - A persisted/external log sink (e.g., Sentry, file rotation) — logs go to server stdout only for v1.
 - Auth-session-expiry redirect refinement (existing redirect behavior unchanged).
 - Refactoring handlers to throw `AppError` (option C) — keeping the return-error pattern.
+</protect>
