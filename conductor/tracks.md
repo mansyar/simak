@@ -4,5 +4,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Bulk Import for Users & Templates**
-*Link: [./tracks/bulk-import_20260623/](./tracks/bulk-import_20260623/)*
+*No active tracks.*
+
+## Archived
+
+- **Bulk Import for Users & Templates** — Archived to [./archive/bulk-import_20260623/](./archive/bulk-import_20260623/) (commit `85f0060`)
