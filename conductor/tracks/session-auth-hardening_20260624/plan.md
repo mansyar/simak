@@ -8,11 +8,11 @@
     - [x] Verify: tests pass, coverage >80% for new file
     - [x] Commit: `feat(auth): Add revokeUserSessions helper for centralized session revocation`
 
-- [ ] Task: Strengthen `BETTER_AUTH_SECRET` validation in `src/config/env.ts`
-    - [ ] Write tests: `tests/unit/config/env.test.ts` — env config rejects `BETTER_AUTH_SECRET` shorter than 32 chars; accepts 32+ chars
-    - [ ] Implement: Change `.min(1)` to `.min(32)` on `BETTER_AUTH_SECRET` Zod schema
-    - [ ] Verify: tests pass, no existing env validation breaks
-    - [ ] Commit: `fix(auth): Enforce minimum 32-char length on BETTER_AUTH_SECRET`
+- [x] Task: Strengthen `BETTER_AUTH_SECRET` validation in `src/config/env.ts` `c631496`
+    - [x] Write tests: `tests/unit/config/env.test.ts` — env config rejects `BETTER_AUTH_SECRET` shorter than 32 chars; accepts 32+ chars
+    - [x] Implement: Change `.min(1)` to `.min(32)` on `BETTER_AUTH_SECRET` Zod schema
+    - [x] Verify: tests pass, no existing env validation breaks
+    - [x] Commit: `fix(auth): Enforce minimum 32-char length on BETTER_AUTH_SECRET`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation' (Protocol in workflow.md)
 
