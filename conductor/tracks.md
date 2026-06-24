@@ -4,9 +4,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Session Lifecycle & Auth Hardening**
-*Link: [./tracks/session-auth-hardening_20260624/](./tracks/session-auth-hardening_20260624/)*
-
 ## Archived
 
+- **Session Lifecycle & Auth Hardening** — Archived to [./archive/session-auth-hardening_20260624/](./archive/session-auth-hardening_20260624/) (commit `72a5a35`)
 - **Bulk Import for Users & Templates** — Archived to [./archive/bulk-import_20260623/](./archive/bulk-import_20260623/) (commit `85f0060`)
