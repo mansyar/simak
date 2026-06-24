@@ -13,5 +13,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active
 
-- [ ] **Track: Email Pipeline Hardening**
+- [~] **Track: Email Pipeline Hardening**
 *Link: [./tracks/email-pipeline-hardening_20260625/](./tracks/email-pipeline-hardening_20260625/)*

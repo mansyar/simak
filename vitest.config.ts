@@ -13,7 +13,7 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     include: ['tests/**/*.test.{ts,tsx}'],
-    exclude: ['node_modules', 'dist', 'tests/integration/**'],
+    exclude: ['node_modules', 'dist'],
     testTimeout: 30000,
 
     // Load .env files

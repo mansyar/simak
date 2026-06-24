@@ -33,4 +33,11 @@ describe('EmailQueue schema', () => {
     expect(emailQueue.errorMessage).toBeDefined();
     expect(emailQueue.createdAt).toBeDefined();
   });
+
+  it('should include processing in status enum', async () => {
+    const { emailQueue } = await import('@/db/schema/email-queue');
+    const statusEnum = (emailQueue.status as any).enumValues as string[];
+    expect(statusEnum).toContain('processing');
+    expect(statusEnum).toEqual(expect.arrayContaining(['pending', 'processing', 'sent', 'failed']));
+  });
 });

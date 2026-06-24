@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { eq } from 'drizzle-orm';
+import { and, eq, lt } from 'drizzle-orm';
 import { getDb } from '@/db/index';
 import { getEnv } from '@/config/env';
 import { emailQueue } from '@/db/schema/index';
@@ -19,6 +19,10 @@ function getResendClient(): Resend {
 // Index maps to number of previous attempts: 0 → no delay, 1 → 30s, 2 → 5min, 3+ → 30min
 const BACKOFF_MS = [0, 30_000, 300_000, 1_800_000];
 
+// --- Claim / reclaim settings ---
+const CLAIM_LIMIT = 10;
+const STALE_PROCESSING_THRESHOLD_MS = 5 * 60 * 1000;
+
 function isDueForRetry(lastAttemptAt: Date | null, attempts: number | null): boolean {
   if (!lastAttemptAt) return true;
   const elapsed = Date.now() - lastAttemptAt.getTime();
@@ -28,8 +32,13 @@ function isDueForRetry(lastAttemptAt: Date | null, attempts: number | null): boo
 
 /**
  * Process up to 10 pending email queue items.
- * For each: checks backoff, sends via Resend, updates status/attempts.
- * After 3 failed attempts, marks the item as `failed`.
+ *
+ * 1. Reclaims stale `processing` rows (> 5 min) back to `pending`.
+ * 2. Claims up to 10 due `pending` rows inside a transaction using
+ *    `SELECT ... FOR UPDATE SKIP LOCKED`, marking them `processing`.
+ * 3. Sends each email via Resend OUTSIDE the transaction.
+ * 4. Updates each row individually to `sent`, `pending` (with incremented
+ *    attempts), or `failed` after 3 attempts.
  */
 export async function processEmailQueue(): Promise<{
   processed: number;
@@ -39,22 +48,43 @@ export async function processEmailQueue(): Promise<{
   const db = getDb();
   const resend = getResendClient();
 
+  const staleThreshold = new Date(Date.now() - STALE_PROCESSING_THRESHOLD_MS);
+  await db
+    .update(emailQueue)
+    .set({ status: 'pending' })
+    .where(and(eq(emailQueue.status, 'processing'), lt(emailQueue.lastAttemptAt, staleThreshold)));
+
+  const emails = await db.transaction(async (tx) => {
+    const rows = await tx
+      .select()
+      .from(emailQueue)
+      .where(eq(emailQueue.status, 'pending'))
+      .orderBy(emailQueue.createdAt)
+      .limit(CLAIM_LIMIT)
+      .for('update', { skipLocked: true });
+
+    const dueRows = rows.filter((row) => isDueForRetry(row.lastAttemptAt, row.attempts));
+
+    if (dueRows.length > 0) {
+      const now = new Date();
+      await Promise.all(
+        dueRows.map((row) =>
+          tx
+            .update(emailQueue)
+            .set({ status: 'processing', lastAttemptAt: now })
+            .where(eq(emailQueue.id, row.id)),
+        ),
+      );
+    }
+
+    return dueRows;
+  });
+
   let processed = 0;
   let sent = 0;
   let failed = 0;
 
-  const pendingEmails = await db
-    .select()
-    .from(emailQueue)
-    .where(eq(emailQueue.status, 'pending'))
-    .orderBy(emailQueue.createdAt)
-    .limit(10);
-
-  for (const email of pendingEmails) {
-    if (!isDueForRetry(email.lastAttemptAt, email.attempts)) {
-      continue;
-    }
-
+  for (const email of emails) {
     processed++;
 
     try {

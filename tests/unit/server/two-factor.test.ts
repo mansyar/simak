@@ -41,9 +41,13 @@ vi.mock('@/lib/audit', () => ({
   logAuditEvent: vi.fn(),
 }));
 
-vi.mock('@/lib/email', () => ({
-  enqueueEmail: vi.fn(),
-}));
+vi.mock('@/lib/email', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/email')>('@/lib/email');
+  return {
+    ...actual,
+    enqueueEmail: vi.fn(),
+  };
+});
 
 vi.mock('@/lib/auth-session', () => ({
   revokeUserSessions: vi.fn().mockResolvedValue(undefined),
@@ -215,6 +219,31 @@ describe('Two-factor server functions', () => {
 
       expect(result).toEqual({ error: 'Invalid TOTP code' });
     });
+
+    it('escapes malicious user name in enable email body', async () => {
+      const maliciousName = 'Eve <script>alert(1)</script>';
+      vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue({
+        ...mockSession,
+        user: { ...mockSession.user, name: maliciousName },
+      });
+      vi.mocked(auth.api.verifyTOTP).mockResolvedValue({} as any);
+
+      await enableTwoFactorHandler({ data: { code: '123456', trustDevice: false } });
+
+      const callArg = vi.mocked(emailMod.enqueueEmail).mock.calls[0][0];
+      expect(callArg.bodyHtml).toContain('Hi Eve &lt;script&gt;alert(1)&lt;/script&gt;');
+      expect(callArg.bodyHtml).not.toContain('<script>alert(1)</script>');
+    });
+
+    it('greets the user by name in enable email body for normal input', async () => {
+      vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.verifyTOTP).mockResolvedValue({} as any);
+
+      await enableTwoFactorHandler({ data: { code: '123456', trustDevice: false } });
+
+      const callArg = vi.mocked(emailMod.enqueueEmail).mock.calls[0][0];
+      expect(callArg.bodyHtml).toContain('Hi Test User,');
+    });
   });
 
   // ─── disableTwoFactorHandler ─────────────────────────────────
@@ -277,6 +306,47 @@ describe('Two-factor server functions', () => {
       });
 
       expect(result).toEqual({ error: 'Wrong password' });
+    });
+
+    it('escapes malicious user name in disable email body', async () => {
+      const maliciousName = 'Mallory <img src=x onerror=alert(1)>';
+      vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue({
+        ...mockSession,
+        user: { ...mockSession.user, name: maliciousName },
+      });
+      vi.mocked(auth.api.disableTwoFactor).mockResolvedValue({} as any);
+
+      const mockUpdateSet = vi.fn().mockResolvedValue(undefined);
+      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
+      mockDb.update.mockReturnValue({ set: mockUpdateSet } as any);
+      mockUpdateSet.mockReturnValue({ where: mockUpdateWhere } as any);
+
+      const mockDeleteWhere = vi.fn().mockResolvedValue(undefined);
+      mockDb.delete.mockReturnValue({ where: mockDeleteWhere } as any);
+
+      await disableTwoFactorHandler({ data: { password: 'testpass123' } });
+
+      const callArg = vi.mocked(emailMod.enqueueEmail).mock.calls[0][0];
+      expect(callArg.bodyHtml).toContain('Hi Mallory &lt;img src=x onerror=alert(1)&gt;');
+      expect(callArg.bodyHtml).not.toContain('<img src=x onerror=alert(1)>');
+    });
+
+    it('greets the user by name in disable email body for normal input', async () => {
+      vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.disableTwoFactor).mockResolvedValue({} as any);
+
+      const mockUpdateSet = vi.fn().mockResolvedValue(undefined);
+      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
+      mockDb.update.mockReturnValue({ set: mockUpdateSet } as any);
+      mockUpdateSet.mockReturnValue({ where: mockUpdateWhere } as any);
+
+      const mockDeleteWhere = vi.fn().mockResolvedValue(undefined);
+      mockDb.delete.mockReturnValue({ where: mockDeleteWhere } as any);
+
+      await disableTwoFactorHandler({ data: { password: 'testpass123' } });
+
+      const callArg = vi.mocked(emailMod.enqueueEmail).mock.calls[0][0];
+      expect(callArg.bodyHtml).toContain('Hi Test User,');
     });
 
     it('should revoke all user sessions after disabling 2FA', async () => {

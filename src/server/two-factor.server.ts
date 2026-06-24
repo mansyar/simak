@@ -6,7 +6,7 @@ import { getDb } from '../db/index';
 import { users, twoFactor } from '../db/schema/index';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
-import { enqueueEmail } from '../lib/email';
+import { enqueueEmail, escapeHtml } from '../lib/email';
 import { revokeUserSessions } from '../lib/auth-session';
 import type { z } from 'zod';
 import type {
@@ -108,6 +108,7 @@ export async function enableTwoFactorHandler(args: { data: VerifyTwoFactorInput 
                 <tr>
                   <td style="padding: 32px;">
                     <h2 style="font-size: 20px; color: #111827; margin: 0 0 16px;">Two-Factor Authentication Enabled</h2>
+                    <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hi ${escapeHtml(session.user.name)},</p>
                     <p style="font-size: 15px; color: #374151; line-height: 1.6; margin: 0 0 16px;">
                       Two-factor authentication has been successfully enabled on your account. Your account is now more secure.
                     </p>
@@ -190,6 +191,7 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
                 <tr>
                   <td style="padding: 32px;">
                     <h2 style="font-size: 20px; color: #111827; margin: 0 0 16px;">Two-Factor Authentication Disabled</h2>
+                    <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hi ${escapeHtml(session.user.name)},</p>
                     <p style="font-size: 15px; color: #374151; line-height: 1.6; margin: 0 0 16px;">
                       Two-factor authentication has been disabled on your account. Your account is now less secure.
                     </p>

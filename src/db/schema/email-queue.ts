@@ -10,7 +10,7 @@ export const emailQueue = pgTable(
     templateType: text('template_type', {
       enum: ['password_reset', 'invitation', 'sla_alert', 'two_factor'],
     }).notNull(),
-    status: text('status', { enum: ['pending', 'sent', 'failed'] }).notNull(),
+    status: text('status', { enum: ['pending', 'processing', 'sent', 'failed'] }).notNull(),
     attempts: integer('attempts').default(0),
     lastAttemptAt: timestamp('last_attempt_at'),
     errorMessage: text('error_message'),

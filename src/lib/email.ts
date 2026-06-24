@@ -6,6 +6,15 @@ export type TemplateType = 'password_reset' | 'invitation' | 'sla_alert' | 'two_
 
 const INVITATION_SUBJECT = 'Welcome to SIMAK — Set up your password';
 
+export function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export async function enqueueEmail(params: {
   recipientEmail: string;
   subject: string;
@@ -29,6 +38,7 @@ export async function sendPasswordResetEmail(params: {
   token: string;
 }): Promise<void> {
   const resetUrl = `${getEnv().BETTER_AUTH_URL}/auth/reset-password?token=${params.token}`;
+  const safeName = escapeHtml(params.name);
 
   await enqueueEmail({
     recipientEmail: params.email,
@@ -49,7 +59,7 @@ export async function sendPasswordResetEmail(params: {
             </tr>
             <tr>
               <td style="padding: 32px;">
-                <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hi ${params.name},</p>
+                <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hi ${safeName},</p>
                 <p style="font-size: 16px; color: #374151; margin: 0 0 24px;">
                   We received a request to reset your SIMAK password. Click the button below to set a new password. This link expires in 1 hour.
                 </p>
@@ -90,6 +100,7 @@ export async function sendInvitationEmail(params: {
   token: string;
 }): Promise<void> {
   const setupUrl = `${getEnv().BETTER_AUTH_URL}/auth/setup-password?token=${params.token}`;
+  const safeName = escapeHtml(params.name);
 
   await enqueueEmail({
     recipientEmail: params.email,
@@ -110,7 +121,7 @@ export async function sendInvitationEmail(params: {
             </tr>
             <tr>
               <td style="padding: 32px;">
-                <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hi ${params.name},</p>
+                <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hi ${safeName},</p>
                 <p style="font-size: 16px; color: #374151; margin: 0 0 24px;">
                   An account has been created for you on SIMAK. Click the button below to set up your password. This link expires in 1 hour.
                 </p>
@@ -155,10 +166,14 @@ export async function sendSLAAlertEmail(params: {
 }): Promise<void> {
   const { adminEmail, adminName, assignmentTitle, studentName, checkpointName, breachDays } =
     params;
+  const safeAdminName = escapeHtml(adminName);
+  const safeAssignmentTitle = escapeHtml(assignmentTitle);
+  const safeStudentName = escapeHtml(studentName);
+  const safeCheckpointName = escapeHtml(checkpointName);
 
   await enqueueEmail({
     recipientEmail: adminEmail,
-    subject: `SLA Breach Alert — ${assignmentTitle}`,
+    subject: `SLA Breach Alert — ${safeAssignmentTitle}`,
     bodyHtml: `
       <!DOCTYPE html>
       <html>
@@ -175,22 +190,22 @@ export async function sendSLAAlertEmail(params: {
             </tr>
             <tr>
               <td style="padding: 32px;">
-                <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hi ${adminName},</p>
+                <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hi ${safeAdminName},</p>
                 <p style="font-size: 16px; color: #374151; margin: 0 0 24px;">
                   An instructor has exceeded the 3-day SLA (Service Level Agreement) for reviewing a student submission. Please review the details below.
                 </p>
                 <table cellpadding="0" cellspacing="0" style="width: 100%; margin-bottom: 24px; border-collapse: collapse;">
                   <tr>
                     <td style="padding: 12px 16px; background-color: #f3f4f6; font-size: 14px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Assignment</td>
-                    <td style="padding: 12px 16px; font-size: 14px; color: #374151; border-bottom: 1px solid #e5e7eb;">${assignmentTitle}</td>
+                    <td style="padding: 12px 16px; font-size: 14px; color: #374151; border-bottom: 1px solid #e5e7eb;">${safeAssignmentTitle}</td>
                   </tr>
                   <tr>
                     <td style="padding: 12px 16px; background-color: #f3f4f6; font-size: 14px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Student</td>
-                    <td style="padding: 12px 16px; font-size: 14px; color: #374151; border-bottom: 1px solid #e5e7eb;">${studentName}</td>
+                    <td style="padding: 12px 16px; font-size: 14px; color: #374151; border-bottom: 1px solid #e5e7eb;">${safeStudentName}</td>
                   </tr>
                   <tr>
                     <td style="padding: 12px 16px; background-color: #f3f4f6; font-size: 14px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Checkpoint</td>
-                    <td style="padding: 12px 16px; font-size: 14px; color: #374151; border-bottom: 1px solid #e5e7eb;">${checkpointName}</td>
+                    <td style="padding: 12px 16px; font-size: 14px; color: #374151; border-bottom: 1px solid #e5e7eb;">${safeCheckpointName}</td>
                   </tr>
                   <tr>
                     <td style="padding: 12px 16px; background-color: #f3f4f6; font-size: 14px; font-weight: 600; color: #dc2626;">Breach Duration</td>
