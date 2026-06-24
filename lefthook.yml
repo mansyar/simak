@@ -18,4 +18,4 @@ pre-push:
     typecheck:
       run: pnpm typecheck
     test:
-      run: pnpm vitest run --coverage
+      run: pnpm test:coverage
