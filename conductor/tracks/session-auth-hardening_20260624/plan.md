@@ -1,6 +1,6 @@
 # Implementation Plan — Track 8.1: Session Lifecycle & Auth Hardening
 
-## Phase 1: Foundation — revokeUserSessions Helper & Secret Validation
+## Phase 1: Foundation — revokeUserSessions Helper & Secret Validation [checkpoint: 815bc59]
 
 - [x] Task: Create `revokeUserSessions` helper in `src/lib/auth-session.ts` `7b421c7`
     - [x] Write tests: `tests/unit/lib/auth-session.test.ts` — helper deletes all sessions for a user; leaves other users' sessions intact; handles user with no sessions gracefully
