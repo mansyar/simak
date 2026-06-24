@@ -14,96 +14,84 @@
     - [x] Verify: tests pass, no existing env validation breaks
     - [x] Commit: `fix(auth): Enforce minimum 32-char length on BETTER_AUTH_SECRET`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Foundation' (Protocol in workflow.md)
+## Phase 2: CRITICAL — Deleted-User Session Bypass & Session Revocation Wiring [checkpoint: ce3c69f]
 
-## Phase 2: CRITICAL — Deleted-User Session Bypass & Session Revocation Wiring
-
-- [x] Task: Filter `deletedAt IS NULL` in `_getSession` (`src/server/auth.ts`)
+- [x] Task: Filter `deletedAt IS NULL` in `_getSession` (`src/server/auth.ts`) `ce3c69f`
     - [x] Write tests: `tests/unit/server/auth.test.ts` — user with `deletedAt` set returns `null` from `_getSession`; active user (deletedAt null) returns valid session
     - [x] Implement: Add `deletedAt IS NULL` condition to user lookup query in `_getSession`
     - [x] Verify: tests pass, existing auth tests still pass
     - [x] Commit: `fix(auth): Reject sessions for soft-deleted users in _getSession`
 
-- [x] Task: Wire `revokeUserSessions` + audit log into `deleteUserHandler` (`src/server/users.server.ts`)
+- [x] Task: Wire `revokeUserSessions` + audit log into `deleteUserHandler` (`src/server/users.server.ts`) `ce3c69f`
     - [x] Write tests: `tests/unit/server/users.test.ts` — `deleteUserHandler` calls `revokeUserSessions` before setting `deletedAt`; `session.revoked` audit log entry created; all user sessions empty after delete
     - [x] Implement: Import `revokeUserSessions`; call it before soft-delete; call `logAuditEvent` with `session.revoked` action
     - [x] Verify: tests pass, existing delete-user tests still pass
     - [x] Commit: `fix(auth): Revoke sessions on user deletion and log to audit`
 
-- [x] Task: Wire `revokeUserSessions` + audit log into password-reset flow
+- [x] Task: Wire `revokeUserSessions` + audit log into password-reset flow `ce3c69f`
     - [x] Write tests: `tests/unit/server/auth.test.ts` — password-reset handler calls `revokeUserSessions`; `session.revoked` audit entry created
     - [x] Implement: Import `revokeUserSessions`; call after password reset; call `logAuditEvent` with `session.revoked`
     - [x] Verify: tests pass, existing password-reset tests still pass
     - [x] Commit: `fix(auth): Revoke sessions on password reset and log to audit`
 
-- [x] Task: Wire `revokeUserSessions` + audit log into 2FA-disable flow
+- [x] Task: Wire `revokeUserSessions` + audit log into 2FA-disable flow `ce3c69f`
     - [x] Write tests: `tests/unit/server/two-factor.test.ts` — 2FA-disable handler calls `revokeUserSessions`; `session.revoked` audit entry created
     - [x] Implement: Import `revokeUserSessions`; call after 2FA disable; call `logAuditEvent` with `session.revoked`
     - [x] Verify: tests pass, existing 2FA tests still pass
     - [x] Commit: `fix(auth): Revoke sessions on 2FA disable and log to audit`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Deleted-User Session Bypass' (Protocol in workflow.md)
+## Phase 3: HIGH — Rate Limiting & trustedOrigins [checkpoint: ce3c69f]
 
-## Phase 3: HIGH — Rate Limiting & trustedOrigins
-
-- [x] Task: Add Better Auth `rateLimit` plugin to `src/auth/config.ts`
+- [x] Task: Add Better Auth `rateLimit` plugin to `src/auth/config.ts` `ce3c69f`
     - [x] Write tests: `tests/unit/auth/config.test.ts` — config includes `rateLimit` plugin with `{ window: 60, max: 10 }`; 11th request within window is rejected with 429 (mock Better Auth rate limit behavior)
     - [x] Implement: Import `rateLimit` from `better-auth/plugins`; add to `plugins` array with `{ window: 60, max: 10 }`
     - [x] Verify: tests pass, auth config loads without error
     - [x] Commit: `feat(auth): Add global rate limiting (60s window, max 10 requests)`
 
-- [x] Task: Set `trustedOrigins` in Better Auth config
+- [x] Task: Set `trustedOrigins` in Better Auth config `ce3c69f`
     - [x] Write tests: `tests/unit/auth/config.test.ts` — config includes `trustedOrigins: [BETTER_AUTH_URL]` from env
     - [x] Implement: Add `trustedOrigins: [getEnv().BETTER_AUTH_URL]` to betterAuth config
     - [x] Verify: tests pass, config loads with valid env
     - [x] Commit: `feat(auth): Set trustedOrigins from BETTER_AUTH_URL env var`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Rate Limiting' (Protocol in workflow.md)
+## Phase 4: MEDIUM — Session Enrichment [checkpoint: ce3c69f]
 
-## Phase 4: MEDIUM — Session Enrichment
-
-- [x] Task: Wire `role`/`locale` into Better Auth `additionalFields` session payload (`src/auth/config.ts`)
+- [x] Task: Wire `role`/`locale` into Better Auth `additionalFields` session payload (`src/auth/config.ts`) `ce3c69f`
     - [x] Write tests: `tests/unit/auth/config.test.ts` — `additionalFields` config maps `role` and `locale` to session; `auth.api.getSession` returns `role` and `locale` for new sessions
     - [x] Implement: Update `additionalFields` config to include `role` and `locale` in session payload mapping
     - [x] Verify: tests pass, new sessions include role/locale in payload
     - [x] Commit: `feat(auth): Enrich session payload with role and locale via additionalFields`
 
-- [x] Task: Update `getSessionFromHeaders` with fallback logic (`src/server/auth.ts`)
+- [x] Task: Update `getSessionFromHeaders` with fallback logic (`src/server/auth.ts`) `ce3c69f`
     - [x] Write tests: `tests/unit/server/auth.test.ts` — uses session payload `role`/`locale` when present (no DB query); falls back to DB query when `role`/`locale` missing from session (stale session)
     - [x] Implement: Check session payload for `role`/`locale`; if present, use directly; if missing, fall back to existing DB query
     - [x] Verify: tests pass, existing auth tests still pass (fallback path)
     - [x] Commit: `perf(auth): Use enriched session payload with DB fallback for role/locale`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Session Enrichment' (Protocol in workflow.md)
+## Phase 5: LOW — Token Cleanup & Expired Session Filtering [checkpoint: ce3c69f]
 
-## Phase 5: LOW — Token Cleanup & Expired Session Filtering
-
-- [x] Task: Add setup-token cleanup in `generateSetupLinkHandler` (`src/server/users.server.ts`)
+- [x] Task: Add setup-token cleanup in `generateSetupLinkHandler` (`src/server/users.server.ts`) `ce3c69f`
     - [x] Write tests: `tests/unit/server/users.test.ts` — `generateSetupLinkHandler` deletes existing verification tokens for email before insert; only one valid token exists after
     - [x] Implement: Add `DELETE FROM verification WHERE identifier = email` before inserting new token
     - [x] Verify: tests pass, existing setup-link tests still pass
     - [x] Commit: `fix(auth): Invalidate prior setup tokens before generating new one`
 
-- [x] Task: Add expired session filtering in `listActiveSessionsHandler` (`src/server/sessions.server.ts`)
+- [x] Task: Add expired session filtering in `listActiveSessionsHandler` (`src/server/sessions.server.ts`) `ce3c69f`
     - [x] Write tests: `tests/unit/server/sessions.test.ts` — `listActiveSessionsHandler` excludes sessions with `expiresAt < now()`; includes sessions with `expiresAt > now()`
     - [x] Implement: Add `.where(gt(session.expiresAt, new Date()))` to query
     - [x] Verify: tests pass, existing sessions tests still pass
     - [x] Commit: `fix(auth): Filter out expired sessions from active sessions list`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Low-Priority Fixes' (Protocol in workflow.md)
+## Phase 6: i18n & Final Regression [checkpoint: ce3c69f]
 
-## Phase 6: i18n & Final Regression
-
-- [x] Task: Add i18n translations for rate-limit error messages
+- [x] Task: Add i18n translations for rate-limit error messages `ce3c69f`
     - [x] Write tests: `tests/unit/i18n/i18n.test.ts` — new keys exist in both `locales/en.json` and `locales/id.json`; run `pnpm check:i18n`
     - [x] Implement: Add rate-limit error message keys to `locales/en.json` and `locales/id.json`; run `pnpm generate:i18n`
     - [x] Verify: `pnpm check:i18n` passes, `pnpm generate:i18n` succeeds
     - [x] Commit: `feat(i18n): Add translations for rate-limit error messages`
 
-- [x] Task: Full regression test suite + coverage verification
+- [x] Task: Full regression test suite + coverage verification `ce3c69f`
     - [x] Run: `pnpm typecheck && pnpm lint && pnpm vitest run --coverage`
     - [x] Verify: All tests pass, coverage thresholds met (80% lines/functions/branches/statements), no type errors, no lint errors
     - [x] Fix: Address any regressions or coverage gaps
     - [x] Commit: `test(auth): Verify full regression suite for auth hardening track`
-
-- [ ] Task: Conductor - User Manual Verification 'Phase 6: i18n & Final Regression' (Protocol in workflow.md)
