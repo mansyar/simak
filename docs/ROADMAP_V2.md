@@ -940,6 +940,366 @@ Integration tests against a real PostgreSQL database, deferred from V1.
 
 ---
 
+## Phase 8: Security & Correctness Hardening
+
+Phase 8 addresses 16 findings from a full four-pillar security and code-quality audit (Logic & Correctness, Performance & Scalability, Security & Vulnerability, Maintainability). Tracks are ordered by severity and dependency: Track 8.1 (session/auth) goes first because the deleted-user session bypass is the single most critical risk and its `revokeUserSessions` helper is reused by Track 8.3's transactional user-deletion flow. Track 8.2 (email) is independent. Track 8.3 (transactions) touches the most handlers but has no new schema dependencies. Track 8.4 (performance) is the lowest priority and can be implemented last.
+
+**Audit Reference:** Findings are referenced by severity and short title throughout (e.g., `CRITICAL — Deleted-User Session Bypass`). The full audit report lives in session context; each track's Acceptance Criteria trace directly to specific findings.
+
+---
+
+### Track 8.1 — Session Lifecycle & Auth Hardening
+
+**Description:** Closes the critical deleted-user session bypass where soft-deleted users retain full access because `_getSession` does not filter on `deletedAt` and `deleteUserHandler` never revokes active sessions. Encompasses broader auth hardening: Better Auth rate limiting (currently absent, exposing login and password-setup endpoints to brute-force attacks), setup-token cleanup (stale tokens accumulate without invalidation), expired-session filtering in the active-sessions list, session enrichment with `role`/`locale` via Better Auth `additionalFields` (eliminating the per-request extra DB query), and strengthening `BETTER_AUTH_SECRET` validation from `.min(1)` to `.min(32)`.
+
+A central `revokeUserSessions(userId)` helper is introduced and called from `deleteUserHandler`, password-reset, and 2FA-disable flows — closing the bypass and hardening the auth lifecycle in one place.
+
+**Dependencies:** V1.3 (Better Auth base auth with Drizzle adapter), Track 3.1 (2FA & Session Management — `session` table and `twoFactorEnabled` column), Track 1.1 (audit log — session revocation events logged).
+
+**Status:** ⏳ Planned
+
+**Audit Findings Addressed:**
+
+| Severity | Finding | Location |
+| -------- | ------- | -------- |
+| CRITICAL | Deleted-User Session Bypass | `src/server/auth.ts` `_getSession` + `src/server/users.server.ts` `deleteUserHandler` |
+| HIGH | No Rate Limiting on Authentication | `src/auth/config.ts` |
+| MEDIUM | Every Authenticated Request Triggers Extra DB Query | `src/server/auth.ts` `_getSession` |
+| LOW | `generateSetupLink` Doesn't Invalidate Prior Tokens | `src/server/users.server.ts` `generateSetupLinkHandler` |
+| LOW | `listActiveSessions` Returns Expired Sessions | `src/server/sessions.server.ts` `listActiveSessionsHandler` |
+
+**Estimated Scope:**
+
+| Area                                                                              | Effort |
+| --------------------------------------------------------------------------------- | ------ |
+| `revokeUserSessions(userId)` helper in `src/lib/auth-session.ts`                  | Small  |
+| `_getSession` — filter `deletedAt IS NULL` on user lookup                         | Small  |
+| `deleteUserHandler` — call `revokeUserSessions` before soft-delete                | Small  |
+| Better Auth `rateLimit` plugin + `trustedOrigins` in `src/auth/config.ts`         | Small  |
+| `generateSetupLinkHandler` — delete prior verification tokens before insert       | Small  |
+| `listActiveSessionsHandler` — add `expiresAt > now()` filter                      | Small  |
+| Session enrichment — wire `role`/`locale` into Better Auth `additionalFields`    | Medium |
+| `src/config/env.ts` — `BETTER_AUTH_SECRET` `.min(32)`                            | Small  |
+| Remove redundant per-request DB query from `getSessionFromHeaders`                | Small  |
+| Tests                                                                              | Medium |
+
+**Database Schema Changes:**
+
+None — uses existing `session` table, `users` table, and `verification` table. The `role` and `locale` columns already exist on `users` and are already declared as `additionalFields` in the Better Auth config; this track wires them into the session payload so `auth.api.getSession` returns them directly.
+
+**Modified: `src/auth/config.ts`**
+
+```typescript
+import { rateLimit } from 'better-auth/plugins';
+
+// In betterAuth config:
+plugins: [
+  tanstackStartCookies(),
+  twoFactor({ issuer: 'SIMAK' }),
+  rateLimit({
+    window: 60,
+    max: 10,
+  }),
+],
+trustedOrigins: [getEnv().BETTER_AUTH_URL],
+```
+
+**New Server Helper: `src/lib/auth-session.ts`**
+
+```typescript
+export async function revokeUserSessions(userId: string): Promise<void>;
+```
+
+Deletes all rows from the `session` table for the given user. Single-import helper used by `deleteUserHandler`, password-reset, and 2FA-disable flows.
+
+**Acceptance Criteria:**
+
+- [ ] Soft-deleted users (`deletedAt IS NOT NULL`) are rejected by `_getSession` — their session returns `null`, treating them as logged out
+- [ ] `deleteUserHandler` calls `revokeUserSessions(userId)` before setting `deletedAt`, invalidating all active sessions atomically
+- [ ] `revokeUserSessions` helper is importable from `src/lib/auth-session.ts` and used by all session-revoking flows (delete user, password reset, 2FA disable)
+- [ ] Better Auth `rateLimit` plugin is registered with a 60-second window and max 10 requests per window per IP
+- [ ] `trustedOrigins` is set to `[BETTER_AUTH_URL]` from env config
+- [ ] `BETTER_AUTH_SECRET` validation in `src/config/env.ts` enforces `.min(32)` (currently `.min(1)`)
+- [ ] `generateSetupLinkHandler` deletes existing verification tokens for the user's email before inserting a new one
+- [ ] `listActiveSessionsHandler` filters out expired sessions (`expiresAt > now()`)
+- [ ] `role` and `locale` are returned by `auth.api.getSession` via `additionalFields` session mapping — `getSessionFromHeaders` no longer issues a separate `SELECT role, locale FROM users` query
+- [ ] Session revocation events are logged to audit log (`session.revoked` action)
+- [ ] i18n translations for any new UI strings (e.g., rate-limit error messages)
+
+**Test Plan:**
+
+| Area                          | Approach                                                                                  |
+| ----------------------------- | ----------------------------------------------------------------------------------------- |
+| Deleted-user session bypass   | Unit test — user with `deletedAt` set returns `null` from `_getSession`                 |
+| Session revocation on delete  | Unit test — `deleteUserHandler` calls `revokeUserSessions`; session table is empty after |
+| `revokeUserSessions` helper   | Unit test — deletes all sessions for a user; leaves other users' sessions intact        |
+| Rate limiting                 | Unit test — 11th request within window is rejected with 429                               |
+| Token cleanup                 | Unit test — `generateSetupLinkHandler` deletes prior tokens; only one valid token exists |
+| Expired session filtering     | Unit test — `listActiveSessionsHandler` excludes sessions with `expiresAt < now()`       |
+| Session enrichment            | Unit test — `auth.api.getSession` returns `role` and `locale` without extra DB query     |
+| Secret length validation      | Unit test — env config rejects `BETTER_AUTH_SECRET` shorter than 32 chars                 |
+
+---
+
+### Track 8.2 — Email Pipeline Hardening
+
+**Description:** Fixes the critical email-queue race condition where overlapping `setInterval` ticks (the interval fires every 30s without awaiting the previous run) and multi-instance deployments cause duplicate email delivery. The processor currently uses a plain `SELECT ... LIMIT 10` with no `FOR UPDATE SKIP LOCKED`, no transaction, and no in-flight mutex. This track introduces row-level locking via `FOR UPDATE SKIP LOCKED` within a transaction, adds a `processing` status to the `email_queue` table, and guards the interval so a new tick cannot start while a previous run is in flight.
+
+Also addresses HTML injection in email templates (`src/lib/email.ts`) where user-controlled values — assignment titles, checkpoint names, student names, user display names — are interpolated directly into HTML via template literals without escaping. An attacker (or compromised instructor account) can inject styled content, fake login forms, and deceptive links, enabling phishing and content spoofing against every email recipient (CWE-79). A centralized `escapeHtml` helper applied to all user-derived interpolations closes this class.
+
+**Dependencies:** Track 4.1 (Email Queue — `email_queue` table and processor being hardened).
+
+**Status:** ⏳ Planned
+
+**Audit Findings Addressed:**
+
+| Severity | Finding | Location |
+| -------- | ------- | -------- |
+| CRITICAL | Email Queue Race Condition (Duplicate Delivery) | `src/lib/email-queue-processor.ts` `processEmailQueue` + `src/lib/email-queue-init.ts` |
+| HIGH | HTML Injection in Email Templates | `src/lib/email.ts` (lines 52, 113, 185–193) + `src/server/two-factor.server.ts` |
+
+**Estimated Scope:**
+
+| Area                                                                  | Effort |
+| --------------------------------------------------------------------- | ------ |
+| `email_queue` — add `processing` status to enum + migration           | Small  |
+| `processEmailQueue` — wrap claim in `db.transaction` + `FOR UPDATE SKIP LOCKED` | Medium |
+| `email-queue-init.ts` — add `isRunning` guard to prevent overlapping ticks | Small  |
+| `escapeHtml` helper in `src/lib/email.ts`                            | Small  |
+| Apply `escapeHtml` to all user-derived interpolations across email templates | Medium |
+| Tests                                                                 | Medium |
+
+**Database Schema Changes:**
+
+**Modified: `email_queue`** (extend status enum)
+
+| Column | Current Type | New Type | Notes |
+| ------ | ------------ | -------- | ----- |
+| `status` | `pending` \| `sent` \| `failed` | `pending` \| `processing` \| `sent` \| `failed` | `processing` marks rows claimed by a worker |
+
+**Migration:** `ALTER TYPE email_queue_status_enum ADD VALUE 'processing'`.
+
+**Modified: `src/lib/email-queue-processor.ts`**
+
+```typescript
+const sent = await db.transaction(async (tx) => {
+  const items = await tx
+    .select()
+    .from(emailQueue)
+    .where(eq(emailQueue.status, 'pending'))
+    .orderBy(emailQueue.createdAt)
+    .limit(10)
+    .for('UPDATE SKIP LOCKED');
+
+  if (items.length === 0) return 0;
+
+  // Mark as 'processing' so concurrent workers skip them
+  const ids = items.map((i) => i.id);
+  await tx.update(emailQueue).set({ status: 'processing' }).where(inArray(emailQueue.id, ids));
+
+  return items;
+});
+// Send emails outside the transaction (network calls should not hold locks)
+// Then update status to 'sent' or 'failed' individually
+```
+
+**Modified: `src/lib/email-queue-init.ts`**
+
+```typescript
+let isRunning = false;
+setInterval(async () => {
+  if (isRunning) return; // prevent overlapping ticks
+  isRunning = true;
+  try {
+    await processEmailQueue();
+  } finally {
+    isRunning = false;
+  }
+}, 30_000);
+```
+
+**New Helper: `src/lib/email.ts`**
+
+```typescript
+function escapeHtml(s: string): string {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+```
+
+Applied to every interpolation of user-derived data: `params.name`, `assignmentTitle`, `studentName`, `checkpointName` across all email template functions (`sendPasswordResetEmail`, `sendInvitationEmail`, `sendSLAAlertEmail`, 2FA enable/disable emails, submission/review notifications).
+
+**Acceptance Criteria:**
+
+- [ ] `email_queue.status` enum includes `processing` value; migration applied
+- [ ] `processEmailQueue` claims rows using `SELECT ... FOR UPDATE SKIP LOCKED` within a transaction
+- [ ] Claimed rows are marked `processing` before sending so concurrent workers skip them
+- [ ] `email-queue-init.ts` guards against overlapping ticks via `isRunning` flag
+- [ ] In a multi-worker scenario, no two workers send the same email (verified by integration test)
+- [ ] `escapeHtml` helper exists in `src/lib/email.ts` and is applied to all user-derived interpolations
+- [ ] Email templates containing `<script>`, `<img onerror=...>`, or `<a href=...>` in user data render as escaped text, not executable HTML
+- [ ] No regression in email content or formatting for non-malicious input
+- [ ] i18n not affected (email bodies are server-rendered HTML, not i18n keys)
+
+**Test Plan:**
+
+| Area                      | Approach                                                                                  |
+| ------------------------- | ----------------------------------------------------------------------------------------- |
+| Race condition — single   | Unit test — overlapping `processEmailQueue` calls do not pick up the same rows             |
+| Race condition — multi    | Integration test — two concurrent `processEmailQueue` calls each send disjoint email sets |
+| `FOR UPDATE SKIP LOCKED`  | Unit test — locked rows are skipped, unlocked rows are claimed                            |
+| `isRunning` guard         | Unit test — second tick within 30s of first returns immediately without processing         |
+| HTML escaping             | Unit test — `<script>alert(1)</script>` in assignment title renders as `&lt;script&gt;`   |
+| HTML escaping — all fields | Unit test — name, assignmentTitle, studentName, checkpointName all escaped in every template |
+| Regression                | Unit test — normal (non-malicious) input produces identical email output as before        |
+
+---
+
+### Track 8.3 — Transactional Integrity & Input Validation
+
+**Description:** Wraps all multi-step mutation handlers in `db.transaction` following the gold-standard pattern already established in `submitReviewHandler` (reviews). Adds a database-level unique constraint on `(submissions.checkpointId, version)` to enforce version uniqueness even under concurrent contention (defense-in-depth complementing the transaction). Fixes the notification metadata bug where `submissionId` is incorrectly set to the version number instead of the actual submission ID (the insert lacks `.returning()`). Enforces file-type validation on instructor feedback uploads (currently skipped, allowing arbitrary file types to R2). Investigates the fileKey trust gap where the client-supplied `fileKey` is not verified against the server-presigned key for that checkpoint.
+
+**Dependencies:** V1 server functions (submissions, reviews, consultations, users, setup-password, files). Track 8.1 (`revokeUserSessions` helper used by transactional `deleteUserHandler`).
+
+**Status:** ⏳ Planned
+
+**Audit Findings Addressed:**
+
+| Severity | Finding | Location |
+| -------- | ------- | -------- |
+| HIGH | Submission Version Race Condition (TOCTOU) | `src/server/submissions.server.ts` `submitCheckpointHandler` |
+| HIGH | Non-Transactional Multi-Step Operations | `users.server.ts` `createUserHandler`, `setup-password.ts` `completePasswordSetup`, `consultations.server.ts` `verify`/`rejectConsultationHandler`, `submissions.server.ts` `submitCheckpointHandler` |
+| HIGH | Instructor Feedback Upload Skips File-Type Validation | `src/server/files.server.ts` `getPresignedReviewFeedbackUploadUrlHandler` |
+| MEDIUM | Notification Metadata Bug — submissionId Set to Version Number | `src/server/submissions.server.ts` `submitCheckpointHandler` (lines 143–147) |
+| LOW | fileKey Trust in submitCheckpoint (Limited IDOR) | `src/server/submissions.server.ts` `submitCheckpointHandler` |
+
+**Estimated Scope:**
+
+| Area                                                                                          | Effort |
+| --------------------------------------------------------------------------------------------- | ------ |
+| Unique constraint on `(submissions.checkpointId, version)` + migration                        | Small  |
+| `submitCheckpointHandler` — wrap in `db.transaction`, use `.returning()` for submission ID   | Medium |
+| `createUserHandler` — wrap in `db.transaction`                                                | Small  |
+| `completePasswordSetup` — wrap in `db.transaction`                                           | Small  |
+| `verifyConsultationHandler` / `rejectConsultationHandler` — wrap in `db.transaction`         | Small  |
+| `getPresignedReviewFeedbackUploadUrlHandler` — call `validateUploadType`                     | Small  |
+| `fileKey` trust investigation — record presigned fileKey ↔ checkpoint mapping at presign time | Medium |
+| Establish "write transaction" convention in `conductor/code_styleguides/`                    | Small  |
+| Tests                                                                                         | Medium |
+
+**Database Schema Changes:**
+
+**Modified: `submissions`** (add unique constraint)
+
+```sql
+ALTER TABLE submissions
+  ADD CONSTRAINT submissions_checkpoint_version_unq
+  UNIQUE (checkpoint_id, version);
+```
+
+This ensures that even if two concurrent transactions both read `MAX(version) = N` and both try to insert `version = N+1`, the second insert fails and the transaction rolls back — preventing duplicate versions at the database level.
+
+**Modified Handlers:**
+
+| Handler | Current | After |
+| ------- | ------- | ----- |
+| `submitCheckpointHandler` | 5 separate statements (version select → insert → checkpoint update → notification insert) | Single `db.transaction` with `.returning({ id })` for submission ID |
+| `createUserHandler` | insert user → insert verification → send email (3 separate statements) | `db.transaction` for user + verification; email sent after commit |
+| `completePasswordSetup` | upsert account → update user → delete token (3 separate statements) | Single `db.transaction` |
+| `verifyConsultationHandler` | update consultation → insert notification → audit log (3 separate statements) | Single `db.transaction`; audit log after commit |
+| `rejectConsultationHandler` | same pattern as verify | Same fix |
+| `getPresignedReviewFeedbackUploadUrlHandler` | No file-type validation | Calls `validateUploadType(extension, contentType)` before presigning |
+
+**Acceptance Criteria:**
+
+- [ ] `submissions` table has a unique constraint on `(checkpoint_id, version)`
+- [ ] `submitCheckpointHandler` runs entirely within `db.transaction`; all queries use `tx`
+- [ ] `submitCheckpointHandler` uses `.returning({ id: submissions.id })` and stores the real submission ID in notification metadata (not the version number)
+- [ ] Concurrent submissions for the same checkpoint do not produce duplicate versions — the second transaction fails and rolls back
+- [ ] `createUserHandler` wraps user + verification inserts in `db.transaction`; email is sent only after the transaction commits
+- [ ] `completePasswordSetup` wraps account upsert + user update + token deletion in `db.transaction`
+- [ ] `verifyConsultationHandler` and `rejectConsultationHandler` wrap all writes in `db.transaction`; audit logging occurs after commit
+- [ ] `getPresignedReviewFeedbackUploadUrlHandler` calls `validateUploadType` and rejects unsupported extensions/content-types
+- [ ] If a transaction fails midway, no partial writes persist (verified by integration test)
+- [ ] Post-commit advisory work (emails, audit logs) is placed after the transaction and wrapped in try/catch so failures don't surface misleading errors
+- [ ] "Write transaction" convention is documented in `conductor/code_styleguides/`
+- [ ] **Investigation Required:** `fileKey` trust — if implemented, presigned fileKey ↔ checkpoint mapping is recorded at presign time and validated at submit time
+- [ ] i18n not affected (no new UI strings)
+
+**Test Plan:**
+
+| Area                         | Approach                                                                                       |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- |
+| Version race — single        | Unit test — `submitCheckpointHandler` wraps all writes in a transaction                       |
+| Version race — concurrent    | Integration test — two concurrent submissions for same checkpoint; second fails with unique violation |
+| Notification metadata fix    | Unit test — notification metadata `submissionId` matches the actual inserted submission ID    |
+| `createUserHandler` txn      | Unit test — if verification insert fails, user insert is rolled back                          |
+| `completePasswordSetup` txn  | Unit test — if token deletion fails, account upsert is rolled back                            |
+| Consultation verify txn      | Unit test — if notification insert fails, consultation update is rolled back                  |
+| Consultation reject txn      | Unit test — same as verify                                                                     |
+| Feedback upload validation   | Unit test — `.exe` / `.svg` extensions are rejected; `.docx` / `.pdf` are accepted            |
+| Post-commit failure isolation | Unit test — audit log failure after successful transaction does not return error to client    |
+| fileKey trust (if implemented) | Unit test — fileKey not matching the presigned checkpoint mapping is rejected                |
+
+---
+
+### Track 8.4 — Performance Refinements
+
+**Description:** Parallelizes independent dashboard queries with `Promise.all` (the instructor dashboard currently issues 6+ queries strictly sequentially — many are independent and could run concurrently). Refactors bulk user import to batch database writes and decouple email sends from the request cycle (currently up to 500 rows are processed sequentially with per-row DB + Resend calls, potentially taking minutes). Isolates post-commit advisory work (audit logging in `submitReviewHandler`) in try/catch so that a failure in the audit insert doesn't surface a misleading "Internal Server Error" response for a transaction that actually committed successfully.
+
+**Dependencies:** V1 dashboards (`dashboard-instructor.server.ts`), Track 1.1 (audit log — `logAuditEvent` called post-commit), bulk import infrastructure (`bulk-import.server.ts`).
+
+**Status:** ⏳ Planned
+
+**Audit Findings Addressed:**
+
+| Severity | Finding | Location |
+| -------- | ------- | -------- |
+| MEDIUM | Dashboard Sequential Query Fan-out | `src/server/dashboard-instructor.server.ts` `getInstructorDashboardDataHandler` |
+| MEDIUM | Bulk Import Sequential Processing | `src/server/bulk-import.server.ts` `bulkCreateUsersHandler` |
+| LOW | Audit-Log Failure Returns Misleading "Internal Server Error" | `src/server/reviews.server.ts` `submitReviewHandler` (lines 376–396) |
+
+**Estimated Scope:**
+
+| Area                                                                                  | Effort |
+| ------------------------------------------------------------------------------------- | ------ |
+| `getInstructorDashboardDataHandler` — parallelize independent queries with `Promise.all` | Medium |
+| `bulkCreateUsersHandler` — batch user + verification inserts                          | Medium |
+| `bulkCreateUsersHandler` — decouple email sends (enqueue after DB transaction)       | Small  |
+| `submitReviewHandler` — wrap post-commit audit log in try/catch                       | Small  |
+| Tests                                                                                 | Medium |
+
+**Database Schema Changes:**
+
+None.
+
+**Acceptance Criteria:**
+
+- [ ] `getInstructorDashboardDataHandler` uses `Promise.all` for independent queries (e.g., recent submissions, assignment overview, and count queries run concurrently)
+- [ ] Instructor dashboard load time is reduced (measurable: sequential round-trips → parallel)
+- [ ] `bulkCreateUsersHandler` batches DB inserts (users + verifications) rather than per-row sequential inserts
+- [ ] `bulkCreateUsersHandler` enqueues invitation emails after the DB transaction commits (no per-row `await sendInvitationEmail` in the loop)
+- [ ] `submitReviewHandler` wraps post-commit `logAuditEvent` and SLA notification calls in try/catch — a failure in advisory work does not return an error response for a successful review
+- [ ] No regression in dashboard data correctness or bulk import behavior
+- [ ] i18n not affected
+
+**Test Plan:**
+
+| Area                        | Approach                                                                          |
+| --------------------------- | --------------------------------------------------------------------------------- |
+| Dashboard parallelization   | Unit test — `Promise.all` fires queries concurrently; results match sequential    |
+| Dashboard correctness       | Unit test — same data returned as before parallelization                          |
+| Bulk import batching        | Unit test — 100 rows produce batched inserts, not 100 sequential inserts          |
+| Bulk import email decoupling | Unit test — emails are enqueued post-transaction, not awaited in the loop        |
+| Bulk import partial failure | Unit test — if batch fails, no partial users persist (transaction rollback)       |
+| Audit log failure isolation | Unit test — `logAuditEvent` throw does not change the success response           |
+
+---
+
 ## Priority Summary
 
 | Priority         | Track                          | Rationale                                                                |
@@ -948,7 +1308,11 @@ Integration tests against a real PostgreSQL database, deferred from V1.
 | 🔴 **Immediate** | Track 1.2 (DueDates)           | Fixes broken V1 deadline logic; unblocks all deadline-dependent features |
 | 🔴 **High**      | Track 1.3 (Extensions)         | Depends on Track 1.1 + 1.2; student/instructor extension workflow        |
 | 🔴 **High**      | Track 4.1 (Email Queue)        | Removes synchronous Resend bottleneck; improves reliability              |
+| 🔴 **Immediate** | Track 8.1 (Session & Auth)     | CRITICAL: deleted-user session bypass — soft-deleted users retain access; no rate limiting on auth |
+| 🔴 **Immediate** | Track 8.2 (Email Pipeline)     | CRITICAL: email queue race condition (duplicate delivery) + HTML injection in email templates |
+| 🟠 **High**      | Track 8.3 (Transactions)       | HIGH: submission version race, non-transactional handlers, feedback upload validation, notification metadata bug |
 | 🟠 **Medium**    | Track 2.1 (Groups)             | Largest feature request; significant scope                               |
+| 🟡 **Lower**     | Track 8.4 (Performance)        | MEDIUM/LOW: dashboard query parallelization, bulk import batching, audit log error isolation |
 | 🟡 **Lower**     | Tracks 3.1, 5.1, 6.2, 6.3, 6.4, 6.5, 7.1 | Security, analytics, UX polish, UI consistency, testing — valuable but not blocking |
 | ✅ **Completed** | Bulk Import (Users & Templates) | Ad-hoc track: Excel bulk import for users and templates with client preview, server re-validation, per-group atomicity, audit logging, bilingual i18n |
 
@@ -1062,11 +1426,11 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 11. ✅ Track 6.6 — UI Consistency for Admin-Facing UI (Complete)
 12. ✅ Production Migration Hardening — Dockerfile executes bundled `migrate.mjs` (advisory-locked, PgBouncer bypass via `MIGRATE_DATABASE_URL`); `drizzle-kit` removed from production image (Complete)
 13. ✅ Bulk Import for Users & Templates — Excel (.xlsx) bulk import with client-side preview (SheetJS), server-side re-validation, per-group atomicity for templates, audit logging, bilingual i18n, 500 row/5 MB limits (Complete)
-14. [ ] Select next track to implement (recommended: **Track 2.1 — Group Assignments & Version Comparison**)
-14. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-15. [ ] Write failing tests
-16. [ ] Implement features
-17. [ ] Verify & archive
+14. [ ] Select next track to implement (recommended priority order: **Track 8.1 → 8.2 → 8.3 → 8.4** for security hardening, then **Track 2.1 — Group Assignments** for feature work)
+15. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+16. [ ] Write failing tests
+17. [ ] Implement features
+18. [ ] Verify & archive
 
 ---
 
