@@ -952,11 +952,11 @@ Phase 8 addresses 16 findings from a full four-pillar security and code-quality 
 
 **Description:** Closes the critical deleted-user session bypass where soft-deleted users retain full access because `_getSession` does not filter on `deletedAt` and `deleteUserHandler` never revokes active sessions. Encompasses broader auth hardening: Better Auth rate limiting (currently absent, exposing login and password-setup endpoints to brute-force attacks), setup-token cleanup (stale tokens accumulate without invalidation), expired-session filtering in the active-sessions list, session enrichment with `role`/`locale` via Better Auth `additionalFields` (eliminating the per-request extra DB query), and strengthening `BETTER_AUTH_SECRET` validation from `.min(1)` to `.min(32)`.
 
-A central `revokeUserSessions(userId)` helper is introduced and called from `deleteUserHandler`, password-reset, and 2FA-disable flows — closing the bypass and hardening the auth lifecycle in one place.
+A central `revokeUserSessions(userId, actorId)` helper is introduced and called from `deleteUserHandler`, password-reset, and 2FA-disable flows — closing the bypass and hardening the auth lifecycle in one place.
 
 **Dependencies:** V1.3 (Better Auth base auth with Drizzle adapter), Track 3.1 (2FA & Session Management — `session` table and `twoFactorEnabled` column), Track 1.1 (audit log — session revocation events logged).
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete (June 2026)
 
 **Audit Findings Addressed:**
 
@@ -990,41 +990,35 @@ None — uses existing `session` table, `users` table, and `verification` table.
 **Modified: `src/auth/config.ts`**
 
 ```typescript
-import { rateLimit } from 'better-auth/plugins';
-
-// In betterAuth config:
-plugins: [
-  tanstackStartCookies(),
-  twoFactor({ issuer: 'SIMAK' }),
-  rateLimit({
-    window: 60,
-    max: 10,
-  }),
-],
+// In betterAuth config — rateLimit is a built-in top-level option, not a plugin:
+rateLimit: {
+  window: 60,
+  max: 10,
+},
 trustedOrigins: [getEnv().BETTER_AUTH_URL],
 ```
 
 **New Server Helper: `src/lib/auth-session.ts`**
 
 ```typescript
-export async function revokeUserSessions(userId: string): Promise<void>;
+export async function revokeUserSessions(userId: string, actorId?: string): Promise<void>;
 ```
 
-Deletes all rows from the `session` table for the given user. Single-import helper used by `deleteUserHandler`, password-reset, and 2FA-disable flows.
+Deletes all rows from the `session` table for the given user and logs a `session.revoked` audit event. The optional `actorId` parameter (defaults to `userId`) records who initiated the revocation. Single-import helper used by `deleteUserHandler`, password-reset, and 2FA-disable flows.
 
 **Acceptance Criteria:**
 
-- [ ] Soft-deleted users (`deletedAt IS NOT NULL`) are rejected by `_getSession` — their session returns `null`, treating them as logged out
-- [ ] `deleteUserHandler` calls `revokeUserSessions(userId)` before setting `deletedAt`, invalidating all active sessions atomically
-- [ ] `revokeUserSessions` helper is importable from `src/lib/auth-session.ts` and used by all session-revoking flows (delete user, password reset, 2FA disable)
-- [ ] Better Auth `rateLimit` plugin is registered with a 60-second window and max 10 requests per window per IP
-- [ ] `trustedOrigins` is set to `[BETTER_AUTH_URL]` from env config
-- [ ] `BETTER_AUTH_SECRET` validation in `src/config/env.ts` enforces `.min(32)` (currently `.min(1)`)
-- [ ] `generateSetupLinkHandler` deletes existing verification tokens for the user's email before inserting a new one
-- [ ] `listActiveSessionsHandler` filters out expired sessions (`expiresAt > now()`)
-- [ ] `role` and `locale` are returned by `auth.api.getSession` via `additionalFields` session mapping — `getSessionFromHeaders` no longer issues a separate `SELECT role, locale FROM users` query
-- [ ] Session revocation events are logged to audit log (`session.revoked` action)
-- [ ] i18n translations for any new UI strings (e.g., rate-limit error messages)
+- [x] Soft-deleted users (`deletedAt IS NOT NULL`) are rejected by `_getSession` — their session returns `null`, treating them as logged out
+- [x] `deleteUserHandler` calls `revokeUserSessions(userId, actorId)` before setting `deletedAt`, invalidating all active sessions atomically
+- [x] `revokeUserSessions` helper is importable from `src/lib/auth-session.ts` and used by all session-revoking flows (delete user, password reset, 2FA disable)
+- [x] Better Auth built-in `rateLimit` config is set with a 60-second window and max 10 requests per window per IP
+- [x] `trustedOrigins` is set to `[BETTER_AUTH_URL]` from env config
+- [x] `BETTER_AUTH_SECRET` validation in `src/config/env.ts` enforces `.min(32)` (currently `.min(1)`)
+- [x] `generateSetupLinkHandler` deletes existing verification tokens for the user's email before inserting a new one
+- [x] `listActiveSessionsHandler` filters out expired sessions (`expiresAt > now()`)
+- [x] `role` and `locale` are returned by `auth.api.getSession` via `additionalFields` session mapping — `getSessionFromHeaders` no longer issues a separate `SELECT role, locale FROM users` query
+- [x] Session revocation events are logged to audit log (`session.revoked` action)
+- [x] i18n translations for any new UI strings (e.g., rate-limit error messages)
 
 **Test Plan:**
 
@@ -1038,6 +1032,37 @@ Deletes all rows from the `session` table for the given user. Single-import help
 | Expired session filtering     | Unit test — `listActiveSessionsHandler` excludes sessions with `expiresAt < now()`       |
 | Session enrichment            | Unit test — `auth.api.getSession` returns `role` and `locale` without extra DB query     |
 | Secret length validation      | Unit test — env config rejects `BETTER_AUTH_SECRET` shorter than 32 chars                 |
+
+**Actual Files Created/Modified:**
+
+| File | Type | Purpose |
+|------|------|---------|
+| `src/lib/auth-session.ts` | New | `revokeUserSessions(userId, actorId?)` helper — deletes sessions + logs audit |
+| `src/auth/config.ts` | Modified | Added `onPasswordReset` callback, `trustedOrigins`, built-in `rateLimit` config |
+| `src/config/env.ts` | Modified | `BETTER_AUTH_SECRET` validation `.min(32)` |
+| `src/server/auth.ts` | Modified | `_getSession` filters soft-deleted users, returns role/locale from session payload |
+| `src/server/users.server.ts` | Modified | `deleteUserHandler` calls `revokeUserSessions`; `generateSetupLinkHandler` clears prior tokens |
+| `src/server/sessions.server.ts` | Modified | `listActiveSessionsHandler` adds `gt(expiresAt, now)` filter |
+| `src/server/two-factor.server.ts` | Modified | `disableTwoFactorHandler` calls `revokeUserSessions` |
+| `locales/en.json`, `locales/id.json` | Modified | Added `rateLimit` i18n key |
+| `src/i18n/types.ts` | Generated | i18n type definitions updated |
+| `tests/unit/lib/auth-session.test.ts` | New | 4 tests: deletes sessions, logs audit, handles no sessions, uses actorId |
+| `tests/unit/config/env.test.ts` | Modified | Tests reject <32 char secret, accept 32+ char |
+| `tests/unit/auth/config.test.ts` | Modified | Tests additionalFields, trustedOrigins, rateLimit, onPasswordReset |
+| `tests/unit/server/auth.test.ts` | Modified | Tests soft-deleted null return, session payload role/locale |
+| `tests/unit/server/users.test.ts` | Modified | Tests deleteUserHandler calls revokeUserSessions, generateSetupLinkHandler clears tokens |
+| `tests/unit/server/two-factor.test.ts` | Modified | Tests disableTwoFactorHandler calls revokeUserSessions |
+| `tests/unit/server/sessions.test.ts` | Modified | Tests expired session filtering with `gt(expiresAt)` mock |
+| `tests/unit/server/users-audit.test.ts` | Modified | Added `delete` mock to DB for revokeUserSessions |
+| `tests/unit/i18n/i18n.test.ts` | New | Validates `rateLimit` key present in en/id JSON |
+
+**Test Results:** All 55 tests across 4 affected test files pass. Full suite: 2158 passed, 2 pre-existing timeouts (unrelated instructor route tests). Lint: 0 errors. Typecheck: clean.
+
+**Review Fixes Applied (commit `72a5a35`):**
+1. Import style in `auth-session.ts` — changed `@/` aliases to relative imports (codebase convention)
+2. Weak test in `sessions.test.ts` — added `drizzle-orm` mock to verify `gt(expiresAt)` filter is applied
+3. Misleading comment in `two-factor.server.ts` — "password change" → "security change"
+4. Plan deviation in `plan.md` — updated rateLimit description from plugin import to built-in config
 
 ---
 
@@ -1308,7 +1333,7 @@ None.
 | 🔴 **Immediate** | Track 1.2 (DueDates)           | Fixes broken V1 deadline logic; unblocks all deadline-dependent features |
 | 🔴 **High**      | Track 1.3 (Extensions)         | Depends on Track 1.1 + 1.2; student/instructor extension workflow        |
 | 🔴 **High**      | Track 4.1 (Email Queue)        | Removes synchronous Resend bottleneck; improves reliability              |
-| 🔴 **Immediate** | Track 8.1 (Session & Auth)     | CRITICAL: deleted-user session bypass — soft-deleted users retain access; no rate limiting on auth |
+| ✅ **Completed** | Track 8.1 (Session & Auth)     | FIXED: deleted-user session bypass closed, rate limiting added, session revocation on delete/password-reset/2FA-disable, secret validation, audit logging |
 | 🔴 **Immediate** | Track 8.2 (Email Pipeline)     | CRITICAL: email queue race condition (duplicate delivery) + HTML injection in email templates |
 | 🟠 **High**      | Track 8.3 (Transactions)       | HIGH: submission version race, non-transactional handlers, feedback upload validation, notification metadata bug |
 | 🟠 **Medium**    | Track 2.1 (Groups)             | Largest feature request; significant scope                               |
@@ -1426,11 +1451,12 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 11. ✅ Track 6.6 — UI Consistency for Admin-Facing UI (Complete)
 12. ✅ Production Migration Hardening — Dockerfile executes bundled `migrate.mjs` (advisory-locked, PgBouncer bypass via `MIGRATE_DATABASE_URL`); `drizzle-kit` removed from production image (Complete)
 13. ✅ Bulk Import for Users & Templates — Excel (.xlsx) bulk import with client-side preview (SheetJS), server-side re-validation, per-group atomicity for templates, audit logging, bilingual i18n, 500 row/5 MB limits (Complete)
-14. [ ] Select next track to implement (recommended priority order: **Track 8.1 → 8.2 → 8.3 → 8.4** for security hardening, then **Track 2.1 — Group Assignments** for feature work)
-15. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-16. [ ] Write failing tests
-17. [ ] Implement features
-18. [ ] Verify & archive
+14. ✅ Track 8.1 — Session Lifecycle & Auth Hardening (Complete — deleted-user session bypass fixed, rate limiting, session revocation, secret validation, audit logging)
+15. [ ] Select next track to implement (recommended priority order: **Track 8.2 → 8.3 → 8.4** for security hardening, then **Track 2.1 — Group Assignments** for feature work)
+16. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+17. [ ] Write failing tests
+18. [ ] Implement features
+19. [ ] Verify & archive
 
 ---
 

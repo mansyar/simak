@@ -49,7 +49,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - A **SuperAdmin account is seeded** into the database during initial deployment.
 - SuperAdmin can create Admin accounts via the admin panel.
 - Admin can create Instructor and Student accounts.
-- Authentication is powered by **Better-Auth** with email/password, database-backed sessions, and HTTP-only cookies.
+- Authentication is powered by **Better-Auth** with email/password, database-backed sessions, and HTTP-only cookies. Auth endpoints (login, password setup, password reset) are **rate-limited** (10 requests per 60-second window per IP) to prevent brute-force attacks. The `BETTER_AUTH_SECRET` environment variable must be at least 32 characters long (validated at startup).
 - When an account is created, the system sends an email (via Resend) with a **password setup link** via a custom invitation email handler (`sendInvitationEmail`).
 - The link directs the user to a dedicated password setup page (`/auth/setup-password?token=xxx`) where they choose their password.
 - SuperAdmin and Admin can also generate a password setup link from the dashboard to share manually (e.g., in person).
@@ -162,6 +162,8 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Users can revoke individual sessions or all other sessions at once.
 - Email notification sent on 2FA enable/disable.
 - All 2FA and session management actions are logged to the audit log.
+- Active sessions are **automatically revoked** when a user is soft-deleted, when their password is reset, or when 2FA is disabled — ensuring security changes take effect immediately across all devices.
+- The active sessions list filters out expired sessions automatically.
 
 ### Analytics & Reporting `[v2]`
 
