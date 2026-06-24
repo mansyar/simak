@@ -1,0 +1,8 @@
+{
+  "track_id": "error-handling_20260625",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-06-25T02:36:50Z",
+  "updated_at": "2026-06-25T02:36:50Z",
+  "description": "Improve error boundary and error messages for server log and for user in UI. 1. for server, informative for debugging. 2. for UI, inform user about what went wrong just enough using sonner and user friendly."
+}
