@@ -1,3 +1,4 @@
+<protect>
 # Track 8.2 — Email Pipeline Hardening
 
 ## Overview
@@ -99,3 +100,4 @@ This track hardens the email pipeline against two security/correctness findings 
 | HTML escaping — single field | Unit test — `<script>alert(1)</script>` in assignment title renders as `&lt;script&gt;` in email body |
 | HTML escaping — all fields | Unit test — `name`, `assignmentTitle`, `studentName`, `checkpointName`, `adminName` all escaped in every template (email.ts + two-factor.server.ts) |
 | Regression — non-malicious input | Unit test — normal input produces identical email output as before (existing assertions still pass) |
+</protect>

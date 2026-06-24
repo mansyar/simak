@@ -1,3 +1,4 @@
+<protect>
 # Track 8.2 — Email Pipeline Hardening: Implementation Plan
 
 > **Spec:** [./spec.md](./spec.md)
@@ -7,6 +8,9 @@
 
 ## Phase 1: Database Schema & Migration
 
+- [ ] Task: Read spec.md and workflow.md before starting this phase
+    - [ ] Read `./spec.md` — review requirements and acceptance criteria for this phase
+    - [ ] Read `../../workflow.md` — review TDD protocol and Phase Completion Verification Protocol
 - [ ] Task: Add `processing` status to `email_queue` schema
     - [ ] Write failing unit test asserting `email_queue.status` enum includes `processing` alongside `pending`, `sent`, `failed` (Red)
     - [ ] Run test and confirm it fails as expected
@@ -20,6 +24,9 @@
 
 ## Phase 2: Email Queue Concurrency Hardening
 
+- [ ] Task: Read spec.md and workflow.md before starting this phase
+    - [ ] Read `./spec.md` — review requirements and acceptance criteria for this phase
+    - [ ] Read `../../workflow.md` — review TDD protocol and Phase Completion Verification Protocol
 - [ ] Task: Implement transactional claim with `FOR UPDATE SKIP LOCKED`
     - [ ] Write failing unit test — `processEmailQueue` wraps the claim query in `db.transaction` (Red)
     - [ ] Write failing unit test — claim query uses `.for('UPDATE SKIP LOCKED')` (Red)
@@ -48,6 +55,9 @@
 
 ## Phase 3: HTML Injection Remediation
 
+- [ ] Task: Read spec.md and workflow.md before starting this phase
+    - [ ] Read `./spec.md` — review requirements and acceptance criteria for this phase
+    - [ ] Read `../../workflow.md` — review TDD protocol and Phase Completion Verification Protocol
 - [ ] Task: Implement `escapeHtml` helper in `src/lib/email.ts`
     - [ ] Write failing unit test — `escapeHtml` escapes ampersand (`&` → `&amp;`) (Red)
     - [ ] Write failing unit test — `escapeHtml` escapes less-than (`<` → `&lt;`) and greater-than (`>` → `&gt;`) (Red)
@@ -79,6 +89,9 @@
 
 ## Phase 4: Integration Test & Final Verification
 
+- [ ] Task: Read spec.md and workflow.md before starting this phase
+    - [ ] Read `./spec.md` — review requirements and acceptance criteria for this phase
+    - [ ] Read `../../workflow.md` — review TDD protocol and Phase Completion Verification Protocol
 - [ ] Task: Multi-worker integration test for duplicate-delivery prevention
     - [ ] Write integration test in `tests/integration/` — two concurrent `processEmailQueue` calls each send disjoint email sets against real PostgreSQL using `FOR UPDATE SKIP LOCKED`
     - [ ] Write integration test assertion — no email row is sent twice across both workers
@@ -91,3 +104,4 @@
     - [ ] Run coverage (`pnpm test:coverage`) — confirm >80% thresholds met for changed files
     - [ ] Verify all new files are under 500-line modularity limit (`node scripts/check-modularity.js`)
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Integration Test & Final Verification' (Protocol in workflow.md)
+</protect>
