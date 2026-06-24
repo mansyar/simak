@@ -1,0 +1,8 @@
+{
+  "track_id": "email-pipeline-hardening_20260625",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-06-25T00:23:03Z",
+  "updated_at": "2026-06-25T00:23:03Z",
+  "description": "Email Pipeline Hardening — fix CRITICAL email queue race condition (duplicate delivery) and HIGH HTML injection in email templates (CWE-79)"
+}
