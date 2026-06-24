@@ -174,4 +174,29 @@ describe('Environment validation', () => {
     const { getEnv } = await import('@/config/env');
     expect(() => getEnv()).toThrow('BETTER_AUTH_SECRET');
   });
+
+  it('should reject BETTER_AUTH_SECRET shorter than 32 characters', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'short-secret';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+
+    const { getEnv } = await import('@/config/env');
+    expect(() => getEnv()).toThrow('BETTER_AUTH_SECRET');
+  });
+
+  it('should accept BETTER_AUTH_SECRET of at least 32 characters', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+
+    const { getEnv } = await import('@/config/env');
+    const env = getEnv();
+    expect(env.BETTER_AUTH_SECRET).toBe('test-secret-32-chars-minimum!!!!!');
+  });
 });
