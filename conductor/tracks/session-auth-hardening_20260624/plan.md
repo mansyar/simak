@@ -2,11 +2,11 @@
 
 ## Phase 1: Foundation — revokeUserSessions Helper & Secret Validation
 
-- [ ] Task: Create `revokeUserSessions` helper in `src/lib/auth-session.ts`
-    - [ ] Write tests: `tests/unit/lib/auth-session.test.ts` — helper deletes all sessions for a user; leaves other users' sessions intact; handles user with no sessions gracefully
-    - [ ] Implement: `export async function revokeUserSessions(userId: string): Promise<void>` — deletes all rows from `session` table for given userId
-    - [ ] Verify: tests pass, coverage >80% for new file
-    - [ ] Commit: `feat(auth): Add revokeUserSessions helper for centralized session revocation`
+- [x] Task: Create `revokeUserSessions` helper in `src/lib/auth-session.ts` `7b421c7`
+    - [x] Write tests: `tests/unit/lib/auth-session.test.ts` — helper deletes all sessions for a user; leaves other users' sessions intact; handles user with no sessions gracefully
+    - [x] Implement: `export async function revokeUserSessions(userId: string): Promise<void>` — deletes all rows from `session` table for given userId
+    - [x] Verify: tests pass, coverage >80% for new file
+    - [x] Commit: `feat(auth): Add revokeUserSessions helper for centralized session revocation`
 
 - [ ] Task: Strengthen `BETTER_AUTH_SECRET` validation in `src/config/env.ts`
     - [ ] Write tests: `tests/unit/config/env.test.ts` — env config rejects `BETTER_AUTH_SECRET` shorter than 32 chars; accepts 32+ chars
