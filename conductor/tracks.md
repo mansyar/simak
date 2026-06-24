@@ -4,7 +4,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-*No active tracks.*
+- [ ] **Track: Session Lifecycle & Auth Hardening**
+*Link: [./tracks/session-auth-hardening_20260624/](./tracks/session-auth-hardening_20260624/)*
 
 ## Archived
 
