@@ -129,4 +129,8 @@
     - [x] Run `pnpm typecheck` and `pnpm lint`; confirm clean
     - [x] Run `pnpm test:coverage`; confirm no regression below thresholds
 - [x] Task: Conductor - User Manual Verification 'Phase 5: Mutation Hook Wiring' (Protocol in workflow.md) [d3cf731]
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 844b380
 </protect>
