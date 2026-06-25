@@ -55,7 +55,7 @@
 
 ---
 
-## Phase 4: Transactional Wrapping — Consultation Handlers
+## Phase 4: Transactional Wrapping — Consultation Handlers [checkpoint: 4d59d88]
 
 - [x] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase [c4304f6]
 - [x] Task: Write unit tests (Red) [c4304f6]
