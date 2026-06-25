@@ -136,6 +136,14 @@ export async function getPresignedReviewFeedbackUploadUrlHandler(args: {
 
   const { extension, contentType } = args.data;
 
+  const typeCheck = validateUploadType(extension, contentType);
+  if (!typeCheck.valid) {
+    return serverError(
+      ErrorCode.BAD_REQUEST,
+      typeof typeCheck.error === 'string' ? typeCheck.error : String(typeCheck.error),
+    );
+  }
+
   try {
     // Generate UUID file key with 'feedback' prefix
     const fileKey = generateFileKey(extension, 'feedback');
