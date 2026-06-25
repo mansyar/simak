@@ -1,4 +1,13 @@
-import { pgTable, text, timestamp, serial, integer, index, pgEnum } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  serial,
+  integer,
+  index,
+  pgEnum,
+  unique,
+} from 'drizzle-orm/pg-core';
 import { users } from './users';
 import { checkpoints } from './assignments';
 
@@ -23,6 +32,7 @@ export const submissions = pgTable(
   (table) => [
     index('submissions_checkpoint_id_idx').on(table.checkpointId),
     index('submissions_uploaded_by_idx').on(table.uploadedBy),
+    unique('submissions_checkpoint_version_unq').on(table.checkpointId, table.version),
   ],
 );
 

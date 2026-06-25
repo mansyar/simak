@@ -8,11 +8,11 @@
 
 ## Phase 1: Database — Unique Constraint & Migration
 
-- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
-- [ ] Task: Write schema & migration tests (Red)
-    - [ ] Test that `submissions` schema declares a unique constraint on `(checkpointId, version)`
-    - [ ] Test the migration SQL defensively deduplicates pre-existing rows (delete all but max version per checkpoint) before adding the constraint
-    - [ ] Test a companion rollback migration exists and drops the constraint
+- [~] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
+- [~] Task: Write schema & migration tests (Red)
+    - [~] Test that `submissions` schema declares a unique constraint on `(checkpointId, version)`
+    - [~] Test the migration SQL defensively deduplicates pre-existing rows (delete all but max version per checkpoint) before adding the constraint
+    - [~] Test a companion rollback migration exists and drops the constraint
 - [ ] Task: Implement unique constraint & migration (Green)
     - [ ] Add `unique()` on `(checkpointId, version)` to `submissions` schema in `src/db/schema/submissions.ts`
     - [ ] Write migration SQL: dedup `DELETE` (keep max version per `checkpoint_id`) + `ALTER TABLE ... ADD CONSTRAINT submissions_checkpoint_version_unq UNIQUE (checkpoint_id, version)`
