@@ -86,30 +86,30 @@
 
 **Objective:** Migrate all 24 server handlers from `{ error: '<string>' }` to `serverError(code, message, context?)`, wrap uncaught DB ops in try/catch, and update their unit tests.
 
-- [~] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
-    - [ ] Re-read the track specification for requirements context
-    - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
-- [ ] Task: Migrate handlers and update tests (per file)
-    - [ ] `src/server/users.server.ts` + its test - map Unauthorized->UNAUTHORIZED, not-found->NOT_FOUND, DB errors->INTERNAL
-    - [ ] `src/server/templates.server.ts` + test
-    - [ ] `src/server/assignments.server.ts` + `assignments-extras.server.ts` + tests
-    - [ ] `src/server/submissions.server.ts` + test
-    - [ ] `src/server/reviews.server.ts` + `reviews-extras.server.ts` + tests
-    - [ ] `src/server/consultations.server.ts` + `consultations-extras.server.ts` + tests
-    - [ ] `src/server/extensions.server.ts` + `extensions-extras.server.ts` + tests
-    - [ ] `src/server/due-dates.server.ts` + test
-    - [ ] `src/server/notifications.server.ts` + test (assert `{ error: { code: 'INTERNAL', message } }` instead of `{ error: 'Internal Server Error' }`)
-    - [ ] `src/server/files.server.ts` + test
-    - [ ] `src/server/dashboard.server.ts` + `dashboard-student`/`dashboard-instructor`/`dashboard-admin` + tests
-    - [ ] `src/server/instructor-assignments-filter.server.ts` + test
-    - [ ] `src/server/settings.server.ts` + `sessions.server.ts` + `two-factor.server.ts` + tests
-    - [ ] `src/server/bulk-import.server.ts` + `audit-logs.server.ts` + tests
-- [ ] Task: Wrap uncaught DB operations in try/catch returning `serverError('INTERNAL', ...)`
-    - [ ] For each handler above, audit for unguarded `await db...` and wrap with the original error in `context`
-- [ ] Task: Run full test suite and quality gates
-    - [ ] Run `CI=true pnpm test` and confirm all pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint`; confirm clean
-    - [ ] Run `pnpm test:coverage`; confirm no regression below thresholds
+- [x] Task: Read `./spec.md` and `../../workflow.md` before starting this phase [40684b8]
+    - [x] Re-read the track specification for requirements context
+    - [x] Re-read the workflow for the TDD task lifecycle and phase completion protocol
+- [x] Task: Migrate handlers and update tests (per file) [40684b8]
+    - [x] `src/server/users.server.ts` + its test - map Unauthorized->UNAUTHORIZED, not-found->NOT_FOUND, DB errors->INTERNAL
+    - [x] `src/server/templates.server.ts` + test
+    - [x] `src/server/assignments.server.ts` + `assignments-extras.server.ts` + tests
+    - [x] `src/server/submissions.server.ts` + test
+    - [x] `src/server/reviews.server.ts` + `reviews-extras.server.ts` + tests
+    - [x] `src/server/consultations.server.ts` + `consultations-extras.server.ts` + tests
+    - [x] `src/server/extensions.server.ts` + `extensions-extras.server.ts` + tests
+    - [x] `src/server/due-dates.server.ts` + test
+    - [x] `src/server/notifications.server.ts` + test (assert `{ error: { code: 'INTERNAL', message } }` instead of `{ error: 'Internal Server Error' }`)
+    - [x] `src/server/files.server.ts` + test
+    - [x] `src/server/dashboard.server.ts` + `dashboard-student`/`dashboard-instructor`/`dashboard-admin` + tests
+    - [x] `src/server/instructor-assignments-filter.server.ts` + test
+    - [x] `src/server/settings.server.ts` + `sessions.server.ts` + `two-factor.server.ts` + tests
+    - [x] `src/server/bulk-import.server.ts` + `audit-logs.server.ts` + tests
+- [x] Task: Wrap uncaught DB operations in try/catch returning `serverError('INTERNAL', ...)` [40684b8]
+    - [x] For each handler above, audit for unguarded `await db...` and wrap with the original error in `context`
+- [x] Task: Run full test suite and quality gates [40684b8]
+    - [x] Run `CI=true pnpm test` and confirm all pass (234 files / 2271 tests)
+    - [x] Run `pnpm typecheck` and `pnpm lint`; confirm clean
+    - [x] Run `pnpm test:coverage`; confirm no regression below thresholds (Stmt 87.21%, Branch 80.11%, Funcs 81.73%, Lines 87.97%)
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Server Handler Migration' (Protocol in workflow.md)
 
 ## Phase 5: Mutation Hook Wiring
