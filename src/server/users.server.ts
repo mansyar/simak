@@ -160,46 +160,49 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
 
   const db = getDb();
 
+  // Check if email already in use (active or soft-deleted)
+  const existingUser = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, userEmail))
+    .limit(1)
+    .then((rows) => rows[0]);
+
+  if (existingUser) {
+    return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
+  }
+
+  const userId = crypto.randomUUID();
+  const token = crypto.randomUUID();
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
   try {
-    // Check if email already in use (active or soft-deleted)
-    const existingUser = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, userEmail))
-      .limit(1)
-      .then((rows) => rows[0]);
+    await db.transaction(async (tx) => {
+      await tx.insert(users).values({
+        id: userId,
+        name,
+        email: userEmail,
+        role: role as 'admin' | 'instructor' | 'student',
+        locale: session.user.locale || 'en',
+      });
 
-    if (existingUser) {
-      return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
-    }
+      await logAuditEvent({
+        actorId: session.user.id,
+        action: 'user.created',
+        entityType: 'user',
+        entityId: userId,
+        details: { role, email: userEmail },
+      });
 
-    const userId = crypto.randomUUID();
-    const token = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    await db.insert(users).values({
-      id: userId,
-      name,
-      email: userEmail,
-      role: role as 'admin' | 'instructor' | 'student',
-      locale: session.user.locale || 'en',
+      await tx.insert(verification).values({
+        id: crypto.randomUUID(),
+        identifier: userEmail,
+        value: token,
+        expiresAt,
+      });
     });
 
-    await logAuditEvent({
-      actorId: session.user.id,
-      action: 'user.created',
-      entityType: 'user',
-      entityId: userId,
-      details: { role, email: userEmail },
-    });
-
-    await db.insert(verification).values({
-      id: crypto.randomUUID(),
-      identifier: userEmail,
-      value: token,
-      expiresAt,
-    });
-
+    // Post-commit advisory work: invitation email is non-fatal
     let emailSent = false;
     try {
       await sendInvitationEmail({
@@ -209,7 +212,6 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
       });
       emailSent = true;
     } catch (err) {
-      // Email failure is non-fatal as per spec
       console.error('Failed to send invitation email:', err);
     }
 
