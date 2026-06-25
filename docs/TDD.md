@@ -738,6 +738,17 @@ A checkpoint unlocks when:
 | Transient     | R2 timeout, database connection drop       | Retry + toast notification |
 | Permanent     | Server misconfiguration                    | Error boundary fallback    |
 
+### Implementation
+
+| Module | Responsibility |
+| --- | --- |
+| `src/lib/errors.ts` | `ErrorCode` union (`UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION`, `BAD_REQUEST`, `CONFLICT`, `INTERNAL`), `ServerError` shape `{ error: { code, message } }`, `serverError(code, message, context?)` factory, `logError()` structured logger (readable text in dev, single-line JSON in prod), `sanitizeInput()` (redacts `password`/`token`/`secret`/etc.), `isServerError()` guard. Responses expose only `code` + `message` — never stack traces, SQL, or raw errors. |
+| `src/lib/toast.ts` | `showErrorToast(code, t)` renders a sonner `toast.error` with the translated message (falls back to `error.default`); `parseServerError(res)` extracts `{ code, message }`, tolerant of both the typed shape and the legacy `{ error: string }` shape. |
+| `src/components/ui/sonner.tsx` | `<Toaster>` wrapper — theme-aware (light/dark via `MutationObserver`), design-token CSS vars, `position="top-right"`, `richColors`. Mounted once in `src/routes/__root.tsx`. |
+| `src/components/error-boundary.tsx` | `RootErrorComponent` — bilingual fallback (`error.somethingWentWrong`), Reload button + home link, `role="alert"` + `aria-live="assertive"`, logs via `logError('INTERNAL', ...)`. Wired as `errorComponent` in `src/routes/__root.tsx`. |
+| Server handlers (`src/server/*.server.ts`) | All migrated from `{ error: '<string>' }` to `serverError(code, message, context?)`. DB operations wrapped in `try/catch` → `serverError('INTERNAL', ..., { cause, handler })`. Client mutation hooks (`src/hooks/*.ts`) call `showErrorToast()` on error. |
+| i18n (`locales/{en,id}.json`) | `error` namespace (camelCase) holds user-facing messages per code; `simak-i18n/no-hardcoded` lint rule enforces `t('key')` usage. |
+
 ---
 
 ## 10. Testing Strategy
