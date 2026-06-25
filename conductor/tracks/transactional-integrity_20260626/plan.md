@@ -6,19 +6,19 @@
 
 ---
 
-## Phase 1: Database — Unique Constraint & Migration
+## Phase 1: Database — Unique Constraint & Migration [checkpoint: ff2b7e3]
 
-- [~] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
-- [~] Task: Write schema & migration tests (Red)
-    - [~] Test that `submissions` schema declares a unique constraint on `(checkpointId, version)`
-    - [~] Test the migration SQL defensively deduplicates pre-existing rows (delete all but max version per checkpoint) before adding the constraint
-    - [~] Test a companion rollback migration exists and drops the constraint
-- [ ] Task: Implement unique constraint & migration (Green)
-    - [ ] Add `unique()` on `(checkpointId, version)` to `submissions` schema in `src/db/schema/submissions.ts`
-    - [ ] Write migration SQL: dedup `DELETE` (keep max version per `checkpoint_id`) + `ALTER TABLE ... ADD CONSTRAINT submissions_checkpoint_version_unq UNIQUE (checkpoint_id, version)`
-    - [ ] Write companion rollback migration per SQL styleguide §5.1
-    - [ ] Run `pnpm db:generate` / verify migration applies on dev DB
-- [ ] Task: Conductor - User Manual Verification 'Database — Unique Constraint & Migration' (Protocol in workflow.md)
+- [x] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase [ff2b7e3]
+- [x] Task: Write schema & migration tests (Red) [ff2b7e3]
+    - [x] Test that `submissions` schema declares a unique constraint on `(checkpointId, version)` [ff2b7e3]
+    - [x] Test the migration SQL defensively deduplicates pre-existing rows (delete all but max version per checkpoint) before adding the constraint [ff2b7e3]
+    - [x] Test a companion rollback migration exists and drops the constraint [ff2b7e3]
+- [x] Task: Implement unique constraint & migration (Green) [ff2b7e3]
+    - [x] Add `unique()` on `(checkpointId, version)` to `submissions` schema in `src/db/schema/submissions.ts` [ff2b7e3]
+    - [x] Write migration SQL: dedup `DELETE` (keep max version per `checkpoint_id`) + `ALTER TABLE ... ADD CONSTRAINT submissions_checkpoint_version_unq UNIQUE (checkpoint_id, version)` [ff2b7e3]
+    - [x] Write companion rollback migration per SQL styleguide §5.1 [ff2b7e3]
+    - [x] Run `pnpm db:generate` / verify migration applies on dev DB [ff2b7e3]
+- [x] Task: Conductor - User Manual Verification 'Database — Unique Constraint & Migration' (Protocol in workflow.md) [ff2b7e3]
 
 ---
 
