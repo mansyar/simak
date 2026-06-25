@@ -69,7 +69,7 @@
 
 ---
 
-## Phase 5: File-Type Validation on Feedback Uploads
+## Phase 5: File-Type Validation on Feedback Uploads [checkpoint: 62f75dd]
 
 - [x] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase [4d33ee6]
 - [x] Task: Write unit tests (Red) [4d33ee6]
