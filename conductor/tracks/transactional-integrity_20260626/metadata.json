@@ -1,0 +1,8 @@
+{
+  "track_id": "transactional-integrity_20260626",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-06-25T14:12:56Z",
+  "updated_at": "2026-06-25T14:12:56Z",
+  "description": "Wrap multi-step mutation handlers in db.transaction, add unique constraint on (checkpoint_id, version), fix notification metadata bug, enforce file-type validation on feedback uploads, investigate fileKey trust gap."
+}

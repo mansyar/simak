@@ -15,4 +15,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active
 
-*No active tracks.*
+---
+
+- [ ] **Track: Transactional Integrity & Input Validation**
+*Link: [./tracks/transactional-integrity_20260626/](./tracks/transactional-integrity_20260626/)*
