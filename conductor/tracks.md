@@ -14,5 +14,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active
 
-- [ ] **Track: Error Boundary & Error Message Improvements**
+- [~] **Track: Error Boundary & Error Message Improvements**
 *Link: [./tracks/error-handling_20260625/](./tracks/error-handling_20260625/)*

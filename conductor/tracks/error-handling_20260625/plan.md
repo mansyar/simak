@@ -5,10 +5,10 @@
 
 **Objective:** Create the foundational server-side error module (`src/lib/errors.ts`) with typed error codes, a `serverError()` factory, and a structured `logError()` logger.
 
-- [ ] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
+- [x] Task: Read `./spec.md` and `../../workflow.md` before starting this phase [1d9781e]
     - [ ] Re-read the track specification for requirements context
     - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
-- [ ] Task: Write failing tests for `src/lib/errors.ts` (Red Phase)
+- [x] Task: Write failing tests for `src/lib/errors.ts` (Red Phase) [1d9781e]
     - [ ] Create `tests/unit/lib/errors.test.ts`
     - [ ] Test `ErrorCode` union includes: UNAUTHORIZED, FORBIDDEN, NOT_FOUND, VALIDATION, CONFLICT, INTERNAL
     - [ ] Test `serverError(code, message)` returns `{ error: { code, message } }`
@@ -17,13 +17,13 @@
     - [ ] Test `logError` output is readable text in dev and JSON in production (`import.meta.env.PROD`)
     - [ ] Test the returned `ServerError` object NEVER contains stack/internal details (only code + message)
     - [ ] Run `CI=true pnpm vitest run tests/unit/lib/errors.test.ts` and confirm tests fail
-- [ ] Task: Implement `src/lib/errors.ts` (Green Phase)
+- [x] Task: Implement `src/lib/errors.ts` (Green Phase) [1d9781e]
     - [ ] Create `src/lib/errors.ts` exporting `ErrorCode`, `ServerError` type, `serverError()`, `logError()`
     - [ ] `logError` reads session/userId where available and sanitizes input (redact sensitive fields)
     - [ ] Dev: readable multi-line log; Prod: single-line JSON (`import.meta.env.PROD`)
     - [ ] Run `CI=true pnpm vitest run tests/unit/lib/errors.test.ts` and confirm tests pass
-- [ ] Task: Verify coverage
-    - [ ] Run `pnpm test:coverage` and confirm `src/lib/errors.ts` >= 80% coverage
+- [x] Task: Verify coverage [1d9781e]
+    - [x] Run `pnpm test:coverage` and confirm `src/lib/errors.ts` >= 80% coverage
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Server Error Utilities' (Protocol in workflow.md)
 
 ## Phase 2: i18n Error Keys, Sonner & Client Toast Helper
