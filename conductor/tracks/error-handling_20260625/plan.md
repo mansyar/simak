@@ -63,10 +63,10 @@
 
 **Objective:** Add a TanStack Router `errorComponent` to `__root.tsx` that catches render crashes and shows a bilingual fallback with reload + dashboard links.
 
-- [ ] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
+- [x] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
     - [ ] Re-read the track specification for requirements context
     - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
-- [ ] Task: Write failing tests for the error boundary (Red Phase)
+- [x] Task: Write failing tests for the error boundary (Red Phase) [796e8db]
     - [ ] Create `tests/unit/components/error-boundary.test.tsx`
     - [ ] Test the fallback renders "Something went wrong" heading + reassurance via i18n
     - [ ] Test a "Reload" button is present and triggers `window.location.reload`
@@ -74,12 +74,12 @@
     - [ ] Test the caught error is logged via `console.error`
     - [ ] Test the fallback is keyboard-navigable and theme-aware (renders in light/dark)
     - [ ] Run tests and confirm they fail
-- [ ] Task: Implement the error boundary (Green Phase)
+- [x] Task: Implement the error boundary (Green Phase) [796e8db]
     - [ ] Create `src/components/error-boundary.tsx` exporting `RootErrorComponent`
     - [ ] Add `errorComponent: RootErrorComponent` to the `createRootRoute({...})` options in `src/routes/__root.tsx`
     - [ ] Run tests and confirm they pass
-- [ ] Task: Verify coverage
-    - [ ] Run `pnpm test:coverage`; confirm `src/components/error-boundary.tsx` >= 80%
+- [x] Task: Verify coverage [796e8db]
+    - [x] Run `pnpm test:coverage`; confirm `src/components/error-boundary.tsx` >= 80%
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Global Error Boundary' (Protocol in workflow.md)
 
 ## Phase 4: Server Handler Migration
