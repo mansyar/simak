@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Outlet, createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '../components/ui/sonner';
+import { RootErrorComponent } from '../components/error-boundary';
 import globalCss from '../app/global.css?url';
 import type { Locales } from '../i18n/types';
 import { detectLocale } from '../i18n/index';
@@ -117,6 +118,7 @@ function NotFoundComponent() {
 
 export const Route = createRootRoute({
   notFoundComponent: NotFoundComponent,
+  errorComponent: RootErrorComponent,
   head: () => ({
     meta: [
       {
