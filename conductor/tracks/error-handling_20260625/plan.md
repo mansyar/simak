@@ -82,7 +82,7 @@
     - [x] Run `pnpm test:coverage`; confirm `src/components/error-boundary.tsx` >= 80%
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Global Error Boundary' (Protocol in workflow.md)
 
-## Phase 4: Server Handler Migration
+## Phase 4: Server Handler Migration [checkpoint: e1003e5]
 
 **Objective:** Migrate all 24 server handlers from `{ error: '<string>' }` to `serverError(code, message, context?)`, wrap uncaught DB ops in try/catch, and update their unit tests.
 
@@ -110,7 +110,7 @@
     - [x] Run `CI=true pnpm test` and confirm all pass (234 files / 2271 tests)
     - [x] Run `pnpm typecheck` and `pnpm lint`; confirm clean
     - [x] Run `pnpm test:coverage`; confirm no regression below thresholds (Stmt 87.21%, Branch 80.11%, Funcs 81.73%, Lines 87.97%)
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Server Handler Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Server Handler Migration' (Protocol in workflow.md) [e1003e5]
 
 ## Phase 5: Mutation Hook Wiring
 
