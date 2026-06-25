@@ -83,13 +83,13 @@
 
 ---
 
-## Phase 6: Documentation & fileKey Investigation
+## Phase 6: Documentation & fileKey Investigation [f8f67bc]
 
-- [~] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
-- [~] Task: Document "Transaction Wrapping" convention
-    - [~] Append a "Transaction Wrapping" section to `conductor/code_styleguides/sql.md` covering: when to use `db.transaction` (2+ writes), the `.returning()` pattern, post-commit advisory work isolation (try/catch after commit), and the gold-standard reference (`submitReviewHandler`)
-- [ ] Task: Investigate fileKey trust gap (document only)
-    - [ ] Trace the presign→submit flow: how `fileKey` is generated in `getPresignedUploadUrl` and consumed in `submitCheckpointHandler`
-    - [ ] Record findings (the exact trust gap, feasibility of a presign-time mapping table, recommended approach) in a findings note within this track's folder
+- [x] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase [f8f67bc]
+- [x] Task: Document "Transaction Wrapping" convention [f8f67bc]
+    - [x] Append a "Transaction Wrapping" section to `conductor/code_styleguides/sql.md` covering: when to use `db.transaction` (2+ writes), the `.returning()` pattern, post-commit advisory work isolation (try/catch after commit), and the gold-standard reference (`submitReviewHandler`) [f8f67bc]
+- [x] Task: Investigate fileKey trust gap (document only) [f8f67bc]
+    - [x] Trace the presign→submit flow: how `fileKey` is generated in `getPresignedUploadUrl` and consumed in `submitCheckpointHandler` [f8f67bc]
+    - [x] Record findings (the exact trust gap, feasibility of a presign-time mapping table, recommended approach) in a findings note within this track's folder [f8f67bc]
 - [ ] Task: Conductor - User Manual Verification 'Documentation & fileKey Investigation' (Protocol in workflow.md)
 </protect>
