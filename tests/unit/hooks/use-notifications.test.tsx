@@ -10,7 +10,19 @@ import {
 } from '@/hooks/use-notifications';
 import { getUnreadCount, listNotifications, markRead, markAllRead } from '@/server/notifications';
 
-// Mock server functions
+// Mocks
+const mockShowErrorToast = vi.fn();
+
+vi.mock('@/routes/__root', () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+}));
+
+vi.mock('@/lib/toast', () => ({
+  parseServerError: (res: { error?: { code: string; message: string } }) =>
+    res.error ? res.error : { code: 'UNKNOWN', message: '' },
+  showErrorToast: (...args: unknown[]) => mockShowErrorToast(...args),
+}));
+
 vi.mock('@/server/notifications', () => ({
   getUnreadCount: vi.fn(),
   listNotifications: vi.fn(),
@@ -123,6 +135,32 @@ describe('Notification query hooks', () => {
       expect(markAllRead).toHaveBeenCalled();
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['notifications', 'unreadCount'] });
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['notifications', 'list'] });
+    });
+  });
+
+  describe('error handling', () => {
+    it('shows a toast and surfaces the typed server error for mutations', async () => {
+      mockShowErrorToast.mockClear();
+      vi.mocked(markRead).mockResolvedValue({
+        error: { code: 'FORBIDDEN', message: 'Forbidden' },
+      } as any);
+
+      const queryClient = new QueryClient();
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      );
+
+      const { result } = renderHook(() => useMarkRead(), { wrapper });
+
+      result.current.mutate(42);
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+
+      expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
+      expect(result.current.error).toBeInstanceOf(Error);
+      expect(result.current.error?.message).toBe('Forbidden');
     });
   });
 });

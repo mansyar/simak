@@ -6,6 +6,17 @@ const mockListPendingConsultations = vi.fn();
 const mockListExtensionRequests = vi.fn();
 const mockApproveExtension = vi.fn();
 const mockRejectExtension = vi.fn();
+const mockShowErrorToast = vi.fn();
+
+vi.mock('@/routes/__root', () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+}));
+
+vi.mock('@/lib/toast', () => ({
+  parseServerError: (res: { error?: { code: string; message: string } }) =>
+    res.error ? res.error : { code: 'UNKNOWN', message: '' },
+  showErrorToast: (...args: unknown[]) => mockShowErrorToast(...args),
+}));
 
 vi.mock('@/server/consultations', () => ({
   listPendingConsultations: (...args: unknown[]) => mockListPendingConsultations(...args),
@@ -95,7 +106,9 @@ describe('useAssignmentTabs', () => {
   });
 
   it('does not set extensionRequests when the response has no items key', async () => {
-    mockListExtensionRequests.mockResolvedValue({ error: 'denied' });
+    mockListExtensionRequests.mockResolvedValue({
+      error: { code: 'FORBIDDEN', message: 'Forbidden' },
+    });
 
     const { result } = renderHook(() => useAssignmentTabs(1));
 
@@ -128,8 +141,8 @@ describe('useAssignmentTabs', () => {
     });
   });
 
-  it('approveExtensionHandler does not refresh when the server returns an error', async () => {
-    mockApproveExtension.mockResolvedValue({ error: 'forbidden' });
+  it('approveExtensionHandler does not refresh and toasts server error', async () => {
+    mockApproveExtension.mockResolvedValue({ error: { code: 'FORBIDDEN', message: 'Forbidden' } });
     mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
 
     const { result } = renderHook(() => useAssignmentTabs(1));
@@ -145,6 +158,7 @@ describe('useAssignmentTabs', () => {
     expect(mockApproveExtension).toHaveBeenCalledTimes(1);
     // Only the initial mount fetch should have occurred — no second refresh
     expect(mockListExtensionRequests).toHaveBeenCalledTimes(1);
+    expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
   });
 
   it('rejectExtensionHandler calls the server with the reason and refreshes on success', async () => {
@@ -170,8 +184,8 @@ describe('useAssignmentTabs', () => {
     });
   });
 
-  it('rejectExtensionHandler does not refresh on error response', async () => {
-    mockRejectExtension.mockResolvedValue({ error: 'forbidden' });
+  it('rejectExtensionHandler does not refresh and toasts server error', async () => {
+    mockRejectExtension.mockResolvedValue({ error: { code: 'FORBIDDEN', message: 'Forbidden' } });
     mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
 
     const { result } = renderHook(() => useAssignmentTabs(1));
@@ -186,6 +200,7 @@ describe('useAssignmentTabs', () => {
 
     expect(mockRejectExtension).toHaveBeenCalledTimes(1);
     expect(mockListExtensionRequests).toHaveBeenCalledTimes(1);
+    expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
   });
 
   it('exposes setPendingConsultations for parent components to update the queue', async () => {

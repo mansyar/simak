@@ -5,6 +5,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { listPendingConsultations } from '@/server/consultations';
 import { listExtensionRequests, approveExtension, rejectExtension } from '@/server/extensions';
+import { parseServerError, showErrorToast } from '@/lib/toast';
+import { useI18n } from '@/routes/__root';
 import type { PendingConsultation } from '@/components/instructor/assignments/AssignmentConsultationsTab';
 import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
 
@@ -17,17 +19,18 @@ const listPendingFn = listPendingConsultations as unknown as (args: {
 
 const listExtensionsFn = listExtensionRequests as unknown as (args: {
   data: { assignmentId: number; status: string; page: number; limit: number };
-}) => Promise<{ items: ExtensionRequestItem[] }>;
+}) => Promise<{ items: ExtensionRequestItem[]; error?: { code: string; message: string } }>;
 
 const approveFn = approveExtension as unknown as (args: {
   data: { requestId: number; resolutionReason?: string };
-}) => Promise<{ error?: string }>;
+}) => Promise<{ error?: { code: string; message: string } }>;
 
 const rejectFn = rejectExtension as unknown as (args: {
   data: { requestId: number; resolutionReason: string };
-}) => Promise<{ error?: string }>;
+}) => Promise<{ error?: { code: string; message: string } }>;
 
 export function useAssignmentTabs(assignmentId: number | null) {
+  const { t } = useI18n();
   const [pendingConsultations, setPendingConsultations] = useState<PendingConsultation[]>([]);
   const [extensionRequests, setExtensionRequests] = useState<ExtensionRequestItem[]>([]);
   const [extensionsLoading, setExtensionsLoading] = useState(false);
@@ -58,17 +61,27 @@ export function useAssignmentTabs(assignmentId: number | null) {
   const handleApproveExtension = useCallback(
     async (requestId: number, comment?: string) => {
       const result = await approveFn({ data: { requestId, resolutionReason: comment } });
-      if (!result.error) await refreshExtensions();
+      if ('error' in result) {
+        const parsed = parseServerError(result);
+        showErrorToast(parsed.code, t);
+        return;
+      }
+      await refreshExtensions();
     },
-    [refreshExtensions],
+    [refreshExtensions, t],
   );
 
   const handleRejectExtension = useCallback(
     async (requestId: number, reason: string) => {
       const result = await rejectFn({ data: { requestId, resolutionReason: reason } });
-      if (!result.error) await refreshExtensions();
+      if ('error' in result) {
+        const parsed = parseServerError(result);
+        showErrorToast(parsed.code, t);
+        return;
+      }
+      await refreshExtensions();
     },
-    [refreshExtensions],
+    [refreshExtensions, t],
   );
 
   return {
