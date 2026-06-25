@@ -41,7 +41,7 @@
 
 ---
 
-## Phase 3: Transactional Wrapping — User & Password Setup Handlers
+## Phase 3: Transactional Wrapping — User & Password Setup Handlers [checkpoint: cf72b19]
 
 - [x] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
 - [x] Task: Write unit tests (Red)
@@ -51,7 +51,7 @@
 - [x] Task: Implement transactional user & password-setup handlers (Green)
     - [x] Wrap `createUserHandler` user + verification inserts in `db.transaction`; move `sendInvitationEmail` to post-commit try/catch
     - [x] Wrap `completePasswordSetup` account upsert + user update + token deletion in `db.transaction`
-- [~] Task: Conductor - User Manual Verification 'Transactional Wrapping — User & Password Setup Handlers' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Transactional Wrapping — User & Password Setup Handlers' (Protocol in workflow.md) [cf72b19]
 
 ---
 
