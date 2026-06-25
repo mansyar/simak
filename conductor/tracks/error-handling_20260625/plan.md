@@ -59,28 +59,28 @@
     - [x] Run `pnpm test:coverage`; confirm `src/lib/toast.ts` >= 80%
 - [x] Task: Conductor - User Manual Verification 'Phase 2: i18n Error Keys, Sonner & Client Toast Helper' (Protocol in workflow.md) [6e1505e]
 
-## Phase 3: Global Error Boundary
+## Phase 3: Global Error Boundary [checkpoint: 536f170]
 
 **Objective:** Add a TanStack Router `errorComponent` to `__root.tsx` that catches render crashes and shows a bilingual fallback with reload + dashboard links.
 
-- [x] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
-    - [ ] Re-read the track specification for requirements context
-    - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
+- [x] Task: Read `./spec.md` and `../../workflow.md` before starting this phase [796e8db]
+    - [x] Re-read the track specification for requirements context
+    - [x] Re-read the workflow for the TDD task lifecycle and phase completion protocol
 - [x] Task: Write failing tests for the error boundary (Red Phase) [796e8db]
-    - [ ] Create `tests/unit/components/error-boundary.test.tsx`
-    - [ ] Test the fallback renders "Something went wrong" heading + reassurance via i18n
-    - [ ] Test a "Reload" button is present and triggers `window.location.reload`
-    - [ ] Test a "Go to dashboard" link is present
-    - [ ] Test the caught error is logged via `console.error`
-    - [ ] Test the fallback is keyboard-navigable and theme-aware (renders in light/dark)
-    - [ ] Run tests and confirm they fail
+    - [x] Create `tests/unit/components/error-boundary.test.tsx`
+    - [x] Test the fallback renders "Something went wrong" heading + reassurance via i18n
+    - [x] Test a "Reload" button is present and triggers `window.location.reload`
+    - [x] Test a "Go to dashboard" link is present
+    - [x] Test the caught error is logged via `console.error`
+    - [x] Test the fallback is keyboard-navigable and theme-aware (renders in light/dark)
+    - [x] Run tests and confirm they fail
 - [x] Task: Implement the error boundary (Green Phase) [796e8db]
-    - [ ] Create `src/components/error-boundary.tsx` exporting `RootErrorComponent`
-    - [ ] Add `errorComponent: RootErrorComponent` to the `createRootRoute({...})` options in `src/routes/__root.tsx`
-    - [ ] Run tests and confirm they pass
+    - [x] Create `src/components/error-boundary.tsx` exporting `RootErrorComponent`
+    - [x] Add `errorComponent: RootErrorComponent` to the `createRootRoute({...})` options in `src/routes/__root.tsx`
+    - [x] Run tests and confirm they pass
 - [x] Task: Verify coverage [796e8db]
     - [x] Run `pnpm test:coverage`; confirm `src/components/error-boundary.tsx` >= 80%
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Global Error Boundary' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Global Error Boundary' (Protocol in workflow.md) [536f170]
 
 ## Phase 4: Server Handler Migration [checkpoint: e1003e5]
 
@@ -112,21 +112,21 @@
     - [x] Run `pnpm test:coverage`; confirm no regression below thresholds (Stmt 87.21%, Branch 80.11%, Funcs 81.73%, Lines 87.97%)
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Server Handler Migration' (Protocol in workflow.md) [e1003e5]
 
-## Phase 5: Mutation Hook Wiring
+## Phase 5: Mutation Hook Wiring [checkpoint: d3cf731]
 
 **Objective:** Wire client mutation hooks (and any inline `useMutation` sites in routes) to call `showErrorToast(code, t)` on server errors, replacing the `throw new Error(res.error)` pattern.
 
-- [ ] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
-    - [ ] Re-read the track specification for requirements context
-    - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
-- [ ] Task: Update client hooks
-    - [ ] `src/hooks/use-notifications.ts` - replace 4x `throw new Error(res.error)` with `parseServerError` + `showErrorToast`; update hook tests to mock the new error shape
-    - [ ] `src/hooks/use-assignment-tabs.ts` - replace `if (!result.error)` checks with the typed flow + toast; update test
-    - [ ] Scan `src/routes/**` for inline `useMutation` calls and wire them with `showErrorToast` on error
-- [ ] Task: Update and run hook tests
-    - [ ] Update affected hook tests to assert the new error-shape flow
-    - [ ] Run `CI=true pnpm test` and confirm all pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint`; confirm clean
-    - [ ] Run `pnpm test:coverage`; confirm no regression below thresholds
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Mutation Hook Wiring' (Protocol in workflow.md)
+- [x] Task: Read `./spec.md` and `../../workflow.md` before starting this phase [452a2c6]
+    - [x] Re-read the track specification for requirements context
+    - [x] Re-read the workflow for the TDD task lifecycle and phase completion protocol
+- [x] Task: Update client hooks [452a2c6]
+    - [x] `src/hooks/use-notifications.ts` - replace 4x `throw new Error(res.error)` with `parseServerError` + `showErrorToast`; update hook tests to mock the new error shape
+    - [x] `src/hooks/use-assignment-tabs.ts` - replace `if (!result.error)` checks with the typed flow + toast; update test
+    - [x] Scan `src/routes/**` for inline `useMutation` calls and wire them with `showErrorToast` on error (none found)
+- [x] Task: Update and run hook tests [452a2c6]
+    - [x] Update affected hook tests to assert the new error-shape flow
+    - [x] Run `CI=true pnpm test` and confirm all pass (234 files / 2272 tests)
+    - [x] Run `pnpm typecheck` and `pnpm lint`; confirm clean
+    - [x] Run `pnpm test:coverage`; confirm no regression below thresholds
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Mutation Hook Wiring' (Protocol in workflow.md) [d3cf731]
 </protect>
