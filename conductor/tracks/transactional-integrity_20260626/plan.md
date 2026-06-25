@@ -92,4 +92,13 @@
     - [x] Trace the presign→submit flow: how `fileKey` is generated in `getPresignedUploadUrl` and consumed in `submitCheckpointHandler` [c3617fd]
     - [x] Record findings (the exact trust gap, feasibility of a presign-time mapping table, recommended approach) in a findings note within this track's folder [c3617fd]
 - [x] Task: Conductor - User Manual Verification 'Documentation & fileKey Investigation' (Protocol in workflow.md) [c3617fd]
+
+---
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [a1c6f58]
+    - Fix migration dedup to preserve version history (group by checkpoint_id + version, not DISTINCT ON checkpoint_id)
+    - Move `createUserHandler` audit log out of the transaction into post-commit try/catch (styleguide §6.4)
+    - Update migration test to assert the correct dedup pattern
 </protect>
