@@ -4,8 +4,6 @@ export const ErrorCode = {
   NOT_FOUND: 'NOT_FOUND',
   VALIDATION: 'VALIDATION',
   BAD_REQUEST: 'BAD_REQUEST',
-  UNPROCESSABLE: 'UNPROCESSABLE',
-  TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
   CONFLICT: 'CONFLICT',
   INTERNAL: 'INTERNAL',
 } as const;
@@ -86,12 +84,17 @@ export function logError(code: ErrorCode, message: string, context: ErrorContext
   const timestamp = new Date().toISOString();
   const sanitizedInput = sanitizeInput(input);
   const stack = cause instanceof Error ? cause.stack : undefined;
+  const causeDetail = cause instanceof Error ? cause.message : cause;
 
   const entry: Record<string, unknown> = {
     timestamp,
     code,
     message,
   };
+
+  if (causeDetail !== undefined && causeDetail !== '') {
+    entry.cause = causeDetail;
+  }
 
   if (userId !== undefined && userId !== null) {
     entry.userId = userId;
@@ -115,6 +118,10 @@ export function logError(code: ErrorCode, message: string, context: ErrorContext
   }
 
   const lines: string[] = [`[${code}] ${message}`, `Timestamp: ${timestamp}`];
+
+  if (causeDetail !== undefined && causeDetail !== '') {
+    lines.push(`Cause: ${causeDetail}`);
+  }
 
   if (userId !== undefined && userId !== null) {
     lines.push(`User: ${userId}`);

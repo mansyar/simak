@@ -112,7 +112,7 @@ function ReviewDetailPage() {
 
       {/* Review history */}
       <ReviewHistory
-        reviews={(reviewHistory ?? []).map((r: any) => ({
+        reviews={(reviewHistory ?? []).map((r) => ({
           ...r,
           createdAt: r.createdAt ?? new Date(),
         }))}

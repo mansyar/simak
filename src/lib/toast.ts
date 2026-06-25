@@ -10,8 +10,6 @@ const VALID_ERROR_CODES: readonly ErrorCode[] = [
   'NOT_FOUND',
   'VALIDATION',
   'BAD_REQUEST',
-  'UNPROCESSABLE',
-  'TOO_MANY_REQUESTS',
   'CONFLICT',
   'INTERNAL',
 ];
@@ -22,8 +20,6 @@ const ERROR_CODE_TO_KEY: Record<ErrorCode | 'NETWORK', TranslationKey> = {
   NOT_FOUND: 'error.notFound',
   VALIDATION: 'error.validation',
   BAD_REQUEST: 'error.badRequest',
-  UNPROCESSABLE: 'error.unprocessable',
-  TOO_MANY_REQUESTS: 'error.tooManyRequests',
   CONFLICT: 'error.conflict',
   INTERNAL: 'error.internal',
   NETWORK: 'error.network',

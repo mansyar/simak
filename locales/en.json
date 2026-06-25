@@ -626,8 +626,6 @@
     "forbidden": "You do not have permission to access this page",
     "validation": "The data you entered is invalid",
     "badRequest": "The request could not be processed. Please check your input and try again.",
-    "unprocessable": "The request could not be processed. Please check your input and try again.",
-    "tooManyRequests": "Too many requests. Please wait a moment and try again.",
     "conflict": "The resource you requested already exists or conflicts with another",
     "internal": "An unexpected server error occurred. Please try again later.",
     "network": "Could not connect to the server. Please check your internet connection.",

@@ -32,7 +32,7 @@ export function RootErrorComponent({ error }: { error: Error }) {
           {t('error.reload')}
         </Button>
         <a
-          href="/dashboard"
+          href="/"
           className="inline-flex h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-primary underline-offset-4 hover:underline"
         >
           {t('common.goToDashboard')}

@@ -33,7 +33,7 @@ describe('RootErrorComponent', () => {
     expect(screen.getByRole('button', { name: 'i18n:error.reload' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'i18n:common.goToDashboard' })).toHaveAttribute(
       'href',
-      '/dashboard',
+      '/',
     );
   });
 
