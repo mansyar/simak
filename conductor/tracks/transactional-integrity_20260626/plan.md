@@ -48,10 +48,10 @@
     - [x] Test `createUserHandler` — if the verification-token insert fails, the user insert is rolled back (no partial user row)
     - [x] Test `createUserHandler` — the invitation email is sent only AFTER the transaction commits (not inside it)
     - [x] Test `completePasswordSetup` — if token deletion fails, the account upsert and user update are rolled back
-- [~] Task: Implement transactional user & password-setup handlers (Green)
-    - [~] Wrap `createUserHandler` user + verification inserts in `db.transaction`; move `sendInvitationEmail` to post-commit try/catch
-    - [~] Wrap `completePasswordSetup` account upsert + user update + token deletion in `db.transaction`
-- [ ] Task: Conductor - User Manual Verification 'Transactional Wrapping — User & Password Setup Handlers' (Protocol in workflow.md)
+- [x] Task: Implement transactional user & password-setup handlers (Green)
+    - [x] Wrap `createUserHandler` user + verification inserts in `db.transaction`; move `sendInvitationEmail` to post-commit try/catch
+    - [x] Wrap `completePasswordSetup` account upsert + user update + token deletion in `db.transaction`
+- [~] Task: Conductor - User Manual Verification 'Transactional Wrapping — User & Password Setup Handlers' (Protocol in workflow.md)
 
 ---
 
