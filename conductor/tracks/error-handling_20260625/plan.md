@@ -30,34 +30,34 @@
 
 **Objective:** Add bilingual error message keys, install sonner, mount the global `<Toaster />`, and build the client `showErrorToast()` helper plus a response-shape-tolerant parser.
 
-- [ ] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
+- [x] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
     - [ ] Re-read the track specification for requirements context
     - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
-- [ ] Task: Add error i18n keys to both locales
+- [x] Task: Add error i18n keys to both locales
     - [ ] Extend the existing `error` namespace in `locales/en.json` (camelCase convention; reuse existing `error.notFound`): add `unauthorized`, `forbidden`, `validation`, `conflict`, `internal`, `network`, `default`, `somethingWentWrong`, `reload`
     - [ ] Add matching Indonesian translations to `locales/id.json`
     - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` + `detect-locale.ts`
     - [ ] Run `pnpm check:i18n` and `pnpm check:i18n:unused`; confirm parity and no unused keys
-- [ ] Task: Install sonner
+- [x] Task: Install sonner
     - [ ] Run `pnpm add sonner`
     - [ ] Add the shadcn sonner wrapper via `pnpm dlx shadcn@latest add sonner` (or import `Toaster` directly)
-- [ ] Task: Write failing tests for `src/lib/toast.ts` (Red Phase)
+- [x] Task: Write failing tests for `src/lib/toast.ts` (Red Phase) [5d571b0]
     - [ ] Create `tests/unit/lib/toast.test.tsx`
     - [ ] Test `showErrorToast(code, t)` calls `toast.error` with the translated message for each code
     - [ ] Test unknown code falls back to `t('error.default')`
     - [ ] Test `parseServerError(res)` extracts `{ code, message }` from the new typed shape `{ error: { code, message } }`
     - [ ] Test `parseServerError(res)` tolerates legacy shape `{ error: 'string' }` (maps to INTERNAL/default)
     - [ ] Run tests and confirm they fail
-- [ ] Task: Implement `src/lib/toast.ts` (Green Phase)
+- [x] Task: Implement `src/lib/toast.ts` (Green Phase) [5d571b0]
     - [ ] Create `src/lib/toast.ts` exporting `showErrorToast(code, t)` with an explicit code->`TranslationKey` map, and `parseServerError(res)` helper
     - [ ] Run tests and confirm they pass
-- [ ] Task: Mount `<Toaster />` in `src/routes/__root.tsx`
-    - [ ] Import `Toaster` from the sonner wrapper
-    - [ ] Render `<Toaster richColors position="top-right" />` inside `<QueryClientProvider>` in `RootDocument`
-    - [ ] Wire theme (light/dark) and reduced-motion; localize close-button aria-label via `t()`
-- [ ] Task: Verify coverage
-    - [ ] Run `pnpm test:coverage`; confirm `src/lib/toast.ts` >= 80%
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: i18n Error Keys, Sonner & Client Toast Helper' (Protocol in workflow.md)
+- [x] Task: Mount `<Toaster />` in `src/routes/__root.tsx` [5d571b0]
+    - [x] Import `Toaster` from the sonner wrapper
+    - [x] Render `<Toaster richColors position="top-right" />` inside `<QueryClientProvider>` in `RootDocument`
+    - [x] Wire theme (light/dark) and reduced-motion; localize close-button aria-label via `t()`
+- [x] Task: Verify coverage [5d571b0]
+    - [x] Run `pnpm test:coverage`; confirm `src/lib/toast.ts` >= 80%
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: i18n Error Keys, Sonner & Client Toast Helper' (Protocol in workflow.md) [pending checkpoint]
 
 ## Phase 3: Global Error Boundary
 
