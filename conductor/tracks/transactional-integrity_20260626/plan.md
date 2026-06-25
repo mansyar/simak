@@ -6,7 +6,7 @@
 
 ---
 
-## Phase 1: Database — Unique Constraint & Migration [checkpoint: ff2b7e3]
+## Phase 1: Database — Unique Constraint & Migration [checkpoint: 84391e8]
 
 - [x] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase [ff2b7e3]
 - [x] Task: Write schema & migration tests (Red) [ff2b7e3]
