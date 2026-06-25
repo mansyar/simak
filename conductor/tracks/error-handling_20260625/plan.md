@@ -26,7 +26,7 @@
     - [x] Run `pnpm test:coverage` and confirm `src/lib/errors.ts` >= 80% coverage
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Server Error Utilities' (Protocol in workflow.md) [6985efb]
 
-## Phase 2: i18n Error Keys, Sonner & Client Toast Helper
+## Phase 2: i18n Error Keys, Sonner & Client Toast Helper [checkpoint: 6e1505e]
 
 **Objective:** Add bilingual error message keys, install sonner, mount the global `<Toaster />`, and build the client `showErrorToast()` helper plus a response-shape-tolerant parser.
 
@@ -57,7 +57,7 @@
     - [x] Wire theme (light/dark) and reduced-motion; localize close-button aria-label via `t()`
 - [x] Task: Verify coverage [5d571b0]
     - [x] Run `pnpm test:coverage`; confirm `src/lib/toast.ts` >= 80%
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: i18n Error Keys, Sonner & Client Toast Helper' (Protocol in workflow.md) [pending checkpoint]
+- [x] Task: Conductor - User Manual Verification 'Phase 2: i18n Error Keys, Sonner & Client Toast Helper' (Protocol in workflow.md) [6e1505e]
 
 ## Phase 3: Global Error Boundary
 
