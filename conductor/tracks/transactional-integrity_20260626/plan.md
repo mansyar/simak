@@ -22,7 +22,7 @@
 
 ---
 
-## Phase 2: submitCheckpointHandler — Transaction, Metadata Fix & Concurrency [checkpoint: faa70c9]
+## Phase 2: submitCheckpointHandler — Transaction, Metadata Fix & Concurrency [checkpoint: acf4226]
 
 - [x] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase [faa70c9]
 - [x] Task: Write unit tests (Red) [faa70c9]
