@@ -622,12 +622,21 @@
   },
   "error": {
     "notFound": "Halaman tidak ditemukan",
+    "unauthorized": "Anda tidak memiliki izin untuk melakukan tindakan ini",
     "forbidden": "Anda tidak memiliki izin untuk mengakses halaman ini",
+    "validation": "Data yang Anda masukkan tidak valid",
+    "conflict": "Sumber daya yang Anda minta sudah ada atau bertabrakan",
+    "internal": "Terjadi kesalahan pada server. Silakan coba lagi.",
+    "network": "Tidak dapat terhubung ke server. Silakan periksa koneksi internet Anda.",
+    "default": "Terjadi kesalahan",
     "serverError": "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
     "required": "Bidang ini wajib diisi",
     "invalidEmail": "Masukkan alamat email yang valid",
     "assignmentNotFound": "Tugas ini tidak ditemukan atau Anda tidak memiliki izin untuk melihatnya.",
-    "templateNotFound": "Templat ini tidak ditemukan atau Anda tidak memiliki izin untuk melihatnya."
+    "templateNotFound": "Templat ini tidak ditemukan atau Anda tidak memiliki izin untuk melihatnya.",
+    "somethingWentWrong": "Terjadi kesalahan",
+    "reload": "Muat Ulang",
+    "errorBoundaryDescription": "Maaf, terjadi sesuatu yang tidak terduga. Anda dapat mencoba memuat ulang halaman atau kembali ke dasbor."
   },
   "notifications": {
     "title": "Notifikasi",

@@ -622,12 +622,21 @@
   },
   "error": {
     "notFound": "Page not found",
+    "unauthorized": "You are not authorized to perform this action",
     "forbidden": "You do not have permission to access this page",
+    "validation": "The data you entered is invalid",
+    "conflict": "The resource you requested already exists or conflicts with another",
+    "internal": "An unexpected server error occurred. Please try again later.",
+    "network": "Could not connect to the server. Please check your internet connection.",
+    "default": "An error occurred",
     "serverError": "An unexpected error occurred. Please try again later.",
     "required": "This field is required",
     "invalidEmail": "Please enter a valid email address",
     "assignmentNotFound": "This assignment could not be found or you do not have permission to view it.",
-    "templateNotFound": "This template could not be found or you do not have permission to view it."
+    "templateNotFound": "This template could not be found or you do not have permission to view it.",
+    "somethingWentWrong": "Something went wrong",
+    "reload": "Reload",
+    "errorBoundaryDescription": "We're sorry, but something unexpected happened. You can try reloading the page or return to your dashboard."
   },
   "notifications": {
     "title": "Notifications",

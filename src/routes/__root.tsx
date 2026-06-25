@@ -3,6 +3,7 @@ import { useState, createContext, useContext, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { Outlet, createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '../components/ui/sonner';
 import globalCss from '../app/global.css?url';
 import type { Locales } from '../i18n/types';
 import { detectLocale } from '../i18n/index';
@@ -166,7 +167,10 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           </a>
         </div>
         <QueryClientProvider client={queryClient}>
-          <I18nContext.Provider value={i18n}>{children}</I18nContext.Provider>
+          <I18nContext.Provider value={i18n}>
+            {children}
+            <Toaster richColors position="top-right" />
+          </I18nContext.Provider>
         </QueryClientProvider>
         <Scripts />
       </body>

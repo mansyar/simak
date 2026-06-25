@@ -627,12 +627,21 @@ export type Translation = {
   }
   error: {
     notFound: string
+    unauthorized: string
     forbidden: string
+    validation: string
+    conflict: string
+    internal: string
+    network: string
+    default: string
     serverError: string
     required: string
     invalidEmail: string
     assignmentNotFound: string
     templateNotFound: string
+    somethingWentWrong: string
+    reload: string
+    errorBoundaryDescription: string
   }
   notifications: {
     title: string
