@@ -379,6 +379,8 @@ _Note: Each row represents one student's individual participation. Group assignm
 | version      | integer, default 1         | Auto-calculated at insert. Each resubmission creates a new row with version = previous max + 1 |
 | uploadedAt   | timestamp                  |                                                                                                |
 
+> **Constraint (Track 8.3):** `UNIQUE (checkpoint_id, version)` — prevents duplicate submission versions under concurrent `submitCheckpointHandler` calls (TOCTOU race). Migration `0002` defensively deduplicates only exact `(checkpoint_id, version)` duplicates before adding the constraint, preserving the append-only version history.
+
 #### reviews
 
 | Column           | Type                               | Notes                                                      |
@@ -613,6 +615,8 @@ Admin       (creates Instructors and Students)
 | **Versioning**       | Version increments by 1 each time a student resubmits after a REVISE decision. Initial submission is version 1.                                                                                                    |
 | **Preview**          | PDF: in-browser via blob URL. [v2: use range requests to fetch only the first few pages for thumbnail preview instead of downloading the full 25MB file.] DOCX: metadata display only (name, size, date, version). |
 | **Permissions**      | Students see own submissions; instructors see all for their assignments; admins see all.                                                                                                                           |
+
+> **File-type validation (Track 8.3):** Instructor feedback uploads (`getPresignedReviewFeedbackUploadUrlHandler`) now enforce the same `.docx`/`.pdf`-only policy via `validateUploadType(extension, contentType)` before presigning — previously skipped, allowing arbitrary file types to be uploaded to R2.
 
 ---
 
