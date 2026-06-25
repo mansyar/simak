@@ -160,23 +160,23 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
 
   const db = getDb();
 
-  // Check if email already in use (active or soft-deleted)
-  const existingUser = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(eq(users.email, userEmail))
-    .limit(1)
-    .then((rows) => rows[0]);
-
-  if (existingUser) {
-    return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
-  }
-
-  const userId = crypto.randomUUID();
-  const token = crypto.randomUUID();
-  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
   try {
+    // Check if email already in use (active or soft-deleted)
+    const existingUser = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, userEmail))
+      .limit(1)
+      .then((rows) => rows[0]);
+
+    if (existingUser) {
+      return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
+    }
+
+    const userId = crypto.randomUUID();
+    const token = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
     await db.transaction(async (tx) => {
       await tx.insert(users).values({
         id: userId,

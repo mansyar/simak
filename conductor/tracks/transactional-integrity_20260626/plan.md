@@ -57,11 +57,11 @@
 
 ## Phase 4: Transactional Wrapping — Consultation Handlers
 
-- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
-- [ ] Task: Write unit tests (Red)
-    - [ ] Test `verifyConsultationHandler` — if the notification insert fails, the consultation update is rolled back
-    - [ ] Test `rejectConsultationHandler` — if the notification insert fails, the consultation update is rolled back
-    - [ ] Test audit logging for both handlers occurs after commit; a failure in the audit insert does not surface an error for the committed transaction
+- [~] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
+- [~] Task: Write unit tests (Red)
+    - [~] Test `verifyConsultationHandler` — if the notification insert fails, the consultation update is rolled back
+    - [~] Test `rejectConsultationHandler` — if the notification insert fails, the consultation update is rolled back
+    - [~] Test audit logging for both handlers occurs after commit; a failure in the audit insert does not surface an error for the committed transaction
 - [ ] Task: Implement transactional consultation handlers (Green)
     - [ ] Wrap `verifyConsultationHandler` writes in `db.transaction`; move `logAuditEvent` to post-commit try/catch
     - [ ] Wrap `rejectConsultationHandler` writes in `db.transaction`; move `logAuditEvent` to post-commit try/catch

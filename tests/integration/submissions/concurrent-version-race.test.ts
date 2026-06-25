@@ -10,6 +10,7 @@ import {
   assignmentTemplates,
   templateCheckpoints,
   submissions,
+  auditLog,
 } from '@/db/schema/index';
 import { submitCheckpointHandler } from '@/server/submissions.server';
 import * as auth from '@/server/auth';
@@ -93,7 +94,7 @@ describe('submitCheckpointHandler concurrent version race', () => {
     checkpointId = checkpoint.id;
 
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
-      user: { id: studentId, name: 'Race Student' },
+      user: { id: studentId, name: 'Race Student', role: 'student' },
       session: {} as any,
     } as any);
   });
@@ -104,6 +105,7 @@ describe('submitCheckpointHandler concurrent version race', () => {
     await db.delete(assignmentStudents).where(eq(assignmentStudents.assignmentId, assignmentId));
     await db.delete(assignments).where(eq(assignments.id, assignmentId));
     await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, templateId));
+    await db.delete(auditLog).where(eq(auditLog.actorId, studentId));
     await db.delete(assignmentTemplates).where(eq(assignmentTemplates.id, templateId));
     await db.delete(users).where(eq(users.id, studentId));
     await db.delete(users).where(eq(users.id, instructorId));

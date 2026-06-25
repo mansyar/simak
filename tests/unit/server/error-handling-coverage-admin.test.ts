@@ -127,7 +127,12 @@ const throwingDb = new Proxy(
     get(_target, prop) {
       if (prop === 'then') {
         return (_resolve: unknown, reject: (reason: unknown) => void) => {
-          reject(new Error('DB failure'));
+          const err = new Error('DB failure');
+          if (typeof reject === 'function') {
+            reject(err);
+          } else {
+            throw err;
+          }
         };
       }
       return (..._args: unknown[]) => throwingDb;

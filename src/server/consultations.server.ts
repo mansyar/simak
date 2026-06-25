@@ -328,36 +328,42 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
       return serverError(ErrorCode.BAD_REQUEST, 'Consultation is not in pending state');
     }
 
-    // 2. Update status to verified
-    await db
-      .update(consultations)
-      .set({
-        status: 'verified',
-        verifiedById: session.user.id,
-        verifiedAt: new Date(),
-      })
-      .where(eq(consultations.id, consultationId));
+    // 2. Update status and notify the student inside a transaction
+    await db.transaction(async (tx) => {
+      await tx
+        .update(consultations)
+        .set({
+          status: 'verified',
+          verifiedById: session.user.id,
+          verifiedAt: new Date(),
+        })
+        .where(eq(consultations.id, consultationId));
 
-    // 3. Notify the student
-    await db.insert(notifications).values({
-      userId: consultation.studentId,
-      type: 'consultation_verified',
-      title: 'Consultation Verified',
-      message: 'Your consultation session has been verified by the instructor.',
-      channel: 'in_app',
-      metadata: {
-        consultationId,
-        assignmentId: consultation.assignmentId,
-      },
+      await tx.insert(notifications).values({
+        userId: consultation.studentId,
+        type: 'consultation_verified',
+        title: 'Consultation Verified',
+        message: 'Your consultation session has been verified by the instructor.',
+        channel: 'in_app',
+        metadata: {
+          consultationId,
+          assignmentId: consultation.assignmentId,
+        },
+      });
     });
 
-    await logAuditEvent({
-      actorId: session.user.id,
-      action: 'consultation.verified',
-      entityType: 'consultation',
-      entityId: String(consultationId),
-      details: { checkpoint: consultation.assignmentId, student: consultation.studentId },
-    });
+    // 3. Audit log after commit (advisory work; must not fail the committed transaction)
+    try {
+      await logAuditEvent({
+        actorId: session.user.id,
+        action: 'consultation.verified',
+        entityType: 'consultation',
+        entityId: String(consultationId),
+        details: { checkpoint: consultation.assignmentId, student: consultation.studentId },
+      });
+    } catch (err) {
+      console.error('Failed to log consultation verified audit event:', err);
+    }
 
     return { success: true };
   } catch (err) {
@@ -409,38 +415,44 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
       return serverError(ErrorCode.BAD_REQUEST, 'Consultation is not in pending state');
     }
 
-    // 2. Update status to rejected with reason
-    await db
-      .update(consultations)
-      .set({
-        status: 'rejected',
-        verifiedById: session.user.id,
-        verifiedAt: new Date(),
-        notes: sql`CASE WHEN ${consultations.notes} IS NULL THEN ${reason} ELSE ${consultations.notes} || E'\n\nRejection reason: ' || ${reason} END`,
-      })
-      .where(eq(consultations.id, consultationId));
+    // 2. Update status to rejected with reason and notify the student inside a transaction
+    await db.transaction(async (tx) => {
+      await tx
+        .update(consultations)
+        .set({
+          status: 'rejected',
+          verifiedById: session.user.id,
+          verifiedAt: new Date(),
+          notes: sql`CASE WHEN ${consultations.notes} IS NULL THEN ${reason} ELSE ${consultations.notes} || E'\n\nRejection reason: ' || ${reason} END`,
+        })
+        .where(eq(consultations.id, consultationId));
 
-    // 3. Notify the student
-    await db.insert(notifications).values({
-      userId: consultation.studentId,
-      type: 'consultation_rejected',
-      title: 'Consultation Rejected',
-      message: `Your consultation session has been rejected. Reason: ${reason}`,
-      channel: 'in_app',
-      metadata: {
-        consultationId,
-        assignmentId: consultation.assignmentId,
-        rejectionReason: reason,
-      },
+      await tx.insert(notifications).values({
+        userId: consultation.studentId,
+        type: 'consultation_rejected',
+        title: 'Consultation Rejected',
+        message: `Your consultation session has been rejected. Reason: ${reason}`,
+        channel: 'in_app',
+        metadata: {
+          consultationId,
+          assignmentId: consultation.assignmentId,
+          rejectionReason: reason,
+        },
+      });
     });
 
-    await logAuditEvent({
-      actorId: session.user.id,
-      action: 'consultation.rejected',
-      entityType: 'consultation',
-      entityId: String(consultationId),
-      details: { checkpoint: consultation.assignmentId, student: consultation.studentId, reason },
-    });
+    // 3. Audit log after commit (advisory work; must not fail the committed transaction)
+    try {
+      await logAuditEvent({
+        actorId: session.user.id,
+        action: 'consultation.rejected',
+        entityType: 'consultation',
+        entityId: String(consultationId),
+        details: { checkpoint: consultation.assignmentId, student: consultation.studentId, reason },
+      });
+    } catch (err) {
+      console.error('Failed to log consultation rejected audit event:', err);
+    }
 
     return { success: true };
   } catch (err) {

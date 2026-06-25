@@ -31,7 +31,7 @@ vi.mock('@tanstack/react-start', () => ({
 describe('Consultation server functions - Logic & Security', () => {
   let returningResult: any = null;
 
-  const mockDb = {
+  const mockDb: any = {
     select: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
     where: vi.fn().mockReturnThis(),
@@ -50,6 +50,8 @@ describe('Consultation server functions - Logic & Security', () => {
       return Promise.resolve([]).then(onfulfilled);
     }),
   };
+
+  mockDb.transaction = vi.fn().mockImplementation(async (callback: any) => callback(mockDb));
 
   // Helper to set .returning() to return a thenable with custom data
   function mockReturning(data: any) {

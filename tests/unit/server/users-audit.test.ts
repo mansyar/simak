@@ -28,7 +28,7 @@ vi.mock('@tanstack/react-start', () => ({
 }));
 
 describe('User handlers audit logging', () => {
-  const mockDb = {
+  const mockDb: any = {
     select: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
     where: vi.fn().mockReturnThis(),
@@ -42,6 +42,8 @@ describe('User handlers audit logging', () => {
       return Promise.resolve([]).then(onfulfilled);
     }),
   };
+
+  mockDb.transaction = vi.fn().mockImplementation(async (callback: any) => callback(mockDb));
 
   beforeEach(() => {
     vi.clearAllMocks();
