@@ -10,6 +10,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 - **Bulk Import for Users & Templates** — Archived to [./archive/bulk-import_20260623/](./archive/bulk-import_20260623/) (commit `85f0060`)
 - **Email Pipeline Hardening** — Archived to [./archive/email-pipeline-hardening_20260625/](./archive/email-pipeline-hardening_20260625/) (commit `06cbcea`)
 - **Error Boundary & Error Message Improvements** — Archived to [./archive/error-handling_20260625/](./archive/error-handling_20260625/) (commit `d3cf731`)
+- **Transactional Integrity & Input Validation** — Archived to [./archive/transactional-integrity_20260626/](./archive/transactional-integrity_20260626/) (commit `a1c6f58`)
 
 ---
 
@@ -17,5 +18,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Transactional Integrity & Input Validation**
-*Link: [./tracks/transactional-integrity_20260626/](./tracks/transactional-integrity_20260626/)*
+
