@@ -15,10 +15,10 @@ describe('0002_unique_submission_version migration', () => {
   it('exists and defensively deduplicates submissions before adding the unique constraint', () => {
     const sql = readFileSync(migrationPath, 'utf8');
     expect(sql).toMatch(/DELETE\s+FROM\s+["']?submissions["']?/i);
-    expect(sql).toMatch(/SELECT\s+DISTINCT\s+ON\s*\(\s*["']?checkpoint_id["']?\s*\)/is);
-    expect(sql).toMatch(
-      /ORDER\s+BY\s+["']?checkpoint_id["']?\s+ASC\s*,\s*["']?version["']?\s+DESC/is,
-    );
+    // Dedup must group by BOTH checkpoint_id AND version so that distinct
+    // version history (1, 2, 3 ...) is preserved — only exact duplicate
+    // (checkpoint_id, version) pairs are removed.
+    expect(sql).toMatch(/GROUP\s+BY\s+["']?checkpoint_id["']?\s*,\s*["']?version["']?/is);
     expect(sql).toContain(
       'ALTER TABLE "submissions" ADD CONSTRAINT "submissions_checkpoint_version_unq" UNIQUE ("checkpoint_id", "version")',
     );

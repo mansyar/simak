@@ -186,14 +186,6 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
         locale: session.user.locale || 'en',
       });
 
-      await logAuditEvent({
-        actorId: session.user.id,
-        action: 'user.created',
-        entityType: 'user',
-        entityId: userId,
-        details: { role, email: userEmail },
-      });
-
       await tx.insert(verification).values({
         id: crypto.randomUUID(),
         identifier: userEmail,
@@ -201,6 +193,19 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
         expiresAt,
       });
     });
+
+    // Post-commit advisory work: audit log is non-fatal (styleguide §6.4)
+    try {
+      await logAuditEvent({
+        actorId: session.user.id,
+        action: 'user.created',
+        entityType: 'user',
+        entityId: userId,
+        details: { role, email: userEmail },
+      });
+    } catch (err) {
+      console.error('Failed to log user.created audit event:', err);
+    }
 
     // Post-commit advisory work: invitation email is non-fatal
     let emailSent = false;
