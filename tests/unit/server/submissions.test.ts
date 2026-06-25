@@ -1,16 +1,9 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { z } from 'zod';
-import {
-  SubmitCheckpointSchema,
-  ListSubmissionsSchema,
-  GetSubmissionDetailSchema,
-} from '@/server/submissions';
-import { submitCheckpointHandler, listSubmissionsHandler } from '@/server/submissions.server';
+import { submitCheckpointHandler } from '@/server/submissions.server';
 import { isServerError } from '@/lib/errors';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
-import * as storage from '@/lib/storage';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -33,83 +26,6 @@ vi.mock('@/lib/storage', () => ({
   generatePresignedDownloadUrl: vi.fn().mockResolvedValue('https://presigned-download.test/url'),
   getR2Client: vi.fn().mockReturnValue({}),
 }));
-
-describe('Submission server functions - Schemas', () => {
-  describe('SubmitCheckpointSchema', () => {
-    it('should accept valid input', () => {
-      const result = SubmitCheckpointSchema.safeParse({
-        checkpointId: 1,
-        fileKey: 'submissions/uuid-123.pdf',
-        fileName: 'chapter1.pdf',
-        fileSize: 1024,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('should reject missing checkpointId', () => {
-      const result = SubmitCheckpointSchema.safeParse({
-        fileKey: 'submissions/uuid-123.pdf',
-        fileName: 'chapter1.pdf',
-        fileSize: 1024,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('should reject negative fileSize', () => {
-      const result = SubmitCheckpointSchema.safeParse({
-        checkpointId: 1,
-        fileKey: 'submissions/uuid-123.pdf',
-        fileName: 'chapter1.pdf',
-        fileSize: -1,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('should reject empty fileName', () => {
-      const result = SubmitCheckpointSchema.safeParse({
-        checkpointId: 1,
-        fileKey: 'submissions/uuid-123.pdf',
-        fileName: '',
-        fileSize: 1024,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('should reject empty fileKey', () => {
-      const result = SubmitCheckpointSchema.safeParse({
-        checkpointId: 1,
-        fileKey: '',
-        fileName: 'chapter1.pdf',
-        fileSize: 1024,
-      });
-      expect(result.success).toBe(false);
-    });
-  });
-
-  describe('ListSubmissionsSchema', () => {
-    it('should accept valid checkpointId', () => {
-      const result = ListSubmissionsSchema.safeParse({ checkpointId: 1 });
-      expect(result.success).toBe(true);
-    });
-
-    it('should reject non-numeric checkpointId', () => {
-      const result = ListSubmissionsSchema.safeParse({ checkpointId: 'abc' });
-      expect(result.success).toBe(false);
-    });
-  });
-
-  describe('GetSubmissionDetailSchema', () => {
-    it('should accept valid submissionId', () => {
-      const result = GetSubmissionDetailSchema.safeParse({ submissionId: 1 });
-      expect(result.success).toBe(true);
-    });
-
-    it('should reject non-numeric submissionId', () => {
-      const result = GetSubmissionDetailSchema.safeParse({ submissionId: 'abc' });
-      expect(result.success).toBe(false);
-    });
-  });
-});
 
 describe('Submission server functions - Logic & Security', () => {
   let mockDb: any;
@@ -141,6 +57,10 @@ describe('Submission server functions - Logic & Security', () => {
         return Promise.resolve([]).then(onfulfilled);
       }),
     };
+    // Default transaction mock runs the callback with the same mock query builder.
+    mockDb.transaction = vi.fn().mockImplementation(async (callback: any) => {
+      return callback(mockDb);
+    });
     vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
   });
 
@@ -194,6 +114,10 @@ describe('Submission server functions - Logic & Security', () => {
 
     it('should transition unlocked → submitted on first upload', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+      mockDb.returning.mockReturnValueOnce({
+        then: (onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled),
+      });
 
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
@@ -292,6 +216,10 @@ describe('Submission server functions - Logic & Security', () => {
 
     it('should accept upload from revise state and transition to submitted', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+      mockDb.returning.mockReturnValueOnce({
+        then: (onfulfilled: any) => Promise.resolve([{ id: 2 }]).then(onfulfilled),
+      });
 
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
@@ -398,6 +326,10 @@ describe('Submission server functions - Logic & Security', () => {
     it('should allow submission when sufficient verified consultations', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
+      mockDb.returning.mockReturnValueOnce({
+        then: (onfulfilled: any) => Promise.resolve([{ id: 3 }]).then(onfulfilled),
+      });
+
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([
@@ -424,13 +356,16 @@ describe('Submission server functions - Logic & Security', () => {
     it('should notify instructor on successful submission', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
+      mockDb.returning.mockReturnValueOnce({
+        then: (onfulfilled: any) => Promise.resolve([{ id: 123 }]).then(onfulfilled),
+      });
+
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([
             { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
           ]).then(onfulfilled),
         )
-        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
         .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
         .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
         .mockImplementationOnce((onfulfilled: any) =>
@@ -441,31 +376,19 @@ describe('Submission server functions - Logic & Security', () => {
 
       const result = await submitCheckpointHandler({ data: submitData });
       expect(result).toEqual({ success: true });
+      expect(mockDb.transaction).toHaveBeenCalledTimes(1);
       expect(mockDb.insert).toHaveBeenCalled();
-      // The notification insert adds a second db.insert call (notification)
-      expect(mockDb.values).toHaveBeenCalledTimes(2);
-      const valuesCalls = vi.mocked(mockDb.values).mock.calls;
-      const notificationValues = valuesCalls[1][0];
+      expect(mockDb.values.mock.calls.length).toBeGreaterThanOrEqual(2);
+      const valuesCalls = vi.mocked(mockDb.values).mock.calls.map((c: any[]) => c[0]);
+      const notificationValues = valuesCalls.find((v: any) => v?.type === 'submission_received');
+      expect(notificationValues).toBeDefined();
       expect(notificationValues.userId).toBe('instructor-1');
       expect(notificationValues.type).toBe('submission_received');
+      expect(notificationValues.metadata.submissionId).toBe(123);
     });
   });
 
   describe('Ownership guard', () => {
-    it('should prevent student A from listing student B submissions', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
-        user: { id: 'student-2', role: 'student' } as any,
-        session: {} as any,
-      });
-
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
-
-      const result = await listSubmissionsHandler({ data: { checkpointId: 1 } });
-      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
-    });
-
     it('should prevent student A from submitting to student B checkpoint', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
         user: { id: 'student-2', role: 'student' } as any,

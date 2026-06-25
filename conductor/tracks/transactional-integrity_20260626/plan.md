@@ -24,12 +24,12 @@
 
 ## Phase 2: submitCheckpointHandler — Transaction, Metadata Fix & Concurrency
 
-- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
-- [ ] Task: Write unit tests (Red)
-    - [ ] Test `submitCheckpointHandler` wraps all writes (version select → insert → checkpoint update → notification insert) inside `db.transaction` using `tx`
-    - [ ] Test the submission insert uses `.returning({ id: submissions.id })` and returns the real submission ID
-    - [ ] Test notification `metadata.submissionId` equals the real inserted submission ID (not the version number)
-    - [ ] Test post-commit audit log / notification dispatch failures are wrapped in try/catch and do not surface an error response for the committed transaction
+- [~] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
+- [~] Task: Write unit tests (Red)
+    - [~] Test `submitCheckpointHandler` wraps all writes (version select → insert → checkpoint update → notification insert) inside `db.transaction` using `tx`
+    - [~] Test the submission insert uses `.returning({ id: submissions.id })` and returns the real submission ID
+    - [~] Test notification `metadata.submissionId` equals the real inserted submission ID (not the version number)
+    - [~] Test post-commit audit log / notification dispatch failures are wrapped in try/catch and do not surface an error response for the committed transaction
 - [ ] Task: Implement transactional submitCheckpointHandler (Green)
     - [ ] Wrap the full handler body in `db.transaction(async (tx) => { ... })`
     - [ ] Use `.returning({ id: submissions.id })` on the submission insert; capture the returned ID

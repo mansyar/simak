@@ -186,6 +186,22 @@ describe('Submission query handlers - Logic & Security', () => {
     });
   });
 
+  describe('Ownership guard', () => {
+    it('should prevent student A from listing student B submissions', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'student-2', role: 'student' } as any,
+        session: {} as any,
+      });
+
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = await listSubmissionsHandler({ data: { checkpointId: 1 } });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
+    });
+  });
+
   describe('getPresignedUploadUrl', () => {
     it('should generate UUID file key and return URL for unlocked checkpoint', async () => {
       // This will be tested via the handler import

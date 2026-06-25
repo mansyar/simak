@@ -44,6 +44,7 @@ describe('Event trigger notifications', () => {
       innerJoin: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
       set: vi.fn().mockReturnThis(),
       then: vi.fn((onfulfilled: any) => Promise.resolve([]).then(onfulfilled)),
@@ -73,33 +74,50 @@ describe('Event trigger notifications', () => {
     it('should create a submission_received notification for the instructor when checkpoint is submitted', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
-      // Checkpoint lookup (returns checkpoint + assignment info)
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            id: 100,
-            assignmentId: 1,
-            studentId: 'student-1',
-            state: 'unlocked',
-            minConsultations: 0,
-          },
-        ]).then(onfulfilled),
-      );
+      // All submitCheckpointHandler writes run inside db.transaction using tx.
+      mockDb.transaction.mockImplementation(async (cb: (tx: any) => Promise<any>) => {
+        // Checkpoint lookup (returns checkpoint + assignment info)
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 100,
+              assignmentId: 1,
+              studentId: 'student-1',
+              state: 'unlocked',
+              minConsultations: 0,
+            },
+          ]).then(onfulfilled),
+        );
 
-      // Version count query
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ maxVersion: 0 }]).then(onfulfilled),
-      );
+        // Version count query
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ maxVersion: 0 }]).then(onfulfilled),
+        );
 
-      // Submission insert
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{}]).then(onfulfilled),
-      );
+        // Submission insert returns real submission id via .returning()
+        mockTx.returning.mockReturnValueOnce({
+          then: (onfulfilled: any) => Promise.resolve([{ id: 42 }]).then(onfulfilled),
+        });
 
-      // Checkpoint state update to 'submitted'
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{}]).then(onfulfilled),
-      );
+        // Checkpoint state update to 'submitted'
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{}]).then(onfulfilled),
+        );
+
+        // Instructor lookup for notification
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ instructorId: 'instructor-1', assignmentTitle: 'Thesis 2026' }]).then(
+            onfulfilled,
+          ),
+        );
+
+        // Notification insert
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{}]).then(onfulfilled),
+        );
+
+        return cb(mockTx);
+      });
 
       const result = await submitCheckpointHandler({
         data: {
@@ -112,7 +130,7 @@ describe('Event trigger notifications', () => {
 
       expect(result).toEqual({ success: true });
       // Verify notification was created via db.insert(notifications)
-      expect(mockDb.insert).toHaveBeenCalled();
+      expect(mockTx.insert).toHaveBeenCalled();
     });
   });
 

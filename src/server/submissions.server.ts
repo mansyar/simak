@@ -8,6 +8,7 @@ import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
 import { generatePresignedDownloadUrl } from '../lib/storage';
 import { validateUploadSize, validateUploadFileName } from '../lib/file-validation';
+import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -37,103 +38,113 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
   const db = getDb();
 
   try {
-    // 1. Verify the checkpoint exists and belongs to the student via assignmentStudents
-    const [checkpoint] = await db
-      .select({
-        id: checkpoints.id,
-        assignmentId: checkpoints.assignmentId,
-        studentId: checkpoints.studentId,
-        state: checkpoints.state,
-        minConsultations: checkpoints.minConsultations,
-      })
-      .from(checkpoints)
-      .innerJoin(assignmentStudents, eq(checkpoints.assignmentId, assignmentStudents.assignmentId))
-      .where(
-        and(
-          eq(checkpoints.id, checkpointId),
-          eq(checkpoints.studentId, session.user.id),
-          eq(assignmentStudents.studentId, session.user.id),
-        ),
-      )
-      .limit(1);
+    let submissionId: number | undefined;
 
-    if (!checkpoint) {
-      return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
-    }
-
-    if (checkpoint.state === 'locked') {
-      return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is locked');
-    }
-
-    if (!SUBMITTABLE_STATES.includes(checkpoint.state as (typeof SUBMITTABLE_STATES)[number])) {
-      return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in a submittable state');
-    }
-
-    // 1b. Validate file size and type server-side (TDD §5: 25MB max, .docx/.pdf only)
-    const sizeCheck = validateUploadSize(fileSize);
-    if (!sizeCheck.valid) {
-      return serverError(
-        ErrorCode.BAD_REQUEST,
-        typeof sizeCheck.error === 'string' ? sizeCheck.error : String(sizeCheck.error),
-      );
-    }
-    const nameCheck = validateUploadFileName(fileName);
-    if (!nameCheck.valid) {
-      return serverError(
-        ErrorCode.BAD_REQUEST,
-        typeof nameCheck.error === 'string' ? nameCheck.error : String(nameCheck.error),
-      );
-    }
-
-    // 1c. Check consultation gating
-    const minConsults = checkpoint.minConsultations ?? 0;
-    if (minConsults > 0) {
-      const [{ count }] = await db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(consultations)
+    const result = await db.transaction(async (tx) => {
+      // 1. Verify the checkpoint exists and belongs to the student via assignmentStudents
+      const [checkpoint] = await tx
+        .select({
+          id: checkpoints.id,
+          assignmentId: checkpoints.assignmentId,
+          studentId: checkpoints.studentId,
+          state: checkpoints.state,
+          minConsultations: checkpoints.minConsultations,
+        })
+        .from(checkpoints)
+        .innerJoin(
+          assignmentStudents,
+          eq(checkpoints.assignmentId, assignmentStudents.assignmentId),
+        )
         .where(
           and(
-            eq(consultations.checkpointId, checkpointId),
-            eq(consultations.studentId, session.user.id),
-            eq(consultations.status, 'verified'),
+            eq(checkpoints.id, checkpointId),
+            eq(checkpoints.studentId, session.user.id),
+            eq(assignmentStudents.studentId, session.user.id),
           ),
-        );
+        )
+        .limit(1);
 
-      if (Number(count) < minConsults) {
+      if (!checkpoint) {
+        return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+      }
+
+      if (checkpoint.state === 'locked') {
+        return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is locked');
+      }
+
+      if (!SUBMITTABLE_STATES.includes(checkpoint.state as (typeof SUBMITTABLE_STATES)[number])) {
+        return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in a submittable state');
+      }
+
+      // 1b. Validate file size and type server-side (TDD §5: 25MB max, .docx/.pdf only)
+      const sizeCheck = validateUploadSize(fileSize);
+      if (!sizeCheck.valid) {
         return serverError(
           ErrorCode.BAD_REQUEST,
-          `Checkpoint requires ${minConsults} verified consultations before submission (currently ${count})`,
+          typeof sizeCheck.error === 'string' ? sizeCheck.error : String(sizeCheck.error),
         );
       }
-    }
+      const nameCheck = validateUploadFileName(fileName);
+      if (!nameCheck.valid) {
+        return serverError(
+          ErrorCode.BAD_REQUEST,
+          typeof nameCheck.error === 'string' ? nameCheck.error : String(nameCheck.error),
+        );
+      }
 
-    // 2. Calculate next version number
-    const [versionResult] = await db
-      .select({ maxVersion: sql<number>`COALESCE(MAX(${submissions.version}), 0)::int` })
-      .from(submissions)
-      .where(eq(submissions.checkpointId, checkpointId));
+      // 1c. Check consultation gating
+      const minConsults = checkpoint.minConsultations ?? 0;
+      if (minConsults > 0) {
+        const [{ count }] = await tx
+          .select({ count: sql<number>`count(*)::int` })
+          .from(consultations)
+          .where(
+            and(
+              eq(consultations.checkpointId, checkpointId),
+              eq(consultations.studentId, session.user.id),
+              eq(consultations.status, 'verified'),
+            ),
+          );
 
-    const nextVersion = Number(versionResult?.maxVersion ?? 0) + 1;
+        if (Number(count) < minConsults) {
+          return serverError(
+            ErrorCode.BAD_REQUEST,
+            `Checkpoint requires ${minConsults} verified consultations before submission (currently ${count})`,
+          );
+        }
+      }
 
-    // 3. Insert submission record
-    await db.insert(submissions).values({
-      checkpointId,
-      uploadedBy: session.user.id,
-      fileKey,
-      fileName,
-      fileSize,
-      version: nextVersion,
-    });
+      // 2. Calculate next version number
+      const [versionResult] = await tx
+        .select({ maxVersion: sql<number>`COALESCE(MAX(${submissions.version}), 0)::int` })
+        .from(submissions)
+        .where(eq(submissions.checkpointId, checkpointId));
 
-    // 4. Transition checkpoint state to 'submitted'
-    await db
-      .update(checkpoints)
-      .set({ state: 'submitted', updatedAt: new Date() })
-      .where(eq(checkpoints.id, checkpointId));
+      const nextVersion = Number(versionResult?.maxVersion ?? 0) + 1;
 
-    // 5. Notify the instructor (submission_received event)
-    try {
-      const [instructorInfo] = await db
+      // 3. Insert submission record and capture the real id
+      const [submissionRecord] = await tx
+        .insert(submissions)
+        .values({
+          checkpointId,
+          uploadedBy: session.user.id,
+          fileKey,
+          fileName,
+          fileSize,
+          version: nextVersion,
+        })
+        .returning({ id: submissions.id });
+
+      submissionId = submissionRecord.id;
+
+      // 4. Transition checkpoint state to 'submitted'
+      await tx
+        .update(checkpoints)
+        .set({ state: 'submitted', updatedAt: new Date() })
+        .where(eq(checkpoints.id, checkpointId));
+
+      // 5. Notify the instructor (submission_received event)
+      const [instructorInfo] = await tx
         .select({
           instructorId: assignments.instructorId,
           assignmentTitle: assignments.title,
@@ -143,7 +154,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
         .limit(1);
 
       if (instructorInfo) {
-        await db.insert(notifications).values({
+        await tx.insert(notifications).values({
           userId: instructorInfo.instructorId,
           type: 'submission_received',
           title: 'New Submission Received',
@@ -152,16 +163,31 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
           metadata: {
             checkpointId,
             assignmentId: checkpoint.assignmentId,
-            submissionId: nextVersion,
+            submissionId: submissionRecord.id,
           },
         });
       }
+
+      return { success: true };
+    });
+
+    // Post-commit advisory work: audit log of the successful submission.
+    // Wrapped in try/catch so a failure here never surfaces an error for a committed transaction.
+    try {
+      if (submissionId) {
+        await logAuditEvent({
+          actorId: session.user.id,
+          action: 'submission.created',
+          entityType: 'submission',
+          entityId: String(submissionId),
+          details: { checkpointId, fileName },
+        });
+      }
     } catch (err) {
-      // Non-blocking error logging for notification dispatch
-      console.error('Failed to create submission_received notification:', err);
+      console.error('Failed to log submission.created audit event:', err);
     }
 
-    return { success: true };
+    return result;
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
