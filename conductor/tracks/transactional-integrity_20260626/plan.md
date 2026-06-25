@@ -57,15 +57,15 @@
 
 ## Phase 4: Transactional Wrapping — Consultation Handlers
 
-- [~] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
-- [~] Task: Write unit tests (Red)
-    - [~] Test `verifyConsultationHandler` — if the notification insert fails, the consultation update is rolled back
-    - [~] Test `rejectConsultationHandler` — if the notification insert fails, the consultation update is rolled back
-    - [~] Test audit logging for both handlers occurs after commit; a failure in the audit insert does not surface an error for the committed transaction
-- [ ] Task: Implement transactional consultation handlers (Green)
-    - [ ] Wrap `verifyConsultationHandler` writes in `db.transaction`; move `logAuditEvent` to post-commit try/catch
-    - [ ] Wrap `rejectConsultationHandler` writes in `db.transaction`; move `logAuditEvent` to post-commit try/catch
-- [ ] Task: Conductor - User Manual Verification 'Transactional Wrapping — Consultation Handlers' (Protocol in workflow.md)
+- [x] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase [c4304f6]
+- [x] Task: Write unit tests (Red) [c4304f6]
+    - [x] Test `verifyConsultationHandler` — if the notification insert fails, the consultation update is rolled back [c4304f6]
+    - [x] Test `rejectConsultationHandler` — if the notification insert fails, the consultation update is rolled back [c4304f6]
+    - [x] Test audit logging for both handlers occurs after commit; a failure in the audit insert does not surface an error for the committed transaction [c4304f6]
+- [x] Task: Implement transactional consultation handlers (Green) [c4304f6]
+    - [x] Wrap `verifyConsultationHandler` writes in `db.transaction`; move `logAuditEvent` to post-commit try/catch [c4304f6]
+    - [x] Wrap `rejectConsultationHandler` writes in `db.transaction`; move `logAuditEvent` to post-commit try/catch [c4304f6]
+- [x] Task: Conductor - User Manual Verification 'Transactional Wrapping — Consultation Handlers' (Protocol in workflow.md) [c4304f6]
 
 ---
 
