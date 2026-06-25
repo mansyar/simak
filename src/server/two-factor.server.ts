@@ -8,6 +8,7 @@ import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { enqueueEmail, escapeHtml } from '../lib/email';
 import { revokeUserSessions } from '../lib/auth-session';
+import { serverError, ErrorCode } from '@/lib/errors';
 import type { z } from 'zod';
 import type {
   EnableTwoFactorSchema,
@@ -30,7 +31,7 @@ type GetTwoFactorStatusInput = z.infer<typeof GetTwoFactorStatusSchema>;
 export async function generateTwoFactorSetupHandler(args: { data: EnableTwoFactorInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const headers = getRequestHeaders();
@@ -58,7 +59,10 @@ export async function generateTwoFactorSetupHandler(args: { data: EnableTwoFacto
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    return { error: message };
+    return serverError(
+      ErrorCode.BAD_REQUEST,
+      typeof message === 'string' ? message : String(message),
+    );
   }
 }
 
@@ -69,7 +73,7 @@ export async function generateTwoFactorSetupHandler(args: { data: EnableTwoFacto
 export async function enableTwoFactorHandler(args: { data: VerifyTwoFactorInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const headers = getRequestHeaders();
@@ -129,7 +133,10 @@ export async function enableTwoFactorHandler(args: { data: VerifyTwoFactorInput 
     return { success: true };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    return { error: message };
+    return serverError(
+      ErrorCode.BAD_REQUEST,
+      typeof message === 'string' ? message : String(message),
+    );
   }
 }
 
@@ -139,7 +146,7 @@ export async function enableTwoFactorHandler(args: { data: VerifyTwoFactorInput 
 export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const headers = getRequestHeaders();
@@ -212,7 +219,10 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
     return { success: true };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    return { error: message };
+    return serverError(
+      ErrorCode.BAD_REQUEST,
+      typeof message === 'string' ? message : String(message),
+    );
   }
 }
 
@@ -222,7 +232,7 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
 export async function regenerateBackupCodesHandler(args: { data: RegenerateBackupCodesInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const headers = getRequestHeaders();
@@ -248,7 +258,10 @@ export async function regenerateBackupCodesHandler(args: { data: RegenerateBacku
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    return { error: message };
+    return serverError(
+      ErrorCode.BAD_REQUEST,
+      typeof message === 'string' ? message : String(message),
+    );
   }
 }
 
@@ -258,16 +271,23 @@ export async function regenerateBackupCodesHandler(args: { data: RegenerateBacku
 export async function getTwoFactorStatusHandler(_args: { data: GetTwoFactorStatusInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const db = getDb();
-  const record = await db
-    .select({ twoFactorEnabled: users.twoFactorEnabled })
-    .from(users)
-    .where(eq(users.id, session.user.id))
-    .limit(1)
-    .then((rows) => rows[0]);
+  try {
+    const db = getDb();
+    const record = await db
+      .select({ twoFactorEnabled: users.twoFactorEnabled })
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1)
+      .then((rows) => rows[0]);
 
-  return { enabled: record?.twoFactorEnabled ?? false };
+    return { enabled: record?.twoFactorEnabled ?? false };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getTwoFactorStatusHandler',
+    });
+  }
 }

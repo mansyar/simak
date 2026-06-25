@@ -4,6 +4,7 @@ import { getDb } from '@/db/index';
 import { users } from '@/db/schema/users';
 import { eq } from 'drizzle-orm';
 import { generateFileKey, generatePresignedUploadUrl } from '@/lib/storage';
+import { serverError, ErrorCode } from '@/lib/errors';
 
 const SUPPORTED_IMAGE_TYPES: Record<string, string> = {
   jpg: 'image/jpeg',
@@ -15,7 +16,7 @@ const SUPPORTED_IMAGE_TYPES: Record<string, string> = {
 
 export async function updateProfileHandler(args: unknown) {
   const session = await getSessionFromHeaders();
-  if (!session) return { error: 'Unauthorized' };
+  if (!session) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { user } = session;
   const { name } = args as { name: string };
@@ -29,31 +30,37 @@ export async function updateProfileHandler(args: unknown) {
       .returning();
 
     return updatedUser;
-  } catch {
-    return { error: 'Failed to update profile' };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'updateProfileHandler',
+    });
   }
 }
 
 export async function getPresignedAvatarUploadUrlHandler(args: unknown) {
   const session = await getSessionFromHeaders();
-  if (!session) return { error: 'Unauthorized' };
+  if (!session) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { extension } = args as { extension: string };
   const contentType = SUPPORTED_IMAGE_TYPES[extension.toLowerCase()];
-  if (!contentType) return { error: 'Unsupported image type' };
+  if (!contentType) return serverError(ErrorCode.BAD_REQUEST, 'Unsupported image type');
 
   try {
     const fileKey = generateFileKey(extension, 'avatars');
     const uploadUrl = await generatePresignedUploadUrl({ key: fileKey, contentType });
     return { uploadUrl, fileKey };
-  } catch {
-    return { error: 'Failed to generate upload URL' };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getPresignedAvatarUploadUrlHandler',
+    });
   }
 }
 
 export async function getCurrentUserHandler() {
   const session = await getSessionFromHeaders();
-  if (!session) return { error: 'Unauthorized' };
+  if (!session) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { user } = session;
   try {
@@ -70,20 +77,23 @@ export async function getCurrentUserHandler() {
       .limit(1)
       .then((rows) => rows[0]);
 
-    if (!record) return { error: 'User not found' };
+    if (!record) return serverError(ErrorCode.NOT_FOUND, 'User not found');
 
     return {
       user: { id: user.id, name: record.name, email: record.email, image: record.image },
       settings: record.settings ?? null,
     };
-  } catch {
-    return { error: 'Failed to fetch user data' };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getCurrentUserHandler',
+    });
   }
 }
 
 export async function updateUserSettingsHandler(args: unknown) {
   const session = await getSessionFromHeaders();
-  if (!session) return { error: 'Unauthorized' };
+  if (!session) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { user } = session;
   const { reducedMotion } = args as { reducedMotion: boolean };
@@ -97,7 +107,10 @@ export async function updateUserSettingsHandler(args: unknown) {
       .returning({ settings: users.settings });
 
     return updated.settings;
-  } catch {
-    return { error: 'Failed to update settings' };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'updateUserSettingsHandler',
+    });
   }
 }

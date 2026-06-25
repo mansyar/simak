@@ -6,6 +6,7 @@ import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
+import { serverError, ErrorCode } from '../lib/errors';
 import { calculateDueDates, validateDueDates } from './due-dates.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -26,7 +27,7 @@ function isInstructor(session: NonNullableSession | null): session is NonNullabl
 export async function createAssignmentHandler(args: { data: CreateAssignmentInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { templateId, title, description, finalDeadline, studentIds, overrideDueDates } = args.data;
@@ -138,10 +139,12 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
     // Validation errors (thrown inside transaction) return the specific message
     // All other errors return a generic server error
     if (err instanceof Error && err.message.startsWith('Checkpoint')) {
-      return { error: err.message };
+      return serverError(ErrorCode.BAD_REQUEST, err.message);
     }
-    console.error('Failed to create assignment:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'createAssignmentHandler',
+    });
   }
 }
 
@@ -156,62 +159,72 @@ export async function listInstructorAssignmentsHandler(args: {
   const { search, page, limit } = args.data;
   const db = getDb();
 
-  const conditions = [eq(assignments.instructorId, session.user.id), isNull(assignments.deletedAt)];
+  try {
+    const conditions = [
+      eq(assignments.instructorId, session.user.id),
+      isNull(assignments.deletedAt),
+    ];
 
-  if (search) {
-    conditions.push(sql`${assignments.title} ILIKE ${'%' + search + '%'}`);
-  }
+    if (search) {
+      conditions.push(sql`${assignments.title} ILIKE ${'%' + search + '%'}`);
+    }
 
-  // Fetch basic assignments
-  const rawAssignments = await db
-    .select({
-      id: assignments.id,
-      title: assignments.title,
-      description: assignments.description,
-      finalDeadline: assignments.finalDeadline,
-      createdAt: assignments.createdAt,
-      templateName: assignmentTemplates.name,
-      templateType: assignmentTemplates.type,
-    })
-    .from(assignments)
-    .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-    .where(and(...conditions))
-    .orderBy(assignments.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
-
-  // Fetch student counts for the assignments in a separate query
-  const assignmentIds = rawAssignments.map((a) => a.id);
-  let studentCounts: Map<number, number> = new Map();
-
-  if (assignmentIds.length > 0) {
-    const counts = await db
+    // Fetch basic assignments
+    const rawAssignments = await db
       .select({
-        assignmentId: assignmentStudents.assignmentId,
-        count: sql<number>`count(*)::int`,
+        id: assignments.id,
+        title: assignments.title,
+        description: assignments.description,
+        finalDeadline: assignments.finalDeadline,
+        createdAt: assignments.createdAt,
+        templateName: assignmentTemplates.name,
+        templateType: assignmentTemplates.type,
       })
-      .from(assignmentStudents)
-      .where(inArray(assignmentStudents.assignmentId, assignmentIds))
-      .groupBy(assignmentStudents.assignmentId);
+      .from(assignments)
+      .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
+      .where(and(...conditions))
+      .orderBy(assignments.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit);
 
-    studentCounts = new Map(counts.map((c) => [c.assignmentId, c.count]));
+    // Fetch student counts for the assignments in a separate query
+    const assignmentIds = rawAssignments.map((a) => a.id);
+    let studentCounts: Map<number, number> = new Map();
+
+    if (assignmentIds.length > 0) {
+      const counts = await db
+        .select({
+          assignmentId: assignmentStudents.assignmentId,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(assignmentStudents)
+        .where(inArray(assignmentStudents.assignmentId, assignmentIds))
+        .groupBy(assignmentStudents.assignmentId);
+
+      studentCounts = new Map(counts.map((c) => [c.assignmentId, c.count]));
+    }
+
+    const enrichedAssignments = rawAssignments.map((a) => ({
+      ...a,
+      studentCount: studentCounts.get(a.id) ?? 0,
+    }));
+
+    // Fetch total count for pagination
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(assignments)
+      .where(and(...conditions));
+
+    return {
+      assignments: enrichedAssignments,
+      total: Number(count),
+    };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listInstructorAssignmentsHandler',
+    });
   }
-
-  const enrichedAssignments = rawAssignments.map((a) => ({
-    ...a,
-    studentCount: studentCounts.get(a.id) ?? 0,
-  }));
-
-  // Fetch total count for pagination
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(assignments)
-    .where(and(...conditions));
-
-  return {
-    assignments: enrichedAssignments,
-    total: Number(count),
-  };
 }
 
 export async function getAssignmentDetailHandler(args: { data: AssignmentIdParam }) {
@@ -223,114 +236,121 @@ export async function getAssignmentDetailHandler(args: { data: AssignmentIdParam
   const { id } = args.data;
   const db = getDb();
 
-  // 1. Fetch assignment details (verify ownership)
-  const [assignment] = await db
-    .select({
-      id: assignments.id,
-      title: assignments.title,
-      description: assignments.description,
-      finalDeadline: assignments.finalDeadline,
-      createdAt: assignments.createdAt,
-      instructorId: assignments.instructorId,
-      templateName: assignmentTemplates.name,
-      templateType: assignmentTemplates.type,
-    })
-    .from(assignments)
-    .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-    .where(and(eq(assignments.id, id), isNull(assignments.deletedAt)))
-    .limit(1);
-
-  if (!assignment || assignment.instructorId !== session.user.id) {
-    return null;
-  }
-
-  // 2. Fetch assigned students list
-  const studentsList = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      email: users.email,
-    })
-    .from(assignmentStudents)
-    .innerJoin(users, eq(assignmentStudents.studentId, users.id))
-    .where(eq(assignmentStudents.assignmentId, id))
-    .orderBy(users.name);
-
-  const studentIds = studentsList.map((s) => s.id);
-  const studentsWithProgress: {
-    id: string;
-    name: string;
-    email: string;
-    passedCount: number;
-    totalCheckpointsCount: number;
-    progressPercent: number;
-    activeCheckpoint: { id: number; name: string; state: string } | null;
-    checkpoints: {
-      id: number;
-      name: string;
-      order: number;
-      state: string;
-      studentId: string;
-      dueDate: Date | null;
-      minConsultations: number | null;
-    }[];
-  }[] = [];
-
-  if (studentIds.length > 0) {
-    // 3. Fetch all checkpoints for these students
-    const allCheckpoints = await db
+  try {
+    // 1. Fetch assignment details (verify ownership)
+    const [assignment] = await db
       .select({
-        id: checkpoints.id,
-        name: checkpoints.name,
-        order: checkpoints.order,
-        state: checkpoints.state,
-        studentId: checkpoints.studentId,
-        dueDate: checkpoints.dueDate,
-        minConsultations: checkpoints.minConsultations,
+        id: assignments.id,
+        title: assignments.title,
+        description: assignments.description,
+        finalDeadline: assignments.finalDeadline,
+        createdAt: assignments.createdAt,
+        instructorId: assignments.instructorId,
+        templateName: assignmentTemplates.name,
+        templateType: assignmentTemplates.type,
       })
-      .from(checkpoints)
-      .where(eq(checkpoints.assignmentId, id))
-      .orderBy(checkpoints.studentId, checkpoints.order);
+      .from(assignments)
+      .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
+      .where(and(eq(assignments.id, id), isNull(assignments.deletedAt)))
+      .limit(1);
 
-    // Group checkpoints by studentId
-    const checkpointsByStudent: Map<string, typeof allCheckpoints> = new Map();
-    allCheckpoints.forEach((cp) => {
-      if (!checkpointsByStudent.has(cp.studentId)) {
-        checkpointsByStudent.set(cp.studentId, []);
-      }
-      checkpointsByStudent.get(cp.studentId)!.push(cp);
-    });
+    if (!assignment || assignment.instructorId !== session.user.id) {
+      return null;
+    }
 
-    // 4. Calculate progress & active checkpoint for each student
-    studentsList.forEach((s) => {
-      const sCheckpoints = checkpointsByStudent.get(s.id) ?? [];
-      const totalCheckpointsCount = sCheckpoints.length;
-      const passedCount = sCheckpoints.filter((cp) => cp.state === 'passed').length;
+    // 2. Fetch assigned students list
+    const studentsList = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+      })
+      .from(assignmentStudents)
+      .innerJoin(users, eq(assignmentStudents.studentId, users.id))
+      .where(eq(assignmentStudents.assignmentId, id))
+      .orderBy(users.name);
 
-      const activeCheckpoint = sCheckpoints.find((cp) => cp.state !== 'passed') ?? null;
+    const studentIds = studentsList.map((s) => s.id);
+    const studentsWithProgress: {
+      id: string;
+      name: string;
+      email: string;
+      passedCount: number;
+      totalCheckpointsCount: number;
+      progressPercent: number;
+      activeCheckpoint: { id: number; name: string; state: string } | null;
+      checkpoints: {
+        id: number;
+        name: string;
+        order: number;
+        state: string;
+        studentId: string;
+        dueDate: Date | null;
+        minConsultations: number | null;
+      }[];
+    }[] = [];
 
-      studentsWithProgress.push({
-        ...s,
-        passedCount,
-        totalCheckpointsCount,
-        progressPercent:
-          totalCheckpointsCount > 0 ? Math.round((passedCount / totalCheckpointsCount) * 100) : 0,
-        activeCheckpoint: activeCheckpoint
-          ? {
-              id: activeCheckpoint.id,
-              name: activeCheckpoint.name,
-              state: activeCheckpoint.state,
-            }
-          : null,
-        checkpoints: sCheckpoints,
+    if (studentIds.length > 0) {
+      // 3. Fetch all checkpoints for these students
+      const allCheckpoints = await db
+        .select({
+          id: checkpoints.id,
+          name: checkpoints.name,
+          order: checkpoints.order,
+          state: checkpoints.state,
+          studentId: checkpoints.studentId,
+          dueDate: checkpoints.dueDate,
+          minConsultations: checkpoints.minConsultations,
+        })
+        .from(checkpoints)
+        .where(eq(checkpoints.assignmentId, id))
+        .orderBy(checkpoints.studentId, checkpoints.order);
+
+      // Group checkpoints by studentId
+      const checkpointsByStudent: Map<string, typeof allCheckpoints> = new Map();
+      allCheckpoints.forEach((cp) => {
+        if (!checkpointsByStudent.has(cp.studentId)) {
+          checkpointsByStudent.set(cp.studentId, []);
+        }
+        checkpointsByStudent.get(cp.studentId)!.push(cp);
       });
+
+      // 4. Calculate progress & active checkpoint for each student
+      studentsList.forEach((s) => {
+        const sCheckpoints = checkpointsByStudent.get(s.id) ?? [];
+        const totalCheckpointsCount = sCheckpoints.length;
+        const passedCount = sCheckpoints.filter((cp) => cp.state === 'passed').length;
+
+        const activeCheckpoint = sCheckpoints.find((cp) => cp.state !== 'passed') ?? null;
+
+        studentsWithProgress.push({
+          ...s,
+          passedCount,
+          totalCheckpointsCount,
+          progressPercent:
+            totalCheckpointsCount > 0 ? Math.round((passedCount / totalCheckpointsCount) * 100) : 0,
+          activeCheckpoint: activeCheckpoint
+            ? {
+                id: activeCheckpoint.id,
+                name: activeCheckpoint.name,
+                state: activeCheckpoint.state,
+              }
+            : null,
+          checkpoints: sCheckpoints,
+        });
+      });
+    }
+
+    return {
+      ...assignment,
+      students: studentsWithProgress,
+    };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getAssignmentDetailHandler',
     });
   }
-
-  return {
-    ...assignment,
-    students: studentsWithProgress,
-  };
 }
 
 export {

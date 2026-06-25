@@ -54,14 +54,14 @@ describe('listInstructorAssignmentsForFilterHandler', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
     const result = await listInstructorAssignmentsForFilterHandler();
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if user is not an instructor', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
 
     const result = await listInstructorAssignmentsForFilterHandler();
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should return assignments for the current instructor', async () => {

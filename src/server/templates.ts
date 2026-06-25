@@ -2,6 +2,7 @@
 // Handler implementations are in templates.server.ts (not bundled for client)
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import type { ServerError } from '@/lib/errors';
 
 export const CheckpointInputSchema = z.object({
   name: z.string().min(1, 'Checkpoint name is required'),
@@ -124,10 +125,10 @@ export interface TemplateAssignment {
   createdAt: Date | null;
 }
 
-export type GetTemplateResult = TemplateDetail | null;
+export type GetTemplateResult = TemplateDetail | null | ServerError;
 
-export type DeleteTemplateResult = { error: string; count?: number } | { success: true };
+export type DeleteTemplateResult = { success: true } | ServerError;
 
-export type DuplicateTemplateResult = { error: string } | { template: GetTemplateResult };
+export type DuplicateTemplateResult = { template: TemplateDetail } | ServerError;
 
-export type CreateTemplateResult = { error: string } | { template: GetTemplateResult };
+export type CreateTemplateResult = { template: TemplateDetail } | ServerError;

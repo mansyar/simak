@@ -4,6 +4,7 @@ import { getDb } from '../db/index';
 import { assignments } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
 import type { NonNullableSession } from '../lib/types';
+import { serverError, ErrorCode } from '../lib/errors';
 
 function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
@@ -12,16 +13,23 @@ function isInstructor(session: NonNullableSession | null): session is NonNullabl
 export async function listInstructorAssignmentsForFilterHandler() {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const db = getDb();
 
-  const results = await db
-    .select({ id: assignments.id, title: assignments.title })
-    .from(assignments)
-    .where(and(eq(assignments.instructorId, session.user.id), isNull(assignments.deletedAt)))
-    .orderBy(desc(assignments.createdAt));
+  try {
+    const results = await db
+      .select({ id: assignments.id, title: assignments.title })
+      .from(assignments)
+      .where(and(eq(assignments.instructorId, session.user.id), isNull(assignments.deletedAt)))
+      .orderBy(desc(assignments.createdAt));
 
-  return { success: true, assignments: results };
+    return { success: true, assignments: results };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listInstructorAssignmentsForFilterHandler',
+    });
+  }
 }

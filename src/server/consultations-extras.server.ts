@@ -4,6 +4,7 @@ import { consultations } from '../db/schema/consultations';
 import { checkpoints } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
 import { verifyAssignmentAccess } from './ownership';
+import { serverError, ErrorCode } from '../lib/errors';
 import type { z } from 'zod';
 import type { ListVerifiedCountsSchema } from './consultations';
 
@@ -12,7 +13,7 @@ type ListVerifiedCountsInput = z.infer<typeof ListVerifiedCountsSchema>;
 export async function listVerifiedCountsHandler(args: { data: ListVerifiedCountsInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { assignmentId } = args.data;
@@ -65,7 +66,9 @@ export async function listVerifiedCountsHandler(args: { data: ListVerifiedCounts
 
     return { counts: result };
   } catch (err) {
-    console.error('Failed to list verified counts:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listVerifiedCountsHandler',
+    });
   }
 }

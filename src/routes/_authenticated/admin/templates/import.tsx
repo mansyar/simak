@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { AlertBanner } from '@/components/ui/alert-banner';
 import { Upload, Download, ChevronRight, ChevronDown } from 'lucide-react';
 import { useI18n } from '../../../__root';
+import { isServerError } from '@/lib/errors';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -149,11 +150,10 @@ function BulkTemplateImportPage() {
     setIsCommitting(true);
     try {
       const response = await bulkCreateTemplatesFn({ data: { rows } });
-      if (response.error) {
-        setValidationError(String(response.error));
+      if (isServerError(response)) {
+        setValidationError(response.error.message);
       } else {
-        // Cast needed: TanStack Start wraps server fn return type; shape matches ImportResult
-        setResult(response as unknown as ImportResult);
+        setResult(response);
       }
     } catch {
       setValidationError(t('bulkImport.common.importFailed'));

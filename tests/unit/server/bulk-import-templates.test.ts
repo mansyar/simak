@@ -262,7 +262,7 @@ describe('Bulk template import handler', () => {
         },
       })) as any;
 
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should reject non-admin roles', async () => {
@@ -284,7 +284,7 @@ describe('Bulk template import handler', () => {
         },
       })) as any;
 
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
   });
 });

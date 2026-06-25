@@ -11,6 +11,7 @@ import {
 } from '@/server/consultations.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
+import { serverError, ErrorCode, isServerError } from '@/lib/errors';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -83,13 +84,13 @@ describe('Consultation server functions - Logic & Security', () => {
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await logConsultationHandler({ data: logData });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should fail if instructor tries to log consultation', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
       const result = await logConsultationHandler({ data: logData });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should fail if checkpoint not found', async () => {
@@ -100,7 +101,7 @@ describe('Consultation server functions - Logic & Security', () => {
       );
 
       const result = await logConsultationHandler({ data: logData });
-      expect(result).toEqual({ error: 'Checkpoint not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
     });
 
     it('should log consultation successfully for student', async () => {
@@ -125,6 +126,7 @@ describe('Consultation server functions - Logic & Security', () => {
 
       const result = await logConsultationHandler({ data: logData });
       expect(result).toHaveProperty('consultation');
+      if (isServerError(result)) throw new Error(result.error.message);
       expect(result.consultation).toEqual({ id: 1 });
       expect(mockDb.insert).toHaveBeenCalled();
       expect(mockDb.values).toHaveBeenCalled();
@@ -135,7 +137,7 @@ describe('Consultation server functions - Logic & Security', () => {
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await listConsultationsHandler({ data: { assignmentId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return consultations for student', async () => {
@@ -178,7 +180,7 @@ describe('Consultation server functions - Logic & Security', () => {
         Promise.resolve([]).then(onfulfilled),
       );
       const result = await listConsultationsHandler({ data: { assignmentId: 999 } });
-      expect(result).toEqual({ error: 'Assignment not found' });
+      expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Assignment not found'));
     });
 
     it('should reject if instructor does not own assignment', async () => {
@@ -187,7 +189,7 @@ describe('Consultation server functions - Logic & Security', () => {
         Promise.resolve([]).then(onfulfilled),
       );
       const result = await listConsultationsHandler({ data: { assignmentId: 999 } });
-      expect(result).toEqual({ error: 'Assignment not found' });
+      expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Assignment not found'));
     });
   });
 
@@ -195,13 +197,13 @@ describe('Consultation server functions - Logic & Security', () => {
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await listPendingConsultationsHandler({ data: { assignmentId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should fail if student tries', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
       const result = await listPendingConsultationsHandler({ data: { assignmentId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return pending consultations for instructor', async () => {
@@ -227,7 +229,7 @@ describe('Consultation server functions - Logic & Security', () => {
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await verifyConsultationHandler({ data: { consultationId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should fail if consultation not found', async () => {
@@ -237,7 +239,7 @@ describe('Consultation server functions - Logic & Security', () => {
       );
 
       const result = await verifyConsultationHandler({ data: { consultationId: 1 } });
-      expect(result).toEqual({ error: 'Consultation not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Consultation not found' } });
     });
 
     it('should verify consultation successfully', async () => {
@@ -275,7 +277,9 @@ describe('Consultation server functions - Logic & Security', () => {
       );
 
       const result = await verifyConsultationHandler({ data: { consultationId: 1 } });
-      expect(result).toEqual({ error: 'Consultation is not in pending state' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Consultation is not in pending state' },
+      });
     });
   });
 
@@ -285,7 +289,7 @@ describe('Consultation server functions - Logic & Security', () => {
       const result = await rejectConsultationHandler({
         data: { consultationId: 1, reason: 'Not acceptable' },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should reject consultation successfully', async () => {
@@ -326,7 +330,9 @@ describe('Consultation server functions - Logic & Security', () => {
       const result = await rejectConsultationHandler({
         data: { consultationId: 1, reason: 'Already done' },
       });
-      expect(result).toEqual({ error: 'Consultation is not in pending state' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Consultation is not in pending state' },
+      });
     });
   });
 
@@ -334,7 +340,7 @@ describe('Consultation server functions - Logic & Security', () => {
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await getConsultationDetailHandler({ data: { consultationId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return consultation detail', async () => {
@@ -368,7 +374,7 @@ describe('Consultation server functions - Logic & Security', () => {
       );
 
       const result = await getConsultationDetailHandler({ data: { consultationId: 999 } });
-      expect(result).toEqual({ error: 'Consultation not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Consultation not found' } });
     });
   });
 
@@ -376,7 +382,7 @@ describe('Consultation server functions - Logic & Security', () => {
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await listVerifiedCountsHandler({ data: { assignmentId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return counts for student', async () => {
@@ -436,7 +442,7 @@ describe('Consultation server functions - Logic & Security', () => {
         Promise.resolve([]).then(onfulfilled),
       );
       const result = await listVerifiedCountsHandler({ data: { assignmentId: 999 } });
-      expect(result).toEqual({ error: 'Assignment not found' });
+      expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Assignment not found'));
     });
 
     it('should reject if instructor does not own assignment for verified counts', async () => {
@@ -446,7 +452,7 @@ describe('Consultation server functions - Logic & Security', () => {
         Promise.resolve([]).then(onfulfilled),
       );
       const result = await listVerifiedCountsHandler({ data: { assignmentId: 999 } });
-      expect(result).toEqual({ error: 'Assignment not found' });
+      expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Assignment not found'));
     });
   });
 });

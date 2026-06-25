@@ -260,7 +260,7 @@ describe('Bulk user import handler', () => {
         },
       });
 
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should reject non-admin/instructor roles', async () => {
@@ -274,7 +274,7 @@ describe('Bulk user import handler', () => {
         },
       });
 
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
   });
 });

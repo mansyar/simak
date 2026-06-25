@@ -6,6 +6,7 @@ import { assignmentTemplates } from '../db/schema/templates';
 import { submissions } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
+import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '../lib/types';
 
 function isStudent(session: NonNullableSession | null): session is NonNullableSession {
@@ -18,7 +19,7 @@ function isStudent(session: NonNullableSession | null): session is NonNullableSe
 export async function getStudentDashboardDataHandler() {
   const session = await getSessionFromHeaders();
   if (!isStudent(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const db = getDb();
@@ -189,7 +190,9 @@ export async function getStudentDashboardDataHandler() {
       })),
     };
   } catch (err) {
-    console.error('Failed to get student dashboard data:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getStudentDashboardDataHandler',
+    });
   }
 }

@@ -28,6 +28,7 @@ import { Search } from 'lucide-react';
 import { z } from 'zod';
 import { getActionVisualProps, ACTION_TYPES } from '@/lib/admin/audit-actions';
 import { formatDate } from '@/lib/format-date';
+import { isServerError } from '@/lib/errors';
 
 interface AuditLogEntry {
   id: number;
@@ -68,8 +69,11 @@ export const Route = createFileRoute('/_authenticated/admin/audit-log')({
 function AuditLogPage() {
   const { t, locale } = useI18n();
   const data = Route.useLoaderData();
-  const entries = data?.entries ?? [];
-  const total = data?.total ?? 0;
+  const listData = isServerError(data)
+    ? { entries: [], total: 0 }
+    : (data ?? { entries: [], total: 0 });
+  const entries = listData.entries;
+  const total = listData.total;
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const router = useRouter();

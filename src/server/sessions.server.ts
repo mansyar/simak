@@ -4,6 +4,7 @@ import { getDb } from '../db/index';
 import { session as sessionTable } from '../db/schema/index';
 import { logAuditEvent } from '../lib/audit';
 import { getSessionFromHeaders } from './auth';
+import { serverError, ErrorCode } from '@/lib/errors';
 import type { z } from 'zod';
 import type { RevokeSessionSchema } from './sessions';
 
@@ -42,38 +43,45 @@ function parseUserAgent(ua: string | null): {
 export async function listActiveSessionsHandler() {
   const session_ = await getSessionFromHeaders();
   if (!session_) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const db = getDb();
-  const now = new Date();
-  const sessions = await db
-    .select()
-    .from(sessionTable)
-    .where(and(eq(sessionTable.userId, session_.user.id), gt(sessionTable.expiresAt, now)))
-    .orderBy(sessionTable.createdAt);
+  try {
+    const db = getDb();
+    const now = new Date();
+    const sessions = await db
+      .select()
+      .from(sessionTable)
+      .where(and(eq(sessionTable.userId, session_.user.id), gt(sessionTable.expiresAt, now)))
+      .orderBy(sessionTable.createdAt);
 
-  const enriched = sessions.map((s) => ({
-    id: s.id,
-    isCurrent: s.id === session_.session.id,
-    ipAddress: s.ipAddress,
-    userAgent: s.userAgent,
-    device: parseUserAgent(s.userAgent),
-    createdAt: s.createdAt,
-    updatedAt: s.updatedAt,
-  }));
+    const enriched = sessions.map((s) => ({
+      id: s.id,
+      isCurrent: s.id === session_.session.id,
+      ipAddress: s.ipAddress,
+      userAgent: s.userAgent,
+      device: parseUserAgent(s.userAgent),
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt,
+    }));
 
-  return { sessions: enriched, total: enriched.length };
+    return { sessions: enriched, total: enriched.length };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listActiveSessionsHandler',
+    });
+  }
 }
 
 export async function revokeSessionHandler(args: { data: RevokeSessionInput }) {
   const session_ = await getSessionFromHeaders();
   if (!session_) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   if (args.data.sessionId === session_.session.id) {
-    return { error: 'Cannot revoke current session' };
+    return serverError(ErrorCode.BAD_REQUEST, 'Cannot revoke current session');
   }
 
   try {
@@ -92,15 +100,18 @@ export async function revokeSessionHandler(args: { data: RevokeSessionInput }) {
     });
 
     return { success: true };
-  } catch {
-    return { error: 'Failed to revoke session' };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'revokeSessionHandler',
+    });
   }
 }
 
 export async function revokeAllOtherSessionsHandler() {
   const session_ = await getSessionFromHeaders();
   if (!session_) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   try {
@@ -122,7 +133,10 @@ export async function revokeAllOtherSessionsHandler() {
     });
 
     return { success: true, revokedCount };
-  } catch {
-    return { error: 'Failed to revoke sessions' };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'revokeAllOtherSessionsHandler',
+    });
   }
 }

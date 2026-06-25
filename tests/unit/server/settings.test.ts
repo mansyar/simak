@@ -139,7 +139,7 @@ describe('Settings handlers', () => {
     it('should reject if unauthorized (no session)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await updateProfileHandler({ name: 'John Updated' });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should update users.name and return updated user', async () => {
@@ -162,7 +162,7 @@ describe('Settings handlers', () => {
       });
 
       const result = await updateProfileHandler({ name: 'John Updated' });
-      expect(result).toEqual({ error: 'Failed to update profile' });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
 
@@ -170,7 +170,7 @@ describe('Settings handlers', () => {
     it('should reject if unauthorized (no session)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await getPresignedAvatarUploadUrlHandler({ extension: 'jpg' });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should generate correct avatars/ key prefix and return presigned URL', async () => {
@@ -195,7 +195,7 @@ describe('Settings handlers', () => {
     it('should return error for unsupported image type', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
       const result = await getPresignedAvatarUploadUrlHandler({ extension: 'exe' });
-      expect(result).toEqual({ error: 'Unsupported image type' });
+      expect(result).toEqual({ error: { code: 'BAD_REQUEST', message: 'Unsupported image type' } });
     });
 
     it('should handle storage failure gracefully', async () => {
@@ -205,7 +205,7 @@ describe('Settings handlers', () => {
       );
 
       const result = await getPresignedAvatarUploadUrlHandler({ extension: 'jpg' });
-      expect(result).toEqual({ error: 'Failed to generate upload URL' });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
 
@@ -213,7 +213,7 @@ describe('Settings handlers', () => {
     it('should reject if unauthorized (no session)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await updateUserSettingsHandler({ reducedMotion: true });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should update settings jsonb and return updated settings', async () => {
@@ -237,7 +237,7 @@ describe('Settings handlers', () => {
       });
 
       const result = await updateUserSettingsHandler({ reducedMotion: false });
-      expect(result).toEqual({ error: 'Failed to update settings' });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
 
@@ -245,7 +245,7 @@ describe('Settings handlers', () => {
     it('should reject if unauthorized (no session)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await getCurrentUserHandler();
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return user data and settings for authenticated user', async () => {
@@ -290,7 +290,7 @@ describe('Settings handlers', () => {
       mockDb.then = vi.fn((onfulfilled: any) => Promise.resolve([undefined]).then(onfulfilled));
 
       const result = await getCurrentUserHandler();
-      expect(result).toEqual({ error: 'User not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'User not found' } });
     });
 
     it('should handle database failure gracefully', async () => {
@@ -301,7 +301,7 @@ describe('Settings handlers', () => {
       );
 
       const result = await getCurrentUserHandler();
-      expect(result).toEqual({ error: 'Failed to fetch user data' });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
 });

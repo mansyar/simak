@@ -120,7 +120,9 @@ describe('unlockCheckpointHandler', () => {
       checkpointId: 100,
     });
 
-    expect(result).toEqual({ error: 'Checkpoint is not in locked state' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Checkpoint is not in locked state' },
+    });
   });
 
   it('should return error if checkpoint is already passed', async () => {
@@ -130,7 +132,9 @@ describe('unlockCheckpointHandler', () => {
       checkpointId: 100,
     });
 
-    expect(result).toEqual({ error: 'Checkpoint is not in locked state' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Checkpoint is not in locked state' },
+    });
   });
 
   it('should return error if checkpoint not found', async () => {
@@ -138,7 +142,7 @@ describe('unlockCheckpointHandler', () => {
 
     const result = await runHandlerWithResult([], { checkpointId: 999 });
 
-    expect(result).toEqual({ error: 'Checkpoint not found' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
   });
 
   it('should return error if non-owner instructor tries to unlock', async () => {
@@ -147,7 +151,7 @@ describe('unlockCheckpointHandler', () => {
     // Empty result simulates both not-found and non-ownership (same behavior)
     const result = await runHandlerWithResult([], { checkpointId: 200 });
 
-    expect(result).toEqual({ error: 'Checkpoint not found' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
   });
 
   it('should reject non-instructor users', async () => {
@@ -157,7 +161,7 @@ describe('unlockCheckpointHandler', () => {
       data: { checkpointId: 100 },
     });
 
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject unauthenticated users', async () => {
@@ -167,7 +171,7 @@ describe('unlockCheckpointHandler', () => {
       data: { checkpointId: 100 },
     });
 
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should update updatedAt when unlocking', async () => {

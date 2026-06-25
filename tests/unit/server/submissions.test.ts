@@ -7,6 +7,7 @@ import {
   GetSubmissionDetailSchema,
 } from '@/server/submissions';
 import { submitCheckpointHandler, listSubmissionsHandler } from '@/server/submissions.server';
+import { isServerError } from '@/lib/errors';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import * as storage from '@/lib/storage';
@@ -155,7 +156,7 @@ describe('Submission server functions - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
       const result = await submitCheckpointHandler({ data: submitData });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should reject if not a student', async () => {
@@ -165,7 +166,7 @@ describe('Submission server functions - Logic & Security', () => {
       });
 
       const result = await submitCheckpointHandler({ data: submitData });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should reject upload to locked checkpoint', async () => {
@@ -188,7 +189,7 @@ describe('Submission server functions - Logic & Security', () => {
         );
 
       const result = await submitCheckpointHandler({ data: submitData });
-      expect(result).toEqual({ error: 'Checkpoint is locked' });
+      expect(result).toEqual({ error: { code: 'BAD_REQUEST', message: 'Checkpoint is locked' } });
     });
 
     it('should transition unlocked → submitted on first upload', async () => {
@@ -232,7 +233,9 @@ describe('Submission server functions - Logic & Security', () => {
         .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
       const result = await submitCheckpointHandler({ data: submitData });
-      expect(result).toEqual({ error: 'Checkpoint is not in a submittable state' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Checkpoint is not in a submittable state' },
+      });
     });
 
     it('should reject file exceeding 25MB limit', async () => {
@@ -257,7 +260,9 @@ describe('Submission server functions - Logic & Security', () => {
           fileSize: 25 * 1024 * 1024 + 1,
         },
       });
-      expect(result).toEqual({ error: 'File size exceeds 25MB limit' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'File size exceeds 25MB limit' },
+      });
     });
 
     it('should reject file with unsupported extension', async () => {
@@ -282,7 +287,7 @@ describe('Submission server functions - Logic & Security', () => {
           fileSize: 1024,
         },
       });
-      expect(result).toEqual({ error: 'Unsupported file type' });
+      expect(result).toEqual({ error: { code: 'BAD_REQUEST', message: 'Unsupported file type' } });
     });
 
     it('should accept upload from revise state and transition to submitted', async () => {
@@ -317,7 +322,7 @@ describe('Submission server functions - Logic & Security', () => {
       );
 
       const result = await submitCheckpointHandler({ data: submitData });
-      expect(result).toEqual({ error: 'Checkpoint not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
     });
 
     it('should reject upload under_review state', async () => {
@@ -337,7 +342,9 @@ describe('Submission server functions - Logic & Security', () => {
         .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
       const result = await submitCheckpointHandler({ data: submitData });
-      expect(result).toEqual({ error: 'Checkpoint is not in a submittable state' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Checkpoint is not in a submittable state' },
+      });
     });
 
     it('should reject upload passed state', async () => {
@@ -357,7 +364,9 @@ describe('Submission server functions - Logic & Security', () => {
         .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
       const result = await submitCheckpointHandler({ data: submitData });
-      expect(result).toEqual({ error: 'Checkpoint is not in a submittable state' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Checkpoint is not in a submittable state' },
+      });
     });
 
     it('should block submission when insufficient verified consultations', async () => {
@@ -382,7 +391,8 @@ describe('Submission server functions - Logic & Security', () => {
 
       const result = await submitCheckpointHandler({ data: submitData });
       expect(result).toHaveProperty('error');
-      expect(result.error).toContain('requires 2 verified consultations');
+      if (!isServerError(result)) throw new Error('Expected server error');
+      expect(result.error.message).toContain('requires 2 verified consultations');
     });
 
     it('should allow submission when sufficient verified consultations', async () => {
@@ -453,7 +463,7 @@ describe('Submission server functions - Logic & Security', () => {
       );
 
       const result = await listSubmissionsHandler({ data: { checkpointId: 1 } });
-      expect(result).toEqual({ error: 'Checkpoint not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
     });
 
     it('should prevent student A from submitting to student B checkpoint', async () => {
@@ -474,7 +484,7 @@ describe('Submission server functions - Logic & Security', () => {
           fileSize: 1024,
         },
       });
-      expect(result).toEqual({ error: 'Checkpoint not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
     });
   });
 });

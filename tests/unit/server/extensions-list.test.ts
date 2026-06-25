@@ -66,7 +66,7 @@ describe('listExtensionRequestsHandler', () => {
     const result = await listExtensionRequestsHandler({
       data: defaultInput,
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if not an instructor', async () => {
@@ -75,7 +75,7 @@ describe('listExtensionRequestsHandler', () => {
     const result = await listExtensionRequestsHandler({
       data: defaultInput,
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if assignment is not found or not owned by instructor', async () => {
@@ -86,7 +86,7 @@ describe('listExtensionRequestsHandler', () => {
     const result = await listExtensionRequestsHandler({
       data: { ...defaultInput, assignmentId: 999 },
     });
-    expect(result).toEqual({ error: 'Assignment not found' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Assignment not found' } });
   });
 
   it('should return paginated results without status filter', async () => {
@@ -200,7 +200,7 @@ describe('listExtensionRequestsHandler', () => {
     const result = await listExtensionRequestsHandler({
       data: defaultInput,
     });
-    expect(result).toEqual({ error: 'Internal Server Error' });
+    expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
   });
 });
 
@@ -238,7 +238,7 @@ describe('listMyExtensionRequestsHandler', () => {
     const result = await listMyExtensionRequestsHandler({
       data: { assignmentId: 1 },
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if not a student', async () => {
@@ -247,7 +247,7 @@ describe('listMyExtensionRequestsHandler', () => {
     const result = await listMyExtensionRequestsHandler({
       data: { assignmentId: 1 },
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if student is not enrolled', async () => {
@@ -258,7 +258,7 @@ describe('listMyExtensionRequestsHandler', () => {
     const result = await listMyExtensionRequestsHandler({
       data: { assignmentId: 999 },
     });
-    expect(result).toEqual({ error: 'Assignment not found' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Assignment not found' } });
   });
 
   it('should return empty items list', async () => {
@@ -315,6 +315,6 @@ describe('listMyExtensionRequestsHandler', () => {
     const result = await listMyExtensionRequestsHandler({
       data: { assignmentId: 1 },
     });
-    expect(result).toEqual({ error: 'Internal Server Error' });
+    expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
   });
 });

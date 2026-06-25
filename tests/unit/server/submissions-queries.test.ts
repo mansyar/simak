@@ -61,7 +61,7 @@ describe('Submission query handlers - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
       const result = await listSubmissionsHandler({ data: { checkpointId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return empty array when no submissions exist', async () => {
@@ -125,7 +125,7 @@ describe('Submission query handlers - Logic & Security', () => {
       );
 
       const result = await listSubmissionsHandler({ data: { checkpointId: 1 } });
-      expect(result).toEqual({ error: 'Checkpoint not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
     });
   });
 
@@ -134,7 +134,7 @@ describe('Submission query handlers - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
       const result = await getSubmissionDetailHandler({ data: { submissionId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return submission detail with download URL for own submission', async () => {
@@ -169,7 +169,7 @@ describe('Submission query handlers - Logic & Security', () => {
       );
 
       const result = await getSubmissionDetailHandler({ data: { submissionId: 999 } });
-      expect(result).toEqual({ error: 'Submission not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Submission not found' } });
     });
 
     it('should reject access to another student submission', async () => {
@@ -182,7 +182,7 @@ describe('Submission query handlers - Logic & Security', () => {
       );
 
       const result = await getSubmissionDetailHandler({ data: { submissionId: 1 } });
-      expect(result).toEqual({ error: 'Submission not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Submission not found' } });
     });
   });
 

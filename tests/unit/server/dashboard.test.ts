@@ -107,13 +107,13 @@ describe('Dashboard handlers', () => {
     it('should reject if unauthorized (no session)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await getStudentDashboardDataHandler();
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should reject if not a student', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
       const result = await getStudentDashboardDataHandler();
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return empty data when no assignments exist', async () => {
@@ -265,13 +265,13 @@ describe('Dashboard handlers', () => {
     it('should reject if unauthorized (no session)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await getInstructorDashboardDataHandler();
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should reject if not an instructor', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
       const result = await getInstructorDashboardDataHandler();
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return empty data when no assignments exist', async () => {

@@ -209,7 +209,7 @@ describe('Notification handlers', () => {
       const result = await createNotificationHandler({
         data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should reject if non-admin', async () => {
@@ -218,7 +218,7 @@ describe('Notification handlers', () => {
       const result = await createNotificationHandler({
         data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should create a notification and return it when admin', async () => {
@@ -241,7 +241,7 @@ describe('Notification handlers', () => {
       const result = await createNotificationHandler({
         data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
       });
-      expect(result).toEqual({ error: 'Internal Server Error' });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
 
@@ -250,7 +250,7 @@ describe('Notification handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
       const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return paginated notifications', async () => {
@@ -299,7 +299,7 @@ describe('Notification handlers', () => {
       });
 
       const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
-      expect(result).toEqual({ error: 'Internal Server Error' });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
   describe('markReadHandler', () => {
@@ -307,7 +307,7 @@ describe('Notification handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
       const result = await markReadHandler({ data: { notificationId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should mark a notification as read if owned by user', async () => {
@@ -330,7 +330,7 @@ describe('Notification handlers', () => {
       );
 
       const result = await markReadHandler({ data: { notificationId: 999 } });
-      expect(result).toEqual({ error: 'Notification not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Notification not found' } });
     });
 
     it('should reject if notification belongs to another user', async () => {
@@ -341,7 +341,7 @@ describe('Notification handlers', () => {
       );
 
       const result = await markReadHandler({ data: { notificationId: 1 } });
-      expect(result).toEqual({ error: 'Notification not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Notification not found' } });
     });
 
     it('should handle database error gracefully', async () => {
@@ -351,7 +351,7 @@ describe('Notification handlers', () => {
       });
 
       const result = await markReadHandler({ data: { notificationId: 1 } });
-      expect(result).toEqual({ error: 'Internal Server Error' });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
 
@@ -360,7 +360,7 @@ describe('Notification handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
       const result = await markAllReadHandler({ data: {} });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should mark all unread notifications as read for current user', async () => {
@@ -390,7 +390,7 @@ describe('Notification handlers', () => {
       });
 
       const result = await markAllReadHandler({ data: {} });
-      expect(result).toEqual({ error: 'Internal Server Error' });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
 
@@ -399,7 +399,7 @@ describe('Notification handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
       const result = await getUnreadCountHandler({ data: {} });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return unread count for current user', async () => {
@@ -429,7 +429,7 @@ describe('Notification handlers', () => {
       });
 
       const result = await getUnreadCountHandler({ data: {} });
-      expect(result).toEqual({ error: 'Internal Server Error' });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
 });

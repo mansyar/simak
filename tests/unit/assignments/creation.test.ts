@@ -8,6 +8,7 @@ import {
 } from '@/server/assignments.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
+import { isServerError } from '@/lib/errors';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -65,7 +66,7 @@ describe('Assignment Server Functions', () => {
           studentIds: ['student-1'],
         },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should fail if user is not an instructor', async () => {
@@ -82,7 +83,7 @@ describe('Assignment Server Functions', () => {
           studentIds: ['student-1'],
         },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should succeed and instantiate checkpoints for students', async () => {
@@ -148,6 +149,7 @@ describe('Assignment Server Functions', () => {
       const result = await listInstructorAssignmentsHandler({
         data: { page: 1, limit: 20, search: '' },
       });
+      if (isServerError(result)) throw new Error(result.error.message);
 
       expect(result.assignments).toHaveLength(1);
       expect(result.assignments[0].studentCount).toBe(5);
@@ -202,7 +204,8 @@ describe('Assignment Server Functions', () => {
       const result = await getAssignmentDetailHandler({ data: { id: 42 } });
 
       expect(result).not.toBeNull();
-      if (result) {
+      if (!result || isServerError(result)) throw new Error('unexpected server error');
+      {
         expect(result.title).toBe('Detailed Assignment');
         expect(result.students).toHaveLength(1);
         expect(result.students[0].passedCount).toBe(1);

@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { requestExtensionHandler } from '@/server/extensions.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
+import { isServerError } from '@/lib/errors';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -65,14 +66,14 @@ describe('requestExtensionHandler', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
     const result = await requestExtensionHandler({ data: validInput });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if not a student', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
     const result = await requestExtensionHandler({ data: validInput });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if student is not enrolled in the assignment', async () => {
@@ -81,7 +82,7 @@ describe('requestExtensionHandler', () => {
     mockDb.then.mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
     const result = await requestExtensionHandler({ data: validInput });
-    expect(result).toEqual({ error: 'Assignment not found' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Assignment not found' } });
   });
 
   it('should reject if extensionDays exceeds max_extension_days cap', async () => {
@@ -98,7 +99,9 @@ describe('requestExtensionHandler', () => {
     const result = await requestExtensionHandler({
       data: { ...validInput, extensionDays: 5 },
     });
-    expect(result).toEqual({ error: 'Extension days cannot exceed 3 for this assignment' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Extension days cannot exceed 3 for this assignment' },
+    });
   });
 
   it('should reject if max total extensions exceeded', async () => {
@@ -117,7 +120,10 @@ describe('requestExtensionHandler', () => {
 
     const result = await requestExtensionHandler({ data: validInput });
     expect(result).toEqual({
-      error: 'Maximum 2 extension(s) allowed for this assignment. You have used 2.',
+      error: {
+        code: 'BAD_REQUEST',
+        message: 'Maximum 2 extension(s) allowed for this assignment. You have used 2.',
+      },
     });
   });
 
@@ -145,6 +151,7 @@ describe('requestExtensionHandler', () => {
 
     const result = await requestExtensionHandler({ data: validInput });
     expect(result).toHaveProperty('extensionRequest');
+    if (isServerError(result)) throw new Error(result.error.message);
     expect(result.extensionRequest!.id).toBe(100);
   });
 
@@ -171,6 +178,7 @@ describe('requestExtensionHandler', () => {
       data: { ...validInput, checkpointId: 10 },
     });
     expect(result).toHaveProperty('extensionRequest');
+    if (isServerError(result)) throw new Error(result.error.message);
     expect(result.extensionRequest!.id).toBe(101);
   });
 
@@ -192,7 +200,7 @@ describe('requestExtensionHandler', () => {
     const result = await requestExtensionHandler({
       data: { ...validInput, checkpointId: 15 },
     });
-    expect(result).toEqual({ error: 'Checkpoint not found' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
   });
 
   it('should notify instructor via notification insert', async () => {

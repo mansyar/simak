@@ -9,14 +9,14 @@ import { ReviewQueueSkeleton } from '@/components/reviews/ReviewQueueSkeleton';
 import { useI18n } from '../../../__root';
 import { AlertCircle, CheckCircle2, SearchX } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
+import { isServerError, serverError, ErrorCode } from '@/lib/errors';
 
 export const Route = createFileRoute('/_authenticated/instructor/reviews/$submissionId')({
   loader: async ({ params }) => {
     try {
-      const data = await getReviewDetail({ data: { submissionId: Number(params.submissionId) } });
-      return data;
+      return await getReviewDetail({ data: { submissionId: Number(params.submissionId) } });
     } catch {
-      return { error: 'Failed to load review detail' };
+      return serverError(ErrorCode.INTERNAL, 'Failed to load review detail');
     }
   },
   pendingComponent: () => (
@@ -30,6 +30,7 @@ export const Route = createFileRoute('/_authenticated/instructor/reviews/$submis
 function ReviewDetailPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData();
+  const detail = data && !isServerError(data) ? data : null;
   const params = Route.useParams();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +39,7 @@ function ReviewDetailPage() {
 
   // On page load, if checkpoint is 'submitted', call openForReview
   useEffect(() => {
-    if (data?.submission && data.submission.checkpointState === 'submitted' && !transitioned) {
+    if (detail?.submission && detail.submission.checkpointState === 'submitted' && !transitioned) {
       setTransitioned(true);
       let cancelled = false;
       (async () => {
@@ -51,17 +52,22 @@ function ReviewDetailPage() {
         cancelled = true;
       };
     }
-  }, [data, params.submissionId, transitioned, navigate]);
+  }, [detail, params.submissionId, transitioned, navigate]);
 
-  if (data?.error) {
-    return <EmptyState icon={AlertCircle} title={data.error} />;
+  if (!detail) {
+    return (
+      <EmptyState
+        icon={AlertCircle}
+        title={data && isServerError(data) ? data.error.message : t('common.error')}
+      />
+    );
   }
 
-  if (!data?.submission) {
+  if (!detail?.submission) {
     return <EmptyState icon={SearchX} title={t('common.noResults')} />;
   }
 
-  const { submission, reviewHistory } = data;
+  const { submission, reviewHistory } = detail;
 
   if (success) {
     return (
@@ -106,7 +112,7 @@ function ReviewDetailPage() {
 
       {/* Review history */}
       <ReviewHistory
-        reviews={(reviewHistory ?? []).map((r) => ({
+        reviews={(reviewHistory ?? []).map((r: any) => ({
           ...r,
           createdAt: r.createdAt ?? new Date(),
         }))}

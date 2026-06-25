@@ -98,7 +98,7 @@ describe('files.server.ts - getPresignedUploadUrlHandler', () => {
     const result = await getPresignedUploadUrlHandler({
       data: { checkpointId: 1, contentType: 'application/pdf', extension: 'pdf' },
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject when checkpoint not found', async () => {
@@ -121,7 +121,9 @@ describe('files.server.ts - getPresignedUploadUrlHandler', () => {
     const result = await getPresignedUploadUrlHandler({
       data: { checkpointId: 999, contentType: 'application/pdf', extension: 'pdf' },
     });
-    expect(result).toEqual({ error: 'Checkpoint not found' });
+    expect(result).toEqual({
+      error: { code: 'NOT_FOUND', message: 'Checkpoint not found' },
+    });
   });
 
   it('should reject when checkpoint is not in a submittable state', async () => {
@@ -144,7 +146,9 @@ describe('files.server.ts - getPresignedUploadUrlHandler', () => {
     const result = await getPresignedUploadUrlHandler({
       data: { checkpointId: 1, contentType: 'application/pdf', extension: 'pdf' },
     });
-    expect(result).toEqual({ error: 'Checkpoint is not in a submittable state' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Checkpoint is not in a submittable state' },
+    });
   });
 
   it('should reject unsupported file extension', async () => {
@@ -167,7 +171,9 @@ describe('files.server.ts - getPresignedUploadUrlHandler', () => {
     const result = await getPresignedUploadUrlHandler({
       data: { checkpointId: 1, contentType: 'image/png', extension: 'png' },
     });
-    expect(result).toEqual({ error: 'Unsupported file extension' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Unsupported file extension' },
+    });
   });
 
   it('should reject content type that does not match extension', async () => {
@@ -194,7 +200,9 @@ describe('files.server.ts - getPresignedUploadUrlHandler', () => {
         extension: 'pdf',
       },
     });
-    expect(result).toEqual({ error: 'Content type does not match file extension' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Content type does not match file extension' },
+    });
   });
 
   it('should return upload URL for unlocked checkpoint', async () => {
@@ -281,7 +289,7 @@ describe('files.server.ts - getPresignedDownloadUrlHandler', () => {
 
     const { getPresignedDownloadUrlHandler } = await import('@/server/files.server');
     const result = await getPresignedDownloadUrlHandler({ data: { submissionId: 1 } });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject when submission not found', async () => {
@@ -302,7 +310,9 @@ describe('files.server.ts - getPresignedDownloadUrlHandler', () => {
 
     const { getPresignedDownloadUrlHandler } = await import('@/server/files.server');
     const result = await getPresignedDownloadUrlHandler({ data: { submissionId: 999 } });
-    expect(result).toEqual({ error: 'Submission not found' });
+    expect(result).toEqual({
+      error: { code: 'NOT_FOUND', message: 'Submission not found' },
+    });
   });
 
   it('should return download URL for student submission', async () => {
@@ -348,7 +358,9 @@ describe('files.server.ts - getPresignedDownloadUrlHandler', () => {
 
     const { getPresignedDownloadUrlHandler } = await import('@/server/files.server');
     const result = await getPresignedDownloadUrlHandler({ data: { submissionId: 1 } });
-    expect(result).toEqual({ error: 'Submission not found' });
+    expect(result).toEqual({
+      error: { code: 'NOT_FOUND', message: 'Submission not found' },
+    });
   });
 });
 
@@ -374,7 +386,7 @@ describe('files.server.ts - getPresignedReviewFeedbackUploadUrlHandler', () => {
     const result = await getPresignedReviewFeedbackUploadUrlHandler({
       data: { extension: 'pdf', contentType: 'application/pdf' },
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should return upload URL for instructor feedback', async () => {

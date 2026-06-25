@@ -111,7 +111,7 @@ describe('Two-factor server functions', () => {
         data: { password: 'testpass123' },
       });
 
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should call auth.api.enableTwoFactor and return totpURI + backupCodes', async () => {
@@ -163,7 +163,7 @@ describe('Two-factor server functions', () => {
         data: { password: 'wrongpass' },
       });
 
-      expect(result).toEqual({ error: 'Invalid password' });
+      expect(result).toEqual({ error: { code: 'BAD_REQUEST', message: 'Invalid password' } });
     });
   });
 
@@ -177,7 +177,7 @@ describe('Two-factor server functions', () => {
         data: { code: '123456', trustDevice: false },
       });
 
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should verify TOTP code, log audit, and send email', async () => {
@@ -217,7 +217,7 @@ describe('Two-factor server functions', () => {
         data: { code: '000000', trustDevice: false },
       });
 
-      expect(result).toEqual({ error: 'Invalid TOTP code' });
+      expect(result).toEqual({ error: { code: 'BAD_REQUEST', message: 'Invalid TOTP code' } });
     });
 
     it('escapes malicious user name in enable email body', async () => {
@@ -256,7 +256,7 @@ describe('Two-factor server functions', () => {
         data: { password: 'testpass123' },
       });
 
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should disable 2FA, update user, delete record, log audit, and send email', async () => {
@@ -305,7 +305,7 @@ describe('Two-factor server functions', () => {
         data: { password: 'wrongpass' },
       });
 
-      expect(result).toEqual({ error: 'Wrong password' });
+      expect(result).toEqual({ error: { code: 'BAD_REQUEST', message: 'Wrong password' } });
     });
 
     it('escapes malicious user name in disable email body', async () => {
@@ -379,7 +379,7 @@ describe('Two-factor server functions', () => {
         data: { password: 'testpass123' },
       });
 
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should call generateBackupCodes and return new codes', async () => {
@@ -414,7 +414,7 @@ describe('Two-factor server functions', () => {
         data: { password: '' },
       });
 
-      expect(result).toEqual({ error: 'Password required' });
+      expect(result).toEqual({ error: { code: 'BAD_REQUEST', message: 'Password required' } });
     });
   });
 
@@ -426,7 +426,7 @@ describe('Two-factor server functions', () => {
 
       const result = await getTwoFactorStatusHandler({ data: {} });
 
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return enabled: true when 2FA is enabled', async () => {

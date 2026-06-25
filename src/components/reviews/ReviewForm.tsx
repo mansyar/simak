@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { submitReview } from '@/server/reviews';
+import { isServerError } from '@/lib/errors';
 import { getPresignedReviewFeedbackUploadUrl } from '@/server/files';
 import { Loader2, Upload } from 'lucide-react';
 
@@ -70,7 +71,7 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
         setIsUploadingFeedback(false);
       }
     },
-    [onError],
+    [onError, t],
   );
 
   const handleSubmit = useCallback(async () => {
@@ -103,8 +104,8 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
         },
       });
 
-      if (result.error) {
-        onError(result.error);
+      if (isServerError(result)) {
+        onError(result.error.message);
         return;
       }
 

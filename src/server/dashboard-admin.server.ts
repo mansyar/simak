@@ -8,6 +8,7 @@ import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { emailQueue } from '../db/schema/email-queue';
 import { getSessionFromHeaders } from './auth';
+import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '../lib/types';
 
 const instructorUsers = aliasedTable(users, 'instructor');
@@ -22,7 +23,7 @@ function isAdmin(session: NonNullableSession | null): session is NonNullableSess
 export async function getAdminDashboardDataHandler() {
   const session = await getSessionFromHeaders();
   if (!isAdmin(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const db = getDb();
@@ -135,7 +136,9 @@ export async function getAdminDashboardDataHandler() {
       })),
     };
   } catch (err) {
-    console.error('Failed to get admin dashboard data:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getAdminDashboardDataHandler',
+    });
   }
 }

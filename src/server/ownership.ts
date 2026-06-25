@@ -2,6 +2,7 @@
 import { eq, and, isNull } from 'drizzle-orm';
 import { assignments, assignmentStudents } from '../db/schema/assignments';
 import { checkpoints } from '../db/schema/assignments';
+import { serverError, ErrorCode, type ServerError } from '../lib/errors';
 import type { Db } from '../db/index';
 
 type Session = { user: { id: string; role: string } };
@@ -16,36 +17,43 @@ export async function verifyAssignmentAccess(
   db: Db,
   assignmentId: number,
   session: Session,
-): Promise<{ error: string } | null> {
+): Promise<ServerError | null> {
   const role = session.user.role;
-  if (role === 'student') {
-    const [enrollment] = await db
-      .select({ id: assignmentStudents.id })
-      .from(assignmentStudents)
-      .where(
-        and(
-          eq(assignmentStudents.assignmentId, assignmentId),
-          eq(assignmentStudents.studentId, session.user.id),
-        ),
-      )
-      .limit(1);
-    return enrollment ? null : { error: 'Assignment not found' };
+  try {
+    if (role === 'student') {
+      const [enrollment] = await db
+        .select({ id: assignmentStudents.id })
+        .from(assignmentStudents)
+        .where(
+          and(
+            eq(assignmentStudents.assignmentId, assignmentId),
+            eq(assignmentStudents.studentId, session.user.id),
+          ),
+        )
+        .limit(1);
+      return enrollment ? null : serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
+    }
+    if (role === 'instructor') {
+      const [assignment] = await db
+        .select({ id: assignments.id })
+        .from(assignments)
+        .where(
+          and(
+            eq(assignments.id, assignmentId),
+            eq(assignments.instructorId, session.user.id),
+            isNull(assignments.deletedAt),
+          ),
+        )
+        .limit(1);
+      return assignment ? null : serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
+    }
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'verifyAssignmentAccess',
+    });
   }
-  if (role === 'instructor') {
-    const [assignment] = await db
-      .select({ id: assignments.id })
-      .from(assignments)
-      .where(
-        and(
-          eq(assignments.id, assignmentId),
-          eq(assignments.instructorId, session.user.id),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .limit(1);
-    return assignment ? null : { error: 'Assignment not found' };
-  }
-  return { error: 'Unauthorized' };
+  return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 }
 
 /**
@@ -58,37 +66,47 @@ export async function verifyCheckpointAccess(
   db: Db,
   checkpointId: number,
   session: Session,
-): Promise<{ error: string } | null> {
+): Promise<ServerError | null> {
   const role = session.user.role;
-  if (role === 'student') {
-    const [owned] = await db
-      .select({ id: checkpoints.id })
-      .from(checkpoints)
-      .innerJoin(assignmentStudents, eq(checkpoints.assignmentId, assignmentStudents.assignmentId))
-      .where(
-        and(
-          eq(checkpoints.id, checkpointId),
-          eq(checkpoints.studentId, session.user.id),
-          eq(assignmentStudents.studentId, session.user.id),
-        ),
-      )
-      .limit(1);
-    return owned ? null : { error: 'Checkpoint not found' };
+  try {
+    if (role === 'student') {
+      const [owned] = await db
+        .select({ id: checkpoints.id })
+        .from(checkpoints)
+        .innerJoin(
+          assignmentStudents,
+          eq(checkpoints.assignmentId, assignmentStudents.assignmentId),
+        )
+        .where(
+          and(
+            eq(checkpoints.id, checkpointId),
+            eq(checkpoints.studentId, session.user.id),
+            eq(assignmentStudents.studentId, session.user.id),
+          ),
+        )
+        .limit(1);
+      return owned ? null : serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+    }
+    if (role === 'instructor') {
+      const [owned] = await db
+        .select({ id: checkpoints.id })
+        .from(checkpoints)
+        .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+        .where(
+          and(
+            eq(checkpoints.id, checkpointId),
+            eq(assignments.instructorId, session.user.id),
+            isNull(assignments.deletedAt),
+          ),
+        )
+        .limit(1);
+      return owned ? null : serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+    }
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'verifyCheckpointAccess',
+    });
   }
-  if (role === 'instructor') {
-    const [owned] = await db
-      .select({ id: checkpoints.id })
-      .from(checkpoints)
-      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-      .where(
-        and(
-          eq(checkpoints.id, checkpointId),
-          eq(assignments.instructorId, session.user.id),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .limit(1);
-    return owned ? null : { error: 'Checkpoint not found' };
-  }
-  return { error: 'Unauthorized' };
+  return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 }

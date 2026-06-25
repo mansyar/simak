@@ -14,6 +14,7 @@ import { ExtensionHistoryList } from '@/components/student/extensions/ExtensionH
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
+import { isServerError } from '@/lib/errors';
 
 export const Route = createFileRoute('/_authenticated/student/assignments/$id')({
   loader: async ({ params }) => {
@@ -56,6 +57,7 @@ function AssignmentNotFound() {
 function AssignmentDetailPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData();
+  const assignment = data && !isServerError(data) ? data : null;
   const matchRoute = useMatchRoute();
   const [consultations, setConsultations] = useState<
     {
@@ -95,7 +97,7 @@ function AssignmentDetailPage() {
 
   // Load consultation data on mount
   useEffect(() => {
-    if (data) {
+    if (assignment) {
       const loadConsultations = async () => {
         const listConsFn = listConsultations as unknown as (args: {
           data: { assignmentId: number };
@@ -104,7 +106,7 @@ function AssignmentDetailPage() {
           data: { assignmentId: number };
         }) => Promise<unknown>;
         const consResult = await listConsFn({
-          data: { assignmentId: (data as { id: number }).id },
+          data: { assignmentId: assignment.id },
         });
         if (
           consResult &&
@@ -115,7 +117,7 @@ function AssignmentDetailPage() {
         }
 
         const countsResult = await listCountsFn({
-          data: { assignmentId: (data as { id: number }).id },
+          data: { assignmentId: assignment.id },
         });
         if (
           countsResult &&
@@ -130,7 +132,7 @@ function AssignmentDetailPage() {
           data: { assignmentId: number };
         }) => Promise<unknown>;
         const extResult = await listExtFn({
-          data: { assignmentId: (data as { id: number }).id },
+          data: { assignmentId: assignment.id },
         });
         if (
           extResult &&
@@ -142,7 +144,7 @@ function AssignmentDetailPage() {
       };
       loadConsultations();
     }
-  }, [data]);
+  }, [assignment]);
 
   // If a child route is active (e.g., /checkpoints/:checkpointId), render it via Outlet
   // The child route (submission page) has its own full layout and back navigation
@@ -153,21 +155,21 @@ function AssignmentDetailPage() {
     return <Outlet />;
   }
 
-  if (!data) {
+  if (!assignment) {
     return <AssignmentNotFound />;
   }
 
   const detail = {
-    title: data.title,
-    description: data.description,
-    finalDeadline: new Date(data.finalDeadline),
-    instructorName: data.instructorName,
-    templateName: data.templateName,
-    templateType: data.templateType,
+    title: assignment.title,
+    description: assignment.description,
+    finalDeadline: new Date(assignment.finalDeadline),
+    instructorName: assignment.instructorName,
+    templateName: assignment.templateName,
+    templateType: assignment.templateType,
   };
 
   const checkpoints = (
-    ((data as Record<string, unknown>).checkpoints as {
+    (assignment.checkpoints as {
       id: number;
       name: string;
       order: number;
@@ -197,7 +199,7 @@ function AssignmentDetailPage() {
       data: { assignmentId: number };
     }) => Promise<unknown>;
     const consResult = await listConsFn({
-      data: { assignmentId: (data as { id: number }).id },
+      data: { assignmentId: assignment.id },
     });
     if (
       consResult &&
@@ -208,7 +210,7 @@ function AssignmentDetailPage() {
     }
 
     const countsResult = await listCountsFn({
-      data: { assignmentId: (data as { id: number }).id },
+      data: { assignmentId: assignment.id },
     });
     if (
       countsResult &&
@@ -225,7 +227,7 @@ function AssignmentDetailPage() {
       data: { assignmentId: number };
     }) => Promise<unknown>;
     const extResult = await listExtFn({
-      data: { assignmentId: (data as { id: number }).id },
+      data: { assignmentId: assignment.id },
     });
     if (
       extResult &&
@@ -253,7 +255,7 @@ function AssignmentDetailPage() {
         {/* Progress summary */}
         <div className="flex items-center gap-2 text-sm">
           <span className="text-muted-foreground">{t('studentAssignments.progress')}</span>
-          <span className="font-semibold text-foreground">{data.progressPercent ?? 0}%</span>
+          <span className="font-semibold text-foreground">{assignment.progressPercent ?? 0}%</span>
         </div>
       </div>
 
@@ -304,7 +306,7 @@ function AssignmentDetailPage() {
       {/* Tab Content */}
       {activeTab === 'timeline' && (
         <div className="border-t pt-6">
-          <CheckpointTimeline checkpoints={checkpoints} assignmentId={data.id} />
+          <CheckpointTimeline checkpoints={checkpoints} assignmentId={assignment.id} />
         </div>
       )}
 
@@ -317,7 +319,7 @@ function AssignmentDetailPage() {
               {t('consultations.logConsultation')}
             </h3>
             <ConsultationForm
-              assignmentId={data.id}
+              assignmentId={assignment.id}
               checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
               onSuccess={handleConsultationSuccess}
             />
@@ -339,9 +341,9 @@ function AssignmentDetailPage() {
               {t('extensions.requestTitle')}
             </h3>
             <ExtensionRequestForm
-              assignmentId={data.id}
-              maxExtensionDays={data.maxExtensionDays ?? 7}
-              maxTotalExtensions={data.maxTotalExtensions ?? 3}
+              assignmentId={assignment.id}
+              maxExtensionDays={assignment.maxExtensionDays ?? 7}
+              maxTotalExtensions={assignment.maxTotalExtensions ?? 3}
               checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
               onSuccess={handleExtensionSuccess}
             />

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CreateTemplateDialog } from '@/components/admin/templates/CreateTemplateDialog';
+import { serverError, ErrorCode } from '@/lib/errors';
 
 const mockFormMethods = vi.hoisted(() => ({
   register: vi.fn(),
@@ -359,7 +360,9 @@ describe('CreateTemplateDialog', () => {
   });
 
   it('server error displayed when onSubmit returns error', async () => {
-    const errorSubmit = vi.fn().mockResolvedValue({ error: 'Name already taken' });
+    const errorSubmit = vi
+      .fn()
+      .mockResolvedValue(serverError(ErrorCode.BAD_REQUEST, 'Name already taken'));
     const { container } = render(
       <CreateTemplateDialog
         open={true}
@@ -378,7 +381,9 @@ describe('CreateTemplateDialog', () => {
   });
 
   it('handleOpenChange clears server error on close', async () => {
-    const errorSubmit = vi.fn().mockResolvedValue({ error: 'Name already taken' });
+    const errorSubmit = vi
+      .fn()
+      .mockResolvedValue(serverError(ErrorCode.BAD_REQUEST, 'Name already taken'));
     const { container } = render(
       <CreateTemplateDialog
         open={true}

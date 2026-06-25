@@ -86,7 +86,7 @@
 
 **Objective:** Migrate all 24 server handlers from `{ error: '<string>' }` to `serverError(code, message, context?)`, wrap uncaught DB ops in try/catch, and update their unit tests.
 
-- [ ] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
+- [~] Task: Read `./spec.md` and `../../workflow.md` before starting this phase
     - [ ] Re-read the track specification for requirements context
     - [ ] Re-read the workflow for the TDD task lifecycle and phase completion protocol
 - [ ] Task: Migrate handlers and update tests (per file)

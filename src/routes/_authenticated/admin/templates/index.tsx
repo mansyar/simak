@@ -22,6 +22,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { RefreshButton } from '@/components/ui/refresh-button';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
+import { isServerError } from '@/lib/errors';
 
 const TemplateSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -49,9 +50,12 @@ function TemplatesPage() {
   const { t } = useI18n();
   const router = useRouter();
   const data = Route.useLoaderData();
-  const templates: TemplateRow[] = data?.templates ?? [];
-  const total = data?.total ?? 0;
-  const allTypes: string[] = data?.allTypes ?? [];
+  const listData = isServerError(data)
+    ? { templates: [], total: 0, allTypes: [] }
+    : (data ?? { templates: [], total: 0, allTypes: [] });
+  const templates: TemplateRow[] = listData.templates;
+  const total = listData.total;
+  const allTypes: string[] = listData.allTypes;
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -117,7 +121,7 @@ function TemplatesPage() {
   const handleDelete = async (template: TemplateRow) => {
     // First check if template is in use
     const fullTemplate = await getTemplateFn({ data: { id: template.id } });
-    const usageCount = fullTemplate?.assignmentCount ?? 0;
+    const usageCount = (isServerError(fullTemplate) ? 0 : fullTemplate?.assignmentCount) ?? 0;
     setDeletingTemplate({ id: template.id, usageCount });
     setIsDeleteDialogOpen(true);
   };
@@ -127,7 +131,14 @@ function TemplatesPage() {
     const result = await deleteTemplateFn({
       data: { id: deletingTemplate.id },
     });
-    if ('success' in result || ('error' in result && result.error === 'in_use')) {
+    if (
+      'success' in result ||
+      ('error' in result &&
+        typeof result.error === 'object' &&
+        result.error !== null &&
+        'message' in result.error &&
+        result.error.message === 'in_use')
+    ) {
       navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
     }
   };

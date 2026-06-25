@@ -7,6 +7,7 @@ import { sendInvitationEmail } from '../lib/email';
 import { logAuditEvent } from '../lib/audit';
 import { getSessionFromHeaders } from './auth';
 import { CREATION_ALLOWED_ROLES } from '../lib/role-permissions';
+import { serverError, ErrorCode } from '../lib/errors';
 import type { z } from 'zod';
 import type { BulkCreateUsersSchema, BulkCreateTemplatesSchema } from './bulk-import';
 
@@ -18,12 +19,12 @@ const BULK_USER_ROW_LIMIT = 500;
 export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const allowedRoles = CREATION_ALLOWED_ROLES[session.user.role];
   if (!allowedRoles) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { rows } = args.data;
@@ -44,90 +45,97 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
   const skipped: number[] = [];
   const errors: { row: number; email: string; reason: string }[] = [];
 
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
-    const rowIndex = i + 1;
+  try {
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const rowIndex = i + 1;
 
-    // Role-permission check
-    if (!allowedRoles.includes(row.role)) {
-      if (session.user.role === 'admin' && row.role === 'admin') {
-        errors.push({
-          row: rowIndex,
-          email: row.email,
-          reason: 'Admins cannot create other Admin accounts',
-        });
-      } else {
-        errors.push({ row: rowIndex, email: row.email, reason: 'Invalid role' });
+      // Role-permission check
+      if (!allowedRoles.includes(row.role)) {
+        if (session.user.role === 'admin' && row.role === 'admin') {
+          errors.push({
+            row: rowIndex,
+            email: row.email,
+            reason: 'Admins cannot create other Admin accounts',
+          });
+        } else {
+          errors.push({ row: rowIndex, email: row.email, reason: 'Invalid role' });
+        }
+        skipped.push(rowIndex);
+        continue;
       }
-      skipped.push(rowIndex);
-      continue;
-    }
 
-    // Email uniqueness check (excluding soft-deleted users per spec FR-1)
-    const existingUser = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(and(eq(users.email, row.email), isNull(users.deletedAt)))
-      .limit(1)
-      .then((rows) => rows[0]);
+      // Email uniqueness check (excluding soft-deleted users per spec FR-1)
+      const existingUser = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(and(eq(users.email, row.email), isNull(users.deletedAt)))
+        .limit(1)
+        .then((rows) => rows[0]);
 
-    if (existingUser) {
-      errors.push({ row: rowIndex, email: row.email, reason: 'Email already in use' });
-      skipped.push(rowIndex);
-      continue;
-    }
+      if (existingUser) {
+        errors.push({ row: rowIndex, email: row.email, reason: 'Email already in use' });
+        skipped.push(rowIndex);
+        continue;
+      }
 
-    // Create user
-    const userId = crypto.randomUUID();
-    const token = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      // Create user
+      const userId = crypto.randomUUID();
+      const token = crypto.randomUUID();
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-    await db.insert(users).values({
-      id: userId,
-      name: row.name,
-      email: row.email,
-      // Safe: Zod schema already validated role is one of 'admin' | 'instructor' | 'student'
-      role: row.role as 'admin' | 'instructor' | 'student',
-      locale: session.user.locale || 'en',
-    });
-
-    await db.insert(verification).values({
-      id: crypto.randomUUID(),
-      identifier: row.email,
-      value: token,
-      expiresAt,
-    });
-
-    created.push(rowIndex);
-
-    // Enqueue invitation email (non-blocking)
-    try {
-      await sendInvitationEmail({
-        email: row.email,
+      await db.insert(users).values({
+        id: userId,
         name: row.name,
-        token,
+        email: row.email,
+        // Safe: Zod schema already validated role is one of 'admin' | 'instructor' | 'student'
+        role: row.role as 'admin' | 'instructor' | 'student',
+        locale: session.user.locale || 'en',
       });
-    } catch {
-      // Email failure is non-fatal as per spec
-    }
-  }
 
-  // Audit log
-  if (created.length > 0) {
-    await logAuditEvent({
-      actorId: session.user.id,
-      action: 'user.bulk_created',
-      entityType: 'user',
-      entityId: session.user.id,
-      details: {
-        created: created.length,
-        skipped: skipped.length,
-        errors: errors.length,
-      },
+      await db.insert(verification).values({
+        id: crypto.randomUUID(),
+        identifier: row.email,
+        value: token,
+        expiresAt,
+      });
+
+      created.push(rowIndex);
+
+      // Enqueue invitation email (non-blocking)
+      try {
+        await sendInvitationEmail({
+          email: row.email,
+          name: row.name,
+          token,
+        });
+      } catch {
+        // Email failure is non-fatal as per spec
+      }
+    }
+
+    // Audit log
+    if (created.length > 0) {
+      await logAuditEvent({
+        actorId: session.user.id,
+        action: 'user.bulk_created',
+        entityType: 'user',
+        entityId: session.user.id,
+        details: {
+          created: created.length,
+          skipped: skipped.length,
+          errors: errors.length,
+        },
+      });
+    }
+
+    return { created: created.length, skipped: skipped.length, errors };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'bulkCreateUsersHandler',
     });
   }
-
-  return { created: created.length, skipped: skipped.length, errors };
 }
 
 const BULK_TEMPLATE_ROW_LIMIT = 500;
@@ -135,7 +143,7 @@ const BULK_TEMPLATE_ROW_LIMIT = 500;
 export async function bulkCreateTemplatesHandler(args: { data: BulkCreateTemplatesInput }) {
   const session = await getSessionFromHeaders();
   if (!session || (session.user.role !== 'admin' && session.user.role !== 'superadmin')) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { rows } = args.data;
@@ -170,79 +178,86 @@ export async function bulkCreateTemplatesHandler(args: { data: BulkCreateTemplat
   let skippedCount = 0;
   const errors: { templateName: string; reason: string }[] = [];
 
-  for (const [templateName, groupRows] of groups) {
-    // Validate group: consistent type
-    const types = new Set(groupRows.map((r) => r.type));
-    if (types.size > 1) {
-      errors.push({ templateName, reason: 'Inconsistent type across rows' });
-      skippedCount++;
-      continue;
+  try {
+    for (const [templateName, groupRows] of groups) {
+      // Validate group: consistent type
+      const types = new Set(groupRows.map((r) => r.type));
+      if (types.size > 1) {
+        errors.push({ templateName, reason: 'Inconsistent type across rows' });
+        skippedCount++;
+        continue;
+      }
+
+      // Validate group: all checkpoint names non-empty
+      const hasEmptyCheckpoint = groupRows.some(
+        (r) => !r.checkpointName || r.checkpointName.trim() === '',
+      );
+      if (hasEmptyCheckpoint) {
+        errors.push({ templateName, reason: 'Checkpoint name cannot be empty' });
+        skippedCount++;
+        continue;
+      }
+
+      // Validate group: at least one checkpoint
+      if (groupRows.length < 1) {
+        errors.push({ templateName, reason: 'Template must have at least one checkpoint' });
+        skippedCount++;
+        continue;
+      }
+
+      const type = groupRows[0].type;
+
+      // Create template + checkpoints in a single transaction (per-group atomicity)
+      try {
+        await db.transaction(async (tx) => {
+          const [inserted] = await tx
+            .insert(assignmentTemplates)
+            .values({
+              name: templateName,
+              type,
+              createdBy: session.user.id,
+            })
+            .returning({ id: assignmentTemplates.id })
+            .then((rows) => rows);
+
+          const checkpointRows = groupRows.map((cp, index) => ({
+            templateId: inserted.id,
+            name: cp.checkpointName,
+            order: index + 1,
+            minConsultations: cp.minConsultations ?? 0,
+            estimatedDuration: cp.estimatedDuration ?? 7,
+          }));
+
+          await tx.insert(templateCheckpoints).values(checkpointRows);
+        });
+
+        createdCount++;
+      } catch {
+        errors.push({ templateName, reason: 'Failed to create template' });
+        skippedCount++;
+      }
     }
 
-    // Validate group: all checkpoint names non-empty
-    const hasEmptyCheckpoint = groupRows.some(
-      (r) => !r.checkpointName || r.checkpointName.trim() === '',
-    );
-    if (hasEmptyCheckpoint) {
-      errors.push({ templateName, reason: 'Checkpoint name cannot be empty' });
-      skippedCount++;
-      continue;
-    }
-
-    // Validate group: at least one checkpoint
-    if (groupRows.length < 1) {
-      errors.push({ templateName, reason: 'Template must have at least one checkpoint' });
-      skippedCount++;
-      continue;
-    }
-
-    const type = groupRows[0].type;
-
-    // Create template + checkpoints in a single transaction (per-group atomicity)
-    try {
-      await db.transaction(async (tx) => {
-        const [inserted] = await tx
-          .insert(assignmentTemplates)
-          .values({
-            name: templateName,
-            type,
-            createdBy: session.user.id,
-          })
-          .returning({ id: assignmentTemplates.id })
-          .then((rows) => rows);
-
-        const checkpointRows = groupRows.map((cp, index) => ({
-          templateId: inserted.id,
-          name: cp.checkpointName,
-          order: index + 1,
-          minConsultations: cp.minConsultations ?? 0,
-          estimatedDuration: cp.estimatedDuration ?? 7,
-        }));
-
-        await tx.insert(templateCheckpoints).values(checkpointRows);
+    // Audit log
+    if (createdCount > 0) {
+      await logAuditEvent({
+        actorId: session.user.id,
+        action: 'template.bulk_created',
+        entityType: 'template',
+        entityId: session.user.id,
+        details: {
+          created: createdCount,
+          skipped: skippedCount,
+          errors: errors.length,
+        },
       });
-
-      createdCount++;
-    } catch {
-      errors.push({ templateName, reason: 'Failed to create template' });
-      skippedCount++;
     }
-  }
 
-  // Audit log
-  if (createdCount > 0) {
-    await logAuditEvent({
-      actorId: session.user.id,
-      action: 'template.bulk_created',
-      entityType: 'template',
-      entityId: session.user.id,
-      details: {
-        created: createdCount,
-        skipped: skippedCount,
-        errors: errors.length,
-      },
+    return { created: createdCount, skipped: skippedCount, errors };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'bulkCreateTemplatesHandler',
     });
   }
-
-  return { created: createdCount, skipped: skippedCount, errors };
 }

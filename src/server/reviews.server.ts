@@ -8,6 +8,7 @@ import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
+import { serverError, ErrorCode } from '../lib/errors';
 import { generatePresignedDownloadUrl } from '../lib/storage';
 import { calculateBreachDuration } from '../lib/sla';
 import {
@@ -41,85 +42,92 @@ const REVIEWABLE_STATES = ['submitted', 'under_review'] as const;
 export async function listPendingReviewsHandler(args: { data: ListPendingReviewsInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { page, limit, assignmentId } = args.data;
   const db = getDb();
 
-  // 1. Get instructor's assignment IDs
-  const assignmentConditions = [
-    eq(assignments.instructorId, session.user.id),
-    isNull(assignments.deletedAt),
-  ];
-  if (assignmentId) {
-    assignmentConditions.push(eq(assignments.id, assignmentId));
+  try {
+    // 1. Get instructor's assignment IDs
+    const assignmentConditions = [
+      eq(assignments.instructorId, session.user.id),
+      isNull(assignments.deletedAt),
+    ];
+    if (assignmentId) {
+      assignmentConditions.push(eq(assignments.id, assignmentId));
+    }
+
+    const instructorAssignments = await db
+      .select({ id: assignments.id })
+      .from(assignments)
+      .where(and(...assignmentConditions));
+
+    if (instructorAssignments.length === 0) {
+      return { items: [], total: 0 };
+    }
+
+    const assignmentIds = instructorAssignments.map((a) => a.id);
+
+    // 2. Get total count of pending checkpoints (submitted or under_review state)
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(checkpoints)
+      .where(
+        and(
+          inArray(checkpoints.assignmentId, assignmentIds),
+          sql`${checkpoints.state} IN ('submitted', 'under_review')`,
+        ),
+      );
+
+    // 3. Fetch pending submissions with DISTINCT ON to get latest per checkpoint
+    const pendingItems = await db
+      .select({
+        submissionId: submissions.id,
+        checkpointId: checkpoints.id,
+        checkpointName: checkpoints.name,
+        assignmentId: assignments.id,
+        assignmentTitle: assignments.title,
+        studentId: checkpoints.studentId,
+        studentName: users.name,
+        fileName: submissions.fileName,
+        fileSize: submissions.fileSize,
+        fileKey: submissions.fileKey,
+        version: submissions.version,
+        uploadedAt: submissions.uploadedAt,
+        checkpointState: checkpoints.state,
+        checkpointUpdatedAt: checkpoints.updatedAt,
+      })
+      .from(submissions)
+      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+      .innerJoin(users, eq(checkpoints.studentId, users.id))
+      .where(
+        and(
+          sql`${submissions.id} IN (
+            SELECT DISTINCT ON (s2.checkpoint_id) s2.id
+            FROM submissions s2
+            WHERE s2.checkpoint_id = ${submissions.checkpointId}
+            ORDER BY s2.checkpoint_id, s2.version DESC
+          )`,
+          inArray(checkpoints.assignmentId, assignmentIds),
+          sql`${checkpoints.state} IN ('submitted', 'under_review')`,
+        ),
+      )
+      .orderBy(sql`${submissions.uploadedAt} ASC`)
+      .limit(limit)
+      .offset((page - 1) * limit);
+
+    return {
+      items: pendingItems,
+      total: Number(count),
+    };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listPendingReviewsHandler',
+    });
   }
-
-  const instructorAssignments = await db
-    .select({ id: assignments.id })
-    .from(assignments)
-    .where(and(...assignmentConditions));
-
-  if (instructorAssignments.length === 0) {
-    return { items: [], total: 0 };
-  }
-
-  const assignmentIds = instructorAssignments.map((a) => a.id);
-
-  // 2. Get total count of pending checkpoints (submitted or under_review state)
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(checkpoints)
-    .where(
-      and(
-        inArray(checkpoints.assignmentId, assignmentIds),
-        sql`${checkpoints.state} IN ('submitted', 'under_review')`,
-      ),
-    );
-
-  // 3. Fetch pending submissions with DISTINCT ON to get latest per checkpoint
-  const pendingItems = await db
-    .select({
-      submissionId: submissions.id,
-      checkpointId: checkpoints.id,
-      checkpointName: checkpoints.name,
-      assignmentId: assignments.id,
-      assignmentTitle: assignments.title,
-      studentId: checkpoints.studentId,
-      studentName: users.name,
-      fileName: submissions.fileName,
-      fileSize: submissions.fileSize,
-      fileKey: submissions.fileKey,
-      version: submissions.version,
-      uploadedAt: submissions.uploadedAt,
-      checkpointState: checkpoints.state,
-      checkpointUpdatedAt: checkpoints.updatedAt,
-    })
-    .from(submissions)
-    .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-    .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-    .innerJoin(users, eq(checkpoints.studentId, users.id))
-    .where(
-      and(
-        sql`${submissions.id} IN (
-          SELECT DISTINCT ON (s2.checkpoint_id) s2.id
-          FROM submissions s2
-          WHERE s2.checkpoint_id = ${submissions.checkpointId}
-          ORDER BY s2.checkpoint_id, s2.version DESC
-        )`,
-        inArray(checkpoints.assignmentId, assignmentIds),
-        sql`${checkpoints.state} IN ('submitted', 'under_review')`,
-      ),
-    )
-    .orderBy(sql`${submissions.uploadedAt} ASC`)
-    .limit(limit)
-    .offset((page - 1) * limit);
-
-  return {
-    items: pendingItems,
-    total: Number(count),
-  };
 }
 
 /**
@@ -130,73 +138,80 @@ export async function listPendingReviewsHandler(args: { data: ListPendingReviews
 export async function getReviewDetailHandler(args: { data: GetReviewDetailInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { submissionId } = args.data;
   const db = getDb();
 
-  // 1. Fetch submission with checkpoint, assignment, and user info
-  const [submission] = await db
-    .select({
-      submissionId: submissions.id,
-      checkpointId: checkpoints.id,
-      checkpointName: checkpoints.name,
-      assignmentId: assignments.id,
-      assignmentTitle: assignments.title,
-      instructorId: assignments.instructorId,
-      studentId: checkpoints.studentId,
-      studentName: users.name,
-      fileKey: submissions.fileKey,
-      fileName: submissions.fileName,
-      fileSize: submissions.fileSize,
-      version: submissions.version,
-      uploadedAt: submissions.uploadedAt,
-      checkpointState: checkpoints.state,
-      checkpointUpdatedAt: checkpoints.updatedAt,
-    })
-    .from(submissions)
-    .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-    .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-    .innerJoin(users, eq(checkpoints.studentId, users.id))
-    .where(
-      and(
-        eq(submissions.id, submissionId),
-        eq(assignments.instructorId, session.user.id),
-        isNull(assignments.deletedAt),
-      ),
-    )
-    .limit(1);
+  try {
+    // 1. Fetch submission with checkpoint, assignment, and user info
+    const [submission] = await db
+      .select({
+        submissionId: submissions.id,
+        checkpointId: checkpoints.id,
+        checkpointName: checkpoints.name,
+        assignmentId: assignments.id,
+        assignmentTitle: assignments.title,
+        instructorId: assignments.instructorId,
+        studentId: checkpoints.studentId,
+        studentName: users.name,
+        fileKey: submissions.fileKey,
+        fileName: submissions.fileName,
+        fileSize: submissions.fileSize,
+        version: submissions.version,
+        uploadedAt: submissions.uploadedAt,
+        checkpointState: checkpoints.state,
+        checkpointUpdatedAt: checkpoints.updatedAt,
+      })
+      .from(submissions)
+      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+      .innerJoin(users, eq(checkpoints.studentId, users.id))
+      .where(
+        and(
+          eq(submissions.id, submissionId),
+          eq(assignments.instructorId, session.user.id),
+          isNull(assignments.deletedAt),
+        ),
+      )
+      .limit(1);
 
-  if (!submission) {
-    return { error: 'Submission not found' };
+    if (!submission) {
+      return serverError(ErrorCode.NOT_FOUND, 'Submission not found');
+    }
+
+    // 2. Generate presigned download URL
+    const downloadUrl = await generatePresignedDownloadUrl({ key: submission.fileKey });
+
+    // 3. Fetch past review history for this checkpoint
+    const reviewHistory = await db
+      .select({
+        id: reviews.id,
+        decision: reviews.decision,
+        comment: reviews.comment,
+        instructorName: users.name,
+        createdAt: reviews.createdAt,
+      })
+      .from(reviews)
+      .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
+      .innerJoin(users, eq(reviews.instructorId, users.id))
+      .where(eq(submissions.checkpointId, submission.checkpointId))
+      .orderBy(desc(reviews.createdAt));
+
+    return {
+      submission: {
+        ...submission,
+        downloadUrl,
+      },
+      reviewHistory,
+    };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getReviewDetailHandler',
+    });
   }
-
-  // 2. Generate presigned download URL
-  const downloadUrl = await generatePresignedDownloadUrl({ key: submission.fileKey });
-
-  // 3. Fetch past review history for this checkpoint
-  const reviewHistory = await db
-    .select({
-      id: reviews.id,
-      decision: reviews.decision,
-      comment: reviews.comment,
-      instructorName: users.name,
-      createdAt: reviews.createdAt,
-    })
-    .from(reviews)
-    .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
-    .innerJoin(users, eq(reviews.instructorId, users.id))
-    .where(eq(submissions.checkpointId, submission.checkpointId))
-    .orderBy(desc(reviews.createdAt));
-
-  return {
-    submission: {
-      ...submission,
-      downloadUrl,
-    },
-    reviewHistory,
-  };
 }
 
 /**
@@ -211,72 +226,75 @@ export async function getReviewDetailHandler(args: { data: GetReviewDetailInput 
 export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { submissionId, decision, comment, feedbackFileKey, revisionDeadline } = args.data;
   const db = getDb();
 
-  // 1. Verify ownership — submission belongs to an assignment owned by this instructor
-  const [submission] = await db
-    .select({
-      checkpointId: checkpoints.id,
-      checkpointState: checkpoints.state,
-      checkpointName: checkpoints.name,
-      assignmentId: assignments.id,
-      assignmentTitle: assignments.title,
-      instructorId: assignments.instructorId,
-      studentId: checkpoints.studentId,
-      studentName: users.name,
-      checkpointUpdatedAt: checkpoints.updatedAt,
-      checkpointDueDate: checkpoints.dueDate,
-      checkpointOrder: checkpoints.order,
-      finalDeadline: assignments.finalDeadline,
-    })
-    .from(submissions)
-    .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-    .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-    .innerJoin(users, eq(checkpoints.studentId, users.id))
-    .where(
-      and(
-        eq(submissions.id, submissionId),
-        eq(assignments.instructorId, session.user.id),
-        isNull(assignments.deletedAt),
-      ),
-    )
-    .limit(1);
-
-  if (!submission) {
-    return { error: 'Submission not found' };
-  }
-
-  // 2. Validate checkpoint is in reviewable state
-  if (
-    !REVIEWABLE_STATES.includes(submission.checkpointState as (typeof REVIEWABLE_STATES)[number])
-  ) {
-    return { error: 'Checkpoint is not in a reviewable state' };
-  }
-
-  // 3. If revise, revision deadline is required
-  if (decision === 'revise' && !revisionDeadline) {
-    return { error: 'Revision deadline is required for revise decision' };
-  }
-
-  // 4. Execute in transaction
-  let breachDays = 0;
-  const slaFields: SLASubmissionFields = {
-    checkpointId: submission.checkpointId,
-    checkpointDueDate: submission.checkpointDueDate,
-    checkpointName: submission.checkpointName ?? '',
-    checkpointOrder: submission.checkpointOrder,
-    assignmentId: submission.assignmentId,
-    assignmentTitle: submission.assignmentTitle ?? '',
-    studentId: submission.studentId,
-    studentName: submission.studentName ?? '',
-    finalDeadline: submission.finalDeadline,
-  };
-
   try {
+    // 1. Verify ownership — submission belongs to an assignment owned by this instructor
+    const [submission] = await db
+      .select({
+        checkpointId: checkpoints.id,
+        checkpointState: checkpoints.state,
+        checkpointName: checkpoints.name,
+        assignmentId: assignments.id,
+        assignmentTitle: assignments.title,
+        instructorId: assignments.instructorId,
+        studentId: checkpoints.studentId,
+        studentName: users.name,
+        checkpointUpdatedAt: checkpoints.updatedAt,
+        checkpointDueDate: checkpoints.dueDate,
+        checkpointOrder: checkpoints.order,
+        finalDeadline: assignments.finalDeadline,
+      })
+      .from(submissions)
+      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+      .innerJoin(users, eq(checkpoints.studentId, users.id))
+      .where(
+        and(
+          eq(submissions.id, submissionId),
+          eq(assignments.instructorId, session.user.id),
+          isNull(assignments.deletedAt),
+        ),
+      )
+      .limit(1);
+
+    if (!submission) {
+      return serverError(ErrorCode.NOT_FOUND, 'Submission not found');
+    }
+
+    // 2. Validate checkpoint is in reviewable state
+    if (
+      !REVIEWABLE_STATES.includes(submission.checkpointState as (typeof REVIEWABLE_STATES)[number])
+    ) {
+      return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in a reviewable state');
+    }
+
+    // 3. If revise, revision deadline is required
+    if (decision === 'revise' && !revisionDeadline) {
+      return serverError(
+        ErrorCode.BAD_REQUEST,
+        'Revision deadline is required for revise decision',
+      );
+    }
+
+    // 4. Execute in transaction
+    let breachDays = 0;
+    const slaFields: SLASubmissionFields = {
+      checkpointId: submission.checkpointId,
+      checkpointDueDate: submission.checkpointDueDate,
+      checkpointName: submission.checkpointName ?? '',
+      checkpointOrder: submission.checkpointOrder,
+      assignmentId: submission.assignmentId,
+      assignmentTitle: submission.assignmentTitle ?? '',
+      studentId: submission.studentId,
+      studentName: submission.studentName ?? '',
+      finalDeadline: submission.finalDeadline,
+    };
+
     await db.transaction(async (tx) => {
       // 4a. Insert review record
       await tx.insert(reviews).values({
@@ -391,8 +409,10 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
 
     return { success: true };
   } catch (err) {
-    console.error('Failed to submit review:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'submitReviewHandler',
+    });
   }
 }
 

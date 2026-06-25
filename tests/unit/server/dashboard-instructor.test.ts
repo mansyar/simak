@@ -46,13 +46,13 @@ describe('getInstructorDashboardDataHandler', () => {
   it('should reject if unauthorized (no session)', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
     const result = await getInstructorDashboardDataHandler();
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if not an instructor', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
     const result = await getInstructorDashboardDataHandler();
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should return empty dashboard when instructor has no assignments', async () => {
@@ -342,7 +342,7 @@ describe('getInstructorDashboardDataHandler', () => {
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const result = await getInstructorDashboardDataHandler();
-    expect(result).toEqual({ error: 'Internal Server Error' });
+    expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     consoleSpy.mockRestore();
   });
 });

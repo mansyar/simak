@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { CreateTemplateDialog } from '@/components/admin/templates/CreateTemplateDialog';
 // Direct import to test Zod schema validation
 import { CreateTemplateSchema } from '@/server/templates';
+import { serverError, ErrorCode } from '@/lib/errors';
 
 // Minimal react-hook-form mock
 vi.mock('react-hook-form', () => ({
@@ -216,7 +217,9 @@ describe('CreateTemplateDialog', () => {
   });
 
   it('should show server error on submit failure', async () => {
-    const submitFn = vi.fn().mockResolvedValue({ error: 'Server error occurred' });
+    const submitFn = vi
+      .fn()
+      .mockResolvedValue(serverError(ErrorCode.BAD_REQUEST, 'Server error occurred'));
     const onClose = vi.fn();
     const onSucceed = vi.fn();
     const { container } = render(

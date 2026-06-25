@@ -77,7 +77,7 @@ describe('listActiveSessionsHandler', () => {
   it('should return unauthorized when no session', async () => {
     mockGetSessionFromHeaders.mockResolvedValue(null);
     const result = await listActiveSessionsHandler();
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should return all sessions for current user', async () => {
@@ -95,7 +95,7 @@ describe('listActiveSessionsHandler', () => {
     });
     mockGetDb.mockReturnValue({ select: mockSelect } as any);
 
-    const result = await listActiveSessionsHandler();
+    const result = (await listActiveSessionsHandler()) as any;
 
     expect(result.sessions).toHaveLength(2);
     expect(result.total).toBe(2);
@@ -112,7 +112,7 @@ describe('listActiveSessionsHandler', () => {
     });
     mockGetDb.mockReturnValue({ select: mockSelect } as any);
 
-    const result = await listActiveSessionsHandler();
+    const result = (await listActiveSessionsHandler()) as any;
 
     expect(result.sessions).toEqual([]);
     expect(result.total).toBe(0);
@@ -311,7 +311,7 @@ describe('revokeSessionHandler', () => {
     const result = await revokeSessionHandler({
       data: { sessionId: 'session-other' },
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should revoke a specific session', async () => {
@@ -340,7 +340,9 @@ describe('revokeSessionHandler', () => {
     const result = await revokeSessionHandler({
       data: { sessionId: 'session-current' },
     });
-    expect(result).toEqual({ error: 'Cannot revoke current session' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Cannot revoke current session' },
+    });
   });
 
   it('should handle revocation failure', async () => {
@@ -354,7 +356,7 @@ describe('revokeSessionHandler', () => {
       data: { sessionId: 'session-other' },
     });
 
-    expect(result).toEqual({ error: 'Failed to revoke session' });
+    expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
   });
 });
 
@@ -366,7 +368,7 @@ describe('revokeAllOtherSessionsHandler', () => {
   it('should return unauthorized when no session', async () => {
     mockGetSessionFromHeaders.mockResolvedValue(null);
     const result = await revokeAllOtherSessionsHandler();
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should revoke all sessions except current', async () => {
@@ -395,7 +397,7 @@ describe('revokeAllOtherSessionsHandler', () => {
     });
     mockGetDb.mockReturnValue({ delete: mockDelete } as any);
 
-    const result = await revokeAllOtherSessionsHandler();
+    const result = (await revokeAllOtherSessionsHandler()) as any;
 
     expect(result.success).toBe(true);
   });
@@ -409,6 +411,6 @@ describe('revokeAllOtherSessionsHandler', () => {
 
     const result = await revokeAllOtherSessionsHandler();
 
-    expect(result).toEqual({ error: 'Failed to revoke sessions' });
+    expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
   });
 });

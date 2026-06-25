@@ -630,6 +630,9 @@ export type Translation = {
     unauthorized: string
     forbidden: string
     validation: string
+    badRequest: string
+    unprocessable: string
+    tooManyRequests: string
     conflict: string
     internal: string
     network: string

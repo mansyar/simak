@@ -24,6 +24,7 @@ import { AlertBanner } from '@/components/ui/alert-banner';
 import { Plus, Upload } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
+import { isServerError } from '@/lib/errors';
 
 const UserSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -49,7 +50,8 @@ export const Route = createFileRoute('/_authenticated/admin/users/')({
 
 function UsersPage() {
   const { t } = useI18n();
-  const { users, total } = Route.useLoaderData();
+  const data = Route.useLoaderData();
+  const { users, total } = isServerError(data) ? { users: [], total: 0 } : data;
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const router = useRouter();
@@ -106,18 +108,18 @@ function UsersPage() {
 
   const handleGenerateLink = async (user: UserRow) => {
     const result = await generateSetupLinkFn({ data: { id: user.id } });
-    if ('url' in result) {
+    if (isServerError(result)) {
+      setInlineError(result.error.message);
+    } else {
       setSetupLinkUrl(result.url ?? '');
       setSetupLinkUser(user);
-    } else {
-      setInlineError(result.error ?? t('common.error'));
     }
   };
 
   const handleCreateUser = async (values: z.infer<typeof CreateUserSchema>) => {
     const result = await createUserFn({ data: values });
-    if (result.error) {
-      setInlineError(`${t('common.error')}: ${result.error}`);
+    if (isServerError(result)) {
+      setInlineError(`${t('common.error')}: ${result.error.message}`);
     } else {
       navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
     }
@@ -125,8 +127,8 @@ function UsersPage() {
 
   const handleUpdateUser = async (id: string, values: z.infer<typeof UpdateUserSchema>) => {
     const result = await updateUserFn({ data: { ...values, id } });
-    if (result.error) {
-      setInlineError(`${t('common.error')}: ${result.error}`);
+    if (isServerError(result)) {
+      setInlineError(`${t('common.error')}: ${result.error.message}`);
     } else {
       navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
     }

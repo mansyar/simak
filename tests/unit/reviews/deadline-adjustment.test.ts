@@ -218,6 +218,6 @@ describe('Deadline adjustment in submitReview', () => {
       data: { submissionId: 1, decision: 'pass', comment: '' },
     });
 
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 });

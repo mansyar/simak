@@ -5,6 +5,7 @@ import { assignments, assignmentStudents, checkpoints } from '../db/schema/assig
 import { submissions } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
+import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '../lib/types';
 
 function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
@@ -17,7 +18,7 @@ function isInstructor(session: NonNullableSession | null): session is NonNullabl
 export async function getInstructorDashboardDataHandler() {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const db = getDb();
@@ -204,7 +205,9 @@ export async function getInstructorDashboardDataHandler() {
       assignments: assignmentsWithDetails,
     };
   } catch (err) {
-    console.error('Failed to get instructor dashboard data:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getInstructorDashboardDataHandler',
+    });
   }
 }

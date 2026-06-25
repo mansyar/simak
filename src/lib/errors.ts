@@ -1,10 +1,16 @@
-export type ErrorCode =
-  | 'UNAUTHORIZED'
-  | 'FORBIDDEN'
-  | 'NOT_FOUND'
-  | 'VALIDATION'
-  | 'CONFLICT'
-  | 'INTERNAL';
+export const ErrorCode = {
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  NOT_FOUND: 'NOT_FOUND',
+  VALIDATION: 'VALIDATION',
+  BAD_REQUEST: 'BAD_REQUEST',
+  UNPROCESSABLE: 'UNPROCESSABLE',
+  TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
+  CONFLICT: 'CONFLICT',
+  INTERNAL: 'INTERNAL',
+} as const;
+
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 
 export type ServerError = {
   error: {
@@ -12,6 +18,16 @@ export type ServerError = {
     message: string;
   };
 };
+
+export function isServerError(result: unknown): result is ServerError {
+  return (
+    typeof result === 'object' &&
+    result !== null &&
+    'error' in result &&
+    typeof (result as ServerError).error === 'object' &&
+    typeof (result as ServerError).error.message === 'string'
+  );
+}
 
 export type ErrorContext = {
   cause?: unknown;

@@ -161,7 +161,7 @@ describe('extendDeadlineHandler', () => {
 
     const result = await runHandlerWithResult([], { checkpointId: 999, newDueDate: futureDate });
 
-    expect(result).toEqual({ error: 'Checkpoint not found' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
   });
 
   it('should return error if non-owner instructor tries to extend', async () => {
@@ -170,7 +170,7 @@ describe('extendDeadlineHandler', () => {
     // Empty result simulates both not-found and non-ownership (same behavior)
     const result = await runHandlerWithResult([], { checkpointId: 200, newDueDate: futureDate });
 
-    expect(result).toEqual({ error: 'Checkpoint not found' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
   });
 
   it('should reject non-instructor users', async () => {
@@ -180,7 +180,7 @@ describe('extendDeadlineHandler', () => {
       data: { checkpointId: 100, newDueDate: futureDate },
     });
 
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject unauthenticated users', async () => {
@@ -190,7 +190,7 @@ describe('extendDeadlineHandler', () => {
       data: { checkpointId: 100, newDueDate: futureDate },
     });
 
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should extend any checkpoint regardless of state', async () => {

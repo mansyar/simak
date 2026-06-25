@@ -3,6 +3,7 @@ import { eq, and, desc, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
+import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -34,7 +35,7 @@ function isAuthenticated(session: NonNullableSession | null): session is NonNull
 export async function createNotificationHandler(args: { data: CreateNotificationInput }) {
   const session = await getSessionFromHeaders();
   if (!isAdmin(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { userId, type, title, message, channel, metadata } = args.data;
@@ -55,8 +56,10 @@ export async function createNotificationHandler(args: { data: CreateNotification
 
     return { notification: notification as never };
   } catch (err) {
-    console.error('Failed to create notification:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'createNotificationHandler',
+    });
   }
 }
 
@@ -67,7 +70,7 @@ export async function createNotificationHandler(args: { data: CreateNotification
 export async function listNotificationsHandler(args: { data: ListNotificationsInput }) {
   const session = await getSessionFromHeaders();
   if (!isAuthenticated(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { page, limit, type } = args.data;
@@ -100,8 +103,10 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
       total: Number(count),
     };
   } catch (err) {
-    console.error('Failed to list notifications:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listNotificationsHandler',
+    });
   }
 }
 
@@ -114,7 +119,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
 export async function markReadHandler(args: { data: MarkReadInput }) {
   const session = await getSessionFromHeaders();
   if (!isAuthenticated(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { notificationId } = args.data;
@@ -128,15 +133,17 @@ export async function markReadHandler(args: { data: MarkReadInput }) {
       .where(and(eq(notifications.id, notificationId), eq(notifications.userId, session.user.id)));
 
     if (!existing) {
-      return { error: 'Notification not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Notification not found');
     }
 
     await db.update(notifications).set({ read: true }).where(eq(notifications.id, notificationId));
 
     return { success: true };
   } catch (err) {
-    console.error('Failed to mark notification as read:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'markReadHandler',
+    });
   }
 }
 
@@ -146,7 +153,7 @@ export async function markReadHandler(args: { data: MarkReadInput }) {
 export async function markAllReadHandler(_args: { data: MarkAllReadInput }) {
   const session = await getSessionFromHeaders();
   if (!isAuthenticated(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const db = getDb();
@@ -159,8 +166,10 @@ export async function markAllReadHandler(_args: { data: MarkAllReadInput }) {
 
     return { success: true };
   } catch (err) {
-    console.error('Failed to mark all notifications as read:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'markAllReadHandler',
+    });
   }
 }
 
@@ -170,7 +179,7 @@ export async function markAllReadHandler(_args: { data: MarkAllReadInput }) {
 export async function getUnreadCountHandler(_args: { data: GetUnreadCountInput }) {
   const session = await getSessionFromHeaders();
   if (!isAuthenticated(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const db = getDb();
@@ -183,7 +192,9 @@ export async function getUnreadCountHandler(_args: { data: GetUnreadCountInput }
 
     return { count: Number(count) };
   } catch (err) {
-    console.error('Failed to get unread count:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getUnreadCountHandler',
+    });
   }
 }

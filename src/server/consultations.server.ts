@@ -7,6 +7,7 @@ import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
+import { serverError, ErrorCode } from '../lib/errors';
 import { verifyAssignmentAccess } from './ownership';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -41,7 +42,7 @@ function isInstructor(session: NonNullableSession | null): session is NonNullabl
 export async function logConsultationHandler(args: { data: LogConsultationInput }) {
   const session = await getSessionFromHeaders();
   if (!isStudent(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { checkpointId, sessionType, externalConsultantName, notes } = args.data;
@@ -70,7 +71,7 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
       .limit(1);
 
     if (!checkpoint) {
-      return { error: 'Checkpoint not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
     }
 
     // 2. Insert consultation record with pending status
@@ -104,8 +105,10 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
 
     return { consultation: { id: inserted.id } };
   } catch (err) {
-    console.error('Failed to log consultation:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'logConsultationHandler',
+    });
   }
 }
 
@@ -116,7 +119,7 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
 export async function listConsultationsHandler(args: { data: ListConsultationsInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { assignmentId, checkpointId } = args.data;
@@ -158,8 +161,10 @@ export async function listConsultationsHandler(args: { data: ListConsultationsIn
 
     return { consultations: items };
   } catch (err) {
-    console.error('Failed to list consultations:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listConsultationsHandler',
+    });
   }
 }
 
@@ -170,7 +175,7 @@ export async function listConsultationsHandler(args: { data: ListConsultationsIn
 export async function getConsultationDetailHandler(args: { data: GetConsultationDetailInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { consultationId } = args.data;
@@ -209,13 +214,15 @@ export async function getConsultationDetailHandler(args: { data: GetConsultation
       .limit(1);
 
     if (!consultation) {
-      return { error: 'Consultation not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Consultation not found');
     }
 
     return { consultation };
   } catch (err) {
-    console.error('Failed to get consultation detail:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getConsultationDetailHandler',
+    });
   }
 }
 
@@ -228,7 +235,7 @@ export async function listPendingConsultationsHandler(args: {
 }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { assignmentId } = args.data;
@@ -249,7 +256,7 @@ export async function listPendingConsultationsHandler(args: {
       .limit(1);
 
     if (!assignment) {
-      return { error: 'Assignment not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
     }
 
     const items = await db
@@ -272,8 +279,10 @@ export async function listPendingConsultationsHandler(args: {
 
     return { consultations: items };
   } catch (err) {
-    console.error('Failed to list pending consultations:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listPendingConsultationsHandler',
+    });
   }
 }
 
@@ -284,7 +293,7 @@ export async function listPendingConsultationsHandler(args: {
 export async function verifyConsultationHandler(args: { data: VerifyConsultationInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { consultationId } = args.data;
@@ -312,11 +321,11 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
       .limit(1);
 
     if (!consultation) {
-      return { error: 'Consultation not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Consultation not found');
     }
 
     if (consultation.status !== 'pending') {
-      return { error: 'Consultation is not in pending state' };
+      return serverError(ErrorCode.BAD_REQUEST, 'Consultation is not in pending state');
     }
 
     // 2. Update status to verified
@@ -352,8 +361,10 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
 
     return { success: true };
   } catch (err) {
-    console.error('Failed to verify consultation:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'verifyConsultationHandler',
+    });
   }
 }
 
@@ -363,7 +374,7 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
 export async function rejectConsultationHandler(args: { data: RejectConsultationInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { consultationId, reason } = args.data;
@@ -391,11 +402,11 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
       .limit(1);
 
     if (!consultation) {
-      return { error: 'Consultation not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Consultation not found');
     }
 
     if (consultation.status !== 'pending') {
-      return { error: 'Consultation is not in pending state' };
+      return serverError(ErrorCode.BAD_REQUEST, 'Consultation is not in pending state');
     }
 
     // 2. Update status to rejected with reason
@@ -433,8 +444,10 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
 
     return { success: true };
   } catch (err) {
-    console.error('Failed to reject consultation:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'rejectConsultationHandler',
+    });
   }
 }
 

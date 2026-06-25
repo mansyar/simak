@@ -6,6 +6,7 @@ import { submissions, reviews } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { verifyCheckpointAccess } from './ownership';
+import { serverError, ErrorCode } from '../lib/errors';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type { OpenForReviewSchema, GetLatestReviewSchema } from './reviews';
@@ -24,48 +25,55 @@ function isStudent(session: NonNullableSession | null): session is NonNullableSe
 export async function openForReviewHandler(args: { data: OpenForReviewInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { submissionId } = args.data;
   const db = getDb();
 
-  // 1. Verify submission exists, get its checkpoint and assignment
-  const [submission] = await db
-    .select({
-      checkpointId: checkpoints.id,
-      checkpointState: checkpoints.state,
-      assignmentId: assignments.id,
-      instructorId: assignments.instructorId,
-    })
-    .from(submissions)
-    .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-    .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-    .where(
-      and(
-        eq(submissions.id, submissionId),
-        eq(assignments.instructorId, session.user.id),
-        isNull(assignments.deletedAt),
-      ),
-    )
-    .limit(1);
+  try {
+    // 1. Verify submission exists, get its checkpoint and assignment
+    const [submission] = await db
+      .select({
+        checkpointId: checkpoints.id,
+        checkpointState: checkpoints.state,
+        assignmentId: assignments.id,
+        instructorId: assignments.instructorId,
+      })
+      .from(submissions)
+      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+      .where(
+        and(
+          eq(submissions.id, submissionId),
+          eq(assignments.instructorId, session.user.id),
+          isNull(assignments.deletedAt),
+        ),
+      )
+      .limit(1);
 
-  if (!submission) {
-    return { error: 'Submission not found' };
+    if (!submission) {
+      return serverError(ErrorCode.NOT_FOUND, 'Submission not found');
+    }
+
+    // 2. Validates checkpoint is in submitted state
+    if (submission.checkpointState !== 'submitted') {
+      return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in submittable state');
+    }
+
+    // 3. Transition to under_review
+    await db
+      .update(checkpoints)
+      .set({ state: 'under_review', updatedAt: new Date() })
+      .where(eq(checkpoints.id, submission.checkpointId));
+
+    return { success: true };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'openForReviewHandler',
+    });
   }
-
-  // 2. Validates checkpoint is in submitted state
-  if (submission.checkpointState !== 'submitted') {
-    return { error: 'Checkpoint is not in submittable state' };
-  }
-
-  // 3. Transition to under_review
-  await db
-    .update(checkpoints)
-    .set({ state: 'under_review', updatedAt: new Date() })
-    .where(eq(checkpoints.id, submission.checkpointId));
-
-  return { success: true };
 }
 
 /**
@@ -75,33 +83,40 @@ export async function openForReviewHandler(args: { data: OpenForReviewInput }) {
 export async function getLatestReviewHandler(args: { data: GetLatestReviewInput }) {
   const session = await getSessionFromHeaders();
   if (!isStudent(session) && !isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { checkpointId } = args.data;
   const db = getDb();
 
-  // Ownership check: verify the checkpoint belongs to this user
-  const accessError = await verifyCheckpointAccess(db, checkpointId, session);
-  if (accessError) return accessError;
+  try {
+    // Ownership check: verify the checkpoint belongs to this user
+    const accessError = await verifyCheckpointAccess(db, checkpointId, session);
+    if (accessError) return accessError;
 
-  // Fetch the most recent review for the checkpoint's latest submission
-  const [latestReview] = await db
-    .select({
-      id: reviews.id,
-      decision: reviews.decision,
-      comment: reviews.comment,
-      instructorName: users.name,
-      createdAt: reviews.createdAt,
-      feedbackFileKey: reviews.feedbackFileKey,
-      revisionDeadline: reviews.revisionDeadline,
-    })
-    .from(reviews)
-    .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
-    .innerJoin(users, eq(reviews.instructorId, users.id))
-    .where(eq(submissions.checkpointId, checkpointId))
-    .orderBy(desc(reviews.createdAt))
-    .limit(1);
+    // Fetch the most recent review for the checkpoint's latest submission
+    const [latestReview] = await db
+      .select({
+        id: reviews.id,
+        decision: reviews.decision,
+        comment: reviews.comment,
+        instructorName: users.name,
+        createdAt: reviews.createdAt,
+        feedbackFileKey: reviews.feedbackFileKey,
+        revisionDeadline: reviews.revisionDeadline,
+      })
+      .from(reviews)
+      .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
+      .innerJoin(users, eq(reviews.instructorId, users.id))
+      .where(eq(submissions.checkpointId, checkpointId))
+      .orderBy(desc(reviews.createdAt))
+      .limit(1);
 
-  return { review: latestReview ?? null };
+    return { review: latestReview ?? null };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getLatestReviewHandler',
+    });
+  }
 }

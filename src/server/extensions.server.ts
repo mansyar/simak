@@ -6,6 +6,7 @@ import { extensionRequests } from '../db/schema/extensions';
 import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
+import { serverError, ErrorCode } from '../lib/errors';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -79,7 +80,7 @@ async function countActiveExtensionRequests(
 export async function requestExtensionHandler(args: { data: RequestExtensionInput }) {
   const session = await getSessionFromHeaders();
   if (!isStudent(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { assignmentId, checkpointId, category, reason, extensionDays } = args.data;
@@ -99,7 +100,7 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
       .limit(1);
 
     if (!enrollment) {
-      return { error: 'Assignment not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
     }
 
     // 2. Fetch assignment caps and instructor
@@ -114,7 +115,7 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
       .limit(1);
 
     if (!assignment) {
-      return { error: 'Assignment not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
     }
 
     const maxDays = assignment.maxExtensionDays ?? 7;
@@ -122,15 +123,19 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
 
     // 3. Validate extension days against assignment cap
     if (extensionDays > maxDays) {
-      return { error: `Extension days cannot exceed ${maxDays} for this assignment` };
+      return serverError(
+        ErrorCode.BAD_REQUEST,
+        `Extension days cannot exceed ${maxDays} for this assignment`,
+      );
     }
 
     // 4. Validate total extension count cap
     const activeCount = await countActiveExtensionRequests(db, assignmentId, session.user.id);
     if (activeCount >= maxExtensions) {
-      return {
-        error: `Maximum ${maxExtensions} extension(s) allowed for this assignment. You have used ${activeCount}.`,
-      };
+      return serverError(
+        ErrorCode.BAD_REQUEST,
+        `Maximum ${maxExtensions} extension(s) allowed for this assignment. You have used ${activeCount}.`,
+      );
     }
 
     // 5. Resolve checkpoint: use provided or find active
@@ -138,7 +143,7 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
     if (!targetCheckpointId) {
       const active = await findActiveCheckpoint(db, assignmentId, session.user.id);
       if (!active) {
-        return { error: 'No active checkpoint found to extend' };
+        return serverError(ErrorCode.BAD_REQUEST, 'No active checkpoint found to extend');
       }
       targetCheckpointId = active.id;
     }
@@ -157,7 +162,7 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
       .limit(1);
 
     if (!targetCp) {
-      return { error: 'Checkpoint not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
     }
 
     const requestedDeadline = new Date(
@@ -197,8 +202,10 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
 
     return { extensionRequest: { id: request.id } };
   } catch (err) {
-    console.error('Failed to request extension:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'requestExtensionHandler',
+    });
   }
 }
 
@@ -209,7 +216,7 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
 export async function listExtensionRequestsHandler(args: { data: ListExtensionRequestsInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { assignmentId, status, page, limit } = args.data;
@@ -230,7 +237,7 @@ export async function listExtensionRequestsHandler(args: { data: ListExtensionRe
       .limit(1);
 
     if (!assignment) {
-      return { error: 'Assignment not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
     }
 
     // 2. Build conditions
@@ -271,8 +278,10 @@ export async function listExtensionRequestsHandler(args: { data: ListExtensionRe
 
     return { items, total: Number(count) };
   } catch (err) {
-    console.error('Failed to list extension requests:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listExtensionRequestsHandler',
+    });
   }
 }
 
@@ -283,7 +292,7 @@ export async function listExtensionRequestsHandler(args: { data: ListExtensionRe
 export async function listMyExtensionRequestsHandler(args: { data: ListMyExtensionsInput }) {
   const session = await getSessionFromHeaders();
   if (!isStudent(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { assignmentId } = args.data;
@@ -303,7 +312,7 @@ export async function listMyExtensionRequestsHandler(args: { data: ListMyExtensi
       .limit(1);
 
     if (!enrollment) {
-      return { error: 'Assignment not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
     }
 
     const items = await db
@@ -332,8 +341,10 @@ export async function listMyExtensionRequestsHandler(args: { data: ListMyExtensi
 
     return { items };
   } catch (err) {
-    console.error('Failed to list my extension requests:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listMyExtensionRequestsHandler',
+    });
   }
 }
 

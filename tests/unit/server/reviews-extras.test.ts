@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getLatestReviewHandler, getReviewDetailHandler } from '@/server/reviews.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
+import { serverError, ErrorCode } from '@/lib/errors';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -141,7 +142,7 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
         Promise.resolve([]).then(onfulfilled),
       );
       const result = await getLatestReviewHandler({ data: { checkpointId: 100 } });
-      expect(result).toEqual({ error: 'Checkpoint not found' });
+      expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found'));
     });
 
     it('should reject if instructor does not own the checkpoint', async () => {
@@ -151,13 +152,13 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
         Promise.resolve([]).then(onfulfilled),
       );
       const result = await getLatestReviewHandler({ data: { checkpointId: 100 } });
-      expect(result).toEqual({ error: 'Checkpoint not found' });
+      expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found'));
     });
 
     it('should reject if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await getLatestReviewHandler({ data: { checkpointId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
   });
 
@@ -165,7 +166,7 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
     it('should reject if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await getReviewDetailHandler({ data: { submissionId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return submission detail with download URL and review history', async () => {
@@ -215,7 +216,7 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
         Promise.resolve([]).then(onfulfilled),
       );
       const result = await getReviewDetailHandler({ data: { submissionId: 999 } });
-      expect(result).toEqual({ error: 'Submission not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Submission not found' } });
     });
   });
 });

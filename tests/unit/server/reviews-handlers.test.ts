@@ -79,13 +79,13 @@ describe('Review handlers - Logic & Security', () => {
     it('should reject if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await listPendingReviewsHandler({ data: { page: 1, limit: 20 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should reject if not an instructor', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
       const result = await listPendingReviewsHandler({ data: { page: 1, limit: 20 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should return empty list when no pending submissions', async () => {
@@ -192,7 +192,7 @@ describe('Review handlers - Logic & Security', () => {
     it('should reject if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await openForReviewHandler({ data: { submissionId: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should transition submitted to under_review', async () => {
@@ -225,7 +225,9 @@ describe('Review handlers - Logic & Security', () => {
         ]).then(onfulfilled),
       );
       const result = await openForReviewHandler({ data: { submissionId: 1 } });
-      expect(result).toEqual({ error: 'Checkpoint is not in submittable state' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Checkpoint is not in submittable state' },
+      });
     });
 
     it('should return error for non-existent submission', async () => {
@@ -235,7 +237,7 @@ describe('Review handlers - Logic & Security', () => {
       );
 
       const result = await openForReviewHandler({ data: { submissionId: 999 } });
-      expect(result).toEqual({ error: 'Submission not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Submission not found' } });
     });
   });
 
@@ -245,7 +247,7 @@ describe('Review handlers - Logic & Security', () => {
       const result = await submitReviewHandler({
         data: { submissionId: 1, decision: 'pass', comment: '' },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should record a pass decision and unlock next checkpoint', async () => {
@@ -359,7 +361,12 @@ describe('Review handlers - Logic & Security', () => {
       const result = await submitReviewHandler({
         data: { submissionId: 1, decision: 'revise', comment: '' },
       });
-      expect(result).toEqual({ error: 'Revision deadline is required for revise decision' });
+      expect(result).toEqual({
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'Revision deadline is required for revise decision',
+        },
+      });
     });
 
     it('should reject if instructor does not own the assignment', async () => {
@@ -370,7 +377,7 @@ describe('Review handlers - Logic & Security', () => {
       const result = await submitReviewHandler({
         data: { submissionId: 1, decision: 'pass', comment: '' },
       });
-      expect(result).toEqual({ error: 'Submission not found' });
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Submission not found' } });
     });
   });
 });

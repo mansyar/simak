@@ -5,6 +5,7 @@ import { assignments, checkpoints } from '../db/schema/assignments';
 import { extensionRequests } from '../db/schema/extensions';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
+import { serverError, ErrorCode } from '../lib/errors';
 import { logAuditEvent } from '../lib/audit';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -100,7 +101,7 @@ async function calculateExtensionAdjustment(
 export async function approveExtensionHandler(args: { data: ApproveExtensionInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { requestId, resolutionReason } = args.data;
@@ -130,11 +131,11 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
       .limit(1);
 
     if (!request) {
-      return { error: 'Extension request not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Extension request not found');
     }
 
     if (request.status !== 'pending') {
-      return { error: 'Extension request is not in pending state' };
+      return serverError(ErrorCode.BAD_REQUEST, 'Extension request is not in pending state');
     }
 
     // 2. Execute in transaction: approve request + extend deadlines
@@ -189,8 +190,10 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
 
     return { success: true };
   } catch (err) {
-    console.error('Failed to approve extension:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'approveExtensionHandler',
+    });
   }
 }
 
@@ -201,7 +204,7 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
 export async function rejectExtensionHandler(args: { data: RejectExtensionInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { requestId, resolutionReason } = args.data;
@@ -230,11 +233,11 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
       .limit(1);
 
     if (!request) {
-      return { error: 'Extension request not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Extension request not found');
     }
 
     if (request.status !== 'pending') {
-      return { error: 'Extension request is not in pending state' };
+      return serverError(ErrorCode.BAD_REQUEST, 'Extension request is not in pending state');
     }
 
     // 2. Update status to rejected
@@ -279,8 +282,10 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
 
     return { success: true };
   } catch (err) {
-    console.error('Failed to reject extension:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'rejectExtensionHandler',
+    });
   }
 }
 
@@ -291,7 +296,7 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
 export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { assignmentId, studentId, extraDays, reason } = args.data;
@@ -312,7 +317,7 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
       .limit(1);
 
     if (!assignment) {
-      return { error: 'Assignment not found' };
+      return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
     }
 
     // 2. Find all unfinished checkpoints for this student
@@ -329,7 +334,7 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
       .orderBy(checkpoints.order);
 
     if (unfinishedCheckpoints.length === 0) {
-      return { error: 'No unfinished checkpoints found for this student' };
+      return serverError(ErrorCode.BAD_REQUEST, 'No unfinished checkpoints found for this student');
     }
 
     const msPerDay = 24 * 60 * 60 * 1000;
@@ -400,7 +405,9 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
 
     return { success: true, extendedCount: unfinishedCheckpoints.length };
   } catch (err) {
-    console.error('Failed to bulk extend deadlines:', err);
-    return { error: 'Internal Server Error' };
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'bulkExtendHandler',
+    });
   }
 }

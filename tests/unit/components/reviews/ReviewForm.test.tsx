@@ -146,7 +146,9 @@ describe('ReviewForm', () => {
   });
 
   it('should show error when submitReview returns error', async () => {
-    vi.mocked(submitReview).mockResolvedValue({ error: 'Submission failed' });
+    vi.mocked(submitReview).mockResolvedValue({
+      error: { code: 'INTERNAL', message: 'Submission failed' },
+    });
 
     render(<ReviewForm submissionId={1} onComplete={mockOnComplete} onError={mockOnError} />);
 

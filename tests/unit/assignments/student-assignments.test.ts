@@ -8,6 +8,7 @@ import {
 } from '@/server/assignments.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
+import { isServerError } from '@/lib/errors';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -161,6 +162,7 @@ describe('Student Assignment Server Functions - Logic & Security', () => {
       const result = await listStudentAssignmentsHandler({
         data: { page: 1, limit: 20, search: '' },
       });
+      if (isServerError(result)) throw new Error(result.error.message);
 
       expect(result.assignments).toHaveLength(2);
       expect(result.assignments[0].title).toBe('Thesis Assignment');
@@ -192,6 +194,7 @@ describe('Student Assignment Server Functions - Logic & Security', () => {
       const result = await listStudentAssignmentsHandler({
         data: { page: 1, limit: 20, search: 'thesis' },
       });
+      if (isServerError(result)) throw new Error(result.error.message);
 
       expect(result.assignments).toHaveLength(1);
       expect(result.total).toBe(1);
@@ -289,7 +292,8 @@ describe('Student Assignment Server Functions - Logic & Security', () => {
       const result = await getStudentAssignmentDetailHandler({ data: { id: 101 } });
 
       expect(result).not.toBeNull();
-      if (result) {
+      if (!result || isServerError(result)) throw new Error('unexpected server error');
+      {
         expect(result.title).toBe('Thesis Assignment');
         expect(result.instructorName).toBe('Dr. Smith');
         expect(result.checkpoints).toHaveLength(3);

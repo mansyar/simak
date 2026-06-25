@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { getStudentAssignmentDetail } from '@/server/assignments';
 import { listSubmissions, submitCheckpoint } from '@/server/submissions';
 import { getPresignedUploadUrl } from '@/server/files';
+import { isServerError } from '@/lib/errors';
 import { getLatestReview } from '@/server/reviews';
 import { FileUploader } from '@/components/files/file-uploader';
 import { FileList } from '@/components/files/file-list';
@@ -144,7 +145,7 @@ function CheckpointSubmissionPage() {
         // Step 1: Get presigned upload URL
         const getUploadUrlFn = getPresignedUploadUrl as unknown as (args: {
           data: { checkpointId: number; contentType: string; extension: string };
-        }) => Promise<{ uploadUrl: string; fileKey: string; error?: string }>;
+        }) => Promise<{ uploadUrl: string; fileKey: string }>;
         const uploadData = await getUploadUrlFn({
           data: {
             checkpointId: Number(params.checkpointId),
@@ -153,8 +154,8 @@ function CheckpointSubmissionPage() {
           },
         });
 
-        if (uploadData.error) {
-          setUploadError(uploadData.error);
+        if (isServerError(uploadData)) {
+          setUploadError(uploadData.error.message);
           return;
         }
 

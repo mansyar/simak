@@ -173,9 +173,9 @@ describe('Audit log handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
 
       const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
-      const result = await listAuditLogsHandler({
+      const result = (await listAuditLogsHandler({
         data: { page: 1, limit: 20, action: '', dateFrom: '', dateTo: '', search: '' },
-      });
+      })) as { entries: unknown[]; total: number };
 
       expect(result).toBeDefined();
       expect(result.entries).toBeDefined();
@@ -186,11 +186,13 @@ describe('Audit log handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(nonAdminSession);
 
       const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
-      await expect(
-        listAuditLogsHandler({
-          data: { page: 1, limit: 20, action: '', dateFrom: '', dateTo: '', search: '' },
-        }),
-      ).rejects.toThrow();
+      const result = await listAuditLogsHandler({
+        data: { page: 1, limit: 20, action: '', dateFrom: '', dateTo: '', search: '' },
+      });
+
+      expect(result).toEqual({
+        error: { code: 'FORBIDDEN', message: 'Forbidden: Admin role required' },
+      });
     });
 
     it('should filter by action type', async () => {
@@ -202,11 +204,11 @@ describe('Audit log handlers', () => {
       });
 
       const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
-      const result = await listAuditLogsHandler({
+      const result = (await listAuditLogsHandler({
         data: { page: 1, limit: 20, action: 'user.created', dateFrom: '', dateTo: '', search: '' },
-      });
+      })) as { entries: { action: string }[] };
 
-      expect(result.entries.every((e: any) => e.action === 'user.created')).toBe(true);
+      expect(result.entries.every((e) => e.action === 'user.created')).toBe(true);
     });
 
     it('should handle empty results', async () => {
@@ -216,9 +218,9 @@ describe('Audit log handlers', () => {
       });
 
       const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
-      const result = await listAuditLogsHandler({
+      const result = (await listAuditLogsHandler({
         data: { page: 1, limit: 20, action: '', dateFrom: '', dateTo: '', search: '' },
-      });
+      })) as { entries: unknown[]; total: number };
 
       expect(result.entries).toHaveLength(0);
       expect(result.total).toBe(0);
@@ -230,7 +232,7 @@ describe('Audit log handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
 
       const { getAuditLogDetailHandler } = await import('@/server/audit-logs.server');
-      const result = await getAuditLogDetailHandler({ data: { id: 1 } });
+      const result = (await getAuditLogDetailHandler({ data: { id: 1 } })) as { id: unknown };
 
       expect(result).toBeDefined();
       expect(result.id).toBeDefined();
@@ -240,7 +242,11 @@ describe('Audit log handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(nonAdminSession);
 
       const { getAuditLogDetailHandler } = await import('@/server/audit-logs.server');
-      await expect(getAuditLogDetailHandler({ data: { id: 1 } })).rejects.toThrow();
+      const result = await getAuditLogDetailHandler({ data: { id: 1 } });
+
+      expect(result).toEqual({
+        error: { code: 'FORBIDDEN', message: 'Forbidden: Admin role required' },
+      });
     });
   });
 });

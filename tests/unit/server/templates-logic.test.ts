@@ -9,6 +9,7 @@ import {
   duplicateTemplateHandler,
   listTemplateAssignmentsHandler,
 } from '@/server/templates.server';
+import { serverError, ErrorCode } from '@/lib/errors';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 
@@ -75,6 +76,7 @@ describe('Template server functions - Logic & Security', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.restoreAllMocks();
     vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
   });
 
@@ -91,29 +93,19 @@ describe('Template server functions - Logic & Security', () => {
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await createTemplateHandler({ data: createData });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual(serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized'));
     });
 
     it('should fail if student tries to create template', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
       const result = await createTemplateHandler({ data: createData });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual(serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized'));
     });
 
     it('should create template with checkpoints for admin', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
 
       mockReturning([{ id: 1 }]);
-
-      // Mock getTemplate's inner queries (select + count)
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 1, name: 'Thesis', type: 'Thesis' }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ assignmentCount: 0 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
       const result = await createTemplateHandler({ data: createData });
 
@@ -126,15 +118,6 @@ describe('Template server functions - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
 
       mockReturning([{ id: 1 }]);
-
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 1, name: 'Thesis', type: 'Thesis' }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ assignmentCount: 0 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
       await createTemplateHandler({ data: createData });
 
@@ -164,7 +147,10 @@ describe('Template server functions - Logic & Security', () => {
           Promise.resolve([{ count: 1 }]).then(onfulfilled),
         );
 
-      const result = await listTemplatesHandler({ data: listData });
+      const result = (await listTemplatesHandler({ data: listData })) as {
+        templates: { checkpointCount: number }[];
+        total: number;
+      };
 
       expect(result.templates).toHaveLength(1);
       expect(result.templates[0].checkpointCount).toBe(3);
@@ -240,7 +226,9 @@ describe('Template server functions - Logic & Security', () => {
           Promise.resolve([{ type: 'Thesis' }, { type: 'Project' }]).then(onfulfilled),
         );
 
-      const result = await listTemplatesHandler({ data: listData });
+      const result = (await listTemplatesHandler({ data: listData })) as {
+        allTypes: string[];
+      };
 
       expect(result.allTypes).toBeDefined();
       expect(result.allTypes).toEqual(['Thesis', 'Project']);
@@ -305,7 +293,7 @@ describe('Template server functions - Logic & Security', () => {
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await updateTemplateHandler({ data: { id: 1, ...updateData } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual(serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized'));
     });
 
     it('should update template and replace checkpoints', async () => {
@@ -340,17 +328,29 @@ describe('Template server functions - Logic & Security', () => {
       );
 
       const result = await deleteTemplateHandler({ data: { id: 1 } });
-      expect(result).toEqual({ error: 'in_use', count: 3 });
+      expect(result).toEqual(serverError(ErrorCode.BAD_REQUEST, 'in_use', { input: { count: 3 } }));
     });
 
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await deleteTemplateHandler({ data: { id: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual(serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized'));
     });
   });
 
   describe('duplicateTemplate', () => {
+    const templateDetail = {
+      id: 1,
+      name: 'Thesis Copy',
+      type: 'Thesis',
+      createdBy: 'admin-1',
+      createdByName: 'Admin',
+      createdAt: null,
+      updatedAt: null,
+      checkpoints: [],
+      assignmentCount: 0,
+    };
+
     it('should duplicate template with checkpoints and append (Copy)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
 
@@ -377,13 +377,13 @@ describe('Template server functions - Logic & Security', () => {
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await duplicateTemplateHandler({ data: { id: 1 } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual(serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized'));
     });
 
     it('should return error for non-existent template', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
       const result = await duplicateTemplateHandler({ data: { id: 999 } });
-      expect(result).toEqual({ error: 'Template not found' });
+      expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Template not found'));
     });
   });
 
@@ -405,7 +405,9 @@ describe('Template server functions - Logic & Security', () => {
           ]).then(onfulfilled),
         );
 
-      const result = await listTemplateAssignmentsHandler({ data: { templateId: 1 } });
+      const result = (await listTemplateAssignmentsHandler({
+        data: { templateId: 1 },
+      })) as { assignments: { studentCount: number }[] };
 
       expect(result.assignments).toHaveLength(2);
       expect(result.assignments[0]).toEqual({

@@ -67,7 +67,7 @@ describe('User server functions - Logic & Security', () => {
       const result = await createUserHandler({
         data: { name: 'Test', email: 'test@example.com', role: 'student' },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should fail if student tries to create user', async () => {
@@ -78,7 +78,7 @@ describe('User server functions - Logic & Security', () => {
       const result = await createUserHandler({
         data: { name: 'Test', email: 'test@example.com', role: 'student' },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should allow admin to create instructor', async () => {
@@ -119,7 +119,9 @@ describe('User server functions - Logic & Security', () => {
       const result = await createUserHandler({
         data: { name: 'Other Admin', email: 'admin2@example.com', role: 'admin' },
       });
-      expect(result).toEqual({ error: 'Admins cannot create other Admin accounts' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Admins cannot create other Admin accounts' },
+      });
     });
 
     it('should prevent superadmin from creating instructor (scope violation)', async () => {
@@ -131,7 +133,7 @@ describe('User server functions - Logic & Security', () => {
       const result = await createUserHandler({
         data: { name: 'Bad Instructor', email: 'inst@example.com', role: 'instructor' },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should prevent superadmin from creating student (scope violation)', async () => {
@@ -143,7 +145,7 @@ describe('User server functions - Logic & Security', () => {
       const result = await createUserHandler({
         data: { name: 'Bad Student', email: 'student@example.com', role: 'student' },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should allow superadmin to create admin', async () => {
@@ -177,7 +179,9 @@ describe('User server functions - Logic & Security', () => {
       const result = await createUserHandler({
         data: { name: 'Duplicate', email: 'existing@test.com', role: 'student' },
       });
-      expect(result).toEqual({ error: 'Email already in use' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Email already in use' },
+      });
     });
   });
 
@@ -197,7 +201,9 @@ describe('User server functions - Logic & Security', () => {
           Promise.resolve([{ count: 1 }]).then(onfulfilled),
         );
 
-      const result = await listUsersHandler({ data: { page: 1, limit: 20, search: '' } });
+      const result = (await listUsersHandler({
+        data: { page: 1, limit: 20, search: '' },
+      })) as { users: { role?: string }[]; total: number };
 
       expect(result.users).toHaveLength(1);
       expect(result.total).toBe(1);
@@ -232,7 +238,10 @@ describe('User server functions - Logic & Security', () => {
           Promise.resolve([{ count: 1 }]).then(onfulfilled),
         );
 
-      const result = await listUsersHandler({ data: { page: 1, limit: 20, search: '' } });
+      const result = (await listUsersHandler({
+        data: { page: 1, limit: 20, search: '' },
+      })) as { users: { role: string }[] };
+
       expect(result.users).toHaveLength(1);
       expect(result.users[0].role).toBe('student');
     });
@@ -269,7 +278,10 @@ describe('User server functions - Logic & Security', () => {
           Promise.resolve([{ count: 1 }]).then(onfulfilled),
         );
 
-      const result = await listUsersHandler({ data: { page: 1, limit: 20, search: 'john' } });
+      const result = (await listUsersHandler({
+        data: { page: 1, limit: 20, search: 'john' },
+      })) as { users: unknown[]; total: number };
+
       expect(result.users).toHaveLength(1);
       expect(result.total).toBe(1);
     });
@@ -283,7 +295,9 @@ describe('User server functions - Logic & Security', () => {
       });
 
       const result = await deleteUserHandler({ data: { id: 'my-id' } });
-      expect(result).toEqual({ error: 'You cannot delete your own account' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'You cannot delete your own account' },
+      });
     });
 
     it('should soft-delete another user', async () => {
@@ -299,7 +313,7 @@ describe('User server functions - Logic & Security', () => {
     it('should reject unauthorized (no session)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await deleteUserHandler({ data: { id: 'user-1' } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should call revokeUserSessions before soft-deleting', async () => {
@@ -341,7 +355,9 @@ describe('User server functions - Logic & Security', () => {
         ]).then(fn),
       );
 
-      const result = await getUserHandler({ data: { id: 'user-1' } });
+      const result = (await getUserHandler({ data: { id: 'user-1' } })) as {
+        id: string;
+      };
       expect(result).not.toBeNull();
       expect(result?.id).toBe('user-1');
     });
@@ -368,7 +384,7 @@ describe('User server functions - Logic & Security', () => {
       const result = await updateUserHandler({
         data: { id: 'user-1', name: 'New', email: 'n@t.com' },
       });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should update user successfully', async () => {
@@ -398,7 +414,9 @@ describe('User server functions - Logic & Security', () => {
       const result = await updateUserHandler({
         data: { id: 'user-1', name: 'Updated', email: 'existing@t.com' },
       });
-      expect(result).toEqual({ error: 'Email already in use' });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Email already in use' },
+      });
     });
   });
 
@@ -406,7 +424,7 @@ describe('User server functions - Logic & Security', () => {
     it('should reject unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
       const result = await generateSetupLinkHandler({ data: { id: 'user-1' } });
-      expect(result).toEqual({ error: 'Unauthorized' });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should reject non-existent user', async () => {
@@ -417,7 +435,9 @@ describe('User server functions - Logic & Security', () => {
       mockDb.then.mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
 
       const result = await generateSetupLinkHandler({ data: { id: 'nonexistent' } });
-      expect(result).toEqual({ error: 'User not found or deleted' });
+      expect(result).toEqual({
+        error: { code: 'NOT_FOUND', message: 'User not found or deleted' },
+      });
     });
 
     it('should generate setup link for valid user', async () => {
@@ -429,9 +449,11 @@ describe('User server functions - Logic & Security', () => {
         Promise.resolve([{ email: 'user@test.com' }]).then(fn),
       );
 
-      const result = await generateSetupLinkHandler({ data: { id: 'user-1' } });
+      const result = (await generateSetupLinkHandler({ data: { id: 'user-1' } })) as {
+        url: string;
+      };
       expect(result).toHaveProperty('url');
-      expect(result?.url).toContain('/auth/setup-password?token=');
+      expect(result.url).toContain('/auth/setup-password?token=');
     });
 
     it('should clear existing verification tokens before generating a new link', async () => {

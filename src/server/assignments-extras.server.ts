@@ -6,6 +6,7 @@ import { assignmentTemplates } from '../db/schema/templates';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
+import { serverError, ErrorCode } from '../lib/errors';
 import { consultations } from '../db/schema/consultations';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -37,50 +38,57 @@ function isStudent(session: NonNullableSession | null): session is NonNullableSe
 export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { checkpointId } = args.data;
   const db = getDb();
 
-  const [checkpoint] = await db
-    .select({
-      id: checkpoints.id,
-      state: checkpoints.state,
-      assignmentInstructorId: assignments.instructorId,
-      assignmentId: checkpoints.assignmentId,
-    })
-    .from(checkpoints)
-    .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-    .where(and(eq(checkpoints.id, checkpointId), isNull(assignments.deletedAt)))
-    .limit(1);
+  try {
+    const [checkpoint] = await db
+      .select({
+        id: checkpoints.id,
+        state: checkpoints.state,
+        assignmentInstructorId: assignments.instructorId,
+        assignmentId: checkpoints.assignmentId,
+      })
+      .from(checkpoints)
+      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+      .where(and(eq(checkpoints.id, checkpointId), isNull(assignments.deletedAt)))
+      .limit(1);
 
-  if (!checkpoint) {
-    return { error: 'Checkpoint not found' };
+    if (!checkpoint) {
+      return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+    }
+
+    if (checkpoint.assignmentInstructorId !== session.user.id) {
+      return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+    }
+
+    if (checkpoint.state !== 'locked') {
+      return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in locked state');
+    }
+
+    await db
+      .update(checkpoints)
+      .set({ state: 'unlocked', updatedAt: new Date() })
+      .where(eq(checkpoints.id, checkpointId));
+
+    await logAuditEvent({
+      actorId: session.user.id,
+      action: 'checkpoint.unlocked',
+      entityType: 'checkpoint',
+      entityId: String(checkpointId),
+      details: { assignmentId: checkpoint.assignmentId },
+    });
+
+    return { success: true };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'unlockCheckpointHandler',
+    });
   }
-
-  if (checkpoint.assignmentInstructorId !== session.user.id) {
-    return { error: 'Checkpoint not found' };
-  }
-
-  if (checkpoint.state !== 'locked') {
-    return { error: 'Checkpoint is not in locked state' };
-  }
-
-  await db
-    .update(checkpoints)
-    .set({ state: 'unlocked', updatedAt: new Date() })
-    .where(eq(checkpoints.id, checkpointId));
-
-  await logAuditEvent({
-    actorId: session.user.id,
-    action: 'checkpoint.unlocked',
-    entityType: 'checkpoint',
-    entityId: String(checkpointId),
-    details: { assignmentId: checkpoint.assignmentId },
-  });
-
-  return { success: true };
 }
 
 /**
@@ -91,45 +99,52 @@ export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInpu
 export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
-    return { error: 'Unauthorized' };
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const { checkpointId, newDueDate } = args.data;
   const db = getDb();
 
-  const [checkpoint] = await db
-    .select({
-      id: checkpoints.id,
-      assignmentInstructorId: assignments.instructorId,
-      assignmentId: checkpoints.assignmentId,
-    })
-    .from(checkpoints)
-    .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-    .where(and(eq(checkpoints.id, checkpointId), isNull(assignments.deletedAt)))
-    .limit(1);
+  try {
+    const [checkpoint] = await db
+      .select({
+        id: checkpoints.id,
+        assignmentInstructorId: assignments.instructorId,
+        assignmentId: checkpoints.assignmentId,
+      })
+      .from(checkpoints)
+      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+      .where(and(eq(checkpoints.id, checkpointId), isNull(assignments.deletedAt)))
+      .limit(1);
 
-  if (!checkpoint) {
-    return { error: 'Checkpoint not found' };
+    if (!checkpoint) {
+      return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+    }
+
+    if (checkpoint.assignmentInstructorId !== session.user.id) {
+      return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+    }
+
+    await db
+      .update(checkpoints)
+      .set({ dueDate: newDueDate, updatedAt: new Date() })
+      .where(eq(checkpoints.id, checkpointId));
+
+    await logAuditEvent({
+      actorId: session.user.id,
+      action: 'deadline.extended',
+      entityType: 'checkpoint',
+      entityId: String(checkpointId),
+      details: { assignmentId: checkpoint.assignmentId, newDueDate: newDueDate.toISOString() },
+    });
+
+    return { success: true };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'extendDeadlineHandler',
+    });
   }
-
-  if (checkpoint.assignmentInstructorId !== session.user.id) {
-    return { error: 'Checkpoint not found' };
-  }
-
-  await db
-    .update(checkpoints)
-    .set({ dueDate: newDueDate, updatedAt: new Date() })
-    .where(eq(checkpoints.id, checkpointId));
-
-  await logAuditEvent({
-    actorId: session.user.id,
-    action: 'deadline.extended',
-    entityType: 'checkpoint',
-    entityId: String(checkpointId),
-    details: { assignmentId: checkpoint.assignmentId, newDueDate: newDueDate.toISOString() },
-  });
-
-  return { success: true };
 }
 
 export async function listStudentAssignmentsHandler(args: { data: ListStudentAssignmentsInput }) {
@@ -141,81 +156,91 @@ export async function listStudentAssignmentsHandler(args: { data: ListStudentAss
   const { search, page, limit } = args.data;
   const db = getDb();
 
-  const conditions = [isNull(assignments.deletedAt)];
+  try {
+    const conditions = [isNull(assignments.deletedAt)];
 
-  if (search) {
-    conditions.push(sql`${assignments.title} ILIKE ${'%' + search + '%'}`);
-  }
+    if (search) {
+      conditions.push(sql`${assignments.title} ILIKE ${'%' + search + '%'}`);
+    }
 
-  const rawAssignments = await db
-    .select({
-      id: assignments.id,
-      title: assignments.title,
-      description: assignments.description,
-      finalDeadline: assignments.finalDeadline,
-      createdAt: assignments.createdAt,
-      templateName: assignmentTemplates.name,
-      templateType: assignmentTemplates.type,
-      studentId: assignmentStudents.studentId,
-    })
-    .from(assignmentStudents)
-    .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
-    .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-    .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions))
-    .orderBy(assignments.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
-
-  const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(assignmentStudents)
-    .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
-    .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions));
-
-  // Calculate progress per assignment from checkpoint states
-  const assignmentIds = rawAssignments.map((a) => a.id);
-  const progressMap = new Map<number, number>();
-
-  if (assignmentIds.length > 0) {
-    const allCheckpoints = await db
+    const rawAssignments = await db
       .select({
-        assignmentId: checkpoints.assignmentId,
-        state: checkpoints.state,
+        id: assignments.id,
+        title: assignments.title,
+        description: assignments.description,
+        finalDeadline: assignments.finalDeadline,
+        createdAt: assignments.createdAt,
+        templateName: assignmentTemplates.name,
+        templateType: assignmentTemplates.type,
+        studentId: assignmentStudents.studentId,
       })
-      .from(checkpoints)
-      .where(
-        and(
-          inArray(checkpoints.assignmentId, assignmentIds),
-          eq(checkpoints.studentId, session.user.id),
-        ),
-      );
+      .from(assignmentStudents)
+      .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
+      .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
+      .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions))
+      .orderBy(assignments.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit);
 
-    const countsByAssignment = new Map<number, { total: number; passed: number }>();
-    for (const cp of allCheckpoints) {
-      const existing = countsByAssignment.get(cp.assignmentId) ?? { total: 0, passed: 0 };
-      existing.total++;
-      if (cp.state === 'passed') existing.passed++;
-      countsByAssignment.set(cp.assignmentId, existing);
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(assignmentStudents)
+      .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
+      .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions));
+
+    // Calculate progress per assignment from checkpoint states
+    const assignmentIds = rawAssignments.map((a) => a.id);
+    const progressMap = new Map<number, number>();
+
+    if (assignmentIds.length > 0) {
+      const allCheckpoints = await db
+        .select({
+          assignmentId: checkpoints.assignmentId,
+          state: checkpoints.state,
+        })
+        .from(checkpoints)
+        .where(
+          and(
+            inArray(checkpoints.assignmentId, assignmentIds),
+            eq(checkpoints.studentId, session.user.id),
+          ),
+        );
+
+      const countsByAssignment = new Map<number, { total: number; passed: number }>();
+      for (const cp of allCheckpoints) {
+        const existing = countsByAssignment.get(cp.assignmentId) ?? { total: 0, passed: 0 };
+        existing.total++;
+        if (cp.state === 'passed') existing.passed++;
+        countsByAssignment.set(cp.assignmentId, existing);
+      }
+
+      for (const [id, counts] of countsByAssignment) {
+        progressMap.set(
+          id,
+          counts.total > 0 ? Math.round((counts.passed / counts.total) * 100) : 0,
+        );
+      }
     }
 
-    for (const [id, counts] of countsByAssignment) {
-      progressMap.set(id, counts.total > 0 ? Math.round((counts.passed / counts.total) * 100) : 0);
-    }
+    return {
+      assignments: rawAssignments.map((a) => ({
+        id: a.id,
+        title: a.title,
+        description: a.description,
+        finalDeadline: a.finalDeadline,
+        createdAt: a.createdAt,
+        templateName: a.templateName,
+        templateType: a.templateType,
+        progressPercent: progressMap.get(a.id) ?? 0,
+      })),
+      total: Number(count),
+    };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'listStudentAssignmentsHandler',
+    });
   }
-
-  return {
-    assignments: rawAssignments.map((a) => ({
-      id: a.id,
-      title: a.title,
-      description: a.description,
-      finalDeadline: a.finalDeadline,
-      createdAt: a.createdAt,
-      templateName: a.templateName,
-      templateType: a.templateType,
-      progressPercent: progressMap.get(a.id) ?? 0,
-    })),
-    total: Number(count),
-  };
 }
 
 export async function getStudentAssignmentDetailHandler(args: { data: StudentAssignmentIdParam }) {
@@ -227,113 +252,120 @@ export async function getStudentAssignmentDetailHandler(args: { data: StudentAss
   const { id } = args.data;
   const db = getDb();
 
-  const [assignmentData] = await db
-    .select({
-      id: assignments.id,
-      title: assignments.title,
-      description: assignments.description,
-      finalDeadline: assignments.finalDeadline,
-      createdAt: assignments.createdAt,
-      instructorName: users.name,
-      templateName: assignmentTemplates.name,
-      templateType: assignmentTemplates.type,
-      maxExtensionDays: assignments.maxExtensionDays,
-      maxTotalExtensions: assignments.maxTotalExtensions,
-    })
-    .from(assignmentStudents)
-    .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
-    .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-    .innerJoin(users, eq(assignments.instructorId, users.id))
-    .where(
-      and(
-        eq(assignmentStudents.studentId, session.user.id),
-        eq(assignments.id, id),
-        isNull(assignments.deletedAt),
-      ),
-    )
-    .limit(1);
+  try {
+    const [assignmentData] = await db
+      .select({
+        id: assignments.id,
+        title: assignments.title,
+        description: assignments.description,
+        finalDeadline: assignments.finalDeadline,
+        createdAt: assignments.createdAt,
+        instructorName: users.name,
+        templateName: assignmentTemplates.name,
+        templateType: assignmentTemplates.type,
+        maxExtensionDays: assignments.maxExtensionDays,
+        maxTotalExtensions: assignments.maxTotalExtensions,
+      })
+      .from(assignmentStudents)
+      .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
+      .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
+      .innerJoin(users, eq(assignments.instructorId, users.id))
+      .where(
+        and(
+          eq(assignmentStudents.studentId, session.user.id),
+          eq(assignments.id, id),
+          isNull(assignments.deletedAt),
+        ),
+      )
+      .limit(1);
 
-  if (!assignmentData) {
-    return null;
-  }
+    if (!assignmentData) {
+      return null;
+    }
 
-  const checkpointsWithConsults = await db
-    .select({
-      id: checkpoints.id,
-      name: checkpoints.name,
-      order: checkpoints.order,
-      state: checkpoints.state,
-      dueDate: checkpoints.dueDate,
-      minConsultations: checkpoints.minConsultations,
-      verifiedConsultationCount: sql<number>`COALESCE(COUNT(CASE WHEN ${consultations.status} = 'verified' THEN 1 END), 0)::int`,
-    })
-    .from(checkpoints)
-    .leftJoin(
-      consultations,
-      and(
-        eq(consultations.checkpointId, checkpoints.id),
-        eq(consultations.studentId, session.user.id),
-      ),
-    )
-    .where(and(eq(checkpoints.assignmentId, id), eq(checkpoints.studentId, session.user.id)))
-    .groupBy(
-      checkpoints.id,
-      checkpoints.name,
-      checkpoints.order,
-      checkpoints.state,
-      checkpoints.dueDate,
-      checkpoints.minConsultations,
-    )
-    .orderBy(checkpoints.order);
+    const checkpointsWithConsults = await db
+      .select({
+        id: checkpoints.id,
+        name: checkpoints.name,
+        order: checkpoints.order,
+        state: checkpoints.state,
+        dueDate: checkpoints.dueDate,
+        minConsultations: checkpoints.minConsultations,
+        verifiedConsultationCount: sql<number>`COALESCE(COUNT(CASE WHEN ${consultations.status} = 'verified' THEN 1 END), 0)::int`,
+      })
+      .from(checkpoints)
+      .leftJoin(
+        consultations,
+        and(
+          eq(consultations.checkpointId, checkpoints.id),
+          eq(consultations.studentId, session.user.id),
+        ),
+      )
+      .where(and(eq(checkpoints.assignmentId, id), eq(checkpoints.studentId, session.user.id)))
+      .groupBy(
+        checkpoints.id,
+        checkpoints.name,
+        checkpoints.order,
+        checkpoints.state,
+        checkpoints.dueDate,
+        checkpoints.minConsultations,
+      )
+      .orderBy(checkpoints.order);
 
-  const totalCheckpointsCount = checkpointsWithConsults.length;
-  const passedCount = checkpointsWithConsults.filter((cp) => cp.state === 'passed').length;
-  const progressPercent =
-    totalCheckpointsCount > 0 ? Math.round((passedCount / totalCheckpointsCount) * 100) : 0;
+    const totalCheckpointsCount = checkpointsWithConsults.length;
+    const passedCount = checkpointsWithConsults.filter((cp) => cp.state === 'passed').length;
+    const progressPercent =
+      totalCheckpointsCount > 0 ? Math.round((passedCount / totalCheckpointsCount) * 100) : 0;
 
-  const enrichedCheckpoints = checkpointsWithConsults.map((cp, index) => {
-    const blockingReasons: string[] = [];
+    const enrichedCheckpoints = checkpointsWithConsults.map((cp, index) => {
+      const blockingReasons: string[] = [];
 
-    if (cp.state === 'locked') {
-      if (index > 0) {
-        const prev = checkpointsWithConsults[index - 1];
-        if (prev.state !== 'passed') {
-          blockingReasons.push('Previous checkpoint not passed');
+      if (cp.state === 'locked') {
+        if (index > 0) {
+          const prev = checkpointsWithConsults[index - 1];
+          if (prev.state !== 'passed') {
+            blockingReasons.push('Previous checkpoint not passed');
+          }
+        }
+
+        const minConsults = cp.minConsultations ?? 0;
+        if (minConsults > 0 && cp.verifiedConsultationCount < minConsults) {
+          blockingReasons.push(
+            `Insufficient consultations: ${cp.verifiedConsultationCount}/${minConsults} verified`,
+          );
         }
       }
 
-      const minConsults = cp.minConsultations ?? 0;
-      if (minConsults > 0 && cp.verifiedConsultationCount < minConsults) {
-        blockingReasons.push(
-          `Insufficient consultations: ${cp.verifiedConsultationCount}/${minConsults} verified`,
-        );
-      }
-    }
+      return {
+        id: cp.id,
+        name: cp.name,
+        order: cp.order,
+        state: cp.state,
+        dueDate: cp.dueDate,
+        minConsultations: cp.minConsultations,
+        verifiedConsultationCount: cp.verifiedConsultationCount,
+        blockingReasons: blockingReasons.length > 0 ? blockingReasons : undefined,
+      };
+    });
 
     return {
-      id: cp.id,
-      name: cp.name,
-      order: cp.order,
-      state: cp.state,
-      dueDate: cp.dueDate,
-      minConsultations: cp.minConsultations,
-      verifiedConsultationCount: cp.verifiedConsultationCount,
-      blockingReasons: blockingReasons.length > 0 ? blockingReasons : undefined,
+      id: assignmentData.id,
+      title: assignmentData.title,
+      description: assignmentData.description,
+      finalDeadline: assignmentData.finalDeadline,
+      createdAt: assignmentData.createdAt,
+      instructorName: assignmentData.instructorName,
+      templateName: assignmentData.templateName,
+      templateType: assignmentData.templateType,
+      maxExtensionDays: assignmentData.maxExtensionDays ?? 7,
+      maxTotalExtensions: assignmentData.maxTotalExtensions ?? 3,
+      progressPercent,
+      checkpoints: enrichedCheckpoints,
     };
-  });
-
-  return {
-    id: assignmentData.id,
-    title: assignmentData.title,
-    description: assignmentData.description,
-    finalDeadline: assignmentData.finalDeadline,
-    createdAt: assignmentData.createdAt,
-    instructorName: assignmentData.instructorName,
-    templateName: assignmentData.templateName,
-    templateType: assignmentData.templateType,
-    maxExtensionDays: assignmentData.maxExtensionDays ?? 7,
-    maxTotalExtensions: assignmentData.maxTotalExtensions ?? 3,
-    progressPercent,
-    checkpoints: enrichedCheckpoints,
-  };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getStudentAssignmentDetailHandler',
+    });
+  }
 }

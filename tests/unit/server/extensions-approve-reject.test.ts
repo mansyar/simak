@@ -82,7 +82,7 @@ describe('approveExtensionHandler', () => {
     const result = await approveExtensionHandler({
       data: { requestId: 100 },
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if not an instructor', async () => {
@@ -91,7 +91,7 @@ describe('approveExtensionHandler', () => {
     const result = await approveExtensionHandler({
       data: { requestId: 100 },
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should return error if extension request not found', async () => {
@@ -102,7 +102,9 @@ describe('approveExtensionHandler', () => {
     const result = await approveExtensionHandler({
       data: { requestId: 999 },
     });
-    expect(result).toEqual({ error: 'Extension request not found' });
+    expect(result).toEqual({
+      error: { code: 'NOT_FOUND', message: 'Extension request not found' },
+    });
   });
 
   it('should return error if request is not in pending state', async () => {
@@ -115,7 +117,9 @@ describe('approveExtensionHandler', () => {
     const result = await approveExtensionHandler({
       data: { requestId: 100 },
     });
-    expect(result).toEqual({ error: 'Extension request is not in pending state' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Extension request is not in pending state' },
+    });
   });
 
   it('should approve extension and log audit event', async () => {
@@ -236,7 +240,7 @@ describe('rejectExtensionHandler', () => {
     const result = await rejectExtensionHandler({
       data: { requestId: 100, resolutionReason: rejectReason },
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if not an instructor', async () => {
@@ -245,7 +249,7 @@ describe('rejectExtensionHandler', () => {
     const result = await rejectExtensionHandler({
       data: { requestId: 100, resolutionReason: rejectReason },
     });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should return error if extension request not found', async () => {
@@ -256,7 +260,9 @@ describe('rejectExtensionHandler', () => {
     const result = await rejectExtensionHandler({
       data: { requestId: 999, resolutionReason: rejectReason },
     });
-    expect(result).toEqual({ error: 'Extension request not found' });
+    expect(result).toEqual({
+      error: { code: 'NOT_FOUND', message: 'Extension request not found' },
+    });
   });
 
   it('should return error if request is not in pending state', async () => {
@@ -269,7 +275,9 @@ describe('rejectExtensionHandler', () => {
     const result = await rejectExtensionHandler({
       data: { requestId: 100, resolutionReason: rejectReason },
     });
-    expect(result).toEqual({ error: 'Extension request is not in pending state' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Extension request is not in pending state' },
+    });
   });
 
   it('should reject extension and log audit event', async () => {

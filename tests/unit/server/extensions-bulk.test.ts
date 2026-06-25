@@ -82,14 +82,14 @@ describe('bulkExtendHandler', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
     const result = await bulkExtendHandler({ data: validInput });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should reject if not an instructor', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
     const result = await bulkExtendHandler({ data: validInput });
-    expect(result).toEqual({ error: 'Unauthorized' });
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
   it('should return error if assignment not found', async () => {
@@ -98,7 +98,7 @@ describe('bulkExtendHandler', () => {
     mockDb.then.mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
     const result = await bulkExtendHandler({ data: validInput });
-    expect(result).toEqual({ error: 'Assignment not found' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Assignment not found' } });
   });
 
   it('should return error if no unfinished checkpoints found', async () => {
@@ -109,7 +109,9 @@ describe('bulkExtendHandler', () => {
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
     const result = await bulkExtendHandler({ data: validInput });
-    expect(result).toEqual({ error: 'No unfinished checkpoints found for this student' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'No unfinished checkpoints found for this student' },
+    });
   });
 
   it('should extend all unfinished checkpoints (locked, unlocked, submitted, under_review, revise)', async () => {
