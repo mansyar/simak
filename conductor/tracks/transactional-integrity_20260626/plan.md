@@ -71,14 +71,14 @@
 
 ## Phase 5: File-Type Validation on Feedback Uploads
 
-- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
-- [ ] Task: Write unit tests (Red)
-    - [ ] Test `getPresignedReviewFeedbackUploadUrlHandler` rejects `.exe` extension
-    - [ ] Test `getPresignedReviewFeedbackUploadUrlHandler` rejects `.svg` extension
-    - [ ] Test `getPresignedReviewFeedbackUploadUrlHandler` accepts `.docx`
-    - [ ] Test `getPresignedReviewFeedbackUploadUrlHandler` accepts `.pdf`
-- [ ] Task: Implement file-type validation (Green)
-    - [ ] Call `validateUploadType(extension, contentType)` in `getPresignedReviewFeedbackUploadUrlHandler` before presigning; reject unsupported types
+- [x] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase [4d33ee6]
+- [x] Task: Write unit tests (Red) [4d33ee6]
+    - [x] Test `getPresignedReviewFeedbackUploadUrlHandler` rejects `.exe` extension [4d33ee6]
+    - [x] Test `getPresignedReviewFeedbackUploadUrlHandler` rejects `.svg` extension [4d33ee6]
+    - [x] Test `getPresignedReviewFeedbackUploadUrlHandler` accepts `.docx` [4d33ee6]
+    - [x] Test `getPresignedReviewFeedbackUploadUrlHandler` accepts `.pdf` [4d33ee6]
+- [x] Task: Implement file-type validation (Green) [4d33ee6]
+    - [x] Call `validateUploadType(extension, contentType)` in `getPresignedReviewFeedbackUploadUrlHandler` before presigning; reject unsupported types [4d33ee6]
 - [ ] Task: Conductor - User Manual Verification 'File-Type Validation on Feedback Uploads' (Protocol in workflow.md)
 
 ---
