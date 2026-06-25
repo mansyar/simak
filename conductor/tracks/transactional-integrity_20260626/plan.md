@@ -1,3 +1,4 @@
+<protect>
 # Track 8.3 — Transactional Integrity & Input Validation
 ## Implementation Plan
 
@@ -7,6 +8,7 @@
 
 ## Phase 1: Database — Unique Constraint & Migration
 
+- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
 - [ ] Task: Write schema & migration tests (Red)
     - [ ] Test that `submissions` schema declares a unique constraint on `(checkpointId, version)`
     - [ ] Test the migration SQL defensively deduplicates pre-existing rows (delete all but max version per checkpoint) before adding the constraint
@@ -22,6 +24,7 @@
 
 ## Phase 2: submitCheckpointHandler — Transaction, Metadata Fix & Concurrency
 
+- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
 - [ ] Task: Write unit tests (Red)
     - [ ] Test `submitCheckpointHandler` wraps all writes (version select → insert → checkpoint update → notification insert) inside `db.transaction` using `tx`
     - [ ] Test the submission insert uses `.returning({ id: submissions.id })` and returns the real submission ID
@@ -40,6 +43,7 @@
 
 ## Phase 3: Transactional Wrapping — User & Password Setup Handlers
 
+- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
 - [ ] Task: Write unit tests (Red)
     - [ ] Test `createUserHandler` — if the verification-token insert fails, the user insert is rolled back (no partial user row)
     - [ ] Test `createUserHandler` — the invitation email is sent only AFTER the transaction commits (not inside it)
@@ -53,6 +57,7 @@
 
 ## Phase 4: Transactional Wrapping — Consultation Handlers
 
+- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
 - [ ] Task: Write unit tests (Red)
     - [ ] Test `verifyConsultationHandler` — if the notification insert fails, the consultation update is rolled back
     - [ ] Test `rejectConsultationHandler` — if the notification insert fails, the consultation update is rolled back
@@ -66,6 +71,7 @@
 
 ## Phase 5: File-Type Validation on Feedback Uploads
 
+- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
 - [ ] Task: Write unit tests (Red)
     - [ ] Test `getPresignedReviewFeedbackUploadUrlHandler` rejects `.exe` extension
     - [ ] Test `getPresignedReviewFeedbackUploadUrlHandler` rejects `.svg` extension
@@ -79,9 +85,11 @@
 
 ## Phase 6: Documentation & fileKey Investigation
 
+- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
 - [ ] Task: Document "Transaction Wrapping" convention
     - [ ] Append a "Transaction Wrapping" section to `conductor/code_styleguides/sql.md` covering: when to use `db.transaction` (2+ writes), the `.returning()` pattern, post-commit advisory work isolation (try/catch after commit), and the gold-standard reference (`submitReviewHandler`)
 - [ ] Task: Investigate fileKey trust gap (document only)
     - [ ] Trace the presign→submit flow: how `fileKey` is generated in `getPresignedUploadUrl` and consumed in `submitCheckpointHandler`
     - [ ] Record findings (the exact trust gap, feasibility of a presign-time mapping table, recommended approach) in a findings note within this track's folder
 - [ ] Task: Conductor - User Manual Verification 'Documentation & fileKey Investigation' (Protocol in workflow.md)
+</protect>

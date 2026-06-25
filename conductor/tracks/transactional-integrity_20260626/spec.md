@@ -1,3 +1,4 @@
+<protect>
 # Track 8.3 — Transactional Integrity & Input Validation
 
 ## Overview
@@ -82,3 +83,4 @@ Each handler below runs all its DB writes inside a single `db.transaction`, usin
 - `deleteUserHandler` transactional wrapping (handled by Track 8.1).
 - Dashboard query parallelization and bulk-import batching (Track 8.4).
 - `submitReviewHandler` post-commit audit-log try/catch isolation (Track 8.4).
+</protect>
