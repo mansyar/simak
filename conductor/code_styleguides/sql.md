@@ -100,6 +100,63 @@ ALTER TABLE t DROP CONSTRAINT t_col_nn;
 - `ALTER COLUMN TYPE` on millions of rows (long `ACCESS EXCLUSIVE` lock)
 - Any operation that cannot be safely split across deploys
 
+## 6. Transaction Wrapping
+
+When writing server handlers that perform two or more database writes, the writes MUST be executed inside a single `db.transaction` so that a failure in any step rolls back every change in the unit of work.
+
+### 6.1 When to use `db.transaction`
+
+- **Always wrap** handlers that perform two or more writes (INSERT, UPDATE, DELETE).
+- **Do not wrap** single-read or single-write handlers purely for stylistic reasons; extra transactions add overhead.
+- **Prefer read-only queries outside the transaction** when they are only needed for authorization or validation, unless the read result must remain stable for the lifetime of the transaction.
+
+### 6.2 Transaction handle usage
+
+Use the transaction handle (`tx`) for every query inside the transaction. Do not mix the outer `db` instance with `tx` inside the callback; doing so may run queries outside the transaction and break atomicity.
+
+```typescript
+await db.transaction(async (tx) => {
+  await tx.insert(users).values({ ... });
+  await tx.insert(verification).values({ ... });
+});
+```
+
+### 6.3 Obtaining inserted IDs
+
+Use `.returning({ id: table.id })` (or another column list) to capture generated IDs inside the transaction. Never rely on a separate `SELECT` after the INSERT inside the same transaction if you can avoid it, and never use a client-generated placeholder as the inserted record identity.
+
+```typescript
+const [inserted] = await tx
+  .insert(submissions)
+  .values({ ... })
+  .returning({ id: submissions.id });
+```
+
+### 6.4 Post-commit advisory work
+
+Work that is not required for the consistency of the write — e.g., audit logs, notification emails, external API calls — MUST run **after** the transaction commits. Wrap it in a `try/catch` so that a failure in advisory work never surfaces an error for a transaction that already committed or misleads the user into thinking the write failed.
+
+```typescript
+try {
+  await db.transaction(async (tx) => {
+    // ... core writes ...
+  });
+
+  // After the transaction commits
+  try {
+    await logAuditEvent({ ... });
+  } catch (auditErr) {
+    console.error('Audit log failed after successful transaction:', auditErr);
+  }
+} catch (err) {
+  return serverError(ErrorCode.INTERNAL, 'Internal Server Error', { cause: ... });
+}
+```
+
+### 6.5 Gold-standard reference
+
+See `src/server/reviews.server.ts` — `submitReviewHandler` for the canonical implementation: authorisation reads outside the transaction, all writes inside the transaction, inserted IDs captured via `.returning()`, and audit logging dispatched after the transaction commits with isolated error handling.
+
 _Source: [SQL Style Guide (General Best Practices)](https://www.sqlstyle.guide/)_
 
 </protect>

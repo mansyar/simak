@@ -85,9 +85,9 @@
 
 ## Phase 6: Documentation & fileKey Investigation
 
-- [ ] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
-- [ ] Task: Document "Transaction Wrapping" convention
-    - [ ] Append a "Transaction Wrapping" section to `conductor/code_styleguides/sql.md` covering: when to use `db.transaction` (2+ writes), the `.returning()` pattern, post-commit advisory work isolation (try/catch after commit), and the gold-standard reference (`submitReviewHandler`)
+- [~] Task: Read context — review `./spec.md` and `../../workflow.md` before starting this phase
+- [~] Task: Document "Transaction Wrapping" convention
+    - [~] Append a "Transaction Wrapping" section to `conductor/code_styleguides/sql.md` covering: when to use `db.transaction` (2+ writes), the `.returning()` pattern, post-commit advisory work isolation (try/catch after commit), and the gold-standard reference (`submitReviewHandler`)
 - [ ] Task: Investigate fileKey trust gap (document only)
     - [ ] Trace the presign→submit flow: how `fileKey` is generated in `getPresignedUploadUrl` and consumed in `submitCheckpointHandler`
     - [ ] Record findings (the exact trust gap, feasibility of a presign-time mapping table, recommended approach) in a findings note within this track's folder
