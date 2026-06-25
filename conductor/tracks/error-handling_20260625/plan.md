@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Error Boundary & Error Message Improvements
 
-## Phase 1: Server Error Utilities
+## Phase 1: Server Error Utilities [checkpoint: 6985efb]
 
 **Objective:** Create the foundational server-side error module (`src/lib/errors.ts`) with typed error codes, a `serverError()` factory, and a structured `logError()` logger.
 
@@ -24,7 +24,7 @@
     - [ ] Run `CI=true pnpm vitest run tests/unit/lib/errors.test.ts` and confirm tests pass
 - [x] Task: Verify coverage [1d9781e]
     - [x] Run `pnpm test:coverage` and confirm `src/lib/errors.ts` >= 80% coverage
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Server Error Utilities' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Server Error Utilities' (Protocol in workflow.md) [6985efb]
 
 ## Phase 2: i18n Error Keys, Sonner & Client Toast Helper
 
