@@ -260,6 +260,7 @@ describe('Notification handlers', () => {
         { id: 2, userId: 'user-1', type: 'test', title: 'Test 2', channel: 'in_app' },
       ];
       mockDb.then
+        .mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn))
         .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 2 }]).then(fn))
         .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
 
@@ -273,6 +274,7 @@ describe('Notification handlers', () => {
         { id: 1, userId: 'user-1', type: 'sla_breach', title: 'SLA', channel: 'in_app' },
       ];
       mockDb.then
+        .mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn))
         .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 1 }]).then(fn))
         .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
 
@@ -285,6 +287,7 @@ describe('Notification handlers', () => {
     it('should handle empty results', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
       mockDb.then
+        .mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn))
         .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
         .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
 

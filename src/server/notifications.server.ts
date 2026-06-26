@@ -2,9 +2,11 @@
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { notifications } from '../db/schema/notifications';
+import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '../lib/types';
+import type { Locales } from '../i18n/types';
 import type { z } from 'zod';
 import type {
   CreateNotificationSchema,
@@ -13,6 +15,47 @@ import type {
   MarkAllReadSchema,
   GetUnreadCountSchema,
 } from './notifications';
+import enTranslations from '../../locales/en.json';
+import idTranslations from '../../locales/id.json';
+
+type TranslationRecord = { [key: string]: string | TranslationRecord };
+
+const translations: Record<Locales, TranslationRecord> = {
+  en: enTranslations as TranslationRecord,
+  id: idTranslations as TranslationRecord,
+};
+
+function resolveKey(obj: TranslationRecord, key: string): string {
+  const parts = key.split('.');
+  let current: TranslationRecord | string = obj;
+  for (const part of parts) {
+    if (typeof current === 'object' && current !== null && part in current) {
+      current = current[part];
+    } else {
+      return key;
+    }
+  }
+  return typeof current === 'string' ? current : key;
+}
+
+function interpolate(text: string, params?: Record<string, string>): string {
+  if (!params) return text;
+  return text.replace(/\{(\w+)\}/g, (_, p) => params[p] ?? `{${p}}`);
+}
+
+export function resolveNotificationContent(
+  titleKey: string,
+  messageKey: string | null,
+  params: Record<string, string> | null,
+  locale: Locales,
+) {
+  return {
+    title: interpolate(resolveKey(translations[locale], titleKey), params ?? undefined),
+    message: messageKey
+      ? interpolate(resolveKey(translations[locale], messageKey), params ?? undefined)
+      : null,
+  };
+}
 
 type CreateNotificationInput = z.infer<typeof CreateNotificationSchema>;
 type ListNotificationsInput = z.infer<typeof ListNotificationsSchema>;
@@ -77,6 +120,13 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
   const db = getDb();
 
   try {
+    // Resolve the requesting user's locale for read-time localization
+    const [userRow] = await db
+      .select({ locale: users.locale })
+      .from(users)
+      .where(eq(users.id, session.user.id));
+    const locale: Locales = (userRow?.locale as Locales) ?? 'en';
+
     // Build conditions
     const conditions = [eq(notifications.userId, session.user.id)];
     if (type) {
@@ -98,8 +148,24 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
       .limit(limit)
       .offset((page - 1) * limit);
 
+    const hydratedItems = items.map((item) => {
+      if (item.titleKey) {
+        return {
+          ...item,
+          ...resolveNotificationContent(
+            item.titleKey,
+            item.messageKey ?? null,
+            item.params,
+            locale,
+          ),
+        };
+      }
+      // Expand-phase fallback: legacy rows without stored keys
+      return item;
+    });
+
     return {
-      items: items as never,
+      items: hydratedItems as never,
       total: Number(count),
     };
   } catch (err) {
