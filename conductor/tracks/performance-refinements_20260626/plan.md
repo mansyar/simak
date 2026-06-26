@@ -91,7 +91,7 @@
     - [ ] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Batch email uniqueness check' as complete`
 
-- [~] Task: Batch user + verification inserts in a single transaction (FR-4)
+- [x] Task: Batch user + verification inserts in a single transaction (FR-4) — commit `66f35671aa420b42014631d541ef5d96e79b733b`
     - [x] Mark task `[~]` in progress in `plan.md`
     - [ ] Write failing tests — extend `tests/unit/server/bulk-import.test.ts` (Red phase)
         - [ ] Test: All valid users + verification tokens inserted in a single `db.transaction` with `.values([...])` batch inserts
