@@ -6,9 +6,9 @@
 
 ## Phase 1: Notification i18n (H1)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
-    - [ ] Read `./spec.md` — focus on FR-1 (Notification i18n) and NFR-5 (expand-contract migration)
-    - [ ] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
+ - [~] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+     - [x] Read `./spec.md` — focus on FR-1 (Notification i18n) and NFR-5 (expand-contract migration)
+     - [x] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
 
 - [ ] Task: Define notification i18n keys in locale files
     - [ ] Write test verifying all notification types have keys in both `en.json` and `id.json` (Red)
