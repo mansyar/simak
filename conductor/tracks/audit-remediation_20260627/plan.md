@@ -4,7 +4,7 @@
 **Track ID:** `audit-remediation_20260627`
 **Specification:** `./spec.md`
 
-## Phase 1: Notification i18n (H1)
+## [x] Phase 1: Notification i18n (H1) [checkpoint: 4875b95]
 
  - [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase [1c289ff]
      - [x] Read `./spec.md` — focus on FR-1 (Notification i18n) and NFR-5 (expand-contract migration)
@@ -64,7 +64,7 @@
      - [x] Generate + apply migration
      - [x] Verify `pnpm typecheck` and `pnpm test` pass
 
- - [~] Task: Conductor - User Manual Verification 'Phase 1: Notification i18n' (Protocol in workflow.md)
+ - [x] Task: Conductor - User Manual Verification 'Phase 1: Notification i18n' (Protocol in workflow.md) [checkpoint: 4875b95]
 
 ## Phase 2: Boundary Type Contract (H2)
 
