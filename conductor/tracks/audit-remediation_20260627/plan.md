@@ -66,28 +66,35 @@
 
  - [x] Task: Conductor - User Manual Verification 'Phase 1: Notification i18n' (Protocol in workflow.md) [checkpoint: 4875b95]
 
-## Phase 2: Boundary Type Contract (H2)
+## [x] Phase 2: Boundary Type Contract (H2) [checkpoint: TBD]
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
-    - [ ] Read `./spec.md` — focus on FR-2 (Boundary Type Contract) and NFR-4 (no new `any`/`@ts-expect-error`)
-    - [ ] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+    - [x] Read `./spec.md` — focus on FR-2 (Boundary Type Contract) and NFR-4 (no new `any`/`@ts-expect-error`)
+    - [x] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
 
-- [ ] Task: Write boundary type tests
-    - [ ] Write tests verifying server-fn handlers that cross the boundary have explicit return types with `Date` fields modeled as `string` (Red)
-    - [ ] Run tests and confirm they fail (no explicit types declared yet)
+- [x] Task: Write boundary type tests
+    - [x] Write tests verifying server-fn handlers that cross the boundary have explicit return types with `Date` fields modeled as `string` (Red)
+    - [x] `tests/unit/server/dashboard-instructor-boundary.test.ts`
+    - [x] `tests/unit/server/assignments-boundary.test.ts`
+    - [x] `tests/unit/server/consultations-boundary.test.ts`
+    - [x] `tests/unit/server/setup-password-boundary.test.ts`
+    - [x] Run tests and confirm they fail (no explicit types declared yet)
 
-- [ ] Task: Declare explicit return types on server-fn handlers
-    - [ ] Identify all server-fn handlers whose output is consumed by route loaders (instructor/dashboard, instructor/assignments/$id, assignments/index, AssignmentConsultationsTab, AssignmentOverviewTab, setup-password) (Green)
-    - [ ] Declare explicit return types modeling `Date` → `string` (ISO) on each handler
-    - [ ] Run `pnpm typecheck` and fix any inference errors
+- [x] Task: Declare explicit return types on server-fn handlers
+    - [x] Identify all server-fn handlers whose output is consumed by route loaders (instructor/dashboard, instructor/assignments/$id, assignments/index, AssignmentConsultationsTab, AssignmentOverviewTab, setup-password) (Green)
+    - [x] `src/server/dashboard-instructor.server.ts` — explicit `InstructorDashboardSuccess | ServerError` with ISO date conversion
+    - [x] `src/server/assignments.server.ts` — explicit `ListInstructorAssignmentsSuccess | ServerError` and `AssignmentDetailSuccess | ServerError | null`
+    - [x] `src/server/consultations.server.ts` — explicit `ListPendingConsultationsSuccess | ServerError`
+    - [x] `src/server/setup-password.ts` — explicit `PasswordSetupResult` and typed `createServerFn` input
+    - [x] Run `pnpm typecheck` and fix any inference errors
 
-- [ ] Task: Remove TODOs and @ts-expect-error
-    - [ ] Remove the 6 `TODO`/`FIXME` data-shape-mismatch comments (instructor/dashboard.tsx:19, instructor/assignments/$id.tsx:24, assignments/index.tsx:39, assignments/index.tsx:57, AssignmentConsultationsTab.tsx:72, AssignmentOverviewTab.tsx:122)
-    - [ ] Remove `@ts-expect-error` at `setup-password.tsx:51` by fixing the underlying type inference
-    - [ ] Run `pnpm typecheck` — must pass with zero new errors
-    - [ ] Grep source for remaining `@ts-expect-error` (excluding generated files) — must be zero
+- [x] Task: Remove TODOs and @ts-expect-error
+    - [x] Remove the 6 `TODO`/`FIXME` data-shape-mismatch comments (instructor/dashboard.tsx:19, instructor/assignments/$id.tsx:24, assignments/index.tsx:39, assignments/index.tsx:57, AssignmentConsultationsTab.tsx:72, AssignmentOverviewTab.tsx:122)
+    - [x] Remove `@ts-expect-error` at `setup-password.tsx:51` by fixing the underlying type inference
+    - [x] Run `pnpm typecheck` — must pass with zero new errors
+    - [x] Grep source for remaining `@ts-expect-error` (excluding generated files) — must be zero
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Boundary Type Contract' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Boundary Type Contract' (Protocol in workflow.md)
 
 ## Phase 3: Dead i18n Key Cleanup (M1)
 

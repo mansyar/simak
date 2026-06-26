@@ -3,21 +3,39 @@ import { formatDateShort, formatDateTimeShort } from '@/lib/format';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MetricCard } from '@/components/ui/metric-card';
 import { ProgressTable } from '@/components/instructor/assignments/ProgressTable';
-import type { StudentProgress } from '@/components/instructor/assignments/ProgressTable';
 import { DeadlineManager } from '@/components/reviews/DeadlineManager';
 import { useI18n } from '@/routes/__root';
+
+interface AssignmentOverviewStudent {
+  id: string;
+  name: string;
+  email: string;
+  progressPercent: number;
+  passedCount: number;
+  totalCheckpointsCount: number;
+  activeCheckpoint: { id: number; name: string; state: string } | null;
+  checkpoints: {
+    id: number;
+    name: string;
+    order: number;
+    state: string;
+    studentId: string;
+    dueDate: string | null;
+    minConsultations: number | null;
+  }[];
+}
 
 interface AssignmentOverviewTabProps {
   assignment: {
     id: number;
     title: string;
     description: string | null;
-    finalDeadline: Date;
-    createdAt: Date;
+    finalDeadline: string;
+    createdAt: string;
     templateName: string;
     templateType: string;
-    instructorId: number;
-    students: StudentProgress[];
+    instructorId: string;
+    students: AssignmentOverviewStudent[];
   };
 }
 
@@ -28,15 +46,10 @@ export function AssignmentOverviewTab({ assignment }: AssignmentOverviewTabProps
   const avgProgress =
     totalStudents > 0
       ? Math.round(
-          assignment.students.reduce(
-            (sum: number, s: StudentProgress) => sum + s.progressPercent,
-            0,
-          ) / totalStudents,
+          assignment.students.reduce((sum, s) => sum + s.progressPercent, 0) / totalStudents,
         )
       : 0;
-  const completedStudents = assignment.students.filter(
-    (s: StudentProgress) => s.progressPercent === 100,
-  ).length;
+  const completedStudents = assignment.students.filter((s) => s.progressPercent === 100).length;
 
   return (
     <div className="space-y-6">
@@ -118,32 +131,7 @@ export function AssignmentOverviewTab({ assignment }: AssignmentOverviewTabProps
       </div>
 
       {/* Deadline Manager */}
-      <DeadlineManager
-        // TODO: data shape mismatch — DeadlineManager expects `id: string` for
-        // students, but the loader returns `id: number` (DB row id). The cast
-        // is unavoidable until the loader normalises the shape.
-        students={
-          assignment.students as unknown as {
-            id: string;
-            name: string;
-            email: string;
-            progressPercent: number;
-            passedCount: number;
-            totalCheckpointsCount: number;
-            activeCheckpoint: { id: number; name: string; state: string } | null;
-            checkpoints: {
-              id: number;
-              name: string;
-              order: number;
-              state: 'locked' | 'unlocked' | 'submitted' | 'under_review' | 'passed' | 'revise';
-              studentId: string;
-              dueDate: Date | null;
-              minConsultations: number | null;
-            }[];
-          }[]
-        }
-        assignmentId={assignment.id}
-      />
+      <DeadlineManager students={assignment.students} assignmentId={assignment.id} />
     </div>
   );
 }

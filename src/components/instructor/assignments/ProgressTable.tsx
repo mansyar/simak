@@ -21,7 +21,7 @@ export type StudentProgress = {
   activeCheckpoint: {
     id: number;
     name: string;
-    state: 'passed' | 'under_review' | 'submitted' | 'locked' | 'unlocked' | 'revise';
+    state: string;
   } | null;
 };
 

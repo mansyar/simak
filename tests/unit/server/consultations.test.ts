@@ -218,7 +218,13 @@ describe('Consultation server functions - Logic & Security', () => {
         )
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([
-            { id: 1, studentName: 'Student A', checkpointName: 'Ch 1', sessionType: 'internal' },
+            {
+              id: 1,
+              studentName: 'Student A',
+              checkpointName: 'Ch 1',
+              sessionType: 'internal',
+              createdAt: new Date('2026-05-01T00:00:00.000Z'),
+            },
           ]).then(onfulfilled),
         );
 

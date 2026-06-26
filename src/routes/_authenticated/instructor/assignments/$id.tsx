@@ -6,11 +6,11 @@ import { AssignmentOverviewTab } from '@/components/instructor/assignments/Assig
 import { AssignmentConsultationsTab } from '@/components/instructor/assignments/AssignmentConsultationsTab';
 import { AssignmentExtensionsTab } from '@/components/instructor/assignments/AssignmentExtensionsTab';
 import { AssignmentDetailTabs } from '@/components/instructor/assignments/AssignmentDetailTabs';
-import type { StudentProgress } from '@/components/instructor/assignments/ProgressTable';
 import { useAssignmentTabs } from '@/hooks/use-assignment-tabs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { FileX } from 'lucide-react';
 import { useI18n } from '../../../__root';
+import { isServerError } from '@/lib/errors';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id')({
   loader: async ({ params }) => {
@@ -21,20 +21,8 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/$id
 
 function AssignmentDetailPage() {
   const { t } = useI18n();
-  // TODO: data shape mismatch — loader returns the raw handler output; the
-  // server function's union return (data | null) cannot be narrowed without a
-  // discriminator. Follow-up to the type-fix track.
-  const assignment = Route.useLoaderData() as unknown as {
-    id: number;
-    title: string;
-    description: string | null;
-    finalDeadline: Date;
-    createdAt: Date;
-    templateName: string;
-    templateType: string;
-    instructorId: number;
-    students: StudentProgress[];
-  } | null;
+  const loaderData = Route.useLoaderData();
+  const assignment = loaderData && !isServerError(loaderData) ? loaderData : null;
 
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedConsultationId, setSelectedConsultationId] = useState<number | null>(null);

@@ -13,7 +13,7 @@ interface PendingReviewItem {
   checkpointName: string;
   assignmentTitle: string;
   studentName: string;
-  submittedAt: string;
+  submittedAt: string | null;
 }
 
 interface RecentSubmission {
@@ -141,7 +141,9 @@ export function InstructorDashboard({ data }: Props) {
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0 ml-2">
-                    <SLABadge state="under_review" updatedAt={new Date(item.submittedAt)} />
+                    {item.submittedAt && (
+                      <SLABadge state="under_review" updatedAt={new Date(item.submittedAt)} />
+                    )}
                     <ArrowRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </Link>

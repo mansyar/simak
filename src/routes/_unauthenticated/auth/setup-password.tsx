@@ -48,9 +48,8 @@ function SetupPasswordPage() {
     setIsSubmitting(true);
 
     try {
-      // @ts-expect-error - server function type inference limitation
       const result = await completePasswordSetup({ data: { token, password } });
-      if (result.error) {
+      if ('error' in result) {
         setError(result.error);
       } else {
         setSuccess(true);

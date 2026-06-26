@@ -20,9 +20,9 @@ interface CheckpointData {
   id: number;
   name: string;
   order: number;
-  state: 'locked' | 'unlocked' | 'submitted' | 'under_review' | 'passed' | 'revise';
+  state: string;
   studentId: string;
-  dueDate: Date | null;
+  dueDate: Date | string | null;
   minConsultations: number | null;
 }
 
@@ -150,7 +150,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
     [extendDates, extendMutation],
   );
 
-  const formatDate = (date: Date | null) => {
+  const formatDate = (date: Date | string | null) => {
     if (!date) return '—';
     try {
       return format(new Date(date), 'MMM d, yyyy');
@@ -159,7 +159,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
     }
   };
 
-  const isOverdue = (date: Date | null) => {
+  const isOverdue = (date: Date | string | null) => {
     if (!date) return false;
     try {
       return new Date(date) < new Date();

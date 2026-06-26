@@ -136,7 +136,14 @@ describe('Assignment Server Functions', () => {
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([
-            { id: 42, title: 'Assignment 1', templateName: 'Tpl', templateType: 'Thesis' },
+            {
+              id: 42,
+              title: 'Assignment 1',
+              templateName: 'Tpl',
+              templateType: 'Thesis',
+              finalDeadline: new Date('2026-12-31T00:00:00.000Z'),
+              createdAt: new Date('2026-05-01T00:00:00.000Z'),
+            },
           ]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
@@ -186,6 +193,8 @@ describe('Assignment Server Functions', () => {
               instructorId: 'instructor-1',
               templateName: 'Thesis Template',
               templateType: 'Thesis',
+              finalDeadline: new Date('2026-12-31T00:00:00.000Z'),
+              createdAt: new Date('2026-05-01T00:00:00.000Z'),
             },
           ]).then(onfulfilled),
         )
@@ -196,8 +205,24 @@ describe('Assignment Server Functions', () => {
         )
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([
-            { id: 101, studentId: 'student-1', name: 'Milestone 1', order: 1, state: 'passed' },
-            { id: 102, studentId: 'student-1', name: 'Milestone 2', order: 2, state: 'unlocked' },
+            {
+              id: 101,
+              studentId: 'student-1',
+              name: 'Milestone 1',
+              order: 1,
+              state: 'passed',
+              dueDate: new Date('2026-06-01T00:00:00.000Z'),
+              minConsultations: 0,
+            },
+            {
+              id: 102,
+              studentId: 'student-1',
+              name: 'Milestone 2',
+              order: 2,
+              state: 'unlocked',
+              dueDate: new Date('2026-07-01T00:00:00.000Z'),
+              minConsultations: 0,
+            },
           ]).then(onfulfilled),
         );
 

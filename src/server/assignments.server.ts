@@ -6,7 +6,7 @@ import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
-import { serverError, ErrorCode } from '../lib/errors';
+import { serverError, ErrorCode, type ServerError } from '../lib/errors';
 import { calculateDueDates, validateDueDates } from './due-dates.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -19,6 +19,55 @@ import type {
 type CreateAssignmentInput = z.infer<typeof CreateAssignmentSchema>;
 type ListInstructorAssignmentsInput = z.infer<typeof ListInstructorAssignmentsSchema>;
 type AssignmentIdParam = z.infer<typeof AssignmentIdParamSchema>;
+
+export type InstructorAssignmentRow = {
+  id: number;
+  title: string;
+  description: string | null;
+  finalDeadline: string;
+  createdAt: string;
+  templateName: string;
+  templateType: string;
+  studentCount: number;
+};
+
+export type ListInstructorAssignmentsSuccess = {
+  assignments: InstructorAssignmentRow[];
+  total: number;
+};
+
+export type AssignmentDetailCheckpoint = {
+  id: number;
+  name: string;
+  order: number;
+  state: string;
+  studentId: string;
+  dueDate: string | null;
+  minConsultations: number | null;
+};
+
+export type AssignmentDetailStudent = {
+  id: string;
+  name: string;
+  email: string;
+  passedCount: number;
+  totalCheckpointsCount: number;
+  progressPercent: number;
+  activeCheckpoint: { id: number; name: string; state: string } | null;
+  checkpoints: AssignmentDetailCheckpoint[];
+};
+
+export type AssignmentDetailSuccess = {
+  id: number;
+  title: string;
+  description: string | null;
+  finalDeadline: string;
+  createdAt: string;
+  instructorId: string;
+  templateName: string;
+  templateType: string;
+  students: AssignmentDetailStudent[];
+};
 
 function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
@@ -150,7 +199,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
 
 export async function listInstructorAssignmentsHandler(args: {
   data: ListInstructorAssignmentsInput;
-}) {
+}): Promise<ListInstructorAssignmentsSuccess | ServerError> {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
     return { assignments: [], total: 0 };
@@ -204,8 +253,14 @@ export async function listInstructorAssignmentsHandler(args: {
       studentCounts = new Map(counts.map((c) => [c.assignmentId, c.count]));
     }
 
-    const enrichedAssignments = rawAssignments.map((a) => ({
-      ...a,
+    const enrichedAssignments: InstructorAssignmentRow[] = rawAssignments.map((a) => ({
+      id: a.id,
+      title: a.title,
+      description: a.description,
+      finalDeadline: a.finalDeadline.toISOString(),
+      createdAt: a.createdAt ? a.createdAt.toISOString() : '',
+      templateName: a.templateName,
+      templateType: a.templateType,
       studentCount: studentCounts.get(a.id) ?? 0,
     }));
 
@@ -227,7 +282,9 @@ export async function listInstructorAssignmentsHandler(args: {
   }
 }
 
-export async function getAssignmentDetailHandler(args: { data: AssignmentIdParam }) {
+export async function getAssignmentDetailHandler(args: {
+  data: AssignmentIdParam;
+}): Promise<AssignmentDetailSuccess | ServerError | null> {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
     return null;
@@ -271,24 +328,7 @@ export async function getAssignmentDetailHandler(args: { data: AssignmentIdParam
       .orderBy(users.name);
 
     const studentIds = studentsList.map((s) => s.id);
-    const studentsWithProgress: {
-      id: string;
-      name: string;
-      email: string;
-      passedCount: number;
-      totalCheckpointsCount: number;
-      progressPercent: number;
-      activeCheckpoint: { id: number; name: string; state: string } | null;
-      checkpoints: {
-        id: number;
-        name: string;
-        order: number;
-        state: string;
-        studentId: string;
-        dueDate: Date | null;
-        minConsultations: number | null;
-      }[];
-    }[] = [];
+    const studentsWithProgress: AssignmentDetailStudent[] = [];
 
     if (studentIds.length > 0) {
       // 3. Fetch all checkpoints for these students
@@ -336,13 +376,23 @@ export async function getAssignmentDetailHandler(args: { data: AssignmentIdParam
                 state: activeCheckpoint.state,
               }
             : null,
-          checkpoints: sCheckpoints,
+          checkpoints: sCheckpoints.map((cp) => ({
+            id: cp.id,
+            name: cp.name,
+            order: cp.order,
+            state: cp.state,
+            studentId: cp.studentId,
+            dueDate: cp.dueDate ? cp.dueDate.toISOString() : null,
+            minConsultations: cp.minConsultations,
+          })),
         });
       });
     }
 
     return {
       ...assignment,
+      finalDeadline: assignment.finalDeadline.toISOString(),
+      createdAt: assignment.createdAt ? assignment.createdAt.toISOString() : '',
       students: studentsWithProgress,
     };
   } catch (err) {

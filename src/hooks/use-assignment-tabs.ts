@@ -7,15 +7,9 @@ import { listPendingConsultations } from '@/server/consultations';
 import { listExtensionRequests, approveExtension, rejectExtension } from '@/server/extensions';
 import { parseServerError, showErrorToast } from '@/lib/toast';
 import { useI18n } from '@/routes/__root';
+import { isServerError } from '@/lib/errors';
 import type { PendingConsultation } from '@/components/instructor/assignments/AssignmentConsultationsTab';
 import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
-
-// as unknown as casts required: handler return types include Date | null
-// fields that PendingConsultation/ExtensionRequestItem do not accept. This is
-// a pre-existing data shape mismatch unrelated to the createServerFn typing fix.
-const listPendingFn = listPendingConsultations as unknown as (args: {
-  data: { assignmentId: number };
-}) => Promise<{ consultations: PendingConsultation[] }>;
 
 const listExtensionsFn = listExtensionRequests as unknown as (args: {
   data: { assignmentId: number; status: string; page: number; limit: number };
@@ -48,10 +42,12 @@ export function useAssignmentTabs(assignmentId: number | null) {
     const load = async () => {
       setExtensionsLoading(true);
       const [consultResult, extResult] = await Promise.all([
-        listPendingFn({ data: { assignmentId } }),
+        listPendingConsultations({ data: { assignmentId } }),
         listExtensionsFn({ data: { assignmentId, status: 'pending', page: 1, limit: 50 } }),
       ]);
-      if (consultResult.consultations) setPendingConsultations(consultResult.consultations);
+      if (!isServerError(consultResult) && consultResult.consultations) {
+        setPendingConsultations(consultResult.consultations);
+      }
       if ('items' in extResult) setExtensionRequests(extResult.items);
       setExtensionsLoading(false);
     };

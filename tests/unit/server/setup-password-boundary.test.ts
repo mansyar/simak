@@ -1,0 +1,88 @@
+/** @vitest-environment node */
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { completePasswordSetupHandler, type PasswordSetupResult } from '@/server/setup-password';
+
+vi.mock('@tanstack/react-start', () => ({
+  createServerFn: vi.fn().mockReturnValue({
+    inputValidator: vi.fn().mockReturnThis(),
+    handler: vi.fn().mockImplementation((fn) => fn),
+  }),
+}));
+
+const mockTx = {
+  select: vi.fn().mockReturnThis(),
+  from: vi.fn().mockReturnThis(),
+  where: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockReturnThis(),
+  then: vi.fn(),
+  insert: vi.fn().mockReturnThis(),
+  values: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  set: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+};
+
+const mockDb = {
+  select: vi.fn().mockReturnThis(),
+  from: vi.fn().mockReturnThis(),
+  where: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockReturnThis(),
+  then: vi.fn(),
+  transaction: vi.fn(async (callback) => callback(mockTx)),
+};
+
+vi.mock('@/db/index', () => ({
+  getDb: vi.fn().mockReturnValue(mockDb),
+}));
+
+vi.mock('@/db/schema/index', () => ({
+  verification: { id: 'v-id', value: 'v-value', expiresAt: 'v-expires', identifier: 'v-email' },
+  account: { id: 'a-id', userId: 'a-userId', accountId: 'a-accountId', providerId: 'a-providerId' },
+  users: { id: 'u-id', email: 'u-email', deletedAt: 'u-deletedAt' },
+}));
+
+vi.mock('drizzle-orm', () => ({
+  eq: vi.fn((a, b) => ({ eq: [a, b] })),
+  and: vi.fn((...args) => ({ and: args })),
+  gt: vi.fn((a, b) => ({ gt: [a, b] })),
+  isNull: vi.fn((a) => ({ isNull: a })),
+}));
+
+vi.mock('better-auth/crypto', () => ({
+  hashPassword: vi.fn().mockResolvedValue('hashed-password'),
+}));
+
+vi.mock('node:crypto', () => ({
+  default: { randomUUID: vi.fn().mockReturnValue('random-uuid') },
+}));
+
+describe('completePasswordSetupHandler — boundary return type', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockTx.then.mockImplementation((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+  });
+
+  it('returns success shape with explicit type', async () => {
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ identifier: 'user@example.com', id: 'verif-id' }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 'user-id' }]).then(onfulfilled),
+      );
+
+    const result: PasswordSetupResult = await completePasswordSetupHandler({
+      data: { token: 'valid-token', password: 'securepassword' },
+    });
+
+    expect(result).toEqual({ success: true });
+  });
+
+  it('returns error string shape for invalid input', async () => {
+    const result: PasswordSetupResult = await completePasswordSetupHandler({
+      data: { token: '', password: 'short' },
+    });
+
+    expect(result).toEqual({ error: 'Invalid token or password' });
+  });
+});

@@ -5,17 +5,54 @@ import { assignments, assignmentStudents, checkpoints } from '../db/schema/assig
 import { submissions } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
-import { serverError, ErrorCode } from '@/lib/errors';
+import { serverError, ErrorCode, type ServerError } from '@/lib/errors';
 import type { NonNullableSession } from '../lib/types';
 
 function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
 }
 
+type DashboardAssignmentOverview = {
+  id: number;
+  title: string;
+  finalDeadline: string | null;
+  createdAt: string | null;
+  studentCount: number;
+  pendingReviewCount: number;
+  overallProgressPercent: number;
+};
+
+type DashboardPendingReviewItem = {
+  submissionId: number;
+  checkpointName: string;
+  assignmentTitle: string;
+  studentName: string;
+  submittedAt: string | null;
+  waitTimeDays: number;
+};
+
+type DashboardRecentSubmission = {
+  submissionId: number;
+  studentName: string;
+  assignmentTitle: string;
+  checkpointName: string;
+  submittedAt: string;
+  status: string;
+};
+
+export type InstructorDashboardSuccess = {
+  pendingReviewCount: number;
+  pendingReviewItems: DashboardPendingReviewItem[];
+  recentSubmissions: DashboardRecentSubmission[];
+  assignments: DashboardAssignmentOverview[];
+};
+
 /**
  * Get all data for the instructor dashboard.
  */
-export async function getInstructorDashboardDataHandler() {
+export async function getInstructorDashboardDataHandler(): Promise<
+  InstructorDashboardSuccess | ServerError
+> {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
@@ -167,10 +204,11 @@ export async function getInstructorDashboardDataHandler() {
       );
     }
 
-    const assignmentsWithDetails = assignmentOverview.map((a) => ({
+    const assignmentsWithDetails: DashboardAssignmentOverview[] = assignmentOverview.map((a) => ({
       id: a.id,
       title: a.title,
-      finalDeadline: a.finalDeadline,
+      finalDeadline: a.finalDeadline ? a.finalDeadline.toISOString() : null,
+      createdAt: a.createdAt ? a.createdAt.toISOString() : null,
       studentCount: studentCountMap.get(a.id) ?? 0,
       pendingReviewCount: pendingReviewCountMap.get(a.id) ?? 0,
       overallProgressPercent: progressMap.get(a.id) ?? 0,
@@ -192,7 +230,7 @@ export async function getInstructorDashboardDataHandler() {
         checkpointName: item.checkpointName,
         assignmentTitle: item.assignmentTitle,
         studentName: item.studentName,
-        submittedAt: item.submittedAt,
+        submittedAt: item.submittedAt ? item.submittedAt.toISOString() : null,
         waitTimeDays: Math.floor(
           (Date.now() - (item.submittedAt?.getTime() ?? Date.now())) / (1000 * 60 * 60 * 24),
         ),
@@ -202,7 +240,7 @@ export async function getInstructorDashboardDataHandler() {
         studentName: rs.studentName,
         assignmentTitle: rs.assignmentTitle,
         checkpointName: rs.checkpointName,
-        submittedAt: rs.submittedAt,
+        submittedAt: rs.submittedAt ? rs.submittedAt.toISOString() : '',
         status: statusLabel(rs.checkpointState),
       })),
       assignments: assignmentsWithDetails,

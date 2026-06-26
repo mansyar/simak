@@ -7,7 +7,7 @@ import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
-import { serverError, ErrorCode } from '../lib/errors';
+import { serverError, ErrorCode, type ServerError } from '../lib/errors';
 import { verifyAssignmentAccess } from './ownership';
 import { getNotificationKeys } from './notifications.server';
 import type { NonNullableSession } from '../lib/types';
@@ -27,6 +27,22 @@ type ListPendingConsultationsInput = z.infer<typeof ListPendingConsultationsSche
 type VerifyConsultationInput = z.infer<typeof VerifyConsultationSchema>;
 type RejectConsultationInput = z.infer<typeof RejectConsultationSchema>;
 type GetConsultationDetailInput = z.infer<typeof GetConsultationDetailSchema>;
+
+export type PendingConsultationItem = {
+  id: number;
+  checkpointId: number;
+  studentId: string;
+  sessionType: string | null;
+  externalConsultantName: string | null;
+  notes: string | null;
+  createdAt: string;
+  studentName: string;
+  checkpointName: string;
+};
+
+export type ListPendingConsultationsSuccess = {
+  consultations: PendingConsultationItem[];
+};
 
 function isStudent(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'student';
@@ -236,7 +252,7 @@ export async function getConsultationDetailHandler(args: { data: GetConsultation
  */
 export async function listPendingConsultationsHandler(args: {
   data: ListPendingConsultationsInput;
-}) {
+}): Promise<ListPendingConsultationsSuccess | ServerError> {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
@@ -281,7 +297,12 @@ export async function listPendingConsultationsHandler(args: {
       .where(and(eq(consultations.assignmentId, assignmentId), eq(consultations.status, 'pending')))
       .orderBy(asc(consultations.createdAt));
 
-    return { consultations: items };
+    return {
+      consultations: items.map((item) => ({
+        ...item,
+        createdAt: item.createdAt ? item.createdAt.toISOString() : '',
+      })),
+    };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

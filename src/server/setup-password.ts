@@ -1,8 +1,16 @@
 import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
+
+export const SetupPasswordSchema = z.object({
+  token: z.string().min(1),
+  password: z.string().min(8),
+});
+
+export type PasswordSetupResult = { success: true } | { error: string };
 
 export async function completePasswordSetupHandler(args: {
   data: { token: string; password: string };
-}) {
+}): Promise<PasswordSetupResult> {
   const { token, password } = args.data;
 
   if (!token || !password || password.length < 8) {
@@ -89,9 +97,8 @@ export async function completePasswordSetupHandler(args: {
   }
 }
 
-export const completePasswordSetup = createServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
-    const { token, password } = args.data as { token: string; password: string };
-    return completePasswordSetupHandler({ data: { token, password } });
-  },
-);
+export const completePasswordSetup = createServerFn({ method: 'POST' })
+  .inputValidator(SetupPasswordSchema)
+  .handler(async ({ data }) => {
+    return completePasswordSetupHandler({ data });
+  });
