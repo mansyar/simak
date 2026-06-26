@@ -53,12 +53,12 @@
     - [x] Apply migration with `pnpm db:migrate`
      - [x] Verify backfill via a query check
 
-- [ ] Task: Extend lint rule for notification strings
-    - [ ] Write test for the extended `simak-i18n/no-hardcoded` rule (or companion rule) flagging string literals in notification insert `titleKey`/`messageKey` fields (Red)
-    - [ ] Extend `lint-plugin.js` to flag non-key strings in notification insert shape (Green)
-    - [ ] Run `pnpm lint` and verify zero violations on existing code (all sites now use keys)
+ - [x] Task: Extend lint rule for notification strings [9674dcc]
+     - [x] Write test for the extended `simak-i18n/no-hardcoded` rule (or companion rule) flagging string literals in notification insert `titleKey`/`messageKey` fields (Red)
+     - [x] Extend `lint-plugin.js` to flag non-key strings in notification insert shape (Green)
+     - [x] Run `pnpm lint` and verify zero violations on existing code (all sites now use keys)
 
-- [ ] Task: Schema migration — contract (drop old columns)
+ - [~] Task: Schema migration — contract (drop old columns)
     - [ ] Write test verifying old `title`/`message` columns are dropped and new columns are non-null (Red)
     - [ ] Remove `title`/`message` columns from schema, make `titleKey`/`messageKey` non-null (Green)
     - [ ] Generate + apply migration
