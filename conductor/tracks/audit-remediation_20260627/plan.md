@@ -6,7 +6,7 @@
 
 ## Phase 1: Notification i18n (H1)
 
- - [~] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+ - [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase [1c289ff]
      - [x] Read `./spec.md` — focus on FR-1 (Notification i18n) and NFR-5 (expand-contract migration)
      - [x] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
 
