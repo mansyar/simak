@@ -96,7 +96,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Boundary Type Contract' (Protocol in workflow.md) [checkpoint: 5f73fb7]
 
-## [x] Phase 3: Dead i18n Key Cleanup (M1)
+## [x] Phase 3: Dead i18n Key Cleanup (M1) [checkpoint: 99a244c]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
     - [x] Read `./spec.md` — focus on FR-3 (Dead i18n Key Cleanup) and NFR-6 (i18n keys in both locales)
@@ -119,7 +119,7 @@
     - [x] Write `tests/unit/i18n/gate-unused.test.ts` verifying the gate fails on an intentionally-unused key
     - [x] Run `pnpm test`, `pnpm typecheck`, and `pnpm lint` — all pass
 
-- [x] Task: Conductor - User Manual Verification 'Phase 3: Dead i18n Key Cleanup' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Dead i18n Key Cleanup' (Protocol in workflow.md) [checkpoint: 99a244c]
 
 ## Phase 4: Client Error Handling (M4)
 
