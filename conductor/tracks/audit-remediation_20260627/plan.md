@@ -58,13 +58,13 @@
      - [x] Extend `lint-plugin.js` to flag non-key strings in notification insert shape (Green)
      - [x] Run `pnpm lint` and verify zero violations on existing code (all sites now use keys)
 
- - [~] Task: Schema migration — contract (drop old columns)
-    - [ ] Write test verifying old `title`/`message` columns are dropped and new columns are non-null (Red)
-    - [ ] Remove `title`/`message` columns from schema, make `titleKey`/`messageKey` non-null (Green)
-    - [ ] Generate + apply migration
-    - [ ] Verify `pnpm typecheck` and `pnpm test` pass
+ - [x] Task: Schema migration — contract (drop old columns) [e1f60d5]
+     - [x] Write test verifying old `title`/`message` columns are dropped and new columns are non-null (Red)
+     - [x] Remove `title`/`message` columns from schema, make `titleKey`/`messageKey` non-null (Green)
+     - [x] Generate + apply migration
+     - [x] Verify `pnpm typecheck` and `pnpm test` pass
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Notification i18n' (Protocol in workflow.md)
+ - [~] Task: Conductor - User Manual Verification 'Phase 1: Notification i18n' (Protocol in workflow.md)
 
 ## Phase 2: Boundary Type Contract (H2)
 
