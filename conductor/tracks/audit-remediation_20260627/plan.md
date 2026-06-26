@@ -66,7 +66,7 @@
 
  - [x] Task: Conductor - User Manual Verification 'Phase 1: Notification i18n' (Protocol in workflow.md) [checkpoint: 4875b95]
 
-## [x] Phase 2: Boundary Type Contract (H2) [checkpoint: TBD]
+## [x] Phase 2: Boundary Type Contract (H2) [checkpoint: 5f73fb7]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
     - [x] Read `./spec.md` — focus on FR-2 (Boundary Type Contract) and NFR-4 (no new `any`/`@ts-expect-error`)
@@ -94,7 +94,7 @@
     - [x] Run `pnpm typecheck` — must pass with zero new errors
     - [x] Grep source for remaining `@ts-expect-error` (excluding generated files) — must be zero
 
-- [x] Task: Conductor - User Manual Verification 'Phase 2: Boundary Type Contract' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Boundary Type Contract' (Protocol in workflow.md) [checkpoint: 5f73fb7]
 
 ## Phase 3: Dead i18n Key Cleanup (M1)
 
