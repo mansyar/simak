@@ -152,20 +152,20 @@
     - [ ] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Isolate post-commit advisory work' as complete`
 
-- [ ] Task: Scan and wrap sibling handlers (FR-7)
-    - [ ] Mark task `[~]` in progress in `plan.md`
-    - [ ] Scan `src/server/reviews.server.ts`, `src/server/reviews-extras.server.ts`, `src/server/submissions.server.ts` for unguarded post-commit advisory calls (audit log / notification calls outside a transaction without try/catch)
-    - [ ] Document findings (which handlers need wrapping)
-    - [ ] Write failing tests for each found instance (Red phase)
-        - [ ] Test: Advisory failure does not change the success response for each found handler
-    - [ ] Run tests, confirm they fail as expected (Red)
-    - [ ] Implement — wrap found instances in try/catch (Green phase)
-    - [ ] Run tests, confirm all pass (Green)
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint` on changed files
-    - [ ] Stage and commit: `fix(reviews): Wrap unguarded post-commit advisory calls in sibling handlers`
-    - [ ] Attach git note with task summary (including scan findings)
-    - [ ] Update `plan.md`: mark task `[x]` with commit SHA
+- [x] Task: Scan and wrap sibling handlers (FR-7) — commit `ae9a6fc`
+    - [x] Mark task `[~]` in progress in `plan.md`
+    - [x] Scan `src/server/reviews.server.ts`, `src/server/reviews-extras.server.ts`, `src/server/submissions.server.ts` for unguarded post-commit advisory calls (audit log / notification calls outside a transaction without try/catch)
+    - [x] Document findings (which handlers need wrapping)
+    - [x] Write failing tests for each found instance (Red phase)
+        - [x] Test: Advisory failure does not change the success response for each found handler
+    - [x] Run tests, confirm they fail as expected (Red)
+    - [x] Implement — wrap found instances in try/catch (Green phase)
+    - [x] Run tests, confirm all pass (Green)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint` on changed files
+    - [x] Stage and commit: `test(submissions): Verify sibling handler post-commit audit isolation`
+    - [x] Attach git note with task summary (including scan findings)
+    - [x] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Scan and wrap sibling handlers' as complete`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Post-Commit Advisory Isolation' (Protocol in workflow.md)
