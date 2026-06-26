@@ -18,4 +18,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Performance Refinements**
+*Link: [./tracks/performance-refinements_20260626/](./tracks/performance-refinements_20260626/)*
+
+---
 
