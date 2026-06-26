@@ -390,21 +390,29 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       }
     });
 
-    // 4g. Audit logging
-    await logAuditEvent({
-      actorId: session.user.id,
-      action: decision === 'pass' ? 'review.passed' : 'review.revised',
-      entityType: 'review',
-      entityId: String(submissionId),
-      details:
-        decision === 'pass'
-          ? { checkpointName: submission.checkpointName, comment: comment || null }
-          : { checkpointName: submission.checkpointName, revisionDeadline },
-    });
+    // 4g. Audit logging (post-commit advisory — must not fail the request)
+    try {
+      await logAuditEvent({
+        actorId: session.user.id,
+        action: decision === 'pass' ? 'review.passed' : 'review.revised',
+        entityType: 'review',
+        entityId: String(submissionId),
+        details:
+          decision === 'pass'
+            ? { checkpointName: submission.checkpointName, comment: comment || null }
+            : { checkpointName: submission.checkpointName, revisionDeadline },
+      });
+    } catch (advisoryErr) {
+      console.error('Post-commit advisory work failed in submitReviewHandler:', advisoryErr);
+    }
 
     // 4f. SLA breach notifications (after transaction — advisory, non-critical)
     if (breachDays > 0) {
-      await dispatchSLABreachNotifications(db, slaFields, breachDays);
+      try {
+        await dispatchSLABreachNotifications(db, slaFields, breachDays);
+      } catch (advisoryErr) {
+        console.error('Post-commit advisory work failed in submitReviewHandler:', advisoryErr);
+      }
     }
 
     return { success: true };
