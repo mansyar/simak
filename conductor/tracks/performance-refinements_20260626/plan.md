@@ -29,23 +29,23 @@
     - [x] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Parallelize instructor dashboard queries' as complete`
 
-- [ ] Task: Parallelize student dashboard queries (FR-2)
-    - [ ] Mark task `[~]` in progress in `plan.md`
-    - [ ] Write failing tests — `tests/unit/server/dashboard-student-parallel.test.ts` (Red phase)
-        - [ ] Test: `upcomingDeadlines`, `pendingReviews`, and `consultationReminders` run concurrently with `activeAssignments` via `Promise.all`
-        - [ ] Test: Checkpoints-by-assignment query still runs after `activeAssignments` resolves `assignmentIds`
-        - [ ] Test: Returned data shape is identical to the sequential version (activeAssignmentsWithProgress, upcomingDeadlines, pendingReviews, consultationReminders)
-        - [ ] Test: Progress calculation and sorting (soonest deadline first, then least progress) preserved
-        - [ ] Test: Edge case — student with zero active assignments does not throw
-    - [ ] Run tests, confirm they fail as expected (Red)
-    - [ ] Implement — restructure `getStudentDashboardDataHandler` in `src/server/dashboard-student.server.ts` (Green phase)
-    - [ ] Run tests, confirm all pass (Green)
-    - [ ] Run `pnpm vitest run tests/unit/server/dashboard-student-parallel.test.ts` to verify
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint` on changed files
-    - [ ] Stage and commit: `perf(dashboard): Parallelize student dashboard queries with Promise.all`
-    - [ ] Attach git note with task summary
-    - [ ] Update `plan.md`: mark task `[x]` with commit SHA
+- [x] Task: Parallelize student dashboard queries (FR-2) — commit `4fd9f5cdfbd013d160f2af309d32696e110a993f`
+    - [x] Mark task `[~]` in progress in `plan.md`
+    - [x] Write failing tests — `tests/unit/server/dashboard-student-parallel.test.ts` (Red phase)
+        - [x] Test: `upcomingDeadlines`, `pendingReviews`, and `consultationReminders` run concurrently with `activeAssignments` via `Promise.all`
+        - [x] Test: Checkpoints-by-assignment query still runs after `activeAssignments` resolves `assignmentIds`
+        - [x] Test: Returned data shape is identical to the sequential version (activeAssignmentsWithProgress, upcomingDeadlines, pendingReviews, consultationReminders)
+        - [x] Test: Progress calculation and sorting (soonest deadline first, then least progress) preserved
+        - [x] Test: Edge case — student with zero active assignments does not throw
+    - [x] Run tests, confirm they fail as expected (Red)
+    - [x] Implement — restructure `getStudentDashboardDataHandler` in `src/server/dashboard-student.server.ts` (Green phase)
+    - [x] Run tests, confirm all pass (Green)
+    - [x] Run `pnpm vitest run tests/unit/server/dashboard-student-parallel.test.ts` to verify
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint` on changed files
+    - [x] Stage and commit: `perf(dashboard): Parallelize student dashboard queries with Promise.all`
+    - [x] Attach git note with task summary
+    - [x] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Parallelize student dashboard queries' as complete`
 
 - [ ] Task: Parallelize admin dashboard queries (FR-3)
