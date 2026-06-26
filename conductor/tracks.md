@@ -19,3 +19,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Audit Remediation — i18n, Type Safety, Hygiene (H1, H2, M1, M4)**
+*Link: [./tracks/audit-remediation_20260627/](./tracks/audit-remediation_20260627/)*
+
