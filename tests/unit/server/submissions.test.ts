@@ -4,9 +4,14 @@ import { submitCheckpointHandler } from '@/server/submissions.server';
 import { isServerError } from '@/lib/errors';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
+import { logAuditEvent } from '@/lib/audit';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
+}));
+
+vi.mock('@/lib/audit', () => ({
+  logAuditEvent: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('@/db/index', () => ({
@@ -385,6 +390,42 @@ describe('Submission server functions - Logic & Security', () => {
       expect(notificationValues.userId).toBe('instructor-1');
       expect(notificationValues.type).toBe('submission_received');
       expect(notificationValues.metadata.submissionId).toBe(123);
+    });
+
+    it('should return success when post-commit audit logging throws', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+      vi.mocked(logAuditEvent).mockRejectedValueOnce(new Error('audit service down'));
+
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      mockDb.returning.mockReturnValueOnce({
+        then: (onfulfilled: any) => Promise.resolve([{ id: 42 }]).then(onfulfilled),
+      });
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+
+      const result = await submitCheckpointHandler({ data: submitData });
+
+      expect(result).toEqual({ success: true });
+      expect(logAuditEvent).toHaveBeenCalledWith({
+        actorId: 'student-1',
+        action: 'submission.created',
+        entityType: 'submission',
+        entityId: '42',
+        details: { checkpointId: 1, fileName: 'chapter1.pdf' },
+      });
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to log submission.created audit event:',
+        expect.any(Error),
+      );
+
+      consoleSpy.mockRestore();
     });
   });
 
