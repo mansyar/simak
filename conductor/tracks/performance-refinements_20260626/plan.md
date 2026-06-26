@@ -8,25 +8,25 @@
     - [ ] Read `./spec.md` to review functional requirements for this phase
     - [ ] Read `conductor/workflow.md` to review the TDD lifecycle and commit protocol
 
-- [ ] Task: Parallelize instructor dashboard queries (FR-1)
-    - [ ] Mark task `[~]` in progress in `plan.md`
-    - [ ] Write failing tests — `tests/unit/server/dashboard-instructor-parallel.test.ts` (Red phase)
-        - [ ] Test: `Promise.all` is used for independent query groups (Group A: instructorAssignments + recentSubmissions + assignmentOverview run concurrently)
-        - [ ] Test: Group B queries (pending review count + pendingReviewItems) run concurrently after Group A resolves `assignmentIds`
-        - [ ] Test: Group C queries (studentCount + pendingReviewCount + progressData) run concurrently after `overviewIds` resolves
-        - [ ] Test: Returned data shape is identical to the sequential version (pendingReviewCount, pendingReviewItems, recentSubmissions, assignments with details)
-        - [ ] Test: Deduplication logic (latest submission per checkpoint) is preserved
-        - [ ] Test: Edge case — instructor with zero assignments (assignmentIds empty) does not throw
-    - [ ] Run tests, confirm they fail as expected (Red)
-    - [ ] Implement — restructure `getInstructorDashboardDataHandler` in `src/server/dashboard-instructor.server.ts` to use `Promise.all` for independent query groups (Green phase)
-    - [ ] Run tests, confirm all pass (Green)
-    - [ ] Refactor (optional) — extract query groups into named async functions for readability if needed
-    - [ ] Run `pnpm vitest run tests/unit/server/dashboard-instructor-parallel.test.ts` to verify
-    - [ ] Run `pnpm typecheck` to verify types
-    - [ ] Run `pnpm lint` on changed files
-    - [ ] Stage and commit: `perf(dashboard): Parallelize instructor dashboard queries with Promise.all`
-    - [ ] Attach git note with task summary (files changed, why)
-    - [ ] Update `plan.md`: mark task `[x]` with commit SHA
+- [x] Task: Parallelize instructor dashboard queries (FR-1) — commit `a28fd73ac676f0c8d0b4003aa2caff1756cb7f7e`
+    - [x] Mark task `[~]` in progress in `plan.md`
+    - [x] Write failing tests — `tests/unit/server/dashboard-instructor-parallel.test.ts` (Red phase)
+        - [x] Test: `Promise.all` is used for independent query groups (Group A: instructorAssignments + recentSubmissions + assignmentOverview run concurrently)
+        - [x] Test: Group B queries (pending review count + pendingReviewItems) run concurrently after Group A resolves `assignmentIds`
+        - [x] Test: Group C queries (studentCount + pendingReviewCount + progressData) run concurrently after `overviewIds` resolves
+        - [x] Test: Returned data shape is identical to the sequential version (pendingReviewCount, pendingReviewItems, recentSubmissions, assignments with details)
+        - [x] Test: Deduplication logic (latest submission per checkpoint) is preserved
+        - [x] Test: Edge case — instructor with zero assignments (assignmentIds empty) does not throw
+    - [x] Run tests, confirm they fail as expected (Red)
+    - [x] Implement — restructure `getInstructorDashboardDataHandler` in `src/server/dashboard-instructor.server.ts` to use `Promise.all` for independent query groups (Green phase)
+    - [x] Run tests, confirm all pass (Green)
+    - [x] Refactor (optional) — kept inline groups to match existing style
+    - [x] Run `pnpm vitest run tests/unit/server/dashboard-instructor-parallel.test.ts` to verify
+    - [x] Run `pnpm typecheck` to verify types
+    - [x] Run `pnpm lint` on changed files
+    - [x] Stage and commit: `perf(dashboard): Parallelize instructor dashboard queries with Promise.all`
+    - [x] Attach git note with task summary (files changed, why)
+    - [x] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Parallelize instructor dashboard queries' as complete`
 
 - [ ] Task: Parallelize student dashboard queries (FR-2)
