@@ -16,6 +16,7 @@ import {
   dispatchSLABreachNotifications,
   type SLASubmissionFields,
 } from '../lib/review-sla';
+import { getNotificationKeys, resolveNotificationContent } from './notifications.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -359,12 +360,27 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       }
 
       // 4f. Create notification for the student (review_completed or revision_requested)
+      const reviewParams = {
+        checkpointName: submission.checkpointName,
+        assignmentTitle: submission.assignmentTitle,
+      };
+
       if (decision === 'pass') {
+        const reviewCompletedKeys = getNotificationKeys('review_completed');
+        const reviewCompletedFallback = resolveNotificationContent(
+          reviewCompletedKeys.titleKey,
+          reviewCompletedKeys.messageKey,
+          reviewParams,
+          'en',
+        );
         await tx.insert(notifications).values({
           userId: submission.studentId,
           type: 'review_completed',
-          title: 'Review Completed',
-          message: `Your submission for checkpoint "${submission.checkpointName}" in assignment "${submission.assignmentTitle}" has passed!`,
+          title: reviewCompletedFallback.title,
+          message: reviewCompletedFallback.message,
+          titleKey: reviewCompletedKeys.titleKey,
+          messageKey: reviewCompletedKeys.messageKey,
+          params: reviewParams,
           channel: 'in_app',
           metadata: {
             checkpointId: submission.checkpointId,
@@ -374,11 +390,21 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           },
         });
       } else if (decision === 'revise') {
+        const revisionRequestedKeys = getNotificationKeys('revision_requested');
+        const revisionRequestedFallback = resolveNotificationContent(
+          revisionRequestedKeys.titleKey,
+          revisionRequestedKeys.messageKey,
+          reviewParams,
+          'en',
+        );
         await tx.insert(notifications).values({
           userId: submission.studentId,
           type: 'revision_requested',
-          title: 'Revision Requested',
-          message: `Your submission for checkpoint "${submission.checkpointName}" in assignment "${submission.assignmentTitle}" requires revision.`,
+          title: revisionRequestedFallback.title,
+          message: revisionRequestedFallback.message,
+          titleKey: revisionRequestedKeys.titleKey,
+          messageKey: revisionRequestedKeys.messageKey,
+          params: reviewParams,
           channel: 'in_app',
           metadata: {
             checkpointId: submission.checkpointId,

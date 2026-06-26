@@ -7,6 +7,7 @@ import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '../lib/errors';
 import { logAuditEvent } from '../lib/audit';
+import { getNotificationKeys, resolveNotificationContent } from './notifications.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type { ApproveExtensionSchema, RejectExtensionSchema, BulkExtendSchema } from './extensions';
@@ -161,11 +162,22 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
     });
 
     // 3. Notify the student (outside transaction — advisory)
+    const approvedParams = { extensionDays: String(request.extensionDays) };
+    const approvedKeys = getNotificationKeys('extension_approved');
+    const approvedContent = resolveNotificationContent(
+      approvedKeys.titleKey,
+      approvedKeys.messageKey,
+      approvedParams,
+      'en',
+    );
     await db.insert(notifications).values({
       userId: request.studentId,
       type: 'extension_approved',
-      title: 'Extension Approved',
-      message: `Your ${request.extensionDays}-day deadline extension request has been approved.`,
+      title: approvedContent.title,
+      message: approvedContent.message,
+      titleKey: approvedKeys.titleKey,
+      messageKey: approvedKeys.messageKey,
+      params: approvedParams,
       channel: 'in_app',
       metadata: {
         extensionRequestId: requestId,
@@ -252,11 +264,25 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
       .where(eq(extensionRequests.id, requestId));
 
     // 3. Notify the student
+    const rejectedParams = {
+      extensionDays: String(request.extensionDays),
+      resolutionReason,
+    };
+    const rejectedKeys = getNotificationKeys('extension_rejected');
+    const rejectedContent = resolveNotificationContent(
+      rejectedKeys.titleKey,
+      rejectedKeys.messageKey,
+      rejectedParams,
+      'en',
+    );
     await db.insert(notifications).values({
       userId: request.studentId,
       type: 'extension_rejected',
-      title: 'Extension Rejected',
-      message: `Your ${request.extensionDays}-day deadline extension request has been rejected. Reason: ${resolutionReason}`,
+      title: rejectedContent.title,
+      message: rejectedContent.message,
+      titleKey: rejectedKeys.titleKey,
+      messageKey: rejectedKeys.messageKey,
+      params: rejectedParams,
       channel: 'in_app',
       metadata: {
         extensionRequestId: requestId,
@@ -388,11 +414,26 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
     }
 
     // 6. Notify the student
+    const extendedParams = {
+      extraDays: String(extraDays),
+      checkpointCount: String(unfinishedCheckpoints.length),
+      reason,
+    };
+    const extendedKeys = getNotificationKeys('deadline_extended');
+    const extendedContent = resolveNotificationContent(
+      extendedKeys.titleKey,
+      extendedKeys.messageKey,
+      extendedParams,
+      'en',
+    );
     await db.insert(notifications).values({
       userId: studentId,
       type: 'deadline_extended',
-      title: 'Deadline Extended',
-      message: `Your deadlines have been extended by ${extraDays} day(s) for ${unfinishedCheckpoints.length} checkpoint(s). Reason: ${reason}`,
+      title: extendedContent.title,
+      message: extendedContent.message,
+      titleKey: extendedKeys.titleKey,
+      messageKey: extendedKeys.messageKey,
+      params: extendedParams,
       channel: 'in_app',
       metadata: {
         assignmentId,

@@ -57,6 +57,13 @@ export function resolveNotificationContent(
   };
 }
 
+export function getNotificationKeys(type: string) {
+  return {
+    titleKey: `notifications.events.${type}.title`,
+    messageKey: `notifications.events.${type}.message`,
+  };
+}
+
 type CreateNotificationInput = z.infer<typeof CreateNotificationSchema>;
 type ListNotificationsInput = z.infer<typeof ListNotificationsSchema>;
 type MarkReadInput = z.infer<typeof MarkReadSchema>;

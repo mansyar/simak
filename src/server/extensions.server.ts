@@ -7,6 +7,7 @@ import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '../lib/errors';
+import { getNotificationKeys, resolveNotificationContent } from './notifications.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -185,11 +186,22 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
       .returning({ id: extensionRequests.id });
 
     // 8. Notify the instructor
+    const requestedParams = { extensionDays: String(extensionDays) };
+    const requestedKeys = getNotificationKeys('extension_requested');
+    const requestedContent = resolveNotificationContent(
+      requestedKeys.titleKey,
+      requestedKeys.messageKey,
+      requestedParams,
+      'en',
+    );
     await db.insert(notifications).values({
       userId: assignment.instructorId,
       type: 'extension_requested',
-      title: 'Extension Requested',
-      message: `A student has requested a ${extensionDays}-day deadline extension for checkpoint.`,
+      title: requestedContent.title,
+      message: requestedContent.message,
+      titleKey: requestedKeys.titleKey,
+      messageKey: requestedKeys.messageKey,
+      params: requestedParams,
       channel: 'in_app',
       metadata: {
         extensionRequestId: request.id,
