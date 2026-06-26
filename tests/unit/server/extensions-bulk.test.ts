@@ -226,7 +226,7 @@ describe('bulkExtendHandler', () => {
     );
     expect(notificationValues).toBeDefined();
     expect(notificationValues[0].userId).toBe('student-1');
-    expect(notificationValues[0].message).toContain('3');
+    expect(notificationValues[0].params.extraDays).toBe('5');
   });
 
   it('should extend assignment finalDeadline when it exists', async () => {

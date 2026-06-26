@@ -41,8 +41,6 @@ describe('Notification schemas', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: 'user-1',
         type: 'sla_breach',
-        title: 'SLA Breach',
-        message: 'Review overdue',
         channel: 'in_app',
         metadata: { assignmentId: 1, breachDays: 3 },
       });
@@ -53,7 +51,6 @@ describe('Notification schemas', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: 'user-1',
         type: 'sla_breach',
-        title: 'SLA Breach',
         channel: 'in_app',
       });
       expect(result.success).toBe(true);
@@ -63,7 +60,6 @@ describe('Notification schemas', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: 'user-1',
         type: 'sla_breach',
-        title: 'SLA Breach',
         channel: 'sms',
       });
       expect(result.success).toBe(false);
@@ -81,7 +77,6 @@ describe('Notification schemas', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: '',
         type: 'sla_breach',
-        title: 'Test',
         channel: 'in_app',
       });
       expect(result.success).toBe(false);
@@ -207,7 +202,7 @@ describe('Notification handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
       const result = await createNotificationHandler({
-        data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
+        data: { userId: 'user-1', type: 'test', channel: 'in_app' as const },
       });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
@@ -216,18 +211,18 @@ describe('Notification handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
 
       const result = await createNotificationHandler({
-        data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
+        data: { userId: 'user-1', type: 'test', channel: 'in_app' as const },
       });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
     it('should create a notification and return it when admin', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
-      const created = { id: 1, userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' };
+      const created = { id: 1, userId: 'user-1', type: 'test', titleKey: 'k', messageKey: 'm', channel: 'in_app' };
       mockDb.returning.mockResolvedValue([created]);
 
       const result = await createNotificationHandler({
-        data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
+        data: { userId: 'user-1', type: 'test', channel: 'in_app' as const },
       });
       expect(result).toEqual({ notification: created });
       expect(mockDb.insert).toHaveBeenCalled();
@@ -239,7 +234,7 @@ describe('Notification handlers', () => {
       mockDb.returning.mockRejectedValue(new Error('DB error'));
 
       const result = await createNotificationHandler({
-        data: { userId: 'user-1', type: 'test', title: 'Test', channel: 'in_app' as const },
+        data: { userId: 'user-1', type: 'test', channel: 'in_app' as const },
       });
       expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });

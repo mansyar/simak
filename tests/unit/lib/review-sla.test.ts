@@ -222,10 +222,14 @@ describe('dispatchSLABreachNotifications', () => {
 
     const valuesCall = mockDb.values.mock.calls[0][0];
     expect(valuesCall.type).toBe('sla_breach');
-    expect(valuesCall.title).toBe('SLA Breach');
-    expect(valuesCall.message).toContain('Checkpoint 1');
-    expect(valuesCall.message).toContain('Assignment 1');
-    expect(valuesCall.message).toContain('3 day(s)');
+    expect(valuesCall.titleKey).toBe('notifications.events.sla_breach.title');
+    expect(valuesCall.messageKey).toBe('notifications.events.sla_breach.message');
+    expect(valuesCall.params).toEqual({
+      checkpointName: 'Checkpoint 1',
+      assignmentTitle: 'Assignment 1',
+      studentName: 'Student One',
+      breachDays: '3',
+    });
     expect(valuesCall.metadata).toEqual({
       assignmentId: 10,
       checkpointId: 100,

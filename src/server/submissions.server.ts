@@ -10,7 +10,7 @@ import { generatePresignedDownloadUrl } from '../lib/storage';
 import { validateUploadSize, validateUploadFileName } from '../lib/file-validation';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
-import { getNotificationKeys, resolveNotificationContent } from './notifications.server';
+import { getNotificationKeys } from './notifications.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -160,17 +160,9 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
           assignmentTitle: instructorInfo.assignmentTitle,
         };
         const receivedKeys = getNotificationKeys('submission_received');
-        const receivedContent = resolveNotificationContent(
-          receivedKeys.titleKey,
-          receivedKeys.messageKey,
-          receivedParams,
-          'en',
-        );
         await tx.insert(notifications).values({
           userId: instructorInfo.instructorId,
           type: 'submission_received',
-          title: receivedContent.title,
-          message: receivedContent.message,
           titleKey: receivedKeys.titleKey,
           messageKey: receivedKeys.messageKey,
           params: receivedParams,

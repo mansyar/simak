@@ -127,7 +127,14 @@ describe('getAdminDashboardDataHandler — parallel query execution', () => {
       {
         name: 'recentActivity',
         result: [
-          { id: 1, type: 'sla_breach', title: 'SLA Breach', message: 'Overdue', createdAt: now },
+          {
+            id: 1,
+            type: 'sla_breach',
+            titleKey: 'SLA Breach',
+            messageKey: 'Overdue',
+            params: null,
+            createdAt: now,
+          },
         ],
       },
       { name: 'emailCounts', result: [{ pending: 12, sent: 45, failed: 3 }] },

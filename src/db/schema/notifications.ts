@@ -9,10 +9,8 @@ export const notifications = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     type: text('type').notNull(),
-    title: text('title').notNull(),
-    message: text('message'),
-    titleKey: varchar('title_key', { length: 255 }),
-    messageKey: varchar('message_key', { length: 255 }),
+    titleKey: varchar('title_key', { length: 255 }).notNull(),
+    messageKey: varchar('message_key', { length: 255 }).notNull(),
     params: jsonb('params').$type<Record<string, string>>(),
     read: boolean('read').default(false),
     channel: text('channel').notNull(), // 'in_app' | 'email'

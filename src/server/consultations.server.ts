@@ -9,7 +9,7 @@ import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import { verifyAssignmentAccess } from './ownership';
-import { getNotificationKeys, resolveNotificationContent } from './notifications.server';
+import { getNotificationKeys } from './notifications.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -92,20 +92,13 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
 
     // 3. Create in-app notification for the instructor
     const loggedKeys = getNotificationKeys('consultation_logged');
-    const loggedContent = resolveNotificationContent(
-      loggedKeys.titleKey,
-      loggedKeys.messageKey,
-      { sessionType: sessionType ?? 'general' },
-      'en',
-    );
+    const loggedParams = { sessionType: sessionType ?? 'general' };
     await db.insert(notifications).values({
       userId: checkpoint.assignmentInstructorId,
       type: 'consultation_logged',
-      title: loggedContent.title,
-      message: loggedContent.message,
       titleKey: loggedKeys.titleKey,
       messageKey: loggedKeys.messageKey,
-      params: { sessionType: sessionType ?? 'general' },
+      params: loggedParams,
       channel: 'in_app',
       metadata: {
         consultationId: inserted.id,
@@ -351,17 +344,9 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
         .where(eq(consultations.id, consultationId));
 
       const verifiedKeys = getNotificationKeys('consultation_verified');
-      const verifiedContent = resolveNotificationContent(
-        verifiedKeys.titleKey,
-        verifiedKeys.messageKey,
-        null,
-        'en',
-      );
       await tx.insert(notifications).values({
         userId: consultation.studentId,
         type: 'consultation_verified',
-        title: verifiedContent.title,
-        message: verifiedContent.message,
         titleKey: verifiedKeys.titleKey,
         messageKey: verifiedKeys.messageKey,
         params: null,
@@ -450,17 +435,9 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
 
       const rejectedParams = { reason };
       const rejectedKeys = getNotificationKeys('consultation_rejected');
-      const rejectedContent = resolveNotificationContent(
-        rejectedKeys.titleKey,
-        rejectedKeys.messageKey,
-        rejectedParams,
-        'en',
-      );
       await tx.insert(notifications).values({
         userId: consultation.studentId,
         type: 'consultation_rejected',
-        title: rejectedContent.title,
-        message: rejectedContent.message,
         titleKey: rejectedKeys.titleKey,
         messageKey: rejectedKeys.messageKey,
         params: rejectedParams,

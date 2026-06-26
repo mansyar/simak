@@ -6,8 +6,9 @@ import { z } from 'zod';
 export const CreateNotificationSchema = z.object({
   userId: z.string().min(1, 'User ID is required'),
   type: z.string().min(1, 'Type is required'),
-  title: z.string().min(1, 'Title is required'),
-  message: z.string().optional(),
+  titleKey: z.string().optional(),
+  messageKey: z.string().optional(),
+  params: z.record(z.string(), z.string()).optional(),
   channel: z.enum(['in_app', 'email'], { message: 'Channel must be in_app or email' }),
   metadata: z.record(z.string(), z.any()).optional(),
 });

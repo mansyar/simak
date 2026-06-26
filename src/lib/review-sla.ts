@@ -9,7 +9,7 @@ import { checkpoints, assignments } from '../db/schema/assignments';
 import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { sendSLAAlertEmail } from './email';
-import { getNotificationKeys, resolveNotificationContent } from './i18n-server';
+import { getNotificationKeys } from './i18n-server';
 import type { Db } from '../db/index';
 
 export interface SLASubmissionFields {
@@ -106,20 +106,12 @@ export async function dispatchSLABreachNotifications(
       breachDays: String(breachDays),
     };
     const slaKeys = getNotificationKeys('sla_breach');
-    const slaContent = resolveNotificationContent(
-      slaKeys.titleKey,
-      slaKeys.messageKey,
-      slaParams,
-      'en',
-    );
 
     for (const admin of adminUsers) {
       // Create in-app notification
       await db.insert(notifications).values({
         userId: admin.id,
         type: 'sla_breach',
-        title: slaContent.title,
-        message: slaContent.message,
         titleKey: slaKeys.titleKey,
         messageKey: slaKeys.messageKey,
         params: slaParams,
@@ -138,8 +130,6 @@ export async function dispatchSLABreachNotifications(
       await db.insert(notifications).values({
         userId: admin.id,
         type: 'sla_breach',
-        title: slaContent.title,
-        message: slaContent.message,
         titleKey: slaKeys.titleKey,
         messageKey: slaKeys.messageKey,
         params: slaParams,

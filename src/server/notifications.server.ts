@@ -43,17 +43,19 @@ export async function createNotificationHandler(args: { data: CreateNotification
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { userId, type, title, message, channel, metadata } = args.data;
+  const { userId, type, titleKey, messageKey, params, channel, metadata } = args.data;
   const db = getDb();
 
   try {
+    const keys = getNotificationKeys(type);
     const [notification] = await db
       .insert(notifications)
       .values({
         userId,
         type,
-        title,
-        message: message || null,
+        titleKey: titleKey ?? keys.titleKey,
+        messageKey: messageKey ?? keys.messageKey,
+        params: (params as Record<string, string> | undefined) ?? null,
         channel,
         metadata: (metadata as Record<string, unknown>) || null,
       })

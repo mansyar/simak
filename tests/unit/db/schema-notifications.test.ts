@@ -11,10 +11,15 @@ describe('notifications schema', () => {
     expect(columns).toContain('params');
   });
 
-  it('retains legacy title and message columns during the expand phase', () => {
+  it('drops legacy title and message columns in the contract phase', () => {
     const columns = Object.keys(notifications);
 
-    expect(columns).toContain('title');
-    expect(columns).toContain('message');
+    expect(columns).not.toContain('title');
+    expect(columns).not.toContain('message');
+  });
+
+  it('makes titleKey and messageKey non-nullable after backfill', () => {
+    expect(notifications.titleKey.notNull).toBe(true);
+    expect(notifications.messageKey.notNull).toBe(true);
   });
 });

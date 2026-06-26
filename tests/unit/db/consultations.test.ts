@@ -33,8 +33,9 @@ describe('Notifications schema', () => {
     expect(notifications).toHaveProperty('id');
     expect(notifications).toHaveProperty('userId');
     expect(notifications).toHaveProperty('type');
-    expect(notifications).toHaveProperty('title');
-    expect(notifications).toHaveProperty('message');
+    expect(notifications).toHaveProperty('titleKey');
+    expect(notifications).toHaveProperty('messageKey');
+    expect(notifications).toHaveProperty('params');
     expect(notifications).toHaveProperty('read');
     expect(notifications).toHaveProperty('channel');
     expect(notifications).toHaveProperty('metadata');

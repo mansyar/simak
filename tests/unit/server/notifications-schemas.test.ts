@@ -23,8 +23,6 @@ describe('Notification Schemas', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: 'user-123',
         type: 'assignment_created',
-        title: 'New Assignment',
-        message: 'You have a new assignment',
         channel: 'in_app',
       });
       expect(result.success).toBe(true);
@@ -34,7 +32,6 @@ describe('Notification Schemas', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: 'user-123',
         type: 'sla_breach',
-        title: 'SLA Breach',
         channel: 'email',
         metadata: { assignmentId: 1 },
       });
@@ -45,7 +42,6 @@ describe('Notification Schemas', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: 'user-123',
         type: 'test',
-        title: 'Test',
         channel: 'invalid',
       });
       expect(result.success).toBe(false);
@@ -55,7 +51,6 @@ describe('Notification Schemas', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: '',
         type: 'test',
-        title: 'Test',
         channel: 'in_app',
       });
       expect(result.success).toBe(false);
@@ -65,27 +60,26 @@ describe('Notification Schemas', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: 'user-123',
         type: '',
-        title: 'Test',
         channel: 'in_app',
       });
       expect(result.success).toBe(false);
     });
 
-    it('should reject empty title', () => {
+    it('should accept optional titleKey override', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: 'user-123',
         type: 'test',
-        title: '',
+        titleKey: 'custom.title',
         channel: 'in_app',
       });
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
 
-    it('should accept optional message', () => {
+    it('should accept optional messageKey override', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: 'user-123',
         type: 'test',
-        title: 'Test',
+        messageKey: 'custom.message',
         channel: 'in_app',
       });
       expect(result.success).toBe(true);
@@ -95,7 +89,6 @@ describe('Notification Schemas', () => {
       const result = CreateNotificationSchema.safeParse({
         userId: 'user-123',
         type: 'test',
-        title: 'Test',
         channel: 'in_app',
         metadata: { key: 'value' },
       });

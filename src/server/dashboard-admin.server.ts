@@ -9,6 +9,7 @@ import { users } from '../db/schema/users';
 import { emailQueue } from '../db/schema/email-queue';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
+import { resolveNotificationContent } from '../lib/i18n-server';
 import type { NonNullableSession } from '../lib/types';
 
 const instructorUsers = aliasedTable(users, 'instructor');
@@ -66,8 +67,9 @@ export async function getAdminDashboardDataHandler() {
         .select({
           id: notifications.id,
           type: notifications.type,
-          title: notifications.title,
-          message: notifications.message,
+          titleKey: notifications.titleKey,
+          messageKey: notifications.messageKey,
+          params: notifications.params,
           createdAt: notifications.createdAt,
         })
         .from(notifications)
@@ -121,13 +123,21 @@ export async function getAdminDashboardDataHandler() {
         sent: Number(emailCounts.sent),
         failed: Number(emailCounts.failed),
       },
-      recentActivity: recentActivity.map((ra) => ({
-        id: ra.id,
-        type: ra.type,
-        title: ra.title,
-        message: ra.message,
-        createdAt: ra.createdAt,
-      })),
+      recentActivity: recentActivity.map((ra) => {
+        const content = resolveNotificationContent(
+          ra.titleKey,
+          ra.messageKey,
+          ra.params,
+          'en',
+        );
+        return {
+          id: ra.id,
+          type: ra.type,
+          title: content.title,
+          message: content.message,
+          createdAt: ra.createdAt,
+        };
+      }),
       escalationAlerts: escalationAlerts.map((ea) => ({
         submissionId: ea.submissionId,
         instructorName: ea.instructorName,
