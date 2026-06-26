@@ -26,22 +26,78 @@ export async function getStudentDashboardDataHandler() {
   const studentId = session.user.id;
 
   try {
-    // 1. Active assignments overview
-    const activeAssignments = await db
-      .select({
-        id: assignments.id,
-        title: assignments.title,
-        finalDeadline: assignments.finalDeadline,
-        templateName: assignmentTemplates.name,
-        templateType: assignmentTemplates.type,
-      })
-      .from(assignmentStudents)
-      .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
-      .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-      .where(and(eq(assignmentStudents.studentId, studentId), isNull(assignments.deletedAt)))
-      .orderBy(assignments.finalDeadline);
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-    // Fetch checkpoints per assignment for progress calculation
+    // Group A (independent): active assignments, upcoming deadlines, pending reviews, consultations
+    const [activeAssignments, upcomingDeadlines, pendingReviews, consultationReminders] =
+      await Promise.all([
+        db
+          .select({
+            id: assignments.id,
+            title: assignments.title,
+            finalDeadline: assignments.finalDeadline,
+            templateName: assignmentTemplates.name,
+            templateType: assignmentTemplates.type,
+          })
+          .from(assignmentStudents)
+          .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
+          .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
+          .where(and(eq(assignmentStudents.studentId, studentId), isNull(assignments.deletedAt)))
+          .orderBy(assignments.finalDeadline),
+        db
+          .select({
+            assignmentId: assignments.id,
+            assignmentTitle: assignments.title,
+            checkpointName: checkpoints.name,
+            dueDate: checkpoints.dueDate,
+            state: checkpoints.state,
+          })
+          .from(checkpoints)
+          .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+          .where(and(eq(checkpoints.studentId, studentId), isNull(assignments.deletedAt)))
+          .orderBy(checkpoints.dueDate)
+          .limit(5),
+        db
+          .select({
+            submissionId: submissions.id,
+            assignmentTitle: assignments.title,
+            checkpointName: checkpoints.name,
+            submittedAt: submissions.uploadedAt,
+          })
+          .from(submissions)
+          .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+          .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+          .where(
+            and(
+              eq(checkpoints.studentId, studentId),
+              isNull(assignments.deletedAt),
+              gte(submissions.uploadedAt, thirtyDaysAgo),
+              sql`${checkpoints.state} = 'under_review'`,
+            ),
+          )
+          .orderBy(desc(submissions.uploadedAt)),
+        db
+          .select({
+            assignmentId: consultations.assignmentId,
+            assignmentTitle: assignments.title,
+            checkpointName: checkpoints.name,
+            consultationDate: consultations.createdAt,
+            consultationId: consultations.id,
+          })
+          .from(consultations)
+          .innerJoin(assignments, eq(consultations.assignmentId, assignments.id))
+          .innerJoin(checkpoints, eq(consultations.checkpointId, checkpoints.id))
+          .where(
+            and(
+              eq(consultations.studentId, studentId),
+              eq(consultations.status, 'pending'),
+              isNull(assignments.deletedAt),
+            ),
+          )
+          .orderBy(desc(consultations.createdAt)),
+      ]);
+
+    // Fetch checkpoints per assignment for progress calculation (depends on Group A assignmentIds)
     const assignmentIds = activeAssignments.map((a) => a.id);
     const checkpointsByAssignment = new Map<
       number,
@@ -101,22 +157,6 @@ export async function getStudentDashboardDataHandler() {
       return a.progressPercent - b.progressPercent;
     });
 
-    // 2. Upcoming deadlines (next 5 upcoming due dates)
-    // After Phase 1 backfill, all checkpoints have real dueDates
-    const upcomingDeadlines = await db
-      .select({
-        assignmentId: assignments.id,
-        assignmentTitle: assignments.title,
-        checkpointName: checkpoints.name,
-        dueDate: checkpoints.dueDate,
-        state: checkpoints.state,
-      })
-      .from(checkpoints)
-      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-      .where(and(eq(checkpoints.studentId, studentId), isNull(assignments.deletedAt)))
-      .orderBy(checkpoints.dueDate)
-      .limit(5);
-
     const now = new Date();
     const deadlines = upcomingDeadlines.map((d) => ({
       assignmentId: d.assignmentId,
@@ -126,49 +166,6 @@ export async function getStudentDashboardDataHandler() {
       state: d.state,
       isOverdue: (d.dueDate ?? new Date()) < now,
     }));
-
-    // 3. Pending reviews — submissions under instructor review (last 30 days)
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const pendingReviews = await db
-      .select({
-        submissionId: submissions.id,
-        assignmentTitle: assignments.title,
-        checkpointName: checkpoints.name,
-        submittedAt: submissions.uploadedAt,
-      })
-      .from(submissions)
-      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-      .where(
-        and(
-          eq(checkpoints.studentId, studentId),
-          isNull(assignments.deletedAt),
-          gte(submissions.uploadedAt, thirtyDaysAgo),
-          sql`${checkpoints.state} = 'under_review'`,
-        ),
-      )
-      .orderBy(desc(submissions.uploadedAt));
-
-    // 4. Consultation reminders — pending consultations
-    const consultationReminders = await db
-      .select({
-        assignmentId: consultations.assignmentId,
-        assignmentTitle: assignments.title,
-        checkpointName: checkpoints.name,
-        consultationDate: consultations.createdAt,
-        consultationId: consultations.id,
-      })
-      .from(consultations)
-      .innerJoin(assignments, eq(consultations.assignmentId, assignments.id))
-      .innerJoin(checkpoints, eq(consultations.checkpointId, checkpoints.id))
-      .where(
-        and(
-          eq(consultations.studentId, studentId),
-          eq(consultations.status, 'pending'),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .orderBy(desc(consultations.createdAt));
 
     return {
       activeAssignments: activeAssignmentsWithProgress,
