@@ -109,7 +109,7 @@
     - [ ] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Batch user + verification inserts' as complete`
 
-- [~] Task: Decouple email sends from request cycle (FR-5)
+- [x] Task: Decouple email sends from request cycle (FR-5) — commit `27e2f9f5dd750967af2615573b89aff7346a7386`
     - [x] Mark task `[~]` in progress in `plan.md`
     - [ ] Write failing tests — extend `tests/unit/server/bulk-import.test.ts` (Red phase)
         - [ ] Test: `sendInvitationEmail` is NOT called per-row inside the loop
