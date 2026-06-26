@@ -183,9 +183,16 @@
     - [x] Verify coverage thresholds met (lines 88.2%, functions 81.96%, branches 80.4%, statements 87.46%)
     - [x] Verify no regression — all pre-existing tests still pass
     - [x] Verify all changed files under 500-line modularity limit (`node scripts/check-modularity.js`)
-    - [~] Stage and commit: `test(perf): Final verification for Track 8.4 performance refinements`
-    - [~] Attach git note with full test results summary
-    - [~] Update `plan.md`: mark task `[x]` with commit SHA
+    - [x] Task: Run full test suite and coverage check — commit `0cab0c7`
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint`
+    - [x] Run `pnpm vitest run --coverage`
+    - [x] Verify coverage thresholds met (lines 88.2%, functions 81.96%, branches 80.4%, statements 87.46%)
+    - [x] Verify no regression — all pre-existing tests still pass
+    - [x] Verify all changed files under 500-line modularity limit (`node scripts/check-modularity.js`)
+    - [x] Stage and commit: `test(perf): Final verification for Track 8.4 performance refinements`
+    - [x] Attach git note with full test results summary
+    - [x] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Final verification' as complete`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Verification & Quality Gates' (Protocol in workflow.md)
