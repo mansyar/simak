@@ -41,14 +41,14 @@
      - [x] Update `src/lib/review-sla.ts` (SLA breach in_app + email records)
      - [x] Verify all handler tests pass
 
- - [~] Task: Email subject localization
-    - [ ] Write test verifying email subject resolves to recipient's locale (Red)
-    - [ ] Update `src/lib/email.ts` to resolve subjects via i18n keys using recipient locale (Green)
-    - [ ] Add email subject i18n keys to `locales/en.json` and `locales/id.json`
-    - [ ] Run `pnpm generate:i18n`
-    - [ ] Verify tests pass
+ - [x] Task: Email subject localization [dc3c6c7]
+     - [x] Write test verifying email subject resolves to recipient's locale (Red)
+     - [x] Update `src/lib/email.ts` to resolve subjects via i18n keys using recipient locale (Green)
+     - [x] Add email subject i18n keys to `locales/en.json` and `locales/id.json`
+     - [x] Run `pnpm generate:i18n`
+     - [x] Verify tests pass
 
-- [ ] Task: Backfill existing notification rows
+ - [~] Task: Backfill existing notification rows
     - [ ] Write a backfill migration that maps existing `title`/`message` English text to the new `titleKey`/`messageKey`/`params` columns
     - [ ] Apply migration with `pnpm db:migrate`
     - [ ] Verify backfill via a query check

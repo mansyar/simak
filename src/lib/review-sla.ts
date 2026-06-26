@@ -9,7 +9,7 @@ import { checkpoints, assignments } from '../db/schema/assignments';
 import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { sendSLAAlertEmail } from './email';
-import { getNotificationKeys, resolveNotificationContent } from '../server/notifications.server';
+import { getNotificationKeys, resolveNotificationContent } from './i18n-server';
 import type { Db } from '../db/index';
 
 export interface SLASubmissionFields {

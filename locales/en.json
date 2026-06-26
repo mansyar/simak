@@ -699,6 +699,13 @@
       }
     }
   },
+  "emails": {
+    "subjects": {
+      "password_reset": "Reset your SIMAK password",
+      "invitation": "Welcome to SIMAK — Set up your password",
+      "sla_alert": "SLA Breach Alert — {assignmentTitle}"
+    }
+  },
   "extensions": {
     "requestTitle": "Request Deadline Extension",
     "category": "Category",

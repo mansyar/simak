@@ -699,6 +699,13 @@
       }
     }
   },
+  "emails": {
+    "subjects": {
+      "password_reset": "Reset Kata Sandi SIMAK Anda",
+      "invitation": "Selamat Datang di SIMAK — Atur Kata Sandi Anda",
+      "sla_alert": "Peringatan Pelanggaran SLA — {assignmentTitle}"
+    }
+  },
   "extensions": {
     "requestTitle": "Ajukan Perpanjangan Tenggat",
     "category": "Kategori",

@@ -1,10 +1,24 @@
+import { eq } from 'drizzle-orm';
 import { getEnv } from '../config/env';
 import { getDb } from '@/db/index';
 import { emailQueue } from '@/db/schema/index';
+import { users } from '@/db/schema/users';
+import { resolveEmailSubject } from './i18n-server';
+import type { Locales } from '../i18n/types';
 
 export type TemplateType = 'password_reset' | 'invitation' | 'sla_alert' | 'two_factor';
 
-const INVITATION_SUBJECT = 'Welcome to SIMAK — Set up your password';
+async function getUserLocaleByEmail(email: string): Promise<Locales> {
+  try {
+    const [user] = await getDb()
+      .select({ locale: users.locale })
+      .from(users)
+      .where(eq(users.email, email));
+    return (user?.locale as Locales) ?? 'en';
+  } catch {
+    return 'en';
+  }
+}
 
 export function escapeHtml(s: string): string {
   return s
@@ -39,10 +53,11 @@ export async function sendPasswordResetEmail(params: {
 }): Promise<void> {
   const resetUrl = `${getEnv().BETTER_AUTH_URL}/auth/reset-password?token=${params.token}`;
   const safeName = escapeHtml(params.name);
+  const locale = await getUserLocaleByEmail(params.email);
 
   await enqueueEmail({
     recipientEmail: params.email,
-    subject: 'Reset your SIMAK password',
+    subject: resolveEmailSubject('emails.subjects.password_reset', undefined, locale),
     bodyHtml: `
       <!DOCTYPE html>
       <html>
@@ -101,10 +116,11 @@ export async function sendInvitationEmail(params: {
 }): Promise<void> {
   const setupUrl = `${getEnv().BETTER_AUTH_URL}/auth/setup-password?token=${params.token}`;
   const safeName = escapeHtml(params.name);
+  const locale = await getUserLocaleByEmail(params.email);
 
   await enqueueEmail({
     recipientEmail: params.email,
-    subject: INVITATION_SUBJECT,
+    subject: resolveEmailSubject('emails.subjects.invitation', undefined, locale),
     bodyHtml: `
       <!DOCTYPE html>
       <html>
@@ -170,10 +186,15 @@ export async function sendSLAAlertEmail(params: {
   const safeAssignmentTitle = escapeHtml(assignmentTitle);
   const safeStudentName = escapeHtml(studentName);
   const safeCheckpointName = escapeHtml(checkpointName);
+  const locale = await getUserLocaleByEmail(adminEmail);
 
   await enqueueEmail({
     recipientEmail: adminEmail,
-    subject: `SLA Breach Alert — ${safeAssignmentTitle}`,
+    subject: resolveEmailSubject(
+      'emails.subjects.sla_alert',
+      { assignmentTitle: safeAssignmentTitle },
+      locale,
+    ),
     bodyHtml: `
       <!DOCTYPE html>
       <html>

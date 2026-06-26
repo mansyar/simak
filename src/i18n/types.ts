@@ -704,6 +704,13 @@ export type Translation = {
       }
     }
   }
+  emails: {
+    subjects: {
+      password_reset: string
+      invitation: string
+      sla_alert: string
+    }
+  }
   extensions: {
     requestTitle: string
     category: string

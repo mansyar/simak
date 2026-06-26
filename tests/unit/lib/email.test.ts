@@ -21,7 +21,13 @@ vi.mock('@/config/env', () => ({
 function createMockDb() {
   const values = vi.fn().mockReturnThis();
   const insert = vi.fn().mockReturnValue({ values });
-  return { insert, values };
+  const where = vi.fn().mockReturnThis();
+  const from = vi.fn().mockReturnThis();
+  const then = vi
+    .fn()
+    .mockImplementation((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn));
+  const select = vi.fn().mockReturnValue({ from, where, then });
+  return { insert, values, select, from, where, then };
 }
 
 function getLastBodyHtml(mockDb: ReturnType<typeof createMockDb>) {
@@ -106,6 +112,28 @@ describe('Email library', () => {
       const htmlArg = getLastBodyHtml(mockDb);
       expect(htmlArg).toContain('Hi John Doe,');
     });
+
+    it('resolves the subject using the recipients locale', async () => {
+      await sendPasswordResetEmail({
+        email: 'user@example.com',
+        name: 'John Doe',
+        token: 'my-token',
+      });
+
+      expect(mockDb.values.mock.calls[0][0].subject).toBe('Reset your SIMAK password');
+    });
+
+    it('localizes the subject for Indonesian recipients', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'id' }]).then(fn));
+
+      await sendPasswordResetEmail({
+        email: 'user@example.com',
+        name: 'John Doe',
+        token: 'my-token',
+      });
+
+      expect(mockDb.values.mock.calls[0][0].subject).toBe('Reset Kata Sandi SIMAK Anda');
+    });
   });
 
   describe('sendInvitationEmail', () => {
@@ -162,6 +190,32 @@ describe('Email library', () => {
       const htmlArg = getLastBodyHtml(mockDb);
       expect(htmlArg).toContain('Hi Jane Doe,');
     });
+
+    it('resolves the subject using the recipients locale', async () => {
+      await sendInvitationEmail({
+        email: 'new@example.com',
+        name: 'Jane Doe',
+        token: 'invite-token',
+      });
+
+      expect(mockDb.values.mock.calls[0][0].subject).toBe(
+        'Welcome to SIMAK — Set up your password',
+      );
+    });
+
+    it('localizes the subject for Indonesian recipients', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'id' }]).then(fn));
+
+      await sendInvitationEmail({
+        email: 'new@example.com',
+        name: 'Jane Doe',
+        token: 'invite-token',
+      });
+
+      expect(mockDb.values.mock.calls[0][0].subject).toBe(
+        'Selamat Datang di SIMAK — Atur Kata Sandi Anda',
+      );
+    });
   });
 
   describe('sendSLAAlertEmail', () => {
@@ -217,6 +271,36 @@ describe('Email library', () => {
       expect(htmlArg).toContain('John Doe');
       expect(htmlArg).toContain('Draft Review');
       expect(htmlArg).toContain('1 day');
+    });
+
+    it('resolves the subject using the admin locale and assignment title', async () => {
+      await sendSLAAlertEmail({
+        adminEmail: 'admin@example.com',
+        adminName: 'Admin User',
+        assignmentTitle: 'Final Project',
+        studentName: 'John Doe',
+        checkpointName: 'Draft Review',
+        breachDays: 1,
+      });
+
+      expect(mockDb.values.mock.calls[0][0].subject).toBe('SLA Breach Alert — Final Project');
+    });
+
+    it('localizes the SLA subject for Indonesian recipients', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'id' }]).then(fn));
+
+      await sendSLAAlertEmail({
+        adminEmail: 'admin@example.com',
+        adminName: 'Admin User',
+        assignmentTitle: 'Final Project',
+        studentName: 'John Doe',
+        checkpointName: 'Draft Review',
+        breachDays: 1,
+      });
+
+      expect(mockDb.values.mock.calls[0][0].subject).toBe(
+        'Peringatan Pelanggaran SLA — Final Project',
+      );
     });
   });
 });
