@@ -149,12 +149,6 @@ describe('Dashboard handlers', () => {
             },
           ]).then(onfulfilled),
         )
-        // allCheckpoints query
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            { assignmentId: 1, name: 'Ch 1', state: 'unlocked', dueDate: new Date('2026-06-15') },
-          ]).then(onfulfilled),
-        )
         // upcomingDeadlines query
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([
@@ -189,6 +183,12 @@ describe('Dashboard handlers', () => {
               consultationId: 1,
             },
           ]).then(onfulfilled),
+        )
+        // allCheckpoints query
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            { assignmentId: 1, name: 'Ch 1', state: 'unlocked', dueDate: new Date('2026-06-15') },
+          ]).then(onfulfilled),
         );
 
       const result = (await getStudentDashboardDataHandler()) as any;
@@ -212,14 +212,6 @@ describe('Dashboard handlers', () => {
               templateName: 'Thesis Template',
               templateType: 'Thesis',
             },
-          ]).then(onfulfilled),
-        )
-        // allCheckpoints query → return 3 checkpoints
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            { assignmentId: 1, name: 'Ch 1', state: 'unlocked', dueDate: new Date('2026-06-15') },
-            { assignmentId: 1, name: 'Ch 2', state: 'locked', dueDate: new Date('2026-07-15') },
-            { assignmentId: 1, name: 'Ch 3', state: 'locked', dueDate: new Date('2026-08-15') },
           ]).then(onfulfilled),
         )
         // upcomingDeadlines query → return all 3 (no IS NOT NULL filter)
@@ -251,7 +243,15 @@ describe('Dashboard handlers', () => {
         // pendingReviews query → empty
         .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
         // consultationReminders query → empty
-        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        // allCheckpoints query → return 3 checkpoints
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            { assignmentId: 1, name: 'Ch 1', state: 'unlocked', dueDate: new Date('2026-06-15') },
+            { assignmentId: 1, name: 'Ch 2', state: 'locked', dueDate: new Date('2026-07-15') },
+            { assignmentId: 1, name: 'Ch 3', state: 'locked', dueDate: new Date('2026-08-15') },
+          ]).then(onfulfilled),
+        );
 
       const result = (await getStudentDashboardDataHandler()) as any;
       expect(result.upcomingDeadlines).toHaveLength(3);
@@ -294,23 +294,6 @@ describe('Dashboard handlers', () => {
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ id: 1 }]).then(onfulfilled),
         )
-        // pending review count query
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ count: 2 }]).then(onfulfilled),
-        )
-        // pending review items query
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              submissionId: 10,
-              checkpointId: 100,
-              checkpointName: 'Ch 1',
-              assignmentTitle: 'Thesis',
-              studentName: 'Alice',
-              submittedAt: new Date(),
-            },
-          ]).then(onfulfilled),
-        )
         // recent submissions query
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([
@@ -328,6 +311,23 @@ describe('Dashboard handlers', () => {
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([
             { id: 1, title: 'Thesis', finalDeadline: null, createdAt: new Date() },
+          ]).then(onfulfilled),
+        )
+        // pending review count query
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 2 }]).then(onfulfilled),
+        )
+        // pending review items query
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              submissionId: 10,
+              checkpointId: 100,
+              checkpointName: 'Ch 1',
+              assignmentTitle: 'Thesis',
+              studentName: 'Alice',
+              submittedAt: new Date(),
+            },
           ]).then(onfulfilled),
         )
         // student count query

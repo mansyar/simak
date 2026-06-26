@@ -176,16 +176,16 @@
     - [ ] Read `./spec.md` to review functional requirements for this phase
     - [ ] Read `conductor/workflow.md` to review the TDD lifecycle and commit protocol
 
-- [ ] Task: Run full test suite and coverage check
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint`
-    - [ ] Run `pnpm vitest run --coverage`
-    - [ ] Verify coverage thresholds met (lines 80%, functions 80%, branches 72%, statements 79%)
-    - [ ] Verify no regression — all pre-existing tests still pass
-    - [ ] Verify all changed files under 500-line modularity limit (`node scripts/check-modularity.js`)
-    - [ ] Stage and commit: `test(perf): Final verification for Track 8.4 performance refinements`
-    - [ ] Attach git note with full test results summary
-    - [ ] Update `plan.md`: mark task `[x]` with commit SHA
+- [x] Task: Run full test suite and coverage check
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint`
+    - [x] Run `pnpm vitest run --coverage`
+    - [x] Verify coverage thresholds met (lines 88.2%, functions 81.96%, branches 80.4%, statements 87.46%)
+    - [x] Verify no regression — all pre-existing tests still pass
+    - [x] Verify all changed files under 500-line modularity limit (`node scripts/check-modularity.js`)
+    - [~] Stage and commit: `test(perf): Final verification for Track 8.4 performance refinements`
+    - [~] Attach git note with full test results summary
+    - [~] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Final verification' as complete`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Verification & Quality Gates' (Protocol in workflow.md)
