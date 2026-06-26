@@ -41,17 +41,17 @@
      - [x] Update `src/lib/review-sla.ts` (SLA breach in_app + email records)
      - [x] Verify all handler tests pass
 
- - [x] Task: Email subject localization [dc3c6c7]
+ - [x] Task: Email subject localization [d9e5143]
      - [x] Write test verifying email subject resolves to recipient's locale (Red)
      - [x] Update `src/lib/email.ts` to resolve subjects via i18n keys using recipient locale (Green)
-     - [x] Add email subject i18n keys to `locales/en.json` and `locales/id.json`
+    - [x] Add email subject i18n keys to `locales/en.json` and `locales/id.json`
      - [x] Run `pnpm generate:i18n`
      - [x] Verify tests pass
 
- - [~] Task: Backfill existing notification rows
-    - [ ] Write a backfill migration that maps existing `title`/`message` English text to the new `titleKey`/`messageKey`/`params` columns
-    - [ ] Apply migration with `pnpm db:migrate`
-    - [ ] Verify backfill via a query check
+ - [x] Task: Backfill existing notification rows [d9e5143]
+     - [x] Write a backfill migration that maps existing `title`/`message` English text to the new `titleKey`/`messageKey`/`params` columns
+    - [x] Apply migration with `pnpm db:migrate`
+     - [x] Verify backfill via a query check
 
 - [ ] Task: Extend lint rule for notification strings
     - [ ] Write test for the extended `simak-i18n/no-hardcoded` rule (or companion rule) flagging string literals in notification insert `titleKey`/`messageKey` fields (Red)
