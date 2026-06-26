@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, serial, boolean, jsonb, index } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, serial, boolean, jsonb, index, varchar } from 'drizzle-orm/pg-core';
 import { users } from './users';
 
 export const notifications = pgTable(
@@ -11,6 +11,9 @@ export const notifications = pgTable(
     type: text('type').notNull(),
     title: text('title').notNull(),
     message: text('message'),
+    titleKey: varchar('title_key', { length: 255 }),
+    messageKey: varchar('message_key', { length: 255 }),
+    params: jsonb('params').$type<Record<string, string>>(),
     read: boolean('read').default(false),
     channel: text('channel').notNull(), // 'in_app' | 'email'
     metadata: jsonb('metadata'),
