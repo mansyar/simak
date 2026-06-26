@@ -48,22 +48,22 @@
     - [x] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Parallelize student dashboard queries' as complete`
 
-- [ ] Task: Parallelize admin dashboard queries (FR-3)
-    - [ ] Mark task `[~]` in progress in `plan.md`
-    - [ ] Write failing tests — `tests/unit/server/dashboard-admin-parallel.test.ts` (Red phase)
-        - [ ] Test: All 7 queries (userCounts, activeAssignmentCount, pendingReviewCount, activeConsultationCount, recentActivity, emailCounts, escalationAlerts) run concurrently via a single `Promise.all`
-        - [ ] Test: Returned data shape is identical to the sequential version (metrics, emailQueueCounts, recentActivity, escalationAlerts)
-        - [ ] Test: Metrics computed from parallel query results match sequential results
-        - [ ] Test: Escalation alert ordering (by daysOverdue DESC) preserved
-    - [ ] Run tests, confirm they fail as expected (Red)
-    - [ ] Implement — restructure `getAdminDashboardDataHandler` in `src/server/dashboard-admin.server.ts` (Green phase)
-    - [ ] Run tests, confirm all pass (Green)
-    - [ ] Run `pnpm vitest run tests/unit/server/dashboard-admin-parallel.test.ts` to verify
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint` on changed files
-    - [ ] Stage and commit: `perf(dashboard): Parallelize admin dashboard queries with Promise.all`
-    - [ ] Attach git note with task summary
-    - [ ] Update `plan.md`: mark task `[x]` with commit SHA
+- [x] Task: Parallelize admin dashboard queries (FR-3) — commit `95653942a29e8deda6265cb2574bdaa804dc3598`
+    - [x] Mark task `[~]` in progress in `plan.md`
+    - [x] Write failing tests — `tests/unit/server/dashboard-admin-parallel.test.ts` (Red phase)
+        - [x] Test: All 7 queries (userCounts, activeAssignmentCount, pendingReviewCount, activeConsultationCount, recentActivity, emailCounts, escalationAlerts) run concurrently via a single `Promise.all`
+        - [x] Test: Returned data shape is identical to the sequential version (metrics, emailQueueCounts, recentActivity, escalationAlerts)
+        - [x] Test: Metrics computed from parallel query results match sequential results
+        - [x] Test: Escalation alert ordering (by daysOverdue DESC) preserved
+    - [x] Run tests, confirm they fail as expected (Red)
+    - [x] Implement — restructure `getAdminDashboardDataHandler` in `src/server/dashboard-admin.server.ts` (Green phase)
+    - [x] Run tests, confirm all pass (Green)
+    - [x] Run `pnpm vitest run tests/unit/server/dashboard-admin-parallel.test.ts` to verify
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint` on changed files
+    - [x] Stage and commit: `perf(dashboard): Parallelize admin dashboard queries with Promise.all`
+    - [x] Attach git note with task summary
+    - [x] Update `plan.md`: mark task `[x]` with commit SHA
     - [ ] Commit plan update: `conductor(plan): Mark task 'Parallelize admin dashboard queries' as complete`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Dashboard Query Parallelization' (Protocol in workflow.md)
