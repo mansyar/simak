@@ -6,6 +6,7 @@ import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import * as email from '@/lib/email';
 import * as audit from '@/lib/audit';
+import { users } from '@/db/schema/index';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -38,6 +39,7 @@ describe('Bulk user import handler', () => {
     limit: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
     values: vi.fn().mockReturnThis(),
+    transaction: vi.fn((fn: any) => fn(mockDb)),
     then: vi.fn(function (onfulfilled) {
       return Promise.resolve([]).then(onfulfilled);
     }),
@@ -81,13 +83,10 @@ describe('Bulk user import handler', () => {
 
   describe('Partial failure', () => {
     it('should skip invalid rows and create valid ones', async () => {
-      // First row: email exists
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 'existing' }]).then(onfulfilled),
-        )
-        // Second row: no existing email
-        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+      // Batch uniqueness query returns one existing email
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ email: 'existing@test.com' }]).then(onfulfilled),
+      );
 
       const result = (await bulkCreateUsersHandler({
         data: {
@@ -109,7 +108,7 @@ describe('Bulk user import handler', () => {
     it('should reject emails that exist for active users (excluding soft-deleted)', async () => {
       // Mock email exists (active user found — isNull(deletedAt) filters out soft-deleted)
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ id: 'existing' }]).then(onfulfilled),
+        Promise.resolve([{ email: 'existing@test.com' }]).then(onfulfilled),
       );
 
       const result = (await bulkCreateUsersHandler({
@@ -245,6 +244,76 @@ describe('Bulk user import handler', () => {
       expect(audit.logAuditEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           action: 'user.bulk_created',
+        }),
+      );
+    });
+  });
+
+  describe('Batch email uniqueness check', () => {
+    it('should use a single batched query to fetch existing emails, not per-row queries', async () => {
+      const result = (await bulkCreateUsersHandler({
+        data: {
+          rows: [
+            { name: 'John Doe', email: 'john@test.com', role: 'student' },
+            { name: 'Jane Smith', email: 'jane@test.com', role: 'instructor' },
+          ],
+        },
+      })) as any;
+
+      expect(result.created).toBe(2);
+      expect(result.skipped).toBe(0);
+      expect(mockDb.from).toHaveBeenCalledTimes(1);
+      expect(mockDb.from).toHaveBeenCalledWith(users);
+      expect(mockDb.where).toHaveBeenCalledTimes(1);
+    });
+
+    it('should skip rows with existing emails and add them to errors', async () => {
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ email: 'existing@test.com' }]).then(onfulfilled),
+      );
+
+      const result = (await bulkCreateUsersHandler({
+        data: {
+          rows: [
+            { name: 'Existing User', email: 'existing@test.com', role: 'student' },
+            { name: 'New User', email: 'new@test.com', role: 'student' },
+          ],
+        },
+      })) as any;
+
+      expect(result.created).toBe(1);
+      expect(result.skipped).toBe(1);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].reason).toBe('Email already in use');
+    });
+
+    it('should skip invalid-role rows before the batched uniqueness check', async () => {
+      const result = (await bulkCreateUsersHandler({
+        data: {
+          rows: [
+            { name: 'Invalid Role', email: 'invalid-role@test.com', role: 'superadmin' as any },
+            { name: 'Valid User', email: 'valid@test.com', role: 'student' },
+          ],
+        },
+      })) as any;
+
+      expect(result.created).toBe(1);
+      expect(result.skipped).toBe(1);
+      expect(result.errors[0].reason).toContain('Invalid role');
+      expect(mockDb.from).toHaveBeenCalledTimes(1);
+      expect(mockDb.where).toHaveBeenCalledTimes(1);
+    });
+
+    it('should preserve { created, skipped, errors } return shape', async () => {
+      const result = (await bulkCreateUsersHandler({
+        data: { rows: [{ name: 'John Doe', email: 'john@test.com', role: 'student' }] },
+      })) as any;
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          created: expect.any(Number),
+          skipped: expect.any(Number),
+          errors: expect.any(Array),
         }),
       );
     });

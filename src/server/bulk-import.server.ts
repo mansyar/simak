@@ -1,5 +1,5 @@
 // Server-only helpers (not imported by client code)
-import { eq, and, isNull } from 'drizzle-orm';
+import { and, isNull, inArray } from 'drizzle-orm';
 import crypto from 'node:crypto';
 import { getDb } from '../db/index';
 import { users, verification, assignmentTemplates, templateCheckpoints } from '../db/schema/index';
@@ -45,36 +45,59 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
   const skipped: number[] = [];
   const errors: { row: number; email: string; reason: string }[] = [];
 
-  try {
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      const rowIndex = i + 1;
+  // Pre-filter rows by role before any DB writes
+  const validRows: {
+    rowIndex: number;
+    name: string;
+    email: string;
+    role: string;
+  }[] = [];
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const rowIndex = i + 1;
 
-      // Role-permission check
-      if (!allowedRoles.includes(row.role)) {
-        if (session.user.role === 'admin' && row.role === 'admin') {
-          errors.push({
-            row: rowIndex,
-            email: row.email,
-            reason: 'Admins cannot create other Admin accounts',
-          });
-        } else {
-          errors.push({ row: rowIndex, email: row.email, reason: 'Invalid role' });
-        }
-        skipped.push(rowIndex);
-        continue;
+    if (!allowedRoles.includes(row.role)) {
+      if (session.user.role === 'admin' && row.role === 'admin') {
+        errors.push({
+          row: rowIndex,
+          email: row.email,
+          reason: 'Admins cannot create other Admin accounts',
+        });
+      } else {
+        errors.push({ row: rowIndex, email: row.email, reason: 'Invalid role' });
       }
+      skipped.push(rowIndex);
+      continue;
+    }
 
-      // Email uniqueness check (excluding soft-deleted users per spec FR-1)
-      const existingUser = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(and(eq(users.email, row.email), isNull(users.deletedAt)))
-        .limit(1)
-        .then((rows) => rows[0]);
+    validRows.push({ rowIndex, name: row.name, email: row.email, role: row.role });
+  }
 
-      if (existingUser) {
-        errors.push({ row: rowIndex, email: row.email, reason: 'Email already in use' });
+  try {
+    // Batch email uniqueness check (excluding soft-deleted users per spec FR-1)
+    const existingEmails = new Set(
+      validRows.length > 0
+        ? await db
+            .select({ email: users.email })
+            .from(users)
+            .where(
+              and(
+                inArray(
+                  users.email,
+                  validRows.map((r) => r.email),
+                ),
+                isNull(users.deletedAt),
+              ),
+            )
+            .then((rows) => rows.map((r) => r.email))
+        : [],
+    );
+
+    for (const candidate of validRows) {
+      const { rowIndex, email, name, role } = candidate;
+
+      if (existingEmails.has(email)) {
+        errors.push({ row: rowIndex, email, reason: 'Email already in use' });
         skipped.push(rowIndex);
         continue;
       }
@@ -86,16 +109,16 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
 
       await db.insert(users).values({
         id: userId,
-        name: row.name,
-        email: row.email,
-        // Safe: Zod schema already validated role is one of 'admin' | 'instructor' | 'student'
-        role: row.role as 'admin' | 'instructor' | 'student',
+        name,
+        email,
+        // Safe: role already passed the allowedRoles check
+        role: role as 'admin' | 'instructor' | 'student',
         locale: session.user.locale || 'en',
       });
 
       await db.insert(verification).values({
         id: crypto.randomUUID(),
-        identifier: row.email,
+        identifier: email,
         value: token,
         expiresAt,
       });
@@ -105,8 +128,8 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
       // Enqueue invitation email (non-blocking)
       try {
         await sendInvitationEmail({
-          email: row.email,
-          name: row.name,
+          email,
+          name,
           token,
         });
       } catch {
