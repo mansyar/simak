@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { listUsers } from '@/server/users';
 import { useI18n } from '../../../routes/__root';
+import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -50,12 +51,14 @@ export function StudentPicker({
         }
       } catch (err) {
         console.error('Failed to load students', err);
+        toast.error(t('errors.fetchFailed'));
         setError('Could not load student list.');
       } finally {
         setLoading(false);
       }
     }
     fetchStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredStudents = students.filter(

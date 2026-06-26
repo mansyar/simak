@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { listTemplates } from '@/server/templates';
 import { useI18n } from '../../../routes/__root';
+import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -42,12 +43,14 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
         }
       } catch (err) {
         console.error('Failed to load templates', err);
+        toast.error(t('errors.fetchFailed'));
         setError('Could not load assignment templates.');
       } finally {
         setLoading(false);
       }
     }
     fetchTemplates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredTemplates = templates.filter(

@@ -665,6 +665,9 @@
       "sla_alert": "SLA Breach Alert — {assignmentTitle}"
     }
   },
+  "errors": {
+    "fetchFailed": "Failed to load data. Please try again."
+  },
   "extensions": {
     "requestTitle": "Request Deadline Extension",
     "category": "Category",

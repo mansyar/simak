@@ -665,6 +665,9 @@
       "sla_alert": "Peringatan Pelanggaran SLA — {assignmentTitle}"
     }
   },
+  "errors": {
+    "fetchFailed": "Gagal memuat data. Silakan coba lagi."
+  },
   "extensions": {
     "requestTitle": "Ajukan Perpanjangan Tenggat",
     "category": "Kategori",

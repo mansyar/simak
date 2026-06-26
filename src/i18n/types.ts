@@ -670,6 +670,9 @@ export type Translation = {
       sla_alert: string
     }
   }
+  errors: {
+    fetchFailed: string
+  }
   extensions: {
     requestTitle: string
     category: string

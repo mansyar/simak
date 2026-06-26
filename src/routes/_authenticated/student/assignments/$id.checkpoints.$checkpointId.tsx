@@ -12,7 +12,30 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
 import { SearchX, ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
+import { detectLocale, type Locales } from '@/i18n';
+import { toast } from 'sonner';
 import { useState, useCallback } from 'react';
+import enTranslations from '../../../../../locales/en.json';
+import idTranslations from '../../../../../locales/id.json';
+
+const localeTranslations: Record<Locales, typeof enTranslations> = {
+  en: enTranslations,
+  id: idTranslations,
+};
+
+function t(key: string): string {
+  const locale = detectLocale();
+  const parts = key.split('.');
+  let current: unknown = localeTranslations[locale];
+  for (const part of parts) {
+    if (current && typeof current === 'object' && part in current) {
+      current = (current as Record<string, unknown>)[part];
+    } else {
+      return key;
+    }
+  }
+  return typeof current === 'string' ? current : key;
+}
 
 export const Route = createFileRoute(
   '/_authenticated/student/assignments/$id/checkpoints/$checkpointId',
@@ -83,6 +106,7 @@ export const Route = createFileRoute(
       };
     } catch (err) {
       console.error('Failed to load submission page:', err);
+      toast.error(t('errors.fetchFailed'));
       return null;
     }
   },

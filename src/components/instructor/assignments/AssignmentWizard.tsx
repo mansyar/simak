@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
+import { toast } from 'sonner';
 import { createAssignment } from '@/server/assignments';
 import { getTemplate } from '@/server/templates';
 import { listUsers } from '@/server/users';
@@ -74,9 +75,11 @@ export function AssignmentWizard() {
         }
       } catch (err) {
         console.error('Failed to pre-fetch student names', err);
+        toast.error(t('errors.fetchFailed'));
       }
     }
     loadStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSelectTemplate = async (tpl: Template) => {
@@ -107,6 +110,7 @@ export function AssignmentWizard() {
       }
     } catch (err) {
       console.error('Failed to fetch template details', err);
+      toast.error(t('errors.fetchFailed'));
     }
   };
 
@@ -212,6 +216,7 @@ export function AssignmentWizard() {
       }
     } catch (err) {
       console.error(err);
+      toast.error(t('errors.fetchFailed'));
       setErrors({ submit: t('instructorAssignments.wizard.errors.networkError') });
     } finally {
       setIsSubmitting(false);
