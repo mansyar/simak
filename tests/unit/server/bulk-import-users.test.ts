@@ -1,12 +1,13 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import crypto from 'node:crypto';
 import { BulkCreateUsersSchema } from '@/server/bulk-import';
 import { bulkCreateUsersHandler } from '@/server/bulk-import.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import * as email from '@/lib/email';
 import * as audit from '@/lib/audit';
-import { users } from '@/db/schema/index';
+import { users, verification } from '@/db/schema/index';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -305,6 +306,101 @@ describe('Bulk user import handler', () => {
     });
 
     it('should preserve { created, skipped, errors } return shape', async () => {
+      const result = (await bulkCreateUsersHandler({
+        data: { rows: [{ name: 'John Doe', email: 'john@test.com', role: 'student' }] },
+      })) as any;
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          created: expect.any(Number),
+          skipped: expect.any(Number),
+          errors: expect.any(Array),
+        }),
+      );
+    });
+  });
+
+  describe('Batch user + verification inserts', () => {
+    it('should insert all valid users + verification tokens in a single transaction', async () => {
+      const result = (await bulkCreateUsersHandler({
+        data: {
+          rows: [
+            { name: 'John Doe', email: 'john@test.com', role: 'student' },
+            { name: 'Jane Smith', email: 'jane@test.com', role: 'instructor' },
+          ],
+        },
+      })) as any;
+
+      expect(result.created).toBe(2);
+      expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+      expect(mockDb.insert).toHaveBeenCalledWith(users);
+      expect(mockDb.insert).toHaveBeenCalledWith(verification);
+    });
+
+    it('should use one batched .values([...]) call per table for 100 rows', async () => {
+      const rows = Array.from({ length: 100 }, (_, i) => ({
+        name: `User ${i}`,
+        email: `user${i}@test.com`,
+        role: 'student' as const,
+      }));
+
+      (await bulkCreateUsersHandler({ data: { rows } })) as any;
+
+      const userInsertCalls = mockDb.insert.mock.calls.filter((call) => call[0] === users);
+      const verificationInsertCalls = mockDb.insert.mock.calls.filter(
+        (call) => call[0] === verification,
+      );
+
+      expect(userInsertCalls).toHaveLength(1);
+      expect(verificationInsertCalls).toHaveLength(1);
+
+      const usersValuesCall = mockDb.values.mock.calls.find(
+        (call) => Array.isArray(call[0]) && call[0][0]?.email?.startsWith('user'),
+      );
+      expect(usersValuesCall?.[0]).toHaveLength(100);
+    });
+
+    it('should rollback and return internal error when the batch transaction fails', async () => {
+      vi.mocked(dbMod.getDb).mockReturnValue({
+        ...mockDb,
+        transaction: vi.fn().mockRejectedValueOnce(new Error('Transaction failed')),
+      } as any);
+
+      const result = (await bulkCreateUsersHandler({
+        data: { rows: [{ name: 'John Doe', email: 'john@test.com', role: 'student' }] },
+      })) as any;
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          error: { code: 'INTERNAL', message: 'Internal Server Error' },
+        }),
+      );
+      expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
+    it('should generate unique UUIDs per user before the batch insert', async () => {
+      const uuids = new Set<string>();
+      const originalRandomUUID = crypto.randomUUID;
+      vi.spyOn(crypto, 'randomUUID').mockImplementation(() => {
+        const id = originalRandomUUID();
+        uuids.add(id);
+        return id;
+      });
+
+      (await bulkCreateUsersHandler({
+        data: {
+          rows: [
+            { name: 'John Doe', email: 'john@test.com', role: 'student' },
+            { name: 'Jane Smith', email: 'jane@test.com', role: 'student' },
+          ],
+        },
+      })) as any;
+
+      expect(uuids.size).toBeGreaterThanOrEqual(4); // 2 userIds + 2 tokens + verification ids
+      vi.restoreAllMocks();
+    });
+
+    it('should preserve { created, skipped, errors } return shape after batch insert', async () => {
       const result = (await bulkCreateUsersHandler({
         data: { rows: [{ name: 'John Doe', email: 'john@test.com', role: 'student' }] },
       })) as any;

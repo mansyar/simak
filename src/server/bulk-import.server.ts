@@ -93,6 +93,20 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
         : [],
     );
 
+    const usersToInsert: {
+      id: string;
+      name: string;
+      email: string;
+      role: 'admin' | 'instructor' | 'student';
+      locale: string;
+    }[] = [];
+    const verificationsToInsert: {
+      id: string;
+      identifier: string;
+      value: string;
+      expiresAt: Date;
+    }[] = [];
+
     for (const candidate of validRows) {
       const { rowIndex, email, name, role } = candidate;
 
@@ -107,7 +121,7 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
       const token = crypto.randomUUID();
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-      await db.insert(users).values({
+      usersToInsert.push({
         id: userId,
         name,
         email,
@@ -116,7 +130,7 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
         locale: session.user.locale || 'en',
       });
 
-      await db.insert(verification).values({
+      verificationsToInsert.push({
         id: crypto.randomUUID(),
         identifier: email,
         value: token,
@@ -135,6 +149,14 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
       } catch {
         // Email failure is non-fatal as per spec
       }
+    }
+
+    // Atomic batch insert of all valid users + verification tokens
+    if (usersToInsert.length > 0) {
+      await db.transaction(async (tx) => {
+        await tx.insert(users).values(usersToInsert);
+        await tx.insert(verification).values(verificationsToInsert);
+      });
     }
 
     // Audit log
