@@ -10,12 +10,12 @@
      - [x] Read `./spec.md` — focus on FR-1 (Notification i18n) and NFR-5 (expand-contract migration)
      - [x] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
 
-- [ ] Task: Define notification i18n keys in locale files
-    - [ ] Write test verifying all notification types have keys in both `en.json` and `id.json` (Red)
-    - [ ] Add `notifications.*` namespace keys for all 10 notification types to `locales/en.json` (Green)
-    - [ ] Add corresponding Indonesian translations to `locales/id.json`
-    - [ ] Run `pnpm generate:i18n` to regenerate types
-    - [ ] Run `pnpm check:i18n` to verify parity
+ - [x] Task: Define notification i18n keys in locale files [09ea8e0]
+     - [x] Write test verifying all notification types have keys in both `en.json` and `id.json` (Red)
+     - [x] Add `notifications.*` namespace keys for all 10 notification types to `locales/en.json` (Green)
+     - [x] Add corresponding Indonesian translations to `locales/id.json`
+     - [x] Run `pnpm generate:i18n` to regenerate types
+     - [x] Run `pnpm check:i18n` to verify parity
 
 - [ ] Task: Schema migration — expand (add new columns)
     - [ ] Write test verifying new columns exist on the `notifications` table schema (Red)
