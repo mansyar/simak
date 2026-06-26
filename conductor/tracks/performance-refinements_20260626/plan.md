@@ -74,7 +74,7 @@
     - [ ] Read `./spec.md` to review functional requirements for this phase
     - [ ] Read `conductor/workflow.md` to review the TDD lifecycle and commit protocol
 
-- [~] Task: Batch email uniqueness check in bulkCreateUsersHandler (FR-4 partial)
+- [x] Task: Batch email uniqueness check in bulkCreateUsersHandler (FR-4 partial) — commit `02ecdfda599ca23d70cc2665e81693c7bf490516`
     - [x] Mark task `[~]` in progress in `plan.md`
     - [ ] Write failing tests — extend `tests/unit/server/bulk-import.test.ts` (Red phase)
         - [ ] Test: A single `inArray` query fetches all existing emails for submitted rows (not per-row queries)
