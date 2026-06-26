@@ -1252,11 +1252,11 @@ This ensures that even if two concurrent transactions both read `MAX(version) = 
 
 ### Track 8.4 — Performance Refinements
 
-**Description:** Parallelizes independent dashboard queries with `Promise.all` (the instructor dashboard currently issues 6+ queries strictly sequentially — many are independent and could run concurrently). Refactors bulk user import to batch database writes and decouple email sends from the request cycle (currently up to 500 rows are processed sequentially with per-row DB + Resend calls, potentially taking minutes). Isolates post-commit advisory work (audit logging in `submitReviewHandler`) in try/catch so that a failure in the audit insert doesn't surface a misleading "Internal Server Error" response for a transaction that actually committed successfully.
+**Description:** Parallelizes independent dashboard queries with `Promise.all` across all three role dashboards — instructor (6+ queries grouped into independent A/B/C sets), student (4 queries), and admin (7 queries in a single `Promise.all`). Also scanned sibling handlers (`reviews-extras.server.ts`, `submissions.server.ts`) for the same advisory-isolation pattern; `submissions.server.ts`'s post-commit `logAuditEvent` was verified already wrapped. Refactors bulk user import to batch database writes (users + verifications in a single `db.transaction`) and decouple email sends from the request cycle (previously up to 500 rows were processed sequentially with per-row DB + Resend calls, potentially taking minutes). Isolates post-commit advisory work (audit logging in `submitReviewHandler`) in try/catch so that a failure in the audit insert doesn't surface a misleading "Internal Server Error" response for a transaction that actually committed successfully.
 
 **Dependencies:** V1 dashboards (`dashboard-instructor.server.ts`), Track 1.1 (audit log — `logAuditEvent` called post-commit), bulk import infrastructure (`bulk-import.server.ts`).
 
-**Status:** ⏳ Planned
+**Status:** ✅ Complete (June 2026)
 
 **Audit Findings Addressed:**
 
@@ -1282,13 +1282,18 @@ None.
 
 **Acceptance Criteria:**
 
-- [ ] `getInstructorDashboardDataHandler` uses `Promise.all` for independent queries (e.g., recent submissions, assignment overview, and count queries run concurrently)
-- [ ] Instructor dashboard load time is reduced (measurable: sequential round-trips → parallel)
-- [ ] `bulkCreateUsersHandler` batches DB inserts (users + verifications) rather than per-row sequential inserts
-- [ ] `bulkCreateUsersHandler` enqueues invitation emails after the DB transaction commits (no per-row `await sendInvitationEmail` in the loop)
-- [ ] `submitReviewHandler` wraps post-commit `logAuditEvent` and SLA notification calls in try/catch — a failure in advisory work does not return an error response for a successful review
-- [ ] No regression in dashboard data correctness or bulk import behavior
-- [ ] i18n not affected
+- [x] `getInstructorDashboardDataHandler` uses `Promise.all` for independent queries (recent submissions, assignment overview, and count queries run concurrently in groups A/B/C)
+- [x] `getStudentDashboardDataHandler` uses `Promise.all` for independent queries (4 queries parallelized; checkpoints query correctly sequenced after assignment IDs)
+- [x] `getAdminDashboardDataHandler` uses `Promise.all` for all 7 dashboard queries in a single concurrent batch
+- [x] Dashboard load time reduced (sequential round-trips → parallel)
+- [x] `bulkCreateUsersHandler` batches DB inserts (users + verifications in a single `db.transaction` with `.values([...])`) rather than per-row sequential inserts
+- [x] `bulkCreateUsersHandler` enqueues invitation emails after the DB transaction commits (no per-row `await sendInvitationEmail` in the loop)
+- [x] `bulkCreateUsersHandler` handles intra-batch duplicate emails gracefully (skips with "Email already in use" rather than violating the UNIQUE constraint) *(review fix — commit `17ec76a`)*
+- [x] `submitReviewHandler` wraps post-commit `logAuditEvent` and SLA notification calls in try/catch — a failure in advisory work does not return an error response for a successful review
+- [x] `bulkCreateUsersHandler` wraps the post-commit `logAuditEvent` in try/catch — a transaction that committed successfully never surfaces a misleading error *(review fix — commit `17ec76a`)*
+- [x] Sibling handlers scanned for the same advisory-isolation pattern (`reviews-extras.server.ts`, `submissions.server.ts`); `submissions.server.ts` post-commit `logAuditEvent` verified already wrapped
+- [x] No regression in dashboard data correctness or bulk import behavior
+- [x] i18n not affected
 
 **Test Plan:**
 
@@ -1301,6 +1306,39 @@ None.
 | Bulk import partial failure | Unit test — if batch fails, no partial users persist (transaction rollback)       |
 | Audit log failure isolation | Unit test — `logAuditEvent` throw does not change the success response           |
 
+**Actual Files Created/Modified:**
+
+| File | Change |
+| ---- | ------ |
+| `src/server/dashboard-instructor.server.ts` | Parallelize independent queries with `Promise.all` (groups A/B/C) |
+| `src/server/dashboard-student.server.ts` | Parallelize independent queries with `Promise.all` (4 queries) |
+| `src/server/dashboard-admin.server.ts` | Parallelize all 7 dashboard queries in a single `Promise.all` |
+| `src/server/bulk-import.server.ts` | Batch user + verification inserts in one `db.transaction`; decouple emails post-commit; intra-batch duplicate handling + guarded audit log (review fix) |
+| `src/server/reviews.server.ts` | Wrap post-commit `logAuditEvent` + SLA notifications in try/catch |
+| `tests/unit/server/dashboard-instructor-parallel.test.ts` | New — verifies `Promise.all` concurrency & correctness (instructor) |
+| `tests/unit/server/dashboard-student-parallel.test.ts` | New — verifies `Promise.all` concurrency & correctness (student) |
+| `tests/unit/server/dashboard-admin-parallel.test.ts` | New — verifies `Promise.all` concurrency & correctness (admin) |
+| `tests/unit/server/bulk-import-users-batching.test.ts` | New — batched inserts, email decoupling, partial-failure rollback, intra-batch duplicate handling |
+| `tests/unit/server/bulk-import-users.test.ts` | Updated — bulk import regression coverage |
+| `tests/unit/server/reviews-advisory-isolation.test.ts` | New — advisory-work failure does not surface a misleading error |
+| `tests/unit/server/submissions.test.ts` | Updated — `submitCheckpointHandler` post-commit audit isolation |
+| `tests/unit/server/dashboard-instructor.test.ts` | Updated — instructor dashboard regression coverage |
+| `tests/unit/server/dashboard.test.ts` | Updated — dashboard regression coverage |
+
+**Test Results (at time of archiving):**
+
+- 84 unit tests passed across 9 test files (track scope).
+- `pnpm typecheck` clean.
+- `pnpm lint` — 0 warnings, 0 errors.
+- Modularity check (`scripts/check-modularity.js`) — all 5 source files under the 500-line limit.
+
+**Review Fixes Applied (commit `17ec76a`):**
+
+Two Medium findings surfaced during the conductor review and were fixed before archiving:
+
+1. **Intra-batch duplicate emails** (`src/server/bulk-import.server.ts`) — the batched uniqueness check only queried the DB, so two rows sharing a new email would both pass and then violate the `users.email` UNIQUE constraint, rolling back the whole transaction with a misleading "Internal Server Error". Fixed by tracking staged emails in a `Set` and skipping duplicates gracefully ("Email already in use"). Regression test added.
+2. **Unguarded post-commit `logAuditEvent`** (`src/server/bulk-import.server.ts`) — the audit log call after the transaction was not wrapped in try/catch, so a throw there would surface a misleading error despite a committed transaction (the exact NFR-3 failure class the track targeted). Fixed by wrapping in try/catch with `console.error`, matching the adjacent email-send pattern and the `submitReviewHandler` gold standard.
+
 ---
 
 ## Priority Summary
@@ -1312,10 +1350,10 @@ None.
 | 🔴 **High**      | Track 1.3 (Extensions)         | Depends on Track 1.1 + 1.2; student/instructor extension workflow        |
 | 🔴 **High**      | Track 4.1 (Email Queue)        | Removes synchronous Resend bottleneck; improves reliability              |
 | ✅ **Completed** | Track 8.1 (Session & Auth)     | FIXED: deleted-user session bypass closed, rate limiting added, session revocation on delete/password-reset/2FA-disable, secret validation, audit logging |
-| 🔴 **Immediate** | Track 8.2 (Email Pipeline)     | CRITICAL: email queue race condition (duplicate delivery) + HTML injection in email templates |
+| ✅ **Completed** | Track 8.2 (Email Pipeline)     | FIXED: email queue race condition (duplicate delivery) + HTML injection in email templates |
 | ✅ **Completed** | Track 8.3 (Transactions)       | FIXED: submission version race (unique constraint), transactional handlers, feedback upload validation, notification metadata bug; fileKey IDOR investigated (deferred to follow-up track) |
 | 🟠 **Medium**    | Track 2.1 (Groups)             | Largest feature request; significant scope                               |
-| 🟡 **Lower**     | Track 8.4 (Performance)        | MEDIUM/LOW: dashboard query parallelization, bulk import batching, audit log error isolation |
+| ✅ **Completed** | Track 8.4 (Performance)        | FIXED: dashboard query parallelization (instructor/student/admin), bulk import batching + email decoupling, post-commit advisory isolation (reviews + bulk import); sibling-handler scan verified |
 | 🟡 **Lower**     | Tracks 3.1, 5.1, 6.2, 6.3, 6.4, 6.5, 7.1 | Security, analytics, UX polish, UI consistency, testing — valuable but not blocking |
 | ✅ **Completed** | Bulk Import (Users & Templates) | Ad-hoc track: Excel bulk import for users and templates with client preview, server re-validation, per-group atomicity, audit logging, bilingual i18n |
 
@@ -1430,11 +1468,14 @@ _Note: Items 1–2 are partially addressed by V1 code (blocking reasons already 
 12. ✅ Production Migration Hardening — Dockerfile executes bundled `migrate.mjs` (advisory-locked, PgBouncer bypass via `MIGRATE_DATABASE_URL`); `drizzle-kit` removed from production image (Complete)
 13. ✅ Bulk Import for Users & Templates — Excel (.xlsx) bulk import with client-side preview (SheetJS), server-side re-validation, per-group atomicity for templates, audit logging, bilingual i18n, 500 row/5 MB limits (Complete)
 14. ✅ Track 8.1 — Session Lifecycle & Auth Hardening (Complete — deleted-user session bypass fixed, rate limiting, session revocation, secret validation, audit logging)
-15. [ ] Select next track to implement (recommended priority order: **Track 8.2 → 8.3 → 8.4** for security hardening, then **Track 2.1 — Group Assignments** for feature work)
-16. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
-17. [ ] Write failing tests
-18. [ ] Implement features
-19. [ ] Verify & archive
+15. ✅ Track 8.2 — Email Pipeline Hardening (Complete — email queue race condition + HTML injection fixed)
+16. ✅ Track 8.3 — Transactional Integrity & Input Validation (Complete — submission version race, transactional handlers, feedback upload validation, fileKey IDOR investigated)
+17. ✅ Track 8.4 — Performance Refinements (Complete — dashboard query parallelization across all 3 role dashboards, bulk import batching + email decoupling, post-commit advisory isolation; 2 review fixes applied — commit `17ec76a`)
+18. [ ] Select next track to implement — **Track 2.1 — Group Assignments** for feature work (Phase 8 security hardening complete; Tracks 8.1–8.4 all archived)
+19. [ ] Create implementation plan in `conductor/tracks/<id>/plan.md`
+20. [ ] Write failing tests
+21. [ ] Implement features
+22. [ ] Verify & archive
 
 ---
 
