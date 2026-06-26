@@ -134,8 +134,8 @@
     - [ ] Read `./spec.md` to review functional requirements for this phase
     - [ ] Read `conductor/workflow.md` to review the TDD lifecycle and commit protocol
 
-- [ ] Task: Wrap post-commit advisory work in submitReviewHandler (FR-6)
-    - [ ] Mark task `[~]` in progress in `plan.md`
+- [x] Task: Wrap post-commit advisory work in submitReviewHandler (FR-6) — commit `7f665fe`
+    - [x] Mark task `[~]` in progress in `plan.md`
     - [ ] Write failing tests — `tests/unit/server/reviews-advisory-isolation.test.ts` (Red phase)
         - [ ] Test: `logAuditEvent` throwing does NOT change the success response (returns `{ success: true }`)
         - [ ] Test: `dispatchSLABreachNotifications` throwing does NOT change the success response
