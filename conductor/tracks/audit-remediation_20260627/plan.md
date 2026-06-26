@@ -17,12 +17,12 @@
      - [x] Run `pnpm generate:i18n` to regenerate types
      - [x] Run `pnpm check:i18n` to verify parity
 
-- [ ] Task: Schema migration — expand (add new columns)
-    - [ ] Write test verifying new columns exist on the `notifications` table schema (Red)
-    - [ ] Add `titleKey` (varchar), `messageKey` (varchar), `params` (jsonb, nullable) columns to the notifications schema in `src/db/schema.ts` (Green)
-    - [ ] Generate migration with `pnpm db:generate`
-    - [ ] Apply migration to dev DB with `pnpm db:push`
-    - [ ] Verify old `title`/`message` columns still exist (expand phase — no drops)
+ - [x] Task: Schema migration — expand (add new columns) [c7e4869]
+     - [x] Write test verifying new columns exist on the `notifications` table schema (Red)
+     - [x] Add `titleKey` (varchar), `messageKey` (varchar), `params` (jsonb, nullable) columns to the notifications schema in `src/db/schema.ts` (Green)
+     - [x] Generate migration with `pnpm db:generate`
+     - [x] Apply migration to dev DB with `pnpm db:push`
+     - [x] Verify old `title`/`message` columns still exist (expand phase — no drops)
 
 - [ ] Task: Read-time notification resolver
     - [ ] Write tests for the resolver: EN locale returns English strings, ID locale returns Indonesian strings, params interpolation works, missing key returns fallback (Red)
