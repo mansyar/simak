@@ -1,9 +1,14 @@
+<protect>
 # Implementation Plan: Audit Remediation — i18n, Type Safety, Hygiene
 
 **Track ID:** `audit-remediation_20260627`
 **Specification:** `./spec.md`
 
 ## Phase 1: Notification i18n (H1)
+
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+    - [ ] Read `./spec.md` — focus on FR-1 (Notification i18n) and NFR-5 (expand-contract migration)
+    - [ ] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
 
 - [ ] Task: Define notification i18n keys in locale files
     - [ ] Write test verifying all notification types have keys in both `en.json` and `id.json` (Red)
@@ -62,6 +67,10 @@
 
 ## Phase 2: Boundary Type Contract (H2)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+    - [ ] Read `./spec.md` — focus on FR-2 (Boundary Type Contract) and NFR-4 (no new `any`/`@ts-expect-error`)
+    - [ ] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
+
 - [ ] Task: Write boundary type tests
     - [ ] Write tests verifying server-fn handlers that cross the boundary have explicit return types with `Date` fields modeled as `string` (Red)
     - [ ] Run tests and confirm they fail (no explicit types declared yet)
@@ -80,6 +89,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Boundary Type Contract' (Protocol in workflow.md)
 
 ## Phase 3: Dead i18n Key Cleanup (M1)
+
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+    - [ ] Read `./spec.md` — focus on FR-3 (Dead i18n Key Cleanup) and NFR-6 (i18n keys in both locales)
+    - [ ] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
 
 - [ ] Task: Audit dynamic key references
     - [ ] Grep codebase for dynamic i18n key construction patterns: `t(`...${`, string concatenation with `t(`, `i18n(` with template literals
@@ -102,6 +115,10 @@
 
 ## Phase 4: Client Error Handling (M4)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+    - [ ] Read `./spec.md` — focus on FR-4 (Client Error Handling) and NFR-6 (i18n keys in both locales)
+    - [ ] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
+
 - [ ] Task: Write tests for toast error display on failed fetches
     - [ ] Write tests verifying `toast.error` is called with the correct i18n key when a fetch fails in AssignmentWizard, TemplatePicker, StudentPicker, and the student checkpoint route (Red)
 
@@ -115,3 +132,4 @@
     - [ ] Verify all tests pass
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Client Error Handling' (Protocol in workflow.md)
+</protect>

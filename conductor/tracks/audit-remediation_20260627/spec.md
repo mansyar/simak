@@ -1,3 +1,4 @@
+<protect>
 # Specification: Audit Remediation — i18n, Type Safety, Hygiene
 
 **Track ID:** `audit-remediation_20260627`
@@ -74,3 +75,4 @@ An independent audit identified systemic quality gaps. The four findings address
 - The duplicated `ILIKE` search pattern (M3) is NOT included — trivial refactor, separate concern.
 - No changes to the notification polling infrastructure or notification UI components beyond passing localized strings through.
 - No new notification types are added.
+</protect>
