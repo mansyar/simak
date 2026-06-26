@@ -29,30 +29,81 @@ export async function getAdminDashboardDataHandler() {
   const db = getDb();
 
   try {
-    // 1. System metrics
-    const [userCounts] = await db
-      .select({
-        total: sql<number>`count(*)::int`,
-        instructors: sql<number>`count(*) FILTER (WHERE ${users.role} = 'instructor')::int`,
-        students: sql<number>`count(*) FILTER (WHERE ${users.role} = 'student')::int`,
-      })
-      .from(users)
-      .where(isNull(users.deletedAt));
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const slaThreshold = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
 
-    const [{ activeAssignmentCount }] = await db
-      .select({ activeAssignmentCount: sql<number>`count(*)::int` })
-      .from(assignments)
-      .where(isNull(assignments.deletedAt));
-
-    const [{ pendingReviewCount }] = await db
-      .select({ pendingReviewCount: sql<number>`count(*)::int` })
-      .from(checkpoints)
-      .where(sql`${checkpoints.state} IN ('submitted', 'under_review')`);
-
-    const [{ activeConsultationCount }] = await db
-      .select({ activeConsultationCount: sql<number>`count(*)::int` })
-      .from(consultations)
-      .where(eq(consultations.status, 'pending'));
+    // Run all 7 independent dashboard queries concurrently
+    const [
+      [userCounts],
+      [{ activeAssignmentCount }],
+      [{ pendingReviewCount }],
+      [{ activeConsultationCount }],
+      recentActivity,
+      [emailCounts],
+      escalationAlerts,
+    ] = await Promise.all([
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          instructors: sql<number>`count(*) FILTER (WHERE ${users.role} = 'instructor')::int`,
+          students: sql<number>`count(*) FILTER (WHERE ${users.role} = 'student')::int`,
+        })
+        .from(users)
+        .where(isNull(users.deletedAt)),
+      db
+        .select({ activeAssignmentCount: sql<number>`count(*)::int` })
+        .from(assignments)
+        .where(isNull(assignments.deletedAt)),
+      db
+        .select({ pendingReviewCount: sql<number>`count(*)::int` })
+        .from(checkpoints)
+        .where(sql`${checkpoints.state} IN ('submitted', 'under_review')`),
+      db
+        .select({ activeConsultationCount: sql<number>`count(*)::int` })
+        .from(consultations)
+        .where(eq(consultations.status, 'pending')),
+      db
+        .select({
+          id: notifications.id,
+          type: notifications.type,
+          title: notifications.title,
+          message: notifications.message,
+          createdAt: notifications.createdAt,
+        })
+        .from(notifications)
+        .where(gte(notifications.createdAt, sevenDaysAgo))
+        .orderBy(desc(notifications.createdAt))
+        .limit(10),
+      db
+        .select({
+          pending: sql<number>`count(*) FILTER (WHERE ${emailQueue.status} = 'pending')::int`,
+          sent: sql<number>`count(*) FILTER (WHERE ${emailQueue.status} = 'sent')::int`,
+          failed: sql<number>`count(*) FILTER (WHERE ${emailQueue.status} = 'failed')::int`,
+        })
+        .from(emailQueue),
+      db
+        .select({
+          submissionId: submissions.id,
+          instructorName: instructorUsers.name,
+          assignmentTitle: assignments.title,
+          checkpointName: checkpoints.name,
+          studentName: users.name,
+          daysOverdue: sql<number>`extract(day from now() - ${submissions.uploadedAt})::int`,
+        })
+        .from(submissions)
+        .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+        .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+        .innerJoin(users, eq(checkpoints.studentId, users.id))
+        .innerJoin(instructorUsers, eq(assignments.instructorId, instructorUsers.id))
+        .where(
+          and(
+            sql`${checkpoints.state} = 'submitted'`,
+            lte(submissions.uploadedAt, slaThreshold),
+            isNull(assignments.deletedAt),
+          ),
+        )
+        .orderBy(desc(sql`extract(day from now() - ${submissions.uploadedAt})`)),
+    ]);
 
     const metrics = {
       totalUsers: Number(userCounts.total),
@@ -62,55 +113,6 @@ export async function getAdminDashboardDataHandler() {
       pendingReviews: Number(pendingReviewCount),
       activeConsultations: Number(activeConsultationCount),
     };
-
-    // 2. Recent activity feed (last 10 events from last 7 days)
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const recentActivity = await db
-      .select({
-        id: notifications.id,
-        type: notifications.type,
-        title: notifications.title,
-        message: notifications.message,
-        createdAt: notifications.createdAt,
-      })
-      .from(notifications)
-      .where(gte(notifications.createdAt, sevenDaysAgo))
-      .orderBy(desc(notifications.createdAt))
-      .limit(10);
-
-    // 3. Email queue counts
-    const [emailCounts] = await db
-      .select({
-        pending: sql<number>`count(*) FILTER (WHERE ${emailQueue.status} = 'pending')::int`,
-        sent: sql<number>`count(*) FILTER (WHERE ${emailQueue.status} = 'sent')::int`,
-        failed: sql<number>`count(*) FILTER (WHERE ${emailQueue.status} = 'failed')::int`,
-      })
-      .from(emailQueue);
-
-    // 4. Deadline escalation alerts — active SLA breaches (submissions older than 3 days)
-    const slaThreshold = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-    const escalationAlerts = await db
-      .select({
-        submissionId: submissions.id,
-        instructorName: instructorUsers.name,
-        assignmentTitle: assignments.title,
-        checkpointName: checkpoints.name,
-        studentName: users.name,
-        daysOverdue: sql<number>`extract(day from now() - ${submissions.uploadedAt})::int`,
-      })
-      .from(submissions)
-      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-      .innerJoin(users, eq(checkpoints.studentId, users.id))
-      .innerJoin(instructorUsers, eq(assignments.instructorId, instructorUsers.id))
-      .where(
-        and(
-          sql`${checkpoints.state} = 'submitted'`,
-          lte(submissions.uploadedAt, slaThreshold),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .orderBy(desc(sql`extract(day from now() - ${submissions.uploadedAt})`));
 
     return {
       metrics,
