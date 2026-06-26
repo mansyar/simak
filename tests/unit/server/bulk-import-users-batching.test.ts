@@ -97,6 +97,29 @@ describe('Bulk user import handler — batching', () => {
       expect(result.errors[0].reason).toBe('Email already in use');
     });
 
+    it('should skip intra-batch duplicate emails (same email submitted twice)', async () => {
+      const result = (await bulkCreateUsersHandler({
+        data: {
+          rows: [
+            { name: 'First Dup', email: 'dup@test.com', role: 'student' },
+            { name: 'Second Dup', email: 'dup@test.com', role: 'student' },
+          ],
+        },
+      })) as any;
+
+      expect(result.created).toBe(1);
+      expect(result.skipped).toBe(1);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].reason).toBe('Email already in use');
+      expect(result.errors[0].email).toBe('dup@test.com');
+
+      // The duplicate must not reach the batch insert — only one user staged
+      const usersValuesCall = mockDb.values.mock.calls.find(
+        (call) => Array.isArray(call[0]) && call[0][0]?.email === 'dup@test.com',
+      );
+      expect(usersValuesCall?.[0]).toHaveLength(1);
+    });
+
     it('should skip invalid-role rows before the batched uniqueness check', async () => {
       const result = (await bulkCreateUsersHandler({
         data: {

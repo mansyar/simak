@@ -107,11 +107,12 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
       expiresAt: Date;
     }[] = [];
     const emailPayloads: { email: string; name: string; token: string }[] = [];
+    const stagedEmails = new Set<string>();
 
     for (const candidate of validRows) {
       const { rowIndex, email, name, role } = candidate;
 
-      if (existingEmails.has(email)) {
+      if (existingEmails.has(email) || stagedEmails.has(email)) {
         errors.push({ row: rowIndex, email, reason: 'Email already in use' });
         skipped.push(rowIndex);
         continue;
@@ -140,6 +141,7 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
 
       created.push(rowIndex);
       emailPayloads.push({ email, name, token });
+      stagedEmails.add(email);
     }
 
     // Atomic batch insert of all valid users + verification tokens
@@ -159,19 +161,23 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
       }
     }
 
-    // Audit log
+    // Audit log (post-commit advisory — must not fail the request)
     if (created.length > 0) {
-      await logAuditEvent({
-        actorId: session.user.id,
-        action: 'user.bulk_created',
-        entityType: 'user',
-        entityId: session.user.id,
-        details: {
-          created: created.length,
-          skipped: skipped.length,
-          errors: errors.length,
-        },
-      });
+      try {
+        await logAuditEvent({
+          actorId: session.user.id,
+          action: 'user.bulk_created',
+          entityType: 'user',
+          entityId: session.user.id,
+          details: {
+            created: created.length,
+            skipped: skipped.length,
+            errors: errors.length,
+          },
+        });
+      } catch (advisoryErr) {
+        console.error('Post-commit advisory work failed in bulkCreateUsersHandler:', advisoryErr);
+      }
     }
 
     return { created: created.length, skipped: skipped.length, errors };
