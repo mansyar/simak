@@ -106,6 +106,7 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
       value: string;
       expiresAt: Date;
     }[] = [];
+    const emailPayloads: { email: string; name: string; token: string }[] = [];
 
     for (const candidate of validRows) {
       const { rowIndex, email, name, role } = candidate;
@@ -138,17 +139,7 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
       });
 
       created.push(rowIndex);
-
-      // Enqueue invitation email (non-blocking)
-      try {
-        await sendInvitationEmail({
-          email,
-          name,
-          token,
-        });
-      } catch {
-        // Email failure is non-fatal as per spec
-      }
+      emailPayloads.push({ email, name, token });
     }
 
     // Atomic batch insert of all valid users + verification tokens
@@ -157,6 +148,15 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
         await tx.insert(users).values(usersToInsert);
         await tx.insert(verification).values(verificationsToInsert);
       });
+    }
+
+    // Enqueue invitation emails after the DB transaction commits (non-blocking)
+    for (const payload of emailPayloads) {
+      try {
+        await sendInvitationEmail(payload);
+      } catch {
+        // Email failure is non-fatal as per spec
+      }
     }
 
     // Audit log
