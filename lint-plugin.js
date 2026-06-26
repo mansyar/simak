@@ -26,11 +26,7 @@ const rule = {
     return {
       JSXText(node) {
         const text = node.value.trim();
-        if (
-          text &&
-          !ALLOWED_STRINGS.has(text) &&
-          UI_TEXT_RE.test(text)
-        ) {
+        if (text && !ALLOWED_STRINGS.has(text) && UI_TEXT_RE.test(text)) {
           context.report({
             node,
             messageId: 'hardcodedText',
@@ -39,9 +35,10 @@ const rule = {
         }
       },
       JSXAttribute(node) {
-        const attrName = typeof node.name === 'object' && node.name !== null
-          ? /** @type {{ name: string }} */ (node.name).name
-          : undefined;
+        const attrName =
+          typeof node.name === 'object' && node.name !== null
+            ? /** @type {{ name: string }} */ (node.name).name
+            : undefined;
 
         if (!attrName || !UI_ATTRS.has(attrName)) return;
         if (!node.value || node.value.type !== 'Literal') return;
@@ -53,6 +50,27 @@ const rule = {
             node,
             messageId: 'hardcodedAttr',
             data: { attr: attrName, text: val },
+          });
+        }
+      },
+      Property(node) {
+        const keyName =
+          node.key && node.key.type === 'Identifier'
+            ? node.key.name
+            : node.key && node.key.type === 'Literal' && typeof node.key.value === 'string'
+              ? node.key.value
+              : undefined;
+
+        if (keyName !== 'titleKey' && keyName !== 'messageKey') return;
+        if (!node.value || node.value.type !== 'Literal') return;
+        if (typeof node.value.value !== 'string') return;
+
+        const text = node.value.value.trim();
+        if (text && !ALLOWED_STRINGS.has(text) && UI_TEXT_RE.test(text)) {
+          context.report({
+            node,
+            messageId: 'hardcodedText',
+            data: { text },
           });
         }
       },
