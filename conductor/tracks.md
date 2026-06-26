@@ -11,15 +11,11 @@ This file tracks all major tracks for the project. Each track has its own detail
 - **Email Pipeline Hardening** — Archived to [./archive/email-pipeline-hardening_20260625/](./archive/email-pipeline-hardening_20260625/) (commit `06cbcea`)
 - **Error Boundary & Error Message Improvements** — Archived to [./archive/error-handling_20260625/](./archive/error-handling_20260625/) (commit `d3cf731`)
 - **Transactional Integrity & Input Validation** — Archived to [./archive/transactional-integrity_20260626/](./archive/transactional-integrity_20260626/) (commit `a1c6f58`)
+- **Performance Refinements** — Archived to [./archive/performance-refinements_20260626/](./archive/performance-refinements_20260626/) (commit `17ec76a`)
 
 ---
 
 ## Active
-
----
-
-- [x] **Track: Performance Refinements**
-*Link: [./tracks/performance-refinements_20260626/](./tracks/performance-refinements_20260626/)*
 
 ---
 
