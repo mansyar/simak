@@ -128,7 +128,7 @@
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Bulk Import Batching & Email Decoupling' (Protocol in workflow.md)
 
-## Phase 3: Post-Commit Advisory Isolation
+## Phase 3: Post-Commit Advisory Isolation [checkpoint: 3b86276]
 
 - [ ] Task: Read `spec.md` and `workflow.md` before starting this phase
     - [ ] Read `./spec.md` to review functional requirements for this phase
