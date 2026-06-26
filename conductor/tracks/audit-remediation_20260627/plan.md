@@ -30,17 +30,18 @@
      - [x] Update `listNotifications`/`getNotifications` handlers to call the resolver before returning, passing the requesting user's locale
      - [x] Verify tests pass
 
-- [ ] Task: Update notification INSERT sites to use keys + params
-    - [ ] Write tests verifying each handler inserts `titleKey`/`messageKey`/`params` instead of literal strings (Red)
-    - [ ] Update `reviews.server.ts` (2 sites: review completed, revision requested) (Green)
-    - [ ] Update `consultations.server.ts` (3 sites: logged, verified, rejected)
-    - [ ] Update `extensions-extras.server.ts` (3 sites: approved, rejected, requested)
-    - [ ] Update `submissions.server.ts` (1 site: new submission)
-    - [ ] Update `notifications.server.ts` (any direct inserts)
-    - [ ] Update `extensions.server.ts` (any direct inserts)
-    - [ ] Verify all handler tests pass
+ - [x] Task: Update notification INSERT sites to use keys + params [75903a5]
+     - [x] Write tests verifying each handler inserts `titleKey`/`messageKey`/`params` instead of literal strings (Red)
+     - [x] Update `reviews.server.ts` (2 sites: review completed, revision requested) (Green)
+     - [x] Update `consultations.server.ts` (3 sites: logged, verified, rejected)
+     - [x] Update `extensions-extras.server.ts` (3 sites: approved, rejected, requested)
+     - [x] Update `submissions.server.ts` (1 site: new submission)
+     - [x] Update `notifications.server.ts` (createNotification uses localized keys from resolver)
+     - [x] Update `extensions.server.ts` (1 site: extension requested)
+     - [x] Update `src/lib/review-sla.ts` (SLA breach in_app + email records)
+     - [x] Verify all handler tests pass
 
-- [ ] Task: Email subject localization
+ - [~] Task: Email subject localization
     - [ ] Write test verifying email subject resolves to recipient's locale (Red)
     - [ ] Update `src/lib/email.ts` to resolve subjects via i18n keys using recipient locale (Green)
     - [ ] Add email subject i18n keys to `locales/en.json` and `locales/id.json`
