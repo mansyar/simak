@@ -24,11 +24,11 @@
      - [x] Apply migration to dev DB with `pnpm db:push`
      - [x] Verify old `title`/`message` columns still exist (expand phase — no drops)
 
-- [ ] Task: Read-time notification resolver
-    - [ ] Write tests for the resolver: EN locale returns English strings, ID locale returns Indonesian strings, params interpolation works, missing key returns fallback (Red)
-    - [ ] Implement `resolveNotificationContent(titleKey, messageKey, params, locale)` in `src/server/notifications.server.ts` or a shared util (Green)
-    - [ ] Update `listNotifications`/`getNotifications` handlers to call the resolver before returning, passing the requesting user's locale
-    - [ ] Verify tests pass
+ - [x] Task: Read-time notification resolver
+     - [x] Write tests for the resolver: EN locale returns English strings, ID locale returns Indonesian strings, params interpolation works, missing key returns fallback (Red)
+     - [x] Implement `resolveNotificationContent(titleKey, messageKey, params, locale)` in `src/server/notifications.server.ts` or a shared util (Green)
+     - [x] Update `listNotifications`/`getNotifications` handlers to call the resolver before returning, passing the requesting user's locale
+     - [x] Verify tests pass
 
 - [ ] Task: Update notification INSERT sites to use keys + params
     - [ ] Write tests verifying each handler inserts `titleKey`/`messageKey`/`params` instead of literal strings (Red)
