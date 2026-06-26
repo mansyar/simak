@@ -651,6 +651,52 @@
       "consultations": "Consultation Updates",
       "submissions": "Submissions",
       "system": "System Notifications"
+    },
+    "events": {
+      "review_completed": {
+        "title": "Review Completed",
+        "message": "The review for checkpoint \"{checkpointName}\" in \"{assignmentTitle}\" has been completed."
+      },
+      "revision_requested": {
+        "title": "Revision Requested",
+        "message": "A revision has been requested for \"{checkpointName}\" in \"{assignmentTitle}\"."
+      },
+      "consultation_logged": {
+        "title": "New Consultation Logged",
+        "message": "A new {sessionType} consultation has been logged."
+      },
+      "consultation_verified": {
+        "title": "Consultation Verified",
+        "message": "Your consultation has been verified."
+      },
+      "consultation_rejected": {
+        "title": "Consultation Rejected",
+        "message": "Your consultation was rejected: {reason}."
+      },
+      "extension_approved": {
+        "title": "Extension Approved",
+        "message": "Your extension request for {extensionDays} day(s) has been approved."
+      },
+      "extension_rejected": {
+        "title": "Extension Rejected",
+        "message": "Your extension request for {extensionDays} day(s) was rejected: {resolutionReason}."
+      },
+      "deadline_extended": {
+        "title": "Deadline Extended",
+        "message": "The deadline has been extended by {extraDays} day(s) for {checkpointCount} checkpoint(s). Reason: {reason}."
+      },
+      "submission_received": {
+        "title": "New Submission Received",
+        "message": "{studentName} submitted work for \"{assignmentTitle}\"."
+      },
+      "extension_requested": {
+        "title": "Extension Requested",
+        "message": "An extension of {extensionDays} day(s) has been requested."
+      },
+      "sla_breach": {
+        "title": "SLA Breach",
+        "message": "The review SLA for \"{checkpointName}\" in \"{assignmentTitle}\" for {studentName} has been breached by {breachDays} day(s)."
+      }
     }
   },
   "extensions": {

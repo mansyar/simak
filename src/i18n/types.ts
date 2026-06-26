@@ -657,6 +657,52 @@ export type Translation = {
       submissions: string
       system: string
     }
+    events: {
+      review_completed: {
+        title: string
+        message: string
+      }
+      revision_requested: {
+        title: string
+        message: string
+      }
+      consultation_logged: {
+        title: string
+        message: string
+      }
+      consultation_verified: {
+        title: string
+        message: string
+      }
+      consultation_rejected: {
+        title: string
+        message: string
+      }
+      extension_approved: {
+        title: string
+        message: string
+      }
+      extension_rejected: {
+        title: string
+        message: string
+      }
+      deadline_extended: {
+        title: string
+        message: string
+      }
+      submission_received: {
+        title: string
+        message: string
+      }
+      extension_requested: {
+        title: string
+        message: string
+      }
+      sla_breach: {
+        title: string
+        message: string
+      }
+    }
   }
   extensions: {
     requestTitle: string

@@ -651,6 +651,52 @@
       "consultations": "Pembaruan Konsultasi",
       "submissions": "Unggahan",
       "system": "Notifikasi Sistem"
+    },
+    "events": {
+      "review_completed": {
+        "title": "Ulasan Selesai",
+        "message": "Ulasan untuk checkpoint \"{checkpointName}\" di \"{assignmentTitle}\" telah selesai."
+      },
+      "revision_requested": {
+        "title": "Revisi Diminta",
+        "message": "Revisi telah diminta untuk \"{checkpointName}\" di \"{assignmentTitle}\"."
+      },
+      "consultation_logged": {
+        "title": "Konsultasi Baru Dicatat",
+        "message": "Konsultasi {sessionType} baru telah dicatat."
+      },
+      "consultation_verified": {
+        "title": "Konsultasi Terverifikasi",
+        "message": "Konsultasi Anda telah terverifikasi."
+      },
+      "consultation_rejected": {
+        "title": "Konsultasi Ditolak",
+        "message": "Konsultasi Anda ditolak: {reason}."
+      },
+      "extension_approved": {
+        "title": "Perpanjangan Disetujui",
+        "message": "Permohonan perpanjangan Anda selama {extensionDays} hari telah disetujui."
+      },
+      "extension_rejected": {
+        "title": "Perpanjangan Ditolak",
+        "message": "Permohonan perpanjangan Anda selama {extensionDays} hari ditolak: {resolutionReason}."
+      },
+      "deadline_extended": {
+        "title": "Tenggat Diperpanjang",
+        "message": "Tenggat waktu diperpanjang {extraDays} hari untuk {checkpointCount} checkpoint. Alasan: {reason}."
+      },
+      "submission_received": {
+        "title": "Pengumpulan Baru Diterima",
+        "message": "{studentName} telah mengumpulkan pekerjaan untuk \"{assignmentTitle}\"."
+      },
+      "extension_requested": {
+        "title": "Permohonan Perpanjangan",
+        "message": "Permohonan perpanjangan {extensionDays} hari telah diajukan."
+      },
+      "sla_breach": {
+        "title": "Pelanggaran SLA",
+        "message": "SLA ulasan untuk \"{checkpointName}\" di \"{assignmentTitle}\" milik {studentName} telah dilanggar selama {breachDays} hari."
+      }
     }
   },
   "extensions": {
