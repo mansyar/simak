@@ -25,11 +25,39 @@ export async function getInstructorDashboardDataHandler() {
   const instructorId = session.user.id;
 
   try {
-    // 1. Pending review queue — count + FIFO list
-    const instructorAssignments = await db
-      .select({ id: assignments.id })
-      .from(assignments)
-      .where(and(eq(assignments.instructorId, instructorId), isNull(assignments.deletedAt)));
+    // Group A (independent): active assignments, recent submissions, assignment overview
+    const [instructorAssignments, recentSubmissions, assignmentOverview] = await Promise.all([
+      db
+        .select({ id: assignments.id })
+        .from(assignments)
+        .where(and(eq(assignments.instructorId, instructorId), isNull(assignments.deletedAt))),
+      db
+        .select({
+          submissionId: submissions.id,
+          studentName: users.name,
+          assignmentTitle: assignments.title,
+          checkpointName: checkpoints.name,
+          submittedAt: submissions.uploadedAt,
+          checkpointState: checkpoints.state,
+        })
+        .from(submissions)
+        .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+        .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+        .innerJoin(users, eq(checkpoints.studentId, users.id))
+        .where(and(eq(assignments.instructorId, instructorId), isNull(assignments.deletedAt)))
+        .orderBy(desc(submissions.uploadedAt))
+        .limit(5),
+      db
+        .select({
+          id: assignments.id,
+          title: assignments.title,
+          finalDeadline: assignments.finalDeadline,
+          createdAt: assignments.createdAt,
+        })
+        .from(assignments)
+        .where(and(eq(assignments.instructorId, instructorId), isNull(assignments.deletedAt)))
+        .orderBy(desc(assignments.createdAt)),
+    ]);
 
     const assignmentIds = instructorAssignments.map((a) => a.id);
     let pendingReviewCount = 0;
@@ -43,39 +71,43 @@ export async function getInstructorDashboardDataHandler() {
     }[] = [];
 
     if (assignmentIds.length > 0) {
-      const [{ count }] = await db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(checkpoints)
-        .where(
-          and(
-            inArray(checkpoints.assignmentId, assignmentIds),
-            sql`${checkpoints.state} IN ('submitted', 'under_review')`,
-          ),
-        );
+      // Group B (depends on Group A assignmentIds): count + FIFO list
+      const [{ count }, rawPendingReviewItems] = await Promise.all([
+        db
+          .select({ count: sql<number>`count(*)::int` })
+          .from(checkpoints)
+          .where(
+            and(
+              inArray(checkpoints.assignmentId, assignmentIds),
+              sql`${checkpoints.state} IN ('submitted', 'under_review')`,
+            ),
+          )
+          .then((rows) => rows[0]),
+        db
+          .select({
+            submissionId: submissions.id,
+            checkpointId: checkpoints.id,
+            checkpointName: checkpoints.name,
+            assignmentTitle: assignments.title,
+            studentName: users.name,
+            submittedAt: submissions.uploadedAt,
+          })
+          .from(submissions)
+          .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+          .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+          .innerJoin(users, eq(checkpoints.studentId, users.id))
+          .where(
+            and(
+              inArray(checkpoints.assignmentId, assignmentIds),
+              sql`${checkpoints.state} IN ('submitted', 'under_review')`,
+            ),
+          )
+          .orderBy(submissions.uploadedAt)
+          .limit(50),
+      ]);
       pendingReviewCount = Number(count);
 
-      // List — oldest submissions first (FIFO)
-      pendingReviewItems = await db
-        .select({
-          submissionId: submissions.id,
-          checkpointId: checkpoints.id,
-          checkpointName: checkpoints.name,
-          assignmentTitle: assignments.title,
-          studentName: users.name,
-          submittedAt: submissions.uploadedAt,
-        })
-        .from(submissions)
-        .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-        .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-        .innerJoin(users, eq(checkpoints.studentId, users.id))
-        .where(
-          and(
-            inArray(checkpoints.assignmentId, assignmentIds),
-            sql`${checkpoints.state} IN ('submitted', 'under_review')`,
-          ),
-        )
-        .orderBy(submissions.uploadedAt)
-        .limit(50);
+      pendingReviewItems = rawPendingReviewItems;
 
       // Deduplicate: keep only the latest submission per checkpoint
       const seenCheckpoints = new Set<number>();
@@ -89,73 +121,44 @@ export async function getInstructorDashboardDataHandler() {
         .reverse();
     }
 
-    // 2. Recent submissions (last 5)
-    const recentSubmissions = await db
-      .select({
-        submissionId: submissions.id,
-        studentName: users.name,
-        assignmentTitle: assignments.title,
-        checkpointName: checkpoints.name,
-        submittedAt: submissions.uploadedAt,
-        checkpointState: checkpoints.state,
-      })
-      .from(submissions)
-      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-      .innerJoin(users, eq(checkpoints.studentId, users.id))
-      .where(and(eq(assignments.instructorId, instructorId), isNull(assignments.deletedAt)))
-      .orderBy(desc(submissions.uploadedAt))
-      .limit(5);
-
-    // 3. Assignment overview — all active assignments with student count and progress
-    const assignmentOverview = await db
-      .select({
-        id: assignments.id,
-        title: assignments.title,
-        finalDeadline: assignments.finalDeadline,
-        createdAt: assignments.createdAt,
-      })
-      .from(assignments)
-      .where(and(eq(assignments.instructorId, instructorId), isNull(assignments.deletedAt)))
-      .orderBy(desc(assignments.createdAt));
-
     const overviewIds = assignmentOverview.map((a) => a.id);
     let studentCountMap = new Map<number, number>();
     let pendingReviewCountMap = new Map<number, number>();
     let progressMap = new Map<number, number>();
 
     if (overviewIds.length > 0) {
-      const counts = await db
-        .select({
-          assignmentId: assignmentStudents.assignmentId,
-          count: sql<number>`count(*)::int`,
-        })
-        .from(assignmentStudents)
-        .where(inArray(assignmentStudents.assignmentId, overviewIds))
-        .groupBy(assignmentStudents.assignmentId);
+      // Group C (depends on Group A overviewIds): student count, pending review count, progress
+      const [counts, pendingCounts, progressData] = await Promise.all([
+        db
+          .select({
+            assignmentId: assignmentStudents.assignmentId,
+            count: sql<number>`count(*)::int`,
+          })
+          .from(assignmentStudents)
+          .where(inArray(assignmentStudents.assignmentId, overviewIds))
+          .groupBy(assignmentStudents.assignmentId),
+        db
+          .select({ assignmentId: checkpoints.assignmentId, count: sql<number>`count(*)::int` })
+          .from(checkpoints)
+          .where(
+            and(
+              inArray(checkpoints.assignmentId, overviewIds),
+              sql`${checkpoints.state} IN ('submitted', 'under_review')`,
+            ),
+          )
+          .groupBy(checkpoints.assignmentId),
+        db
+          .select({
+            assignmentId: checkpoints.assignmentId,
+            totalCount: sql<number>`count(*)::int`,
+            passedCount: sql<number>`count(*) FILTER (WHERE ${checkpoints.state} = 'passed')::int`,
+          })
+          .from(checkpoints)
+          .where(inArray(checkpoints.assignmentId, overviewIds))
+          .groupBy(checkpoints.assignmentId),
+      ]);
       studentCountMap = new Map(counts.map((c) => [c.assignmentId, c.count]));
-
-      const pendingCounts = await db
-        .select({ assignmentId: checkpoints.assignmentId, count: sql<number>`count(*)::int` })
-        .from(checkpoints)
-        .where(
-          and(
-            inArray(checkpoints.assignmentId, overviewIds),
-            sql`${checkpoints.state} IN ('submitted', 'under_review')`,
-          ),
-        )
-        .groupBy(checkpoints.assignmentId);
       pendingReviewCountMap = new Map(pendingCounts.map((c) => [c.assignmentId, c.count]));
-
-      const progressData = await db
-        .select({
-          assignmentId: checkpoints.assignmentId,
-          totalCount: sql<number>`count(*)::int`,
-          passedCount: sql<number>`count(*) FILTER (WHERE ${checkpoints.state} = 'passed')::int`,
-        })
-        .from(checkpoints)
-        .where(inArray(checkpoints.assignmentId, overviewIds))
-        .groupBy(checkpoints.assignmentId);
       progressMap = new Map(
         progressData.map((p) => [
           p.assignmentId,

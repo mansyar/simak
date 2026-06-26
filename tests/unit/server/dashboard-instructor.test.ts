@@ -81,9 +81,17 @@ describe('getInstructorDashboardDataHandler', () => {
     mockDb.then
       // Query 1: instructorAssignments
       .mockImplementationOnce((fn: any) => Promise.resolve([{ id: 1 }]).then(fn))
-      // Query 2: pendingReviewCount
+      // Query 2: recentSubmissions
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      // Query 3: assignmentOverview
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { id: 1, title: 'Thesis Draft', finalDeadline: null, createdAt: new Date() },
+        ]).then(fn),
+      )
+      // Query 4: pendingReviewCount
       .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 2 }]).then(fn))
-      // Query 3: pendingReviewItems
+      // Query 5: pendingReviewItems
       .mockImplementationOnce((fn: any) =>
         Promise.resolve([
           {
@@ -94,14 +102,6 @@ describe('getInstructorDashboardDataHandler', () => {
             studentName: 'Alice',
             submittedAt,
           },
-        ]).then(fn),
-      )
-      // Query 4: recentSubmissions
-      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
-      // Query 5: assignmentOverview
-      .mockImplementationOnce((fn: any) =>
-        Promise.resolve([
-          { id: 1, title: 'Thesis Draft', finalDeadline: null, createdAt: new Date() },
         ]).then(fn),
       )
       // Query 6: studentCounts
@@ -134,6 +134,12 @@ describe('getInstructorDashboardDataHandler', () => {
 
     mockDb.then
       .mockImplementationOnce((fn: any) => Promise.resolve([{ id: 1 }]).then(fn))
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { id: 1, title: 'Thesis', finalDeadline: null, createdAt: new Date() },
+        ]).then(fn),
+      )
       .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 3 }]).then(fn))
       // Two submissions for the same checkpoint (checkpointId: 10)
       .mockImplementationOnce((fn: any) =>
@@ -164,12 +170,6 @@ describe('getInstructorDashboardDataHandler', () => {
           },
         ]).then(fn),
       )
-      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
-      .mockImplementationOnce((fn: any) =>
-        Promise.resolve([
-          { id: 1, title: 'Thesis', finalDeadline: null, createdAt: new Date() },
-        ]).then(fn),
-      )
       .mockImplementationOnce((fn: any) =>
         Promise.resolve([{ assignmentId: 1, count: 2 }]).then(fn),
       )
@@ -189,6 +189,12 @@ describe('getInstructorDashboardDataHandler', () => {
 
     mockDb.then
       .mockImplementationOnce((fn: any) => Promise.resolve([{ id: 1 }]).then(fn))
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { id: 1, title: 'Thesis', finalDeadline: null, createdAt: new Date() },
+        ]).then(fn),
+      )
       .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 1 }]).then(fn))
       .mockImplementationOnce((fn: any) =>
         Promise.resolve([
@@ -200,12 +206,6 @@ describe('getInstructorDashboardDataHandler', () => {
             studentName: 'Alice',
             submittedAt: null,
           },
-        ]).then(fn),
-      )
-      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
-      .mockImplementationOnce((fn: any) =>
-        Promise.resolve([
-          { id: 1, title: 'Thesis', finalDeadline: null, createdAt: new Date() },
         ]).then(fn),
       )
       .mockImplementationOnce((fn: any) =>
@@ -230,10 +230,6 @@ describe('getInstructorDashboardDataHandler', () => {
 
     mockDb.then
       .mockImplementationOnce((fn: any) => Promise.resolve([{ id: 1 }]).then(fn))
-      // count query (destructured as [{ count }])
-      .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
-      // pending review items (empty)
-      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
       // Recent submissions with all 4 status types
       .mockImplementationOnce((fn: any) =>
         Promise.resolve([
@@ -276,6 +272,10 @@ describe('getInstructorDashboardDataHandler', () => {
           fn,
         ),
       )
+      // count query (destructured as [{ count }])
+      .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
+      // pending review items (empty)
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
@@ -292,14 +292,14 @@ describe('getInstructorDashboardDataHandler', () => {
 
     mockDb.then
       .mockImplementationOnce((fn: any) => Promise.resolve([{ id: 1 }]).then(fn))
-      .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
-      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
       .mockImplementationOnce((fn: any) =>
         Promise.resolve([
           { id: 1, title: 'Thesis', finalDeadline: null, createdAt: new Date() },
         ]).then(fn),
       )
+      .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
       // All maps return empty (no matching entries)
       .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
@@ -315,17 +315,25 @@ describe('getInstructorDashboardDataHandler', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
     mockDb.then
+      // Query 1: instructorAssignments
       .mockImplementationOnce((fn: any) => Promise.resolve([{ id: 1 }]).then(fn))
-      .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
+      // Query 2: recentSubmissions
       .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
-      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      // Query 3: assignmentOverview
       .mockImplementationOnce((fn: any) =>
         Promise.resolve([
           { id: 1, title: 'Thesis', finalDeadline: null, createdAt: new Date() },
         ]).then(fn),
       )
+      // Query 4: pendingReviewCount (Group B)
+      .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
+      // Query 5: pendingReviewItems (Group B)
       .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      // Query 6: studentCount (Group C)
       .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      // Query 7: pendingAssignmentCount (Group C)
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      // Query 8: progressData (Group C)
       .mockImplementationOnce((fn: any) =>
         Promise.resolve([{ assignmentId: 1, totalCount: 0, passedCount: 0 }]).then(fn),
       );
