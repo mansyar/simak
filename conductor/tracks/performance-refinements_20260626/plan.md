@@ -1,6 +1,12 @@
+<protect>
+
 # Track 8.4 — Performance Refinements: Implementation Plan
 
 ## Phase 1: Dashboard Query Parallelization
+
+- [ ] Task: Read `spec.md` and `workflow.md` before starting this phase
+    - [ ] Read `./spec.md` to review functional requirements for this phase
+    - [ ] Read `conductor/workflow.md` to review the TDD lifecycle and commit protocol
 
 - [ ] Task: Parallelize instructor dashboard queries (FR-1)
     - [ ] Mark task `[~]` in progress in `plan.md`
@@ -64,6 +70,10 @@
 
 ## Phase 2: Bulk Import Batching & Email Decoupling
 
+- [ ] Task: Read `spec.md` and `workflow.md` before starting this phase
+    - [ ] Read `./spec.md` to review functional requirements for this phase
+    - [ ] Read `conductor/workflow.md` to review the TDD lifecycle and commit protocol
+
 - [ ] Task: Batch email uniqueness check in bulkCreateUsersHandler (FR-4 partial)
     - [ ] Mark task `[~]` in progress in `plan.md`
     - [ ] Write failing tests — extend `tests/unit/server/bulk-import.test.ts` (Red phase)
@@ -120,6 +130,10 @@
 
 ## Phase 3: Post-Commit Advisory Isolation
 
+- [ ] Task: Read `spec.md` and `workflow.md` before starting this phase
+    - [ ] Read `./spec.md` to review functional requirements for this phase
+    - [ ] Read `conductor/workflow.md` to review the TDD lifecycle and commit protocol
+
 - [ ] Task: Wrap post-commit advisory work in submitReviewHandler (FR-6)
     - [ ] Mark task `[~]` in progress in `plan.md`
     - [ ] Write failing tests — `tests/unit/server/reviews-advisory-isolation.test.ts` (Red phase)
@@ -158,6 +172,10 @@
 
 ## Phase 4: Final Verification & Quality Gates
 
+- [ ] Task: Read `spec.md` and `workflow.md` before starting this phase
+    - [ ] Read `./spec.md` to review functional requirements for this phase
+    - [ ] Read `conductor/workflow.md` to review the TDD lifecycle and commit protocol
+
 - [ ] Task: Run full test suite and coverage check
     - [ ] Run `pnpm typecheck`
     - [ ] Run `pnpm lint`
@@ -171,3 +189,5 @@
     - [ ] Commit plan update: `conductor(plan): Mark task 'Final verification' as complete`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Verification & Quality Gates' (Protocol in workflow.md)
+
+</protect>

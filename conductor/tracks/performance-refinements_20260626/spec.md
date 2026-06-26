@@ -1,3 +1,5 @@
+<protect>
+
 # Track 8.4 — Performance Refinements
 
 ## Overview
@@ -118,3 +120,5 @@ Scan other review/submission handlers for the same unguarded post-commit advisor
 - File preview optimization (Track 6.3 — separate track)
 - New product features or UI changes
 - Database schema changes (none required)
+
+</protect>
