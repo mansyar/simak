@@ -31,15 +31,7 @@ describe('Admin templates i18n types', () => {
       'moveDown',
     ];
     const actionKeys = ['edit', 'duplicate', 'delete'];
-    const messageKeys = [
-      'createSuccess',
-      'updateSuccess',
-      'duplicateSuccess',
-      'deleteConfirm',
-      'deleteInUse',
-      'deleteSuccess',
-      'inUseBanner',
-    ];
+    const messageKeys = ['deleteConfirm', 'deleteInUse', 'inUseBanner'];
 
     // Check form section exists
     expect(typesContent).toContain('form:');

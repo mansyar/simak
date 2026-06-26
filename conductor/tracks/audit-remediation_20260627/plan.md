@@ -96,30 +96,30 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Boundary Type Contract' (Protocol in workflow.md) [checkpoint: 5f73fb7]
 
-## Phase 3: Dead i18n Key Cleanup (M1)
+## [x] Phase 3: Dead i18n Key Cleanup (M1)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
-    - [ ] Read `./spec.md` — focus on FR-3 (Dead i18n Key Cleanup) and NFR-6 (i18n keys in both locales)
-    - [ ] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+    - [x] Read `./spec.md` — focus on FR-3 (Dead i18n Key Cleanup) and NFR-6 (i18n keys in both locales)
+    - [x] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
 
-- [ ] Task: Audit dynamic key references
-    - [ ] Grep codebase for dynamic i18n key construction patterns: `t(`...${`, string concatenation with `t(`, `i18n(` with template literals
-    - [ ] Cross-reference any dynamic patterns against the 186 unused keys list
-    - [ ] Document confirmed-safe keys vs. keys held for further investigation
+- [x] Task: Audit dynamic key references
+    - [x] Grep codebase for dynamic i18n key construction patterns: `t(`...${`, string concatenation with `t(`, `i18n(` with template literals
+    - [x] Cross-reference any dynamic patterns against the 186 unused keys list
+    - [x] Document confirmed-safe keys vs. keys held for further investigation
 
-- [ ] Task: Delete confirmed-safe unused keys
-    - [ ] Remove unused keys from `locales/en.json`
-    - [ ] Remove corresponding keys from `locales/id.json`
-    - [ ] Run `pnpm generate:i18n` to regenerate types
-    - [ ] Run `pnpm check:i18n:unused` — must report 0 unused keys
-    - [ ] Run `pnpm check:i18n` — must pass parity check
+- [x] Task: Delete confirmed-safe unused keys
+    - [x] Remove unused keys from `locales/en.json`
+    - [x] Remove corresponding keys from `locales/id.json`
+    - [x] Run `pnpm generate:i18n` to regenerate types after deletion
+    - [x] Run `pnpm check:i18n:unused` — reports 0 unused keys (39 dynamic keys whitelisted)
+    - [x] Run `pnpm check:i18n` — passes parity check
 
-- [ ] Task: Add pre-push gate for unused keys
-    - [ ] Update `lefthook.yml` (or equivalent) to add `pnpm check:i18n:unused` to pre-push, exiting non-zero on unused keys
-    - [ ] Write a test or manual verification that the gate triggers on an intentionally-unused key
-    - [ ] Run `pnpm test` to verify no regressions
+- [x] Task: Add pre-push gate for unused keys
+    - [x] Update `lefthook.yml` to add `pnpm check:i18n:unused` to pre-push, exiting non-zero on unused keys
+    - [x] Write `tests/unit/i18n/gate-unused.test.ts` verifying the gate fails on an intentionally-unused key
+    - [x] Run `pnpm test`, `pnpm typecheck`, and `pnpm lint` — all pass
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Dead i18n Key Cleanup' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Dead i18n Key Cleanup' (Protocol in workflow.md)
 
 ## Phase 4: Client Error Handling (M4)
 

@@ -1,7 +1,6 @@
 {
   "app": {
-    "name": "SIMAK",
-    "tagline": "Sistem Informasi & Manajemen Akademik"
+    "name": "SIMAK"
   },
   "auth": {
     "login": "Masuk",
@@ -9,11 +8,9 @@
     "email": "Email",
     "password": "Kata Sandi",
     "signIn": "Masuk",
-    "signUp": "Daftar",
     "forgotPassword": "Lupa Kata Sandi?",
     "resetPassword": "Atur Ulang Kata Sandi",
     "invalidCredentials": "Email atau kata sandi tidak valid",
-    "sessionExpired": "Sesi Anda telah berakhir. Silakan masuk kembali.",
     "confirmPassword": "Konfirmasi Kata Sandi",
     "passwordMismatch": "Kata sandi tidak cocok",
     "passwordMinLength": "Kata sandi minimal 8 karakter",
@@ -37,18 +34,7 @@
     "rateLimit": "Terlalu banyak permintaan. Silakan coba lagi nanti."
   },
   "nav": {
-    "dashboard": "Dasbor",
-    "welcome": "Selamat datang, {name}",
-    "role_student": "Anda masuk sebagai Mahasiswa",
-    "role_instructor": "Anda masuk sebagai Dosen",
-    "role_admin": "Anda masuk sebagai Admin",
-    "assignments": "Tugas",
-    "reviews": "Review",
-    "consultations": "Konsultasi",
-    "settings": "Pengaturan",
-    "users": "Pengguna",
-    "templates": "Templat",
-    "branding_instructor": "SIMAK Instruktur"
+    "settings": "Pengaturan"
   },
   "common": {
     "save": "Simpan",
@@ -57,10 +43,8 @@
     "edit": "Ubah",
     "create": "Buat",
     "search": "Cari",
-    "filter": "Filter",
     "loading": "Memuat...",
     "error": "Terjadi kesalahan",
-    "success": "Berhasil",
     "confirm": "Konfirmasi",
     "back": "Kembali",
     "next": "Lanjut",
@@ -85,8 +69,6 @@
     "noSearchResults": "Tidak ada {items} yang ditemukan.",
     "deleteConfirmationWord": "DELETE",
     "typeDeleteToConfirm": "Ketik DELETE untuk mengonfirmasi",
-    "templateNamePlaceholder": "misal, Templat Skripsi",
-    "templateTypePlaceholder": "misal, Skripsi, Makalah Penelitian",
     "saving": "Menyimpan...",
     "previousPage": "Sebelumnya",
     "nextPage": "Selanjutnya",
@@ -161,22 +143,15 @@
     "newUser": "Pengguna Baru",
     "table": {
       "name": "Nama",
-      "email": "Email",
       "role": "Peran",
       "createdAt": "Dibuat Pada",
-      "actions": "Aksi",
-      "emailVerified": "Email Terverifikasi"
+      "actions": "Aksi"
     },
     "empty": "Tidak ada pengguna",
     "emptyPrompt": "Mulai dengan menambahkan pengguna baru",
     "createPrompt": "Buat pengguna pertama Anda",
     "deleteConfirm": "Apakah Anda yakin ingin menghapus {name}?",
     "deleteTitle": "Hapus Pengguna",
-    "deleteSuccess": "Pengguna berhasil dihapus",
-    "createSuccess": "Pengguna berhasil dibuat. Email undangan terkirim.",
-    "createSuccessNoEmail": "Pengguna berhasil dibuat tetapi email undangan gagal dikirim.",
-    "updateSuccess": "Pengguna berhasil diperbarui",
-    "linkGenerated": "Tautan pengaturan kata sandi berhasil dibuat",
     "linkCopied": "Tautan disalin ke papan klip",
     "setupLinkTitle": "Tautan Pengaturan Kata Sandi",
     "setupLinkDescription": "Bagikan tautan ini kepada pengguna untuk mengatur kata sandi mereka.",
@@ -190,7 +165,6 @@
     "searchPlaceholder": "Cari pengguna berdasarkan nama atau email...",
     "emailVerified": "Email Terverifikasi",
     "notVerified": "Belum Terverifikasi",
-    "createdAt": "Dibuat",
     "showing": "Menampilkan {count} dari {total} pengguna",
     "editDescription": "Perbarui informasi pengguna. Perubahan email akan memerlukan verifikasi ulang."
   },
@@ -226,12 +200,8 @@
       "duplicate": "Duplikasi",
       "delete": "Hapus"
     },
-    "createSuccess": "Templat berhasil dibuat",
-    "updateSuccess": "Templat berhasil diperbarui",
-    "duplicateSuccess": "Templat berhasil diduplikasi",
     "deleteConfirm": "Hapus templat ini?",
     "deleteInUse": "Templat ini digunakan oleh {count} tugas. Ketik DELETE untuk mengonfirmasi.",
-    "deleteSuccess": "Templat berhasil dihapus",
     "studentsCount": "{count} mahasiswa",
     "inUseBanner": "Templat ini digunakan oleh {count} tugas. Perubahan akan memengaruhi pembuatan tugas di masa mendatang.",
     "detail": {
@@ -313,8 +283,7 @@
       "student": "Mahasiswa",
       "email": "Email",
       "progress": "Progres",
-      "activeCheckpoint": "Checkpoint Aktif",
-      "actions": "Aksi"
+      "activeCheckpoint": "Checkpoint Aktif"
     },
     "status": {
       "passed": "Lulus",
@@ -325,7 +294,6 @@
       "revise": "Revisi"
     },
     "details": {
-      "title": "Detail Tugas",
       "overview": "Ikhtisar",
       "totalStudents": "Total Mahasiswa",
       "studentsProgress": "Progres Mahasiswa",
@@ -355,15 +323,12 @@
       "deadlineLabel": "Tenggat Waktu Pengumpulan Akhir",
       "selectedStudents": "{count} mahasiswa terpilih",
       "noStudentsSelected": "Belum ada mahasiswa terpilih",
-      "templateSelected": "Templat: {name}",
       "checkpointsPreview": "Pratinjau Tahapan",
       "stepDueDates": "Tenggat Waktu",
       "dueDatesPrompt": "Tinjau dan sesuaikan tenggat waktu untuk setiap tahapan.",
       "daysLabel": "{count} hari",
       "dueDateFor": "Tenggat waktu untuk",
       "searchStudents": "Cari mahasiswa berdasarkan nama atau email...",
-      "successMessage": "Tugas berhasil dibuat!",
-      "errorMessage": "Gagal membuat tugas. Silakan coba lagi.",
       "errors": {
         "templateRequired": "Silakan pilih templat",
         "titleRequired": "Judul wajib diisi",
@@ -500,8 +465,6 @@
     "retry": "Coba Lagi",
     "version": "Versi {version}",
     "download": "Unduh",
-    "noSubmissions": "Belum ada pengumpulan",
-    "noSubmissionsHint": "Unggah file Anda menggunakan area drop di atas",
     "validation": {
       "invalidType": "Hanya file .docx dan .pdf yang diterima",
       "fileTooLarge": "Ukuran file harus di bawah 25 MB"
@@ -630,9 +593,6 @@
     "internal": "Terjadi kesalahan pada server. Silakan coba lagi.",
     "network": "Tidak dapat terhubung ke server. Silakan periksa koneksi internet Anda.",
     "default": "Terjadi kesalahan",
-    "serverError": "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
-    "required": "Bidang ini wajib diisi",
-    "invalidEmail": "Masukkan alamat email yang valid",
     "assignmentNotFound": "Tugas ini tidak ditemukan atau Anda tidak memiliki izin untuk melihatnya.",
     "templateNotFound": "Templat ini tidak ditemukan atau Anda tidak memiliki izin untuk melihatnya.",
     "somethingWentWrong": "Terjadi kesalahan",
@@ -643,7 +603,6 @@
     "title": "Notifikasi",
     "markAllRead": "Tandai semua dibaca",
     "empty": "Belum ada notifikasi",
-    "unreadCount": "notifikasi belum dibaca",
     "closePanel": "Tutup panel",
     "viewNotifications": "Lihat notifikasi",
     "groups": {
@@ -721,8 +680,6 @@
     "submitting": "Mengirim...",
     "successMessage": "Permintaan perpanjangan berhasil dikirim!",
     "queueTitle": "Permintaan Perpanjangan",
-    "pendingCount": "{count} tertunda",
-    "noPending": "Tidak ada permintaan perpanjangan tertunda",
     "historyTitle": "Riwayat Perpanjangan",
     "noHistory": "Belum ada permintaan perpanjangan",
     "tableDate": "Tanggal",
@@ -761,25 +718,6 @@
       "approve": "Setujui",
       "reject": "Tolak"
     },
-    "approveDialogTitle": "Setujui Permintaan Perpanjangan",
-    "approveComment": "Komentar (opsional)",
-    "approveConfirm": "Setujui Perpanjangan",
-    "approveSuccess": "Perpanjangan berhasil disetujui!",
-    "rejectDialogTitle": "Tolak Permintaan Perpanjangan",
-    "rejectReasonRequired": "Alasan penolakan (minimal 20 karakter)",
-    "rejectReasonChars": "{count}/20 karakter",
-    "rejectConfirm": "Tolak Perpanjangan",
-    "rejectSuccess": "Perpanjangan ditolak.",
-    "bulkExtendTitle": "Perpanjangan Massal",
-    "bulkExtendDays": "Hari tambahan",
-    "bulkExtendReason": "Alasan",
-    "bulkExtendApply": "Terapkan Perpanjangan",
-    "bulkExtendConfirm": "Perpanjang semua checkpoint yang belum selesai sebanyak {days} hari?",
-    "bulkExtendSuccess": "Berhasil memperpanjang {count} checkpoint!",
-    "notificationRequested": "Perpanjangan Diajukan",
-    "notificationApproved": "Perpanjangan Disetujui",
-    "notificationRejected": "Perpanjangan Ditolak",
-    "notificationDeadlineExtended": "Tenggat Diperpanjang",
     "categoryPersonal": "Pribadi",
     "categoryResearch": "Penelitian",
     "categoryHealth": "Kesehatan",
@@ -810,13 +748,6 @@
       "disableTitle": "Nonaktifkan Autentikasi Dua Faktor",
       "disableDescription": "Masukkan kata sandi Anda untuk menonaktifkan 2FA. Akun Anda akan kurang aman.",
       "disableError": "Gagal menonaktifkan 2FA. Silakan coba lagi.",
-      "viewBackupCodes": "Lihat Kode Cadangan",
-      "backupCodesTitle": "Kode Cadangan",
-      "backupCodesDescription": "Simpan kode-kode ini di tempat yang aman. Setiap kode hanya bisa digunakan sekali.",
-      "copy": "Salin",
-      "download": "Unduh",
-      "regenerate": "Buat Ulang Kode",
-      "regenerateError": "Gagal membuat ulang kode cadangan. Silakan coba lagi.",
       "saveBackupCodes": "Simpan Kode Cadangan"
     },
     "sessions": {

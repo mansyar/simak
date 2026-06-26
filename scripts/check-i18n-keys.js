@@ -5,10 +5,40 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
 
 const SRC_DIR = 'src';
+const TESTS_DIR = 'tests';
 const LOCALE_DIR = 'locales';
 const ALLOWED_EXT = new Set(['.ts', '.tsx']);
 const EXCLUDE_DIRS = new Set(['node_modules', '.output', 'dist', 'build', '.git', 'scripts']);
 const EXCLUDE_GEN = /\.gen\.(ts|tsx)$/;
+
+/**
+ * Keys that are constructed dynamically at runtime (template literals, object
+ * lookups, labelKey maps, etc.) and therefore cannot be found by the static
+ * t('key') extractor. They are still valid and must not be reported as unused.
+ */
+const DYNAMIC_KEY_PATTERNS = [
+  /^adminUsers\.role_(superadmin|admin|instructor|student)$/,
+  /^adminAuditLog\.actionLabels\./,
+  /^files\.review\.(passed|revise)$/,
+  /^consultations\.status\.(pending|verified|rejected)$/,
+  /^extensions\.category(Personal|Research|Health|Other)$/,
+  /^extensions\.status(Pending|Approved|Rejected)$/,
+  /^notifications\.groups\./,
+  /^notifications\.events\./,
+  /^error\.(unauthorized|forbidden|validation|badRequest|conflict|internal|network|default)$/,
+  /^studentAssignments\.status\.(locked|unlocked)$/,
+  // Sidebar labels are passed dynamically to t(link.label)
+  /^adminSidebar\.(dashboard|users|templates|auditLog)$/,
+  /^instructorSidebar\.(dashboard|assignments|reviews)$/,
+  /^studentSidebar\.(dashboard|assignments|settings)$/,
+  /^nav\.settings$/,
+  // Email subjects are resolved server-side via resolveEmailSubject
+  /^emails\.subjects\./,
+];
+
+function isDynamicKey(key) {
+  return DYNAMIC_KEY_PATTERNS.some((re) => re.test(key));
+}
 
 /**
  * Flatten nested JSON object into dot-notation key paths
@@ -65,9 +95,11 @@ function collectFiles(dir) {
  */
 function extractKeys(content) {
   const keys = new Set();
-  // Match t('key') or t("key") or i18n.t('key') — captures the key
-  // Require t preceded by word boundary to avoid matching split('.') etc.
-  const regex = /(?:(?:^|[^a-zA-Z0-9_])i18n\.|(?:^|[^a-zA-Z0-9_]))t\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+  // Match t('key'), t("key"), i18n.t('key'), and calls with interpolation
+  // params such as t('key', { ... }). Require t preceded by word boundary
+  // to avoid matching split('.') etc.
+  const regex =
+    /(?:(?:^|[^a-zA-Z0-9_])i18n\.|(?:^|[^a-zA-Z0-9_]))t\s*\(\s*['"]([^'"]+)['"]\s*(?:,|\))/g;
   let match;
   while ((match = regex.exec(content)) !== null) {
     keys.add(match[1]);
@@ -93,7 +125,7 @@ try {
 const enKeys = new Set(flattenKeys(en));
 const idKeys = new Set(flattenKeys(id));
 
-// Extract all keys from source files
+// Extract all keys from source files (t('key') usage)
 const sourceFiles = collectFiles(SRC_DIR);
 const usedKeys = new Set();
 
@@ -106,6 +138,24 @@ for (const file of sourceFiles) {
     // skip unreadable files
   }
 }
+
+// Tests may reference keys as bare strings (assertions, mocks, etc.).
+// Any locale key that appears as a literal in a test file is treated as used.
+const testFiles = collectFiles(TESTS_DIR);
+const keysUsedInTests = new Set();
+
+for (const file of testFiles) {
+  try {
+    const content = readFileSync(file, 'utf-8');
+    for (const k of enKeys) {
+      if (!usedKeys.has(k) && content.includes(k)) keysUsedInTests.add(k);
+    }
+  } catch {
+    // skip unreadable files
+  }
+}
+
+const effectivelyUsedKeys = new Set([...usedKeys, ...keysUsedInTests]);
 
 let hasError = false;
 
@@ -123,14 +173,16 @@ if (missingId.length > 0) {
   hasError = true;
 }
 
-const unusedEn = [...enKeys].filter((k) => !usedKeys.has(k));
+const unusedEn = [...enKeys].filter((k) => !effectivelyUsedKeys.has(k) && !isDynamicKey(k));
+const dynamicEn = [...enKeys].filter((k) => !effectivelyUsedKeys.has(k) && isDynamicKey(k));
 if (unusedEn.length > 0) {
-  console.log(`\nℹ️  ${unusedEn.length} key(s) in en.json but UNUSED in code:`);
+  console.log(`\n❌ ${unusedEn.length} key(s) in en.json but UNUSED in code:`);
   unusedEn.forEach((k) => console.log(`   ${k}`));
+  hasError = true;
 }
 
 console.log(
-  `\n📊 ${usedKeys.size} keys used in code · ${enKeys.size} in en.json · ${idKeys.size} in id.json`,
+  `\n📊 ${usedKeys.size} keys used in code · ${enKeys.size} in en.json · ${idKeys.size} in id.json · ${dynamicEn.length} dynamic key(s) whitelisted`,
 );
 
 if (hasError) {

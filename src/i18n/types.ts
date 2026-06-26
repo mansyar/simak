@@ -6,7 +6,6 @@ export type Locales = 'en' | 'id'
 export type Translation = {
   app: {
     name: string
-    tagline: string
   }
   auth: {
     login: string
@@ -14,11 +13,9 @@ export type Translation = {
     email: string
     password: string
     signIn: string
-    signUp: string
     forgotPassword: string
     resetPassword: string
     invalidCredentials: string
-    sessionExpired: string
     confirmPassword: string
     passwordMismatch: string
     passwordMinLength: string
@@ -42,18 +39,7 @@ export type Translation = {
     rateLimit: string
   }
   nav: {
-    dashboard: string
-    welcome: string
-    role_student: string
-    role_instructor: string
-    role_admin: string
-    assignments: string
-    reviews: string
-    consultations: string
     settings: string
-    users: string
-    templates: string
-    branding_instructor: string
   }
   common: {
     save: string
@@ -62,10 +48,8 @@ export type Translation = {
     edit: string
     create: string
     search: string
-    filter: string
     loading: string
     error: string
-    success: string
     confirm: string
     back: string
     next: string
@@ -90,8 +74,6 @@ export type Translation = {
     noSearchResults: string
     deleteConfirmationWord: string
     typeDeleteToConfirm: string
-    templateNamePlaceholder: string
-    templateTypePlaceholder: string
     saving: string
     previousPage: string
     nextPage: string
@@ -166,22 +148,15 @@ export type Translation = {
     newUser: string
     table: {
       name: string
-      email: string
       role: string
       createdAt: string
       actions: string
-      emailVerified: string
     }
     empty: string
     emptyPrompt: string
     createPrompt: string
     deleteConfirm: string
     deleteTitle: string
-    deleteSuccess: string
-    createSuccess: string
-    createSuccessNoEmail: string
-    updateSuccess: string
-    linkGenerated: string
     linkCopied: string
     setupLinkTitle: string
     setupLinkDescription: string
@@ -195,7 +170,6 @@ export type Translation = {
     searchPlaceholder: string
     emailVerified: string
     notVerified: string
-    createdAt: string
     showing: string
     editDescription: string
   }
@@ -231,12 +205,8 @@ export type Translation = {
       duplicate: string
       delete: string
     }
-    createSuccess: string
-    updateSuccess: string
-    duplicateSuccess: string
     deleteConfirm: string
     deleteInUse: string
-    deleteSuccess: string
     studentsCount: string
     inUseBanner: string
     detail: {
@@ -319,7 +289,6 @@ export type Translation = {
       email: string
       progress: string
       activeCheckpoint: string
-      actions: string
     }
     status: {
       passed: string
@@ -330,7 +299,6 @@ export type Translation = {
       revise: string
     }
     details: {
-      title: string
       overview: string
       totalStudents: string
       studentsProgress: string
@@ -360,15 +328,12 @@ export type Translation = {
       deadlineLabel: string
       selectedStudents: string
       noStudentsSelected: string
-      templateSelected: string
       checkpointsPreview: string
       stepDueDates: string
       dueDatesPrompt: string
       daysLabel: string
       dueDateFor: string
       searchStudents: string
-      successMessage: string
-      errorMessage: string
       errors: {
         templateRequired: string
         titleRequired: string
@@ -505,8 +470,6 @@ export type Translation = {
     retry: string
     version: string
     download: string
-    noSubmissions: string
-    noSubmissionsHint: string
     validation: {
       invalidType: string
       fileTooLarge: string
@@ -635,9 +598,6 @@ export type Translation = {
     internal: string
     network: string
     default: string
-    serverError: string
-    required: string
-    invalidEmail: string
     assignmentNotFound: string
     templateNotFound: string
     somethingWentWrong: string
@@ -648,7 +608,6 @@ export type Translation = {
     title: string
     markAllRead: string
     empty: string
-    unreadCount: string
     closePanel: string
     viewNotifications: string
     groups: {
@@ -726,8 +685,6 @@ export type Translation = {
     submitting: string
     successMessage: string
     queueTitle: string
-    pendingCount: string
-    noPending: string
     historyTitle: string
     noHistory: string
     tableDate: string
@@ -766,25 +723,6 @@ export type Translation = {
       approve: string
       reject: string
     }
-    approveDialogTitle: string
-    approveComment: string
-    approveConfirm: string
-    approveSuccess: string
-    rejectDialogTitle: string
-    rejectReasonRequired: string
-    rejectReasonChars: string
-    rejectConfirm: string
-    rejectSuccess: string
-    bulkExtendTitle: string
-    bulkExtendDays: string
-    bulkExtendReason: string
-    bulkExtendApply: string
-    bulkExtendConfirm: string
-    bulkExtendSuccess: string
-    notificationRequested: string
-    notificationApproved: string
-    notificationRejected: string
-    notificationDeadlineExtended: string
     categoryPersonal: string
     categoryResearch: string
     categoryHealth: string
@@ -815,13 +753,6 @@ export type Translation = {
       disableTitle: string
       disableDescription: string
       disableError: string
-      viewBackupCodes: string
-      backupCodesTitle: string
-      backupCodesDescription: string
-      copy: string
-      download: string
-      regenerate: string
-      regenerateError: string
       saveBackupCodes: string
     }
     sessions: {

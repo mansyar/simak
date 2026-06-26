@@ -1,7 +1,6 @@
 {
   "app": {
-    "name": "SIMAK",
-    "tagline": "Academic Information & Management System"
+    "name": "SIMAK"
   },
   "auth": {
     "login": "Login",
@@ -9,11 +8,9 @@
     "email": "Email",
     "password": "Password",
     "signIn": "Sign In",
-    "signUp": "Sign Up",
     "forgotPassword": "Forgot Password?",
     "resetPassword": "Reset Password",
     "invalidCredentials": "Invalid email or password",
-    "sessionExpired": "Your session has expired. Please login again.",
     "confirmPassword": "Confirm Password",
     "passwordMismatch": "Passwords do not match",
     "passwordMinLength": "Password must be at least 8 characters",
@@ -37,18 +34,7 @@
     "rateLimit": "Too many requests. Please try again later."
   },
   "nav": {
-    "dashboard": "Dashboard",
-    "welcome": "Welcome, {name}",
-    "role_student": "You are logged in as a Student",
-    "role_instructor": "You are logged in as an Instructor",
-    "role_admin": "You are logged in as an Admin",
-    "assignments": "Assignments",
-    "reviews": "Reviews",
-    "consultations": "Consultations",
-    "settings": "Settings",
-    "users": "Users",
-    "templates": "Templates",
-    "branding_instructor": "SIMAK Instructor"
+    "settings": "Settings"
   },
   "common": {
     "save": "Save",
@@ -57,10 +43,8 @@
     "edit": "Edit",
     "create": "Create",
     "search": "Search",
-    "filter": "Filter",
     "loading": "Loading...",
     "error": "An error occurred",
-    "success": "Success",
     "confirm": "Confirm",
     "back": "Back",
     "next": "Next",
@@ -85,8 +69,6 @@
     "noSearchResults": "No {items} found matching your search.",
     "deleteConfirmationWord": "DELETE",
     "typeDeleteToConfirm": "Type DELETE to confirm",
-    "templateNamePlaceholder": "e.g., Thesis Template",
-    "templateTypePlaceholder": "e.g., Thesis, Research Paper",
     "saving": "Saving...",
     "previousPage": "Previous",
     "nextPage": "Next",
@@ -161,22 +143,15 @@
     "newUser": "New User",
     "table": {
       "name": "Name",
-      "email": "Email",
       "role": "Role",
       "createdAt": "Created At",
-      "actions": "Actions",
-      "emailVerified": "Email Verified"
+      "actions": "Actions"
     },
     "empty": "No users found",
     "emptyPrompt": "Get started by adding a new user",
     "createPrompt": "Create your first user",
     "deleteConfirm": "Are you sure you want to delete {name}?",
     "deleteTitle": "Delete User",
-    "deleteSuccess": "User deleted successfully",
-    "createSuccess": "User created successfully. Invitation email sent.",
-    "createSuccessNoEmail": "User created but invitation email failed to send.",
-    "updateSuccess": "User updated successfully",
-    "linkGenerated": "Password setup link generated",
     "linkCopied": "Link copied to clipboard",
     "setupLinkTitle": "Password Setup Link",
     "setupLinkDescription": "Share this link with the user to set up their password.",
@@ -190,7 +165,6 @@
     "searchPlaceholder": "Search users by name or email...",
     "emailVerified": "Email Verified",
     "notVerified": "Not Verified",
-    "createdAt": "Created",
     "showing": "Showing {count} of {total} users",
     "editDescription": "Update user information. Email changes will require re-verification."
   },
@@ -226,12 +200,8 @@
       "duplicate": "Duplicate",
       "delete": "Delete"
     },
-    "createSuccess": "Template created successfully",
-    "updateSuccess": "Template updated successfully",
-    "duplicateSuccess": "Template duplicated successfully",
     "deleteConfirm": "Delete this template?",
     "deleteInUse": "This template is used by {count} assignment(s). Type DELETE to confirm.",
-    "deleteSuccess": "Template deleted successfully",
     "studentsCount": "{count} students",
     "inUseBanner": "This template is used by {count} assignment(s). Changes will affect future assignment creation.",
     "detail": {
@@ -313,8 +283,7 @@
       "student": "Student",
       "email": "Email",
       "progress": "Progress",
-      "activeCheckpoint": "Active Checkpoint",
-      "actions": "Actions"
+      "activeCheckpoint": "Active Checkpoint"
     },
     "status": {
       "passed": "Passed",
@@ -325,7 +294,6 @@
       "revise": "Revise"
     },
     "details": {
-      "title": "Assignment Details",
       "overview": "Overview",
       "totalStudents": "Total Students",
       "studentsProgress": "Students Progress",
@@ -355,15 +323,12 @@
       "deadlineLabel": "Final Submission Deadline",
       "selectedStudents": "{count} students selected",
       "noStudentsSelected": "No students selected yet",
-      "templateSelected": "Template: {name}",
       "checkpointsPreview": "Milestones Preview",
       "stepDueDates": "Due Dates",
       "dueDatesPrompt": "Review and adjust due dates for each checkpoint milestone.",
       "daysLabel": "{count} days",
       "dueDateFor": "Due date for",
       "searchStudents": "Search students by name or email...",
-      "successMessage": "Assignment created successfully!",
-      "errorMessage": "Failed to create assignment. Please try again.",
       "errors": {
         "templateRequired": "Please select a template",
         "titleRequired": "Title is required",
@@ -500,8 +465,6 @@
     "retry": "Retry",
     "version": "Version {version}",
     "download": "Download",
-    "noSubmissions": "No submissions yet",
-    "noSubmissionsHint": "Upload your file using the drop zone above",
     "validation": {
       "invalidType": "Only .docx and .pdf files are accepted",
       "fileTooLarge": "File size must be under 25 MB"
@@ -630,9 +593,6 @@
     "internal": "An unexpected server error occurred. Please try again later.",
     "network": "Could not connect to the server. Please check your internet connection.",
     "default": "An error occurred",
-    "serverError": "An unexpected error occurred. Please try again later.",
-    "required": "This field is required",
-    "invalidEmail": "Please enter a valid email address",
     "assignmentNotFound": "This assignment could not be found or you do not have permission to view it.",
     "templateNotFound": "This template could not be found or you do not have permission to view it.",
     "somethingWentWrong": "Something went wrong",
@@ -643,7 +603,6 @@
     "title": "Notifications",
     "markAllRead": "Mark all read",
     "empty": "No notifications yet",
-    "unreadCount": "unread notifications",
     "closePanel": "Close panel",
     "viewNotifications": "View notifications",
     "groups": {
@@ -721,8 +680,6 @@
     "submitting": "Submitting...",
     "successMessage": "Extension request submitted successfully!",
     "queueTitle": "Extension Requests",
-    "pendingCount": "{count} pending",
-    "noPending": "No pending extension requests",
     "historyTitle": "Extension History",
     "noHistory": "No extension requests yet",
     "tableDate": "Date",
@@ -761,25 +718,6 @@
       "approve": "Approve",
       "reject": "Reject"
     },
-    "approveDialogTitle": "Approve Extension Request",
-    "approveComment": "Comment (optional)",
-    "approveConfirm": "Approve Extension",
-    "approveSuccess": "Extension approved successfully!",
-    "rejectDialogTitle": "Reject Extension Request",
-    "rejectReasonRequired": "Reason for rejection (minimum 20 characters)",
-    "rejectReasonChars": "{count}/20 characters",
-    "rejectConfirm": "Reject Extension",
-    "rejectSuccess": "Extension rejected.",
-    "bulkExtendTitle": "Bulk Extend",
-    "bulkExtendDays": "Extra days",
-    "bulkExtendReason": "Reason",
-    "bulkExtendApply": "Apply Extension",
-    "bulkExtendConfirm": "Extend all unfinished checkpoints by {days} day(s)?",
-    "bulkExtendSuccess": "Extended {count} checkpoint(s) successfully!",
-    "notificationRequested": "Extension Requested",
-    "notificationApproved": "Extension Approved",
-    "notificationRejected": "Extension Rejected",
-    "notificationDeadlineExtended": "Deadline Extended",
     "categoryPersonal": "Personal",
     "categoryResearch": "Research",
     "categoryHealth": "Health",
@@ -810,13 +748,6 @@
       "disableTitle": "Disable Two-Factor Authentication",
       "disableDescription": "Enter your password to disable 2FA. Your account will be less secure.",
       "disableError": "Failed to disable 2FA. Please try again.",
-      "viewBackupCodes": "View Backup Codes",
-      "backupCodesTitle": "Backup Codes",
-      "backupCodesDescription": "Save these codes in a secure location. Each code can only be used once.",
-      "copy": "Copy",
-      "download": "Download",
-      "regenerate": "Regenerate Codes",
-      "regenerateError": "Failed to regenerate backup codes. Please try again.",
       "saveBackupCodes": "Save Backup Codes"
     },
     "sessions": {
