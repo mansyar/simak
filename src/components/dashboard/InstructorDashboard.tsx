@@ -21,7 +21,7 @@ interface RecentSubmission {
   studentName: string;
   assignmentTitle: string;
   checkpointName: string;
-  submittedAt: string;
+  submittedAt: string | null;
   status: string;
 }
 

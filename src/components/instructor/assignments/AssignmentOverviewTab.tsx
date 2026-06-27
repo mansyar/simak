@@ -31,7 +31,7 @@ interface AssignmentOverviewTabProps {
     title: string;
     description: string | null;
     finalDeadline: string;
-    createdAt: string;
+    createdAt: string | null;
     templateName: string;
     templateType: string;
     instructorId: string;
@@ -113,7 +113,7 @@ export function AssignmentOverviewTab({ assignment }: AssignmentOverviewTabProps
                 {t('instructorAssignments.details.created')}
               </span>
               <div className="font-medium text-foreground">
-                {formatDateTimeShort(assignment.createdAt)}
+                {assignment.createdAt ? formatDateTimeShort(assignment.createdAt) : null}
               </div>
             </div>
           </div>

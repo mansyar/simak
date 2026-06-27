@@ -10,7 +10,7 @@ export interface AssignmentRow {
   title: string;
   description: string | null;
   finalDeadline: string;
-  createdAt: string;
+  createdAt: string | null;
   templateName: string;
   templateType: string;
   studentCount: number;

@@ -48,6 +48,10 @@ export function getNotificationKeys(type: string) {
   };
 }
 
+export function translateKey(key: string, locale: Locales): string {
+  return resolveKey(translations[locale], key);
+}
+
 export function resolveEmailSubject(
   key: string,
   params?: Record<string, string>,

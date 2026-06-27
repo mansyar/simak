@@ -25,7 +25,7 @@ export type InstructorAssignmentRow = {
   title: string;
   description: string | null;
   finalDeadline: string;
-  createdAt: string;
+  createdAt: string | null;
   templateName: string;
   templateType: string;
   studentCount: number;
@@ -62,7 +62,7 @@ export type AssignmentDetailSuccess = {
   title: string;
   description: string | null;
   finalDeadline: string;
-  createdAt: string;
+  createdAt: string | null;
   instructorId: string;
   templateName: string;
   templateType: string;
@@ -258,7 +258,7 @@ export async function listInstructorAssignmentsHandler(args: {
       title: a.title,
       description: a.description,
       finalDeadline: a.finalDeadline.toISOString(),
-      createdAt: a.createdAt ? a.createdAt.toISOString() : '',
+      createdAt: a.createdAt ? a.createdAt.toISOString() : null,
       templateName: a.templateName,
       templateType: a.templateType,
       studentCount: studentCounts.get(a.id) ?? 0,
@@ -392,7 +392,7 @@ export async function getAssignmentDetailHandler(args: {
     return {
       ...assignment,
       finalDeadline: assignment.finalDeadline.toISOString(),
-      createdAt: assignment.createdAt ? assignment.createdAt.toISOString() : '',
+      createdAt: assignment.createdAt ? assignment.createdAt.toISOString() : null,
       students: studentsWithProgress,
     };
   } catch (err) {

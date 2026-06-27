@@ -36,7 +36,7 @@ type DashboardRecentSubmission = {
   studentName: string;
   assignmentTitle: string;
   checkpointName: string;
-  submittedAt: string;
+  submittedAt: string | null;
   status: string;
 };
 
@@ -240,7 +240,7 @@ export async function getInstructorDashboardDataHandler(): Promise<
         studentName: rs.studentName,
         assignmentTitle: rs.assignmentTitle,
         checkpointName: rs.checkpointName,
-        submittedAt: rs.submittedAt ? rs.submittedAt.toISOString() : '',
+        submittedAt: rs.submittedAt ? rs.submittedAt.toISOString() : null,
         status: statusLabel(rs.checkpointState),
       })),
       assignments: assignmentsWithDetails,
