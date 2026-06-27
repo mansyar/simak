@@ -266,4 +266,12 @@ Students and instructors lack a centralized system to:
 - **Test coverage** — new unit tests for every primitive, i18n regression test, and 44 test-file mock updates to support the new `.inputValidator()` server-fn pattern
 - **All 1913 tests pass, typecheck and lint clean, coverage thresholds met** (84.94% lines, 84.28% statements, 80.86% branches, 80% functions)
 
+### Track 8: Audit Remediation — i18n, Type Safety, and Hygiene (June 2026)
+
+- **Notification i18n architecture** — Notifications table stores `titleKey`/`messageKey` (varchar) and `params` (jsonb); localized title and message are resolved at read-time using the recipient user's locale; schema migrated via an expand-contract pattern with legacy `title`/`message` columns backfilled and dropped.
+- **Localized email subjects** — Password reset, invitation, and SLA alert email subjects are resolved from i18n keys using the recipient or admin locale via a shared server-side i18n helper.
+- **Server boundary type contracts** — Explicit return types on client-crossing server handlers (`getInstructorDashboardData`, `listInstructorAssignments`, `getAssignmentDetail`, `listPendingConsultations`, `completePasswordSetup`) serialize `Date` fields to ISO strings; removed TODO/FIXME casts and a `@ts-expect-error` workaround in the password setup route.
+- **Dead i18n key cleanup** — Removed 69 unused locale keys and added `pnpm check:i18n:unused` to the pre-push gate.
+- **Client fetch error handling** — Replaced silent `console.error` catch blocks with `toast.error(t('errors.fetchFailed'))` for user-visible fetch-failure diagnostics.
+
 </protect>
