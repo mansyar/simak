@@ -12,13 +12,11 @@ This file tracks all major tracks for the project. Each track has its own detail
 - **Error Boundary & Error Message Improvements** — Archived to [./archive/error-handling_20260625/](./archive/error-handling_20260625/) (commit `d3cf731`)
 - **Transactional Integrity & Input Validation** — Archived to [./archive/transactional-integrity_20260626/](./archive/transactional-integrity_20260626/) (commit `a1c6f58`)
 - **Performance Refinements** — Archived to [./archive/performance-refinements_20260626/](./archive/performance-refinements_20260626/) (commit `17ec76a`)
+- **Audit Remediation — i18n, Type Safety, Hygiene (H1, H2, M1, M4)** — Archived to [./archive/audit-remediation_20260627/](./archive/audit-remediation_20260627/) (commit `2204cad`)
 
 ---
 
 ## Active
 
 ---
-
-- [x] **Track: Audit Remediation — i18n, Type Safety, Hygiene (H1, H2, M1, M4)**
- *Link: [./tracks/audit-remediation_20260627/](./tracks/audit-remediation_20260627/)*
 
