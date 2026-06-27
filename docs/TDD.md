@@ -418,8 +418,9 @@ _Note: Each row represents one student's individual participation. Group assignm
 | id        | serial (PK)            |                                         |
 | userId    | text (FK → users)      | Recipient                               |
 | type      | text, not null         | Event type identifier                   |
-| title     | text, not null         | Short summary                           |
-| message   | text                   | Body                                    |
+| titleKey  | varchar(255), not null | i18n key for localized title            |
+| messageKey| varchar(255), not null | i18n key for localized message          |
+| params    | jsonb                  | Interpolation params (e.g. checkpointName) |
 | read      | boolean, default false |                                         |
 | channel   | text, not null         | in_app \| email                         |
 | metadata  | jsonb                  | Event-specific data (e.g. assignmentId) |
@@ -698,7 +699,7 @@ A checkpoint unlocks when:
 
 ### In-App Delivery [v1]
 
-- Notifications stored in the `notifications` table.
+- Notifications stored in the `notifications` table with i18n keys (`titleKey`, `messageKey`) and interpolation `params` (jsonb) instead of literal text. The `listNotifications` handler resolves the display strings at read time using the requesting user's `locale`, so Indonesian users see Indonesian notifications and English users see English.
 - TanStack Query `refetchInterval` polls for new unread notifications at a flat 15-second interval (see PRD line 148). The notification bell in the shared header reflects the unread count.
 - Notification center UI with read/unread filtering.
 - Badge indicator on the sidebar.
@@ -706,6 +707,7 @@ A checkpoint unlocks when:
 ### Email Delivery
 
 - Sent via Resend API. [v1] for auth-related emails (invitations, password reset, 2FA enable/disable); [v2] for event notification emails (submission, review, deadline alerts).
+- **Localized email subjects:** Password reset, invitation, and SLA alert subjects are resolved from i18n keys (`emails.subjects.*`) using the recipient's `locale` preference via a shared server-side resolver (`resolveEmailSubject`).
 - Email queue (`email_queue` table) with retry logic: 3 attempts with exponential backoff (30s, 5min, 30min).
 - Dead letter after 3 failed attempts (logged, not retried).
 - **Concurrency hardening:** rows are claimed inside a transaction using `FOR UPDATE SKIP LOCKED` and marked `processing`; the Resend send occurs **outside** the transaction so no long-lived lock is held. An in-process `isRunning` guard prevents overlapping ticks. Rows stuck in `processing` for > 5 minutes are reclaimed to `pending` at the start of each tick, preventing lockup on worker crash.
@@ -940,13 +942,22 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 2. **Logged-in user**: Use the `locale` column from the user's profile (can change in the settings hub at `/student/settings`, `/instructor/settings`, or `/admin/settings`).
 3. **Server functions**: Resolve locale from the authenticated user's session. Used for email subjects, notification messages, and validation errors.
 
+### Boundary Type Contracts
+
+Server functions whose output crosses the network boundary to a route loader declare **explicit return types** (e.g. `InstructorDashboardSuccess | ServerError`, `AssignmentDetailSuccess | ServerError | null`). All `Date` fields are serialized to ISO strings at the boundary — the client never receives raw `Date` objects. This eliminates `@ts-expect-error` workarounds and TODO comments in route loaders that previously compensated for type inference gaps.
+
+### Lint Enforcement
+
+- **`simak-i18n/no-hardcoded`** custom lint rule (oxlint plugin) flags hardcoded English UI text in JSX children and `placeholder`/`aria-label`/`title`/`alt` attributes, plus literal strings in notification insert `titleKey`/`messageKey` fields. Enforces `t('key')` usage for all user-visible strings.
+- **`pnpm check:i18n:unused`** runs in the pre-push gate (Lefthook) and exits non-zero on unused i18n keys, preventing dead keys from accumulating.
+
 ### Translation Scope
 
 | Surface             | Strategy                                                                         | Example                                                    |
 | ------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | **UI labels**       | Static translation keys                                                          | `t('button.submit')`                                       |
 | **Dynamic text**    | Interpolation with parameters                                                    | `t('checkpoint.passed', { name: checkpoint.name })`        |
-| **Notifications**   | Store event `type` + `params` in DB. Render with current locale at display time. | `{ type: 'review_completed', params: { checkpointName } }` |
+| **Notifications**   | Store i18n `titleKey`/`messageKey` + `params` in DB. Resolve display strings at read time using recipient's locale. | `{ titleKey: 'notifications.events.review_completed.title', messageKey: '...', params: { checkpointName } }` |
 | **Email templates** | Render at send time based on recipient's locale.                                 | Resend email body in `en` or `id`                          |
 
 ### Files

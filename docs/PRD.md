@@ -143,7 +143,8 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 ### Notifications
 
 - In-app notification center with read/unread tracking and type-based grouping.
-- Email delivery via Resend for account invitations and password setup.
+- In-app notifications are **localized at read time** — the database stores i18n keys (`titleKey`, `messageKey`) and interpolation `params` (jsonb) instead of literal text; the recipient's locale resolves the display strings, so Indonesian users see Indonesian notifications and English users see English.
+- Email delivery via Resend for account invitations and password setup. Email subjects (password reset, invitation, SLA alerts) are **localized** using the recipient's `locale` preference.
 - Users receive in-app alerts for submissions, reviews, revision requests, and consultation verifications.
 - SLA breach alerts are sent to Admins via in-app and email notifications.
 - Notification bell in the shared header shows the unread count with 15-second polling.
