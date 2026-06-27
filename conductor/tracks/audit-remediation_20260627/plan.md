@@ -121,7 +121,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Dead i18n Key Cleanup' (Protocol in workflow.md) [checkpoint: 99a244c]
 
-## Phase 4: Client Error Handling (M4) [checkpoint: ea1549f]
+## [x] Phase 4: Client Error Handling (M4) [checkpoint: 1aebc21]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase [ea1549f]
     - [x] Read `./spec.md` — focus on FR-4 (Client Error Handling) and NFR-6 (i18n keys in both locales) [ea1549f]
@@ -139,5 +139,5 @@
     - [x] Update student checkpoint route (1 catch block) [ea1549f]
     - [x] Verify all tests pass [ea1549f]
 
-- [x] Task: Conductor - User Manual Verification 'Phase 4: Client Error Handling' (Protocol in workflow.md) [ea1549f]
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Client Error Handling' (Protocol in workflow.md) [checkpoint: 1aebc21]
 </protect>
