@@ -121,23 +121,23 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Dead i18n Key Cleanup' (Protocol in workflow.md) [checkpoint: 99a244c]
 
-## Phase 4: Client Error Handling (M4)
+## Phase 4: Client Error Handling (M4) [checkpoint: ea1549f]
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
-    - [ ] Read `./spec.md` — focus on FR-4 (Client Error Handling) and NFR-6 (i18n keys in both locales)
-    - [ ] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase [ea1549f]
+    - [x] Read `./spec.md` — focus on FR-4 (Client Error Handling) and NFR-6 (i18n keys in both locales) [ea1549f]
+    - [x] Read `conductor/workflow.md` — focus on Standard Task Workflow (TDD Red/Green) and Phase Completion Verification protocol [ea1549f]
 
-- [ ] Task: Write tests for toast error display on failed fetches
-    - [ ] Write tests verifying `toast.error` is called with the correct i18n key when a fetch fails in AssignmentWizard, TemplatePicker, StudentPicker, and the student checkpoint route (Red)
+- [x] Task: Write tests for toast error display on failed fetches [ea1549f]
+    - [x] Write tests verifying `toast.error` is called with the correct i18n key when a fetch fails in AssignmentWizard, TemplatePicker, StudentPicker, and the student checkpoint route (Red) [ea1549f]
 
-- [ ] Task: Replace console.error with toast.error
-    - [ ] Add `errors.fetchFailed` (and any context-specific) i18n keys to `locales/en.json` and `locales/id.json` (Green)
-    - [ ] Run `pnpm generate:i18n`
-    - [ ] Update `AssignmentWizard.tsx` (3 catch blocks) to call `toast.error(t('errors.fetchFailed'))` alongside `console.error`
-    - [ ] Update `TemplatePicker.tsx` (1 catch block)
-    - [ ] Update `StudentPicker.tsx` (1 catch block)
-    - [ ] Update student checkpoint route (1 catch block)
-    - [ ] Verify all tests pass
+- [x] Task: Replace console.error with toast.error [ea1549f]
+    - [x] Add `errors.fetchFailed` (and any context-specific) i18n keys to `locales/en.json` and `locales/id.json` (Green) [ea1549f]
+    - [x] Run `pnpm generate:i18n` [ea1549f]
+    - [x] Update `AssignmentWizard.tsx` (3 catch blocks) to call `toast.error(t('errors.fetchFailed'))` alongside `console.error` [ea1549f]
+    - [x] Update `TemplatePicker.tsx` (1 catch block) [ea1549f]
+    - [x] Update `StudentPicker.tsx` (1 catch block) [ea1549f]
+    - [x] Update student checkpoint route (1 catch block) [ea1549f]
+    - [x] Verify all tests pass [ea1549f]
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Client Error Handling' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Client Error Handling' (Protocol in workflow.md) [ea1549f]
 </protect>
