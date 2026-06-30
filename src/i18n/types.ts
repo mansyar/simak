@@ -835,6 +835,17 @@ export type Translation = {
       role: string
       importButton: string
       createdSkipped: string
+      errors: {
+        rowLimit: string
+        invalidRole: string
+        cannotCreateAdmin: string
+        duplicateEmail: string
+      }
+      status: {
+        created: string
+        restored: string
+        skipped: string
+      }
     }
     templates: {
       title: string
