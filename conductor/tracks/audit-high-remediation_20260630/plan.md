@@ -7,7 +7,7 @@
 
 > **Task lifecycle (per workflow.md):** mark task `[ ]`→`[~]` → write failing tests (Red) → implement to pass (Green) → refactor → verify >80% coverage → commit (`<type>(<scope>): <desc>`) → attach git note → mark `[x]` + commit SHA in plan.md. Every code task ends with: commit + git note + plan.md status update.
 
-## Phase 1: H1 — Upload-intent trust boundary
+## Phase 1: H1 — Upload-intent trust boundary [checkpoint: c3aa2b9]
 
 - [x] Task: Review spec.md and workflow.md before beginning work
     - [x] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
