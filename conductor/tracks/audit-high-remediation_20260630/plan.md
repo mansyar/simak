@@ -55,11 +55,11 @@
 
 ## Phase 2: H2 — SLA anchored at submission time (+ L1)
 
-- [ ] Task: Review spec.md and workflow.md before beginning work
-    - [ ] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
-    - [ ] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
+- [x] Task: Review spec.md and workflow.md before beginning work
+    - [x] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
+    - [x] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
 
-- [ ] Task: Verify extension-grant path under new anchor (impl-time verification per spec risk)
+- [~] Task: Verify extension-grant path under new anchor (impl-time verification per spec risk)
     - [ ] Read `review-sla.ts` / `due-dates.server.ts`; confirm student-earns-extension assumption holds when `underReviewAt = submission.uploadedAt`
     - [ ] If it diverges, surface decision before proceeding
     - [ ] Commit findings/note, mark task [x] in plan.md
