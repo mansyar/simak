@@ -143,11 +143,11 @@
     - [x] `pnpm format` (oxfmt) applied to changed files
     - [ ] Commit, attach git note, mark task [x] in plan.md
 
-- [~] Task: Integration tests + i18n parity
-    - [ ] Run `pnpm test:integration` (H1 opt-in test passes)
-    - [ ] `pnpm check:i18n` + `pnpm check:i18n:unused` clean
+- [x] Task: Integration tests + i18n parity [b109ead]
+    - [x] Run `pnpm test:integration` (H1 opt-in test passes)
+    - [x] `pnpm check:i18n` + `pnpm check:i18n:unused` clean
     - [ ] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Final hardening & quality gates' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Final hardening & quality gates' (Protocol in workflow.md)
 
 </protect>
