@@ -94,12 +94,12 @@
     - [x] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
     - [x] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
 
-- [~] Task: Write failing tests for bulk import restore/skip (Red)
-    - [ ] AC-H3-1: bulk import with email matching a soft-deleted user → restored (name/cohort/role from row; password/id/history preserved); batch survives
-    - [ ] AC-H3-2: bulk import with duplicate active email → skipped with reason; batch survives (no whole-batch rollback on 23505)
-    - [ ] AC-H3-4: per-row report shape `{results:[{rowIndex,email,status,reason?}]}`; audit events `user.created`/`user.reactivated`
-    - [ ] Run tests; confirm they fail
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Write failing tests for bulk import restore/skip (Red) [ec17a03]
+    - [x] AC-H3-1: bulk import with email matching a soft-deleted user → restored (name/role from row; password/id/history preserved); batch survives
+    - [x] AC-H3-2: bulk import with duplicate active email → skipped with reason; batch survives (no whole-batch rollback on 23505)
+    - [x] AC-H3-4: per-row report shape `{results:[{rowIndex,email,status,reason?}]}`; audit events `user.created`/`user.reactivated`
+    - [x] Run tests; confirm 5 failures in `tests/unit/server/bulk-import-users-restore.test.ts`
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Implement bulk import savepoint + restore (Green)
     - [ ] Remove `isNull(users.deletedAt)` pre-check from `bulkCreateUsersHandler`
