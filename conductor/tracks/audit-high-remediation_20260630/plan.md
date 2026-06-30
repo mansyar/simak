@@ -126,7 +126,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'H3 — Bulk import + restore-on-soft-deleted' (Protocol in workflow.md) [eeb9ce3]
 
-## Phase 4: Final hardening & quality gates
+## Phase 4: Final hardening & quality gates [checkpoint: 958cd99]
 
 - [x] Task: Review spec.md and workflow.md before beginning work [f5ada75]
     - [x] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
@@ -148,6 +148,6 @@
     - [x] `pnpm check:i18n` + `pnpm check:i18n:unused` clean
     - [ ] Commit, attach git note, mark task [x] in plan.md
 
-- [~] Task: Conductor - User Manual Verification 'Final hardening & quality gates' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Final hardening & quality gates' (Protocol in workflow.md) [958cd99]
 
 </protect>
