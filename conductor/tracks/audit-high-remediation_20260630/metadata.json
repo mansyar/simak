@@ -1,0 +1,8 @@
+{
+  "track_id": "audit-high-remediation_20260630",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-06-30T06:33:20Z",
+  "updated_at": "2026-06-30T06:33:20Z",
+  "description": "Audit HIGH-remediation: close H1 (fileKey trust boundary via upload_intents binding), H2 (SLA anchored at submission time + L1 openForReview error msg), H3 (bulk import restore-on-soft-deleted + single-create consistency). Security & correctness remediation."
+}

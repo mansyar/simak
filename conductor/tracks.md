@@ -20,3 +20,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Audit HIGH-Remediation (H1, H2, H3 + L1)**
+*Link: [./tracks/audit-high-remediation_20260630/](./tracks/audit-high-remediation_20260630/)*
+
