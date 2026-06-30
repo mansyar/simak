@@ -1,4 +1,9 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 /**
@@ -70,6 +75,27 @@ export async function generatePresignedUploadUrl(params: {
   });
 
   return getSignedUrl(client, command, { expiresIn: 300 }); // 5 minutes
+}
+
+/**
+ * Performs an R2 HEAD request for the given key and returns Content-Length.
+ * Returns null if R2 is not configured or the object does not exist.
+ */
+export async function getObjectContentLength(params: { key: string }): Promise<number | null> {
+  const client = getR2Client();
+  const bucket = getBucketName();
+
+  if (!client || !bucket) {
+    return null;
+  }
+
+  const command = new HeadObjectCommand({
+    Bucket: bucket,
+    Key: params.key,
+  });
+
+  const response = await client.send(command);
+  return response.ContentLength ?? null;
 }
 
 /**
