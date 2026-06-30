@@ -132,12 +132,12 @@
     - [x] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
     - [x] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
 
-- [~] Task: Full unit suite + coverage gate
-    - [ ] Run `CI=true pnpm test:coverage`; confirm >80% lines/functions/branches/statements
-    - [ ] Address any coverage gaps in changed modules
+- [x] Task: Full unit suite + coverage gate [d554be5]
+    - [x] Run `CI=true pnpm test:coverage`; confirm >80% lines/functions/branches/statements
+    - [x] Address any coverage gaps in changed modules
     - [ ] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Typecheck + lint + format
+- [~] Task: Typecheck + lint + format
     - [ ] `pnpm typecheck` passes
     - [ ] `pnpm lint` (oxlint) clean
     - [ ] `pnpm format` (oxfmt) applied to changed files
