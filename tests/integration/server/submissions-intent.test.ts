@@ -10,7 +10,6 @@ import {
   assignmentTemplates,
   templateCheckpoints,
   submissions,
-  auditLog,
   uploadIntents,
 } from '@/db/schema/index';
 import { submitCheckpointHandler } from '@/server/submissions.server';
@@ -31,11 +30,11 @@ vi.mock('@/lib/storage', () => ({
   getObjectContentLength: vi.fn().mockResolvedValue(1024),
 }));
 
-describe('submitCheckpointHandler concurrent version race', () => {
+describe('submitCheckpointHandler fabricated-key rejection end-to-end', () => {
   const db = getDb();
   const timestamp = Date.now();
-  const instructorId = `race-instructor-${timestamp}`;
-  const studentId = `race-student-${timestamp}`;
+  const instructorId = `intent-instructor-${timestamp}`;
+  const studentId = `intent-student-${timestamp}`;
   let templateId: number;
   let assignmentId: number;
   let checkpointId: number;
@@ -44,13 +43,13 @@ describe('submitCheckpointHandler concurrent version race', () => {
     await db.insert(users).values([
       {
         id: instructorId,
-        name: 'Race Instructor',
+        name: 'Intent Instructor',
         email: `${instructorId}@test.com`,
         role: 'instructor',
       },
       {
         id: studentId,
-        name: 'Race Student',
+        name: 'Intent Student',
         email: `${studentId}@test.com`,
         role: 'student',
       },
@@ -59,7 +58,7 @@ describe('submitCheckpointHandler concurrent version race', () => {
     const [template] = await db
       .insert(assignmentTemplates)
       .values({
-        name: 'Race Test Template',
+        name: 'Intent Test Template',
         type: 'Thesis',
         createdBy: instructorId,
       })
@@ -71,7 +70,7 @@ describe('submitCheckpointHandler concurrent version race', () => {
       .insert(assignments)
       .values({
         templateId,
-        title: 'Race Test Assignment',
+        title: 'Intent Test Assignment',
         finalDeadline: new Date(Date.now() + 5000000),
         instructorId,
       })
@@ -89,7 +88,7 @@ describe('submitCheckpointHandler concurrent version race', () => {
       .values({
         assignmentId,
         studentId,
-        name: 'Race Checkpoint',
+        name: 'Intent Checkpoint',
         order: 1,
         state: 'unlocked',
         dueDate: new Date(Date.now() + 1000000),
@@ -99,69 +98,42 @@ describe('submitCheckpointHandler concurrent version race', () => {
     checkpointId = checkpoint.id;
 
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
-      user: { id: studentId, name: 'Race Student', role: 'student' },
+      user: { id: studentId, name: 'Intent Student', role: 'student' },
       session: {} as any,
     } as any);
-
-    await db.insert(uploadIntents).values({
-      fileKey: `submissions/race-${timestamp}.pdf`,
-      userId: studentId,
-      purpose: 'submission',
-      checkpointId,
-      fileName: 'race.pdf',
-      fileSize: 1024,
-      contentType: 'application/pdf',
-      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
-    });
   });
 
   afterEach(async () => {
-    await db.delete(uploadIntents).where(eq(uploadIntents.checkpointId, checkpointId));
+    await db.delete(uploadIntents).where(eq(uploadIntents.userId, studentId));
     await db.delete(submissions).where(eq(submissions.checkpointId, checkpointId));
     await db.delete(checkpoints).where(eq(checkpoints.id, checkpointId));
     await db.delete(assignmentStudents).where(eq(assignmentStudents.assignmentId, assignmentId));
     await db.delete(assignments).where(eq(assignments.id, assignmentId));
     await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, templateId));
-    await db.delete(auditLog).where(eq(auditLog.actorId, studentId));
     await db.delete(assignmentTemplates).where(eq(assignmentTemplates.id, templateId));
     await db.delete(users).where(eq(users.id, studentId));
     await db.delete(users).where(eq(users.id, instructorId));
   });
 
-  it('prevents duplicate versions when two submissions run concurrently', async () => {
-    const sharedFileKey = `submissions/race-${timestamp}.pdf`;
-    const dataA = {
-      checkpointId,
-      fileKey: sharedFileKey,
-      fileName: 'race-a.pdf',
-      fileSize: 1024,
-    };
-    const dataB = {
-      checkpointId,
-      fileKey: sharedFileKey,
-      fileName: 'race-b.pdf',
-      fileSize: 1024,
-    };
+  it('AC-H1-5: rejects a fabricated fileKey with no matching upload intent', async () => {
+    const result = await submitCheckpointHandler({
+      data: {
+        checkpointId,
+        fileKey: 'submissions/fabricated-key.pdf',
+        fileName: 'fabricated.pdf',
+        fileSize: 1024,
+      },
+    });
 
-    const [resultA, resultB] = await Promise.all([
-      submitCheckpointHandler({ data: dataA }),
-      submitCheckpointHandler({ data: dataB }),
-    ]);
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Invalid or expired upload intent' },
+    });
 
-    const successes = [resultA, resultB].filter(
-      (r) => (r as { success?: boolean }).success === true,
-    );
-    const failures = [resultA, resultB].filter((r) => (r as { error?: unknown }).error);
-
-    expect(successes).toHaveLength(1);
-    expect(failures).toHaveLength(1);
-
-    const rows = await db
-      .select({ id: submissions.id, version: submissions.version, fileKey: submissions.fileKey })
+    const remaining = await db
+      .select({ id: submissions.id })
       .from(submissions)
       .where(eq(submissions.checkpointId, checkpointId));
 
-    expect(rows).toHaveLength(1);
-    expect(rows[0].version).toBe(1);
+    expect(remaining).toHaveLength(0);
   });
 });
