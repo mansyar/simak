@@ -25,11 +25,11 @@
     - [x] Run tests; confirm they fail (intent not yet inserted)
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Implement presign intent insertion (Green)
-    - [ ] Insert intent row at presign in `files.server.ts` and the review-feedback presign handler
-    - [ ] Run presign tests; confirm they pass
-    - [ ] Verify coverage >80% on changed code
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Implement presign intent insertion (Green) [098c33c]
+    - [x] Insert intent row at presign in `files.server.ts` and the review-feedback presign handler
+    - [x] Run presign tests; confirm they pass
+    - [x] Verify coverage >80% on changed code
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Write failing tests for submit intent verification + HEAD size check (Red)
     - [ ] AC-H1-1: submit with fileKey having no matching unconsumed/unexpired intent → rejected
