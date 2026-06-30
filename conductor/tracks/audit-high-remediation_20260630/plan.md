@@ -9,9 +9,9 @@
 
 ## Phase 1: H1 — Upload-intent trust boundary
 
-- [ ] Task: Review spec.md and workflow.md before beginning work
-    - [ ] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
-    - [ ] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
+- [x] Task: Review spec.md and workflow.md before beginning work
+    - [x] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
+    - [x] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
 
 - [x] Task: Define `upload_intents` Drizzle schema & generate migration [d382148]
     - [x] Add `uploadIntents` table to the DB schema (`fileKey` unique, `userId`, `purpose` enum `'submission'|'review_feedback'`, `checkpointId` nullable, `fileName`, `fileSize`, `contentType`, `expiresAt`, `consumedAt`)
@@ -46,10 +46,10 @@
     - [x] Run tests; confirm pass; verify >80% coverage
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Write opt-in integration test (AC-H1-5)
-    - [ ] Add `tests/integration/server/submissions-intent.test.ts` proving fabricated-key rejection end-to-end (mock R2, real DB tx)
-    - [ ] Run via `pnpm test:integration`; confirm it passes (not in pre-push gate)
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Write opt-in integration test (AC-H1-5) [3881d9e]
+    - [x] Add `tests/integration/server/submissions-intent.test.ts` proving fabricated-key rejection end-to-end (mock R2, real DB tx)
+    - [x] Run via `pnpm test:integration`; confirm it passes (not in pre-push gate)
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'H1 — Upload-intent trust boundary' (Protocol in workflow.md)
 
