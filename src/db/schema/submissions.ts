@@ -13,6 +13,8 @@ import { checkpoints } from './assignments';
 
 export const reviewDecision = pgEnum('review_decision', ['pass', 'revise']);
 
+export const uploadPurpose = pgEnum('upload_purpose', ['submission', 'review_feedback']);
+
 export const submissions = pgTable(
   'submissions',
   {
@@ -54,4 +56,28 @@ export const reviews = pgTable(
     reviewedAt: timestamp('reviewed_at'),
   },
   (table) => [index('reviews_submission_id_idx').on(table.submissionId)],
+);
+
+export const uploadIntents = pgTable(
+  'upload_intents',
+  {
+    fileKey: text('file_key').notNull().unique(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id),
+    purpose: uploadPurpose('purpose').notNull(),
+    checkpointId: integer('checkpoint_id').references(() => checkpoints.id, {
+      onDelete: 'cascade',
+    }),
+    fileName: text('file_name').notNull(),
+    fileSize: integer('file_size').notNull(),
+    contentType: text('content_type').notNull(),
+    expiresAt: timestamp('expires_at').notNull(),
+    consumedAt: timestamp('consumed_at'),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => [
+    index('upload_intents_user_id_idx').on(table.userId),
+    index('upload_intents_file_key_idx').on(table.fileKey),
+  ],
 );
