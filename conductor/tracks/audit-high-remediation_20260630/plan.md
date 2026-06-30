@@ -101,13 +101,13 @@
     - [x] Run tests; confirm 5 failures in `tests/unit/server/bulk-import-users-restore.test.ts`
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Implement bulk import savepoint + restore (Green)
-    - [ ] Remove `isNull(users.deletedAt)` pre-check from `bulkCreateUsersHandler`
-    - [ ] One outer tx + SAVEPOINT per row; catch `23505` → per-row skip; non-23505 → rollback whole batch
-    - [ ] Restore-on-soft-deleted: overwrite name/cohort/role from import row (role wins incl. mismatch); preserve password/password-setup-state/id/history
-    - [ ] Per-row report + `user.created`/`user.reactivated` audit events
-    - [ ] Run tests; confirm pass; verify >80% coverage
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Implement bulk import savepoint + restore (Green) [7605ac7]
+    - [x] Remove `isNull(users.deletedAt)` pre-check from `bulkCreateUsersHandler`
+    - [x] One outer tx + SAVEPOINT per row; catch `23505` → per-row skip; non-23505 → rollback whole batch
+    - [x] Restore-on-soft-deleted: overwrite name/cohort/role from import row (role wins incl. mismatch); preserve password/password-setup-state/id/history
+    - [x] Per-row report + `user.created`/`user.reactivated` audit events
+    - [x] Run tests; confirm pass; verify >80% coverage
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Write failing test for single-create restore (Red)
     - [ ] AC-H3-3: `createUserHandler` with email matching a soft-deleted user → restores (consistent with bulk)
