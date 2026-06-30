@@ -13,13 +13,11 @@ This file tracks all major tracks for the project. Each track has its own detail
 - **Transactional Integrity & Input Validation** — Archived to [./archive/transactional-integrity_20260626/](./archive/transactional-integrity_20260626/) (commit `a1c6f58`)
 - **Performance Refinements** — Archived to [./archive/performance-refinements_20260626/](./archive/performance-refinements_20260626/) (commit `17ec76a`)
 - **Audit Remediation — i18n, Type Safety, Hygiene (H1, H2, M1, M4)** — Archived to [./archive/audit-remediation_20260627/](./archive/audit-remediation_20260627/) (commit `2204cad`)
+- **Audit HIGH-Remediation (H1, H2, H3 + L1)** — Archived to [./archive/audit-high-remediation_20260630/](./archive/audit-high-remediation_20260630/)
 
 ---
 
 ## Active
 
 ---
-
-- [x] **Track: Audit HIGH-Remediation (H1, H2, H3 + L1)**
-*Link: [./tracks/audit-high-remediation_20260630/](./tracks/audit-high-remediation_20260630/)*
 
