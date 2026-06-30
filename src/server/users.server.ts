@@ -161,30 +161,54 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
   const db = getDb();
 
   try {
-    // Check if email already in use (active or soft-deleted)
     const existingUser = await db
-      .select({ id: users.id })
+      .select({ id: users.id, deletedAt: users.deletedAt })
       .from(users)
       .where(eq(users.email, userEmail))
       .limit(1)
       .then((rows) => rows[0]);
 
+    let userId = '';
+    let auditAction: 'user.created' | 'user.reactivated' = 'user.created';
+    let status: 'created' | 'restored' = 'created';
+
     if (existingUser) {
-      return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
+      if (existingUser.deletedAt == null) {
+        return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
+      }
+      userId = existingUser.id;
+      auditAction = 'user.reactivated';
+      status = 'restored';
+    } else {
+      userId = crypto.randomUUID();
     }
 
-    const userId = crypto.randomUUID();
     const token = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
     await db.transaction(async (tx) => {
-      await tx.insert(users).values({
-        id: userId,
-        name,
-        email: userEmail,
-        role: role as 'admin' | 'instructor' | 'student',
-        locale: session.user.locale || 'en',
-      });
+      if (status === 'restored') {
+        await tx
+          .update(users)
+          .set({
+            deletedAt: null,
+            name,
+            role: role as 'admin' | 'instructor' | 'student',
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, userId));
+
+        // Clear any stale verification token so a fresh invitation can be sent
+        await tx.delete(verification).where(eq(verification.identifier, userEmail));
+      } else {
+        await tx.insert(users).values({
+          id: userId,
+          name,
+          email: userEmail,
+          role: role as 'admin' | 'instructor' | 'student',
+          locale: session.user.locale || 'en',
+        });
+      }
 
       await tx.insert(verification).values({
         id: crypto.randomUUID(),
@@ -198,13 +222,13 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
     try {
       await logAuditEvent({
         actorId: session.user.id,
-        action: 'user.created',
+        action: auditAction,
         entityType: 'user',
         entityId: userId,
-        details: { role, email: userEmail },
+        details: { role, email: userEmail, status },
       });
     } catch (err) {
-      console.error('Failed to log user.created audit event:', err);
+      console.error(`Failed to log ${auditAction} audit event:`, err);
     }
 
     // Post-commit advisory work: invitation email is non-fatal
