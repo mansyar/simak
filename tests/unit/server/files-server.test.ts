@@ -31,6 +31,9 @@ vi.mock('@/db/schema/submissions', () => ({
     fileKey: 'submissions_fileKey',
     uploadedBy: 'submissions_uploadedBy',
   },
+  uploadIntents: {
+    fileKey: 'upload_intents_fileKey',
+  },
 }));
 
 // Mock lib/storage
@@ -70,6 +73,11 @@ function mockDbQuery(rows: any[]) {
   return {
     select: vi.fn().mockReturnValue({
       from: vi.fn().mockReturnValue(fromStep),
+    }),
+    insert: vi.fn().mockReturnValue({
+      values: vi.fn().mockReturnValue({
+        then: (fn: (v: unknown[]) => unknown) => Promise.resolve([]).then(fn),
+      }),
     }),
     eq,
     and,

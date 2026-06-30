@@ -2,7 +2,7 @@
 import { eq, and } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { checkpoints, assignmentStudents } from '../db/schema/assignments';
-import { submissions } from '../db/schema/submissions';
+import { submissions, uploadIntents } from '../db/schema/submissions';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '../lib/errors';
 import {
@@ -80,6 +80,20 @@ export async function getPresignedUploadUrlHandler(args: { data: GetPresignedUpl
     // 4. Generate presigned upload URL
     const uploadUrl = await generatePresignedUploadUrl({ key: fileKey, contentType });
 
+    // 5. Record upload intent bound to the acting user and checkpoint.
+    //    This is the trust token that submitCheckpointHandler will verify.
+    await db.insert(uploadIntents).values({
+      fileKey,
+      userId: session.user.id,
+      purpose: 'submission',
+      checkpointId,
+      fileName: null,
+      fileSize: null,
+      contentType,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+      consumedAt: null,
+    });
+
     return { uploadUrl, fileKey };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
@@ -135,6 +149,7 @@ export async function getPresignedReviewFeedbackUploadUrlHandler(args: {
   }
 
   const { extension, contentType } = args.data;
+  const db = getDb();
 
   const typeCheck = validateUploadType(extension, contentType);
   if (!typeCheck.valid) {
@@ -150,6 +165,19 @@ export async function getPresignedReviewFeedbackUploadUrlHandler(args: {
 
     // Generate presigned upload URL
     const uploadUrl = await generatePresignedUploadUrl({ key: fileKey, contentType });
+
+    // Record upload intent bound to the acting instructor for review feedback.
+    await db.insert(uploadIntents).values({
+      fileKey,
+      userId: session.user.id,
+      purpose: 'review_feedback',
+      checkpointId: null,
+      fileName: null,
+      fileSize: null,
+      contentType,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+      consumedAt: null,
+    });
 
     return { uploadUrl, fileKey };
   } catch (err) {

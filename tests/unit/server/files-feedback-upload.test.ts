@@ -6,6 +6,11 @@ vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
 }));
 
+// Mock db
+vi.mock('@/db/index', () => ({
+  getDb: vi.fn(),
+}));
+
 // Mock lib/storage
 vi.mock('@/lib/storage', () => ({
   generateFileKey: vi
@@ -15,11 +20,20 @@ vi.mock('@/lib/storage', () => ({
 }));
 
 import { getSessionFromHeaders } from '@/server/auth';
+import { getDb } from '@/db/index';
 import { generateFileKey, generatePresignedUploadUrl } from '@/lib/storage';
 
 describe('files.server.ts - getPresignedReviewFeedbackUploadUrlHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    vi.mocked(getDb).mockReturnValue({
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockReturnValue({
+          then: (fn: (v: unknown[]) => unknown) => Promise.resolve([]).then(fn),
+        }),
+      }),
+    } as any);
   });
 
   const instructorSession = {
