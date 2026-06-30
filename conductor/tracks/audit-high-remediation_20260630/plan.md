@@ -75,10 +75,10 @@
     - [x] Run tests; confirm pass; verify >80% coverage
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Write failing test for L1 openForReview error message (Red)
-    - [ ] AC-H2-2: `openForReview` on a non-submitted checkpoint returns an accurate message (not "submittable state")
-    - [ ] Run test; confirm it fails
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Write failing test for L1 openForReview error message (Red) [a0e92a9]
+    - [x] AC-H2-2: `openForReview` on a non-submitted checkpoint returns an accurate message (not "submittable state")
+    - [x] Run test; confirm it fails
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Implement L1 fix + i18n keys (Green)
     - [ ] Correct error message at `reviews-extras.server.ts:61`
