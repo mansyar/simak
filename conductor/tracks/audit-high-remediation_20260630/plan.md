@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan — Audit HIGH-Remediation (H1, H2, H3 + L1)
 
 **Track ID:** `audit-high-remediation_20260630`
@@ -7,6 +8,10 @@
 > **Task lifecycle (per workflow.md):** mark task `[ ]`→`[~]` → write failing tests (Red) → implement to pass (Green) → refactor → verify >80% coverage → commit (`<type>(<scope>): <desc>`) → attach git note → mark `[x]` + commit SHA in plan.md. Every code task ends with: commit + git note + plan.md status update.
 
 ## Phase 1: H1 — Upload-intent trust boundary
+
+- [ ] Task: Review spec.md and workflow.md before beginning work
+    - [ ] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
+    - [ ] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
 
 - [ ] Task: Define `upload_intents` Drizzle schema & generate migration
     - [ ] Add `uploadIntents` table to the DB schema (`fileKey` unique, `userId`, `purpose` enum `'submission'|'review_feedback'`, `checkpointId` nullable, `fileName`, `fileSize`, `contentType`, `expiresAt`, `consumedAt` nullable)
@@ -50,6 +55,10 @@
 
 ## Phase 2: H2 — SLA anchored at submission time (+ L1)
 
+- [ ] Task: Review spec.md and workflow.md before beginning work
+    - [ ] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
+    - [ ] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
+
 - [ ] Task: Verify extension-grant path under new anchor (impl-time verification per spec risk)
     - [ ] Read `review-sla.ts` / `due-dates.server.ts`; confirm student-earns-extension assumption holds when `underReviewAt = submission.uploadedAt`
     - [ ] If it diverges, surface decision before proceeding
@@ -80,6 +89,10 @@
 - [ ] Task: Conductor - User Manual Verification 'H2 — SLA anchored at submission time' (Protocol in workflow.md)
 
 ## Phase 3: H3 — Bulk import + single-create restore-on-soft-deleted
+
+- [ ] Task: Review spec.md and workflow.md before beginning work
+    - [ ] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
+    - [ ] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
 
 - [ ] Task: Write failing tests for bulk import restore/skip (Red)
     - [ ] AC-H3-1: bulk import with email matching a soft-deleted user → restored (name/cohort/role from row; password/id/history preserved); batch survives
@@ -115,6 +128,10 @@
 
 ## Phase 4: Final hardening & quality gates
 
+- [ ] Task: Review spec.md and workflow.md before beginning work
+    - [ ] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
+    - [ ] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
+
 - [ ] Task: Full unit suite + coverage gate
     - [ ] Run `CI=true pnpm test:coverage`; confirm >80% lines/functions/branches/statements
     - [ ] Address any coverage gaps in changed modules
@@ -132,3 +149,5 @@
     - [ ] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Final hardening & quality gates' (Protocol in workflow.md)
+
+</protect>

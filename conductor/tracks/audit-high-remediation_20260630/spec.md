@@ -1,3 +1,4 @@
+<protect>
 # Track: Audit HIGH-Remediation (H1, H2, H3 + L1)
 
 **Type:** Bug (security & correctness remediation)
@@ -75,3 +76,5 @@ Closes the three HIGH-severity findings from the SIMAK codebase audit (2026-06-3
 ## Risks / Open Items
 - **H2:** verify the extension-grant path in review-sla.ts / due-dates.server.ts under the new `uploadedAt` anchor (student-earns-extension assumption). Surface if it diverges.
 - **H3:** confirm no existing production flows depend on the old "block on soft-deleted email" behavior — the restore policy changes single-create and bulk-create behavior.
+
+</protect>
