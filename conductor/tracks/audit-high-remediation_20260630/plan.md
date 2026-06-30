@@ -90,11 +90,11 @@
 
 ## Phase 3: H3 — Bulk import + single-create restore-on-soft-deleted
 
-- [ ] Task: Review spec.md and workflow.md before beginning work
-    - [ ] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
-    - [ ] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
+- [x] Task: Review spec.md and workflow.md before beginning work
+    - [x] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
+    - [x] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
 
-- [ ] Task: Write failing tests for bulk import restore/skip (Red)
+- [~] Task: Write failing tests for bulk import restore/skip (Red)
     - [ ] AC-H3-1: bulk import with email matching a soft-deleted user → restored (name/cohort/role from row; password/id/history preserved); batch survives
     - [ ] AC-H3-2: bulk import with duplicate active email → skipped with reason; batch survives (no whole-batch rollback on 23505)
     - [ ] AC-H3-4: per-row report shape `{results:[{rowIndex,email,status,reason?}]}`; audit events `user.created`/`user.reactivated`
