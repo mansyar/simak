@@ -109,10 +109,10 @@
     - [x] Run tests; confirm pass; verify >80% coverage
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Write failing test for single-create restore (Red)
-    - [ ] AC-H3-3: `createUserHandler` with email matching a soft-deleted user → restores (consistent with bulk)
-    - [ ] Run test; confirm it fails
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Write failing test for single-create restore (Red) [66b7a66]
+    - [x] AC-H3-3: `createUserHandler` with email matching a soft-deleted user → restores (consistent with bulk)
+    - [x] Run test; confirm it fails
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Implement single-create restore (Green)
     - [ ] Apply same restore policy to `createUserHandler`
