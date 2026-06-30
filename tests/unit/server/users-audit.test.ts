@@ -72,7 +72,7 @@ describe('User handlers audit logging', () => {
         action: 'user.created',
         entityType: 'user',
         entityId: expect.any(String),
-        details: { role: 'student', email: 'test@example.com' },
+        details: { role: 'student', email: 'test@example.com', status: 'created' },
       });
     });
   });
