@@ -246,6 +246,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
         instructorId: assignments.instructorId,
         studentId: checkpoints.studentId,
         studentName: users.name,
+        uploadedAt: submissions.uploadedAt,
         checkpointUpdatedAt: checkpoints.updatedAt,
         checkpointDueDate: checkpoints.dueDate,
         checkpointOrder: checkpoints.order,
@@ -387,13 +388,11 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       }
 
       // 4e. SLA breach detection & deadline adjustment
-      // SLA clock starts at the under_review transition (TDD §6 Review SLA).
-      // If the instructor reviews directly from 'submitted' state (openForReview
-      // not called), the SLA clock starts now — no breach counted, no false
-      // deadline extension for the student.
-      const underReviewAt =
-        submission.checkpointState === 'under_review' ? submission.checkpointUpdatedAt : new Date();
-      breachDays = calculateBreachDuration(underReviewAt ?? new Date(), new Date());
+      // H2: SLA clock is anchored at submission time. A student waiting since
+      // upload earns a deadline extension whenever the instructor reviews late,
+      // regardless of whether openForReview was explicitly called first.
+      const underReviewAt = submission.uploadedAt ?? new Date();
+      breachDays = calculateBreachDuration(underReviewAt, new Date());
 
       if (breachDays > 0) {
         await adjustDeadlinesForBreach(tx, slaFields, breachDays);
