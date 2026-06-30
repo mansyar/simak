@@ -150,4 +150,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Final hardening & quality gates' (Protocol in workflow.md) [958cd99]
 
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions [4777aae]
+
 </protect>
