@@ -31,13 +31,13 @@
     - [x] Verify coverage >80% on changed code
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Write failing tests for submit intent verification + HEAD size check (Red)
-    - [ ] AC-H1-1: submit with fileKey having no matching unconsumed/unexpired intent → rejected
-    - [ ] AC-H1-2: submit with fileKey issued for different user/checkpoint/purpose → rejected
-    - [ ] AC-H1-3: valid presign→submit consumes intent; second submit reusing same fileKey → rejected
-    - [ ] AC-H1-4: R2 HEAD `Content-Length` >25MB → rejected (mock `@/lib/storage` HEAD)
-    - [ ] Run tests; confirm they fail
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Write failing tests for submit intent verification + HEAD size check (Red) [c55f878]
+    - [x] AC-H1-1: submit with fileKey having no matching unconsumed/unexpired intent → rejected
+    - [x] AC-H1-2: submit with fileKey issued for different user/checkpoint/purpose → rejected
+    - [x] AC-H1-3: valid presign→submit consumes intent; second submit reusing same fileKey → rejected
+    - [x] AC-H1-4: R2 HEAD `Content-Length` >25MB → rejected (mock `@/lib/storage` HEAD)
+    - [x] Run tests; confirm they fail
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Implement submit intent verification + HEAD size check (Green)
     - [ ] `submitCheckpointHandler`: `SELECT…FOR UPDATE WHERE fileKey=? AND userId=? AND consumedAt IS NULL AND expiresAt>now`; verify checkpointId/purpose; set `consumedAt=now`; reject if none
