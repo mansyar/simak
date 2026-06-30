@@ -119,10 +119,10 @@
     - [x] Run test; confirm pass; verify >80% coverage
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Add i18n keys for import results
-    - [ ] Add `created`/`restored`/`skipped` + skip-reason variants to `locales/en.json` + `locales/id.json`
-    - [ ] Run `pnpm generate:i18n`; `pnpm check:i18n` + `pnpm check:i18n:unused` clean
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Add i18n keys for import results [2d0dabb]
+    - [x] Add `created`/`restored`/`skipped` + skip-reason variants to `locales/en.json` + `locales/id.json`
+    - [x] Run `pnpm generate:i18n`; `pnpm check:i18n` + `pnpm check:i18n:unused` clean
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'H3 — Bulk import + restore-on-soft-deleted' (Protocol in workflow.md)
 
