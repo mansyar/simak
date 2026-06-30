@@ -128,11 +128,11 @@
 
 ## Phase 4: Final hardening & quality gates
 
-- [~] Task: Review spec.md and workflow.md before beginning work
+- [x] Task: Review spec.md and workflow.md before beginning work [f5ada75]
     - [x] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
     - [x] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
 
-- [ ] Task: Full unit suite + coverage gate
+- [~] Task: Full unit suite + coverage gate
     - [ ] Run `CI=true pnpm test:coverage`; confirm >80% lines/functions/branches/statements
     - [ ] Address any coverage gaps in changed modules
     - [ ] Commit, attach git note, mark task [x] in plan.md
