@@ -114,10 +114,10 @@
     - [x] Run test; confirm it fails
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Implement single-create restore (Green)
-    - [ ] Apply same restore policy to `createUserHandler`
-    - [ ] Run test; confirm pass; verify >80% coverage
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Implement single-create restore (Green) [477d665]
+    - [x] Apply same restore policy to `createUserHandler`
+    - [x] Run test; confirm pass; verify >80% coverage
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Add i18n keys for import results
     - [ ] Add `created`/`restored`/`skipped` + skip-reason variants to `locales/en.json` + `locales/id.json`
