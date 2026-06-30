@@ -83,6 +83,7 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
             checkpointId: 100,
             checkpointState: 'under_review',
             checkpointUpdatedAt: underReviewAt,
+            uploadedAt: underReviewAt,
             checkpointName: 'Chapter 1',
             checkpointDueDate: new Date('2026-06-01'),
             checkpointOrder: 1,
