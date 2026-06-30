@@ -13,11 +13,11 @@
     - [ ] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
     - [ ] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
 
-- [ ] Task: Define `upload_intents` Drizzle schema & generate migration
-    - [ ] Add `uploadIntents` table to the DB schema (`fileKey` unique, `userId`, `purpose` enum `'submission'|'review_feedback'`, `checkpointId` nullable, `fileName`, `fileSize`, `contentType`, `expiresAt`, `consumedAt` nullable)
-    - [ ] Run `pnpm db:generate`; verify generated migration SQL (unique on `fileKey`, index on `userId`/`fileKey`)
-    - [ ] Apply to dev DB (`pnpm db:push` or `pnpm db:migrate`); confirm table exists
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Define `upload_intents` Drizzle schema & generate migration [d382148]
+    - [x] Add `uploadIntents` table to the DB schema (`fileKey` unique, `userId`, `purpose` enum `'submission'|'review_feedback'`, `checkpointId` nullable, `fileName`, `fileSize`, `contentType`, `expiresAt`, `consumedAt`)
+    - [x] Run `pnpm db:generate`; verify generated migration SQL (unique on `fileKey`, index on `userId`/`fileKey`)
+    - [x] Apply to dev DB (`pnpm db:push` or `pnpm db:migrate`); confirm table exists
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Write failing tests for presign intent insertion (Red)
     - [ ] Test `getPresignedUploadUrl` inserts an `upload_intents` row bound to session user + `checkpointId`, `purpose='submission'`, `consumedAt=null`, `expiresAt` ~now+15min
