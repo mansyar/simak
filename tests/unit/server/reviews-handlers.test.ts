@@ -232,7 +232,10 @@ describe('Review handlers - Logic & Security', () => {
       );
       const result = await openForReviewHandler({ data: { submissionId: 1 } });
       expect(result).toEqual({
-        error: { code: 'BAD_REQUEST', message: 'Checkpoint is not in submittable state' },
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'Checkpoint must be in submitted state to open for review',
+        },
       });
     });
 
