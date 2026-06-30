@@ -64,11 +64,11 @@
     - [x] If it diverges, surface decision before proceeding
     - [x] Commit findings/note, mark task [x] in plan.md
 
-- [ ] Task: Write failing tests for submission-anchored SLA (Red)
-    - [ ] AC-H2-1: direct `submitReview` on a `submitted` checkpoint (no openForReview) → non-zero breach when past the SLA window
-    - [ ] Test `underReviewAt = submission.uploadedAt` regardless of checkpoint state
-    - [ ] Run tests; confirm they fail
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Write failing tests for submission-anchored SLA (Red) [0685bb3]
+    - [x] AC-H2-1: direct `submitReview` on a `submitted` checkpoint (no openForReview) → non-zero breach when past the SLA window
+    - [x] Test `underReviewAt = submission.uploadedAt` regardless of checkpoint state
+    - [x] Run tests; confirm they fail
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Implement `underReviewAt = submission.uploadedAt` (Green)
     - [ ] Update `reviews.server.ts` SLA anchor (replace state-conditional `checkpointUpdatedAt`/`now`)
