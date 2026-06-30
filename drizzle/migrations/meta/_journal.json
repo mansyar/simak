@@ -50,6 +50,13 @@
       "when": 1782801881535,
       "tag": "0006_complete_morbius",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1782802068388,
+      "tag": "0007_cool_tag",
+      "breakpoints": true
     }
   ]
 }

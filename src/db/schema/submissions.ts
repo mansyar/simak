@@ -69,8 +69,8 @@ export const uploadIntents = pgTable(
     checkpointId: integer('checkpoint_id').references(() => checkpoints.id, {
       onDelete: 'cascade',
     }),
-    fileName: text('file_name').notNull(),
-    fileSize: integer('file_size').notNull(),
+    fileName: text('file_name'),
+    fileSize: integer('file_size'),
     contentType: text('content_type').notNull(),
     expiresAt: timestamp('expires_at').notNull(),
     consumedAt: timestamp('consumed_at'),
