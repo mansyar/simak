@@ -59,10 +59,10 @@
     - [x] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
     - [x] Read `../../workflow.md` — confirm TDD Red→Green→Refactor lifecycle, commit format, phase-completion checkpointing protocol
 
-- [~] Task: Verify extension-grant path under new anchor (impl-time verification per spec risk)
-    - [ ] Read `review-sla.ts` / `due-dates.server.ts`; confirm student-earns-extension assumption holds when `underReviewAt = submission.uploadedAt`
-    - [ ] If it diverges, surface decision before proceeding
-    - [ ] Commit findings/note, mark task [x] in plan.md
+- [x] Task: Verify extension-grant path under new anchor (impl-time verification per spec risk) [8f750b0]
+    - [x] Read `review-sla.ts` / `due-dates.server.ts`; confirm student-earns-extension assumption holds when `underReviewAt = submission.uploadedAt`
+    - [x] If it diverges, surface decision before proceeding
+    - [x] Commit findings/note, mark task [x] in plan.md
 
 - [ ] Task: Write failing tests for submission-anchored SLA (Red)
     - [ ] AC-H2-1: direct `submitReview` on a `submitted` checkpoint (no openForReview) → non-zero breach when past the SLA window
