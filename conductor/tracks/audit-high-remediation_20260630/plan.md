@@ -19,11 +19,11 @@
     - [x] Apply to dev DB (`pnpm db:push` or `pnpm db:migrate`); confirm table exists
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Write failing tests for presign intent insertion (Red)
-    - [ ] Test `getPresignedUploadUrl` inserts an `upload_intents` row bound to session user + `checkpointId`, `purpose='submission'`, `consumedAt=null`, `expiresAt` ~now+15min
-    - [ ] Test `getPresignedReviewFeedbackUploadUrl` inserts intent with `purpose='review_feedback'`, `checkpointId` null
-    - [ ] Run tests; confirm they fail (intent not yet inserted)
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Write failing tests for presign intent insertion (Red) [899bba8]
+    - [x] Test `getPresignedUploadUrl` inserts an `upload_intents` row bound to session user + `checkpointId`, `purpose='submission'`, `consumedAt=null`, `expiresAt` ~now+15min
+    - [x] Test `getPresignedReviewFeedbackUploadUrl` inserts intent with `purpose='review_feedback'`, `checkpointId` null
+    - [x] Run tests; confirm they fail (intent not yet inserted)
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Implement presign intent insertion (Green)
     - [ ] Insert intent row at presign in `files.server.ts` and the review-feedback presign handler
