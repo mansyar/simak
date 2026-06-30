@@ -43,9 +43,11 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
 
   // Row-limit guard
   if (rows.length > BULK_USER_ROW_LIMIT) {
-    const reason = resolveEmailSubject('bulkImport.users.errors.rowLimit', {
-      max: String(BULK_USER_ROW_LIMIT),
-    });
+    const reason = resolveEmailSubject(
+      'bulkImport.users.errors.rowLimit',
+      { max: String(BULK_USER_ROW_LIMIT) },
+      locale,
+    );
     return {
       created: 0,
       skipped: rows.length,
@@ -71,6 +73,13 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
   const skipped: number[] = [];
   const errors: { row: number; email: string; reason: string }[] = [];
   const stagedEmails = new Set<string>();
+  // Advisory payloads collected during the transaction, dispatched post-commit (SQL styleguide §6.4)
+  const emailPayloads: { email: string; name: string; token: string }[] = [];
+  const perRowAudits: {
+    action: 'user.created' | 'user.reactivated';
+    userId: string;
+    details: { email: string; role: string; status: 'created' | 'restored' };
+  }[] = [];
 
   // Pre-filter rows by role before any DB writes
   for (let i = 0; i < rows.length; i++) {
@@ -93,7 +102,7 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
   }
 
   try {
-    return await db.transaction(async (outerTx) => {
+    await db.transaction(async (outerTx) => {
       for (const candidate of validRows) {
         const { rowIndex, email, name, role } = candidate;
 
@@ -167,27 +176,13 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
             });
           });
 
-          try {
-            await sendInvitationEmail({ email, name, token });
-          } catch {
-            // Email failure is non-fatal as per spec
-          }
-
-          try {
-            await logAuditEvent({
-              actorId: session.user.id,
-              action: auditAction,
-              entityType: 'user',
-              entityId: userId,
-              details: {
-                email,
-                role,
-                status,
-              },
-            });
-          } catch (advisoryErr) {
-            console.error('Per-row advisory audit log failed:', advisoryErr);
-          }
+          // Collect advisory payloads — dispatched post-commit (SQL styleguide §6.4)
+          emailPayloads.push({ email, name, token });
+          perRowAudits.push({
+            action: auditAction,
+            userId,
+            details: { email, role, status },
+          });
 
           created.push(rowIndex);
           results.push({ rowIndex, email, status });
@@ -204,28 +199,50 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
           throw err;
         }
       }
-
-      // Audit log (post-commit advisory — must not fail the request)
-      if (created.length > 0) {
-        try {
-          await logAuditEvent({
-            actorId: session.user.id,
-            action: 'user.bulk_created',
-            entityType: 'user',
-            entityId: session.user.id,
-            details: {
-              created: created.length,
-              skipped: skipped.length,
-              errors: errors.length,
-            },
-          });
-        } catch (advisoryErr) {
-          console.error('Post-commit advisory work failed in bulkCreateUsersHandler:', advisoryErr);
-        }
-      }
-
-      return { created: created.length, skipped: skipped.length, errors, results };
     });
+
+    // Post-commit advisory work (SQL styleguide §6.4 — must run AFTER the transaction commits)
+    for (const payload of emailPayloads) {
+      try {
+        await sendInvitationEmail(payload);
+      } catch {
+        // Email failure is non-fatal as per spec
+      }
+    }
+
+    for (const audit of perRowAudits) {
+      try {
+        await logAuditEvent({
+          actorId: session.user.id,
+          action: audit.action,
+          entityType: 'user',
+          entityId: audit.userId,
+          details: audit.details,
+        });
+      } catch (advisoryErr) {
+        console.error('Per-row advisory audit log failed:', advisoryErr);
+      }
+    }
+
+    if (created.length > 0) {
+      try {
+        await logAuditEvent({
+          actorId: session.user.id,
+          action: 'user.bulk_created',
+          entityType: 'user',
+          entityId: session.user.id,
+          details: {
+            created: created.length,
+            skipped: skipped.length,
+            errors: errors.length,
+          },
+        });
+      } catch (advisoryErr) {
+        console.error('Post-commit advisory work failed in bulkCreateUsersHandler:', advisoryErr);
+      }
+    }
+
+    return { created: created.length, skipped: skipped.length, errors, results };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

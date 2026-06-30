@@ -59,7 +59,8 @@ export async function openForReviewHandler(args: { data: OpenForReviewInput }) {
 
     // 2. Validates checkpoint is in submitted state
     if (submission.checkpointState !== 'submitted') {
-      const message = translateKey('instructorReviews.errors.notInSubmittedState', 'en');
+      const locale = (session.user.locale || 'en') as 'en' | 'id';
+      const message = translateKey('instructorReviews.errors.notInSubmittedState', locale);
       return serverError(ErrorCode.BAD_REQUEST, message);
     }
 
