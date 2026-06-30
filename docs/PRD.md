@@ -123,7 +123,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Instructors review and mark as Pass or Revise with comments.
 - Instructors can attach feedback files to reviews.
 - Late submissions are controlled: overdue checkpoints lock automatically; instructors can unlock them.
-- **SLA & Escalation (Addressing the Instructor Bottleneck):** To ensure students aren't unfairly blocked, if an instructor does not review a submission within a defined SLA (e.g., 3 days), an automated escalation alert is sent to the Admin, and the student's subsequent deadlines are **automatically extended by the number of days the review was delayed** (breach duration is added to affected deadlines).
+- **SLA & Escalation (Addressing the Instructor Bottleneck):** To ensure students aren't unfairly blocked, if an instructor does not review a submission within a defined SLA (e.g., 3 days), an automated escalation alert is sent to the Admin, and the student's subsequent deadlines are **automatically extended by the number of days the review was delayed** (breach duration is added to affected deadlines). The SLA timer is anchored at `submissions.uploadedAt` (when the student uploaded), ensuring the breach duration reflects the actual delay the student experienced.
 - **Deadline Extension Workflow**
   - **Student-Initiated:** Students can request deadline extensions via an approval workflow with reason categories (Personal, Research, Health, Other) and a proposed duration (1–30 days). Instructors approve or reject with optional comment.
   - **Instructor-Initiated:** Instructors can directly extend deadlines for one or all checkpoints without student request. Bulk extension applies +N days to all remaining checkpoints for a student.
@@ -178,13 +178,15 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Files are accessible within assignment and submission context.
 - Previously submitted files can be downloaded at any time.
 - Role-based access control with audit trails.
+- **Upload-intent trust boundary:** When a client requests a presigned upload URL, the server creates an `upload_intents` record binding the generated file key to the requesting user, the target checkpoint, the upload purpose (`submission` or `review_feedback`), and an expiry. At submit time, the server verifies the intent (ownership, purpose, expiry, single-use) and performs an R2 `HEAD` request to confirm the actual file size — the client-reported size is never trusted. This prevents cross-user file hijacking, fabricated file keys, and size spoofing.
 
 ### User Management (Admin / SuperAdmin)
 
 - User CRUD with filtering and bulk operations.
 - Role assignment: SuperAdmin creates Admin; Admin creates Instructor and Student.
 - Email-based password setup on account creation.
-- **Bulk Import**: Admins can upload `.xlsx` files to create multiple users (columns: `name`, `email`, `role`) or assignment templates (columns: `templateName`, `type`, `checkpointName`, `minConsultations`, `estimatedDuration`). Client-side parsing via SheetJS provides a preview table with validation badges. Server re-validates all rows (role permissions, email uniqueness excluding soft-deleted users, row/size limits). Partial success is supported — invalid rows are skipped with per-row error reasons. Template groups are inserted atomically per group via `db.transaction()`. All actions are audit-logged. Bilingual (EN/ID) throughout. Limits: 500 rows / 5 MB per file.
+- **Restore-on-soft-deleted:** When an admin creates or bulk-imports a user whose email matches a soft-deleted account, the existing account is restored (`deletedAt` cleared, name/role updated) and a new invitation email is sent — rather than rejecting the duplicate. This ensures soft-deleted users can be re-invited without manual database intervention.
+- **Bulk Import**: Admins can upload `.xlsx` files to create multiple users (columns: `name`, `email`, `role`) or assignment templates (columns: `templateName`, `type`, `checkpointName`, `minConsultations`, `estimatedDuration`). Client-side parsing via SheetJS provides a preview table with validation badges. Server re-validates all rows (role permissions, email uniqueness with restore-on-soft-deleted, row/size limits). Partial success is supported — invalid rows are skipped with per-row error reasons. User rows are inserted via nested savepoints (`SAVEPOINT` per row) within a single outer transaction: duplicate-email conflicts (PostgreSQL `23505`) are caught per-row and skipped without aborting the batch; non-duplicate errors roll back the entire batch. Invitation emails and audit events are dispatched **after** the transaction commits (post-commit advisory work). Template groups are inserted atomically per group via `db.transaction()`. All actions are audit-logged. Bilingual (EN/ID) throughout. Limits: 500 rows / 5 MB per file.
 
 ---
 

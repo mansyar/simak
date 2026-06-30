@@ -486,6 +486,23 @@ Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for t
 | errorMessage   | text               | NULLABLE — last failure reason                                  |
 | createdAt      | timestamp          | DEFAULT NOW()                                                   |
 
+#### upload_intents
+
+| Column        | Type                          | Notes                                                                                          |
+| ------------- | ----------------------------- | ---------------------------------------------------------------------------------------------- |
+| fileKey       | text, not null, unique        | R2 object key (UUID-based) — bound to this intent at presign time                               |
+| userId        | text (FK → users)             | User who requested the presigned URL                                                           |
+| purpose       | upload_purpose enum, not null | `submission` \| `review_feedback`                                                              |
+| checkpointId  | integer (FK → checkpoints)    | NULLABLE — target checkpoint for submission uploads; null for review feedback                  |
+| fileName      | text                          | NULLABLE — client-reported original filename (not trusted at submit)                           |
+| fileSize      | integer                       | NULLABLE — client-reported size in bytes (not trusted at submit; verified via R2 HEAD request) |
+| contentType   | text, not null                | MIME type validated at presign time                                                             |
+| expiresAt     | timestamp, not null           | Intent validity window (presigned URL TTL)                                                     |
+| consumedAt    | timestamp                     | NULLABLE — set when the intent is verified and consumed at submit time (single-use enforcement) |
+| createdAt     | timestamp                     | DEFAULT NOW()                                                                                  |
+
+> **Trust boundary (Track: Audit HIGH-Remediation H1):** Presigned upload URLs are never issued without a corresponding `upload_intents` row. At submit time, the handler verifies the intent exists, belongs to the requesting user, matches the expected purpose and checkpoint, has not expired, and has not already been consumed. The server then issues an R2 `HeadObjectCommand` to read the actual `ContentLength` — the client-reported `fileSize` is never trusted. This prevents cross-user file hijacking, fabricated file keys, and size spoofing.
+
 ### Database Indexes
 
 | Table                | Column(s)                | Type             | Purpose                                      |
@@ -503,6 +520,8 @@ Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for t
 | `audit_log`          | `entityType`, `entityId` | composite b-tree | Entity-specific history                      |
 | `extension_requests` | `assignmentId`, `status` | composite b-tree | Instructor queue queries                     |
 | `email_queue`        | `status`                 | b-tree           | Pick pending emails for delivery             |
+| `upload_intents`     | `fileKey`                | b-tree (unique)  | Intent lookup at submit time                 |
+| `upload_intents`     | `userId`                 | b-tree           | User's pending upload intents                 |
 
 All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migration generated with `drizzle-kit generate`.
 
@@ -570,6 +589,7 @@ Admin       (creates Instructors and Students)
 - Password setup links expire after 1 hour.
 - Tokens are single-use.
 - Resend handles all transactional email delivery.
+- **Restore-on-soft-deleted:** When creating a user whose email matches a soft-deleted account (Admin single-create via `createUserHandler` or bulk import via `bulkCreateUsersHandler`), the existing account is restored — `deletedAt` cleared, name/role updated — and a new invitation email is sent, rather than rejecting the duplicate.
 
 ### Session & Access Control [v1]
 
@@ -600,9 +620,9 @@ Admin       (creates Instructors and Students)
 
 ```
 1. Client selects file
-2. Client calls server function → generates short-lived presigned PUT URL
+2. Client calls server function → creates upload_intents record (binds fileKey, userId, purpose, checkpointId, expiry), generates short-lived presigned PUT URL
 3. Client uploads file directly to R2 via the presigned URL
-4. Client calls server function → records file metadata in PostgreSQL
+4. Client calls server function → verifies intent (ownership, purpose, expiry, single-use), performs R2 HEAD for actual file size, records file metadata + consumes intent in PostgreSQL
 5. UI confirms upload complete
 ```
 
@@ -613,6 +633,7 @@ Admin       (creates Instructors and Students)
 | **Accepted formats** | `.docx` and `.pdf` only. Enforced client-side (accept attribute) and server-side (MIME check).                                                                                                                     |
 | **File naming**      | UUID-based keys in R2 (e.g. `submissions/{uuid}.pdf`). Original name stored in DB.                                                                                                                                 |
 | **Presigned URLs**   | 5 minutes for upload, 1 hour for download.                                                                                                                                                                         |
+| **Size verification**| Server-side via R2 `HEAD` request at submit time. Client-reported size is never trusted (Track: Audit HIGH-Remediation H1).                                                                                         |
 | **Versioning**       | Version increments by 1 each time a student resubmits after a REVISE decision. Initial submission is version 1.                                                                                                    |
 | **Preview**          | PDF: in-browser via blob URL. [v2: use range requests to fetch only the first few pages for thumbnail preview instead of downloading the full 25MB file.] DOCX: metadata display only (name, size, date, version). |
 | **Permissions**      | Students see own submissions; instructors see all for their assignments; admins see all.                                                                                                                           |
@@ -658,6 +679,7 @@ A checkpoint unlocks when:
 - Instructors have a 3-day SLA to review submissions from the time they transition to `UNDER_REVIEW`.
 - If the SLA is breached, an `sla_breach` in-app notification is sent to the Admin.
 - The SLA is advisory (non-blocking) — Admin can follow up with the instructor. No automatic action is taken beyond the alert and the automatic deadline adjustment for the student (see Overdue Behavior above).
+- The SLA timer is anchored at `submissions.uploadedAt` (when the student uploaded the file), not `reviews.reviewedAt` — ensuring the breach duration reflects the actual delay the student experienced.
 
 ---
 
