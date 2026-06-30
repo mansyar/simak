@@ -39,12 +39,12 @@
     - [x] Run tests; confirm they fail
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Implement submit intent verification + HEAD size check (Green)
-    - [ ] `submitCheckpointHandler`: `SELECT…FOR UPDATE WHERE fileKey=? AND userId=? AND consumedAt IS NULL AND expiresAt>now`; verify checkpointId/purpose; set `consumedAt=now`; reject if none
-    - [ ] `submitReviewHandler`: same verification for `feedbackFileKey` (purpose='review_feedback')
-    - [ ] R2 HEAD `Content-Length` enforcement (25MB max); intent `fileSize` audit-only (no cross-validation)
-    - [ ] Run tests; confirm pass; verify >80% coverage
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Implement submit intent verification + HEAD size check (Green) [bbfc382]
+    - [x] `submitCheckpointHandler`: `SELECT…FOR UPDATE WHERE fileKey=? AND userId=? AND consumedAt IS NULL AND expiresAt>now`; verify checkpointId/purpose; set `consumedAt=now`; reject if none
+    - [x] `submitReviewHandler`: same verification for `feedbackFileKey` (purpose='review_feedback')
+    - [x] R2 HEAD `Content-Length` enforcement (25MB max); intent `fileSize` audit-only (no cross-validation)
+    - [x] Run tests; confirm pass; verify >80% coverage
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Write opt-in integration test (AC-H1-5)
     - [ ] Add `tests/integration/server/submissions-intent.test.ts` proving fabricated-key rejection end-to-end (mock R2, real DB tx)
