@@ -53,7 +53,7 @@
 
 - [ ] Task: Conductor - User Manual Verification 'H1 — Upload-intent trust boundary' (Protocol in workflow.md)
 
-## Phase 2: H2 — SLA anchored at submission time (+ L1)
+## Phase 2: H2 — SLA anchored at submission time (+ L1) [checkpoint: 22ddb56]
 
 - [x] Task: Review spec.md and workflow.md before beginning work
     - [x] Read `./spec.md` — confirm scope, acceptance criteria, out-of-scope items for this phase
@@ -86,7 +86,7 @@
     - [x] Run test; confirm pass; `pnpm check:i18n` parity OK
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'H2 — SLA anchored at submission time' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'H2 — SLA anchored at submission time' (Protocol in workflow.md) [22ddb56]
 
 ## Phase 3: H3 — Bulk import + single-create restore-on-soft-deleted
 
