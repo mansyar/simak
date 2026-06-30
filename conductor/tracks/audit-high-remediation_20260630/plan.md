@@ -70,10 +70,10 @@
     - [x] Run tests; confirm they fail
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Implement `underReviewAt = submission.uploadedAt` (Green)
-    - [ ] Update `reviews.server.ts` SLA anchor (replace state-conditional `checkpointUpdatedAt`/`now`)
-    - [ ] Run tests; confirm pass; verify >80% coverage
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Implement `underReviewAt = submission.uploadedAt` (Green) [1ef468e]
+    - [x] Update `reviews.server.ts` SLA anchor (replace state-conditional `checkpointUpdatedAt`/`now`)
+    - [x] Run tests; confirm pass; verify >80% coverage
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Write failing test for L1 openForReview error message (Red)
     - [ ] AC-H2-2: `openForReview` on a non-submitted checkpoint returns an accurate message (not "submittable state")
