@@ -259,6 +259,7 @@ export type Translation = {
     backToQueue: string
     errors: {
       feedbackUploadFailed: string
+      notInSubmittedState: string
     }
     reviewDateLabel: string
   }

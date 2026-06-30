@@ -253,7 +253,8 @@
     "reviewSubmitted": "Review berhasil dikirim!",
     "backToQueue": "Kembali ke Antrean Review",
     "errors": {
-      "feedbackUploadFailed": "Gagal mengunggah file umpan balik"
+      "feedbackUploadFailed": "Gagal mengunggah file umpan balik",
+      "notInSubmittedState": "Checkpoint harus berstatus diserahkan untuk dibuka peninjauannya"
     },
     "reviewDateLabel": "Direview pada {date}"
   },

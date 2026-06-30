@@ -34,6 +34,8 @@ const DYNAMIC_KEY_PATTERNS = [
   /^nav\.settings$/,
   // Email subjects are resolved server-side via resolveEmailSubject
   /^emails\.subjects\./,
+  // Server-side error messages resolved via translateKey
+  /^instructorReviews\.errors\.notInSubmittedState$/,
 ];
 
 function isDynamicKey(key) {

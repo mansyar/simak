@@ -253,7 +253,8 @@
     "reviewSubmitted": "Review submitted successfully!",
     "backToQueue": "Back to Review Queue",
     "errors": {
-      "feedbackUploadFailed": "Failed to upload feedback file"
+      "feedbackUploadFailed": "Failed to upload feedback file",
+      "notInSubmittedState": "Checkpoint must be in submitted state to open for review"
     },
     "reviewDateLabel": "Reviewed on {date}"
   },

@@ -7,6 +7,7 @@ import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { verifyCheckpointAccess } from './ownership';
 import { serverError, ErrorCode } from '../lib/errors';
+import { translateKey } from '../lib/i18n-server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type { OpenForReviewSchema, GetLatestReviewSchema } from './reviews';
@@ -58,7 +59,8 @@ export async function openForReviewHandler(args: { data: OpenForReviewInput }) {
 
     // 2. Validates checkpoint is in submitted state
     if (submission.checkpointState !== 'submitted') {
-      return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in submittable state');
+      const message = translateKey('instructorReviews.errors.notInSubmittedState', 'en');
+      return serverError(ErrorCode.BAD_REQUEST, message);
     }
 
     // 3. Transition to under_review
