@@ -158,6 +158,30 @@ describe('submitCheckpointHandler - upload intent verification', () => {
     expect(result.error.message).toBe('Invalid or expired upload intent');
   });
 
+  it('AC-H1-2: rejects an intent issued for a different user', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+    mockTx.enqueue(
+      [{ id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' }], // checkpoint
+      [
+        {
+          fileKey: 'submissions/uuid-123.pdf',
+          userId: 'student-2',
+          purpose: 'submission',
+          checkpointId: 1,
+          consumedAt: null,
+        },
+      ], // intent: wrong user
+    );
+
+    const result = await submitCheckpointHandler({ data: baseSubmitData });
+
+    expect(isServerError(result)).toBe(true);
+    if (!isServerError(result)) throw new Error('Expected server error');
+    expect(result.error.code).toBe('BAD_REQUEST');
+    expect(result.error.message).toBe('Invalid or expired upload intent');
+  });
+
   it('AC-H1-3: accepts a valid intent, consumes it, and rejects a second submit', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
@@ -173,6 +197,7 @@ describe('submitCheckpointHandler - upload intent verification', () => {
           consumedAt: null,
         },
       ], // intent valid
+      [], // consume intent
       [{ maxVersion: 0 }], // version
       [{ id: 42 }], // insert submission
       [], // update checkpoint

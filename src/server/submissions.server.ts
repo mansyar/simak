@@ -1,13 +1,13 @@
 // Server-only handlers (not imported by client code)
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, desc, sql, gt, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints, assignmentStudents } from '../db/schema/assignments';
 import { notifications } from '../db/schema/notifications';
-import { submissions } from '../db/schema/submissions';
+import { submissions, uploadIntents } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
-import { generatePresignedDownloadUrl } from '../lib/storage';
-import { validateUploadSize, validateUploadFileName } from '../lib/file-validation';
+import { generatePresignedDownloadUrl, getObjectContentLength } from '../lib/storage';
+import { MAX_FILE_SIZE, validateUploadFileName } from '../lib/file-validation';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import { getNotificationKeys } from './notifications.server';
@@ -77,14 +77,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
         return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in a submittable state');
       }
 
-      // 1b. Validate file size and type server-side (TDD §5: 25MB max, .docx/.pdf only)
-      const sizeCheck = validateUploadSize(fileSize);
-      if (!sizeCheck.valid) {
-        return serverError(
-          ErrorCode.BAD_REQUEST,
-          typeof sizeCheck.error === 'string' ? sizeCheck.error : String(sizeCheck.error),
-        );
-      }
+      // 1b. Validate file type server-side (TDD §5: .docx/.pdf only)
       const nameCheck = validateUploadFileName(fileName);
       if (!nameCheck.valid) {
         return serverError(
@@ -114,6 +107,44 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
           );
         }
       }
+
+      // 1d. Verify and consume upload intent (H1 trust boundary).
+      const now = new Date();
+      const [intent] = await tx
+        .select()
+        .from(uploadIntents)
+        .where(
+          and(
+            eq(uploadIntents.fileKey, fileKey),
+            eq(uploadIntents.userId, session.user.id),
+            eq(uploadIntents.purpose, 'submission'),
+            eq(uploadIntents.checkpointId, checkpointId),
+            isNull(uploadIntents.consumedAt),
+            gt(uploadIntents.expiresAt, now),
+          ),
+        )
+        .limit(1)
+        .for('update');
+
+      if (
+        !intent ||
+        intent.userId !== session.user.id ||
+        intent.purpose !== 'submission' ||
+        intent.checkpointId !== checkpointId
+      ) {
+        return serverError(ErrorCode.BAD_REQUEST, 'Invalid or expired upload intent');
+      }
+
+      // 1e. R2 HEAD is the single size authority for the 25MB cap.
+      const actualSize = await getObjectContentLength({ key: fileKey });
+      if (actualSize === null || actualSize > MAX_FILE_SIZE) {
+        return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
+      }
+
+      await tx
+        .update(uploadIntents)
+        .set({ consumedAt: now })
+        .where(eq(uploadIntents.fileKey, fileKey));
 
       // 2. Calculate next version number
       const [versionResult] = await tx

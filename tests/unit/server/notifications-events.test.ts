@@ -18,6 +18,7 @@ vi.mock('@/lib/storage', () => ({
   generatePresignedUploadUrl: vi.fn().mockResolvedValue('https://presigned-upload.test/url'),
   generatePresignedDownloadUrl: vi.fn().mockResolvedValue('https://presigned-download.test/url'),
   getR2Client: vi.fn().mockReturnValue({}),
+  getObjectContentLength: vi.fn().mockResolvedValue(1024),
 }));
 
 describe('Event trigger notifications', () => {
@@ -42,6 +43,7 @@ describe('Event trigger notifications', () => {
       orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
       returning: vi.fn().mockReturnThis(),
@@ -87,6 +89,24 @@ describe('Event trigger notifications', () => {
               minConsultations: 0,
             },
           ]).then(onfulfilled),
+        );
+
+        // Upload intent lookup
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              fileKey: 'submissions/uuid-1.pdf',
+              userId: 'student-1',
+              purpose: 'submission',
+              checkpointId: 100,
+              consumedAt: null,
+            },
+          ]).then(onfulfilled),
+        );
+
+        // Consume intent
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([]).then(onfulfilled),
         );
 
         // Version count query

@@ -30,6 +30,7 @@ vi.mock('@/lib/storage', () => ({
   generatePresignedUploadUrl: vi.fn().mockResolvedValue('https://presigned-upload.test/url'),
   generatePresignedDownloadUrl: vi.fn().mockResolvedValue('https://presigned-download.test/url'),
   getR2Client: vi.fn().mockReturnValue({}),
+  getObjectContentLength: vi.fn().mockResolvedValue(1024),
 }));
 
 describe('submitCheckpointHandler — transactions & metadata', () => {
@@ -46,6 +47,22 @@ describe('submitCheckpointHandler — transactions & metadata', () => {
     fileSize: 1024,
   };
 
+  const validIntentRow = {
+    fileKey: 'submissions/uuid-123.pdf',
+    userId: 'student-1',
+    purpose: 'submission',
+    checkpointId: 1,
+    consumedAt: null,
+  };
+
+  function enqueueIntentSuccess(db: any) {
+    db.then
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([validIntentRow]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+  }
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockDb = {
@@ -56,6 +73,7 @@ describe('submitCheckpointHandler — transactions & metadata', () => {
       limit: vi.fn().mockReturnThis(),
       offset: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
       returning: vi.fn().mockReturnThis(),
@@ -74,13 +92,14 @@ describe('submitCheckpointHandler — transactions & metadata', () => {
   it('should wrap all writes inside db.transaction using tx', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
-    mockDb.then
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
-        ]).then(onfulfilled),
-      )
-      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([
+        { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
+      ]).then(onfulfilled),
+    );
+
+    enqueueIntentSuccess(mockDb);
+    mockDb.then.mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
     await submitCheckpointHandler({ data: submitData });
 
@@ -96,12 +115,14 @@ describe('submitCheckpointHandler — transactions & metadata', () => {
       then: (onfulfilled: any) => Promise.resolve([{ id: 42 }]).then(onfulfilled),
     });
 
+    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([
+        { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
+      ]).then(onfulfilled),
+    );
+
+    enqueueIntentSuccess(mockDb);
     mockDb.then
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
-        ]).then(onfulfilled),
-      )
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) =>
@@ -128,12 +149,14 @@ describe('submitCheckpointHandler — transactions & metadata', () => {
       then: (onfulfilled: any) => Promise.resolve([{ id: 99 }]).then(onfulfilled),
     });
 
+    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([
+        { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
+      ]).then(onfulfilled),
+    );
+
+    enqueueIntentSuccess(mockDb);
     mockDb.then
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
-        ]).then(onfulfilled),
-      )
       .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ maxVersion: 3 }]).then(onfulfilled),
       )
@@ -160,12 +183,14 @@ describe('submitCheckpointHandler — transactions & metadata', () => {
       then: (onfulfilled: any) => Promise.resolve([{ id: 77 }]).then(onfulfilled),
     });
 
+    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([
+        { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
+      ]).then(onfulfilled),
+    );
+
+    enqueueIntentSuccess(mockDb);
     mockDb.then
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
-        ]).then(onfulfilled),
-      )
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) =>
@@ -187,12 +212,14 @@ describe('submitCheckpointHandler — transactions & metadata', () => {
       then: (onfulfilled: any) => Promise.resolve([{ id: 55 }]).then(onfulfilled),
     });
 
+    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([
+        { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
+      ]).then(onfulfilled),
+    );
+
+    enqueueIntentSuccess(mockDb);
     mockDb.then
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
-        ]).then(onfulfilled),
-      )
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) =>

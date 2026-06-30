@@ -1,15 +1,16 @@
 // Server-only handlers for review operations
-import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
+import { eq, and, desc, sql, inArray, isNull, gt } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
-import { submissions, reviews } from '../db/schema/submissions';
+import { submissions, reviews, uploadIntents } from '../db/schema/submissions';
 
 import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
-import { serverError, ErrorCode } from '../lib/errors';
-import { generatePresignedDownloadUrl } from '../lib/storage';
+import { serverError, ErrorCode, isServerError } from '../lib/errors';
+import { generatePresignedDownloadUrl, getObjectContentLength } from '../lib/storage';
+import { MAX_FILE_SIZE } from '../lib/file-validation';
 import { calculateBreachDuration } from '../lib/sla';
 import {
   adjustDeadlinesForBreach,
@@ -296,8 +297,47 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       finalDeadline: submission.finalDeadline,
     };
 
-    await db.transaction(async (tx) => {
-      // 4a. Insert review record
+    const txResult = await db.transaction(async (tx) => {
+      // 4a. Verify and consume upload intent for review feedback (H1 trust boundary).
+      if (feedbackFileKey) {
+        const now = new Date();
+        const [intent] = await tx
+          .select()
+          .from(uploadIntents)
+          .where(
+            and(
+              eq(uploadIntents.fileKey, feedbackFileKey),
+              eq(uploadIntents.userId, session.user.id),
+              eq(uploadIntents.purpose, 'review_feedback'),
+              isNull(uploadIntents.checkpointId),
+              isNull(uploadIntents.consumedAt),
+              gt(uploadIntents.expiresAt, now),
+            ),
+          )
+          .limit(1)
+          .for('update');
+
+        if (
+          !intent ||
+          intent.userId !== session.user.id ||
+          intent.purpose !== 'review_feedback' ||
+          intent.checkpointId !== null
+        ) {
+          return serverError(ErrorCode.BAD_REQUEST, 'Invalid or expired upload intent');
+        }
+
+        const actualSize = await getObjectContentLength({ key: feedbackFileKey });
+        if (actualSize === null || actualSize > MAX_FILE_SIZE) {
+          return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
+        }
+
+        await tx
+          .update(uploadIntents)
+          .set({ consumedAt: now })
+          .where(eq(uploadIntents.fileKey, feedbackFileKey));
+      }
+
+      // 4b. Insert review record
       await tx.insert(reviews).values({
         submissionId,
         instructorId: session.user.id,
@@ -398,7 +438,13 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           },
         });
       }
+
+      return { success: true };
     });
+
+    if (isServerError(txResult)) {
+      return txResult;
+    }
 
     // 4g. Audit logging (post-commit advisory — must not fail the request)
     try {

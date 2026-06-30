@@ -30,6 +30,7 @@ vi.mock('@/lib/storage', () => ({
   generatePresignedUploadUrl: vi.fn().mockResolvedValue('https://presigned-upload.test/url'),
   generatePresignedDownloadUrl: vi.fn().mockResolvedValue('https://presigned-download.test/url'),
   getR2Client: vi.fn().mockReturnValue({}),
+  getObjectContentLength: vi.fn().mockResolvedValue(1024),
 }));
 
 describe('Submission server functions - Logic & Security', () => {
@@ -43,6 +44,22 @@ describe('Submission server functions - Logic & Security', () => {
     session: {} as any,
   };
 
+  const validIntentRow = {
+    fileKey: 'submissions/uuid-123.pdf',
+    userId: 'student-1',
+    purpose: 'submission',
+    checkpointId: 1,
+    consumedAt: null,
+  };
+
+  function enqueueIntentSuccess(db: any) {
+    db.then
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([validIntentRow]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+  }
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockDb = {
@@ -53,6 +70,7 @@ describe('Submission server functions - Logic & Security', () => {
       limit: vi.fn().mockReturnThis(),
       offset: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
       returning: vi.fn().mockReturnThis(),
@@ -124,20 +142,21 @@ describe('Submission server functions - Logic & Security', () => {
         then: (onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled),
       });
 
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              id: 1,
-              assignmentId: 101,
-              studentId: 'student-1',
-              state: 'unlocked',
-            },
-          ]).then(onfulfilled),
-        )
-        .mockImplementationOnce(
-          (onfulfilled: any) => Promise.resolve([]).then(onfulfilled), // No previous submissions → version 1
-        );
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          {
+            id: 1,
+            assignmentId: 101,
+            studentId: 'student-1',
+            state: 'unlocked',
+          },
+        ]).then(onfulfilled),
+      );
+
+      enqueueIntentSuccess(mockDb);
+      mockDb.then.mockImplementationOnce(
+        (onfulfilled: any) => Promise.resolve([]).then(onfulfilled), // No previous submissions → version 1
+      );
 
       const result = await submitCheckpointHandler({ data: submitData });
       expect(result).toEqual({ success: true });
@@ -180,6 +199,11 @@ describe('Submission server functions - Logic & Security', () => {
           },
         ]).then(onfulfilled),
       );
+
+      enqueueIntentSuccess(mockDb);
+
+      const { getObjectContentLength } = await import('@/lib/storage');
+      vi.mocked(getObjectContentLength).mockResolvedValueOnce(25 * 1024 * 1024 + 1);
 
       const result = await submitCheckpointHandler({
         data: {
@@ -226,20 +250,21 @@ describe('Submission server functions - Logic & Security', () => {
         then: (onfulfilled: any) => Promise.resolve([{ id: 2 }]).then(onfulfilled),
       });
 
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              id: 1,
-              assignmentId: 101,
-              studentId: 'student-1',
-              state: 'revise',
-            },
-          ]).then(onfulfilled),
-        )
-        .mockImplementationOnce(
-          (onfulfilled: any) => Promise.resolve([]).then(onfulfilled), // No previous submissions
-        );
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          {
+            id: 1,
+            assignmentId: 101,
+            studentId: 'student-1',
+            state: 'revise',
+          },
+        ]).then(onfulfilled),
+      );
+
+      enqueueIntentSuccess(mockDb);
+      mockDb.then.mockImplementationOnce(
+        (onfulfilled: any) => Promise.resolve([]).then(onfulfilled), // No previous submissions
+      );
 
       const result = await submitCheckpointHandler({ data: submitData });
       expect(result).toEqual({ success: true });
@@ -350,7 +375,10 @@ describe('Submission server functions - Logic & Security', () => {
         // Consultation count query returns 3 verified (>= 2)
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ count: 3 }]).then(onfulfilled),
-        )
+        );
+
+      enqueueIntentSuccess(mockDb);
+      mockDb.then
         // Version query
         .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
@@ -365,12 +393,14 @@ describe('Submission server functions - Logic & Security', () => {
         then: (onfulfilled: any) => Promise.resolve([{ id: 123 }]).then(onfulfilled),
       });
 
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
+        ]).then(onfulfilled),
+      );
+
+      enqueueIntentSuccess(mockDb);
       mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
-          ]).then(onfulfilled),
-        )
         .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
         .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
         .mockImplementationOnce((onfulfilled: any) =>
@@ -402,13 +432,16 @@ describe('Submission server functions - Logic & Security', () => {
         then: (onfulfilled: any) => Promise.resolve([{ id: 42 }]).then(onfulfilled),
       });
 
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
-          ]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' },
+        ]).then(onfulfilled),
+      );
+
+      enqueueIntentSuccess(mockDb);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
 
       const result = await submitCheckpointHandler({ data: submitData });
 

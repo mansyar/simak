@@ -108,6 +108,7 @@ describe('submitReviewHandler - upload intent verification', () => {
     vi.clearAllMocks();
     mockTx = new MockTx();
     mockDb = {
+      select: () => mockTx.select(),
       transaction: vi.fn((callback: (tx: MockTx) => Promise<unknown>) => callback(mockTx)),
     } as any;
     vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
@@ -119,6 +120,7 @@ describe('submitReviewHandler - upload intent verification', () => {
 
     // Outer submission select.
     mockTx.enqueue([createSubmissionRow('under_review')]);
+    mockTx.enqueue([]); // intent: none
 
     const result = await submitReviewHandler({ data: baseReviewData });
 
@@ -164,6 +166,7 @@ describe('submitReviewHandler - upload intent verification', () => {
         consumedAt: null,
       },
     ]);
+    mockTx.enqueue([]); // consume intent
     mockTx.enqueue([]); // insert reviews
     mockTx.enqueue([]); // update checkpoint
     mockTx.enqueue([{ id: 101 }]); // next checkpoint
@@ -176,6 +179,7 @@ describe('submitReviewHandler - upload intent verification', () => {
     // Second review with same feedback fileKey fails.
     mockTx = new MockTx();
     vi.mocked(dbMod.getDb).mockReturnValue({
+      select: () => mockTx.select(),
       transaction: vi.fn((callback: (tx: MockTx) => Promise<unknown>) => callback(mockTx)),
     } as any);
     mockTx.enqueue([createSubmissionRow('under_review')]);
