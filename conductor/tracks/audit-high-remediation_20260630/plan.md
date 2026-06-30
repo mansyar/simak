@@ -80,11 +80,11 @@
     - [x] Run test; confirm it fails
     - [x] Commit, attach git note, mark task [x] in plan.md
 
-- [~] Task: Implement L1 fix + i18n keys (Green)
-    - [~] Correct error message at `reviews-extras.server.ts:61`
-    - [~] Add i18n keys to `locales/en.json` + `locales/id.json`; run `pnpm generate:i18n`
-    - [~] Run test; confirm pass; `pnpm check:i18n` parity OK
-    - [ ] Commit, attach git note, mark task [x] in plan.md
+- [x] Task: Implement L1 fix + i18n keys (Green) [602944f]
+    - [x] Correct error message at `reviews-extras.server.ts:61`
+    - [x] Add i18n keys to `locales/en.json` + `locales/id.json`; run `pnpm generate:i18n`
+    - [x] Run test; confirm pass; `pnpm check:i18n` parity OK
+    - [x] Commit, attach git note, mark task [x] in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'H2 — SLA anchored at submission time' (Protocol in workflow.md)
 
