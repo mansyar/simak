@@ -5,6 +5,7 @@ import {
   openForReviewHandler,
   submitReviewHandler,
 } from '@/server/reviews.server';
+import { adjustDeadlinesForBreach, dispatchSLABreachNotifications } from '@/lib/review-sla';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 
@@ -14,6 +15,11 @@ vi.mock('@/server/auth', () => ({
 
 vi.mock('@/db/index', () => ({
   getDb: vi.fn(),
+}));
+
+vi.mock('@/lib/review-sla', () => ({
+  adjustDeadlinesForBreach: vi.fn(),
+  dispatchSLABreachNotifications: vi.fn(),
 }));
 
 vi.mock('@/lib/storage', () => ({
@@ -309,40 +315,90 @@ describe('Review handlers - Logic & Security', () => {
       expect(mockDb.transaction).toHaveBeenCalled();
     });
 
-    it('should record a pass decision when reviewing directly from submitted state (no SLA breach)', async () => {
-      // Instructor reviews without calling openForReview first.
-      // SLA clock starts now → breachDays=0 → no false deadline extension.
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              checkpointId: 100,
-              checkpointState: 'submitted',
-              checkpointUpdatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
-              checkpointName: 'Chapter 1',
-              checkpointDueDate: new Date('2026-06-01'),
-              checkpointOrder: 1,
-              assignmentId: 1,
-              assignmentTitle: 'Thesis 2026',
-              instructorId: 'instructor-1',
-              studentId: 'student-1',
-              studentName: 'Alice',
-              finalDeadline: new Date('2026-08-01'),
-            },
-          ]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            { id: 100, order: 1, state: 'submitted' },
-            { id: 101, order: 2, state: 'locked' },
-          ]).then(onfulfilled),
-        );
-      const result = await submitReviewHandler({
-        data: { submissionId: 1, decision: 'pass', comment: 'Good' },
+    describe('SLA anchoring at submission time', () => {
+      const fiveDaysAgo = new Date('2026-06-10T12:00:00Z');
+
+      beforeEach(() => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2026-06-15T12:00:00Z'));
       });
-      expect(result).toEqual({ success: true });
-      expect(mockDb.transaction).toHaveBeenCalled();
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      it('should apply SLA breach from submission.uploadedAt when reviewing directly from submitted state', async () => {
+        vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+        mockDb.then
+          .mockImplementationOnce((onfulfilled: any) =>
+            Promise.resolve([
+              {
+                checkpointId: 100,
+                checkpointState: 'submitted',
+                uploadedAt: fiveDaysAgo,
+                checkpointUpdatedAt: new Date('2026-06-15T12:00:00Z'),
+                checkpointName: 'Chapter 1',
+                checkpointDueDate: new Date('2026-06-01'),
+                checkpointOrder: 1,
+                assignmentId: 1,
+                assignmentTitle: 'Thesis 2026',
+                instructorId: 'instructor-1',
+                studentId: 'student-1',
+                studentName: 'Alice',
+                finalDeadline: new Date('2026-08-01'),
+              },
+            ]).then(onfulfilled),
+          )
+          .mockImplementationOnce((onfulfilled: any) =>
+            Promise.resolve([
+              { id: 100, order: 1, state: 'submitted' },
+              { id: 101, order: 2, state: 'locked' },
+            ]).then(onfulfilled),
+          );
+        const result = await submitReviewHandler({
+          data: { submissionId: 1, decision: 'pass', comment: 'Good' },
+        });
+        expect(result).toEqual({ success: true });
+        expect(mockDb.transaction).toHaveBeenCalled();
+        expect(vi.mocked(adjustDeadlinesForBreach).mock.calls[0][2]).toBeGreaterThan(0);
+        expect(vi.mocked(dispatchSLABreachNotifications).mock.calls[0][2]).toBeGreaterThan(0);
+      });
+
+      it('should anchor SLA at submission.uploadedAt even when checkpoint is already under_review', async () => {
+        vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+        mockDb.then
+          .mockImplementationOnce((onfulfilled: any) =>
+            Promise.resolve([
+              {
+                checkpointId: 100,
+                checkpointState: 'under_review',
+                uploadedAt: fiveDaysAgo,
+                checkpointUpdatedAt: new Date('2026-06-15T12:00:00Z'),
+                checkpointName: 'Chapter 1',
+                checkpointDueDate: new Date('2026-06-01'),
+                checkpointOrder: 1,
+                assignmentId: 1,
+                assignmentTitle: 'Thesis 2026',
+                instructorId: 'instructor-1',
+                studentId: 'student-1',
+                studentName: 'Alice',
+                finalDeadline: new Date('2026-08-01'),
+              },
+            ]).then(onfulfilled),
+          )
+          .mockImplementationOnce((onfulfilled: any) =>
+            Promise.resolve([
+              { id: 100, order: 1, state: 'under_review' },
+              { id: 101, order: 2, state: 'locked' },
+            ]).then(onfulfilled),
+          );
+        const result = await submitReviewHandler({
+          data: { submissionId: 1, decision: 'pass', comment: 'Good' },
+        });
+        expect(result).toEqual({ success: true });
+        expect(vi.mocked(adjustDeadlinesForBreach).mock.calls[0][2]).toBeGreaterThan(0);
+        expect(vi.mocked(dispatchSLABreachNotifications).mock.calls[0][2]).toBeGreaterThan(0);
+      });
     });
 
     it('should fail if decision is revise without deadline', async () => {
