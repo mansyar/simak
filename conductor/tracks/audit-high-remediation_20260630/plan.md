@@ -137,13 +137,13 @@
     - [x] Address any coverage gaps in changed modules
     - [ ] Commit, attach git note, mark task [x] in plan.md
 
-- [~] Task: Typecheck + lint + format
-    - [ ] `pnpm typecheck` passes
-    - [ ] `pnpm lint` (oxlint) clean
-    - [ ] `pnpm format` (oxfmt) applied to changed files
+- [x] Task: Typecheck + lint + format [21cbd5c]
+    - [x] `pnpm typecheck` passes
+    - [x] `pnpm lint` (oxlint) clean
+    - [x] `pnpm format` (oxfmt) applied to changed files
     - [ ] Commit, attach git note, mark task [x] in plan.md
 
-- [ ] Task: Integration tests + i18n parity
+- [~] Task: Integration tests + i18n parity
     - [ ] Run `pnpm test:integration` (H1 opt-in test passes)
     - [ ] `pnpm check:i18n` + `pnpm check:i18n:unused` clean
     - [ ] Commit, attach git note, mark task [x] in plan.md
