@@ -829,7 +829,18 @@
       "email": "Email",
       "role": "Peran",
       "importButton": "Impor {{count}} Pengguna",
-      "createdSkipped": "{{created}} dibuat, {{skipped}} dilewati."
+      "createdSkipped": "{{created}} dibuat, {{skipped}} dilewati.",
+      "errors": {
+        "rowLimit": "Melebihi batas maksimal {max} baris per impor",
+        "invalidRole": "Peran tidak valid",
+        "cannotCreateAdmin": "Admin tidak dapat membuat akun Admin lain",
+        "duplicateEmail": "Email sudah digunakan"
+      },
+      "status": {
+        "created": "Dibuat",
+        "restored": "Diaktifkan kembali",
+        "skipped": "Dilewati"
+      }
     },
     "templates": {
       "title": "Impor Massal Template",

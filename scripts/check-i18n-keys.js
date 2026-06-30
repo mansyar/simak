@@ -36,6 +36,9 @@ const DYNAMIC_KEY_PATTERNS = [
   /^emails\.subjects\./,
   // Server-side error messages resolved via translateKey
   /^instructorReviews\.errors\.notInSubmittedState$/,
+  // Bulk import result statuses and server-side skip reasons resolved via translateKey
+  /^bulkImport\.users\.errors\./,
+  /^bulkImport\.users\.status\./,
 ];
 
 function isDynamicKey(key) {

@@ -829,7 +829,18 @@
       "email": "Email",
       "role": "Role",
       "importButton": "Import {{count}} Users",
-      "createdSkipped": "{{created}} created, {{skipped}} skipped."
+      "createdSkipped": "{{created}} created, {{skipped}} skipped.",
+      "errors": {
+        "rowLimit": "Exceeds maximum of {max} rows per import",
+        "invalidRole": "Invalid role",
+        "cannotCreateAdmin": "Admins cannot create other Admin accounts",
+        "duplicateEmail": "Email already in use"
+      },
+      "status": {
+        "created": "Created",
+        "restored": "Restored",
+        "skipped": "Skipped"
+      }
     },
     "templates": {
       "title": "Bulk Import Templates",

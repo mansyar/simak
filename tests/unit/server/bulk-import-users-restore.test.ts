@@ -127,10 +127,10 @@ describe('Bulk user import handler — restore / skip behavior (H3)', () => {
   });
 
   it('should catch unique_violation per-row and continue the batch', async () => {
+    // Simulate a race: both rows report no existing user at select time, but the
+    // first insert collides with a concurrent commit and throws a unique violation.
     (innerDb.then as any)
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ id: 'active-user-2', deletedAt: null }]).then(onfulfilled),
-      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
     const uniqueViolationError = Object.assign(new Error('duplicate key value'), { code: '23505' });
@@ -150,6 +150,26 @@ describe('Bulk user import handler — restore / skip behavior (H3)', () => {
     expect(result.error).toBeUndefined();
     expect(result.results[0].status).toBe('skipped');
     expect(result.results[1].status).toBe('created');
+  });
+
+  it('should roll back the whole batch on a non-23505 per-row error', async () => {
+    (innerDb.then as any).mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([]).then(onfulfilled),
+    );
+
+    const fatalError = Object.assign(new Error('check constraint violation'), { code: '23514' });
+    innerDb.insert.mockImplementationOnce(() => {
+      throw fatalError;
+    });
+
+    const result = (await bulkCreateUsersHandler({
+      data: {
+        rows: [{ name: 'Bad User', email: 'bad@test.com', role: 'student' }],
+      },
+    })) as any;
+
+    expect(result.error).toBeDefined();
+    expect(result.error.code).toBe('INTERNAL');
   });
 
   it('should emit user.reactivated audit event on restore and user.created on new user', async () => {

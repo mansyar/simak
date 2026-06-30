@@ -1,10 +1,11 @@
 // Server-only helpers (not imported by client code)
-import { and, isNull, inArray } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import crypto from 'node:crypto';
 import { getDb } from '../db/index';
 import { users, verification, assignmentTemplates, templateCheckpoints } from '../db/schema/index';
 import { sendInvitationEmail } from '../lib/email';
 import { logAuditEvent } from '../lib/audit';
+import { translateKey, resolveEmailSubject } from '../lib/i18n-server';
 import { getSessionFromHeaders } from './auth';
 import { CREATION_ALLOWED_ROLES } from '../lib/role-permissions';
 import { serverError, ErrorCode } from '../lib/errors';
@@ -15,6 +16,15 @@ type BulkCreateUsersInput = z.infer<typeof BulkCreateUsersSchema>;
 type BulkCreateTemplatesInput = z.infer<typeof BulkCreateTemplatesSchema>;
 
 const BULK_USER_ROW_LIMIT = 500;
+
+type RowResult = {
+  rowIndex: number;
+  email: string;
+  status: 'created' | 'restored' | 'skipped';
+  reason?: string;
+};
+
+const DUPLICATE_EMAIL_CODE = 'DUPLICATE_EMAIL';
 
 export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput }) {
   const session = await getSessionFromHeaders();
@@ -29,44 +39,53 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
 
   const { rows } = args.data;
 
+  const locale = (session.user.locale || 'en') as 'en' | 'id';
+
   // Row-limit guard
   if (rows.length > BULK_USER_ROW_LIMIT) {
+    const reason = resolveEmailSubject('bulkImport.users.errors.rowLimit', {
+      max: String(BULK_USER_ROW_LIMIT),
+    });
     return {
       created: 0,
       skipped: rows.length,
-      errors: [
-        { row: 1, email: '', reason: `Exceeds maximum of ${BULK_USER_ROW_LIMIT} rows per import` },
-      ],
+      errors: [{ row: 1, email: '', reason: reason }],
+      results: rows.map((row, index) => ({
+        rowIndex: index + 1,
+        email: row.email,
+        status: 'skipped' as const,
+        reason: reason,
+      })),
     };
   }
 
   const db = getDb();
-  const created: number[] = [];
-  const skipped: number[] = [];
-  const errors: { row: number; email: string; reason: string }[] = [];
-
-  // Pre-filter rows by role before any DB writes
   const validRows: {
     rowIndex: number;
     name: string;
     email: string;
     role: string;
   }[] = [];
+  const results: RowResult[] = [];
+  const created: number[] = [];
+  const skipped: number[] = [];
+  const errors: { row: number; email: string; reason: string }[] = [];
+  const stagedEmails = new Set<string>();
+
+  // Pre-filter rows by role before any DB writes
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const rowIndex = i + 1;
 
     if (!allowedRoles.includes(row.role)) {
-      if (session.user.role === 'admin' && row.role === 'admin') {
-        errors.push({
-          row: rowIndex,
-          email: row.email,
-          reason: 'Admins cannot create other Admin accounts',
-        });
-      } else {
-        errors.push({ row: rowIndex, email: row.email, reason: 'Invalid role' });
-      }
+      const reasonKey =
+        session.user.role === 'admin' && row.role === 'admin'
+          ? 'bulkImport.users.errors.cannotCreateAdmin'
+          : 'bulkImport.users.errors.invalidRole';
+      const reason = translateKey(reasonKey, locale);
+      errors.push({ row: rowIndex, email: row.email, reason });
       skipped.push(rowIndex);
+      results.push({ rowIndex, email: row.email, status: 'skipped', reason });
       continue;
     }
 
@@ -74,113 +93,139 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
   }
 
   try {
-    // Batch email uniqueness check (excluding soft-deleted users per spec FR-1)
-    const existingEmails = new Set(
-      validRows.length > 0
-        ? await db
-            .select({ email: users.email })
-            .from(users)
-            .where(
-              and(
-                inArray(
-                  users.email,
-                  validRows.map((r) => r.email),
-                ),
-                isNull(users.deletedAt),
-              ),
-            )
-            .then((rows) => rows.map((r) => r.email))
-        : [],
-    );
+    return await db.transaction(async (outerTx) => {
+      for (const candidate of validRows) {
+        const { rowIndex, email, name, role } = candidate;
 
-    const usersToInsert: {
-      id: string;
-      name: string;
-      email: string;
-      role: 'admin' | 'instructor' | 'student';
-      locale: string;
-    }[] = [];
-    const verificationsToInsert: {
-      id: string;
-      identifier: string;
-      value: string;
-      expiresAt: Date;
-    }[] = [];
-    const emailPayloads: { email: string; name: string; token: string }[] = [];
-    const stagedEmails = new Set<string>();
+        if (stagedEmails.has(email)) {
+          const reason = translateKey('bulkImport.users.errors.duplicateEmail', locale);
+          errors.push({ row: rowIndex, email, reason });
+          skipped.push(rowIndex);
+          results.push({ rowIndex, email, status: 'skipped', reason });
+          continue;
+        }
 
-    for (const candidate of validRows) {
-      const { rowIndex, email, name, role } = candidate;
+        stagedEmails.add(email);
 
-      if (existingEmails.has(email) || stagedEmails.has(email)) {
-        errors.push({ row: rowIndex, email, reason: 'Email already in use' });
-        skipped.push(rowIndex);
-        continue;
+        let status: 'created' | 'restored' = 'created';
+        let auditAction: 'user.created' | 'user.reactivated' = 'user.created';
+        let userId = '';
+        let token = '';
+
+        try {
+          await outerTx.transaction(async (tx) => {
+            const existing = await tx
+              .select({ id: users.id, deletedAt: users.deletedAt })
+              .from(users)
+              .where(eq(users.email, email))
+              .limit(1)
+              .then((rows) => rows[0]);
+
+            if (existing) {
+              if (existing.deletedAt != null) {
+                userId = existing.id;
+                status = 'restored';
+                auditAction = 'user.reactivated';
+                await tx
+                  .update(users)
+                  .set({
+                    deletedAt: null,
+                    name,
+                    role: role as 'admin' | 'instructor' | 'student',
+                    updatedAt: new Date(),
+                  })
+                  .where(eq(users.id, existing.id));
+              } else {
+                const duplicateErr = Object.assign(
+                  new Error(translateKey('bulkImport.users.errors.duplicateEmail', locale)),
+                  {
+                    code: DUPLICATE_EMAIL_CODE,
+                  },
+                );
+                throw duplicateErr;
+              }
+            } else {
+              userId = crypto.randomUUID();
+              status = 'created';
+              auditAction = 'user.created';
+              await tx.insert(users).values({
+                id: userId,
+                name,
+                email,
+                role: role as 'admin' | 'instructor' | 'student',
+                locale: session.user.locale || 'en',
+              });
+            }
+
+            token = crypto.randomUUID();
+            const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+            await tx.insert(verification).values({
+              id: crypto.randomUUID(),
+              identifier: email,
+              value: token,
+              expiresAt,
+            });
+          });
+
+          try {
+            await sendInvitationEmail({ email, name, token });
+          } catch {
+            // Email failure is non-fatal as per spec
+          }
+
+          try {
+            await logAuditEvent({
+              actorId: session.user.id,
+              action: auditAction,
+              entityType: 'user',
+              entityId: userId,
+              details: {
+                email,
+                role,
+                status,
+              },
+            });
+          } catch (advisoryErr) {
+            console.error('Per-row advisory audit log failed:', advisoryErr);
+          }
+
+          created.push(rowIndex);
+          results.push({ rowIndex, email, status });
+        } catch (err) {
+          const code = err && typeof err === 'object' ? (err as { code?: string }).code : undefined;
+          if (code === '23505' || code === DUPLICATE_EMAIL_CODE) {
+            const reason = translateKey('bulkImport.users.errors.duplicateEmail', locale);
+            errors.push({ row: rowIndex, email, reason });
+            skipped.push(rowIndex);
+            results.push({ rowIndex, email, status: 'skipped', reason });
+            continue;
+          }
+          // Non-23505 errors abort the whole batch per FR-H3.1
+          throw err;
+        }
       }
 
-      // Create user
-      const userId = crypto.randomUUID();
-      const token = crypto.randomUUID();
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-      usersToInsert.push({
-        id: userId,
-        name,
-        email,
-        // Safe: role already passed the allowedRoles check
-        role: role as 'admin' | 'instructor' | 'student',
-        locale: session.user.locale || 'en',
-      });
-
-      verificationsToInsert.push({
-        id: crypto.randomUUID(),
-        identifier: email,
-        value: token,
-        expiresAt,
-      });
-
-      created.push(rowIndex);
-      emailPayloads.push({ email, name, token });
-      stagedEmails.add(email);
-    }
-
-    // Atomic batch insert of all valid users + verification tokens
-    if (usersToInsert.length > 0) {
-      await db.transaction(async (tx) => {
-        await tx.insert(users).values(usersToInsert);
-        await tx.insert(verification).values(verificationsToInsert);
-      });
-    }
-
-    // Enqueue invitation emails after the DB transaction commits (non-blocking)
-    for (const payload of emailPayloads) {
-      try {
-        await sendInvitationEmail(payload);
-      } catch {
-        // Email failure is non-fatal as per spec
+      // Audit log (post-commit advisory — must not fail the request)
+      if (created.length > 0) {
+        try {
+          await logAuditEvent({
+            actorId: session.user.id,
+            action: 'user.bulk_created',
+            entityType: 'user',
+            entityId: session.user.id,
+            details: {
+              created: created.length,
+              skipped: skipped.length,
+              errors: errors.length,
+            },
+          });
+        } catch (advisoryErr) {
+          console.error('Post-commit advisory work failed in bulkCreateUsersHandler:', advisoryErr);
+        }
       }
-    }
 
-    // Audit log (post-commit advisory — must not fail the request)
-    if (created.length > 0) {
-      try {
-        await logAuditEvent({
-          actorId: session.user.id,
-          action: 'user.bulk_created',
-          entityType: 'user',
-          entityId: session.user.id,
-          details: {
-            created: created.length,
-            skipped: skipped.length,
-            errors: errors.length,
-          },
-        });
-      } catch (advisoryErr) {
-        console.error('Post-commit advisory work failed in bulkCreateUsersHandler:', advisoryErr);
-      }
-    }
-
-    return { created: created.length, skipped: skipped.length, errors };
+      return { created: created.length, skipped: skipped.length, errors, results };
+    });
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
