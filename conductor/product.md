@@ -274,4 +274,13 @@ Students and instructors lack a centralized system to:
 - **Dead i18n key cleanup** — Removed 69 unused locale keys and added `pnpm check:i18n:unused` to the pre-push gate.
 - **Client fetch error handling** — Replaced silent `console.error` catch blocks with `toast.error(t('errors.fetchFailed'))` for user-visible fetch-failure diagnostics.
 
+### Track 9: Audit HIGH-Remediation (H1, H2, H3 + L1) (June 2026)
+
+- **Upload-intent deduplication** — New `upload_intents` table records `(userId, checkpointId, fileType)` with `usedAt` to prevent duplicate presigned-URL abuse; schema migration with unique partial index excluding used rows; `getPresignedUploadUrlHandler` inserts/returns the existing unused intent or creates a new one; integration test verifies concurrent callers cannot obtain two active intents.
+- **SLA anchoring fix** — `submitReview` `underReviewAt` is now anchored to `submissions.uploadedAt` so breach calculation is consistent across checkpoint state transitions and preserves deadline-extension semantics.
+- **Review state error accuracy** — `openForReview` rejection now returns `instructorReviews.errors.notInSubmittedState` via server-side i18n translation instead of a stale hardcoded `'submittable state'` message.
+- **Soft-delete restore on user creation** — Bulk import and single `createUser` now restore previously soft-deleted users by clearing `deletedAt` and overwriting `name`/`role`; active duplicates are skipped with per-row `results`; unique-violation races are caught per-row and do not abort the entire batch, while non-23505 errors roll back the whole batch.
+- **Audit event fidelity** — Per-row `user.created`/`user.reactivated` events plus a single `user.bulk_created` batch audit event for bulk import.
+- **i18n keys** — Added server-resolved keys for review state errors and bulk-import result statuses; regenerated types and updated whitelist.
+
 </protect>
