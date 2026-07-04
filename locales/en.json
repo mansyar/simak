@@ -284,7 +284,8 @@
       "student": "Student",
       "email": "Email",
       "progress": "Progress",
-      "activeCheckpoint": "Active Checkpoint"
+      "activeCheckpoint": "Active Checkpoint",
+      "effectiveDeadline": "Effective Deadline"
     },
     "status": {
       "passed": "Passed",
@@ -368,6 +369,7 @@
     "subtitle": "View and track the progress of your assigned academic work.",
     "searchPlaceholder": "Search assignments by title...",
     "finalDeadline": "Deadline: {date}",
+    "effectiveDeadline": "Personal Deadline: {date}",
     "progress": "Progress",
     "empty": "No assignments yet",
     "emptyPrompt": "When your instructor assigns work to you, it will appear here.",
@@ -402,6 +404,7 @@
     "noPendingReviews": "No pending reviews",
     "consultationReminders": "Consultation Reminders",
     "noConsultationReminders": "No pending consultation reminders",
+    "deadline": "Deadline: {date}",
     "overdue": "Overdue",
     "underReview": "Under Review",
     "pending": "Pending",

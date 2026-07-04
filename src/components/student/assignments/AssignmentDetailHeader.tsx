@@ -7,6 +7,7 @@ export interface AssignmentDetail {
   title: string;
   description: string | null;
   finalDeadline: Date;
+  effectiveDeadline?: Date | string | null;
   instructorName: string;
   templateName: string;
   templateType: string;
@@ -44,9 +45,13 @@ export function AssignmentDetailHeader({ detail }: AssignmentDetailHeaderProps) 
         <div className="flex items-center gap-1.5 text-muted-foreground">
           <Calendar className="h-4 w-4" />
           <span className="font-medium text-foreground">
-            {t('studentAssignments.finalDeadline', {
-              date: format(new Date(detail.finalDeadline), 'MMM d, yyyy'),
-            })}
+            {detail.effectiveDeadline
+              ? t('studentAssignments.effectiveDeadline', {
+                  date: format(new Date(detail.effectiveDeadline), 'MMM d, yyyy'),
+                })
+              : t('studentAssignments.finalDeadline', {
+                  date: format(new Date(detail.finalDeadline), 'MMM d, yyyy'),
+                })}
           </span>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useI18n } from '../../routes/__root';
 import { Link } from '@tanstack/react-router';
-import { Clock, FileText, MessageSquare, ClipboardList } from 'lucide-react';
+import { Clock, FileText, MessageSquare, ClipboardList, Calendar } from 'lucide-react';
+import { formatDateShort } from '@/lib/format';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -10,6 +11,7 @@ interface ActiveAssignment {
   id: number;
   title: string;
   finalDeadline: string | null;
+  effectiveDeadline?: Date | string | null;
   templateName: string;
   templateType: string;
   progressPercent: number;
@@ -53,7 +55,7 @@ interface Props {
 }
 
 export function StudentDashboard({ data }: Props) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   if (data?.error) {
     return (
@@ -95,6 +97,17 @@ export function StudentDashboard({ data }: Props) {
                     </span>
                   </div>
                   <h3 className="font-medium text-foreground truncate mb-2">{assignment.title}</h3>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                    <Calendar className="h-3.5 w-3.5" />
+                    <span>
+                      {(() => {
+                        const deadline = assignment.effectiveDeadline ?? assignment.finalDeadline;
+                        return t('studentDashboard.deadline', {
+                          date: deadline ? formatDateShort(deadline, locale) : '—',
+                        });
+                      })()}
+                    </span>
+                  </div>
                   <Progress value={assignment.progressPercent ?? 0} />
                 </Link>
               ))}

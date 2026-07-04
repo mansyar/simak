@@ -10,7 +10,10 @@ vi.mock('@tanstack/react-router', () => ({
 // Mock __root
 vi.mock('@/routes/__root', () => ({
   useI18n: vi.fn().mockReturnValue({
-    t: vi.fn().mockImplementation((key: string) => key),
+    t: vi.fn().mockImplementation((key: string, params?: Record<string, string>) => {
+      if (params) return `${key} ${JSON.stringify(params)}`;
+      return key;
+    }),
     locale: 'en',
     setLocale: vi.fn(),
   }),
@@ -22,6 +25,7 @@ vi.mock('lucide-react', () => ({
   FileText: () => <div data-testid="file-text-icon" />,
   MessageSquare: () => <div data-testid="message-square-icon" />,
   ClipboardList: () => <div data-testid="clipboard-list-icon" />,
+  Calendar: () => <div data-testid="calendar-icon" />,
 }));
 
 import { StudentDashboard } from '@/components/dashboard/StudentDashboard';
@@ -68,6 +72,7 @@ describe('StudentDashboard', () => {
           id: 1,
           title: 'Thesis Assignment',
           finalDeadline: '2026-06-01',
+          effectiveDeadline: null,
           templateName: 'Thesis Template',
           templateType: 'thesis',
           progressPercent: 50,
@@ -84,6 +89,55 @@ describe('StudentDashboard', () => {
     expect(screen.getByText('Thesis Assignment')).toBeDefined();
     expect(screen.getByText('thesis')).toBeDefined();
     expect(screen.getByText('50%')).toBeDefined();
+  });
+
+  it('should render effective deadline for active assignments when present', () => {
+    const data = {
+      activeAssignments: [
+        {
+          id: 1,
+          title: 'Thesis Assignment',
+          finalDeadline: '2026-06-01',
+          effectiveDeadline: '2026-07-15',
+          templateName: 'Thesis Template',
+          templateType: 'thesis',
+          progressPercent: 50,
+          currentState: 'unlocked',
+        },
+      ],
+      upcomingDeadlines: [],
+      pendingReviews: [],
+      consultationReminders: [],
+    };
+
+    render(<StudentDashboard data={data} />);
+
+    expect(screen.getByText(/Jul 15, 2026/)).toBeDefined();
+    expect(screen.queryByText(/Jun 1, 2026/)).toBeNull();
+  });
+
+  it('should fall back to final deadline for active assignments when effective deadline is null', () => {
+    const data = {
+      activeAssignments: [
+        {
+          id: 1,
+          title: 'Thesis Assignment',
+          finalDeadline: '2026-06-01',
+          effectiveDeadline: null,
+          templateName: 'Thesis Template',
+          templateType: 'thesis',
+          progressPercent: 50,
+          currentState: 'unlocked',
+        },
+      ],
+      upcomingDeadlines: [],
+      pendingReviews: [],
+      consultationReminders: [],
+    };
+
+    render(<StudentDashboard data={data} />);
+
+    expect(screen.getByText(/Jun 1, 2026/)).toBeDefined();
   });
 
   it('should render upcoming deadlines', () => {

@@ -28,6 +28,7 @@ const mockAssignment = {
   id: 1,
   title: 'Thesis Assignment',
   finalDeadline: new Date('2026-06-01'),
+  effectiveDeadline: null,
   templateName: 'Thesis Template',
   templateType: 'thesis',
   progressPercent: 50,
@@ -80,5 +81,23 @@ describe('StudentAssignmentCard', () => {
     render(<StudentAssignmentCard assignment={mockAssignment} />);
 
     expect(screen.getByText(/common\.viewAll/)).toBeDefined();
+  });
+
+  it('should render effective deadline when present and not the final deadline', () => {
+    const assignmentWithPersonalDeadline = {
+      ...mockAssignment,
+      effectiveDeadline: new Date('2026-07-15'),
+    };
+
+    render(<StudentAssignmentCard assignment={assignmentWithPersonalDeadline} />);
+
+    expect(screen.getByText(/studentAssignments\.effectiveDeadline/)).toBeDefined();
+    expect(screen.queryByText(/studentAssignments\.finalDeadline/)).toBeNull();
+  });
+
+  it('should fall back to final deadline when effective deadline is null', () => {
+    render(<StudentAssignmentCard assignment={mockAssignment} />);
+
+    expect(screen.getByText(/studentAssignments\.finalDeadline/)).toBeDefined();
   });
 });

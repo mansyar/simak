@@ -9,6 +9,7 @@ export interface StudentAssignmentRow {
   id: number;
   title: string;
   finalDeadline: Date;
+  effectiveDeadline?: Date | string | null;
   templateName: string;
   templateType: string;
   progressPercent: number;
@@ -54,9 +55,13 @@ export function StudentAssignmentCard({ assignment }: StudentAssignmentCardProps
         <div className="flex items-center gap-1">
           <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
           <span>
-            {t('studentAssignments.finalDeadline', {
-              date: format(new Date(assignment.finalDeadline), 'MMM d, yyyy'),
-            })}
+            {assignment.effectiveDeadline
+              ? t('studentAssignments.effectiveDeadline', {
+                  date: format(new Date(assignment.effectiveDeadline), 'MMM d, yyyy'),
+                })
+              : t('studentAssignments.finalDeadline', {
+                  date: format(new Date(assignment.finalDeadline), 'MMM d, yyyy'),
+                })}
           </span>
         </div>
 

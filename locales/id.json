@@ -284,7 +284,8 @@
       "student": "Mahasiswa",
       "email": "Email",
       "progress": "Progres",
-      "activeCheckpoint": "Checkpoint Aktif"
+      "activeCheckpoint": "Checkpoint Aktif",
+      "effectiveDeadline": "Tenggat Efektif"
     },
     "status": {
       "passed": "Lulus",
@@ -368,6 +369,7 @@
     "subtitle": "Lihat dan lacak kemajuan tugas akademik yang diberikan kepada Anda.",
     "searchPlaceholder": "Cari tugas berdasarkan judul...",
     "finalDeadline": "Tenggat: {date}",
+    "effectiveDeadline": "Tenggat Pribadi: {date}",
     "progress": "Progres",
     "empty": "Belum ada tugas",
     "emptyPrompt": "Ketika dosen memberikan tugas, tugas akan muncul di sini.",
@@ -402,6 +404,7 @@
     "noPendingReviews": "Tidak ada review yang tertunda",
     "consultationReminders": "Pengingat Konsultasi",
     "noConsultationReminders": "Tidak ada pengingat konsultasi",
+    "deadline": "Tenggat: {date}",
     "overdue": "Terlambat",
     "underReview": "Sedang Ditinjau",
     "pending": "Tertunda",

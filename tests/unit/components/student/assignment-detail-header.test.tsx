@@ -17,6 +17,7 @@ describe('AssignmentDetailHeader', () => {
     title: 'Thesis Assignment',
     description: 'Final thesis project for graduating students',
     finalDeadline: new Date('2026-06-01'),
+    effectiveDeadline: null as Date | null,
     instructorName: 'Dr. Smith',
     templateName: 'Thesis Template',
     templateType: 'Thesis',
@@ -53,5 +54,20 @@ describe('AssignmentDetailHeader', () => {
   it('should render the deadline', () => {
     render(<AssignmentDetailHeader detail={detail} />);
     expect(screen.getByText(/Jun/)).toBeDefined();
+  });
+
+  it('should render effective deadline when present and not the final deadline', () => {
+    render(
+      <AssignmentDetailHeader detail={{ ...detail, effectiveDeadline: new Date('2026-07-15') }} />,
+    );
+
+    expect(screen.getByText(/studentAssignments\.effectiveDeadline/)).toBeDefined();
+    expect(screen.queryByText(/studentAssignments\.finalDeadline/)).toBeNull();
+  });
+
+  it('should fall back to final deadline when effective deadline is null', () => {
+    render(<AssignmentDetailHeader detail={detail} />);
+
+    expect(screen.getByText(/studentAssignments\.finalDeadline/)).toBeDefined();
   });
 });

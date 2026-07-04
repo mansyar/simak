@@ -290,6 +290,7 @@ export type Translation = {
       email: string
       progress: string
       activeCheckpoint: string
+      effectiveDeadline: string
     }
     status: {
       passed: string
@@ -373,6 +374,7 @@ export type Translation = {
     subtitle: string
     searchPlaceholder: string
     finalDeadline: string
+    effectiveDeadline: string
     progress: string
     empty: string
     emptyPrompt: string
@@ -407,6 +409,7 @@ export type Translation = {
     noPendingReviews: string
     consultationReminders: string
     noConsultationReminders: string
+    deadline: string
     overdue: string
     underReview: string
     pending: string

@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { formatDateShort } from '@/lib/format';
 import { useI18n } from '../../../routes/__root';
 
 export type StudentProgress = {
@@ -18,6 +19,7 @@ export type StudentProgress = {
   progressPercent: number;
   passedCount: number;
   totalCheckpointsCount: number;
+  effectiveDeadline?: Date | string | null;
   activeCheckpoint: {
     id: number;
     name: string;
@@ -103,6 +105,18 @@ export function ProgressTable({ students }: ProgressTableProps) {
             <span className="text-sm font-medium text-foreground">{cp.name}</span>
             <div>{getStatusBadge(cp.state)}</div>
           </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'effectiveDeadline',
+      header: t('instructorAssignments.table.effectiveDeadline'),
+      cell: ({ row }) => {
+        const deadline = row.original.effectiveDeadline;
+        return (
+          <span className="text-sm text-muted-foreground">
+            {deadline ? formatDateShort(deadline) : '—'}
+          </span>
         );
       },
     },

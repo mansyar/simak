@@ -13,6 +13,7 @@ interface AssignmentOverviewStudent {
   progressPercent: number;
   passedCount: number;
   totalCheckpointsCount: number;
+  effectiveDeadline?: Date | string | null;
   activeCheckpoint: { id: number; name: string; state: string } | null;
   checkpoints: {
     id: number;
