@@ -34,3 +34,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [ ] **Track: Atomic extension request + notification**
 *Link: [./tracks/extension-atomic_20260704/](./tracks/extension-atomic_20260704/)*
 
+---
+
+- [ ] **Track: Atomic checkpoint state transitions in review handlers**
+*Link: [./tracks/review-atomic_20260704/](./tracks/review-atomic_20260704/)*
+

@@ -1,0 +1,8 @@
+{
+  "track_id": "review-atomic_20260704",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-07-04T12:37:43Z",
+  "updated_at": "2026-07-04T12:37:43Z",
+  "description": "Atomic checkpoint state transitions in review handlers — Eliminate the non-atomic check-then-act pattern in openForReviewHandler and submitReviewHandler (and submitCheckpointHandler on audit) where checkpointState is read without a row lock before being used to validate and then mutate the checkpoint, by moving the state read inside each handler's transaction and applying SELECT ... FOR UPDATE on the checkpoint row."
+}

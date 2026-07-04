@@ -1,0 +1,81 @@
+# Implementation Plan: Atomic Checkpoint State Transitions in Review Handlers
+
+Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) → Green (implement) → Refactor → Verify coverage → Commit + git note. A Phase Completion meta-task closes each phase per the Checkpointing Protocol.
+
+## Phase 1: Atomic Checkpoint Read in `submitCheckpointHandler` (partial gap — in-tx read missing the lock)
+
+- [ ] Task: Write failing unit tests (Red phase)
+    - [ ] Reshape existing `submitCheckpointHandler` unit tests in `tests/unit/server/submissions*.test.ts` so the checkpoint read is asserted via `tx.select(...).for('update')` (MockTx queue routing).
+    - [ ] Add a stale-state assertion: when the locked re-read returns a non-submittable state (e.g. `submitted`), the handler returns the existing `'Checkpoint is not in a submittable state'` error and inserts nothing.
+    - [ ] Run `pnpm vitest run tests/unit/server/submissions.test.ts tests/unit/server/submissions-transaction.test.ts` and confirm the tests fail (Red).
+- [ ] Task: Implement (Green phase)
+    - [ ] In `src/server/submissions.server.ts`, add `.for('update')` to the checkpoint read (lines 46–66, inside the existing transaction).
+    - [ ] Add post-lock re-validation of `SUBMITTABLE_STATES` against the locked row.
+    - [ ] Run the unit tests; confirm they now pass (Green).
+- [ ] Task: Refactor (optional)
+    - [ ] If the re-validation duplicates the pre-lock check, consolidate into a single predicate applied post-lock (surgical, no behavior change).
+    - [ ] Re-run unit tests to confirm still passing.
+- [ ] Task: Verify coverage
+    - [ ] Run `pnpm test:coverage` and confirm ≥80% thresholds hold for `src/server/submissions.server.ts`.
+- [ ] Task: Commit and attach git note
+    - [ ] Stage handler + test changes; commit as `fix(submissions): Lock checkpoint row in submitCheckpointHandler with FOR UPDATE`.
+    - [ ] Attach a git note summarizing the change, files touched, and the why (serialize concurrent submissions).
+- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+
+## Phase 2: Atomic Checkpoint Read in `openForReviewHandler` (full gap — no transaction at all)
+
+- [ ] Task: Write failing unit tests (Red phase)
+    - [ ] Reshape existing `openForReviewHandler` unit tests in `tests/unit/server/reviews-*.test.ts` to assert a transaction wraps the read + `FOR UPDATE` + mutation (MockTx queue routing).
+    - [ ] Add a stale-state test: a late `openForReview` that re-reads `passed`/`revise` returns the existing `notInSubmittedState` error and does NOT mutate state.
+    - [ ] Run the relevant test files and confirm they fail (Red).
+- [ ] Task: Implement (Green phase)
+    - [ ] In `src/server/reviews-extras.server.ts`, wrap the checkpoint read, `submitted` validation, and `under_review` mutation in `db.transaction(async (tx) => {...})`.
+    - [ ] Read the checkpoint row with `.for('update')` inside the tx; re-validate state after acquiring the lock.
+    - [ ] Run the unit tests; confirm they pass (Green).
+- [ ] Task: Refactor (optional)
+    - [ ] Ensure the error path returns the existing `translateKey('instructorReviews.errors.notInSubmittedState', locale)` message unchanged (no new i18n keys).
+    - [ ] Re-run unit tests.
+- [ ] Task: Verify coverage
+    - [ ] Run `pnpm test:coverage`; confirm thresholds hold for `src/server/reviews-extras.server.ts`.
+- [ ] Task: Commit and attach git note
+    - [ ] Commit as `fix(reviews): Make openForReview atomic with SELECT FOR UPDATE`.
+    - [ ] Attach git note.
+- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+
+## Phase 3: Atomic Checkpoint Read in `submitReviewHandler` (full gap — read outside the tx)
+
+- [ ] Task: Write failing unit tests (Red phase)
+    - [ ] Reshape the existing `submitReviewHandler` unit tests (`reviews-handlers.test.ts`, `reviews-intent.test.ts`, `reviews-advisory-isolation.test.ts`) so the checkpoint read flows through `tx.select(...).for('update')` (MockTx queue: outer read removed; in-tx locked read enqueued).
+    - [ ] Add stale-state tests: a concurrent submitReview that re-reads a non-reviewable state returns the existing `'Checkpoint is not in a reviewable state'` error and inserts no review.
+    - [ ] Run the relevant test files and confirm they fail (Red).
+- [ ] Task: Implement (Green phase)
+    - [ ] In `src/server/reviews.server.ts`, move the checkpoint read (lines 239–266) inside the existing `db.transaction` (starts at 301); read with `.for('update')`.
+    - [ ] Re-validate `REVIEWABLE_STATES` after acquiring the lock, before the review insert / state mutation / next-checkpoint unlock.
+    - [ ] Preserve upload-intent consumption, SLA, notification, and post-commit advisory logic unchanged.
+    - [ ] Run unit tests; confirm pass (Green).
+- [ ] Task: Refactor (optional)
+    - [ ] Remove now-dead outer-read variables; consolidate duplicate state predicates if a pre-lock validation is retained.
+    - [ ] Re-run unit tests.
+- [ ] Task: Verify coverage
+    - [ ] Run `pnpm test:coverage`; confirm thresholds hold for `src/server/reviews.server.ts`.
+- [ ] Task: Commit and attach git note
+    - [ ] Commit as `fix(reviews): Make submitReview atomic with SELECT FOR UPDATE on checkpoint`.
+    - [ ] Attach git note.
+- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+
+## Phase 4: Concurrency Integration Tests (C2/H3 Precedent)
+
+- [ ] Task: Write integration tests
+    - [ ] Add `tests/integration/server/reviews-concurrency.test.ts` mirroring the `submissions-intent.test.ts` / `concurrent-version-race.test.ts` precedent.
+    - [ ] Test: two concurrent `submitReviewHandler` calls (pass vs revise) on the same submission → exactly one succeeds, exactly one `reviews` row inserted, checkpoint ends in a single deterministic state.
+    - [ ] Test: a late `openForReviewHandler` invoked after a completed `submitReview` (pass) → rejected with `notInSubmittedState`, checkpoint remains `passed`.
+    - [ ] Test (optional): two concurrent `submitCheckpointHandler` calls → exactly one inserts + transitions; the second rejects on stale state.
+- [ ] Task: Run integration tests
+    - [ ] Ensure local PostgreSQL is up (`docker-compose up -d`).
+    - [ ] Run `pnpm test:integration` and confirm all pass.
+- [ ] Task: Verify full suite + gates
+    - [ ] Run `pnpm typecheck`, `pnpm lint`, `pnpm test:coverage`; confirm clean and thresholds met (AC7).
+- [ ] Task: Commit and attach git note
+    - [ ] Commit as `test(reviews): Add concurrency integration tests for atomic review transitions`.
+    - [ ] Attach git note.
+- [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
