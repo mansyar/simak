@@ -21,7 +21,7 @@
     - [x] Review and update `tests/unit/reviews/sla-integration.test.ts` and `tests/unit/server/notifications-events.test.ts` for finalDeadline write assertions
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Remove Non-Scoped finalDeadline Writes' (Protocol in workflow.md) [1d431ee]
 
-## Phase 2: Derive Per-Student Effective Deadline in Reader Views [654dc95]
+## Phase 2: Derive Per-Student Effective Deadline in Reader Views [checkpoint: f920786]
 
 - [x] Task: Read spec.md and workflow.md [654dc95]
     - [x] Read `./spec.md` to confirm requirements and acceptance criteria
@@ -38,7 +38,7 @@
 - [x] Task: Implement per-student effectiveDeadline in instructor detail handler [654dc95]
     - [x] `getAssignmentDetailHandler` (`src/server/assignments.server.ts`): add per-student `effectiveDeadline` (last checkpoint dueDate) to each `AssignmentDetailStudent`; keep assignment-level `finalDeadline`
     - [x] Verify `listInstructorAssignmentsHandler` and `getInstructorDashboardDataHandler` read the course-wide `finalDeadline` correctly (no code change expected)
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Derive Per-Student Effective Deadline in Reader Views' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Derive Per-Student Effective Deadline in Reader Views' (Protocol in workflow.md) [f920786]
 
 ## Phase 3: Frontend Display + i18n
 
