@@ -163,6 +163,7 @@ function AssignmentDetailPage() {
     title: assignment.title,
     description: assignment.description,
     finalDeadline: new Date(assignment.finalDeadline),
+    effectiveDeadline: assignment.effectiveDeadline ? new Date(assignment.effectiveDeadline) : null,
     instructorName: assignment.instructorName,
     templateName: assignment.templateName,
     templateType: assignment.templateType,

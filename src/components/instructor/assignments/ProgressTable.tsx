@@ -32,7 +32,7 @@ interface ProgressTableProps {
 }
 
 export function ProgressTable({ students }: ProgressTableProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const getStatusBadge = (state: string) => {
     switch (state) {
@@ -115,7 +115,7 @@ export function ProgressTable({ students }: ProgressTableProps) {
         const deadline = row.original.effectiveDeadline;
         return (
           <span className="text-sm text-muted-foreground">
-            {deadline ? formatDateShort(deadline) : '—'}
+            {deadline ? formatDateShort(deadline, locale) : '—'}
           </span>
         );
       },
