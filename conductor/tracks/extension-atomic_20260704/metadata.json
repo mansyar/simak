@@ -1,0 +1,8 @@
+{
+  "track_id": "extension-atomic_20260704",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-07-04T12:19:29Z",
+  "updated_at": "2026-07-04T12:19:29Z",
+  "description": "Wrap the two non-transactional writes in requestExtensionHandler (extensionRequests insert + instructor notifications insert) in a single db.transaction, changing db.insert to tx.insert so that a notification-insert failure rolls back the extension request."
+}
