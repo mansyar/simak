@@ -23,10 +23,10 @@
 
 ## Phase 2: Derive Per-Student Effective Deadline in Reader Views
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read `./spec.md` to confirm requirements and acceptance criteria
-    - [ ] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
-- [ ] Task: Write failing tests for effective deadline derivation (Red)
+- [~] Task: Read spec.md and workflow.md
+    - [x] Read `./spec.md` to confirm requirements and acceptance criteria
+    - [x] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
+- [~] Task: Write failing tests for effective deadline derivation (Red)
     - [ ] Add test asserting `listStudentAssignmentsHandler` returns `effectiveDeadline` derived from the student's last checkpoint dueDate
     - [ ] Add test asserting `getStudentAssignmentDetailHandler` returns `effectiveDeadline` from last checkpoint dueDate
     - [ ] Add test asserting `getStudentDashboardDataHandler` returns and sorts by `effectiveDeadline`
