@@ -42,6 +42,25 @@ vi.mock('@/server/consultations', () => ({
   listPendingConsultations: vi.fn(),
 }));
 
+// Mock server extensions (prevents loading drizzle-orm transitively)
+vi.mock('@/server/extensions', () => ({
+  listExtensionRequests: vi.fn(),
+  approveExtension: vi.fn(),
+  rejectExtension: vi.fn(),
+}));
+
+// Mock assignment detail hook (prevents transitive server imports under load)
+vi.mock('@/hooks/use-assignment-tabs', () => ({
+  useAssignmentTabs: vi.fn().mockReturnValue({
+    pendingConsultations: [],
+    setPendingConsultations: vi.fn(),
+    extensionRequests: [],
+    extensionsLoading: false,
+    handleApproveExtension: vi.fn(),
+    handleRejectExtension: vi.fn(),
+  }),
+}));
+
 // Mock server reviews
 vi.mock('@/server/reviews', () => ({
   listPendingReviews: vi.fn(),

@@ -94,6 +94,25 @@ vi.mock('@/server/consultations', () => ({
   listPendingConsultations: vi.fn(),
 }));
 
+// Mock server extensions (prevents loading drizzle-orm transitively under parallel load)
+vi.mock('@/server/extensions', () => ({
+  listExtensionRequests: vi.fn(),
+  approveExtension: vi.fn(),
+  rejectExtension: vi.fn(),
+}));
+
+// Mock assignment detail hook (prevents transitive server imports under load)
+vi.mock('@/hooks/use-assignment-tabs', () => ({
+  useAssignmentTabs: vi.fn().mockReturnValue({
+    pendingConsultations: [],
+    setPendingConsultations: vi.fn(),
+    extensionRequests: [],
+    extensionsLoading: false,
+    handleApproveExtension: vi.fn(),
+    handleRejectExtension: vi.fn(),
+  }),
+}));
+
 // Heavy child components – stub to simple divs so we can isolate headings
 vi.mock('@/components/dashboard/InstructorDashboard', () => ({
   InstructorDashboard: () => <div data-testid="instructor-dashboard" />,
