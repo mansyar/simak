@@ -1,0 +1,8 @@
+{
+  "track_id": "deadline-isolation_20260704",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-07-04T06:41:03Z",
+  "updated_at": "2026-07-04T06:41:03Z",
+  "description": "Per-student deadline isolation — eliminate cross-student deadline contamination caused by three server paths (calculateExtensionAdjustment, bulkExtendHandler, adjustDeadlinesForBreach) that mutate the course-wide assignments.finalDeadline column when granting a per-student extension or SLA-breach adjustment."
+}
