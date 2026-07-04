@@ -1,3 +1,4 @@
+<protect>
 # Specification: Atomic Checkpoint State Transitions in Review Handlers
 
 **Track Type:** Bug / Hardening (concurrency race-condition elimination)
@@ -69,3 +70,4 @@ The fix must not alter existing post-commit advisory work (audit logging, SLA br
 - Refactoring of post-commit advisory work (audit log, SLA breach notifications).
 - Changes to the `submissions_checkpoint_version_unq` unique constraint (existing backstop, retained as-is).
 - Any change to the manual `unlockCheckpoint` / `extendDeadline` server functions (Track 5.2).
+</protect>

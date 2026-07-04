@@ -1,9 +1,12 @@
+<protect>
 # Implementation Plan: Atomic Checkpoint State Transitions in Review Handlers
 
 Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) → Green (implement) → Refactor → Verify coverage → Commit + git note. A Phase Completion meta-task closes each phase per the Checkpointing Protocol.
 
 ## Phase 1: Atomic Checkpoint Read in `submitCheckpointHandler` (partial gap — in-tx read missing the lock)
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
 - [ ] Task: Write failing unit tests (Red phase)
     - [ ] Reshape existing `submitCheckpointHandler` unit tests in `tests/unit/server/submissions*.test.ts` so the checkpoint read is asserted via `tx.select(...).for('update')` (MockTx queue routing).
     - [ ] Add a stale-state assertion: when the locked re-read returns a non-submittable state (e.g. `submitted`), the handler returns the existing `'Checkpoint is not in a submittable state'` error and inserts nothing.
@@ -24,6 +27,8 @@ Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) →
 
 ## Phase 2: Atomic Checkpoint Read in `openForReviewHandler` (full gap — no transaction at all)
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
 - [ ] Task: Write failing unit tests (Red phase)
     - [ ] Reshape existing `openForReviewHandler` unit tests in `tests/unit/server/reviews-*.test.ts` to assert a transaction wraps the read + `FOR UPDATE` + mutation (MockTx queue routing).
     - [ ] Add a stale-state test: a late `openForReview` that re-reads `passed`/`revise` returns the existing `notInSubmittedState` error and does NOT mutate state.
@@ -44,6 +49,8 @@ Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) →
 
 ## Phase 3: Atomic Checkpoint Read in `submitReviewHandler` (full gap — read outside the tx)
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
 - [ ] Task: Write failing unit tests (Red phase)
     - [ ] Reshape the existing `submitReviewHandler` unit tests (`reviews-handlers.test.ts`, `reviews-intent.test.ts`, `reviews-advisory-isolation.test.ts`) so the checkpoint read flows through `tx.select(...).for('update')` (MockTx queue: outer read removed; in-tx locked read enqueued).
     - [ ] Add stale-state tests: a concurrent submitReview that re-reads a non-reviewable state returns the existing `'Checkpoint is not in a reviewable state'` error and inserts no review.
@@ -65,6 +72,8 @@ Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) →
 
 ## Phase 4: Concurrency Integration Tests (C2/H3 Precedent)
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
 - [ ] Task: Write integration tests
     - [ ] Add `tests/integration/server/reviews-concurrency.test.ts` mirroring the `submissions-intent.test.ts` / `concurrent-version-race.test.ts` precedent.
     - [ ] Test: two concurrent `submitReviewHandler` calls (pass vs revise) on the same submission → exactly one succeeds, exactly one `reviews` row inserted, checkpoint ends in a single deterministic state.
@@ -79,3 +88,4 @@ Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) →
     - [ ] Commit as `test(reviews): Add concurrency integration tests for atomic review transitions`.
     - [ ] Attach git note.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
+</protect>
