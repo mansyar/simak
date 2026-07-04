@@ -184,6 +184,9 @@ describe('Assignment Server Functions', () => {
     it('should return assignment details with student progress', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
 
+      const dueDate1 = new Date('2026-06-01T00:00:00.000Z');
+      const dueDate2 = new Date('2026-07-01T00:00:00.000Z');
+
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([
@@ -211,7 +214,7 @@ describe('Assignment Server Functions', () => {
               name: 'Milestone 1',
               order: 1,
               state: 'passed',
-              dueDate: new Date('2026-06-01T00:00:00.000Z'),
+              dueDate: dueDate1,
               minConsultations: 0,
             },
             {
@@ -220,7 +223,7 @@ describe('Assignment Server Functions', () => {
               name: 'Milestone 2',
               order: 2,
               state: 'unlocked',
-              dueDate: new Date('2026-07-01T00:00:00.000Z'),
+              dueDate: dueDate2,
               minConsultations: 0,
             },
           ]).then(onfulfilled),
@@ -238,6 +241,7 @@ describe('Assignment Server Functions', () => {
         expect(result.students[0].activeCheckpoint).not.toBeNull();
         expect(result.students[0].activeCheckpoint!.name).toBe('Milestone 2');
         expect(result.students[0].activeCheckpoint!.state).toBe('unlocked');
+        expect(result.students[0].effectiveDeadline).toBe(dueDate2.toISOString());
       }
     });
   });

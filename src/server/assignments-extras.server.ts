@@ -188,15 +188,18 @@ export async function listStudentAssignmentsHandler(args: { data: ListStudentAss
       .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
       .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions));
 
-    // Calculate progress per assignment from checkpoint states
+    // Calculate progress and effective deadline per assignment from checkpoint states
     const assignmentIds = rawAssignments.map((a) => a.id);
     const progressMap = new Map<number, number>();
+    const effectiveDeadlineMap = new Map<number, Date | null>();
 
     if (assignmentIds.length > 0) {
       const allCheckpoints = await db
         .select({
           assignmentId: checkpoints.assignmentId,
           state: checkpoints.state,
+          dueDate: checkpoints.dueDate,
+          order: checkpoints.order,
         })
         .from(checkpoints)
         .where(
@@ -207,11 +210,18 @@ export async function listStudentAssignmentsHandler(args: { data: ListStudentAss
         );
 
       const countsByAssignment = new Map<number, { total: number; passed: number }>();
+      const highestOrderByAssignment = new Map<number, number>();
       for (const cp of allCheckpoints) {
         const existing = countsByAssignment.get(cp.assignmentId) ?? { total: 0, passed: 0 };
         existing.total++;
         if (cp.state === 'passed') existing.passed++;
         countsByAssignment.set(cp.assignmentId, existing);
+
+        const currentHighest = highestOrderByAssignment.get(cp.assignmentId) ?? -Infinity;
+        if (cp.order > currentHighest) {
+          highestOrderByAssignment.set(cp.assignmentId, cp.order);
+          effectiveDeadlineMap.set(cp.assignmentId, cp.dueDate);
+        }
       }
 
       for (const [id, counts] of countsByAssignment) {
@@ -232,6 +242,7 @@ export async function listStudentAssignmentsHandler(args: { data: ListStudentAss
         templateName: a.templateName,
         templateType: a.templateType,
         progressPercent: progressMap.get(a.id) ?? 0,
+        effectiveDeadline: effectiveDeadlineMap.get(a.id) ?? null,
       })),
       total: Number(count),
     };
@@ -317,6 +328,12 @@ export async function getStudentAssignmentDetailHandler(args: { data: StudentAss
     const progressPercent =
       totalCheckpointsCount > 0 ? Math.round((passedCount / totalCheckpointsCount) * 100) : 0;
 
+    const effectiveDeadline =
+      checkpointsWithConsults.length > 0
+        ? (checkpointsWithConsults.reduce((max, cp) => (cp.order > max.order ? cp : max)).dueDate ??
+          null)
+        : null;
+
     const enrichedCheckpoints = checkpointsWithConsults.map((cp, index) => {
       const blockingReasons: string[] = [];
 
@@ -360,6 +377,7 @@ export async function getStudentAssignmentDetailHandler(args: { data: StudentAss
       maxExtensionDays: assignmentData.maxExtensionDays ?? 7,
       maxTotalExtensions: assignmentData.maxTotalExtensions ?? 3,
       progressPercent,
+      effectiveDeadline,
       checkpoints: enrichedCheckpoints,
     };
   } catch (err) {

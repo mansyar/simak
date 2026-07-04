@@ -101,7 +101,7 @@ export async function getStudentDashboardDataHandler() {
     const assignmentIds = activeAssignments.map((a) => a.id);
     const checkpointsByAssignment = new Map<
       number,
-      { state: string; dueDate: Date | null; name: string }[]
+      { state: string; dueDate: Date | null; name: string; order: number }[]
     >();
 
     if (assignmentIds.length > 0) {
@@ -111,6 +111,7 @@ export async function getStudentDashboardDataHandler() {
           name: checkpoints.name,
           state: checkpoints.state,
           dueDate: checkpoints.dueDate,
+          order: checkpoints.order,
         })
         .from(checkpoints)
         .where(
@@ -129,6 +130,7 @@ export async function getStudentDashboardDataHandler() {
           state: cp.state,
           dueDate: cp.dueDate,
           name: cp.name,
+          order: cp.order,
         });
       });
     }
@@ -138,6 +140,16 @@ export async function getStudentDashboardDataHandler() {
       const totalCount = cps.length;
       const passedCount = cps.filter((cp) => cp.state === 'passed').length;
       const currentState = cps.find((cp) => cp.state !== 'passed')?.state ?? 'passed';
+
+      let effectiveDeadline: Date | null = null;
+      let highestOrder = -Infinity;
+      for (const cp of cps) {
+        if (cp.order > highestOrder) {
+          highestOrder = cp.order;
+          effectiveDeadline = cp.dueDate ?? null;
+        }
+      }
+
       return {
         id: a.id,
         title: a.title,
@@ -146,13 +158,14 @@ export async function getStudentDashboardDataHandler() {
         templateType: a.templateType,
         progressPercent: totalCount > 0 ? Math.round((passedCount / totalCount) * 100) : 0,
         currentState,
+        effectiveDeadline,
       };
     });
 
-    // Sort: soonest deadline first, then least progress
+    // Sort: soonest effective deadline first, then least progress
     activeAssignmentsWithProgress.sort((a, b) => {
-      const dateA = a.finalDeadline?.getTime() ?? 0;
-      const dateB = b.finalDeadline?.getTime() ?? 0;
+      const dateA = a.effectiveDeadline?.getTime() ?? 0;
+      const dateB = b.effectiveDeadline?.getTime() ?? 0;
       if (dateA !== dateB) return dateA - dateB;
       return a.progressPercent - b.progressPercent;
     });

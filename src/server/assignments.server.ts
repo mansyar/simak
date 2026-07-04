@@ -54,6 +54,7 @@ export type AssignmentDetailStudent = {
   totalCheckpointsCount: number;
   progressPercent: number;
   activeCheckpoint: { id: number; name: string; state: string } | null;
+  effectiveDeadline: string | null;
   checkpoints: AssignmentDetailCheckpoint[];
 };
 
@@ -362,6 +363,10 @@ export async function getAssignmentDetailHandler(args: {
         const passedCount = sCheckpoints.filter((cp) => cp.state === 'passed').length;
 
         const activeCheckpoint = sCheckpoints.find((cp) => cp.state !== 'passed') ?? null;
+        const effectiveCheckpoint =
+          sCheckpoints.length > 0
+            ? sCheckpoints.reduce((max, cp) => (cp.order > max.order ? cp : max), sCheckpoints[0])
+            : undefined;
 
         studentsWithProgress.push({
           ...s,
@@ -376,6 +381,7 @@ export async function getAssignmentDetailHandler(args: {
                 state: activeCheckpoint.state,
               }
             : null,
+          effectiveDeadline: effectiveCheckpoint?.dueDate?.toISOString() ?? null,
           checkpoints: sCheckpoints.map((cp) => ({
             id: cp.id,
             name: cp.name,

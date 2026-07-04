@@ -216,6 +216,55 @@ describe('Student Assignment Server Functions - Logic & Security', () => {
       expect(mockDb.limit).toHaveBeenCalledWith(10);
       expect(mockDb.offset).toHaveBeenCalledWith(10);
     });
+
+    it('should compute effectiveDeadline from the highest-order checkpoint', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+      const laterDueDate = new Date('2026-05-01');
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 101,
+              title: 'Thesis Assignment',
+              description: 'Final thesis',
+              finalDeadline: new Date('2026-06-01'),
+              createdAt: new Date(),
+              templateName: 'Thesis Template',
+              templateType: 'Thesis',
+            },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              assignmentId: 101,
+              order: 1,
+              state: 'passed',
+              dueDate: new Date('2026-03-01'),
+            },
+            {
+              assignmentId: 101,
+              order: 2,
+              state: 'unlocked',
+              dueDate: laterDueDate,
+            },
+          ]).then(onfulfilled),
+        );
+
+      const result = await listStudentAssignmentsHandler({
+        data: { page: 1, limit: 20, search: '' },
+      });
+      if (isServerError(result)) throw new Error(result.error.message);
+
+      expect(result.assignments).toHaveLength(1);
+      expect(result.assignments[0].effectiveDeadline).toEqual(laterDueDate);
+      expect(result.assignments[0].progressPercent).toBe(50);
+    });
   });
 
   describe('getStudentAssignmentDetailHandler', () => {
@@ -306,6 +355,7 @@ describe('Student Assignment Server Functions - Logic & Security', () => {
         );
         expect(result.checkpoints[2].blockingReasons![1]).toContain('Insufficient consultations');
         expect(result.progressPercent).toBe(33);
+        expect(result.effectiveDeadline).toEqual(new Date('2026-05-01'));
       }
     });
   });

@@ -170,18 +170,19 @@ describe('getStudentDashboardDataHandler — parallel query execution', () => {
     });
   });
 
-  it('preserves sorting and progress calculation', async () => {
+  it('preserves sorting by effectiveDeadline and progress calculation', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
     const now = new Date('2025-06-26T10:00:00Z');
     const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const dayAfterTomorrow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
 
     const sequence: QueryResult[] = [
       {
         name: 'activeAssignments',
         result: [
-          { id: 1, title: 'A', finalDeadline: tomorrow, templateName: 'T', templateType: 'thesis' },
-          { id: 2, title: 'B', finalDeadline: now, templateName: 'T', templateType: 'thesis' },
+          { id: 1, title: 'A', finalDeadline: now, templateName: 'T', templateType: 'thesis' },
+          { id: 2, title: 'B', finalDeadline: tomorrow, templateName: 'T', templateType: 'thesis' },
         ],
       },
       { name: 'upcomingDeadlines', result: [] },
@@ -190,9 +191,15 @@ describe('getStudentDashboardDataHandler — parallel query execution', () => {
       {
         name: 'checkpoints',
         result: [
-          { assignmentId: 1, name: 'Ch 1', state: 'passed', dueDate: now },
-          { assignmentId: 1, name: 'Ch 2', state: 'submitted', dueDate: tomorrow },
-          { assignmentId: 2, name: 'Ch 1', state: 'passed', dueDate: now },
+          { assignmentId: 1, name: 'Ch 1', order: 1, state: 'passed', dueDate: tomorrow },
+          {
+            assignmentId: 1,
+            name: 'Ch 2',
+            order: 2,
+            state: 'submitted',
+            dueDate: dayAfterTomorrow,
+          },
+          { assignmentId: 2, name: 'Ch 1', order: 1, state: 'passed', dueDate: now },
         ],
       },
     ];
@@ -202,9 +209,11 @@ describe('getStudentDashboardDataHandler — parallel query execution', () => {
 
     const result = (await getStudentDashboardDataHandler()) as any;
     expect(result.activeAssignments).toHaveLength(2);
-    expect(result.activeAssignments[0].id).toBe(2); // Soonest deadline
+    expect(result.activeAssignments[0].id).toBe(2); // Soonest effective deadline
+    expect(result.activeAssignments[0].effectiveDeadline).toEqual(now);
     expect(result.activeAssignments[0].progressPercent).toBe(100);
     expect(result.activeAssignments[1].id).toBe(1);
+    expect(result.activeAssignments[1].effectiveDeadline).toEqual(dayAfterTomorrow);
     expect(result.activeAssignments[1].progressPercent).toBe(50);
   });
 

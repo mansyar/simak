@@ -259,6 +259,69 @@ describe('Dashboard handlers', () => {
       expect(result.upcomingDeadlines[1].checkpointName).toBe('Ch 2');
       expect(result.upcomingDeadlines[2].checkpointName).toBe('Ch 3');
     });
+
+    it('should sort active assignments by effectiveDeadline when it differs from finalDeadline', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+      const effectiveEarly = new Date('2026-05-01');
+      const effectiveLate = new Date('2026-06-15');
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 1,
+              title: 'Thesis A',
+              finalDeadline: new Date('2026-07-01'),
+              templateName: 'Thesis Template',
+              templateType: 'Thesis',
+            },
+            {
+              id: 2,
+              title: 'Thesis B',
+              finalDeadline: new Date('2026-06-01'),
+              templateName: 'Thesis Template',
+              templateType: 'Thesis',
+            },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              assignmentId: 1,
+              name: 'Ch 1',
+              order: 1,
+              state: 'unlocked',
+              dueDate: new Date('2026-08-01'),
+            },
+            {
+              assignmentId: 1,
+              name: 'Ch 2',
+              order: 2,
+              state: 'submitted',
+              dueDate: effectiveEarly,
+            },
+            {
+              assignmentId: 2,
+              name: 'Ch 1',
+              order: 1,
+              state: 'unlocked',
+              dueDate: effectiveLate,
+            },
+          ]).then(onfulfilled),
+        );
+
+      const result = (await getStudentDashboardDataHandler()) as any;
+
+      expect(result.activeAssignments).toHaveLength(2);
+      expect(result.activeAssignments[0].id).toBe(1);
+      expect(result.activeAssignments[0].effectiveDeadline).toEqual(effectiveEarly);
+      expect(result.activeAssignments[1].id).toBe(2);
+      expect(result.activeAssignments[1].effectiveDeadline).toEqual(effectiveLate);
+    });
   });
 
   describe('getInstructorDashboardDataHandler', () => {

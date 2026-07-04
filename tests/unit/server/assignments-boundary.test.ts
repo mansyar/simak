@@ -145,6 +145,7 @@ describe('Assignment handlers — boundary date serialization', () => {
       expect(data.createdAt).toBe(createdAt.toISOString());
       expect(data.students[0].checkpoints[0].dueDate).toBe(dueDate1.toISOString());
       expect(data.students[0].checkpoints[1].dueDate).toBe(dueDate2.toISOString());
+      expect(data.students[0].effectiveDeadline).toBe(dueDate2.toISOString());
     });
 
     it('converts null dueDate to null string sentinel', async () => {
@@ -189,6 +190,7 @@ describe('Assignment handlers — boundary date serialization', () => {
       const data = result as Exclude<typeof result, null | { error: unknown }>;
 
       expect(data.students[0].checkpoints[0].dueDate).toBeNull();
+      expect(data.students[0].effectiveDeadline).toBeNull();
     });
   });
 });
