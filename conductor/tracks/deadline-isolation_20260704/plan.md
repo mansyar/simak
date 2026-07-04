@@ -61,14 +61,14 @@
     - [x] Run `pnpm generate:i18n` and validate with `pnpm check:i18n`
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Frontend Display + i18n' (Protocol in workflow.md) [170bbc8]
 
-## Phase 4: Final Verification
+## Phase 4: Final Verification [~]
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read `./spec.md` to confirm requirements and acceptance criteria
-    - [ ] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
-- [ ] Task: Run full quality gates
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint`
-    - [ ] Run `pnpm test:coverage` (verify >=80% thresholds: lines, functions, branches, statements)
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Verification' (Protocol in workflow.md)
+- [~] Task: Read spec.md and workflow.md
+    - [x] Read `./spec.md` to confirm requirements and acceptance criteria
+    - [x] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
+- [~] Task: Run full quality gates
+    - [~] Run `pnpm typecheck`
+    - [~] Run `pnpm lint`
+    - [~] Run `pnpm test:coverage` (verify >=80% thresholds: lines, functions, branches, statements)
+- [~] Task: Conductor - User Manual Verification 'Phase 4: Final Verification' (Protocol in workflow.md)
 </protect>
