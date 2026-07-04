@@ -223,7 +223,7 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 **Consultation** — student-instructor meeting log, tied to a specific checkpoint.
 **Notification** — in-app event log.
 **NotificationPreference** — per-user, per-event, per-channel toggle. [v2]
-**ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, subsequent checkpoints and assignment finalDeadline auto-extend.
+**ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, the affected student's subsequent checkpoint `dueDate` values auto-extend. The assignment-wide `finalDeadline` is immutable after creation and never mutated by extensions.
 **AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v1] — admin viewer at `/admin/audit-log`.
 **EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, and 2FA emails; extended to event notifications in [v2]. Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS.
 **TwoFactor** — TOTP configuration (secret, backup codes) managed by Better Auth's `twoFactor` plugin.
@@ -332,7 +332,7 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 | templateId         | integer (FK → assignment_templates) | Template used                                                                                           |
 | title              | text, not null                      |                                                                                                         |
 | description        | text                                |                                                                                                         |
-| finalDeadline      | timestamp, not null                 | Soft target deadline — individual checkpoint dueDates enforce locking; finalDeadline is a display/guide |
+| finalDeadline      | timestamp, not null                 | Immutable after creation — course-wide soft target. Individual checkpoint `dueDate` values enforce locking; per-student effective deadline is derived at read time from the highest-order checkpoint `dueDate`. |
 | instructorId       | text (FK → users)                   |                                                                                                         |
 | maxExtensionDays   | integer, default 7                  | Admin cap per request, CHECK (1–30)                                                                     |
 | maxTotalExtensions | integer, default 3                  | Cap per assignment, CHECK (1–10)                                                                        |
@@ -671,7 +671,7 @@ A checkpoint unlocks when:
 
 - When a checkpoint's `dueDate` passes, it auto-locks (if not already submitted).
 - Instructor can manually unlock an overdue checkpoint.
-- The assignment's `finalDeadline` is a **soft target** — it does not auto-lock anything. Individual checkpoint `dueDate` values are what enforce deadlines.
+- The assignment's `finalDeadline` is a **soft target** and is **immutable after creation** — it is never mutated by extensions, SLA-breach adjustments, or direct extension. It does not auto-lock anything. Individual checkpoint `dueDate` values are what enforce deadlines. Each student's effective deadline is derived at read time from their highest-order checkpoint's `dueDate`.
 - On-time submissions awaiting review: if the instructor reviews late, the student is not penalized. Subsequent deadlines are **automatically extended by the number of days the review was delayed** (breach duration added to affected deadlines).
 
 ### Review SLA (3 days)

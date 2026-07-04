@@ -127,7 +127,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - **Deadline Extension Workflow**
   - **Student-Initiated:** Students can request deadline extensions via an approval workflow with reason categories (Personal, Research, Health, Other) and a proposed duration (1–30 days). Instructors approve or reject with optional comment.
   - **Instructor-Initiated:** Instructors can directly extend deadlines for one or all checkpoints without student request. Bulk extension applies +N days to all remaining checkpoints for a student.
-  - **Auto-Adjustment:** Subsequent checkpoints and assignment finalDeadline auto-extend when an extension is approved or directly applied.
+  - **Auto-Adjustment:** When an extension is approved or directly applied, the affected student's subsequent checkpoint `dueDate` values auto-extend. The assignment-wide `finalDeadline` (set once at creation) is **immutable** and never mutated by extensions or SLA-breach adjustments — each student's effective deadline is derived at read time from their highest-order checkpoint's `dueDate`.
   - **Configurable Caps:** Admin-configurable extension limits per assignment: `maxExtensionDays` (1–30, default 7) and `maxTotalExtensions` (1–10, default 3).
   - **Audit Trail:** All deadline changes — approved requests, direct extensions, and manual unlocks — are recorded in the shared `audit_log` table with actor, previous/next values, reason, and timestamp.
 
