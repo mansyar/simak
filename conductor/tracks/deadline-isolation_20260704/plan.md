@@ -21,24 +21,24 @@
     - [x] Review and update `tests/unit/reviews/sla-integration.test.ts` and `tests/unit/server/notifications-events.test.ts` for finalDeadline write assertions
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Remove Non-Scoped finalDeadline Writes' (Protocol in workflow.md) [1d431ee]
 
-## Phase 2: Derive Per-Student Effective Deadline in Reader Views
+## Phase 2: Derive Per-Student Effective Deadline in Reader Views [654dc95]
 
-- [~] Task: Read spec.md and workflow.md
+- [x] Task: Read spec.md and workflow.md [654dc95]
     - [x] Read `./spec.md` to confirm requirements and acceptance criteria
     - [x] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
-- [~] Task: Write failing tests for effective deadline derivation (Red)
-    - [ ] Add test asserting `listStudentAssignmentsHandler` returns `effectiveDeadline` derived from the student's last checkpoint dueDate
-    - [ ] Add test asserting `getStudentAssignmentDetailHandler` returns `effectiveDeadline` from last checkpoint dueDate
-    - [ ] Add test asserting `getStudentDashboardDataHandler` returns and sorts by `effectiveDeadline`
-    - [ ] Add test asserting `getAssignmentDetailHandler` (instructor) returns per-student `effectiveDeadline` alongside the course-wide `finalDeadline`
-- [ ] Task: Implement effectiveDeadline in student reader handlers (Green)
-    - [ ] `listStudentAssignmentsHandler` (`src/server/assignments-extras.server.ts`): enhance the checkpoints query to select `dueDate` + `order`; compute `effectiveDeadline` (highest-order checkpoint dueDate) per assignment
-    - [ ] `getStudentAssignmentDetailHandler` (`src/server/assignments-extras.server.ts`): compute `effectiveDeadline` from the already-loaded checkpoints (highest order)
-    - [ ] `getStudentDashboardDataHandler` (`src/server/dashboard-student.server.ts`): compute `effectiveDeadline` from loaded checkpoints; sort active assignments by `effectiveDeadline` instead of `finalDeadline`
-- [ ] Task: Implement per-student effectiveDeadline in instructor detail handler
-    - [ ] `getAssignmentDetailHandler` (`src/server/assignments.server.ts`): add per-student `effectiveDeadline` (last checkpoint dueDate) to each `AssignmentDetailStudent`; keep assignment-level `finalDeadline`
-    - [ ] Verify `listInstructorAssignmentsHandler` and `getInstructorDashboardDataHandler` read the course-wide `finalDeadline` correctly (no code change expected)
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Derive Per-Student Effective Deadline in Reader Views' (Protocol in workflow.md)
+- [x] Task: Write failing tests for effective deadline derivation (Red) [654dc95]
+    - [x] Add test asserting `listStudentAssignmentsHandler` returns `effectiveDeadline` derived from the student's last checkpoint dueDate
+    - [x] Add test asserting `getStudentAssignmentDetailHandler` returns `effectiveDeadline` from last checkpoint dueDate
+    - [x] Add test asserting `getStudentDashboardDataHandler` returns and sorts by `effectiveDeadline`
+    - [x] Add test asserting `getAssignmentDetailHandler` (instructor) returns per-student `effectiveDeadline` alongside the course-wide `finalDeadline`
+- [x] Task: Implement effectiveDeadline in student reader handlers (Green) [654dc95]
+    - [x] `listStudentAssignmentsHandler` (`src/server/assignments-extras.server.ts`): enhance the checkpoints query to select `dueDate` + `order`; compute `effectiveDeadline` (highest-order checkpoint dueDate) per assignment
+    - [x] `getStudentAssignmentDetailHandler` (`src/server/assignments-extras.server.ts`): compute `effectiveDeadline` from the already-loaded checkpoints (highest order)
+    - [x] `getStudentDashboardDataHandler` (`src/server/dashboard-student.server.ts`): compute `effectiveDeadline` from loaded checkpoints; sort active assignments by `effectiveDeadline` instead of `finalDeadline`
+- [x] Task: Implement per-student effectiveDeadline in instructor detail handler [654dc95]
+    - [x] `getAssignmentDetailHandler` (`src/server/assignments.server.ts`): add per-student `effectiveDeadline` (last checkpoint dueDate) to each `AssignmentDetailStudent`; keep assignment-level `finalDeadline`
+    - [x] Verify `listInstructorAssignmentsHandler` and `getInstructorDashboardDataHandler` read the course-wide `finalDeadline` correctly (no code change expected)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Derive Per-Student Effective Deadline in Reader Views' (Protocol in workflow.md)
 
 ## Phase 3: Frontend Display + i18n
 
