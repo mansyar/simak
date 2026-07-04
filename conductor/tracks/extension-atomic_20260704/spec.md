@@ -1,3 +1,4 @@
+<protect>
 # Track: Atomic Extension Request + Notification
 
 ## Overview
@@ -75,3 +76,4 @@ All 9 existing unit tests in `tests/unit/server/extensions-request.test.ts` must
 - **Audit logging** — The handler does not currently log audit events, and no audit logging is added by this track. The `submitCheckpointHandler` post-commit audit pattern is noted as a possible future enhancement but is out of scope.
 - **API contract changes** — No changes to request/response shapes, Zod schemas, or server-function stubs (`src/server/extensions.ts`).
 - **Other extension handlers** — `approveExtensionHandler`, `rejectExtensionHandler`, `bulkExtendHandler`, and `listExtensionRequestsHandler` are not modified.
+</protect>

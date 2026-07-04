@@ -1,7 +1,11 @@
+<protect>
 # Implementation Plan: Atomic Extension Request + Notification
 
 ## Phase 1: Reshape Unit Tests to Mock `db.transaction` (Red)
 
+- [ ] Task: Pre-phase context review
+    - [ ] Read `spec.md` (`./conductor/tracks/extension-atomic_20260704/spec.md`) to confirm requirements and acceptance criteria
+    - [ ] Read `workflow.md` (`./conductor/workflow.md`) to confirm TDD workflow and quality gates
 - [ ] Task: Add `transaction` mock to `mockDb` in `beforeEach`
     - [ ] Add a `transaction: vi.fn()` method to the `mockDb` object in `beforeEach` that invokes the provided callback with `mockDb` itself as the `tx` argument, returning the callback's result
     - [ ] Ensure the existing `.then` queue logic continues to work when reads run on `db` and writes run on `tx` (same mock object)
@@ -20,6 +24,9 @@
 
 ## Phase 2: Wrap Two Writes in `db.transaction` (Green)
 
+- [ ] Task: Pre-phase context review
+    - [ ] Read `spec.md` (`./conductor/tracks/extension-atomic_20260704/spec.md`) to confirm requirements and acceptance criteria
+    - [ ] Read `workflow.md` (`./conductor/workflow.md`) to confirm implementation workflow and commit format
 - [ ] Task: Implement the transaction wrapper in `requestExtensionHandler`
     - [ ] Wrap the `db.insert(extensionRequests)` (step 7) and `db.insert(notifications)` (step 8) in a single `db.transaction(async (tx) => { ... })` block
     - [ ] Change both `db.insert(...)` calls to `tx.insert(...)` inside the transaction callback
@@ -34,6 +41,9 @@
 
 ## Phase 3: Quality Gates & Coverage Verification
 
+- [ ] Task: Pre-phase context review
+    - [ ] Read `spec.md` (`./conductor/tracks/extension-atomic_20260704/spec.md`) to confirm acceptance criteria
+    - [ ] Read `workflow.md` (`./conductor/workflow.md`) to confirm quality gate definitions and commit format
 - [ ] Task: Verify type safety
     - [ ] Run `pnpm typecheck` and confirm zero errors
 - [ ] Task: Verify linting
@@ -43,3 +53,4 @@
     - [ ] Confirm the `extensions.server.ts` module coverage is not reduced by the transaction wrapper
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Quality Gates & Coverage Verification' (Protocol in workflow.md)
+</protect>
