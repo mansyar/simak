@@ -20,7 +20,8 @@ export default defineConfig({
     env: loadEnv('', process.cwd(), ''),
 
     // Performance: parallel execution (Vitest 4 syntax)
-    pool: 'threads',
+    // vmThreads isolates via VM contexts (cheaper than re-importing modules per file) — ~50% faster than 'threads'.
+    pool: 'vmThreads',
     maxWorkers: 14,
     fileParallelism: true,
 
