@@ -1,7 +1,11 @@
+<protect>
 # Implementation Plan: Per-Student Deadline Isolation
 
 ## Phase 1: Remove Non-Scoped finalDeadline Writes
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `./spec.md` to confirm requirements and acceptance criteria
+    - [ ] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
 - [ ] Task: Write failing tests asserting finalDeadline isolation (Red)
     - [ ] Add test asserting `calculateExtensionAdjustment` (via `approveExtensionHandler`) does NOT mutate `assignments.finalDeadline`; only the target student's checkpoints move; other students' checkpoints unchanged
     - [ ] Add test asserting `bulkExtendHandler` does NOT mutate `assignments.finalDeadline`; only the target student's unfinished checkpoints move
@@ -19,6 +23,9 @@
 
 ## Phase 2: Derive Per-Student Effective Deadline in Reader Views
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `./spec.md` to confirm requirements and acceptance criteria
+    - [ ] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
 - [ ] Task: Write failing tests for effective deadline derivation (Red)
     - [ ] Add test asserting `listStudentAssignmentsHandler` returns `effectiveDeadline` derived from the student's last checkpoint dueDate
     - [ ] Add test asserting `getStudentAssignmentDetailHandler` returns `effectiveDeadline` from last checkpoint dueDate
@@ -35,6 +42,9 @@
 
 ## Phase 3: Frontend Display + i18n
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `./spec.md` to confirm requirements and acceptance criteria
+    - [ ] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
 - [ ] Task: Write failing component tests for effective deadline display (Red)
     - [ ] Add test asserting `StudentAssignmentCard` displays the effective deadline
     - [ ] Add test asserting `AssignmentDetailHeader` (student) displays the effective deadline
@@ -53,8 +63,12 @@
 
 ## Phase 4: Final Verification
 
+- [ ] Task: Read spec.md and workflow.md
+    - [ ] Read `./spec.md` to confirm requirements and acceptance criteria
+    - [ ] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
 - [ ] Task: Run full quality gates
     - [ ] Run `pnpm typecheck`
     - [ ] Run `pnpm lint`
     - [ ] Run `pnpm test:coverage` (verify >=80% thresholds: lines, functions, branches, statements)
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Verification' (Protocol in workflow.md)
+</protect>

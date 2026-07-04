@@ -1,3 +1,4 @@
+<protect>
 # Specification: Per-Student Deadline Isolation
 
 ## Overview
@@ -63,3 +64,4 @@ The "effective deadline" for a student is the `dueDate` of that student's highes
 - Data migration to repair historically contaminated `finalDeadline` values (forward-only fix).
 - Changes to `extendDeadlineHandler` (already correct).
 - Changes to the instructor dashboard/list handlers beyond verifying they read the now-correct course-wide `finalDeadline`.
+</protect>
