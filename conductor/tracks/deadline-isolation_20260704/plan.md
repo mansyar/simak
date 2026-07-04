@@ -3,23 +3,23 @@
 
 ## Phase 1: Remove Non-Scoped finalDeadline Writes
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read `./spec.md` to confirm requirements and acceptance criteria
-    - [ ] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
-- [ ] Task: Write failing tests asserting finalDeadline isolation (Red)
-    - [ ] Add test asserting `calculateExtensionAdjustment` (via `approveExtensionHandler`) does NOT mutate `assignments.finalDeadline`; only the target student's checkpoints move; other students' checkpoints unchanged
-    - [ ] Add test asserting `bulkExtendHandler` does NOT mutate `assignments.finalDeadline`; only the target student's unfinished checkpoints move
-    - [ ] Add test asserting `adjustDeadlinesForBreach` does NOT mutate `assignments.finalDeadline`; only the target student's affected + subsequent checkpoints move; other students' checkpoints unchanged
-- [ ] Task: Remove finalDeadline write blocks (Green)
-    - [ ] Remove the "Extend assignment finalDeadline" block from `calculateExtensionAdjustment` in `src/server/extensions-extras.server.ts` (lines 81-95)
-    - [ ] Remove the "Also extend assignment finalDeadline" block from `bulkExtendHandler` in `src/server/extensions-extras.server.ts` (lines 364-380)
-    - [ ] Remove the "Extend assignment finalDeadline" block from `adjustDeadlinesForBreach` in `src/lib/review-sla.ts` (lines 72-82)
-- [ ] Task: Update existing tests that encoded the old buggy behavior
-    - [ ] Invert `tests/unit/lib/review-sla.test.ts` — "should extend assignment finalDeadline when present" -> assert finalDeadline is NOT extended
-    - [ ] Invert `tests/unit/server/extensions-bulk.test.ts` — "should extend assignment finalDeadline when it exists" -> assert NOT extended
-    - [ ] Invert `tests/unit/reviews/deadline-adjustment.test.ts` — "should extend assignment finalDeadline when review is late" -> assert NOT extended
-    - [ ] Review and update `tests/unit/reviews/sla-integration.test.ts` and `tests/unit/server/notifications-events.test.ts` for finalDeadline write assertions
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Remove Non-Scoped finalDeadline Writes' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md
+    - [x] Read `./spec.md` to confirm requirements and acceptance criteria
+    - [x] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
+- [x] Task: Write failing tests asserting finalDeadline isolation (Red) [fdc3edf]
+    - [x] Add test asserting `calculateExtensionAdjustment` (via `approveExtensionHandler`) does NOT mutate `assignments.finalDeadline`; only the target student's checkpoints move; other students' checkpoints unchanged
+    - [x] Add test asserting `bulkExtendHandler` does NOT mutate `assignments.finalDeadline`; only the target student's unfinished checkpoints move
+    - [x] Add test asserting `adjustDeadlinesForBreach` does NOT mutate `assignments.finalDeadline`; only the target student's affected + subsequent checkpoints move; other students' checkpoints unchanged
+- [x] Task: Remove finalDeadline write blocks (Green) [fdc3edf]
+    - [x] Remove the "Extend assignment finalDeadline" block from `calculateExtensionAdjustment` in `src/server/extensions-extras.server.ts` (lines 81-95)
+    - [x] Remove the "Also extend assignment finalDeadline" block from `bulkExtendHandler` in `src/server/extensions-extras.server.ts` (lines 364-380)
+    - [x] Remove the "Extend assignment finalDeadline" block from `adjustDeadlinesForBreach` in `src/lib/review-sla.ts` (lines 72-82)
+- [x] Task: Update existing tests that encoded the old buggy behavior [fdc3edf]
+    - [x] Invert `tests/unit/lib/review-sla.test.ts` — "should extend assignment finalDeadline when present" -> assert finalDeadline is NOT extended
+    - [x] Invert `tests/unit/server/extensions-bulk.test.ts` — "should extend assignment finalDeadline when it exists" -> assert NOT extended
+    - [x] Invert `tests/unit/reviews/deadline-adjustment.test.ts` — "should extend assignment finalDeadline when review is late" -> assert NOT extended
+    - [x] Review and update `tests/unit/reviews/sla-integration.test.ts` and `tests/unit/server/notifications-events.test.ts` for finalDeadline write assertions
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Remove Non-Scoped finalDeadline Writes' (Protocol in workflow.md)
 
 ## Phase 2: Derive Per-Student Effective Deadline in Reader Views
 
