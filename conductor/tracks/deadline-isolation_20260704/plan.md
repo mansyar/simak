@@ -42,24 +42,24 @@
 
 ## Phase 3: Frontend Display + i18n
 
-- [~] Task: Read spec.md and workflow.md
-    - [~] Read `./spec.md` to confirm requirements and acceptance criteria
-    - [~] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
-- [ ] Task: Write failing component tests for effective deadline display (Red)
-    - [ ] Add test asserting `StudentAssignmentCard` displays the effective deadline
-    - [ ] Add test asserting `AssignmentDetailHeader` (student) displays the effective deadline
-    - [ ] Add test asserting `StudentDashboard` displays the effective deadline
-    - [ ] Add test asserting `AssignmentOverviewTab` (instructor) displays both the course-wide finalDeadline and per-student effectiveDeadline
-- [ ] Task: Update frontend components to display effective deadline (Green)
-    - [ ] `StudentAssignmentCard` (`src/components/student/assignments/StudentAssignmentCard.tsx`): display effectiveDeadline
-    - [ ] `AssignmentDetailHeader` (`src/components/student/assignments/AssignmentDetailHeader.tsx`): display effectiveDeadline
-    - [ ] `StudentDashboard` (`src/components/dashboard/StudentDashboard.tsx`): display effectiveDeadline
-    - [ ] `AssignmentOverviewTab` (`src/components/instructor/assignments/AssignmentOverviewTab.tsx`): display both course-wide finalDeadline + per-student effectiveDeadline
-    - [ ] `src/routes/_authenticated/student/assignments/$id.tsx`: pass `effectiveDeadline` to the header component
-- [ ] Task: Add i18n keys for new labels
-    - [ ] Add effective/original deadline label keys to `locales/en.json` and `locales/id.json`
-    - [ ] Run `pnpm generate:i18n` and validate with `pnpm check:i18n`
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Frontend Display + i18n' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md [467ef2c]
+    - [x] Read `./spec.md` to confirm requirements and acceptance criteria
+    - [x] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
+- [x] Task: Write failing component tests for effective deadline display (Red) [467ef2c]
+    - [x] Add test asserting `StudentAssignmentCard` displays the effective deadline
+    - [x] Add test asserting `AssignmentDetailHeader` (student) displays the effective deadline
+    - [x] Add test asserting `StudentDashboard` displays the effective deadline
+    - [x] Add test asserting `AssignmentOverviewTab` (instructor) displays both the course-wide finalDeadline and per-student effectiveDeadline
+- [x] Task: Update frontend components to display effective deadline (Green) [467ef2c]
+    - [x] `StudentAssignmentCard` (`src/components/student/assignments/StudentAssignmentCard.tsx`): display effectiveDeadline
+    - [x] `AssignmentDetailHeader` (`src/components/student/assignments/AssignmentDetailHeader.tsx`): display effectiveDeadline
+    - [x] `StudentDashboard` (`src/components/dashboard/StudentDashboard.tsx`): display effectiveDeadline
+    - [x] `AssignmentOverviewTab` (`src/components/instructor/assignments/AssignmentOverviewTab.tsx`): display both course-wide finalDeadline + per-student effectiveDeadline
+    - [x] `src/routes/_authenticated/student/assignments/$id.tsx`: pass `effectiveDeadline` to the header component
+- [x] Task: Add i18n keys for new labels [467ef2c]
+    - [x] Add effective/original deadline label keys to `locales/en.json` and `locales/id.json`
+    - [x] Run `pnpm generate:i18n` and validate with `pnpm check:i18n`
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Frontend Display + i18n' (Protocol in workflow.md)
 
 ## Phase 4: Final Verification
 
