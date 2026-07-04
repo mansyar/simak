@@ -42,9 +42,9 @@
 
 ## Phase 3: Frontend Display + i18n
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read `./spec.md` to confirm requirements and acceptance criteria
-    - [ ] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
+- [~] Task: Read spec.md and workflow.md
+    - [~] Read `./spec.md` to confirm requirements and acceptance criteria
+    - [~] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
 - [ ] Task: Write failing component tests for effective deadline display (Red)
     - [ ] Add test asserting `StudentAssignmentCard` displays the effective deadline
     - [ ] Add test asserting `AssignmentDetailHeader` (student) displays the effective deadline
