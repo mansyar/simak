@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Per-Student Deadline Isolation
 
-## Phase 1: Remove Non-Scoped finalDeadline Writes
+## Phase 1: Remove Non-Scoped finalDeadline Writes [checkpoint: 1d431ee]
 
 - [x] Task: Read spec.md and workflow.md
     - [x] Read `./spec.md` to confirm requirements and acceptance criteria
@@ -19,7 +19,7 @@
     - [x] Invert `tests/unit/server/extensions-bulk.test.ts` — "should extend assignment finalDeadline when it exists" -> assert NOT extended
     - [x] Invert `tests/unit/reviews/deadline-adjustment.test.ts` — "should extend assignment finalDeadline when review is late" -> assert NOT extended
     - [x] Review and update `tests/unit/reviews/sla-integration.test.ts` and `tests/unit/server/notifications-events.test.ts` for finalDeadline write assertions
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Remove Non-Scoped finalDeadline Writes' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Remove Non-Scoped finalDeadline Writes' (Protocol in workflow.md) [1d431ee]
 
 ## Phase 2: Derive Per-Student Effective Deadline in Reader Views
 
