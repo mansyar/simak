@@ -5,7 +5,7 @@
  * Both functions are called from submitReviewHandler.
  */
 import { eq, and, gt, isNull, sql } from 'drizzle-orm';
-import { checkpoints, assignments } from '../db/schema/assignments';
+import { checkpoints } from '../db/schema/assignments';
 import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { sendSLAAlertEmail } from './email';
@@ -67,18 +67,6 @@ export async function adjustDeadlinesForBreach(
         updatedAt: new Date(),
       })
       .where(eq(checkpoints.id, cp.id));
-  }
-
-  // Extend assignment finalDeadline
-  if (submission.finalDeadline) {
-    await tx
-      .update(assignments)
-      .set({
-        finalDeadline: new Date(
-          submission.finalDeadline.getTime() + breachDays * 24 * 60 * 60 * 1000,
-        ),
-      })
-      .where(eq(assignments.id, submission.assignmentId));
   }
 }
 

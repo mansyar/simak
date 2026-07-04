@@ -77,22 +77,6 @@ async function calculateExtensionAdjustment(
       })
       .where(eq(checkpoints.id, cp.id));
   }
-
-  // 4. Extend assignment finalDeadline
-  const [assignment] = await db
-    .select({ finalDeadline: assignments.finalDeadline })
-    .from(assignments)
-    .where(eq(assignments.id, assignmentId))
-    .limit(1);
-
-  if (assignment?.finalDeadline) {
-    await db
-      .update(assignments)
-      .set({
-        finalDeadline: new Date(assignment.finalDeadline.getTime() + extensionDays * msPerDay),
-      })
-      .where(eq(assignments.id, assignmentId));
-  }
 }
 
 /**
@@ -359,24 +343,6 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
             updatedAt: new Date(),
           })
           .where(eq(checkpoints.id, cp.id));
-      }
-
-      // 4. Also extend assignment finalDeadline
-      const [assignmentRecord] = await tx
-        .select({ finalDeadline: assignments.finalDeadline })
-        .from(assignments)
-        .where(eq(assignments.id, assignmentId))
-        .limit(1);
-
-      if (assignmentRecord?.finalDeadline) {
-        await tx
-          .update(assignments)
-          .set({
-            finalDeadline: new Date(
-              assignmentRecord.finalDeadline.getTime() + extraDays * msPerDay,
-            ),
-          })
-          .where(eq(assignments.id, assignmentId));
       }
     });
 

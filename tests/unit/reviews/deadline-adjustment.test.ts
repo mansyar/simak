@@ -123,7 +123,7 @@ describe('Deadline adjustment in submitReview', () => {
     });
 
     expect(sla.calculateBreachDuration).toHaveBeenCalled();
-    // Should have called update for: state change, dueDate extension, and finalDeadline
+    // Should have called update for state change and dueDate extension
     expect(mockTx.update).toHaveBeenCalled();
   });
 
@@ -153,7 +153,7 @@ describe('Deadline adjustment in submitReview', () => {
     expect(mockTx.update).toHaveBeenCalled();
   });
 
-  it('should extend assignment finalDeadline when review is late', async () => {
+  it('should not extend assignment finalDeadline when review is late', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(sla.calculateBreachDuration).mockReturnValue(3);
 
@@ -169,6 +169,10 @@ describe('Deadline adjustment in submitReview', () => {
     });
 
     expect(sla.calculateBreachDuration).toHaveBeenCalled();
+    const finalDeadlineCalls = mockTx.set.mock.calls.filter(
+      (call: any[]) => 'finalDeadline' in call[0],
+    );
+    expect(finalDeadlineCalls).toHaveLength(0);
   });
 
   it('should only adjust deadlines for affected student', async () => {

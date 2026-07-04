@@ -179,6 +179,35 @@ describe('approveExtensionHandler', () => {
     expect(notificationValues).toBeDefined();
     expect(notificationValues[0].userId).toBe('student-1');
   });
+
+  it('should not update assignment finalDeadline when approving extension', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve(makePendingRequest()).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ order: 1, dueDate: new Date('2026-06-01T00:00:00Z') }]).then(
+          onfulfilled,
+        ),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ finalDeadline: new Date('2026-07-01T00:00:00Z') }]).then(onfulfilled),
+      );
+
+    await approveExtensionHandler({
+      data: { requestId: 100, resolutionReason: 'Approved' },
+    });
+
+    const finalDeadlineCalls = mockDb.set.mock.calls.filter(
+      (call: any[]) => 'finalDeadline' in call[0],
+    );
+    expect(finalDeadlineCalls).toHaveLength(0);
+  });
 });
 
 // ============================================================

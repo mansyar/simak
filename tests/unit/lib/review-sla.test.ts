@@ -38,7 +38,7 @@ describe('adjustDeadlinesForBreach', () => {
 
     await adjustDeadlinesForBreach(mockTx, baseSubmission, 3);
 
-    expect(mockTx.update).toHaveBeenCalledTimes(2); // checkpoint + assignment
+    expect(mockTx.update).toHaveBeenCalledTimes(1); // only the affected checkpoint
     // First update call is for the affected checkpoint
     const setCall = mockTx.set.mock.calls[0][0];
     expect(setCall.dueDate).toBeInstanceOf(Date);
@@ -57,8 +57,8 @@ describe('adjustDeadlinesForBreach', () => {
 
     await adjustDeadlinesForBreach(mockTx, baseSubmission, 2);
 
-    // Should have updated checkpoint + 2 subsequent + assignment = 4 updates
-    expect(mockTx.update).toHaveBeenCalledTimes(4);
+    // Should have updated checkpoint + 2 subsequent = 3 updates
+    expect(mockTx.update).toHaveBeenCalledTimes(3);
     // Second update = first subsequent checkpoint (id 101)
     expect(mockTx.set.mock.calls[1][0].dueDate.getTime()).toBe(
       new Date('2026-06-12T00:00:00Z').getTime(),
@@ -79,15 +79,15 @@ describe('adjustDeadlinesForBreach', () => {
     expect(mockTx.where).toHaveBeenCalled();
   });
 
-  it('should extend assignment finalDeadline when present', async () => {
+  it('should never extend assignment finalDeadline', async () => {
     mockTx.then.mockImplementation((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
     await adjustDeadlinesForBreach(mockTx, baseSubmission, 3);
 
-    // Last update call should be for assignment
-    const lastSetCall = mockTx.set.mock.calls[1][0];
-    expect(lastSetCall.finalDeadline).toBeInstanceOf(Date);
-    expect(lastSetCall.finalDeadline.getTime()).toBe(new Date('2026-07-04T00:00:00Z').getTime());
+    const finalDeadlineCalls = mockTx.set.mock.calls.filter(
+      (call: any[]) => 'finalDeadline' in call[0],
+    );
+    expect(finalDeadlineCalls).toHaveLength(0);
   });
 
   it('should NOT extend finalDeadline when null', async () => {
@@ -119,7 +119,7 @@ describe('adjustDeadlinesForBreach', () => {
     await adjustDeadlinesForBreach(mockTx, baseSubmission, 2);
 
     // Should still update the subsequent checkpoint
-    expect(mockTx.update).toHaveBeenCalledTimes(3);
+    expect(mockTx.update).toHaveBeenCalledTimes(2);
     const subSetCall = mockTx.set.mock.calls[1][0];
     expect(subSetCall.dueDate).toBeInstanceOf(Date);
     expect(subSetCall.dueDate.getTime()).toBeGreaterThan(Date.now());
@@ -131,7 +131,7 @@ describe('adjustDeadlinesForBreach', () => {
     await adjustDeadlinesForBreach(mockTx, { ...baseSubmission, checkpointOrder: null }, 1);
 
     // Should not throw; subsequent checkpoints query uses `?? 0`
-    expect(mockTx.update).toHaveBeenCalledTimes(2);
+    expect(mockTx.update).toHaveBeenCalledTimes(1);
   });
 });
 

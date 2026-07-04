@@ -229,21 +229,25 @@ describe('bulkExtendHandler', () => {
     expect(notificationValues[0].params.extraDays).toBe('5');
   });
 
-  it('should extend assignment finalDeadline when it exists', async () => {
+  it('should not update assignment finalDeadline during bulk extension', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
     const checkpoints = [{ id: 10, dueDate: new Date('2026-06-15'), name: 'CP1' }];
 
     mockDb.then
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
-      .mockImplementationOnce((onfulfilled: any) => Promise.resolve(checkpoints).then(onfulfilled));
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve(checkpoints).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ finalDeadline: new Date('2026-07-01T00:00:00Z') }]).then(onfulfilled),
+      );
 
     await bulkExtendHandler({ data: validInput });
 
-    // Transaction was used to wrap the operations
     expect(mockDb.transaction).toHaveBeenCalledTimes(1);
-    // The transaction callback mutates checkpoints and the assignment
-    // Update should have been called (at least once for the checkpoint)
-    expect(mockDb.update).toHaveBeenCalled();
+    const finalDeadlineCalls = mockDb.set.mock.calls.filter(
+      (call: any[]) => 'finalDeadline' in call[0],
+    );
+    expect(finalDeadlineCalls).toHaveLength(0);
   });
 });
