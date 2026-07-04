@@ -1,0 +1,8 @@
+{
+  "track_id": "setup-token-atomic_20260704",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-07-04T16:57:24Z",
+  "updated_at": "2026-07-04T16:57:24Z",
+  "description": "Secure password-setup token consumption — Replace the non-atomic check-then-act token validation in completePasswordSetupHandler with an atomic consume-once DELETE ... RETURNING inside the existing transaction, eliminating the token-replay race where two concurrent requests with the same setup token both succeed and set potentially different passwords on the same account (enabling silent account takeover if an attacker intercepts the token). The fix uses the consume-once pattern, rolls back on any downstream failure so a used token is never orphaned, and is proven by an integration test mirroring tests/integration/submissions/concurrent-version-race.test.ts."
+}

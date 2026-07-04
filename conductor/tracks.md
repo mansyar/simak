@@ -24,3 +24,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 - [ ] **Track: Per-student deadline isolation**
 *Link: [./tracks/deadline-isolation_20260704/](./tracks/deadline-isolation_20260704/)*
 
+---
+
+- [ ] **Track: Secure password-setup token consumption**
+*Link: [./tracks/setup-token-atomic_20260704/](./tracks/setup-token-atomic_20260704/)*
+
