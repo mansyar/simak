@@ -40,7 +40,7 @@
     - [x] Verify `listInstructorAssignmentsHandler` and `getInstructorDashboardDataHandler` read the course-wide `finalDeadline` correctly (no code change expected)
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Derive Per-Student Effective Deadline in Reader Views' (Protocol in workflow.md) [f920786]
 
-## Phase 3: Frontend Display + i18n
+## Phase 3: Frontend Display + i18n [checkpoint: 170bbc8]
 
 - [x] Task: Read spec.md and workflow.md [467ef2c]
     - [x] Read `./spec.md` to confirm requirements and acceptance criteria
@@ -59,7 +59,7 @@
 - [x] Task: Add i18n keys for new labels [467ef2c]
     - [x] Add effective/original deadline label keys to `locales/en.json` and `locales/id.json`
     - [x] Run `pnpm generate:i18n` and validate with `pnpm check:i18n`
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Frontend Display + i18n' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Frontend Display + i18n' (Protocol in workflow.md) [170bbc8]
 
 ## Phase 4: Final Verification
 
