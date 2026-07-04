@@ -283,4 +283,13 @@ Students and instructors lack a centralized system to:
 - **Audit event fidelity** — Per-row `user.created`/`user.reactivated` events plus a single `user.bulk_created` batch audit event for bulk import.
 - **i18n keys** — Added server-resolved keys for review state errors and bulk-import result statuses; regenerated types and updated whitelist.
 
+### Track 10: Per-Student Deadline Isolation (July 2026)
+
+- **Bug fixed:** `assignments.finalDeadline` is no longer mutated by per-student extension approvals, bulk extensions, or SLA-breach adjustments. These operations now only update the target student's checkpoint `dueDate` values.
+- **Per-student effective deadline** — Reader views derive each student's personal deadline from the `dueDate` of their highest-order checkpoint in the assignment.
+- **Server handlers updated** — `listStudentAssignments`, `getStudentAssignmentDetail`, `getStudentDashboardData`, and `getAssignmentDetail` (instructor) now return `effectiveDeadline` alongside the immutable course-wide `finalDeadline`.
+- **Frontend components updated** — `StudentAssignmentCard`, `AssignmentDetailHeader`, `StudentDashboard`, and `AssignmentOverviewTab` display the per-student effective deadline; the instructor Overview tab shows both the course-wide final deadline and a per-student effective deadline column.
+- **i18n translations** — New English and Indonesian keys for personal/effective deadline labels.
+- **Tests** — Failing tests asserted the new behavior first; full unit suite passes (2,373 tests), coverage thresholds met.
+
 </protect>
