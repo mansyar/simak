@@ -22,7 +22,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Secure password-setup token consumption**
+- [~] **Track: Secure password-setup token consumption**
 *Link: [./tracks/setup-token-atomic_20260704/](./tracks/setup-token-atomic_20260704/)*
 
 ---
