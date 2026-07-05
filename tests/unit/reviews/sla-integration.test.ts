@@ -51,6 +51,7 @@ describe('SLA Integration — Full Flow', () => {
       where: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
@@ -88,8 +89,8 @@ describe('SLA Integration — Full Flow', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(sla.calculateBreachDuration).mockReturnValue(3);
 
-    // Initial query: submission data
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+    // Initial query: submission data (now locked inside the transaction)
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
       Promise.resolve([
         {
           checkpointId: 100,
@@ -139,8 +140,8 @@ describe('SLA Integration — Full Flow', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(sla.calculateBreachDuration).mockReturnValue(0);
 
-    // Initial query: submission data
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+    // Initial query: submission data (now locked inside the transaction)
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
       Promise.resolve([
         {
           checkpointId: 100,
@@ -170,29 +171,29 @@ describe('SLA Integration — Full Flow', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(sla.calculateBreachDuration).mockReturnValue(2);
 
-    // Initial query
-    mockDb.then
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            checkpointId: 100,
-            checkpointState: 'under_review',
-            assignmentId: 1,
-            instructorId: 'instructor-1',
-            studentId: 'student-1',
-            checkpointUpdatedAt: new Date('2026-05-20T10:00:00Z'),
-            checkpointDueDate: new Date('2026-06-01T00:00:00Z'),
-            checkpointOrder: 1,
-            finalDeadline: new Date('2026-07-01T00:00:00Z'),
-          },
-        ]).then(onfulfilled),
-      )
-      // Admin users
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ id: 'admin-1', name: 'Admin One', email: 'admin1@test.com' }]).then(
-          onfulfilled,
-        ),
-      );
+    // Initial query: submission data (now locked inside the transaction)
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([
+        {
+          checkpointId: 100,
+          checkpointState: 'under_review',
+          assignmentId: 1,
+          instructorId: 'instructor-1',
+          studentId: 'student-1',
+          checkpointUpdatedAt: new Date('2026-05-20T10:00:00Z'),
+          checkpointDueDate: new Date('2026-06-01T00:00:00Z'),
+          checkpointOrder: 1,
+          finalDeadline: new Date('2026-07-01T00:00:00Z'),
+        },
+      ]).then(onfulfilled),
+    );
+
+    // Admin users query
+    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([{ id: 'admin-1', name: 'Admin One', email: 'admin1@test.com' }]).then(
+        onfulfilled,
+      ),
+    );
 
     mockTx.then.mockImplementation((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
     // Notification insert mock

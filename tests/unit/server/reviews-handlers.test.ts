@@ -27,6 +27,7 @@ vi.mock('@/lib/storage', () => ({
 
 describe('Review handlers - Logic & Security', () => {
   let mockDb: any;
+  let mockTx: any;
   const instructorSession = {
     user: { id: 'instructor-1', role: 'instructor' as const },
     session: {} as any,
@@ -43,13 +44,15 @@ describe('Review handlers - Logic & Security', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    const mockTx = {
+    mockTx = {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
+      leftJoin: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
@@ -199,53 +202,66 @@ describe('Review handlers - Logic & Security', () => {
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
-    it('should record a pass decision and unlock next checkpoint', async () => {
+    it('should record a pass decision and lock checkpoint read with FOR UPDATE', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              checkpointId: 100,
-              checkpointState: 'under_review',
-              assignmentId: 1,
-              instructorId: 'instructor-1',
-              studentId: 'student-1',
-            },
-          ]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            { id: 100, order: 1, state: 'under_review' },
-            { id: 101, order: 2, state: 'locked' },
-          ]).then(onfulfilled),
-        );
+      mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          {
+            checkpointId: 100,
+            checkpointState: 'under_review',
+            assignmentId: 1,
+            instructorId: 'instructor-1',
+            studentId: 'student-1',
+          },
+        ]).then(onfulfilled),
+      );
       const result = await submitReviewHandler({
         data: { submissionId: 1, decision: 'pass', comment: 'Well done!' },
       });
       expect(result).toEqual({ success: true });
       expect(mockDb.transaction).toHaveBeenCalled();
+      expect(mockTx.for).toHaveBeenCalledWith('update');
+    });
+
+    it('should reject review when checkpoint is no longer reviewable after lock', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          {
+            checkpointId: 100,
+            checkpointState: 'passed',
+            assignmentId: 1,
+            instructorId: 'instructor-1',
+            studentId: 'student-1',
+          },
+        ]).then(onfulfilled),
+      );
+      const result = await submitReviewHandler({
+        data: { submissionId: 1, decision: 'pass', comment: 'Well done!' },
+      });
+      expect(result).toEqual({
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'Checkpoint is not in a reviewable state',
+        },
+      });
+      expect(mockTx.insert).not.toHaveBeenCalled();
+      expect(mockTx.for).toHaveBeenCalledWith('update');
     });
 
     it('should record a revise decision with deadline', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              checkpointId: 100,
-              checkpointState: 'under_review',
-              assignmentId: 1,
-              instructorId: 'instructor-1',
-              studentId: 'student-1',
-            },
-          ]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            { id: 100, order: 1, state: 'under_review' },
-            { id: 101, order: 2, state: 'locked' },
-          ]).then(onfulfilled),
-        );
+      mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          {
+            checkpointId: 100,
+            checkpointState: 'under_review',
+            assignmentId: 1,
+            instructorId: 'instructor-1',
+            studentId: 'student-1',
+          },
+        ]).then(onfulfilled),
+      );
       const result = await submitReviewHandler({
         data: {
           submissionId: 1,
@@ -256,6 +272,7 @@ describe('Review handlers - Logic & Security', () => {
       });
       expect(result).toEqual({ success: true });
       expect(mockDb.transaction).toHaveBeenCalled();
+      expect(mockTx.for).toHaveBeenCalledWith('update');
     });
 
     describe('SLA anchoring at submission time', () => {
@@ -272,32 +289,25 @@ describe('Review handlers - Logic & Security', () => {
 
       it('should apply SLA breach from submission.uploadedAt when reviewing directly from submitted state', async () => {
         vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-        mockDb.then
-          .mockImplementationOnce((onfulfilled: any) =>
-            Promise.resolve([
-              {
-                checkpointId: 100,
-                checkpointState: 'submitted',
-                uploadedAt: fiveDaysAgo,
-                checkpointUpdatedAt: new Date('2026-06-15T12:00:00Z'),
-                checkpointName: 'Chapter 1',
-                checkpointDueDate: new Date('2026-06-01'),
-                checkpointOrder: 1,
-                assignmentId: 1,
-                assignmentTitle: 'Thesis 2026',
-                instructorId: 'instructor-1',
-                studentId: 'student-1',
-                studentName: 'Alice',
-                finalDeadline: new Date('2026-08-01'),
-              },
-            ]).then(onfulfilled),
-          )
-          .mockImplementationOnce((onfulfilled: any) =>
-            Promise.resolve([
-              { id: 100, order: 1, state: 'submitted' },
-              { id: 101, order: 2, state: 'locked' },
-            ]).then(onfulfilled),
-          );
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              checkpointId: 100,
+              checkpointState: 'submitted',
+              uploadedAt: fiveDaysAgo,
+              checkpointUpdatedAt: new Date('2026-06-15T12:00:00Z'),
+              checkpointName: 'Chapter 1',
+              checkpointDueDate: new Date('2026-06-01'),
+              checkpointOrder: 1,
+              assignmentId: 1,
+              assignmentTitle: 'Thesis 2026',
+              instructorId: 'instructor-1',
+              studentId: 'student-1',
+              studentName: 'Alice',
+              finalDeadline: new Date('2026-08-01'),
+            },
+          ]).then(onfulfilled),
+        );
         const result = await submitReviewHandler({
           data: { submissionId: 1, decision: 'pass', comment: 'Good' },
         });
@@ -309,32 +319,25 @@ describe('Review handlers - Logic & Security', () => {
 
       it('should anchor SLA at submission.uploadedAt even when checkpoint is already under_review', async () => {
         vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-        mockDb.then
-          .mockImplementationOnce((onfulfilled: any) =>
-            Promise.resolve([
-              {
-                checkpointId: 100,
-                checkpointState: 'under_review',
-                uploadedAt: fiveDaysAgo,
-                checkpointUpdatedAt: new Date('2026-06-15T12:00:00Z'),
-                checkpointName: 'Chapter 1',
-                checkpointDueDate: new Date('2026-06-01'),
-                checkpointOrder: 1,
-                assignmentId: 1,
-                assignmentTitle: 'Thesis 2026',
-                instructorId: 'instructor-1',
-                studentId: 'student-1',
-                studentName: 'Alice',
-                finalDeadline: new Date('2026-08-01'),
-              },
-            ]).then(onfulfilled),
-          )
-          .mockImplementationOnce((onfulfilled: any) =>
-            Promise.resolve([
-              { id: 100, order: 1, state: 'under_review' },
-              { id: 101, order: 2, state: 'locked' },
-            ]).then(onfulfilled),
-          );
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              checkpointId: 100,
+              checkpointState: 'under_review',
+              uploadedAt: fiveDaysAgo,
+              checkpointUpdatedAt: new Date('2026-06-15T12:00:00Z'),
+              checkpointName: 'Chapter 1',
+              checkpointDueDate: new Date('2026-06-01'),
+              checkpointOrder: 1,
+              assignmentId: 1,
+              assignmentTitle: 'Thesis 2026',
+              instructorId: 'instructor-1',
+              studentId: 'student-1',
+              studentName: 'Alice',
+              finalDeadline: new Date('2026-08-01'),
+            },
+          ]).then(onfulfilled),
+        );
         const result = await submitReviewHandler({
           data: { submissionId: 1, decision: 'pass', comment: 'Good' },
         });
@@ -346,7 +349,7 @@ describe('Review handlers - Logic & Security', () => {
 
     it('should fail if decision is revise without deadline', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      mockTx.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([
           {
             checkpointId: 100,
@@ -370,9 +373,6 @@ describe('Review handlers - Logic & Security', () => {
 
     it('should reject if instructor does not own the assignment', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(otherInstructorSession as any);
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
       const result = await submitReviewHandler({
         data: { submissionId: 1, decision: 'pass', comment: '' },
       });

@@ -41,6 +41,7 @@ describe('Deadline adjustment in submitReview', () => {
       where: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
@@ -94,8 +95,8 @@ describe('Deadline adjustment in submitReview', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(sla.calculateBreachDuration).mockReturnValue(0);
 
-    // Initial query returns submission data (via mockDb.then)
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+    // Locked transaction read returns submission data (via mockTx.then)
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
       Promise.resolve(makeSubmissionRow()).then(onfulfilled),
     );
 
@@ -111,8 +112,8 @@ describe('Deadline adjustment in submitReview', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(sla.calculateBreachDuration).mockReturnValue(3);
 
-    // Initial query (via mockDb.then)
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+    // Locked transaction read returns submission data (via mockTx.then)
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
       Promise.resolve(makeSubmissionRow()).then(onfulfilled),
     );
     // Inside transaction: queries return empty (no subsequent checkpoints)
@@ -131,8 +132,8 @@ describe('Deadline adjustment in submitReview', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(sla.calculateBreachDuration).mockReturnValue(2);
 
-    // Initial query
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+    // Locked transaction read returns submission data (via mockTx.then)
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
       Promise.resolve(makeSubmissionRow()).then(onfulfilled),
     );
     // Transaction: next checkpoint query returns subsequent checkpoints
@@ -157,8 +158,8 @@ describe('Deadline adjustment in submitReview', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(sla.calculateBreachDuration).mockReturnValue(3);
 
-    // Initial query
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+    // Locked transaction read returns submission data (via mockTx.then)
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
       Promise.resolve(makeSubmissionRow()).then(onfulfilled),
     );
     // Transaction: no subsequent checkpoints
@@ -179,8 +180,8 @@ describe('Deadline adjustment in submitReview', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(sla.calculateBreachDuration).mockReturnValue(2);
 
-    // Initial query
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+    // Locked transaction read returns submission data (via mockTx.then)
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
       Promise.resolve(makeSubmissionRow()).then(onfulfilled),
     );
     // Transaction: subsequent checkpoints query filters by studentId
@@ -197,8 +198,8 @@ describe('Deadline adjustment in submitReview', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(sla.calculateBreachDuration).mockReturnValue(2);
 
-    // Initial query
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+    // Locked transaction read returns submission data (via mockTx.then)
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
       Promise.resolve(makeSubmissionRow()).then(onfulfilled),
     );
     mockTx.then.mockImplementation((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));

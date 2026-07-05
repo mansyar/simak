@@ -48,6 +48,7 @@ describe('Assignment & Review handlers audit logging', () => {
       where: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
       groupBy: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),

@@ -47,20 +47,20 @@ Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) →
     - [x] Attach a git note.
 - [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
-## Phase 3: Atomic Checkpoint Read in `submitReviewHandler` (full gap — read outside the tx)
+## Phase 3: Atomic Checkpoint Read in `submitReviewHandler` (full gap — read outside the tx) [checkpoint TBD]
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
-- [ ] Task: Write failing unit tests (Red phase)
-    - [ ] Reshape the existing `submitReviewHandler` unit tests (`reviews-handlers.test.ts`, `reviews-intent.test.ts`, `reviews-advisory-isolation.test.ts`) so the checkpoint read flows through `tx.select(...).for('update')` (MockTx queue: outer read removed; in-tx locked read enqueued).
-    - [ ] Add stale-state tests: a concurrent submitReview that re-reads a non-reviewable state returns the existing `'Checkpoint is not in a reviewable state'` error and inserts no review.
-    - [ ] Run the relevant test files and confirm they fail (Red).
-- [ ] Task: Implement (Green phase)
-    - [ ] In `src/server/reviews.server.ts`, move the checkpoint read (lines 239–266) inside the existing `db.transaction` (starts at 301); read with `.for('update')`.
-    - [ ] Re-validate `REVIEWABLE_STATES` after acquiring the lock, before the review insert / state mutation / next-checkpoint unlock.
-    - [ ] Preserve upload-intent consumption, SLA, notification, and post-commit advisory logic unchanged.
-    - [ ] Run unit tests; confirm pass (Green).
-- [ ] Task: Refactor (optional)
+- [x] Task: Read spec.md and workflow.md
+    - [x] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
+- [x] Task: Write failing unit tests (Red phase)
+    - [x] Reshape the existing `submitReviewHandler` unit tests (`reviews-handlers.test.ts`, `reviews-intent.test.ts`, `reviews-advisory-isolation.test.ts`) so the checkpoint read flows through `tx.select(...).for('update')` (MockTx queue: outer read removed; in-tx locked read enqueued).
+    - [x] Add stale-state tests: a concurrent submitReview that re-reads a non-reviewable state returns the existing `'Checkpoint is not in a reviewable state'` error and inserts no review.
+    - [x] Run the relevant test files and confirm they fail (Red).
+- [x] Task: Implement (Green phase)
+    - [x] In `src/server/reviews.server.ts`, move the checkpoint read (lines 239–266) inside the existing `db.transaction` (starts at 301); read with `.for('update')`.
+    - [x] Re-validate `REVIEWABLE_STATES` after acquiring the lock, before the review insert / state mutation / next-checkpoint unlock.
+    - [x] Preserve upload-intent consumption, SLA, notification, and post-commit advisory logic unchanged.
+    - [x] Run unit tests; confirm pass (Green).
+- [~] Task: Refactor (optional)
     - [ ] Remove now-dead outer-read variables; consolidate duplicate state predicates if a pre-lock validation is retained.
     - [ ] Re-run unit tests.
 - [ ] Task: Verify coverage

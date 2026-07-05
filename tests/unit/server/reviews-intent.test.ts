@@ -100,6 +100,14 @@ function createSubmissionRow(state: string) {
   };
 }
 
+function assertCheckpointReadForUpdate(mockTx: MockTx) {
+  const hasForUpdate = mockTx.calls.some((call: any) => {
+    const path = (call as { path: string[] }).path;
+    return path.some((_, i) => path[i] === 'for' && path[i + 1] === 'update');
+  });
+  expect(hasForUpdate).toBe(true);
+}
+
 describe('submitReviewHandler - upload intent verification', () => {
   let mockTx: MockTx;
   let mockDb: ReturnType<typeof dbMod.getDb>;
@@ -118,7 +126,7 @@ describe('submitReviewHandler - upload intent verification', () => {
   it('AC-H1-1: rejects a fabricated feedback fileKey with no matching intent', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-    // Outer submission select.
+    // Locked submission select inside the transaction.
     mockTx.enqueue([createSubmissionRow('under_review')]);
     mockTx.enqueue([]); // intent: none
 
@@ -128,6 +136,23 @@ describe('submitReviewHandler - upload intent verification', () => {
     if (!isServerError(result)) throw new Error('Expected server error');
     expect(result.error.code).toBe('BAD_REQUEST');
     expect(result.error.message).toBe('Invalid or expired upload intent');
+    assertCheckpointReadForUpdate(mockTx);
+  });
+
+  it('AC-H1-5: rejects review when locked re-read is not in a reviewable state', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+
+    mockTx.enqueue([createSubmissionRow('passed')]);
+
+    const result = await submitReviewHandler({ data: baseReviewData });
+
+    expect(isServerError(result)).toBe(true);
+    if (!isServerError(result)) throw new Error('Expected server error');
+    expect(result.error.code).toBe('BAD_REQUEST');
+    expect(result.error.message).toBe('Checkpoint is not in a reviewable state');
+    // Only the locked checkpoint read should execute; no upload-intent lookup.
+    expect(mockTx.calls.length).toBe(1);
+    assertCheckpointReadForUpdate(mockTx);
   });
 
   it('AC-H1-2: rejects an intent issued for a different instructor', async () => {
@@ -150,6 +175,7 @@ describe('submitReviewHandler - upload intent verification', () => {
     if (!isServerError(result)) throw new Error('Expected server error');
     expect(result.error.code).toBe('BAD_REQUEST');
     expect(result.error.message).toBe('Invalid or expired upload intent');
+    assertCheckpointReadForUpdate(mockTx);
   });
 
   it('AC-H1-3: accepts a valid intent, consumes it, and rejects a second review with same fileKey', async () => {
@@ -175,6 +201,7 @@ describe('submitReviewHandler - upload intent verification', () => {
 
     const result1 = await submitReviewHandler({ data: baseReviewData });
     expect(result1).toEqual({ success: true });
+    assertCheckpointReadForUpdate(mockTx);
 
     // Second review with same feedback fileKey fails.
     mockTx = new MockTx();
@@ -191,6 +218,7 @@ describe('submitReviewHandler - upload intent verification', () => {
     if (!isServerError(result2)) throw new Error('Expected server error');
     expect(result2.error.code).toBe('BAD_REQUEST');
     expect(result2.error.message).toBe('Invalid or expired upload intent');
+    assertCheckpointReadForUpdate(mockTx);
   });
 
   it('AC-H1-4: rejects review feedback whose R2 HEAD Content-Length exceeds 25MB', async () => {
@@ -215,5 +243,6 @@ describe('submitReviewHandler - upload intent verification', () => {
     expect(result.error.code).toBe('BAD_REQUEST');
     expect(result.error.message).toBe('File size exceeds 25MB limit');
     expect(getObjectContentLength).toHaveBeenCalledWith({ key: 'feedback/uuid-123.pdf' });
+    assertCheckpointReadForUpdate(mockTx);
   });
 });

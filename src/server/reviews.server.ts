@@ -235,48 +235,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
   const db = getDb();
 
   try {
-    // 1. Verify ownership — submission belongs to an assignment owned by this instructor
-    const [submission] = await db
-      .select({
-        checkpointId: checkpoints.id,
-        checkpointState: checkpoints.state,
-        checkpointName: checkpoints.name,
-        assignmentId: assignments.id,
-        assignmentTitle: assignments.title,
-        instructorId: assignments.instructorId,
-        studentId: checkpoints.studentId,
-        studentName: users.name,
-        uploadedAt: submissions.uploadedAt,
-        checkpointUpdatedAt: checkpoints.updatedAt,
-        checkpointDueDate: checkpoints.dueDate,
-        checkpointOrder: checkpoints.order,
-        finalDeadline: assignments.finalDeadline,
-      })
-      .from(submissions)
-      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-      .innerJoin(users, eq(checkpoints.studentId, users.id))
-      .where(
-        and(
-          eq(submissions.id, submissionId),
-          eq(assignments.instructorId, session.user.id),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .limit(1);
-
-    if (!submission) {
-      return serverError(ErrorCode.NOT_FOUND, 'Submission not found');
-    }
-
-    // 2. Validate checkpoint is in reviewable state
-    if (
-      !REVIEWABLE_STATES.includes(submission.checkpointState as (typeof REVIEWABLE_STATES)[number])
-    ) {
-      return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in a reviewable state');
-    }
-
-    // 3. If revise, revision deadline is required
+    // 1. If revise, revision deadline is required (input validation only).
     if (decision === 'revise' && !revisionDeadline) {
       return serverError(
         ErrorCode.BAD_REQUEST,
@@ -284,22 +243,66 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       );
     }
 
-    // 4. Execute in transaction
-    let breachDays = 0;
-    const slaFields: SLASubmissionFields = {
-      checkpointId: submission.checkpointId,
-      checkpointDueDate: submission.checkpointDueDate,
-      checkpointName: submission.checkpointName ?? '',
-      checkpointOrder: submission.checkpointOrder,
-      assignmentId: submission.assignmentId,
-      assignmentTitle: submission.assignmentTitle ?? '',
-      studentId: submission.studentId,
-      studentName: submission.studentName ?? '',
-      finalDeadline: submission.finalDeadline,
-    };
-
+    // 2. Execute in transaction
     const txResult = await db.transaction(async (tx) => {
-      // 4a. Verify and consume upload intent for review feedback (H1 trust boundary).
+      // 2a. Verify ownership — submission belongs to an assignment owned by this instructor
+      const [submission] = await tx
+        .select({
+          checkpointId: checkpoints.id,
+          checkpointState: checkpoints.state,
+          checkpointName: checkpoints.name,
+          assignmentId: assignments.id,
+          assignmentTitle: assignments.title,
+          instructorId: assignments.instructorId,
+          studentId: checkpoints.studentId,
+          studentName: users.name,
+          uploadedAt: submissions.uploadedAt,
+          checkpointUpdatedAt: checkpoints.updatedAt,
+          checkpointDueDate: checkpoints.dueDate,
+          checkpointOrder: checkpoints.order,
+          finalDeadline: assignments.finalDeadline,
+        })
+        .from(submissions)
+        .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+        .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+        .innerJoin(users, eq(checkpoints.studentId, users.id))
+        .where(
+          and(
+            eq(submissions.id, submissionId),
+            eq(assignments.instructorId, session.user.id),
+            isNull(assignments.deletedAt),
+          ),
+        )
+        .limit(1)
+        .for('update');
+
+      if (!submission) {
+        return serverError(ErrorCode.NOT_FOUND, 'Submission not found');
+      }
+
+      // 2b. Validate checkpoint is in reviewable state (post-lock).
+      if (
+        !REVIEWABLE_STATES.includes(
+          submission.checkpointState as (typeof REVIEWABLE_STATES)[number],
+        )
+      ) {
+        return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in a reviewable state');
+      }
+
+      let breachDays = 0;
+      const slaFields: SLASubmissionFields = {
+        checkpointId: submission.checkpointId,
+        checkpointDueDate: submission.checkpointDueDate,
+        checkpointName: submission.checkpointName ?? '',
+        checkpointOrder: submission.checkpointOrder,
+        assignmentId: submission.assignmentId,
+        assignmentTitle: submission.assignmentTitle ?? '',
+        studentId: submission.studentId,
+        studentName: submission.studentName ?? '',
+        finalDeadline: submission.finalDeadline,
+      };
+
+      // 2c. Verify and consume upload intent for review feedback (H1 trust boundary).
       if (feedbackFileKey) {
         const now = new Date();
         const [intent] = await tx
@@ -338,7 +341,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           .where(eq(uploadIntents.fileKey, feedbackFileKey));
       }
 
-      // 4b. Insert review record
+      // 2d. Insert review record
       await tx.insert(reviews).values({
         submissionId,
         instructorId: session.user.id,
@@ -351,13 +354,13 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       });
 
       if (decision === 'pass') {
-        // 4b. Set checkpoint to passed
+        // 2e. Set checkpoint to passed
         await tx
           .update(checkpoints)
           .set({ state: 'passed', updatedAt: new Date() })
           .where(eq(checkpoints.id, submission.checkpointId));
 
-        // 4c. Unlock next sequential checkpoint
+        // 2f. Unlock next sequential checkpoint
         // (minConsultations gates SUBMISSION, not unlock — enforced in
         //  submitCheckpointHandler, not here)
         const nextCheckpoint = await tx
@@ -380,14 +383,14 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
             .where(eq(checkpoints.id, nextCheckpoint[0].id));
         }
       } else if (decision === 'revise') {
-        // 4d. Set checkpoint to revise
+        // 2g. Set checkpoint to revise
         await tx
           .update(checkpoints)
           .set({ state: 'revise', updatedAt: new Date() })
           .where(eq(checkpoints.id, submission.checkpointId));
       }
 
-      // 4e. SLA breach detection & deadline adjustment
+      // 2h. SLA breach detection & deadline adjustment
       // H2: SLA clock is anchored at submission time. A student waiting since
       // upload earns a deadline extension whenever the instructor reviews late,
       // regardless of whether openForReview was explicitly called first.
@@ -398,7 +401,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
         await adjustDeadlinesForBreach(tx, slaFields, breachDays);
       }
 
-      // 4f. Create notification for the student (review_completed or revision_requested)
+      // 2i. Create notification for the student (review_completed or revision_requested)
       const reviewParams = {
         checkpointName: submission.checkpointName,
         assignmentTitle: submission.assignmentTitle,
@@ -438,14 +441,16 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
         });
       }
 
-      return { success: true };
+      return { success: true, submission, breachDays, slaFields };
     });
 
     if (isServerError(txResult)) {
       return txResult;
     }
 
-    // 4g. Audit logging (post-commit advisory — must not fail the request)
+    const { submission, breachDays, slaFields } = txResult;
+
+    // 3. Audit logging (post-commit advisory — must not fail the request)
     try {
       await logAuditEvent({
         actorId: session.user.id,
@@ -461,7 +466,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       console.error('Post-commit advisory work failed in submitReviewHandler:', advisoryErr);
     }
 
-    // 4f. SLA breach notifications (after transaction — advisory, non-critical)
+    // 4. SLA breach notifications (after transaction — advisory, non-critical)
     if (breachDays > 0) {
       try {
         await dispatchSLABreachNotifications(db, slaFields, breachDays);

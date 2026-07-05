@@ -29,6 +29,7 @@ vi.mock('@/lib/review-sla', async (importOriginal) => {
 
 describe('submitReviewHandler - post-commit advisory isolation', () => {
   let mockDb: any;
+  let mockTx: any;
   const instructorSession = {
     user: { id: 'instructor-1', role: 'instructor' as const },
     session: {} as any,
@@ -37,13 +38,15 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    const mockTx = {
+    mockTx = {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
+      leftJoin: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
@@ -76,32 +79,25 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
     const reviewedAt = new Date();
     const underReviewAt = new Date(reviewedAt.getTime() - (3 + breachDays) * 24 * 60 * 60 * 1000);
 
-    mockDb.then
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            checkpointId: 100,
-            checkpointState: 'under_review',
-            checkpointUpdatedAt: underReviewAt,
-            uploadedAt: underReviewAt,
-            checkpointName: 'Chapter 1',
-            checkpointDueDate: new Date('2026-06-01'),
-            checkpointOrder: 1,
-            assignmentId: 1,
-            assignmentTitle: 'Thesis 2026',
-            instructorId: 'instructor-1',
-            studentId: 'student-1',
-            studentName: 'Alice',
-            finalDeadline: new Date('2026-08-01'),
-          },
-        ]).then(onfulfilled),
-      )
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          { id: 100, order: 1, state: 'under_review' },
-          { id: 101, order: 2, state: 'locked' },
-        ]).then(onfulfilled),
-      );
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([
+        {
+          checkpointId: 100,
+          checkpointState: 'under_review',
+          checkpointUpdatedAt: underReviewAt,
+          uploadedAt: underReviewAt,
+          checkpointName: 'Chapter 1',
+          checkpointDueDate: new Date('2026-06-01'),
+          checkpointOrder: 1,
+          assignmentId: 1,
+          assignmentTitle: 'Thesis 2026',
+          instructorId: 'instructor-1',
+          studentId: 'student-1',
+          studentName: 'Alice',
+          finalDeadline: new Date('2026-08-01'),
+        },
+      ]).then(onfulfilled),
+    );
   }
 
   it('should return success true when logAuditEvent throws', async () => {

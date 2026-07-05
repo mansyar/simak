@@ -158,33 +158,32 @@ describe('Event trigger notifications', () => {
     it('should create a review_completed notification for the student when pass decision is made', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-      // Initial submission lookup
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            checkpointId: 100,
-            checkpointState: 'under_review',
-            assignmentId: 1,
-            instructorId: 'instructor-1',
-            studentId: 'student-1',
-            studentName: 'Alice',
-            checkpointName: 'Chapter 1',
-            assignmentTitle: 'Thesis 2026',
-            checkpointUpdatedAt: new Date('2026-05-20'),
-            checkpointDueDate: new Date('2026-06-15'),
-            checkpointOrder: 1,
-            finalDeadline: new Date('2026-07-01'),
-          },
-        ]).then(onfulfilled),
-      );
-
       // Transaction mock — pass decision
       mockDb.transaction.mockImplementation(async (cb: any) => {
+        // Locked submission read
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              checkpointId: 100,
+              checkpointState: 'under_review',
+              assignmentId: 1,
+              instructorId: 'instructor-1',
+              studentId: 'student-1',
+              studentName: 'Alice',
+              checkpointName: 'Chapter 1',
+              assignmentTitle: 'Thesis 2026',
+              checkpointUpdatedAt: new Date('2026-05-20'),
+              checkpointDueDate: new Date('2026-06-15'),
+              checkpointOrder: 1,
+              finalDeadline: new Date('2026-07-01'),
+            },
+          ]).then(onfulfilled),
+        );
         // Review insert
         mockTx.then.mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{}]).then(onfulfilled),
         );
-        await cb(mockTx);
+        return cb(mockTx);
       });
 
       const result = await submitReviewHandler({
@@ -205,33 +204,32 @@ describe('Event trigger notifications', () => {
     it('should create a revision_requested notification for the student when revise decision is made', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
-      // Initial submission lookup
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            checkpointId: 100,
-            checkpointState: 'under_review',
-            assignmentId: 1,
-            instructorId: 'instructor-1',
-            studentId: 'student-1',
-            studentName: 'Alice',
-            checkpointName: 'Chapter 1',
-            assignmentTitle: 'Thesis 2026',
-            checkpointUpdatedAt: new Date('2026-05-20'),
-            checkpointDueDate: new Date('2026-06-15'),
-            checkpointOrder: 1,
-            finalDeadline: new Date('2026-07-01'),
-          },
-        ]).then(onfulfilled),
-      );
-
       // Transaction mock — revise decision
       mockDb.transaction.mockImplementation(async (cb: any) => {
+        // Locked submission read
+        mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              checkpointId: 100,
+              checkpointState: 'under_review',
+              assignmentId: 1,
+              instructorId: 'instructor-1',
+              studentId: 'student-1',
+              studentName: 'Alice',
+              checkpointName: 'Chapter 1',
+              assignmentTitle: 'Thesis 2026',
+              checkpointUpdatedAt: new Date('2026-05-20'),
+              checkpointDueDate: new Date('2026-06-15'),
+              checkpointOrder: 1,
+              finalDeadline: new Date('2026-07-01'),
+            },
+          ]).then(onfulfilled),
+        );
         // Review insert
         mockTx.then.mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{}]).then(onfulfilled),
         );
-        await cb(mockTx);
+        return cb(mockTx);
       });
 
       const result = await submitReviewHandler({
