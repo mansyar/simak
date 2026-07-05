@@ -25,27 +25,27 @@ Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) →
     - [x] Attach a git note summarizing the change, files touched, and the why (serialize concurrent submissions).
 - [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
-## Phase 2: Atomic Checkpoint Read in `openForReviewHandler` (full gap — no transaction at all)
+## Phase 2: Atomic Checkpoint Read in `openForReviewHandler` (full gap — no transaction at all) [checkpoint `0857fb8`]
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
-- [ ] Task: Write failing unit tests (Red phase)
-    - [ ] Reshape existing `openForReviewHandler` unit tests in `tests/unit/server/reviews-*.test.ts` to assert a transaction wraps the read + `FOR UPDATE` + mutation (MockTx queue routing).
-    - [ ] Add a stale-state test: a late `openForReview` that re-reads `passed`/`revise` returns the existing `notInSubmittedState` error and does NOT mutate state.
-    - [ ] Run the relevant test files and confirm they fail (Red).
-- [ ] Task: Implement (Green phase)
-    - [ ] In `src/server/reviews-extras.server.ts`, wrap the checkpoint read, `submitted` validation, and `under_review` mutation in `db.transaction(async (tx) => {...})`.
-    - [ ] Read the checkpoint row with `.for('update')` inside the tx; re-validate state after acquiring the lock.
-    - [ ] Run the unit tests; confirm they pass (Green).
-- [ ] Task: Refactor (optional)
-    - [ ] Ensure the error path returns the existing `translateKey('instructorReviews.errors.notInSubmittedState', locale)` message unchanged (no new i18n keys).
-    - [ ] Re-run unit tests.
-- [ ] Task: Verify coverage
-    - [ ] Run `pnpm test:coverage`; confirm thresholds hold for `src/server/reviews-extras.server.ts`.
-- [ ] Task: Commit and attach git note
-    - [ ] Commit as `fix(reviews): Make openForReview atomic with SELECT FOR UPDATE`.
-    - [ ] Attach git note.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md (`09a9dfb`)
+    - [x] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
+- [x] Task: Write failing unit tests (Red phase) (`09a9dfb`)
+    - [x] Reshape existing `openForReviewHandler` unit tests in `tests/unit/server/reviews-*.test.ts` to assert a transaction wraps the read + `FOR UPDATE` + mutation (MockTx queue routing).
+    - [x] Add a stale-state test: a late `openForReview` that re-reads `passed`/`revise` returns the existing `notInSubmittedState` error and does NOT mutate state.
+    - [x] Run the relevant test files and confirm they fail (Red).
+- [x] Task: Implement (Green phase) (`09a9dfb`)
+    - [x] In `src/server/reviews-extras.server.ts`, wrap the checkpoint read, `submitted` validation, and `under_review` mutation in `db.transaction(async (tx) => {...})`.
+    - [x] Read the checkpoint row with `.for('update')` inside the tx; re-validate state after acquiring the lock.
+    - [x] Run the unit tests; confirm they pass (Green).
+- [x] Task: Refactor (optional) (`09a9dfb`)
+    - [x] Ensure the error path returns the existing `translateKey('instructorReviews.errors.notInSubmittedState', locale)` message unchanged (no new i18n keys).
+    - [x] Re-run unit tests.
+- [x] Task: Verify coverage (`09a9dfb`)
+    - [x] Run `pnpm test:coverage`; confirm thresholds hold for `src/server/reviews-extras.server.ts`.
+- [x] Task: Commit and attach git note (`09a9dfb`)
+    - [x] Commit as `fix(reviews): Make openForReview atomic with SELECT FOR UPDATE`.
+    - [x] Attach a git note.
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3: Atomic Checkpoint Read in `submitReviewHandler` (full gap — read outside the tx)
 
