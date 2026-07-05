@@ -88,4 +88,7 @@ Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) →
     - [x] Commit as `test(reviews): Add concurrency integration tests for atomic review transitions`.
     - [x] Attach a git note.
 - [x] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions (1e38b49)
 </protect>
