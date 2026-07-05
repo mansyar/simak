@@ -1,10 +1,6 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  listPendingReviewsHandler,
-  openForReviewHandler,
-  submitReviewHandler,
-} from '@/server/reviews.server';
+import { listPendingReviewsHandler, submitReviewHandler } from '@/server/reviews.server';
 import { adjustDeadlinesForBreach, dispatchSLABreachNotifications } from '@/lib/review-sla';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
@@ -191,62 +187,6 @@ describe('Review handlers - Logic & Security', () => {
       })) as any;
       expect(result.items).toHaveLength(1);
       expect(result.total).toBe(1);
-    });
-  });
-
-  describe('openForReviewHandler', () => {
-    it('should reject if unauthorized', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await openForReviewHandler({ data: { submissionId: 1 } });
-      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
-    });
-
-    it('should transition submitted to under_review', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            checkpointId: 100,
-            checkpointState: 'submitted',
-            assignmentId: 1,
-            instructorId: 'instructor-1',
-          },
-        ]).then(onfulfilled),
-      );
-      const result = await openForReviewHandler({ data: { submissionId: 1 } });
-      expect(result).toEqual({ success: true });
-      expect(mockDb.update).toHaveBeenCalled();
-    });
-
-    it('should reject if checkpoint is not in submitted state', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            checkpointId: 100,
-            checkpointState: 'passed',
-            assignmentId: 1,
-            instructorId: 'instructor-1',
-          },
-        ]).then(onfulfilled),
-      );
-      const result = await openForReviewHandler({ data: { submissionId: 1 } });
-      expect(result).toEqual({
-        error: {
-          code: 'BAD_REQUEST',
-          message: 'Checkpoint must be in submitted state to open for review',
-        },
-      });
-    });
-
-    it('should return error for non-existent submission', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
-
-      const result = await openForReviewHandler({ data: { submissionId: 999 } });
-      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Submission not found' } });
     });
   });
 

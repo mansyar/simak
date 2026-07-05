@@ -33,44 +33,47 @@ export async function openForReviewHandler(args: { data: OpenForReviewInput }) {
   const db = getDb();
 
   try {
-    // 1. Verify submission exists, get its checkpoint and assignment
-    const [submission] = await db
-      .select({
-        checkpointId: checkpoints.id,
-        checkpointState: checkpoints.state,
-        assignmentId: assignments.id,
-        instructorId: assignments.instructorId,
-      })
-      .from(submissions)
-      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-      .where(
-        and(
-          eq(submissions.id, submissionId),
-          eq(assignments.instructorId, session.user.id),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .limit(1);
+    return await db.transaction(async (tx) => {
+      // 1. Verify submission exists, get its checkpoint and assignment
+      const [submission] = await tx
+        .select({
+          checkpointId: checkpoints.id,
+          checkpointState: checkpoints.state,
+          assignmentId: assignments.id,
+          instructorId: assignments.instructorId,
+        })
+        .from(submissions)
+        .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+        .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+        .where(
+          and(
+            eq(submissions.id, submissionId),
+            eq(assignments.instructorId, session.user.id),
+            isNull(assignments.deletedAt),
+          ),
+        )
+        .limit(1)
+        .for('update');
 
-    if (!submission) {
-      return serverError(ErrorCode.NOT_FOUND, 'Submission not found');
-    }
+      if (!submission) {
+        return serverError(ErrorCode.NOT_FOUND, 'Submission not found');
+      }
 
-    // 2. Validates checkpoint is in submitted state
-    if (submission.checkpointState !== 'submitted') {
-      const locale = (session.user.locale || 'en') as 'en' | 'id';
-      const message = translateKey('instructorReviews.errors.notInSubmittedState', locale);
-      return serverError(ErrorCode.BAD_REQUEST, message);
-    }
+      // 2. Validates checkpoint is in submitted state
+      if (submission.checkpointState !== 'submitted') {
+        const locale = (session.user.locale || 'en') as 'en' | 'id';
+        const message = translateKey('instructorReviews.errors.notInSubmittedState', locale);
+        return serverError(ErrorCode.BAD_REQUEST, message);
+      }
 
-    // 3. Transition to under_review
-    await db
-      .update(checkpoints)
-      .set({ state: 'under_review', updatedAt: new Date() })
-      .where(eq(checkpoints.id, submission.checkpointId));
+      // 3. Transition to under_review
+      await tx
+        .update(checkpoints)
+        .set({ state: 'under_review', updatedAt: new Date() })
+        .where(eq(checkpoints.id, submission.checkpointId));
 
-    return { success: true };
+      return { success: true };
+    });
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

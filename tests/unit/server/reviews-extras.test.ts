@@ -1,8 +1,13 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getLatestReviewHandler, getReviewDetailHandler } from '@/server/reviews.server';
+import {
+  getLatestReviewHandler,
+  getReviewDetailHandler,
+  openForReviewHandler,
+} from '@/server/reviews.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
+import { checkpoints } from '@/db/schema/assignments';
 import { serverError, ErrorCode } from '@/lib/errors';
 
 vi.mock('@/server/auth', () => ({
@@ -22,6 +27,7 @@ vi.mock('@/lib/storage', () => ({
 
 describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
   let mockDb: any;
+  let mockTx: any;
   const instructorSession = {
     user: { id: 'instructor-1', role: 'instructor' as const },
     session: {} as any,
@@ -38,7 +44,7 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    const mockTx = {
+    mockTx = {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
@@ -49,6 +55,7 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
       values: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
       set: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       then: vi.fn((onfulfilled: any) => Promise.resolve([]).then(onfulfilled)),
     };
 
@@ -217,6 +224,72 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
       );
       const result = await getReviewDetailHandler({ data: { submissionId: 999 } });
       expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Submission not found' } });
+    });
+  });
+
+  describe('openForReviewHandler', () => {
+    it('should reject if unauthorized', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+      const result = await openForReviewHandler({ data: { submissionId: 1 } });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
+    });
+
+    it('should transition submitted to under_review with SELECT FOR UPDATE inside a transaction', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          {
+            checkpointId: 100,
+            checkpointState: 'submitted',
+            assignmentId: 1,
+            instructorId: 'instructor-1',
+          },
+        ]).then(onfulfilled),
+      );
+
+      const result = await openForReviewHandler({ data: { submissionId: 1 } });
+
+      expect(result).toEqual({ success: true });
+      expect(mockDb.transaction).toHaveBeenCalled();
+      expect(mockTx.for).toHaveBeenCalledWith('update');
+      expect(mockTx.update).toHaveBeenCalledWith(checkpoints);
+      expect(mockTx.set).toHaveBeenCalledWith({
+        state: 'under_review',
+        updatedAt: expect.any(Date),
+      });
+    });
+
+    it('should reject if locked re-read shows a non-submitted state', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          {
+            checkpointId: 100,
+            checkpointState: 'passed',
+            assignmentId: 1,
+            instructorId: 'instructor-1',
+          },
+        ]).then(onfulfilled),
+      );
+
+      const result = await openForReviewHandler({ data: { submissionId: 1 } });
+
+      expect(result).toEqual({
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'Checkpoint must be in submitted state to open for review',
+        },
+      });
+      expect(mockTx.update).not.toHaveBeenCalled();
+    });
+
+    it('should return error for non-existent submission', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+
+      const result = await openForReviewHandler({ data: { submissionId: 999 } });
+
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Submission not found' } });
+      expect(mockTx.update).not.toHaveBeenCalled();
     });
   });
 });
