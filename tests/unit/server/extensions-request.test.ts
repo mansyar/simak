@@ -58,6 +58,9 @@ describe('requestExtensionHandler', () => {
       then: vi.fn(function (onfulfilled: any) {
         return Promise.resolve([]).then(onfulfilled);
       }),
+      transaction: vi.fn(async (callback: (tx: any) => any) => {
+        return callback(mockDb);
+      }),
     };
     vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
   });
@@ -153,6 +156,8 @@ describe('requestExtensionHandler', () => {
     expect(result).toHaveProperty('extensionRequest');
     if (isServerError(result)) throw new Error(result.error.message);
     expect(result.extensionRequest!.id).toBe(100);
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+    expect(mockDb.insert).toHaveBeenCalledTimes(2);
   });
 
   it('should create extension request with specific checkpointId', async () => {
@@ -180,6 +185,8 @@ describe('requestExtensionHandler', () => {
     expect(result).toHaveProperty('extensionRequest');
     if (isServerError(result)) throw new Error(result.error.message);
     expect(result.extensionRequest!.id).toBe(101);
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+    expect(mockDb.insert).toHaveBeenCalledTimes(2);
   });
 
   it('should return error if target checkpoint not found', async () => {
@@ -227,10 +234,51 @@ describe('requestExtensionHandler', () => {
 
     await requestExtensionHandler({ data: validInput });
 
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1);
     expect(mockDb.insert).toHaveBeenCalledTimes(2);
     const valuesCalls = vi.mocked(mockDb.values).mock.calls;
     const notificationValues = valuesCalls[1][0];
     expect(notificationValues.userId).toBe('instructor-1');
     expect(notificationValues.type).toBe('extension_requested');
+  });
+
+  it('should roll back extension request when notification insert fails', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { maxExtensionDays: 7, maxTotalExtensions: 3, instructorId: 'instructor-1' },
+        ]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 0 }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 10, dueDate: new Date('2026-06-15'), order: 1 }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ dueDate: new Date('2026-06-15') }]).then(onfulfilled),
+      );
+
+    mockDb.returning.mockResolvedValue([{ id: 100 }]);
+    mockDb.insert.mockReturnValueOnce(mockDb).mockImplementationOnce(() => {
+      throw new Error('notification insert failed');
+    });
+
+    const result = await requestExtensionHandler({ data: validInput });
+
+    expect(result).toEqual({
+      error: {
+        code: 'INTERNAL',
+        message: 'Internal Server Error',
+      },
+    });
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+    expect(mockDb.insert).toHaveBeenCalledTimes(2);
+    await expect(mockDb.transaction.mock.results[0].value).rejects.toThrow(
+      'notification insert failed',
+    );
   });
 });
