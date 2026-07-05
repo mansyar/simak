@@ -28,15 +28,15 @@
     - [x] Run `pnpm vitest run tests/integration/auth/concurrent-token-replay.test.ts tests/unit/server/setup-password-boundary.test.ts` and confirm all tests pass (Green phase)
 - [x] Task: Conductor - User Manual Verification 'Phase 1: TDD — Failing Tests & Atomic Consume-Once Implementation' (Protocol in workflow.md)
 
-## Phase 2: Final Verification
+## Phase 2: Final Verification [checkpoint: c23df1d]
 
-- [~] Task: Read spec.md and workflow.md
-    - [ ] Read `./spec.md` to confirm requirements and acceptance criteria
-    - [ ] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
-- [ ] Task: Run full quality gates
-    - [ ] Run `pnpm typecheck` — confirm no type errors
-    - [ ] Run `pnpm lint` — confirm no lint errors
-    - [ ] Run `pnpm test:coverage` — confirm >=80% thresholds (lines, functions, branches, statements)
-    - [ ] Run `pnpm test:integration` — confirm all integration tests (including the new concurrent-token-replay tests) pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Final Verification' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md
+    - [x] Read `./spec.md` to confirm requirements and acceptance criteria
+    - [x] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
+- [x] Task: Run full quality gates
+    - [x] Run `pnpm typecheck` — confirm no type errors
+    - [x] Run `pnpm lint` — confirm no lint errors
+    - [x] Run `pnpm test:coverage` — confirm >=80% thresholds (lines, functions, branches, statements)
+    - [x] Run `pnpm test:integration` — confirm all integration tests (including the new concurrent-token-replay tests) pass
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Final Verification' (Protocol in workflow.md)
 </protect>
