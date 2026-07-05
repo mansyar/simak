@@ -1,26 +1,26 @@
 <protect>
 # Implementation Plan: Atomic Extension Request + Notification
 
-## Phase 1: Reshape Unit Tests to Mock `db.transaction` (Red)
+## Phase 1: Reshape Unit Tests to Mock `db.transaction` (Red) [checkpoint: 3420328]
 
-- [ ] Task: Pre-phase context review
-    - [ ] Read `spec.md` (`./conductor/tracks/extension-atomic_20260704/spec.md`) to confirm requirements and acceptance criteria
-    - [ ] Read `workflow.md` (`./conductor/workflow.md`) to confirm TDD workflow and quality gates
-- [ ] Task: Add `transaction` mock to `mockDb` in `beforeEach`
-    - [ ] Add a `transaction: vi.fn()` method to the `mockDb` object in `beforeEach` that invokes the provided callback with `mockDb` itself as the `tx` argument, returning the callback's result
-    - [ ] Ensure the existing `.then` queue logic continues to work when reads run on `db` and writes run on `tx` (same mock object)
-- [ ] Task: Update existing 9 unit tests for the transaction boundary
-    - [ ] Update the two happy-path tests ("create extension request successfully with default checkpoint" + "create extension request with specific checkpointId") to assert `tx.insert` is called instead of `db.insert` for both the extensionRequests and notifications writes
-    - [ ] Update the "should notify instructor via notification insert" test to assert the notification insert goes through `tx.insert` (not `db.insert`), and that `db.transaction` was called once
-    - [ ] Verify the 6 validation-read tests (unauthorized, not-a-student, not-enrolled, exceeds-max-days, max-extensions-exceeded, checkpoint-not-found) still pass without modification — they short-circuit before the transaction boundary
-- [ ] Task: Add new rollback unit test
-    - [ ] Write a test that mocks `db.transaction` to invoke the callback, then makes the second `tx.insert` (notifications) throw an error
-    - [ ] Assert the handler returns `serverError(INTERNAL)`
-    - [ ] Assert the extensionRequests insert was called inside the tx but the transaction rejected (rollback semantics)
-- [ ] Task: Run tests and confirm Red phase
-    - [ ] Run `pnpm vitest run tests/unit/server/extensions-request.test.ts` and confirm the reshaped/new tests fail because `requestExtensionHandler` does not yet call `db.transaction`
+- [x] Task: Pre-phase context review
+    - [x] Read `spec.md` (`./conductor/tracks/extension-atomic_20260704/spec.md`) to confirm requirements and acceptance criteria
+    - [x] Read `workflow.md` (`./conductor/workflow.md`) to confirm TDD workflow and quality gates
+- [x] Task: Add `transaction` mock to `mockDb` in `beforeEach`
+    - [x] Add a `transaction: vi.fn()` method to the `mockDb` object in `beforeEach` that invokes the provided callback with `mockDb` itself as the `tx` argument, returning the callback's result
+    - [x] Ensure the existing `.then` queue logic continues to work when reads run on `db` and writes run on `tx` (same mock object)
+- [x] Task: Update existing 9 unit tests for the transaction boundary
+    - [x] Update the two happy-path tests ("create extension request successfully with default checkpoint" + "create extension request with specific checkpointId") to assert `tx.insert` is called instead of `db.insert` for both the extensionRequests and notifications writes
+    - [x] Update the "should notify instructor via notification insert" test to assert the notification insert goes through `tx.insert` (not `db.insert`), and that `db.transaction` was called once
+    - [x] Verify the 6 validation-read tests (unauthorized, not-a-student, not-enrolled, exceeds-max-days, max-extensions-exceeded, checkpoint-not-found) still pass without modification — they short-circuit before the transaction boundary
+- [x] Task: Add new rollback unit test
+    - [x] Write a test that mocks `db.transaction` to invoke the callback, then makes the second `tx.insert` (notifications) throw an error
+    - [x] Assert the handler returns `serverError(INTERNAL)`
+    - [x] Assert the extensionRequests insert was called inside the tx but the transaction rejected (rollback semantics)
+- [x] Task: Run tests and confirm Red phase
+    - [x] Run `pnpm vitest run tests/unit/server/extensions-request.test.ts` and confirm the reshaped/new tests fail because `requestExtensionHandler` does not yet call `db.transaction`
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Reshape Unit Tests to Mock `db.transaction` (Red)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Reshape Unit Tests to Mock `db.transaction` (Red)' (Protocol in workflow.md)
 
 ## Phase 2: Wrap Two Writes in `db.transaction` (Green)
 
