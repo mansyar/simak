@@ -68,24 +68,24 @@ Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) →
 - [x] Task: Commit and attach git note (`d4b843a`)
     - [x] Commit as `fix(reviews): Make submitReview atomic with SELECT FOR UPDATE on checkpoint`.
     - [x] Attach git note.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
-## Phase 4: Concurrency Integration Tests (C2/H3 Precedent)
+## Phase 4: Concurrency Integration Tests (C2/H3 Precedent) [checkpoint `86b5a4c`]
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
-- [ ] Task: Write integration tests
-    - [ ] Add `tests/integration/server/reviews-concurrency.test.ts` mirroring the `submissions-intent.test.ts` / `concurrent-version-race.test.ts` precedent.
-    - [ ] Test: two concurrent `submitReviewHandler` calls (pass vs revise) on the same submission → exactly one succeeds, exactly one `reviews` row inserted, checkpoint ends in a single deterministic state.
-    - [ ] Test: a late `openForReviewHandler` invoked after a completed `submitReview` (pass) → rejected with `notInSubmittedState`, checkpoint remains `passed`.
-    - [ ] Test (optional): two concurrent `submitCheckpointHandler` calls → exactly one inserts + transitions; the second rejects on stale state.
-- [ ] Task: Run integration tests
-    - [ ] Ensure local PostgreSQL is up (`docker-compose up -d`).
-    - [ ] Run `pnpm test:integration` and confirm all pass.
-- [ ] Task: Verify full suite + gates
-    - [ ] Run `pnpm typecheck`, `pnpm lint`, `pnpm test:coverage`; confirm clean and thresholds met (AC7).
-- [ ] Task: Commit and attach git note
-    - [ ] Commit as `test(reviews): Add concurrency integration tests for atomic review transitions`.
-    - [ ] Attach git note.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md
+    - [x] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
+- [x] Task: Write integration tests (`86b5a4c`)
+    - [x] Add `tests/integration/server/reviews-concurrency.test.ts` mirroring the `submissions-intent.test.ts` / `concurrent-version-race.test.ts` precedent.
+    - [x] Test: two concurrent `submitReviewHandler` calls (pass vs revise) on the same submission → exactly one succeeds, exactly one `reviews` row inserted, checkpoint ends in a single deterministic state.
+    - [x] Test: a late `openForReviewHandler` invoked after a completed `submitReview` (pass) → rejected with `notInSubmittedState`, checkpoint remains `passed`.
+    - [x] Test (optional): two concurrent `submitCheckpointHandler` calls → exactly one inserts + transitions; the second rejects on stale state.
+- [x] Task: Run integration tests (`86b5a4c`)
+    - [x] Ensure local PostgreSQL is up (`docker-compose up -d`).
+    - [x] Run `pnpm test:integration` and confirm all 11 integration tests pass.
+- [x] Task: Verify full suite + gates (`86b5a4c`)
+    - [x] Run `pnpm typecheck`, `pnpm lint`, `pnpm test:coverage`; confirm clean and thresholds met (AC7).
+- [x] Task: Commit and attach git note (`86b5a4c`)
+    - [x] Commit as `test(reviews): Add concurrency integration tests for atomic review transitions`.
+    - [x] Attach a git note.
+- [x] Task: Conductor - User Manual Verification 'Phase 4' (Protocol in workflow.md)
 </protect>
