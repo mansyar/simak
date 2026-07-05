@@ -251,7 +251,7 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
 
       expect(result).toEqual({ success: true });
       expect(mockDb.transaction).toHaveBeenCalled();
-      expect(mockTx.for).toHaveBeenCalledWith('update');
+      expect(mockTx.for).toHaveBeenCalledWith('update', { of: checkpoints });
       expect(mockTx.update).toHaveBeenCalledWith(checkpoints);
       expect(mockTx.set).toHaveBeenCalledWith({
         state: 'under_review',

@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { listPendingReviewsHandler, submitReviewHandler } from '@/server/reviews.server';
 import { adjustDeadlinesForBreach, dispatchSLABreachNotifications } from '@/lib/review-sla';
+import { checkpoints } from '@/db/schema/assignments';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 
@@ -220,7 +221,7 @@ describe('Review handlers - Logic & Security', () => {
       });
       expect(result).toEqual({ success: true });
       expect(mockDb.transaction).toHaveBeenCalled();
-      expect(mockTx.for).toHaveBeenCalledWith('update');
+      expect(mockTx.for).toHaveBeenCalledWith('update', { of: checkpoints });
     });
 
     it('should reject review when checkpoint is no longer reviewable after lock', async () => {
@@ -246,7 +247,7 @@ describe('Review handlers - Logic & Security', () => {
         },
       });
       expect(mockTx.insert).not.toHaveBeenCalled();
-      expect(mockTx.for).toHaveBeenCalledWith('update');
+      expect(mockTx.for).toHaveBeenCalledWith('update', { of: checkpoints });
     });
 
     it('should record a revise decision with deadline', async () => {
@@ -272,7 +273,7 @@ describe('Review handlers - Logic & Security', () => {
       });
       expect(result).toEqual({ success: true });
       expect(mockDb.transaction).toHaveBeenCalled();
-      expect(mockTx.for).toHaveBeenCalledWith('update');
+      expect(mockTx.for).toHaveBeenCalledWith('update', { of: checkpoints });
     });
 
     describe('SLA anchoring at submission time', () => {

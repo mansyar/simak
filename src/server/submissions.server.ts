@@ -64,7 +64,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
           ),
         )
         .limit(1)
-        .for('update');
+        .for('update', { of: checkpoints });
 
       if (!checkpoint) {
         return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');

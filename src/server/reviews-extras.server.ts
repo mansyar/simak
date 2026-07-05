@@ -53,7 +53,7 @@ export async function openForReviewHandler(args: { data: OpenForReviewInput }) {
           ),
         )
         .limit(1)
-        .for('update');
+        .for('update', { of: checkpoints });
 
       if (!submission) {
         return serverError(ErrorCode.NOT_FOUND, 'Submission not found');

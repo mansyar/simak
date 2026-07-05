@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { submitCheckpointHandler } from '@/server/submissions.server';
 import { isServerError } from '@/lib/errors';
+import { checkpoints } from '@/db/schema/assignments';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import { logAuditEvent } from '@/lib/audit';
@@ -186,7 +187,7 @@ describe('Submission server functions - Logic & Security', () => {
       });
 
       // FR2: the stale-state re-read must happen under FOR UPDATE.
-      expect(mockDb.for).toHaveBeenCalledWith('update');
+      expect(mockDb.for).toHaveBeenCalledWith('update', { of: checkpoints });
       expect(mockDb.insert).not.toHaveBeenCalled();
     });
 
