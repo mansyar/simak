@@ -1,11 +1,6 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { completePasswordSetupHandler } from '@/server/setup-password';
-import * as auth from '@/server/auth';
-
-vi.mock('@/server/auth', () => ({
-  getSessionFromHeaders: vi.fn(),
-}));
+import { completePasswordSetupHandler, type PasswordSetupResult } from '@/server/setup-password';
 
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: vi.fn().mockReturnValue({
@@ -14,12 +9,12 @@ vi.mock('@tanstack/react-start', () => ({
   }),
 }));
 
-// Capture the dynamically-imported helpers so the handler can run against mocks.
 const mockTx = {
   select: vi.fn().mockReturnThis(),
   from: vi.fn().mockReturnThis(),
   where: vi.fn().mockReturnThis(),
   limit: vi.fn().mockReturnThis(),
+  returning: vi.fn().mockReturnThis(),
   then: vi.fn(),
   insert: vi.fn().mockReturnThis(),
   values: vi.fn().mockReturnThis(),
@@ -29,11 +24,6 @@ const mockTx = {
 };
 
 const mockDb = {
-  select: vi.fn().mockReturnThis(),
-  from: vi.fn().mockReturnThis(),
-  where: vi.fn().mockReturnThis(),
-  limit: vi.fn().mockReturnThis(),
-  then: vi.fn(),
   transaction: vi.fn(async (callback) => callback(mockTx)),
 };
 
@@ -73,16 +63,19 @@ describe('completePasswordSetupHandler', () => {
     expect(result).toEqual({ error: 'Invalid token or password' });
   });
 
-  it('should wrap writes in a transaction and succeed', async () => {
-    mockDb.then
+  it('should atomically consume the token and complete setup', async () => {
+    mockTx.then
       .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ identifier: 'user@example.com', id: 'verif-id' }]).then(onfulfilled),
+        Promise.resolve([{ id: 'verif-id', identifier: 'user@example.com' }]).then(onfulfilled),
       )
       .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ id: 'user-id' }]).then(onfulfilled),
-      );
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
-    const result = await completePasswordSetupHandler({
+    const result: PasswordSetupResult = await completePasswordSetupHandler({
       data: { token: 'valid-token', password: 'securepassword' },
     });
 
@@ -90,16 +83,32 @@ describe('completePasswordSetupHandler', () => {
     expect(mockDb.transaction).toHaveBeenCalledTimes(1);
   });
 
-  it('should return an error when the transaction fails (partial writes prevented)', async () => {
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ identifier: 'user@example.com', id: 'verif-id' }]).then(onfulfilled),
-    );
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ id: 'user-id' }]).then(onfulfilled),
-    );
-    mockDb.transaction.mockRejectedValueOnce(new Error('token delete failed'));
+  it('should return a generic error when the token is missing, expired, or already consumed', async () => {
+    mockTx.then.mockImplementation((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
-    const result = await completePasswordSetupHandler({
+    const result: PasswordSetupResult = await completePasswordSetupHandler({
+      data: { token: 'used-token', password: 'securepassword' },
+    });
+
+    expect(result).toEqual({ error: 'Invalid or expired token' });
+  });
+
+  it('should return an internal error when the transaction fails', async () => {
+    mockDb.transaction.mockRejectedValueOnce(new Error('database failure'));
+
+    const result: PasswordSetupResult = await completePasswordSetupHandler({
+      data: { token: 'valid-token', password: 'securepassword' },
+    });
+
+    expect(result).toEqual({ error: 'Internal Server Error' });
+  });
+
+  it('should roll back and return an internal error when the user is not found', async () => {
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([{ id: 'verif-id', identifier: 'user@example.com' }]).then(onfulfilled),
+    );
+
+    const result: PasswordSetupResult = await completePasswordSetupHandler({
       data: { token: 'valid-token', password: 'securepassword' },
     });
 

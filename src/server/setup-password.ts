@@ -26,37 +26,37 @@ export async function completePasswordSetupHandler(args: {
 
   const db = getDb();
 
-  // Find the verification record
-  const verificationRecord = await db
-    .select()
-    .from(verification)
-    .where(and(eq(verification.value, token), gt(verification.expiresAt, new Date())))
-    .limit(1)
-    .then((rows) => rows[0]);
-
-  if (!verificationRecord) {
-    return { error: 'Invalid or expired token' };
-  }
-
-  const email = verificationRecord.identifier;
-
-  // Find the user by email
-  const user = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(and(eq(users.email, email), isNull(users.deletedAt)))
-    .limit(1)
-    .then((rows) => rows[0]);
-
-  if (!user) {
-    return { error: 'User not found' };
-  }
-
-  // Hash the password
+  // Hash the password outside the transaction — it is CPU-bound and does not touch the database.
+  // If hashing fails, the token has not yet been consumed and nothing needs to roll back.
   const hashedPassword = await hashPassword(password);
 
   try {
-    await db.transaction(async (tx) => {
+    return await db.transaction(async (tx) => {
+      // Atomic consume-once token validation: DELETE the token only if it exists and has not expired.
+      // Concurrent requests with the same token will race on this row; exactly one will DELETE it.
+      const consumed = await tx
+        .delete(verification)
+        .where(and(eq(verification.value, token), gt(verification.expiresAt, new Date())))
+        .returning();
+
+      if (consumed.length === 0) {
+        return { error: 'Invalid or expired token' };
+      }
+
+      const email = consumed[0].identifier;
+
+      // Find the user by email inside the transaction so the token is only consumed if the user exists.
+      const user = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(and(eq(users.email, email), isNull(users.deletedAt)))
+        .limit(1)
+        .then((rows) => rows[0]);
+
+      if (!user) {
+        throw new Error('User not found during password setup');
+      }
+
       // Upsert the account with the password
       const existingAccount = await tx
         .select({ id: account.id })
@@ -86,11 +86,8 @@ export async function completePasswordSetupHandler(args: {
         .set({ emailVerified: true, updatedAt: new Date() })
         .where(eq(users.id, user.id));
 
-      // Delete the used verification token
-      await tx.delete(verification).where(eq(verification.id, verificationRecord.id));
+      return { success: true };
     });
-
-    return { success: true };
   } catch (err) {
     console.error('completePasswordSetupHandler failed:', err);
     return { error: 'Internal Server Error' };

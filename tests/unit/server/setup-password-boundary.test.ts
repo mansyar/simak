@@ -14,6 +14,7 @@ const mockTx = {
   from: vi.fn().mockReturnThis(),
   where: vi.fn().mockReturnThis(),
   limit: vi.fn().mockReturnThis(),
+  returning: vi.fn().mockReturnThis(),
   then: vi.fn(),
   insert: vi.fn().mockReturnThis(),
   values: vi.fn().mockReturnThis(),
@@ -23,11 +24,6 @@ const mockTx = {
 };
 
 const mockDb = {
-  select: vi.fn().mockReturnThis(),
-  from: vi.fn().mockReturnThis(),
-  where: vi.fn().mockReturnThis(),
-  limit: vi.fn().mockReturnThis(),
-  then: vi.fn(),
   transaction: vi.fn(async (callback) => callback(mockTx)),
 };
 
@@ -63,19 +59,23 @@ describe('completePasswordSetupHandler — boundary return type', () => {
   });
 
   it('returns success shape with explicit type', async () => {
-    mockDb.then
+    mockTx.then
       .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ identifier: 'user@example.com', id: 'verif-id' }]).then(onfulfilled),
+        Promise.resolve([{ id: 'verif-id', identifier: 'user@example.com' }]).then(onfulfilled),
       )
       .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ id: 'user-id' }]).then(onfulfilled),
-      );
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
     const result: PasswordSetupResult = await completePasswordSetupHandler({
       data: { token: 'valid-token', password: 'securepassword' },
     });
 
     expect(result).toEqual({ success: true });
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1);
   });
 
   it('returns error string shape for invalid input', async () => {
@@ -84,5 +84,15 @@ describe('completePasswordSetupHandler — boundary return type', () => {
     });
 
     expect(result).toEqual({ error: 'Invalid token or password' });
+  });
+
+  it('returns generic error for a consumed or expired token', async () => {
+    mockTx.then.mockImplementation((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+
+    const result: PasswordSetupResult = await completePasswordSetupHandler({
+      data: { token: 'used-token', password: 'securepassword' },
+    });
+
+    expect(result).toEqual({ error: 'Invalid or expired token' });
   });
 });
