@@ -41,16 +41,16 @@
 
 ## Phase 3: Quality Gates & Coverage Verification
 
-- [ ] Task: Pre-phase context review
-    - [ ] Read `spec.md` (`./conductor/tracks/extension-atomic_20260704/spec.md`) to confirm acceptance criteria
-    - [ ] Read `workflow.md` (`./conductor/workflow.md`) to confirm quality gate definitions and commit format
-- [ ] Task: Verify type safety
-    - [ ] Run `pnpm typecheck` and confirm zero errors
-- [ ] Task: Verify linting
-    - [ ] Run `pnpm lint` and confirm zero errors
-- [ ] Task: Verify test coverage
-    - [ ] Run `pnpm test:coverage` and confirm all thresholds met (>80% lines, functions, branches, statements)
-    - [ ] Confirm the `extensions.server.ts` module coverage is not reduced by the transaction wrapper
+- [x] Task: Pre-phase context review
+    - [x] Read `spec.md` (`./conductor/tracks/extension-atomic_20260704/spec.md`) to confirm acceptance criteria
+    - [x] Read `workflow.md` (`./conductor/workflow.md`) to confirm quality gate definitions and commit format
+- [x] Task: Verify type safety
+    - [x] Run `pnpm typecheck` and confirm zero errors
+- [x] Task: Verify linting
+    - [x] Run `pnpm lint` and confirm zero errors
+- [x] Task: Verify test coverage
+    - [x] Run `pnpm test:coverage` and confirm all thresholds met (>80% lines, functions, branches, statements)
+    - [x] Confirm the `extensions.server.ts` module coverage is not reduced by the transaction wrapper
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Quality Gates & Coverage Verification' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Quality Gates & Coverage Verification' (Protocol in workflow.md)
 </protect>
