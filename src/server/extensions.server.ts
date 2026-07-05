@@ -166,45 +166,49 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
       return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
     }
 
-    const requestedDeadline = new Date(
-      (targetCp.dueDate ?? new Date()).getTime() + extensionDays * 24 * 60 * 60 * 1000,
-    );
+    const result = await db.transaction(async (tx) => {
+      const requestedDeadline = new Date(
+        (targetCp.dueDate ?? new Date()).getTime() + extensionDays * 24 * 60 * 60 * 1000,
+      );
 
-    // 7. Create extension request
-    const [request] = await db
-      .insert(extensionRequests)
-      .values({
-        assignmentId,
-        studentId: session.user.id,
-        checkpointId: targetCheckpointId,
-        category,
-        reason,
-        extensionDays,
-        requestedDeadline,
-        status: 'pending',
-      })
-      .returning({ id: extensionRequests.id });
+      // 7. Create extension request
+      const [request] = await tx
+        .insert(extensionRequests)
+        .values({
+          assignmentId,
+          studentId: session.user.id,
+          checkpointId: targetCheckpointId,
+          category,
+          reason,
+          extensionDays,
+          requestedDeadline,
+          status: 'pending',
+        })
+        .returning({ id: extensionRequests.id });
 
-    // 8. Notify the instructor
-    const requestedParams = { extensionDays: String(extensionDays) };
-    const requestedKeys = getNotificationKeys('extension_requested');
-    await db.insert(notifications).values({
-      userId: assignment.instructorId,
-      type: 'extension_requested',
-      titleKey: requestedKeys.titleKey,
-      messageKey: requestedKeys.messageKey,
-      params: requestedParams,
-      channel: 'in_app',
-      metadata: {
-        extensionRequestId: request.id,
-        assignmentId,
-        checkpointId: targetCheckpointId,
-        extensionDays,
-        category,
-      },
+      // 8. Notify the instructor
+      const requestedParams = { extensionDays: String(extensionDays) };
+      const requestedKeys = getNotificationKeys('extension_requested');
+      await tx.insert(notifications).values({
+        userId: assignment.instructorId,
+        type: 'extension_requested',
+        titleKey: requestedKeys.titleKey,
+        messageKey: requestedKeys.messageKey,
+        params: requestedParams,
+        channel: 'in_app',
+        metadata: {
+          extensionRequestId: request.id,
+          assignmentId,
+          checkpointId: targetCheckpointId,
+          extensionDays,
+          category,
+        },
+      });
+
+      return { extensionRequest: { id: request.id } };
     });
 
-    return { extensionRequest: { id: request.id } };
+    return result;
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
