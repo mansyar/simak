@@ -17,13 +17,11 @@ This file tracks all major tracks for the project. Each track has its own detail
 - **Per-student deadline isolation** — Archived to [./archive/deadline-isolation_20260704/](./archive/deadline-isolation_20260704/) (commit `cbf99cd`)
 - **Secure password-setup token consumption** — Archived to [./archive/setup-token-atomic_20260704/](./archive/setup-token-atomic_20260704/) (commit `e58ef42`)
 - **Atomic extension request + notification** — Archived to [./archive/extension-atomic_20260704/](./archive/extension-atomic_20260704/) (commit `6f2bec3`)
+- **Atomic checkpoint state transitions in review handlers** — Archived to [./archive/review-atomic_20260704/](./archive/review-atomic_20260704/) (commit `4feadca`)
 
 ---
 
 ## Active
 
 ---
-
-- [x] **Track: Atomic checkpoint state transitions in review handlers**
-*Link: [./tracks/review-atomic_20260704/](./tracks/review-atomic_20260704/)*
 
