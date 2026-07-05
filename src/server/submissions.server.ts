@@ -63,7 +63,8 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
             eq(assignmentStudents.studentId, session.user.id),
           ),
         )
-        .limit(1);
+        .limit(1)
+        .for('update');
 
       if (!checkpoint) {
         return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');

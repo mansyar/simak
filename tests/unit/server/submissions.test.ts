@@ -184,6 +184,10 @@ describe('Submission server functions - Logic & Security', () => {
       expect(result).toEqual({
         error: { code: 'BAD_REQUEST', message: 'Checkpoint is not in a submittable state' },
       });
+
+      // FR2: the stale-state re-read must happen under FOR UPDATE.
+      expect(mockDb.for).toHaveBeenCalledWith('update');
+      expect(mockDb.insert).not.toHaveBeenCalled();
     });
 
     it('should reject file exceeding 25MB limit', async () => {
