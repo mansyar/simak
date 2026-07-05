@@ -16,15 +16,11 @@ This file tracks all major tracks for the project. Each track has its own detail
 - **Audit HIGH-Remediation (H1, H2, H3 + L1)** — Archived to [./archive/audit-high-remediation_20260630/](./archive/audit-high-remediation_20260630/) (commit `807ba72`)
 - **Per-student deadline isolation** — Archived to [./archive/deadline-isolation_20260704/](./archive/deadline-isolation_20260704/) (commit `cbf99cd`)
 - **Secure password-setup token consumption** — Archived to [./archive/setup-token-atomic_20260704/](./archive/setup-token-atomic_20260704/) (commit `e58ef42`)
+- **Atomic extension request + notification** — Archived to [./archive/extension-atomic_20260704/](./archive/extension-atomic_20260704/) (commit `6f2bec3`)
 
 ---
 
 ## Active
-
----
-
-- [x] **Track: Atomic extension request + notification**
-*Link: [./tracks/extension-atomic_20260704/](./tracks/extension-atomic_20260704/)*
 
 ---
 
