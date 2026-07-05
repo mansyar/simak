@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Secure Password-Setup Token Consumption
 
-## Phase 1: TDD — Failing Tests & Atomic Consume-Once Implementation
+## Phase 1: TDD — Failing Tests & Atomic Consume-Once Implementation [checkpoint: 5c08edd]
 
 - [x] Task: Read spec.md and workflow.md
     - [x] Read `./spec.md` to confirm requirements and acceptance criteria
@@ -26,11 +26,11 @@
     - [x] Remove the old `tx.delete(verification)` at the END of the transaction (line 90) — it is now the first statement
     - [x] Ensure the outer `catch` block still returns `{ error: 'Internal Server Error' }` for thrown errors
     - [x] Run `pnpm vitest run tests/integration/auth/concurrent-token-replay.test.ts tests/unit/server/setup-password-boundary.test.ts` and confirm all tests pass (Green phase)
-- [~] Task: Conductor - User Manual Verification 'Phase 1: TDD — Failing Tests & Atomic Consume-Once Implementation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: TDD — Failing Tests & Atomic Consume-Once Implementation' (Protocol in workflow.md)
 
 ## Phase 2: Final Verification
 
-- [ ] Task: Read spec.md and workflow.md
+- [~] Task: Read spec.md and workflow.md
     - [ ] Read `./spec.md` to confirm requirements and acceptance criteria
     - [ ] Read `../../../../workflow.md` to confirm TDD workflow and phase completion protocol
 - [ ] Task: Run full quality gates
