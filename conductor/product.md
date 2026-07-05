@@ -292,4 +292,12 @@ Students and instructors lack a centralized system to:
 - **i18n translations** — New English and Indonesian keys for personal/effective deadline labels.
 - **Tests** — Failing tests asserted the new behavior first; full unit suite passes (2,373 tests), coverage thresholds met.
 
+### Track 11: Secure Password-Setup Token Consumption (July 2026)
+
+- **Bug fixed (security):** Eliminated a non-atomic check-then-act race condition in `completePasswordSetupHandler` (`src/server/setup-password.ts`). The former flow performed a SELECT to validate the token, then later DELETEd it at the end of the transaction — a TOCTOU window where concurrent requests could replay the same token before deletion.
+- **Atomic `DELETE ... RETURNING`** — The token is now consumed via `DELETE FROM verification WHERE value = ? AND expiresAt > now() RETURNING *` as the **first statement** inside `db.transaction()`. This makes validation and consumption a single atomic step: zero rows returned means the token was already used, expired, or invalid.
+- **Transaction integrity** — User lookup, password upsert, and `emailVerified` update all run inside the same transaction. If any downstream step fails (e.g. user not found), the transaction rolls back and the token is restored. Password hashing (scrypt) is performed **outside** the transaction so a hashing failure does not consume the token.
+- **No information leakage** — A generic "Invalid or expired token" error is returned for all failure cases (consumed, expired, invalid, or user-not-found). The former "User not found" error was changed to a thrown error that surfaces as "Internal Server Error".
+- **Tests** — New integration test (`concurrent-token-replay.test.ts`) with 4 tests: concurrent replay protection, expired token rejection, user-lookup rollback, and sequential consumption. Updated 2 unit test files for the new transaction-scoped mock flow. Full suite: 2,374 tests pass, coverage ≥80% on all thresholds.
+
 </protect>

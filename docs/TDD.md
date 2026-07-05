@@ -300,6 +300,8 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 | createdAt  | timestamp           |                    |
 | updatedAt  | timestamp           |                    |
 
+> **Atomic token consumption (Track: Secure password-setup token consumption):** Password setup tokens are consumed via `DELETE FROM verification WHERE value = ? AND expiresAt > now() RETURNING *` as the **first statement** inside `db.transaction()` in `completePasswordSetupHandler`. This replaces the former check-then-act pattern (SELECT outside transaction → DELETE at the end), which was vulnerable to concurrent token replay (TOCTOU race). The atomic DELETE serves as both validation and consumption in a single step — if zero rows are returned, the token was already used, expired, or never existed, and the handler returns a generic "Invalid or expired token" error (no information leakage). User lookup, password upsert, and `emailVerified` update all run inside the same transaction; a failure on any step rolls back the transaction and restores the token. Password hashing (scrypt, CPU-bound) is performed **outside** the transaction so that a hashing failure does not consume the token.
+
 #### assignment_templates
 
 | Column    | Type              | Notes                           |
@@ -587,7 +589,7 @@ Admin       (creates Instructors and Students)
 
 - No self-registration. No `/auth/register` page.
 - Password setup links expire after 1 hour.
-- Tokens are single-use.
+- Tokens are single-use. Password setup tokens are consumed **atomically** via `DELETE ... RETURNING` inside a database transaction — see the `verification` table note above for the full security rationale.
 - Resend handles all transactional email delivery.
 - **Restore-on-soft-deleted:** When creating a user whose email matches a soft-deleted account (Admin single-create via `createUserHandler` or bulk import via `bulkCreateUsersHandler`), the existing account is restored — `deletedAt` cleared, name/role updated — and a new invitation email is sent, rather than rejecting the duplicate.
 
