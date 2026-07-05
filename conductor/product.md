@@ -300,4 +300,13 @@ Students and instructors lack a centralized system to:
 - **No information leakage** — A generic "Invalid or expired token" error is returned for all failure cases (consumed, expired, invalid, or user-not-found). The former "User not found" error was changed to a thrown error that surfaces as "Internal Server Error".
 - **Tests** — New integration test (`concurrent-token-replay.test.ts`) with 4 tests: concurrent replay protection, expired token rejection, user-lookup rollback, and sequential consumption. Updated 2 unit test files for the new transaction-scoped mock flow. Full suite: 2,374 tests pass, coverage ≥80% on all thresholds.
 
+### Track 12: Atomic Checkpoint State Transitions in Review Handlers (July 2026)
+
+- **Bug fixed (data integrity):** Eliminated non-atomic check-then-act race conditions in `submitCheckpointHandler`, `openForReviewHandler`, and `submitReviewHandler` where the checkpoint state was read outside (or without a row lock inside) the mutation transaction.
+- **SELECT ... FOR UPDATE** — All checkpoint reads that guard state transitions now happen inside their respective transactions using `.for('update')`, with state re-validated after the lock is acquired.
+- **Handlers updated** — `src/server/submissions.server.ts` (`submitCheckpoint`), `src/server/reviews-extras.server.ts` (`openForReview`), and `src/server/reviews.server.ts` (`submitReview`).
+- **Consistent concurrency behavior** — Concurrent submissions/reviews on the same checkpoint now serialize safely: one succeeds, the others receive descriptive stale-state errors and make no mutations.
+- **No new i18n keys** — Reused existing `notInSubmittedState`, `'Checkpoint is not in a submittable state'`, and `'Checkpoint is not in a reviewable state'` messages.
+- **Tests** — Updated unit-test mocks for the new in-transaction locked-read flow, added stale-state assertions, and added integration tests (`tests/integration/server/reviews-concurrency.test.ts`) verifying concurrent `submitReview`, late `openForReview`, and concurrent `submitCheckpoint` scenarios. Full suite: 2,377 tests pass; coverage ≥80%.
+
 </protect>
