@@ -3,27 +3,27 @@
 
 Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) → Green (implement) → Refactor → Verify coverage → Commit + git note. A Phase Completion meta-task closes each phase per the Checkpointing Protocol.
 
-## Phase 1: Atomic Checkpoint Read in `submitCheckpointHandler` (partial gap — in-tx read missing the lock)
+## Phase 1: Atomic Checkpoint Read in `submitCheckpointHandler` (partial gap — in-tx read missing the lock) [checkpoint `9e589e3`]
 
-- [ ] Task: Read spec.md and workflow.md
-    - [ ] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
-- [ ] Task: Write failing unit tests (Red phase)
-    - [ ] Reshape existing `submitCheckpointHandler` unit tests in `tests/unit/server/submissions*.test.ts` so the checkpoint read is asserted via `tx.select(...).for('update')` (MockTx queue routing).
-    - [ ] Add a stale-state assertion: when the locked re-read returns a non-submittable state (e.g. `submitted`), the handler returns the existing `'Checkpoint is not in a submittable state'` error and inserts nothing.
-    - [ ] Run `pnpm vitest run tests/unit/server/submissions.test.ts tests/unit/server/submissions-transaction.test.ts` and confirm the tests fail (Red).
-- [ ] Task: Implement (Green phase)
-    - [ ] In `src/server/submissions.server.ts`, add `.for('update')` to the checkpoint read (lines 46–66, inside the existing transaction).
-    - [ ] Add post-lock re-validation of `SUBMITTABLE_STATES` against the locked row.
-    - [ ] Run the unit tests; confirm they now pass (Green).
-- [ ] Task: Refactor (optional)
-    - [ ] If the re-validation duplicates the pre-lock check, consolidate into a single predicate applied post-lock (surgical, no behavior change).
-    - [ ] Re-run unit tests to confirm still passing.
-- [ ] Task: Verify coverage
-    - [ ] Run `pnpm test:coverage` and confirm ≥80% thresholds hold for `src/server/submissions.server.ts`.
-- [ ] Task: Commit and attach git note
-    - [ ] Stage handler + test changes; commit as `fix(submissions): Lock checkpoint row in submitCheckpointHandler with FOR UPDATE`.
-    - [ ] Attach a git note summarizing the change, files touched, and the why (serialize concurrent submissions).
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md
+    - [x] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
+- [x] Task: Write failing unit tests (Red phase) (`395d0bf`)
+    - [x] Reshape existing `submitCheckpointHandler` unit tests in `tests/unit/server/submissions*.test.ts` so the checkpoint read is asserted via `tx.select(...).for('update')` (MockTx queue routing).
+    - [x] Add a stale-state assertion: when the locked re-read returns a non-submittable state (e.g. `submitted`), the handler returns the existing `'Checkpoint is not in a submittable state'` error and inserts nothing.
+    - [x] Run `pnpm vitest run tests/unit/server/submissions.test.ts tests/unit/server/submissions-transaction.test.ts` and confirm the tests fail (Red).
+- [x] Task: Implement (Green phase) (`395d0bf`)
+    - [x] In `src/server/submissions.server.ts`, add `.for('update')` to the checkpoint read (lines 46–66, inside the existing transaction).
+    - [x] Add post-lock re-validation of `SUBMITTABLE_STATES` against the locked row.
+    - [x] Run the unit tests; confirm they now pass (Green).
+- [x] Task: Refactor (optional) (`395d0bf`)
+    - [x] If the re-validation duplicates the pre-lock check, consolidate into a single predicate applied post-lock (surgical, no behavior change).
+    - [x] Re-run unit tests to confirm still passing.
+- [x] Task: Verify coverage (`395d0bf`)
+    - [x] Run `pnpm test:coverage` and confirm ≥80% thresholds hold for `src/server/submissions.server.ts`.
+- [x] Task: Commit and attach git note (`395d0bf`)
+    - [x] Stage handler + test changes; commit as `fix(submissions): Lock checkpoint row in submitCheckpointHandler with FOR UPDATE`.
+    - [x] Attach a git note summarizing the change, files touched, and the why (serialize concurrent submissions).
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: Atomic Checkpoint Read in `openForReviewHandler` (full gap — no transaction at all)
 
