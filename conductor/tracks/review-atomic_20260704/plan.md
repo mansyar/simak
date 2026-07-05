@@ -47,27 +47,27 @@ Each phase follows the TDD lifecycle from `workflow.md`: Red (failing tests) →
     - [x] Attach a git note.
 - [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
-## Phase 3: Atomic Checkpoint Read in `submitReviewHandler` (full gap — read outside the tx) [checkpoint TBD]
+## Phase 3: Atomic Checkpoint Read in `submitReviewHandler` (full gap — read outside the tx) [checkpoint `d4b843a`]
 
 - [x] Task: Read spec.md and workflow.md
     - [x] Read the confirmed spec.md and workflow.md to re-establish context before beginning implementation.
-- [x] Task: Write failing unit tests (Red phase)
+- [x] Task: Write failing unit tests (Red phase) (`d4b843a`)
     - [x] Reshape the existing `submitReviewHandler` unit tests (`reviews-handlers.test.ts`, `reviews-intent.test.ts`, `reviews-advisory-isolation.test.ts`) so the checkpoint read flows through `tx.select(...).for('update')` (MockTx queue: outer read removed; in-tx locked read enqueued).
     - [x] Add stale-state tests: a concurrent submitReview that re-reads a non-reviewable state returns the existing `'Checkpoint is not in a reviewable state'` error and inserts no review.
     - [x] Run the relevant test files and confirm they fail (Red).
-- [x] Task: Implement (Green phase)
+- [x] Task: Implement (Green phase) (`d4b843a`)
     - [x] In `src/server/reviews.server.ts`, move the checkpoint read (lines 239–266) inside the existing `db.transaction` (starts at 301); read with `.for('update')`.
     - [x] Re-validate `REVIEWABLE_STATES` after acquiring the lock, before the review insert / state mutation / next-checkpoint unlock.
     - [x] Preserve upload-intent consumption, SLA, notification, and post-commit advisory logic unchanged.
     - [x] Run unit tests; confirm pass (Green).
-- [~] Task: Refactor (optional)
-    - [ ] Remove now-dead outer-read variables; consolidate duplicate state predicates if a pre-lock validation is retained.
-    - [ ] Re-run unit tests.
-- [ ] Task: Verify coverage
-    - [ ] Run `pnpm test:coverage`; confirm thresholds hold for `src/server/reviews.server.ts`.
-- [ ] Task: Commit and attach git note
-    - [ ] Commit as `fix(reviews): Make submitReview atomic with SELECT FOR UPDATE on checkpoint`.
-    - [ ] Attach git note.
+- [x] Task: Refactor (optional) (`d4b843a`)
+    - [x] Remove now-dead outer-read variables; consolidate duplicate state predicates if a pre-lock validation is retained.
+    - [x] Re-run unit tests.
+- [x] Task: Verify coverage (`d4b843a`)
+    - [x] Run `pnpm test:coverage`; confirm thresholds hold for `src/server/reviews.server.ts`.
+- [x] Task: Commit and attach git note (`d4b843a`)
+    - [x] Commit as `fix(reviews): Make submitReview atomic with SELECT FOR UPDATE on checkpoint`.
+    - [x] Attach git note.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 
 ## Phase 4: Concurrency Integration Tests (C2/H3 Precedent)
