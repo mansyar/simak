@@ -459,6 +459,8 @@ _Note: Each row represents one student's individual participation. Group assignm
 
 Index on `(assignmentId, status)` for instructor queue queries.
 
+> **Transactional write boundary (Track: Atomic extension request + notification):** The `requestExtensionHandler` in `src/server/extensions.server.ts` wraps the `extension_requests` insert and the instructor's in-app `notifications` insert in a single `db.transaction(async (tx) => { ... })` block. Both inserts use the `tx` client — if the notification insert throws, the transaction rejects and the extension request is rolled back, preventing orphaned extension records without their alert. All six validation reads (session, role, assignment existence, student enrollment, checkpoint state, extension cap enforcement) run **outside** the transaction using the `db` client and are not part of the atomic boundary. The `requestedDeadline` calculation is performed inside the transaction callback. This pattern follows SQL style guide §6 (transaction wrapping) and is consistent with `submitReviewHandler` (`src/server/reviews.server.ts`), which also places in-app notification inserts inside the transaction boundary.
+
 #### audit_log
 
 | Column     | Type              | Notes                                                                                              |

@@ -131,6 +131,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
   - **Auto-Adjustment:** When an extension is approved or directly applied, the affected student's subsequent checkpoint `dueDate` values auto-extend. The assignment-wide `finalDeadline` (set once at creation) is **immutable** and never mutated by extensions or SLA-breach adjustments — each student's effective deadline is derived at read time from their highest-order checkpoint's `dueDate`.
   - **Configurable Caps:** Admin-configurable extension limits per assignment: `maxExtensionDays` (1–30, default 7) and `maxTotalExtensions` (1–10, default 3).
   - **Audit Trail:** All deadline changes — approved requests, direct extensions, and manual unlocks — are recorded in the shared `audit_log` table with actor, previous/next values, reason, and timestamp.
+  - **Atomic Write Guarantee:** When a student requests an extension, the `extension_requests` insert and the instructor's in-app `notifications` insert are wrapped in a single database transaction. If the notification insert fails, the entire operation rolls back — ensuring no extension request is ever left without its corresponding instructor alert. All validation reads occur outside the transaction; only the two writes are atomic.
 
 ### Consultation Tracking (Kartu Bimbingan)
 
