@@ -22,22 +22,22 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Reshape Unit Tests to Mock `db.transaction` (Red)' (Protocol in workflow.md)
 
-## Phase 2: Wrap Two Writes in `db.transaction` (Green)
+## Phase 2: Wrap Two Writes in `db.transaction` (Green) [checkpoint: 4d41ee6]
 
-- [ ] Task: Pre-phase context review
-    - [ ] Read `spec.md` (`./conductor/tracks/extension-atomic_20260704/spec.md`) to confirm requirements and acceptance criteria
-    - [ ] Read `workflow.md` (`./conductor/workflow.md`) to confirm implementation workflow and commit format
-- [ ] Task: Implement the transaction wrapper in `requestExtensionHandler`
-    - [ ] Wrap the `db.insert(extensionRequests)` (step 7) and `db.insert(notifications)` (step 8) in a single `db.transaction(async (tx) => { ... })` block
-    - [ ] Change both `db.insert(...)` calls to `tx.insert(...)` inside the transaction callback
-    - [ ] Move the `requestedDeadline` calculation and `requestedParams`/`requestedKeys` setup inside the transaction callback (they depend on data computed before the writes)
-    - [ ] Keep all six validation reads outside the transaction, using `db` (not `tx`)
-    - [ ] Preserve the return shape: `{ extensionRequest: { id: request.id } }` returned from inside the tx callback
-- [ ] Task: Run tests and confirm Green phase
-    - [ ] Run `pnpm vitest run tests/unit/server/extensions-request.test.ts` and confirm all 10 tests (9 reshaped + 1 new rollback) pass
-    - [ ] Run `pnpm test` to confirm no regressions across the full unit suite
+- [x] Task: Pre-phase context review
+    - [x] Read `spec.md` (`./conductor/tracks/extension-atomic_20260704/spec.md`) to confirm requirements and acceptance criteria
+    - [x] Read `workflow.md` (`./conductor/workflow.md`) to confirm implementation workflow and commit format
+- [x] Task: Implement the transaction wrapper in `requestExtensionHandler`
+    - [x] Wrap the `db.insert(extensionRequests)` (step 7) and `db.insert(notifications)` (step 8) in a single `db.transaction(async (tx) => { ... })` block
+    - [x] Change both `db.insert(...)` calls to `tx.insert(...)` inside the transaction callback
+    - [x] Move the `requestedDeadline` calculation and `requestedParams`/`requestedKeys` setup inside the transaction callback (they depend on data computed before the writes)
+    - [x] Keep all six validation reads outside the transaction, using `db` (not `tx`)
+    - [x] Preserve the return shape: `{ extensionRequest: { id: request.id } }` returned from inside the tx callback
+- [x] Task: Run tests and confirm Green phase
+    - [x] Run `pnpm vitest run tests/unit/server/extensions-request.test.ts` and confirm all 10 tests (9 reshaped + 1 new rollback) pass
+    - [x] Run `pnpm test` to confirm no regressions across the full unit suite
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Wrap Two Writes in `db.transaction` (Green)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Wrap Two Writes in `db.transaction` (Green)' (Protocol in workflow.md)
 
 ## Phase 3: Quality Gates & Coverage Verification
 
