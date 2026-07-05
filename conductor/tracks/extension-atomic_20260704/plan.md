@@ -39,7 +39,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Wrap Two Writes in `db.transaction` (Green)' (Protocol in workflow.md)
 
-## Phase 3: Quality Gates & Coverage Verification
+## Phase 3: Quality Gates & Coverage Verification [checkpoint: 6f2bec3]
 
 - [x] Task: Pre-phase context review
     - [x] Read `spec.md` (`./conductor/tracks/extension-atomic_20260704/spec.md`) to confirm acceptance criteria
@@ -52,5 +52,5 @@
     - [x] Run `pnpm test:coverage` and confirm all thresholds met (>80% lines, functions, branches, statements)
     - [x] Confirm the `extensions.server.ts` module coverage is not reduced by the transaction wrapper
 
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Quality Gates & Coverage Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Quality Gates & Coverage Verification' (Protocol in workflow.md)
 </protect>
