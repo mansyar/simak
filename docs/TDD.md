@@ -368,6 +368,8 @@ _Note: Each row represents one student's individual participation. Group assignm
 | createdAt        | timestamp                  |                                                                             |
 | updatedAt        | timestamp                  |                                                                             |
 
+> **Atomic state transitions (Track: review-atomic_20260704):** The three handlers that mutate checkpoint state — `submitCheckpointHandler` (`src/server/submissions.server.ts`), `openForReviewHandler` (`src/server/reviews-extras.server.ts`), and `submitReviewHandler` (`src/server/reviews.server.ts`) — read the checkpoint row **inside** a database transaction using `SELECT ... FOR UPDATE OF checkpoints`. The row lock is acquired before state validation, so a concurrent transaction that changes the state between the read and the write is blocked until the first transaction commits. After acquiring the lock, each handler re-validates the checkpoint state (e.g. `SUBMITTABLE_STATES`, `REVIEWABLE_STATES`, `submitted`) and returns a stale-state error if the locked row is no longer in the expected state. This eliminates the check-then-act TOCTOU race where two concurrent requests could both read the same state and both proceed to mutate it. On multi-table JOINs, `FOR UPDATE OF checkpoints` locks only the checkpoint row, not the joined `submissions`/`assignments`/`users` rows.
+
 #### submissions
 
 | Column       | Type                       | Notes                                                                                          |
@@ -396,6 +398,8 @@ _Note: Each row represents one student's individual participation. Group assignm
 | revisionDeadline | timestamp                          | Deadline for resubmission (if revise)                      |
 | createdAt        | timestamp                          |                                                            |
 | reviewedAt       | timestamp                          | When instructor submitted the review (for SLA calculation) |
+
+> **Atomic review submission (Track: review-atomic_20260704):** `submitReviewHandler` (`src/server/reviews.server.ts`) wraps the checkpoint state read, ownership validation, review insert, checkpoint state mutation, next-checkpoint unlock, SLA adjustment, and in-app notification inserts in a single `db.transaction(async (tx) => { ... })` block. The checkpoint row is locked with `FOR UPDATE OF checkpoints` and re-validated against `REVIEWABLE_STATES` post-lock. All error returns occur before any writes (safe empty-commit pattern). Post-commit advisory work (audit logging, SLA breach notifications) runs after the transaction commits, wrapped in try/catch. This follows SQL style guide §6.
 
 #### consultations
 
@@ -790,7 +794,7 @@ A checkpoint unlocks when:
 | Focus                 | Examples                                                                              |
 | --------------------- | ------------------------------------------------------------------------------------- |
 | **Gating logic**      | Checkpoint unlock conditions, consultation counting, sequential order enforcement.    |
-| **State transitions** | Valid and invalid checkpoint state transitions (e.g. can't go from LOCKED to PASSED). |
+| **State transitions** | Valid and invalid checkpoint state transitions (e.g. can't go from LOCKED to PASSED). Stale-state rejection: handler returns error when locked re-read shows state changed (FOR UPDATE re-validation). |
 | **Validation**        | Zod schema tests for all input types (assignment creation, submission upload, etc.).  |
 | **Permission checks** | Role-based access logic unit tests.                                                   |
 | **Bulk import**       | Xlsx parsing, role-permission validation, email uniqueness (excluding soft-deleted), transaction rollback, audit logging. |                                                   |
@@ -802,6 +806,7 @@ A checkpoint unlocks when:
 | **Server functions** | Call server functions with test database, verify DB state changes.         |
 | **Auth flow**        | Login, session validation, role enforcement end-to-end within test server. |
 | **File upload flow** | Presigned URL generation → mock upload → metadata persistence.             |
+| **Concurrency**      | Concurrent review/submission race conditions — exactly one succeeds, stale-state rejection for the loser. |
 
 ### E2E Tests (Playwright) [v2]
 
