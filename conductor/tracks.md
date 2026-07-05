@@ -24,6 +24,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Atomic checkpoint state transitions in review handlers**
+- [~] **Track: Atomic checkpoint state transitions in review handlers**
 *Link: [./tracks/review-atomic_20260704/](./tracks/review-atomic_20260704/)*
 
