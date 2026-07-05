@@ -15,15 +15,11 @@ This file tracks all major tracks for the project. Each track has its own detail
 - **Audit Remediation — i18n, Type Safety, Hygiene (H1, H2, M1, M4)** — Archived to [./archive/audit-remediation_20260627/](./archive/audit-remediation_20260627/) (commit `2204cad`)
 - **Audit HIGH-Remediation (H1, H2, H3 + L1)** — Archived to [./archive/audit-high-remediation_20260630/](./archive/audit-high-remediation_20260630/) (commit `807ba72`)
 - **Per-student deadline isolation** — Archived to [./archive/deadline-isolation_20260704/](./archive/deadline-isolation_20260704/) (commit `cbf99cd`)
+- **Secure password-setup token consumption** — Archived to [./archive/setup-token-atomic_20260704/](./archive/setup-token-atomic_20260704/) (commit `e58ef42`)
 
 ---
 
 ## Active
-
----
-
-- [x] **Track: Secure password-setup token consumption**
-*Link: [./tracks/setup-token-atomic_20260704/](./tracks/setup-token-atomic_20260704/)*
 
 ---
 
