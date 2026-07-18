@@ -106,3 +106,17 @@ export const extendDeadline = createServerFn({ method: 'POST' })
     const { extendDeadlineHandler } = await import('./assignments.server');
     return extendDeadlineHandler({ data });
   });
+
+// ---- Assignment Reassignment (Admin) ----
+
+export const ReassignAssignmentSchema = z.object({
+  assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
+  newInstructorId: z.string().min(1, 'Instructor ID is required'),
+});
+
+export const reassignAssignment = createServerFn({ method: 'POST' })
+  .inputValidator(ReassignAssignmentSchema)
+  .handler(async ({ data }) => {
+    const { reassignAssignmentHandler } = await import('./assignments.server');
+    return reassignAssignmentHandler({ data });
+  });
