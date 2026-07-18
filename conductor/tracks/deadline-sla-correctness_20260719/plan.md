@@ -4,7 +4,7 @@
 **Track ID:** `deadline-sla-correctness_20260719`
 **Spec:** [./spec.md](./spec.md)
 
-## Phase 1: Documentation & Naming Fixes (BUG-3, BUG-16)
+## Phase 1: Documentation & Naming Fixes (BUG-3, BUG-16) [checkpoint: 6451fe2]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
     - [x] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
