@@ -25,15 +25,15 @@
 
 ## Phase 2: Extensions (BUG-2, BUG-5, BUG-6, BUG-7)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
-- [ ] Task: Write failing unit tests for `approveExtensionHandler` and `rejectExtensionHandler` concurrency
-    - [ ] Test: stale-state rejection — status no longer `pending` after lock returns descriptive error
-    - [ ] Test: successful approve/reject transitions `status` correctly within transaction
-    - [ ] Test: handler uses `db.transaction` with `.for('update')` on extension request
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Refactor `approveExtensionHandler` and `rejectExtensionHandler` — move SELECT inside `db.transaction`, add `.for('update')`, re-check `status === 'pending'` after lock
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Write failing unit tests for `requestExtensionHandler` TOCTOU fix (BUG-5)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
+- [x] Task: Write failing unit tests for `approveExtensionHandler` and `rejectExtensionHandler` concurrency (ac2cf9b)
+    - [x] Test: stale-state rejection — status no longer `pending` after lock returns descriptive error
+    - [x] Test: successful approve/reject transitions `status` correctly within transaction
+    - [x] Test: handler uses `db.transaction` with `.for('update')` on extension request
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Refactor `approveExtensionHandler` and `rejectExtensionHandler` — move SELECT inside `db.transaction`, add `.for('update')`, re-check `status === 'pending'` after lock (ac2cf9b)
+    - [x] Run `pnpm test` — verify new tests pass (Green)
+- [~] Task: Write failing unit tests for `requestExtensionHandler` TOCTOU fix (BUG-5)
     - [ ] Test: extension count check occurs inside transaction under lock — concurrent requests cannot exceed `maxTotalExtensions`
     - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
 - [ ] Task: Refactor `requestExtensionHandler` — move extension count check inside transaction with row locking
@@ -43,7 +43,7 @@
     - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
 - [ ] Task: Refactor `calculateExtensionAdjustment` — lock checkpoint rows inside transaction before reading
     - [ ] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Move notification INSERTs inside the transaction for extension handlers (keep audit log post-commit with try/catch)
+- [x] Task: Move notification INSERTs inside the transaction for extension handlers (keep audit log post-commit with try/catch) (ac2cf9b)
     - [ ] Run `pnpm test` — verify existing tests still pass
 - [ ] Task: Run quality gates for Phase 2
     - [ ] Run `pnpm typecheck`
