@@ -30,7 +30,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Documentation & Naming Fixes' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Documentation & Naming Fixes' (Protocol in workflow.md) — User approved checkpoint
 
 ## Phase 2: SQL & Dashboard Query Fixes (BUG-11, BUG-19)
 
