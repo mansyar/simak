@@ -10,6 +10,7 @@ import {
 import * as auth from '@/server/auth';
 import * as authSession from '@/lib/auth-session';
 import * as dbMod from '@/db/index';
+import { consultations, extensionRequests, uploadIntents } from '@/db/schema';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -181,8 +182,26 @@ describe('User server functions - Logic & Security', () => {
         session: {} as any,
       });
 
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ id: 'user-1', role: 'admin', deletedAt: null }]).then(fn),
+      );
+
       const result = await deleteUserHandler({ data: { id: 'user-1' } });
       expect(result).toEqual({ success: true });
+    });
+
+    it('should return error if user not found or already deleted', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+
+      mockDb.then.mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
+
+      const result = await deleteUserHandler({ data: { id: 'nonexistent' } });
+      expect(result).toEqual({
+        error: { code: 'NOT_FOUND', message: 'User not found or already deleted' },
+      });
     });
 
     it('should reject unauthorized (no session)', async () => {
@@ -197,9 +216,68 @@ describe('User server functions - Logic & Security', () => {
         session: {} as any,
       });
 
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ id: 'user-1', role: 'admin', deletedAt: null }]).then(fn),
+      );
+
       await deleteUserHandler({ data: { id: 'user-1' } });
 
       expect(authSession.revokeUserSessions).toHaveBeenCalledWith('user-1', 'admin-1');
+    });
+
+    it('should auto-reject pending consultations, extension requests, and revoke upload intents when deleting a student', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 'user-1', role: 'student', deletedAt: null }]).then(onfulfilled),
+      );
+
+      await deleteUserHandler({ data: { id: 'user-1' } });
+
+      expect(mockDb.transaction).toHaveBeenCalled();
+      expect(mockDb.update).toHaveBeenCalledWith(consultations);
+      expect(mockDb.update).toHaveBeenCalledWith(extensionRequests);
+      expect(mockDb.update).toHaveBeenCalledWith(uploadIntents);
+    });
+
+    it('should block instructor deletion if they have active assignments', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+
+      mockDb.then
+        .mockImplementationOnce((fn: any) =>
+          Promise.resolve([{ id: 'inst-1', role: 'instructor', deletedAt: null }]).then(fn),
+        )
+        .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 3 }]).then(fn));
+
+      const result = await deleteUserHandler({ data: { id: 'inst-1' } });
+      expect(result).toEqual({
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'Instructor has active assignments. Reassign them first.',
+        },
+      });
+    });
+
+    it('should allow instructor deletion when no active assignments', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+
+      mockDb.then
+        .mockImplementationOnce((fn: any) =>
+          Promise.resolve([{ id: 'inst-1', role: 'instructor', deletedAt: null }]).then(fn),
+        )
+        .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn));
+
+      const result = await deleteUserHandler({ data: { id: 'inst-1' } });
+      expect(result).toEqual({ success: true });
     });
   });
 

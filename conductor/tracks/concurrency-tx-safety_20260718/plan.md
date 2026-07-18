@@ -80,8 +80,8 @@
 
 ## Phase 4: Soft-Delete Cleanup (BUG-9)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
-- [ ] Task: Write failing unit tests for student soft-delete auto-reject (FR-4.1)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
+- [~] Task: Write failing unit tests for student soft-delete auto-reject (FR-4.1)
     - [ ] Test: pending consultations are auto-rejected with reason "User deleted"
     - [ ] Test: pending extension requests are auto-rejected with reason "User deleted"
     - [ ] Test: open upload intents are revoked

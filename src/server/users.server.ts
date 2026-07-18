@@ -2,7 +2,14 @@
 import { eq, and, isNull, sql, ne } from 'drizzle-orm';
 import crypto from 'node:crypto';
 import { getDb } from '../db/index';
-import { users, verification } from '../db/schema/index';
+import {
+  users,
+  verification,
+  assignments,
+  consultations,
+  extensionRequests,
+  uploadIntents,
+} from '../db/schema/index';
 import { sendInvitationEmail } from '../lib/email';
 import { logAuditEvent } from '../lib/audit';
 import { revokeUserSessions } from '../lib/auth-session';
@@ -320,11 +327,60 @@ export async function deleteUserHandler(args: { data: UserIdParam }) {
   const db = getDb();
 
   try {
-    // Revoke all sessions for the user before soft-deleting, so they are
-    // immediately logged out on every device.
+    // Fetch user to determine role for cleanup
+    const [user] = await db.select().from(users).where(eq(users.id, args.data.id)).limit(1);
+    if (!user || user.deletedAt) {
+      return serverError(ErrorCode.NOT_FOUND, 'User not found or already deleted');
+    }
+
+    // Block instructor soft-delete if they have active assignments
+    if (user.role === 'instructor') {
+      const [activeCount] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(assignments)
+        .where(and(eq(assignments.instructorId, args.data.id), isNull(assignments.deletedAt)));
+      if (activeCount && activeCount.count > 0) {
+        return serverError(
+          ErrorCode.BAD_REQUEST,
+          'Instructor has active assignments. Reassign them first.',
+        );
+      }
+    }
+
+    // Revoke all sessions before soft-deleting
     await revokeUserSessions(args.data.id, session.user.id);
 
-    await db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, args.data.id));
+    await db.transaction(async (tx) => {
+      if (user.role === 'student') {
+        // Auto-reject pending consultations
+        await tx
+          .update(consultations)
+          .set({ status: 'rejected', notes: 'User deleted' })
+          .where(
+            and(eq(consultations.studentId, args.data.id), eq(consultations.status, 'pending')),
+          );
+
+        // Auto-reject pending extension requests
+        await tx
+          .update(extensionRequests)
+          .set({ status: 'rejected', resolutionReason: 'User deleted' })
+          .where(
+            and(
+              eq(extensionRequests.studentId, args.data.id),
+              eq(extensionRequests.status, 'pending'),
+            ),
+          );
+
+        // Revoke open upload intents
+        await tx
+          .update(uploadIntents)
+          .set({ consumedAt: new Date() })
+          .where(and(eq(uploadIntents.userId, args.data.id), isNull(uploadIntents.consumedAt)));
+      }
+
+      // Soft-delete the user
+      await tx.update(users).set({ deletedAt: new Date() }).where(eq(users.id, args.data.id));
+    });
 
     await logAuditEvent({
       actorId: session.user.id,

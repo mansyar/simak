@@ -85,6 +85,13 @@ describe('User handlers audit logging', () => {
         session: {} as any,
       });
 
+      // Mock user fetch: return a valid non-deleted user
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 'user-to-delete', role: 'admin', deletedAt: null }]).then(
+          onfulfilled,
+        ),
+      );
+
       const { deleteUserHandler } = await import('@/server/users.server');
       await deleteUserHandler({
         data: { id: 'user-to-delete' },
