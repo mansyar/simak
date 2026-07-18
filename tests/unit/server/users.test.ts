@@ -47,6 +47,7 @@ describe('User server functions - Logic & Security', () => {
     update: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
+    transaction: vi.fn(async (callback: any) => callback(mockDb)),
     // Simple mock for Drizzle's thenable queries
     then: vi.fn(function (onfulfilled) {
       return Promise.resolve([]).then(onfulfilled);
@@ -347,6 +348,22 @@ describe('User server functions - Logic & Security', () => {
       expect(mockDb.delete).toHaveBeenCalled();
       expect(mockDeleteWhere).toHaveBeenCalled();
       mockDb.delete = originalDelete;
+    });
+
+    it('should wrap DELETE + INSERT in a single transaction', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ email: 'user@test.com' }]).then(fn),
+      );
+
+      await generateSetupLinkHandler({ data: { id: 'user-1' } });
+
+      expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+      expect(mockDb.delete).toHaveBeenCalled();
+      expect(mockDb.insert).toHaveBeenCalled();
     });
   });
 });

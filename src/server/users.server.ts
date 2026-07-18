@@ -345,15 +345,17 @@ export async function generateSetupLinkHandler(args: { data: UserIdParam }) {
 
     const token = crypto.randomUUID();
 
-    // Invalidate any existing setup/verification tokens for this email
-    // before issuing a new one.
-    await db.delete(verification).where(eq(verification.identifier, user.email));
+    // Invalidate any existing setup/verification tokens and insert the new one
+    // in a single transaction (BUG-13: DELETE + INSERT must be atomic)
+    await db.transaction(async (tx) => {
+      await tx.delete(verification).where(eq(verification.identifier, user.email));
 
-    await db.insert(verification).values({
-      id: crypto.randomUUID(),
-      identifier: user.email,
-      value: token,
-      expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+      await tx.insert(verification).values({
+        id: crypto.randomUUID(),
+        identifier: user.email,
+        value: token,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+      });
     });
 
     const setupUrl = `${process.env.BETTER_AUTH_URL || 'http://localhost:3000'}/auth/setup-password?token=${token}`;
