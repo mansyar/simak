@@ -8,8 +8,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Concurrency & Transaction Safety**
-*Link: [./tracks/concurrency-tx-safety_20260718/](./tracks/concurrency-tx-safety_20260718/)*
-
----
-
