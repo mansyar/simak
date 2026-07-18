@@ -72,10 +72,10 @@
     - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
 - [x] Task: Refactor `createUserHandler` and `updateUserHandler` — move email check inside transaction with `FOR UPDATE`, catch PG error `23505` (3cdfbe5)
     - [x] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Run quality gates for Phase 3
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint`
-    - [ ] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
+- [x] Task: Run quality gates for Phase 3 (238e5ff)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint`
+    - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: 2FA & Users' (Protocol in workflow.md)
 
 ## Phase 4: Soft-Delete Cleanup (BUG-9)
