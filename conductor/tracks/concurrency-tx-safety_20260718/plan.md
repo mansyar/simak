@@ -17,11 +17,11 @@
     - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
 - [x] Task: Refactor `rejectConsultationHandler` — same pattern (transaction + `FOR UPDATE` + post-lock status re-check)
     - [x] Run `pnpm test` — verify new tests pass (Green)
-- [~] Task: Run quality gates for Phase 1
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint`
-    - [ ] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Consultations' (Protocol in workflow.md)
+- [x] Task: Run quality gates for Phase 1 (commit: 4149eea)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint`
+    - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Consultations' (Protocol in workflow.md)
 
 ## Phase 2: Extensions (BUG-2, BUG-5, BUG-6, BUG-7)
 
