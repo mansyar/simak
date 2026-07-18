@@ -26,8 +26,9 @@ export interface SLASubmissionFields {
 
 /**
  * Adjust deadlines when an SLA breach occurs.
- * Extends the affected checkpoint's dueDate, subsequent checkpoints' dueDates,
- * and the assignment's finalDeadline by the breach duration.
+ * Extends the affected checkpoint's dueDate and subsequent checkpoints'
+ * dueDates by the breach duration. Per-student only — does NOT modify the
+ * course-wide assignment finalDeadline (immutable per Track 10).
  *
  * Must be called inside the review transaction (tx).
  */

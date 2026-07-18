@@ -22,8 +22,9 @@ function isInstructor(session: NonNullableSession | null): session is NonNullabl
 
 /**
  * Calculate and apply extension adjustment.
- * Extends the affected checkpoint's dueDate, all subsequent checkpoints,
- * and the assignment finalDeadline by the given number of days.
+ * Extends the affected checkpoint's dueDate and all subsequent checkpoints'
+ * dueDates by the given number of days. Per-student only — does NOT modify
+ * the course-wide assignment finalDeadline (immutable per Track 10).
  */
 async function calculateExtensionAdjustment(
   db: ReturnType<typeof getDb>,
@@ -311,6 +312,8 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
 
 /**
  * Bulk extend all unfinished checkpoints for a student by N days.
+ * Adjusts per-student checkpoint dueDates only — does NOT modify the
+ * course-wide assignment finalDeadline (immutable per Track 10).
  * Instructor-only, ownership-guarded.
  */
 export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
