@@ -61,12 +61,12 @@
     - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
 - [x] Task: Refactor `disableTwoFactorHandler` — wrap DB ops in `db.transaction`, call auth API last (06218fd)
     - [x] Run `pnpm test` — verify new tests pass (Green)
-- [~] Task: Write failing unit tests for `generateSetupLinkHandler` (BUG-13)
-    - [ ] Test: DELETE + INSERT occur in a single `db.transaction` — failure rolls back both
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Refactor `generateSetupLinkHandler` — wrap DELETE + INSERT in a single `db.transaction`
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Write failing unit tests for `createUserHandler` and `updateUserHandler` email uniqueness (BUG-22)
+- [x] Task: Write failing unit tests for `generateSetupLinkHandler` (BUG-13) (1a9b01c)
+    - [x] Test: DELETE + INSERT occur in a single `db.transaction` — failure rolls back both
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Refactor `generateSetupLinkHandler` — wrap DELETE + INSERT in a single `db.transaction` (1a9b01c)
+    - [x] Run `pnpm test` — verify new tests pass (Green)
+- [~] Task: Write failing unit tests for `createUserHandler` and `updateUserHandler` email uniqueness (BUG-22)
     - [ ] Test: email uniqueness check occurs inside transaction with `FOR UPDATE` on users rows
     - [ ] Test: PG error `23505` is caught and returns clean "Email already in use" message
     - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
