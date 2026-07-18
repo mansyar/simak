@@ -248,6 +248,12 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 | deletedAt        | timestamp              | Soft delete                                                                         |
 | twoFactorEnabled | boolean, default false | Whether the user has enabled TOTP 2FA                                               |
 
+> **User email uniqueness transaction safety (Track: Concurrency & Transaction Safety):** The `createUserHandler` and `updateUserHandler` in `src/server/users.server.ts` perform the email uniqueness check **inside** a `db.transaction` with a `FOR UPDATE` lock on the matching `users` row, preventing a TOCTOU race where two concurrent create/update requests could both pass the uniqueness check and insert conflicting emails. As defense-in-depth, PostgreSQL's unique constraint violation (error code `23505`) is also caught and mapped to a clean "Email already in use" error message.
+
+> **Soft-delete cleanup transaction safety (Track: Concurrency & Transaction Safety):** The `deleteUserHandler` in `src/server/users.server.ts` performs all cleanup inside a single `db.transaction`:
+> - **Student soft-delete:** auto-rejects all pending consultations and extension requests with reason "User deleted", revokes open upload intents, and sets `deletedAt`. All cleanup runs inside the transaction — the user is either fully cleaned up and soft-deleted, or nothing changes.
+> - **Instructor soft-delete:** checks for active (non-deleted) assignments **inside** the transaction with a `FOR UPDATE` lock on the matching `assignments` rows. If active assignments exist, the deletion is blocked with a `BAD_REQUEST` error and the admin is presented with a Reassignment Dialog. The admin must reassign **all** active assignments to replacement instructors (via `reassignAssignmentHandler`, which transitions `under_review` checkpoints back to `submitted`) before the soft-delete can proceed. After successful soft-delete, active sessions are revoked post-commit in a try/catch.
+
 #### session (Better-Auth)
 
 | Column    | Type                | Notes          |
@@ -289,6 +295,8 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 | verified    | boolean, default true | Whether 2FA setup has been verified               |
 | userId      | text (FK → users)     | Cascade delete                                    |
 
+> **2FA disable transaction safety (Track: Concurrency & Transaction Safety):** The `disableTwoFactorHandler` in `src/server/two-factor.server.ts` wraps the DB operations (set `users.twoFactorEnabled = false` and delete the `two_factor` row) in a single `db.transaction`. The Better Auth API call (`auth.api.disableTwoFactor`) is invoked **after** the transaction commits as post-commit advisory work in a try/catch — if the API call fails, the DB state is already durable and the system reconciles on the user's next login by checking the DB flag. Active session revocation is also performed post-commit in a try/catch. This follows SQL style guide §6.4 (post-commit advisory work).
+
 #### verification (Better-Auth)
 
 | Column     | Type                | Notes              |
@@ -301,6 +309,8 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 | updatedAt  | timestamp           |                    |
 
 > **Atomic token consumption (Track: Secure password-setup token consumption):** Password setup tokens are consumed via `DELETE FROM verification WHERE value = ? AND expiresAt > now() RETURNING *` as the **first statement** inside `db.transaction()` in `completePasswordSetupHandler`. This replaces the former check-then-act pattern (SELECT outside transaction → DELETE at the end), which was vulnerable to concurrent token replay (TOCTOU race). The atomic DELETE serves as both validation and consumption in a single step — if zero rows are returned, the token was already used, expired, or never existed, and the handler returns a generic "Invalid or expired token" error (no information leakage). User lookup, password upsert, and `emailVerified` update all run inside the same transaction; a failure on any step rolls back the transaction and restores the token. Password hashing (scrypt, CPU-bound) is performed **outside** the transaction so that a hashing failure does not consume the token.
+
+> **Setup link generation transaction safety (Track: Concurrency & Transaction Safety):** The `generateSetupLinkHandler` in `src/server/users.server.ts` wraps the `DELETE` (revoke any existing setup token for the user) and `INSERT` (create a new verification token) in a single `db.transaction`. If either operation fails, both are rolled back — preventing a state where an old token is deleted but the new one fails to insert, leaving the user unable to set up their password.
 
 #### assignment_templates
 
@@ -417,6 +427,8 @@ _Note: Each row represents one student's individual participation. Group assignm
 | verifiedAt             | timestamp                          | When instructor verified                     |
 | createdAt              | timestamp                          |                                              |
 
+> **Consultation verify/reject transaction safety (Track: Concurrency & Transaction Safety):** The `verifyConsultationHandler` and `rejectConsultationHandler` in `src/server/consultations.server.ts` read the `consultations` row **inside** a `db.transaction` with `FOR UPDATE` on the consultation row, then re-validate `status === 'pending'` after acquiring the lock. If the locked re-read shows the status has changed (e.g. another instructor already verified/rejected it), the operation is rejected with a stale-state error. This eliminates the check-then-act TOCTOU race where two concurrent verify/reject requests could both read `pending` and both proceed. Audit logging runs post-commit in a try/catch.
+
 #### notifications
 
 | Column    | Type                   | Notes                                   |
@@ -463,7 +475,9 @@ _Note: Each row represents one student's individual participation. Group assignm
 
 Index on `(assignmentId, status)` for instructor queue queries.
 
-> **Transactional write boundary (Track: Atomic extension request + notification):** The `requestExtensionHandler` in `src/server/extensions.server.ts` wraps the `extension_requests` insert and the instructor's in-app `notifications` insert in a single `db.transaction(async (tx) => { ... })` block. Both inserts use the `tx` client — if the notification insert throws, the transaction rejects and the extension request is rolled back, preventing orphaned extension records without their alert. All six validation reads (session, role, assignment existence, student enrollment, checkpoint state, extension cap enforcement) run **outside** the transaction using the `db` client and are not part of the atomic boundary. The `requestedDeadline` calculation is performed inside the transaction callback. This pattern follows SQL style guide §6 (transaction wrapping) and is consistent with `submitReviewHandler` (`src/server/reviews.server.ts`), which also places in-app notification inserts inside the transaction boundary.
+> **Transactional write boundary (Track: Concurrency & Transaction Safety):** The `requestExtensionHandler` in `src/server/extensions.server.ts` wraps the `extension_requests` insert, the instructor's in-app `notifications` insert, **and** the extension count cap check in a single `db.transaction(async (tx) => { ... })` block. Both inserts use the `tx` client — if the notification insert throws, the transaction rejects and the extension request is rolled back, preventing orphaned extension records without their alert. The extension count check (`maxTotalExtensions` enforcement) is performed **inside** the transaction with a `FOR UPDATE` lock on the matching `assignment_students` row, preventing a TOCTOU race where two concurrent extension requests could both pass the count check and exceed the cap. The `requestedDeadline` calculation is also performed inside the transaction callback. The remaining validation reads (session, role, assignment existence, student enrollment, checkpoint state) run outside the transaction. This pattern follows SQL style guide §6 (transaction wrapping) and is consistent with `submitReviewHandler` (`src/server/reviews.server.ts`), which also places in-app notification inserts inside the transaction boundary.
+
+> **Extension approve/reject transaction safety (Track: Concurrency & Transaction Safety):** The `approveExtensionHandler` and `rejectExtensionHandler` in `src/server/extensions-extras.server.ts` read the `extension_requests` row **inside** a `db.transaction` with `FOR UPDATE` on the extension request row, then re-validate `status === 'pending'` after acquiring the lock. If the locked re-read shows the status has changed (e.g. another request already approved/rejected it), the operation is rejected with a stale-state error. On approval, `calculateExtensionAdjustment` locks the affected `checkpoints` rows with `FOR UPDATE` inside the same transaction before reading and adjusting their `dueDate` values, preventing concurrent deadline modifications from producing inconsistent results. Notification INSERTs run inside the transaction; audit logging runs post-commit in a try/catch.
 
 #### audit_log
 

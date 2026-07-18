@@ -50,7 +50,7 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-001: Concurrency & Transaction Safety
 
-- **Status:** `Pending`
+- **Status:** `Complete` (archived to `conductor/archive/concurrency-tx-safety_20260718/`)
 - **Dependencies:** None
 - **Estimated Effort:** 5 Days / 3 Sprint Loops
 - **Audit IDs:** BUG-1, BUG-2, BUG-5, BUG-6, BUG-7, BUG-8, BUG-9, BUG-13, BUG-17, BUG-22
@@ -100,11 +100,11 @@ All tracks must adhere to the following project constraints:
 
 #### Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Open two browser tabs for the same consultation; submit verify simultaneously. Only one succeeds; the other gets "already processed" error.
-- [ ] **Manual Checkpoint:** Attempt to soft-delete an instructor with active assignments — system blocks and requires reassignment. After reassignment, new instructor sees pending reviews in their queue.
-- [ ] **Automated Tests:** `pnpm test:unit` and `pnpm test:integration` — all pass. New concurrency tests verify no duplicate operations under parallel load.
-- [ ] **Code Review:** All state-transition handlers use `db.transaction` + `FOR UPDATE` + post-lock status re-check. No SELECT-then-UPDATE patterns remain outside transactions.
-- [ ] **Conductor Review:** Passes `pnpm typecheck`, `pnpm lint`, and `pnpm test:coverage` (≥80%).
+- [x] **Manual Checkpoint:** Open two browser tabs for the same consultation; submit verify simultaneously. Only one succeeds; the other gets "already processed" error.
+- [x] **Manual Checkpoint:** Attempt to soft-delete an instructor with active assignments — system blocks and requires reassignment. After reassignment, new instructor sees pending reviews in their queue.
+- [x] **Automated Tests:** `pnpm test:unit` and `pnpm test:integration` — all pass. New concurrency tests verify no duplicate operations under parallel load.
+- [x] **Code Review:** All state-transition handlers use `db.transaction` + `FOR UPDATE` + post-lock status re-check. No SELECT-then-UPDATE patterns remain outside transactions.
+- [x] **Conductor Review:** Passes `pnpm typecheck`, `pnpm lint`, and `pnpm test:coverage` (≥80%).
 
 ---
 
