@@ -6,9 +6,9 @@
 1. **The Plan is the Source of Truth:** All work must be tracked in `plan.md`
 2. **The Tech Stack is Deliberate:** Changes to the tech stack must be documented in `tech-stack.md` _before_ implementation
 3. **Test-Driven Development:** Write unit tests before implementing functionality
-4. **High Code Coverage:** Aim for >80% code coverage for all modules
+4. **High Code Coverage:** ≥80% on lines, statements, branches, **and** functions (enforced by `vitest.config.ts` thresholds)
 5. **User Experience First:** Every decision should prioritize user experience
-6. **Non-Interactive & CI-Aware:** Prefer non-interactive commands. Use `CI=true` for watch-mode tools (tests, linters) to ensure single execution.
+6. **Non-Interactive & Single-Run:** Prefer non-interactive commands. `pnpm test` runs `vitest run` (single execution, not watch). Use `pnpm test:watch` only during active development, never in checkpoints or CI.
 
 ## AI Agent Behavioral Guidelines
 
@@ -52,25 +52,26 @@ All tasks follow a strict lifecycle:
 2. **Mark In Progress:** Before beginning work, edit `plan.md` and change the task from `[ ]` to `[~]`
 
 3. **Write Failing Tests (Red Phase):**
-   - Create a new test file for the feature or bug fix.
+   - Create a new test file under `tests/unit/` mirroring the `src/` path of the feature.
    - Write one or more unit tests that clearly define the expected behavior and acceptance criteria for the task.
-   - **CRITICAL:** Run the tests and confirm that they fail as expected. This is the "Red" phase of TDD. Do not proceed until you have failing tests.
+   - **CRITICAL:** Run `pnpm test` and confirm the new tests fail as expected. Do not proceed until you have failing tests.
 
 4. **Implement to Pass Tests (Green Phase):**
    - Write the minimum amount of application code necessary to make the failing tests pass.
-   - Run the test suite again and confirm that all tests now pass. This is the "Green" phase.
+   - Run `pnpm test` again and confirm all tests now pass.
 
 5. **Refactor (Optional but Recommended):**
-   - With the safety of passing tests, refactor the implementation code and the test code to improve clarity, remove duplication, and enhance performance without changing the external behavior.
+   - With the safety of passing tests, refactor implementation and test code to improve clarity, remove duplication, and enhance performance without changing external behavior.
    - Rerun tests to ensure they still pass after refactoring.
 
-6. **Verify Coverage:** Run coverage reports using the project's chosen tools. For example, in a Python project, this might look like:
+6. **Verify Coverage & Quality Gates:** Run the full quality gate suite (see **Quality Gates** below):
 
    ```bash
-   pytest --cov=app --cov-report=html
+   pnpm test:coverage   # vitest run --coverage; thresholds: lines/stmts/branches/funcs ≥80%
+   pnpm typecheck       # tsc --noEmit --incremental
+   pnpm lint            # oxlint . (includes simak-i18n/no-hardcoded rule)
+   pnpm check:i18n      # i18n key parity EN↔ID
    ```
-
-   Target: >80% coverage for new code. The specific tools and commands will vary by language and framework.
 
 7. **Document Deviations:** If implementation differs from tech stack:
    - **STOP** implementation
@@ -81,16 +82,16 @@ All tasks follow a strict lifecycle:
 8. **Commit Code Changes:**
    - Stage all code changes related to the task.
    - Propose a clear, concise commit message e.g, `feat(ui): Create basic HTML structure for calculator`.
-   - Perform the commit.
+   - Perform the commit. The Lefthook pre-commit hook will run `oxlint --fix` → `oxfmt --write` → `check-modularity.js` on staged files.
 
 9. **Attach Task Summary with Git Notes:**
    - **Step 9.1: Get Commit Hash:** Obtain the hash of the _just-completed commit_ (`git log -1 --format="%H"`).
    - **Step 9.2: Draft Note Content:** Create a detailed summary for the completed task. This should include the task name, a summary of changes, a list of all created/modified files, and the core "why" for the change.
    - **Step 9.3: Attach Note:** Use the `git notes` command to attach the summary to the commit.
-     ```bash
-     # The note content from the previous step is passed via the -m flag.
-     git notes add -m "<note content>" <commit_hash>
-     ```
+      ```bash
+      # The note content from the previous step is passed via the -m flag.
+      git notes add -m "<note content>" <commit_hash>
+      ```
 
 10. **Get and Record Task Commit SHA:**
     - **Step 10.1: Update Plan:** Read `plan.md`, find the line for the completed task, update its status from `[~]` to `[x]`, and append the first 7 characters of the _just-completed commit's_ commit hash.
@@ -110,13 +111,14 @@ All tasks follow a strict lifecycle:
     - **Step 2.1: Determine Phase Scope:** To identify the files changed in this phase, you must first find the starting point. Read `plan.md` to find the Git commit SHA of the _previous_ phase's checkpoint. If no previous checkpoint exists, the scope is all changes since the first commit.
     - **Step 2.2: List Changed Files:** Execute `git diff --name-only <previous_checkpoint_sha> HEAD` to get a precise list of all files modified during this phase.
     - **Step 2.3: Verify and Create Tests:** For each file in the list:
-      - **CRITICAL:** First, check its extension. Exclude non-code files (e.g., `.json`, `.md`, `.yaml`).
-      - For each remaining code file, verify a corresponding test file exists.
+      - First, check its extension. Exclude non-code files (e.g., `.md`, `.yaml`, `*.gen.ts`).
+      - **Note on `.json`:** `locales/en.json` and `locales/id.json` are i18n source-of-truth — exclude them from "needs a unit test" but DO verify `pnpm check:i18n` passes. Other `.json` (e.g., package config) can be excluded.
+      - For each remaining code file, verify a corresponding test file exists under `tests/unit/` (mirroring the `src/` path).
       - If a test file is missing, you **must** create one. Before writing the test, **first, analyze other test files in the repository to determine the correct naming convention and testing style.** The new tests **must** validate the functionality described in this phase's tasks (`plan.md`).
 
 3.  **Execute Automated Tests with Proactive Debugging:**
     - Before execution, you **must** announce the exact shell command you will use to run the tests.
-    - **Example Announcement:** "I will now run the automated test suite to verify the phase. **Command:** `CI=true npm test`"
+    - **Example Announcement:** "I will now run the automated test suite to verify the phase. **Command:** `pnpm test:coverage`"
     - Execute the announced command.
     - If tests fail, you **must** inform the user and begin debugging. You may attempt to propose a fix a **maximum of two times**. If the tests still fail after your second proposed fix, you **must stop**, report the persistent failure, and ask the user for guidance.
 
@@ -125,34 +127,37 @@ All tasks follow a strict lifecycle:
     - You **must** generate a step-by-step plan that walks the user through the verification process, including any necessary commands and specific, expected outcomes.
     - The plan you present to the user **must** follow this format:
 
-      **For a Frontend Change:**
+      **For a Frontend / UI Change:**
 
       ```
       The automated tests have passed. For manual verification, please follow these steps:
 
       **Manual Verification Steps:**
-      1.  **Start the development server with the command:** `npm run dev`
-      2.  **Open your browser to:** `http://localhost:3000`
+      1.  **Start the development server:** `pnpm dev`  (runs i18n codegen, then `vite dev`)
+      2.  **Open your browser to:** `http://localhost:3000` (TanStack Start default)
       3.  **Confirm that you see:** The new user profile page, with the user's name and email displayed correctly.
       ```
 
-      **For a Backend Change:**
+      **For a Server Function / Database Change:**
 
       ```
       The automated tests have passed. For manual verification, please follow these steps:
 
       **Manual Verification Steps:**
-      1.  **Ensure the server is running.**
-      2.  **Execute the following command in your terminal:** `curl -X POST http://localhost:8080/api/v1/users -d '{"name": "test"}'`
-      3.  **Confirm that you receive:** A JSON response with a status of `201 Created`.
+      1.  **Start the dev server:** `pnpm dev`
+      2.  **Navigate to the page that triggers the server function** (e.g., `/admin/users` → "Create User").
+      3.  **Perform the action in the UI and confirm the result:** A toast notification appears and the new row appears in the list.
+      4.  *(Optional)* **Verify the database state:** `docker compose exec postgres psql -U simak -d simak -c "SELECT ..."`
       ```
+
+      SIMAK is a fullstack TanStack Start app — there is no separate REST backend. Server functions are invoked through the UI, not via `curl` endpoints.
 
 5.  **Await Explicit User Feedback:**
     - After presenting the detailed plan, ask the user for confirmation: "**Does this meet your expectations? Please confirm with yes or provide feedback on what needs to be changed.**"
     - **PAUSE** and await the user's response. Do not proceed without an explicit yes or confirmation.
 
 6.  **Create Checkpoint Commit:**
-    - Stage all changes. If no changes occurred in this step, proceed with an empty commit.
+    - Stage all changes. The checkpoint commit must contain at minimum the `plan.md` update from step 8 below; if additional test/code changes were made during verification, stage those too.
     - Perform the commit with a clear and concise message (e.g., `conductor(checkpoint): Checkpoint end of Phase X`).
 
 7.  **Attach Auditable Verification Report using Git Notes:**
@@ -172,69 +177,151 @@ All tasks follow a strict lifecycle:
 
 ### Quality Gates
 
-Before marking any task complete, verify:
+Before marking any task complete, verify ALL of the following. These mirror the Lefthook pre-commit and pre-push gates plus project-specific enforced rules.
 
-- [ ] All tests pass
-- [ ] Code coverage meets requirements (>80%)
-- [ ] Code follows project's code style guidelines (as defined in `code_styleguides/`)
-- [ ] All public functions/methods are documented (e.g., docstrings, JSDoc, GoDoc)
-- [ ] Type safety is enforced (e.g., type hints, TypeScript types, Go types)
-- [ ] No linting or static analysis errors (using the project's configured tools)
-- [ ] Works correctly on mobile (if applicable)
+- [ ] `pnpm test` passes (unit tests; excludes `tests/integration/**`)
+- [ ] `pnpm test:coverage` meets thresholds — lines, statements, branches, **and** functions ≥80%
+- [ ] `pnpm typecheck` passes (`tsc --noEmit --incremental`)
+- [ ] `pnpm lint` passes — `oxlint .`, including the custom `simak-i18n/no-hardcoded` rule (no hardcoded English UI strings)
+- [ ] `pnpm check:i18n` passes — i18n key parity between `locales/en.json` and `locales/id.json`
+- [ ] No file in `src/`, `tests/`, or `scripts/` exceeds **500 lines** (enforced by `scripts/check-modularity.js` on commit; exempt: `*.gen.ts`, `src/i18n/types.ts`, `src/i18n/detect-locale.ts`, `scripts/generate-i18n-types.ts`)
+- [ ] No `@ts-expect-error` directives added without a documented reason
+- [ ] Server functions follow the **two-file split**: `src/server/<feature>.ts` (Zod schemas + `createServerFn` stubs) and `src/server/<feature>.server.ts` (handler implementations, never client-bundled)
+- [ ] Type safety enforced (TypeScript strict; explicit return types on client-crossing server handlers)
+- [ ] No security vulnerabilities introduced (input validation via Zod; SQL via Drizzle parameterized queries; ownership guards on all student/instructor server functions)
+- [ ] Responsive layout verified in browser dev tools at mobile/tablet/desktop widths (if UI changed)
 - [ ] Documentation updated if needed
-- [ ] No security vulnerabilities introduced
+
+## i18n Workflow
+
+SIMAK is fully bilingual (English + Indonesian). i18n is a **first-class, enforced discipline** — not an afterthought.
+
+### Adding or changing user-visible strings
+
+1. **Add keys to `locales/en.json`** (the source of truth).
+2. **Add the same keys to `locales/id.json`** with the Indonesian translation.
+3. **Run `pnpm generate:i18n`** to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts` (these are generated — **never edit by hand**).
+4. **Use `t('key')` in components** — never hardcode user-facing strings. The custom lint rule `simak-i18n/no-hardcoded` (in `lint-plugin.js`, loaded via `.oxlintrc.json`) flags hardcoded English text in JSX children and in `placeholder`/`aria-label`/`title`/`alt` attributes. Only the literal `DELETE` is allowlisted.
+5. **Validate parity:** `pnpm check:i18n` (missing keys) and `pnpm check:i18n:unused` (unused keys). The unused-key check runs in the pre-push gate.
+
+### Codegen timing
+
+- `pnpm generate:i18n` runs **automatically before every `pnpm dev` and `pnpm build`** (see the `dev` and `build` scripts in `package.json`).
+- For server-side i18n (e.g., localized email subjects, server-resolved error messages), use the shared server-side i18n helper — do not import the client `t()` into server code.
+
+### When NOT to add keys
+
+- Log messages, internal error messages, and developer-facing strings do not need i18n keys — only user-visible UI text does.
 
 ## Development Commands
-
-**AI AGENT INSTRUCTION: This section should be adapted to the project's specific language, framework, and build tools.**
 
 ### Setup
 
 ```bash
-# Example: Commands to set up the development environment (e.g., install dependencies, configure database)
-# e.g., for a Node.js project: npm install
-# e.g., for a Go project: go mod tidy
+pnpm install                              # install dependencies
+docker compose up -d                       # start local PostgreSQL (postgres:16-alpine, port 5432)
+pnpm db:push                               # push schema to dev DB (drizzle-kit push)
+pnpm db:seed                               # seed SuperAdmin user (reads .env via --env-file)
 ```
 
 ### Daily Development
 
 ```bash
-# Example: Commands for common daily tasks (e.g., start dev server, run tests, lint, format)
-# e.g., for a Node.js project: npm run dev, npm test, npm run lint
-# e.g., for a Go project: go run main.go, go test ./..., go fmt ./...
+pnpm dev                                   # i18n codegen + vite dev server (http://localhost:3000)
+pnpm test                                  # vitest run (unit tests; excludes integration + xlsx-threaded tests)
+pnpm test:watch                            # watch mode (unit only)
+pnpm test:integration                      # opt-in integration tests only
+pnpm test:coverage                         # unit + coverage report
+pnpm lint                                  # oxlint . (includes simak-i18n/no-hardcoded)
+pnpm format                                # oxfmt --write "src/**/*.{ts,tsx,css}"
+pnpm typecheck                             # tsc --noEmit --incremental
+pnpm check:i18n                            # i18n key parity EN↔ID
+pnpm check:i18n:unused                     # show unused i18n keys
+```
+
+### Database
+
+```bash
+pnpm db:generate                           # generate Drizzle migration from schema
+pnpm db:push                               # push schema to dev DB
+pnpm db:migrate                            # run pending migrations
+pnpm db:seed                               # seed SuperAdmin
+```
+
+### i18n
+
+```bash
+pnpm generate:i18n                         # regenerate src/i18n/types.ts + detect-locale.ts
+pnpm check:i18n                            # validate EN↔ID key parity
+pnpm check:i18n:unused                     # list unused keys
 ```
 
 ### Before Committing
 
+The Lefthook pre-commit gate runs **sequentially** on staged files:
+
+1. `oxlint --fix {staged_files}`
+2. `oxfmt --write {staged_files}`
+3. `node scripts/check-modularity.js {staged_files}` (500-line limit)
+
+The pre-push gate runs:
+
 ```bash
-# Example: Commands to run all pre-commit checks (e.g., format, lint, type check, run tests)
-# e.g., for a Node.js project: npm run check
-# e.g., for a Go project: make check (if a Makefile exists)
+pnpm typecheck && pnpm vitest run --coverage
+```
+
+Run these manually before pushing if you want early feedback:
+
+```bash
+pnpm typecheck && pnpm lint && pnpm test:coverage && pnpm check:i18n
 ```
 
 ## Testing Requirements
 
+### Test Layout
+
+- `tests/unit/` — unit tests, mirror the `src/` directory structure. Run by default.
+- `tests/integration/` — integration tests (DB, concurrency, end-to-end flows). **Opt-in only** — excluded from `pnpm test`, `pnpm test:watch`, and the pre-push coverage run. Run explicitly with `pnpm test:integration`.
+- A small set of xlsx-parsing tests run in a separate `--pool=threads` invocation (see the `test` script in `package.json`) — this is handled automatically.
+
 ### Unit Testing
 
-- Every module must have corresponding tests.
-- Use appropriate test setup/teardown mechanisms (e.g., fixtures, beforeEach/afterEach).
-- Mock external dependencies.
+- Every module must have corresponding tests under `tests/unit/`.
+- Default test environment is **`happy-dom`** (configured in `vitest.config.ts`).
+- **Server-handler tests must override to Node:** add `/** @vitest-environment node */` as the first line of the test file.
+- Tests import handlers directly via `@/server/*.server` and mock `@/server/auth`, `@/db/index`, plus external clients (`@/lib/storage`, Resend).
+- **Mocking `@tanstack/react-start`:** when a server function uses `.inputValidator(Schema).handler(...)`, the test **must** mock the builder chain or the import fails. Canonical pattern (see `tests/unit/server/submissions.test.ts`):
+
+  ```ts
+  vi.mock('@/server/auth', () => ({ getSessionFromHeaders: vi.fn() }));
+  vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
+  vi.mock('@tanstack/react-start', () => ({
+    createServerFn: vi.fn().mockReturnValue({
+      inputValidator: vi.fn().mockReturnThis(),
+      handler: vi.fn().mockImplementation((fn) => fn),
+    }),
+  }));
+  ```
+
+- Use appropriate test setup/teardown (`beforeEach`/`afterEach`).
+- Mock external dependencies (R2, Resend, DB).
 - Test both success and failure cases.
 
 ### Integration Testing
 
-- Test complete user flows
-- Verify database transactions
-- Test authentication and authorization
-- Check form submissions
+- Run with `pnpm test:integration` — never runs unless explicitly invoked.
+- Test complete user flows, DB transactions, concurrency (`SELECT ... FOR UPDATE`), and token-consumption atomicity.
+- Requires the local PostgreSQL container (`docker compose up -d`).
 
-### Mobile Testing
+### Responsive & Accessibility Testing
 
-- Test on actual iPhone when possible
-- Use Safari developer tools
-- Test touch interactions
-- Verify responsive layouts
-- Check performance on 3G/4G
+SIMAK is a responsive web app (not a native mobile app). The product targets WCAG 2.1 AA compliance (`product.md`).
+
+- Verify layouts in browser dev tools at mobile (375px), tablet (768px), and desktop (1280px) widths.
+- Keyboard navigation: every interactive element reachable and operable via Tab/Enter/Space.
+- Screen-reader sanity check (VoiceOver / NVDA) on key flows (login, assignment submission, review).
+- Color contrast meets WCAG AA; do not rely on color alone for status — pair with text/icon (the status badges already do this).
+- Reduced-motion: respect the `prefers-reduced-motion` media query (the Settings Hub exposes a toggle).
 
 ## Code Review Process
 
@@ -245,35 +332,41 @@ Before requesting review:
 1. **Functionality**
    - Feature works as specified
    - Edge cases handled
-   - Error messages are user-friendly
+   - Error messages are user-friendly and localized
 
 2. **Code Quality**
-   - Follows style guide
+   - Follows `conductor/code_styleguides/` (TypeScript, React, SQL, HTML/CSS)
    - DRY principle applied
    - Clear variable/function names
-   - Appropriate comments
+   - File ≤500 lines (`scripts/check-modularity.js`)
 
 3. **Testing**
    - Unit tests comprehensive
-   - Integration tests pass
-   - Coverage adequate (>80%)
+   - Integration tests pass (if applicable)
+   - Coverage ≥80% on all four metrics
 
-4. **Security**
-   - No hardcoded secrets
-   - Input validation present
-   - SQL injection prevented
-   - XSS protection in place
+4. **i18n**
+   - No hardcoded user-visible strings (`simak-i18n/no-hardcoded` lint rule)
+   - Keys added to both `locales/en.json` and `locales/id.json`
+   - `pnpm check:i18n` passes; no new unused keys
 
-5. **Performance**
-   - Database queries optimized
-   - Images optimized
-   - Caching implemented where needed
+5. **Security**
+   - No hardcoded secrets (use `src/config/env.ts` Zod-validated env vars)
+   - Input validation via Zod on every server function
+   - SQL via Drizzle (parameterized — never raw string interpolation)
+   - Ownership guards on student/instructor server functions
+   - XSS: React escapes by default; avoid `dangerouslySetInnerHTML`
 
-6. **Mobile Experience**
-   - Touch targets adequate (44x44px)
-   - Text readable without zooming
-   - Performance acceptable on mobile
-   - Interactions feel native
+6. **Performance**
+   - Database queries optimized (indexes on filtered/joined columns)
+   - Images optimized (R2 uploads, not in-repo)
+   - TanStack Query caching used for server state; polling only where needed (e.g., notification unread count)
+
+7. **Responsive & Accessibility**
+   - Layouts work at mobile/tablet/desktop widths
+   - Keyboard-navigable; visible focus states
+   - WCAG 2.1 AA color contrast
+   - Status conveyed by text/icon, not color alone
 
 ## Commit Guidelines
 
@@ -303,7 +396,7 @@ Before requesting review:
 git commit -m "feat(auth): Add remember me functionality"
 git commit -m "fix(posts): Correct excerpt generation for short posts"
 git commit -m "test(comments): Add tests for emoji reaction limits"
-git commit -m "style(mobile): Improve button touch targets"
+git commit -m "style(a11y): Improve button focus visibility"
 ```
 
 ## Definition of Done
@@ -311,25 +404,27 @@ git commit -m "style(mobile): Improve button touch targets"
 A task is complete when:
 
 1. All code implemented to specification
-2. Unit tests written and passing
-3. Code coverage meets project requirements
-4. Documentation complete (if applicable)
-5. Code passes all configured linting and static analysis checks
-6. Works beautifully on mobile (if applicable)
-7. Implementation notes added to `plan.md`
-8. Changes committed with proper message
-9. Git note with task summary attached to the commit
+2. Unit tests written and passing (`pnpm test`)
+3. Code coverage ≥80% on lines, statements, branches, **and** functions (`pnpm test:coverage`)
+4. `pnpm typecheck` passes
+5. `pnpm lint` passes (including `simak-i18n/no-hardcoded`)
+6. i18n keys added to both `en.json` and `id.json`; `pnpm check:i18n` passes; no new unused keys
+7. No file in `src/`/`tests/`/`scripts/` exceeds 500 lines
+8. Responsive layout verified at mobile/tablet/desktop widths (if UI changed)
+9. Implementation notes / task summary added to `plan.md`
+10. Changes committed with a properly-formatted message
+11. Git note with task summary attached to the commit
 
 ## Emergency Procedures
 
 ### Critical Bug in Production
 
 1. Create hotfix branch from main
-2. Write failing test for bug
+2. Write failing test for the bug
 3. Implement minimal fix
-4. Test thoroughly including mobile
-5. Deploy immediately
-6. Document in plan.md
+4. Test thoroughly (unit + relevant integration)
+5. Deploy via the normal Docker → Coolify flow
+6. Document in `plan.md`
 
 ### Data Loss
 
@@ -341,38 +436,49 @@ A task is complete when:
 
 ### Security Breach
 
-1. Rotate all secrets immediately
-2. Review access logs
+1. Rotate all secrets immediately (`DATABASE_URL`, `RESEND_API_KEY`, `BETTER_AUTH_SECRET`, R2 credentials)
+2. Review access logs (audit_log table tracks actor, action, entity)
 3. Patch vulnerability
 4. Notify affected users (if any)
 5. Document and update security procedures
 
 ## Deployment Workflow
 
+SIMAK builds to a self-contained Node server via Docker and is hosted on Coolify (self-hosted PaaS on a VPS, with Traefik for auto-SSL).
+
 ### Pre-Deployment Checklist
 
-- [ ] All tests passing
-- [ ] Coverage >80%
-- [ ] No linting errors
-- [ ] Mobile testing complete
-- [ ] Environment variables configured
-- [ ] Database migrations ready
+- [ ] `pnpm test` passes
+- [ ] `pnpm test:coverage` meets thresholds (≥80% on all four metrics)
+- [ ] `pnpm typecheck` passes
+- [ ] `pnpm lint` passes
+- [ ] `pnpm check:i18n` passes
+- [ ] Environment variables configured on Coolify (the 6 required: `DATABASE_URL`, `RESEND_API_KEY`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`; plus `R2_*` for file uploads)
+- [ ] Database migrations ready (`pnpm db:generate` committed)
 - [ ] Backup created
+
+### Build
+
+```bash
+pnpm build     # runs: i18n codegen → vite build → esbuild bundles for migrate.mjs + seed.mjs
+```
+
+Output lands in `.output/server/index.mjs` (multi-stage `docker/Dockerfile`).
 
 ### Deployment Steps
 
 1. Merge feature branch to main
-2. Tag release with version
-3. Push to deployment service
-4. Run database migrations
-5. Verify deployment
-6. Test critical paths
-7. Monitor for errors
+2. Build the Docker image (multi-stage; see `docker/Dockerfile`)
+3. Deploy via Coolify (Traefik auto-proxies SSL)
+4. Run pending migrations against the production DB (the image bundles `migrate.mjs`)
+5. Verify deployment — hit the health endpoint / load the landing page
+6. Test critical paths (login, create assignment, submit checkpoint, review)
+7. Monitor Coolify logs for errors
 
 ### Post-Deployment
 
-1. Monitor analytics
-2. Check error logs
+1. Monitor application logs (Coolify dashboard)
+2. Check error rates
 3. Gather user feedback
 4. Plan next iteration
 

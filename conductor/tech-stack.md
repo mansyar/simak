@@ -46,7 +46,7 @@
 | -------------------------- | ------------------------------------ | ------------------------------------------------------- |
 | **Unit/Integration Tests** | Vitest                               | Fast unit and integration tests with coverage reporting |
 | **E2E Tests**              | Playwright                           | End-to-end browser tests (v2)                           |
-| **Code Quality**           | oxlint + oxfmt + Husky + lint-staged | Pre-commit linting, formatting, typechecking            |
+| **Code Quality**           | oxlint + oxfmt + Lefthook            | Pre-commit linting/formatting/modularity; pre-push typecheck & coverage |
 
 ## Version Requirements
 
