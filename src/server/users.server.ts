@@ -441,3 +441,22 @@ export async function generateSetupLinkHandler(args: { data: UserIdParam }) {
     });
   }
 }
+
+export async function listInstructorActiveAssignmentsHandler(args: {
+  data: { instructorId: string };
+}) {
+  const session = await getSessionFromHeaders();
+  if (!session || (session.user.role !== 'admin' && session.user.role !== 'superadmin')) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const db = getDb();
+  const result = await db
+    .select({ id: assignments.id, title: assignments.title })
+    .from(assignments)
+    .where(
+      and(eq(assignments.instructorId, args.data.instructorId), isNull(assignments.deletedAt)),
+    );
+
+  return { assignments: result };
+}

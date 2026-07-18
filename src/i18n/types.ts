@@ -78,6 +78,7 @@ export type Translation = {
     previousPage: string
     nextPage: string
     pageOf: string
+    done: string
   }
   theme: {
     light: string
@@ -172,6 +173,9 @@ export type Translation = {
     notVerified: string
     showing: string
     editDescription: string
+    reassignTitle: string
+    reassignDescription: string
+    selectInstructor: string
   }
   adminTemplates: {
     title: string

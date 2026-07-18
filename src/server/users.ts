@@ -69,3 +69,14 @@ export const generateSetupLink = createServerFn({ method: 'POST' })
     const { generateSetupLinkHandler } = await import('./users.server');
     return generateSetupLinkHandler({ data });
   });
+
+export const ListInstructorActiveAssignmentsSchema = z.object({
+  instructorId: z.string().min(1, 'Instructor ID is required'),
+});
+
+export const listInstructorActiveAssignments = createServerFn({ method: 'GET' })
+  .inputValidator(ListInstructorActiveAssignmentsSchema)
+  .handler(async ({ data }) => {
+    const { listInstructorActiveAssignmentsHandler } = await import('./users.server');
+    return listInstructorActiveAssignmentsHandler({ data });
+  });

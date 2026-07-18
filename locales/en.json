@@ -72,7 +72,8 @@
     "saving": "Saving...",
     "previousPage": "Previous",
     "nextPage": "Next",
-    "pageOf": "Page {current} of {total}"
+    "pageOf": "Page {current} of {total}",
+    "done": "Done"
   },
   "theme": {
     "light": "Light Mode",
@@ -166,7 +167,10 @@
     "emailVerified": "Email Verified",
     "notVerified": "Not Verified",
     "showing": "Showing {count} of {total} users",
-    "editDescription": "Update user information. Email changes will require re-verification."
+    "editDescription": "Update user information. Email changes will require re-verification.",
+    "reassignTitle": "Reassign Assignments",
+    "reassignDescription": "This instructor has active assignments. Reassign them before deleting.",
+    "selectInstructor": "Select an instructor"
   },
   "adminTemplates": {
     "title": "Templates",

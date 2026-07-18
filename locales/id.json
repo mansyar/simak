@@ -72,7 +72,8 @@
     "saving": "Menyimpan...",
     "previousPage": "Sebelumnya",
     "nextPage": "Selanjutnya",
-    "pageOf": "Halaman {current} dari {total}"
+    "pageOf": "Halaman {current} dari {total}",
+    "done": "Selesai"
   },
   "theme": {
     "light": "Mode Terang",
@@ -166,7 +167,10 @@
     "emailVerified": "Email Terverifikasi",
     "notVerified": "Belum Terverifikasi",
     "showing": "Menampilkan {count} dari {total} pengguna",
-    "editDescription": "Perbarui informasi pengguna. Perubahan email akan memerlukan verifikasi ulang."
+    "editDescription": "Perbarui informasi pengguna. Perubahan email akan memerlukan verifikasi ulang.",
+    "reassignTitle": "Tugaskan Ulang Tugas",
+    "reassignDescription": "Instruktur ini memiliki tugas aktif. Tugaskan ulang sebelum menghapus.",
+    "selectInstructor": "Pilih instruktur"
   },
   "adminTemplates": {
     "title": "Templat",

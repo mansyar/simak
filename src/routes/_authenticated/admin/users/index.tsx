@@ -7,14 +7,17 @@ import {
   generateSetupLink,
   createUser,
   updateUser,
+  listInstructorActiveAssignments,
   CreateUserSchema,
   UpdateUserSchema,
 } from '@/server/users';
+import { reassignAssignment } from '@/server/assignments';
 import { UserTable, UserRow } from '@/components/admin/users/UserTable';
 import { UserFilters } from '@/components/admin/users/UserFilters';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 import { EditUserSheet } from '@/components/admin/users/EditUserSheet';
 import { DeleteUserDialog } from '@/components/admin/users/DeleteUserDialog';
+import { ReassignmentDialog } from '@/components/admin/users/ReassignmentDialog';
 import { SetupLinkSheet } from '@/components/admin/users/SetupLinkSheet';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
@@ -63,11 +66,20 @@ function UsersPage() {
   const [setupLinkUser, setSetupLinkUser] = useState<UserRow | null>(null);
   const [setupLinkUrl, setSetupLinkUrl] = useState('');
   const [inlineError, setInlineError] = useState('');
+  const [reassignmentUser, setReassignmentUser] = useState<UserRow | null>(null);
+  const [reassignmentAssignments, setReassignmentAssignments] = useState<
+    { id: number; title: string }[]
+  >([]);
+  const [reassignmentInstructors, setReassignmentInstructors] = useState<
+    { id: string; name: string }[]
+  >([]);
 
   const deleteUserFn = useServerFn(deleteUser);
   const generateSetupLinkFn = useServerFn(generateSetupLink);
   const createUserFn = useServerFn(createUser);
   const updateUserFn = useServerFn(updateUser);
+  const listInstructorActiveAssignmentsFn = useServerFn(listInstructorActiveAssignments);
+  const reassignAssignmentFn = useServerFn(reassignAssignment);
 
   type UserSearchParams = z.infer<typeof UserSearchSchema>;
 
@@ -102,8 +114,27 @@ function UsersPage() {
   };
 
   const handleDelete = async (user: UserRow) => {
-    await deleteUserFn({ data: { id: user.id } });
-    navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
+    const result = await deleteUserFn({ data: { id: user.id } });
+    if (isServerError(result) && result.error.message.includes('active assignments')) {
+      const assignmentsResult = await listInstructorActiveAssignmentsFn({
+        data: { instructorId: user.id },
+      });
+      const instructorsResult = await listUsers({
+        data: { page: 1, limit: 100, search: '', role: 'instructor' },
+      });
+      const instructors = isServerError(instructorsResult)
+        ? []
+        : instructorsResult.users
+            .filter((u) => u.id !== user.id)
+            .map((u) => ({ id: u.id, name: u.name }));
+      setReassignmentAssignments(
+        isServerError(assignmentsResult) ? [] : assignmentsResult.assignments,
+      );
+      setReassignmentInstructors(instructors);
+      setReassignmentUser(user);
+    } else {
+      navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
+    }
   };
 
   const handleGenerateLink = async (user: UserRow) => {
@@ -193,6 +224,29 @@ function UsersPage() {
           }
         }}
         userName={deletingUser?.name ?? ''}
+      />
+
+      <ReassignmentDialog
+        open={reassignmentUser !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setReassignmentUser(null);
+            setReassignmentAssignments([]);
+            setReassignmentInstructors([]);
+          }
+        }}
+        assignments={reassignmentAssignments}
+        instructors={reassignmentInstructors}
+        onReassign={async (assignmentId, newInstructorId) => {
+          await reassignAssignmentFn({ data: { assignmentId, newInstructorId } });
+        }}
+        onDelete={async () => {
+          if (reassignmentUser) {
+            await deleteUserFn({ data: { id: reassignmentUser.id } });
+            setReassignmentUser(null);
+            navigate({ search: (prev: UserSearchParams) => prev });
+          }
+        }}
       />
 
       <SetupLinkSheet
