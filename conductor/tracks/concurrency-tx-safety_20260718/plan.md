@@ -23,7 +23,7 @@
     - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Consultations' (checkpoint: 507ac9c)
 
-## Phase 2: Extensions (BUG-2, BUG-5, BUG-6, BUG-7)
+## Phase 2: Extensions (BUG-2, BUG-5, BUG-6, BUG-7) [checkpoint: 30667f0]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
 - [x] Task: Write failing unit tests for `approveExtensionHandler` and `rejectExtensionHandler` concurrency (ac2cf9b)
@@ -49,7 +49,7 @@
     - [x] Run `pnpm typecheck`
     - [x] Run `pnpm lint`
     - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Extensions' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Extensions' (Protocol in workflow.md) (30667f0)
 
 ## Phase 3: 2FA & Users (BUG-8, BUG-13, BUG-22)
 
