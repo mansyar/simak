@@ -6,20 +6,20 @@
 
 ## Phase 1: Documentation & Naming Fixes (BUG-3, BUG-16)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
-    - [ ] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
+    - [x] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
 
-- [ ] Task: Fix stale docstrings claiming finalDeadline mutation (BUG-3)
-    - [ ] Write failing tests: assert that `calculateExtensionAdjustment`, `adjustDeadlinesForBreach`, and `bulkExtendHandler` do NOT modify `assignments.finalDeadline` (mock DB, call function, assert no UPDATE on assignments table)
-    - [ ] Update docstrings in `src/server/extensions-extras.server.ts` (`calculateExtensionAdjustment` lines 23-26, `bulkExtendHandler` lines 312-314) and `src/lib/review-sla.ts` (`adjustDeadlinesForBreach` lines 27-32) to remove claims of extending `finalDeadline`; document that they adjust per-student checkpoint `dueDate` values only
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Commit: `docs(deadlines): Update stale docstrings for finalDeadline immutability`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Fix stale docstrings claiming finalDeadline mutation (BUG-3) [commit: 63d4eec]
+    - [x] Write failing tests: assert that `calculateExtensionAdjustment`, `adjustDeadlinesForBreach`, and `bulkExtendHandler` do NOT modify `assignments.finalDeadline` (mock DB, call function, assert no UPDATE on assignments table) — NOTE: Behavior tests already exist and pass; behavior was already correct (Track 10). Only docstrings were stale.
+    - [x] Update docstrings in `src/server/extensions-extras.server.ts` (`calculateExtensionAdjustment` lines 23-26, `bulkExtendHandler` lines 312-314) and `src/lib/review-sla.ts` (`adjustDeadlinesForBreach` lines 27-32) to remove claims of extending `finalDeadline`; document that they adjust per-student checkpoint `dueDate` values only
+    - [x] Run `pnpm test` — confirm all tests pass (258 files, 2367 tests)
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `docs(deadlines): Update stale docstrings for finalDeadline immutability`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
-- [ ] Task: Fix SLA docstring and rename underReviewAt parameter (BUG-16)
+- [~] Task: Fix SLA docstring and rename underReviewAt parameter (BUG-16)
     - [ ] Write failing tests: call `calculateBreachDuration` with new `anchorTime` parameter name; verify SLA duration is computed from submission upload time
     - [ ] Update docstring in `src/lib/sla.ts` (lines 1-9) to state "SLA is 3 calendar days from submission upload time"
     - [ ] Rename `underReviewAt` → `anchorTime` in `calculateBreachDuration` (`src/lib/sla.ts`)
