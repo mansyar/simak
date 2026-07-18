@@ -227,6 +227,29 @@ describe('approveExtensionHandler', () => {
     );
     expect(finalDeadlineCalls).toHaveLength(0);
   });
+
+  it('should lock checkpoints with FOR UPDATE when calculating extension adjustment', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve(makePendingRequest()).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ order: 1, dueDate: new Date('2026-06-01T00:00:00Z') }]).then(
+          onfulfilled,
+        ),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+
+    await approveExtensionHandler({ data: { requestId: 100 } });
+
+    // FOR UPDATE called for: extensionRequests, target checkpoint, subsequent checkpoints
+    expect(mockDb.for).toHaveBeenCalledTimes(3);
+  });
 });
 
 // ============================================================

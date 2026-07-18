@@ -41,6 +41,7 @@ async function calculateExtensionAdjustment(
     .select({ order: checkpoints.order, dueDate: checkpoints.dueDate })
     .from(checkpoints)
     .where(eq(checkpoints.id, checkpointId))
+    .for('update', { of: checkpoints })
     .limit(1);
 
   if (!targetCheckpoint) return;
@@ -66,7 +67,8 @@ async function calculateExtensionAdjustment(
         eq(checkpoints.studentId, studentId),
         sql`${checkpoints.order} > ${targetCheckpoint.order}`,
       ),
-    );
+    )
+    .for('update', { of: checkpoints });
 
   for (const cp of subsequentCheckpoints) {
     await db
