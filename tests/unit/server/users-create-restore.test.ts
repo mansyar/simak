@@ -35,6 +35,7 @@ function createChainableMock(baseThenValue: unknown = []) {
     from: vi.fn().mockReturnThis(),
     where: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
+    for: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
     values: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),

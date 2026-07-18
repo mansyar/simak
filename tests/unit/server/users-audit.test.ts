@@ -38,6 +38,7 @@ describe('User handlers audit logging', () => {
     update: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
+    for: vi.fn().mockReturnThis(),
     then: vi.fn(function (onfulfilled) {
       return Promise.resolve([]).then(onfulfilled);
     }),
