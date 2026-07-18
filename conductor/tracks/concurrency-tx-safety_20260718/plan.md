@@ -45,10 +45,10 @@
     - [x] Run `pnpm test` — verify new tests pass (Green)
 - [x] Task: Move notification INSERTs inside the transaction for extension handlers (keep audit log post-commit with try/catch) (ac2cf9b)
     - [x] Run `pnpm test` — verify existing tests still pass
-- [ ] Task: Run quality gates for Phase 2
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint`
-    - [ ] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
+- [x] Task: Run quality gates for Phase 2
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint`
+    - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Extensions' (Protocol in workflow.md)
 
 ## Phase 3: 2FA & Users (BUG-8, BUG-13, BUG-22)
