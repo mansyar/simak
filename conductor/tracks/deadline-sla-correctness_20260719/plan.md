@@ -19,16 +19,16 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [~] Task: Fix SLA docstring and rename underReviewAt parameter (BUG-16)
-    - [ ] Write failing tests: call `calculateBreachDuration` with new `anchorTime` parameter name; verify SLA duration is computed from submission upload time
-    - [ ] Update docstring in `src/lib/sla.ts` (lines 1-9) to state "SLA is 3 calendar days from submission upload time"
-    - [ ] Rename `underReviewAt` → `anchorTime` in `calculateBreachDuration` (`src/lib/sla.ts`)
-    - [ ] Rename local variable `underReviewAt` → `anchorTime` in `submitReviewHandler` (`src/server/reviews.server.ts` line 397)
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Commit: `fix(sla): Correct docstring and rename underReviewAt to anchorTime`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Fix SLA docstring and rename underReviewAt parameter (BUG-16) [commit: fdc72ab]
+    - [x] Write failing tests: call `calculateBreachDuration` with new `anchorTime` parameter name; verify SLA duration is computed from submission upload time — created tests/unit/lib/sla.test.ts (12 tests)
+    - [x] Update docstring in `src/lib/sla.ts` (lines 1-9) to state "SLA is 3 calendar days from submission upload time"
+    - [x] Rename `underReviewAt` → `anchorTime` in `calculateBreachDuration` (`src/lib/sla.ts`)
+    - [x] Rename local variable `underReviewAt` → `anchorTime` in `submitReviewHandler` (`src/server/reviews.server.ts` line 397)
+    - [x] Run `pnpm test` — confirm all tests pass (259 files, 2379 tests)
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `fix(sla): Correct docstring and rename underReviewAt to anchorTime`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Documentation & Naming Fixes' (Protocol in workflow.md)
 
