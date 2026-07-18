@@ -1,0 +1,8 @@
+{
+  "track_id": "deadline-sla-correctness_20260719",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-07-19T12:00:00Z",
+  "updated_at": "2026-07-19T12:00:00Z",
+  "description": "Fix 8 logic correctness bugs in the deadline and SLA subsystem: stale docstrings (BUG-3), incorrect daysOverdue SQL (BUG-11), missing finalDeadline validation (BUG-12), SLA docstring/param naming (BUG-16), missing extendDeadline validation (BUG-18), upcomingDeadlines query issues (BUG-19), dead email notification rows (BUG-21), and incorrect effectiveDeadline derivation (BUG-28)."
+}
