@@ -78,7 +78,7 @@
     - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
 - [x] Task: Conductor - User Manual Verification 'Phase 3: 2FA & Users' (48dbdde)
 
-## Phase 4: Soft-Delete Cleanup (BUG-9)
+## Phase 4: Soft-Delete Cleanup (BUG-9) [checkpoint: 4067962]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
 - [x] Task: Write failing unit tests for student soft-delete auto-reject (FR-4.1) (d4181d1)
@@ -122,7 +122,7 @@
     - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
     - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
     - [x] Run `pnpm check:i18n` — verify key parity
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Soft-Delete Cleanup' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Soft-Delete Cleanup' (checkpoint: 4067962)
 
 ## Phase 5: Final Verification & Coverage
 
