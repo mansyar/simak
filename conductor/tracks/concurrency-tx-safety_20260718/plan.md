@@ -33,11 +33,11 @@
     - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
 - [x] Task: Refactor `approveExtensionHandler` and `rejectExtensionHandler` — move SELECT inside `db.transaction`, add `.for('update')`, re-check `status === 'pending'` after lock (ac2cf9b)
     - [x] Run `pnpm test` — verify new tests pass (Green)
-- [~] Task: Write failing unit tests for `requestExtensionHandler` TOCTOU fix (BUG-5)
-    - [ ] Test: extension count check occurs inside transaction under lock — concurrent requests cannot exceed `maxTotalExtensions`
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Refactor `requestExtensionHandler` — move extension count check inside transaction with row locking
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
+- [x] Task: Write failing unit tests for `requestExtensionHandler` TOCTOU fix (BUG-5) (325bc11)
+    - [x] Test: extension count check occurs inside transaction under lock — concurrent requests cannot exceed `maxTotalExtensions`
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Refactor `requestExtensionHandler` — move extension count check inside transaction with row locking (325bc11)
+    - [x] Run `pnpm test` — verify new tests pass (Green)
 - [ ] Task: Write failing unit tests for `calculateExtensionAdjustment` checkpoint locking (BUG-6)
     - [ ] Test: checkpoint rows are locked inside transaction before reading
     - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
