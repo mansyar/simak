@@ -53,15 +53,15 @@
 
 ## Phase 3: 2FA & Users (BUG-8, BUG-13, BUG-22)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
-- [ ] Task: Write failing unit tests for `disableTwoFactorHandler` (BUG-8)
-    - [ ] Test: DB operations (update `users.twoFactorEnabled` + delete `twoFactor` row) occur inside a single `db.transaction`
-    - [ ] Test: `auth.api.disableTwoFactor` is called AFTER the DB commit (last step)
-    - [ ] Test: if auth API call fails post-commit, no DB rollback occurs (reconcile on next login)
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Refactor `disableTwoFactorHandler` — wrap DB ops in `db.transaction`, call auth API last
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Write failing unit tests for `generateSetupLinkHandler` (BUG-13)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
+- [x] Task: Write failing unit tests for `disableTwoFactorHandler` (BUG-8) (06218fd)
+    - [x] Test: DB operations (update `users.twoFactorEnabled` + delete `twoFactor` row) occur inside a single `db.transaction`
+    - [x] Test: `auth.api.disableTwoFactor` is called AFTER the DB commit (last step)
+    - [x] Test: if auth API call fails post-commit, no DB rollback occurs (reconcile on next login)
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Refactor `disableTwoFactorHandler` — wrap DB ops in `db.transaction`, call auth API last (06218fd)
+    - [x] Run `pnpm test` — verify new tests pass (Green)
+- [~] Task: Write failing unit tests for `generateSetupLinkHandler` (BUG-13)
     - [ ] Test: DELETE + INSERT occur in a single `db.transaction` — failure rolls back both
     - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
 - [ ] Task: Refactor `generateSetupLinkHandler` — wrap DELETE + INSERT in a single `db.transaction`
