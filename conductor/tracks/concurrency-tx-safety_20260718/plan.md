@@ -124,7 +124,7 @@
     - [x] Run `pnpm check:i18n` — verify key parity
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Soft-Delete Cleanup' (checkpoint: 4067962)
 
-## Phase 5: Final Verification & Coverage
+## Phase 5: Final Verification & Coverage [checkpoint: 5884248]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
 - [x] Task: Verify no SELECT-then-UPDATE patterns remain outside transactions for all in-scope handlers
@@ -134,5 +134,5 @@
     - [x] Run `pnpm typecheck`
     - [x] Run `pnpm lint`
     - [x] Run `pnpm check:i18n`
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Final Verification & Coverage' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Final Verification & Coverage' (checkpoint: 5884248)
 </protect>
