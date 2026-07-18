@@ -39,6 +39,12 @@ vi.mock('@/server/users', () => ({
   generateSetupLink: vi.fn(),
   createUser: vi.fn(),
   updateUser: vi.fn(),
+  listInstructorActiveAssignments: vi.fn(),
+}));
+
+// Mock server assignments
+vi.mock('@/server/assignments', () => ({
+  reassignAssignment: vi.fn(),
 }));
 
 // Mock __root
@@ -77,6 +83,9 @@ vi.mock('@/components/admin/users/SetupLinkSheet', () => ({
       SetupLinkSheet
     </div>
   ),
+}));
+vi.mock('@/components/admin/users/ReassignmentDialog', () => ({
+  ReassignmentDialog: () => null,
 }));
 
 async function getComponent(): Promise<ComponentType> {
