@@ -1,7 +1,9 @@
+<protect>
 # Implementation Plan: Concurrency & Transaction Safety (TRACK-001)
 
 ## Phase 1: Consultations (BUG-1, BUG-17)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
 - [ ] Task: Write failing unit tests for `verifyConsultationHandler` concurrency
     - [ ] Test: stale-state rejection — status no longer `pending` after lock returns descriptive "already processed" error
     - [ ] Test: successful verify transitions `status` to `verified` within transaction
@@ -23,6 +25,7 @@
 
 ## Phase 2: Extensions (BUG-2, BUG-5, BUG-6, BUG-7)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
 - [ ] Task: Write failing unit tests for `approveExtensionHandler` and `rejectExtensionHandler` concurrency
     - [ ] Test: stale-state rejection — status no longer `pending` after lock returns descriptive error
     - [ ] Test: successful approve/reject transitions `status` correctly within transaction
@@ -50,6 +53,7 @@
 
 ## Phase 3: 2FA & Users (BUG-8, BUG-13, BUG-22)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
 - [ ] Task: Write failing unit tests for `disableTwoFactorHandler` (BUG-8)
     - [ ] Test: DB operations (update `users.twoFactorEnabled` + delete `twoFactor` row) occur inside a single `db.transaction`
     - [ ] Test: `auth.api.disableTwoFactor` is called AFTER the DB commit (last step)
@@ -76,6 +80,7 @@
 
 ## Phase 4: Soft-Delete Cleanup (BUG-9)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
 - [ ] Task: Write failing unit tests for student soft-delete auto-reject (FR-4.1)
     - [ ] Test: pending consultations are auto-rejected with reason "User deleted"
     - [ ] Test: pending extension requests are auto-rejected with reason "User deleted"
@@ -121,6 +126,7 @@
 
 ## Phase 5: Final Verification & Coverage
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
 - [ ] Task: Verify no SELECT-then-UPDATE patterns remain outside transactions for all in-scope handlers
     - [ ] Grep `src/server/**/*.server.ts` for state-transition handlers — confirm all use `db.transaction` + `FOR UPDATE`
 - [ ] Task: Run full quality gate suite
@@ -129,3 +135,4 @@
     - [ ] Run `pnpm lint`
     - [ ] Run `pnpm check:i18n`
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Final Verification & Coverage' (Protocol in workflow.md)
+</protect>

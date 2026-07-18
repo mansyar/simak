@@ -1,3 +1,4 @@
+<protect>
 # Track Specification: Concurrency & Transaction Safety (TRACK-001)
 
 ## Overview
@@ -96,3 +97,4 @@ These decisions are documented in `docs/roadmap.md` (TRACK-001) and confirmed du
 - Integration tests (opt-in tier; this track uses unit tests only)
 - Database schema migrations (no new columns/tables required — existing schema supports all changes)
 - Moving R2 HEAD check outside transaction (BUG-14 — deferred to TRACK-006)
+</protect>
