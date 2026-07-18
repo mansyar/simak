@@ -47,6 +47,7 @@ describe('User server functions - Logic & Security', () => {
     update: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
+    for: vi.fn().mockReturnThis(),
     transaction: vi.fn(async (callback: any) => callback(mockDb)),
     // Simple mock for Drizzle's thenable queries
     then: vi.fn(function (onfulfilled) {
@@ -261,7 +262,7 @@ describe('User server functions - Logic & Security', () => {
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
-    it('should update user successfully', async () => {
+    it('should update user successfully within a transaction with FOR UPDATE lock', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
         user: { id: 'admin-1', role: 'admin' } as any,
         session: {} as any,
@@ -274,9 +275,14 @@ describe('User server functions - Logic & Security', () => {
         data: { id: 'user-1', name: 'Updated', email: 'u@t.com' },
       });
       expect(result).toEqual({ success: true });
+      expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+      expect(mockDb.for).toHaveBeenCalledWith(
+        'update',
+        expect.objectContaining({ of: expect.anything() }),
+      );
     });
 
-    it('should reject duplicate email', async () => {
+    it('should reject duplicate email (checked inside transaction with FOR UPDATE)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
         user: { id: 'admin-1', role: 'admin' } as any,
         session: {} as any,
@@ -287,6 +293,28 @@ describe('User server functions - Logic & Security', () => {
 
       const result = await updateUserHandler({
         data: { id: 'user-1', name: 'Updated', email: 'existing@t.com' },
+      });
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Email already in use' },
+      });
+      expect(mockDb.for).toHaveBeenCalledWith(
+        'update',
+        expect.objectContaining({ of: expect.anything() }),
+      );
+    });
+
+    it('should catch unique constraint violation (23505) and return email-in-use error', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'admin-1', role: 'admin' } as any,
+        session: {} as any,
+      });
+
+      const pgError = new Error('duplicate key value violates unique constraint');
+      (pgError as any).code = '23505';
+      mockDb.transaction.mockRejectedValueOnce(pgError);
+
+      const result = await updateUserHandler({
+        data: { id: 'user-1', name: 'Updated', email: 'race@t.com' },
       });
       expect(result).toEqual({
         error: { code: 'BAD_REQUEST', message: 'Email already in use' },

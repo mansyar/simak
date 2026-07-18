@@ -38,6 +38,7 @@ describe('createUserHandler', () => {
     update: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
+    for: vi.fn().mockReturnThis(),
     then: vi.fn(function (onfulfilled) {
       return Promise.resolve([]).then(onfulfilled);
     }),
@@ -55,6 +56,7 @@ describe('createUserHandler', () => {
     update: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
+    for: vi.fn().mockReturnThis(),
     then: vi.fn(function (onfulfilled) {
       return Promise.resolve([]).then(onfulfilled);
     }),
@@ -164,14 +166,14 @@ describe('createUserHandler', () => {
     expect(email.sendInvitationEmail).toHaveBeenCalled();
   });
 
-  it('should reject duplicate email', async () => {
+  it('should reject duplicate email (checked inside transaction with FOR UPDATE)', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
       user: { id: 'admin-1', role: 'admin' } as any,
       session: {} as any,
     });
 
-    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ id: 'existing-user' }]).then(onfulfilled),
+    txDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([{ id: 'existing-user', deletedAt: null }]).then(onfulfilled),
     );
 
     const result = await createUserHandler({
@@ -180,6 +182,10 @@ describe('createUserHandler', () => {
     expect(result).toEqual({
       error: { code: 'BAD_REQUEST', message: 'Email already in use' },
     });
+    expect(txDb.for).toHaveBeenCalledWith(
+      'update',
+      expect.objectContaining({ of: expect.anything() }),
+    );
   });
 
   it('should wrap user and verification inserts in a transaction', async () => {
@@ -188,13 +194,12 @@ describe('createUserHandler', () => {
       session: {} as any,
     });
 
-    mockDb.then.mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
-
     await createUserHandler({
       data: { name: 'Tx User', email: 'tx@example.com', role: 'student' },
     });
 
     expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+    expect(txDb.select).toHaveBeenCalled();
     expect(txDb.insert).toHaveBeenCalledTimes(2);
   });
 
@@ -204,7 +209,6 @@ describe('createUserHandler', () => {
       session: {} as any,
     });
 
-    mockDb.then.mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
     mockDb.transaction.mockRejectedValueOnce(new Error('verification insert failed'));
 
     const result = await createUserHandler({
@@ -218,5 +222,24 @@ describe('createUserHandler', () => {
       },
     });
     expect(email.sendInvitationEmail).not.toHaveBeenCalled();
+  });
+
+  it('should catch unique constraint violation (23505) and return email-in-use error', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+      user: { id: 'admin-1', role: 'admin' } as any,
+      session: {} as any,
+    });
+
+    const pgError = new Error('duplicate key value violates unique constraint');
+    (pgError as any).code = '23505';
+    mockDb.transaction.mockRejectedValueOnce(pgError);
+
+    const result = await createUserHandler({
+      data: { name: 'Race', email: 'race@test.com', role: 'student' },
+    });
+
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Email already in use' },
+    });
   });
 });

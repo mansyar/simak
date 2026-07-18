@@ -161,32 +161,32 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
   const db = getDb();
 
   try {
-    const existingUser = await db
-      .select({ id: users.id, deletedAt: users.deletedAt })
-      .from(users)
-      .where(eq(users.email, userEmail))
-      .limit(1)
-      .then((rows) => rows[0]);
-
     let userId = '';
     let auditAction: 'user.created' | 'user.reactivated' = 'user.created';
     let status: 'created' | 'restored' = 'created';
-
-    if (existingUser) {
-      if (existingUser.deletedAt == null) {
-        return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
-      }
-      userId = existingUser.id;
-      auditAction = 'user.reactivated';
-      status = 'restored';
-    } else {
-      userId = crypto.randomUUID();
-    }
-
     const token = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-    await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
+      // Email uniqueness check with FOR UPDATE (BUG-22: prevent TOCTOU race)
+      const [existingUser] = await tx
+        .select({ id: users.id, deletedAt: users.deletedAt })
+        .from(users)
+        .where(eq(users.email, userEmail))
+        .limit(1)
+        .for('update', { of: users });
+
+      if (existingUser) {
+        if (existingUser.deletedAt == null) {
+          return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
+        }
+        userId = existingUser.id;
+        auditAction = 'user.reactivated';
+        status = 'restored';
+      } else {
+        userId = crypto.randomUUID();
+      }
+
       if (status === 'restored') {
         await tx
           .update(users)
@@ -216,7 +216,13 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
         value: token,
         expiresAt,
       });
+
+      return { success: true as const };
     });
+
+    if ('error' in result) {
+      return result;
+    }
 
     // Post-commit advisory work: audit log is non-fatal (styleguide §6.4)
     try {
@@ -246,6 +252,10 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
 
     return { user: { id: userId }, emailSent };
   } catch (err) {
+    // BUG-22: Catch unique constraint violation as safety net for concurrent inserts
+    if (err && typeof err === 'object' && 'code' in err && err.code === '23505') {
+      return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
+    }
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
       handler: 'createUserHandler',
@@ -263,25 +273,33 @@ export async function updateUserHandler(args: { data: UpdateUserInput & { id: st
   const db = getDb();
 
   try {
-    // Validate email uniqueness against other active users
-    const existingUser = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(and(eq(users.email, userEmail), ne(users.id, id), isNull(users.deletedAt)))
-      .limit(1)
-      .then((rows) => rows[0]);
+    const result = await db.transaction(async (tx) => {
+      // Email uniqueness check with FOR UPDATE (BUG-22: prevent TOCTOU race)
+      const [existingUser] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(and(eq(users.email, userEmail), ne(users.id, id), isNull(users.deletedAt)))
+        .limit(1)
+        .for('update', { of: users });
 
-    if (existingUser) {
+      if (existingUser) {
+        return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
+      }
+
+      await tx
+        .update(users)
+        .set({ name, email: userEmail, updatedAt: new Date() })
+        .where(eq(users.id, id));
+
+      return { success: true as const };
+    });
+
+    return result;
+  } catch (err) {
+    // BUG-22: Catch unique constraint violation as safety net
+    if (err && typeof err === 'object' && 'code' in err && err.code === '23505') {
       return serverError(ErrorCode.BAD_REQUEST, 'Email already in use');
     }
-
-    await db
-      .update(users)
-      .set({ name, email: userEmail, updatedAt: new Date() })
-      .where(eq(users.id, id));
-
-    return { success: true };
-  } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
       handler: 'updateUserHandler',
