@@ -94,16 +94,16 @@
     - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
 - [x] Task: Implement instructor active-assignments check in `deleteUserHandler` — block if any active assignments exist (d4181d1)
     - [x] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Write failing unit tests for `reassignAssignment` server function (FR-4.3, FR-4.5)
-    - [ ] Test: admin/superadmin-only access — instructor/student roles rejected
-    - [ ] Test: target assignment must exist and be active (not deleted)
-    - [ ] Test: replacement instructor must be active (`role='instructor'` AND `deletedAt IS NULL`)
-    - [ ] Test: `under_review` checkpoints transition to `submitted` on reassignment
-    - [ ] Test: `submitted` checkpoints stay as-is
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Implement `reassignAssignment` server function — Zod validation, admin-only guard, instructor validation, checkpoint state transition
-    - [ ] Create `reassignAssignment` stub in `src/server/users.ts` (client-safe) and handler in `src/server/users.server.ts`
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
+- [x] Task: Write failing unit tests for `reassignAssignment` server function (FR-4.3, FR-4.5) (9276157)
+    - [x] Test: admin/superadmin-only access — instructor/student roles rejected
+    - [x] Test: target assignment must exist and be active (not deleted)
+    - [x] Test: replacement instructor must be active (`role='instructor'` AND `deletedAt IS NULL`)
+    - [x] Test: `under_review` checkpoints transition to `submitted` on reassignment
+    - [x] Test: `submitted` checkpoints stay as-is
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Implement `reassignAssignment` server function — Zod validation, admin-only guard, instructor validation, checkpoint state transition (9276157)
+    - [x] Create `reassignAssignment` stub in `src/server/assignments.ts` (client-safe) and handler in `src/server/assignments.server.ts`
+    - [x] Run `pnpm test` — verify new tests pass (Green)
 - [ ] Task: Write failing unit tests for reassignment UI component (FR-4.4)
     - [ ] Test: dialog renders list of active assignments when instructor has active assignments
     - [ ] Test: replacement-instructor picker (dropdown of active instructors) per assignment
