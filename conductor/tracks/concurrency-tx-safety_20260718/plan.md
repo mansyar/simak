@@ -117,11 +117,11 @@
     - [x] Add same keys to `locales/id.json` with Indonesian translations
     - [x] Run `pnpm generate:i18n` to regenerate types
     - [x] Run `pnpm check:i18n` — verify parity
-- [ ] Task: Run quality gates for Phase 4
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
-    - [ ] Run `pnpm check:i18n` — verify key parity
+- [x] Task: Run quality gates for Phase 4 (commit: 3007299)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
+    - [x] Run `pnpm check:i18n` — verify key parity
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Soft-Delete Cleanup' (Protocol in workflow.md)
 
 ## Phase 5: Final Verification & Coverage
