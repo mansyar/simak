@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Concurrency & Transaction Safety (TRACK-001)
 
-## Phase 1: Consultations (BUG-1, BUG-17)
+## Phase 1: Consultations (BUG-1, BUG-17) [checkpoint: 507ac9c]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
 - [x] Task: Write failing unit tests for `verifyConsultationHandler` concurrency
@@ -21,7 +21,7 @@
     - [x] Run `pnpm typecheck`
     - [x] Run `pnpm lint`
     - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Consultations' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Consultations' (checkpoint: 507ac9c)
 
 ## Phase 2: Extensions (BUG-2, BUG-5, BUG-6, BUG-7)
 
