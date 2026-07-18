@@ -81,19 +81,19 @@
 ## Phase 4: Soft-Delete Cleanup (BUG-9)
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
-- [~] Task: Write failing unit tests for student soft-delete auto-reject (FR-4.1)
-    - [ ] Test: pending consultations are auto-rejected with reason "User deleted"
-    - [ ] Test: pending extension requests are auto-rejected with reason "User deleted"
-    - [ ] Test: open upload intents are revoked
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Implement student soft-delete cleanup in `deleteUserHandler` — auto-reject pending consultations/extensions, revoke upload intents
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Write failing unit tests for instructor soft-delete block (FR-4.2)
-    - [ ] Test: soft-delete blocked with descriptive error when instructor has active (non-deleted) assignments
-    - [ ] Test: soft-delete proceeds when instructor has NO active assignments
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Implement instructor active-assignments check in `deleteUserHandler` — block if any active assignments exist
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
+- [x] Task: Write failing unit tests for student soft-delete auto-reject (FR-4.1) (d4181d1)
+    - [x] Test: pending consultations are auto-rejected with reason "User deleted"
+    - [x] Test: pending extension requests are auto-rejected with reason "User deleted"
+    - [x] Test: open upload intents are revoked
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Implement student soft-delete cleanup in `deleteUserHandler` — auto-reject pending consultations/extensions, revoke upload intents (d4181d1)
+    - [x] Run `pnpm test` — verify new tests pass (Green)
+- [x] Task: Write failing unit tests for instructor soft-delete block (FR-4.2) (d4181d1)
+    - [x] Test: soft-delete blocked with descriptive error when instructor has active (non-deleted) assignments
+    - [x] Test: soft-delete proceeds when instructor has NO active assignments
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Implement instructor active-assignments check in `deleteUserHandler` — block if any active assignments exist (d4181d1)
+    - [x] Run `pnpm test` — verify new tests pass (Green)
 - [ ] Task: Write failing unit tests for `reassignAssignment` server function (FR-4.3, FR-4.5)
     - [ ] Test: admin/superadmin-only access — instructor/student roles rejected
     - [ ] Test: target assignment must exist and be active (not deleted)
