@@ -51,7 +51,7 @@
     - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Extensions' (Protocol in workflow.md) (30667f0)
 
-## Phase 3: 2FA & Users (BUG-8, BUG-13, BUG-22)
+## Phase 3: 2FA & Users (BUG-8, BUG-13, BUG-22) [checkpoint: 48dbdde]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
 - [x] Task: Write failing unit tests for `disableTwoFactorHandler` (BUG-8) (06218fd)
@@ -76,7 +76,7 @@
     - [x] Run `pnpm typecheck`
     - [x] Run `pnpm lint`
     - [x] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: 2FA & Users' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: 2FA & Users' (48dbdde)
 
 ## Phase 4: Soft-Delete Cleanup (BUG-9)
 
