@@ -1,15 +1,15 @@
 /**
  * SLA breach duration calculation.
  *
- * SLA is 3 calendar days (72 hours) from when the checkpoint transitioned to `under_review`.
+ * SLA is 3 calendar days (72 hours) from submission upload time.
  * Returns the breach duration in whole days (rounded down), or 0 if on time.
  */
 const SLA_MS = 3 * 24 * 60 * 60 * 1000; // 72 hours in milliseconds
 
-export function calculateBreachDuration(underReviewAt: Date, reviewedAt: Date): number {
-  if (!underReviewAt || !reviewedAt) return 0;
+export function calculateBreachDuration(anchorTime: Date, reviewedAt: Date): number {
+  if (!anchorTime || !reviewedAt) return 0;
 
-  const elapsedMs = reviewedAt.getTime() - underReviewAt.getTime();
+  const elapsedMs = reviewedAt.getTime() - anchorTime.getTime();
   if (elapsedMs <= SLA_MS) return 0;
 
   const breachMs = elapsedMs - SLA_MS;

@@ -394,8 +394,8 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       // H2: SLA clock is anchored at submission time. A student waiting since
       // upload earns a deadline extension whenever the instructor reviews late,
       // regardless of whether openForReview was explicitly called first.
-      const underReviewAt = submission.uploadedAt ?? new Date();
-      breachDays = calculateBreachDuration(underReviewAt, new Date());
+      const anchorTime = submission.uploadedAt ?? new Date();
+      breachDays = calculateBreachDuration(anchorTime, new Date());
 
       if (breachDays > 0) {
         await adjustDeadlinesForBreach(tx, slaFields, breachDays);
