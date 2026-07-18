@@ -79,10 +79,7 @@ async function calculateExtensionAdjustment(
   }
 }
 
-/**
- * Approve a pending extension request.
- * Instructor-only, ownership-guarded. Extends deadlines and notifies student.
- */
+// Approve a pending extension request. Instructor-only, ownership-guarded. Extends deadlines and notifies student.
 export async function approveExtensionHandler(args: { data: ApproveExtensionInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
@@ -93,38 +90,39 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
   const db = getDb();
 
   try {
-    // 1. Fetch request with assignment ownership check
-    const [request] = await db
-      .select({
-        id: extensionRequests.id,
-        status: extensionRequests.status,
-        extensionDays: extensionRequests.extensionDays,
-        studentId: extensionRequests.studentId,
-        checkpointId: extensionRequests.checkpointId,
-        assignmentId: extensionRequests.assignmentId,
-        instructorId: assignments.instructorId,
-      })
-      .from(extensionRequests)
-      .innerJoin(assignments, eq(extensionRequests.assignmentId, assignments.id))
-      .where(
-        and(
-          eq(extensionRequests.id, requestId),
-          eq(assignments.instructorId, session.user.id),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .limit(1);
+    let auditData: { assignmentId: number; studentId: string; extensionDays: number } | undefined;
 
-    if (!request) {
-      return serverError(ErrorCode.NOT_FOUND, 'Extension request not found');
-    }
+    const result = await db.transaction(async (tx) => {
+      const [request] = await tx
+        .select({
+          id: extensionRequests.id,
+          status: extensionRequests.status,
+          extensionDays: extensionRequests.extensionDays,
+          studentId: extensionRequests.studentId,
+          checkpointId: extensionRequests.checkpointId,
+          assignmentId: extensionRequests.assignmentId,
+          instructorId: assignments.instructorId,
+        })
+        .from(extensionRequests)
+        .innerJoin(assignments, eq(extensionRequests.assignmentId, assignments.id))
+        .where(
+          and(
+            eq(extensionRequests.id, requestId),
+            eq(assignments.instructorId, session.user.id),
+            isNull(assignments.deletedAt),
+          ),
+        )
+        .for('update', { of: extensionRequests })
+        .limit(1);
 
-    if (request.status !== 'pending') {
-      return serverError(ErrorCode.BAD_REQUEST, 'Extension request is not in pending state');
-    }
+      if (!request) {
+        return serverError(ErrorCode.NOT_FOUND, 'Extension request not found');
+      }
 
-    // 2. Execute in transaction: approve request + extend deadlines
-    await db.transaction(async (tx) => {
+      if (request.status !== 'pending') {
+        return serverError(ErrorCode.BAD_REQUEST, 'Extension request has already been processed');
+      }
+
       await tx
         .update(extensionRequests)
         .set({
@@ -143,40 +141,53 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
           extensionDays: request.extensionDays,
         });
       }
-    });
 
-    // 3. Notify the student (outside transaction — advisory)
-    const approvedParams = { extensionDays: String(request.extensionDays) };
-    const approvedKeys = getNotificationKeys('extension_approved');
-    await db.insert(notifications).values({
-      userId: request.studentId,
-      type: 'extension_approved',
-      titleKey: approvedKeys.titleKey,
-      messageKey: approvedKeys.messageKey,
-      params: approvedParams,
-      channel: 'in_app',
-      metadata: {
-        extensionRequestId: requestId,
-        assignmentId: request.assignmentId,
-        extensionDays: request.extensionDays,
-      },
-    });
+      const approvedParams = { extensionDays: String(request.extensionDays) };
+      const approvedKeys = getNotificationKeys('extension_approved');
+      await tx.insert(notifications).values({
+        userId: request.studentId,
+        type: 'extension_approved',
+        titleKey: approvedKeys.titleKey,
+        messageKey: approvedKeys.messageKey,
+        params: approvedParams,
+        channel: 'in_app',
+        metadata: {
+          extensionRequestId: requestId,
+          assignmentId: request.assignmentId,
+          extensionDays: request.extensionDays,
+        },
+      });
 
-    // 4. Audit log
-    await logAuditEvent({
-      actorId: session.user.id,
-      action: 'extension.approved',
-      entityType: 'extension_request',
-      entityId: String(requestId),
-      details: {
+      auditData = {
         assignmentId: request.assignmentId,
         studentId: request.studentId,
         extensionDays: request.extensionDays,
-        resolutionReason: resolutionReason ?? null,
-      },
+      };
+
+      return { success: true };
     });
 
-    return { success: true };
+    // Audit log after commit (advisory work; must not fail the committed transaction)
+    if (auditData) {
+      try {
+        await logAuditEvent({
+          actorId: session.user.id,
+          action: 'extension.approved',
+          entityType: 'extension_request',
+          entityId: String(requestId),
+          details: {
+            assignmentId: auditData.assignmentId,
+            studentId: auditData.studentId,
+            extensionDays: auditData.extensionDays,
+            resolutionReason: resolutionReason ?? null,
+          },
+        });
+      } catch (err) {
+        console.error('Failed to log extension approved audit event:', err);
+      }
+    }
+
+    return result;
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
@@ -185,10 +196,7 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
   }
 }
 
-/**
- * Reject a pending extension request with a reason.
- * Instructor-only, ownership-guarded.
- */
+// Reject a pending extension request with a reason. Instructor-only, ownership-guarded.
 export async function rejectExtensionHandler(args: { data: RejectExtensionInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
@@ -199,82 +207,98 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
   const db = getDb();
 
   try {
-    // 1. Fetch request with assignment ownership check
-    const [request] = await db
-      .select({
-        id: extensionRequests.id,
-        status: extensionRequests.status,
-        extensionDays: extensionRequests.extensionDays,
-        studentId: extensionRequests.studentId,
-        assignmentId: extensionRequests.assignmentId,
-        instructorId: assignments.instructorId,
-      })
-      .from(extensionRequests)
-      .innerJoin(assignments, eq(extensionRequests.assignmentId, assignments.id))
-      .where(
-        and(
-          eq(extensionRequests.id, requestId),
-          eq(assignments.instructorId, session.user.id),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .limit(1);
+    let auditData: { assignmentId: number; studentId: string; extensionDays: number } | undefined;
 
-    if (!request) {
-      return serverError(ErrorCode.NOT_FOUND, 'Extension request not found');
-    }
+    const result = await db.transaction(async (tx) => {
+      const [request] = await tx
+        .select({
+          id: extensionRequests.id,
+          status: extensionRequests.status,
+          extensionDays: extensionRequests.extensionDays,
+          studentId: extensionRequests.studentId,
+          assignmentId: extensionRequests.assignmentId,
+          instructorId: assignments.instructorId,
+        })
+        .from(extensionRequests)
+        .innerJoin(assignments, eq(extensionRequests.assignmentId, assignments.id))
+        .where(
+          and(
+            eq(extensionRequests.id, requestId),
+            eq(assignments.instructorId, session.user.id),
+            isNull(assignments.deletedAt),
+          ),
+        )
+        .for('update', { of: extensionRequests })
+        .limit(1);
 
-    if (request.status !== 'pending') {
-      return serverError(ErrorCode.BAD_REQUEST, 'Extension request is not in pending state');
-    }
+      if (!request) {
+        return serverError(ErrorCode.NOT_FOUND, 'Extension request not found');
+      }
 
-    // 2. Update status to rejected
-    await db
-      .update(extensionRequests)
-      .set({
-        status: 'rejected',
-        resolvedBy: session.user.id,
+      if (request.status !== 'pending') {
+        return serverError(ErrorCode.BAD_REQUEST, 'Extension request has already been processed');
+      }
+
+      await tx
+        .update(extensionRequests)
+        .set({
+          status: 'rejected',
+          resolvedBy: session.user.id,
+          resolutionReason,
+          resolvedAt: new Date(),
+        })
+        .where(eq(extensionRequests.id, requestId));
+
+      const rejectedParams = {
+        extensionDays: String(request.extensionDays),
         resolutionReason,
-        resolvedAt: new Date(),
-      })
-      .where(eq(extensionRequests.id, requestId));
+      };
+      const rejectedKeys = getNotificationKeys('extension_rejected');
+      await tx.insert(notifications).values({
+        userId: request.studentId,
+        type: 'extension_rejected',
+        titleKey: rejectedKeys.titleKey,
+        messageKey: rejectedKeys.messageKey,
+        params: rejectedParams,
+        channel: 'in_app',
+        metadata: {
+          extensionRequestId: requestId,
+          assignmentId: request.assignmentId,
+          extensionDays: request.extensionDays,
+          resolutionReason,
+        },
+      });
 
-    // 3. Notify the student
-    const rejectedParams = {
-      extensionDays: String(request.extensionDays),
-      resolutionReason,
-    };
-    const rejectedKeys = getNotificationKeys('extension_rejected');
-    await db.insert(notifications).values({
-      userId: request.studentId,
-      type: 'extension_rejected',
-      titleKey: rejectedKeys.titleKey,
-      messageKey: rejectedKeys.messageKey,
-      params: rejectedParams,
-      channel: 'in_app',
-      metadata: {
-        extensionRequestId: requestId,
-        assignmentId: request.assignmentId,
-        extensionDays: request.extensionDays,
-        resolutionReason,
-      },
-    });
-
-    // 4. Audit log
-    await logAuditEvent({
-      actorId: session.user.id,
-      action: 'extension.rejected',
-      entityType: 'extension_request',
-      entityId: String(requestId),
-      details: {
+      auditData = {
         assignmentId: request.assignmentId,
         studentId: request.studentId,
         extensionDays: request.extensionDays,
-        resolutionReason,
-      },
+      };
+
+      return { success: true };
     });
 
-    return { success: true };
+    // Audit log after commit (advisory work; must not fail the committed transaction)
+    if (auditData) {
+      try {
+        await logAuditEvent({
+          actorId: session.user.id,
+          action: 'extension.rejected',
+          entityType: 'extension_request',
+          entityId: String(requestId),
+          details: {
+            assignmentId: auditData.assignmentId,
+            studentId: auditData.studentId,
+            extensionDays: auditData.extensionDays,
+            resolutionReason,
+          },
+        });
+      } catch (err) {
+        console.error('Failed to log extension rejected audit event:', err);
+      }
+    }
+
+    return result;
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

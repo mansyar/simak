@@ -63,6 +63,7 @@ describe('approveExtensionHandler', () => {
       leftJoin: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
       returning: vi.fn().mockReturnThis(),
@@ -107,7 +108,7 @@ describe('approveExtensionHandler', () => {
     });
   });
 
-  it('should return error if request is not in pending state', async () => {
+  it('should return already-processed error if status changed after lock', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
@@ -118,8 +119,26 @@ describe('approveExtensionHandler', () => {
       data: { requestId: 100 },
     });
     expect(result).toEqual({
-      error: { code: 'BAD_REQUEST', message: 'Extension request is not in pending state' },
+      error: { code: 'BAD_REQUEST', message: 'Extension request has already been processed' },
     });
+    expect(mockDb.update).not.toHaveBeenCalled();
+  });
+
+  it('should approve extension within transaction with FOR UPDATE lock', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+
+    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve(makePendingRequest()).then(onfulfilled),
+    );
+
+    const result = await approveExtensionHandler({ data: { requestId: 100 } });
+
+    expect(result).toEqual({ success: true });
+    expect(mockDb.transaction).toHaveBeenCalled();
+    expect(mockDb.for).toHaveBeenCalledWith(
+      'update',
+      expect.objectContaining({ of: expect.anything() }),
+    );
   });
 
   it('should approve extension and log audit event', async () => {
@@ -250,6 +269,7 @@ describe('rejectExtensionHandler', () => {
       leftJoin: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
       returning: vi.fn().mockReturnThis(),
@@ -294,19 +314,39 @@ describe('rejectExtensionHandler', () => {
     });
   });
 
-  it('should return error if request is not in pending state', async () => {
+  it('should return already-processed error if status changed after lock', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve(makePendingRequest({ status: 'approved' })).then(onfulfilled),
+      Promise.resolve(makePendingRequest({ status: 'rejected' })).then(onfulfilled),
     );
 
     const result = await rejectExtensionHandler({
       data: { requestId: 100, resolutionReason: rejectReason },
     });
     expect(result).toEqual({
-      error: { code: 'BAD_REQUEST', message: 'Extension request is not in pending state' },
+      error: { code: 'BAD_REQUEST', message: 'Extension request has already been processed' },
     });
+    expect(mockDb.update).not.toHaveBeenCalled();
+  });
+
+  it('should reject extension within transaction with FOR UPDATE lock', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+
+    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve(makePendingRequest()).then(onfulfilled),
+    );
+
+    const result = await rejectExtensionHandler({
+      data: { requestId: 100, resolutionReason: rejectReason },
+    });
+
+    expect(result).toEqual({ success: true });
+    expect(mockDb.transaction).toHaveBeenCalled();
+    expect(mockDb.for).toHaveBeenCalledWith(
+      'update',
+      expect.objectContaining({ of: expect.anything() }),
+    );
   });
 
   it('should reject extension and log audit event', async () => {
