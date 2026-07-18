@@ -1,3 +1,4 @@
+<protect>
 # Track: Deadline & SLA Logic Correctness
 
 **Track ID:** `deadline-sla-correctness_20260719`
@@ -105,3 +106,4 @@ Three locations derive `effectiveDeadline` as the highest-order checkpoint's `du
 - **Concurrency/locking** — Track 13 already added transaction safety. Not touched here.
 - **UI redesign of dashboards** — Only the minimal display change for null `dueDate` ("No deadline" text) is in scope.
 - **Notification system overhaul** — Only the dead `channel: 'email'` rows are removed. The in-app + email-queue paths remain as-is.
+</protect>

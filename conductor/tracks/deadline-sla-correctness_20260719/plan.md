@@ -1,9 +1,14 @@
+<protect>
 # Implementation Plan: Deadline & SLA Logic Correctness
 
 **Track ID:** `deadline-sla-correctness_20260719`
 **Spec:** [./spec.md](./spec.md)
 
 ## Phase 1: Documentation & Naming Fixes (BUG-3, BUG-16)
+
+- [ ] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
+    - [ ] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
+    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
 
 - [ ] Task: Fix stale docstrings claiming finalDeadline mutation (BUG-3)
     - [ ] Write failing tests: assert that `calculateExtensionAdjustment`, `adjustDeadlinesForBreach`, and `bulkExtendHandler` do NOT modify `assignments.finalDeadline` (mock DB, call function, assert no UPDATE on assignments table)
@@ -28,6 +33,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Documentation & Naming Fixes' (Protocol in workflow.md)
 
 ## Phase 2: SQL & Dashboard Query Fixes (BUG-11, BUG-19)
+
+- [ ] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
+    - [ ] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
+    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
 
 - [ ] Task: Fix daysOverdue SQL arithmetic in admin dashboard (BUG-11)
     - [ ] Write failing tests: verify `daysOverdue` returns total elapsed days (not day-component) for a 45-day-old submission — mock the DB query result and assert the SQL template uses `EXTRACT(EPOCH FROM ...) / 86400`
@@ -54,6 +63,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: SQL & Dashboard Query Fixes' (Protocol in workflow.md)
 
 ## Phase 3: Validation Logic (BUG-12, BUG-18)
+
+- [ ] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
+    - [ ] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
+    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
 
 - [ ] Task: Add finalDeadline cap to validateDueDates (BUG-12)
     - [ ] Write failing tests: (1) verify `validateDueDates` rejects checkpoint `dueDate` exceeding `finalDeadline` when provided; (2) verify it does NOT enforce the cap when `finalDeadline` is omitted (backward compatible)
@@ -82,6 +95,10 @@
 
 ## Phase 4: Notification Cleanup (BUG-21)
 
+- [ ] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
+    - [ ] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
+    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
+
 - [ ] Task: Remove dead channel:'email' notification rows from dispatchSLABreachNotifications (BUG-21)
     - [ ] Write failing tests: verify `dispatchSLABreachNotifications` inserts only `channel: 'in_app'` rows (not `channel: 'email'`); verify `sendSLAAlertEmail` is still called
     - [ ] Remove the `channel: 'email'` INSERT block from `src/lib/review-sla.ts` (lines 117-130)
@@ -96,6 +113,10 @@
 
 ## Phase 5: effectiveDeadline Derivation (BUG-28)
 
+- [ ] Task: Read spec.md and workflow.md to prepare for Phase 5 implementation
+    - [ ] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
+    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
+
 - [ ] Task: Create computeEffectiveDeadline helper and update all call sites (BUG-28)
     - [ ] Write failing tests for `computeEffectiveDeadline(checkpoints)` helper: (1) returns first non-passed checkpoint's `dueDate` when checkpoints have mixed statuses; (2) returns last checkpoint's `dueDate` when all are `passed`; (3) handles empty checkpoints array gracefully (returns null or throws descriptive error)
     - [ ] Implement `computeEffectiveDeadline` helper function in `src/server/due-dates.server.ts` (co-located with `calculateDueDates` and `validateDueDates`)
@@ -109,3 +130,4 @@
     - [ ] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: effectiveDeadline Derivation' (Protocol in workflow.md)
+</protect>
