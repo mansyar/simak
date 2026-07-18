@@ -50,6 +50,7 @@ describe('requestExtensionHandler', () => {
       where: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
       leftJoin: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
@@ -107,7 +108,7 @@ describe('requestExtensionHandler', () => {
     });
   });
 
-  it('should reject if max total extensions exceeded', async () => {
+  it('should reject if max total extensions exceeded (count checked inside transaction)', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
     mockDb.then
@@ -117,6 +118,13 @@ describe('requestExtensionHandler', () => {
           { maxExtensionDays: 7, maxTotalExtensions: 2, instructorId: 'instructor-1' },
         ]).then(onfulfilled),
       )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 10, dueDate: new Date('2026-06-15'), order: 1 }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ dueDate: new Date('2026-06-15') }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ count: 2 }]).then(onfulfilled),
       );
@@ -128,6 +136,11 @@ describe('requestExtensionHandler', () => {
         message: 'Maximum 2 extension(s) allowed for this assignment. You have used 2.',
       },
     });
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+    expect(mockDb.for).toHaveBeenCalledWith(
+      'update',
+      expect.objectContaining({ of: expect.anything() }),
+    );
   });
 
   it('should create extension request successfully with default checkpoint', async () => {
@@ -141,13 +154,14 @@ describe('requestExtensionHandler', () => {
         ]).then(onfulfilled),
       )
       .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ count: 0 }]).then(onfulfilled),
-      )
-      .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ id: 10, dueDate: new Date('2026-06-15'), order: 1 }]).then(onfulfilled),
       )
       .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ dueDate: new Date('2026-06-15') }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 0 }]).then(onfulfilled),
       );
 
     mockDb.returning.mockResolvedValue([{ id: 100 }]);
@@ -158,6 +172,10 @@ describe('requestExtensionHandler', () => {
     expect(result.extensionRequest!.id).toBe(100);
     expect(mockDb.transaction).toHaveBeenCalledTimes(1);
     expect(mockDb.insert).toHaveBeenCalledTimes(2);
+    expect(mockDb.for).toHaveBeenCalledWith(
+      'update',
+      expect.objectContaining({ of: expect.anything() }),
+    );
   });
 
   it('should create extension request with specific checkpointId', async () => {
@@ -171,10 +189,11 @@ describe('requestExtensionHandler', () => {
         ]).then(onfulfilled),
       )
       .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ count: 0 }]).then(onfulfilled),
-      )
-      .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ id: 10, dueDate: new Date('2026-06-15') }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 0 }]).then(onfulfilled),
       );
 
     mockDb.returning.mockResolvedValue([{ id: 101 }]);
@@ -199,9 +218,6 @@ describe('requestExtensionHandler', () => {
           { maxExtensionDays: 7, maxTotalExtensions: 3, instructorId: 'instructor-1' },
         ]).then(onfulfilled),
       )
-      .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ count: 0 }]).then(onfulfilled),
-      )
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
     const result = await requestExtensionHandler({
@@ -221,13 +237,14 @@ describe('requestExtensionHandler', () => {
         ]).then(onfulfilled),
       )
       .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ count: 0 }]).then(onfulfilled),
-      )
-      .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ id: 10, dueDate: new Date('2026-06-15'), order: 1 }]).then(onfulfilled),
       )
       .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ dueDate: new Date('2026-06-15') }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 0 }]).then(onfulfilled),
       );
 
     mockDb.returning.mockResolvedValue([{ id: 100 }]);
@@ -253,13 +270,14 @@ describe('requestExtensionHandler', () => {
         ]).then(onfulfilled),
       )
       .mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([{ count: 0 }]).then(onfulfilled),
-      )
-      .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ id: 10, dueDate: new Date('2026-06-15'), order: 1 }]).then(onfulfilled),
       )
       .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ dueDate: new Date('2026-06-15') }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 0 }]).then(onfulfilled),
       );
 
     mockDb.returning.mockResolvedValue([{ id: 100 }]);

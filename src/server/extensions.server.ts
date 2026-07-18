@@ -130,16 +130,7 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
       );
     }
 
-    // 4. Validate total extension count cap
-    const activeCount = await countActiveExtensionRequests(db, assignmentId, session.user.id);
-    if (activeCount >= maxExtensions) {
-      return serverError(
-        ErrorCode.BAD_REQUEST,
-        `Maximum ${maxExtensions} extension(s) allowed for this assignment. You have used ${activeCount}.`,
-      );
-    }
-
-    // 5. Resolve checkpoint: use provided or find active
+    // 4. Resolve checkpoint: use provided or find active
     let targetCheckpointId = checkpointId;
     if (!targetCheckpointId) {
       const active = await findActiveCheckpoint(db, assignmentId, session.user.id);
@@ -149,7 +140,7 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
       targetCheckpointId = active.id;
     }
 
-    // 6. Get checkpoint info for requestedDeadline calculation
+    // 5. Get checkpoint info for requestedDeadline calculation
     const [targetCp] = await db
       .select({ dueDate: checkpoints.dueDate })
       .from(checkpoints)
@@ -167,11 +158,33 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
     }
 
     const result = await db.transaction(async (tx) => {
+      // 6. Lock enrollment row to serialize concurrent extension requests
+      await tx
+        .select({ id: assignmentStudents.id })
+        .from(assignmentStudents)
+        .where(
+          and(
+            eq(assignmentStudents.assignmentId, assignmentId),
+            eq(assignmentStudents.studentId, session.user.id),
+          ),
+        )
+        .for('update', { of: assignmentStudents })
+        .limit(1);
+
+      // 7. Validate total extension count cap inside transaction (under lock)
+      const activeCount = await countActiveExtensionRequests(tx, assignmentId, session.user.id);
+      if (activeCount >= maxExtensions) {
+        return serverError(
+          ErrorCode.BAD_REQUEST,
+          `Maximum ${maxExtensions} extension(s) allowed for this assignment. You have used ${activeCount}.`,
+        );
+      }
+
       const requestedDeadline = new Date(
         (targetCp.dueDate ?? new Date()).getTime() + extensionDays * 24 * 60 * 60 * 1000,
       );
 
-      // 7. Create extension request
+      // 8. Create extension request
       const [request] = await tx
         .insert(extensionRequests)
         .values({
@@ -186,7 +199,7 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
         })
         .returning({ id: extensionRequests.id });
 
-      // 8. Notify the instructor
+      // 9. Notify the instructor
       const requestedParams = { extensionDays: String(extensionDays) };
       const requestedKeys = getNotificationKeys('extension_requested');
       await tx.insert(notifications).values({
