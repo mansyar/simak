@@ -104,19 +104,19 @@
 - [x] Task: Implement `reassignAssignment` server function — Zod validation, admin-only guard, instructor validation, checkpoint state transition (9276157)
     - [x] Create `reassignAssignment` stub in `src/server/assignments.ts` (client-safe) and handler in `src/server/assignments.server.ts`
     - [x] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Write failing unit tests for reassignment UI component (FR-4.4)
-    - [ ] Test: dialog renders list of active assignments when instructor has active assignments
-    - [ ] Test: replacement-instructor picker (dropdown of active instructors) per assignment
-    - [ ] Test: soft-delete button disabled until ALL assignments are reassigned
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Implement reassignment dialog component — assignment list, instructor picker, block-until-all-reassigned logic
-    - [ ] Wire into existing user management delete flow (`/admin/users`)
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Add i18n keys for Phase 4 (NFR-2)
-    - [ ] Add reassignment dialog labels, replacement-instructor picker, "active assignments block delete" error, and "User deleted" rejection reason to `locales/en.json`
-    - [ ] Add same keys to `locales/id.json` with Indonesian translations
-    - [ ] Run `pnpm generate:i18n` to regenerate types
-    - [ ] Run `pnpm check:i18n` — verify parity
+- [x] Task: Write failing unit tests for reassignment UI component (FR-4.4) (02a47c2)
+    - [x] Test: dialog renders list of active assignments when instructor has active assignments
+    - [x] Test: replacement-instructor picker (dropdown of active instructors) per assignment
+    - [x] Test: soft-delete button disabled until ALL assignments are reassigned
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Implement reassignment dialog component — assignment list, instructor picker, block-until-all-reassigned logic (02a47c2)
+    - [x] Wire into existing user management delete flow (`/admin/users`)
+    - [x] Run `pnpm test` — verify new tests pass (Green)
+- [x] Task: Add i18n keys for Phase 4 (NFR-2) (02a47c2)
+    - [x] Add reassignment dialog labels, replacement-instructor picker, "active assignments block delete" error, and "User deleted" rejection reason to `locales/en.json`
+    - [x] Add same keys to `locales/id.json` with Indonesian translations
+    - [x] Run `pnpm generate:i18n` to regenerate types
+    - [x] Run `pnpm check:i18n` — verify parity
 - [ ] Task: Run quality gates for Phase 4
     - [ ] Run `pnpm typecheck`
     - [ ] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
