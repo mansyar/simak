@@ -140,9 +140,7 @@ export async function enableTwoFactorHandler(args: { data: VerifyTwoFactorInput 
   }
 }
 
-/**
- * Disable 2FA after password confirmation.
- */
+// Disable 2FA after password confirmation.
 export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
@@ -150,35 +148,49 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
   }
 
   const headers = getRequestHeaders();
+  const db = getDb();
 
   try {
-    await auth.api.disableTwoFactor({
-      body: { password: args.data.password },
-      headers,
+    // 1. DB-first: wrap update + delete in a transaction (BUG-8)
+    await db.transaction(async (tx) => {
+      await tx
+        .update(users)
+        .set({ twoFactorEnabled: false, updatedAt: new Date() })
+        .where(eq(users.id, session.user.id));
+
+      await tx.delete(twoFactor).where(eq(twoFactor.userId, session.user.id));
     });
 
-    // Mark 2FA as disabled on the user
-    const db = getDb();
-    await db
-      .update(users)
-      .set({ twoFactorEnabled: false, updatedAt: new Date() })
-      .where(eq(users.id, session.user.id));
+    // 2. Auth API call post-commit — if it fails, DB stays committed.
+    // The system reconciles on next login by checking the DB flag.
+    try {
+      await auth.api.disableTwoFactor({
+        body: { password: args.data.password },
+        headers,
+      });
+    } catch (authErr) {
+      console.error(
+        'auth.api.disableTwoFactor failed post-commit (DB already committed):',
+        authErr,
+      );
+    }
 
-    // Delete the two-factor record
-    await db.delete(twoFactor).where(eq(twoFactor.userId, session.user.id));
-
-    // Revoke all sessions so the security change takes effect immediately
+    // 3. Revoke all sessions so the security change takes effect immediately
     await revokeUserSessions(session.user.id, session.user.id);
 
-    // Log audit event
-    await logAuditEvent({
-      actorId: session.user.id,
-      action: 'two_factor.disabled',
-      entityType: 'user',
-      entityId: session.user.id,
-    });
+    // 4. Log audit event
+    try {
+      await logAuditEvent({
+        actorId: session.user.id,
+        action: 'two_factor.disabled',
+        entityType: 'user',
+        entityId: session.user.id,
+      });
+    } catch (err) {
+      console.error('Failed to log 2FA disable audit event:', err);
+    }
 
-    // Send email notification
+    // 5. Send email notification
     try {
       await enqueueEmail({
         recipientEmail: session.user.email,

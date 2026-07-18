@@ -91,6 +91,7 @@ describe('Two-factor server functions', () => {
     update: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) }),
+    transaction: vi.fn(async (callback: any) => callback(mockDb)),
     then: vi.fn(function (onfulfilled: any) {
       return Promise.resolve([]).then(onfulfilled);
     }),
@@ -249,6 +250,15 @@ describe('Two-factor server functions', () => {
   // ─── disableTwoFactorHandler ─────────────────────────────────
 
   describe('disableTwoFactorHandler', () => {
+    beforeEach(() => {
+      const mockUpdateSet = vi.fn().mockResolvedValue(undefined);
+      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
+      mockDb.update.mockReturnValue({ set: mockUpdateSet } as any);
+      mockUpdateSet.mockReturnValue({ where: mockUpdateWhere } as any);
+      const mockDeleteWhere = vi.fn().mockResolvedValue(undefined);
+      mockDb.delete.mockReturnValue({ where: mockDeleteWhere } as any);
+    });
+
     it('should return Unauthorized when no session', async () => {
       vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(null);
 
@@ -262,14 +272,6 @@ describe('Two-factor server functions', () => {
     it('should disable 2FA, update user, delete record, log audit, and send email', async () => {
       vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
       vi.mocked(auth.api.disableTwoFactor).mockResolvedValue({} as any);
-
-      const mockUpdateSet = vi.fn().mockResolvedValue(undefined);
-      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
-      mockDb.update.mockReturnValue({ set: mockUpdateSet } as any);
-      mockUpdateSet.mockReturnValue({ where: mockUpdateWhere } as any);
-
-      const mockDeleteWhere = vi.fn().mockResolvedValue(undefined);
-      mockDb.delete.mockReturnValue({ where: mockDeleteWhere } as any);
 
       const result = await disableTwoFactorHandler({
         data: { password: 'testpass123' },
@@ -297,15 +299,45 @@ describe('Two-factor server functions', () => {
       );
     });
 
-    it('should return error on disable failure', async () => {
+    it('should perform DB operations inside a single transaction', async () => {
       vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
-      vi.mocked(auth.api.disableTwoFactor).mockRejectedValue(new Error('Wrong password'));
+      vi.mocked(auth.api.disableTwoFactor).mockResolvedValue({} as any);
 
-      const result = await disableTwoFactorHandler({
-        data: { password: 'wrongpass' },
+      await disableTwoFactorHandler({ data: { password: 'testpass123' } });
+
+      expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+      expect(mockDb.update).toHaveBeenCalled();
+      expect(mockDb.delete).toHaveBeenCalled();
+    });
+
+    it('should call auth.api.disableTwoFactor after DB commit', async () => {
+      vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
+
+      const callOrder: string[] = [];
+      mockDb.transaction.mockImplementationOnce(async (cb: any) => {
+        callOrder.push('transaction');
+        await cb(mockDb);
+      });
+      vi.mocked(auth.api.disableTwoFactor).mockImplementationOnce(async () => {
+        callOrder.push('authApi');
+        return {} as any;
       });
 
-      expect(result).toEqual({ error: { code: 'BAD_REQUEST', message: 'Wrong password' } });
+      await disableTwoFactorHandler({ data: { password: 'testpass123' } });
+
+      expect(callOrder).toEqual(['transaction', 'authApi']);
+    });
+
+    it('should not rollback DB if auth API fails post-commit', async () => {
+      vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
+      vi.mocked(auth.api.disableTwoFactor).mockRejectedValue(new Error('Auth API failure'));
+
+      const result = await disableTwoFactorHandler({
+        data: { password: 'testpass123' },
+      });
+
+      expect(result).toEqual({ success: true });
+      expect(mockDb.transaction).toHaveBeenCalledTimes(1);
     });
 
     it('escapes malicious user name in disable email body', async () => {
@@ -315,14 +347,6 @@ describe('Two-factor server functions', () => {
         user: { ...mockSession.user, name: maliciousName },
       });
       vi.mocked(auth.api.disableTwoFactor).mockResolvedValue({} as any);
-
-      const mockUpdateSet = vi.fn().mockResolvedValue(undefined);
-      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
-      mockDb.update.mockReturnValue({ set: mockUpdateSet } as any);
-      mockUpdateSet.mockReturnValue({ where: mockUpdateWhere } as any);
-
-      const mockDeleteWhere = vi.fn().mockResolvedValue(undefined);
-      mockDb.delete.mockReturnValue({ where: mockDeleteWhere } as any);
 
       await disableTwoFactorHandler({ data: { password: 'testpass123' } });
 
@@ -335,14 +359,6 @@ describe('Two-factor server functions', () => {
       vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
       vi.mocked(auth.api.disableTwoFactor).mockResolvedValue({} as any);
 
-      const mockUpdateSet = vi.fn().mockResolvedValue(undefined);
-      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
-      mockDb.update.mockReturnValue({ set: mockUpdateSet } as any);
-      mockUpdateSet.mockReturnValue({ where: mockUpdateWhere } as any);
-
-      const mockDeleteWhere = vi.fn().mockResolvedValue(undefined);
-      mockDb.delete.mockReturnValue({ where: mockDeleteWhere } as any);
-
       await disableTwoFactorHandler({ data: { password: 'testpass123' } });
 
       const callArg = vi.mocked(emailMod.enqueueEmail).mock.calls[0][0];
@@ -352,14 +368,6 @@ describe('Two-factor server functions', () => {
     it('should revoke all user sessions after disabling 2FA', async () => {
       vi.mocked(authMod.getSessionFromHeaders).mockResolvedValue(mockSession);
       vi.mocked(auth.api.disableTwoFactor).mockResolvedValue({} as any);
-
-      const mockUpdateSet = vi.fn().mockResolvedValue(undefined);
-      const mockUpdateWhere = vi.fn().mockResolvedValue(undefined);
-      mockDb.update.mockReturnValue({ set: mockUpdateSet } as any);
-      mockUpdateSet.mockReturnValue({ where: mockUpdateWhere } as any);
-
-      const mockDeleteWhere = vi.fn().mockResolvedValue(undefined);
-      mockDb.delete.mockReturnValue({ where: mockDeleteWhere } as any);
 
       await disableTwoFactorHandler({
         data: { password: 'testpass123' },
