@@ -66,12 +66,12 @@
     - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
 - [x] Task: Refactor `generateSetupLinkHandler` — wrap DELETE + INSERT in a single `db.transaction` (1a9b01c)
     - [x] Run `pnpm test` — verify new tests pass (Green)
-- [~] Task: Write failing unit tests for `createUserHandler` and `updateUserHandler` email uniqueness (BUG-22)
-    - [ ] Test: email uniqueness check occurs inside transaction with `FOR UPDATE` on users rows
-    - [ ] Test: PG error `23505` is caught and returns clean "Email already in use" message
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Refactor `createUserHandler` and `updateUserHandler` — move email check inside transaction with `FOR UPDATE`, catch PG error `23505`
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
+- [x] Task: Write failing unit tests for `createUserHandler` and `updateUserHandler` email uniqueness (BUG-22)
+    - [x] Test: email uniqueness check occurs inside transaction with `FOR UPDATE` on users rows
+    - [x] Test: PG error `23505` is caught and returns clean "Email already in use" message
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Refactor `createUserHandler` and `updateUserHandler` — move email check inside transaction with `FOR UPDATE`, catch PG error `23505` (3cdfbe5)
+    - [x] Run `pnpm test` — verify new tests pass (Green)
 - [ ] Task: Run quality gates for Phase 3
     - [ ] Run `pnpm typecheck`
     - [ ] Run `pnpm lint`
