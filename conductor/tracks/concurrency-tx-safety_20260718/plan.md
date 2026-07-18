@@ -126,13 +126,13 @@
 
 ## Phase 5: Final Verification & Coverage
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
-- [ ] Task: Verify no SELECT-then-UPDATE patterns remain outside transactions for all in-scope handlers
-    - [ ] Grep `src/server/**/*.server.ts` for state-transition handlers — confirm all use `db.transaction` + `FOR UPDATE`
-- [ ] Task: Run full quality gate suite
-    - [ ] Run `pnpm test:coverage` — verify ≥80% on lines, statements, branches, functions
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint`
-    - [ ] Run `pnpm check:i18n`
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
+- [x] Task: Verify no SELECT-then-UPDATE patterns remain outside transactions for all in-scope handlers
+    - [x] Grep `src/server/**/*.server.ts` for state-transition handlers — confirm all use `db.transaction` + `FOR UPDATE`
+- [x] Task: Run full quality gate suite
+    - [x] Run `pnpm test:coverage` — verify ≥80% on lines, statements, branches, functions
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint`
+    - [x] Run `pnpm check:i18n`
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Final Verification & Coverage' (Protocol in workflow.md)
 </protect>
