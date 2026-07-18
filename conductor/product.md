@@ -309,4 +309,17 @@ Students and instructors lack a centralized system to:
 - **No new i18n keys** — Reused existing `notInSubmittedState`, `'Checkpoint is not in a submittable state'`, and `'Checkpoint is not in a reviewable state'` messages.
 - **Tests** — Updated unit-test mocks for the new in-transaction locked-read flow, added stale-state assertions, and added integration tests (`tests/integration/server/reviews-concurrency.test.ts`) verifying concurrent `submitReview`, late `openForReview`, and concurrent `submitCheckpoint` scenarios. Full suite: 2,377 tests pass; coverage ≥80%.
 
+### Track 13: Concurrency & Transaction Safety (July 2026)
+
+- **Bug fixed (data integrity):** Eliminated TOCTOU (time-of-check-to-time-of-use) race conditions in 10 server handlers across consultations, extensions, 2FA, and user management. All state-transition handlers now perform SELECT + status check inside `db.transaction` with `FOR UPDATE` row locking and post-lock state re-validation.
+- **Consultation handlers** (BUG-1, BUG-17) — `verifyConsultationHandler` and `rejectConsultationHandler` moved SELECT inside transaction with FOR UPDATE; stale-state returns 'already processed' error.
+- **Extension handlers** (BUG-2, BUG-5, BUG-6, BUG-7) — `approveExtensionHandler`, `rejectExtensionHandler`, `requestExtensionHandler`, and `calculateExtensionAdjustment` all use FOR UPDATE row locking inside transactions.
+- **2FA & user handlers** (BUG-8, BUG-13, BUG-22) — `disableTwoFactorHandler` uses DB-first in transaction then auth API; `generateSetupLinkHandler` wraps DELETE+INSERT in transaction; `createUserHandler` and `updateUserHandler` use FOR UPDATE on email uniqueness check + catch PG error 23505.
+- **Soft-delete cleanup** (BUG-9) — `deleteUserHandler` now auto-rejects pending consultations and extension requests (with 'User deleted' reason), revokes open upload intents for students, and blocks instructor deletion if they have active assignments.
+- **New `reassignAssignment` server function** (FR-4.3, FR-4.5) — Admin-only, validates assignment exists + is active, validates replacement instructor is active instructor, updates `assignments.instructorId`, transitions `under_review` checkpoints back to `submitted`.
+- **New `ReassignmentDialog` UI component** (FR-4.4) — Dialog with assignment list, instructor picker dropdown, and block-until-all-reassigned logic; wired into admin user management delete flow.
+- **New `listInstructorActiveAssignments` server function** — Admin-only, returns active assignments for a given instructor (used by reassignment dialog).
+- **i18n keys** — New EN/ID translations for reassignment dialog labels, instructor picker, and block error.
+- **Tests** — 2,399 tests pass across 261 test files; coverage ≥80% on all thresholds (stmts 87.63%, branches 81.04%, functions 81.38%, lines 88.3%).
+
 </protect>
