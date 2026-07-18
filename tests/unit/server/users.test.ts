@@ -210,7 +210,7 @@ describe('User server functions - Logic & Security', () => {
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
-    it('should call revokeUserSessions before soft-deleting', async () => {
+    it('should call revokeUserSessions after soft-deleting', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
         user: { id: 'admin-1', role: 'admin' } as any,
         session: {} as any,
@@ -253,7 +253,7 @@ describe('User server functions - Logic & Security', () => {
         .mockImplementationOnce((fn: any) =>
           Promise.resolve([{ id: 'inst-1', role: 'instructor', deletedAt: null }]).then(fn),
         )
-        .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 3 }]).then(fn));
+        .mockImplementationOnce((fn: any) => Promise.resolve([{ id: 1 }]).then(fn));
 
       const result = await deleteUserHandler({ data: { id: 'inst-1' } });
       expect(result).toEqual({
@@ -274,7 +274,7 @@ describe('User server functions - Logic & Security', () => {
         .mockImplementationOnce((fn: any) =>
           Promise.resolve([{ id: 'inst-1', role: 'instructor', deletedAt: null }]).then(fn),
         )
-        .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn));
+        .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
 
       const result = await deleteUserHandler({ data: { id: 'inst-1' } });
       expect(result).toEqual({ success: true });

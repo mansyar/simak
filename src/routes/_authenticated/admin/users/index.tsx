@@ -27,7 +27,7 @@ import { AlertBanner } from '@/components/ui/alert-banner';
 import { Plus, Upload } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
-import { isServerError } from '@/lib/errors';
+import { isServerError, ErrorCode } from '@/lib/errors';
 
 const UserSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -115,7 +115,7 @@ function UsersPage() {
 
   const handleDelete = async (user: UserRow) => {
     const result = await deleteUserFn({ data: { id: user.id } });
-    if (isServerError(result) && result.error.message.includes('active assignments')) {
+    if (isServerError(result) && result.error.code === ErrorCode.BAD_REQUEST) {
       const assignmentsResult = await listInstructorActiveAssignmentsFn({
         data: { instructorId: user.id },
       });
@@ -242,9 +242,13 @@ function UsersPage() {
         }}
         onDelete={async () => {
           if (reassignmentUser) {
-            await deleteUserFn({ data: { id: reassignmentUser.id } });
-            setReassignmentUser(null);
-            navigate({ search: (prev: UserSearchParams) => prev });
+            const result = await deleteUserFn({ data: { id: reassignmentUser.id } });
+            if (!isServerError(result)) {
+              setReassignmentUser(null);
+              navigate({ search: (prev: UserSearchParams) => prev });
+            } else {
+              setInlineError(result.error.message);
+            }
           }
         }}
       />

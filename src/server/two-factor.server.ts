@@ -176,7 +176,11 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
     }
 
     // 3. Revoke all sessions so the security change takes effect immediately
-    await revokeUserSessions(session.user.id, session.user.id);
+    try {
+      await revokeUserSessions(session.user.id, session.user.id);
+    } catch (err) {
+      console.error('Failed to revoke sessions post-commit (DB already committed):', err);
+    }
 
     // 4. Log audit event
     try {

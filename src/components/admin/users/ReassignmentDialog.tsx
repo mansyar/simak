@@ -47,6 +47,14 @@ export function ReassignmentDialog({
     try {
       await onReassign(assignmentId, instructorId);
       setReassigned((prev) => new Set(prev).add(assignmentId));
+    } catch (err) {
+      // Reset selection so the user can retry
+      setSelectedInstructors((prev) => {
+        const next = { ...prev };
+        delete next[assignmentId];
+        return next;
+      });
+      console.error('Reassignment failed:', err);
     } finally {
       setIsReassigning(false);
     }

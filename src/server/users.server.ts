@@ -333,24 +333,23 @@ export async function deleteUserHandler(args: { data: UserIdParam }) {
       return serverError(ErrorCode.NOT_FOUND, 'User not found or already deleted');
     }
 
-    // Block instructor soft-delete if they have active assignments
-    if (user.role === 'instructor') {
-      const [activeCount] = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(assignments)
-        .where(and(eq(assignments.instructorId, args.data.id), isNull(assignments.deletedAt)));
-      if (activeCount && activeCount.count > 0) {
-        return serverError(
-          ErrorCode.BAD_REQUEST,
-          'Instructor has active assignments. Reassign them first.',
-        );
+    const deleteResult = await db.transaction(async (tx) => {
+      // Block instructor soft-delete if they have active assignments (under lock)
+      if (user.role === 'instructor') {
+        const [activeAssignment] = await tx
+          .select({ id: assignments.id })
+          .from(assignments)
+          .where(and(eq(assignments.instructorId, args.data.id), isNull(assignments.deletedAt)))
+          .for('update', { of: assignments })
+          .limit(1);
+        if (activeAssignment) {
+          return serverError(
+            ErrorCode.BAD_REQUEST,
+            'Instructor has active assignments. Reassign them first.',
+          );
+        }
       }
-    }
 
-    // Revoke all sessions before soft-deleting
-    await revokeUserSessions(args.data.id, session.user.id);
-
-    await db.transaction(async (tx) => {
       if (user.role === 'student') {
         // Auto-reject pending consultations
         await tx
@@ -381,6 +380,17 @@ export async function deleteUserHandler(args: { data: UserIdParam }) {
       // Soft-delete the user
       await tx.update(users).set({ deletedAt: new Date() }).where(eq(users.id, args.data.id));
     });
+
+    if (deleteResult) {
+      return deleteResult;
+    }
+
+    // Revoke all sessions (post-commit advisory work)
+    try {
+      await revokeUserSessions(args.data.id, session.user.id);
+    } catch (err) {
+      console.error('Failed to revoke sessions post-commit (user already soft-deleted):', err);
+    }
 
     await logAuditEvent({
       actorId: session.user.id,
