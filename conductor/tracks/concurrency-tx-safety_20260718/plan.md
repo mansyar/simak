@@ -38,13 +38,13 @@
     - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
 - [x] Task: Refactor `requestExtensionHandler` — move extension count check inside transaction with row locking (325bc11)
     - [x] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Write failing unit tests for `calculateExtensionAdjustment` checkpoint locking (BUG-6)
-    - [ ] Test: checkpoint rows are locked inside transaction before reading
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Refactor `calculateExtensionAdjustment` — lock checkpoint rows inside transaction before reading
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
+- [x] Task: Write failing unit tests for `calculateExtensionAdjustment` checkpoint locking (BUG-6) (9418316)
+    - [x] Test: checkpoint rows are locked inside transaction before reading
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Refactor `calculateExtensionAdjustment` — lock checkpoint rows inside transaction before reading (9418316)
+    - [x] Run `pnpm test` — verify new tests pass (Green)
 - [x] Task: Move notification INSERTs inside the transaction for extension handlers (keep audit log post-commit with try/catch) (ac2cf9b)
-    - [ ] Run `pnpm test` — verify existing tests still pass
+    - [x] Run `pnpm test` — verify existing tests still pass
 - [ ] Task: Run quality gates for Phase 2
     - [ ] Run `pnpm typecheck`
     - [ ] Run `pnpm lint`
