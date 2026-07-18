@@ -30,6 +30,7 @@ describe('Consultation handlers audit logging', () => {
     where: vi.fn().mockReturnThis(),
     innerJoin: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
+    for: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),

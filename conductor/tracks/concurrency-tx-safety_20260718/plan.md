@@ -3,21 +3,21 @@
 
 ## Phase 1: Consultations (BUG-1, BUG-17)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
-- [ ] Task: Write failing unit tests for `verifyConsultationHandler` concurrency
-    - [ ] Test: stale-state rejection — status no longer `pending` after lock returns descriptive "already processed" error
-    - [ ] Test: successful verify transitions `status` to `verified` within transaction
-    - [ ] Test: handler uses `db.transaction` with `.for('update', { of: consultations })`
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Refactor `verifyConsultationHandler` — move SELECT inside `db.transaction`, add `.for('update', { of: consultations })`, re-check `status === 'pending'` after lock
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Write failing unit tests for `rejectConsultationHandler` concurrency
-    - [ ] Test: stale-state rejection after lock returns descriptive error
-    - [ ] Test: successful reject transitions `status` to `rejected` within transaction
-    - [ ] Run `pnpm test` — confirm new tests fail as expected (Red)
-- [ ] Task: Refactor `rejectConsultationHandler` — same pattern (transaction + `FOR UPDATE` + post-lock status re-check)
-    - [ ] Run `pnpm test` — verify new tests pass (Green)
-- [ ] Task: Run quality gates for Phase 1
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to load context for this phase
+- [x] Task: Write failing unit tests for `verifyConsultationHandler` concurrency
+    - [x] Test: stale-state rejection — status no longer `pending` after lock returns descriptive "already processed" error
+    - [x] Test: successful verify transitions `status` to `verified` within transaction
+    - [x] Test: handler uses `db.transaction` with `.for('update', { of: consultations })`
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Refactor `verifyConsultationHandler` — move SELECT inside `db.transaction`, add `.for('update', { of: consultations })`, re-check `status === 'pending'` after lock
+    - [x] Run `pnpm test` — verify new tests pass (Green)
+- [x] Task: Write failing unit tests for `rejectConsultationHandler` concurrency
+    - [x] Test: stale-state rejection after lock returns descriptive error
+    - [x] Test: successful reject transitions `status` to `rejected` within transaction
+    - [x] Run `pnpm test` — confirm new tests fail as expected (Red)
+- [x] Task: Refactor `rejectConsultationHandler` — same pattern (transaction + `FOR UPDATE` + post-lock status re-check)
+    - [x] Run `pnpm test` — verify new tests pass (Green)
+- [~] Task: Run quality gates for Phase 1
     - [ ] Run `pnpm typecheck`
     - [ ] Run `pnpm lint`
     - [ ] Run `pnpm test:coverage` — verify ≥80% thresholds on all four metrics

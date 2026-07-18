@@ -39,6 +39,7 @@ describe('Consultation server functions - Logic & Security', () => {
     limit: vi.fn().mockReturnThis(),
     offset: vi.fn().mockReturnThis(),
     orderBy: vi.fn().mockReturnThis(),
+    for: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
     values: vi.fn().mockReturnThis(),
     returning: vi.fn().mockReturnThis(),
@@ -250,28 +251,38 @@ describe('Consultation server functions - Logic & Security', () => {
       expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Consultation not found' } });
     });
 
-    it('should verify consultation successfully', async () => {
+    it('should verify consultation successfully within a transaction with FOR UPDATE lock', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
 
-      // Mock consultation query returns pending record
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            id: 1,
-            status: 'pending',
-            studentId: 'student-1',
-            assignmentId: 1,
-            instructorId: 'instructor-1',
-          },
-        ]).then(onfulfilled),
-      );
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 1,
+              status: 'pending',
+              studentId: 'student-1',
+              assignmentId: 1,
+              instructorId: 'instructor-1',
+            },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
       const result = await verifyConsultationHandler({ data: { consultationId: 1 } });
       expect(result).toEqual({ success: true });
+
+      expect(mockDb.transaction).toHaveBeenCalled();
+      expect(mockDb.for).toHaveBeenCalledWith(
+        'update',
+        expect.objectContaining({ of: expect.anything() }),
+      );
     });
 
-    it('should reject if consultation is not in pending state', async () => {
+    it('should return already-processed error if status changed after lock', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+
+      // Mock consultation SELECT returns non-pending status (stale state after acquiring lock)
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([
           {
@@ -286,8 +297,11 @@ describe('Consultation server functions - Logic & Security', () => {
 
       const result = await verifyConsultationHandler({ data: { consultationId: 1 } });
       expect(result).toEqual({
-        error: { code: 'BAD_REQUEST', message: 'Consultation is not in pending state' },
+        error: { code: 'BAD_REQUEST', message: 'Consultation has already been processed' },
       });
+
+      // Verify no UPDATE was performed (stale state detected after lock)
+      expect(mockDb.update).not.toHaveBeenCalled();
     });
   });
 
@@ -300,28 +314,42 @@ describe('Consultation server functions - Logic & Security', () => {
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
-    it('should reject consultation successfully', async () => {
+    it('should reject consultation successfully within a transaction with FOR UPDATE lock', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
 
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            id: 1,
-            status: 'pending',
-            studentId: 'student-1',
-            assignmentId: 1,
-            instructorId: 'instructor-1',
-          },
-        ]).then(onfulfilled),
-      );
+      mockDb.then
+        // Mock consultation SELECT (inside transaction, returns pending record)
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 1,
+              status: 'pending',
+              studentId: 'student-1',
+              assignmentId: 1,
+              instructorId: 'instructor-1',
+            },
+          ]).then(onfulfilled),
+        )
+        // Mock UPDATE result
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        // Mock INSERT notification result
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
       const result = await rejectConsultationHandler({
         data: { consultationId: 1, reason: 'Insufficient detail' },
       });
       expect(result).toEqual({ success: true });
+
+      // Verify transaction was used (SELECT inside db.transaction)
+      expect(mockDb.transaction).toHaveBeenCalled();
+      // Verify FOR UPDATE row lock was applied
+      expect(mockDb.for).toHaveBeenCalledWith(
+        'update',
+        expect.objectContaining({ of: expect.anything() }),
+      );
     });
 
-    it('should reject if consultation is not in pending state', async () => {
+    it('should return already-processed error if status changed after lock', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([
@@ -339,8 +367,11 @@ describe('Consultation server functions - Logic & Security', () => {
         data: { consultationId: 1, reason: 'Already done' },
       });
       expect(result).toEqual({
-        error: { code: 'BAD_REQUEST', message: 'Consultation is not in pending state' },
+        error: { code: 'BAD_REQUEST', message: 'Consultation has already been processed' },
       });
+
+      // Verify no UPDATE was performed (stale state detected after lock)
+      expect(mockDb.update).not.toHaveBeenCalled();
     });
   });
 

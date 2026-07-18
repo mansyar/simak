@@ -1,6 +1,7 @@
 // Server-only handlers for consultation operations
 import { eq, and, desc, asc, sql, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
+import type { Db } from '../db/index';
 import { consultations } from '../db/schema/consultations';
 import { checkpoints, assignments, assignmentStudents } from '../db/schema/assignments';
 import { notifications } from '../db/schema/notifications';
@@ -311,10 +312,31 @@ export async function listPendingConsultationsHandler(args: {
   }
 }
 
-/**
- * Instructor verifies a consultation.
- * Sets status to verified, records who verified it and when.
- */
+type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
+
+async function fetchConsultationForUpdate(tx: Tx, consultationId: number, instructorId: string) {
+  return tx
+    .select({
+      id: consultations.id,
+      status: consultations.status,
+      studentId: consultations.studentId,
+      assignmentId: consultations.assignmentId,
+      instructorId: assignments.instructorId,
+    })
+    .from(consultations)
+    .innerJoin(assignments, eq(consultations.assignmentId, assignments.id))
+    .where(
+      and(
+        eq(consultations.id, consultationId),
+        eq(assignments.instructorId, instructorId),
+        isNull(assignments.deletedAt),
+      ),
+    )
+    .limit(1)
+    .for('update', { of: consultations });
+}
+
+// Instructor verifies a consultation. Sets status to verified, records who verified it and when.
 export async function verifyConsultationHandler(args: { data: VerifyConsultationInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
@@ -325,36 +347,19 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
   const db = getDb();
 
   try {
-    // 1. Fetch consultation with assignment ownership check
-    const [consultation] = await db
-      .select({
-        id: consultations.id,
-        status: consultations.status,
-        studentId: consultations.studentId,
-        assignmentId: consultations.assignmentId,
-        instructorId: assignments.instructorId,
-      })
-      .from(consultations)
-      .innerJoin(assignments, eq(consultations.assignmentId, assignments.id))
-      .where(
-        and(
-          eq(consultations.id, consultationId),
-          eq(assignments.instructorId, session.user.id),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .limit(1);
+    let auditData: { assignmentId: number; studentId: string } | undefined;
 
-    if (!consultation) {
-      return serverError(ErrorCode.NOT_FOUND, 'Consultation not found');
-    }
+    const result = await db.transaction(async (tx) => {
+      const [consultation] = await fetchConsultationForUpdate(tx, consultationId, session.user.id);
 
-    if (consultation.status !== 'pending') {
-      return serverError(ErrorCode.BAD_REQUEST, 'Consultation is not in pending state');
-    }
+      if (!consultation) {
+        return serverError(ErrorCode.NOT_FOUND, 'Consultation not found');
+      }
 
-    // 2. Update status and notify the student inside a transaction
-    await db.transaction(async (tx) => {
+      if (consultation.status !== 'pending') {
+        return serverError(ErrorCode.BAD_REQUEST, 'Consultation has already been processed');
+      }
+
       await tx
         .update(consultations)
         .set({
@@ -377,22 +382,28 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
           assignmentId: consultation.assignmentId,
         },
       });
+
+      auditData = { assignmentId: consultation.assignmentId, studentId: consultation.studentId };
+
+      return { success: true };
     });
 
     // 3. Audit log after commit (advisory work; must not fail the committed transaction)
-    try {
-      await logAuditEvent({
-        actorId: session.user.id,
-        action: 'consultation.verified',
-        entityType: 'consultation',
-        entityId: String(consultationId),
-        details: { checkpoint: consultation.assignmentId, student: consultation.studentId },
-      });
-    } catch (err) {
-      console.error('Failed to log consultation verified audit event:', err);
+    if (auditData) {
+      try {
+        await logAuditEvent({
+          actorId: session.user.id,
+          action: 'consultation.verified',
+          entityType: 'consultation',
+          entityId: String(consultationId),
+          details: { checkpoint: auditData.assignmentId, student: auditData.studentId },
+        });
+      } catch (err) {
+        console.error('Failed to log consultation verified audit event:', err);
+      }
     }
 
-    return { success: true };
+    return result;
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
@@ -401,9 +412,7 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
   }
 }
 
-/**
- * Instructor rejects a consultation with a reason.
- */
+// Instructor rejects a consultation with a reason.
 export async function rejectConsultationHandler(args: { data: RejectConsultationInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
@@ -414,36 +423,19 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
   const db = getDb();
 
   try {
-    // 1. Fetch consultation with assignment ownership check
-    const [consultation] = await db
-      .select({
-        id: consultations.id,
-        status: consultations.status,
-        studentId: consultations.studentId,
-        assignmentId: consultations.assignmentId,
-        instructorId: assignments.instructorId,
-      })
-      .from(consultations)
-      .innerJoin(assignments, eq(consultations.assignmentId, assignments.id))
-      .where(
-        and(
-          eq(consultations.id, consultationId),
-          eq(assignments.instructorId, session.user.id),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .limit(1);
+    let auditData: { assignmentId: number; studentId: string } | undefined;
 
-    if (!consultation) {
-      return serverError(ErrorCode.NOT_FOUND, 'Consultation not found');
-    }
+    const result = await db.transaction(async (tx) => {
+      const [consultation] = await fetchConsultationForUpdate(tx, consultationId, session.user.id);
 
-    if (consultation.status !== 'pending') {
-      return serverError(ErrorCode.BAD_REQUEST, 'Consultation is not in pending state');
-    }
+      if (!consultation) {
+        return serverError(ErrorCode.NOT_FOUND, 'Consultation not found');
+      }
 
-    // 2. Update status to rejected with reason and notify the student inside a transaction
-    await db.transaction(async (tx) => {
+      if (consultation.status !== 'pending') {
+        return serverError(ErrorCode.BAD_REQUEST, 'Consultation has already been processed');
+      }
+
       await tx
         .update(consultations)
         .set({
@@ -469,22 +461,28 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
           rejectionReason: reason,
         },
       });
+
+      auditData = { assignmentId: consultation.assignmentId, studentId: consultation.studentId };
+
+      return { success: true };
     });
 
     // 3. Audit log after commit (advisory work; must not fail the committed transaction)
-    try {
-      await logAuditEvent({
-        actorId: session.user.id,
-        action: 'consultation.rejected',
-        entityType: 'consultation',
-        entityId: String(consultationId),
-        details: { checkpoint: consultation.assignmentId, student: consultation.studentId, reason },
-      });
-    } catch (err) {
-      console.error('Failed to log consultation rejected audit event:', err);
+    if (auditData) {
+      try {
+        await logAuditEvent({
+          actorId: session.user.id,
+          action: 'consultation.rejected',
+          entityType: 'consultation',
+          entityId: String(consultationId),
+          details: { checkpoint: auditData.assignmentId, student: auditData.studentId, reason },
+        });
+      } catch (err) {
+        console.error('Failed to log consultation rejected audit event:', err);
+      }
     }
 
-    return { success: true };
+    return result;
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
