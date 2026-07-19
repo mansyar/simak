@@ -172,7 +172,7 @@ const cases: TestCase[] = [
     label: 'extensions.listMyExtensionRequestsHandler',
     handler: listMyExtensionRequestsHandler,
     role: 'student',
-    input: { page: 1, limit: 10 },
+    input: { assignmentId: 1, page: 1, limit: 20 },
   },
 
   {

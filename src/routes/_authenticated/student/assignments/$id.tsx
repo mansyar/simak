@@ -84,6 +84,8 @@ function AssignmentDetailPage() {
   );
   const [consultationPage, setConsultationPage] = useState(1);
   const [consultationTotal, setConsultationTotal] = useState(0);
+  const [extensionPage, setExtensionPage] = useState(1);
+  const [extensionTotal, setExtensionTotal] = useState(0);
   const [extensionItems, setExtensionItems] = useState<
     {
       id: number;
@@ -134,22 +136,24 @@ function AssignmentDetailPage() {
 
         // Load extension requests
         const listExtFn = listMyExtensionRequests as unknown as (args: {
-          data: { assignmentId: number };
+          data: { assignmentId: number; page: number; limit: number };
         }) => Promise<unknown>;
         const extResult = await listExtFn({
-          data: { assignmentId: assignment.id },
+          data: { assignmentId: assignment.id, page: extensionPage, limit: 20 },
         });
         if (
           extResult &&
           typeof extResult === 'object' &&
           'items' in (extResult as Record<string, unknown>)
         ) {
-          setExtensionItems((extResult as { items: typeof extensionItems }).items);
+          const extData = extResult as { items: typeof extensionItems; total: number };
+          setExtensionItems(extData.items);
+          setExtensionTotal(extData.total);
         }
       };
       loadConsultations();
     }
-  }, [assignment, consultationPage]);
+  }, [assignment, consultationPage, extensionPage]);
 
   // If a child route is active (e.g., /checkpoints/:checkpointId), render it via Outlet
   // The child route (submission page) has its own full layout and back navigation
@@ -232,17 +236,19 @@ function AssignmentDetailPage() {
   const handleExtensionSuccess = async () => {
     // Refresh extension data
     const listExtFn = listMyExtensionRequests as unknown as (args: {
-      data: { assignmentId: number };
+      data: { assignmentId: number; page: number; limit: number };
     }) => Promise<unknown>;
     const extResult = await listExtFn({
-      data: { assignmentId: assignment.id },
+      data: { assignmentId: assignment.id, page: extensionPage, limit: 20 },
     });
     if (
       extResult &&
       typeof extResult === 'object' &&
       'items' in (extResult as Record<string, unknown>)
     ) {
-      setExtensionItems((extResult as { items: typeof extensionItems }).items);
+      const extData = extResult as { items: typeof extensionItems; total: number };
+      setExtensionItems(extData.items);
+      setExtensionTotal(extData.total);
     }
   };
 
@@ -363,6 +369,11 @@ function AssignmentDetailPage() {
           </div>
 
           <ExtensionHistoryList items={extensionItems} />
+          <Pagination
+            currentPage={extensionPage}
+            totalPages={Math.max(1, Math.ceil(extensionTotal / 20))}
+            onPageChange={setExtensionPage}
+          />
         </div>
       )}
     </div>

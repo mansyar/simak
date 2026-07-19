@@ -36,6 +36,8 @@ export const RejectExtensionSchema = z.object({
 
 export const ListMyExtensionsSchema = z.object({
   assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
 export const BulkExtendSchema = z.object({

@@ -223,6 +223,7 @@ describe('listMyExtensionRequestsHandler', () => {
       where: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
+      offset: vi.fn().mockReturnThis(),
       innerJoin: vi.fn().mockReturnThis(),
       leftJoin: vi.fn().mockReturnThis(),
       then: vi.fn(function (onfulfilled: any) {
@@ -236,7 +237,7 @@ describe('listMyExtensionRequestsHandler', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
     const result = await listMyExtensionRequestsHandler({
-      data: { assignmentId: 1 },
+      data: { assignmentId: 1, page: 1, limit: 20 },
     });
     expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
@@ -245,7 +246,7 @@ describe('listMyExtensionRequestsHandler', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
 
     const result = await listMyExtensionRequestsHandler({
-      data: { assignmentId: 1 },
+      data: { assignmentId: 1, page: 1, limit: 20 },
     });
     expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
@@ -256,7 +257,7 @@ describe('listMyExtensionRequestsHandler', () => {
     mockDb.then.mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
 
     const result = await listMyExtensionRequestsHandler({
-      data: { assignmentId: 999 },
+      data: { assignmentId: 999, page: 1, limit: 20 },
     });
     expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Assignment not found' } });
   });
@@ -266,12 +267,15 @@ describe('listMyExtensionRequestsHandler', () => {
 
     mockDb.then
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
-      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 0 }]).then(onfulfilled),
+      );
 
     const result = await listMyExtensionRequestsHandler({
-      data: { assignmentId: 1 },
+      data: { assignmentId: 1, page: 1, limit: 20 },
     });
-    expect(result).toEqual({ items: [] });
+    expect(result).toEqual({ items: [], total: 0 });
   });
 
   it('should return items with checkpoint info', async () => {
@@ -297,12 +301,15 @@ describe('listMyExtensionRequestsHandler', () => {
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve(expectedItems).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 1 }]).then(onfulfilled),
       );
 
     const result = await listMyExtensionRequestsHandler({
-      data: { assignmentId: 1 },
+      data: { assignmentId: 1, page: 1, limit: 20 },
     });
-    expect(result).toEqual({ items: expectedItems });
+    expect(result).toEqual({ items: expectedItems, total: 1 });
   });
 
   it('should handle database errors gracefully', async () => {
@@ -313,8 +320,60 @@ describe('listMyExtensionRequestsHandler', () => {
     });
 
     const result = await listMyExtensionRequestsHandler({
-      data: { assignmentId: 1 },
+      data: { assignmentId: 1, page: 1, limit: 20 },
     });
     expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
+  });
+
+  it('should accept page/limit params and return total count (PERF-19)', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 42 }]).then(onfulfilled),
+      );
+
+    const result = await listMyExtensionRequestsHandler({
+      data: { assignmentId: 1, page: 2, limit: 10 },
+    });
+    expect(result).toEqual({ items: [], total: 42 });
+    expect(mockDb.limit).toHaveBeenCalledWith(10);
+    expect(mockDb.offset).toHaveBeenCalledWith(10);
+  });
+
+  it('should default to page=1, limit=20 when not provided (PERF-19)', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 0 }]).then(onfulfilled),
+      );
+
+    const result = await listMyExtensionRequestsHandler({
+      data: { assignmentId: 1 } as any,
+    });
+    expect(mockDb.limit).toHaveBeenCalledWith(20);
+    expect(mockDb.offset).toHaveBeenCalledWith(0);
+    expect(result).toEqual({ items: [], total: 0 });
+  });
+
+  it('should return empty items when page is beyond range (PERF-19)', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 5 }]).then(onfulfilled),
+      );
+
+    const result = await listMyExtensionRequestsHandler({
+      data: { assignmentId: 1, page: 100, limit: 20 },
+    });
+    expect(result).toEqual({ items: [], total: 5 });
   });
 });
