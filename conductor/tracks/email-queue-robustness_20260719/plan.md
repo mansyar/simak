@@ -94,5 +94,5 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Admin Inspector UI + Retry Action' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Admin Inspector UI + Retry Action' (Protocol in workflow.md)
 </protect>
