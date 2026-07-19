@@ -91,7 +91,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Validation Logic' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Validation Logic' (Protocol in workflow.md) — User approved checkpoint
 
 ## Phase 4: Notification Cleanup (BUG-21)
 
