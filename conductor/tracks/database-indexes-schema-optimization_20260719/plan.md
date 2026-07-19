@@ -7,13 +7,13 @@
 ## Phase 1: Schema Changes with TDD [checkpoint: 50444d1]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
-    - [ ] Read `./spec.md` — review TR-1 (Schema Changes), TR-4 (Index Verification Tests - Unit), AC-1, AC-4, AC-6 through AC-10
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements, and Phase Completion Verification Protocol
+    - [x] Read `./spec.md` — review TR-1 (Schema Changes), TR-4 (Index Verification Tests - Unit), AC-1, AC-4, AC-6 through AC-10
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements, and Phase Completion Verification Protocol
 
 - [x] Task: Write failing unit test for Drizzle schema index declarations (Red Phase)
-    - [ ] Create `tests/unit/db/schema/indexes.test.ts`
-    - [ ] Add `/** @vitest-environment node */` at the top of the file (Drizzle schema imports pull in `pg` types)
-    - [ ] Add test cases for each of the 9 expected indexes:
+    - [x] Create `tests/unit/db/schema/indexes.test.ts`
+    - [x] Add `/** @vitest-environment node */` at the top of the file (Drizzle schema imports pull in `pg` types)
+    - [x] Add test cases for each of the 9 expected indexes:
         - `assignment_students_assignment_id_student_id_idx` on `(assignmentId, studentId)` (PERF-7)
         - `assignment_students_student_id_idx` on `(studentId)` (PERF-7)
         - `notifications_created_at_idx` on `(createdAt)` (PERF-8)
@@ -23,32 +23,32 @@
         - `extension_requests_assignment_id_student_id_idx` on `(assignmentId, studentId)` (PERF-12)
         - `audit_log_actor_id_idx` on `(actorId)` (PERF-13)
         - `reviews_submission_id_created_at_idx` on `(submissionId, createdAt)` (PERF-14)
-    - [ ] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm all test cases FAIL (no indexes declared yet)
+    - [x] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm all test cases FAIL (no indexes declared yet)
 
 - [x] Task: Add indexes to tables currently with ZERO indexes (PERF-7, PERF-9, PERF-10)
-    - [ ] `src/db/schema/assignments.ts` — Convert `assignmentStudents` from plain object to table-callback function; add 2 indexes: `(assignmentId, studentId)` and `(studentId)` (PERF-7)
-    - [ ] `src/db/schema/templates.ts` — Convert `templateCheckpoints` from plain object to table-callback function; add 1 index: `(templateId, order)` (PERF-9)
-    - [ ] `src/db/schema/users.ts` — Convert `users` from plain object to table-callback function; add 1 index: `(role, deletedAt)` (PERF-10)
-    - [ ] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm the 4 new-index test cases now PASS
+    - [x] `src/db/schema/assignments.ts` — Convert `assignmentStudents` from plain object to table-callback function; add 2 indexes: `(assignmentId, studentId)` and `(studentId)` (PERF-7)
+    - [x] `src/db/schema/templates.ts` — Convert `templateCheckpoints` from plain object to table-callback function; add 1 index: `(templateId, order)` (PERF-9)
+    - [x] `src/db/schema/users.ts` — Convert `users` from plain object to table-callback function; add 1 index: `(role, deletedAt)` (PERF-10)
+    - [x] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm the 4 new-index test cases now PASS
 
 - [x] Task: Replace low-cardinality indexes with composites (PERF-11, PERF-14)
-    - [ ] `src/db/schema/consultations.ts` — Replace `(status)` index definition with `(assignmentId, status)` composite in existing callback; keep `consultations_checkpoint_id_idx` (PERF-11)
-    - [ ] `src/db/schema/submissions.ts` — Replace `(submissionId)` index definition with `(submissionId, createdAt)` composite in `reviews` table callback (PERF-14)
-    - [ ] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm the 2 replacement test cases now PASS
+    - [x] `src/db/schema/consultations.ts` — Replace `(status)` index definition with `(assignmentId, status)` composite in existing callback; keep `consultations_checkpoint_id_idx` (PERF-11)
+    - [x] `src/db/schema/submissions.ts` — Replace `(submissionId)` index definition with `(submissionId, createdAt)` composite in `reviews` table callback (PERF-14)
+    - [x] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm the 2 replacement test cases now PASS
 
 - [x] Task: Add new indexes to existing callbacks (PERF-8, PERF-12, PERF-13)
-    - [ ] `src/db/schema/notifications.ts` — Add `(createdAt)` index to existing callback; keep existing `(userId, read)` index (PERF-8)
-    - [ ] `src/db/schema/extensions.ts` — Add `(assignmentId, studentId)` index to existing callback; keep existing `extension_requests_assignment_id_status_idx` (PERF-12)
-    - [ ] `src/db/schema/audit-log.ts` — Add `(actorId)` index to existing callback; keep existing `(createdAt)`, `(action)`, `(entityType, entityId)` indexes (PERF-13)
-    - [ ] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm all 9 test cases now PASS (Green Phase)
+    - [x] `src/db/schema/notifications.ts` — Add `(createdAt)` index to existing callback; keep existing `(userId, read)` index (PERF-8)
+    - [x] `src/db/schema/extensions.ts` — Add `(assignmentId, studentId)` index to existing callback; keep existing `extension_requests_assignment_id_status_idx` (PERF-12)
+    - [x] `src/db/schema/audit-log.ts` — Add `(actorId)` index to existing callback; keep existing `(createdAt)`, `(action)`, `(entityType, entityId)` indexes (PERF-13)
+    - [x] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm all 9 test cases now PASS (Green Phase)
 
 - [x] Task: Verify unit tests pass + run quality gates (96f056c)
-    - [ ] Run `pnpm test` — all existing 2,377+ tests pass (no regressions from schema changes)
-    - [ ] Run `pnpm typecheck` — passes (no TypeScript errors introduced)
-    - [ ] Run `pnpm lint` — passes (no lint errors introduced)
-    - [ ] Commit: `feat(db): Add and replace database indexes for PERF-7 through PERF-14`
-    - [ ] Attach git note with task summary (list of changed files, core why)
-    - [ ] Record commit SHA in plan.md
+    - [x] Run `pnpm test` — all existing 2,377+ tests pass (no regressions from schema changes)
+    - [x] Run `pnpm typecheck` — passes (no TypeScript errors introduced)
+    - [x] Run `pnpm lint` — passes (no lint errors introduced)
+    - [x] Commit: `feat(db): Add and replace database indexes for PERF-7 through PERF-14`
+    - [x] Attach git note with task summary (list of changed files, core why)
+    - [x] Record commit SHA in plan.md
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Schema Changes with TDD' (Protocol in workflow.md)
 
@@ -82,7 +82,7 @@
     - [x] Verify total: 11 DDL statements
     - [x] Verify index names follow Drizzle's auto-naming convention: `<table>_<col1>_<col2>_idx`
     - [x] If count is wrong, halt and investigate schema definition issue (investigated: spec estimation error — spec counted only 7 new indexes, not 2 replacement CREATE INDEX statements; implementation correct; user confirmed to proceed)
-    - [ ] Commit: `chore(db): Generate migration for index additions and replacements`
+    - [x] Commit: `chore(db): Generate migration for index additions and replacements`
 
 - [x] Task: Apply migration to dev DB (TR-3)
     - [x] Ensure `docker compose up -d` is running (PostgreSQL container on port 5432)
@@ -109,4 +109,7 @@
     NOTE: Dev DB tables are tiny (1-11 rows). PostgreSQL naturally prefers Seq Scan for small tables. Used `SET enable_seqscan = off` to force Index Scan and verify each index is USABLE by the query planner. This confirms the indexes cover the query predicates — in production with larger data volumes, the planner will choose Index Scan naturally.
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Migration & Integration Verification' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 238caff
 </protect>
