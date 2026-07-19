@@ -95,19 +95,19 @@
 
 ## Phase 4: Notification Cleanup (BUG-21)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
-    - [ ] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
+    - [x] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements (already in context)
 
-- [ ] Task: Remove dead channel:'email' notification rows from dispatchSLABreachNotifications (BUG-21)
-    - [ ] Write failing tests: verify `dispatchSLABreachNotifications` inserts only `channel: 'in_app'` rows (not `channel: 'email'`); verify `sendSLAAlertEmail` is still called
-    - [ ] Remove the `channel: 'email'` INSERT block from `src/lib/review-sla.ts` (lines 117-130)
-    - [ ] Keep in-app notification INSERT (lines 99-115) and `sendSLAAlertEmail` call (lines 132-140) intact
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Commit: `fix(sla): Remove dead channel:email notification rows from dispatchSLABreachNotifications`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Remove dead channel:'email' notification rows from dispatchSLABreachNotifications (BUG-21) [commit: 07cd641]
+    - [x] Write failing tests: verify `dispatchSLABreachNotifications` inserts only `channel: 'in_app'` rows (not `channel: 'email'`); verify `sendSLAAlertEmail` is still called
+    - [x] Remove the `channel: 'email'` INSERT block from `src/lib/review-sla.ts` (lines 117-130)
+    - [x] Keep in-app notification INSERT (lines 99-115) and `sendSLAAlertEmail` call (lines 132-140) intact
+    - [x] Run `pnpm test` — confirm all tests pass (260 files, 2389 tests)
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `fix(sla): Remove dead channel:email notification rows from dispatchSLABreachNotifications`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Notification Cleanup' (Protocol in workflow.md)
 
