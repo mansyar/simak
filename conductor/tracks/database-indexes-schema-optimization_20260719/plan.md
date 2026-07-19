@@ -50,7 +50,7 @@
     - [ ] Attach git note with task summary (list of changed files, core why)
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Schema Changes with TDD' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Schema Changes with TDD' (Protocol in workflow.md)
 
 ## Phase 2: Migration & Integration Verification
 

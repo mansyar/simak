@@ -1,7 +1,7 @@
 {
   "track_id": "database-indexes-schema-optimization_20260719",
   "type": "chore",
-  "state": "INIT",
+  "state": "IMPLEMENT",
   "spec": {
     "approved": true,
     "approved_at": "2026-07-19T18:56:27Z"
