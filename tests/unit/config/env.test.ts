@@ -199,4 +199,34 @@ describe('Environment validation', () => {
     const env = getEnv();
     expect(env.BETTER_AUTH_SECRET).toBe('test-secret-32-chars-minimum!!!!!');
   });
+
+  it('should return EMAIL_FROM from env when set', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    process.env.EMAIL_FROM = 'Custom Sender <noreply@custom.app>';
+
+    const { getEnv } = await import('@/config/env');
+    const env = getEnv();
+
+    expect(env.EMAIL_FROM).toBe('Custom Sender <noreply@custom.app>');
+  });
+
+  it('should default EMAIL_FROM to SIMAK default when unset', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    delete process.env.EMAIL_FROM;
+
+    const { getEnv } = await import('@/config/env');
+    const env = getEnv();
+
+    expect(env.EMAIL_FROM).toBe('SIMAK <noreply@simak.app>');
+  });
 });

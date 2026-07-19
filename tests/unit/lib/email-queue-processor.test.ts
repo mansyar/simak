@@ -8,7 +8,10 @@ import { emailQueue } from '@/db/schema/index';
 
 vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
 vi.mock('@/config/env', () => ({
-  getEnv: vi.fn().mockReturnValue({ RESEND_API_KEY: 'test-key' }),
+  getEnv: vi.fn().mockReturnValue({
+    RESEND_API_KEY: 'test-key',
+    EMAIL_FROM: 'SIMAK <noreply@simak.app>',
+  }),
 }));
 
 const { mockResendSend, ResendMock } = vi.hoisted(() => {
@@ -336,16 +339,30 @@ describe('email-queue-processor', () => {
       expect(result.sent).toBe(1);
     });
 
-    it('uses custom EMAIL_FROM env var when set', async () => {
+    it('reads EMAIL_FROM from getEnv() rather than process.env', async () => {
+      vi.mocked(getEnv).mockReturnValueOnce({
+        RESEND_API_KEY: 'test-key',
+        EMAIL_FROM: 'from-getenv@simak.app',
+      } as any);
       const origFrom = process.env.EMAIL_FROM;
-      process.env.EMAIL_FROM = 'custom@simak.app';
+      process.env.EMAIL_FROM = 'from-processenv@simak.app';
       setupDb([makeEmail()], { data: { id: 'sent-1' }, error: null });
 
       await processEmailQueue();
 
       expect(mockResendSend).toHaveBeenCalled();
-      expect(mockResendSend.mock.calls[0]?.[0]?.from).toBe('custom@simak.app');
+      expect(mockResendSend.mock.calls[0]?.[0]?.from).toBe('from-getenv@simak.app');
       process.env.EMAIL_FROM = origFrom;
+    });
+
+    it('uses default EMAIL_FROM from getEnv() when not customized', async () => {
+      delete process.env.EMAIL_FROM;
+      setupDb([makeEmail()], { data: { id: 'sent-1' }, error: null });
+
+      await processEmailQueue();
+
+      expect(mockResendSend).toHaveBeenCalled();
+      expect(mockResendSend.mock.calls[0]?.[0]?.from).toBe('SIMAK <noreply@simak.app>');
     });
 
     it('returns counts when queue is empty', async () => {
