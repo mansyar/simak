@@ -180,7 +180,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Over-fetch, Parallel & Query Rewrite' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Over-fetch, Parallel & Query Rewrite' (Protocol in workflow.md)
 
 ## Phase 4: Verification & Definition of Done
 
