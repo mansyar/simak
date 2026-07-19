@@ -61,7 +61,7 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 ---
 
-## Phase 3: Bundle Verification & Final Quality Gates
+## Phase 3: Bundle Verification & Final Quality Gates [checkpoint: c4acdcc]
 
 **Goal:** Prove the split prevents server-only modules from leaking into the client bundle, and confirm all quality gates pass before archive.
 
@@ -79,5 +79,5 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
     - [x] `pnpm test:coverage` ≥80% on lines, statements, branches, and functions — 87.66% stmts, 81.35% branches, 81.34% funcs, 88.29% lines
     - [x] Verify no file in `src/`/`tests/` exceeds 500 lines (`scripts/check-modularity.js` on `auth.ts` + `auth.server.ts`) — auth.ts=36, auth.server.ts=95
     - [x] Grep `src/server/auth.ts` for forbidden imports (`drizzle-orm`, `getDb`, `users`, `getRequestHeaders`, `auth config`) — assert zero matches (AC-1) — 0 matches
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Bundle Verification & Final Quality Gates' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Bundle Verification & Final Quality Gates' (Protocol in workflow.md) [checkpoint: c4acdcc]
 </protect>
