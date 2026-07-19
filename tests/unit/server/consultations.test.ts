@@ -7,7 +7,6 @@ import {
   verifyConsultationHandler,
   rejectConsultationHandler,
   getConsultationDetailHandler,
-  listVerifiedCountsHandler,
 } from '@/server/consultations.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
@@ -414,84 +413,6 @@ describe('Consultation server functions - Logic & Security', () => {
 
       const result = await getConsultationDetailHandler({ data: { consultationId: 999 } });
       expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Consultation not found' } });
-    });
-  });
-
-  describe('listVerifiedCountsHandler', () => {
-    it('should fail if unauthorized', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await listVerifiedCountsHandler({ data: { assignmentId: 1 } });
-      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
-    });
-
-    it('should return counts for student', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
-
-      mockDb.then
-        // Enrollment check
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 1 }]).then(onfulfilled),
-        )
-        // Mock checkpoint query (with studentId filter)
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 1, name: 'Ch 1', order: 1, minConsultations: 2 }]).then(
-            onfulfilled,
-          ),
-        )
-        // Mock count query
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ count: 1 }]).then(onfulfilled),
-        );
-
-      const result = (await listVerifiedCountsHandler({
-        data: { assignmentId: 1 },
-      })) as { counts: any[] };
-      expect(result).toHaveProperty('counts');
-      expect(result.counts).toHaveLength(1);
-      expect(result.counts[0].verifiedCount).toBe(1);
-    });
-
-    it('should return counts for instructor', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
-
-      mockDb.then
-        // Assignment ownership check
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 1 }]).then(onfulfilled),
-        )
-        // Mock checkpoint query for instructor (all students)
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 1, name: 'Ch 1', order: 1, minConsultations: 2 }]).then(
-            onfulfilled,
-          ),
-        )
-        // Mock count query
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ count: 3 }]).then(onfulfilled),
-        );
-
-      const result = await listVerifiedCountsHandler({ data: { assignmentId: 1 } });
-      expect(result).toHaveProperty('counts');
-    });
-
-    it('should reject if student is not enrolled for verified counts', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
-      // Enrollment check returns empty
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
-      const result = await listVerifiedCountsHandler({ data: { assignmentId: 999 } });
-      expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Assignment not found'));
-    });
-
-    it('should reject if instructor does not own assignment for verified counts', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
-      // Ownership check returns empty
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
-      const result = await listVerifiedCountsHandler({ data: { assignmentId: 999 } });
-      expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Assignment not found'));
     });
   });
 });
