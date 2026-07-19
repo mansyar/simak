@@ -143,7 +143,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Parallelize listTemplatesHandler independent queries (PERF-25)
+- [x] Task: Parallelize listTemplatesHandler independent queries (PERF-25) [1c3f70f]
     - [ ] Write failing tests: assert total count query and distinct types query run in parallel with the data query via `Promise.all` — run `pnpm test` and confirm failures
     - [ ] Refactor `listTemplatesHandler` (`src/server/templates.server.ts`) to run total count + distinct types in parallel with data query via `Promise.all`; checkpoint counts + names remain dependent on data query (run after)
     - [ ] Run `pnpm test` — confirm all tests pass
