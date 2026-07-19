@@ -72,16 +72,16 @@
 
 ## Phase 4: Admin Inspector UI + Retry Action (FR-1, FR-2 frontend)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
-    - [ ] Read `./spec.md` — review FR-1, FR-2, Acceptance Criteria #1, #2, #6
-    - [ ] Reference existing admin list page pattern (`/admin/audit-log`) for paginated table + filters + shared `<Pagination>` primitive
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
+    - [x] Read `./spec.md` — review FR-1, FR-2, Acceptance Criteria #1, #2, #6
+    - [x] Reference existing admin list page pattern (`/admin/audit-log`) for paginated table + filters + shared `<Pagination>` primitive
 
-- [ ] Task: Add i18n keys for the email queue inspector UI
-    - [ ] Add keys under `adminEmailQueue.*` (page title, table headers: recipient/subject/template/attempts/createdAt/lastAttemptAt/errorMessage, status labels, filter labels, retry button, retry confirmation dialog text, empty state) to `locales/en.json` and `locales/id.json`
-    - [ ] Run `pnpm generate:i18n` to regenerate types
-    - [ ] Run `pnpm check:i18n` — parity passes
+- [x] Task: Add i18n keys for the email queue inspector UI
+    - [x] Add keys under `adminEmailQueue.*` (page title, table headers: recipient/subject/template/attempts/createdAt/lastAttemptAt/errorMessage, status labels, filter labels, retry button, retry confirmation dialog text, empty state) to `locales/en.json` and `locales/id.json`
+    - [x] Run `pnpm generate:i18n` to regenerate types
+    - [x] Run `pnpm check:i18n` — parity passes (710 en = 710 id; 31 new keys unused until route built in Task 3)
 
-- [ ] Task: Implement /admin/email-queue inspector route + retry action
+- [x] Task: Implement /admin/email-queue inspector route + retry action [cdb08a8]
     - [ ] Write failing tests in `tests/unit/routes/admin/email-queue.test.tsx` (and/or component test): (1) page renders table with rows from `listEmailQueue`; (2) status filter and search drive the query; (3) summary stat row shows pending/sent/failed; (4) `failed` rows show a Retry button; (5) clicking Retry opens a confirmation dialog, confirming calls `retryEmail` and refetches — mock the server functions — run `pnpm test` and confirm failures
     - [ ] Create route `src/routes/_authenticated/admin/email-queue/index.tsx` (SSR loader calls `listEmailQueue`; ≤120 lines — extract subcomponents if needed)
     - [ ] Create inspector components (e.g. `src/components/admin/email-queue/EmailQueueTable.tsx`, `EmailQueueFilters.tsx`, summary stat row) reusing shared primitives (`<Pagination>`, `<PageHeader>`, `<EmptyState>`, `<Select>`, status badges)
