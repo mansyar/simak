@@ -32,7 +32,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Documentation & Naming Fixes' (Protocol in workflow.md) — User approved checkpoint
 
-## Phase 2: SQL & Dashboard Query Fixes (BUG-11, BUG-19)
+## Phase 2: SQL & Dashboard Query Fixes (BUG-11, BUG-19) [checkpoint: c5437a8]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
     - [x] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
@@ -60,7 +60,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: SQL & Dashboard Query Fixes' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: SQL & Dashboard Query Fixes' (Protocol in workflow.md)
 
 ## Phase 3: Validation Logic (BUG-12, BUG-18)
 
