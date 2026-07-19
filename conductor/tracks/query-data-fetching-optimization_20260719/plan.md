@@ -134,7 +134,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Remove redundant locale query (PERF-24)
+- [x] Task: Remove redundant locale query (PERF-24) [e3e1f2f]
     - [ ] Write failing tests: assert `listNotificationsHandler` uses `session.user.locale` directly and does NOT issue a separate `SELECT locale FROM users` query — run `pnpm test` and confirm failures
     - [ ] Remove the `SELECT locale FROM users` query in `listNotificationsHandler`; use `session.user.locale` directly (already enriched in `auth.ts` via `_getSession`)
     - [ ] Run `pnpm test` — confirm all tests pass
