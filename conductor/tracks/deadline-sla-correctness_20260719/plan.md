@@ -130,4 +130,8 @@
     - [ ] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: effectiveDeadline Derivation' (Protocol in workflow.md)
-</protect>
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions a95f7b7
+
