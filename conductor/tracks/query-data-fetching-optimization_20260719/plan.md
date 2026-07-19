@@ -6,12 +6,12 @@
 
 ## Phase 1: N+1 Query Elimination (FR-1)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
     - [ ] Read `./spec.md` — review FR-1 (PERF-1 through PERF-6) and Acceptance Criteria #1–#4
     - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gates
     - [ ] Explore current implementations via codegraph: `listVerifiedCountsHandler`, `calculateExtensionAdjustment`, `bulkExtendHandler`, `adjustDeadlinesForBreach`, `dispatchSLABreachNotifications`, `bulk-import.server.ts` post-commit loop
 
-- [ ] Task: Rewrite listVerifiedCountsHandler with single GROUP BY query (PERF-1)
+- [x] Task: Rewrite listVerifiedCountsHandler with single GROUP BY query (PERF-1) [16c543c]
     - [ ] Write failing tests in `tests/unit/server/consultations.test.ts` (Node env): assert `listVerifiedCountsHandler` returns identical counts as before for a set of checkpoints, but issues a single `GROUP BY` query (not N per-checkpoint COUNTs) — mock `@/db/index` and `@/server/auth` — run `pnpm test` and confirm failures
     - [ ] Rewrite `listVerifiedCountsHandler` in `src/server/consultations.server.ts` to use a single `GROUP BY checkpointId` query returning counts for all checkpoints at once (use `inArray` + `groupBy`)
     - [ ] Run `pnpm test` — confirm all tests pass

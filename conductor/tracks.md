@@ -8,7 +8,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Query & Data-Fetching Optimization**
+- [~] **Track: Query & Data-Fetching Optimization**
 *Link: [./tracks/query-data-fetching-optimization_20260719/](./tracks/query-data-fetching-optimization_20260719/)*
 
 ---
