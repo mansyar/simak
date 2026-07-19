@@ -6,7 +6,7 @@ import {
   listEmailQueue,
   retryEmail,
 } from '@/server/email-queue';
-import type { ListEmailQueueSuccess } from '@/server/email-queue.server';
+import type { ListEmailQueueSuccess, RetryEmailSuccess } from '@/server/email-queue.server';
 import type { ServerError } from '@/lib/errors';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
@@ -326,6 +326,136 @@ describe('listEmailQueueHandler', () => {
     const result = (await listEmailQueueHandler({
       data: { page: 1, status: 'all', search: '' },
     })) as ServerError;
+
+    expect(result).toHaveProperty('error');
+    expect(result.error.code).toBe('INTERNAL');
+  });
+});
+
+// ---- retryEmailHandler Tests ----
+
+describe('retryEmailHandler', () => {
+  let mockDb: any;
+  let mockTx: any;
+
+  const adminSession = {
+    user: {
+      id: 'admin-1',
+      name: 'Admin',
+      email: 'admin@test.com',
+      role: 'superadmin',
+      locale: 'en',
+      emailVerified: true,
+    },
+    session: {} as any,
+  };
+
+  const nonAdminSession = {
+    user: {
+      id: 'student-1',
+      name: 'Student',
+      email: 'student@test.com',
+      role: 'student',
+      locale: 'en',
+      emailVerified: true,
+    },
+    session: {} as any,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockTx = {
+      select: vi.fn().mockReturnThis(),
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      for: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      set: vi.fn().mockReturnThis(),
+      then: vi.fn(function (onfulfilled: any) {
+        return Promise.resolve([]).then(onfulfilled);
+      }),
+    };
+    mockDb = {
+      transaction: vi.fn(async (cb: any) => cb(mockTx)),
+    };
+    vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
+  });
+
+  it('resets a failed email to pending with attempts=0, errorMessage=null, lastAttemptAt=null', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+
+    mockTx.then
+      .mockImplementationOnce((onf: any) =>
+        Promise.resolve([
+          {
+            id: 5,
+            status: 'failed',
+            attempts: 3,
+            errorMessage: 'SMTP timeout',
+            lastAttemptAt: new Date('2026-07-19T10:00:00Z'),
+          },
+        ]).then(onf),
+      )
+      .mockImplementationOnce((onf: any) => Promise.resolve([]).then(onf));
+
+    const { retryEmailHandler } = await import('@/server/email-queue.server');
+    const result = (await retryEmailHandler({ data: { emailId: 5 } })) as RetryEmailSuccess;
+
+    expect(result).toEqual({ success: true, emailId: 5 });
+    expect(mockTx.update).toHaveBeenCalled();
+    expect(mockTx.set).toHaveBeenCalledWith({
+      status: 'pending',
+      attempts: 0,
+      errorMessage: null,
+      lastAttemptAt: null,
+    });
+  });
+
+  it('rejects retry of non-failed email with CONFLICT (idempotent guard)', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+
+    mockTx.then.mockImplementationOnce((onf: any) =>
+      Promise.resolve([{ id: 5, status: 'sent', attempts: 1 }]).then(onf),
+    );
+
+    const { retryEmailHandler } = await import('@/server/email-queue.server');
+    const result = (await retryEmailHandler({ data: { emailId: 5 } })) as ServerError;
+
+    expect(result).toHaveProperty('error');
+    expect(result.error.code).toBe('CONFLICT');
+    expect(mockTx.update).not.toHaveBeenCalled();
+  });
+
+  it('rejects non-admin with UNAUTHORIZED', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(nonAdminSession as any);
+
+    const { retryEmailHandler } = await import('@/server/email-queue.server');
+    const result = (await retryEmailHandler({ data: { emailId: 5 } })) as ServerError;
+
+    expect(result).toHaveProperty('error');
+    expect(result.error.code).toBe('UNAUTHORIZED');
+    expect(mockDb.transaction).not.toHaveBeenCalled();
+  });
+
+  it('returns NOT_FOUND for non-existent email id', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+
+    mockTx.then.mockImplementationOnce((onf: any) => Promise.resolve([]).then(onf));
+
+    const { retryEmailHandler } = await import('@/server/email-queue.server');
+    const result = (await retryEmailHandler({ data: { emailId: 999 } })) as ServerError;
+
+    expect(result).toHaveProperty('error');
+    expect(result.error.code).toBe('NOT_FOUND');
+  });
+
+  it('handles DB error with INTERNAL server error', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+
+    mockDb.transaction.mockRejectedValue(new Error('DB connection failed'));
+
+    const { retryEmailHandler } = await import('@/server/email-queue.server');
+    const result = (await retryEmailHandler({ data: { emailId: 5 } })) as ServerError;
 
     expect(result).toHaveProperty('error');
     expect(result.error.code).toBe('INTERNAL');

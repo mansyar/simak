@@ -148,9 +148,9 @@ export async function listEmailQueueHandler(args: {
   }
 }
 
-// ---- retryEmailHandler (stub — will be implemented in Task 3) ----
+// ---- retryEmailHandler ----
 
-export async function retryEmailHandler(_args: {
+export async function retryEmailHandler(args: {
   data: RetryEmailInput;
 }): Promise<RetryEmailSuccess | ServerError> {
   const session = await getSessionFromHeaders();
@@ -158,6 +158,54 @@ export async function retryEmailHandler(_args: {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  // TODO: implement retry logic in Task 3
-  return serverError(ErrorCode.INTERNAL, 'Not implemented');
+  const db = getDb();
+  const { emailId } = args.data;
+
+  try {
+    const result = await db.transaction(async (tx) => {
+      const [row] = await tx
+        .select()
+        .from(emailQueue)
+        .where(eq(emailQueue.id, emailId))
+        .for('update', { of: emailQueue });
+
+      if (!row) {
+        return { kind: 'not_found' as const };
+      }
+
+      if (row.status !== 'failed') {
+        return { kind: 'conflict' as const, currentStatus: row.status as string };
+      }
+
+      await tx
+        .update(emailQueue)
+        .set({
+          status: 'pending',
+          attempts: 0,
+          errorMessage: null,
+          lastAttemptAt: null,
+        })
+        .where(eq(emailQueue.id, emailId));
+
+      return { kind: 'ok' as const };
+    });
+
+    if (result.kind === 'not_found') {
+      return serverError(ErrorCode.NOT_FOUND, 'Email not found');
+    }
+
+    if (result.kind === 'conflict') {
+      return serverError(
+        ErrorCode.CONFLICT,
+        `Email is not in failed state (current: ${result.currentStatus})`,
+      );
+    }
+
+    return { success: true, emailId };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'retryEmailHandler',
+    });
+  }
 }
