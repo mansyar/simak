@@ -80,6 +80,8 @@ export async function dispatchSLABreachNotifications(
       .from(users)
       .where(and(sql`${users.role} IN ('superadmin', 'admin')`, isNull(users.deletedAt)));
 
+    if (adminUsers.length === 0) return;
+
     const slaParams = {
       checkpointName: submission.checkpointName,
       assignmentTitle: submission.assignmentTitle,
@@ -88,35 +90,39 @@ export async function dispatchSLABreachNotifications(
     };
     const slaKeys = getNotificationKeys('sla_breach');
 
-    for (const admin of adminUsers) {
-      // Create in-app notification
-      await db.insert(notifications).values({
-        userId: admin.id,
-        type: 'sla_breach',
-        titleKey: slaKeys.titleKey,
-        messageKey: slaKeys.messageKey,
-        params: slaParams,
-        channel: 'in_app',
-        metadata: {
-          assignmentId: submission.assignmentId,
-          checkpointId: submission.checkpointId,
-          breachDays,
-          assignmentTitle: submission.assignmentTitle,
-          studentName: submission.studentName,
-          checkpointName: submission.checkpointName,
-        },
-      });
-
-      // Send email via the email queue (not a notification row — BUG-21)
-      await sendSLAAlertEmail({
-        adminEmail: admin.email,
-        adminName: admin.name,
+    // Batch in-app notifications into a single INSERT (PERF-5)
+    const notificationValues = adminUsers.map((admin) => ({
+      userId: admin.id,
+      type: 'sla_breach',
+      titleKey: slaKeys.titleKey,
+      messageKey: slaKeys.messageKey,
+      params: slaParams,
+      channel: 'in_app',
+      metadata: {
+        assignmentId: submission.assignmentId,
+        checkpointId: submission.checkpointId,
+        breachDays,
         assignmentTitle: submission.assignmentTitle,
         studentName: submission.studentName,
         checkpointName: submission.checkpointName,
-        breachDays,
-      });
-    }
+      },
+    }));
+
+    await db.insert(notifications).values(notificationValues);
+
+    // Send emails concurrently — failures don't short-circuit (PERF-5)
+    await Promise.allSettled(
+      adminUsers.map((admin) =>
+        sendSLAAlertEmail({
+          adminEmail: admin.email,
+          adminName: admin.name,
+          assignmentTitle: submission.assignmentTitle,
+          studentName: submission.studentName,
+          checkpointName: submission.checkpointName,
+          breachDays,
+        }),
+      ),
+    );
   } catch (notifErr) {
     // Notifications are advisory — log but don't fail the review
     console.error('Failed to send SLA notifications:', notifErr);

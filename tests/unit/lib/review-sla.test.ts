@@ -208,22 +208,19 @@ describe('dispatchSLABreachNotifications', () => {
 
     await dispatchSLABreachNotifications(mockDb, baseSubmission, 3);
 
-    // 2 admins × in_app only = 2 insert calls (email rows removed — BUG-21)
-    expect(mockDb.insert).toHaveBeenCalledTimes(2);
-    const valuesCalls = mockDb.values.mock.calls.map((c: any[]) => c[0]);
+    // Single batch INSERT for all admins (PERF-5)
+    expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    const valuesArg = mockDb.values.mock.calls[0][0];
+    expect(Array.isArray(valuesArg)).toBe(true);
+    expect(valuesArg).toHaveLength(2);
 
     // Each admin should have only in_app notification (no email rows)
-    const admin1Notifications = valuesCalls.filter((v: any) => v.userId === 'admin-1');
-    const admin2Notifications = valuesCalls.filter((v: any) => v.userId === 'admin-2');
-
-    expect(admin1Notifications).toHaveLength(1);
-    expect(admin1Notifications[0].channel).toBe('in_app');
-
-    expect(admin2Notifications).toHaveLength(1);
-    expect(admin2Notifications[0].channel).toBe('in_app');
+    valuesArg.forEach((v: any) => {
+      expect(v.channel).toBe('in_app');
+    });
 
     // Verify no email channel rows were inserted
-    const emailNotifications = valuesCalls.filter((v: any) => v.channel === 'email');
+    const emailNotifications = valuesArg.filter((v: any) => v.channel === 'email');
     expect(emailNotifications).toHaveLength(0);
   });
 
@@ -234,17 +231,20 @@ describe('dispatchSLABreachNotifications', () => {
 
     await dispatchSLABreachNotifications(mockDb, baseSubmission, 3);
 
-    const valuesCall = mockDb.values.mock.calls[0][0];
-    expect(valuesCall.type).toBe('sla_breach');
-    expect(valuesCall.titleKey).toBe('notifications.events.sla_breach.title');
-    expect(valuesCall.messageKey).toBe('notifications.events.sla_breach.message');
-    expect(valuesCall.params).toEqual({
+    // Batch insert: values receives an array
+    const valuesArg = mockDb.values.mock.calls[0][0];
+    expect(Array.isArray(valuesArg)).toBe(true);
+    const notif = valuesArg[0];
+    expect(notif.type).toBe('sla_breach');
+    expect(notif.titleKey).toBe('notifications.events.sla_breach.title');
+    expect(notif.messageKey).toBe('notifications.events.sla_breach.message');
+    expect(notif.params).toEqual({
       checkpointName: 'Checkpoint 1',
       assignmentTitle: 'Assignment 1',
       studentName: 'Student One',
       breachDays: '3',
     });
-    expect(valuesCall.metadata).toEqual({
+    expect(notif.metadata).toEqual({
       assignmentId: 10,
       checkpointId: 100,
       breachDays: 3,
@@ -291,14 +291,58 @@ describe('dispatchSLABreachNotifications', () => {
     expect(sendSLAAlertEmail).not.toHaveBeenCalled();
   });
 
+  it('should use single batch INSERT for all admin notifications (PERF-5)', async () => {
+    const threeAdmins = [
+      { id: 'admin-1', name: 'Admin One', email: 'admin1@test.com' },
+      { id: 'admin-2', name: 'Admin Two', email: 'admin2@test.com' },
+      { id: 'admin-3', name: 'Admin Three', email: 'admin3@test.com' },
+    ];
+    mockDb.then.mockImplementation((onfulfilled: any) =>
+      Promise.resolve(threeAdmins).then(onfulfilled),
+    );
+
+    await dispatchSLABreachNotifications(mockDb, baseSubmission, 3);
+
+    // Single batch INSERT, not 3 individual inserts
+    expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    const valuesArg = mockDb.values.mock.calls[0][0];
+    expect(Array.isArray(valuesArg)).toBe(true);
+    expect(valuesArg).toHaveLength(3);
+    expect(valuesArg.map((v: any) => v.userId)).toEqual(['admin-1', 'admin-2', 'admin-3']);
+  });
+
+  it('should send SLA alert emails concurrently via Promise.allSettled (PERF-5)', async () => {
+    mockDb.then.mockImplementation((onfulfilled: any) =>
+      Promise.resolve(adminUsers).then(onfulfilled),
+    );
+
+    // Make one email reject — Promise.allSettled should not throw
+    const { sendSLAAlertEmail } = await import('@/lib/email');
+    vi.mocked(sendSLAAlertEmail)
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error('Email send failed'));
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    // Should not throw — allSettled handles rejections internally
+    await dispatchSLABreachNotifications(mockDb, baseSubmission, 3);
+
+    // Both emails attempted (allSettled doesn't short-circuit)
+    expect(sendSLAAlertEmail).toHaveBeenCalledTimes(2);
+    // No error logged — allSettled catches rejections internally
+    expect(consoleSpy).not.toHaveBeenCalled();
+
+    consoleSpy.mockRestore();
+  });
+
   it('should catch and log errors without re-throwing', async () => {
     mockDb.then.mockImplementation((onfulfilled: any) =>
       Promise.resolve(adminUsers).then(onfulfilled),
     );
-    // Make insert throw on second admin's in_app insert (admin-1 succeeds, admin-2 fails)
-    mockDb.insert
-      .mockImplementationOnce(() => ({ values: vi.fn().mockResolvedValue(undefined) }))
-      .mockImplementationOnce(() => ({ values: vi.fn().mockRejectedValue(new Error('DB error')) }));
+    // Make the batch insert throw
+    mockDb.insert.mockImplementationOnce(() => ({
+      values: vi.fn().mockRejectedValue(new Error('DB error')),
+    }));
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
