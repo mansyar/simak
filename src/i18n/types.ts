@@ -501,6 +501,8 @@ export type Translation = {
     empty: string
     emptyPrompt: string
     uploadError: string
+    r2NotConfigured: string
+    objectNotFound: string
   }
   consultations: {
     title: string
