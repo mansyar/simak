@@ -184,6 +184,10 @@
 
 ## Phase 4: Verification & Definition of Done
 
+- [ ] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
+    - [ ] Read `./spec.md` — review all Acceptance Criteria #1–#15 and Verification Strategy
+    - [ ] Read `conductor/workflow.md` — review Phase Completion Verification and Checkpointing Protocol
+
 - [ ] Task: Run EXPLAIN ANALYZE on rewritten queries (manual)
     - [ ] Start dev DB (`docker compose up -d`) and run `pnpm db:migrate` if needed
     - [ ] Run `EXPLAIN ANALYZE` on the LATERAL join query in `listPendingReviewsHandler` — confirm index scan on `submissions(checkpoint_id, version)`
