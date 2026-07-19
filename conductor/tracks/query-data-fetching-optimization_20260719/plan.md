@@ -152,7 +152,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Parallelize listInstructorAssignmentsHandler count query (PERF-26)
+- [x] Task: Parallelize listInstructorAssignmentsHandler count query (PERF-26) [f81c77d]
     - [ ] Write failing tests: assert total count query runs in parallel with the data query via `Promise.all` — run `pnpm test` and confirm failures
     - [ ] Refactor `listInstructorAssignmentsHandler` to run total count in parallel with data query via `Promise.all`; student counts remain dependent on data query (run after)
     - [ ] Run `pnpm test` — confirm all tests pass
