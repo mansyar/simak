@@ -34,19 +34,19 @@
 
 ## Phase 2: SQL & Dashboard Query Fixes (BUG-11, BUG-19)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
-    - [ ] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
+    - [x] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements (already in context from Phase 1)
 
-- [ ] Task: Fix daysOverdue SQL arithmetic in admin dashboard (BUG-11)
-    - [ ] Write failing tests: verify `daysOverdue` returns total elapsed days (not day-component) for a 45-day-old submission — mock the DB query result and assert the SQL template uses `EXTRACT(EPOCH FROM ...) / 86400`
-    - [ ] Replace `extract(day from now() - uploadedAt)` with `EXTRACT(EPOCH FROM now() - uploadedAt) / 86400` in SELECT (`src/server/dashboard-admin.server.ts` line 93)
-    - [ ] Apply same fix to ORDER BY (`src/server/dashboard-admin.server.ts` line 107)
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Commit: `fix(dashboard): Correct daysOverdue SQL to use total elapsed days`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Fix daysOverdue SQL arithmetic in admin dashboard (BUG-11) [commit: 7c5e22c]
+    - [x] Write failing tests: verify `daysOverdue` returns total elapsed days (not day-component) for a 45-day-old submission — mock the DB query result and assert the SQL template uses `EXTRACT(EPOCH FROM ...) / 86400`
+    - [x] Replace `extract(day from now() - uploadedAt)` with `EXTRACT(EPOCH FROM now() - uploadedAt) / 86400` in SELECT (`src/server/dashboard-admin.server.ts` line 93)
+    - [x] Apply same fix to ORDER BY (`src/server/dashboard-admin.server.ts` line 107)
+    - [x] Run `pnpm test` — confirm all tests pass (259 files, 2381 tests)
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `fix(dashboard): Correct daysOverdue SQL to use total elapsed days`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Fix upcomingDeadlines query and null dueDate handling (BUG-19)
     - [ ] Write failing tests: (1) verify `passed` checkpoints are excluded from `upcomingDeadlines`; (2) verify null `dueDate` results in `isOverdue=false` and `daysRemaining=null`
