@@ -137,13 +137,14 @@ describe('Template server functions - Logic & Security', () => {
           Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis' }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ templateId: 1, name: 'Proposal', order: 1 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ count: 1 }]).then(onfulfilled),
         );
 
       const result = (await listTemplatesHandler({ data: listData })) as {
@@ -213,16 +214,16 @@ describe('Template server functions - Logic & Security', () => {
           Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis' }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ templateId: 1, name: 'Proposal', order: 1 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ count: 1 }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ type: 'Thesis' }, { type: 'Project' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, name: 'Proposal', order: 1 }]).then(onfulfilled),
         );
 
       const result = (await listTemplatesHandler({ data: listData })) as {
@@ -231,6 +232,39 @@ describe('Template server functions - Logic & Security', () => {
 
       expect(result.allTypes).toBeDefined();
       expect(result.allTypes).toEqual(['Thesis', 'Project']);
+    });
+
+    it('should run data, count, and types queries in parallel via Promise.all (PERF-25)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ type: 'Thesis' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, count: 2 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, name: 'Ch 1', order: 1 }]).then(onfulfilled),
+        );
+
+      const result = (await listTemplatesHandler({ data: listData })) as {
+        templates: { checkpointCount: number }[];
+        total: number;
+        allTypes: string[];
+      };
+
+      // With Promise.all, count query (2nd call) runs before checkpoint queries (4th+5th calls)
+      expect(mockDb.then).toHaveBeenCalledTimes(5);
+      expect(result.total).toBe(1);
+      expect(result.allTypes).toEqual(['Thesis']);
+      expect(result.templates[0].checkpointCount).toBe(2);
     });
   });
 

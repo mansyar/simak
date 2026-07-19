@@ -52,20 +52,31 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
       conditions.push(eq(assignmentTemplates.type, type));
     }
 
-    const templatesData = await db
-      .select({
-        id: assignmentTemplates.id,
-        name: assignmentTemplates.name,
-        type: assignmentTemplates.type,
-        createdBy: assignmentTemplates.createdBy,
-        createdAt: assignmentTemplates.createdAt,
-        updatedAt: assignmentTemplates.updatedAt,
-      })
-      .from(assignmentTemplates)
-      .where(and(...conditions))
-      .orderBy(assignmentTemplates.createdAt)
-      .limit(limit)
-      .offset((page - 1) * limit);
+    const [templatesData, [{ count }], typeRows] = await Promise.all([
+      db
+        .select({
+          id: assignmentTemplates.id,
+          name: assignmentTemplates.name,
+          type: assignmentTemplates.type,
+          createdBy: assignmentTemplates.createdBy,
+          createdAt: assignmentTemplates.createdAt,
+          updatedAt: assignmentTemplates.updatedAt,
+        })
+        .from(assignmentTemplates)
+        .where(and(...conditions))
+        .orderBy(assignmentTemplates.createdAt)
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(assignmentTemplates)
+        .where(and(...conditions)),
+      db
+        .select({ type: assignmentTemplates.type })
+        .from(assignmentTemplates)
+        .where(isNull(assignmentTemplates.deletedAt))
+        .groupBy(assignmentTemplates.type),
+    ]);
 
     // Enrich with checkpoints and counts in a separate query
     const templateIds = templatesData.map((t) => t.id);
@@ -105,19 +116,6 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
       checkpointCount: checkpointCounts.get(t.id) ?? 0,
       checkpoints: checkpointsMap.get(t.id) ?? [],
     }));
-
-    // Total count for pagination
-    const [{ count }] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(assignmentTemplates)
-      .where(and(...conditions));
-
-    // All distinct types (for filter dropdown)
-    const typeRows = await db
-      .select({ type: assignmentTemplates.type })
-      .from(assignmentTemplates)
-      .where(isNull(assignmentTemplates.deletedAt))
-      .groupBy(assignmentTemplates.type);
 
     return {
       templates: templatesWithCounts,
