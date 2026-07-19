@@ -34,7 +34,7 @@ A three-way audit (bugs, performance, UX) identified 30 performance issues. The 
 | PERF-13 | — | `auditLog` | Add `(actorId)` index for JOIN in listAuditLogsHandler |
 | PERF-14 | — | `reviews` | REPLACE `(submissionId)` with `(submissionId, createdAt)` composite |
 
-**Total DDL changes:** 7 `CREATE INDEX` + 2 `DROP INDEX` = 9 statements in the generated migration.
+**Total DDL changes:** 9 `CREATE INDEX` (7 new + 2 replacements) + 2 `DROP INDEX` = 11 statements in the generated migration.
 
 ## Technical Requirements
 
@@ -56,9 +56,9 @@ For each table below, either add a table-callback function (where the table is c
 
 1. Run `pnpm db:generate` to generate the migration SQL.
 2. Open the generated `.sql` file in `drizzle/` and verify:
-   - Exactly 7 `CREATE INDEX` statements
+   - Exactly 9 `CREATE INDEX` statements (7 new + 2 replacements for PERF-11 and PERF-14)
    - Exactly 2 `DROP INDEX` statements (for PERF-11 and PERF-14 replacements)
-   - Total: 9 DDL statements
+   - Total: 11 DDL statements
    - Index names follow Drizzle's auto-naming convention: `<table>_<col1>_<col2>_idx`
 3. If the count is wrong, halt and investigate (likely a schema definition issue).
 4. Use standard Drizzle migration (NOT `CONCURRENTLY`) — table locks are trivial for this academic app's data volume.
@@ -120,7 +120,7 @@ Document the following 4 manual checkpoints in `plan.md`'s checkpoint protocol (
 ## Acceptance Criteria
 
 - [ ] AC-1: All 7 schema files in `src/db/schema/` are updated per TR-1
-- [ ] AC-2: `pnpm db:generate` produces a migration with exactly 9 DDL statements (7 CREATE + 2 DROP)
+- [ ] AC-2: `pnpm db:generate` produces a migration with exactly 11 DDL statements (9 CREATE + 2 DROP)
 - [ ] AC-3: `pnpm db:migrate` applies cleanly to a fresh dev DB
 - [ ] AC-4: Unit test `tests/unit/db/schema/indexes.test.ts` passes (verifies Drizzle schema declarations)
 - [ ] AC-5: Integration test `tests/integration/db/migration-applied.test.ts` passes (verifies `pg_indexes` contains all 9 new/replaced indexes by name)
