@@ -161,7 +161,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Rewrite listPendingReviewsHandler with LATERAL join (PERF-35)
+- [x] Task: Rewrite listPendingReviewsHandler with LATERAL join (PERF-35) [45fb0df]
     - [ ] Write failing tests in `tests/unit/server/reviews.test.ts`: assert `listPendingReviewsHandler` returns identical results as before (same checkpoints, same latest submission per checkpoint) but uses a LATERAL join instead of a correlated subquery — run `pnpm test` and confirm failures
     - [ ] Rewrite the query in `listPendingReviewsHandler` (`src/server/reviews.server.ts` ~lines 109-114) to start from checkpoints and LATERAL join the latest submission per checkpoint (`ORDER BY version DESC LIMIT 1`) using Drizzle's `sql` template or `leftJoin` with a lateral subquery
     - [ ] Run `pnpm test` — confirm all tests pass
