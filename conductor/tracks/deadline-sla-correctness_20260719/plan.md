@@ -64,22 +64,22 @@
 
 ## Phase 3: Validation Logic (BUG-12, BUG-18)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
-    - [ ] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
+    - [x] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements (already in context)
 
-- [ ] Task: Add finalDeadline cap to validateDueDates (BUG-12)
-    - [ ] Write failing tests: (1) verify `validateDueDates` rejects checkpoint `dueDate` exceeding `finalDeadline` when provided; (2) verify it does NOT enforce the cap when `finalDeadline` is omitted (backward compatible)
-    - [ ] Add optional `finalDeadline?: Date` parameter to `validateDueDates` in `src/server/due-dates.server.ts`
-    - [ ] Implement validation: reject any checkpoint `dueDate` > `finalDeadline` with descriptive error
-    - [ ] Wire `finalDeadline` argument at all assignment-creation call sites (search for `validateDueDates` callers)
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Commit: `fix(deadlines): Add finalDeadline cap to validateDueDates at creation time`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Add finalDeadline cap to validateDueDates (BUG-12) [commit: fb30d10]
+    - [x] Write failing tests: (1) verify `validateDueDates` rejects checkpoint `dueDate` exceeding `finalDeadline` when provided; (2) verify it does NOT enforce the cap when `finalDeadline` is omitted (backward compatible)
+    - [x] Add optional `finalDeadline?: Date` parameter to `validateDueDates` in `src/server/due-dates.server.ts`
+    - [x] Implement validation: reject any checkpoint `dueDate` > `finalDeadline` with descriptive error
+    - [x] Wire `finalDeadline` argument at all assignment-creation call sites (search for `validateDueDates` callers)
+    - [x] Run `pnpm test` — confirm all tests pass (260 files, 2386 tests)
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `fix(deadlines): Add finalDeadline cap to validateDueDates at creation time`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
-- [ ] Task: Add validation to extendDeadlineHandler (BUG-18)
+- [~] Task: Add validation to extendDeadlineHandler (BUG-18)
     - [ ] Write failing tests: (1) verify past `newDueDate` is rejected; (2) verify non-sequential dueDates are rejected; (3) verify `assignments.finalDeadline` is NOT modified
     - [ ] Add future-date validation to `extendDeadlineHandler` (`src/server/assignments-extras.server.ts` lines 99-148)
     - [ ] Add sequential-ordering validation relative to adjacent checkpoints
