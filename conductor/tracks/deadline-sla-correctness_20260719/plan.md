@@ -48,17 +48,17 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Fix upcomingDeadlines query and null dueDate handling (BUG-19)
-    - [ ] Write failing tests: (1) verify `passed` checkpoints are excluded from `upcomingDeadlines`; (2) verify null `dueDate` results in `isOverdue=false` and `daysRemaining=null`
-    - [ ] Add WHERE clause to filter out `passed` checkpoints in `upcomingDeadlines` query (`src/server/dashboard-student.server.ts` lines 47-59)
-    - [ ] Update null `dueDate` handling: set `isOverdue=false`, `daysRemaining=null` instead of `new Date()` fallback (`src/server/dashboard-student.server.ts` lines 174-181)
-    - [ ] Add i18n key for "No deadline" display text in `locales/en.json` and `locales/id.json`; run `pnpm generate:i18n`
-    - [ ] Update `StudentDashboard.tsx` to display the localized "No deadline" text when `daysRemaining` is null
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Commit: `fix(dashboard): Exclude passed checkpoints and handle null dueDate in student dashboard`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Fix upcomingDeadlines query and null dueDate handling (BUG-19) [commit: f65c6c7]
+    - [x] Write failing tests: (1) verify `passed` checkpoints are excluded from `upcomingDeadlines`; (2) verify null `dueDate` results in `isOverdue=false` and `daysRemaining=null`
+    - [x] Add WHERE clause to filter out `passed` checkpoints in `upcomingDeadlines` query (`src/server/dashboard-student.server.ts` lines 47-59)
+    - [x] Update null `dueDate` handling: set `isOverdue=false`, `daysRemaining=null` instead of `new Date()` fallback (`src/server/dashboard-student.server.ts` lines 174-181)
+    - [x] Add i18n key for "No deadline" display text in `locales/en.json` and `locales/id.json`; run `pnpm generate:i18n`
+    - [x] Update `StudentDashboard.tsx` to display the localized "No deadline" text when `daysRemaining` is null
+    - [x] Run `pnpm test` — confirm all tests pass (260 files, 2385 tests)
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `fix(dashboard): Exclude passed checkpoints and handle null dueDate in student dashboard`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: SQL & Dashboard Query Fixes' (Protocol in workflow.md)
 
