@@ -6,11 +6,11 @@
 
 ## Phase 1: Config Hygiene (FR-5)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
-    - [ ] Read `./spec.md` — review FR-5 and Acceptance Criterion #5
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gates
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
+    - [x] Read `./spec.md` — review FR-5 and Acceptance Criterion #5
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gates
 
-- [ ] Task: Route EMAIL_FROM through validated env config
+- [x] Task: Route EMAIL_FROM through validated env config [2bcf3d2]
     - [ ] Write failing tests: extend/inspect `tests/unit/config/env.test.ts` (or create) to assert `getEnv().EMAIL_FROM` returns the env value when set and the default `'SIMAK <noreply@simak.app>'` when unset; update `tests/unit/lib/email-queue-processor.test.ts` to assert the processor reads `EMAIL_FROM` from `getEnv()` (not `process.env`) — run `pnpm test` and confirm failures
     - [ ] Add `EMAIL_FROM: z.string().default('SIMAK <noreply@simak.app>')` to `envSchema` in `src/config/env.ts`; add `EMAIL_FROM: string` to the `Env` type intersection
     - [ ] Replace `process.env.EMAIL_FROM || 'SIMAK <noreply@simak.app>'` (line 91 of `src/lib/email-queue-processor.ts`) with `getEnv().EMAIL_FROM` (getEnv already imported)
