@@ -81,9 +81,9 @@
 
 ## Phase 3: Assignment & Ownership Validation (BUG-24, BUG-26)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
-    - [ ] Read `./spec.md` — review FR-4 (studentIds Role Validation), FR-5 (instructorId WHERE Clause), AC-13 through AC-17, AC-22 (i18n key for invalidStudentIds)
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
+    - [x] Read `./spec.md` — review FR-4 (studentIds Role Validation), FR-5 (instructorId WHERE Clause), AC-13 through AC-17, AC-22 (i18n key for invalidStudentIds)
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements
 
 - [ ] Task: Add studentIds role validation in createAssignmentHandler (BUG-24)
     - [ ] Add `assignments.errors.invalidStudentIds` to `locales/en.json` with value: "One or more selected users are not active students"
