@@ -1,0 +1,8 @@
+{
+  "track_id": "input-validation-data-integrity_20260719",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-07-19T10:18:04Z",
+  "updated_at": "2026-07-19T10:18:04Z",
+  "description": "Fix 6 input-validation and data-integrity bugs: settings Zod bypass (BUG-15), R2 error discrimination (BUG-10), EMAIL_FROM env validation (BUG-25), studentIds role validation (BUG-24), instructorId WHERE clause (BUG-26), and actualSize storage in submissions (BUG-27)."
+}
