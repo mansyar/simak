@@ -52,7 +52,7 @@ describe('TemplateLinkedAssignments', () => {
   it('should render assignments using ListRow primitive', async () => {
     const { TemplateLinkedAssignments } =
       await import('@/components/admin/templates/TemplateLinkedAssignments');
-    render(<TemplateLinkedAssignments assignments={assignments} />);
+    render(<TemplateLinkedAssignments assignments={assignments} currentPage={1} totalPages={1} />);
     expect(screen.getAllByTestId('list-row')).toHaveLength(2);
     expect(screen.getByText('Assignment 1')).toBeInTheDocument();
     expect(screen.getByText('Assignment 2')).toBeInTheDocument();
@@ -61,14 +61,14 @@ describe('TemplateLinkedAssignments', () => {
   it('should render no-assignments message when empty', async () => {
     const { TemplateLinkedAssignments } =
       await import('@/components/admin/templates/TemplateLinkedAssignments');
-    render(<TemplateLinkedAssignments assignments={[]} />);
+    render(<TemplateLinkedAssignments assignments={[]} currentPage={1} totalPages={1} />);
     expect(screen.getByText('adminTemplates.detail.noAssignments')).toBeInTheDocument();
   });
 
   it('should render instructor names', async () => {
     const { TemplateLinkedAssignments } =
       await import('@/components/admin/templates/TemplateLinkedAssignments');
-    render(<TemplateLinkedAssignments assignments={assignments} />);
+    render(<TemplateLinkedAssignments assignments={assignments} currentPage={1} totalPages={1} />);
     expect(screen.getByText(/Dr\. Smith/)).toBeInTheDocument();
     expect(screen.getByText(/Dr\. Jones/)).toBeInTheDocument();
   });

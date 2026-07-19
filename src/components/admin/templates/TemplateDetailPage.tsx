@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
-import { updateTemplate, deleteTemplate } from '@/server/templates';
+import { updateTemplate, deleteTemplate, listTemplateAssignments } from '@/server/templates';
 import { TemplateMetadata } from './TemplateMetadata';
 import { TemplateCheckpointSection } from './TemplateCheckpointSection';
 import { TemplateLinkedAssignments } from './TemplateLinkedAssignments';
@@ -41,9 +41,11 @@ const defaultCheckpoint = () => ({ name: '', minConsultations: 0, estimatedDurat
 export function TemplateDetailPage({
   template,
   assignments: initialAssignments,
+  assignmentsTotal: initialTotal,
 }: {
   template: TemplateData | null;
   assignments?: AssignmentData[];
+  assignmentsTotal?: number;
 }) {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -60,10 +62,13 @@ export function TemplateDetailPage({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const assignments = initialAssignments ?? [];
+  const [assignmentsList, setAssignmentsList] = useState(initialAssignments ?? []);
+  const [assignmentsPage, setAssignmentsPage] = useState(1);
+  const [assignmentsTotal, setAssignmentsTotal] = useState(initialTotal ?? 0);
 
   const updateTemplateFn = useServerFn(updateTemplate);
   const deleteTemplateFn = useServerFn(deleteTemplate);
+  const listTemplateAssignmentsFn = useServerFn(listTemplateAssignments);
 
   // Checkpoint handlers
   const handleAddCheckpoint = useCallback(() => {
@@ -154,6 +159,26 @@ export function TemplateDetailPage({
     }
   };
 
+  const fetchAssignments = async (page: number) => {
+    if (!template) return;
+    const result = await (
+      listTemplateAssignmentsFn as unknown as (args: {
+        data: { templateId: number; page: number; limit: number };
+      }) => Promise<{ assignments?: AssignmentData[]; total?: number; error?: string }>
+    )({
+      data: { templateId: template.id, page, limit: 20 },
+    });
+    if (!result?.error) {
+      setAssignmentsList(result?.assignments ?? []);
+      setAssignmentsTotal(result?.total ?? 0);
+    }
+  };
+
+  const handleAssignmentsPageChange = (page: number) => {
+    setAssignmentsPage(page);
+    fetchAssignments(page);
+  };
+
   if (!template) return null;
 
   return (
@@ -191,7 +216,12 @@ export function TemplateDetailPage({
         isSaving={isSaving}
       />
 
-      <TemplateLinkedAssignments assignments={assignments} />
+      <TemplateLinkedAssignments
+        assignments={assignmentsList}
+        currentPage={assignmentsPage}
+        totalPages={Math.max(1, Math.ceil(assignmentsTotal / 20))}
+        onPageChange={handleAssignmentsPageChange}
+      />
 
       <TemplateDangerZone assignmentCount={template.assignmentCount} onDelete={handleDelete} />
     </div>

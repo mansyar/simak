@@ -356,7 +356,7 @@ const cases: TestCase[] = [
     label: 'templates.listTemplateAssignmentsHandler',
     handler: listTemplateAssignmentsHandler,
     role: 'admin',
-    input: { id: 1 },
+    input: { templateId: 1, page: 1, limit: 20 },
   },
 
   {
