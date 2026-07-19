@@ -68,15 +68,15 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Add pagination to listPendingConsultationsHandler (PERF-16)
-    - [ ] Write failing tests: assert pagination params, total count, and edge cases — run `pnpm test` and confirm failures
-    - [ ] Add `page`/`limit` Zod params + total count query via `Promise.all` in `listPendingConsultationsHandler`
-    - [ ] Wire shared `<Pagination>` component on the instructor verification queue page
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
-    - [ ] Commit: `feat(consultations): Add pagination to pending consultations list`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Add pagination to listPendingConsultationsHandler (PERF-16) [17e70fe]
+    - [x] Write failing tests: assert pagination params, total count, and edge cases — run `pnpm test` and confirm failures
+    - [x] Add `page`/`limit` Zod params + total count query via `Promise.all` in `listPendingConsultationsHandler`
+    - [x] Wire shared `<Pagination>` component on the instructor verification queue page
+    - [x] Run `pnpm test` — confirm all tests pass
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `feat(consultations): Add pagination to pending consultations list`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Add pagination to listSubmissionsHandler (PERF-17)
     - [ ] Write failing tests: assert pagination params, total count, and edge cases — run `pnpm test` and confirm failures
