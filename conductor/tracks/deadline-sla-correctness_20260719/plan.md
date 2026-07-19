@@ -60,7 +60,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [~] Task: Conductor - User Manual Verification 'Phase 2: SQL & Dashboard Query Fixes' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: SQL & Dashboard Query Fixes' (Protocol in workflow.md) — User approved checkpoint
 
 ## Phase 3: Validation Logic (BUG-12, BUG-18)
 
