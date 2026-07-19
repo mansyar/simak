@@ -58,7 +58,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Implement retryEmail server function (FR-2 backend)
+- [x] Task: Implement retryEmail server function (FR-2 backend) [c2dabd8]
     - [ ] Write failing tests in `tests/unit/server/email-queue.test.ts`: (1) resets a `failed` row to `status='pending'`, `attempts=0`, `errorMessage=null`, `lastAttemptAt=null`; (2) rejects (idempotent guard) when the row is not currently `failed`; (3) admin role passes, non-admin rejected; (4) non-existent id returns a not-found error — run `pnpm test` and confirm failures
     - [ ] Add `retryEmail` stub to `src/server/email-queue.ts` (Zod schema for `emailId`)
     - [ ] Add `retryEmailHandler` to `src/server/email-queue.server.ts`: `requireRole(['superadmin', 'admin'])`, SELECT FOR UPDATE the row, assert `status === 'failed'` else throw stale-state error, UPDATE reset fields
