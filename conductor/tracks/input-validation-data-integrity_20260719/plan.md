@@ -77,7 +77,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Storage Discrimination, Env & i18n' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Storage Discrimination, Env & i18n' (Protocol in workflow.md)
 
 ## Phase 3: Assignment & Ownership Validation (BUG-24, BUG-26)
 
