@@ -473,7 +473,7 @@ _Note: Each row represents one student's individual participation. Group assignm
 | createdAt         | timestamp                  |                                                |
 | resolvedAt        | timestamp                  | NULLABLE                                       |
 
-Index on `(assignmentId, status)` for instructor queue queries.
+Index on `(assignmentId, status)` for instructor queue queries. Index on `(assignmentId, studentId)` for per-student extension lookup (added TRACK-005).
 
 > **Transactional write boundary (Track: Concurrency & Transaction Safety):** The `requestExtensionHandler` in `src/server/extensions.server.ts` wraps the `extension_requests` insert, the instructor's in-app `notifications` insert, **and** the extension count cap check in a single `db.transaction(async (tx) => { ... })` block. Both inserts use the `tx` client — if the notification insert throws, the transaction rejects and the extension request is rolled back, preventing orphaned extension records without their alert. The extension count check (`maxTotalExtensions` enforcement) is performed **inside** the transaction with a `FOR UPDATE` lock on the matching `assignment_students` row, preventing a TOCTOU race where two concurrent extension requests could both pass the count check and exceed the cap. The `requestedDeadline` calculation is also performed inside the transaction callback. The remaining validation reads (session, role, assignment existence, student enrollment, checkpoint state) run outside the transaction. This pattern follows SQL style guide §6 (transaction wrapping) and is consistent with `submitReviewHandler` (`src/server/reviews.server.ts`), which also places in-app notification inserts inside the transaction boundary.
 
@@ -491,7 +491,7 @@ Index on `(assignmentId, status)` for instructor queue queries.
 | details    | jsonb             | NULLABLE — previous value, new value, reason, etc.                                                 |
 | createdAt  | timestamp         | DEFAULT NOW()                                                                                      |
 
-Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for type filtering. Index on `(entity_type, entity_id)` for entity-specific history.
+Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for type filtering. Index on `(entity_type, entity_id)` for entity-specific history. Index on `(actorId)` for JOIN in listAuditLogsHandler (added TRACK-005).
 
 #### email_queue
 
@@ -529,23 +529,30 @@ Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for t
 
 | Table                | Column(s)                | Type             | Purpose                                      |
 | -------------------- | ------------------------ | ---------------- | -------------------------------------------- |
+| `assignment_students`| `assignmentId`, `studentId` | composite b-tree | Ownership check + assignment-student lookup (TRACK-005) |
+| `assignment_students`| `studentId`              | b-tree           | Student's assignment memberships (TRACK-005) |
 | `checkpoints`        | `assignmentId`           | b-tree           | Fetch checkpoints when loading an assignment |
 | `submissions`        | `checkpointId`           | b-tree           | Fetch submissions for a checkpoint           |
 | `submissions`        | `uploadedBy`             | b-tree           | Student's submission history                 |
-| `reviews`            | `submissionId`           | b-tree           | Fetch review for a submission                |
+| `reviews`            | `submissionId`, `createdAt` | composite b-tree | Fetch review for a submission + ORDER BY createdAt DESC (TRACK-005 replaced single-column `submissionId`; leftmost prefix satisfies FK enforcement) |
 | `consultations`      | `checkpointId`           | b-tree           | Count consultations for gating logic         |
-| `consultations`      | `status`                 | b-tree           | Filter pending verifications                 |
+| `consultations`      | `assignmentId`, `status` | composite b-tree | Filter pending verifications per assignment (TRACK-005 replaced low-cardinality single-column `status`) |
 | `notifications`      | `userId`, `read`         | composite b-tree | Notification center filtering                |
+| `notifications`      | `createdAt`              | b-tree           | Admin dashboard recentActivity query (TRACK-005) |
+| `template_checkpoints`| `templateId`, `order`   | composite b-tree | Template checkpoint ordering (TRACK-005)     |
+| `users`              | `role`, `deletedAt`      | composite b-tree | Admin user list filtering by role + active (TRACK-005) |
 | `verification`       | `value`                  | b-tree           | Token lookup on password setup/reset         |
 | `audit_log`          | `createdAt`              | b-tree           | Time-ordered queries                         |
 | `audit_log`          | `action`                 | b-tree           | Type filtering                               |
 | `audit_log`          | `entityType`, `entityId` | composite b-tree | Entity-specific history                      |
+| `audit_log`          | `actorId`                | b-tree           | JOIN in listAuditLogsHandler (TRACK-005)     |
 | `extension_requests` | `assignmentId`, `status` | composite b-tree | Instructor queue queries                     |
+| `extension_requests` | `assignmentId`, `studentId` | composite b-tree | Per-student extension lookup (TRACK-005)  |
 | `email_queue`        | `status`                 | b-tree           | Pick pending emails for delivery             |
 | `upload_intents`     | `fileKey`                | b-tree (unique)  | Intent lookup at submit time                 |
 | `upload_intents`     | `userId`                 | b-tree           | User's pending upload intents                 |
 
-All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migration generated with `drizzle-kit generate`.
+All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
 
 ---
 

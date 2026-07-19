@@ -279,7 +279,7 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-005: Database Indexes & Schema Optimization
 
-- **Status:** `Pending`
+- **Status:** `Complete` (archived to `conductor/archive/database-indexes-schema-optimization_20260719/`)
 - **Dependencies:** None
 - **Estimated Effort:** 1 Day / 0.5 Sprint Loops
 - **Audit IDs:** PERF-7, PERF-8, PERF-9, PERF-10, PERF-11, PERF-12, PERF-13, PERF-14
@@ -337,9 +337,9 @@ All tracks must adhere to the following project constraints:
 
 #### Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Run `EXPLAIN ANALYZE` on: (1) admin dashboard `recentActivity` query — confirms Index Scan on `notifications_created_at_idx`; (2) ownership check query — confirms Index Scan on `assignment_students_assignment_id_student_id_idx`; (3) `listPendingConsultationsHandler` query — confirms Index Scan on `consultations_assignment_id_status_idx`; (4) review history query — confirms Index Scan on `reviews_submission_id_created_at_idx`.
-- [ ] **Automated Tests:** `pnpm test:unit` — all existing tests still pass. Migration applies cleanly (`pnpm db:migrate` on fresh dev DB). Add a test that queries `pg_indexes` to verify all 9 new/replaced indexes exist by name.
-- [ ] **Conductor Review:** All index additions are non-breaking. No queries regress. Verify the 2 replaced indexes (consultations, reviews) are correctly dropped and recreated — no orphaned indexes remain. Confirm FK enforcement on `reviews.submissionId` still works via leftmost-prefix rule.
+- [x] **Manual Checkpoint:** `EXPLAIN ANALYZE` verified on 4 queries: (1) admin dashboard `recentActivity` — Index Scan on `notifications_created_at_idx`; (2) ownership check query — Index Scan on `assignment_students_assignment_id_student_id_idx`; (3) `listPendingConsultationsHandler` — Index Scan on `consultations_assignment_id_status_idx`; (4) review history query — Index Scan on `reviews_submission_id_created_at_idx`.
+- [x] **Automated Tests:** `pnpm test:unit` — 15 new unit tests in `tests/unit/db/schema/indexes.test.ts` (Drizzle Symbol introspection) + 2 integration tests in `tests/integration/db/migration-applied.test.ts` (query `pg_indexes` view). All pass. Migration `0008_deep_santa_claus.sql` applies cleanly. Typecheck and lint clean.
+- [x] **Conductor Review:** All 9 indexes (7 new + 2 replaced) verified non-breaking. The 2 replaced indexes (`consultations_status_idx` → `consultations_assignment_id_status_idx`, `reviews_submission_id_idx` → `reviews_submission_id_created_at_idx`) correctly dropped and recreated — no orphaned indexes. FK enforcement on `reviews.submissionId` confirmed via leftmost-prefix rule. Review found missing rollback file (SQL styleguide §5.1) — created `0008_deep_santa_claus.rollback.sql` with 9 DROP IF EXISTS + 2 CREATE INDEX (recreating replaced single-column indexes).
 
 ---
 
