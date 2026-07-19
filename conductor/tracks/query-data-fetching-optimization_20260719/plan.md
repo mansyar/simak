@@ -4,7 +4,7 @@
 **Track ID:** `query-data-fetching-optimization_20260719`
 **Spec:** [./spec.md](./spec.md)
 
-## Phase 1: N+1 Query Elimination (FR-1)
+## Phase 1: N+1 Query Elimination (FR-1) [checkpoint: f3df6e2]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
     - [ ] Read `./spec.md` — review FR-1 (PERF-1 through PERF-6) and Acceptance Criteria #1–#4
