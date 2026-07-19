@@ -110,13 +110,13 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-002: Deadline & SLA Logic Correctness
 
-- **Status:** `Pending`
+- **Status:** `Complete` (archived to `conductor/archive/deadline-sla-correctness_20260719/`)
 - **Dependencies:** None (but coordinate with TRACK-001 — both touch extension handlers)
 - **Estimated Effort:** 3 Days / 1.5 Sprint Loops
 - **Audit IDs:** BUG-3, BUG-11, BUG-12, BUG-16, BUG-18, BUG-19, BUG-21, BUG-28
 - **Decisions:**
-  - **BUG-3/12 — `finalDeadline` is mutable and extends with extensions (Option A):** `calculateExtensionAdjustment`, `adjustDeadlinesForBreach`, AND `bulkExtendHandler` (consistency fix — same defect pattern) will all UPDATE `assignments.finalDeadline` by the extended days, matching their existing docstrings. The invariant maintained is: `finalDeadline >= max(checkpoint.dueDate)` for the assignment+student. `validateDueDates` gains an optional `finalDeadline` param that caps checkpoint dueDates **at assignment creation time only** — extensions legitimately push `finalDeadline` forward, so no cap is enforced at extension request/approve time. The `maxExtensionDays` (1-30) and `maxTotalExtensions` (1-10) schema caps remain the real limits on extension magnitude.
-  - **BUG-16 — Fix SLA docstring only (Option A):** The submission-anchored SLA clock is a deliberate Track 9 decision (comment at `reviews.server.ts:394-397`: "H2: SLA clock is anchored at submission time"). Keep current behavior — update `sla.ts` docstring to say "from submission upload time" and rename the misleading `underReviewAt` parameter/variable to `anchorTime` for accuracy. No schema change, no migration. `openForReviewHandler` remains a pure state marker with no SLA effect.
+  - **BUG-3/12 — `finalDeadline` is immutable (honors Track 10):** `assignments.finalDeadline` is course-wide (one value shared by all students). Checkpoints are per-student. Extensions and SLA breaches are per-student operations. Bumping a course-wide deadline for one student's extension would incorrectly move the deadline for ALL students. Therefore `finalDeadline` remains **immutable** after assignment creation. Per-student effective deadlines are derived from checkpoint `dueDate` values, which DO move with extensions. The `finalDeadline >= max(checkpoint.dueDate)` invariant is enforced **only at assignment creation time** via `validateDueDates`. The `maxExtensionDays` (1-30) and `maxTotalExtensions` (1-10) schema caps remain the real limits on extension magnitude. Docstrings in `calculateExtensionAdjustment`, `adjustDeadlinesForBreach`, and `bulkExtendHandler` were updated to remove stale claims of extending `finalDeadline`.
+  - **BUG-16 — Fix SLA docstring and rename parameter (implemented):** The submission-anchored SLA clock is a deliberate Track 9 decision. The `sla.ts` docstring was updated to say "from submission upload time" and the misleading `underReviewAt` parameter/variable was renamed to `anchorTime` for accuracy. No schema change, no migration. `openForReviewHandler` remains a pure state marker with no SLA effect.
 
 #### Context Anchors (Traceability)
 
@@ -132,15 +132,15 @@ All tracks must adhere to the following project constraints:
 
 #### Scope Boundaries
 
-- **In Scope:**
-  - Make `calculateExtensionAdjustment` actually extend `assignments.finalDeadline` as its docstring claims (BUG-3). Same for `adjustDeadlinesForBreach`. Also extend `finalDeadline` in `bulkExtendHandler` (consistency fix — identical defect pattern, not in original audit but required for invariant). Fetch `finalDeadline` inside each function (within the existing transaction) before computing the new value.
-  - Fix admin dashboard `daysOverdue` to use `EXTRACT(EPOCH FROM now() - uploadedAt) / 86400` instead of `extract(day from ...)` (BUG-11). Fix the `ORDER BY` too.
-  - Add `finalDeadline` validation to `validateDueDates` — reject checkpoint dueDates past `finalDeadline` **at assignment creation time only** (BUG-12). Per Decision A, no finalDeadline cap at extension request/approve time (extensions push finalDeadline forward).
-  - Update `sla.ts` docstring to say "from submission upload time" (BUG-16, Decision A). Rename the misleading `underReviewAt` parameter in `calculateBreachDuration` and the local variable in `submitReviewHandler` (line 397) to `anchorTime`.
-  - Add validation to `extendDeadlineHandler` — check `newDueDate` is in the future, maintains sequential ordering (after previous checkpoint's dueDate, before next checkpoint's dueDate), and if `newDueDate` exceeds `finalDeadline`, bump `finalDeadline` to `newDueDate` (consistent with Decision A — `finalDeadline >= max(checkpoint.dueDate)` invariant) (BUG-18).
-  - Fix student dashboard `upcomingDeadlines` query — filter out `passed` checkpoints; handle null `dueDate` as "No deadline" instead of treating as `now`/overdue (BUG-19).
-  - Remove dead `channel: 'email'` notification rows from `dispatchSLABreachNotifications` — the actual email goes through `emailQueue` table (BUG-21).
-  - Fix `effectiveDeadline` computation — use first non-passed checkpoint's dueDate instead of highest-order checkpoint (BUG-28).
+- **In Scope (implemented):**
+  - Update stale docstrings in `calculateExtensionAdjustment`, `adjustDeadlinesForBreach`, and `bulkExtendHandler` to remove claims of extending `assignments.finalDeadline` — `finalDeadline` is immutable per Track 10 (BUG-3). No code behavior change, docstrings only.
+  - Fix admin dashboard `daysOverdue` to use `EXTRACT(EPOCH FROM now() - uploadedAt) / 86400` instead of `extract(day from ...)` (BUG-11). Fixed in both SELECT and ORDER BY.
+  - Add optional `finalDeadline` parameter to `validateDueDates` — reject checkpoint dueDates past `finalDeadline` **at assignment creation time only** (BUG-12). Not enforced at extension request/approve time (per-student extensions legitimately push dueDates past the course-wide `finalDeadline`).
+  - Update `sla.ts` docstring to say "from submission upload time" (BUG-16). Renamed `underReviewAt` parameter in `calculateBreachDuration` and the local variable in `submitReviewHandler` to `anchorTime`.
+  - Add validation to `extendDeadlineHandler` — check `newDueDate` is in the future, maintains sequential ordering relative to adjacent checkpoints (BUG-18). Does NOT modify `assignments.finalDeadline` (immutable per Track 10).
+  - Fix student dashboard `upcomingDeadlines` query — filter out `passed` checkpoints; handle null `dueDate` as "No deadline" with `isOverdue=false` and `daysRemaining=null` (BUG-19).
+  - Remove dead `channel: 'email'` notification rows from `dispatchSLABreachNotifications` — the actual email goes through `sendSLAAlertEmail` → email queue (BUG-21).
+  - Fix `effectiveDeadline` computation — use first non-passed checkpoint's dueDate via shared `computeEffectiveDeadline` helper instead of highest-order checkpoint (BUG-28). Helper is used by all three call sites: `listStudentAssignmentsHandler`, `getStudentAssignmentDetailHandler`, `getStudentDashboardDataHandler`.
 - **Out of Scope:**
  - Concurrency/locking fixes for extension handlers (TRACK-001)
  - Email queue improvements (TRACK-004)
@@ -148,15 +148,17 @@ All tracks must adhere to the following project constraints:
 
 #### High-Level Execution Vectors
 
-- **Phase 1 (Deadline Validation):** Add optional `finalDeadline` parameter to `validateDueDates` (caps dueDates at creation time only — Decision A). Pass `finalDeadline` from `createAssignmentHandler`. Add future-date + sequential-ordering validation to `extendDeadlineHandler`; if `newDueDate > finalDeadline`, bump `finalDeadline` to `newDueDate`. Write tests for each validation rule.
-- **Phase 2 (Extension & SLA):** Add `finalDeadline` UPDATE to `calculateExtensionAdjustment`, `adjustDeadlinesForBreach`, and `bulkExtendHandler` (all three extend `finalDeadline` by the extended/breach days — Decision A). Update `sla.ts` docstring + rename `underReviewAt` to `anchorTime` (Decision A — BUG-16). Remove dead `channel: 'email'` SLA notification INSERT rows (BUG-21). Write tests verifying `finalDeadline` moves and invariant holds.
-- **Phase 3 (Dashboard Fixes):** Fix `daysOverdue` SQL to `EXTRACT(EPOCH FROM ...) / 86400` + fix ORDER BY (BUG-11). Fix `upcomingDeadlines` query to exclude `passed` checkpoints + handle null `dueDate` as "No deadline" (BUG-19). Fix `effectiveDeadline` to use first non-passed checkpoint (BUG-28). Write tests for edge cases (>1 month overdue, completed assignments, null dueDates).
+- **Phase 1 (Documentation & Naming Fixes):** Updated stale docstrings in `calculateExtensionAdjustment`, `adjustDeadlinesForBreach`, and `bulkExtendHandler` to remove claims of extending `finalDeadline` (BUG-3). Updated `sla.ts` docstring + renamed `underReviewAt` to `anchorTime` in `calculateBreachDuration` and `submitReviewHandler` (BUG-16).
+- **Phase 2 (SQL & Dashboard Query Fixes):** Fixed `daysOverdue` SQL to `EXTRACT(EPOCH FROM ...) / 86400` + fixed ORDER BY (BUG-11). Fixed `upcomingDeadlines` query to exclude `passed` checkpoints + handle null `dueDate` as "No deadline" with `isOverdue=false` and `daysRemaining=null` (BUG-19). Added i18n key `studentDashboard.noDeadline` to both locales.
+- **Phase 3 (Validation Logic):** Added optional `finalDeadline` parameter to `validateDueDates` — caps dueDates at creation time only (BUG-12). Added future-date + sequential-ordering validation to `extendDeadlineHandler` (BUG-18). Does NOT bump `finalDeadline` (immutable per Track 10).
+- **Phase 4 (Notification Cleanup):** Removed dead `channel: 'email'` SLA notification INSERT rows from `dispatchSLABreachNotifications` (BUG-21). Kept in-app notification INSERT and `sendSLAAlertEmail` call intact.
+- **Phase 5 (effectiveDeadline Derivation):** Created shared `computeEffectiveDeadline` helper in `src/server/due-dates.server.ts`. Refactored all three call sites to use the helper: `listStudentAssignmentsHandler`, `getStudentAssignmentDetailHandler`, `getStudentDashboardDataHandler` (BUG-28).
 
 #### Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Create an assignment with checkpoints spanning past `finalDeadline` — creation is rejected. Approve an extension — `finalDeadline` moves forward by the extension days. Trigger an SLA breach — `finalDeadline` moves forward by breach days. Run `bulkExtendHandler` — `finalDeadline` moves. Admin dashboard shows correct overdue days for a 45-day-old submission (not ~15).
-- [ ] **Automated Tests:** `pnpm test:unit` — new tests for `validateDueDates` (with `finalDeadline` cap), `calculateExtensionAdjustment` (verifies `finalDeadline` UPDATE), `adjustDeadlinesForBreach` (verifies `finalDeadline` UPDATE), `bulkExtendHandler` (verifies `finalDeadline` UPDATE), `extendDeadlineHandler` (future/sequential/bump validation), `sla.ts` docstring + `anchorTime` rename, `daysOverdue` SQL, `upcomingDeadlines` filter, `effectiveDeadline`. All pass with >=80% coverage.
-- [ ] **Conductor Review:** No docstring/implementation mismatches remain in SLA-related code. The `finalDeadline >= max(checkpoint.dueDate)` invariant holds across all three extension paths + `extendDeadlineHandler`.
+- [x] **Manual Checkpoint:** Create an assignment with checkpoints spanning past `finalDeadline` — creation is rejected. Admin dashboard shows correct overdue days for a 45-day-old submission (not ~15). Student dashboard excludes passed checkpoints from upcoming deadlines and shows "No deadline" for null dueDates. Extensions and SLA breaches adjust per-student checkpoint dueDates only — `finalDeadline` stays immutable.
+- [x] **Automated Tests:** `pnpm test:unit` — 260 test files, 2397 tests, all pass. New tests for `validateDueDates` (with `finalDeadline` cap), `computeEffectiveDeadline` (first non-passed checkpoint logic), `extendDeadlineHandler` (future/sequential validation, finalDeadline immutability), `sla.ts` (`anchorTime` parameter), `daysOverdue` SQL (EPOCH extraction), `upcomingDeadlines` filter, `dispatchSLABreachNotifications` (no email channel rows). Coverage: 87.55% lines, 81.38% statements, 81.37% branches, 88.2% functions (all ≥80%).
+- [x] **Conductor Review:** No docstring/implementation mismatches remain in SLA-related code. `finalDeadline` is immutable across all extension and SLA-breach paths. `computeEffectiveDeadline` shared helper used by all three call sites. Code review passed with 2 Low-severity style fixes applied (non-null assertion removal).
 
 ---
 

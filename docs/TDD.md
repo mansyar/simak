@@ -344,7 +344,7 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 | templateId         | integer (FK → assignment_templates) | Template used                                                                                           |
 | title              | text, not null                      |                                                                                                         |
 | description        | text                                |                                                                                                         |
-| finalDeadline      | timestamp, not null                 | Immutable after creation — course-wide soft target. Individual checkpoint `dueDate` values enforce locking; per-student effective deadline is derived at read time from the highest-order checkpoint `dueDate`. |
+| finalDeadline      | timestamp, not null                 | Immutable after creation — course-wide soft target. Individual checkpoint `dueDate` values enforce locking; per-student effective deadline is derived at read time from the first non-passed checkpoint's `dueDate` (via `computeEffectiveDeadline` in `src/server/due-dates.server.ts`). |
 | instructorId       | text (FK → users)                   |                                                                                                         |
 | maxExtensionDays   | integer, default 7                  | Admin cap per request, CHECK (1–30)                                                                     |
 | maxTotalExtensions | integer, default 3                  | Cap per assignment, CHECK (1–10)                                                                        |
@@ -693,12 +693,12 @@ A checkpoint unlocks when:
 
 - When a checkpoint's `dueDate` passes, it auto-locks (if not already submitted).
 - Instructor can manually unlock an overdue checkpoint.
-- The assignment's `finalDeadline` is a **soft target** and is **immutable after creation** — it is never mutated by extensions, SLA-breach adjustments, or direct extension. It does not auto-lock anything. Individual checkpoint `dueDate` values are what enforce deadlines. Each student's effective deadline is derived at read time from their highest-order checkpoint's `dueDate`.
+- The assignment's `finalDeadline` is a **soft target** and is **immutable after creation** — it is never mutated by extensions, SLA-breach adjustments, or direct extension. It does not auto-lock anything. Individual checkpoint `dueDate` values are what enforce deadlines. Each student's effective deadline is derived at read time from their first non-passed checkpoint's `dueDate` (via the shared `computeEffectiveDeadline` helper).
 - On-time submissions awaiting review: if the instructor reviews late, the student is not penalized. Subsequent deadlines are **automatically extended by the number of days the review was delayed** (breach duration added to affected deadlines).
 
 ### Review SLA (3 days)
 
-- Instructors have a 3-day SLA to review submissions from the time they transition to `UNDER_REVIEW`.
+- Instructors have a 3-day SLA to review submissions from the time the student uploads (`submissions.uploadedAt`).
 - If the SLA is breached, an `sla_breach` in-app notification is sent to the Admin.
 - The SLA is advisory (non-blocking) — Admin can follow up with the instructor. No automatic action is taken beyond the alert and the automatic deadline adjustment for the student (see Overdue Behavior above).
 - The SLA timer is anchored at `submissions.uploadedAt` (when the student uploaded the file), not `reviews.reviewedAt` — ensuring the breach duration reflects the actual delay the student experienced.
