@@ -64,18 +64,18 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Add EMAIL_FROM env validation (BUG-25)
-    - [ ] Write failing tests: in `tests/unit/config/env.test.ts`, add a test that the Zod schema rejects missing/empty `EMAIL_FROM` with the error message 'EMAIL_FROM is required'. Run `pnpm test` and confirm new tests fail.
-    - [ ] Add `EMAIL_FROM` to `baseSchema` in `src/config/env.ts` as `z.string().min(1, 'EMAIL_FROM is required')`
-    - [ ] Update `.env.example` with the placeholder: `EMAIL_FROM="SIMAK <noreply@simak.app>"`
-    - [ ] Replace `process.env.EMAIL_FROM` (and the `'SIMAK <noreply@simak.app>'` fallback) in `src/lib/email-queue-processor.ts` (~line 91) with `getEnv().EMAIL_FROM`
-    - [ ] Add `EMAIL_FROM="SIMAK <noreply@simak.app>"` to local `.env` (developer manual step — not committed)
-    - [ ] Run `pnpm test` — confirm env tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Grep assertion: no `process.env.EMAIL_FROM` and no `'SIMAK <noreply@simak.app>'` fallback in `email-queue-processor.ts`
-    - [ ] Commit: `fix(env): Add EMAIL_FROM to Zod-validated env schema`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Add EMAIL_FROM env validation (BUG-25)
+    - [x] Write failing tests: in `tests/unit/config/env.test.ts`, add a test that the Zod schema rejects missing/empty `EMAIL_FROM` with the error message 'EMAIL_FROM is required'. Run `pnpm test` and confirm new tests fail.
+    - [x] Add `EMAIL_FROM` to `baseSchema` in `src/config/env.ts` as `z.string({ error: 'EMAIL_FROM is required' }).min(1, 'EMAIL_FROM is required')` (Zod v4 API — uses `{ error }` not `{ required_error }`)
+    - [x] Update `.env.example` with the placeholder: `EMAIL_FROM="SIMAK <noreply@simak.app>"`
+    - [x] Replace `process.env.EMAIL_FROM` (and the `'SIMAK <noreply@simak.app>'` fallback) in `src/lib/email-queue-processor.ts` (~line 91) with `getEnv().EMAIL_FROM`
+    - [x] Add `EMAIL_FROM="SIMAK <noreply@simak.app>"` to local `.env` (developer manual step — not committed)
+    - [x] Run `pnpm test` — confirm env tests pass
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
+    - [x] Grep assertion: no `process.env.EMAIL_FROM` and no `'SIMAK <noreply@simak.app>'` fallback in `email-queue-processor.ts`
+    - [x] Commit: `fix(env): Add EMAIL_FROM to Zod-validated env schema` (b103c92)
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Storage Discrimination, Env & i18n' (Protocol in workflow.md)
 
