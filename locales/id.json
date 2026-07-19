@@ -410,6 +410,7 @@
     "noConsultationReminders": "Tidak ada pengingat konsultasi",
     "deadline": "Tenggat: {date}",
     "overdue": "Terlambat",
+    "noDeadline": "Tidak ada tenggat",
     "underReview": "Sedang Ditinjau",
     "pending": "Tertunda",
     "submittedAgo": "{days} hari yang lalu"

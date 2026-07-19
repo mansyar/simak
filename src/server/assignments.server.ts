@@ -146,8 +146,8 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
         }
       }
 
-      // Validate sequential ordering and past dates
-      const validation = validateDueDates(checkpointDueDates);
+      // Validate sequential ordering, past dates, and finalDeadline cap
+      const validation = validateDueDates(checkpointDueDates, finalDeadline);
       if (!validation.valid) {
         throw new Error(validation.error);
       }

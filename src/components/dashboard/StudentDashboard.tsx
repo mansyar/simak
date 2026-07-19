@@ -22,9 +22,10 @@ interface UpcomingDeadline {
   assignmentId: number;
   assignmentTitle: string;
   checkpointName: string;
-  dueDate: string;
+  dueDate: string | null;
   state: string;
   isOverdue: boolean;
+  daysRemaining: number | null;
 }
 
 interface PendingReview {
@@ -152,7 +153,9 @@ export function StudentDashboard({ data }: Props) {
                           : 'text-muted-foreground'
                       }`}
                     >
-                      {deadline.dueDate ? new Date(deadline.dueDate).toLocaleDateString() : ''}
+                      {deadline.dueDate === null
+                        ? t('studentDashboard.noDeadline')
+                        : new Date(deadline.dueDate).toLocaleDateString()}
                       {deadline.isOverdue && (
                         <Badge variant="destructive" className="ml-1">
                           {t('studentDashboard.overdue')}

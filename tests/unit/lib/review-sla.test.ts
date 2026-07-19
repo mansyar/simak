@@ -187,30 +187,30 @@ describe('dispatchSLABreachNotifications', () => {
     expect(mockDb.where).toHaveBeenCalled();
   });
 
-  it('should create in_app and email notifications per admin', async () => {
+  it('should create only in_app notifications per admin (not email rows)', async () => {
     mockDb.then.mockImplementation((onfulfilled: any) =>
       Promise.resolve(adminUsers).then(onfulfilled),
     );
 
     await dispatchSLABreachNotifications(mockDb, baseSubmission, 3);
 
-    // 2 admins × (in_app + email) = 4 insert calls
-    expect(mockDb.insert).toHaveBeenCalledTimes(4);
-    // First two values calls = admin-1 in_app + email
-    // Next two values calls = admin-2 in_app + email
+    // 2 admins × in_app only = 2 insert calls (email rows removed — BUG-21)
+    expect(mockDb.insert).toHaveBeenCalledTimes(2);
     const valuesCalls = mockDb.values.mock.calls.map((c: any[]) => c[0]);
 
-    // Each admin should have in_app and email notifications
+    // Each admin should have only in_app notification (no email rows)
     const admin1Notifications = valuesCalls.filter((v: any) => v.userId === 'admin-1');
     const admin2Notifications = valuesCalls.filter((v: any) => v.userId === 'admin-2');
 
-    expect(admin1Notifications).toHaveLength(2);
+    expect(admin1Notifications).toHaveLength(1);
     expect(admin1Notifications[0].channel).toBe('in_app');
-    expect(admin1Notifications[1].channel).toBe('email');
 
-    expect(admin2Notifications).toHaveLength(2);
+    expect(admin2Notifications).toHaveLength(1);
     expect(admin2Notifications[0].channel).toBe('in_app');
-    expect(admin2Notifications[1].channel).toBe('email');
+
+    // Verify no email channel rows were inserted
+    const emailNotifications = valuesCalls.filter((v: any) => v.channel === 'email');
+    expect(emailNotifications).toHaveLength(0);
   });
 
   it('should include breach metadata in notifications', async () => {
@@ -237,22 +237,6 @@ describe('dispatchSLABreachNotifications', () => {
       assignmentTitle: 'Assignment 1',
       studentName: 'Student One',
       checkpointName: 'Checkpoint 1',
-    });
-  });
-
-  it('should include limited metadata for email channel', async () => {
-    mockDb.then.mockImplementation((onfulfilled: any) =>
-      Promise.resolve(adminUsers.slice(0, 1)).then(onfulfilled),
-    );
-
-    await dispatchSLABreachNotifications(mockDb, baseSubmission, 3);
-
-    const emailValuesCall = mockDb.values.mock.calls[1][0];
-    expect(emailValuesCall.channel).toBe('email');
-    expect(emailValuesCall.metadata).toEqual({
-      assignmentId: 10,
-      checkpointId: 100,
-      breachDays: 3,
     });
   });
 
@@ -297,12 +281,10 @@ describe('dispatchSLABreachNotifications', () => {
     mockDb.then.mockImplementation((onfulfilled: any) =>
       Promise.resolve(adminUsers).then(onfulfilled),
     );
-    // Make insert throw after first call (admin-1 in_app succeeds, admin-1 email fails)
+    // Make insert throw on second admin's in_app insert (admin-1 succeeds, admin-2 fails)
     mockDb.insert
       .mockImplementationOnce(() => ({ values: vi.fn().mockResolvedValue(undefined) }))
-      .mockImplementationOnce(() => ({ values: vi.fn().mockRejectedValue(new Error('DB error')) }))
-      .mockImplementationOnce(() => ({ values: vi.fn().mockResolvedValue(undefined) }))
-      .mockImplementationOnce(() => ({ values: vi.fn().mockResolvedValue(undefined) }));
+      .mockImplementationOnce(() => ({ values: vi.fn().mockRejectedValue(new Error('DB error')) }));
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 

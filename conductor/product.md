@@ -181,7 +181,7 @@ Students and instructors lack a centralized system to:
 ### Track 5.2: Escalation & Deadline Management (May 2026)
 
 - **SLA breach detection** — `submitReview` handler calculates breach duration after the 3-day SLA; triggers notifications and deadline adjustments
-- **Automatic deadline adjustment** — Late reviews extend affected + subsequent checkpoint `dueDate` values and assignment `finalDeadline` by breach duration (per-student)
+- **Automatic deadline adjustment** — Late reviews extend affected + subsequent checkpoint `dueDate` values by breach duration (per-student only; `finalDeadline` is immutable per Track 10)
 - **Admin notifications** — `sla_breach` in-app + email notifications (via Resend) sent to all Admins
 - **Manual checkpoint unlock** — Server function transitions `locked` → `unlocked` regardless of blocking reasons; instructor-only, ownership-verified
 - **Manual deadline extension** — Server function updates any checkpoint's `dueDate`; no state restriction; instructor-only, ownership-verified
@@ -242,7 +242,7 @@ Students and instructors lack a centralized system to:
 - **DB migration** — Generated with Drizzle Kit, applied to dev database
 - **Student-initiated extension flow** — Students submit requests with category, reason (min 10 chars), and duration (1–max_extension_days); capped by per-assignment `maxExtensionDays` (1–30, default 7) and `maxTotalExtensions` (1–10, default 3)
 - **Instructor approval/rejection queue** — FIFO pending requests list per assignment with Approve (optional comment) and Reject (required reason, min 20 chars) actions
-- **Auto-deadline adjustment on approval** — Extends affected checkpoint + subsequent checkpoints + assignment `finalDeadline`
+- **Auto-deadline adjustment on approval** — Extends affected checkpoint + subsequent checkpoints `dueDate` values (per-student only; `finalDeadline` is immutable per Track 10)
 - **Instructor-initiated bulk extension** — Directly extends all unfinished checkpoints for a student by +N days with reason
 - **Audit log integration** — `deadline.extension_approved`, `deadline.extension_rejected`, `deadline.extended`, and `checkpoint.unlocked` audit events
 - **In-app notifications** — `extension_requested` → instructor, `extension_approved`/`extension_rejected` → student
@@ -286,7 +286,7 @@ Students and instructors lack a centralized system to:
 ### Track 10: Per-Student Deadline Isolation (July 2026)
 
 - **Bug fixed:** `assignments.finalDeadline` is no longer mutated by per-student extension approvals, bulk extensions, or SLA-breach adjustments. These operations now only update the target student's checkpoint `dueDate` values.
-- **Per-student effective deadline** — Reader views derive each student's personal deadline from the `dueDate` of their highest-order checkpoint in the assignment.
+- **Per-student effective deadline** — Reader views derive each student's personal deadline from the `dueDate` of their first non-passed checkpoint in the assignment (or the last checkpoint's dueDate if all are passed), via a shared `computeEffectiveDeadline` helper.
 - **Server handlers updated** — `listStudentAssignments`, `getStudentAssignmentDetail`, `getStudentDashboardData`, and `getAssignmentDetail` (instructor) now return `effectiveDeadline` alongside the immutable course-wide `finalDeadline`.
 - **Frontend components updated** — `StudentAssignmentCard`, `AssignmentDetailHeader`, `StudentDashboard`, and `AssignmentOverviewTab` display the per-student effective deadline; the instructor Overview tab shows both the course-wide final deadline and a per-student effective deadline column.
 - **i18n translations** — New English and Indonesian keys for personal/effective deadline labels.
@@ -321,5 +321,18 @@ Students and instructors lack a centralized system to:
 - **New `listInstructorActiveAssignments` server function** — Admin-only, returns active assignments for a given instructor (used by reassignment dialog).
 - **i18n keys** — New EN/ID translations for reassignment dialog labels, instructor picker, and block error.
 - **Tests** — 2,399 tests pass across 261 test files; coverage ≥80% on all thresholds (stmts 87.63%, branches 81.04%, functions 81.38%, lines 88.3%).
+
+### Track: Deadline & SLA Logic Correctness (July 2026)
+
+- **8 logic correctness bugs fixed** across the deadline and SLA subsystem: BUG-3, BUG-11, BUG-12, BUG-16, BUG-18, BUG-19, BUG-21, BUG-28.
+- **Stale docstrings** — Updated `calculateExtensionAdjustment`, `adjustDeadlinesForBreach`, and `bulkExtendHandler` docstrings to remove false claims of extending `finalDeadline` (immutable per Track 10).
+- **SQL arithmetic fix** — Admin dashboard `daysOverdue` now uses `EXTRACT(EPOCH FROM ... ) / 86400` instead of `extract(day from ...)` which wrapped at ~30 days.
+- **finalDeadline cap at creation** — `validateDueDates` now optionally rejects checkpoint dueDates exceeding `finalDeadline` when provided (enforced only at assignment creation, not during per-student extensions).
+- **extendDeadlineHandler validation** — Added future-date and sequential-ordering validation; does NOT modify `finalDeadline`.
+- **Student dashboard fixes** — `upcomingDeadlines` now excludes `passed` checkpoints; null `dueDate` handled as "No deadline" with `isOverdue=false`.
+- **Notification cleanup** — Removed dead `channel: 'email'` notification rows from `dispatchSLABreachNotifications` (actual email goes via `sendSLAAlertEmail` through the email queue).
+- **effectiveDeadline derivation** — Changed from highest-order checkpoint's `dueDate` to first non-passed checkpoint's `dueDate` via shared `computeEffectiveDeadline` helper.
+- **SLA docstring/param** — Updated `calculateBreachDuration` docstring to "from submission upload time" and renamed `underReviewAt` parameter to `anchorTime`.
+- **Tests** — 2,397 tests pass across 260 test files; coverage thresholds met.
 
 </protect>

@@ -115,22 +115,7 @@ export async function dispatchSLABreachNotifications(
         },
       });
 
-      // Create email notification record
-      await db.insert(notifications).values({
-        userId: admin.id,
-        type: 'sla_breach',
-        titleKey: slaKeys.titleKey,
-        messageKey: slaKeys.messageKey,
-        params: slaParams,
-        channel: 'email',
-        metadata: {
-          assignmentId: submission.assignmentId,
-          checkpointId: submission.checkpointId,
-          breachDays,
-        },
-      });
-
-      // Send email
+      // Send email via the email queue (not a notification row — BUG-21)
       await sendSLAAlertEmail({
         adminEmail: admin.email,
         adminName: admin.name,

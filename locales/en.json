@@ -410,6 +410,7 @@
     "noConsultationReminders": "No pending consultation reminders",
     "deadline": "Deadline: {date}",
     "overdue": "Overdue",
+    "noDeadline": "No deadline",
     "underReview": "Under Review",
     "pending": "Pending",
     "submittedAgo": "{days} day(s) ago"
