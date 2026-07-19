@@ -8,9 +8,8 @@ import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode, isServerError } from '../lib/errors';
-import { generatePresignedDownloadUrl, getObjectContentLength } from '../lib/storage';
+import { generatePresignedDownloadUrl, getObjectContentLength, r2SizeError } from '../lib/storage';
 import { MAX_FILE_SIZE } from '../lib/file-validation';
-import { translateKey } from '../lib/i18n-server';
 import { calculateBreachDuration } from '../lib/sla';
 import {
   adjustDeadlinesForBreach,
@@ -333,11 +332,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
         const sizeResult = await getObjectContentLength({ key: feedbackFileKey });
         if (!sizeResult.ok) {
           const locale = (session.user.locale || 'en') as 'en' | 'id';
-          const keys = {
-            not_configured: 'files.r2NotConfigured',
-            not_found: 'files.objectNotFound',
-          };
-          return serverError(ErrorCode.BAD_REQUEST, translateKey(keys[sizeResult.reason], locale));
+          return r2SizeError(sizeResult.reason, locale);
         }
         if (sizeResult.size > MAX_FILE_SIZE) {
           return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');

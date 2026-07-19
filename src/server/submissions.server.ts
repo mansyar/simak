@@ -6,11 +6,10 @@ import { notifications } from '../db/schema/notifications';
 import { submissions, uploadIntents } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
-import { generatePresignedDownloadUrl, getObjectContentLength } from '../lib/storage';
+import { generatePresignedDownloadUrl, getObjectContentLength, r2SizeError } from '../lib/storage';
 import { MAX_FILE_SIZE, validateUploadFileName } from '../lib/file-validation';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
-import { translateKey } from '../lib/i18n-server';
 import { getNotificationKeys } from './notifications.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -140,8 +139,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
       const sizeResult = await getObjectContentLength({ key: fileKey });
       if (!sizeResult.ok) {
         const locale = (session.user.locale || 'en') as 'en' | 'id';
-        const keys = { not_configured: 'files.r2NotConfigured', not_found: 'files.objectNotFound' };
-        return serverError(ErrorCode.BAD_REQUEST, translateKey(keys[sizeResult.reason], locale));
+        return r2SizeError(sizeResult.reason, locale);
       }
       if (sizeResult.size > MAX_FILE_SIZE) {
         return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');

@@ -18,12 +18,16 @@ vi.mock('@/lib/audit', () => ({
   logAuditEvent: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('@/lib/storage', () => ({
-  generateFileKey: vi.fn(),
-  generatePresignedUploadUrl: vi.fn(),
-  generatePresignedDownloadUrl: vi.fn(),
-  getObjectContentLength: vi.fn(),
-}));
+vi.mock('@/lib/storage', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/storage')>();
+  return {
+    ...actual,
+    generateFileKey: vi.fn(),
+    generatePresignedUploadUrl: vi.fn(),
+    generatePresignedDownloadUrl: vi.fn(),
+    getObjectContentLength: vi.fn(),
+  };
+});
 
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: vi.fn().mockReturnValue({

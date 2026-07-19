@@ -5,6 +5,8 @@ import {
   HeadObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { serverError, ErrorCode, type ServerError } from './errors';
+import { translateKey } from './i18n-server';
 
 /**
  * Generates a UUID-based file key for R2 storage.
@@ -131,6 +133,18 @@ function isNotFoundError(error: unknown): boolean {
   }
   const metadata = (error as { $metadata?: { httpStatusCode?: number } } | null)?.$metadata;
   return metadata?.httpStatusCode === 404;
+}
+
+/**
+ * Converts a failed R2 size check into a server error with a localized message.
+ * Used by submitCheckpointHandler and submitReviewHandler.
+ */
+export function r2SizeError(
+  reason: 'not_configured' | 'not_found',
+  locale: 'en' | 'id',
+): ServerError {
+  const messageKey = reason === 'not_configured' ? 'files.r2NotConfigured' : 'files.objectNotFound';
+  return serverError(ErrorCode.BAD_REQUEST, translateKey(messageKey, locale));
 }
 
 /**
