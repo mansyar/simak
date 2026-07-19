@@ -113,21 +113,21 @@
 
 ## Phase 5: effectiveDeadline Derivation (BUG-28)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 5 implementation
-    - [ ] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 5 implementation
+    - [x] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, and quality gate requirements (already in context from Phase 1)
 
-- [ ] Task: Create computeEffectiveDeadline helper and update all call sites (BUG-28)
-    - [ ] Write failing tests for `computeEffectiveDeadline(checkpoints)` helper: (1) returns first non-passed checkpoint's `dueDate` when checkpoints have mixed statuses; (2) returns last checkpoint's `dueDate` when all are `passed`; (3) handles empty checkpoints array gracefully (returns null or throws descriptive error)
-    - [ ] Implement `computeEffectiveDeadline` helper function in `src/server/due-dates.server.ts` (co-located with `calculateDueDates` and `validateDueDates`)
-    - [ ] Refactor `listStudentAssignmentsHandler` (`src/server/assignments-extras.server.ts` lines 220-224) to use the helper — remove the `highestOrderByAssignment` iteration pattern
-    - [ ] Refactor `getStudentAssignmentDetailHandler` (`src/server/assignments-extras.server.ts` lines 331-335) to use the helper — remove the `reduce` that finds highest-order checkpoint
-    - [ ] Refactor `getStudentDashboardDataHandler` (`src/server/dashboard-student.server.ts` lines 144-151) to use the helper
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Commit: `fix(deadlines): Use first non-passed checkpoint for effectiveDeadline via shared helper`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Create computeEffectiveDeadline helper and update all call sites (BUG-28) [commit: 7e63996]
+    - [x] Write failing tests for `computeEffectiveDeadline(checkpoints)` helper: (1) returns first non-passed checkpoint's `dueDate` when checkpoints have mixed statuses; (2) returns last checkpoint's `dueDate` when all are `passed`; (3) handles empty checkpoints array gracefully (returns null or throws descriptive error)
+    - [x] Implement `computeEffectiveDeadline` helper function in `src/server/due-dates.server.ts` (co-located with `calculateDueDates` and `validateDueDates`)
+    - [x] Refactor `listStudentAssignmentsHandler` (`src/server/assignments-extras.server.ts` lines 220-224) to use the helper — remove the `highestOrderByAssignment` iteration pattern
+    - [x] Refactor `getStudentAssignmentDetailHandler` (`src/server/assignments-extras.server.ts` lines 331-335) to use the helper — remove the `reduce` that finds highest-order checkpoint
+    - [x] Refactor `getStudentDashboardDataHandler` (`src/server/dashboard-student.server.ts` lines 144-151) to use the helper
+    - [x] Run `pnpm test` — confirm all tests pass (260 files, 2397 tests)
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `fix(deadlines): Use first non-passed checkpoint for effectiveDeadline via shared helper`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: effectiveDeadline Derivation' (Protocol in workflow.md)
 </protect>
