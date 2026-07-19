@@ -65,19 +65,19 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 **Goal:** Prove the split prevents server-only modules from leaking into the client bundle, and confirm all quality gates pass before archive.
 
-- [ ] Task: Read spec.md and workflow.md to re-establish context
-    - [ ] Read `./spec.md` (track specification — requirements, acceptance criteria, decisions)
-    - [ ] Read `../../workflow.md` (TDD lifecycle, commit format, phase checkpoint protocol)
-- [ ] Task: Verify bundle safety (PERF-34)
-    - [ ] Run `pnpm build` (i18n codegen → vite build → esbuild bundles)
-    - [ ] Grep built client chunks in `.output/` for `from 'pg'`, `from 'drizzle-orm'`, and `postgres` — assert zero matches
-    - [ ] (Ad-hoc, optional) Run `npx vite-bundle-visualizer` for visual before/after confirmation — document findings in the phase checkpoint git note (no `package.json` change; `rollup-plugin-visualizer@7.0.1` is already a transitive dep)
-- [ ] Task: Run full quality gate suite
-    - [ ] `pnpm typecheck` passes (`tsc --noEmit --incremental`)
-    - [ ] `pnpm lint` passes (`oxlint .`, including `simak-i18n/no-hardcoded`)
-    - [ ] `pnpm check:i18n` passes (EN↔ID parity; no new unused keys — this track adds no i18n keys)
-    - [ ] `pnpm test:coverage` ≥80% on lines, statements, branches, and functions
-    - [ ] Verify no file in `src/`/`tests/` exceeds 500 lines (`scripts/check-modularity.js` on `auth.ts` + `auth.server.ts`)
-    - [ ] Grep `src/server/auth.ts` for forbidden imports (`drizzle-orm`, `getDb`, `users`, `getRequestHeaders`, `auth config`) — assert zero matches (AC-1)
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Bundle Verification & Final Quality Gates' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md to re-establish context
+    - [x] Read `./spec.md` (track specification — requirements, acceptance criteria, decisions)
+    - [x] Read `../../workflow.md` (TDD lifecycle, commit format, phase checkpoint protocol)
+- [x] Task: Verify bundle safety (PERF-34)
+    - [x] Run `pnpm build` (i18n codegen → vite build → esbuild bundles)
+    - [x] Grep built client chunks in `dist/client/assets/` for `from 'pg'`, `from 'drizzle-orm'`, and `postgres` — assert zero matches (0 matches across 106 client JS chunks)
+    - [~] (Ad-hoc, optional) Run `npx vite-bundle-visualizer` for visual before/after confirmation — document findings in the phase checkpoint git note (no `package.json` change; `rollup-plugin-visualizer@7.0.1` is already a transitive dep)
+- [x] Task: Run full quality gate suite
+    - [x] `pnpm typecheck` passes (`tsc --noEmit --incremental`)
+    - [x] `pnpm lint` passes (`oxlint .`, including `simak-i18n/no-hardcoded`) — 0 warnings, 0 errors on 253 files
+    - [x] `pnpm check:i18n` passes (EN↔ID parity; no new unused keys — this track adds no i18n keys)
+    - [x] `pnpm test:coverage` ≥80% on lines, statements, branches, and functions — 87.66% stmts, 81.35% branches, 81.34% funcs, 88.29% lines
+    - [x] Verify no file in `src/`/`tests/` exceeds 500 lines (`scripts/check-modularity.js` on `auth.ts` + `auth.server.ts`) — auth.ts=36, auth.server.ts=95
+    - [x] Grep `src/server/auth.ts` for forbidden imports (`drizzle-orm`, `getDb`, `users`, `getRequestHeaders`, `auth config`) — assert zero matches (AC-1) — 0 matches
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Bundle Verification & Final Quality Gates' (Protocol in workflow.md)
 </protect>
