@@ -335,4 +335,15 @@ Students and instructors lack a centralized system to:
 - **SLA docstring/param** — Updated `calculateBreachDuration` docstring to "from submission upload time" and renamed `underReviewAt` parameter to `anchorTime`.
 - **Tests** — 2,397 tests pass across 260 test files; coverage thresholds met.
 
+### Track: Email Queue Robustness (July 2026)
+
+- **Config hygiene** — `EMAIL_FROM` routed through Zod-validated `src/config/env.ts` with default `'SIMAK <noreply@simak.app>'`; processor reads from `getEnv()` instead of raw `process.env`
+- **Structured processor logging** — Email queue processor emits structured log lines for cycle start/end (processed/sent/failed counts), stale-row reclamation count, per-email failures (email id + error, no PII from body/subject), and tick errors (with `willRetryNextInterval` flag)
+- **Admin queue inspector page** (`/admin/email-queue`) — Paginated table (20/page) with recipient, subject (truncated), template type, status badge, attempts, timestamps, error message; filter by status (all/pending/processing/sent/failed) and free-text search by recipient email or subject; summary stat row (Pending/Sent/Failed counts)
+- **Manual retry of failed emails** — `failed` rows expose a Retry action with confirmation dialog; resets status→pending, attempts→0, error_message→null, last_attempt_at→null; idempotent guard (only `failed` rows can be retried); server function `retryEmail(emailId)` with SELECT FOR UPDATE
+- **Server functions** — `listEmailQueue` (paginated, filtered, searched query + summary counts) and `retryEmail` (idempotent reset with FOR UPDATE) in `src/server/email-queue.ts` + `email-queue.server.ts`
+- **Sidebar link** — 'Email Queue' link with Mail icon in admin sidebar
+- **i18n translations** — 31 new keys in EN and ID for admin email queue UI
+- **Tests** — 45 new tests across processor logging, server handlers, and route component; full suite 2,445 tests pass; coverage ≥80%
+
 </protect>
