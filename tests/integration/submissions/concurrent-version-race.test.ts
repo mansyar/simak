@@ -28,7 +28,7 @@ vi.mock('@tanstack/react-start', () => ({
 }));
 
 vi.mock('@/lib/storage', () => ({
-  getObjectContentLength: vi.fn().mockResolvedValue(1024),
+  getObjectContentLength: vi.fn().mockResolvedValue({ ok: true, size: 1024 }),
 }));
 
 describe('submitCheckpointHandler concurrent version race', () => {

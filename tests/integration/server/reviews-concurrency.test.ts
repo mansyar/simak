@@ -31,7 +31,7 @@ vi.mock('@tanstack/react-start', () => ({
 }));
 
 vi.mock('@/lib/storage', () => ({
-  getObjectContentLength: vi.fn().mockResolvedValue(1024),
+  getObjectContentLength: vi.fn().mockResolvedValue({ ok: true, size: 1024 }),
 }));
 
 describe('Review concurrency and atomic state transitions', () => {
@@ -144,10 +144,12 @@ describe('Review concurrency and atomic state transitions', () => {
   });
 
   afterEach(async () => {
-    await db.delete(notifications).where(
-      or(eq(notifications.userId, studentId), eq(notifications.userId, instructorId)),
-    );
-    await db.delete(auditLog).where(or(eq(auditLog.actorId, studentId), eq(auditLog.actorId, instructorId)));
+    await db
+      .delete(notifications)
+      .where(or(eq(notifications.userId, studentId), eq(notifications.userId, instructorId)));
+    await db
+      .delete(auditLog)
+      .where(or(eq(auditLog.actorId, studentId), eq(auditLog.actorId, instructorId)));
     await db.delete(reviews).where(eq(reviews.submissionId, submissionId));
     await db.delete(uploadIntents).where(eq(uploadIntents.userId, studentId));
     await db.delete(submissions).where(eq(submissions.checkpointId, checkpointId));
@@ -178,9 +180,7 @@ describe('Review concurrency and atomic state transitions', () => {
     const successes = [resultPass, resultRevise].filter(
       (r) => (r as { success?: boolean }).success === true,
     );
-    const failures = [resultPass, resultRevise].filter(
-      (r) => (r as { error?: unknown }).error,
-    );
+    const failures = [resultPass, resultRevise].filter((r) => (r as { error?: unknown }).error);
 
     expect(successes).toHaveLength(1);
     expect(failures).toHaveLength(1);
@@ -241,10 +241,7 @@ describe('Review concurrency and atomic state transitions', () => {
     await db.delete(submissions).where(eq(submissions.checkpointId, checkpointId));
     await db.delete(uploadIntents).where(eq(uploadIntents.userId, studentId));
 
-    await db
-      .update(checkpoints)
-      .set({ state: 'unlocked' })
-      .where(eq(checkpoints.id, checkpointId));
+    await db.update(checkpoints).set({ state: 'unlocked' }).where(eq(checkpoints.id, checkpointId));
 
     const fileKeyA = `submissions/review-concurrency-a-${timestamp}.pdf`;
     const fileKeyB = `submissions/review-concurrency-b-${timestamp}.pdf`;

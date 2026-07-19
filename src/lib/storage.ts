@@ -78,15 +78,32 @@ export async function generatePresignedUploadUrl(params: {
 }
 
 /**
- * Performs an R2 HEAD request for the given key and returns Content-Length.
- * Returns null if R2 is not configured or the object does not exist.
+ * Result of checking an object's content length in R2.
+ * - `{ ok: true, size }` — object exists; `size` is ContentLength in bytes.
+ * - `{ ok: false, reason: 'not_configured' }` — R2 env vars not set.
+ * - `{ ok: false, reason: 'not_found' }` — object does not exist (404/NotFound).
  */
-export async function getObjectContentLength(params: { key: string }): Promise<number | null> {
+export type GetObjectContentLengthResult =
+  | { ok: true; size: number }
+  | { ok: false; reason: 'not_configured' | 'not_found' };
+
+/**
+ * Performs an R2 HEAD request for the given key and returns a discriminated
+ * result indicating whether the object exists and its content length.
+ *
+ * - Returns `{ ok: false, reason: 'not_configured' }` if R2 is not configured.
+ * - Returns `{ ok: false, reason: 'not_found' }` if the object does not exist (404/NotFound).
+ * - Returns `{ ok: true, size }` on success. If ContentLength is missing, `size` defaults to 0.
+ * - Other unexpected errors propagate to the caller.
+ */
+export async function getObjectContentLength(params: {
+  key: string;
+}): Promise<GetObjectContentLengthResult> {
   const client = getR2Client();
   const bucket = getBucketName();
 
   if (!client || !bucket) {
-    return null;
+    return { ok: false, reason: 'not_configured' };
   }
 
   const command = new HeadObjectCommand({
@@ -94,8 +111,26 @@ export async function getObjectContentLength(params: { key: string }): Promise<n
     Key: params.key,
   });
 
-  const response = await client.send(command);
-  return response.ContentLength ?? null;
+  try {
+    const response = await client.send(command);
+    return { ok: true, size: response.ContentLength ?? 0 };
+  } catch (error) {
+    if (isNotFoundError(error)) {
+      return { ok: false, reason: 'not_found' };
+    }
+    throw error;
+  }
+}
+
+/**
+ * Checks whether an S3 client error represents a "not found" (404) response.
+ */
+function isNotFoundError(error: unknown): boolean {
+  if (error instanceof Error && error.name === 'NotFound') {
+    return true;
+  }
+  const metadata = (error as { $metadata?: { httpStatusCode?: number } } | null)?.$metadata;
+  return metadata?.httpStatusCode === 404;
 }
 
 /**

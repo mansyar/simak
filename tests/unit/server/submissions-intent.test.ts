@@ -91,7 +91,7 @@ describe('submitCheckpointHandler - upload intent verification', () => {
     vi.mocked(dbMod.getDb).mockReturnValue({
       transaction: vi.fn((callback: (tx: MockTx) => Promise<unknown>) => callback(mockTx)),
     } as any);
-    vi.mocked(getObjectContentLength).mockResolvedValue(1024);
+    vi.mocked(getObjectContentLength).mockResolvedValue({ ok: true, size: 1024 });
   });
 
   it('AC-H1-1: rejects a fabricated fileKey with no matching intent', async () => {
@@ -224,7 +224,7 @@ describe('submitCheckpointHandler - upload intent verification', () => {
 
   it('AC-H1-4: rejects a file whose R2 HEAD Content-Length exceeds 25MB', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
-    vi.mocked(getObjectContentLength).mockResolvedValue(25 * 1024 * 1024 + 1);
+    vi.mocked(getObjectContentLength).mockResolvedValue({ ok: true, size: 25 * 1024 * 1024 + 1 });
 
     mockTx.enqueue(
       [{ id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' }], // checkpoint
@@ -247,5 +247,59 @@ describe('submitCheckpointHandler - upload intent verification', () => {
     expect(result.error.code).toBe('BAD_REQUEST');
     expect(result.error.message).toBe('File size exceeds 25MB limit');
     expect(getObjectContentLength).toHaveBeenCalledWith({ key: 'submissions/uuid-123.pdf' });
+  });
+
+  it('AC-H1-5: returns r2NotConfigured i18n message when R2 is not configured', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+    vi.mocked(getObjectContentLength).mockResolvedValue({ ok: false, reason: 'not_configured' });
+
+    mockTx.enqueue(
+      [{ id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' }],
+      [
+        {
+          fileKey: 'submissions/uuid-123.pdf',
+          userId: 'student-1',
+          purpose: 'submission',
+          checkpointId: 1,
+          consumedAt: null,
+        },
+      ],
+    );
+
+    const result = await submitCheckpointHandler({ data: baseSubmitData });
+
+    expect(isServerError(result)).toBe(true);
+    if (!isServerError(result)) throw new Error('Expected server error');
+    expect(result.error.code).toBe('BAD_REQUEST');
+    expect(result.error.message).toBe(
+      'File storage is not configured. Contact your administrator.',
+    );
+  });
+
+  it('AC-H1-6: returns objectNotFound i18n message when R2 object does not exist', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+    vi.mocked(getObjectContentLength).mockResolvedValue({ ok: false, reason: 'not_found' });
+
+    mockTx.enqueue(
+      [{ id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' }],
+      [
+        {
+          fileKey: 'submissions/uuid-123.pdf',
+          userId: 'student-1',
+          purpose: 'submission',
+          checkpointId: 1,
+          consumedAt: null,
+        },
+      ],
+    );
+
+    const result = await submitCheckpointHandler({ data: baseSubmitData });
+
+    expect(isServerError(result)).toBe(true);
+    if (!isServerError(result)) throw new Error('Expected server error');
+    expect(result.error.code).toBe('BAD_REQUEST');
+    expect(result.error.message).toBe(
+      'The uploaded file could not be found. Please try uploading again.',
+    );
   });
 });

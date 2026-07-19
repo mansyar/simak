@@ -10,6 +10,7 @@ import { generatePresignedDownloadUrl, getObjectContentLength } from '../lib/sto
 import { MAX_FILE_SIZE, validateUploadFileName } from '../lib/file-validation';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
+import { translateKey } from '../lib/i18n-server';
 import { getNotificationKeys } from './notifications.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -135,10 +136,14 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
       ) {
         return serverError(ErrorCode.BAD_REQUEST, 'Invalid or expired upload intent');
       }
-
       // 1e. R2 HEAD is the single size authority for the 25MB cap.
-      const actualSize = await getObjectContentLength({ key: fileKey });
-      if (actualSize === null || actualSize > MAX_FILE_SIZE) {
+      const sizeResult = await getObjectContentLength({ key: fileKey });
+      if (!sizeResult.ok) {
+        const locale = (session.user.locale || 'en') as 'en' | 'id';
+        const keys = { not_configured: 'files.r2NotConfigured', not_found: 'files.objectNotFound' };
+        return serverError(ErrorCode.BAD_REQUEST, translateKey(keys[sizeResult.reason], locale));
+      }
+      if (sizeResult.size > MAX_FILE_SIZE) {
         return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
       }
 
@@ -163,7 +168,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
           uploadedBy: session.user.id,
           fileKey,
           fileName,
-          fileSize,
+          fileSize: sizeResult.size,
           version: nextVersion,
         })
         .returning({ id: submissions.id });
