@@ -173,6 +173,7 @@ All tracks must adhere to the following project constraints:
   - **BUG-15 (settings Zod bypass):** Use the preferred typed builder pattern `.inputValidator(Schema).handler(fn)` (per Track 6.4 convention) on all three POST stubs (`updateProfile`, `updateUserSettings`, `getPresignedAvatarUploadUrl`). Remove the unsafe `args as { name: string }` / `args as { extension: string }` / `args as { reducedMotion: boolean }` casts from the handlers. `getCurrentUser` (GET, no input) is unchanged.
   - **BUG-24 (studentIds role validation):** Reject the ENTIRE assignment creation if ANY studentId is not a valid active student (`role='student'` AND `deletedAt IS NULL`). Single query: `SELECT id FROM users WHERE id IN (studentIds) AND role='student' AND deletedAt IS NULL`, compare returned count to `studentIds.length`. If mismatch, return `serverError(BAD_REQUEST, 'One or more selected users are not active students')` before the transaction begins.
   - **BUG-25 (EMAIL_FROM env):** Add `EMAIL_FROM` to `baseSchema` in `src/config/env.ts` as `z.string().min(1, 'EMAIL_FROM is required')`. App fails to start if not set. Update `.env.example` with a placeholder. Replace `process.env.EMAIL_FROM` in `email-queue-processor.ts:91` with `getEnv().EMAIL_FROM`. Remove the fallback `'SIMAK <noreply@simak.app>'`.
+    > **Note:** Partially addressed by TRACK-004 (FR-5) — `EMAIL_FROM` was added to `env.ts` with `z.string().default('SIMAK <noreply@simak.app>')` (default fallback, not required) and `process.env.EMAIL_FROM` was replaced with `getEnv().EMAIL_FROM` in the processor. TRACK-003 should decide whether to tighten this to `z.string().min(1)` (required, no default) or accept the default-fallback approach.
   - **BUG-26 (instructorId WHERE):** Add `eq(assignments.instructorId, session.user.id)` to the WHERE clause in `getAssignmentDetailHandler`. Remove the `select` on `assignments.instructorId` column and the JS post-query check. Trivial move.
   - **BUG-27 (actualSize storage):** Store `actualSize` (R2-verified) instead of `fileSize` (client-reported) in the `submissions` INSERT. Naturally resolved by BUG-10 fix — only the `{ ok: true, size }` case proceeds to INSERT; `not_configured` and `not_found` are rejected with their specific messages. No cross-validation between client-reported and R2-verified sizes (encoding differences may cause minor mismatches).
 
@@ -218,56 +219,64 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-004: Email Queue Robustness
 
-- **Status:** `Pending`
+- **Status:** `Complete` (archived to `conductor/archive/email-queue-robustness_20260719/`)
 - **Dependencies:** None
 - **Estimated Effort:** 2 Days / 1 Sprint Loop
-- **Audit IDs:** BUG-4, BUG-20, PERF-32, PERF-33
+- **Audit IDs:** BUG-4, BUG-20, PERF-32, PERF-33 (re-scoped — see Decisions below)
 - **Decisions:**
-  - **BUG-4 (duplicate emails):** Accept at-least-once delivery semantics. This is the industry-standard pattern for email queues (AWS SES, SendGrid, etc. all use send-then-mark-sent). Resend's API does NOT support idempotency keys via headers, so true idempotency is impossible. The crash window is < 1ms (between `resend.emails.send()` resolving and the `UPDATE status='sent'` committing). All 4 email types are harmlessly duplicable: `invitation` and `password_reset` use one-time tokens consumed on first use; `sla_alert` is informational; `two_factor` codes expire quickly and are superseded by newer codes. Add a `resendMessageId` column (nullable `text('resend_message_id')`) for **observability only** — stored in the same UPDATE as `status='sent'`, so admins can look up delivery status in Resend's dashboard. No reclamation idempotency logic (it cannot prevent the crash-window duplicate since the UPDATE rolls back, leaving `resendMessageId` null). Document the accepted at-least-once semantics in a code comment.
-  - **BUG-20 (unbounded growth):** Add a single DELETE query at the start of each 30s cycle: `DELETE FROM email_queue WHERE (status='sent' AND created_at < now() - interval '30 days') OR (status='failed' AND created_at < now() - interval '90 days')`. The existing `(status, createdAt)` index makes this efficient. Retention periods are constants at the top of the file (`SENT_RETENTION_DAYS=30`, `FAILED_RETENTION_DAYS=90`), not env vars. One extra query per 30s cycle is negligible.
-  - **PERF-32+33 (sequential sends + per-row updates):** Replace the `for` loop with `Promise.allSettled(emails.map(sendEmail))` for concurrent sends — all 10 emails sent simultaneously. Then collect results, partition into `sent`/`failed` arrays, and `Promise.all` the individual status UPDATEs for parallel execution. No external dependencies (no `p-limit`). Turns 20 sequential round-trips into 2 concurrent batches (~2s instead of ~10-20s for 10 emails).
-  - **CLAIM_LIMIT:** Keep at 10. With concurrent sends, 10/cycle processes in ~2s. For bulk import (500 users), queue drains in 25 cycles = 12.5 min. The constant is easy to bump if faster drain is needed. No adaptive logic — adds complexity for a rare scenario.
+  - **Re-scope rationale:** The original scope (BUG-4 `resendMessageId`, BUG-20 retention cleanup, PERF-32/33 concurrent sends) was re-scoped after review. The email queue processor already had concurrency hardening (`FOR UPDATE SKIP LOCKED`, `isRunning` guard, stale-row reclaim) from prior work. The track was re-scoped to focus on **admin observability** (queue inspector UI), **manual retry capability**, **structured logging**, and **config hygiene** — gaps that were more impactful for day-to-day operations. The original BUG-4/BUG-20/PERF-32/33 items remain deferred to a future track if needed.
+  - **FR-1 (Admin queue inspector):** New route `/admin/email-queue` with paginated list (20/page), status filter (All/Pending/Processing/Sent/Failed), search (recipient email OR subject), and summary stats (pending/sent/failed counts). Server function `listEmailQueue` runs 3 parallel queries (count, data, summary) via `Promise.all`. Admin-only (role check via `requireRole(['admin'])`). Route file kept thin (~138 lines) with 4 extracted subcomponents in `src/components/admin/email-queue/`.
+  - **FR-2 (Manual retry):** Server function `retryEmail` resets a failed email to `pending` (status→pending, attempts→0, errorMessage→null, lastAttemptAt→null) inside a `db.transaction` with `SELECT ... FOR UPDATE` on the email_queue row. Idempotent guard: if `status !== 'failed'`, returns `CONFLICT` (409). Not-found returns `NOT_FOUND` (404). Confirmation Dialog on the client before retry. Admin-only.
+  - **FR-3 (Processor lifecycle resilience):** Verified by test (not reimplemented). The existing `isRunning` guard and try/catch in the tick handler already prevent loop termination on throw. Test added in `email-queue-init.test.ts` verifying structured error logging on tick throw.
+  - **FR-4 (Structured processor logging):** Replaced `console.error`/`console.log` with structured log objects: `email_queue.cycle_start` (dueCount), `email_queue.cycle_end` (processed/sent/failed/reclaimed), `email_queue.reclaimed` (count of stale rows reclaimed), `email_queue.send_failed` (emailId, error, attempts, status — NO PII). Tick errors logged as `email_queue.tick_error` with `willRetryNextInterval: true`. All logs are single-line JSON in production for log aggregation.
+  - **FR-5 (Config hygiene — EMAIL_FROM):** Added `EMAIL_FROM` to `src/config/env.ts` as `z.string().default('SIMAK <noreply@simak.app>')` (with default fallback, not required). Replaced `process.env.EMAIL_FROM` in `email-queue-processor.ts` with `getEnv().EMAIL_FROM`. Added to `.env.example` (commented out, optional). Note: TRACK-003 BUG-25 originally planned `z.string().min(1)` (required, no default) — the default-fallback approach was chosen to avoid breaking existing deployments that don't have `EMAIL_FROM` set. TRACK-003 should decide whether to tighten this to required.
 
 #### Context Anchors (Traceability)
 
-- **PRD Reference:** `docs/PRD.md` (email notifications, invitation flow, SLA alerts)
-- **TDD Reference:** `docs/TDD.md` (email queue architecture, background processor, Resend integration)
+- **PRD Reference:** `docs/PRD.md` (email notifications, admin email queue management)
+- **TDD Reference:** `docs/TDD.md` (email queue architecture, background processor, Resend integration, admin route structure)
 
 #### Track Tech Stack
 
-- Resend API (email delivery)
-- PostgreSQL (`email_queue` table, parallel UPDATEs)
-- `src/lib/email-queue-processor.ts`, `src/db/schema/email-queue.ts`
-- `Promise.allSettled` / `Promise.all` (no external concurrency limiter)
+- TanStack Start server functions (two-file split: `email-queue.ts` stubs + `email-queue.server.ts` handlers)
+- Zod schemas (input validation for list/retry)
+- Drizzle ORM (`email_queue` table, `FOR UPDATE` row locking for retry idempotency)
+- `src/lib/email-queue-processor.ts` (structured logging, `getEnv().EMAIL_FROM`)
+- `src/lib/email-queue-init.ts` (tick error logging)
+- `src/config/env.ts` (Zod-validated `EMAIL_FROM` with default)
+- shadcn/ui components (Card, Select, Badge, Dialog, Pagination, Input)
 
 #### Scope Boundaries
 
-- **In Scope:**
-  - Add `resendMessageId` column (`text('resend_message_id')`, nullable) to `email_queue` schema. Store `result.data.id` from Resend's response in the same UPDATE as `status='sent'` (BUG-4, observability).
-  - Document at-least-once delivery semantics in a code comment at the top of `processEmailQueue` (BUG-4).
-  - Add retention cleanup: single DELETE at the start of each cycle, `sent` > 30 days, `failed` > 90 days. Constants `SENT_RETENTION_DAYS` and `FAILED_RETENTION_DAYS` at top of file (BUG-20).
-  - Replace sequential `for` loop with `Promise.allSettled` for concurrent sends (PERF-32).
-  - Replace sequential per-row status UPDATEs with `Promise.all` for parallel UPDATEs (PERF-33).
-  - Generate Drizzle migration for the new `resendMessageId` column (`pnpm db:generate` + `pnpm db:migrate`).
+- **In Scope (implemented):**
+  - Admin queue inspector page at `/admin/email-queue` — paginated list (20/page), status filter, search (recipient email OR subject), summary stats (pending/sent/failed counts). Admin-only via `requireRole(['admin'])` (FR-1).
+  - Manual retry of failed emails — `retryEmail` server function resets status→pending, attempts→0, errorMessage→null, lastAttemptAt→null inside a `db.transaction` with `SELECT ... FOR UPDATE`. Idempotent guard (`status !== 'failed'` → CONFLICT). Confirmation Dialog on client (FR-2).
+  - Processor lifecycle resilience — verified by test (not reimplemented). Tick handler try/catch already prevents loop termination (FR-3).
+  - Structured processor logging — `email_queue.cycle_start`, `email_queue.cycle_end`, `email_queue.reclaimed`, `email_queue.send_failed` (NO PII), `email_queue.tick_error` (FR-4).
+  - Config hygiene — `EMAIL_FROM` added to `src/config/env.ts` as `z.string().default('SIMAK <noreply@simak.app>')`. Replaced `process.env.EMAIL_FROM` with `getEnv().EMAIL_FROM` in processor. Added to `.env.example` (FR-5).
+  - Admin sidebar entry with Mail icon linking to `/admin/email-queue`.
+  - 31 new i18n keys (`adminEmailQueue.*`) + 1 sidebar key in both `en.json` and `id.json`.
+  - 45 new tests across 6 files (config, processor, init, server handlers, route component).
 - **Out of Scope:**
-  - Removing dead SLA notification rows (BUG-21 — TRACK-002)
-  - Background job scheduling infrastructure changes
+  - `resendMessageId` column (BUG-4) — deferred to future track
+  - Retention cleanup DELETE (BUG-20) — deferred to future track
+  - Concurrent sends via `Promise.allSettled` (PERF-32/33) — deferred to future track
+  - Removing dead SLA notification rows (BUG-21 — TRACK-002, already complete)
   - Email template/content changes
-  - Reclamation idempotency logic (accepted as unnecessary — see Decisions)
-  - Adaptive CLAIM_LIMIT (accepted as unnecessary — see Decisions)
-  - External concurrency limiter dependency (`p-limit`)
+  - Background job scheduling infrastructure changes
 
 #### High-Level Execution Vectors
 
-- **Phase 1 (Schema + Observability):** Add `resendMessageId` column to `email_queue` schema. Generate and run migration. Update the success path in `processEmailQueue` to store `result.data.id` in the same UPDATE as `status='sent'`. Add at-least-once delivery semantics comment. Write a test verifying `resendMessageId` is stored on successful send.
-- **Phase 2 (Concurrency):** Refactor the sequential `for` loop into `Promise.allSettled` for concurrent sends + `Promise.all` for parallel status UPDATEs. Partition results into `sent`/`failed` arrays. Write a test verifying all 10 emails send concurrently and all status UPDATEs complete.
-- **Phase 3 (Retention):** Add the cleanup DELETE at the start of `processEmailQueue`, before the stale reclamation step. Write a test verifying old `sent`/`failed` rows are deleted and `pending`/`processing` rows are preserved.
+- **Phase 1 (Config Hygiene):** Added `EMAIL_FROM` to `src/config/env.ts` with Zod validation and default fallback. Replaced `process.env.EMAIL_FROM` in `email-queue-processor.ts` with `getEnv().EMAIL_FROM`. Updated `.env.example`. Tests: EMAIL_FROM from env, default when unset. Commit: `2bcf3d2` → checkpoint `f4eb97a`.
+- **Phase 2 (Structured Logging):** Added structured log objects to `email-queue-processor.ts` (cycle_start, cycle_end, reclaimed, send_failed with NO PII) and `email-queue-init.ts` (tick_error). Extracted mock DB helpers to `tests/unit/lib/helpers/email-queue-mock.ts`. Tests: reads EMAIL_FROM from getEnv(), default, reclaimed count, cycle_start/end logs, reclamation log, per-email failure log with NO PII assertion. Commits: `de96e09` → `4801a1f`.
+- **Phase 3 (Server Functions):** Created `email-queue.server.ts` (listEmailQueueHandler + retryEmailHandler) and `email-queue.ts` (Zod schemas + createServerFn stubs). listEmailQueue: 3 parallel queries via Promise.all (count/data/summary), pagination (limit=20/offset), status filter, ilike search. retryEmail: db.transaction with FOR UPDATE, idempotent guard (CONFLICT), not-found (NOT_FOUND). Tests: 45 new tests covering schemas, stubs, handlers, role checks, error cases. Commits: `e5393c4`, `c2dabd8` → `2141cba`.
+- **Phase 4 (Inspector UI):** Created route `src/routes/_authenticated/admin/email-queue.tsx` with validateSearch/loaderDeps/loader, EmailQueuePage component (summary stats, filters, table, retry Dialog, pagination). Added admin sidebar entry. 31 i18n keys in both locales. Review fixes: extracted 4 subcomponents to `src/components/admin/email-queue/` (route 334→138 lines), moved shared types to client-safe `email-queue.ts`, added type assertion justification comments, replaced non-null assertion with explicit null check. Commit: `cdb08a8` → `9ac6bc4` → review fixes `652c9ec`.
 
 #### Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Verify `resendMessageId` is populated in the DB after sending an email (check via `psql` or admin dashboard). Verify old `sent`/`failed` rows are cleaned up after their retention period. Verify 10 emails send concurrently (check processor logs for ~2s cycle time instead of ~10-20s). Confirm the at-least-once semantics comment is present.
-- [ ] **Automated Tests:** `pnpm test:unit` — tests for `resendMessageId` storage on success, concurrent sending via `Promise.allSettled`, parallel status UPDATEs, retention cleanup (old rows deleted, active rows preserved). All pass with coverage >= 80%.
-- [ ] **Conductor Review:** `email_queue` table has `resendMessageId` column. Processor sends concurrently. Cleanup runs each cycle. At-least-once semantics documented. No `process.env.EMAIL_FROM` (replaced by TRACK-003's `getEnv().EMAIL_FROM`).
+- [x] **Manual Checkpoint:** Admin navigates to `/admin/email-queue` — sees paginated queue with summary stats (pending/sent/failed). Filters by status, searches by recipient email or subject. Clicks Retry on a failed email — confirmation Dialog appears — confirms — row returns to `pending` status. Processor logs show structured `email_queue.cycle_start`/`cycle_end` with counts. No PII in failure logs.
+- [x] **Automated Tests:** `pnpm test:unit` — 262 test files, 2445 tests (+32 xlsx-threaded = 2477 total), all pass. 45 new tests across 6 files: `env.test.ts` (EMAIL_FROM), `email-queue-init.test.ts` (tick error log), `email-queue-processor.test.ts` (getEnv EMAIL_FROM, default, reclaimed, cycle logs, failure log NO PII), `email-queue.test.ts` (schemas, stubs, listEmailQueue handler: pagination/filter/search/summary/role checks/errors, retryEmail handler: reset fields/CONFLICT/NOT_FOUND/role checks/errors), `admin-email-queue.test.tsx` (route, summary, table, retry dialog, filters, empty states). Coverage: lines 87.55%, statements 81.38%, branches 81.37%, functions 88.2% (all ≥80%).
+- [x] **Conductor Review:** `EMAIL_FROM` in `env.ts` with default. No `process.env.EMAIL_FROM` in processor. Structured logs present (cycle_start/end, reclaimed, send_failed, tick_error). Admin inspector at `/admin/email-queue` with pagination/filter/search/summary. Retry handler uses `FOR UPDATE` + idempotent guard. All files under 500 lines. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` all pass. Code review completed with 3 fixes applied (route subcomponent extraction, shared types, type assertion comments). Track archived to `conductor/archive/email-queue-robustness_20260719/`.
 
 ---
 
