@@ -108,5 +108,5 @@
 
     NOTE: Dev DB tables are tiny (1-11 rows). PostgreSQL naturally prefers Seq Scan for small tables. Used `SET enable_seqscan = off` to force Index Scan and verify each index is USABLE by the query planner. This confirms the indexes cover the query predicates — in production with larger data volumes, the planner will choose Index Scan naturally.
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Migration & Integration Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Migration & Integration Verification' (Protocol in workflow.md)
 </protect>
