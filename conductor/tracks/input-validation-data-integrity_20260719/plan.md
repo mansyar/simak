@@ -4,7 +4,7 @@
 **Track ID:** `input-validation-data-integrity_20260719`
 **Spec:** [./spec.md](./spec.md)
 
-## Phase 1: Settings Zod Validation (BUG-15)
+## Phase 1: Settings Zod Validation (BUG-15) [checkpoint: d6dafa9]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
     - [x] Read `./spec.md` — review FR-1 (Settings Zod Validation), NFR-4 (mock builder chain), and AC-1 through AC-5
