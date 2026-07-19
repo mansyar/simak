@@ -51,7 +51,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: N+1 Query Elimination' (Protocol in workflow.md)
 
-## Phase 2: Missing Pagination (FR-2)
+## Phase 2: Missing Pagination (FR-2) [checkpoint: 162d012]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
     - [ ] Read `./spec.md` — review FR-2 (PERF-15 through PERF-21) and Acceptance Criteria #5, #6
