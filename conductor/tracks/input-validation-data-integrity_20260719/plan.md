@@ -25,7 +25,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Settings Zod Validation' (Protocol in workflow.md)
 
-## Phase 2: Storage Discrimination, Env & i18n (BUG-10, BUG-25, BUG-27)
+## Phase 2: Storage Discrimination, Env & i18n (BUG-10, BUG-25, BUG-27) [checkpoint: 96b52db]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
     - [x] Read `./spec.md` — review FR-2 (R2 Error Discrimination), FR-3 (EMAIL_FROM), FR-6 (actualSize storage), FR-7 (new i18n keys), NFR-7 (no process.env outside env.ts/storage.ts), AC-6 through AC-12, AC-18 through AC-21
