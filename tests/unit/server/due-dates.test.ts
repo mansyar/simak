@@ -103,4 +103,41 @@ describe('validateDueDates', () => {
     const result = validateDueDates(dueDates);
     expect(result).toEqual({ valid: true });
   });
+
+  // BUG-12: finalDeadline cap
+  it('should reject checkpoint dueDate exceeding finalDeadline when provided', () => {
+    const dueDates = new Map([
+      [1, new Date('2026-08-01')],
+      [2, new Date('2026-09-01')],
+    ]);
+    const finalDeadline = new Date('2026-08-15');
+
+    const result = validateDueDates(dueDates, finalDeadline);
+    expect(result).not.toEqual({ valid: true });
+    if (!result.valid) {
+      expect(result.error).toContain('finalDeadline');
+      expect(result.error).toContain('2');
+    }
+  });
+
+  it('should accept checkpoint dueDates at or before finalDeadline', () => {
+    const dueDates = new Map([
+      [1, new Date('2026-07-01')],
+      [2, new Date('2026-08-01')],
+    ]);
+    const finalDeadline = new Date('2026-08-01');
+
+    const result = validateDueDates(dueDates, finalDeadline);
+    expect(result).toEqual({ valid: true });
+  });
+
+  it('should NOT enforce finalDeadline cap when not provided (backward compatible)', () => {
+    const dueDates = new Map([
+      [1, new Date('2026-07-01')],
+      [2, new Date('2026-12-01')],
+    ]);
+
+    const result = validateDueDates(dueDates);
+    expect(result).toEqual({ valid: true });
+  });
 });

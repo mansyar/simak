@@ -22,10 +22,13 @@ export function calculateDueDates(
 
 /**
  * Validate that checkpoint dueDates are sequentially ordered (CP1 < CP2 < CP3 ...)
- * and that no dueDates are in the past.
+ * and that no dueDates are in the past. When `finalDeadline` is provided, also
+ * rejects any checkpoint dueDate exceeding the assignment's course-wide finalDeadline
+ * (enforced only at assignment creation time, not during per-student extensions).
  */
 export function validateDueDates(
   dueDates: Map<number, Date>,
+  finalDeadline?: Date,
 ): { valid: true } | { valid: false; error: string } {
   const ordered = [...dueDates.entries()].sort((a, b) => a[0] - b[0]);
 
@@ -47,6 +50,18 @@ export function validateDueDates(
         valid: false,
         error: `Checkpoint ${order} dueDate must not be in the past`,
       };
+    }
+  }
+
+  // finalDeadline cap (assignment creation only — extensions may exceed it)
+  if (finalDeadline) {
+    for (const [order, dueDate] of ordered) {
+      if (dueDate > finalDeadline) {
+        return {
+          valid: false,
+          error: `Checkpoint ${order} dueDate must not exceed the assignment finalDeadline (${finalDeadline.toISOString()})`,
+        };
+      }
     }
   }
 
