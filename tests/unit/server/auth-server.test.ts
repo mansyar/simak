@@ -30,7 +30,7 @@ vi.mock('@/db/schema/users', () => ({
   },
 }));
 
-import { getSessionHandler } from '@/server/auth.server';
+import { getSessionHandler, _clearSessionCache } from '@/server/auth.server';
 import { auth } from '@/auth/config';
 import { getDb } from '@/db/index';
 
@@ -86,6 +86,11 @@ function createMockDb(userRecord?: { role: string; locale: string } | null) {
 describe('getSessionHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    _clearSessionCache?.();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should return null when no session exists', async () => {
@@ -228,5 +233,128 @@ describe('getSessionHandler', () => {
 
     expect(result?.user.role).toBe('instructor');
     expect(result?.user.locale).toBe('id');
+  });
+});
+
+describe('getSessionHandler - session cache (PERF-22)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    _clearSessionCache?.();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('cache miss — first call for a user invokes getDb and caches the result', async () => {
+    vi.useFakeTimers();
+
+    const mockSession = createMockSession({ userId: 'cache-user-1' });
+    const mockDb = createMockDb({ role: 'admin', locale: 'en' });
+
+    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+    vi.mocked(getDb).mockReturnValue(mockDb as any);
+
+    // First call — cache miss, should query DB
+    const result = await getSessionHandler();
+
+    expect(getDb).toHaveBeenCalledTimes(1);
+    expect(result?.user.role).toBe('admin');
+    expect(result?.user.locale).toBe('en');
+  });
+
+  it('cache hit — second call within 5s TTL does NOT invoke getDb', async () => {
+    vi.useFakeTimers();
+
+    const mockSession = createMockSession({ userId: 'cache-user-2' });
+    const mockDb = createMockDb({ role: 'admin', locale: 'en' });
+
+    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+    vi.mocked(getDb).mockReturnValue(mockDb as any);
+
+    // First call — cache miss, queries DB
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(1);
+
+    // Second call within TTL — cache hit, should NOT query DB
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(1); // Still 1, not 2
+
+    // auth.api.getSession must still be called (security-critical, never cached)
+    expect(auth.api.getSession).toHaveBeenCalledTimes(2);
+  });
+
+  it('TTL expiry — after 5001ms, a subsequent call re-queries the DB', async () => {
+    vi.useFakeTimers();
+
+    const mockSession = createMockSession({ userId: 'cache-user-3' });
+    const mockDb = createMockDb({ role: 'admin', locale: 'en' });
+
+    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+    vi.mocked(getDb).mockReturnValue(mockDb as any);
+
+    // First call — cache miss
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(1);
+
+    // Second call within TTL — cache hit
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(1);
+
+    // Advance time past TTL (5001ms)
+    vi.advanceTimersByTime(5001);
+
+    // Third call after TTL — cache miss, re-queries DB
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(2);
+  });
+
+  it('concurrent — two calls within TTL: first misses (queries DB), second hits cache', async () => {
+    vi.useFakeTimers();
+
+    const mockSession = createMockSession({ userId: 'cache-user-4' });
+    const mockDb = createMockDb({ role: 'admin', locale: 'en' });
+
+    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession);
+    vi.mocked(getDb).mockReturnValue(mockDb as any);
+
+    // First call — cache miss, queries DB
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(1);
+
+    // Second call within TTL — cache hit, no DB query
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(1); // Still 1, not 2
+  });
+
+  it('lazy eviction — after TTL expiry, a cache miss for user B evicts expired entry for user A', async () => {
+    vi.useFakeTimers();
+
+    const mockSessionA = createMockSession({ userId: 'user-A' });
+    const mockSessionB = createMockSession({ userId: 'user-B' });
+    const mockDb = createMockDb({ role: 'admin', locale: 'en' });
+
+    // Call for user A — cache miss, queries DB
+    vi.mocked(auth.api.getSession).mockResolvedValue(mockSessionA);
+    vi.mocked(getDb).mockReturnValue(mockDb as any);
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(1);
+
+    // Call for user A again — cache hit
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(1);
+
+    // Advance time past TTL
+    vi.advanceTimersByTime(5001);
+
+    // Call for user B — cache miss, queries DB, evicts expired A entry
+    vi.mocked(auth.api.getSession).mockResolvedValue(mockSessionB);
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(2);
+
+    // Call for user A again — should be cache miss (A was evicted by lazy eviction)
+    vi.mocked(auth.api.getSession).mockResolvedValue(mockSessionA);
+    await getSessionHandler();
+    expect(getDb).toHaveBeenCalledTimes(3);
   });
 });
