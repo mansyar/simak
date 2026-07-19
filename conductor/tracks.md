@@ -13,6 +13,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Input Validation & Data Integrity**
+- [~] **Track: Input Validation & Data Integrity**
 *Link: [./tracks/input-validation-data-integrity_20260719/](./tracks/input-validation-data-integrity_20260719/)*
 
