@@ -8,6 +8,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Database Indexes & Schema Optimization**
-*Link: [./tracks/database-indexes-schema-optimization_20260719/](./tracks/database-indexes-schema-optimization_20260719/)*
-
