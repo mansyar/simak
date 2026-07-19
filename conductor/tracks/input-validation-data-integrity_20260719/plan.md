@@ -27,9 +27,9 @@
 
 ## Phase 2: Storage Discrimination, Env & i18n (BUG-10, BUG-25, BUG-27)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
-    - [ ] Read `./spec.md` — review FR-2 (R2 Error Discrimination), FR-3 (EMAIL_FROM), FR-6 (actualSize storage), FR-7 (new i18n keys), NFR-7 (no process.env outside env.ts/storage.ts), AC-6 through AC-12, AC-18 through AC-21
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
+    - [x] Read `./spec.md` — review FR-2 (R2 Error Discrimination), FR-3 (EMAIL_FROM), FR-6 (actualSize storage), FR-7 (new i18n keys), NFR-7 (no process.env outside env.ts/storage.ts), AC-6 through AC-12, AC-18 through AC-21
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements
 
 - [ ] Task: Add new i18n keys for R2 error messages (BUG-10)
     - [ ] Add `files.r2NotConfigured` to `locales/en.json` with value: "File storage is not configured. Contact your administrator."
