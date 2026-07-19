@@ -39,6 +39,17 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
   const db = getDb();
 
   try {
+    // R2 HEAD check before transaction to avoid holding DB lock during I/O (BUG-14).
+    const sizeResult = await getObjectContentLength({ key: fileKey });
+    if (!sizeResult.ok) {
+      const locale = (session.user.locale || 'en') as 'en' | 'id';
+      return r2SizeError(sizeResult.reason, locale);
+    }
+    if (sizeResult.size > MAX_FILE_SIZE) {
+      return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
+    }
+    const fileSize = sizeResult.size;
+
     let submissionId: number | undefined;
 
     const result = await db.transaction(async (tx) => {
@@ -135,16 +146,6 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
       ) {
         return serverError(ErrorCode.BAD_REQUEST, 'Invalid or expired upload intent');
       }
-      // 1e. R2 HEAD is the single size authority for the 25MB cap.
-      const sizeResult = await getObjectContentLength({ key: fileKey });
-      if (!sizeResult.ok) {
-        const locale = (session.user.locale || 'en') as 'en' | 'id';
-        return r2SizeError(sizeResult.reason, locale);
-      }
-      if (sizeResult.size > MAX_FILE_SIZE) {
-        return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
-      }
-
       await tx
         .update(uploadIntents)
         .set({ consumedAt: now })
@@ -166,7 +167,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
           uploadedBy: session.user.id,
           fileKey,
           fileName,
-          fileSize: sizeResult.size,
+          fileSize: fileSize,
           version: nextVersion,
         })
         .returning({ id: submissions.id });

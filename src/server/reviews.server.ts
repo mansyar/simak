@@ -239,6 +239,18 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       );
     }
 
+    // 1b. R2 HEAD check before transaction to avoid holding DB lock during I/O (BUG-14).
+    if (feedbackFileKey) {
+      const sizeResult = await getObjectContentLength({ key: feedbackFileKey });
+      if (!sizeResult.ok) {
+        const locale = (session.user.locale || 'en') as 'en' | 'id';
+        return r2SizeError(sizeResult.reason, locale);
+      }
+      if (sizeResult.size > MAX_FILE_SIZE) {
+        return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
+      }
+    }
+
     // 2. Execute in transaction
     const txResult = await db.transaction(async (tx) => {
       // 2a. Verify ownership — submission belongs to an assignment owned by this instructor
@@ -324,15 +336,6 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           intent.checkpointId !== null
         ) {
           return serverError(ErrorCode.BAD_REQUEST, 'Invalid or expired upload intent');
-        }
-
-        const sizeResult = await getObjectContentLength({ key: feedbackFileKey });
-        if (!sizeResult.ok) {
-          const locale = (session.user.locale || 'en') as 'en' | 'id';
-          return r2SizeError(sizeResult.reason, locale);
-        }
-        if (sizeResult.size > MAX_FILE_SIZE) {
-          return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
         }
 
         await tx

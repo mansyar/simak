@@ -306,4 +306,35 @@ describe('submitCheckpointHandler - upload intent verification', () => {
       'The uploaded file could not be found. Please try uploading again.',
     );
   });
+
+  it('BUG-14: should call getObjectContentLength before db.transaction', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+    vi.mocked(getObjectContentLength).mockResolvedValue({ ok: true, size: 1024 });
+
+    const transactionSpy = vi.fn((callback: (tx: MockTx) => Promise<unknown>) => callback(mockTx));
+    vi.mocked(dbMod.getDb).mockReturnValue({ transaction: transactionSpy } as any);
+
+    mockTx.enqueue(
+      [{ id: 1, assignmentId: 101, studentId: 'student-1', state: 'unlocked' }],
+      [
+        {
+          fileKey: 'submissions/uuid-123.pdf',
+          userId: 'student-1',
+          purpose: 'submission',
+          checkpointId: 1,
+          consumedAt: null,
+        },
+      ],
+      [], // consume intent
+      [{ maxVersion: 0 }], // version
+      [{ id: 42 }], // insert submission
+      [], // update checkpoint
+      [{ instructorId: 'instructor-1', assignmentTitle: 'Thesis 2026' }], // assignment
+      [], // insert notification
+    );
+
+    await submitCheckpointHandler({ data: baseSubmitData });
+
+    expect(getObjectContentLength).toHaveBeenCalledBefore(transactionSpy);
+  });
 });
