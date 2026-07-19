@@ -121,11 +121,11 @@
 
 ## Phase 3: Over-fetch, Parallel & Query Rewrite (FR-3, FR-4, FR-5, FR-6)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
     - [ ] Read `./spec.md` — review FR-3 (PERF-23, PERF-24), FR-4 (PERF-25, PERF-26), FR-5 (PERF-35), FR-6 (BUG-14) and Acceptance Criteria #7–#11
     - [ ] Explore current implementations via codegraph: `listNotificationsHandler`, `listTemplatesHandler`, `listInstructorAssignmentsHandler`, `listPendingReviewsHandler`, `submitCheckpointHandler`, `submitReviewHandler`, `getObjectContentLength`
 
-- [ ] Task: Narrow listNotificationsHandler SELECT + explicit response construction (PERF-23)
+- [x] Task: Narrow listNotificationsHandler SELECT + explicit response construction (PERF-23) [1938fcf]
     - [ ] Write failing tests in `tests/unit/server/notifications.test.ts`: assert (1) handler selects only `id, type, titleKey, messageKey, params, read, createdAt` (no `metadata`); (2) response objects are constructed explicitly (no `...item` spread leaking raw columns) — run `pnpm test` and confirm failures
     - [ ] Narrow the SELECT in `listNotificationsHandler` (`src/server/notifications.server.ts`) to specific columns; construct response objects explicitly after i18n resolution
     - [ ] Run `pnpm test` — confirm all tests pass
