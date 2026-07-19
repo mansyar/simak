@@ -272,10 +272,12 @@ export async function listStudentAssignmentsHandler(args: { data: ListStudentAss
         if (cp.state === 'passed') existing.passed++;
         countsByAssignment.set(cp.assignmentId, existing);
 
-        if (!checkpointsByAssignment.has(cp.assignmentId)) {
-          checkpointsByAssignment.set(cp.assignmentId, []);
+        let cps = checkpointsByAssignment.get(cp.assignmentId);
+        if (!cps) {
+          cps = [];
+          checkpointsByAssignment.set(cp.assignmentId, cps);
         }
-        checkpointsByAssignment.get(cp.assignmentId)!.push({
+        cps.push({
           state: cp.state,
           dueDate: cp.dueDate,
           order: cp.order,

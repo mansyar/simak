@@ -153,9 +153,9 @@ export function StudentDashboard({ data }: Props) {
                           : 'text-muted-foreground'
                       }`}
                     >
-                      {deadline.daysRemaining === null
+                      {deadline.dueDate === null
                         ? t('studentDashboard.noDeadline')
-                        : new Date(deadline.dueDate!).toLocaleDateString()}
+                        : new Date(deadline.dueDate).toLocaleDateString()}
                       {deadline.isOverdue && (
                         <Badge variant="destructive" className="ml-1">
                           {t('studentDashboard.overdue')}
