@@ -1,4 +1,13 @@
-import { pgTable, text, timestamp, serial, boolean, jsonb, index, varchar } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  serial,
+  boolean,
+  jsonb,
+  index,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { users } from './users';
 
 export const notifications = pgTable(
@@ -17,5 +26,8 @@ export const notifications = pgTable(
     metadata: jsonb('metadata'),
     createdAt: timestamp('created_at').defaultNow(),
   },
-  (table) => [index('notifications_user_id_read_idx').on(table.userId, table.read)],
+  (table) => [
+    index('notifications_user_id_read_idx').on(table.userId, table.read),
+    index('notifications_created_at_idx').on(table.createdAt),
+  ],
 );

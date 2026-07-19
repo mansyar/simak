@@ -57,6 +57,13 @@
       "when": 1782802068388,
       "tag": "0007_cool_tag",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1784455851963,
+      "tag": "0008_deep_santa_claus",
+      "breakpoints": true
     }
   ]
 }
