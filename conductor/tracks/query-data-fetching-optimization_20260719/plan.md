@@ -40,7 +40,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Refactor bulk-import post-commit (PERF-6)
+- [x] Task: Refactor bulk-import post-commit (PERF-6) [23943d3]
     - [ ] Write failing tests in `tests/unit/server/bulk-import.test.ts` (Node env): assert (1) invitation emails are sent concurrently via `Promise.allSettled` (not sequentially); (2) audit log inserts are batched into a single `db.insert(auditLog).values([...])` — run `pnpm test` and confirm failures
     - [ ] Refactor `src/server/bulk-import.server.ts` post-commit: `Promise.allSettled` for invitation emails (each does locale lookup + enqueue), batch audit INSERT into single `db.insert(auditLog).values([...])`
     - [ ] Run `pnpm test` — confirm all tests pass
