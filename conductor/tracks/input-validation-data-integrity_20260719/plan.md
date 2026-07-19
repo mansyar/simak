@@ -79,7 +79,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Storage Discrimination, Env & i18n' (Protocol in workflow.md)
 
-## Phase 3: Assignment & Ownership Validation (BUG-24, BUG-26)
+## Phase 3: Assignment & Ownership Validation (BUG-24, BUG-26) [checkpoint: bfbe67f]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
     - [x] Read `./spec.md` — review FR-4 (studentIds Role Validation), FR-5 (instructorId WHERE Clause), AC-13 through AC-17, AC-22 (i18n key for invalidStudentIds)
@@ -111,5 +111,5 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Assignment & Ownership Validation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Assignment & Ownership Validation' (Protocol in workflow.md) — User approved checkpoint (bfbe67f)
 </protect>
