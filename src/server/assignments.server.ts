@@ -223,23 +223,28 @@ export async function listInstructorAssignmentsHandler(args: {
       conditions.push(sql`${assignments.title} ILIKE ${'%' + search + '%'}`);
     }
 
-    // Fetch basic assignments
-    const rawAssignments = await db
-      .select({
-        id: assignments.id,
-        title: assignments.title,
-        description: assignments.description,
-        finalDeadline: assignments.finalDeadline,
-        createdAt: assignments.createdAt,
-        templateName: assignmentTemplates.name,
-        templateType: assignmentTemplates.type,
-      })
-      .from(assignments)
-      .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-      .where(and(...conditions))
-      .orderBy(assignments.createdAt)
-      .limit(limit)
-      .offset((page - 1) * limit);
+    const [rawAssignments, [{ count }]] = await Promise.all([
+      db
+        .select({
+          id: assignments.id,
+          title: assignments.title,
+          description: assignments.description,
+          finalDeadline: assignments.finalDeadline,
+          createdAt: assignments.createdAt,
+          templateName: assignmentTemplates.name,
+          templateType: assignmentTemplates.type,
+        })
+        .from(assignments)
+        .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
+        .where(and(...conditions))
+        .orderBy(assignments.createdAt)
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(assignments)
+        .where(and(...conditions)),
+    ]);
 
     // Fetch student counts for the assignments in a separate query
     const assignmentIds = rawAssignments.map((a) => a.id);
@@ -268,12 +273,6 @@ export async function listInstructorAssignmentsHandler(args: {
       templateType: a.templateType,
       studentCount: studentCounts.get(a.id) ?? 0,
     }));
-
-    // Fetch total count for pagination
-    const [{ count }] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(assignments)
-      .where(and(...conditions));
 
     return {
       assignments: enrichedAssignments,

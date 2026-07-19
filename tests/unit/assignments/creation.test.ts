@@ -233,10 +233,10 @@ describe('Assignment Server Functions', () => {
           ]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ assignmentId: 42, count: 5 }]).then(onfulfilled),
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+          Promise.resolve([{ assignmentId: 42, count: 5 }]).then(onfulfilled),
         );
 
       const result = await listInstructorAssignmentsHandler({
@@ -247,6 +247,40 @@ describe('Assignment Server Functions', () => {
       expect(result.assignments).toHaveLength(1);
       expect(result.assignments[0].studentCount).toBe(5);
       expect(result.total).toBe(1);
+    });
+
+    it('should run data and count queries in parallel via Promise.all (PERF-26)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 42,
+              title: 'Assignment 1',
+              templateName: 'Tpl',
+              templateType: 'Thesis',
+              finalDeadline: new Date('2026-12-31T00:00:00.000Z'),
+              createdAt: new Date('2026-05-01T00:00:00.000Z'),
+            },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ assignmentId: 42, count: 3 }]).then(onfulfilled),
+        );
+
+      const result = await listInstructorAssignmentsHandler({
+        data: { page: 1, limit: 20, search: '' },
+      });
+      if (isServerError(result)) throw new Error(result.error.message);
+
+      // With Promise.all, count query (2nd call) runs before student counts (3rd call)
+      expect(mockDb.then).toHaveBeenCalledTimes(3);
+      expect(result.total).toBe(1);
+      expect(result.assignments[0].studentCount).toBe(3);
     });
   });
 
