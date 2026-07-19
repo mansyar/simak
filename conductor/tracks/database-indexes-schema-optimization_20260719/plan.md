@@ -84,11 +84,11 @@
     - [x] If count is wrong, halt and investigate schema definition issue (investigated: spec estimation error — spec counted only 7 new indexes, not 2 replacement CREATE INDEX statements; implementation correct; user confirmed to proceed)
     - [ ] Commit: `chore(db): Generate migration for index additions and replacements`
 
-- [ ] Task: Apply migration to dev DB (TR-3)
-    - [ ] Ensure `docker compose up -d` is running (PostgreSQL container on port 5432)
-    - [ ] Run `pnpm db:migrate` to apply the migration
-    - [ ] Verify migration applied cleanly (no errors)
-    - [ ] Run `pnpm test:integration tests/integration/db/migration-applied.test.ts` and confirm all 9 test cases now PASS (Green Phase)
+- [x] Task: Apply migration to dev DB (TR-3)
+    - [x] Ensure `docker compose up -d` is running (PostgreSQL container on port 5432)
+    - [x] Run `pnpm db:migrate` to apply the migration (NOTE: drizzle-kit migrate did not apply migration 0008 due to pre-existing __drizzle_migrations table inconsistency — DB was set up via push, only 3/9 migrations recorded; applied SQL directly via `docker exec -i simak-postgres psql -U simak -d simak` piping the migration file)
+    - [x] Verify migration applied cleanly (no errors) — all 11 DDL statements executed successfully (2 DROP + 9 CREATE)
+    - [x] Run `pnpm test:integration tests/integration/db/migration-applied.test.ts` and confirm all 9 test cases now PASS (Green Phase) — 2 tests passed (all 9 indexes exist, 2 old indexes dropped)
 
 - [ ] Task: Run full quality gate suite
     - [ ] Run `pnpm test` — all existing 2,377+ tests pass (no regressions)
