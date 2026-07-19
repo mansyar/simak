@@ -69,6 +69,7 @@ Throughout this document, features are tagged as:
 │   ├── /admin/templates                  → Template list [v1]
 │   ├── /admin/templates/$id              → Template editor [v1]
 │   ├── /admin/audit-log                  → Audit log viewer
+│   ├── /admin/email-queue                → Email queue inspector (paginated, filterable, retry failed) [v1]
 │   ├── /admin/analytics                  → System analytics [v2]
 │   └── /admin/settings                   → System configuration [v2]
 
@@ -111,7 +112,7 @@ simak/
 │   │   ├── notifications/    → Notification center, badge
 │   │   ├── analytics/        → Charts, metric cards, export
 │   │   ├── settings/         → SettingsPage, ProfileSection, PasswordSection, AppearanceSection, AccessibilitySection
-│   │   └── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton
+│   │   └── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton, email queue inspector subcomponents (summary cards, filters, table, retry dialog)
 │   ├── server/               → Server functions (split: .ts = client-safe stubs + Zod, .server.ts = handlers)
 │   │   ├── auth.ts           → Login, logout, session
 │   │   ├── users.ts          → User CRUD, invitations
@@ -124,9 +125,11 @@ simak/
 │   │   ├── notifications.server.ts → Server-only notification handlers
 │   │   ├── templates.ts      → Template CRUD
 │   │   ├── templates.server.ts → Server-only template handlers
-│   │   ├── audit-logs.ts      → Audit log query stubs + Zod schemas
-│   │   ├── audit-logs.server.ts → Server-only audit log handlers
-│   │   ├── setup-password.ts → Custom password setup handler
+    │   │   ├── audit-logs.ts      → Audit log query stubs + Zod schemas
+    │   │   ├── audit-logs.server.ts → Server-only audit log handlers
+    │   │   ├── email-queue.ts      → Email queue inspector stubs (listEmailQueue, retryEmail) + Zod schemas + shared types
+    │   │   ├── email-queue.server.ts → Server-only email queue handlers (list, retry with FOR UPDATE)
+    │   │   ├── setup-password.ts → Custom password setup handler
 │   │   ├── files.ts          → Presigned URL generation
 │   │   ├── settings.ts       → Settings hub stubs (UpdateProfileSchema, UpdateUserSettingsSchema, GetPresignedAvatarUploadUrlSchema)
 │   │   ├── settings.server.ts → Settings hub handlers (updateProfile, getPresignedAvatarUploadUrl, updateUserSettings)
@@ -225,7 +228,7 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 **NotificationPreference** — per-user, per-event, per-channel toggle. [v2]
 **ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, the affected student's subsequent checkpoint `dueDate` values auto-extend. The assignment-wide `finalDeadline` is immutable after creation and never mutated by extensions.
 **AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v1] — admin viewer at `/admin/audit-log`.
-**EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, and 2FA emails; extended to event notifications in [v2]. Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS.
+**EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, and 2FA emails; extended to event notifications in [v2]. Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS. Admin queue inspector at `/admin/email-queue` provides observability — paginated list (20/page) with status filter, search (recipient email/subject), summary stats (pending/sent/failed), and manual retry of failed emails (idempotent: only `status='failed'` can be retried, resets to `pending` inside a `FOR UPDATE` transaction). Processor emits structured logs (`email_queue.cycle_start`, `email_queue.cycle_end`, `email_queue.reclaimed`, `email_queue.send_failed` — no PII). `EMAIL_FROM` is read from `getEnv().EMAIL_FROM` (Zod-validated in `src/config/env.ts` with default `'SIMAK <noreply@simak.app>'`).
 **TwoFactor** — TOTP configuration (secret, backup codes) managed by Better Auth's `twoFactor` plugin.
 **Session** — Better-Auth session token, FK to users, expiresAt.
 **Account** — Better-Auth credential provider entry (stores hashed password).
@@ -896,6 +899,7 @@ A checkpoint unlocks when:
 | `R2_BUCKET_NAME`       | R2 bucket for uploads                                                   |
 | `R2_PUBLIC_URL`        | R2 public base URL for file access                                      |
 | `RESEND_API_KEY`       | Resend API key for email delivery                                       |
+| `EMAIL_FROM`           | From-address for outgoing emails (default: `SIMAK <noreply@simak.app>`)  |
 | `BETTER_AUTH_SECRET`   | Signing secret for auth tokens                                          |
 | `BETTER_AUTH_URL`      | Public URL of the app                                                   |
 | `SUPERADMIN_EMAIL`     | Email for the seeded SuperAdmin                                         |

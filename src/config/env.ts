@@ -7,7 +7,6 @@ const baseSchema = z.object({
   BETTER_AUTH_URL: z.string().url('BETTER_AUTH_URL must be a valid URL'),
   SUPERADMIN_EMAIL: z.string().email('SUPERADMIN_EMAIL must be a valid email'),
   SUPERADMIN_PASSWORD: z.string().min(8, 'SUPERADMIN_PASSWORD must be at least 8 characters'),
-  EMAIL_FROM: z.string({ error: 'EMAIL_FROM is required' }).min(1, 'EMAIL_FROM is required'),
 });
 
 const r2Schema = z.object({
@@ -25,10 +24,14 @@ const envSchema = baseSchema.extend({
   R2_BUCKET_NAME: z.string().optional(),
   R2_PUBLIC_URL: z.string().url().optional(),
   MIGRATE_DATABASE_URL: z.string().url().optional(),
+  EMAIL_FROM: z.string().min(1, 'EMAIL_FROM cannot be empty').default('SIMAK <noreply@simak.app>'),
 });
 
 export type Env = z.infer<typeof baseSchema> &
-  Partial<z.infer<typeof r2Schema>> & { MIGRATE_DATABASE_URL?: string };
+  Partial<z.infer<typeof r2Schema>> & {
+    MIGRATE_DATABASE_URL?: string;
+    EMAIL_FROM: string;
+  };
 
 let _env: Env | null = null;
 

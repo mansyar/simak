@@ -90,6 +90,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 3. Generates password setup links for manual sharing when needed.
 4. Manages assignment templates — creates templates with ordered checkpoints and types.
 5. Views system-wide analytics and audit logs.
+6. Monitors and manages the email delivery queue via `/admin/email-queue` — views paginated, filterable, searchable list of queued emails with summary stats (pending/sent/failed counts). Can manually retry failed emails (resets to `pending` for reprocessing by the background processor).
 
 ### SuperAdmin
 
@@ -148,6 +149,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - In-app notification center with read/unread tracking and type-based grouping.
 - In-app notifications are **localized at read time** — the database stores i18n keys (`titleKey`, `messageKey`) and interpolation `params` (jsonb) instead of literal text; the recipient's locale resolves the display strings, so Indonesian users see Indonesian notifications and English users see English.
 - Email delivery via Resend for account invitations and password setup. Email subjects (password reset, invitation, SLA alerts) are **localized** using the recipient's `locale` preference.
+- **Email queue inspector:** Admins can monitor the email delivery queue at `/admin/email-queue` — a paginated (20/page), filterable (by status: pending/processing/sent/failed), and searchable (by recipient email or subject) list view with summary statistics. Admins can manually retry failed emails, which resets the email to `pending` status for reprocessing by the background processor. The retry is idempotent — only emails with `status='failed'` can be retried; attempting to retry a non-failed email returns a conflict error.
 - Users receive in-app alerts for submissions, reviews, revision requests, and consultation verifications.
 - SLA breach alerts are sent to Admins via in-app and email notifications.
 - Notification bell in the shared header shows the unread count with 15-second polling.

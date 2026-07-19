@@ -11,7 +11,11 @@ async function tick(): Promise<void> {
   try {
     await processEmailQueue();
   } catch (error) {
-    console.error(error);
+    console.error({
+      event: 'email_queue.tick_error',
+      error: error instanceof Error ? error.message : String(error),
+      willRetryNextInterval: true,
+    });
   } finally {
     isRunning = false;
   }

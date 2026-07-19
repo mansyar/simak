@@ -44,15 +44,24 @@ export async function processEmailQueue(): Promise<{
   processed: number;
   sent: number;
   failed: number;
+  reclaimed: number;
 }> {
   const db = getDb();
   const resend = getResendClient();
 
   const staleThreshold = new Date(Date.now() - STALE_PROCESSING_THRESHOLD_MS);
-  await db
+  // Drizzle's UPDATE result type doesn't expose rowCount; cast to read it
+  const reclaimResult = (await db
     .update(emailQueue)
     .set({ status: 'pending' })
-    .where(and(eq(emailQueue.status, 'processing'), lt(emailQueue.lastAttemptAt, staleThreshold)));
+    .where(
+      and(eq(emailQueue.status, 'processing'), lt(emailQueue.lastAttemptAt, staleThreshold)),
+    )) as unknown as { rowCount?: number };
+  const reclaimed = reclaimResult?.rowCount ?? 0;
+
+  if (reclaimed > 0) {
+    console.info({ event: 'email_queue.reclaimed', count: reclaimed });
+  }
 
   const emails = await db.transaction(async (tx) => {
     const rows = await tx
@@ -79,6 +88,8 @@ export async function processEmailQueue(): Promise<{
 
     return dueRows;
   });
+
+  console.info({ event: 'email_queue.cycle_start', dueCount: emails.length });
 
   let processed = 0;
   let sent = 0;
@@ -124,9 +135,25 @@ export async function processEmailQueue(): Promise<{
         })
         .where(eq(emailQueue.id, email.id));
 
+      console.warn({
+        event: 'email_queue.send_failed',
+        emailId: email.id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        attempts: newAttempts,
+        status: shouldFail ? 'failed' : 'pending',
+      });
+
       failed++;
     }
   }
 
-  return { processed, sent, failed };
+  console.info({
+    event: 'email_queue.cycle_end',
+    processed,
+    sent,
+    failed,
+    reclaimed,
+  });
+
+  return { processed, sent, failed, reclaimed };
 }

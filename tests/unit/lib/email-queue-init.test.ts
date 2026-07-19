@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 
 vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
 vi.mock('@/config/env', () => ({
@@ -53,6 +53,25 @@ describe('email-queue-init', () => {
     await vi.advanceTimersByTimeAsync(0);
 
     expect(processMock).toHaveBeenCalledTimes(2);
+    stopEmailQueue();
+  });
+
+  it('logs structured error when tick throws', async () => {
+    mockProcessor(() => Promise.reject(new Error('tick failed')));
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+
+    const errorLog = (console.error as Mock).mock.calls.find(
+      (call: any[]) => call[0]?.event === 'email_queue.tick_error',
+    );
+    expect(errorLog).toBeTruthy();
+    expect(errorLog![0]).toMatchObject({
+      event: 'email_queue.tick_error',
+      error: 'tick failed',
+      willRetryNextInterval: true,
+    });
     stopEmailQueue();
   });
 });
