@@ -170,15 +170,15 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Move R2 HEAD check before transaction (BUG-14)
-    - [ ] Write failing tests in `tests/unit/server/submissions.test.ts` and `tests/unit/server/reviews.test.ts`: assert `getObjectContentLength` is called BEFORE `db.transaction()` opens in both `submitCheckpointHandler` and `submitReviewHandler` (verify call order via mock invocation order) — run `pnpm test` and confirm failures
-    - [ ] Move `getObjectContentLength` call before `db.transaction()` in `submitCheckpointHandler` (`src/server/submissions.server.ts`) — handle the discriminated return type `{ ok: true, size } | { ok: false, reason }` before entering the transaction
-    - [ ] Move `getObjectContentLength` call before `db.transaction()` in `submitReviewHandler` (`src/server/reviews.server.ts`) — same pattern
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
-    - [ ] Commit: `fix(submissions): Move R2 HEAD check before transaction to avoid lock during I/O`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Move R2 HEAD check before transaction (BUG-14) [8e2190a]
+    - [x] Write failing tests in `tests/unit/server/submissions.test.ts` and `tests/unit/server/reviews.test.ts`: assert `getObjectContentLength` is called BEFORE `db.transaction()` opens in both `submitCheckpointHandler` and `submitReviewHandler` (verify call order via mock invocation order) — run `pnpm test` and confirm failures
+    - [x] Move `getObjectContentLength` call before `db.transaction()` in `submitCheckpointHandler` (`src/server/submissions.server.ts`) — handle the discriminated return type `{ ok: true, size } | { ok: false, reason }` before entering the transaction
+    - [x] Move `getObjectContentLength` call before `db.transaction()` in `submitReviewHandler` (`src/server/reviews.server.ts`) — same pattern
+    - [x] Run `pnpm test` — confirm all tests pass
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `fix(submissions): Move R2 HEAD check before transaction to avoid lock during I/O`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Over-fetch, Parallel & Query Rewrite' (Protocol in workflow.md)
 
