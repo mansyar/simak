@@ -117,7 +117,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Missing Pagination' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Missing Pagination' (Protocol in workflow.md)
 
 ## Phase 3: Over-fetch, Parallel & Query Rewrite (FR-3, FR-4, FR-5, FR-6)
 
