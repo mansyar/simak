@@ -23,7 +23,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Config Hygiene' (Protocol in workflow.md)
 
-## Phase 2: Structured Processor Logging (FR-4) + Verify FR-3
+## Phase 2: Structured Processor Logging (FR-4) + Verify FR-3 [checkpoint: 4801a1f]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
     - [x] Read `./spec.md` — review FR-3, FR-4, and Acceptance Criteria #3, #4
