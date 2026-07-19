@@ -1,5 +1,5 @@
 // Server-only handlers for student assignment views and deadline management
-import { eq, and, isNull, sql, inArray } from 'drizzle-orm';
+import { eq, and, isNull, sql, inArray, desc } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
 import { assignmentTemplates } from '../db/schema/templates';
@@ -95,6 +95,9 @@ export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInpu
  * Extend a checkpoint's due date.
  * Only the assignment owner (instructor) can extend checkpoints in their assignment.
  * Can extend any checkpoint regardless of state.
+ * Validates that newDueDate is in the future and maintains sequential ordering
+ * relative to adjacent checkpoints. Does NOT modify assignments.finalDeadline
+ * (immutable per Track 10).
  */
 export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput }) {
   const session = await getSessionFromHeaders();
@@ -111,6 +114,8 @@ export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput })
         id: checkpoints.id,
         assignmentInstructorId: assignments.instructorId,
         assignmentId: checkpoints.assignmentId,
+        studentId: checkpoints.studentId,
+        order: checkpoints.order,
       })
       .from(checkpoints)
       .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
@@ -123,6 +128,52 @@ export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput })
 
     if (checkpoint.assignmentInstructorId !== session.user.id) {
       return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+    }
+
+    // FR-5.1: Validate newDueDate is in the future
+    if (newDueDate <= new Date()) {
+      return serverError(ErrorCode.BAD_REQUEST, 'New deadline must be in the future');
+    }
+
+    // FR-5.2: Validate sequential ordering relative to adjacent checkpoints
+    const [prevCheckpoint] = await db
+      .select({ dueDate: checkpoints.dueDate })
+      .from(checkpoints)
+      .where(
+        and(
+          eq(checkpoints.assignmentId, checkpoint.assignmentId),
+          eq(checkpoints.studentId, checkpoint.studentId),
+          sql`${checkpoints.order} < ${checkpoint.order}`,
+        ),
+      )
+      .orderBy(desc(checkpoints.order))
+      .limit(1);
+
+    if (prevCheckpoint?.dueDate && newDueDate <= prevCheckpoint.dueDate) {
+      return serverError(
+        ErrorCode.BAD_REQUEST,
+        'New deadline must be after the previous checkpoint deadline',
+      );
+    }
+
+    const [nextCheckpoint] = await db
+      .select({ dueDate: checkpoints.dueDate })
+      .from(checkpoints)
+      .where(
+        and(
+          eq(checkpoints.assignmentId, checkpoint.assignmentId),
+          eq(checkpoints.studentId, checkpoint.studentId),
+          sql`${checkpoints.order} > ${checkpoint.order}`,
+        ),
+      )
+      .orderBy(checkpoints.order)
+      .limit(1);
+
+    if (nextCheckpoint?.dueDate && newDueDate >= nextCheckpoint.dueDate) {
+      return serverError(
+        ErrorCode.BAD_REQUEST,
+        'New deadline must be before the next checkpoint deadline',
+      );
     }
 
     await db
