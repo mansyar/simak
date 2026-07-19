@@ -90,14 +90,14 @@
     - [x] Verify migration applied cleanly (no errors) — all 11 DDL statements executed successfully (2 DROP + 9 CREATE)
     - [x] Run `pnpm test:integration tests/integration/db/migration-applied.test.ts` and confirm all 9 test cases now PASS (Green Phase) — 2 tests passed (all 9 indexes exist, 2 old indexes dropped)
 
-- [ ] Task: Run full quality gate suite
-    - [ ] Run `pnpm test` — all existing 2,377+ tests pass (no regressions)
-    - [ ] Run `pnpm typecheck` — passes
-    - [ ] Run `pnpm lint` — passes (including `simak-i18n/no-hardcoded` rule, though no UI changes)
-    - [ ] Run `pnpm check:i18n` — passes (no new i18n keys needed)
-    - [ ] Run `pnpm test:coverage` — meets thresholds (≥80% on lines, statements, branches, functions)
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Run full quality gate suite
+    - [x] Run `pnpm test` — all existing 2,377+ tests pass (no regressions) — 263 test files, 2459 tests passed (covered by pnpm test:coverage run)
+    - [x] Run `pnpm typecheck` — passes (tsc --noEmit --incremental, no errors)
+    - [x] Run `pnpm lint` — passes (0 warnings, 0 errors on 245 files with 91 rules, including simak-i18n/no-hardcoded)
+    - [x] Run `pnpm check:i18n` — passes (563 keys used, 682 in en.json, 682 in id.json, all present)
+    - [x] Run `pnpm test:coverage` — meets thresholds (87.62% stmts, 81.51% branches, 81.47% functions, 88.27% lines — all ≥80%)
+    - [x] Attach git note with task summary — N/A for verification-only task; git note attached to plan update commit instead
+    - [x] Record commit SHA in plan.md — N/A (no code changes; verification-only task, no code commit)
 
 - [ ] Task: Manual EXPLAIN ANALYZE verification (TR-5)
     - [ ] Run `EXPLAIN ANALYZE` on admin dashboard `recentActivity` query — confirm Index Scan on `notifications_created_at_idx` (not Seq Scan)
