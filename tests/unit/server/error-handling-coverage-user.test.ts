@@ -241,14 +241,12 @@ const cases: TestCase[] = [
     handler: updateProfileHandler,
     role: 'authenticated',
     input: { name: 'New Name' },
-    argsMode: 'direct',
   },
   {
     label: 'settings.getPresignedAvatarUploadUrlHandler',
     handler: getPresignedAvatarUploadUrlHandler,
     role: 'authenticated',
     input: { extension: 'jpg' },
-    argsMode: 'direct',
   },
   {
     label: 'settings.getCurrentUserHandler',
@@ -262,7 +260,6 @@ const cases: TestCase[] = [
     handler: updateUserSettingsHandler,
     role: 'authenticated',
     input: { reducedMotion: true },
-    argsMode: 'direct',
   },
 
   {

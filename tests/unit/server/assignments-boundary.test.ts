@@ -1,5 +1,7 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   listInstructorAssignmentsHandler,
   getAssignmentDetailHandler,
@@ -191,6 +193,35 @@ describe('Assignment handlers — boundary date serialization', () => {
 
       expect(data.students[0].checkpoints[0].dueDate).toBeNull();
       expect(data.students[0].effectiveDeadline).toBeNull();
+    });
+  });
+
+  describe('BUG-26: instructorId ownership check in SQL WHERE', () => {
+    it('AC-16: no JS post-query instructorId !== session.user.id check remains', () => {
+      const filePath = resolve(__dirname, '../../../src/server/assignments.server.ts');
+      const content = readFileSync(filePath, 'utf8');
+      expect(content).not.toContain('instructorId !== session.user.id');
+    });
+
+    it('AC-16: getAssignmentDetailHandler filters by instructorId in SQL WHERE', () => {
+      const filePath = resolve(__dirname, '../../../src/server/assignments.server.ts');
+      const content = readFileSync(filePath, 'utf8');
+      // Before fix: only 1 occurrence (in listInstructorAssignmentsHandler)
+      // After fix: 2+ occurrences (listInstructorAssignmentsHandler + getAssignmentDetailHandler)
+      const matches = content.match(/eq\(assignments\.instructorId, session\.user\.id\)/g);
+      expect(matches?.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('returns null when assignment does not belong to the instructor (zero rows)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+
+      // Simulate WHERE clause filtering: DB returns empty rows for non-owner
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = await getAssignmentDetailHandler({ data: { id: 42 } });
+      expect(result).toBeNull();
     });
   });
 });

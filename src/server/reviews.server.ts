@@ -3,13 +3,12 @@ import { eq, and, desc, sql, inArray, isNull, gt } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews, uploadIntents } from '../db/schema/submissions';
-
 import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode, isServerError } from '../lib/errors';
-import { generatePresignedDownloadUrl, getObjectContentLength } from '../lib/storage';
+import { generatePresignedDownloadUrl, getObjectContentLength, r2SizeError } from '../lib/storage';
 import { MAX_FILE_SIZE } from '../lib/file-validation';
 import { calculateBreachDuration } from '../lib/sla';
 import {
@@ -330,8 +329,12 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           return serverError(ErrorCode.BAD_REQUEST, 'Invalid or expired upload intent');
         }
 
-        const actualSize = await getObjectContentLength({ key: feedbackFileKey });
-        if (actualSize === null || actualSize > MAX_FILE_SIZE) {
+        const sizeResult = await getObjectContentLength({ key: feedbackFileKey });
+        if (!sizeResult.ok) {
+          const locale = (session.user.locale || 'en') as 'en' | 'id';
+          return r2SizeError(sizeResult.reason, locale);
+        }
+        if (sizeResult.size > MAX_FILE_SIZE) {
           return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
         }
 

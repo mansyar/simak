@@ -164,7 +164,7 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-003: Input Validation & Data Integrity
 
-- **Status:** `Pending`
+- **Status:** `Complete (Archived)`
 - **Dependencies:** None
 - **Estimated Effort:** 2 Days / 1 Sprint Loop
 - **Audit IDs:** BUG-10, BUG-15, BUG-24, BUG-25, BUG-26, BUG-27
@@ -210,9 +210,9 @@ All tracks must adhere to the following project constraints:
 
 #### Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Call `updateProfile` with `{ name: "" }` — rejected with Zod validation error (not silently accepted). Submit a file without R2 configured — error says "File storage is not configured" (not "File exceeds 25MB"). Create an assignment with an admin userId in `studentIds` — rejected with "One or more selected users are not active students". Start the app without `EMAIL_FROM` set — fails with Zod env validation error.
-- [ ] **Automated Tests:** `pnpm test:unit` — new tests for: settings Zod rejection (empty name, oversized, wrong types), storage error discrimination (not_configured vs not_found vs too_large), studentId role validation (admin/instructor/deleted userIds rejected), actualSize storage in submission record. All pass. Run `pnpm check:i18n` — new keys exist in both locales.
-- [ ] **Conductor Review:** No server function stub bypasses Zod validation (grep for `args: unknown` in `*.ts` stubs — should be zero outside of `getCurrentUser` GET). No `process.env` reads outside of `env.ts` and `storage.ts` (R2 client). `getObjectContentLength` callers handle all three result branches.
+- [x] **Manual Checkpoint:** Call `updateProfile` with `{ name: "" }` — rejected with Zod validation error (not silently accepted). Submit a file without R2 configured — error says "File storage is not configured" (not "File exceeds 25MB"). Create an assignment with an admin userId in `studentIds` — rejected with "One or more selected users are not active students". Start the app without `EMAIL_FROM` set — fails with Zod env validation error.
+- [x] **Automated Tests:** `pnpm test:unit` — new tests for: settings Zod rejection (empty name, oversized, wrong types), storage error discrimination (not_configured vs not_found vs too_large), studentId role validation (admin/instructor/deleted userIds rejected), actualSize storage in submission record. All pass. Run `pnpm check:i18n` — new keys exist in both locales.
+- [x] **Conductor Review:** No server function stub bypasses Zod validation (grep for `args: unknown` in `*.ts` stubs — should be zero outside of `getCurrentUser` GET). No `process.env` reads outside of `env.ts` and `storage.ts` (R2 client). `getObjectContentLength` callers handle all three result branches.
 
 ---
 

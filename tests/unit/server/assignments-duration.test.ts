@@ -64,15 +64,19 @@ describe('Assignment duration calculation', () => {
         { name: 'CP2', order: 2, minConsultations: 2, estimatedDuration: 14 },
         { name: 'CP3', order: 3, minConsultations: 1, estimatedDuration: 21 },
       ];
-      // 1st await mockDb: student insert (unused result)
+      // 1st await mockDb: studentIds validation query (returns valid student)
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 'student-1' }]).then(onfulfilled),
+      );
+      // 2nd await mockDb: student insert (unused result)
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve(checkpointsData).then(onfulfilled),
       );
-      // 2nd await mockDb: template checkpoints query
+      // 3rd await mockDb: template checkpoints query
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve(checkpointsData).then(onfulfilled),
       );
-      // 3rd await mockDb: assignment createdAt query
+      // 4th await mockDb: assignment createdAt query
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ createdAt: new Date('2026-07-01T00:00:00Z') }]).then(onfulfilled),
       );
