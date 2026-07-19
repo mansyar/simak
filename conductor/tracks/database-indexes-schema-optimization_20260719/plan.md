@@ -4,7 +4,7 @@
 **Track ID:** `database-indexes-schema-optimization_20260719`
 **Spec:** [./spec.md](./spec.md)
 
-## Phase 1: Schema Changes with TDD
+## Phase 1: Schema Changes with TDD [checkpoint: 50444d1]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
     - [ ] Read `./spec.md` — review TR-1 (Schema Changes), TR-4 (Index Verification Tests - Unit), AC-1, AC-4, AC-6 through AC-10
