@@ -31,17 +31,17 @@
     - [x] Read `./spec.md` — review FR-2 (R2 Error Discrimination), FR-3 (EMAIL_FROM), FR-6 (actualSize storage), FR-7 (new i18n keys), NFR-7 (no process.env outside env.ts/storage.ts), AC-6 through AC-12, AC-18 through AC-21
     - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements
 
-- [ ] Task: Add new i18n keys for R2 error messages (BUG-10)
-    - [ ] Add `files.r2NotConfigured` to `locales/en.json` with value: "File storage is not configured. Contact your administrator."
-    - [ ] Add `files.r2NotConfigured` to `locales/id.json` with value: "Penyimpanan berkas tidak dikonfigurasi. Hubungi administrator Anda."
-    - [ ] Add `files.objectNotFound` to `locales/en.json` with value: "The uploaded file could not be found. Please try uploading again."
-    - [ ] Add `files.objectNotFound` to `locales/id.json` with value: "Berkas yang diunggah tidak ditemukan. Silakan coba unggah kembali."
-    - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
-    - [ ] Run `pnpm check:i18n` — confirm EN↔ID parity passes
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint`
-    - [ ] Commit: `feat(i18n): Add files.r2NotConfigured and files.objectNotFound keys`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Add new i18n keys for R2 error messages (BUG-10) — Commits: 2f876b1 (locales), 6df5f63 (regenerated types)
+    - [x] Add `files.r2NotConfigured` to `locales/en.json` with value: "File storage is not configured. Contact your administrator."
+    - [x] Add `files.r2NotConfigured` to `locales/id.json` with value: "Penyimpanan berkas tidak dikonfigurasi. Hubungi administrator Anda."
+    - [x] Add `files.objectNotFound` to `locales/en.json` with value: "The uploaded file could not be found. Please try uploading again."
+    - [x] Add `files.objectNotFound` to `locales/id.json` with value: "Berkas yang diunggah tidak ditemukan. Silakan coba unggah kembali."
+    - [x] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
+    - [~] Run `pnpm check:i18n` — DEFERRED: keys reported as unused until Task 4 caller code uses them; will pass after Task 4
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint` (both pass)
+    - [x] Commit: `feat(i18n): Add R2 error message keys for storage discrimination` (2f876b1) + `chore(i18n): Regenerate types for new R2 error keys` (6df5f63)
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Refactor getObjectContentLength to discriminated return type (BUG-10)
     - [ ] Write failing tests: in `tests/unit/lib/storage.test.ts`, add tests that (1) `getObjectContentLength` returns `{ ok: false, reason: 'not_configured' }` when R2 env vars are missing, (2) returns `{ ok: false, reason: 'not_found' }` when S3 client throws NotFound/404, (3) returns `{ ok: true, size }` on successful HEAD response. Mock the S3 client send method. Run `pnpm test` and confirm new tests fail.
