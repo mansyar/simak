@@ -9,6 +9,7 @@ import {
   LogOut,
   X,
   GraduationCap,
+  Mail,
 } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 
@@ -29,6 +30,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { to: '/admin/users', label: 'adminSidebar.users', icon: Users },
     { to: '/admin/templates', label: 'adminSidebar.templates', icon: FileType },
     { to: '/admin/audit-log', label: 'adminSidebar.auditLog', icon: ScrollText },
+    { to: '/admin/email-queue', label: 'adminSidebar.emailQueue', icon: Mail },
   ] as const;
 
   const preferenceLinks = [

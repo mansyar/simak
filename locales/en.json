@@ -92,6 +92,7 @@
     "users": "Users",
     "templates": "Templates",
     "auditLog": "Audit Log",
+    "emailQueue": "Email Queue",
     "branding": "SIMAK",
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
@@ -137,6 +138,44 @@
       "extensionApproved": "Extension Approved",
       "extensionRejected": "Extension Rejected"
     }
+  },
+  "adminEmailQueue": {
+    "title": "Email Queue",
+    "subtitle": "Monitor and manage email delivery queue",
+    "searchPlaceholder": "Search by recipient or subject...",
+    "statusAll": "All Statuses",
+    "statusPending": "Pending",
+    "statusProcessing": "Processing",
+    "statusSent": "Sent",
+    "statusFailed": "Failed",
+    "table": {
+      "recipient": "Recipient",
+      "subject": "Subject",
+      "template": "Template",
+      "status": "Status",
+      "attempts": "Attempts",
+      "createdAt": "Created",
+      "lastAttemptAt": "Last Attempt",
+      "errorMessage": "Error",
+      "actions": "Actions"
+    },
+    "template": {
+      "password_reset": "Password Reset",
+      "invitation": "Invitation",
+      "sla_alert": "SLA Alert",
+      "two_factor": "Two-Factor Auth"
+    },
+    "summary": {
+      "pending": "Pending",
+      "sent": "Sent",
+      "failed": "Failed"
+    },
+    "retry": "Retry",
+    "retryConfirmTitle": "Retry Email",
+    "retryConfirmDescription": "This will reset the email to pending status with a fresh retry budget. The email will be sent on the next processor cycle.",
+    "retrySuccess": "Email queued for retry",
+    "empty": "No emails in the queue",
+    "emptyFiltered": "No emails match your filters"
   },
   "adminUsers": {
     "title": "Users",

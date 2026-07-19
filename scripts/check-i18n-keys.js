@@ -28,10 +28,12 @@ const DYNAMIC_KEY_PATTERNS = [
   /^error\.(unauthorized|forbidden|validation|badRequest|conflict|internal|network|default)$/,
   /^studentAssignments\.status\.(locked|unlocked)$/,
   // Sidebar labels are passed dynamically to t(link.label)
-  /^adminSidebar\.(dashboard|users|templates|auditLog)$/,
+  /^adminSidebar\.(dashboard|users|templates|auditLog|emailQueue)$/,
   /^instructorSidebar\.(dashboard|assignments|reviews)$/,
   /^studentSidebar\.(dashboard|assignments|settings)$/,
   /^nav\.settings$/,
+  // Email queue template types are resolved via t(`adminEmailQueue.template.${type}`)
+  /^adminEmailQueue\.template\./,
   // Email subjects are resolved server-side via resolveEmailSubject
   /^emails\.subjects\./,
   // Server-side error messages resolved via translateKey

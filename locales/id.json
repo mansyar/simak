@@ -92,6 +92,7 @@
     "users": "Pengguna",
     "templates": "Templat",
     "auditLog": "Log Audit",
+    "emailQueue": "Antrian Email",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
@@ -137,6 +138,44 @@
       "extensionApproved": "Perpanjangan Disetujui",
       "extensionRejected": "Perpanjangan Ditolak"
     }
+  },
+  "adminEmailQueue": {
+    "title": "Antrian Email",
+    "subtitle": "Pantau dan kelola antrian pengiriman email",
+    "searchPlaceholder": "Cari berdasarkan penerima atau subjek...",
+    "statusAll": "Semua Status",
+    "statusPending": "Tertunda",
+    "statusProcessing": "Memproses",
+    "statusSent": "Terkirim",
+    "statusFailed": "Gagal",
+    "table": {
+      "recipient": "Penerima",
+      "subject": "Subjek",
+      "template": "Templat",
+      "status": "Status",
+      "attempts": "Percobaan",
+      "createdAt": "Dibuat",
+      "lastAttemptAt": "Percobaan Terakhir",
+      "errorMessage": "Error",
+      "actions": "Aksi"
+    },
+    "template": {
+      "password_reset": "Reset Kata Sandi",
+      "invitation": "Undangan",
+      "sla_alert": "Peringatan SLA",
+      "two_factor": "Autentikasi Dua Faktor"
+    },
+    "summary": {
+      "pending": "Tertunda",
+      "sent": "Terkirim",
+      "failed": "Gagal"
+    },
+    "retry": "Coba Lagi",
+    "retryConfirmTitle": "Coba Kirim Ulang Email?",
+    "retryConfirmDescription": "Ini akan mengatur ulang email ke status tertunda dengan batas percobaan baru. Email akan dikirim pada siklus prosesor berikutnya.",
+    "retrySuccess": "Email antri untuk dikirim ulang",
+    "empty": "Tidak ada email dalam antrian",
+    "emptyFiltered": "Tidak ada email yang cocok dengan filter"
   },
   "adminUsers": {
     "title": "Pengguna",

@@ -97,6 +97,7 @@ export type Translation = {
     users: string
     templates: string
     auditLog: string
+    emailQueue: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -142,6 +143,44 @@ export type Translation = {
       extensionApproved: string
       extensionRejected: string
     }
+  }
+  adminEmailQueue: {
+    title: string
+    subtitle: string
+    searchPlaceholder: string
+    statusAll: string
+    statusPending: string
+    statusProcessing: string
+    statusSent: string
+    statusFailed: string
+    table: {
+      recipient: string
+      subject: string
+      template: string
+      status: string
+      attempts: string
+      createdAt: string
+      lastAttemptAt: string
+      errorMessage: string
+      actions: string
+    }
+    template: {
+      password_reset: string
+      invitation: string
+      sla_alert: string
+      two_factor: string
+    }
+    summary: {
+      pending: string
+      sent: string
+      failed: string
+    }
+    retry: string
+    retryConfirmTitle: string
+    retryConfirmDescription: string
+    retrySuccess: string
+    empty: string
+    emptyFiltered: string
   }
   adminUsers: {
     title: string
