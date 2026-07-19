@@ -54,9 +54,9 @@
 
 ## Phase 2: Migration & Integration Verification
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
-    - [ ] Read `./spec.md` — review TR-2 (Migration Generation & Review), TR-3 (Migration Application), TR-4 (Integration test), TR-5 (Manual EXPLAIN ANALYZE), AC-2, AC-3, AC-5, AC-11
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, Phase Completion Verification Protocol
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
+    - [x] Read `./spec.md` — review TR-2 (Migration Generation & Review), TR-3 (Migration Application), TR-4 (Integration test), TR-5 (Manual EXPLAIN ANALYZE), AC-2, AC-3, AC-5, AC-11
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, Phase Completion Verification Protocol
 
 - [ ] Task: Write failing integration test for migration-applied indexes (Red Phase)
     - [ ] Create `tests/integration/db/migration-applied.test.ts`
