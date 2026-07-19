@@ -62,7 +62,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: SQL & Dashboard Query Fixes' (Protocol in workflow.md) — User approved checkpoint
 
-## Phase 3: Validation Logic (BUG-12, BUG-18)
+## Phase 3: Validation Logic (BUG-12, BUG-18) [checkpoint: 56c4da8]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
     - [x] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
@@ -91,7 +91,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Validation Logic' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Validation Logic' (Protocol in workflow.md)
 
 ## Phase 4: Notification Cleanup (BUG-21)
 
