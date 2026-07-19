@@ -8,6 +8,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Email Queue Robustness**
-*Link: [./tracks/email-queue-robustness_20260719/](./tracks/email-queue-robustness_20260719/)*
-
