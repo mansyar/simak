@@ -111,5 +111,5 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Assignment & Ownership Validation' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Assignment & Ownership Validation' (Protocol in workflow.md)
 </protect>
