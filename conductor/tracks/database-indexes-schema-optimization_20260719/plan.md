@@ -6,11 +6,11 @@
 
 ## Phase 1: Schema Changes with TDD
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
     - [ ] Read `./spec.md` — review TR-1 (Schema Changes), TR-4 (Index Verification Tests - Unit), AC-1, AC-4, AC-6 through AC-10
     - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements, and Phase Completion Verification Protocol
 
-- [ ] Task: Write failing unit test for Drizzle schema index declarations (Red Phase)
+- [x] Task: Write failing unit test for Drizzle schema index declarations (Red Phase)
     - [ ] Create `tests/unit/db/schema/indexes.test.ts`
     - [ ] Add `/** @vitest-environment node */` at the top of the file (Drizzle schema imports pull in `pg` types)
     - [ ] Add test cases for each of the 9 expected indexes:
@@ -25,24 +25,24 @@
         - `reviews_submission_id_created_at_idx` on `(submissionId, createdAt)` (PERF-14)
     - [ ] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm all test cases FAIL (no indexes declared yet)
 
-- [ ] Task: Add indexes to tables currently with ZERO indexes (PERF-7, PERF-9, PERF-10)
+- [x] Task: Add indexes to tables currently with ZERO indexes (PERF-7, PERF-9, PERF-10)
     - [ ] `src/db/schema/assignments.ts` — Convert `assignmentStudents` from plain object to table-callback function; add 2 indexes: `(assignmentId, studentId)` and `(studentId)` (PERF-7)
     - [ ] `src/db/schema/templates.ts` — Convert `templateCheckpoints` from plain object to table-callback function; add 1 index: `(templateId, order)` (PERF-9)
     - [ ] `src/db/schema/users.ts` — Convert `users` from plain object to table-callback function; add 1 index: `(role, deletedAt)` (PERF-10)
     - [ ] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm the 4 new-index test cases now PASS
 
-- [ ] Task: Replace low-cardinality indexes with composites (PERF-11, PERF-14)
+- [x] Task: Replace low-cardinality indexes with composites (PERF-11, PERF-14)
     - [ ] `src/db/schema/consultations.ts` — Replace `(status)` index definition with `(assignmentId, status)` composite in existing callback; keep `consultations_checkpoint_id_idx` (PERF-11)
     - [ ] `src/db/schema/submissions.ts` — Replace `(submissionId)` index definition with `(submissionId, createdAt)` composite in `reviews` table callback (PERF-14)
     - [ ] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm the 2 replacement test cases now PASS
 
-- [ ] Task: Add new indexes to existing callbacks (PERF-8, PERF-12, PERF-13)
+- [x] Task: Add new indexes to existing callbacks (PERF-8, PERF-12, PERF-13)
     - [ ] `src/db/schema/notifications.ts` — Add `(createdAt)` index to existing callback; keep existing `(userId, read)` index (PERF-8)
     - [ ] `src/db/schema/extensions.ts` — Add `(assignmentId, studentId)` index to existing callback; keep existing `extension_requests_assignment_id_status_idx` (PERF-12)
     - [ ] `src/db/schema/audit-log.ts` — Add `(actorId)` index to existing callback; keep existing `(createdAt)`, `(action)`, `(entityType, entityId)` indexes (PERF-13)
     - [ ] Run `pnpm vitest run tests/unit/db/schema/indexes.test.ts` and confirm all 9 test cases now PASS (Green Phase)
 
-- [ ] Task: Verify unit tests pass + run quality gates
+- [x] Task: Verify unit tests pass + run quality gates (96f056c)
     - [ ] Run `pnpm test` — all existing 2,377+ tests pass (no regressions from schema changes)
     - [ ] Run `pnpm typecheck` — passes (no TypeScript errors introduced)
     - [ ] Run `pnpm lint` — passes (no lint errors introduced)
