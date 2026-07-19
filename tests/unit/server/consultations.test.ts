@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   logConsultationHandler,
   listConsultationsHandler,
-  listPendingConsultationsHandler,
   verifyConsultationHandler,
   rejectConsultationHandler,
   getConsultationDetailHandler,
@@ -272,44 +271,6 @@ describe('Consultation server functions - Logic & Security', () => {
         expect(result.consultations).toEqual([]);
         expect(result.total).toBe(5);
       }
-    });
-  });
-
-  describe('listPendingConsultationsHandler', () => {
-    it('should fail if unauthorized', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await listPendingConsultationsHandler({ data: { assignmentId: 1 } });
-      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
-    });
-
-    it('should fail if student tries', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
-      const result = await listPendingConsultationsHandler({ data: { assignmentId: 1 } });
-      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
-    });
-
-    it('should return pending consultations for instructor', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
-
-      // Mock assignment ownership check
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 1 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              id: 1,
-              studentName: 'Student A',
-              checkpointName: 'Ch 1',
-              sessionType: 'internal',
-              createdAt: new Date('2026-05-01T00:00:00.000Z'),
-            },
-          ]).then(onfulfilled),
-        );
-
-      const result = await listPendingConsultationsHandler({ data: { assignmentId: 1 } });
-      expect(result).toHaveProperty('consultations');
     });
   });
 

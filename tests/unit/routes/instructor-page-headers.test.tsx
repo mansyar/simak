@@ -106,6 +106,10 @@ vi.mock('@/hooks/use-assignment-tabs', () => ({
   useAssignmentTabs: vi.fn().mockReturnValue({
     pendingConsultations: [],
     setPendingConsultations: vi.fn(),
+    pendingPage: 1,
+    setPendingPage: vi.fn(),
+    pendingTotal: 0,
+    refreshPendingConsultations: vi.fn().mockResolvedValue(undefined),
     extensionRequests: [],
     extensionsLoading: false,
     handleApproveExtension: vi.fn(),

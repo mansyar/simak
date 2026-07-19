@@ -58,7 +58,7 @@ describe('useAssignmentTabs', () => {
     mockApproveExtension.mockReset();
     mockRejectExtension.mockReset();
 
-    mockListPendingConsultations.mockResolvedValue({ consultations: [] });
+    mockListPendingConsultations.mockResolvedValue({ consultations: [], total: 0 });
     mockListExtensionRequests.mockResolvedValue({ items: [] });
     mockApproveExtension.mockResolvedValue({});
     mockRejectExtension.mockResolvedValue({});
@@ -77,7 +77,10 @@ describe('useAssignmentTabs', () => {
   });
 
   it('loads pending consultations and extensions on mount when assignmentId is provided', async () => {
-    mockListPendingConsultations.mockResolvedValue({ consultations: [fakeConsultation] });
+    mockListPendingConsultations.mockResolvedValue({
+      consultations: [fakeConsultation],
+      total: 1,
+    });
     mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
 
     const { result } = renderHook(() => useAssignmentTabs(42));
@@ -88,7 +91,9 @@ describe('useAssignmentTabs', () => {
     expect(result.current.extensionRequests).toEqual([fakeExtension]);
     expect(result.current.extensionsLoading).toBe(false);
 
-    expect(mockListPendingConsultations).toHaveBeenCalledWith({ data: { assignmentId: 42 } });
+    expect(mockListPendingConsultations).toHaveBeenCalledWith({
+      data: { assignmentId: 42, page: 1, limit: 20 },
+    });
     expect(mockListExtensionRequests).toHaveBeenCalledWith({
       data: { assignmentId: 42, status: 'pending', page: 1, limit: 50 },
     });
