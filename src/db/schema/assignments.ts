@@ -53,16 +53,26 @@ export const assignments = pgTable(
   ],
 );
 
-export const assignmentStudents = pgTable('assignment_students', {
-  id: serial('id').primaryKey(),
-  assignmentId: integer('assignment_id')
-    .notNull()
-    .references(() => assignments.id, { onDelete: 'cascade' }),
-  studentId: text('student_id')
-    .notNull()
-    .references(() => users.id),
-  createdAt: timestamp('created_at').defaultNow(),
-});
+export const assignmentStudents = pgTable(
+  'assignment_students',
+  {
+    id: serial('id').primaryKey(),
+    assignmentId: integer('assignment_id')
+      .notNull()
+      .references(() => assignments.id, { onDelete: 'cascade' }),
+    studentId: text('student_id')
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => [
+    index('assignment_students_assignment_id_student_id_idx').on(
+      table.assignmentId,
+      table.studentId,
+    ),
+    index('assignment_students_student_id_idx').on(table.studentId),
+  ],
+);
 
 export const checkpoints = pgTable(
   'checkpoints',

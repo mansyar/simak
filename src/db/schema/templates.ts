@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, serial, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, serial, integer, index } from 'drizzle-orm/pg-core';
 import { users } from './users';
 
 export const assignmentTemplates = pgTable('assignment_templates', {
@@ -11,14 +11,20 @@ export const assignmentTemplates = pgTable('assignment_templates', {
   deletedAt: timestamp('deleted_at'),
 });
 
-export const templateCheckpoints = pgTable('template_checkpoints', {
-  id: serial('id').primaryKey(),
-  templateId: integer('template_id')
-    .notNull()
-    .references(() => assignmentTemplates.id, { onDelete: 'cascade' }),
-  name: text('name').notNull(),
-  order: integer('order').notNull(),
-  minConsultations: integer('min_consultations').default(0),
-  estimatedDuration: integer('estimated_duration').default(0),
-  createdAt: timestamp('created_at').defaultNow(),
-});
+export const templateCheckpoints = pgTable(
+  'template_checkpoints',
+  {
+    id: serial('id').primaryKey(),
+    templateId: integer('template_id')
+      .notNull()
+      .references(() => assignmentTemplates.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    order: integer('order').notNull(),
+    minConsultations: integer('min_consultations').default(0),
+    estimatedDuration: integer('estimated_duration').default(0),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (table) => [
+    index('template_checkpoints_template_id_order_idx').on(table.templateId, table.order),
+  ],
+);

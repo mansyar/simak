@@ -26,5 +26,9 @@ export const extensionRequests = pgTable(
   },
   (table) => [
     index('extension_requests_assignment_id_status_idx').on(table.assignmentId, table.status),
+    index('extension_requests_assignment_id_student_id_idx').on(
+      table.assignmentId,
+      table.studentId,
+    ),
   ],
 );

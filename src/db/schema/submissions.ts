@@ -55,7 +55,9 @@ export const reviews = pgTable(
     createdAt: timestamp('created_at').defaultNow(),
     reviewedAt: timestamp('reviewed_at'),
   },
-  (table) => [index('reviews_submission_id_idx').on(table.submissionId)],
+  (table) => [
+    index('reviews_submission_id_created_at_idx').on(table.submissionId, table.createdAt),
+  ],
 );
 
 export const uploadIntents = pgTable(

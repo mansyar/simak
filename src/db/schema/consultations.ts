@@ -37,6 +37,6 @@ export const consultations = pgTable(
   },
   (table) => [
     index('consultations_checkpoint_id_idx').on(table.checkpointId),
-    index('consultations_status_idx').on(table.status),
+    index('consultations_assignment_id_status_idx').on(table.assignmentId, table.status),
   ],
 );
