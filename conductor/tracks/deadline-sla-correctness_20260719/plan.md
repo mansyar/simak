@@ -111,7 +111,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Notification Cleanup' (Protocol in workflow.md) — User approved checkpoint
 
-## Phase 5: effectiveDeadline Derivation (BUG-28)
+## Phase 5: effectiveDeadline Derivation (BUG-28) [checkpoint: 7484f54]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 5 implementation
     - [x] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
@@ -129,5 +129,5 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: effectiveDeadline Derivation' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 5: effectiveDeadline Derivation' (Protocol in workflow.md)
 </protect>
