@@ -44,11 +44,11 @@
 
 ## Phase 3: Admin Queue Server Functions (FR-1 backend, FR-2 backend)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
-    - [ ] Read `./spec.md` — review FR-1, FR-2, and Acceptance Criteria #1, #2
-    - [ ] Read `conductor/workflow.md` — review server-function two-file split and quality gates
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
+    - [x] Read `./spec.md` — review FR-1, FR-2, and Acceptance Criteria #1, #2
+    - [x] Read `conductor/workflow.md` — review server-function two-file split and quality gates
 
-- [ ] Task: Implement listEmailQueue server function (FR-1 backend)
+- [x] Task: Implement listEmailQueue server function (FR-1 backend) [e5393c4]
     - [ ] Write failing tests in `tests/unit/server/email-queue.test.ts` (Node env): (1) returns paginated rows (20/page) ordered by `created_at` DESC; (2) filters by status when provided; (3) free-text search matches recipient_email OR subject (case-insensitive); (4) admin role passes, non-admin is rejected via `requireRole`; (5) returns summary counts (pending/sent/failed) — mock `@/db/index` and `@/server/auth` — run `pnpm test` and confirm failures
     - [ ] Create `src/server/email-queue.ts` — Zod input schema (page, status filter, search) + `createServerFn` stubs (`listEmailQueue`, `retryEmail`) using the typed builder `.inputValidator(Schema).handler(...)` pattern
     - [ ] Create `src/server/email-queue.server.ts` — `listEmailQueueHandler`: `requireRole(['superadmin', 'admin'])`, paginated/filtered/search query using the existing `(status, created_at)` index, plus summary counts
