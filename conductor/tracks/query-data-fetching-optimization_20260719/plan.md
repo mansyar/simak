@@ -31,7 +31,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Refactor dispatchSLABreachNotifications (PERF-5)
+- [x] Task: Refactor dispatchSLABreachNotifications (PERF-5) [de69169]
     - [ ] Write failing tests in `tests/unit/server/sla.test.ts` or `reviews.test.ts` (Node env): assert (1) no `channel: 'email'` notification rows are inserted (dead rows removed); (2) in-app notifications are inserted as a single batch `db.insert(notifications).values([...])` for all admins; (3) SLA alert emails are sent concurrently via `Promise.allSettled` (not sequentially) — run `pnpm test` and confirm failures
     - [ ] Refactor `dispatchSLABreachNotifications` in `src/server/sla.server.ts` (or `src/lib/sla.ts`): remove dead `channel: 'email'` INSERT rows, batch in-app INSERT into single `db.insert(notifications).values([...])`, send emails via `Promise.allSettled`
     - [ ] Run `pnpm test` — confirm all tests pass
