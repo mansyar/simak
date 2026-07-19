@@ -90,7 +90,7 @@ export async function getAdminDashboardDataHandler() {
           assignmentTitle: assignments.title,
           checkpointName: checkpoints.name,
           studentName: users.name,
-          daysOverdue: sql<number>`extract(day from now() - ${submissions.uploadedAt})::int`,
+          daysOverdue: sql<number>`(EXTRACT(EPOCH FROM now() - ${submissions.uploadedAt}) / 86400)::int`,
         })
         .from(submissions)
         .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
@@ -104,7 +104,7 @@ export async function getAdminDashboardDataHandler() {
             isNull(assignments.deletedAt),
           ),
         )
-        .orderBy(desc(sql`extract(day from now() - ${submissions.uploadedAt})`)),
+        .orderBy(desc(sql`EXTRACT(EPOCH FROM now() - ${submissions.uploadedAt}) / 86400`)),
     ]);
 
     const metrics = {
@@ -124,12 +124,7 @@ export async function getAdminDashboardDataHandler() {
         failed: Number(emailCounts.failed),
       },
       recentActivity: recentActivity.map((ra) => {
-        const content = resolveNotificationContent(
-          ra.titleKey,
-          ra.messageKey,
-          ra.params,
-          'en',
-        );
+        const content = resolveNotificationContent(ra.titleKey, ra.messageKey, ra.params, 'en');
         return {
           id: ra.id,
           type: ra.type,

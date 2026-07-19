@@ -212,4 +212,69 @@ describe('getAdminDashboardDataHandler', () => {
     const result = (await getAdminDashboardDataHandler()) as any;
     expect(result.emailQueueCounts).toEqual({ pending: 12, sent: 45, failed: 3 });
   });
+
+  // BUG-11: daysOverdue SQL must use EXTRACT(EPOCH FROM ...) / 86400, not extract(day from ...)
+  // extract(day from interval) returns the day-component (wraps at ~30), not total elapsed days.
+  describe('BUG-11: daysOverdue SQL arithmetic', () => {
+    /**
+     * Recursively extracts raw SQL text from a Drizzle SQL object by collecting
+     * StringChunk values from queryChunks, recursing into nested SQL objects.
+     */
+    function extractSqlText(sqlObj: any): string {
+      if (!sqlObj || !sqlObj.queryChunks) return '';
+      return sqlObj.queryChunks
+        .map((chunk: any) => {
+          if (chunk?.constructor?.name === 'StringChunk' && Array.isArray(chunk.value)) {
+            return chunk.value.join('');
+          }
+          // Recurse into nested SQL objects (e.g. inside desc() wrapper)
+          if (chunk?.queryChunks) {
+            return extractSqlText(chunk);
+          }
+          return '';
+        })
+        .join('');
+    }
+
+    it('daysOverdue SELECT should use EXTRACT(EPOCH FROM ...) / 86400 (not extract(day from ...))', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+      mockDb.then.mockImplementation((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+
+      await getAdminDashboardDataHandler();
+
+      // The 7th select() call (index 6) is the escalationAlerts query
+      const escalationSelectCall = mockDb.select.mock.calls[6];
+      expect(escalationSelectCall).toBeDefined();
+
+      const selectFields = escalationSelectCall[0];
+      const daysOverdueSql = selectFields.daysOverdue;
+      const sqlText = extractSqlText(daysOverdueSql);
+
+      // Should use EPOCH-based extraction for total elapsed days
+      expect(sqlText).toContain('EPOCH');
+      expect(sqlText).toContain('86400');
+      // Should NOT use extract(day from ...) which wraps at ~30 days
+      expect(sqlText.toLowerCase()).not.toContain('extract(day from');
+    });
+
+    it('escalationAlerts ORDER BY should use EXTRACT(EPOCH FROM ...) / 86400 (not extract(day from ...))', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+      mockDb.then.mockImplementation((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+
+      await getAdminDashboardDataHandler();
+
+      // The escalationAlerts query's orderBy is the last orderBy call
+      const orderByCalls = mockDb.orderBy.mock.calls;
+      const lastOrderByCall = orderByCalls[orderByCalls.length - 1];
+      expect(lastOrderByCall).toBeDefined();
+
+      // desc(sql`...`) wraps the inner SQL in a SQL object; extractSqlText recurses into it
+      const descWrapper = lastOrderByCall[0];
+      const sqlText = extractSqlText(descWrapper);
+
+      expect(sqlText).toContain('EPOCH');
+      expect(sqlText).toContain('86400');
+      expect(sqlText.toLowerCase()).not.toContain('extract(day from');
+    });
+  });
 });
