@@ -35,7 +35,7 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 ---
 
-## Phase 2: Session Cache (PERF-22)
+## Phase 2: Session Cache (PERF-22) [checkpoint: 7125d0b]
 
 **Goal:** Add a 5s-TTL in-memory cache for `{ role, locale }` lookups in `getSessionHandler`, eliminating the redundant DB query across server-function calls within a page load.
 
@@ -57,7 +57,7 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
     - [x] Preserve the Better Auth call on every request (cache sits between `auth.api.getSession()` and the DB query — never cache session-token validation)
     - [x] Run `pnpm test` — cache tests pass (Green)
     - [x] Run `pnpm test:coverage` — verify `auth.server.ts` ≥80% on all four metrics (100% achieved)
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Session Cache' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Session Cache' (Protocol in workflow.md) [checkpoint: 7125d0b]
 
 ---
 
