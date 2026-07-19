@@ -13,24 +13,24 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 **Goal:** Move the session-resolution handler into `auth.server.ts` and rewrite `auth.ts` as a client-safe stub. No cache yet — pure structural split preserving current behavior.
 
-- [ ] Task: Read spec.md and workflow.md to re-establish context
-    - [ ] Read `./spec.md` (track specification — requirements, acceptance criteria, decisions)
-    - [ ] Read `../../workflow.md` (TDD lifecycle, commit format, phase checkpoint protocol)
-- [ ] Task: Write failing tests for the auth split (Red)
-    - [ ] Update `tests/unit/server/auth.test.ts` (create if absent) to test `getSessionHandler` directly: returns correct `Session` shape, handles null session, soft-deleted user returns null, role/locale fallback from DB
-    - [ ] Add a test asserting `src/server/auth.ts` does not import forbidden modules (`drizzle-orm`, `../db/index`, `../db/schema/*`, `../auth/config`, `getRequestHeaders`) — file-content assertion
-    - [ ] Add a test asserting `auth.ts` `_getSession` stub delegates to `auth.server.ts` via dynamic import (mock `./auth.server` and assert `getSessionHandler` is called)
-    - [ ] Run `pnpm test` and confirm the new tests fail (Red)
-- [ ] Task: Create `src/server/auth.server.ts` with `getSessionHandler` (Green)
-    - [ ] Move the handler logic from `auth.ts` `_getSession` into `getSessionHandler` in `auth.server.ts` — verbatim: `getRequestHeaders`, `auth.api.getSession`, `getDb`, `users` schema query, soft-delete check (`deletedAt IS NULL`), role/locale fallback
-    - [ ] No cache yet — pure move, behavior identical
-    - [ ] Run `pnpm test` — handler tests pass (Green)
-- [ ] Task: Rewrite `src/server/auth.ts` as client-safe stub
-    - [ ] Keep `Session` type, `getSessionFromHeaders`, `requireRole` exports (unchanged signatures)
-    - [ ] Rewrite `_getSession` as `createServerFn({ method: 'GET' }).handler(async () => { const { getSessionHandler } = await import('./auth.server'); return getSessionHandler(); })`
-    - [ ] Remove all DB/schema/Better-Auth imports from `auth.ts` (`drizzle-orm`, `getDb`, `users`, `auth config`, `getRequestHeaders`)
-    - [ ] Run `pnpm typecheck` — all 6 route layouts compile unchanged (no route file edits)
-    - [ ] Run `pnpm test` — all tests pass
+- [x] Task: Read spec.md and workflow.md to re-establish context
+    - [x] Read `./spec.md` (track specification — requirements, acceptance criteria, decisions)
+    - [x] Read `../../workflow.md` (TDD lifecycle, commit format, phase checkpoint protocol)
+- [x] Task: Write failing tests for the auth split (Red)
+    - [x] Update `tests/unit/server/auth.test.ts` (create if absent) to test `getSessionHandler` directly: returns correct `Session` shape, handles null session, soft-deleted user returns null, role/locale fallback from DB
+    - [x] Add a test asserting `src/server/auth.ts` does not import forbidden modules (`drizzle-orm`, `../db/index`, `../db/schema/*`, `../auth/config`, `getRequestHeaders`) — file-content assertion
+    - [x] Add a test asserting `auth.ts` `_getSession` stub delegates to `auth.server.ts` via dynamic import (mock `./auth.server` and assert `getSessionHandler` is called)
+    - [x] Run `pnpm test` and confirm the new tests fail (Red)
+- [x] Task: Create `src/server/auth.server.ts` with `getSessionHandler` (Green)
+    - [x] Move the handler logic from `auth.ts` `_getSession` into `getSessionHandler` in `auth.server.ts` — verbatim: `getRequestHeaders`, `auth.api.getSession`, `getDb`, `users` schema query, soft-delete check (`deletedAt IS NULL`), role/locale fallback
+    - [x] No cache yet — pure move, behavior identical
+    - [x] Run `pnpm test` — handler tests pass (Green)
+- [x] Task: Rewrite `src/server/auth.ts` as client-safe stub [ef2e6b4]
+    - [x] Keep `Session` type, `getSessionFromHeaders`, `requireRole` exports (unchanged signatures)
+    - [x] Rewrite `_getSession` as `createServerFn({ method: 'GET' }).handler(async () => { const { getSessionHandler } = await import('./auth.server'); return getSessionHandler(); })`
+    - [x] Remove all DB/schema/Better-Auth imports from `auth.ts` (`drizzle-orm`, `getDb`, `users`, `auth config`, `getRequestHeaders`)
+    - [x] Run `pnpm typecheck` — all 6 route layouts compile unchanged (no route file edits)
+    - [x] Run `pnpm test` — all tests pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: auth.ts Two-File Split' (Protocol in workflow.md)
 
 ---
