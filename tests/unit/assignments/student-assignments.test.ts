@@ -217,10 +217,10 @@ describe('Student Assignment Server Functions - Logic & Security', () => {
       expect(mockDb.offset).toHaveBeenCalledWith(10);
     });
 
-    it('should compute effectiveDeadline from the highest-order checkpoint', async () => {
+    it('should compute effectiveDeadline from the first non-passed checkpoint', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
-      const laterDueDate = new Date('2026-05-01');
+      const firstNonPassedDueDate = new Date('2026-05-01');
 
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
@@ -251,7 +251,7 @@ describe('Student Assignment Server Functions - Logic & Security', () => {
               assignmentId: 101,
               order: 2,
               state: 'unlocked',
-              dueDate: laterDueDate,
+              dueDate: firstNonPassedDueDate,
             },
           ]).then(onfulfilled),
         );
@@ -262,7 +262,8 @@ describe('Student Assignment Server Functions - Logic & Security', () => {
       if (isServerError(result)) throw new Error(result.error.message);
 
       expect(result.assignments).toHaveLength(1);
-      expect(result.assignments[0].effectiveDeadline).toEqual(laterDueDate);
+      // BUG-28: first non-passed checkpoint is order=2 (unlocked), not highest order
+      expect(result.assignments[0].effectiveDeadline).toEqual(firstNonPassedDueDate);
       expect(result.assignments[0].progressPercent).toBe(50);
     });
   });
@@ -355,7 +356,8 @@ describe('Student Assignment Server Functions - Logic & Security', () => {
         );
         expect(result.checkpoints[2].blockingReasons![1]).toContain('Insufficient consultations');
         expect(result.progressPercent).toBe(33);
-        expect(result.effectiveDeadline).toEqual(new Date('2026-05-01'));
+        // BUG-28: effectiveDeadline = first non-passed checkpoint (order=2, unlocked), not highest order (order=3)
+        expect(result.effectiveDeadline).toEqual(new Date('2026-04-01'));
       }
     });
   });

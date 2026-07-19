@@ -67,3 +67,25 @@ export function validateDueDates(
 
   return { valid: true };
 }
+
+/**
+ * Compute the effective deadline from a list of checkpoints.
+ * Returns the dueDate of the first checkpoint (lowest order) with state != 'passed'.
+ * If all checkpoints are 'passed', returns the last checkpoint's (highest order) dueDate.
+ * Returns null for an empty array.
+ */
+export function computeEffectiveDeadline(
+  checkpoints: { state: string; dueDate: Date | null; order: number }[],
+): Date | null {
+  if (checkpoints.length === 0) return null;
+
+  const sorted = [...checkpoints].sort((a, b) => a.order - b.order);
+  const firstNonPassed = sorted.find((cp) => cp.state !== 'passed');
+
+  if (firstNonPassed) {
+    return firstNonPassed.dueDate;
+  }
+
+  // All passed — return last checkpoint's dueDate
+  return sorted[sorted.length - 1].dueDate;
+}

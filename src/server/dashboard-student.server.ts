@@ -6,6 +6,7 @@ import { assignmentTemplates } from '../db/schema/templates';
 import { submissions } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
+import { computeEffectiveDeadline } from './due-dates.server';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '../lib/types';
 
@@ -147,14 +148,7 @@ export async function getStudentDashboardDataHandler() {
       const passedCount = cps.filter((cp) => cp.state === 'passed').length;
       const currentState = cps.find((cp) => cp.state !== 'passed')?.state ?? 'passed';
 
-      let effectiveDeadline: Date | null = null;
-      let highestOrder = -Infinity;
-      for (const cp of cps) {
-        if (cp.order > highestOrder) {
-          highestOrder = cp.order;
-          effectiveDeadline = cp.dueDate ?? null;
-        }
-      }
+      const effectiveDeadline = computeEffectiveDeadline(cps);
 
       return {
         id: a.id,

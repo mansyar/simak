@@ -260,11 +260,12 @@ describe('Dashboard handlers', () => {
       expect(result.upcomingDeadlines[2].checkpointName).toBe('Ch 3');
     });
 
-    it('should sort active assignments by effectiveDeadline when it differs from finalDeadline', async () => {
+    it('should sort active assignments by effectiveDeadline (first non-passed checkpoint)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
-      const effectiveEarly = new Date('2026-05-01');
-      const effectiveLate = new Date('2026-06-15');
+      // BUG-28: effectiveDeadline = first non-passed checkpoint's dueDate, not highest-order
+      const effectiveForAssignment1 = new Date('2026-08-01'); // order=1, unlocked
+      const effectiveForAssignment2 = new Date('2026-06-15'); // order=1, unlocked
 
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
@@ -295,21 +296,21 @@ describe('Dashboard handlers', () => {
               name: 'Ch 1',
               order: 1,
               state: 'unlocked',
-              dueDate: new Date('2026-08-01'),
+              dueDate: effectiveForAssignment1,
             },
             {
               assignmentId: 1,
               name: 'Ch 2',
               order: 2,
               state: 'submitted',
-              dueDate: effectiveEarly,
+              dueDate: new Date('2026-05-01'),
             },
             {
               assignmentId: 2,
               name: 'Ch 1',
               order: 1,
               state: 'unlocked',
-              dueDate: effectiveLate,
+              dueDate: effectiveForAssignment2,
             },
           ]).then(onfulfilled),
         );
@@ -317,10 +318,11 @@ describe('Dashboard handlers', () => {
       const result = (await getStudentDashboardDataHandler()) as any;
 
       expect(result.activeAssignments).toHaveLength(2);
-      expect(result.activeAssignments[0].id).toBe(1);
-      expect(result.activeAssignments[0].effectiveDeadline).toEqual(effectiveEarly);
-      expect(result.activeAssignments[1].id).toBe(2);
-      expect(result.activeAssignments[1].effectiveDeadline).toEqual(effectiveLate);
+      // Sort by effectiveDeadline ascending: assignment 2 (2026-06-15) before assignment 1 (2026-08-01)
+      expect(result.activeAssignments[0].id).toBe(2);
+      expect(result.activeAssignments[0].effectiveDeadline).toEqual(effectiveForAssignment2);
+      expect(result.activeAssignments[1].id).toBe(1);
+      expect(result.activeAssignments[1].effectiveDeadline).toEqual(effectiveForAssignment1);
     });
   });
 

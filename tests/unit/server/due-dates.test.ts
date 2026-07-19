@@ -1,6 +1,10 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { calculateDueDates, validateDueDates } from '@/server/due-dates.server';
+import {
+  calculateDueDates,
+  validateDueDates,
+  computeEffectiveDeadline,
+} from '@/server/due-dates.server';
 
 describe('calculateDueDates', () => {
   it('should calculate cumulative dueDates for 3 checkpoints', () => {
@@ -139,5 +143,82 @@ describe('validateDueDates', () => {
 
     const result = validateDueDates(dueDates);
     expect(result).toEqual({ valid: true });
+  });
+});
+
+// BUG-28: computeEffectiveDeadline helper
+describe('computeEffectiveDeadline', () => {
+  it('should return the first non-passed checkpoint dueDate (mixed statuses)', () => {
+    const checkpoints = [
+      { state: 'passed', dueDate: new Date('2026-03-01'), order: 1 },
+      { state: 'unlocked', dueDate: new Date('2026-04-01'), order: 2 },
+      { state: 'locked', dueDate: new Date('2026-05-01'), order: 3 },
+    ];
+
+    const result = computeEffectiveDeadline(checkpoints);
+    expect(result).toEqual(new Date('2026-04-01'));
+  });
+
+  it('should return the last checkpoint dueDate when all are passed', () => {
+    const checkpoints = [
+      { state: 'passed', dueDate: new Date('2026-03-01'), order: 1 },
+      { state: 'passed', dueDate: new Date('2026-04-01'), order: 2 },
+      { state: 'passed', dueDate: new Date('2026-05-01'), order: 3 },
+    ];
+
+    const result = computeEffectiveDeadline(checkpoints);
+    expect(result).toEqual(new Date('2026-05-01'));
+  });
+
+  it('should return null for empty checkpoints array', () => {
+    const result = computeEffectiveDeadline([]);
+    expect(result).toBeNull();
+  });
+
+  it('should sort checkpoints by order before finding first non-passed', () => {
+    // Checkpoints provided out of order
+    const checkpoints = [
+      { state: 'locked', dueDate: new Date('2026-05-01'), order: 3 },
+      { state: 'passed', dueDate: new Date('2026-03-01'), order: 1 },
+      { state: 'unlocked', dueDate: new Date('2026-04-01'), order: 2 },
+    ];
+
+    const result = computeEffectiveDeadline(checkpoints);
+    expect(result).toEqual(new Date('2026-04-01'));
+  });
+
+  it('should return the first checkpoint dueDate when no checkpoints are passed', () => {
+    const checkpoints = [
+      { state: 'unlocked', dueDate: new Date('2026-04-01'), order: 1 },
+      { state: 'locked', dueDate: new Date('2026-05-01'), order: 2 },
+    ];
+
+    const result = computeEffectiveDeadline(checkpoints);
+    expect(result).toEqual(new Date('2026-04-01'));
+  });
+
+  it('should handle null dueDate on the first non-passed checkpoint', () => {
+    const checkpoints = [
+      { state: 'passed', dueDate: new Date('2026-03-01'), order: 1 },
+      { state: 'unlocked', dueDate: null, order: 2 },
+      { state: 'locked', dueDate: new Date('2026-05-01'), order: 3 },
+    ];
+
+    const result = computeEffectiveDeadline(checkpoints);
+    expect(result).toBeNull();
+  });
+
+  it('should handle a single non-passed checkpoint', () => {
+    const checkpoints = [{ state: 'unlocked', dueDate: new Date('2026-04-01'), order: 1 }];
+
+    const result = computeEffectiveDeadline(checkpoints);
+    expect(result).toEqual(new Date('2026-04-01'));
+  });
+
+  it('should handle a single passed checkpoint', () => {
+    const checkpoints = [{ state: 'passed', dueDate: new Date('2026-03-01'), order: 1 }];
+
+    const result = computeEffectiveDeadline(checkpoints);
+    expect(result).toEqual(new Date('2026-03-01'));
   });
 });

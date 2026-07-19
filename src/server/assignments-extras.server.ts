@@ -8,6 +8,7 @@ import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import { consultations } from '../db/schema/consultations';
+import { computeEffectiveDeadline } from './due-dates.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -261,18 +262,28 @@ export async function listStudentAssignmentsHandler(args: { data: ListStudentAss
         );
 
       const countsByAssignment = new Map<number, { total: number; passed: number }>();
-      const highestOrderByAssignment = new Map<number, number>();
+      const checkpointsByAssignment = new Map<
+        number,
+        { state: string; dueDate: Date | null; order: number }[]
+      >();
       for (const cp of allCheckpoints) {
         const existing = countsByAssignment.get(cp.assignmentId) ?? { total: 0, passed: 0 };
         existing.total++;
         if (cp.state === 'passed') existing.passed++;
         countsByAssignment.set(cp.assignmentId, existing);
 
-        const currentHighest = highestOrderByAssignment.get(cp.assignmentId) ?? -Infinity;
-        if (cp.order > currentHighest) {
-          highestOrderByAssignment.set(cp.assignmentId, cp.order);
-          effectiveDeadlineMap.set(cp.assignmentId, cp.dueDate);
+        if (!checkpointsByAssignment.has(cp.assignmentId)) {
+          checkpointsByAssignment.set(cp.assignmentId, []);
         }
+        checkpointsByAssignment.get(cp.assignmentId)!.push({
+          state: cp.state,
+          dueDate: cp.dueDate,
+          order: cp.order,
+        });
+      }
+
+      for (const [id, cps] of checkpointsByAssignment) {
+        effectiveDeadlineMap.set(id, computeEffectiveDeadline(cps));
       }
 
       for (const [id, counts] of countsByAssignment) {
@@ -379,11 +390,13 @@ export async function getStudentAssignmentDetailHandler(args: { data: StudentAss
     const progressPercent =
       totalCheckpointsCount > 0 ? Math.round((passedCount / totalCheckpointsCount) * 100) : 0;
 
-    const effectiveDeadline =
-      checkpointsWithConsults.length > 0
-        ? (checkpointsWithConsults.reduce((max, cp) => (cp.order > max.order ? cp : max)).dueDate ??
-          null)
-        : null;
+    const effectiveDeadline = computeEffectiveDeadline(
+      checkpointsWithConsults.map((cp) => ({
+        state: cp.state,
+        dueDate: cp.dueDate,
+        order: cp.order,
+      })),
+    );
 
     const enrichedCheckpoints = checkpointsWithConsults.map((cp, index) => {
       const blockingReasons: string[] = [];
