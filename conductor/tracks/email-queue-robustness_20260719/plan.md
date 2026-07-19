@@ -42,7 +42,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Structured Processor Logging' (Protocol in workflow.md)
 
-## Phase 3: Admin Queue Server Functions (FR-1 backend, FR-2 backend)
+## Phase 3: Admin Queue Server Functions (FR-1 backend, FR-2 backend) [checkpoint: 2141cba]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
     - [x] Read `./spec.md` — review FR-1, FR-2, and Acceptance Criteria #1, #2
