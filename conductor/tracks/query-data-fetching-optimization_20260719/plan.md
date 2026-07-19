@@ -49,7 +49,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: N+1 Query Elimination' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: N+1 Query Elimination' (Protocol in workflow.md)
 
 ## Phase 2: Missing Pagination (FR-2)
 
