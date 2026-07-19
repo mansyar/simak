@@ -119,7 +119,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Missing Pagination' (Protocol in workflow.md)
 
-## Phase 3: Over-fetch, Parallel & Query Rewrite (FR-3, FR-4, FR-5, FR-6)
+## Phase 3: Over-fetch, Parallel & Query Rewrite (FR-3, FR-4, FR-5, FR-6) [checkpoint: bb3c171]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 3 implementation
     - [ ] Read `./spec.md` — review FR-3 (PERF-23, PERF-24), FR-4 (PERF-25, PERF-26), FR-5 (PERF-35), FR-6 (BUG-14) and Acceptance Criteria #7–#11
