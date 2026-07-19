@@ -25,11 +25,11 @@
 
 ## Phase 2: Structured Processor Logging (FR-4) + Verify FR-3
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
-    - [ ] Read `./spec.md` — review FR-3, FR-4, and Acceptance Criteria #3, #4
-    - [ ] Confirm FR-3 already satisfied: `src/lib/email-queue-init.ts` `tick()` wraps `processEmailQueue()` in try/catch/finally with `isRunning` guard; existing test `tests/unit/lib/email-queue-init.test.ts` ("resets isRunning guard after a tick errors so the next tick runs") verifies the loop continues after an error — no code change needed for FR-3
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
+    - [x] Read `./spec.md` — review FR-3, FR-4, and Acceptance Criteria #3, #4
+    - [x] Confirm FR-3 already satisfied: `src/lib/email-queue-init.ts` `tick()` wraps `processEmailQueue()` in try/catch/finally with `isRunning` guard; existing test `tests/unit/lib/email-queue-init.test.ts` ("resets isRunning guard after a tick errors so the next tick runs") verifies the loop continues after an error — no code change needed for FR-3
 
-- [ ] Task: Add structured logging to the email queue processor cycle
+- [x] Task: Add structured logging to the email queue processor cycle [de96e09]
     - [ ] Write failing tests in `tests/unit/lib/email-queue-processor.test.ts`: (1) assert a structured log line is emitted on cycle start with email count; (2) assert a structured log line is emitted on cycle end with processed/sent/failed counts; (3) assert stale-row reclamation count is logged; (4) assert per-email failure is logged with email id + error message and NO body/subject PII — spy on the logger — run `pnpm test` and confirm failures
     - [ ] Expand `processEmailQueue()` return type in `src/lib/email-queue-processor.ts` to include `reclaimed: number` (capture rowCount from the stale-`processing` UPDATE)
     - [ ] Add structured cycle start/end logs, stale-reclamation log, and per-email failure log (email id + error message only; no PII from `bodyHtml`/`subject`/`recipientEmail`) — use a small `log` helper or `console` with structured fields consistent with existing code
