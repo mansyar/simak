@@ -5,6 +5,16 @@ import { users } from '@/db/schema/users';
 import { eq } from 'drizzle-orm';
 import { generateFileKey, generatePresignedUploadUrl } from '@/lib/storage';
 import { serverError, ErrorCode } from '@/lib/errors';
+import type { z } from 'zod';
+import type {
+  UpdateProfileSchema,
+  UpdateUserSettingsSchema,
+  GetPresignedAvatarUploadUrlSchema,
+} from './settings';
+
+type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;
+type UpdateUserSettingsInput = z.infer<typeof UpdateUserSettingsSchema>;
+type GetPresignedAvatarUploadUrlInput = z.infer<typeof GetPresignedAvatarUploadUrlSchema>;
 
 const SUPPORTED_IMAGE_TYPES: Record<string, string> = {
   jpg: 'image/jpeg',
@@ -14,12 +24,12 @@ const SUPPORTED_IMAGE_TYPES: Record<string, string> = {
   webp: 'image/webp',
 };
 
-export async function updateProfileHandler(args: unknown) {
+export async function updateProfileHandler(args: { data: UpdateProfileInput }) {
   const session = await getSessionFromHeaders();
   if (!session) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { user } = session;
-  const { name } = args as { name: string };
+  const { name } = args.data;
 
   try {
     const db = getDb();
@@ -38,11 +48,13 @@ export async function updateProfileHandler(args: unknown) {
   }
 }
 
-export async function getPresignedAvatarUploadUrlHandler(args: unknown) {
+export async function getPresignedAvatarUploadUrlHandler(args: {
+  data: GetPresignedAvatarUploadUrlInput;
+}) {
   const session = await getSessionFromHeaders();
   if (!session) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
-  const { extension } = args as { extension: string };
+  const { extension } = args.data;
   const contentType = SUPPORTED_IMAGE_TYPES[extension.toLowerCase()];
   if (!contentType) return serverError(ErrorCode.BAD_REQUEST, 'Unsupported image type');
 
@@ -91,12 +103,12 @@ export async function getCurrentUserHandler() {
   }
 }
 
-export async function updateUserSettingsHandler(args: unknown) {
+export async function updateUserSettingsHandler(args: { data: UpdateUserSettingsInput }) {
   const session = await getSessionFromHeaders();
   if (!session) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { user } = session;
-  const { reducedMotion } = args as { reducedMotion: boolean };
+  const { reducedMotion } = args.data;
 
   try {
     const db = getDb();
