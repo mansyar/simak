@@ -103,19 +103,37 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
       .from(notifications)
       .where(and(...conditions));
 
-    // Fetch paginated results
+    // Fetch paginated results — narrow SELECT to only needed columns (PERF-23)
     const items = await db
-      .select()
+      .select({
+        id: notifications.id,
+        type: notifications.type,
+        titleKey: notifications.titleKey,
+        messageKey: notifications.messageKey,
+        params: notifications.params,
+        read: notifications.read,
+        createdAt: notifications.createdAt,
+      })
       .from(notifications)
       .where(and(...conditions))
       .orderBy(desc(notifications.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);
 
+    // Construct response objects explicitly — no ...item spread (PERF-23)
     const hydratedItems = items.map((item) => {
+      const base = {
+        id: item.id,
+        type: item.type,
+        titleKey: item.titleKey,
+        messageKey: item.messageKey,
+        params: item.params,
+        read: item.read,
+        createdAt: item.createdAt,
+      };
       if (item.titleKey) {
         return {
-          ...item,
+          ...base,
           ...resolveNotificationContent(
             item.titleKey,
             item.messageKey ?? null,
@@ -125,7 +143,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
         };
       }
       // Expand-phase fallback: legacy rows without stored keys
-      return item;
+      return base;
     });
 
     return {

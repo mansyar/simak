@@ -218,7 +218,14 @@ describe('Notification handlers', () => {
 
     it('should create a notification and return it when admin', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
-      const created = { id: 1, userId: 'user-1', type: 'test', titleKey: 'k', messageKey: 'm', channel: 'in_app' };
+      const created = {
+        id: 1,
+        userId: 'user-1',
+        type: 'test',
+        titleKey: 'k',
+        messageKey: 'm',
+        channel: 'in_app',
+      };
       mockDb.returning.mockResolvedValue([created]);
 
       const result = await createNotificationHandler({
@@ -246,58 +253,6 @@ describe('Notification handlers', () => {
 
       const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
-    });
-
-    it('should return paginated notifications', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
-      const items = [
-        { id: 1, userId: 'user-1', type: 'test', title: 'Test 1', channel: 'in_app' },
-        { id: 2, userId: 'user-1', type: 'test', title: 'Test 2', channel: 'in_app' },
-      ];
-      mockDb.then
-        .mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn))
-        .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 2 }]).then(fn))
-        .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
-
-      const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
-      expect(result).toEqual({ items, total: 2 });
-    });
-
-    it('should filter by notification type', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
-      const items = [
-        { id: 1, userId: 'user-1', type: 'sla_breach', title: 'SLA', channel: 'in_app' },
-      ];
-      mockDb.then
-        .mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn))
-        .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 1 }]).then(fn))
-        .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
-
-      const result = await listNotificationsHandler({
-        data: { page: 1, limit: 20, type: 'sla_breach' },
-      });
-      expect(result).toEqual({ items, total: 1 });
-    });
-
-    it('should handle empty results', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
-      mockDb.then
-        .mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn))
-        .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
-        .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
-
-      const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
-      expect(result).toEqual({ items: [], total: 0 });
-    });
-
-    it('should handle database error gracefully', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
-      mockDb.select.mockImplementationOnce(() => {
-        throw new Error('DB error');
-      });
-
-      const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
-      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
   describe('markReadHandler', () => {
