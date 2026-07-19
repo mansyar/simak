@@ -247,6 +247,53 @@ describe('Bulk user import handler', () => {
     });
   });
 
+  describe('PERF-6: Post-commit parallelization', () => {
+    it('should send invitation emails concurrently via Promise.allSettled (PERF-6)', async () => {
+      vi.mocked(email.sendInvitationEmail)
+        .mockResolvedValueOnce(undefined)
+        .mockRejectedValueOnce(new Error('SMTP down'))
+        .mockResolvedValueOnce(undefined);
+
+      const result = (await bulkCreateUsersHandler({
+        data: {
+          rows: [
+            { name: 'User 1', email: 'user1@test.com', role: 'student' },
+            { name: 'User 2', email: 'user2@test.com', role: 'student' },
+            { name: 'User 3', email: 'user3@test.com', role: 'student' },
+          ],
+        },
+      })) as any;
+
+      expect(result.created).toBe(3);
+      // All 3 emails attempted despite middle one rejecting (allSettled behavior)
+      expect(email.sendInvitationEmail).toHaveBeenCalledTimes(3);
+    });
+
+    it('should use single batch INSERT for per-row audit logs (PERF-6)', async () => {
+      const result = (await bulkCreateUsersHandler({
+        data: {
+          rows: [
+            { name: 'User 1', email: 'user1@test.com', role: 'student' },
+            { name: 'User 2', email: 'user2@test.com', role: 'student' },
+            { name: 'User 3', email: 'user3@test.com', role: 'student' },
+          ],
+        },
+      })) as any;
+
+      expect(result.created).toBe(3);
+      // Per-row audits are batched into a single db.insert(auditLog).values([...])
+      // Only the batch audit (user.bulk_created) goes through logAuditEvent
+      expect(audit.logAuditEvent).toHaveBeenCalledTimes(1);
+      expect(audit.logAuditEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'user.bulk_created' }),
+      );
+      // Verify batch insert was called with an array of audit entries
+      expect(mockDb.values).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ action: 'user.created' })]),
+      );
+    });
+  });
+
   describe('Session/role verification', () => {
     it('should reject unauthenticated requests', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);

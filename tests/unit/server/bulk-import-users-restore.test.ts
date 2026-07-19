@@ -172,7 +172,7 @@ describe('Bulk user import handler — restore / skip behavior (H3)', () => {
     expect(result.error.code).toBe('INTERNAL');
   });
 
-  it('should emit user.reactivated audit event on restore and user.created on new user', async () => {
+  it('should emit user.reactivated and user.created via batch INSERT (PERF-6)', async () => {
     (innerDb.then as any)
       .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ id: 'deleted-user-2', deletedAt: new Date() }]).then(onfulfilled),
@@ -189,16 +189,18 @@ describe('Bulk user import handler — restore / skip behavior (H3)', () => {
     })) as any;
 
     expect(result.error).toBeUndefined();
-    expect(audit.logAuditEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: 'user.reactivated',
-        entityId: 'deleted-user-2',
-      }),
-    );
-    expect(audit.logAuditEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        action: 'user.created',
-      }),
+    // PERF-6: Per-row audits are batched into a single db.insert(auditLog).values([...])
+    // Only user.bulk_created goes through logAuditEvent
+    expect(mockDb.values).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          action: 'user.reactivated',
+          entityId: 'deleted-user-2',
+        }),
+        expect.objectContaining({
+          action: 'user.created',
+        }),
+      ]),
     );
   });
 
