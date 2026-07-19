@@ -95,4 +95,8 @@
     - [ ] Record commit SHA in plan.md
 
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Admin Inspector UI + Retry Action' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions <652c9ec>
 </protect>
