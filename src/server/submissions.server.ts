@@ -36,7 +36,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { checkpointId, fileKey, fileName, fileSize } = args.data;
+  const { checkpointId, fileKey, fileName } = args.data;
   const db = getDb();
 
   try {
