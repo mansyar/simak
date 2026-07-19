@@ -109,7 +109,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [~] Task: Conductor - User Manual Verification 'Phase 4: Notification Cleanup' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Notification Cleanup' (Protocol in workflow.md) — User approved checkpoint
 
 ## Phase 5: effectiveDeadline Derivation (BUG-28)
 
