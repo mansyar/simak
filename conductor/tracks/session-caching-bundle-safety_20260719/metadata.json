@@ -9,7 +9,7 @@
   "plan": {
     "approved": true,
     "approved_at": "2026-07-19T14:22:14Z",
-    "items_total": 10,
+    "items_total": 13,
     "items_completed": 0
   },
   "revert_baseline": "8d92bf3789146ae84811a4ce66c29d887265d169",

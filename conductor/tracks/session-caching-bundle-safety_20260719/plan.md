@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan: Session Caching & Bundle Safety
 
 **Track ID:** session-caching-bundle-safety_20260719
@@ -12,6 +13,9 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 **Goal:** Move the session-resolution handler into `auth.server.ts` and rewrite `auth.ts` as a client-safe stub. No cache yet — pure structural split preserving current behavior.
 
+- [ ] Task: Read spec.md and workflow.md to re-establish context
+    - [ ] Read `./spec.md` (track specification — requirements, acceptance criteria, decisions)
+    - [ ] Read `../../workflow.md` (TDD lifecycle, commit format, phase checkpoint protocol)
 - [ ] Task: Write failing tests for the auth split (Red)
     - [ ] Update `tests/unit/server/auth.test.ts` (create if absent) to test `getSessionHandler` directly: returns correct `Session` shape, handles null session, soft-deleted user returns null, role/locale fallback from DB
     - [ ] Add a test asserting `src/server/auth.ts` does not import forbidden modules (`drizzle-orm`, `../db/index`, `../db/schema/*`, `../auth/config`, `getRequestHeaders`) — file-content assertion
@@ -35,6 +39,9 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 **Goal:** Add a 5s-TTL in-memory cache for `{ role, locale }` lookups in `getSessionHandler`, eliminating the redundant DB query across server-function calls within a page load.
 
+- [ ] Task: Read spec.md and workflow.md to re-establish context
+    - [ ] Read `./spec.md` (track specification — requirements, acceptance criteria, decisions)
+    - [ ] Read `../../workflow.md` (TDD lifecycle, commit format, phase checkpoint protocol)
 - [ ] Task: Write failing tests for the session cache (Red)
     - [ ] Test: cache miss — first call for a user invokes `getDb` and caches the result
     - [ ] Test: cache hit — second call within the 5s TTL does NOT invoke `getDb` (assert mock not called)
@@ -58,6 +65,9 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 **Goal:** Prove the split prevents server-only modules from leaking into the client bundle, and confirm all quality gates pass before archive.
 
+- [ ] Task: Read spec.md and workflow.md to re-establish context
+    - [ ] Read `./spec.md` (track specification — requirements, acceptance criteria, decisions)
+    - [ ] Read `../../workflow.md` (TDD lifecycle, commit format, phase checkpoint protocol)
 - [ ] Task: Verify bundle safety (PERF-34)
     - [ ] Run `pnpm build` (i18n codegen → vite build → esbuild bundles)
     - [ ] Grep built client chunks in `.output/` for `from 'pg'`, `from 'drizzle-orm'`, and `postgres` — assert zero matches
@@ -70,3 +80,4 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
     - [ ] Verify no file in `src/`/`tests/` exceeds 500 lines (`scripts/check-modularity.js` on `auth.ts` + `auth.server.ts`)
     - [ ] Grep `src/server/auth.ts` for forbidden imports (`drizzle-orm`, `getDb`, `users`, `getRequestHeaders`, `auth config`) — assert zero matches (AC-1)
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Bundle Verification & Final Quality Gates' (Protocol in workflow.md)
+</protect>

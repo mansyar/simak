@@ -1,3 +1,4 @@
+<protect>
 # Track: Session Caching & Bundle Safety
 
 - **Track ID:** session-caching-bundle-safety_20260719
@@ -102,3 +103,4 @@ Two performance and bundle-safety issues exist in the current authentication/ses
 - Changes to the `Session` type shape or any route layout file.
 - Query optimization / N+1 elimination (TRACK-006).
 - Pagination of list handlers (TRACK-006).
+</protect>
