@@ -85,18 +85,18 @@
     - [x] Read `./spec.md` — review FR-4 (studentIds Role Validation), FR-5 (instructorId WHERE Clause), AC-13 through AC-17, AC-22 (i18n key for invalidStudentIds)
     - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements
 
-- [ ] Task: Add studentIds role validation in createAssignmentHandler (BUG-24)
-    - [ ] Add `assignments.errors.invalidStudentIds` to `locales/en.json` with value: "One or more selected users are not active students"
-    - [ ] Add `assignments.errors.invalidStudentIds` to `locales/id.json` with value: "Satu atau lebih pengguna terpilih bukan mahasiswa aktif"
-    - [ ] Run `pnpm generate:i18n` to regenerate i18n types
-    - [ ] Write failing tests: in `tests/unit/server/assignments.test.ts` (or the existing assignments handler test file), add tests that `createAssignmentHandler` (1) rejects `studentIds` containing an admin userId with `assignments.errors.invalidStudentIds`, (2) rejects `studentIds` containing a deleted student userId, (3) rejects `studentIds` containing an instructor userId, (4) accepts `studentIds` where ALL IDs are active students. Mock `@/db/index` to return controlled user rows. Run `pnpm test` and confirm new tests fail.
-    - [ ] In `createAssignmentHandler` (in `src/server/assignments.server.ts` or equivalent), before the transaction begins: execute `SELECT id FROM users WHERE id IN (studentIds) AND role='student' AND deletedAt IS NULL` using Drizzle's `inArray(users.id, studentIds)` parameterized query.
-    - [ ] Compare returned row count to `studentIds.length`. If mismatch, return `serverError(BAD_REQUEST, t('assignments.errors.invalidStudentIds'))` BEFORE the transaction begins.
-    - [ ] Run `pnpm test` — confirm validation tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Commit: `fix(assignments): Validate studentIds are active students before assignment creation`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Add studentIds role validation in createAssignmentHandler (BUG-24) — Commit: 8ae283c
+    - [x] Add `assignments.errors.invalidStudentIds` to `locales/en.json` with value: "One or more selected users are not active students"
+    - [x] Add `assignments.errors.invalidStudentIds` to `locales/id.json` with value: "Satu atau lebih pengguna terpilih bukan mahasiswa aktif"
+    - [x] Run `pnpm generate:i18n` to regenerate i18n types
+    - [x] Write failing tests: Added 3 rejection tests (admin, deleted student, instructor) + updated success test with validation mock in `tests/unit/assignments/creation.test.ts`. Updated `assignments-audit.test.ts` and `assignments-duration.test.ts` with validation query mocks.
+    - [x] In `createAssignmentHandler`, before the transaction begins: execute `SELECT id FROM users WHERE id IN (studentIds) AND role='student' AND deletedAt IS NULL` using Drizzle's `inArray(users.id, studentIds)` parameterized query.
+    - [x] Compare returned row count to `studentIds.length`. If mismatch, return `serverError(BAD_REQUEST, translateKey('assignments.errors.invalidStudentIds', locale))` BEFORE the transaction begins.
+    - [x] Run `pnpm test` — confirm validation tests pass (11/11 in creation.test.ts)
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` (all pass)
+    - [x] Commit: `fix(assignments): Validate studentIds are active students before assignment creation` (8ae283c)
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Move instructorId check into WHERE clause (BUG-26)
     - [ ] Write failing tests: in `tests/unit/server/assignments.test.ts` (or the existing assignments handler test file), add tests that `getAssignmentDetailHandler` (1) returns `notFound()` for a non-owner instructor (zero rows), (2) returns the assignment for the owning instructor. Mock `@/db/index` to return controlled query results. Run `pnpm test` and confirm new tests fail.
