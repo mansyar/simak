@@ -3,12 +3,17 @@ import { processEmailQueue } from '@/lib/email-queue-processor';
 import { getDb } from '@/db/index';
 import { getEnv } from '@/config/env';
 import { emailQueue } from '@/db/schema/index';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 // --- Module-level mocks ---
 
 vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
 vi.mock('@/config/env', () => ({
-  getEnv: vi.fn().mockReturnValue({ RESEND_API_KEY: 'test-key' }),
+  getEnv: vi.fn().mockReturnValue({
+    RESEND_API_KEY: 'test-key',
+    EMAIL_FROM: 'SIMAK <noreply@simak.app>',
+  }),
 }));
 
 const { mockResendSend, ResendMock } = vi.hoisted(() => {
@@ -336,16 +341,17 @@ describe('email-queue-processor', () => {
       expect(result.sent).toBe(1);
     });
 
-    it('uses custom EMAIL_FROM env var when set', async () => {
-      const origFrom = process.env.EMAIL_FROM;
-      process.env.EMAIL_FROM = 'custom@simak.app';
+    it('uses custom EMAIL_FROM value from getEnv', async () => {
+      vi.mocked(getEnv).mockReturnValueOnce({
+        RESEND_API_KEY: 'test-key',
+        EMAIL_FROM: 'custom@simak.app',
+      } as any);
       setupDb([makeEmail()], { data: { id: 'sent-1' }, error: null });
 
       await processEmailQueue();
 
       expect(mockResendSend).toHaveBeenCalled();
       expect(mockResendSend.mock.calls[0]?.[0]?.from).toBe('custom@simak.app');
-      process.env.EMAIL_FROM = origFrom;
     });
 
     it('returns counts when queue is empty', async () => {
@@ -449,6 +455,15 @@ describe('email-queue-processor', () => {
       const rows = mockDb.getRows();
       expect(rows.find((r) => r.id === 1)?.status).toBe('processing');
       expect(rows.find((r) => r.id === 2)?.status).toBe('sent');
+    });
+  });
+
+  describe('AC-21: EMAIL_FROM source', () => {
+    it('uses getEnv().EMAIL_FROM with no process.env fallback', () => {
+      const filePath = resolve(__dirname, '../../../src/lib/email-queue-processor.ts');
+      const content = readFileSync(filePath, 'utf8');
+      expect(content).not.toContain('process.env.EMAIL_FROM');
+      expect(content).not.toContain("'SIMAK <noreply@simak.app>'");
     });
   });
 });
