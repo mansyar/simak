@@ -70,7 +70,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Admin Queue Server Functions' (Protocol in workflow.md)
 
-## Phase 4: Admin Inspector UI + Retry Action (FR-1, FR-2 frontend)
+## Phase 4: Admin Inspector UI + Retry Action (FR-1, FR-2 frontend) [checkpoint: 9ac6bc4]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
     - [x] Read `./spec.md` — review FR-1, FR-2, Acceptance Criteria #1, #2, #6
