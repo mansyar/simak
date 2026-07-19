@@ -8,6 +8,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Deadline & SLA Logic Correctness**
-*Link: [./tracks/deadline-sla-correctness_20260719/](./tracks/deadline-sla-correctness_20260719/)*
+*(No active tracks. Completed tracks are archived under `conductor/archive/`.)*
 
