@@ -23,7 +23,7 @@
     - [x] Attach git note with task summary (list of changed files, core why, test count delta)
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Settings Zod Validation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Settings Zod Validation' (Protocol in workflow.md)
 
 ## Phase 2: Storage Discrimination, Env & i18n (BUG-10, BUG-25, BUG-27)
 
