@@ -108,14 +108,14 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Add .limit(20) safety caps to dashboard queries (PERF-20, PERF-21)
-    - [ ] Write failing tests: assert student dashboard `activeAssignments` and instructor dashboard `assignmentOverview` return at most 20 rows — run `pnpm test` and confirm failures
-    - [ ] Add `.limit(20)` to `activeAssignments` query in `getStudentDashboardDataHandler` and `assignmentOverview` query in `getInstructorDashboardDataHandler`
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
-    - [ ] Commit: `perf(dashboard): Add .limit(20) safety caps to dashboard queries`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Add .limit(20) safety caps to dashboard queries (PERF-20, PERF-21) [ea386e1]
+    - [x] Write failing tests: assert student dashboard `activeAssignments` and instructor dashboard `assignmentOverview` return at most 20 rows — run `pnpm test` and confirm failures
+    - [x] Add `.limit(20)` to `activeAssignments` query in `getStudentDashboardDataHandler` and `assignmentOverview` query in `getInstructorDashboardDataHandler`
+    - [x] Run `pnpm test` — confirm all tests pass
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `perf(dashboard): Add .limit(20) safety caps to dashboard queries`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Missing Pagination' (Protocol in workflow.md)
 
