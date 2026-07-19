@@ -9,7 +9,7 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 ---
 
-## Phase 1: auth.ts Two-File Split (PERF-34)
+## Phase 1: auth.ts Two-File Split (PERF-34) [checkpoint: 4c8345a]
 
 **Goal:** Move the session-resolution handler into `auth.server.ts` and rewrite `auth.ts` as a client-safe stub. No cache yet — pure structural split preserving current behavior.
 
@@ -31,7 +31,7 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
     - [x] Remove all DB/schema/Better-Auth imports from `auth.ts` (`drizzle-orm`, `getDb`, `users`, `auth config`, `getRequestHeaders`)
     - [x] Run `pnpm typecheck` — all 6 route layouts compile unchanged (no route file edits)
     - [x] Run `pnpm test` — all tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: auth.ts Two-File Split' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: auth.ts Two-File Split' (Protocol in workflow.md) [checkpoint: 4c8345a]
 
 ---
 
