@@ -88,15 +88,15 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Add pagination to listTemplateAssignmentsHandler (PERF-18)
-    - [ ] Write failing tests: assert pagination params, total count, and edge cases — run `pnpm test` and confirm failures
-    - [ ] Add `page`/`limit` Zod params + total count query via `Promise.all` in `listTemplateAssignmentsHandler`
-    - [ ] Wire shared `<Pagination>` component on the template assignments page
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
-    - [ ] Commit: `feat(templates): Add pagination to template assignments list`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Add pagination to listTemplateAssignmentsHandler (PERF-18) [718c756]
+    - [x] Write failing tests: assert pagination params, total count, and edge cases — run `pnpm test` and confirm failures
+    - [x] Add `page`/`limit` Zod params + total count query via `Promise.all` in `listTemplateAssignmentsHandler`
+    - [x] Wire shared `<Pagination>` component on the template assignments page
+    - [x] Run `pnpm test` — confirm all tests pass
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `feat(templates): Add pagination to template assignments list`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Add pagination to listMyExtensionRequestsHandler (PERF-19)
     - [ ] Write failing tests: assert pagination params, total count, and edge cases — run `pnpm test` and confirm failures
