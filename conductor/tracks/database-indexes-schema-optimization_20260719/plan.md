@@ -58,10 +58,10 @@
     - [x] Read `./spec.md` — review TR-2 (Migration Generation & Review), TR-3 (Migration Application), TR-4 (Integration test), TR-5 (Manual EXPLAIN ANALYZE), AC-2, AC-3, AC-5, AC-11
     - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, Phase Completion Verification Protocol
 
-- [ ] Task: Write failing integration test for migration-applied indexes (Red Phase)
-    - [ ] Create `tests/integration/db/migration-applied.test.ts`
-    - [ ] Add `/** @vitest-environment node */` at the top of the file
-    - [ ] Add test cases that query `pg_indexes` view for each of the 9 expected index names:
+- [x] Task: Write failing integration test for migration-applied indexes (Red Phase) (8cbed05)
+    - [x] Create `tests/integration/db/migration-applied.test.ts`
+    - [x] Add `/** @vitest-environment node */` at the top of the file
+    - [x] Add test cases that query `pg_indexes` view for each of the 9 expected index names:
         - `assignment_students_assignment_id_student_id_idx`
         - `assignment_students_student_id_idx`
         - `notifications_created_at_idx`
@@ -71,8 +71,8 @@
         - `extension_requests_assignment_id_student_id_idx`
         - `audit_log_actor_id_idx`
         - `reviews_submission_id_created_at_idx`
-    - [ ] Add setup/teardown to ensure docker-compose DB is available and migration is applied
-    - [ ] Run `pnpm test:integration` and confirm tests FAIL (migration not yet generated/applied)
+    - [x] Add setup/teardown to ensure docker-compose DB is available and migration is applied (header comment documents prerequisites; assertions inherently verify migration state — consistent with existing integration test patterns)
+    - [x] Run `pnpm test:integration` and confirm tests FAIL (migration not yet generated/applied)
 
 - [ ] Task: Generate migration via `pnpm db:generate` and review SQL (TR-2)
     - [ ] Run `pnpm db:generate` to generate the migration SQL
