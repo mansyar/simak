@@ -22,7 +22,7 @@ vi.mock('@tanstack/react-start', () => ({
 describe('listNotificationsHandler', () => {
   let mockDb: any;
   const userSession = {
-    user: { id: 'user-1', role: 'student' as const },
+    user: { id: 'user-1', role: 'student' as const, locale: 'en' },
     session: {} as any,
   };
 
@@ -79,7 +79,6 @@ describe('listNotificationsHandler', () => {
       },
     ];
     mockDb.then
-      .mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 2 }]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
 
@@ -118,7 +117,6 @@ describe('listNotificationsHandler', () => {
       },
     ];
     mockDb.then
-      .mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 1 }]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
 
@@ -135,7 +133,6 @@ describe('listNotificationsHandler', () => {
   it('should handle empty results', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
     mockDb.then
-      .mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
 
@@ -161,7 +158,6 @@ describe('listNotificationsHandler', () => {
       },
     ];
     mockDb.then
-      .mockImplementationOnce((fn: any) => Promise.resolve([{ locale: 'en' }]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 1 }]).then(fn))
       .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
 
@@ -187,5 +183,32 @@ describe('listNotificationsHandler', () => {
 
     const result = await listNotificationsHandler({ data: { page: 1, limit: 20 } });
     expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
+  });
+
+  it('should use session.user.locale instead of redundant locale query (PERF-24)', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+      user: { id: 'user-1', role: 'student' as const, locale: 'id' },
+      session: {} as any,
+    } as any);
+    mockDb.then
+      .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 1 }]).then(fn))
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          {
+            id: 1,
+            type: 'test',
+            titleKey: '',
+            messageKey: '',
+            params: null,
+            read: false,
+            createdAt: new Date('2024-01-01'),
+          },
+        ]).then(fn),
+      );
+
+    const result = (await listNotificationsHandler({ data: { page: 1, limit: 20 } })) as any;
+    // Should only make 2 DB queries (count + data), NOT 3 (no locale query)
+    expect(mockDb.then).toHaveBeenCalledTimes(2);
+    expect(result.total).toBe(1);
   });
 });

@@ -2,7 +2,6 @@
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { notifications } from '../db/schema/notifications';
-import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '../lib/types';
@@ -84,12 +83,8 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
   const db = getDb();
 
   try {
-    // Resolve the requesting user's locale for read-time localization
-    const [userRow] = await db
-      .select({ locale: users.locale })
-      .from(users)
-      .where(eq(users.id, session.user.id));
-    const locale: Locales = (userRow?.locale as Locales) ?? 'en';
+    // Use session.user.locale directly (already enriched in auth.ts via _getSession)
+    const locale: Locales = (session.user.locale as Locales) ?? 'en';
 
     // Build conditions
     const conditions = [eq(notifications.userId, session.user.id)];
