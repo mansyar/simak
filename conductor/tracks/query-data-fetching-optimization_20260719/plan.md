@@ -20,7 +20,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Replace sequential UPDATE loops with bulk UPDATE (PERF-2, PERF-3, PERF-4)
+- [x] Task: Replace sequential UPDATE loops with bulk UPDATE (PERF-2, PERF-3, PERF-4) [a1c1ece]
     - [ ] Write failing tests in `tests/unit/server/extensions-extras.test.ts` and `tests/unit/server/due-dates.test.ts` (Node env): assert `calculateExtensionAdjustment`, `bulkExtendHandler`, and `adjustDeadlinesForBreach` produce identical checkpoint dueDate updates as before, but issue a single bulk `UPDATE ... WHERE order > targetCheckpoint.order` instead of N per-checkpoint UPDATEs — run `pnpm test` and confirm failures
     - [ ] Rewrite `calculateExtensionAdjustment` in `src/server/extensions-extras.server.ts` to use bulk `UPDATE ... WHERE order > ?`
     - [ ] Rewrite `bulkExtendHandler` in `src/server/extensions-extras.server.ts` to use bulk `UPDATE ... WHERE order > ?`
