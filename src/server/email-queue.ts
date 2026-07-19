@@ -17,6 +17,26 @@ export const RetryEmailSchema = z.object({
 
 export type RetryEmailInput = z.infer<typeof RetryEmailSchema>;
 
+// ---- Types (client-safe, shared between server handlers and UI) ----
+
+export type EmailQueueEntry = {
+  id: number;
+  recipientEmail: string;
+  subject: string;
+  templateType: string;
+  status: string;
+  attempts: number;
+  lastAttemptAt: string | null;
+  errorMessage: string | null;
+  createdAt: string | null;
+};
+
+export type EmailQueueSummary = {
+  pending: number;
+  sent: number;
+  failed: number;
+};
+
 // ---- Server Function Stubs ----
 
 export const listEmailQueue = createServerFn({ method: 'GET' })

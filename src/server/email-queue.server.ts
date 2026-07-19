@@ -4,27 +4,17 @@ import { getDb } from '../db/index';
 import { emailQueue } from '../db/schema/email-queue';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode, type ServerError } from '../lib/errors';
-import type { ListEmailQueueInput, RetryEmailInput } from './email-queue';
+import type {
+  ListEmailQueueInput,
+  RetryEmailInput,
+  EmailQueueEntry,
+  EmailQueueSummary,
+} from './email-queue';
+
+// Re-export shared types for callers that historically imported them from here
+export type { EmailQueueEntry, EmailQueueSummary } from './email-queue';
 
 // ---- Types ----
-
-export type EmailQueueEntry = {
-  id: number;
-  recipientEmail: string;
-  subject: string;
-  templateType: string;
-  status: string;
-  attempts: number;
-  lastAttemptAt: string | null;
-  errorMessage: string | null;
-  createdAt: string | null;
-};
-
-export type EmailQueueSummary = {
-  pending: number;
-  sent: number;
-  failed: number;
-};
 
 export type ListEmailQueueSuccess = {
   entries: EmailQueueEntry[];
@@ -69,12 +59,13 @@ export async function listEmailQueueHandler(args: {
       conditions.push(eq(emailQueue.status, status));
     }
     if (search) {
-      conditions.push(
-        or(
-          ilike(emailQueue.recipientEmail, `%${search}%`),
-          ilike(emailQueue.subject, `%${search}%`),
-        )!,
+      const searchCondition = or(
+        ilike(emailQueue.recipientEmail, `%${search}%`),
+        ilike(emailQueue.subject, `%${search}%`),
       );
+      if (searchCondition) {
+        conditions.push(searchCondition);
+      }
     }
 
     const combined = conditions.length > 0 ? and(...conditions) : undefined;

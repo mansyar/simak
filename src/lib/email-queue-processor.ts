@@ -50,6 +50,7 @@ export async function processEmailQueue(): Promise<{
   const resend = getResendClient();
 
   const staleThreshold = new Date(Date.now() - STALE_PROCESSING_THRESHOLD_MS);
+  // Drizzle's UPDATE result type doesn't expose rowCount; cast to read it
   const reclaimResult = (await db
     .update(emailQueue)
     .set({ status: 'pending' })
