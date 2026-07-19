@@ -6,22 +6,22 @@
 
 ## Phase 1: Settings Zod Validation (BUG-15)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
-    - [ ] Read `./spec.md` — review FR-1 (Settings Zod Validation), NFR-4 (mock builder chain), and AC-1 through AC-5
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements, and Phase Completion Verification Protocol
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
+    - [x] Read `./spec.md` — review FR-1 (Settings Zod Validation), NFR-4 (mock builder chain), and AC-1 through AC-5
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, commit format, quality gate requirements, and Phase Completion Verification Protocol
 
-- [ ] Task: Add .inputValidator() to settings.ts POST stubs and remove unsafe casts (BUG-15)
-    - [ ] Write failing tests: in `tests/unit/server/settings.test.ts` (or new file mirroring src path), add tests that (1) `updateProfile` rejects `{ name: "" }` with Zod error, (2) `updateProfile` rejects oversized name strings, (3) `updateUserSettings` rejects non-boolean `reducedMotion` and unsupported `extension` values, (4) `getPresignedAvatarUploadUrl` validates input via Zod. Mock `@tanstack/react-start` with the builder chain pattern. Run `pnpm test` and confirm new tests fail as expected (validation not yet wired).
-    - [ ] Refactor `updateProfile` stub in `src/server/settings.ts` to use `.inputValidator(updateProfileSchema).handler(fn)`. Remove `args as { name: string }` cast from handler.
-    - [ ] Refactor `updateUserSettings` stub to use `.inputValidator(updateUserSettingsSchema).handler(fn)`. Remove `args as { extension: string }` cast.
-    - [ ] Refactor `getPresignedAvatarUploadUrl` stub to use `.inputValidator(getPresignedAvatarUploadUrlSchema).handler(fn)`. Remove `args as { reducedMotion: boolean }` cast.
-    - [ ] Verify existing Zod schemas in `settings.ts` cover the full input shape; extend if incomplete.
-    - [ ] Run `pnpm test` — confirm all tests pass (including new validation rejection tests)
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Grep assertion: no `args as { ... }` casts remain in `settings.ts` handlers
-    - [ ] Commit: `fix(settings): Wire Zod validation via inputValidator on POST stubs`
-    - [ ] Attach git note with task summary (list of changed files, core why, test count delta)
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Add .inputValidator() to settings.ts POST stubs and remove unsafe casts (BUG-15) — Commit: 2c0ceaf
+    - [x] Write failing tests: in `tests/unit/server/settings.test.ts` (or new file mirroring src path), add tests that (1) `updateProfile` rejects `{ name: "" }` with Zod error, (2) `updateProfile` rejects oversized name strings, (3) `updateUserSettings` rejects non-boolean `reducedMotion` and unsupported `extension` values, (4) `getPresignedAvatarUploadUrl` validates input via Zod. Mock `@tanstack/react-start` with the builder chain pattern. Run `pnpm test` and confirm new tests fail as expected (validation not yet wired).
+    - [x] Refactor `updateProfile` stub in `src/server/settings.ts` to use `.inputValidator(updateProfileSchema).handler(fn)`. Remove `args as { name: string }` cast from handler.
+    - [x] Refactor `updateUserSettings` stub to use `.inputValidator(updateUserSettingsSchema).handler(fn)`. Remove `args as { extension: string }` cast.
+    - [x] Refactor `getPresignedAvatarUploadUrl` stub to use `.inputValidator(getPresignedAvatarUploadUrlSchema).handler(fn)`. Remove `args as { reducedMotion: boolean }` cast.
+    - [x] Verify existing Zod schemas in `settings.ts` cover the full input shape; extend if incomplete.
+    - [x] Run `pnpm test` — confirm all tests pass (including new validation rejection tests)
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
+    - [x] Grep assertion: no `args as { ... }` casts remain in `settings.ts` handlers
+    - [x] Commit: `fix(settings): Wire Zod validation via inputValidator on POST stubs`
+    - [x] Attach git note with task summary (list of changed files, core why, test count delta)
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Settings Zod Validation' (Protocol in workflow.md)
 
