@@ -98,15 +98,15 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Add pagination to listMyExtensionRequestsHandler (PERF-19)
-    - [ ] Write failing tests: assert pagination params, total count, and edge cases — run `pnpm test` and confirm failures
-    - [ ] Add `page`/`limit` Zod params + total count query via `Promise.all` in `listMyExtensionRequestsHandler` in `src/server/extensions.server.ts`
-    - [ ] Wire shared `<Pagination>` component on the student extension history page
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
-    - [ ] Commit: `feat(extensions): Add pagination to extension requests list`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Add pagination to listMyExtensionRequestsHandler (PERF-19) [540e518]
+    - [x] Write failing tests: assert pagination params, total count, and edge cases — run `pnpm test` and confirm failures
+    - [x] Add `page`/`limit` Zod params + total count query via `Promise.all` in `listMyExtensionRequestsHandler` in `src/server/extensions.server.ts`
+    - [x] Wire shared `<Pagination>` component on the student extension history page
+    - [x] Run `pnpm test` — confirm all tests pass
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `feat(extensions): Add pagination to extension requests list`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Add .limit(20) safety caps to dashboard queries (PERF-20, PERF-21)
     - [ ] Write failing tests: assert student dashboard `activeAssignments` and instructor dashboard `assignmentOverview` return at most 20 rows — run `pnpm test` and confirm failures
