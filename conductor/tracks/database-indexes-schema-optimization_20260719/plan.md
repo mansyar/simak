@@ -52,7 +52,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Schema Changes with TDD' (Protocol in workflow.md)
 
-## Phase 2: Migration & Integration Verification
+## Phase 2: Migration & Integration Verification [checkpoint: 358c873]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
     - [x] Read `./spec.md` — review TR-2 (Migration Generation & Review), TR-3 (Migration Application), TR-4 (Integration test), TR-5 (Manual EXPLAIN ANALYZE), AC-2, AC-3, AC-5, AC-11
