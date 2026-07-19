@@ -44,7 +44,8 @@ export async function getStudentDashboardDataHandler() {
           .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
           .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
           .where(and(eq(assignmentStudents.studentId, studentId), isNull(assignments.deletedAt)))
-          .orderBy(assignments.finalDeadline),
+          .orderBy(assignments.finalDeadline)
+          .limit(20),
         db
           .select({
             assignmentId: assignments.id,

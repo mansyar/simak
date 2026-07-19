@@ -324,6 +324,15 @@ describe('Dashboard handlers', () => {
       expect(result.activeAssignments[1].id).toBe(1);
       expect(result.activeAssignments[1].effectiveDeadline).toEqual(effectiveForAssignment1);
     });
+    it('should cap activeAssignments at 20 rows (PERF-20)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      await getStudentDashboardDataHandler();
+      expect(mockDb.limit).toHaveBeenCalledWith(20);
+    });
   });
 
   describe('getInstructorDashboardDataHandler', () => {
@@ -415,6 +424,16 @@ describe('Dashboard handlers', () => {
       expect(result.assignments).toHaveLength(1);
       expect(result.assignments[0].studentCount).toBe(5);
       expect(result.assignments[0].overallProgressPercent).toBe(33);
+    });
+
+    it('should cap assignmentOverview at 20 rows (PERF-21)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      await getInstructorDashboardDataHandler();
+      expect(mockDb.limit).toHaveBeenCalledWith(20);
     });
   });
 });
