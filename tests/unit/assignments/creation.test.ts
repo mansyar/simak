@@ -89,6 +89,11 @@ describe('Assignment Server Functions', () => {
     it('should succeed and instantiate checkpoints for students', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
 
+      // Mock validation query: all studentIds are valid active students
+      mockDb.then.mockImplementationOnce((onfulfilled: any) => {
+        return Promise.resolve([{ id: 'student-1' }, { id: 'student-2' }]).then(onfulfilled);
+      });
+
       // Mock returning inserted assignment ID = 42
       mockDb.returning.mockImplementation(() => {
         return {
@@ -118,6 +123,87 @@ describe('Assignment Server Functions', () => {
       expect(result).toHaveProperty('assignmentId', 42);
       expect(mockDb.transaction).toHaveBeenCalled();
       expect(mockDb.insert).toHaveBeenCalled();
+    });
+
+    it('AC-13: rejects studentIds containing an admin userId', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+
+      // Validation query returns only 1 valid student (admin userId is not a student)
+      mockDb.then.mockImplementationOnce((onfulfilled: any) => {
+        return Promise.resolve([{ id: 'student-1' }]).then(onfulfilled);
+      });
+
+      const result = await createAssignmentHandler({
+        data: {
+          templateId: 1,
+          title: 'New Assignment',
+          description: 'Description',
+          finalDeadline: new Date(Date.now() + 86400000),
+          studentIds: ['student-1', 'admin-1'],
+        },
+      });
+
+      expect(result).toEqual({
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'One or more selected users are not active students',
+        },
+      });
+      expect(mockDb.transaction).not.toHaveBeenCalled();
+    });
+
+    it('AC-14: rejects studentIds containing a deleted student userId', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+
+      // Validation query returns only 1 valid student (deleted student filtered out)
+      mockDb.then.mockImplementationOnce((onfulfilled: any) => {
+        return Promise.resolve([{ id: 'student-1' }]).then(onfulfilled);
+      });
+
+      const result = await createAssignmentHandler({
+        data: {
+          templateId: 1,
+          title: 'New Assignment',
+          description: 'Description',
+          finalDeadline: new Date(Date.now() + 86400000),
+          studentIds: ['student-1', 'deleted-student-2'],
+        },
+      });
+
+      expect(result).toEqual({
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'One or more selected users are not active students',
+        },
+      });
+      expect(mockDb.transaction).not.toHaveBeenCalled();
+    });
+
+    it('rejects studentIds containing an instructor userId', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+
+      // Validation query returns only 1 valid student (instructor filtered out)
+      mockDb.then.mockImplementationOnce((onfulfilled: any) => {
+        return Promise.resolve([{ id: 'student-1' }]).then(onfulfilled);
+      });
+
+      const result = await createAssignmentHandler({
+        data: {
+          templateId: 1,
+          title: 'New Assignment',
+          description: 'Description',
+          finalDeadline: new Date(Date.now() + 86400000),
+          studentIds: ['student-1', 'instructor-2'],
+        },
+      });
+
+      expect(result).toEqual({
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'One or more selected users are not active students',
+        },
+      });
+      expect(mockDb.transaction).not.toHaveBeenCalled();
     });
   });
 

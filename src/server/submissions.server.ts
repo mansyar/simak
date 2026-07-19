@@ -6,7 +6,7 @@ import { notifications } from '../db/schema/notifications';
 import { submissions, uploadIntents } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
-import { generatePresignedDownloadUrl, getObjectContentLength } from '../lib/storage';
+import { generatePresignedDownloadUrl, getObjectContentLength, r2SizeError } from '../lib/storage';
 import { MAX_FILE_SIZE, validateUploadFileName } from '../lib/file-validation';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
@@ -35,7 +35,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { checkpointId, fileKey, fileName, fileSize } = args.data;
+  const { checkpointId, fileKey, fileName } = args.data;
   const db = getDb();
 
   try {
@@ -135,10 +135,13 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
       ) {
         return serverError(ErrorCode.BAD_REQUEST, 'Invalid or expired upload intent');
       }
-
       // 1e. R2 HEAD is the single size authority for the 25MB cap.
-      const actualSize = await getObjectContentLength({ key: fileKey });
-      if (actualSize === null || actualSize > MAX_FILE_SIZE) {
+      const sizeResult = await getObjectContentLength({ key: fileKey });
+      if (!sizeResult.ok) {
+        const locale = (session.user.locale || 'en') as 'en' | 'id';
+        return r2SizeError(sizeResult.reason, locale);
+      }
+      if (sizeResult.size > MAX_FILE_SIZE) {
         return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
       }
 
@@ -163,7 +166,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
           uploadedBy: session.user.id,
           fileKey,
           fileName,
-          fileSize,
+          fileSize: sizeResult.size,
           version: nextVersion,
         })
         .returning({ id: submissions.id });

@@ -18,12 +18,16 @@ vi.mock('@/lib/audit', () => ({
   logAuditEvent: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('@/lib/storage', () => ({
-  generateFileKey: vi.fn(),
-  generatePresignedUploadUrl: vi.fn(),
-  generatePresignedDownloadUrl: vi.fn(),
-  getObjectContentLength: vi.fn(),
-}));
+vi.mock('@/lib/storage', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/storage')>();
+  return {
+    ...actual,
+    generateFileKey: vi.fn(),
+    generatePresignedUploadUrl: vi.fn(),
+    generatePresignedDownloadUrl: vi.fn(),
+    getObjectContentLength: vi.fn(),
+  };
+});
 
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: vi.fn().mockReturnValue({
@@ -120,7 +124,7 @@ describe('submitReviewHandler - upload intent verification', () => {
       transaction: vi.fn((callback: (tx: MockTx) => Promise<unknown>) => callback(mockTx)),
     } as any;
     vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
-    vi.mocked(getObjectContentLength).mockResolvedValue(1024);
+    vi.mocked(getObjectContentLength).mockResolvedValue({ ok: true, size: 1024 });
   });
 
   it('AC-H1-1: rejects a fabricated feedback fileKey with no matching intent', async () => {
@@ -223,7 +227,7 @@ describe('submitReviewHandler - upload intent verification', () => {
 
   it('AC-H1-4: rejects review feedback whose R2 HEAD Content-Length exceeds 25MB', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-    vi.mocked(getObjectContentLength).mockResolvedValue(25 * 1024 * 1024 + 1);
+    vi.mocked(getObjectContentLength).mockResolvedValue({ ok: true, size: 25 * 1024 * 1024 + 1 });
 
     mockTx.enqueue([createSubmissionRow('under_review')]);
     mockTx.enqueue([
@@ -243,6 +247,58 @@ describe('submitReviewHandler - upload intent verification', () => {
     expect(result.error.code).toBe('BAD_REQUEST');
     expect(result.error.message).toBe('File size exceeds 25MB limit');
     expect(getObjectContentLength).toHaveBeenCalledWith({ key: 'feedback/uuid-123.pdf' });
+    assertCheckpointReadForUpdate(mockTx);
+  });
+
+  it('AC-H1-6: returns r2NotConfigured i18n message when R2 is not configured', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    vi.mocked(getObjectContentLength).mockResolvedValue({ ok: false, reason: 'not_configured' });
+
+    mockTx.enqueue([createSubmissionRow('under_review')]);
+    mockTx.enqueue([
+      {
+        fileKey: 'feedback/uuid-123.pdf',
+        userId: 'instructor-1',
+        purpose: 'review_feedback',
+        checkpointId: null,
+        consumedAt: null,
+      },
+    ]);
+
+    const result = await submitReviewHandler({ data: baseReviewData });
+
+    expect(isServerError(result)).toBe(true);
+    if (!isServerError(result)) throw new Error('Expected server error');
+    expect(result.error.code).toBe('BAD_REQUEST');
+    expect(result.error.message).toBe(
+      'File storage is not configured. Contact your administrator.',
+    );
+    assertCheckpointReadForUpdate(mockTx);
+  });
+
+  it('AC-H1-7: returns objectNotFound i18n message when R2 object does not exist', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    vi.mocked(getObjectContentLength).mockResolvedValue({ ok: false, reason: 'not_found' });
+
+    mockTx.enqueue([createSubmissionRow('under_review')]);
+    mockTx.enqueue([
+      {
+        fileKey: 'feedback/uuid-123.pdf',
+        userId: 'instructor-1',
+        purpose: 'review_feedback',
+        checkpointId: null,
+        consumedAt: null,
+      },
+    ]);
+
+    const result = await submitReviewHandler({ data: baseReviewData });
+
+    expect(isServerError(result)).toBe(true);
+    if (!isServerError(result)) throw new Error('Expected server error');
+    expect(result.error.code).toBe('BAD_REQUEST');
+    expect(result.error.message).toBe(
+      'The uploaded file could not be found. Please try uploading again.',
+    );
     assertCheckpointReadForUpdate(mockTx);
   });
 });

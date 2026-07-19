@@ -30,7 +30,7 @@ vi.mock('@/lib/storage', () => ({
   generatePresignedUploadUrl: vi.fn().mockResolvedValue('https://presigned-upload.test/url'),
   generatePresignedDownloadUrl: vi.fn().mockResolvedValue('https://presigned-download.test/url'),
   getR2Client: vi.fn().mockReturnValue({}),
-  getObjectContentLength: vi.fn().mockResolvedValue(1024),
+  getObjectContentLength: vi.fn().mockResolvedValue({ ok: true, size: 1024 }),
 }));
 
 describe('submitCheckpointHandler — transactions & metadata', () => {

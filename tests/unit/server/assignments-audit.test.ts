@@ -70,6 +70,10 @@ describe('Assignment & Review handlers audit logging', () => {
 
       // Mock returning to return inserted assignment id
       mockDb.returning.mockResolvedValue([{ id: 789 }]);
+      // Mock validation query: studentIds are valid active students
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 'student-1' }]).then(onfulfilled),
+      );
       // Mock then for select queries inside transaction
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([]).then(onfulfilled),

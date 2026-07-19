@@ -18,6 +18,8 @@ import {
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import * as storage from '@/lib/storage';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -30,6 +32,13 @@ vi.mock('@/db/index', () => ({
 vi.mock('@/lib/storage', () => ({
   generateFileKey: vi.fn(),
   generatePresignedUploadUrl: vi.fn(),
+}));
+
+vi.mock('@tanstack/react-start', () => ({
+  createServerFn: vi.fn().mockReturnValue({
+    inputValidator: vi.fn().mockReturnThis(),
+    handler: vi.fn().mockImplementation((fn) => fn),
+  }),
 }));
 
 // Schema validation tests
@@ -71,6 +80,11 @@ describe('Settings schemas', () => {
       const result = UpdateUserSettingsSchema.safeParse({ reducedMotion: 'yes' });
       expect(result.success).toBe(false);
     });
+
+    it('should reject missing reducedMotion', () => {
+      const result = UpdateUserSettingsSchema.safeParse({});
+      expect(result.success).toBe(false);
+    });
   });
 
   describe('GetPresignedAvatarUploadUrlSchema', () => {
@@ -81,6 +95,11 @@ describe('Settings schemas', () => {
 
     it('should reject empty extension', () => {
       const result = GetPresignedAvatarUploadUrlSchema.safeParse({ extension: '' });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject missing extension', () => {
+      const result = GetPresignedAvatarUploadUrlSchema.safeParse({});
       expect(result.success).toBe(false);
     });
   });
@@ -102,6 +121,33 @@ describe('Settings server function stubs', () => {
 
   it('should export getCurrentUser as a function', () => {
     expect(typeof getCurrentUser).toBe('function');
+  });
+});
+
+// Input validation wiring tests (BUG-15)
+describe('Settings input validation wiring (BUG-15)', () => {
+  it('should wire UpdateProfileSchema to updateProfile stub via inputValidator', async () => {
+    const { createServerFn } = await import('@tanstack/react-start');
+    const mockObj = (createServerFn as any)();
+    expect(mockObj.inputValidator).toHaveBeenCalledWith(UpdateProfileSchema);
+  });
+
+  it('should wire UpdateUserSettingsSchema to updateUserSettings stub via inputValidator', async () => {
+    const { createServerFn } = await import('@tanstack/react-start');
+    const mockObj = (createServerFn as any)();
+    expect(mockObj.inputValidator).toHaveBeenCalledWith(UpdateUserSettingsSchema);
+  });
+
+  it('should wire GetPresignedAvatarUploadUrlSchema to getPresignedAvatarUploadUrl stub via inputValidator', async () => {
+    const { createServerFn } = await import('@tanstack/react-start');
+    const mockObj = (createServerFn as any)();
+    expect(mockObj.inputValidator).toHaveBeenCalledWith(GetPresignedAvatarUploadUrlSchema);
+  });
+
+  it('AC-5: should not have args as { ... } casts in settings.server.ts', () => {
+    const filePath = path.resolve(process.cwd(), 'src/server/settings.server.ts');
+    const content = fs.readFileSync(filePath, 'utf-8');
+    expect(content).not.toContain('args as {');
   });
 });
 
@@ -138,7 +184,7 @@ describe('Settings handlers', () => {
   describe('updateProfileHandler', () => {
     it('should reject if unauthorized (no session)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await updateProfileHandler({ name: 'John Updated' });
+      const result = await updateProfileHandler({ data: { name: 'John Updated' } });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
@@ -149,7 +195,7 @@ describe('Settings handlers', () => {
         then: (onfulfilled: any) => Promise.resolve([updatedUser]).then(onfulfilled),
       });
 
-      const result = await updateProfileHandler({ name: 'John Updated' });
+      const result = await updateProfileHandler({ data: { name: 'John Updated' } });
       expect(mockDb.set).toHaveBeenCalledWith({ name: 'John Updated' });
       expect(result).toEqual(updatedUser);
     });
@@ -161,7 +207,7 @@ describe('Settings handlers', () => {
           Promise.reject(new Error('DB error')).catch(onrejected),
       });
 
-      const result = await updateProfileHandler({ name: 'John Updated' });
+      const result = await updateProfileHandler({ data: { name: 'John Updated' } });
       expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
@@ -169,7 +215,7 @@ describe('Settings handlers', () => {
   describe('getPresignedAvatarUploadUrlHandler', () => {
     it('should reject if unauthorized (no session)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await getPresignedAvatarUploadUrlHandler({ extension: 'jpg' });
+      const result = await getPresignedAvatarUploadUrlHandler({ data: { extension: 'jpg' } });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
@@ -180,7 +226,7 @@ describe('Settings handlers', () => {
         'https://fake-upload.example.com/avatars/uuid.jpg',
       );
 
-      const result = await getPresignedAvatarUploadUrlHandler({ extension: 'jpg' });
+      const result = await getPresignedAvatarUploadUrlHandler({ data: { extension: 'jpg' } });
       expect(storage.generateFileKey).toHaveBeenCalledWith('jpg', 'avatars');
       expect(storage.generatePresignedUploadUrl).toHaveBeenCalledWith({
         key: 'avatars/uuid.jpg',
@@ -194,7 +240,7 @@ describe('Settings handlers', () => {
 
     it('should return error for unsupported image type', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
-      const result = await getPresignedAvatarUploadUrlHandler({ extension: 'exe' });
+      const result = await getPresignedAvatarUploadUrlHandler({ data: { extension: 'exe' } });
       expect(result).toEqual({ error: { code: 'BAD_REQUEST', message: 'Unsupported image type' } });
     });
 
@@ -204,7 +250,7 @@ describe('Settings handlers', () => {
         new Error('R2 not configured'),
       );
 
-      const result = await getPresignedAvatarUploadUrlHandler({ extension: 'jpg' });
+      const result = await getPresignedAvatarUploadUrlHandler({ data: { extension: 'jpg' } });
       expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
@@ -212,7 +258,7 @@ describe('Settings handlers', () => {
   describe('updateUserSettingsHandler', () => {
     it('should reject if unauthorized (no session)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await updateUserSettingsHandler({ reducedMotion: true });
+      const result = await updateUserSettingsHandler({ data: { reducedMotion: true } });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
@@ -224,7 +270,7 @@ describe('Settings handlers', () => {
           Promise.resolve([{ settings: updatedSettings }]).then(onfulfilled),
       });
 
-      const result = await updateUserSettingsHandler({ reducedMotion: true });
+      const result = await updateUserSettingsHandler({ data: { reducedMotion: true } });
       expect(mockDb.set).toHaveBeenCalledWith({ settings: { reducedMotion: true } });
       expect(result).toEqual(updatedSettings);
     });
@@ -236,7 +282,7 @@ describe('Settings handlers', () => {
           Promise.reject(new Error('DB error')).catch(onrejected),
       });
 
-      const result = await updateUserSettingsHandler({ reducedMotion: false });
+      const result = await updateUserSettingsHandler({ data: { reducedMotion: false } });
       expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });

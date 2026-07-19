@@ -4,6 +4,8 @@ import { getDb } from '@/db/index';
 import { getEnv } from '@/config/env';
 import { emailQueue } from '@/db/schema/index';
 import { createMockDb, makeEmail, type MockDb, type FakeRow } from './helpers/email-queue-mock';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 // --- Module-level mocks ---
 
@@ -384,6 +386,15 @@ describe('email-queue-processor', () => {
       expect(logJson).not.toContain('secret@user.com');
       expect(logJson).not.toContain('Secret Subject');
       expect(logJson).not.toContain('Secret Body');
+    });
+  });
+
+  describe('AC-21: EMAIL_FROM source', () => {
+    it('uses getEnv().EMAIL_FROM with no process.env fallback', () => {
+      const filePath = resolve(__dirname, '../../../src/lib/email-queue-processor.ts');
+      const content = readFileSync(filePath, 'utf8');
+      expect(content).not.toContain('process.env.EMAIL_FROM');
+      expect(content).not.toContain("'SIMAK <noreply@simak.app>'");
     });
   });
 });

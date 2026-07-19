@@ -535,7 +535,14 @@
     "revisionDeadline": "Tenggat revisi: {date}",
     "empty": "Tidak ada file",
     "emptyPrompt": "Unggah file untuk memulai",
-    "uploadError": "Gagal mengunggah file"
+    "uploadError": "Gagal mengunggah file",
+    "r2NotConfigured": "Penyimpanan berkas tidak dikonfigurasi. Hubungi administrator Anda.",
+    "objectNotFound": "Berkas yang diunggah tidak ditemukan. Silakan coba unggah kembali."
+  },
+  "assignments": {
+    "errors": {
+      "invalidStudentIds": "Satu atau lebih pengguna terpilih bukan mahasiswa aktif"
+    }
   },
   "consultations": {
     "title": "Konsultasi",

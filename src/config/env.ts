@@ -24,7 +24,7 @@ const envSchema = baseSchema.extend({
   R2_BUCKET_NAME: z.string().optional(),
   R2_PUBLIC_URL: z.string().url().optional(),
   MIGRATE_DATABASE_URL: z.string().url().optional(),
-  EMAIL_FROM: z.string().default('SIMAK <noreply@simak.app>'),
+  EMAIL_FROM: z.string().min(1, 'EMAIL_FROM cannot be empty').default('SIMAK <noreply@simak.app>'),
 });
 
 export type Env = z.infer<typeof baseSchema> &

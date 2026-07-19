@@ -1,3 +1,4 @@
+/** @vitest-environment node */
 import { describe, it, expect } from 'vitest';
 import { calculateBreachDuration } from '@/lib/sla';
 
@@ -34,6 +35,14 @@ describe('calculateBreachDuration', () => {
     expect(calculateBreachDuration(anchorTime, reviewedAt)).toBe(45);
   });
 
+  it('should return breach for reviews completed well after SLA', () => {
+    const anchorTime = new Date('2026-05-01T00:00:00Z');
+    const reviewedAt = new Date('2026-06-01T00:00:00Z');
+
+    // 31 days total - 3 day SLA = 28 days breach
+    expect(calculateBreachDuration(anchorTime, reviewedAt)).toBe(28);
+  });
+
   it('should return 0 when reviewed before anchor time', () => {
     const anchorTime = new Date('2026-06-05T12:00:00Z');
     const reviewedAt = new Date('2026-06-01T12:00:00Z'); // before anchor
@@ -63,6 +72,20 @@ describe('calculateBreachDuration', () => {
     );
 
     expect(calculateBreachDuration(anchorTime, reviewedAt)).toBe(2);
+  });
+
+  it('should handle millisecond precision edge cases', () => {
+    const anchorTime = new Date('2026-05-20T10:00:00.000Z');
+    const reviewedAt = new Date('2026-05-23T10:00:00.001Z');
+    // 72h + 1ms → breach of 0 days (rounded down from <1 day)
+    expect(calculateBreachDuration(anchorTime, reviewedAt)).toBe(0);
+  });
+
+  it('should return 1 day breach when 1ms over 4 days', () => {
+    const anchorTime = new Date('2026-05-20T10:00:00.000Z');
+    const reviewedAt = new Date('2026-05-24T10:00:00.001Z');
+    // 4 days + 1ms - 3 day SLA = 1 day + 1ms → rounded down to 1 day
+    expect(calculateBreachDuration(anchorTime, reviewedAt)).toBe(1);
   });
 
   it('should return 0 when anchorTime is null', () => {
