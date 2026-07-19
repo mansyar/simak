@@ -38,7 +38,7 @@ describe('adjustDeadlinesForBreach', () => {
 
     await adjustDeadlinesForBreach(mockTx, baseSubmission, 3);
 
-    expect(mockTx.update).toHaveBeenCalledTimes(1); // only the affected checkpoint
+    expect(mockTx.update).toHaveBeenCalledTimes(2); // affected + bulk subsequent
     // First update call is for the affected checkpoint
     const setCall = mockTx.set.mock.calls[0][0];
     expect(setCall.dueDate).toBeInstanceOf(Date);
@@ -57,16 +57,12 @@ describe('adjustDeadlinesForBreach', () => {
 
     await adjustDeadlinesForBreach(mockTx, baseSubmission, 2);
 
-    // Should have updated checkpoint + 2 subsequent = 3 updates
-    expect(mockTx.update).toHaveBeenCalledTimes(3);
-    // Second update = first subsequent checkpoint (id 101)
-    expect(mockTx.set.mock.calls[1][0].dueDate.getTime()).toBe(
-      new Date('2026-06-12T00:00:00Z').getTime(),
-    );
-    // Third update = second subsequent checkpoint (id 102)
-    expect(mockTx.set.mock.calls[2][0].dueDate.getTime()).toBe(
-      new Date('2026-06-22T00:00:00Z').getTime(),
-    );
+    // With bulk UPDATE: 2 calls (affected + 1 bulk for all subsequent)
+    expect(mockTx.update).toHaveBeenCalledTimes(2);
+    // Bulk UPDATE uses SQL expression for dueDate
+    const bulkSetCall = mockTx.set.mock.calls[1][0];
+    expect(bulkSetCall.dueDate).toBeDefined();
+    expect(bulkSetCall.updatedAt).toBeInstanceOf(Date);
   });
 
   it('should query subsequent checkpoints with correct filters', async () => {
@@ -74,8 +70,8 @@ describe('adjustDeadlinesForBreach', () => {
 
     await adjustDeadlinesForBreach(mockTx, baseSubmission, 1);
 
-    // Select is called once (for subsequent checkpoints query)
-    expect(mockTx.select).toHaveBeenCalledTimes(1);
+    // No SELECT for subsequent checkpoints (replaced by bulk UPDATE)
+    expect(mockTx.select).not.toHaveBeenCalled();
     expect(mockTx.where).toHaveBeenCalled();
   });
 
@@ -95,8 +91,8 @@ describe('adjustDeadlinesForBreach', () => {
 
     await adjustDeadlinesForBreach(mockTx, { ...baseSubmission, finalDeadline: null }, 3);
 
-    // Only one update call — no assignment update
-    expect(mockTx.update).toHaveBeenCalledTimes(1);
+    // Two update calls — affected checkpoint + bulk subsequent (no assignment update)
+    expect(mockTx.update).toHaveBeenCalledTimes(2);
   });
 
   it('should handle null checkpointDueDate with fallback', async () => {
@@ -118,11 +114,12 @@ describe('adjustDeadlinesForBreach', () => {
 
     await adjustDeadlinesForBreach(mockTx, baseSubmission, 2);
 
-    // Should still update the subsequent checkpoint
+    // Should still update affected + bulk subsequent
     expect(mockTx.update).toHaveBeenCalledTimes(2);
+    // Bulk UPDATE uses SQL COALESCE for null handling (not JS Date fallback)
     const subSetCall = mockTx.set.mock.calls[1][0];
-    expect(subSetCall.dueDate).toBeInstanceOf(Date);
-    expect(subSetCall.dueDate.getTime()).toBeGreaterThan(Date.now());
+    expect(subSetCall.dueDate).toBeDefined();
+    expect(subSetCall.dueDate).not.toBeInstanceOf(Date);
   });
 
   it('should handle null checkpointOrder (defaults to 0)', async () => {
@@ -130,8 +127,25 @@ describe('adjustDeadlinesForBreach', () => {
 
     await adjustDeadlinesForBreach(mockTx, { ...baseSubmission, checkpointOrder: null }, 1);
 
-    // Should not throw; subsequent checkpoints query uses `?? 0`
-    expect(mockTx.update).toHaveBeenCalledTimes(1);
+    // Should not throw; bulk UPDATE WHERE clause uses `?? 0`
+    expect(mockTx.update).toHaveBeenCalledTimes(2);
+  });
+
+  it('should use single bulk UPDATE for subsequent checkpoints (PERF-4)', async () => {
+    // Mock subsequent checkpoints being returned (old code would loop through these)
+    mockTx.then.mockImplementation((onfulfilled: any) =>
+      Promise.resolve([
+        { id: 101, dueDate: new Date('2026-06-10T00:00:00Z') },
+        { id: 102, dueDate: new Date('2026-06-20T00:00:00Z') },
+        { id: 103, dueDate: new Date('2026-06-30T00:00:00Z') },
+      ]).then(onfulfilled),
+    );
+
+    await adjustDeadlinesForBreach(mockTx, baseSubmission, 2);
+
+    // With bulk UPDATE: 2 UPDATE calls (1 affected + 1 bulk)
+    // Old code would make 4 UPDATE calls (1 affected + 3 individual)
+    expect(mockTx.update).toHaveBeenCalledTimes(2);
   });
 });
 

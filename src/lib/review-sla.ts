@@ -47,10 +47,13 @@ export async function adjustDeadlinesForBreach(
     .set({ dueDate: extendedDueDate, updatedAt: new Date() })
     .where(eq(checkpoints.id, submission.checkpointId));
 
-  // Extend all subsequent checkpoints for this student in this assignment
-  const subsequentCheckpoints = await tx
-    .select({ id: checkpoints.id, dueDate: checkpoints.dueDate })
-    .from(checkpoints)
+  // Extend all subsequent checkpoints for this student in this assignment (bulk UPDATE)
+  await tx
+    .update(checkpoints)
+    .set({
+      dueDate: sql`COALESCE(${checkpoints.dueDate}, NOW()) + INTERVAL '1 day' * ${breachDays}`,
+      updatedAt: new Date(),
+    })
     .where(
       and(
         eq(checkpoints.assignmentId, submission.assignmentId),
@@ -58,17 +61,6 @@ export async function adjustDeadlinesForBreach(
         gt(checkpoints.order, submission.checkpointOrder ?? 0),
       ),
     );
-
-  for (const cp of subsequentCheckpoints) {
-    // After Phase 1 backfill, all checkpoint dueDates are populated
-    await tx
-      .update(checkpoints)
-      .set({
-        dueDate: new Date((cp.dueDate ?? new Date()).getTime() + breachDays * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(),
-      })
-      .where(eq(checkpoints.id, cp.id));
-  }
 }
 
 /**

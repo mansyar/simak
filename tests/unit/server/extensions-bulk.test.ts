@@ -250,4 +250,26 @@ describe('bulkExtendHandler', () => {
     );
     expect(finalDeadlineCalls).toHaveLength(0);
   });
+
+  it('should use single bulk UPDATE for all unfinished checkpoints (PERF-3)', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+
+    const checkpoints = [
+      { id: 10, dueDate: new Date('2026-06-15'), name: 'CP1' },
+      { id: 11, dueDate: new Date('2026-07-01'), name: 'CP2' },
+      { id: 12, dueDate: new Date('2026-07-15'), name: 'CP3' },
+      { id: 13, dueDate: new Date('2026-08-01'), name: 'CP4' },
+      { id: 14, dueDate: new Date('2026-08-15'), name: 'CP5' },
+    ];
+
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve(checkpoints).then(onfulfilled));
+
+    const result = await bulkExtendHandler({ data: validInput });
+
+    expect(result).toEqual({ success: true, extendedCount: 5 });
+    // Single bulk UPDATE inside transaction, not 5 individual UPDATEs
+    expect(mockDb.update).toHaveBeenCalledTimes(1);
+  });
 });

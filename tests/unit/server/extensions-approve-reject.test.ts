@@ -247,8 +247,44 @@ describe('approveExtensionHandler', () => {
 
     await approveExtensionHandler({ data: { requestId: 100 } });
 
-    // FOR UPDATE called for: extensionRequests, target checkpoint, subsequent checkpoints
-    expect(mockDb.for).toHaveBeenCalledTimes(3);
+    // FOR UPDATE called for: extensionRequests, target checkpoint (no subsequent SELECT)
+    expect(mockDb.for).toHaveBeenCalledTimes(2);
+  });
+
+  it('should use single bulk UPDATE for subsequent checkpoints in extension adjustment (PERF-2)', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+
+    mockDb.then
+      // SELECT extension request
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve(makePendingRequest()).then(onfulfilled),
+      )
+      // UPDATE extension request status
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      // SELECT target checkpoint
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ order: 1, dueDate: new Date('2026-06-01T00:00:00Z') }]).then(
+          onfulfilled,
+        ),
+      )
+      // UPDATE affected checkpoint
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      // SELECT subsequent checkpoints (old code) / bulk UPDATE (new code)
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { id: 101, dueDate: new Date('2026-06-10T00:00:00Z') },
+          { id: 102, dueDate: new Date('2026-06-20T00:00:00Z') },
+          { id: 103, dueDate: new Date('2026-06-30T00:00:00Z') },
+        ]).then(onfulfilled),
+      )
+      // INSERT notification
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+
+    await approveExtensionHandler({ data: { requestId: 100 } });
+
+    // With bulk UPDATE: 3 UPDATE calls (extensionRequests + affected + 1 bulk)
+    // Old code would make 6 UPDATE calls (extensionRequests + affected + 3 individual)
+    expect(mockDb.update).toHaveBeenCalledTimes(3);
   });
 });
 

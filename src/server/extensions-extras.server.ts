@@ -58,28 +58,20 @@ async function calculateExtensionAdjustment(
     .set({ dueDate: newDueDate, updatedAt: new Date() })
     .where(eq(checkpoints.id, checkpointId));
 
-  // 3. Extend all subsequent checkpoints for this student in this assignment
-  const subsequentCheckpoints = await db
-    .select({ id: checkpoints.id, dueDate: checkpoints.dueDate })
-    .from(checkpoints)
+  // 3. Extend all subsequent checkpoints for this student in this assignment (bulk UPDATE)
+  await db
+    .update(checkpoints)
+    .set({
+      dueDate: sql`COALESCE(${checkpoints.dueDate}, NOW()) + INTERVAL '1 day' * ${extensionDays}`,
+      updatedAt: new Date(),
+    })
     .where(
       and(
         eq(checkpoints.assignmentId, assignmentId),
         eq(checkpoints.studentId, studentId),
         sql`${checkpoints.order} > ${targetCheckpoint.order}`,
       ),
-    )
-    .for('update', { of: checkpoints });
-
-  for (const cp of subsequentCheckpoints) {
-    await db
-      .update(checkpoints)
-      .set({
-        dueDate: new Date((cp.dueDate ?? new Date()).getTime() + extensionDays * msPerDay),
-        updatedAt: new Date(),
-      })
-      .where(eq(checkpoints.id, cp.id));
-  }
+    );
 }
 
 // Approve a pending extension request. Instructor-only, ownership-guarded. Extends deadlines and notifies student.
@@ -360,19 +352,21 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
       return serverError(ErrorCode.BAD_REQUEST, 'No unfinished checkpoints found for this student');
     }
 
-    const msPerDay = 24 * 60 * 60 * 1000;
-
-    // 3. Execute in transaction
+    // 3. Execute in transaction (single bulk UPDATE)
     await db.transaction(async (tx) => {
-      for (const cp of unfinishedCheckpoints) {
-        await tx
-          .update(checkpoints)
-          .set({
-            dueDate: new Date((cp.dueDate ?? new Date()).getTime() + extraDays * msPerDay),
-            updatedAt: new Date(),
-          })
-          .where(eq(checkpoints.id, cp.id));
-      }
+      await tx
+        .update(checkpoints)
+        .set({
+          dueDate: sql`COALESCE(${checkpoints.dueDate}, NOW()) + INTERVAL '1 day' * ${extraDays}`,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(checkpoints.assignmentId, assignmentId),
+            eq(checkpoints.studentId, studentId),
+            sql`${checkpoints.state} != 'passed'`,
+          ),
+        );
     });
 
     // 5. Log per-extension audit events (outside transaction)
