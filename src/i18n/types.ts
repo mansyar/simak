@@ -415,6 +415,7 @@ export type Translation = {
     noConsultationReminders: string
     deadline: string
     overdue: string
+    noDeadline: string
     underReview: string
     pending: string
     submittedAgo: string

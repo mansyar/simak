@@ -54,7 +54,13 @@ export async function getStudentDashboardDataHandler() {
           })
           .from(checkpoints)
           .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-          .where(and(eq(checkpoints.studentId, studentId), isNull(assignments.deletedAt)))
+          .where(
+            and(
+              eq(checkpoints.studentId, studentId),
+              isNull(assignments.deletedAt),
+              sql`${checkpoints.state} != 'passed'`,
+            ),
+          )
           .orderBy(checkpoints.dueDate)
           .limit(5),
         db
@@ -171,14 +177,19 @@ export async function getStudentDashboardDataHandler() {
     });
 
     const now = new Date();
-    const deadlines = upcomingDeadlines.map((d) => ({
-      assignmentId: d.assignmentId,
-      assignmentTitle: d.assignmentTitle,
-      checkpointName: d.checkpointName,
-      dueDate: d.dueDate ?? new Date(),
-      state: d.state,
-      isOverdue: (d.dueDate ?? new Date()) < now,
-    }));
+    const deadlines = upcomingDeadlines
+      .filter((d) => d.state !== 'passed')
+      .map((d) => ({
+        assignmentId: d.assignmentId,
+        assignmentTitle: d.assignmentTitle,
+        checkpointName: d.checkpointName,
+        dueDate: d.dueDate ? d.dueDate.toISOString() : null,
+        state: d.state,
+        isOverdue: d.dueDate ? d.dueDate < now : false,
+        daysRemaining: d.dueDate
+          ? Math.ceil((d.dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+          : null,
+      }));
 
     return {
       activeAssignments: activeAssignmentsWithProgress,
