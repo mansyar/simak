@@ -21,7 +21,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Config Hygiene' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Config Hygiene' (Protocol in workflow.md)
 
 ## Phase 2: Structured Processor Logging (FR-4) + Verify FR-3
 
