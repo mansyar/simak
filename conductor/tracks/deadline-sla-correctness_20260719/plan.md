@@ -79,17 +79,17 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [~] Task: Add validation to extendDeadlineHandler (BUG-18)
-    - [ ] Write failing tests: (1) verify past `newDueDate` is rejected; (2) verify non-sequential dueDates are rejected; (3) verify `assignments.finalDeadline` is NOT modified
-    - [ ] Add future-date validation to `extendDeadlineHandler` (`src/server/assignments-extras.server.ts` lines 99-148)
-    - [ ] Add sequential-ordering validation relative to adjacent checkpoints
-    - [ ] Return descriptive validation errors on failure
-    - [ ] Confirm NO `finalDeadline` mutation (immutable per Track 10)
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n`
-    - [ ] Commit: `fix(extensions): Add date validation to extendDeadlineHandler`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md
+- [x] Task: Add validation to extendDeadlineHandler (BUG-18) [commit: 78c5dc6]
+    - [x] Write failing tests: (1) verify past `newDueDate` is rejected; (2) verify non-sequential dueDates are rejected; (3) verify `assignments.finalDeadline` is NOT modified
+    - [x] Add future-date validation to `extendDeadlineHandler` (`src/server/assignments-extras.server.ts` lines 99-148)
+    - [x] Add sequential-ordering validation relative to adjacent checkpoints
+    - [x] Return descriptive validation errors on failure
+    - [x] Confirm NO `finalDeadline` mutation (immutable per Track 10)
+    - [x] Run `pnpm test` — confirm all tests pass (260 files, 2390 tests)
+    - [x] Run quality gates: `pnpm typecheck && pnpm lint && pnpm check:i18n` — all pass
+    - [x] Commit: `fix(extensions): Add date validation to extendDeadlineHandler`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Validation Logic' (Protocol in workflow.md)
 
