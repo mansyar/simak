@@ -133,25 +133,20 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
   }
 }
 
-/**
- * List consultations for a student's assignment.
- * Students see only their own consultations; instructors see all for their assignments.
- */
+/** List consultations for an assignment (students see own; instructors see all). */
 export async function listConsultationsHandler(args: { data: ListConsultationsInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { assignmentId, checkpointId } = args.data;
+  const { assignmentId, checkpointId, page = 1, limit = 20 } = args.data;
   const db = getDb();
 
   try {
     const role = session.user.role;
     const accessError = await verifyAssignmentAccess(db, assignmentId, session);
     if (accessError) return accessError;
-
-    // Common conditions
     const conditions = [eq(consultations.assignmentId, assignmentId)];
     if (checkpointId) conditions.push(eq(consultations.checkpointId, checkpointId));
     if (role === 'student') conditions.push(eq(consultations.studentId, session.user.id));
@@ -178,9 +173,19 @@ export async function listConsultationsHandler(args: { data: ListConsultationsIn
         ? baseQuery.innerJoin(users, eq(consultations.studentId, users.id))
         : baseQuery;
 
-    const items = await query.where(and(...conditions)).orderBy(desc(consultations.createdAt));
+    const [items, [{ count }]] = await Promise.all([
+      query
+        .where(and(...conditions))
+        .orderBy(desc(consultations.createdAt))
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(consultations)
+        .where(and(...conditions)),
+    ]);
 
-    return { consultations: items };
+    return { consultations: items, total: Number(count) };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

@@ -138,7 +138,9 @@ describe('Consultation server functions - Logic & Security', () => {
   describe('listConsultationsHandler', () => {
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await listConsultationsHandler({ data: { assignmentId: 1 } });
+      const result = await listConsultationsHandler({
+        data: { assignmentId: 1, page: 1, limit: 20 },
+      });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
@@ -154,8 +156,14 @@ describe('Consultation server functions - Logic & Security', () => {
           Promise.resolve([
             { id: 1, checkpointId: 1, status: 'pending', checkpointName: 'Ch 1' },
           ]).then(onfulfilled),
+        )
+        // Count query
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
         );
-      const result = await listConsultationsHandler({ data: { assignmentId: 1 } });
+      const result = await listConsultationsHandler({
+        data: { assignmentId: 1, page: 1, limit: 20 },
+      });
       expect(result).toHaveProperty('consultations');
     });
 
@@ -171,8 +179,14 @@ describe('Consultation server functions - Logic & Security', () => {
           Promise.resolve([
             { id: 1, checkpointId: 1, status: 'pending', studentName: 'Student A' },
           ]).then(onfulfilled),
+        )
+        // Count query
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
         );
-      const result = await listConsultationsHandler({ data: { assignmentId: 1 } });
+      const result = await listConsultationsHandler({
+        data: { assignmentId: 1, page: 1, limit: 20 },
+      });
       expect(result).toHaveProperty('consultations');
     });
 
@@ -181,7 +195,9 @@ describe('Consultation server functions - Logic & Security', () => {
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([]).then(onfulfilled),
       );
-      const result = await listConsultationsHandler({ data: { assignmentId: 999 } });
+      const result = await listConsultationsHandler({
+        data: { assignmentId: 999, page: 1, limit: 20 },
+      });
       expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Assignment not found'));
     });
 
@@ -190,8 +206,72 @@ describe('Consultation server functions - Logic & Security', () => {
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([]).then(onfulfilled),
       );
-      const result = await listConsultationsHandler({ data: { assignmentId: 999 } });
+      const result = await listConsultationsHandler({
+        data: { assignmentId: 999, page: 1, limit: 20 },
+      });
       expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Assignment not found'));
+    });
+
+    it('should accept page/limit params and return total count (PERF-15)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            { id: 1, checkpointId: 1, status: 'pending', checkpointName: 'Ch 1' },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 42 }]).then(onfulfilled),
+        );
+      const result = await listConsultationsHandler({
+        data: { assignmentId: 1, page: 2, limit: 10 },
+      });
+      expect(result).toHaveProperty('consultations');
+      expect(result).toHaveProperty('total');
+      if (!isServerError(result)) {
+        expect(result.total).toBe(42);
+        expect(mockDb.limit).toHaveBeenCalledWith(10);
+        expect(mockDb.offset).toHaveBeenCalledWith(10);
+      }
+    });
+
+    it('should default to page=1, limit=20 when not provided (PERF-15)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 0 }]).then(onfulfilled),
+        );
+      const result = await listConsultationsHandler({
+        data: { assignmentId: 1, page: 1, limit: 20 },
+      });
+      expect(mockDb.limit).toHaveBeenCalledWith(20);
+      expect(mockDb.offset).toHaveBeenCalledWith(0);
+    });
+
+    it('should return empty consultations when page is beyond range (PERF-15)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 5 }]).then(onfulfilled),
+        );
+      const result = await listConsultationsHandler({
+        data: { assignmentId: 1, page: 100, limit: 20 },
+      });
+      if (!isServerError(result)) {
+        expect(result.consultations).toEqual([]);
+        expect(result.total).toBe(5);
+      }
     });
   });
 
