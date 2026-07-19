@@ -4,7 +4,7 @@
 **Track ID:** `email-queue-robustness_20260719`
 **Spec:** [./spec.md](./spec.md)
 
-## Phase 1: Config Hygiene (FR-5)
+## Phase 1: Config Hygiene (FR-5) [checkpoint: f4eb97a]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 1 implementation
     - [x] Read `./spec.md` — review FR-5 and Acceptance Criterion #5
