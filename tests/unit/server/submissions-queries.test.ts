@@ -60,7 +60,9 @@ describe('Submission query handlers - Logic & Security', () => {
     it('should reject if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
-      const result = await listSubmissionsHandler({ data: { checkpointId: 1 } });
+      const result = await listSubmissionsHandler({
+        data: { checkpointId: 1, page: 1, limit: 20 },
+      });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
 
@@ -71,10 +73,15 @@ describe('Submission query handlers - Logic & Security', () => {
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ id: 1, studentId: 'student-1' }]).then(onfulfilled),
         )
-        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 0 }]).then(onfulfilled),
+        );
 
-      const result = await listSubmissionsHandler({ data: { checkpointId: 1 } });
-      expect(result).toEqual({ submissions: [] });
+      const result = await listSubmissionsHandler({
+        data: { checkpointId: 1, page: 1, limit: 20 },
+      });
+      expect(result).toEqual({ submissions: [], total: 0 });
     });
 
     it('should return all submissions for own checkpoint, newest first', async () => {
@@ -108,9 +115,14 @@ describe('Submission query handlers - Logic & Security', () => {
               uploadedAt: new Date('2026-05-20'),
             },
           ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 3 }]).then(onfulfilled),
         );
 
-      const result = (await listSubmissionsHandler({ data: { checkpointId: 1 } })) as any;
+      const result = (await listSubmissionsHandler({
+        data: { checkpointId: 1, page: 1, limit: 20 },
+      })) as any;
       expect(result.submissions).toHaveLength(3);
       expect(result.submissions[0].version).toBe(3);
       expect(result.submissions[1].version).toBe(2);
@@ -124,8 +136,75 @@ describe('Submission query handlers - Logic & Security', () => {
         Promise.resolve([]).then(onfulfilled),
       );
 
-      const result = await listSubmissionsHandler({ data: { checkpointId: 1 } });
+      const result = await listSubmissionsHandler({
+        data: { checkpointId: 1, page: 1, limit: 20 },
+      });
       expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
+    });
+
+    it('should accept page/limit params and return total count (PERF-17)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+      const fakeSubmission = {
+        id: 10,
+        version: 3,
+        fileName: 'v3.pdf',
+        fileSize: 3072,
+        uploadedAt: new Date('2026-05-22'),
+      };
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1, studentId: 'student-1' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([fakeSubmission]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 42 }]).then(onfulfilled),
+        );
+
+      const result = await listSubmissionsHandler({
+        data: { checkpointId: 1, page: 2, limit: 10 },
+      });
+      expect(result).toEqual({ submissions: [fakeSubmission], total: 42 });
+      expect(mockDb.limit).toHaveBeenCalledWith(10);
+      expect(mockDb.offset).toHaveBeenCalledWith(10);
+    });
+
+    it('should default to page=1, limit=20 when not provided (PERF-17)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1, studentId: 'student-1' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 0 }]).then(onfulfilled),
+        );
+
+      await listSubmissionsHandler({ data: { checkpointId: 1, page: 1, limit: 20 } });
+      expect(mockDb.limit).toHaveBeenCalledWith(20);
+      expect(mockDb.offset).toHaveBeenCalledWith(0);
+    });
+
+    it('should return empty submissions when page is beyond range (PERF-17)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1, studentId: 'student-1' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 5 }]).then(onfulfilled),
+        );
+
+      const result = await listSubmissionsHandler({
+        data: { checkpointId: 1, page: 100, limit: 20 },
+      });
+      expect(result).toEqual({ submissions: [], total: 5 });
     });
   });
 
@@ -197,7 +276,9 @@ describe('Submission query handlers - Logic & Security', () => {
         Promise.resolve([]).then(onfulfilled),
       );
 
-      const result = await listSubmissionsHandler({ data: { checkpointId: 1 } });
+      const result = await listSubmissionsHandler({
+        data: { checkpointId: 1, page: 1, limit: 20 },
+      });
       expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
     });
   });

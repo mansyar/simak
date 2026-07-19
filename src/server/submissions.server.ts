@@ -244,7 +244,7 @@ export async function listSubmissionsHandler(args: { data: ListSubmissionsInput 
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { checkpointId } = args.data;
+  const { checkpointId, page = 1, limit = 20 } = args.data;
   const db = getDb();
 
   try {
@@ -266,20 +266,28 @@ export async function listSubmissionsHandler(args: { data: ListSubmissionsInput 
       return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
     }
 
-    // 2. Fetch all submissions for this checkpoint, newest first
-    const submissionList = await db
-      .select({
-        id: submissions.id,
-        version: submissions.version,
-        fileName: submissions.fileName,
-        fileSize: submissions.fileSize,
-        uploadedAt: submissions.uploadedAt,
-      })
-      .from(submissions)
-      .where(eq(submissions.checkpointId, checkpointId))
-      .orderBy(desc(submissions.version));
+    // 2. Fetch submissions (paginated) and total count in parallel
+    const [submissionList, [{ count }]] = await Promise.all([
+      db
+        .select({
+          id: submissions.id,
+          version: submissions.version,
+          fileName: submissions.fileName,
+          fileSize: submissions.fileSize,
+          uploadedAt: submissions.uploadedAt,
+        })
+        .from(submissions)
+        .where(eq(submissions.checkpointId, checkpointId))
+        .orderBy(desc(submissions.version))
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(submissions)
+        .where(eq(submissions.checkpointId, checkpointId)),
+    ]);
 
-    return { submissions: submissionList };
+    return { submissions: submissionList, total: Number(count) };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

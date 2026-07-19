@@ -272,7 +272,7 @@ const cases: TestCase[] = [
     label: 'submissions.listSubmissionsHandler',
     handler: listSubmissionsHandler,
     role: 'student',
-    input: { checkpointId: 1 },
+    input: { checkpointId: 1, page: 1, limit: 20 },
   },
   {
     label: 'submissions.getSubmissionDetailHandler',
