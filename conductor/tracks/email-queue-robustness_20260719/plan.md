@@ -68,7 +68,7 @@
     - [ ] Attach git note with task summary
     - [ ] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Admin Queue Server Functions' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Admin Queue Server Functions' (Protocol in workflow.md)
 
 ## Phase 4: Admin Inspector UI + Retry Action (FR-1, FR-2 frontend)
 
