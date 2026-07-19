@@ -38,6 +38,7 @@ const DYNAMIC_KEY_PATTERNS = [
   /^instructorReviews\.errors\.notInSubmittedState$/,
   /^files\.r2NotConfigured$/,
   /^files\.objectNotFound$/,
+  /^assignments\.errors\.invalidStudentIds$/,
   // Bulk import result statuses and server-side skip reasons resolved via translateKey
   /^bulkImport\.users\.errors\./,
   /^bulkImport\.users\.status\./,

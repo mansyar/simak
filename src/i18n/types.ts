@@ -504,6 +504,11 @@ export type Translation = {
     r2NotConfigured: string
     objectNotFound: string
   }
+  assignments: {
+    errors: {
+      invalidStudentIds: string
+    }
+  }
   consultations: {
     title: string
     checkpoint: string

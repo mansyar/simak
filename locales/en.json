@@ -499,6 +499,11 @@
     "r2NotConfigured": "File storage is not configured. Contact your administrator.",
     "objectNotFound": "The uploaded file could not be found. Please try uploading again."
   },
+  "assignments": {
+    "errors": {
+      "invalidStudentIds": "One or more selected users are not active students"
+    }
+  },
   "consultations": {
     "title": "Consultations",
     "checkpoint": "Checkpoint",

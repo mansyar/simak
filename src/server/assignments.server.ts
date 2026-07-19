@@ -7,6 +7,7 @@ import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode, type ServerError } from '../lib/errors';
+import { translateKey } from '../lib/i18n-server';
 import { calculateDueDates, validateDueDates } from './due-dates.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -85,8 +86,20 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
   const db = getDb();
 
   try {
+    const validStudents = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(
+        and(inArray(users.id, studentIds), eq(users.role, 'student'), isNull(users.deletedAt)),
+      );
+    if (validStudents.length !== studentIds.length) {
+      const locale = (session.user.locale || 'en') as 'en' | 'id';
+      return serverError(
+        ErrorCode.BAD_REQUEST,
+        translateKey('assignments.errors.invalidStudentIds', locale),
+      );
+    }
     const result = await db.transaction(async (tx) => {
-      // 1. Insert assignment
       const [insertedAssignment] = await tx
         .insert(assignments)
         .values({
@@ -100,14 +113,12 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
 
       const assignmentId = insertedAssignment.id;
 
-      // 2. Map students
       const studentRows = studentIds.map((studentId) => ({
         assignmentId,
         studentId,
       }));
       await tx.insert(assignmentStudents).values(studentRows);
 
-      // 3. Fetch template checkpoints with estimated_duration
       const tCheckpoints = await tx
         .select({
           name: templateCheckpoints.name,
@@ -119,7 +130,6 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
         .where(eq(templateCheckpoints.templateId, templateId))
         .orderBy(templateCheckpoints.order);
 
-      // 4. Fetch assignment createdAt to use as base date for calculations
       const [assignmentRow] = await tx
         .select({ createdAt: assignments.createdAt })
         .from(assignments)
@@ -128,10 +138,8 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
 
       const baseDate = assignmentRow?.createdAt ?? new Date();
 
-      // 5. Calculate dueDates and apply instructor overrides
       const checkpointDueDates = calculateDueDates(tCheckpoints, baseDate);
 
-      // Apply overrides if provided
       if (overrideDueDates) {
         for (const override of overrideDueDates) {
           checkpointDueDates.set(override.checkpointOrder, override.dueDate);
@@ -144,7 +152,6 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
         throw new Error(validation.error);
       }
 
-      // 6. Instantiate checkpoints for each student with calculated/overridden dueDates
       if (tCheckpoints.length > 0) {
         const checkpointRows: {
           assignmentId: number;
@@ -174,8 +181,6 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
       return { success: true, assignmentId };
     });
 
-    // If validation throws inside transaction, the catch block handles it
-
     const assignmentId = result.assignmentId;
     await logAuditEvent({
       actorId: session.user.id,
@@ -187,8 +192,6 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
 
     return result;
   } catch (err) {
-    // Validation errors (thrown inside transaction) return the specific message
-    // All other errors return a generic server error
     if (err instanceof Error && err.message.startsWith('Checkpoint')) {
       return serverError(ErrorCode.BAD_REQUEST, err.message);
     }
