@@ -299,7 +299,6 @@ export async function getAssignmentDetailHandler(args: {
   const db = getDb();
 
   try {
-    // 1. Fetch assignment details (verify ownership)
     const [assignment] = await db
       .select({
         id: assignments.id,
@@ -307,20 +306,24 @@ export async function getAssignmentDetailHandler(args: {
         description: assignments.description,
         finalDeadline: assignments.finalDeadline,
         createdAt: assignments.createdAt,
-        instructorId: assignments.instructorId,
         templateName: assignmentTemplates.name,
         templateType: assignmentTemplates.type,
       })
       .from(assignments)
       .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-      .where(and(eq(assignments.id, id), isNull(assignments.deletedAt)))
+      .where(
+        and(
+          eq(assignments.id, id),
+          eq(assignments.instructorId, session.user.id),
+          isNull(assignments.deletedAt),
+        ),
+      )
       .limit(1);
 
-    if (!assignment || assignment.instructorId !== session.user.id) {
+    if (!assignment) {
       return null;
     }
 
-    // 2. Fetch assigned students list
     const studentsList = await db
       .select({
         id: users.id,
@@ -336,7 +339,6 @@ export async function getAssignmentDetailHandler(args: {
     const studentsWithProgress: AssignmentDetailStudent[] = [];
 
     if (studentIds.length > 0) {
-      // 3. Fetch all checkpoints for these students
       const allCheckpoints = await db
         .select({
           id: checkpoints.id,
@@ -360,7 +362,6 @@ export async function getAssignmentDetailHandler(args: {
         checkpointsByStudent.get(cp.studentId)!.push(cp);
       });
 
-      // 4. Calculate progress & active checkpoint for each student
       studentsList.forEach((s) => {
         const sCheckpoints = checkpointsByStudent.get(s.id) ?? [];
         const totalCheckpointsCount = sCheckpoints.length;
@@ -401,6 +402,7 @@ export async function getAssignmentDetailHandler(args: {
 
     return {
       ...assignment,
+      instructorId: session.user.id,
       finalDeadline: assignment.finalDeadline.toISOString(),
       createdAt: assignment.createdAt ? assignment.createdAt.toISOString() : null,
       students: studentsWithProgress,
