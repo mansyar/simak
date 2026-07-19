@@ -53,12 +53,12 @@
 
 ## Phase 2: Missing Pagination (FR-2)
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 2 implementation
     - [ ] Read `./spec.md` — review FR-2 (PERF-15 through PERF-21) and Acceptance Criteria #5, #6
     - [ ] Explore existing pagination pattern via codegraph: `listInstructorAssignmentsHandler` (page/limit Zod params, `Promise.all` for data + count, client-side `<Pagination>` component) — this is the pattern to replicate
     - [ ] Explore shared `<Pagination>` primitive location and props
 
-- [ ] Task: Add pagination to listConsultationsHandler (PERF-15)
+- [x] Task: Add pagination to listConsultationsHandler (PERF-15) [d4d4655]
     - [ ] Write failing tests in `tests/unit/server/consultations.test.ts`: assert (1) handler accepts `page`/`limit` params; (2) returns `{ data, total, page, limit }`; (3) pagination edge cases (page beyond range returns empty, limit capped) — run `pnpm test` and confirm failures
     - [ ] Add `page`/`limit` Zod params to `listConsultations` stub in `src/server/consultations.ts`; add total count query via `Promise.all` in `listConsultationsHandler` in `src/server/consultations.server.ts`
     - [ ] Wire shared `<Pagination>` component on the client page that renders consultations
