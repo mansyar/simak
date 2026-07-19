@@ -74,14 +74,14 @@
     - [x] Add setup/teardown to ensure docker-compose DB is available and migration is applied (header comment documents prerequisites; assertions inherently verify migration state — consistent with existing integration test patterns)
     - [x] Run `pnpm test:integration` and confirm tests FAIL (migration not yet generated/applied)
 
-- [ ] Task: Generate migration via `pnpm db:generate` and review SQL (TR-2)
-    - [ ] Run `pnpm db:generate` to generate the migration SQL
-    - [ ] Open the generated `.sql` file in the drizzle output directory
-    - [ ] Verify exactly 7 `CREATE INDEX` statements
-    - [ ] Verify exactly 2 `DROP INDEX` statements (for PERF-11 consultations + PERF-14 reviews replacements)
-    - [ ] Verify total: 9 DDL statements
-    - [ ] Verify index names follow Drizzle's auto-naming convention: `<table>_<col1>_<col2>_idx`
-    - [ ] If count is wrong, halt and investigate schema definition issue
+- [x] Task: Generate migration via `pnpm db:generate` and review SQL (TR-2) (c219fd6)
+    - [x] Run `pnpm db:generate` to generate the migration SQL
+    - [x] Open the generated `.sql` file in the drizzle output directory
+    - [x] Verify exactly 9 `CREATE INDEX` statements (7 new + 2 replacements for PERF-11 and PERF-14)
+    - [x] Verify exactly 2 `DROP INDEX` statements (for PERF-11 consultations + PERF-14 reviews replacements)
+    - [x] Verify total: 11 DDL statements
+    - [x] Verify index names follow Drizzle's auto-naming convention: `<table>_<col1>_<col2>_idx`
+    - [x] If count is wrong, halt and investigate schema definition issue (investigated: spec estimation error — spec counted only 7 new indexes, not 2 replacement CREATE INDEX statements; implementation correct; user confirmed to proceed)
     - [ ] Commit: `chore(db): Generate migration for index additions and replacements`
 
 - [ ] Task: Apply migration to dev DB (TR-3)
