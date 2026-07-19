@@ -93,7 +93,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Validation Logic' (Protocol in workflow.md) — User approved checkpoint
 
-## Phase 4: Notification Cleanup (BUG-21)
+## Phase 4: Notification Cleanup (BUG-21) [checkpoint: dd3d710]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
     - [x] Read `./spec.md` — review functional requirements, acceptance criteria, and out-of-scope items relevant to this phase
@@ -109,7 +109,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Notification Cleanup' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 4: Notification Cleanup' (Protocol in workflow.md)
 
 ## Phase 5: effectiveDeadline Derivation (BUG-28)
 
