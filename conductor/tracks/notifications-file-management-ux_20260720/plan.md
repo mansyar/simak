@@ -42,7 +42,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Notification UX' (Protocol in workflow.md) [checkpoint: 831ec70]
 
-## Phase 3: File UX & Client Perf
+## Phase 3: File UX & Client Perf [checkpoint: 6600d82]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
 
@@ -61,5 +61,5 @@
     - [x] Implement: Wrap `NotificationItem` in `React.memo`; use `useCallback` for `handleClick`
     - [x] Implement: Memoize `NotificationCenter` unread count + `groupedNotifications` with `useMemo` (eliminates 4 redundant `items.filter()` calls)
 
-- [ ] Task: Conductor - User Manual Verification 'File UX & Client Perf' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'File UX & Client Perf' (Protocol in workflow.md) [checkpoint: 6600d82]
 </protect>
