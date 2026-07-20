@@ -78,4 +78,7 @@
     - [x] Run `pnpm typecheck`, `pnpm lint` — confirm clean
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Upload Progress' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 491c604
 </protect>
