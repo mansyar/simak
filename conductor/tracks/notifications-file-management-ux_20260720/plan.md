@@ -54,12 +54,12 @@
     - [x] Write tests: highest version row shows "Latest" badge; non-highest rows do not show badge
     - [x] Implement: Compute `maxVersion = Math.max(...submissions.map(s => s.version))`; show `Badge` (`variant: "secondary"`) on row where `version === maxVersion`
 
-- [~] Task: Client-side performance optimizations
-    - [ ] Write tests: `useNotificationsList` has `staleTime: 30_000`; `useUnreadCount` has `refetchInterval: 30000` and `refetchIntervalInBackground: false`; `NotificationItem` wrapped in `React.memo`; `NotificationCenter` uses `useMemo` for unread count and groupedNotifications
-    - [ ] Implement: Add `staleTime: 30_000` to `useNotificationsList`
-    - [ ] Implement: Change `useUnreadCount` `refetchInterval` to `30000` + add `refetchIntervalInBackground: false`
-    - [ ] Implement: Wrap `NotificationItem` in `React.memo`; use `useCallback` for `handleClick`
-    - [ ] Implement: Memoize `NotificationCenter` unread count + `groupedNotifications` with `useMemo` (eliminates 4 redundant `items.filter()` calls)
+- [x] Task: Client-side performance optimizations (9e8486b)
+    - [x] Write tests: `useNotificationsList` has `staleTime: 30_000`; `useUnreadCount` has `refetchInterval: 30000` and `refetchIntervalInBackground: false`; `NotificationItem` wrapped in `React.memo`; `NotificationCenter` uses `useMemo` for unread count and groupedNotifications
+    - [x] Implement: Add `staleTime: 30_000` to `useNotificationsList`
+    - [x] Implement: Change `useUnreadCount` `refetchInterval` to `30000` + add `refetchIntervalInBackground: false`
+    - [x] Implement: Wrap `NotificationItem` in `React.memo`; use `useCallback` for `handleClick`
+    - [x] Implement: Memoize `NotificationCenter` unread count + `groupedNotifications` with `useMemo` (eliminates 4 redundant `items.filter()` calls)
 
 - [ ] Task: Conductor - User Manual Verification 'File UX & Client Perf' (Protocol in workflow.md)
 </protect>
