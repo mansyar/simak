@@ -26,7 +26,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Notification Navigation' (Protocol in workflow.md)
 
-## Phase 2: Notification UX
+## Phase 2: Notification UX [checkpoint: 831ec70]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
 
@@ -40,7 +40,7 @@
     - [x] Write tests: Load More button increments page and appends items; button hidden when all loaded; limit is 20 (not 50)
     - [x] Implement: Change `limit` from 50 to 20; add "Load More" button with `currentPage` state; append new items on click; hide when `items.length >= total`
 
-- [ ] Task: Conductor - User Manual Verification 'Notification UX' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Notification UX' (Protocol in workflow.md) [checkpoint: 831ec70]
 
 ## Phase 3: File UX & Client Perf
 
