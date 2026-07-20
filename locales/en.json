@@ -676,6 +676,7 @@
     "unreadCount": "{count} unread notifications",
     "filterAll": "All",
     "filterUnread": "Unread",
+    "loadMore": "Load More",
     "groups": {
       "newReviews": "New Reviews",
       "consultations": "Consultation Updates",

@@ -681,6 +681,7 @@ export type Translation = {
     unreadCount: string
     filterAll: string
     filterUnread: string
+    loadMore: string
     groups: {
       newReviews: string
       consultations: string
