@@ -92,12 +92,12 @@
 ## Phase 3: ARIA Attributes
 
 - [x] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
-- [~] Task: Add aria-label to FileList download button (UX-16)
-    - [ ] Write failing tests: assert download `<Button>` in `FileList` has `aria-label={t('files.download')}`
-    - [ ] Implement: add `aria-label={t('files.download')}` to the download Button in `src/components/files/FileList.tsx`
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
-    - [ ] Commit: `fix(a11y): Add aria-label to FileList download button (UX-16)`
+- [x] Task: Add aria-label to FileList download button (UX-16) [c5f3c53]
+    - [x] Write failing tests: assert download `<Button>` in `FileList` has `aria-label={t('files.download')}`
+    - [x] Implement: add `aria-label={t('files.download')}` to the download Button in `src/components/files/file-list.tsx`
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
+    - [x] Commit: `fix(a11y): Add aria-label to FileList download button (UX-16)`
 
 - [ ] Task: Add progressbar ARIA to ProgressTable (UX-21)
     - [ ] Write failing tests: assert progress bar container divs have `role="progressbar"`, `aria-valuenow={value}`, `aria-valuemin={0}`, `aria-valuemax={100}`, `aria-label={t('instructorAssignments.table.progress')}`
