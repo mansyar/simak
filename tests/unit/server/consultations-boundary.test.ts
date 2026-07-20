@@ -71,9 +71,14 @@ describe('listPendingConsultationsHandler — boundary date serialization', () =
             checkpointName: 'Ch 1',
           },
         ]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 1 }]).then(onfulfilled),
       );
 
-    const result = await listPendingConsultationsHandler({ data: { assignmentId: 1 } });
+    const result = await listPendingConsultationsHandler({
+      data: { assignmentId: 1, page: 1, limit: 20 },
+    });
 
     expect(result).not.toHaveProperty('error');
     const data = result as Exclude<typeof result, { error: unknown }>;

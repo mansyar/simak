@@ -2,7 +2,6 @@
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { notifications } from '../db/schema/notifications';
-import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '../lib/types';
@@ -84,12 +83,8 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
   const db = getDb();
 
   try {
-    // Resolve the requesting user's locale for read-time localization
-    const [userRow] = await db
-      .select({ locale: users.locale })
-      .from(users)
-      .where(eq(users.id, session.user.id));
-    const locale: Locales = (userRow?.locale as Locales) ?? 'en';
+    // Use session.user.locale directly (already enriched in auth.ts via _getSession)
+    const locale: Locales = (session.user.locale as Locales) ?? 'en';
 
     // Build conditions
     const conditions = [eq(notifications.userId, session.user.id)];
@@ -103,19 +98,37 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
       .from(notifications)
       .where(and(...conditions));
 
-    // Fetch paginated results
+    // Fetch paginated results — narrow SELECT to only needed columns (PERF-23)
     const items = await db
-      .select()
+      .select({
+        id: notifications.id,
+        type: notifications.type,
+        titleKey: notifications.titleKey,
+        messageKey: notifications.messageKey,
+        params: notifications.params,
+        read: notifications.read,
+        createdAt: notifications.createdAt,
+      })
       .from(notifications)
       .where(and(...conditions))
       .orderBy(desc(notifications.createdAt))
       .limit(limit)
       .offset((page - 1) * limit);
 
+    // Construct response objects explicitly — no ...item spread (PERF-23)
     const hydratedItems = items.map((item) => {
+      const base = {
+        id: item.id,
+        type: item.type,
+        titleKey: item.titleKey,
+        messageKey: item.messageKey,
+        params: item.params,
+        read: item.read,
+        createdAt: item.createdAt,
+      };
       if (item.titleKey) {
         return {
-          ...item,
+          ...base,
           ...resolveNotificationContent(
             item.titleKey,
             item.messageKey ?? null,
@@ -125,7 +138,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
         };
       }
       // Expand-phase fallback: legacy rows without stored keys
-      return item;
+      return base;
     });
 
     return {

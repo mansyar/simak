@@ -229,17 +229,6 @@ describe('submitReviewHandler - upload intent verification', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(getObjectContentLength).mockResolvedValue({ ok: true, size: 25 * 1024 * 1024 + 1 });
 
-    mockTx.enqueue([createSubmissionRow('under_review')]);
-    mockTx.enqueue([
-      {
-        fileKey: 'feedback/uuid-123.pdf',
-        userId: 'instructor-1',
-        purpose: 'review_feedback',
-        checkpointId: null,
-        consumedAt: null,
-      },
-    ]);
-
     const result = await submitReviewHandler({ data: baseReviewData });
 
     expect(isServerError(result)).toBe(true);
@@ -247,23 +236,11 @@ describe('submitReviewHandler - upload intent verification', () => {
     expect(result.error.code).toBe('BAD_REQUEST');
     expect(result.error.message).toBe('File size exceeds 25MB limit');
     expect(getObjectContentLength).toHaveBeenCalledWith({ key: 'feedback/uuid-123.pdf' });
-    assertCheckpointReadForUpdate(mockTx);
   });
 
   it('AC-H1-6: returns r2NotConfigured i18n message when R2 is not configured', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(getObjectContentLength).mockResolvedValue({ ok: false, reason: 'not_configured' });
-
-    mockTx.enqueue([createSubmissionRow('under_review')]);
-    mockTx.enqueue([
-      {
-        fileKey: 'feedback/uuid-123.pdf',
-        userId: 'instructor-1',
-        purpose: 'review_feedback',
-        checkpointId: null,
-        consumedAt: null,
-      },
-    ]);
 
     const result = await submitReviewHandler({ data: baseReviewData });
 
@@ -273,12 +250,31 @@ describe('submitReviewHandler - upload intent verification', () => {
     expect(result.error.message).toBe(
       'File storage is not configured. Contact your administrator.',
     );
-    assertCheckpointReadForUpdate(mockTx);
   });
 
   it('AC-H1-7: returns objectNotFound i18n message when R2 object does not exist', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(getObjectContentLength).mockResolvedValue({ ok: false, reason: 'not_found' });
+
+    const result = await submitReviewHandler({ data: baseReviewData });
+
+    expect(isServerError(result)).toBe(true);
+    if (!isServerError(result)) throw new Error('Expected server error');
+    expect(result.error.code).toBe('BAD_REQUEST');
+    expect(result.error.message).toBe(
+      'The uploaded file could not be found. Please try uploading again.',
+    );
+  });
+
+  it('BUG-14: should call getObjectContentLength before db.transaction', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    vi.mocked(getObjectContentLength).mockResolvedValue({ ok: true, size: 1024 });
+
+    const transactionSpy = vi.fn((callback: (tx: MockTx) => Promise<unknown>) => callback(mockTx));
+    vi.mocked(dbMod.getDb).mockReturnValue({
+      select: () => mockTx.select(),
+      transaction: transactionSpy,
+    } as any);
 
     mockTx.enqueue([createSubmissionRow('under_review')]);
     mockTx.enqueue([
@@ -290,15 +286,15 @@ describe('submitReviewHandler - upload intent verification', () => {
         consumedAt: null,
       },
     ]);
+    mockTx.enqueue([]); // consume intent
+    mockTx.enqueue([]); // insert reviews
+    mockTx.enqueue([]); // update checkpoint
+    mockTx.enqueue([{ id: 101 }]); // next checkpoint
+    mockTx.enqueue([]); // update next checkpoint
+    mockTx.enqueue([]); // insert notification
 
-    const result = await submitReviewHandler({ data: baseReviewData });
+    await submitReviewHandler({ data: baseReviewData });
 
-    expect(isServerError(result)).toBe(true);
-    if (!isServerError(result)) throw new Error('Expected server error');
-    expect(result.error.code).toBe('BAD_REQUEST');
-    expect(result.error.message).toBe(
-      'The uploaded file could not be found. Please try uploading again.',
-    );
-    assertCheckpointReadForUpdate(mockTx);
+    expect(getObjectContentLength).toHaveBeenCalledBefore(transactionSpy);
   });
 });

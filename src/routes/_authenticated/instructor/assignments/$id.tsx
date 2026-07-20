@@ -68,13 +68,15 @@ function AssignmentDetailPage() {
       {activeTab === 'overview' && <AssignmentOverviewTab assignment={assignment} />}
       {activeTab === 'consultations' && (
         <AssignmentConsultationsTab
-          assignmentId={assignment.id}
           pendingConsultations={tabs.pendingConsultations}
-          setPendingConsultations={tabs.setPendingConsultations}
           selectedConsultationId={selectedConsultationId}
           setSelectedConsultationId={setSelectedConsultationId}
           dialogOpen={dialogOpen}
           setDialogOpen={setDialogOpen}
+          pendingPage={tabs.pendingPage}
+          pendingTotal={tabs.pendingTotal}
+          onPageChange={tabs.setPendingPage}
+          onRefresh={tabs.refreshPendingConsultations}
         />
       )}
       {activeTab === 'extensions' && (

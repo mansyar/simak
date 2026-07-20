@@ -9,6 +9,7 @@ import { FileList } from '@/components/files/file-list';
 import { SubmissionStatus } from '@/components/files/submission-status';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Pagination } from '@/components/ui/pagination';
 import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
 import { SearchX, ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
@@ -38,10 +39,10 @@ export const Route = createFileRoute(
       // Fetch submissions for this checkpoint
       const submissionsData = await (
         listSubmissions as unknown as (args: {
-          data: { checkpointId: number };
-        }) => Promise<{ submissions?: unknown }>
+          data: { checkpointId: number; page: number; limit: number };
+        }) => Promise<{ submissions?: unknown; total?: number }>
       )({
-        data: { checkpointId: Number(checkpointId) },
+        data: { checkpointId: Number(checkpointId), page: 1, limit: 20 },
       });
 
       // Find the latest review (from the reviews table)
@@ -82,6 +83,7 @@ export const Route = createFileRoute(
               }[];
             }
           ).submissions ?? [],
+        submissionTotal: (submissionsData as { total?: number })?.total ?? 0,
         latestReview,
       };
     } catch (err) {
@@ -132,6 +134,31 @@ function CheckpointSubmissionPage() {
   const [submissions, setSubmissions] = useState<
     { id: number; version: number; fileName: string; fileSize: number; uploadedAt: Date }[]
   >(data?.submissions ?? []);
+  const [submissionPage, setSubmissionPage] = useState(1);
+  const [submissionTotal, setSubmissionTotal] = useState(data?.submissionTotal ?? 0);
+
+  const fetchSubmissions = useCallback(
+    async (page: number) => {
+      const listSubFn = listSubmissions as unknown as (args: {
+        data: { checkpointId: number; page: number; limit: number };
+      }) => Promise<{
+        submissions: {
+          id: number;
+          version: number;
+          fileName: string;
+          fileSize: number;
+          uploadedAt: Date;
+        }[];
+        total: number;
+      }>;
+      const submissionsData = await listSubFn({
+        data: { checkpointId: Number(params.checkpointId), page, limit: 20 },
+      });
+      setSubmissions(submissionsData?.submissions ?? []);
+      setSubmissionTotal(submissionsData?.total ?? 0);
+    },
+    [params.checkpointId],
+  );
 
   const handleUploadSuccess = useCallback(
     async (file: File) => {
@@ -197,27 +224,13 @@ function CheckpointSubmissionPage() {
         setIsUploading(false);
 
         // Refresh submissions list
-        const listSubFn = listSubmissions as unknown as (args: {
-          data: { checkpointId: number };
-        }) => Promise<{
-          submissions: {
-            id: number;
-            version: number;
-            fileName: string;
-            fileSize: number;
-            uploadedAt: Date;
-          }[];
-        }>;
-        const submissionsData = await listSubFn({
-          data: { checkpointId: Number(params.checkpointId) },
-        });
-        setSubmissions(submissionsData?.submissions ?? []);
+        await fetchSubmissions(submissionPage);
       } catch {
         setUploadError(t('files.uploadError'));
         setIsUploading(false);
       }
     },
-    [params.checkpointId, t],
+    [params.checkpointId, t, fetchSubmissions, submissionPage],
   );
 
   const handleDownload = useCallback(async (submissionId: number) => {
@@ -289,6 +302,16 @@ function CheckpointSubmissionPage() {
       <div>
         <h2 className="font-display text-2xl text-foreground mb-3">{t('files.table.version')}</h2>
         <FileList submissions={submissions} onDownload={handleDownload} />
+        {submissionTotal > 20 && (
+          <Pagination
+            currentPage={submissionPage}
+            totalPages={Math.max(1, Math.ceil(submissionTotal / 20))}
+            onPageChange={(page) => {
+              setSubmissionPage(page);
+              fetchSubmissions(page);
+            }}
+          />
+        )}
       </div>
     </div>
   );

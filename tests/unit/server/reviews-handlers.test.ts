@@ -192,6 +192,42 @@ describe('Review handlers - Logic & Security', () => {
       expect(result.items).toHaveLength(1);
       expect(result.total).toBe(1);
     });
+
+    it('should use LATERAL join from checkpoints instead of correlated subquery (PERF-35)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1 }, { id: 2 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              submissionId: 10,
+              checkpointId: 100,
+              checkpointName: 'Chapter 1',
+              assignmentId: 1,
+              assignmentTitle: 'Thesis 2026',
+              studentId: 'student-1',
+              studentName: 'Alice',
+              fileName: 'chapter1.pdf',
+              fileSize: 2048,
+              fileKey: 'submissions/uuid-1.pdf',
+              version: 1,
+              uploadedAt: new Date('2026-05-20'),
+              checkpointState: 'submitted',
+              checkpointUpdatedAt: new Date('2026-05-20'),
+            },
+          ]).then(onfulfilled),
+        );
+      const result = (await listPendingReviewsHandler({ data: { page: 1, limit: 20 } })) as any;
+      // PERF-35: Query should start FROM checkpoints (not submissions) with LATERAL join
+      expect(mockDb.from).toHaveBeenNthCalledWith(3, checkpoints);
+      expect(result.items).toHaveLength(1);
+      expect(result.total).toBe(1);
+    });
   });
 
   describe('submitReviewHandler', () => {

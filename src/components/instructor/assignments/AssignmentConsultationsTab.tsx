@@ -2,8 +2,7 @@ import { MessageSquare } from 'lucide-react';
 import { VerificationQueueItem } from '@/components/consultations/VerificationQueueItem';
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
 import { EmptyState } from '@/components/ui/empty-state';
-import { listPendingConsultations } from '@/server/consultations';
-import { isServerError } from '@/lib/errors';
+import { Pagination } from '@/components/ui/pagination';
 import { useI18n } from '@/routes/__root';
 
 export interface PendingConsultation {
@@ -17,23 +16,27 @@ export interface PendingConsultation {
 }
 
 interface AssignmentConsultationsTabProps {
-  assignmentId: number;
   pendingConsultations: PendingConsultation[];
-  setPendingConsultations: (consultations: PendingConsultation[]) => void;
   selectedConsultationId: number | null;
   setSelectedConsultationId: (id: number | null) => void;
   dialogOpen: boolean;
   setDialogOpen: (open: boolean) => void;
+  pendingPage: number;
+  pendingTotal: number;
+  onPageChange: (page: number) => void;
+  onRefresh: () => Promise<void>;
 }
 
 export function AssignmentConsultationsTab({
-  assignmentId,
   pendingConsultations,
-  setPendingConsultations,
   selectedConsultationId,
   setSelectedConsultationId,
   dialogOpen,
   setDialogOpen,
+  pendingPage,
+  pendingTotal,
+  onPageChange,
+  onRefresh,
 }: AssignmentConsultationsTabProps) {
   const { t } = useI18n();
 
@@ -64,16 +67,17 @@ export function AssignmentConsultationsTab({
         </div>
       )}
 
+      <Pagination
+        currentPage={pendingPage}
+        totalPages={Math.max(1, Math.ceil(pendingTotal / 20))}
+        onPageChange={onPageChange}
+      />
+
       <VerificationDialog
         consultationId={selectedConsultationId}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        onActionComplete={async () => {
-          const result = await listPendingConsultations({ data: { assignmentId } });
-          if (!isServerError(result) && result.consultations) {
-            setPendingConsultations(result.consultations);
-          }
-        }}
+        onActionComplete={onRefresh}
       />
     </div>
   );

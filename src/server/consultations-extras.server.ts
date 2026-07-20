@@ -1,4 +1,4 @@
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and, sql, inArray } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { consultations } from '../db/schema/consultations';
 import { checkpoints } from '../db/schema/assignments';
@@ -41,28 +41,37 @@ export async function listVerifiedCountsHandler(args: { data: ListVerifiedCounts
       .where(and(...checkpointConditions))
       .orderBy(checkpoints.order);
 
-    const result = [];
-    for (const cp of checkpointData) {
-      const consConditions = [
-        eq(consultations.checkpointId, cp.id),
-        eq(consultations.status, 'verified'),
-      ];
-      if (role === 'student') {
-        consConditions.push(eq(consultations.studentId, session.user.id));
-      }
-
-      const [countResult] = await db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(consultations)
-        .where(and(...consConditions));
-
-      result.push({
-        checkpointId: cp.id,
-        checkpointName: cp.name,
-        verifiedCount: Number(countResult?.count ?? 0),
-        minConsultations: cp.minConsultations ?? 0,
-      });
+    if (checkpointData.length === 0) {
+      return { counts: [] };
     }
+
+    const checkpointIds = checkpointData.map((cp) => cp.id);
+
+    const consConditions = [
+      inArray(consultations.checkpointId, checkpointIds),
+      eq(consultations.status, 'verified'),
+    ];
+    if (role === 'student') {
+      consConditions.push(eq(consultations.studentId, session.user.id));
+    }
+
+    const countData = await db
+      .select({
+        checkpointId: consultations.checkpointId,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(consultations)
+      .where(and(...consConditions))
+      .groupBy(consultations.checkpointId);
+
+    const countMap = new Map(countData.map((row) => [row.checkpointId, row.count]));
+
+    const result = checkpointData.map((cp) => ({
+      checkpointId: cp.id,
+      checkpointName: cp.name,
+      verifiedCount: Number(countMap.get(cp.id) ?? 0),
+      minConsultations: cp.minConsultations ?? 0,
+    }));
 
     return { counts: result };
   } catch (err) {

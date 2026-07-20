@@ -43,6 +43,7 @@ export type PendingConsultationItem = {
 
 export type ListPendingConsultationsSuccess = {
   consultations: PendingConsultationItem[];
+  total: number;
 };
 
 function isStudent(session: NonNullableSession | null): session is NonNullableSession {
@@ -53,10 +54,7 @@ function isInstructor(session: NonNullableSession | null): session is NonNullabl
   return !!session && session.user.role === 'instructor';
 }
 
-/**
- * Student logs a consultation session tied to a specific checkpoint.
- * Validates student is assigned to the assignment and checkpoint belongs to them.
- */
+/** Student logs a consultation session tied to a specific checkpoint. */
 export async function logConsultationHandler(args: { data: LogConsultationInput }) {
   const session = await getSessionFromHeaders();
   if (!isStudent(session)) {
@@ -67,7 +65,6 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
   const db = getDb();
 
   try {
-    // 1. Verify the checkpoint belongs to this student via assignmentStudents
     const [checkpoint] = await db
       .select({
         id: checkpoints.id,
@@ -92,7 +89,6 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
       return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
     }
 
-    // 2. Insert consultation record with pending status
     const [inserted] = await db
       .insert(consultations)
       .values({
@@ -107,7 +103,6 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
       })
       .returning({ id: consultations.id });
 
-    // 3. Create in-app notification for the instructor
     const loggedKeys = getNotificationKeys('consultation_logged');
     const loggedParams = { sessionType: sessionType ?? 'general' };
     await db.insert(notifications).values({
@@ -133,25 +128,20 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
   }
 }
 
-/**
- * List consultations for a student's assignment.
- * Students see only their own consultations; instructors see all for their assignments.
- */
+/** List consultations for an assignment (students see own; instructors see all). */
 export async function listConsultationsHandler(args: { data: ListConsultationsInput }) {
   const session = await getSessionFromHeaders();
   if (!session) {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { assignmentId, checkpointId } = args.data;
+  const { assignmentId, checkpointId, page = 1, limit = 20 } = args.data;
   const db = getDb();
 
   try {
     const role = session.user.role;
     const accessError = await verifyAssignmentAccess(db, assignmentId, session);
     if (accessError) return accessError;
-
-    // Common conditions
     const conditions = [eq(consultations.assignmentId, assignmentId)];
     if (checkpointId) conditions.push(eq(consultations.checkpointId, checkpointId));
     if (role === 'student') conditions.push(eq(consultations.studentId, session.user.id));
@@ -178,9 +168,19 @@ export async function listConsultationsHandler(args: { data: ListConsultationsIn
         ? baseQuery.innerJoin(users, eq(consultations.studentId, users.id))
         : baseQuery;
 
-    const items = await query.where(and(...conditions)).orderBy(desc(consultations.createdAt));
+    const [items, [{ count }]] = await Promise.all([
+      query
+        .where(and(...conditions))
+        .orderBy(desc(consultations.createdAt))
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(consultations)
+        .where(and(...conditions)),
+    ]);
 
-    return { consultations: items };
+    return { consultations: items, total: Number(count) };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
@@ -189,10 +189,7 @@ export async function listConsultationsHandler(args: { data: ListConsultationsIn
   }
 }
 
-/**
- * Get full consultation details for the verification dialog.
- * Only accessible by the assignment instructor.
- */
+/** Get full consultation details for the verification dialog (instructor only). */
 export async function getConsultationDetailHandler(args: { data: GetConsultationDetailInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
@@ -247,10 +244,7 @@ export async function getConsultationDetailHandler(args: { data: GetConsultation
   }
 }
 
-/**
- * List pending consultations for the instructor's assignment queue.
- * Ordered by oldest first (FIFO).
- */
+/** List pending consultations for the instructor's queue (FIFO). */
 export async function listPendingConsultationsHandler(args: {
   data: ListPendingConsultationsInput;
 }): Promise<ListPendingConsultationsSuccess | ServerError> {
@@ -259,11 +253,10 @@ export async function listPendingConsultationsHandler(args: {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { assignmentId } = args.data;
+  const { assignmentId, page = 1, limit = 20 } = args.data;
   const db = getDb();
 
   try {
-    // Verify instructor owns this assignment
     const [assignment] = await db
       .select({ id: assignments.id })
       .from(assignments)
@@ -280,29 +273,43 @@ export async function listPendingConsultationsHandler(args: {
       return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
     }
 
-    const items = await db
-      .select({
-        id: consultations.id,
-        checkpointId: consultations.checkpointId,
-        studentId: consultations.studentId,
-        sessionType: consultations.sessionType,
-        externalConsultantName: consultations.externalConsultantName,
-        notes: consultations.notes,
-        createdAt: consultations.createdAt,
-        studentName: users.name,
-        checkpointName: checkpoints.name,
-      })
-      .from(consultations)
-      .innerJoin(checkpoints, eq(consultations.checkpointId, checkpoints.id))
-      .innerJoin(users, eq(consultations.studentId, users.id))
-      .where(and(eq(consultations.assignmentId, assignmentId), eq(consultations.status, 'pending')))
-      .orderBy(asc(consultations.createdAt));
+    const conditions = and(
+      eq(consultations.assignmentId, assignmentId),
+      eq(consultations.status, 'pending'),
+    );
+
+    const [items, [{ count }]] = await Promise.all([
+      db
+        .select({
+          id: consultations.id,
+          checkpointId: consultations.checkpointId,
+          studentId: consultations.studentId,
+          sessionType: consultations.sessionType,
+          externalConsultantName: consultations.externalConsultantName,
+          notes: consultations.notes,
+          createdAt: consultations.createdAt,
+          studentName: users.name,
+          checkpointName: checkpoints.name,
+        })
+        .from(consultations)
+        .innerJoin(checkpoints, eq(consultations.checkpointId, checkpoints.id))
+        .innerJoin(users, eq(consultations.studentId, users.id))
+        .where(conditions)
+        .orderBy(asc(consultations.createdAt))
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(consultations)
+        .where(conditions),
+    ]);
 
     return {
       consultations: items.map((item) => ({
         ...item,
         createdAt: item.createdAt ? item.createdAt.toISOString() : '',
       })),
+      total: Number(count),
     };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
@@ -388,7 +395,6 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
       return { success: true };
     });
 
-    // 3. Audit log after commit (advisory work; must not fail the committed transaction)
     if (auditData) {
       try {
         await logAuditEvent({
@@ -467,7 +473,6 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
       return { success: true };
     });
 
-    // 3. Audit log after commit (advisory work; must not fail the committed transaction)
     if (auditData) {
       try {
         await logAuditEvent({

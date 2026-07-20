@@ -37,7 +37,7 @@ const REVIEWABLE_STATES = ['submitted', 'under_review'] as const;
 
 /**
  * List pending submissions across all instructor's assignments.
- * Uses DISTINCT ON to get the latest submission per checkpoint.
+ * Uses LATERAL join to get the latest submission per checkpoint.
  * Returns FIFO order (oldest pending submission first).
  */
 export async function listPendingReviewsHandler(args: { data: ListPendingReviewsInput }) {
@@ -81,41 +81,38 @@ export async function listPendingReviewsHandler(args: { data: ListPendingReviews
         ),
       );
 
-    // 3. Fetch pending submissions with DISTINCT ON to get latest per checkpoint
+    // 3. Fetch pending submissions with LATERAL join to get latest per checkpoint
     const pendingItems = await db
       .select({
-        submissionId: submissions.id,
+        submissionId: sql<number>`latest_submission.id`,
         checkpointId: checkpoints.id,
         checkpointName: checkpoints.name,
         assignmentId: assignments.id,
         assignmentTitle: assignments.title,
         studentId: checkpoints.studentId,
         studentName: users.name,
-        fileName: submissions.fileName,
-        fileSize: submissions.fileSize,
-        fileKey: submissions.fileKey,
-        version: submissions.version,
-        uploadedAt: submissions.uploadedAt,
+        fileName: sql<string>`latest_submission.file_name`,
+        fileSize: sql<number>`latest_submission.file_size`,
+        fileKey: sql<string>`latest_submission.file_key`,
+        version: sql<number | null>`latest_submission.version`,
+        uploadedAt: sql<Date | null>`latest_submission.uploaded_at`,
         checkpointState: checkpoints.state,
         checkpointUpdatedAt: checkpoints.updatedAt,
       })
-      .from(submissions)
-      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+      .from(checkpoints)
+      .innerJoin(
+        sql`LATERAL (SELECT * FROM ${submissions} WHERE ${submissions.checkpointId} = ${checkpoints.id} ORDER BY ${submissions.version} DESC LIMIT 1) AS latest_submission`,
+        sql`true`,
+      )
       .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
       .innerJoin(users, eq(checkpoints.studentId, users.id))
       .where(
         and(
-          sql`${submissions.id} IN (
-            SELECT DISTINCT ON (s2.checkpoint_id) s2.id
-            FROM submissions s2
-            WHERE s2.checkpoint_id = ${submissions.checkpointId}
-            ORDER BY s2.checkpoint_id, s2.version DESC
-          )`,
           inArray(checkpoints.assignmentId, assignmentIds),
           sql`${checkpoints.state} IN ('submitted', 'under_review')`,
         ),
       )
-      .orderBy(sql`${submissions.uploadedAt} ASC`)
+      .orderBy(sql`latest_submission.uploaded_at ASC`)
       .limit(limit)
       .offset((page - 1) * limit);
 
@@ -242,6 +239,18 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       );
     }
 
+    // 1b. R2 HEAD check before transaction to avoid holding DB lock during I/O (BUG-14).
+    if (feedbackFileKey) {
+      const sizeResult = await getObjectContentLength({ key: feedbackFileKey });
+      if (!sizeResult.ok) {
+        const locale = (session.user.locale || 'en') as 'en' | 'id';
+        return r2SizeError(sizeResult.reason, locale);
+      }
+      if (sizeResult.size > MAX_FILE_SIZE) {
+        return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
+      }
+    }
+
     // 2. Execute in transaction
     const txResult = await db.transaction(async (tx) => {
       // 2a. Verify ownership — submission belongs to an assignment owned by this instructor
@@ -327,15 +336,6 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           intent.checkpointId !== null
         ) {
           return serverError(ErrorCode.BAD_REQUEST, 'Invalid or expired upload intent');
-        }
-
-        const sizeResult = await getObjectContentLength({ key: feedbackFileKey });
-        if (!sizeResult.ok) {
-          const locale = (session.user.locale || 'en') as 'en' | 'id';
-          return r2SizeError(sizeResult.reason, locale);
-        }
-        if (sizeResult.size > MAX_FILE_SIZE) {
-          return serverError(ErrorCode.BAD_REQUEST, 'File size exceeds 25MB limit');
         }
 
         await tx

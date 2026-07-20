@@ -203,10 +203,12 @@ Query key: `['dashboard']` with role differentiation handled server-side.
 
 ### List Views & Pagination [v1]
 
-All list views (assignments, reviews, users, notifications) implement offset-based pagination:
+All list views (assignments, reviews, users, notifications, consultations, submissions, templates, extension requests) implement offset-based pagination:
 
-- **20 items per page** as default page size.
-- **Page state** persisted in TanStack Router search params (e.g. `?page=2`) so the URL is shareable.
+- **20 items per page** as default page size (max 100 via Zod `max(100)` cap).
+- **Server-side pattern:** Each list handler accepts `page` (Zod `z.coerce.number().int().min(1).default(1)`) and `limit` (Zod `z.coerce.number().int().min(1).max(100).default(20)`) params. The data query and a `SELECT count(*)::int` query run in parallel via `Promise.all`. The response includes a `total` field for client-side page count calculation.
+- **Client-side pattern:** Page state is persisted in TanStack Router search params (e.g. `?page=2`) so the URL is shareable. A shared `<Pagination>` component renders when `totalPages > 1`.
+- **Dashboard safety caps:** Inline dashboard widgets (`activeAssignments` on student dashboard, `assignmentOverview` on instructor dashboard) use a hardcoded `.limit(20)` safety cap since they cannot be independently paginated.
 - **Loading state**: skeleton rows while the next page loads. Prefetch next page on scroll near the bottom.
 - **[v2]**: Migrate to cursor-based pagination for submission histories and audit logs (append-only data where offset pagination drifts).
 
@@ -668,7 +670,7 @@ Admin       (creates Instructors and Students)
 | **Accepted formats** | `.docx` and `.pdf` only. Enforced client-side (accept attribute) and server-side (MIME check).                                                                                                                     |
 | **File naming**      | UUID-based keys in R2 (e.g. `submissions/{uuid}.pdf`). Original name stored in DB.                                                                                                                                 |
 | **Presigned URLs**   | 5 minutes for upload, 1 hour for download.                                                                                                                                                                         |
-| **Size verification**| Server-side via R2 `HEAD` request at submit time. Client-reported size is never trusted (Track: Audit HIGH-Remediation H1).                                                                                         |
+| **Size verification**| Server-side via R2 `HEAD` request at submit time. Client-reported size is never trusted (Track: Audit HIGH-Remediation H1). The HEAD check is performed **before** `db.transaction()` opens, so row locks are not held during I/O (BUG-14). |
 | **Versioning**       | Version increments by 1 each time a student resubmits after a REVISE decision. Initial submission is version 1.                                                                                                    |
 | **Preview**          | PDF: in-browser via blob URL. [v2: use range requests to fetch only the first few pages for thumbnail preview instead of downloading the full 25MB file.] DOCX: metadata display only (name, size, date, version). |
 | **Permissions**      | Students see own submissions; instructors see all for their assignments; admins see all.                                                                                                                           |
@@ -756,7 +758,7 @@ A checkpoint unlocks when:
 
 ### In-App Delivery [v1]
 
-- Notifications stored in the `notifications` table with i18n keys (`titleKey`, `messageKey`) and interpolation `params` (jsonb) instead of literal text. The `listNotifications` handler resolves the display strings at read time using the requesting user's `locale`, so Indonesian users see Indonesian notifications and English users see English.
+- Notifications stored in the `notifications` table with i18n keys (`titleKey`, `messageKey`) and interpolation `params` (jsonb) instead of literal text. The `listNotifications` handler resolves the display strings at read time using the requesting user's `locale` (read directly from `session.user.locale` — no separate DB query), so Indonesian users see Indonesian notifications and English users see English. The handler selects only needed columns (`id, type, titleKey, messageKey, params, read, createdAt` — no `metadata`) and constructs response objects explicitly to avoid leaking raw columns.
 - TanStack Query `refetchInterval` polls for new unread notifications at a flat 15-second interval (see PRD line 148). The notification bell in the shared header reflects the unread count.
 - Notification center UI with read/unread filtering.
 - Badge indicator on the sidebar.
@@ -854,6 +856,15 @@ A checkpoint unlocks when:
 - Suspense boundaries with skeleton screens for async data.
 - TanStack Query stale times: user profile (5min), checkpoint list (30s), notifications (15s, flat).
 - TanStack Query `gcTime`: dashboard data cached for 30 minutes in memory after the user navigates away, so returning to the dashboard is instant.
+
+### Query Optimization [v1]
+
+- **N+1 elimination:** Per-row query loops have been replaced with set-based operations. `listVerifiedCountsHandler` uses a single `GROUP BY checkpointId` query with `inArray` instead of N per-checkpoint `COUNT` queries. Sequential per-checkpoint `UPDATE` loops (`calculateExtensionAdjustment`, `bulkExtendHandler`, `adjustDeadlinesForBreach`) are replaced with bulk `UPDATE ... WHERE order > target`. Post-commit advisory work (audit logging, notifications) is batched into single `db.insert(...).values([...])` statements.
+- **Parallel queries:** Independent queries within a handler run concurrently via `Promise.all` (e.g. `listTemplatesHandler` runs data + count + distinct types in parallel; `listInstructorAssignmentsHandler` runs data + count in parallel). Emails and fire-and-forget notifications use `Promise.allSettled` so one failure doesn't block others.
+- **LATERAL join for latest-submission queries:** `listPendingReviewsHandler` uses a `LATERAL` join (`SELECT * FROM submissions WHERE checkpoint_id = checkpoints.id ORDER BY version DESC LIMIT 1`) instead of a correlated subquery, starting the query from `checkpoints` and joining the latest submission per checkpoint. PostgreSQL optimizes this as an index scan on `submissions(checkpoint_id, version)`.
+- **Over-fetch prevention:** `listNotificationsHandler` selects only needed columns (`id, type, titleKey, messageKey, params, read, createdAt` — no `metadata`) and constructs response objects explicitly (no `...item` spread leaking raw columns). The redundant `SELECT locale FROM users` query was removed — `session.user.locale` (enriched in `auth.ts` via `_getSession`) is used directly.
+- **R2 HEAD check before transaction:** `getObjectContentLength` (R2 `HeadObjectCommand`) is called **before** `db.transaction()` in both `submitCheckpointHandler` and `submitReviewHandler`, so row locks are not held during slow I/O. The discriminated return type `{ ok: true, size } | { ok: false, reason }` is handled before entering the transaction.
+- **Post-commit advisory work:** All advisory work after a transaction commit (audit logging, notification inserts, email dispatch) is wrapped in try/catch per SQL styleguide §6.4, so a failure in advisory work does not surface a 500 error to the user after the primary mutation has already succeeded.
 
 ### Server-Side Caching [v2]
 

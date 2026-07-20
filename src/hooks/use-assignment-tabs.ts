@@ -26,8 +26,21 @@ const rejectFn = rejectExtension as unknown as (args: {
 export function useAssignmentTabs(assignmentId: number | null) {
   const { t } = useI18n();
   const [pendingConsultations, setPendingConsultations] = useState<PendingConsultation[]>([]);
+  const [pendingPage, setPendingPage] = useState(1);
+  const [pendingTotal, setPendingTotal] = useState(0);
   const [extensionRequests, setExtensionRequests] = useState<ExtensionRequestItem[]>([]);
   const [extensionsLoading, setExtensionsLoading] = useState(false);
+
+  const refreshPendingConsultations = useCallback(async () => {
+    if (assignmentId == null) return;
+    const result = await listPendingConsultations({
+      data: { assignmentId, page: pendingPage, limit: 20 },
+    });
+    if (!isServerError(result) && result.consultations) {
+      setPendingConsultations(result.consultations);
+      setPendingTotal(result.total);
+    }
+  }, [assignmentId, pendingPage]);
 
   const refreshExtensions = useCallback(async () => {
     if (assignmentId == null) return;
@@ -42,17 +55,18 @@ export function useAssignmentTabs(assignmentId: number | null) {
     const load = async () => {
       setExtensionsLoading(true);
       const [consultResult, extResult] = await Promise.all([
-        listPendingConsultations({ data: { assignmentId } }),
+        listPendingConsultations({ data: { assignmentId, page: pendingPage, limit: 20 } }),
         listExtensionsFn({ data: { assignmentId, status: 'pending', page: 1, limit: 50 } }),
       ]);
       if (!isServerError(consultResult) && consultResult.consultations) {
         setPendingConsultations(consultResult.consultations);
+        setPendingTotal(consultResult.total);
       }
       if ('items' in extResult) setExtensionRequests(extResult.items);
       setExtensionsLoading(false);
     };
     load();
-  }, [assignmentId]);
+  }, [assignmentId, pendingPage]);
 
   const handleApproveExtension = useCallback(
     async (requestId: number, comment?: string) => {
@@ -83,6 +97,10 @@ export function useAssignmentTabs(assignmentId: number | null) {
   return {
     pendingConsultations,
     setPendingConsultations,
+    pendingPage,
+    setPendingPage,
+    pendingTotal,
+    refreshPendingConsultations,
     extensionRequests,
     extensionsLoading,
     handleApproveExtension,

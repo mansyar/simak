@@ -68,10 +68,10 @@ describe('Assignment handlers — boundary date serialization', () => {
           ]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ assignmentId: 42, count: 5 }]).then(onfulfilled),
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+          Promise.resolve([{ assignmentId: 42, count: 5 }]).then(onfulfilled),
         );
 
       const result = await listInstructorAssignmentsHandler({

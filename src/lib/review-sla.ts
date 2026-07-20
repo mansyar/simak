@@ -47,10 +47,13 @@ export async function adjustDeadlinesForBreach(
     .set({ dueDate: extendedDueDate, updatedAt: new Date() })
     .where(eq(checkpoints.id, submission.checkpointId));
 
-  // Extend all subsequent checkpoints for this student in this assignment
-  const subsequentCheckpoints = await tx
-    .select({ id: checkpoints.id, dueDate: checkpoints.dueDate })
-    .from(checkpoints)
+  // Extend all subsequent checkpoints for this student in this assignment (bulk UPDATE)
+  await tx
+    .update(checkpoints)
+    .set({
+      dueDate: sql`COALESCE(${checkpoints.dueDate}, NOW()) + INTERVAL '1 day' * ${breachDays}`,
+      updatedAt: new Date(),
+    })
     .where(
       and(
         eq(checkpoints.assignmentId, submission.assignmentId),
@@ -58,17 +61,6 @@ export async function adjustDeadlinesForBreach(
         gt(checkpoints.order, submission.checkpointOrder ?? 0),
       ),
     );
-
-  for (const cp of subsequentCheckpoints) {
-    // After Phase 1 backfill, all checkpoint dueDates are populated
-    await tx
-      .update(checkpoints)
-      .set({
-        dueDate: new Date((cp.dueDate ?? new Date()).getTime() + breachDays * 24 * 60 * 60 * 1000),
-        updatedAt: new Date(),
-      })
-      .where(eq(checkpoints.id, cp.id));
-  }
 }
 
 /**
@@ -88,6 +80,8 @@ export async function dispatchSLABreachNotifications(
       .from(users)
       .where(and(sql`${users.role} IN ('superadmin', 'admin')`, isNull(users.deletedAt)));
 
+    if (adminUsers.length === 0) return;
+
     const slaParams = {
       checkpointName: submission.checkpointName,
       assignmentTitle: submission.assignmentTitle,
@@ -96,35 +90,39 @@ export async function dispatchSLABreachNotifications(
     };
     const slaKeys = getNotificationKeys('sla_breach');
 
-    for (const admin of adminUsers) {
-      // Create in-app notification
-      await db.insert(notifications).values({
-        userId: admin.id,
-        type: 'sla_breach',
-        titleKey: slaKeys.titleKey,
-        messageKey: slaKeys.messageKey,
-        params: slaParams,
-        channel: 'in_app',
-        metadata: {
-          assignmentId: submission.assignmentId,
-          checkpointId: submission.checkpointId,
-          breachDays,
-          assignmentTitle: submission.assignmentTitle,
-          studentName: submission.studentName,
-          checkpointName: submission.checkpointName,
-        },
-      });
-
-      // Send email via the email queue (not a notification row — BUG-21)
-      await sendSLAAlertEmail({
-        adminEmail: admin.email,
-        adminName: admin.name,
+    // Batch in-app notifications into a single INSERT (PERF-5)
+    const notificationValues = adminUsers.map((admin) => ({
+      userId: admin.id,
+      type: 'sla_breach',
+      titleKey: slaKeys.titleKey,
+      messageKey: slaKeys.messageKey,
+      params: slaParams,
+      channel: 'in_app',
+      metadata: {
+        assignmentId: submission.assignmentId,
+        checkpointId: submission.checkpointId,
+        breachDays,
         assignmentTitle: submission.assignmentTitle,
         studentName: submission.studentName,
         checkpointName: submission.checkpointName,
-        breachDays,
-      });
-    }
+      },
+    }));
+
+    await db.insert(notifications).values(notificationValues);
+
+    // Send emails concurrently — failures don't short-circuit (PERF-5)
+    await Promise.allSettled(
+      adminUsers.map((admin) =>
+        sendSLAAlertEmail({
+          adminEmail: admin.email,
+          adminName: admin.name,
+          assignmentTitle: submission.assignmentTitle,
+          studentName: submission.studentName,
+          checkpointName: submission.checkpointName,
+          breachDays,
+        }),
+      ),
+    );
   } catch (notifErr) {
     // Notifications are advisory — log but don't fail the review
     console.error('Failed to send SLA notifications:', notifErr);

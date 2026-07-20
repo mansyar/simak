@@ -104,8 +104,9 @@ simak/
 
 - **Server function split:** Every feature has two files — `*.ts` (client-safe stub with Zod schema + `createServerFn`) and `*.server.ts` (handler with DB code). This keeps server-only code out of the client bundle. The `auth.ts`/`auth.server.ts` split was verified with bundle analysis — zero `pg`/`drizzle-orm` imports leak into client chunks.
 - **Session cache:** A 5s-TTL in-memory cache in `auth.server.ts` reduces per-page-load user lookup queries from 4–6 to 1 per 5s window. Tradeoff: role changes and soft-delete checks may take up to 5s to propagate for in-flight requests.
-- **File uploads direct to R2:** Files go directly to Cloudflare R2 via presigned URLs — the server never sees file bytes. An `upload_intents` table enforces ownership, purpose, expiry, and single-use semantics.
+- **File uploads direct to R2:** Files go directly to Cloudflare R2 via presigned URLs — the server never sees file bytes. An `upload_intents` table enforces ownership, purpose, expiry, and single-use semantics. R2 HEAD size verification runs before the DB transaction opens (no row lock held during I/O).
 - **Concurrency safety:** All state-transition handlers (checkpoint submissions, reviews, consultations, extensions) use `db.transaction` + `SELECT ... FOR UPDATE` + post-lock state re-validation to prevent TOCTOU race conditions.
+- **Query optimization:** N+1 patterns eliminated via set-based queries (`GROUP BY`, bulk `UPDATE`). Independent queries parallelized with `Promise.all`. Latest-submission lookups use LATERAL joins. All list handlers have offset-based pagination (page/limit Zod params + parallel count query). Post-commit advisory work (audit logging, notifications) is batched and wrapped in try/catch per SQL styleguide §6.4.
 - **Bilingual i18n:** All user-visible strings use `t('key')` with translations in both `en.json` and `id.json`. A custom oxlint rule (`simak-i18n/no-hardcoded`) enforces this at lint time.
 - **Invitation-only auth:** No self-registration. Admins create users; password setup happens via token-based invitation flow.
 

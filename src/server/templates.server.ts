@@ -52,20 +52,31 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
       conditions.push(eq(assignmentTemplates.type, type));
     }
 
-    const templatesData = await db
-      .select({
-        id: assignmentTemplates.id,
-        name: assignmentTemplates.name,
-        type: assignmentTemplates.type,
-        createdBy: assignmentTemplates.createdBy,
-        createdAt: assignmentTemplates.createdAt,
-        updatedAt: assignmentTemplates.updatedAt,
-      })
-      .from(assignmentTemplates)
-      .where(and(...conditions))
-      .orderBy(assignmentTemplates.createdAt)
-      .limit(limit)
-      .offset((page - 1) * limit);
+    const [templatesData, [{ count }], typeRows] = await Promise.all([
+      db
+        .select({
+          id: assignmentTemplates.id,
+          name: assignmentTemplates.name,
+          type: assignmentTemplates.type,
+          createdBy: assignmentTemplates.createdBy,
+          createdAt: assignmentTemplates.createdAt,
+          updatedAt: assignmentTemplates.updatedAt,
+        })
+        .from(assignmentTemplates)
+        .where(and(...conditions))
+        .orderBy(assignmentTemplates.createdAt)
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(assignmentTemplates)
+        .where(and(...conditions)),
+      db
+        .select({ type: assignmentTemplates.type })
+        .from(assignmentTemplates)
+        .where(isNull(assignmentTemplates.deletedAt))
+        .groupBy(assignmentTemplates.type),
+    ]);
 
     // Enrich with checkpoints and counts in a separate query
     const templateIds = templatesData.map((t) => t.id);
@@ -105,19 +116,6 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
       checkpointCount: checkpointCounts.get(t.id) ?? 0,
       checkpoints: checkpointsMap.get(t.id) ?? [],
     }));
-
-    // Total count for pagination
-    const [{ count }] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(assignmentTemplates)
-      .where(and(...conditions));
-
-    // All distinct types (for filter dropdown)
-    const typeRows = await db
-      .select({ type: assignmentTemplates.type })
-      .from(assignmentTemplates)
-      .where(isNull(assignmentTemplates.deletedAt))
-      .groupBy(assignmentTemplates.type);
 
     return {
       templates: templatesWithCounts,
@@ -261,13 +259,11 @@ export async function updateTemplateHandler(args: { data: UpdateTemplateInput & 
   const db = getDb();
 
   try {
-    // Update template metadata
     await db
       .update(assignmentTemplates)
       .set({ name, type, updatedAt: new Date() })
       .where(eq(assignmentTemplates.id, id));
 
-    // Replace all checkpoint rows (delete old, insert new) in sequence
     await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, id));
 
     const checkpointRows = checkpoints.map((cp, index) => ({
@@ -306,7 +302,6 @@ export async function deleteTemplateHandler(args: { data: TemplateIdParam }) {
   const { id } = args.data;
 
   try {
-    // Check if any active assignments reference this template
     const [{ count }] = await db
       .select({ count: sql<number>`count(*)` })
       .from(assignments)
@@ -347,7 +342,6 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
   const { id } = args.data;
 
   try {
-    // Fetch original template
     const [original] = await db
       .select({
         id: assignmentTemplates.id,
@@ -363,7 +357,6 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
       return serverError(ErrorCode.NOT_FOUND, 'Template not found');
     }
 
-    // Generate unique name with (Copy) suffix
     let newName = original.name;
     const copySuffix = ' (Copy)';
     if (newName.endsWith(copySuffix)) {
@@ -379,7 +372,6 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
       newName = `${newName}${copySuffix}`;
     }
 
-    // Insert duplicated template
     const [inserted] = await db
       .insert(assignmentTemplates)
       .values({
@@ -390,7 +382,6 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
       .returning({ id: assignmentTemplates.id })
       .then((rows) => rows);
 
-    // Fetch original checkpoints and copy them
     const originalCheckpoints = await db
       .select({
         name: templateCheckpoints.name,
@@ -441,27 +432,35 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
 export async function listTemplateAssignmentsHandler(args: { data: ListTemplateAssignmentsInput }) {
   const session = await getSessionFromHeaders();
   if (!isAdmin(session)) {
-    return { assignments: [] };
+    return { assignments: [], total: 0 };
   }
 
   const db = getDb();
-  const { templateId } = args.data;
+  const { templateId, page = 1, limit = 20 } = args.data;
 
   try {
-    // Get assignments linked to this template with instructor name and student count
-    const templateAssignments = await db
-      .select({
-        id: assignments.id,
-        title: assignments.title,
-        instructorName: users.name,
-        createdAt: assignments.createdAt,
-      })
-      .from(assignments)
-      .innerJoin(users, eq(assignments.instructorId, users.id))
-      .where(and(eq(assignments.templateId, templateId), isNull(assignments.deletedAt)))
-      .orderBy(assignments.createdAt);
+    const conditions = and(eq(assignments.templateId, templateId), isNull(assignments.deletedAt));
 
-    // Get student counts per assignment
+    const [templateAssignments, [{ count }]] = await Promise.all([
+      db
+        .select({
+          id: assignments.id,
+          title: assignments.title,
+          instructorName: users.name,
+          createdAt: assignments.createdAt,
+        })
+        .from(assignments)
+        .innerJoin(users, eq(assignments.instructorId, users.id))
+        .where(conditions)
+        .orderBy(assignments.createdAt)
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(assignments)
+        .where(conditions),
+    ]);
+
     const assignmentIds = templateAssignments.map((a) => a.id);
     let studentCounts: Map<number, number> = new Map();
 
@@ -486,6 +485,7 @@ export async function listTemplateAssignmentsHandler(args: { data: ListTemplateA
         studentCount: studentCounts.get(a.id) ?? 0,
         createdAt: a.createdAt,
       })),
+      total: Number(count),
     };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {

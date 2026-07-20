@@ -9,6 +9,7 @@ import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignmen
 import { ConsultationForm } from '@/components/consultations/ConsultationForm';
 import { ConsultationList } from '@/components/consultations/ConsultationList';
 import { ConsultationProgress } from '@/components/consultations/ConsultationProgress';
+import { Pagination } from '@/components/ui/pagination';
 import { ExtensionRequestForm } from '@/components/student/extensions/ExtensionRequestForm';
 import { ExtensionHistoryList } from '@/components/student/extensions/ExtensionHistoryList';
 import { Button } from '@/components/ui/button';
@@ -81,6 +82,10 @@ function AssignmentDetailPage() {
   const [activeTab, setActiveTab] = useState<'timeline' | 'consultations' | 'extensions'>(
     'timeline',
   );
+  const [consultationPage, setConsultationPage] = useState(1);
+  const [consultationTotal, setConsultationTotal] = useState(0);
+  const [extensionPage, setExtensionPage] = useState(1);
+  const [extensionTotal, setExtensionTotal] = useState(0);
   const [extensionItems, setExtensionItems] = useState<
     {
       id: number;
@@ -100,20 +105,22 @@ function AssignmentDetailPage() {
     if (assignment) {
       const loadConsultations = async () => {
         const listConsFn = listConsultations as unknown as (args: {
-          data: { assignmentId: number };
+          data: { assignmentId: number; page: number; limit: number };
         }) => Promise<unknown>;
         const listCountsFn = listVerifiedCounts as unknown as (args: {
           data: { assignmentId: number };
         }) => Promise<unknown>;
         const consResult = await listConsFn({
-          data: { assignmentId: assignment.id },
+          data: { assignmentId: assignment.id, page: consultationPage, limit: 20 },
         });
         if (
           consResult &&
           typeof consResult === 'object' &&
           'consultations' in (consResult as Record<string, unknown>)
         ) {
-          setConsultations((consResult as { consultations: typeof consultations }).consultations);
+          const consData = consResult as { consultations: typeof consultations; total: number };
+          setConsultations(consData.consultations);
+          setConsultationTotal(consData.total);
         }
 
         const countsResult = await listCountsFn({
@@ -129,22 +136,24 @@ function AssignmentDetailPage() {
 
         // Load extension requests
         const listExtFn = listMyExtensionRequests as unknown as (args: {
-          data: { assignmentId: number };
+          data: { assignmentId: number; page: number; limit: number };
         }) => Promise<unknown>;
         const extResult = await listExtFn({
-          data: { assignmentId: assignment.id },
+          data: { assignmentId: assignment.id, page: extensionPage, limit: 20 },
         });
         if (
           extResult &&
           typeof extResult === 'object' &&
           'items' in (extResult as Record<string, unknown>)
         ) {
-          setExtensionItems((extResult as { items: typeof extensionItems }).items);
+          const extData = extResult as { items: typeof extensionItems; total: number };
+          setExtensionItems(extData.items);
+          setExtensionTotal(extData.total);
         }
       };
       loadConsultations();
     }
-  }, [assignment]);
+  }, [assignment, consultationPage, extensionPage]);
 
   // If a child route is active (e.g., /checkpoints/:checkpointId), render it via Outlet
   // The child route (submission page) has its own full layout and back navigation
@@ -194,20 +203,22 @@ function AssignmentDetailPage() {
   const handleConsultationSuccess = async () => {
     // Refresh consultation data
     const listConsFn = listConsultations as unknown as (args: {
-      data: { assignmentId: number };
+      data: { assignmentId: number; page: number; limit: number };
     }) => Promise<unknown>;
     const listCountsFn = listVerifiedCounts as unknown as (args: {
       data: { assignmentId: number };
     }) => Promise<unknown>;
     const consResult = await listConsFn({
-      data: { assignmentId: assignment.id },
+      data: { assignmentId: assignment.id, page: consultationPage, limit: 20 },
     });
     if (
       consResult &&
       typeof consResult === 'object' &&
       'consultations' in (consResult as Record<string, unknown>)
     ) {
-      setConsultations((consResult as { consultations: typeof consultations }).consultations);
+      const consData = consResult as { consultations: typeof consultations; total: number };
+      setConsultations(consData.consultations);
+      setConsultationTotal(consData.total);
     }
 
     const countsResult = await listCountsFn({
@@ -225,17 +236,19 @@ function AssignmentDetailPage() {
   const handleExtensionSuccess = async () => {
     // Refresh extension data
     const listExtFn = listMyExtensionRequests as unknown as (args: {
-      data: { assignmentId: number };
+      data: { assignmentId: number; page: number; limit: number };
     }) => Promise<unknown>;
     const extResult = await listExtFn({
-      data: { assignmentId: assignment.id },
+      data: { assignmentId: assignment.id, page: extensionPage, limit: 20 },
     });
     if (
       extResult &&
       typeof extResult === 'object' &&
       'items' in (extResult as Record<string, unknown>)
     ) {
-      setExtensionItems((extResult as { items: typeof extensionItems }).items);
+      const extData = extResult as { items: typeof extensionItems; total: number };
+      setExtensionItems(extData.items);
+      setExtensionTotal(extData.total);
     }
   };
 
@@ -331,6 +344,11 @@ function AssignmentDetailPage() {
               {t('consultations.previousSessions')}
             </h3>
             <ConsultationList consultations={consultations} />
+            <Pagination
+              currentPage={consultationPage}
+              totalPages={Math.max(1, Math.ceil(consultationTotal / 20))}
+              onPageChange={setConsultationPage}
+            />
           </div>
         </div>
       )}
@@ -351,6 +369,11 @@ function AssignmentDetailPage() {
           </div>
 
           <ExtensionHistoryList items={extensionItems} />
+          <Pagination
+            currentPage={extensionPage}
+            totalPages={Math.max(1, Math.ceil(extensionTotal / 20))}
+            onPageChange={setExtensionPage}
+          />
         </div>
       )}
     </div>

@@ -93,7 +93,8 @@ export async function getInstructorDashboardDataHandler(): Promise<
         })
         .from(assignments)
         .where(and(eq(assignments.instructorId, instructorId), isNull(assignments.deletedAt)))
-        .orderBy(desc(assignments.createdAt)),
+        .orderBy(desc(assignments.createdAt))
+        .limit(20),
     ]);
 
     const assignmentIds = instructorAssignments.map((a) => a.id);

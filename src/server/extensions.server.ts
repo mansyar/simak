@@ -306,17 +306,14 @@ export async function listExtensionRequestsHandler(args: { data: ListExtensionRe
   }
 }
 
-/**
- * List extension requests for a student's own assignment.
- * Student-only. Returns their own requests without pagination (history is typically short).
- */
+/** List extension requests for a student's own assignment. Student-only. */
 export async function listMyExtensionRequestsHandler(args: { data: ListMyExtensionsInput }) {
   const session = await getSessionFromHeaders();
   if (!isStudent(session)) {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { assignmentId } = args.data;
+  const { assignmentId, page = 1, limit = 20 } = args.data;
   const db = getDb();
 
   try {
@@ -336,31 +333,39 @@ export async function listMyExtensionRequestsHandler(args: { data: ListMyExtensi
       return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
     }
 
-    const items = await db
-      .select({
-        id: extensionRequests.id,
-        checkpointId: extensionRequests.checkpointId,
-        checkpointName: checkpoints.name,
-        requestedDeadline: extensionRequests.requestedDeadline,
-        reason: extensionRequests.reason,
-        category: extensionRequests.category,
-        extensionDays: extensionRequests.extensionDays,
-        status: extensionRequests.status,
-        resolutionReason: extensionRequests.resolutionReason,
-        createdAt: extensionRequests.createdAt,
-        resolvedAt: extensionRequests.resolvedAt,
-      })
-      .from(extensionRequests)
-      .leftJoin(checkpoints, eq(extensionRequests.checkpointId, checkpoints.id))
-      .where(
-        and(
-          eq(extensionRequests.assignmentId, assignmentId),
-          eq(extensionRequests.studentId, session.user.id),
-        ),
-      )
-      .orderBy(desc(extensionRequests.createdAt));
+    const conditions = and(
+      eq(extensionRequests.assignmentId, assignmentId),
+      eq(extensionRequests.studentId, session.user.id),
+    );
 
-    return { items };
+    const [items, [{ count }]] = await Promise.all([
+      db
+        .select({
+          id: extensionRequests.id,
+          checkpointId: extensionRequests.checkpointId,
+          checkpointName: checkpoints.name,
+          requestedDeadline: extensionRequests.requestedDeadline,
+          reason: extensionRequests.reason,
+          category: extensionRequests.category,
+          extensionDays: extensionRequests.extensionDays,
+          status: extensionRequests.status,
+          resolutionReason: extensionRequests.resolutionReason,
+          createdAt: extensionRequests.createdAt,
+          resolvedAt: extensionRequests.resolvedAt,
+        })
+        .from(extensionRequests)
+        .leftJoin(checkpoints, eq(extensionRequests.checkpointId, checkpoints.id))
+        .where(conditions)
+        .orderBy(desc(extensionRequests.createdAt))
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(extensionRequests)
+        .where(conditions),
+    ]);
+
+    return { items, total: Number(count) };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

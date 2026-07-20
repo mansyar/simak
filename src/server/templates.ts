@@ -35,6 +35,8 @@ export const TemplateIdParamSchema = z.object({
 
 export const ListTemplateAssignmentsSchema = z.object({
   templateId: z.coerce.number().int().positive('Template ID must be a positive integer'),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
 export const listTemplates = createServerFn({ method: 'GET' })

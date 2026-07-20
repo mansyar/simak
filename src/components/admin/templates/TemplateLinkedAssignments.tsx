@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ListRow } from '@/components/ui/list-row';
+import { Pagination } from '@/components/ui/pagination';
 import { formatDate } from '@/lib/format-date';
 import { useI18n } from '../../../routes/__root';
 
@@ -13,9 +14,17 @@ interface AssignmentData {
 
 interface TemplateLinkedAssignmentsProps {
   assignments: AssignmentData[];
+  currentPage: number;
+  totalPages: number;
+  onPageChange?: (page: number) => void;
 }
 
-export function TemplateLinkedAssignments({ assignments }: TemplateLinkedAssignmentsProps) {
+export function TemplateLinkedAssignments({
+  assignments,
+  currentPage,
+  totalPages,
+  onPageChange,
+}: TemplateLinkedAssignmentsProps) {
   const { t, locale } = useI18n();
 
   return (
@@ -49,6 +58,13 @@ export function TemplateLinkedAssignments({ assignments }: TemplateLinkedAssignm
                 }
               />
             ))}
+            {totalPages > 1 && onPageChange && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            )}
           </div>
         )}
       </CardContent>

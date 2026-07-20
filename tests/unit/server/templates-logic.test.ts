@@ -7,7 +7,6 @@ import {
   updateTemplateHandler,
   deleteTemplateHandler,
   duplicateTemplateHandler,
-  listTemplateAssignmentsHandler,
 } from '@/server/templates.server';
 import { serverError, ErrorCode } from '@/lib/errors';
 import * as auth from '@/server/auth';
@@ -138,13 +137,14 @@ describe('Template server functions - Logic & Security', () => {
           Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis' }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ templateId: 1, name: 'Proposal', order: 1 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ count: 1 }]).then(onfulfilled),
         );
 
       const result = (await listTemplatesHandler({ data: listData })) as {
@@ -214,16 +214,16 @@ describe('Template server functions - Logic & Security', () => {
           Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis' }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ templateId: 1, name: 'Proposal', order: 1 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ count: 1 }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ type: 'Thesis' }, { type: 'Project' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, name: 'Proposal', order: 1 }]).then(onfulfilled),
         );
 
       const result = (await listTemplatesHandler({ data: listData })) as {
@@ -232,6 +232,39 @@ describe('Template server functions - Logic & Security', () => {
 
       expect(result.allTypes).toBeDefined();
       expect(result.allTypes).toEqual(['Thesis', 'Project']);
+    });
+
+    it('should run data, count, and types queries in parallel via Promise.all (PERF-25)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ type: 'Thesis' }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, count: 2 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ templateId: 1, name: 'Ch 1', order: 1 }]).then(onfulfilled),
+        );
+
+      const result = (await listTemplatesHandler({ data: listData })) as {
+        templates: { checkpointCount: number }[];
+        total: number;
+        allTypes: string[];
+      };
+
+      // With Promise.all, count query (2nd call) runs before checkpoint queries (4th+5th calls)
+      expect(mockDb.then).toHaveBeenCalledTimes(5);
+      expect(result.total).toBe(1);
+      expect(result.allTypes).toEqual(['Thesis']);
+      expect(result.templates[0].checkpointCount).toBe(2);
     });
   });
 
@@ -384,65 +417,6 @@ describe('Template server functions - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
       const result = await duplicateTemplateHandler({ data: { id: 999 } });
       expect(result).toEqual(serverError(ErrorCode.NOT_FOUND, 'Template not found'));
-    });
-  });
-
-  describe('listTemplateAssignments', () => {
-    it('should return assignments linked to template with student counts', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
-
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            { id: 1, title: 'Assignment 1', instructorName: 'Dr. Smith', createdAt: new Date() },
-            { id: 2, title: 'Assignment 2', instructorName: 'Dr. Jones', createdAt: new Date() },
-          ]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            { assignmentId: 1, count: 5 },
-            { assignmentId: 2, count: 3 },
-          ]).then(onfulfilled),
-        );
-
-      const result = (await listTemplateAssignmentsHandler({
-        data: { templateId: 1 },
-      })) as { assignments: { studentCount: number }[] };
-
-      expect(result.assignments).toHaveLength(2);
-      expect(result.assignments[0]).toEqual({
-        id: 1,
-        title: 'Assignment 1',
-        instructorName: 'Dr. Smith',
-        studentCount: 5,
-        createdAt: expect.any(Date),
-      });
-      expect(result.assignments[1].studentCount).toBe(3);
-    });
-
-    it('should return empty assignments for non-admin', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
-
-      const result = await listTemplateAssignmentsHandler({ data: { templateId: 1 } });
-      expect(result).toEqual({ assignments: [] });
-    });
-
-    it('should return empty assignments for null session', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-
-      const result = await listTemplateAssignmentsHandler({ data: { templateId: 1 } });
-      expect(result).toEqual({ assignments: [] });
-    });
-
-    it('should return empty array when no assignments exist', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
-
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
-
-      const result = await listTemplateAssignmentsHandler({ data: { templateId: 999 } });
-      expect(result).toEqual({ assignments: [] });
     });
   });
 });

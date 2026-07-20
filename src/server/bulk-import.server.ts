@@ -2,7 +2,13 @@
 import { eq } from 'drizzle-orm';
 import crypto from 'node:crypto';
 import { getDb } from '../db/index';
-import { users, verification, assignmentTemplates, templateCheckpoints } from '../db/schema/index';
+import {
+  users,
+  verification,
+  assignmentTemplates,
+  templateCheckpoints,
+  auditLog,
+} from '../db/schema/index';
 import { sendInvitationEmail } from '../lib/email';
 import { logAuditEvent } from '../lib/audit';
 import { translateKey, resolveEmailSubject } from '../lib/i18n-server';
@@ -202,23 +208,22 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
     });
 
     // Post-commit advisory work (SQL styleguide §6.4 — must run AFTER the transaction commits)
-    for (const payload of emailPayloads) {
-      try {
-        await sendInvitationEmail(payload);
-      } catch {
-        // Email failure is non-fatal as per spec
-      }
+    // PERF-6: Parallelize invitation emails and batch per-row audit inserts
+    if (emailPayloads.length > 0) {
+      await Promise.allSettled(emailPayloads.map((payload) => sendInvitationEmail(payload)));
     }
 
-    for (const audit of perRowAudits) {
+    if (perRowAudits.length > 0) {
       try {
-        await logAuditEvent({
-          actorId: session.user.id,
-          action: audit.action,
-          entityType: 'user',
-          entityId: audit.userId,
-          details: audit.details,
-        });
+        await db.insert(auditLog).values(
+          perRowAudits.map((audit) => ({
+            actorId: session.user.id,
+            action: audit.action,
+            entityType: 'user',
+            entityId: audit.userId,
+            details: audit.details ?? null,
+          })),
+        );
       } catch (advisoryErr) {
         console.error('Per-row advisory audit log failed:', advisoryErr);
       }
