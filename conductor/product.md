@@ -346,6 +346,15 @@ Students and instructors lack a centralized system to:
 - **i18n translations** — 31 new keys in EN and ID for admin email queue UI
 - **Tests** — 45 new tests across processor logging, server handlers, and route component; full suite 2,445 tests pass; coverage ≥80%
 
+### Track: Session Caching & Bundle Safety (July 2026)
+
+- **Bug fixed (bundle leak):** Split `src/server/auth.ts` into the mandated two-file pattern — `auth.ts` (client-safe stub: Session type, getSessionFromHeaders, requireRole, _getSession createServerFn stub) and `auth.server.ts` (server-only handler: getSessionHandler). Removed forbidden imports (drizzle-orm, getDb, users schema, auth config, getRequestHeaders) from the client-bundled stub, preventing server-only modules from leaking into the client bundle.
+- **Performance optimization (PERF-22):** Added a 5-second TTL in-memory Map cache for user role/locale lookups in `getSessionHandler`. A page load triggering 4-6 server function calls now issues at most 1 DB query per 5s window per user (was N queries). Cache sits between `auth.api.getSession()` (always runs — security-critical) and the DB query.
+- **Lazy eviction** — Expired entries are evicted on cache miss; no LRU cap (bounded by distinct active users in 5s window).
+- **Accepted tradeoff** — Soft-delete check is skipped on cache hit; soft-deleted users retain access for up to 5s. Deliberate, documented tradeoff for a university system.
+- **Bundle verification** — Grep of built client chunks for `pg`/`drizzle-orm`/`postgres` returns zero matches; `auth.server.ts` appears in server bundle only.
+- **Tests** — 2,520 tests pass across 266 test files; coverage ≥80% on all thresholds (stmts 88.29%, branches 81.35%, functions 81.34%, lines 87.66%); auth.server.ts and auth.ts at 100% coverage.
+
 ### Track: Query & Data-Fetching Optimization (July 2026)
 
 - **N+1 query elimination** — Replaced per-row sequential queries with bulk operations in 6 handlers: `listVerifiedCountsHandler` (GROUP BY), `calculateExtensionAdjustment`/`bulkExtendHandler`/`adjustDeadlinesForBreach` (bulk UPDATE), `dispatchSLABreachNotifications` (batch INSERT + `Promise.allSettled` for emails), `bulkCreateUsersHandler` (parallel emails + batch audit INSERT).
