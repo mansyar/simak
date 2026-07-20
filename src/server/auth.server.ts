@@ -18,8 +18,31 @@ interface SessionCacheEntry {
 const sessionCache = new Map<string, SessionCacheEntry>();
 
 /** Clear the session cache (test-only). */
-export function _clearSessionCache(): void {
+export function clearSessionCacheForTests(): void {
   sessionCache.clear();
+}
+
+/** Build a Session return value from the Better Auth payload and role/locale fallback. */
+function buildSession(u: NonNullable<Session>, role: UserRole, locale: string): Session {
+  const payloadRole = u.user.role as UserRole | undefined;
+  const payloadLocale = u.user.locale as string | undefined;
+
+  return {
+    user: {
+      id: u.user.id,
+      name: u.user.name,
+      email: u.user.email,
+      role: payloadRole ?? role,
+      locale: payloadLocale ?? locale,
+      emailVerified: Boolean(u.user.emailVerified),
+      image: u.user.image as string | undefined | null,
+    },
+    session: {
+      id: u.session.id,
+      token: u.session.token,
+      expiresAt: u.session.expiresAt,
+    },
+  };
 }
 
 export async function getSessionHandler(): Promise<Session> {
@@ -41,25 +64,7 @@ export async function getSessionHandler(): Promise<Session> {
 
   if (cached && now < cached.expiresAt) {
     // Cache hit — skip the DB query. Soft-delete check is skipped by design (see spec Decisions).
-    const payloadRole = u.user.role as UserRole | undefined;
-    const payloadLocale = u.user.locale as string | undefined;
-
-    return {
-      user: {
-        id: u.user.id,
-        name: u.user.name,
-        email: u.user.email,
-        role: payloadRole ?? cached.role,
-        locale: payloadLocale ?? cached.locale,
-        emailVerified: Boolean(u.user.emailVerified),
-        image: u.user.image as string | undefined | null,
-      },
-      session: {
-        id: u.session.id,
-        token: u.session.token,
-        expiresAt: u.session.expiresAt,
-      },
-    };
+    return buildSession(u, cached.role, cached.locale);
   }
 
   // Cache miss — evict expired entry (lazy eviction) before querying DB.
@@ -91,23 +96,5 @@ export async function getSessionHandler(): Promise<Session> {
     expiresAt: now + SESSION_CACHE_TTL_MS,
   });
 
-  const payloadRole = u.user.role as UserRole | undefined;
-  const payloadLocale = u.user.locale as string | undefined;
-
-  return {
-    user: {
-      id: u.user.id,
-      name: u.user.name,
-      email: u.user.email,
-      role: payloadRole ?? dbRole,
-      locale: payloadLocale ?? dbLocale,
-      emailVerified: Boolean(u.user.emailVerified),
-      image: u.user.image as string | undefined | null,
-    },
-    session: {
-      id: u.session.id,
-      token: u.session.token,
-      expiresAt: u.session.expiresAt,
-    },
-  };
+  return buildSession(u, dbRole, dbLocale);
 }

@@ -28,20 +28,6 @@ vi.mock('@tanstack/react-router', () => ({
   }),
 }));
 
-// Mock database (needed while auth.ts still imports it; harmless after split)
-vi.mock('@/db/index', () => ({
-  getDb: vi.fn(),
-}));
-
-// Mock auth config (needed while auth.ts still imports it; harmless after split)
-vi.mock('@/auth/config', () => ({
-  auth: {
-    api: {
-      getSession: vi.fn(),
-    },
-  },
-}));
-
 // Mock route-utils
 vi.mock('@/lib/route-utils', () => ({
   getRoleDashboard: vi.fn().mockImplementation((role: string) => {
@@ -53,16 +39,6 @@ vi.mock('@/lib/route-utils', () => ({
     };
     return dashboards[role] || '/dashboard';
   }),
-}));
-
-// Mock users schema (needed while auth.ts still imports it; harmless after split)
-vi.mock('@/db/schema/users', () => ({
-  users: {
-    id: 'id',
-    role: 'role',
-    locale: 'locale',
-    deletedAt: 'deletedAt',
-  },
 }));
 
 // Mock auth.server for delegation tests — uses hoisted mock function

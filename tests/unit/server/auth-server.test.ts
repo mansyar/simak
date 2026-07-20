@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock @tanstack/react-start/server
 vi.mock('@tanstack/react-start/server', () => ({
@@ -30,7 +30,7 @@ vi.mock('@/db/schema/users', () => ({
   },
 }));
 
-import { getSessionHandler, _clearSessionCache } from '@/server/auth.server';
+import { getSessionHandler, clearSessionCacheForTests } from '@/server/auth.server';
 import { auth } from '@/auth/config';
 import { getDb } from '@/db/index';
 
@@ -86,7 +86,7 @@ function createMockDb(userRecord?: { role: string; locale: string } | null) {
 describe('getSessionHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    _clearSessionCache?.();
+    clearSessionCacheForTests();
   });
 
   afterEach(() => {
@@ -239,7 +239,7 @@ describe('getSessionHandler', () => {
 describe('getSessionHandler - session cache (PERF-22)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    _clearSessionCache?.();
+    clearSessionCacheForTests();
   });
 
   afterEach(() => {
