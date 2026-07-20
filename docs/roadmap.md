@@ -585,10 +585,10 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-010: Accessibility (a11y) & i18n Compliance
 
-- **Status:** `Pending`
+- **Status:** `Complete` (archived to `conductor/archive/accessibility-i18n-compliance_20260720/`)
 - **Dependencies:** None
 - **Estimated Effort:** 3 Days / 1.5 Sprint Loops
-- **Audit IDs:** UX-13, UX-14, UX-15, UX-16, UX-17, UX-18, UX-19, UX-20, UX-21, UX-22, UX-23, UX-24
+- **Audit IDs:** UX-13, UX-14, UX-15, UX-16, UX-17, UX-18, UX-19, UX-20, UX-21, UX-22, UX-23, UX-24, UX-50
 - **Decisions:**
   - **UX-15 (NotificationCenter refactor):** Replace the custom slide-over panel with the shadcn `Sheet` component (`sheet.tsx`), which uses `@base-ui/react/dialog` and handles Escape key, focus trapping, and backdrop click automatically. Restructure `NotificationCenter` to use `<Sheet open={isOpen} onOpenChange={onClose}><SheetContent side="right">...</SheetContent></Sheet>`. Remove the custom backdrop div and panel div. The Sheet's built-in close button and focus management replace the manual X button and missing focus trap.
   - **UX-14 (NotificationItem keyboard a11y):** Change `<div onClick={handleClick}>` to `<button type="button" onClick={handleClick}>`. A `<button>` is semantically correct, automatically focusable via Tab, and Enter/Space activate it natively. Add `text-left` and `w-full` to the className to maintain the current block-level layout. No `role`/`tabIndex`/`onKeyDown` needed — native button handles everything.
@@ -640,9 +640,9 @@ All tracks must adhere to the following project constraints:
 
 #### Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Navigate notification center using only keyboard -- Tab to bell, Enter to open, Tab through items, Enter to mark as read, Escape to close (Sheet handles this). Screen reader announces notification count changes via dynamic `aria-label`. Switch to Indonesian locale -- all strings (including "Status", "days", dates) are translated. Progress bars announce progress via screen reader. Collapsible sections announce expanded/collapsed state.
-- [ ] **Automated Tests:** `pnpm test:unit` -- tests for keyboard interaction in NotificationCenter (Escape closes, Tab traps within panel), `NotificationItem` is a `<button>` (focusable, Enter/Space activates), ARIA presence on progress bars/collapsible/icon buttons, i18n key usage (no hardcoded strings). `pnpm check:i18n` -- parity verified for 4 new keys. `pnpm lint` -- no `simak-i18n/no-hardcoded` warnings. `pnpm test:coverage` >= 80%.
-- [ ] **Conductor Review:** No hardcoded English UI strings (grep for `header: 'Status'`, `description="No`, ` days</td>`). All interactive elements are keyboard accessible. `NotificationCenter` uses `Sheet` component (no custom backdrop div). `NotificationItem` is a `<button>`. Progress bars have `role="progressbar"`. `DeadlineManager` toggle has `aria-expanded`. `CheckpointTimeline` decorative elements have `aria-hidden`. WCAG 2.1.1 (Keyboard) compliant.
+- [x] **Manual Checkpoint:** Navigate notification center using only keyboard -- Tab to bell, Enter to open, Tab through items, Enter to mark as read, Escape to close (Sheet handles this). Screen reader announces notification count changes via dynamic `aria-label`. Switch to Indonesian locale -- all strings (including "Status", "days", dates) are translated. Progress bars announce progress via screen reader. Collapsible sections announce expanded/collapsed state.
+- [x] **Automated Tests:** `pnpm test:unit` -- 270 test files, 2,608 tests, all pass. New tests verify keyboard interaction in NotificationCenter (Escape closes via Sheet onOpenChange, Tab trapping delegated to Sheet), `NotificationItem` is a `<button type="button">` (focusable, Enter/Space activates onClick), ARIA presence on progress bars/collapsible/icon buttons, dynamic `aria-label` + `aria-live="polite"` on NotificationBadge, i18n key usage (no hardcoded strings). `pnpm check:i18n` -- parity verified for 4 new keys (717 = 717). `pnpm lint` -- 0 warnings, 0 errors (no `simak-i18n/no-hardcoded` warnings). `pnpm test:coverage` >= 80% on all thresholds.
+- [x] **Conductor Review:** No hardcoded English UI strings (grep verified). All interactive elements are keyboard accessible. `NotificationCenter` uses `Sheet` component (no custom backdrop div). `NotificationItem` is a `<button>`. Progress bars have `role="progressbar"`. `DeadlineManager` toggle has `aria-expanded`. `CheckpointTimeline` decorative elements have `aria-hidden`. WCAG 2.1.1 (Keyboard) compliant. Review passed with no Critical/High/Medium issues; one Low informational observation about `aria-live` on the NotificationBadge button (spec-compliant, no change required). Track archived to `conductor/archive/accessibility-i18n-compliance_20260720/`.
 
 ---
 

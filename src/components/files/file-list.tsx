@@ -107,6 +107,7 @@ export function FileList({ submissions, onDownload }: FileListProps) {
                   size="icon"
                   onClick={() => handleDownload(submission.id)}
                   title={t('files.download')}
+                  aria-label={t('files.download')}
                 >
                   <Download className="h-4 w-4" />
                 </Button>

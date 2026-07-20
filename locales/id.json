@@ -185,7 +185,8 @@
       "name": "Nama",
       "role": "Peran",
       "createdAt": "Dibuat Pada",
-      "actions": "Aksi"
+      "actions": "Aksi",
+      "status": "Status"
     },
     "empty": "Tidak ada pengguna",
     "emptyPrompt": "Mulai dengan menambahkan pengguna baru",
@@ -488,6 +489,7 @@
     "activeConsultations": "Konsultasi Aktif",
     "recentActivity": "Aktivitas Terbaru",
     "noRecentActivity": "Tidak ada aktivitas dalam 7 hari terakhir",
+    "noRecentActivityDescription": "Tidak ada aktivitas terbaru untuk ditampilkan",
     "escalationAlerts": "Peringatan Eskalasi Tenggat",
     "noEscalationAlerts": "Tidak ada peringatan eskalasi aktif",
     "allOnTrack": "Semua tugas dalam kondisi baik",
@@ -669,6 +671,7 @@
     "empty": "Belum ada notifikasi",
     "closePanel": "Tutup panel",
     "viewNotifications": "Lihat notifikasi",
+    "unreadCount": "{count} notifikasi belum dibaca",
     "groups": {
       "newReviews": "Ulasan Baru",
       "consultations": "Pembaruan Konsultasi",
@@ -791,6 +794,7 @@
     "categoryOther": "Lainnya",
     "maxExtensionsReached": "Maksimal {count} perpanjangan diizinkan. Anda telah menggunakan {used}.",
     "daysExceeded": "Hari perpanjangan tidak boleh melebihi {max} untuk tugas ini.",
+    "daysCount": "{count} hari",
     "approveSuccess": "Perpanjangan berhasil disetujui",
     "rejectSuccess": "Perpanjangan berhasil ditolak"
   },

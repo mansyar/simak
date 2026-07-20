@@ -367,6 +367,14 @@ Students and instructors lack a centralized system to:
 - **Batch audit log inserts** — `bulkExtendHandler` per-checkpoint `logAuditEvent` loop replaced with single batch `db.insert(auditLog).values([...])`.
 - **Tests** — 2,539 tests pass across 269 test files; coverage ≥80% on all thresholds (stmts 87.43%, branches 81.11%, functions 81.26%, lines 88.07%).
 
+### Track: Accessibility (a11y) & i18n Compliance (July 2026)
+
+- **NotificationCenter a11y refactor** — Replaced custom backdrop/panel with shadcn `Sheet` primitive (focus trapping, Escape, backdrop click); converted `NotificationItem` from `<div onClick>` to native `<button type="button">` for keyboard access; made `NotificationBadge` `aria-label` dynamic with unread count; added `aria-live="polite"` for screen reader announcements
+- **i18n hardcoded string fixes** — Replaced hardcoded "No recent activity to display" (AdminDashboard), "Status" header (UserTable), and "{N} days" suffix (ExtensionHistoryList) with i18n keys; added 4 new translation keys to EN/ID locales
+- **Locale-aware date formatting** — Replaced `toLocaleDateString('en-US')` and `toLocaleDateString()` calls in ExtensionHistoryList, StudentDashboard, and ConsultationList with the shared `formatDate(date, locale, 'short')` helper
+- **ARIA attributes** — Added `aria-label` to FileList download buttons; `role="progressbar"` + `aria-valuenow`/`aria-valuemin`/`aria-valuemax`/`aria-label` to ProgressTable and ConsultationProgress bars; `aria-expanded`/`aria-controls` to DeadlineManager toggle buttons; `aria-hidden="true"` to CheckpointTimeline decorative elements
+- **WCAG 2.1 AA compliance** — Remediated 13 audit findings (UX-13 through UX-24, UX-50) across 10 components; 2,608 tests pass; coverage ≥80% on all thresholds
+
 ### Track 9: Action Feedback & Loading States (July 2026)
 
 - **Success toast infrastructure** — New `showSuccessToast(message)` helper in `src/lib/toast.ts` mirroring `showErrorToast`; wired into ~9 action `onSuccess` handlers across ConsultationForm (log), CreateUserDialog (create), EditUserSheet (update), DeleteUserDialog (delete), DeadlineManager (unlock + extend), VerificationDialog (verify + reject), use-assignment-tabs (approve + reject extension), ProfileSection (name update), PasswordSection (password change)

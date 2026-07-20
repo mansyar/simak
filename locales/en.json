@@ -185,7 +185,8 @@
       "name": "Name",
       "role": "Role",
       "createdAt": "Created At",
-      "actions": "Actions"
+      "actions": "Actions",
+      "status": "Status"
     },
     "empty": "No users found",
     "emptyPrompt": "Get started by adding a new user",
@@ -488,6 +489,7 @@
     "activeConsultations": "Active Consultations",
     "recentActivity": "Recent Activity",
     "noRecentActivity": "No recent activity in the last 7 days",
+    "noRecentActivityDescription": "No recent activity to display",
     "escalationAlerts": "Deadline Escalation Alerts",
     "allOnTrack": "All assignments are on track",
     "noEscalationAlerts": "No active escalation alerts",
@@ -669,6 +671,7 @@
     "empty": "No notifications yet",
     "closePanel": "Close panel",
     "viewNotifications": "View notifications",
+    "unreadCount": "{count} unread notifications",
     "groups": {
       "newReviews": "New Reviews",
       "consultations": "Consultation Updates",
@@ -791,6 +794,7 @@
     "categoryOther": "Other",
     "maxExtensionsReached": "Maximum {count} extension(s) allowed. You have used {used}.",
     "daysExceeded": "Extension days cannot exceed {max} for this assignment.",
+    "daysCount": "{count} days",
     "approveSuccess": "Extension approved successfully",
     "rejectSuccess": "Extension rejected successfully"
   },

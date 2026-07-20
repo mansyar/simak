@@ -1,6 +1,16 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ConsultationList } from '@/components/consultations/ConsultationList';
+
+const { mockFormatDate } = vi.hoisted(() => ({
+  mockFormatDate: vi.fn(
+    (date: string, locale: string, style: string) => `formatted-${date}-${locale}-${style}`,
+  ),
+}));
+
+vi.mock('@/lib/format-date', () => ({
+  formatDate: mockFormatDate,
+}));
 
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
@@ -15,6 +25,7 @@ vi.mock('@/routes/__root', () => ({
       };
       return translations[key] || key;
     },
+    locale: 'en' as const,
   }),
 }));
 
@@ -87,7 +98,7 @@ describe('ConsultationList', () => {
 
   it('should render date', () => {
     render(<ConsultationList consultations={[baseConsultation]} />);
-    expect(screen.getByText(/20\/05\/2026/)).toBeDefined();
+    expect(mockFormatDate).toHaveBeenCalledWith(baseConsultation.createdAt, 'en', 'short');
   });
 
   it('should render dash for null notes', () => {
@@ -104,5 +115,36 @@ describe('ConsultationList', () => {
     expect(screen.getByText('Proposal')).toBeDefined();
     expect(screen.getByText('Chapter 1')).toBeDefined();
     expect(screen.getByText('Reviewed draft.')).toBeDefined();
+  });
+});
+
+describe('ConsultationList - shared formatDate (UX-20)', () => {
+  const baseConsultation = {
+    id: 1,
+    checkpointName: 'Proposal',
+    sessionType: 'internal',
+    externalConsultantName: null,
+    notes: 'Student discussed topic selection.',
+    status: 'pending',
+    createdAt: '2026-05-20T10:00:00Z',
+  };
+
+  beforeEach(() => {
+    mockFormatDate.mockClear();
+  });
+
+  it('uses formatDate from @/lib/format-date with locale and short style', () => {
+    render(<ConsultationList consultations={[baseConsultation]} />);
+    expect(mockFormatDate).toHaveBeenCalledWith(baseConsultation.createdAt, 'en', 'short');
+  });
+
+  it('calls formatDate once per consultation item', () => {
+    const items = [
+      baseConsultation,
+      { ...baseConsultation, id: 2, checkpointName: 'Chapter 1' },
+      { ...baseConsultation, id: 3, checkpointName: 'Chapter 2' },
+    ];
+    render(<ConsultationList consultations={items} />);
+    expect(mockFormatDate).toHaveBeenCalledTimes(items.length);
   });
 });
