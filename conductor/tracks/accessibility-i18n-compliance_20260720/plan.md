@@ -23,12 +23,12 @@
     - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
     - [x] Commit: `refactor(notifications): Replace custom notification panel with shadcn Sheet (UX-15)`
 
-- [ ] Task: Convert NotificationItem to native button (UX-14)
-    - [ ] Write failing tests: assert `NotificationItem` renders a `<button type="button">` with `text-left` and `w-full` classes, Tab focuses it, Enter and Space keys activate the `onClick` handler
-    - [ ] Implement: change `<div onClick={handleClick}>` to `<button type="button" onClick={handleClick}>` in `src/components/notifications/NotificationItem.tsx`, add `text-left w-full` to className
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint` — no errors
-    - [ ] Commit: `fix(a11y): Convert NotificationItem to native button for keyboard access (UX-14)`
+- [x] Task: Convert NotificationItem to native button (UX-14) [424857d]
+    - [x] Write failing tests: assert `NotificationItem` renders a `<button type="button">` with `text-left` and `w-full` classes, Tab focuses it, Enter and Space keys activate the `onClick` handler
+    - [x] Implement: change `<div onClick={handleClick}>` to `<button type="button" onClick={handleClick}>` in `src/components/notifications/NotificationItem.tsx`, add `text-left w-full` to className
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
+    - [x] Commit: `fix(a11y): Convert NotificationItem to native button for keyboard access (UX-14)`
 
 - [ ] Task: Make NotificationBadge aria-label dynamic and add aria-live (UX-23, UX-50)
     - [ ] Write failing tests: assert badge button `aria-label` includes unread count when `hasUnread` is true (uses `t('notifications.unreadCount', { count })`), shows `t('notifications.viewNotifications')` when no unread, count span no longer has `role="status"`, badge container has `aria-live="polite"`
