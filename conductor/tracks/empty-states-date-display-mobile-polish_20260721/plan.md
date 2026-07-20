@@ -53,12 +53,12 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
     - [x] Implement: add `formatRelativeTime(date: Date | string, locale: 'en' | 'id' = 'en')` using `formatDistanceToNow(toDate(date), { addSuffix: true, locale: localeMap[locale] })` from `date-fns` (already a dependency, v4.2.1)
     - [x] Verify: `pnpm test` passes (3097dad)
 
-- [~] Task: CheckpointCard relative date (UX-43)
-    - [ ] Write failing test: `CheckpointCard` due date displays absolute date + parenthesized relative time (e.g., "Mar 5, 2026 (in 3 days)") in the active locale
-    - [ ] Implement: append `(${formatRelativeTime(date, locale)})` to the formatted absolute date
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: CheckpointCard relative date (UX-43)
+    - [x] Write failing test: `CheckpointCard` due date displays absolute date + parenthesized relative time (e.g., "Mar 5, 2026 (in 3 days)") in the active locale
+    - [x] Implement: append `(${formatRelativeTime(date, locale)})` to the formatted absolute date
+    - [x] Verify: `pnpm test` passes (43c3be9)
 
-- [ ] Task: StudentDashboard relative date (UX-43)
+- [~] Task: StudentDashboard relative date (UX-43)
     - [ ] Write failing test: upcoming deadlines display absolute date + parenthesized relative time in the active locale
     - [ ] Implement: append relative time to the formatted date in the upcoming-deadlines list
     - [ ] Verify: `pnpm test` passes
