@@ -30,12 +30,12 @@
     - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
     - [x] Commit: `fix(a11y): Convert NotificationItem to native button for keyboard access (UX-14)`
 
-- [ ] Task: Make NotificationBadge aria-label dynamic and add aria-live (UX-23, UX-50)
-    - [ ] Write failing tests: assert badge button `aria-label` includes unread count when `hasUnread` is true (uses `t('notifications.unreadCount', { count })`), shows `t('notifications.viewNotifications')` when no unread, count span no longer has `role="status"`, badge container has `aria-live="polite"`
-    - [ ] Implement: in `src/components/notifications/NotificationBadge.tsx`, set dynamic `aria-label` on button, remove `role="status"` from count span, add `aria-live="polite"` to badge container
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint` — no errors
-    - [ ] Commit: `fix(a11y): Dynamic aria-label and aria-live on NotificationBadge (UX-23, UX-50)`
+- [x] Task: Make NotificationBadge aria-label dynamic and add aria-live (UX-23, UX-50) [a69968e]
+    - [x] Write failing tests: assert badge button `aria-label` includes unread count when `hasUnread` is true (uses `t('notifications.unreadCount', { count })`), shows `t('notifications.viewNotifications')` when no unread, count span no longer has `role="status"`, badge container has `aria-live="polite"`
+    - [x] Implement: in `src/components/notifications/NotificationBadge.tsx`, set dynamic `aria-label` on button, remove `role="status"` from count span, add `aria-live="polite"` to badge container
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
+    - [x] Commit: `fix(a11y): Dynamic aria-label and aria-live on NotificationBadge (UX-23, UX-50)`
 
 - [ ] Task: Replace AdminDashboard hardcoded string (UX-13)
     - [ ] Write failing tests: assert `AdminDashboard` renders `t('adminDashboard.noRecentActivityDescription')` as the empty-state description, no hardcoded `"No recent activity to display"` string
