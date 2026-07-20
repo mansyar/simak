@@ -50,12 +50,12 @@
 
 ## Phase 2: i18n Hardcoded String & Date Formatting Fixes
 
-- [ ] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
-- [ ] Task: Add Phase 2 i18n keys (`adminUsers.table.status`, `extensions.daysCount`)
-    - [ ] Add `adminUsers.table.status` (en: "Status", id: "Status") to both locale files
-    - [ ] Add `extensions.daysCount` (en: "{count} days", id: "{count} hari") with `{count}` param to both locale files
-    - [ ] Run `pnpm generate:i18n`
-    - [ ] Run `pnpm check:i18n` — verify key parity
+- [x] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
+- [x] Task: Add Phase 2 i18n keys (`adminUsers.table.status`, `extensions.daysCount`) [5cbc7c8]
+    - [x] Add `adminUsers.table.status` (en: "Status", id: "Status") to both locale files
+    - [x] Add `extensions.daysCount` (en: "{count} days", id: "{count} hari") with `{count}` param to both locale files
+    - [x] Run `pnpm generate:i18n`
+    - [x] Run `pnpm check:i18n` — verify key parity
 
 - [ ] Task: Replace UserTable hardcoded "Status" header (UX-17)
     - [ ] Write failing tests: assert `UserTable` column header uses `t('adminUsers.table.status')`, no hardcoded `'Status'` string
