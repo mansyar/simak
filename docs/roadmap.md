@@ -465,7 +465,7 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-008: Critical UX Fixes (Broken Functionality)
 
-- **Status:** `Pending`
+- **Status:** `Complete` (archived to `conductor/archive/critical-ux-fixes_20260720/`)
 - **Dependencies:** None
 - **Estimated Effort:** 1 Day / 0.5 Sprint Loops
 - **Audit IDs:** UX-29, UX-38, UX-39, UX-57
@@ -511,9 +511,9 @@ All tracks must adhere to the following project constraints:
 
 #### Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Upload a file -> click "Upload Another" -> dropzone reappears and a new file can be uploaded. Navigate to a non-existent route -> click "Go Home" -> lands on the landing page (not another 404). Trigger an error boundary -> click "Go Home" -> lands on the landing page. View empty user list -> no pagination controls rendered.
-- [ ] **Automated Tests:** `pnpm test:unit` — tests for FileUploader reset flow (onResetSuccess called, dropzone reappears), 404 link target, ErrorBoundary label, empty-list pagination hidden. `pnpm check:i18n` passes (new key in both locales). `pnpm test:coverage` >= 80%.
-- [ ] **Conductor Review:** No broken links remain (grep for `href="/dashboard"` — should be zero). `common.goHome` key exists in both `en.json` and `id.json`. `onResetSuccess` prop is called in `handleReset`. Pagination wrapped in conditional.
+- [x] **Manual Checkpoint:** Upload a file -> click "Upload Another" -> dropzone reappears and a new file can be uploaded. Navigate to a non-existent route -> click "Go Home" -> lands on the landing page (not another 404). Trigger an error boundary -> click "Go Home" -> lands on the landing page. View empty user list -> no pagination controls rendered.
+- [x] **Automated Tests:** `pnpm test:unit` — 263 test files, 2494 tests, all pass. New tests for FileUploader reset flow (onResetSuccess called, dropzone reappears, optional callback), 404 link target (`href="/"` not `/dashboard`), ErrorBoundary label (`t('common.goHome')`), empty-list pagination hidden. `pnpm check:i18n` passes (713=713 keys, `common.goHome` in both locales). `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors. Coverage: 87.66% stmts / 81.32% branches / 81.36% funcs / 88.29% lines (all >= 80%).
+- [x] **Conductor Review:** No broken links remain (grep for `href="/dashboard"` in `src/` returns zero matches). `common.goHome` key exists in both `en.json` and `id.json`. `onResetSuccess` prop is called in `handleReset`. Pagination wrapped in conditional. Review found 1 Low-severity issue (`any[]` in test mock — TypeScript style guide §2) — fixed in commit `1ddb4ff`. Track archived to `conductor/archive/critical-ux-fixes_20260720/`.
 
 ---
 

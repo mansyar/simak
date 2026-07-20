@@ -208,6 +208,7 @@ All list views (assignments, reviews, users, notifications) implement offset-bas
 - **20 items per page** as default page size.
 - **Page state** persisted in TanStack Router search params (e.g. `?page=2`) so the URL is shareable.
 - **Loading state**: skeleton rows while the next page loads. Prefetch next page on scroll near the bottom.
+- **Empty list conditional**: Pagination controls are hidden when the list is empty (`{items.length > 0 && <Pagination .../>}`). Prevents confusing empty-page navigation. Applied in `admin/users/index.tsx` and `student/assignments/index.tsx`.
 - **[v2]**: Migrate to cursor-based pagination for submission histories and audit logs (append-only data where offset pagination drifts).
 
 ---
