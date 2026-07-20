@@ -49,7 +49,7 @@ describe('listNotificationsHandler', () => {
     expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
   });
 
-  it('should return paginated notifications', async () => {
+  it('should return paginated notifications with metadata', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
     // Mock returns all columns (as db.select() would before narrowing)
     const items = [
@@ -85,7 +85,7 @@ describe('listNotificationsHandler', () => {
     const result = (await listNotificationsHandler({ data: { page: 1, limit: 20 } })) as any;
     expect(result.total).toBe(2);
     expect(result.items).toHaveLength(2);
-    // Response should be explicitly constructed — no userId, channel, or metadata
+    // Response should include metadata for notification navigation (TRACK-012)
     expect(result.items[0]).toEqual({
       id: 1,
       type: 'test',
@@ -93,11 +93,13 @@ describe('listNotificationsHandler', () => {
       messageKey: '',
       params: null,
       read: false,
+      metadata: { foo: 'bar' },
       createdAt: new Date('2024-01-01'),
     });
     expect(result.items[0]).not.toHaveProperty('userId');
     expect(result.items[0]).not.toHaveProperty('channel');
-    expect(result.items[0]).not.toHaveProperty('metadata');
+    // Null metadata should be preserved
+    expect(result.items[1]).toHaveProperty('metadata', null);
   });
 
   it('should filter by notification type', async () => {
@@ -125,7 +127,7 @@ describe('listNotificationsHandler', () => {
     })) as any;
     expect(result.total).toBe(1);
     expect(result.items).toHaveLength(1);
-    expect(result.items[0]).not.toHaveProperty('metadata');
+    expect(result.items[0]).toHaveProperty('metadata');
     expect(result.items[0]).not.toHaveProperty('channel');
     expect(result.items[0]).not.toHaveProperty('userId');
   });
@@ -140,7 +142,7 @@ describe('listNotificationsHandler', () => {
     expect(result).toEqual({ items: [], total: 0 });
   });
 
-  it('should not include metadata or channel in response (PERF-23)', async () => {
+  it('should include metadata but not channel or userId in response (TRACK-012)', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
     // Mock returns items WITH metadata and channel (simulating old db.select() *)
     const items = [
@@ -162,7 +164,9 @@ describe('listNotificationsHandler', () => {
       .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
 
     const result = (await listNotificationsHandler({ data: { page: 1, limit: 20 } })) as any;
-    expect(result.items[0]).not.toHaveProperty('metadata');
+    // metadata IS included for notification navigation (TRACK-012)
+    expect(result.items[0]).toHaveProperty('metadata');
+    expect(result.items[0].metadata).toEqual({ checkpointId: 5, assignmentId: 3 });
     expect(result.items[0]).not.toHaveProperty('channel');
     expect(result.items[0]).not.toHaveProperty('userId');
     // Should still have the needed columns

@@ -10,7 +10,7 @@
     - [ ] Run `pnpm generate:i18n` to regenerate types
     - [ ] Verify `pnpm check:i18n` passes
 
-- [ ] Task: Add metadata to notification creation points (server-side)
+- [~] Task: Add metadata to notification creation points (server-side)
     - [ ] Write tests verifying `metadata: { assignmentId, checkpointId, submissionId }` is included in notification INSERTs for each creation point
     - [ ] Implement: Add metadata to notification INSERTs in `reviews.server.ts`, `submissions.server.ts`, `consultations.server.ts`, `extensions.server.ts` / `extensions-extras.server.ts`, `review-sla.ts`
 
