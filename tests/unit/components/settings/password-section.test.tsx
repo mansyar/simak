@@ -29,6 +29,8 @@ vi.mock('@/routes/__root', () => ({
         'settings.password.passwordError': 'Failed to change password',
         'settings.password.passwordMinLength': 'Password must be at least 8 characters',
         'settings.password.passwordMismatch': 'Passwords do not match',
+        'settings.password.currentPasswordRequired': 'Current password is required',
+        'common.loading': 'Loading...',
       };
       return translations[key] || key;
     },
@@ -53,37 +55,44 @@ describe('PasswordSection', () => {
     expect(screen.getByLabelText('Confirm New Password')).toBeDefined();
   });
 
-  it('should show validation error when new password is too short', async () => {
+  it('should show validation error when new password is too short on blur', async () => {
     render(<PasswordSection />);
 
-    const currentPasswordInput = screen.getByLabelText('Current Password');
     const newPasswordInput = screen.getByLabelText('New Password');
-    const confirmPasswordInput = screen.getByLabelText('Confirm New Password');
 
-    fireEvent.change(currentPasswordInput, { target: { value: 'currentPass123' } });
     fireEvent.change(newPasswordInput, { target: { value: '123' } });
-    fireEvent.change(confirmPasswordInput, { target: { value: '123' } });
+    fireEvent.blur(newPasswordInput);
 
-    fireEvent.click(screen.getByText('Change Password'));
-
-    expect(screen.getByText('Password must be at least 8 characters')).toBeDefined();
+    expect(await screen.findByText('Password must be at least 8 characters')).toBeDefined();
     expect(mockChangePassword).not.toHaveBeenCalled();
   });
 
-  it('should show validation error when passwords do not match', async () => {
+  it('should show validation error when passwords do not match on blur', async () => {
     render(<PasswordSection />);
 
-    const currentPasswordInput = screen.getByLabelText('Current Password');
     const newPasswordInput = screen.getByLabelText('New Password');
     const confirmPasswordInput = screen.getByLabelText('Confirm New Password');
 
-    fireEvent.change(currentPasswordInput, { target: { value: 'currentPass123' } });
     fireEvent.change(newPasswordInput, { target: { value: 'newPass1234' } });
+    fireEvent.blur(newPasswordInput);
     fireEvent.change(confirmPasswordInput, { target: { value: 'differentPass' } });
+    fireEvent.blur(confirmPasswordInput);
+
+    expect(await screen.findByText('Passwords do not match')).toBeDefined();
+    expect(mockChangePassword).not.toHaveBeenCalled();
+  });
+
+  it('should show validation error when current password is empty on submit', async () => {
+    render(<PasswordSection />);
+
+    fireEvent.change(screen.getByLabelText('New Password'), { target: { value: 'newPass1234' } });
+    fireEvent.change(screen.getByLabelText('Confirm New Password'), {
+      target: { value: 'newPass1234' },
+    });
 
     fireEvent.click(screen.getByText('Change Password'));
 
-    expect(screen.getByText('Passwords do not match')).toBeDefined();
+    expect(await screen.findByText('Current password is required')).toBeDefined();
     expect(mockChangePassword).not.toHaveBeenCalled();
   });
 
@@ -102,9 +111,11 @@ describe('PasswordSection', () => {
 
     fireEvent.click(screen.getByText('Change Password'));
 
-    expect(mockChangePassword).toHaveBeenCalledWith({
-      currentPassword: 'currentPass123',
-      newPassword: 'newPass1234',
+    await vi.waitFor(() => {
+      expect(mockChangePassword).toHaveBeenCalledWith({
+        currentPassword: 'currentPass123',
+        newPassword: 'newPass1234',
+      });
     });
   });
 
@@ -162,5 +173,30 @@ describe('PasswordSection', () => {
     expect((currentInput as HTMLInputElement).value).toBe('');
     expect((newInput as HTMLInputElement).value).toBe('');
     expect((confirmInput as HTMLInputElement).value).toBe('');
+  });
+
+  it('should show Loader2 spinner when submitting', async () => {
+    let resolveChangePassword: (value: any) => void = () => {};
+    mockChangePassword.mockReturnValue(
+      new Promise((resolve) => {
+        resolveChangePassword = resolve;
+      }),
+    );
+
+    render(<PasswordSection />);
+
+    fireEvent.change(screen.getByLabelText('Current Password'), { target: { value: 'old' } });
+    fireEvent.change(screen.getByLabelText('New Password'), { target: { value: 'newPass1234' } });
+    fireEvent.change(screen.getByLabelText('Confirm New Password'), {
+      target: { value: 'newPass1234' },
+    });
+    fireEvent.click(screen.getByText('Change Password'));
+
+    // While submitting, the button should show Loading... text
+    await vi.waitFor(() => {
+      expect(screen.getByText('Loading...')).toBeDefined();
+    });
+
+    resolveChangePassword({});
   });
 });

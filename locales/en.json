@@ -73,7 +73,8 @@
     "previousPage": "Previous",
     "nextPage": "Next",
     "pageOf": "Page {current} of {total}",
-    "done": "Done"
+    "done": "Done",
+    "clearSearch": "Clear search"
   },
   "theme": {
     "light": "Light Mode",
@@ -591,7 +592,12 @@
     "rejectReason": "Rejection Reason",
     "rejectReasonPlaceholder": "Enter reason for rejection",
     "verifySuccess": "Consultation verified successfully",
-    "rejectSuccess": "Consultation rejected successfully"
+    "rejectSuccess": "Consultation rejected successfully",
+    "errors": {
+      "checkpointRequired": "Please select a checkpoint",
+      "externalConsultantNameRequired": "External consultant name is required",
+      "notesRequired": "Notes are required"
+    }
   },
   "landing": {
     "hero": {
@@ -755,6 +761,12 @@
     "submit": "Submit Request",
     "submitting": "Submitting...",
     "successMessage": "Extension request submitted successfully!",
+    "errors": {
+      "categoryRequired": "Please select a category",
+      "reasonMin": "Reason must be at least 10 characters",
+      "durationMin": "Duration must be at least 1 day",
+      "durationMax": "Duration cannot exceed {max} days"
+    },
     "queueTitle": "Extension Requests",
     "historyTitle": "Extension History",
     "noHistory": "No extension requests yet",
@@ -861,7 +873,8 @@
       "passwordSuccess": "Password changed successfully",
       "passwordError": "Failed to change password",
       "passwordMinLength": "Password must be at least 8 characters",
-      "passwordMismatch": "Passwords do not match"
+      "passwordMismatch": "Passwords do not match",
+      "currentPasswordRequired": "Current password is required"
     },
     "appearance": {
       "title": "Appearance",

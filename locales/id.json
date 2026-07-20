@@ -73,7 +73,8 @@
     "previousPage": "Sebelumnya",
     "nextPage": "Selanjutnya",
     "pageOf": "Halaman {current} dari {total}",
-    "done": "Selesai"
+    "done": "Selesai",
+    "clearSearch": "Hapus pencarian"
   },
   "theme": {
     "light": "Mode Terang",
@@ -591,7 +592,12 @@
     "rejectReason": "Alasan Penolakan",
     "rejectReasonPlaceholder": "Masukkan alasan penolakan",
     "verifySuccess": "Konsultasi berhasil diverifikasi",
-    "rejectSuccess": "Konsultasi berhasil ditolak"
+    "rejectSuccess": "Konsultasi berhasil ditolak",
+    "errors": {
+      "checkpointRequired": "Silakan pilih checkpoint",
+      "externalConsultantNameRequired": "Nama konsultan eksternal wajib diisi",
+      "notesRequired": "Catatan diperlukan"
+    }
   },
   "landing": {
     "hero": {
@@ -755,6 +761,12 @@
     "submit": "Kirim Permintaan",
     "submitting": "Mengirim...",
     "successMessage": "Permintaan perpanjangan berhasil dikirim!",
+    "errors": {
+      "categoryRequired": "Silakan pilih kategori",
+      "reasonMin": "Alasan harus minimal 10 karakter",
+      "durationMin": "Durasi harus minimal 1 hari",
+      "durationMax": "Durasi tidak boleh melebihi {max} hari"
+    },
     "queueTitle": "Permintaan Perpanjangan",
     "historyTitle": "Riwayat Perpanjangan",
     "noHistory": "Belum ada permintaan perpanjangan",
@@ -861,7 +873,8 @@
       "passwordSuccess": "Kata sandi berhasil diubah",
       "passwordError": "Gagal mengubah kata sandi",
       "passwordMinLength": "Kata sandi minimal 8 karakter",
-      "passwordMismatch": "Kata sandi tidak cocok"
+      "passwordMismatch": "Kata sandi tidak cocok",
+      "currentPasswordRequired": "Kata sandi saat ini wajib diisi"
     },
     "appearance": {
       "title": "Tampilan",

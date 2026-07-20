@@ -1,11 +1,31 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 
-const { mockUseLoaderData, mockUseParams, mockGetPresignedUploadUrl } = vi.hoisted(() => ({
-  mockUseLoaderData: vi.fn(),
-  mockUseParams: vi.fn().mockReturnValue({ id: '1', checkpointId: '1' }),
-  mockGetPresignedUploadUrl: vi.fn(),
-}));
+const { mockUseLoaderData, mockUseParams, mockGetPresignedUploadUrl, mockXhrInstances } =
+  vi.hoisted(() => ({
+    mockUseLoaderData: vi.fn(),
+    mockUseParams: vi.fn().mockReturnValue({ id: '1', checkpointId: '1' }),
+    mockGetPresignedUploadUrl: vi.fn(),
+    mockXhrInstances: [] as any[],
+  }));
+
+// Mock XMLHttpRequest with instance tracking
+class MockXHR {
+  upload: { onprogress: ((e: ProgressEvent) => void) | null } = { onprogress: null };
+  onload: (() => void) | null = null;
+  onerror: (() => void) | null = null;
+  status = 200;
+  response = '';
+
+  open = vi.fn();
+  setRequestHeader = vi.fn();
+
+  send(_body: unknown) {
+    mockXhrInstances.push(this);
+  }
+}
+
+global.XMLHttpRequest = MockXHR as unknown as typeof XMLHttpRequest;
 
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: vi.fn().mockReturnValue((config: any) => ({
@@ -106,8 +126,6 @@ const mockData = {
   latestReview: null,
 };
 
-const originalFetch = global.fetch;
-
 describe('CheckpointSubmissionPage - upload error differentiation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -116,33 +134,48 @@ describe('CheckpointSubmissionPage - upload error differentiation', () => {
       uploadUrl: 'https://r2.example.com/upload',
       fileKey: 'test-key',
     });
+    mockXhrInstances.length = 0;
   });
 
   afterEach(() => {
-    global.fetch = originalFetch;
     vi.restoreAllMocks();
   });
 
-  it('should show network error when fetch throws TypeError', async () => {
-    global.fetch = vi.fn().mockRejectedValue(new TypeError('Failed to fetch')) as any;
-
+  it('should show network error when xhr.onerror fires', async () => {
     const Component = (Route as any).component as React.FC;
     render(<Component />);
 
     fireEvent.click(screen.getByTestId('upload-trigger'));
+
+    const xhr = await waitFor(() => {
+      expect(mockXhrInstances).toHaveLength(1);
+      return mockXhrInstances[0];
+    });
+
+    await act(async () => {
+      xhr.onerror!();
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('upload-error').textContent).toBe('files.networkError');
     });
   });
 
-  it('should show server error when fetch returns non-2xx response', async () => {
-    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 }) as any;
-
+  it('should show server error when xhr returns non-2xx status', async () => {
     const Component = (Route as any).component as React.FC;
     render(<Component />);
 
     fireEvent.click(screen.getByTestId('upload-trigger'));
+
+    const xhr = await waitFor(() => {
+      expect(mockXhrInstances).toHaveLength(1);
+      return mockXhrInstances[0];
+    });
+
+    await act(async () => {
+      xhr.status = 500;
+      xhr.onload!();
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('upload-error').textContent).toBe('files.serverError');

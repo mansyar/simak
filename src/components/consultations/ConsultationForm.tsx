@@ -1,10 +1,19 @@
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { toast } from 'sonner';
 import { logConsultation } from '@/server/consultations';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
@@ -31,20 +40,40 @@ export function ConsultationForm({
   onSuccess,
 }: ConsultationFormProps) {
   const { t } = useI18n();
-  const [checkpointId, setCheckpointId] = useState<string>('');
-  const [sessionType, setSessionType] = useState<string>('internal');
-  const [externalConsultantName, setExternalConsultantName] = useState('');
-  const [notes, setNotes] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!checkpointId) return;
+  const formSchema = z
+    .object({
+      checkpointId: z.string().min(1, t('consultations.errors.checkpointRequired')),
+      sessionType: z.enum(['internal', 'external']),
+      externalConsultantName: z.string().optional(),
+      notes: z.string().min(1, t('consultations.errors.notesRequired')),
+    })
+    .superRefine((data, ctx) => {
+      if (data.sessionType === 'external' && !data.externalConsultantName) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('consultations.errors.externalConsultantNameRequired'),
+          path: ['externalConsultantName'],
+        });
+      }
+    });
 
-    setLoading(true);
-    setError(null);
+  type FormValues = z.infer<typeof formSchema>;
 
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      checkpointId: '',
+      sessionType: 'internal',
+      externalConsultantName: '',
+      notes: '',
+    },
+    mode: 'onBlur',
+  });
+
+  const sessionType = form.watch('sessionType');
+
+  const handleFormSubmit = async (values: FormValues) => {
     const result = await (
       logConsultation as unknown as (args: {
         data: {
@@ -56,100 +85,126 @@ export function ConsultationForm({
       }) => Promise<{ error?: string }>
     )({
       data: {
-        checkpointId: Number(checkpointId),
-        sessionType,
-        externalConsultantName: sessionType === 'external' ? externalConsultantName : undefined,
-        notes,
+        checkpointId: Number(values.checkpointId),
+        sessionType: values.sessionType,
+        externalConsultantName:
+          values.sessionType === 'external' ? values.externalConsultantName : undefined,
+        notes: values.notes,
       },
     });
 
     if (result.error) {
-      setError(result.error);
-      setLoading(false);
+      form.setError('root', { message: result.error });
       return;
     }
 
-    // Reset form
-    setCheckpointId('');
-    setSessionType('internal');
-    setExternalConsultantName('');
-    setNotes('');
-    setLoading(false);
+    form.reset();
     toast.success(t('consultations.logSuccess'));
     onSuccess();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="checkpoint">{t('consultations.checkpoint')}</Label>
-        <Select value={checkpointId} onValueChange={(val) => setCheckpointId(val ?? '')}>
-          <SelectTrigger id="checkpoint">
-            <SelectValue placeholder={t('consultations.selectCheckpoint')} />
-          </SelectTrigger>
-          <SelectContent>
-            {checkpoints.map((cp) => (
-              <SelectItem key={cp.id} value={String(cp.id)}>
-                {cp.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label>{t('consultations.sessionType')}</Label>
-        <Select value={sessionType} onValueChange={(val) => setSessionType(val ?? 'internal')}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="internal">{t('consultations.internal')}</SelectItem>
-            <SelectItem value="external">{t('consultations.external')}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {sessionType === 'external' && (
-        <div className="space-y-2">
-          <Label htmlFor="consultantName">{t('consultations.externalConsultantName')}</Label>
-          <Input
-            id="consultantName"
-            value={externalConsultantName}
-            onChange={(e) => setExternalConsultantName(e.target.value)}
-            placeholder={t('consultations.consultantNamePlaceholder')}
-          />
-        </div>
-      )}
-
-      <div className="space-y-2">
-        <Label htmlFor="notes">{t('consultations.notes')}</Label>
-        <textarea
-          id="notes"
-          value={notes}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNotes(e.target.value)}
-          placeholder={t('consultations.notesPlaceholder')}
-          rows={3}
-          className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="checkpointId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('consultations.checkpoint')}</FormLabel>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('consultations.selectCheckpoint')} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {checkpoints.map((cp) => (
+                    <SelectItem key={cp.id} value={String(cp.id)}>
+                      {cp.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      {error && (
-        <p className="text-sm text-destructive" aria-live="polite">
-          {error}
-        </p>
-      )}
+        <FormField
+          control={form.control}
+          name="sessionType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('consultations.sessionType')}</FormLabel>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="internal">{t('consultations.internal')}</SelectItem>
+                  <SelectItem value="external">{t('consultations.external')}</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <Button type="submit" disabled={loading || !checkpointId || !notes}>
-        {loading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            {t('common.loading')}
-          </>
-        ) : (
-          t('consultations.logConsultation')
+        {sessionType === 'external' && (
+          <FormField
+            control={form.control}
+            name="externalConsultantName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('consultations.externalConsultantName')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('consultations.consultantNamePlaceholder')} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         )}
-      </Button>
-    </form>
+
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('consultations.notes')}</FormLabel>
+              <FormControl>
+                <textarea
+                  placeholder={t('consultations.notesPlaceholder')}
+                  rows={3}
+                  className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {form.formState.errors.root && (
+          <p className="text-sm text-destructive" aria-live="polite">
+            {form.formState.errors.root.message}
+          </p>
+        )}
+
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {t('common.loading')}
+            </>
+          ) : (
+            t('consultations.logConsultation')
+          )}
+        </Button>
+      </form>
+    </Form>
   );
 }

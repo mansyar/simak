@@ -251,4 +251,32 @@ describe('FileUploader', () => {
 
     expect(clickSpy).toHaveBeenCalled();
   });
+
+  it('should render Progress bar when uploading with uploadProgress', async () => {
+    const user = userEvent.setup();
+    render(<FileUploader onUploadSuccess={vi.fn()} isUploading={true} uploadProgress={50} />);
+
+    const file = new File(['content'], 'test.pdf', { type: 'application/pdf' });
+    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
+    await user.upload(fileInput, file);
+
+    const progressbar = screen.getByRole('progressbar');
+    expect(progressbar).toBeDefined();
+    expect(progressbar.getAttribute('aria-valuenow')).toBe('50');
+  });
+
+  it('should show Loader2 spinner as fallback when uploading without uploadProgress', async () => {
+    const user = userEvent.setup();
+    render(<FileUploader onUploadSuccess={vi.fn()} isUploading={true} />);
+
+    const file = new File(['content'], 'test.pdf', { type: 'application/pdf' });
+    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
+    await user.upload(fileInput, file);
+
+    // Loader2 has animate-spin class
+    const spinner = document.querySelector('.animate-spin');
+    expect(spinner).not.toBeNull();
+    // No progressbar should be present when progress is unavailable
+    expect(screen.queryByRole('progressbar')).toBeNull();
+  });
 });

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { toast } from 'sonner';
+import { z } from 'zod';
 import { ConsultationForm } from '@/components/consultations/ConsultationForm';
 
 vi.mock('sonner', () => ({
@@ -25,6 +26,10 @@ vi.mock('@/routes/__root', () => ({
         'consultations.logConsultation': 'Log Consultation',
         'consultations.logSuccess': 'Consultation logged successfully',
         'common.loading': 'Loading...',
+        'consultations.errors.checkpointRequired': 'Please select a checkpoint',
+        'consultations.errors.externalConsultantNameRequired':
+          'External consultant name is required',
+        'consultations.errors.notesRequired': 'Notes are required',
       };
       return translations[key] || key;
     },
@@ -33,17 +38,17 @@ vi.mock('@/routes/__root', () => ({
 
 vi.mock('@/server/consultations', () => ({
   logConsultation: vi.fn(),
+  LogConsultationSchema: z.object({
+    checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),
+    sessionType: z.enum(['internal', 'external']),
+    externalConsultantName: z.string().optional(),
+    notes: z.string().min(1, 'Notes are required'),
+  }),
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, type, onClick, disabled, ...props }: any) => (
-    <button
-      type={type || 'button'}
-      onClick={onClick}
-      disabled={disabled}
-      data-testid="submit-btn"
-      {...props}
-    >
+  Button: ({ children, type, disabled, ...props }: any) => (
+    <button type={type || 'button'} disabled={disabled} data-testid="submit-btn" {...props}>
       {children}
     </button>
   ),
@@ -54,15 +59,15 @@ vi.mock('lucide-react', () => ({
 }));
 
 vi.mock('@/components/ui/label', () => ({
-  Label: ({ children, htmlFor }: any) => (
-    <label htmlFor={htmlFor} data-testid="label">
+  Label: ({ children, htmlFor, ...props }: any) => (
+    <label htmlFor={htmlFor} data-testid="label" {...props}>
       {children}
     </label>
   ),
 }));
 
 vi.mock('@/components/ui/input', () => ({
-  Input: (props: any) => <input data-testid="consultant-input" {...props} />,
+  Input: (props: any) => <input {...props} />,
 }));
 
 vi.mock('@/components/ui/select', () => ({
@@ -91,7 +96,6 @@ describe('ConsultationForm', () => {
   it('should render checkpoint selector', () => {
     render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
     expect(screen.getByText('Checkpoint')).toBeDefined();
-    expect(screen.getByText('Select a checkpoint')).toBeDefined();
   });
 
   it('should render all checkpoint options', () => {
@@ -110,14 +114,14 @@ describe('ConsultationForm', () => {
     const selects = screen.getAllByTestId('select');
     fireEvent.change(selects[1], { target: { value: 'external' } });
     expect(screen.getByText('External Consultant Name')).toBeDefined();
-    expect(screen.getByTestId('consultant-input')).toBeDefined();
+    expect(screen.getByPlaceholderText('Enter consultant name')).toBeDefined();
   });
 
   it('should hide external consultant name input when internal is selected', () => {
     render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
     const selects = screen.getAllByTestId('select');
     fireEvent.change(selects[1], { target: { value: 'internal' } });
-    expect(screen.queryByTestId('consultant-input')).toBeNull();
+    expect(screen.queryByPlaceholderText('Enter consultant name')).toBeNull();
   });
 
   it('should render notes textarea', () => {
@@ -131,25 +135,42 @@ describe('ConsultationForm', () => {
     expect(screen.getByText('Log Consultation')).toBeDefined();
   });
 
-  it('should disable submit button when no checkpoint selected', () => {
+  it('should show error when notes is empty on blur', async () => {
     render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
-    expect(screen.getByTestId('submit-btn')).toHaveProperty('disabled', true);
+    const textarea = screen.getByPlaceholderText('Enter consultation notes');
+    fireEvent.blur(textarea);
+    await waitFor(() => {
+      expect(screen.getByText('Notes are required')).toBeDefined();
+    });
   });
 
-  it('should disable submit button when no notes entered', () => {
+  it('should show error when checkpoint is not selected on submit', async () => {
     render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
-    const selects = screen.getAllByTestId('select');
-    fireEvent.change(selects[0], { target: { value: '1' } });
-    expect(screen.getByTestId('submit-btn')).toHaveProperty('disabled', true);
-  });
-
-  it('should enable submit button when checkpoint and notes are provided', () => {
-    render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
-    const selects = screen.getAllByTestId('select');
-    fireEvent.change(selects[0], { target: { value: '1' } });
     const textarea = screen.getByPlaceholderText('Enter consultation notes');
     fireEvent.change(textarea, { target: { value: 'Met with student' } });
-    expect(screen.getByTestId('submit-btn')).toHaveProperty('disabled', false);
+
+    const form = screen.getByText('Log Consultation').closest('form')!;
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      expect(screen.getByText('Please select a checkpoint')).toBeDefined();
+    });
+  });
+
+  it('should show error when external consultant name is empty on submit', async () => {
+    render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
+    const selects = screen.getAllByTestId('select');
+    fireEvent.change(selects[0], { target: { value: '1' } });
+    fireEvent.change(selects[1], { target: { value: 'external' } });
+    const textarea = screen.getByPlaceholderText('Enter consultation notes');
+    fireEvent.change(textarea, { target: { value: 'Met with student' } });
+
+    const form = screen.getByText('Log Consultation').closest('form')!;
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      expect(screen.getByText('External consultant name is required')).toBeDefined();
+    });
   });
 
   it('should call logConsultation and onSuccess on valid submit', async () => {
@@ -162,10 +183,10 @@ describe('ConsultationForm', () => {
     const textarea = screen.getByPlaceholderText('Enter consultation notes');
     fireEvent.change(textarea, { target: { value: 'Met with student' } });
 
-    const form = screen.getByRole('button', { name: 'Log Consultation' }).closest('form')!;
+    const form = screen.getByText('Log Consultation').closest('form')!;
     fireEvent.submit(form);
 
-    await vi.waitFor(() => {
+    await waitFor(() => {
       expect(logConsultation).toHaveBeenCalledOnce();
     });
     expect(onSuccess).toHaveBeenCalledOnce();
@@ -181,10 +202,10 @@ describe('ConsultationForm', () => {
     const textarea = screen.getByPlaceholderText('Enter consultation notes');
     fireEvent.change(textarea, { target: { value: 'Met with student' } });
 
-    const form = screen.getByRole('button', { name: 'Log Consultation' }).closest('form')!;
+    const form = screen.getByText('Log Consultation').closest('form')!;
     fireEvent.submit(form);
 
-    await vi.waitFor(() => {
+    await waitFor(() => {
       expect(screen.getByText('Failed to log consultation')).toBeDefined();
     });
     expect(onSuccess).not.toHaveBeenCalled();
@@ -200,17 +221,16 @@ describe('ConsultationForm', () => {
     const textarea = screen.getByPlaceholderText('Enter consultation notes');
     fireEvent.change(textarea, { target: { value: 'Met with student' } });
 
-    const form = screen.getByRole('button', { name: 'Log Consultation' }).closest('form')!;
+    const form = screen.getByText('Log Consultation').closest('form')!;
     fireEvent.submit(form);
 
-    await vi.waitFor(() => {
+    await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('Consultation logged successfully');
     });
   });
 
-  it('should show Loader2 spinner in submit button when loading', async () => {
+  it('should show Loader2 spinner in submit button when submitting', async () => {
     const logConsultation = (await import('@/server/consultations')).logConsultation;
-    // Never resolves — keeps the form in loading state
     (logConsultation as any).mockReturnValue(new Promise(() => {}));
 
     render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
@@ -219,10 +239,10 @@ describe('ConsultationForm', () => {
     const textarea = screen.getByPlaceholderText('Enter consultation notes');
     fireEvent.change(textarea, { target: { value: 'Met with student' } });
 
-    const form = screen.getByRole('button', { name: 'Log Consultation' }).closest('form')!;
+    const form = screen.getByText('Log Consultation').closest('form')!;
     fireEvent.submit(form);
 
-    await vi.waitFor(() => {
+    await waitFor(() => {
       expect(screen.getByTestId('loader2-icon')).toBeDefined();
     });
   });

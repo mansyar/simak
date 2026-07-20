@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, type ChangeEvent, type DragEvent } from 'react';
 import { useI18n } from '../../routes/__root';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Upload, FileText, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 
 const ACCEPTED_TYPES = ['.docx', '.pdf'];
@@ -9,6 +10,7 @@ const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 interface FileUploaderProps {
   onUploadSuccess: (file: File) => Promise<void>;
   isUploading?: boolean;
+  uploadProgress?: number;
   uploadError?: string | null;
   uploadSuccess?: boolean;
   onResetSuccess?: () => void;
@@ -17,6 +19,7 @@ interface FileUploaderProps {
 export function FileUploader({
   onUploadSuccess,
   isUploading = false,
+  uploadProgress,
   uploadError = null,
   uploadSuccess = false,
   onResetSuccess,
@@ -171,7 +174,7 @@ export function FileUploader({
           <Button size="sm" onClick={handleUpload} disabled={isUploading}>
             {isUploading ? (
               <>
-                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                {uploadProgress === undefined && <Loader2 className="mr-1 h-4 w-4 animate-spin" />}
                 {t('files.uploading')}
               </>
             ) : (
@@ -180,6 +183,9 @@ export function FileUploader({
           </Button>
         </div>
       )}
+
+      {/* Upload progress bar */}
+      {isUploading && uploadProgress !== undefined && <Progress value={uploadProgress} showValue />}
 
       {/* Validation error */}
       {validationError && (
