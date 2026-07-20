@@ -9,7 +9,7 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 ---
 
-## Phase 1: Toast Infrastructure (UX-5, UX-30, UX-31, UX-32)
+## Phase 1: Toast Infrastructure (UX-5, UX-30, UX-31, UX-32) [checkpoint: e46f6cd]
 
 **Goal:** Establish the `showSuccessToast` helper and wire success toasts into all ~8 action `onSuccess` handlers so no user action completes silently.
 
