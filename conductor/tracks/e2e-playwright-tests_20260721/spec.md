@@ -1,3 +1,4 @@
+<protect>
 # Track: E2E Testing with Playwright
 
 ## Overview
@@ -115,3 +116,4 @@ Playwright is already listed in the project tech stack (`conductor/tech-stack.md
 - Page Object Model pattern (flat spec files instead — can be refactored if suite grows)
 - Pre-push gate integration (opt-in only, like integration tests)
 - Changes to existing application code
+</protect>

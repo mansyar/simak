@@ -1,7 +1,9 @@
+<protect>
 # Implementation Plan: E2E Testing with Playwright
 
 ## Phase 1: Playwright Infrastructure & Test Database
 
+- [ ] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
 - [ ] Task: Install Playwright dependencies
     - [ ] Install `@playwright/test` as devDependency via `pnpm add -D @playwright/test`
     - [ ] Install Chromium browser binary via `npx playwright install chromium`
@@ -17,6 +19,7 @@
 
 ## Phase 2: Test Data, Auth & Mock Helpers
 
+- [ ] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
 - [ ] Task: Create E2E seed script
     - [ ] Create `scripts/seed-e2e.ts` that connects to the test DB and creates: Admin user (`admin@e2e.test`), Instructor user (`instructor@e2e.test`), Student user (`student@e2e.test`), all with password `TestPass123!`
     - [ ] Seed assignment template (3 checkpoints, type "Thesis", minConsultations: 1 per checkpoint, estimatedDuration per checkpoint)
@@ -39,6 +42,7 @@
 
 ## Phase 3: E2E Test Specs
 
+- [ ] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
 - [ ] Task: Write `tests/e2e/auth.spec.ts` (route guards)
     - [ ] Test: Unauthenticated user navigates to `/student/assignments` → redirected to `/auth/login`
     - [ ] Test: Student navigates to `/admin/users` → redirected to `/student/dashboard`
@@ -62,6 +66,7 @@
 
 ## Phase 4: Verification & Documentation
 
+- [ ] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
 - [ ] Task: Run full E2E suite and verify all tests pass
     - [ ] Run `pnpm test:e2e` and confirm all 12-15 tests pass
     - [ ] Verify test execution completes in under 2 minutes
@@ -73,3 +78,4 @@
     - [ ] Run `pnpm typecheck` and confirm clean
     - [ ] Run `pnpm lint` and confirm clean
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Verification & Documentation' (Protocol in workflow.md)
+</protect>
