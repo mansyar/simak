@@ -64,12 +64,12 @@
     - [x] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
     - [x] Commit: `fix(i18n): Replace hardcoded UserTable Status header with i18n key (UX-17)`
 
-- [ ] Task: Replace ExtensionHistoryList hardcoded "days" suffix (UX-18)
-    - [ ] Write failing tests: assert `ExtensionHistoryList` renders `t('extensions.daysCount', { count: String(item.extensionDays) })`, no hardcoded `"days"` suffix
-    - [ ] Implement: replace `{item.extensionDays} days` with `t('extensions.daysCount', { count: String(item.extensionDays) })` in `ExtensionHistoryList`
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
-    - [ ] Commit: `fix(i18n): Replace hardcoded days suffix in ExtensionHistoryList (UX-18)`
+- [x] Task: Replace ExtensionHistoryList hardcoded "days" suffix (UX-18) [c1f02ca]
+    - [x] Write failing tests: assert `ExtensionHistoryList` renders `t('extensions.daysCount', { count: String(item.extensionDays) })`, no hardcoded `"days"` suffix
+    - [x] Implement: replace `{item.extensionDays} days` with `t('extensions.daysCount', { count: String(item.extensionDays) })` in `ExtensionHistoryList`
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
+    - [x] Commit: `fix(i18n): Replace hardcoded days suffix in ExtensionHistoryList (UX-18)`
 
 - [ ] Task: Replace ExtensionHistoryList toLocaleDateString with shared formatDate (UX-19)
     - [ ] Write failing tests: assert component uses `formatDate` imported from `@/lib/format-date` with `locale` and `'short'` format, local `formatDate` function is removed
