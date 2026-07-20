@@ -51,7 +51,7 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 ---
 
-## Phase 2: Loading Skeletons & Spinners (UX-1, UX-2, UX-3, UX-4)
+## Phase 2: Loading Skeletons & Spinners (UX-1, UX-2, UX-3, UX-4) [checkpoint: 8de7a7f]
 
 **Goal:** Eliminate blank-screen route loads via `pendingComponent` skeletons, add side-data loading skeletons, and replace plain "Loading..." text with `Loader2` spinners.
 
