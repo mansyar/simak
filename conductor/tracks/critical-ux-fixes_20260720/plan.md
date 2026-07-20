@@ -30,7 +30,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: FileUploader Fix' (Protocol in workflow.md)
 
-## Phase 2: Navigation & Pagination Fixes (UX-38, UX-39, UX-57)
+## Phase 2: Navigation & Pagination Fixes (UX-38, UX-39, UX-57) [checkpoint: 989a49e]
 
 - [x] Task: Read spec.md and workflow.md to refresh context
     - [x] Read `conductor/tracks/critical-ux-fixes_20260720/spec.md`
