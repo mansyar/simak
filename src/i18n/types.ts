@@ -593,6 +593,11 @@ export type Translation = {
     rejectReasonPlaceholder: string
     verifySuccess: string
     rejectSuccess: string
+    errors: {
+      checkpointRequired: string
+      externalConsultantNameRequired: string
+      notesRequired: string
+    }
   }
   landing: {
     hero: {

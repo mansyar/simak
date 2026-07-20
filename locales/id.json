@@ -587,7 +587,12 @@
     "rejectReason": "Alasan Penolakan",
     "rejectReasonPlaceholder": "Masukkan alasan penolakan",
     "verifySuccess": "Konsultasi berhasil diverifikasi",
-    "rejectSuccess": "Konsultasi berhasil ditolak"
+    "rejectSuccess": "Konsultasi berhasil ditolak",
+    "errors": {
+      "checkpointRequired": "Silakan pilih checkpoint",
+      "externalConsultantNameRequired": "Nama konsultan eksternal wajib diisi",
+      "notesRequired": "Catatan diperlukan"
+    }
   },
   "landing": {
     "hero": {

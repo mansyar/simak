@@ -587,7 +587,12 @@
     "rejectReason": "Rejection Reason",
     "rejectReasonPlaceholder": "Enter reason for rejection",
     "verifySuccess": "Consultation verified successfully",
-    "rejectSuccess": "Consultation rejected successfully"
+    "rejectSuccess": "Consultation rejected successfully",
+    "errors": {
+      "checkpointRequired": "Please select a checkpoint",
+      "externalConsultantNameRequired": "External consultant name is required",
+      "notesRequired": "Notes are required"
+    }
   },
   "landing": {
     "hero": {
