@@ -547,7 +547,8 @@
     "serverError": "Kesalahan server, coba lagi",
     "r2NotConfigured": "Penyimpanan berkas tidak dikonfigurasi. Hubungi administrator Anda.",
     "objectNotFound": "Berkas yang diunggah tidak ditemukan. Silakan coba unggah kembali.",
-    "previewNotAvailable": "Pratinjau tidak tersedia — unduh untuk melihat"
+    "previewNotAvailable": "Pratinjau tidak tersedia — unduh untuk melihat",
+    "latest": "Terbaru"
   },
   "assignments": {
     "errors": {

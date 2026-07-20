@@ -553,6 +553,7 @@ export type Translation = {
     r2NotConfigured: string
     objectNotFound: string
     previewNotAvailable: string
+    latest: string
   }
   assignments: {
     errors: {

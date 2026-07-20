@@ -547,7 +547,8 @@
     "serverError": "Server error, try again",
     "r2NotConfigured": "File storage is not configured. Contact your administrator.",
     "objectNotFound": "The uploaded file could not be found. Please try uploading again.",
-    "previewNotAvailable": "Preview not available — download to view"
+    "previewNotAvailable": "Preview not available — download to view",
+    "latest": "Latest"
   },
   "assignments": {
     "errors": {

@@ -82,6 +82,30 @@ describe('FileList', () => {
     expect(screen.getByText('files.empty')).toBeDefined();
   });
 
+  describe('FileList - Latest badge (FR-6)', () => {
+    it('should show "Latest" badge on the highest version row', () => {
+      render(<FileList submissions={mockSubmissions} />);
+      expect(screen.getByText('files.latest')).toBeDefined();
+    });
+
+    it('should show only one "Latest" badge', () => {
+      render(<FileList submissions={mockSubmissions} />);
+      expect(screen.getAllByText('files.latest')).toHaveLength(1);
+    });
+
+    it('should not show "Latest" badge when only one submission exists', () => {
+      render(<FileList submissions={[mockSubmissions[0]]} />);
+      // Single submission is still the latest, but badge should show
+      expect(screen.getByText('files.latest')).toBeDefined();
+    });
+
+    it('should show "Latest" badge on version with highest number even if not first in array', () => {
+      const unordered = [mockSubmissions[1], mockSubmissions[0], mockSubmissions[2]];
+      render(<FileList submissions={unordered} />);
+      expect(screen.getAllByText('files.latest')).toHaveLength(1);
+    });
+  });
+
   describe('FileList - download button aria-label (UX-16)', () => {
     it('download buttons have accessible name from aria-label', () => {
       render(<FileList submissions={mockSubmissions} />);

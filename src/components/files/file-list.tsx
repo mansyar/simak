@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Download, FileText, FileQuestion } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Badge } from '@/components/ui/badge';
 
 interface Submission {
   id: number;
@@ -71,6 +72,8 @@ export function FileList({ submissions, onDownload }: FileListProps) {
     );
   }
 
+  const maxVersion = Math.max(...submissions.map((s) => s.version));
+
   return (
     <div className="rounded-lg border">
       <Table>
@@ -87,7 +90,12 @@ export function FileList({ submissions, onDownload }: FileListProps) {
           {submissions.map((submission) => (
             <TableRow key={submission.id}>
               <TableCell className="font-medium">
-                {t('files.version', { version: String(submission.version) })}
+                <div className="flex items-center gap-2">
+                  {t('files.version', { version: String(submission.version) })}
+                  {submission.version === maxVersion && (
+                    <Badge variant="secondary">{t('files.latest')}</Badge>
+                  )}
+                </div>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
