@@ -19,7 +19,18 @@ export function ConsultationProgress({ counts }: ConsultationProgressProps) {
   const totalVerified = counts.reduce((sum, c) => sum + c.verifiedCount, 0);
 
   if (totalRequired === 0) {
-    return null;
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('consultations.consultationProgress')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center py-4">
+            {t('consultations.noConsultationsRequired')}
+          </p>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

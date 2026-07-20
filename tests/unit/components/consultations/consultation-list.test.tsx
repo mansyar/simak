@@ -40,9 +40,16 @@ describe('ConsultationList', () => {
     createdAt: '2026-05-20T10:00:00Z',
   };
 
-  it('should render empty state when no consultations', () => {
+  it('should render EmptyState component when no consultations', () => {
     render(<ConsultationList consultations={[]} />);
     expect(screen.getByText('No consultations logged yet.')).toBeDefined();
+    // Verify EmptyState component is used (has dashed border container)
+  });
+
+  it('should render EmptyState with dashed border when no consultations', () => {
+    const { container } = render(<ConsultationList consultations={[]} />);
+    const emptyState = container.querySelector('.border-dashed');
+    expect(emptyState).not.toBeNull();
   });
 
   it('should render consultation checkpoint name', () => {

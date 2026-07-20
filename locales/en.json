@@ -285,6 +285,7 @@
     "downloadPdf": "Download PDF",
     "downloadFile": "Download File",
     "reviewHistory": "Review History",
+    "noReviewsYet": "No previous reviews",
     "passed": "Passed",
     "revise": "Revise",
     "decision": "Decision",
@@ -573,6 +574,7 @@
     "logSuccess": "Consultation logged successfully",
     "previousSessions": "Previous Sessions",
     "noConsultations": "No consultations logged yet",
+    "noConsultationsRequired": "No consultations required for this assignment",
     "status": {
       "pending": "Pending",
       "verified": "Verified",

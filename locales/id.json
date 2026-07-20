@@ -285,6 +285,7 @@
     "downloadPdf": "Unduh PDF",
     "downloadFile": "Unduh File",
     "reviewHistory": "Riwayat Review",
+    "noReviewsYet": "Belum ada ulasan sebelumnya",
     "passed": "Lulus",
     "revise": "Revisi",
     "decision": "Keputusan",
@@ -573,6 +574,7 @@
     "logSuccess": "Konsultasi berhasil dicatat",
     "previousSessions": "Sesi Sebelumnya",
     "noConsultations": "Belum ada konsultasi yang dicatat",
+    "noConsultationsRequired": "Tidak ada konsultasi yang diperlukan untuk tugas ini",
     "status": {
       "pending": "Menunggu",
       "verified": "Terverifikasi",
