@@ -7,7 +7,7 @@
 
 ---
 
-## Phase 1: Notification Center a11y Refactor
+## Phase 1: Notification Center a11y Refactor [checkpoint: 947ba9b]
 
 - [x] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
 - [x] Task: Add Phase 1 i18n keys (`notifications.unreadCount`, `adminDashboard.noRecentActivityDescription`) [4d34366]
