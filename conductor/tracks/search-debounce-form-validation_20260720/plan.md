@@ -6,15 +6,15 @@
 
 ## Phase 1: Debounce & Clear Filters
 
-- [ ] Task: Read spec.md and workflow.md to refresh context
-    - [ ] Read `./spec.md` for requirements and acceptance criteria
-    - [ ] Read `conductor/workflow.md` for TDD lifecycle and checkpoint protocol
+- [x] Task: Read spec.md and workflow.md to refresh context
+    - [x] Read `./spec.md` for requirements and acceptance criteria
+    - [x] Read `conductor/workflow.md` for TDD lifecycle and checkpoint protocol
 
-- [ ] Task: Create `useDebouncedCallback` hook
-    - [ ] Write failing tests in `tests/unit/hooks/use-debounced-callback.test.ts` — verify: callback fires only after delay, re-call resets timer, cleanup clears timer on unmount
-    - [ ] Implement `src/hooks/use-debounced-callback.ts` (~15 lines: `setTimeout`/`clearTimeout`, `useRef` for timer, `useCallback` for stable reference)
-    - [ ] Run `pnpm test` — confirm tests pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint` — confirm clean
+- [x] Task: Create `useDebouncedCallback` hook [22e0fb9]
+    - [x] Write failing tests in `tests/unit/hooks/use-debounced-callback.test.ts` — verify: callback fires only after delay, re-call resets timer, cleanup clears timer on unmount
+    - [x] Implement `src/hooks/use-debounced-callback.ts` (~15 lines: `setTimeout`/`clearTimeout`, `useRef` for timer, `useCallback` for stable reference)
+    - [x] Run `pnpm test` — confirm tests pass
+    - [x] Run `pnpm typecheck` and `pnpm lint` — confirm clean
 
 - [ ] Task: Apply debounce + clear button to 4 server-side search inputs
     - [ ] Write failing tests for `StudentAssignmentFilters` — verify: rapid typing (9 keystrokes) fires 1 `navigate()` call (not 9), X button clears search, X hidden when search empty
