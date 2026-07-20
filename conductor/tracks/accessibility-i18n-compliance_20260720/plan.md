@@ -78,12 +78,12 @@
     - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
     - [x] Commit: `fix(i18n): Use shared formatDate in ExtensionHistoryList (UX-19)`
 
-- [ ] Task: Replace StudentDashboard and ConsultationList toLocaleDateString (UX-20)
-    - [ ] Write failing tests: assert both `StudentDashboard` and `ConsultationList` use `formatDate(date, locale, 'short')` from `@/lib/format-date`, no `toLocaleDateString()` calls remain
-    - [ ] Implement: replace `new Date(date).toLocaleDateString()` with `formatDate(date, locale, 'short')` in both components, obtain `locale` from `useI18n()`
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint` — no errors
-    - [ ] Commit: `fix(i18n): Use shared formatDate in StudentDashboard and ConsultationList (UX-20)`
+- [x] Task: Replace StudentDashboard and ConsultationList toLocaleDateString (UX-20) [f40c78d]
+    - [x] Write failing tests: assert both `StudentDashboard` and `ConsultationList` use `formatDate(date, locale, 'short')` from `@/lib/format-date`, no `toLocaleDateString()` calls remain
+    - [x] Implement: replace `new Date(date).toLocaleDateString()` with `formatDate(date, locale, 'short')` in both components, obtain `locale` from `useI18n()`
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
+    - [x] Commit: `fix(i18n): Use shared formatDate in StudentDashboard and ConsultationList (UX-20)`
 
 - [ ] Task: Conductor - User Manual Verification 'i18n Hardcoded String & Date Formatting Fixes' (Protocol in workflow.md)
 
