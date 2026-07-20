@@ -8,4 +8,9 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Critical UX Fixes (Broken Functionality)**
+*Link: [./tracks/critical-ux-fixes_20260720/](./tracks/critical-ux-fixes_20260720/)*
+
+---
+
 
