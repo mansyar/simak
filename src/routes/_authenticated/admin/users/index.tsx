@@ -266,14 +266,16 @@ function UsersPage() {
 
       {inlineError && <AlertBanner variant="error" title={inlineError} />}
 
-      <Pagination
-        currentPage={searchParams.page || 1}
-        totalPages={Math.ceil(total / searchParams.limit)}
-        onPageChange={(page) =>
-          navigate({ search: (prev: UserSearchParams) => ({ ...prev, page }) })
-        }
-        showCounter
-      />
+      {users.length > 0 && (
+        <Pagination
+          currentPage={searchParams.page || 1}
+          totalPages={Math.ceil(total / searchParams.limit)}
+          onPageChange={(page) =>
+            navigate({ search: (prev: UserSearchParams) => ({ ...prev, page }) })
+          }
+          showCounter
+        />
+      )}
     </div>
   );
 }

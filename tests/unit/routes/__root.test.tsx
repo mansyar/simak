@@ -1,6 +1,7 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
 
 // Mock localStorage
 const localStorageMock = {
@@ -42,5 +43,21 @@ describe('Root route i18n', () => {
   it('should export Route', async () => {
     const { Route } = await import('@/routes/__root');
     expect(Route).toBeDefined();
+  });
+});
+
+describe('NotFoundComponent', () => {
+  it('renders a link with href="/" (not "/dashboard")', async () => {
+    const { NotFoundComponent } = await import('@/routes/__root');
+    render(<NotFoundComponent />);
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('href', '/');
+  });
+
+  it('renders a link with t("common.goHome") label', async () => {
+    const { NotFoundComponent } = await import('@/routes/__root');
+    render(<NotFoundComponent />);
+    const link = screen.getByRole('link');
+    expect(link).toHaveTextContent('common.goHome');
   });
 });

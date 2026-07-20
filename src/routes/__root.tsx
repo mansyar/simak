@@ -103,14 +103,14 @@ function useI18nProvider() {
   return { locale, setLocale, t };
 }
 
-function NotFoundComponent() {
+export function NotFoundComponent() {
   const { t } = useI18n();
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
       <h1 className="text-4xl font-bold text-foreground">404</h1>
       <p className="text-lg text-muted-foreground">{t('error.notFound')}</p>
-      <a href="/dashboard" className="text-primary hover:underline">
-        {t('common.goToDashboard')}
+      <a href="/" className="text-primary hover:underline">
+        {t('common.goHome')}
       </a>
     </div>
   );
