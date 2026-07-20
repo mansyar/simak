@@ -39,7 +39,7 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
     - [x] Implement: render `Card` with message/`<EmptyState>` in place of `return null`
     - [x] Verify: `pnpm test` passes
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Empty States' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Empty States' (Protocol in workflow.md)
 
 ---
 
