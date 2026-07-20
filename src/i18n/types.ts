@@ -191,6 +191,7 @@ export type Translation = {
       role: string
       createdAt: string
       actions: string
+      status: string
     }
     empty: string
     emptyPrompt: string
@@ -789,6 +790,7 @@ export type Translation = {
     categoryOther: string
     maxExtensionsReached: string
     daysExceeded: string
+    daysCount: string
   }
   settings: {
     title: string

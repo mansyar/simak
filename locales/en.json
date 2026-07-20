@@ -185,7 +185,8 @@
       "name": "Name",
       "role": "Role",
       "createdAt": "Created At",
-      "actions": "Actions"
+      "actions": "Actions",
+      "status": "Status"
     },
     "empty": "No users found",
     "emptyPrompt": "Get started by adding a new user",
@@ -783,7 +784,8 @@
     "categoryHealth": "Health",
     "categoryOther": "Other",
     "maxExtensionsReached": "Maximum {count} extension(s) allowed. You have used {used}.",
-    "daysExceeded": "Extension days cannot exceed {max} for this assignment."
+    "daysExceeded": "Extension days cannot exceed {max} for this assignment.",
+    "daysCount": "{count} days"
   },
   "settings": {
     "title": "Settings",

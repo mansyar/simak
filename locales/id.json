@@ -185,7 +185,8 @@
       "name": "Nama",
       "role": "Peran",
       "createdAt": "Dibuat Pada",
-      "actions": "Aksi"
+      "actions": "Aksi",
+      "status": "Status"
     },
     "empty": "Tidak ada pengguna",
     "emptyPrompt": "Mulai dengan menambahkan pengguna baru",
@@ -783,7 +784,8 @@
     "categoryHealth": "Kesehatan",
     "categoryOther": "Lainnya",
     "maxExtensionsReached": "Maksimal {count} perpanjangan diizinkan. Anda telah menggunakan {used}.",
-    "daysExceeded": "Hari perpanjangan tidak boleh melebihi {max} untuk tugas ini."
+    "daysExceeded": "Hari perpanjangan tidak boleh melebihi {max} untuk tugas ini.",
+    "daysCount": "{count} hari"
   },
   "settings": {
     "title": "Pengaturan",
