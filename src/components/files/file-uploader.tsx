@@ -11,6 +11,7 @@ interface FileUploaderProps {
   isUploading?: boolean;
   uploadError?: string | null;
   uploadSuccess?: boolean;
+  onResetSuccess?: () => void;
 }
 
 export function FileUploader({
@@ -18,6 +19,7 @@ export function FileUploader({
   isUploading = false,
   uploadError = null,
   uploadSuccess = false,
+  onResetSuccess,
 }: FileUploaderProps) {
   const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -91,7 +93,8 @@ export function FileUploader({
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  }, []);
+    onResetSuccess?.();
+  }, [onResetSuccess]);
 
   return (
     <div className="space-y-4">
