@@ -184,31 +184,39 @@
 
 ## Phase 4: Verification & Definition of Done
 
-- [ ] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
-    - [ ] Read `./spec.md` — review all Acceptance Criteria #1–#15 and Verification Strategy
-    - [ ] Read `conductor/workflow.md` — review Phase Completion Verification and Checkpointing Protocol
+- [x] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
+    - [x] Read `./spec.md` — review all Acceptance Criteria #1–#15 and Verification Strategy
+    - [x] Read `conductor/workflow.md` — review Phase Completion Verification and Checkpointing Protocol
 
-- [ ] Task: Run EXPLAIN ANALYZE on rewritten queries (manual)
-    - [ ] Start dev DB (`docker compose up -d`) and run `pnpm db:migrate` if needed
-    - [ ] Run `EXPLAIN ANALYZE` on the LATERAL join query in `listPendingReviewsHandler` — confirm index scan on `submissions(checkpoint_id, version)`
-    - [ ] Run `EXPLAIN ANALYZE` on the bulk UPDATEs in `calculateExtensionAdjustment`/`bulkExtendHandler`/`adjustDeadlinesForBreach`
-    - [ ] Run `EXPLAIN ANALYZE` on key paginated queries (consultations, submissions, reviews) — confirm index scans post-TRACK-005
-    - [ ] Document findings in the git note for the checkpoint commit
+- [x] Task: Run EXPLAIN ANALYZE on rewritten queries (manual)
+    - [x] Start dev DB (`docker compose up -d`) and run `pnpm db:migrate` if needed
+    - [x] Run `EXPLAIN ANALYZE` on the LATERAL join query in `listPendingReviewsHandler` — confirm index scan on `submissions(checkpoint_id, version)`
+    - [x] Run `EXPLAIN ANALYZE` on the bulk UPDATEs in `calculateExtensionAdjustment`/`bulkExtendHandler`/`adjustDeadlinesForBreach`
+    - [x] Run `EXPLAIN ANALYZE` on key paginated queries (consultations, submissions, reviews) — confirm index scans post-TRACK-005
+    - [x] Document findings in the git note for the checkpoint commit
 
-- [ ] Task: Structural grep verification
-    - [ ] Grep for `for (const` in `.server.ts` files — confirm no N+1 patterns remain (sequential per-row queries)
-    - [ ] Confirm all 5 list handlers have `page`/`limit` Zod params + total count queries
-    - [ ] Confirm both dashboard queries have `.limit(20)`
-    - [ ] Confirm `listNotificationsHandler` does not spread `...item` into the response
-    - [ ] Confirm `getObjectContentLength` is called before `db.transaction()` in both handlers
-    - [ ] Confirm PERF-36 (audit-log LIKE) is documented as deferred in `spec.md` Out of Scope
+- [x] Task: Structural grep verification
+    - [x] Grep for `for (const` in `.server.ts` files — confirm no N+1 patterns remain (sequential per-row queries)
+    - [x] Confirm all 5 list handlers have `page`/`limit` Zod params + total count queries
+    - [x] Confirm both dashboard queries have `.limit(20)`
+    - [x] Confirm `listNotificationsHandler` does not spread `...item` into the response
+    - [x] Confirm `getObjectContentLength` is called before `db.transaction()` in both handlers
+    - [x] Confirm PERF-36 (audit-log LIKE) is documented as deferred in `spec.md` Out of Scope
+    - [x] Finding: `logAuditEvent` N+1 loop in `bulkExtendHandler` (extensions-extras.server.ts:373) — fixed below
 
-- [ ] Task: Run full quality gate suite
-    - [ ] Run `pnpm test:coverage` — confirm ≥80% on lines, statements, branches, and functions
-    - [ ] Run `pnpm typecheck` — passes
-    - [ ] Run `pnpm lint` — passes (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n` — parity passes (EN↔ID)
-    - [ ] Verify no file in `src/`/`tests/`/`scripts/` exceeds 500 lines (`node scripts/check-modularity.js`)
+- [x] Task: Fix logAuditEvent N+1 in bulkExtendHandler (PERF-4 supplement) [662df5a]
+    - [x] Replace sequential `logAuditEvent` calls with single batch `db.insert(auditLog).values([...])`
+    - [x] Add `auditLog` import from `../db/schema/audit-log`
+    - [x] Update existing test to assert batch INSERT instead of `logAuditEvent` calls
+    - [x] Add new test asserting `logAuditEvent` NOT called and batch INSERT used
+    - [x] Run quality gates — all pass
+
+- [x] Task: Run full quality gate suite
+    - [x] Run `pnpm test:coverage` — confirm ≥80% on lines, statements, branches, and functions
+    - [x] Run `pnpm typecheck` — passes
+    - [x] Run `pnpm lint` — passes (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n` — parity passes (EN↔ID)
+    - [x] Verify no file in `src/`/`tests/`/`scripts/` exceeds 500 lines (`node scripts/check-modularity.js`)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Verification & Definition of Done' (Protocol in workflow.md)
 </protect>
