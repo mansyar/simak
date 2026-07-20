@@ -139,4 +139,9 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
     - [x] No file in `src/`/`tests/` exceeds 500 lines
     - [x] `StudentDashboard` shows `data.error` not `t('common.error')`; `ReviewDetailPage` `openForReview` has try/catch; `CheckpointSubmissionPage` distinguishes network vs server errors
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Error Handling' (Protocol in workflow.md)
-</protect>
+
+---
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 6deeacb
+
