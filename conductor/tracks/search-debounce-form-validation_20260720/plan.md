@@ -32,11 +32,11 @@
 
 ## Phase 2: Form Migration
 
-- [ ] Task: Read spec.md and workflow.md to refresh context
-    - [ ] Read `./spec.md` for requirements and acceptance criteria
-    - [ ] Read `conductor/workflow.md` for TDD lifecycle and checkpoint protocol
+- [x] Task: Read spec.md and workflow.md to refresh context
+    - [x] Read `./spec.md` for requirements and acceptance criteria
+    - [x] Read `conductor/workflow.md` for TDD lifecycle and checkpoint protocol
 
-- [ ] Task: Migrate ConsultationForm to react-hook-form + Zod
+- [x] Task: Migrate ConsultationForm to react-hook-form + Zod [3e40f2e]
     - [ ] Write failing tests — verify: empty `notes` shows error on blur, `sessionType: 'external'` with empty `externalConsultantName` shows error, valid submission calls `logConsultation`
     - [ ] Add i18n keys for form error messages to `locales/en.json` and `locales/id.json`
     - [ ] Run `pnpm generate:i18n`
