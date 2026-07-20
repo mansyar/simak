@@ -371,21 +371,25 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
     });
 
     // 5. Log per-extension audit events via single batch INSERT (outside transaction)
-    await db.insert(auditLog).values(
-      unfinishedCheckpoints.map((cp) => ({
-        actorId: session.user.id,
-        action: 'deadline.extended',
-        entityType: 'checkpoint',
-        entityId: String(cp.id),
-        details: {
-          assignmentId,
-          studentId,
-          extraDays,
-          checkpointName: cp.name,
-          reason,
-        },
-      })),
-    );
+    try {
+      await db.insert(auditLog).values(
+        unfinishedCheckpoints.map((cp) => ({
+          actorId: session.user.id,
+          action: 'deadline.extended',
+          entityType: 'checkpoint',
+          entityId: String(cp.id),
+          details: {
+            assignmentId,
+            studentId,
+            extraDays,
+            checkpointName: cp.name,
+            reason,
+          },
+        })),
+      );
+    } catch (err) {
+      console.error('[bulkExtend] audit log insert failed:', err);
+    }
 
     // 6. Notify the student
     const extendedParams = {
@@ -394,21 +398,25 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
       reason,
     };
     const extendedKeys = getNotificationKeys('deadline_extended');
-    await db.insert(notifications).values({
-      userId: studentId,
-      type: 'deadline_extended',
-      titleKey: extendedKeys.titleKey,
-      messageKey: extendedKeys.messageKey,
-      params: extendedParams,
-      channel: 'in_app',
-      metadata: {
-        assignmentId,
-        extraDays,
-        checkpointCount: unfinishedCheckpoints.length,
-        checkpointIds: unfinishedCheckpoints.map((cp) => cp.id),
-        reason,
-      },
-    });
+    try {
+      await db.insert(notifications).values({
+        userId: studentId,
+        type: 'deadline_extended',
+        titleKey: extendedKeys.titleKey,
+        messageKey: extendedKeys.messageKey,
+        params: extendedParams,
+        channel: 'in_app',
+        metadata: {
+          assignmentId,
+          extraDays,
+          checkpointCount: unfinishedCheckpoints.length,
+          checkpointIds: unfinishedCheckpoints.map((cp) => cp.id),
+          reason,
+        },
+      });
+    } catch (err) {
+      console.error('[bulkExtend] notification insert failed:', err);
+    }
 
     return { success: true, extendedCount: unfinishedCheckpoints.length };
   } catch (err) {
