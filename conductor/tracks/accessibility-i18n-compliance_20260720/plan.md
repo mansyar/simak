@@ -91,8 +91,8 @@
 
 ## Phase 3: ARIA Attributes
 
-- [ ] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
-- [ ] Task: Add aria-label to FileList download button (UX-16)
+- [x] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
+- [~] Task: Add aria-label to FileList download button (UX-16)
     - [ ] Write failing tests: assert download `<Button>` in `FileList` has `aria-label={t('files.download')}`
     - [ ] Implement: add `aria-label={t('files.download')}` to the download Button in `src/components/files/FileList.tsx`
     - [ ] Run `pnpm test` — confirm new tests pass
