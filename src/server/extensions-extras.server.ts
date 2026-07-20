@@ -2,6 +2,7 @@
 import { eq, and, sql, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
+import { auditLog } from '../db/schema/audit-log';
 import { extensionRequests } from '../db/schema/extensions';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
@@ -369,9 +370,9 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
         );
     });
 
-    // 5. Log per-extension audit events (outside transaction)
-    for (const cp of unfinishedCheckpoints) {
-      await logAuditEvent({
+    // 5. Log per-extension audit events via single batch INSERT (outside transaction)
+    await db.insert(auditLog).values(
+      unfinishedCheckpoints.map((cp) => ({
         actorId: session.user.id,
         action: 'deadline.extended',
         entityType: 'checkpoint',
@@ -383,8 +384,8 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
           checkpointName: cp.name,
           reason,
         },
-      });
-    }
+      })),
+    );
 
     // 6. Notify the student
     const extendedParams = {

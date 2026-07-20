@@ -174,9 +174,17 @@ describe('bulkExtendHandler', () => {
 
     await bulkExtendHandler({ data: validInput });
 
-    expect(auditMod.logAuditEvent).toHaveBeenCalledTimes(2);
+    // Batch INSERT — logAuditEvent not called
+    expect(auditMod.logAuditEvent).not.toHaveBeenCalled();
 
-    expect(auditMod.logAuditEvent).toHaveBeenNthCalledWith(1, {
+    const valuesCalls = vi.mocked(mockDb.values).mock.calls;
+    const batchAuditCall = valuesCalls.find(
+      (call: any) =>
+        Array.isArray(call[0]) && call[0].every((item: any) => item.action === 'deadline.extended'),
+    );
+    expect(batchAuditCall).toBeDefined();
+    expect(batchAuditCall[0]).toHaveLength(2);
+    expect(batchAuditCall[0][0]).toEqual({
       actorId: 'instructor-1',
       action: 'deadline.extended',
       entityType: 'checkpoint',
@@ -189,8 +197,7 @@ describe('bulkExtendHandler', () => {
         reason: 'Class-wide deadline extension due to holiday',
       },
     });
-
-    expect(auditMod.logAuditEvent).toHaveBeenNthCalledWith(2, {
+    expect(batchAuditCall[0][1]).toEqual({
       actorId: 'instructor-1',
       action: 'deadline.extended',
       entityType: 'checkpoint',
@@ -271,5 +278,46 @@ describe('bulkExtendHandler', () => {
     expect(result).toEqual({ success: true, extendedCount: 5 });
     // Single bulk UPDATE inside transaction, not 5 individual UPDATEs
     expect(mockDb.update).toHaveBeenCalledTimes(1);
+  });
+
+  it('should use single batch INSERT for per-checkpoint audit logs (PERF-4 supplement)', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+
+    const checkpoints = [
+      { id: 10, dueDate: new Date('2026-06-15'), name: 'Checkpoint 1' },
+      { id: 11, dueDate: new Date('2026-07-01'), name: 'Checkpoint 2' },
+      { id: 12, dueDate: new Date('2026-07-15'), name: 'Checkpoint 3' },
+    ];
+
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve(checkpoints).then(onfulfilled));
+
+    await bulkExtendHandler({ data: validInput });
+
+    // logAuditEvent should NOT be called — batch INSERT instead
+    expect(auditMod.logAuditEvent).not.toHaveBeenCalled();
+
+    // Find the batch INSERT call (values receives an array with action 'deadline.extended')
+    const valuesCalls = vi.mocked(mockDb.values).mock.calls;
+    const batchAuditCall = valuesCalls.find(
+      (call: any) =>
+        Array.isArray(call[0]) && call[0].every((item: any) => item.action === 'deadline.extended'),
+    );
+    expect(batchAuditCall).toBeDefined();
+    expect(batchAuditCall[0]).toHaveLength(3);
+    expect(batchAuditCall[0][0]).toEqual({
+      actorId: 'instructor-1',
+      action: 'deadline.extended',
+      entityType: 'checkpoint',
+      entityId: '10',
+      details: {
+        assignmentId: 1,
+        studentId: 'student-1',
+        extraDays: 5,
+        checkpointName: 'Checkpoint 1',
+        reason: 'Class-wide deadline extension due to holiday',
+      },
+    });
   });
 });
