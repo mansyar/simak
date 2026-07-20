@@ -863,7 +863,8 @@
       "passwordSuccess": "Kata sandi berhasil diubah",
       "passwordError": "Gagal mengubah kata sandi",
       "passwordMinLength": "Kata sandi minimal 8 karakter",
-      "passwordMismatch": "Kata sandi tidak cocok"
+      "passwordMismatch": "Kata sandi tidak cocok",
+      "currentPasswordRequired": "Kata sandi saat ini wajib diisi"
     },
     "appearance": {
       "title": "Tampilan",

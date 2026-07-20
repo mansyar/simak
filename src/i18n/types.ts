@@ -869,6 +869,7 @@ export type Translation = {
       passwordError: string
       passwordMinLength: string
       passwordMismatch: string
+      currentPasswordRequired: string
     }
     appearance: {
       title: string

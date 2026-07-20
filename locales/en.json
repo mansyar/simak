@@ -863,7 +863,8 @@
       "passwordSuccess": "Password changed successfully",
       "passwordError": "Failed to change password",
       "passwordMinLength": "Password must be at least 8 characters",
-      "passwordMismatch": "Passwords do not match"
+      "passwordMismatch": "Passwords do not match",
+      "currentPasswordRequired": "Current password is required"
     },
     "appearance": {
       "title": "Appearance",
