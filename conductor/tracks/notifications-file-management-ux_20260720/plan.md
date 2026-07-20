@@ -14,7 +14,7 @@
     - [ ] Write tests verifying `metadata: { assignmentId, checkpointId, submissionId }` is included in notification INSERTs for each creation point
     - [ ] Implement: Add metadata to notification INSERTs in `reviews.server.ts`, `submissions.server.ts`, `consultations.server.ts`, `extensions.server.ts` / `extensions-extras.server.ts`, `review-sla.ts`
 
-- [ ] Task: Create NOTIFICATION_ROUTES map and convert NotificationItem to navigable Link
+- [~] Task: Create NOTIFICATION_ROUTES map and convert NotificationItem to navigable Link
     - [ ] Write tests for route derivation (type + metadata → correct route; missing metadata → no navigation)
     - [ ] Write tests verifying `markAsRead` is called on click before navigation
     - [ ] Implement: Create `NOTIFICATION_ROUTES` map in client code
