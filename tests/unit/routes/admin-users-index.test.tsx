@@ -8,14 +8,23 @@ const mockRouter = vi.hoisted(() => ({
   invalidate: vi.fn(),
 }));
 
+const mockLoaderData = vi.hoisted(() => ({
+  users: [] as Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    createdAt: string;
+    emailVerified: boolean;
+  }>,
+  total: 0,
+}));
+
 // Mock @tanstack/react-router
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: vi.fn().mockReturnValue((config: any) => ({
     ...config,
-    useLoaderData: vi.fn().mockReturnValue({
-      users: [],
-      total: 0,
-    }),
+    useLoaderData: vi.fn().mockReturnValue(mockLoaderData),
     useSearch: vi.fn().mockReturnValue({
       page: 1,
       limit: 20,
@@ -112,6 +121,11 @@ describe('Admin Users index page', () => {
   });
 
   describe('render', () => {
+    beforeEach(() => {
+      mockLoaderData.users = [];
+      mockLoaderData.total = 0;
+    });
+
     it('should render the page title via PageHeader (text-3xl, not text-4xl)', async () => {
       const Component = await getComponent();
       render(<Component />);
@@ -145,6 +159,17 @@ describe('Admin Users index page', () => {
     });
 
     it('should use Pagination component with common.back/common.next buttons and common.pageOf counter', async () => {
+      mockLoaderData.users = [
+        {
+          id: '1',
+          name: 'Test User',
+          email: 'test@test.com',
+          role: 'student',
+          createdAt: new Date().toISOString(),
+          emailVerified: false,
+        },
+      ];
+      mockLoaderData.total = 1;
       const Component = await getComponent();
       render(<Component />);
       // Pagination renders common.back and common.next as button text
@@ -155,10 +180,30 @@ describe('Admin Users index page', () => {
     });
 
     it('should use Pagination counter instead of adminUsers.showing', async () => {
+      mockLoaderData.users = [
+        {
+          id: '1',
+          name: 'Test User',
+          email: 'test@test.com',
+          role: 'student',
+          createdAt: new Date().toISOString(),
+          emailVerified: false,
+        },
+      ];
+      mockLoaderData.total = 1;
       const Component = await getComponent();
       render(<Component />);
       // The old counter text should be gone
       expect(screen.queryByText('adminUsers.showing')).not.toBeInTheDocument();
+    });
+
+    it('should NOT render Pagination when users list is empty', async () => {
+      mockLoaderData.users = [];
+      mockLoaderData.total = 0;
+      const Component = await getComponent();
+      render(<Component />);
+      expect(screen.queryByText('common.back')).not.toBeInTheDocument();
+      expect(screen.queryByText('common.next')).not.toBeInTheDocument();
     });
 
     it('should render DeleteUserDialog (not use window.confirm)', async () => {

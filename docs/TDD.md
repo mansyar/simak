@@ -210,6 +210,7 @@ All list views (assignments, reviews, users, notifications, consultations, submi
 - **Client-side pattern:** Page state is persisted in TanStack Router search params (e.g. `?page=2`) so the URL is shareable. A shared `<Pagination>` component renders when `totalPages > 1`.
 - **Dashboard safety caps:** Inline dashboard widgets (`activeAssignments` on student dashboard, `assignmentOverview` on instructor dashboard) use a hardcoded `.limit(20)` safety cap since they cannot be independently paginated.
 - **Loading state**: skeleton rows while the next page loads. Prefetch next page on scroll near the bottom.
+- **Empty list conditional**: Pagination controls are hidden when the list is empty (`{items.length > 0 && <Pagination .../>}`). Prevents confusing empty-page navigation. Applied in `admin/users/index.tsx` and `student/assignments/index.tsx`.
 - **[v2]**: Migrate to cursor-based pagination for submission histories and audit logs (append-only data where offset pagination drifts).
 
 ---

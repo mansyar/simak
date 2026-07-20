@@ -66,7 +66,7 @@ export type Translation = {
     close: string
     copy: string
     skipToContent: string
-    goToDashboard: string
+    goHome: string
     emailPlaceholder: string
     namePlaceholder: string
     verify: string

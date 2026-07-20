@@ -292,6 +292,7 @@ function CheckpointSubmissionPage() {
           isUploading={isUploading}
           uploadError={uploadError}
           uploadSuccess={uploadSuccess}
+          onResetSuccess={() => setUploadSuccess(false)}
         />
       )}
 

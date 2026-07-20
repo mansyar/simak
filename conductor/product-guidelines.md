@@ -46,7 +46,7 @@
 
 - **Validation errors** — Display inline below the relevant field, not in a banner at the top
 - **Authorization errors** — Redirect to the appropriate dashboard with a toast message
-- **Not found (404)** — Show a dedicated 404 page with a link back to the dashboard
+- **Not found (404)** — Show a dedicated 404 page with a link back to the home page (`/`)
 - **Empty states** — Every list view must show a helpful empty state (e.g., "No assignments yet") with a clear next action
 - **Loading states** — Use skeleton screens for data lists and checkpoints; use spinners for single actions
 

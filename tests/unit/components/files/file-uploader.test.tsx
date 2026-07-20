@@ -178,6 +178,58 @@ describe('FileUploader', () => {
     expect(screen.getByText('files.dropzone.title')).toBeDefined();
   });
 
+  it('should call onResetSuccess callback when Upload Another is clicked', async () => {
+    const user = userEvent.setup();
+    const onResetSuccess = vi.fn();
+    render(
+      <FileUploader
+        onUploadSuccess={vi.fn().mockResolvedValue(undefined)}
+        uploadSuccess={true}
+        onResetSuccess={onResetSuccess}
+      />,
+    );
+
+    expect(screen.getByText(/files.uploadSuccess/)).toBeDefined();
+
+    await user.click(screen.getByText('files.uploadAnother'));
+
+    expect(onResetSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it('should render without onResetSuccess prop (optional callback)', () => {
+    render(<FileUploader onUploadSuccess={vi.fn()} uploadSuccess={true} />);
+    expect(screen.getByText(/files.uploadSuccess/)).toBeDefined();
+    expect(screen.getByText('files.uploadAnother')).toBeDefined();
+  });
+
+  it('should clear internal state and show dropzone after reset with onResetSuccess', async () => {
+    const user = userEvent.setup();
+    const onResetSuccess = vi.fn();
+    const { rerender } = render(
+      <FileUploader
+        onUploadSuccess={vi.fn().mockResolvedValue(undefined)}
+        uploadSuccess={true}
+        onResetSuccess={onResetSuccess}
+      />,
+    );
+
+    await user.click(screen.getByText('files.uploadAnother'));
+
+    expect(onResetSuccess).toHaveBeenCalled();
+
+    // Parent resets uploadSuccess in response to callback
+    rerender(
+      <FileUploader
+        onUploadSuccess={vi.fn().mockResolvedValue(undefined)}
+        uploadSuccess={false}
+        onResetSuccess={onResetSuccess}
+      />,
+    );
+
+    // Dropzone should reappear
+    expect(screen.getByText('files.dropzone.title')).toBeDefined();
+  });
+
   it('should show validation error for invalid file type dropped', () => {
     render(<FileUploader onUploadSuccess={vi.fn()} />);
     const dropZone = screen.getByTestId('drop-zone');

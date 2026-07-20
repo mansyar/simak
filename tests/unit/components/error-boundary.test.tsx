@@ -27,14 +27,11 @@ describe('RootErrorComponent', () => {
     expect(screen.getByText('i18n:error.errorBoundaryDescription')).toBeInTheDocument();
   });
 
-  it('renders a reload button and a dashboard link', () => {
+  it('renders a reload button and a home link', () => {
     render(<RootErrorComponent error={new Error('boom')} />);
 
     expect(screen.getByRole('button', { name: 'i18n:error.reload' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'i18n:common.goToDashboard' })).toHaveAttribute(
-      'href',
-      '/',
-    );
+    expect(screen.getByRole('link', { name: 'i18n:common.goHome' })).toHaveAttribute('href', '/');
   });
 
   it('triggers window.location.reload when the reload button is clicked', () => {
