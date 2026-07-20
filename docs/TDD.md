@@ -761,7 +761,7 @@ A checkpoint unlocks when:
 
 - Notifications stored in the `notifications` table with i18n keys (`titleKey`, `messageKey`) and interpolation `params` (jsonb) instead of literal text. The `listNotifications` handler resolves the display strings at read time using the requesting user's `locale` (read directly from `session.user.locale` — no separate DB query), so Indonesian users see Indonesian notifications and English users see English. The handler selects only needed columns (`id, type, titleKey, messageKey, params, read, createdAt` — no `metadata`) and constructs response objects explicitly to avoid leaking raw columns.
 - TanStack Query `refetchInterval` polls for new unread notifications at a flat 15-second interval (see PRD line 148). The notification bell in the shared header reflects the unread count.
-- Notification center UI with read/unread filtering.
+- **Notification center UI (Track: Accessibility & i18n Compliance):** The slide-over panel is built on the shadcn `Sheet` primitive (`@base-ui/react/dialog`), which provides built-in focus trapping, Escape-key dismissal, and backdrop-click close — replacing a former custom backdrop div + panel div that lacked focus management. Each `NotificationItem` renders as a native `<button type="button">` (replacing a `<div onClick>`) for keyboard access (Tab focus, Enter/Space activation). The `NotificationBadge` button exposes a dynamic `aria-label` that includes the unread count (e.g. "5 unread notifications") and an `aria-live="polite"` region so screen readers announce count changes without stealing focus. The count `<span>` no longer carries `role="status"` — the button's dynamic `aria-label` conveys the count.
 - Badge indicator on the sidebar.
 
 ### Email Delivery
@@ -990,9 +990,11 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 - Focus management: focus trapping in dialogs and sheets on open, focus return on close, skip-to-content link as first focusable element.
 - `focus-visible:` ring classes on all interactive elements (only visible on keyboard navigation, not mouse clicks).
 - Touch targets minimum 44×44px (`min-h-11 min-w-11`) on all buttons, links, and interactive elements for mobile accessibility.
-- `aria-hidden="true"` on all decorative icons (sidebar nav icons, notification bell icons) to hide them from screen readers.
-- `aria-label` on all icon-only buttons (theme toggle, language switcher, sidebar close, notification bell, pagination controls).
-- `aria-live="polite"` regions for dynamic content: form validation errors (`FormMessage`), submission status messages, dashboard error states, consultation errors.
+- `aria-hidden="true"` on all decorative icons (sidebar nav icons, notification bell icons) to hide them from screen readers. Also applied to purely-visual connector lines and dots in the `CheckpointTimeline` (Track: Accessibility & i18n Compliance).
+- `aria-label` on all icon-only buttons (theme toggle, language switcher, sidebar close, notification bell, pagination controls, FileList download button).
+- `aria-live="polite"` regions for dynamic content: form validation errors (`FormMessage`), submission status messages, dashboard error states, consultation errors, and notification unread-count changes (NotificationBadge).
+- `role="progressbar"` with `aria-valuenow`/`aria-valuemin`/`aria-valuemax`/`aria-label` on all progress bars: `ProgressTable` (per-student completion), `ConsultationProgress` (summary + per-checkpoint verified/required bars) (Track: Accessibility & i18n Compliance).
+- `aria-expanded` + `aria-controls` on the `DeadlineManager` collapsible toggle buttons, with matching `id` on the expandable content div (Track: Accessibility & i18n Compliance).
 - `aria-describedby` on form inputs pointing to error message elements for screen reader association.
 - Heading hierarchy: every page has exactly one `h1`, heading levels don't skip (h1 → h2 → h3).
 - Color contrast meets WCAG 2.1 AA minimum (4.5:1 for normal text, 3:1 for large text).
@@ -1029,6 +1031,7 @@ Server functions whose output crosses the network boundary to a route loader dec
 | **UI labels**       | Static translation keys                                                          | `t('button.submit')`                                       |
 | **Dynamic text**    | Interpolation with parameters                                                    | `t('checkpoint.passed', { name: checkpoint.name })`        |
 | **Notifications**   | Store i18n `titleKey`/`messageKey` + `params` in DB. Resolve display strings at read time using recipient's locale. | `{ titleKey: 'notifications.events.review_completed.title', messageKey: '...', params: { checkpointName } }` |
+| **Date formatting** | Shared `formatDate(date, locale, style)` helper (`src/lib/format-date.ts`) renders dates in the user's locale (`id-ID` or `en-US`). Replaces all `toLocaleDateString('en-US')` and bare `toLocaleDateString()` calls (Track: Accessibility & i18n Compliance). | `formatDate(item.createdAt, locale, 'short')` |
 | **Email templates** | Render at send time based on recipient's locale.                                 | Resend email body in `en` or `id`                          |
 
 ### Files
