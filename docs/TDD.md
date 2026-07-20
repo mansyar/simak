@@ -112,6 +112,7 @@ simak/
 │   │   ├── notifications/    → Notification center, badge
 │   │   ├── analytics/        → Charts, metric cards, export
 │   │   ├── settings/         → SettingsPage, ProfileSection, PasswordSection, AppearanceSection, AccessibilitySection
+│   │   ├── skeletons/        → Reusable loading skeletons (DashboardSkeleton, TableSkeleton, AssignmentDetailSkeleton)
 │   │   └── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton, email queue inspector subcomponents (summary cards, filters, table, retry dialog)
 │   ├── server/               → Server functions (split: .ts = client-safe stubs + Zod, .server.ts = handlers)
 │   │   ├── auth.ts           → Client-safe stub: Session type, getSessionFromHeaders, requireRole, _getSession (dynamic import)
@@ -155,7 +156,8 @@ simak/
 │   ├── lib/
 │   │   ├── email.ts          → Resend client
 │   │   ├── storage.ts        → R2 client
-    │   │   ├── route-utils.ts    → Role-based dashboard routing utility
+│   │   ├── toast.ts          → Toast helpers (showSuccessToast, showErrorToast) — wraps sonner
+│   │   ├── route-utils.ts    → Role-based dashboard routing utility
     │   │   ├── role-permissions.ts → Canonical CREATION_ALLOWED_ROLES (shared by user creation + bulk import)
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
     │   │   └── utils.ts          → Shared utilities
@@ -211,6 +213,21 @@ All list views (assignments, reviews, users, notifications, consultations, submi
 - **Dashboard safety caps:** Inline dashboard widgets (`activeAssignments` on student dashboard, `assignmentOverview` on instructor dashboard) use a hardcoded `.limit(20)` safety cap since they cannot be independently paginated.
 - **Loading state**: skeleton rows while the next page loads. Prefetch next page on scroll near the bottom.
 - **[v2]**: Migrate to cursor-based pagination for submission histories and audit logs (append-only data where offset pagination drifts).
+
+### Action Feedback & Loading States [v1]
+
+All user-initiated mutations and data-fetching surfaces provide consistent feedback via three patterns:
+
+- **Success toasts:** A `showSuccessToast(message)` helper in `src/lib/toast.ts` (mirroring `showErrorToast`) wraps `sonner`'s `toast.success()`. Every action `onSuccess` handler across the app calls it with a localized message: consultation logging, user CRUD, deadline unlock/extend, consultation verify/reject, extension approve/reject, profile/password changes. The global `<Toaster richColors position="top-right" />` in `__root.tsx` renders all toasts — the helper applies no per-call duration or position overrides, so success and error toasts share sonner's default styling. All toast messages use `t('key')` with keys in both `locales/en.json` and `locales/id.json` (enforced by the `simak-i18n/no-hardcoded` lint rule). No action completes silently.
+
+- **Loading skeletons & spinners:** Route-level loading uses TanStack Router's `pendingComponent` with three reusable skeleton components in `src/components/skeletons/`:
+  - `DashboardSkeleton` — metric cards + grid layout for all three role dashboards (`/student/dashboard`, `/instructor/dashboard`, `/admin/dashboard`).
+  - `TableSkeleton` — header + rows for tabular list pages (`/admin/users`, `/admin/audit-log`).
+  - `AssignmentDetailSkeleton` — checkpoint timeline + side panels for `/instructor/assignments/$id`.
+
+  The `/admin/users/import` route fetches only session data (very fast) and uses a simple spinner instead of a skeleton. Inline loading states (form submits, profile fetches, verification actions) use the `Loader2` icon from `lucide-react` with `animate-spin`, matching the `ReviewForm.tsx` and `TwoFactorSettings.tsx` patterns. Side-data loading within the student assignment detail page uses dedicated state flags (`loadingConsultations`, `loadingExtensions`) that show `Skeleton` placeholders in the consultations and extensions tabs while the `useEffect` fetch is in flight.
+
+- **Error handling:** Dashboard and page-level data fetches display the actual server error message (`data.error`) rather than a generic localized fallback — the `StudentDashboard` matches the `InstructorDashboard` pattern. Side-data `useEffect` fetches (student assignment detail consultations/extensions) are wrapped in try/catch with a `sideDataError` state flag that renders an inline error banner with a retry button (using the pre-existing `errors.fetchFailed` and `common.refresh` i18n keys). Auto-actions like `openForReview` on the review detail page are wrapped in try/catch — on failure, a `toast.error()` is shown and the self-navigation loop (`navigate({ replace: true })`) is prevented, keeping the user on the page. File upload errors in `CheckpointSubmissionPage` are differentiated: network failures (caught as `TypeError`) show `files.networkError` ("Network error, check your connection"), while server-side non-2xx responses show `files.serverError` ("Server error, try again") — replacing the former generic `files.uploadError` message.
 
 ---
 
