@@ -80,4 +80,9 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
     - [x] Verify no file in `src/`/`tests/` exceeds 500 lines (`scripts/check-modularity.js` on `auth.ts` + `auth.server.ts`) — auth.ts=36, auth.server.ts=95
     - [x] Grep `src/server/auth.ts` for forbidden imports (`drizzle-orm`, `getDb`, `users`, `getRequestHeaders`, `auth config`) — assert zero matches (AC-1) — 0 matches
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Bundle Verification & Final Quality Gates' (Protocol in workflow.md) [checkpoint: c4acdcc]
+
+---
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions d30059d
 </protect>
