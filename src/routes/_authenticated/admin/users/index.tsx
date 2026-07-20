@@ -113,7 +113,7 @@ function UsersPage() {
     setIsEditSheetOpen(true);
   };
 
-  const handleDelete = async (user: UserRow) => {
+  const handleDelete = async (user: UserRow): Promise<boolean> => {
     const result = await deleteUserFn({ data: { id: user.id } });
     if (isServerError(result) && result.error.code === ErrorCode.BAD_REQUEST) {
       const assignmentsResult = await listInstructorActiveAssignmentsFn({
@@ -132,9 +132,10 @@ function UsersPage() {
       );
       setReassignmentInstructors(instructors);
       setReassignmentUser(user);
-    } else {
-      navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
+      return false; // reassignment needed
     }
+    navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
+    return true; // deleted
   };
 
   const handleGenerateLink = async (user: UserRow) => {
@@ -151,18 +152,18 @@ function UsersPage() {
     const result = await createUserFn({ data: values });
     if (isServerError(result)) {
       setInlineError(`${t('common.error')}: ${result.error.message}`);
-    } else {
-      navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
+      throw new Error(result.error.message);
     }
+    navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
   };
 
   const handleUpdateUser = async (id: string, values: z.infer<typeof UpdateUserSchema>) => {
     const result = await updateUserFn({ data: { ...values, id } });
     if (isServerError(result)) {
       setInlineError(`${t('common.error')}: ${result.error.message}`);
-    } else {
-      navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
+      throw new Error(result.error.message);
     }
+    navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
   };
 
   return (
@@ -219,7 +220,10 @@ function UsersPage() {
         }}
         onConfirm={async () => {
           if (deletingUser) {
-            await handleDelete(deletingUser);
+            const deleted = await handleDelete(deletingUser);
+            if (!deleted) {
+              throw new Error('Reassignment needed');
+            }
             setDeletingUser(null);
           }
         }}

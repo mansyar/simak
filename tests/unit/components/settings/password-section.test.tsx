@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { toast } from 'sonner';
 import { PasswordSection } from '@/components/settings/PasswordSection';
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
@@ -101,7 +108,7 @@ describe('PasswordSection', () => {
     });
   });
 
-  it('should show success message on successful password change', async () => {
+  it('should show success toast on successful password change', async () => {
     mockChangePassword.mockResolvedValue({});
 
     render(<PasswordSection />);
@@ -113,7 +120,9 @@ describe('PasswordSection', () => {
     });
     fireEvent.click(screen.getByText('Change Password'));
 
-    expect(await screen.findByText('Password changed successfully')).toBeDefined();
+    await vi.waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Password changed successfully');
+    });
   });
 
   it('should show error message on failed password change', async () => {
@@ -145,8 +154,10 @@ describe('PasswordSection', () => {
     fireEvent.change(confirmInput, { target: { value: 'newPass1234' } });
     fireEvent.click(screen.getByText('Change Password'));
 
-    // Wait for success then check fields are cleared
-    await screen.findByText('Password changed successfully');
+    // Wait for success toast then check fields are cleared
+    await vi.waitFor(() => {
+      expect(toast.success).toHaveBeenCalled();
+    });
 
     expect((currentInput as HTMLInputElement).value).toBe('');
     expect((newInput as HTMLInputElement).value).toBe('');

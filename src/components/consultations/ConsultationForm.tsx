@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { logConsultation } from '@/server/consultations';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -73,6 +74,7 @@ export function ConsultationForm({
     setExternalConsultantName('');
     setNotes('');
     setLoading(false);
+    toast.success(t('consultations.logSuccess'));
     onSuccess();
   };
 

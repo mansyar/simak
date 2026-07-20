@@ -209,7 +209,10 @@
     "editDescription": "Perbarui informasi pengguna. Perubahan email akan memerlukan verifikasi ulang.",
     "reassignTitle": "Tugaskan Ulang Tugas",
     "reassignDescription": "Instruktur ini memiliki tugas aktif. Tugaskan ulang sebelum menghapus.",
-    "selectInstructor": "Pilih instruktur"
+    "selectInstructor": "Pilih instruktur",
+    "createSuccess": "Pengguna berhasil dibuat",
+    "updateSuccess": "Pengguna berhasil diperbarui",
+    "deleteSuccess": "Pengguna berhasil dihapus"
   },
   "adminTemplates": {
     "title": "Templat",
@@ -321,7 +324,9 @@
       "unlockError": "Gagal membuka checkpoint. Silakan coba lagi.",
       "extend": "Perpanjang",
       "extendError": "Gagal memperpanjang tenggat. Silakan coba lagi.",
-      "currentDeadline": "Tenggat Saat Ini"
+      "currentDeadline": "Tenggat Saat Ini",
+      "unlockSuccess": "Checkpoint berhasil dibuka",
+      "extendSuccess": "Tenggat berhasil diperpanjang"
     },
     "table": {
       "student": "Mahasiswa",
@@ -558,6 +563,7 @@
     "notes": "Catatan",
     "notesPlaceholder": "Deskripsikan sesi konsultasi",
     "logConsultation": "Catat Konsultasi",
+    "logSuccess": "Konsultasi berhasil dicatat",
     "previousSessions": "Sesi Sebelumnya",
     "noConsultations": "Belum ada konsultasi yang dicatat",
     "status": {
@@ -577,7 +583,9 @@
     "reject": "Tolak",
     "confirmReject": "Konfirmasi Penolakan",
     "rejectReason": "Alasan Penolakan",
-    "rejectReasonPlaceholder": "Masukkan alasan penolakan"
+    "rejectReasonPlaceholder": "Masukkan alasan penolakan",
+    "verifySuccess": "Konsultasi berhasil diverifikasi",
+    "rejectSuccess": "Konsultasi berhasil ditolak"
   },
   "landing": {
     "hero": {
@@ -781,7 +789,9 @@
     "categoryHealth": "Kesehatan",
     "categoryOther": "Lainnya",
     "maxExtensionsReached": "Maksimal {count} perpanjangan diizinkan. Anda telah menggunakan {used}.",
-    "daysExceeded": "Hari perpanjangan tidak boleh melebihi {max} untuk tugas ini."
+    "daysExceeded": "Hari perpanjangan tidak boleh melebihi {max} untuk tugas ini.",
+    "approveSuccess": "Perpanjangan berhasil disetujui",
+    "rejectSuccess": "Perpanjangan berhasil ditolak"
   },
   "settings": {
     "title": "Pengaturan",

@@ -215,6 +215,9 @@ export type Translation = {
     reassignTitle: string
     reassignDescription: string
     selectInstructor: string
+    createSuccess: string
+    updateSuccess: string
+    deleteSuccess: string
   }
   adminTemplates: {
     title: string
@@ -327,6 +330,8 @@ export type Translation = {
       extend: string
       extendError: string
       currentDeadline: string
+      unlockSuccess: string
+      extendSuccess: string
     }
     table: {
       student: string
@@ -563,6 +568,7 @@ export type Translation = {
     notes: string
     notesPlaceholder: string
     logConsultation: string
+    logSuccess: string
     previousSessions: string
     noConsultations: string
     status: {
@@ -583,6 +589,8 @@ export type Translation = {
     confirmReject: string
     rejectReason: string
     rejectReasonPlaceholder: string
+    verifySuccess: string
+    rejectSuccess: string
   }
   landing: {
     hero: {
@@ -787,6 +795,8 @@ export type Translation = {
     categoryOther: string
     maxExtensionsReached: string
     daysExceeded: string
+    approveSuccess: string
+    rejectSuccess: string
   }
   settings: {
     title: string

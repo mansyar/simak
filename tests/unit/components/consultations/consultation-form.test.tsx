@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { toast } from 'sonner';
 import { ConsultationForm } from '@/components/consultations/ConsultationForm';
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
 
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
@@ -16,6 +23,7 @@ vi.mock('@/routes/__root', () => ({
         'consultations.notes': 'Notes',
         'consultations.notesPlaceholder': 'Enter consultation notes',
         'consultations.logConsultation': 'Log Consultation',
+        'consultations.logSuccess': 'Consultation logged successfully',
         'common.loading': 'Loading...',
       };
       return translations[key] || key;
@@ -176,5 +184,23 @@ describe('ConsultationForm', () => {
       expect(screen.getByText('Failed to log consultation')).toBeDefined();
     });
     expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  it('should show success toast on successful consultation log', async () => {
+    const logConsultation = (await import('@/server/consultations')).logConsultation;
+    (logConsultation as any).mockResolvedValue({});
+
+    render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
+    const selects = screen.getAllByTestId('select');
+    fireEvent.change(selects[0], { target: { value: '1' } });
+    const textarea = screen.getByPlaceholderText('Enter consultation notes');
+    fireEvent.change(textarea, { target: { value: 'Met with student' } });
+
+    const form = screen.getByRole('button', { name: 'Log Consultation' }).closest('form')!;
+    fireEvent.submit(form);
+
+    await vi.waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Consultation logged successfully');
+    });
   });
 });

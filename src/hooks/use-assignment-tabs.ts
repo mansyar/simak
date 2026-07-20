@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { listPendingConsultations } from '@/server/consultations';
 import { listExtensionRequests, approveExtension, rejectExtension } from '@/server/extensions';
-import { parseServerError, showErrorToast } from '@/lib/toast';
+import { parseServerError, showErrorToast, showSuccessToast } from '@/lib/toast';
 import { useI18n } from '@/routes/__root';
 import { isServerError } from '@/lib/errors';
 import type { PendingConsultation } from '@/components/instructor/assignments/AssignmentConsultationsTab';
@@ -76,6 +76,7 @@ export function useAssignmentTabs(assignmentId: number | null) {
         showErrorToast(parsed.code, t);
         return;
       }
+      showSuccessToast(t('extensions.approveSuccess'));
       await refreshExtensions();
     },
     [refreshExtensions, t],
@@ -89,6 +90,7 @@ export function useAssignmentTabs(assignmentId: number | null) {
         showErrorToast(parsed.code, t);
         return;
       }
+      showSuccessToast(t('extensions.rejectSuccess'));
       await refreshExtensions();
     },
     [refreshExtensions, t],

@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { toast } from 'sonner';
 import { ProfileSection } from '@/components/settings/ProfileSection';
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
 
 const mockUseQuery = vi.fn();
 const mockUseMutation = vi.fn();
@@ -91,7 +98,7 @@ describe('ProfileSection', () => {
     expect(mockMutateAsync).toHaveBeenCalledWith({ name: 'John Updated' });
   });
 
-  it('should show success message after name update', async () => {
+  it('should show success toast after name update', async () => {
     mockUseQuery.mockReturnValue({
       data: {
         user: { id: '1', name: 'John', email: 'john@test.com', image: null },
@@ -107,7 +114,9 @@ describe('ProfileSection', () => {
     fireEvent.change(input, { target: { value: 'John Updated' } });
     fireEvent.click(screen.getByText('Save Name'));
 
-    expect(await screen.findByText('Name updated successfully')).toBeDefined();
+    await vi.waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Name updated successfully');
+    });
   });
 
   it('should show error message on failed name update', async () => {

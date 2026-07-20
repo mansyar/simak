@@ -1,7 +1,7 @@
 {
   "track_id": "action-feedback-loading-states_20260720",
   "type": "bugfix",
-  "state": "INIT",
+  "state": "IMPLEMENT",
   "spec": {
     "approved": true,
     "approved_at": "2026-07-20T12:21:05Z"

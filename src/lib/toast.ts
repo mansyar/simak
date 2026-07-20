@@ -35,6 +35,13 @@ export function showErrorToast(code: string, t: TFunction): void {
   });
 }
 
+export function showSuccessToast(message: string): void {
+  toast.success(message, {
+    duration: 5000,
+    position: 'top-right',
+  });
+}
+
 export function parseServerError(response: unknown): {
   code: ErrorCode | 'UNKNOWN';
   message: string;

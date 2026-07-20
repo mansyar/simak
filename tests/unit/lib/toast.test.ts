@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { toast } from 'sonner';
-import { showErrorToast, parseServerError } from '@/lib/toast';
+import { showErrorToast, showSuccessToast, parseServerError } from '@/lib/toast';
 import { ErrorCode } from '@/lib/errors';
 
 const t = vi.fn((key: string) => `i18n:${key}`);
@@ -8,6 +8,7 @@ const t = vi.fn((key: string) => `i18n:${key}`);
 vi.mock('sonner', () => ({
   toast: {
     error: vi.fn(),
+    success: vi.fn(),
   },
 }));
 
@@ -52,6 +53,30 @@ describe('showErrorToast', () => {
     showErrorToast('INTERNAL', t);
 
     expect(toast.error).toHaveBeenCalledWith(expect.any(String), {
+      duration: 5000,
+      position: 'top-right',
+    });
+  });
+});
+
+describe('showSuccessToast', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('calls toast.success with the given message', () => {
+    showSuccessToast('Operation succeeded');
+
+    expect(toast.success).toHaveBeenCalledWith('Operation succeeded', {
+      duration: 5000,
+      position: 'top-right',
+    });
+  });
+
+  it('passes sensible default toast options', () => {
+    showSuccessToast('Saved');
+
+    expect(toast.success).toHaveBeenCalledWith(expect.any(String), {
       duration: 5000,
       position: 'top-right',
     });

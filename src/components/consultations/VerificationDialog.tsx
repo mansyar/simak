@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import {
   getConsultationDetail,
   verifyConsultation,
@@ -83,6 +84,7 @@ export function VerificationDialog({
       }) => Promise<{ success: boolean; error: string | null }>
     )({ data: { consultationId } });
     if (result.success) {
+      toast.success(t('consultations.verifySuccess'));
       onOpenChange(false);
       onActionComplete();
     } else {
@@ -103,6 +105,7 @@ export function VerificationDialog({
       data: { consultationId, reason: rejectReason.trim() },
     });
     if (result.success) {
+      toast.success(t('consultations.rejectSuccess'));
       onOpenChange(false);
       onActionComplete();
     } else {

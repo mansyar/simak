@@ -7,6 +7,7 @@ const mockListExtensionRequests = vi.fn();
 const mockApproveExtension = vi.fn();
 const mockRejectExtension = vi.fn();
 const mockShowErrorToast = vi.fn();
+const mockShowSuccessToast = vi.fn();
 
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({ t: (key: string) => key }),
@@ -16,6 +17,7 @@ vi.mock('@/lib/toast', () => ({
   parseServerError: (res: { error?: { code: string; message: string } }) =>
     res.error ? res.error : { code: 'UNKNOWN', message: '' },
   showErrorToast: (...args: unknown[]) => mockShowErrorToast(...args),
+  showSuccessToast: (...args: unknown[]) => mockShowSuccessToast(...args),
 }));
 
 vi.mock('@/server/consultations', () => ({
@@ -57,6 +59,7 @@ describe('useAssignmentTabs', () => {
     mockListExtensionRequests.mockReset();
     mockApproveExtension.mockReset();
     mockRejectExtension.mockReset();
+    mockShowSuccessToast.mockReset();
 
     mockListPendingConsultations.mockResolvedValue({ consultations: [], total: 0 });
     mockListExtensionRequests.mockResolvedValue({ items: [] });
@@ -144,6 +147,7 @@ describe('useAssignmentTabs', () => {
     await waitFor(() => {
       expect(result.current.extensionRequests).toEqual([]);
     });
+    expect(mockShowSuccessToast).toHaveBeenCalledWith('extensions.approveSuccess');
   });
 
   it('approveExtensionHandler does not refresh and toasts server error', async () => {
@@ -187,6 +191,7 @@ describe('useAssignmentTabs', () => {
     await waitFor(() => {
       expect(result.current.extensionRequests).toEqual([]);
     });
+    expect(mockShowSuccessToast).toHaveBeenCalledWith('extensions.rejectSuccess');
   });
 
   it('rejectExtensionHandler does not refresh and toasts server error', async () => {

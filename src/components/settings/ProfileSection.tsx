@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,7 +25,6 @@ export function ProfileSection() {
   });
 
   const [name, setName] = useState('');
-  const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -43,11 +43,10 @@ export function ProfileSection() {
   });
 
   const handleSaveName = async () => {
-    setSuccess('');
     setError('');
     try {
       await updateNameMutation.mutateAsync({ name });
-      setSuccess(t('settings.profile.nameSuccess'));
+      toast.success(t('settings.profile.nameSuccess'));
     } catch {
       setError(t('settings.profile.nameError'));
     }
@@ -117,11 +116,6 @@ export function ProfileSection() {
         </div>
 
         {/* Messages */}
-        {success && (
-          <div className="text-sm text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400 p-3 rounded-md">
-            {success}
-          </div>
-        )}
         {error && (
           <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>
         )}

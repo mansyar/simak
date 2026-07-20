@@ -209,7 +209,10 @@
     "editDescription": "Update user information. Email changes will require re-verification.",
     "reassignTitle": "Reassign Assignments",
     "reassignDescription": "This instructor has active assignments. Reassign them before deleting.",
-    "selectInstructor": "Select an instructor"
+    "selectInstructor": "Select an instructor",
+    "createSuccess": "User created successfully",
+    "updateSuccess": "User updated successfully",
+    "deleteSuccess": "User deleted successfully"
   },
   "adminTemplates": {
     "title": "Templates",
@@ -321,7 +324,9 @@
       "unlockError": "Failed to unlock checkpoint. Please try again.",
       "extend": "Extend",
       "extendError": "Failed to extend deadline. Please try again.",
-      "currentDeadline": "Current Deadline"
+      "currentDeadline": "Current Deadline",
+      "unlockSuccess": "Checkpoint unlocked successfully",
+      "extendSuccess": "Deadline extended successfully"
     },
     "table": {
       "student": "Student",
@@ -558,6 +563,7 @@
     "notes": "Notes",
     "notesPlaceholder": "Describe the consultation session",
     "logConsultation": "Log Consultation",
+    "logSuccess": "Consultation logged successfully",
     "previousSessions": "Previous Sessions",
     "noConsultations": "No consultations logged yet",
     "status": {
@@ -577,7 +583,9 @@
     "reject": "Reject",
     "confirmReject": "Confirm Reject",
     "rejectReason": "Rejection Reason",
-    "rejectReasonPlaceholder": "Enter reason for rejection"
+    "rejectReasonPlaceholder": "Enter reason for rejection",
+    "verifySuccess": "Consultation verified successfully",
+    "rejectSuccess": "Consultation rejected successfully"
   },
   "landing": {
     "hero": {
@@ -781,7 +789,9 @@
     "categoryHealth": "Health",
     "categoryOther": "Other",
     "maxExtensionsReached": "Maximum {count} extension(s) allowed. You have used {used}.",
-    "daysExceeded": "Extension days cannot exceed {max} for this assignment."
+    "daysExceeded": "Extension days cannot exceed {max} for this assignment.",
+    "approveSuccess": "Extension approved successfully",
+    "rejectSuccess": "Extension rejected successfully"
   },
   "settings": {
     "title": "Settings",
