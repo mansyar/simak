@@ -1,0 +1,19 @@
+{
+  "track_id": "accessibility-i18n-compliance_20260720",
+  "type": "refactor",
+  "state": "INIT",
+  "spec": {
+    "approved": true,
+    "approved_at": "2026-07-20T13:25:54Z"
+  },
+  "plan": {
+    "approved": true,
+    "approved_at": "2026-07-20T13:25:54Z",
+    "items_total": 18,
+    "items_completed": 0
+  },
+  "revert_baseline": "2096ba89c70ecee070df04fc9b7f2ebed581b3e3",
+  "created_at": "2026-07-20T13:25:54Z",
+  "updated_at": "2026-07-20T13:25:54Z",
+  "description": "TRACK-010: Accessibility (a11y) & i18n Compliance"
+}
