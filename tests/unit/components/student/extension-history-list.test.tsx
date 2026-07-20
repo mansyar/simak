@@ -1,28 +1,39 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
+const { mockT } = vi.hoisted(() => {
+  const translations: Record<string, string> = {
+    'extensions.historyTitle': 'Extension History',
+    'extensions.noHistory': 'No extension requests yet',
+    'extensions.tableDate': 'Date',
+    'extensions.tableCategory': 'Category',
+    'extensions.tableDuration': 'Duration',
+    'extensions.tableStatus': 'Status',
+    'extensions.tableResolution': 'Resolution',
+    'extensions.statusPending': 'Pending',
+    'extensions.statusApproved': 'Approved',
+    'extensions.statusRejected': 'Rejected',
+    'extensions.categoryPersonal': 'Personal',
+    'extensions.categoryResearch': 'Research',
+    'extensions.categoryHealth': 'Health',
+    'extensions.categoryOther': 'Other',
+    'extensions.daysCount': '{count} days',
+  };
+  return {
+    mockT: vi.fn((key: string, params?: Record<string, string>) => {
+      let result = translations[key] || key;
+      if (params) {
+        for (const [param, value] of Object.entries(params)) {
+          result = result.replace(`{${param}}`, value);
+        }
+      }
+      return result;
+    }),
+  };
+});
+
 vi.mock('@/routes/__root', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        'extensions.historyTitle': 'Extension History',
-        'extensions.noHistory': 'No extension requests yet',
-        'extensions.tableDate': 'Date',
-        'extensions.tableCategory': 'Category',
-        'extensions.tableDuration': 'Duration',
-        'extensions.tableStatus': 'Status',
-        'extensions.tableResolution': 'Resolution',
-        'extensions.statusPending': 'Pending',
-        'extensions.statusApproved': 'Approved',
-        'extensions.statusRejected': 'Rejected',
-        'extensions.categoryPersonal': 'Personal',
-        'extensions.categoryResearch': 'Research',
-        'extensions.categoryHealth': 'Health',
-        'extensions.categoryOther': 'Other',
-      };
-      return translations[key] || key;
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }));
 
 import { ExtensionHistoryList } from '@/components/student/extensions/ExtensionHistoryList';
@@ -121,5 +132,24 @@ describe('ExtensionHistoryList', () => {
   it('should render empty state when no items', () => {
     render(<ExtensionHistoryList items={[]} />);
     expect(screen.getByText('No extension requests yet')).toBeDefined();
+  });
+
+  describe('i18n days count (UX-18)', () => {
+    beforeEach(() => {
+      mockT.mockClear();
+    });
+
+    it('calls t() with extensions.daysCount and count param for each item', () => {
+      render(<ExtensionHistoryList items={mockItems} />);
+      expect(mockT).toHaveBeenCalledWith('extensions.daysCount', { count: '3' });
+      expect(mockT).toHaveBeenCalledWith('extensions.daysCount', { count: '5' });
+      expect(mockT).toHaveBeenCalledWith('extensions.daysCount', { count: '7' });
+    });
+
+    it('does not use hardcoded "days" suffix', () => {
+      render(<ExtensionHistoryList items={mockItems} />);
+      const daysCountCalls = mockT.mock.calls.filter((call) => call[0] === 'extensions.daysCount');
+      expect(daysCountCalls).toHaveLength(3);
+    });
   });
 });

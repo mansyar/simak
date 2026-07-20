@@ -92,7 +92,9 @@ export function ExtensionHistoryList({ items }: ExtensionHistoryListProps) {
                 <td className="py-3 pr-4 text-foreground">
                   {t(getCategoryLabel(item.category) as TranslationKey)}
                 </td>
-                <td className="py-3 pr-4 text-foreground">{item.extensionDays} days</td>
+                <td className="py-3 pr-4 text-foreground">
+                  {t('extensions.daysCount', { count: String(item.extensionDays) })}
+                </td>
                 <td className="py-3 pr-4">
                   <Badge variant={getStatusBadgeVariant(item.status)}>
                     {t(
