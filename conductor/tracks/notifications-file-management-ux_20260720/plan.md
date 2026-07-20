@@ -14,15 +14,15 @@
     - [ ] Write tests verifying `metadata: { assignmentId, checkpointId, submissionId }` is included in notification INSERTs for each creation point
     - [ ] Implement: Add metadata to notification INSERTs in `reviews.server.ts`, `submissions.server.ts`, `consultations.server.ts`, `extensions.server.ts` / `extensions-extras.server.ts`, `review-sla.ts`
 
-- [~] Task: Create NOTIFICATION_ROUTES map and convert NotificationItem to navigable Link
+- [x] Task: Create NOTIFICATION_ROUTES map and convert NotificationItem to navigable Link (fad1dad)
     - [ ] Write tests for route derivation (type + metadata → correct route; missing metadata → no navigation)
     - [ ] Write tests verifying `markAsRead` is called on click before navigation
     - [ ] Implement: Create `NOTIFICATION_ROUTES` map in client code
     - [ ] Implement: Convert `NotificationItem` from `<button>` to TanStack Router `<Link>` with `text-left w-full` styling; call `markAsRead` in `onClick`
 
-- [ ] Task: Add "Next Review" button to ReviewDetailPage success screen
-    - [ ] Write tests: button navigates to next pending review when reviews exist; button hidden when no more reviews
-    - [ ] Implement: Add "Next Review" button calling `listPendingReviews({ data: { page: 1, limit: 1 } })`; navigate to `/instructor/reviews/{submissionId}` or hide button when empty
+- [x] Task: Add "Next Review" button to ReviewDetailPage success screen
+    - [x] Write tests: button navigates to next pending review when reviews exist; button hidden when no more reviews
+    - [x] Implement: Add "Next Review" button calling `listPendingReviews({ data: { page: 1, limit: 1 } })`; navigate to `/instructor/reviews/{submissionId}` or hide button when empty
 
 - [ ] Task: Conductor - User Manual Verification 'Notification Navigation' (Protocol in workflow.md)
 
