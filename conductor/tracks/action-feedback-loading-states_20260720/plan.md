@@ -97,7 +97,7 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
     - [x] `pnpm test:coverage` ≥80%
     - [x] No file in `src/`/`tests/` exceeds 500 lines
     - [x] All 7 routes have a `pendingComponent`
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Loading Skeletons & Spinners' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Loading Skeletons & Spinners' (Protocol in workflow.md)
 
 ---
 
@@ -105,38 +105,38 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 **Goal:** Surface real error messages, add retry on side-data fetch failures, prevent the `openForReview` self-navigation loop, and differentiate network vs server upload errors.
 
-- [ ] Task: Read spec.md and workflow.md to re-establish context
-    - [ ] Read `./spec.md`
-    - [ ] Read `../../workflow.md`
-- [ ] Task: Add upload-error i18n keys and run codegen
-    - [ ] Add `files.networkError` (en: "Network error, check your connection" / id: "Kesalahan jaringan, periksa koneksi Anda") and `files.serverError` (en: "Server error, try again" / id: "Kesalahan server, coba lagi") to both locale files
-    - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`
-- [ ] Task: Write failing tests for error handling (Red)
-    - [ ] Test: StudentDashboard renders `data.error` (not `t('common.error')`) when the dashboard query returns an error
-    - [ ] Test: AssignmentDetailPage side-data `useEffect` — on fetch rejection, sets `sideDataError` and renders inline error banner with a retry button; retry re-invokes the fetch
-    - [ ] Test: ReviewDetailPage auto-`openForReview` — on failure, calls `toast.error()` and does NOT call `navigate({ replace: true })` (no self-navigation loop)
-    - [ ] Test: CheckpointSubmissionPage upload — a `TypeError` (network failure) surfaces `t('files.networkError')`; a non-2xx response surfaces `t('files.serverError')`
-    - [ ] Run `pnpm test` and confirm new tests fail (Red)
-- [ ] Task: Fix StudentDashboard error display (UX-6)
-    - [ ] In `StudentDashboard.tsx`, show `data.error` (the actual error message) instead of `t('common.error')` (match `InstructorDashboard.tsx`)
-    - [ ] Run `pnpm test` — StudentDashboard error test passes (Green)
-- [ ] Task: Add side-data error handling to AssignmentDetailPage (UX-7)
-    - [ ] Wrap the side-data `useEffect` in `src/routes/_authenticated/student/assignments/$id.tsx` in try/catch
-    - [ ] Add `sideDataError` state; on catch set error and render an inline error banner with a retry button
-    - [ ] Run `pnpm test` — side-data error test passes (Green)
-- [ ] Task: Fix ReviewDetailPage auto-openForReview (UX-8)
-    - [ ] Wrap the `openForReview` call in `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` in try/catch
-    - [ ] On failure: call `toast.error()` and prevent the `navigate({ replace: true })` self-navigation; stay on the page with an error banner
-    - [ ] Run `pnpm test` — openForReview error test passes (Green)
-- [ ] Task: Differentiate upload errors in CheckpointSubmissionPage (UX-9)
-    - [ ] In `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx` (or the upload handler), catch errors; if `instanceof TypeError`, show `t('files.networkError')`; otherwise parse the response and show `t('files.serverError')`
-    - [ ] Run `pnpm test` — upload error differentiation tests pass (Green)
-- [ ] Task: Verify quality gates for Phase 3
-    - [ ] `pnpm typecheck` passes
-    - [ ] `pnpm lint` passes (incl. `simak-i18n/no-hardcoded`)
-    - [ ] `pnpm check:i18n` passes (2 new keys in both locales)
-    - [ ] `pnpm test:coverage` ≥80%
-    - [ ] No file in `src/`/`tests/` exceeds 500 lines
-    - [ ] `StudentDashboard` shows `data.error` not `t('common.error')`; `ReviewDetailPage` `openForReview` has try/catch; `CheckpointSubmissionPage` distinguishes network vs server errors
+- [x] Task: Read spec.md and workflow.md to re-establish context
+    - [x] Read `./spec.md`
+    - [x] Read `../../workflow.md`
+- [x] Task: Add upload-error i18n keys and run codegen
+    - [x] Add `files.networkError` (en: "Network error, check your connection" / id: "Kesalahan jaringan, periksa koneksi Anda") and `files.serverError` (en: "Server error, try again" / id: "Kesalahan server, coba lagi") to both locale files
+    - [x] Run `pnpm generate:i18n` and `pnpm check:i18n`
+- [x] Task: Write failing tests for error handling (Red) [sha: ef6ccdb]
+    - [x] Test: StudentDashboard renders `data.error` (not `t('common.error')`) when the dashboard query returns an error
+    - [x] Test: AssignmentDetailPage side-data `useEffect` — on fetch rejection, sets `sideDataError` and renders inline error banner with a retry button; retry re-invokes the fetch
+    - [x] Test: ReviewDetailPage auto-`openForReview` — on failure, calls `toast.error()` and does NOT call `navigate({ replace: true })` (no self-navigation loop)
+    - [x] Test: CheckpointSubmissionPage upload — a `TypeError` (network failure) surfaces `t('files.networkError')`; a non-2xx response surfaces `t('files.serverError')`
+    - [x] Run `pnpm test` and confirm new tests fail (Red)
+- [x] Task: Fix StudentDashboard error display (UX-6) [sha: ef6ccdb]
+    - [x] In `StudentDashboard.tsx`, show `data.error` (the actual error message) instead of `t('common.error')` (match `InstructorDashboard.tsx`)
+    - [x] Run `pnpm test` — StudentDashboard error test passes (Green)
+- [x] Task: Add side-data error handling to AssignmentDetailPage (UX-7) [sha: ef6ccdb]
+    - [x] Wrap the side-data `useEffect` in `src/routes/_authenticated/student/assignments/$id.tsx` in try/catch
+    - [x] Add `sideDataError` state; on catch set error and render an inline error banner with a retry button
+    - [x] Run `pnpm test` — side-data error test passes (Green)
+- [x] Task: Fix ReviewDetailPage auto-openForReview (UX-8) [sha: ef6ccdb]
+    - [x] Wrap the `openForReview` call in `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` in try/catch
+    - [x] On failure: call `toast.error()` and prevent the `navigate({ replace: true })` self-navigation; stay on the page with an error banner
+    - [x] Run `pnpm test` — openForReview error test passes (Green)
+- [x] Task: Differentiate upload errors in CheckpointSubmissionPage (UX-9) [sha: ef6ccdb]
+    - [x] In `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx` (or the upload handler), catch errors; if `instanceof TypeError`, show `t('files.networkError')`; otherwise parse the response and show `t('files.serverError')`
+    - [x] Run `pnpm test` — upload error differentiation tests pass (Green)
+- [x] Task: Verify quality gates for Phase 3 [sha: ef6ccdb]
+    - [x] `pnpm typecheck` passes
+    - [x] `pnpm lint` passes (incl. `simak-i18n/no-hardcoded`)
+    - [x] `pnpm check:i18n` passes (2 new keys in both locales)
+    - [x] `pnpm test:coverage` ≥80%
+    - [x] No file in `src/`/`tests/` exceeds 500 lines
+    - [x] `StudentDashboard` shows `data.error` not `t('common.error')`; `ReviewDetailPage` `openForReview` has try/catch; `CheckpointSubmissionPage` distinguishes network vs server errors
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Error Handling' (Protocol in workflow.md)
 </protect>
