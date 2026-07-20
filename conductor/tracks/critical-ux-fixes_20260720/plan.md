@@ -1,6 +1,11 @@
+<protect>
 # Implementation Plan: Critical UX Fixes (Broken Functionality)
 
 ## Phase 1: FileUploader Fix (UX-29)
+
+- [ ] Task: Read spec.md and workflow.md to refresh context
+    - [ ] Read `conductor/tracks/critical-ux-fixes_20260720/spec.md`
+    - [ ] Read `conductor/workflow.md`
 
 - [ ] Task: Write failing tests for FileUploader reset flow (Red Phase)
     - [ ] Create test file `tests/unit/components/files/file-uploader.test.tsx` mirroring `src/components/files/file-uploader.tsx`
@@ -26,6 +31,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: FileUploader Fix' (Protocol in workflow.md)
 
 ## Phase 2: Navigation & Pagination Fixes (UX-38, UX-39, UX-57)
+
+- [ ] Task: Read spec.md and workflow.md to refresh context
+    - [ ] Read `conductor/tracks/critical-ux-fixes_20260720/spec.md`
+    - [ ] Read `conductor/workflow.md`
 
 - [ ] Task: Add `common.goHome` i18n key and regenerate types
     - [ ] Add `"goHome": "Go Home"` to `common` object in `locales/en.json`
@@ -56,3 +65,4 @@
     - [ ] Update `plan.md`: mark Phase 2 tasks complete with commit SHA
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Navigation & Pagination Fixes' (Protocol in workflow.md)
+</protect>

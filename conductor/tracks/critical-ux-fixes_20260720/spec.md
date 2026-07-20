@@ -1,3 +1,4 @@
+<protect>
 # Track: Critical UX Fixes (Broken Functionality)
 
 ## Overview
@@ -82,3 +83,4 @@ This track addresses 4 critical UX bugs where functionality is broken or mislead
 - Client-side auth check for role-specific dashboard links on the 404 page (defer — current fix is simple and honest; an authenticated user on `/` can click "Login" which redirects to their role dashboard via the `_unauthenticated` layout)
 - Refactoring FileUploader to own its success state internally (the callback prop is the minimal fix)
 - Separate i18n keys for 404 vs ErrorBoundary (single `common.goHome` key is sufficient)
+</protect>
