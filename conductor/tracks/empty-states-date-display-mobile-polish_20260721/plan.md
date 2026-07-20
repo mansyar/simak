@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan: Empty States, Date Display & Mobile Polish
 
 ## Track Metadata
@@ -15,6 +16,9 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 ---
 
 ## Phase 1: Empty States (UX-10, UX-11, UX-12)
+
+- [ ] Task: Read context — spec.md and workflow.md
+    - [ ] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
 
 - [ ] Task: Add empty-state i18n keys
     - [ ] Add `instructorReviews.noReviewsYet` (en: "No previous reviews" / id: "Belum ada ulasan sebelumnya") and `consultations.noConsultationsRequired` (en: "No consultations required for this assignment" / id: "Tidak ada konsultasi yang diperlukan untuk tugas ini") to both `locales/en.json` and `locales/id.json`
@@ -40,6 +44,9 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 ---
 
 ## Phase 2: Relative Dates & SLABadge (UX-43, UX-45)
+
+- [ ] Task: Read context — spec.md and workflow.md
+    - [ ] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
 
 - [ ] Task: Add `formatRelativeTime` helper to `src/lib/format.ts`
     - [ ] Write failing test: `formatRelativeTime(date, locale)` returns "in 3 days" (future, en) / "3 days ago" (past, en); locale-aware via `localeMap` (e.g., "dalam 3 hari" for id)
@@ -67,6 +74,9 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 
 ## Phase 3: Mobile Layout (UX-34, UX-35, UX-36)
 
+- [ ] Task: Read context — spec.md and workflow.md
+    - [ ] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
+
 - [ ] Task: CheckpointListEditor mobile stacking (UX-34)
     - [ ] Write failing test: checkpoint row uses `flex-col sm:flex-row` responsive classes; column headers use `hidden sm:flex`
     - [ ] Implement: change row from `flex items-start gap-2` → `flex flex-col sm:flex-row sm:items-start gap-2`; hide column headers on mobile (`hidden sm:flex`); reorder/remove buttons and inputs reflow vertically
@@ -88,6 +98,9 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 
 ## Phase 4: Final Conductor Review & Quality Gates
 
+- [ ] Task: Read context — spec.md and workflow.md
+    - [ ] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
+
 - [ ] Task: Run full quality gate suite
     - [ ] `pnpm test` (unit tests pass)
     - [ ] `pnpm test:coverage` — ≥80% on lines, statements, branches, functions
@@ -99,3 +112,4 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
     - [ ] Confirm UX-44 (timezone) and UX-37 (bulk-import) are documented as dropped/out-of-scope in `spec.md`
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Conductor Review & Quality Gates' (Protocol in workflow.md)
+</protect>

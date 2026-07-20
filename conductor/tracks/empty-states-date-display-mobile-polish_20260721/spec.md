@@ -1,3 +1,4 @@
+<protect>
 # Track Specification: Empty States, Date Display & Mobile Polish
 
 ## Overview
@@ -84,3 +85,4 @@ Make deadline-management and progress-review flows usable on 375px viewports.
 - Tailwind v4 responsive utilities (`flex-col`, `sm:flex-row`, `flex sm:hidden` / `hidden sm:block`).
 - shadcn/ui `Card` (ProgressTable mobile card layout; ReviewHistory/ConsultationProgress Card wrappers).
 - TanStack Start two-file server-function split (no server-function changes expected in this track — all client-side).
+</protect>
