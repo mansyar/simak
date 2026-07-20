@@ -120,12 +120,12 @@
     - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
     - [x] Commit: `fix(a11y): Add aria-expanded/aria-controls to DeadlineManager toggle (UX-22)`
 
-- [ ] Task: Add aria-hidden to CheckpointTimeline decorative elements (UX-24)
-    - [ ] Write failing tests: assert decorative connector line div and dot div have `aria-hidden="true"`
-    - [ ] Implement: add `aria-hidden="true"` to connector line div (~line 21) and dot div (~line 24) in `src/components/student/CheckpointTimeline.tsx`
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint` — no errors
-    - [ ] Commit: `fix(a11y): Add aria-hidden to CheckpointTimeline decorative elements (UX-24)`
+- [x] Task: Add aria-hidden to CheckpointTimeline decorative elements (UX-24) [1e16ed9]
+    - [x] Write failing tests: assert decorative connector line div and dot div have `aria-hidden="true"`
+    - [x] Implement: add `aria-hidden="true"` to connector line div (~line 21) and dot div (~line 24) in `src/components/student/CheckpointTimeline.tsx`
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
+    - [x] Commit: `fix(a11y): Add aria-hidden to CheckpointTimeline decorative elements (UX-24)`
 
 - [ ] Task: Conductor - User Manual Verification 'ARIA Attributes' (Protocol in workflow.md)
 
