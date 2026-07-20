@@ -218,5 +218,5 @@
     - [x] Run `pnpm check:i18n` — parity passes (EN↔ID)
     - [x] Verify no file in `src/`/`tests/`/`scripts/` exceeds 500 lines (`node scripts/check-modularity.js`)
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Verification & Definition of Done' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Verification & Definition of Done' (Protocol in workflow.md)
 </protect>
