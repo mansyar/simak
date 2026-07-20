@@ -377,4 +377,12 @@ Students and instructors lack a centralized system to:
 - **i18n** — 12 new success toast keys + 2 new error keys (`files.networkError`, `files.serverError`); removed `files.uploadError` (replaced by the two new keys); total 724 keys
 - **Tests** — 2,591 tests pass across 277 test files; coverage ≥80% on all thresholds (lines 88.13%, branches 81.14%, functions 81.51%, statements 87.49%)
 
+### Track: Search Debounce & Form Validation (July 2026)
+
+- **Search debounce + clear button** — New `useDebouncedCallback` hook (300ms delay) applied to 4 server-side search inputs (StudentAssignmentFilters, UserFilters, AssignmentFilters, admin audit-log page); conditional X clear button (lucide `X` icon) visible only when search text is non-empty
+- **Form validation migration** — Migrated 3 forms from raw `useState` to `react-hook-form` + `zodResolver` with `onBlur` + `onSubmit` validation mode: ConsultationForm (Zod schema with `superRefine` for conditional external consultant name), ExtensionRequestForm (Zod schema with `refine` for duration max validation using prop), PasswordSection (Zod schema with `refine` for password match validation)
+- **Upload progress bar** — Replaced `fetch` with `XMLHttpRequest` in CheckpointSubmissionPage for R2 uploads; added `xhr.upload.onprogress` handler computing `Math.round((loaded/total)*100)`; `FileUploader` now shows real-time `Progress` bar during upload with `Loader2` spinner as fallback
+- **i18n** — 9 new translation keys added (common.clearSearch, consultations.errors.*, extensions.errors.*, settings.password.currentPasswordRequired) in both EN and ID locales
+- **Tests** — 2,622 tests pass across 280 test files; coverage ≥80% on all thresholds
+
 </protect>
