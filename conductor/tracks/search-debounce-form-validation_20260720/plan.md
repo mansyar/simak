@@ -44,13 +44,13 @@
     - [ ] Run `pnpm test` — confirm tests pass
     - [ ] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
 
-- [ ] Task: Migrate ExtensionRequestForm to react-hook-form + Zod
-    - [ ] Write failing tests — verify: `reason` < 10 chars shows error on blur, `duration` > `maxExtensionDays` shows error, valid submission calls `requestExtension`
-    - [ ] Add i18n keys for form error messages to `locales/en.json` and `locales/id.json`
-    - [ ] Run `pnpm generate:i18n`
-    - [ ] Implement: replace `useState` with `useForm` + `zodResolver(RequestExtensionSchema)`, add `FormField` components, `onBlur` + `onSubmit` validation
-    - [ ] Run `pnpm test` — confirm tests pass
-    - [ ] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
+- [x] Task: Migrate ExtensionRequestForm to react-hook-form + Zod [bc345c5]
+    - [x] Write failing tests — verify: `reason` < 10 chars shows error on blur, `duration` > `maxExtensionDays` shows error, valid submission calls `requestExtension`
+    - [x] Add i18n keys for form error messages to `locales/en.json` and `locales/id.json`
+    - [x] Run `pnpm generate:i18n`
+    - [x] Implement: replace `useState` with `useForm` + `zodResolver(RequestExtensionSchema)`, add `FormField` components, `onBlur` + `onSubmit` validation
+    - [x] Run `pnpm test` — confirm tests pass
+    - [x] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
 
 - [ ] Task: Migrate PasswordSection to react-hook-form + Zod
     - [ ] Write failing tests — verify: mismatched `newPassword`/`confirmPassword` shows error on blur, `newPassword` < 8 chars shows error, valid submission calls `authClient.changePassword`
