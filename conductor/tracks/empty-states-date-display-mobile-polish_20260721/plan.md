@@ -17,27 +17,27 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 
 ## Phase 1: Empty States (UX-10, UX-11, UX-12)
 
-- [ ] Task: Read context — spec.md and workflow.md
-    - [ ] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
+- [x] Task: Read context — spec.md and workflow.md
+    - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
 
-- [ ] Task: Add empty-state i18n keys
-    - [ ] Add `instructorReviews.noReviewsYet` (en: "No previous reviews" / id: "Belum ada ulasan sebelumnya") and `consultations.noConsultationsRequired` (en: "No consultations required for this assignment" / id: "Tidak ada konsultasi yang diperlukan untuk tugas ini") to both `locales/en.json` and `locales/id.json`
-    - [ ] Run `pnpm generate:i18n`; verify `pnpm check:i18n` passes (parity)
+- [x] Task: Add empty-state i18n keys
+    - [x] Add `instructorReviews.noReviewsYet` (en: "No previous reviews" / id: "Belum ada ulasan sebelumnya") and `consultations.noConsultationsRequired` (en: "No consultations required for this assignment" / id: "Tidak ada konsultasi yang diperlukan untuk tugas ini") to both `locales/en.json` and `locales/id.json`
+    - [x] Run `pnpm generate:i18n`; verify `pnpm check:i18n` passes (parity)
 
-- [ ] Task: ConsultationList empty state (UX-10)
-    - [ ] Write failing test: `ConsultationList` renders `<EmptyState>` with `MessageSquare` icon (not a plain-text `<div>`) when there are no consultations
-    - [ ] Implement: replace the plain-text `<div>` with `<EmptyState icon={MessageSquare} title={t('consultations.noConsultations')} />` (reuse existing `consultations.noConsultations` key)
-    - [ ] Verify: `pnpm test` passes; component does not return `null` for empty state
+- [x] Task: ConsultationList empty state (UX-10)
+    - [x] Write failing test: `ConsultationList` renders `<EmptyState>` with `MessageSquare` icon (not a plain-text `<div>`) when there are no consultations
+    - [x] Implement: replace the plain-text `<div>` with `<EmptyState icon={MessageSquare} title={t('consultations.noConsultations')} />` (reuse existing `consultations.noConsultations` key)
+    - [x] Verify: `pnpm test` passes; component does not return `null` for empty state
 
-- [ ] Task: ReviewHistory empty state (UX-11)
-    - [ ] Write failing test: `ReviewHistory` renders a `Card` with `<EmptyState>` (title resolves to `instructorReviews.noReviewsYet`) instead of returning `null`
-    - [ ] Implement: render `Card` with `<EmptyState>` inside in place of `return null`
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: ReviewHistory empty state (UX-11)
+    - [x] Write failing test: `ReviewHistory` renders a `Card` with `<EmptyState>` (title resolves to `instructorReviews.noReviewsYet`) instead of returning `null`
+    - [x] Implement: render `Card` with `<EmptyState>` inside in place of `return null`
+    - [x] Verify: `pnpm test` passes
 
-- [ ] Task: ConsultationProgress empty state (UX-12)
-    - [ ] Write failing test: `ConsultationProgress` renders a `Card` with the `consultations.noConsultationsRequired` message instead of `return null` when `totalRequired === 0`
-    - [ ] Implement: render `Card` with message/`<EmptyState>` in place of `return null`
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: ConsultationProgress empty state (UX-12)
+    - [x] Write failing test: `ConsultationProgress` renders a `Card` with the `consultations.noConsultationsRequired` message instead of `return null` when `totalRequired === 0`
+    - [x] Implement: render `Card` with message/`<EmptyState>` in place of `return null`
+    - [x] Verify: `pnpm test` passes
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Empty States' (Protocol in workflow.md)
 
