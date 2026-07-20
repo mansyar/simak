@@ -15,7 +15,7 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 
 ---
 
-## Phase 1: Empty States (UX-10, UX-11, UX-12)
+## Phase 1: Empty States (UX-10, UX-11, UX-12) [checkpoint: 88ed767]
 
 - [x] Task: Read context — spec.md and workflow.md
     - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
