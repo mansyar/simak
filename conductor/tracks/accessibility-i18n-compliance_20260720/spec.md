@@ -1,3 +1,4 @@
+<protect>
 # Track Specification: Accessibility (a11y) & i18n Compliance (TRACK-010)
 
 ## Overview
@@ -119,3 +120,4 @@ After adding keys: run `pnpm generate:i18n` → validate with `pnpm check:i18n`.
 - **Phase 1 (Notification Refactor):** Refactor `NotificationCenter` to `<Sheet>`/`<SheetContent side="right">`. Convert `NotificationItem` to `<button>`. Make `NotificationBadge` `aria-label` dynamic. Add `aria-live="polite"`. Add 2 new i18n keys (`notifications.unreadCount`, `adminDashboard.noRecentActivityDescription`). Run `pnpm generate:i18n`. Write tests for keyboard navigation.
 - **Phase 2 (i18n Fixes):** Add remaining 2 i18n keys (`adminUsers.table.status`, `extensions.daysCount`). Run `pnpm generate:i18n`. Replace hardcoded strings. Replace `toLocaleDateString` calls with `formatDate`. Run `pnpm check:i18n` and `pnpm lint`.
 - **Phase 3 (ARIA Attributes):** Add `aria-label` to `FileList` download button. Add `role="progressbar"` + ARIA to `ProgressTable` and `ConsultationProgress`. Add `aria-expanded` + `aria-controls` to `DeadlineManager`. Add `aria-hidden` to `CheckpointTimeline`. Write tests for ARIA presence.
+</protect>

@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan: Accessibility (a11y) & i18n Compliance (TRACK-010)
 
 **Spec:** `./spec.md` | **Workflow:** `conductor/workflow.md` (TDD lifecycle + Phase Completion Verification Protocol)
@@ -8,6 +9,7 @@
 
 ## Phase 1: Notification Center a11y Refactor
 
+- [ ] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
 - [ ] Task: Add Phase 1 i18n keys (`notifications.unreadCount`, `adminDashboard.noRecentActivityDescription`)
     - [ ] Add `notifications.unreadCount` (en: "{count} unread notifications", id: "{count} notifikasi belum dibaca") with `{count}` param to both `locales/en.json` and `locales/id.json`
     - [ ] Add `adminDashboard.noRecentActivityDescription` (en: "No recent activity to display", id: "Tidak ada aktivitas terbaru untuk ditampilkan") to both locale files
@@ -48,6 +50,7 @@
 
 ## Phase 2: i18n Hardcoded String & Date Formatting Fixes
 
+- [ ] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
 - [ ] Task: Add Phase 2 i18n keys (`adminUsers.table.status`, `extensions.daysCount`)
     - [ ] Add `adminUsers.table.status` (en: "Status", id: "Status") to both locale files
     - [ ] Add `extensions.daysCount` (en: "{count} days", id: "{count} hari") with `{count}` param to both locale files
@@ -88,6 +91,7 @@
 
 ## Phase 3: ARIA Attributes
 
+- [ ] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
 - [ ] Task: Add aria-label to FileList download button (UX-16)
     - [ ] Write failing tests: assert download `<Button>` in `FileList` has `aria-label={t('files.download')}`
     - [ ] Implement: add `aria-label={t('files.download')}` to the download Button in `src/components/files/FileList.tsx`
@@ -124,3 +128,5 @@
     - [ ] Commit: `fix(a11y): Add aria-hidden to CheckpointTimeline decorative elements (UX-24)`
 
 - [ ] Task: Conductor - User Manual Verification 'ARIA Attributes' (Protocol in workflow.md)
+
+</protect>
