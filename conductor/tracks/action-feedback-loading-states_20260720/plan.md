@@ -138,5 +138,5 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
     - [x] `pnpm test:coverage` ≥80%
     - [x] No file in `src/`/`tests/` exceeds 500 lines
     - [x] `StudentDashboard` shows `data.error` not `t('common.error')`; `ReviewDetailPage` `openForReview` has try/catch; `CheckpointSubmissionPage` distinguishes network vs server errors
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Error Handling' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Error Handling' (Protocol in workflow.md)
 </protect>
