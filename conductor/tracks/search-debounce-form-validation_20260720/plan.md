@@ -37,12 +37,12 @@
     - [x] Read `conductor/workflow.md` for TDD lifecycle and checkpoint protocol
 
 - [x] Task: Migrate ConsultationForm to react-hook-form + Zod [3e40f2e]
-    - [ ] Write failing tests — verify: empty `notes` shows error on blur, `sessionType: 'external'` with empty `externalConsultantName` shows error, valid submission calls `logConsultation`
-    - [ ] Add i18n keys for form error messages to `locales/en.json` and `locales/id.json`
-    - [ ] Run `pnpm generate:i18n`
-    - [ ] Implement: replace raw `useState` with `useForm` + `zodResolver(LogConsultationSchema)`, add `FormField`/`FormItem`/`FormLabel`/`FormControl`/`FormMessage` for each field, `onBlur` + `onSubmit` validation
-    - [ ] Run `pnpm test` — confirm tests pass
-    - [ ] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
+    - [x] Write failing tests — verify: empty `notes` shows error on blur, `sessionType: 'external'` with empty `externalConsultantName` shows error, valid submission calls `logConsultation`
+    - [x] Add i18n keys for form error messages to `locales/en.json` and `locales/id.json`
+    - [x] Run `pnpm generate:i18n`
+    - [x] Implement: replace raw `useState` with `useForm` + `zodResolver(LogConsultationSchema)`, add `FormField`/`FormItem`/`FormLabel`/`FormControl`/`FormMessage` for each field, `onBlur` + `onSubmit` validation
+    - [x] Run `pnpm test` — confirm tests pass
+    - [x] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
 
 - [x] Task: Migrate ExtensionRequestForm to react-hook-form + Zod [bc345c5]
     - [x] Write failing tests — verify: `reason` < 10 chars shows error on blur, `duration` > `maxExtensionDays` shows error, valid submission calls `requestExtension`
@@ -60,7 +60,7 @@
     - [x] Run `pnpm test` — confirm tests pass
     - [x] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Form Migration' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Form Migration' (Protocol in workflow.md)
 
 ## Phase 3: Upload Progress
 
