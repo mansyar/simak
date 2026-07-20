@@ -64,18 +64,18 @@
 
 ## Phase 3: Upload Progress
 
-- [ ] Task: Read spec.md and workflow.md to refresh context
-    - [ ] Read `./spec.md` for requirements and acceptance criteria
-    - [ ] Read `conductor/workflow.md` for TDD lifecycle and checkpoint protocol
+- [x] Task: Read spec.md and workflow.md to refresh context
+    - [x] Read `./spec.md` for requirements and acceptance criteria
+    - [x] Read `conductor/workflow.md` for TDD lifecycle and checkpoint protocol
 
-- [ ] Task: Replace `fetch` with `XMLHttpRequest` + add upload progress bar
-    - [ ] Write failing tests for `CheckpointSubmissionPage` — verify: `XMLHttpRequest` is used (not `fetch`), `xhr.upload.onprogress` updates progress state, progress value passed to `FileUploader`
-    - [ ] Write failing tests for `FileUploader` — verify: `Progress` bar renders when `isUploading` + `uploadProgress` available, `Loader2` spinner shows as fallback when progress unavailable
-    - [ ] Verify `@/components/ui/progress` exists; if not, add via shadcn/ui CLI (`pnpm dlx shadcn@latest add progress`)
-    - [ ] Implement: replace `fetch(uploadUrl, { method: 'PUT', body: file })` with `XMLHttpRequest` in `CheckpointSubmissionPage`, add `xhr.upload.onprogress` handler computing `Math.round((loaded / total) * 100)`, store progress in state, pass `uploadProgress` prop to `FileUploader`
-    - [ ] Implement: add `Progress` bar component to `FileUploader` when `isUploading` is true, keep `Loader2` spinner as fallback
-    - [ ] Run `pnpm test` — confirm tests pass
-    - [ ] Run `pnpm typecheck`, `pnpm lint` — confirm clean
+- [x] Task: Replace `fetch` with `XMLHttpRequest` + add upload progress bar [8185fbd]
+    - [x] Write failing tests for `CheckpointSubmissionPage` — verify: `XMLHttpRequest` is used (not `fetch`), `xhr.upload.onprogress` updates progress state, progress value passed to `FileUploader`
+    - [x] Write failing tests for `FileUploader` — verify: `Progress` bar renders when `isUploading` + `uploadProgress` available, `Loader2` spinner shows as fallback when progress unavailable
+    - [x] Verify `@/components/ui/progress` exists; if not, add via shadcn/ui CLI (`pnpm dlx shadcn@latest add progress`)
+    - [x] Implement: replace `fetch(uploadUrl, { method: 'PUT', body: file })` with `XMLHttpRequest` in `CheckpointSubmissionPage`, add `xhr.upload.onprogress` handler computing `Math.round((loaded / total) * 100)`, store progress in state, pass `uploadProgress` prop to `FileUploader`
+    - [x] Implement: add `Progress` bar component to `FileUploader` when `isUploading` is true, keep `Loader2` spinner as fallback
+    - [x] Run `pnpm test` — confirm tests pass
+    - [x] Run `pnpm typecheck`, `pnpm lint` — confirm clean
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Upload Progress' (Protocol in workflow.md)
 </protect>
