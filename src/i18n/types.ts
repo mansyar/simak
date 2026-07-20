@@ -545,7 +545,8 @@ export type Translation = {
     revisionDeadline: string
     empty: string
     emptyPrompt: string
-    uploadError: string
+    networkError: string
+    serverError: string
     r2NotConfigured: string
     objectNotFound: string
   }

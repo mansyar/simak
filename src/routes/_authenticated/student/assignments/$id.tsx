@@ -85,6 +85,8 @@ function AssignmentDetailPage() {
   );
   const [loadingConsultations, setLoadingConsultations] = useState(true);
   const [loadingExtensions, setLoadingExtensions] = useState(true);
+  const [sideDataError, setSideDataError] = useState(false);
+  const [retryTrigger, setRetryTrigger] = useState(0);
   const [consultationPage, setConsultationPage] = useState(1);
   const [consultationTotal, setConsultationTotal] = useState(0);
   const [extensionPage, setExtensionPage] = useState(1);
@@ -109,58 +111,65 @@ function AssignmentDetailPage() {
       const loadConsultations = async () => {
         setLoadingConsultations(true);
         setLoadingExtensions(true);
-        const listConsFn = listConsultations as unknown as (args: {
-          data: { assignmentId: number; page: number; limit: number };
-        }) => Promise<unknown>;
-        const listCountsFn = listVerifiedCounts as unknown as (args: {
-          data: { assignmentId: number };
-        }) => Promise<unknown>;
-        const consResult = await listConsFn({
-          data: { assignmentId: assignment.id, page: consultationPage, limit: 20 },
-        });
-        if (
-          consResult &&
-          typeof consResult === 'object' &&
-          'consultations' in (consResult as Record<string, unknown>)
-        ) {
-          const consData = consResult as { consultations: typeof consultations; total: number };
-          setConsultations(consData.consultations);
-          setConsultationTotal(consData.total);
-        }
+        setSideDataError(false);
+        try {
+          const listConsFn = listConsultations as unknown as (args: {
+            data: { assignmentId: number; page: number; limit: number };
+          }) => Promise<unknown>;
+          const listCountsFn = listVerifiedCounts as unknown as (args: {
+            data: { assignmentId: number };
+          }) => Promise<unknown>;
+          const consResult = await listConsFn({
+            data: { assignmentId: assignment.id, page: consultationPage, limit: 20 },
+          });
+          if (
+            consResult &&
+            typeof consResult === 'object' &&
+            'consultations' in (consResult as Record<string, unknown>)
+          ) {
+            const consData = consResult as { consultations: typeof consultations; total: number };
+            setConsultations(consData.consultations);
+            setConsultationTotal(consData.total);
+          }
 
-        const countsResult = await listCountsFn({
-          data: { assignmentId: assignment.id },
-        });
-        if (
-          countsResult &&
-          typeof countsResult === 'object' &&
-          'counts' in (countsResult as Record<string, unknown>)
-        ) {
-          setVerifiedCounts((countsResult as { counts: typeof verifiedCounts }).counts);
-        }
-        setLoadingConsultations(false);
+          const countsResult = await listCountsFn({
+            data: { assignmentId: assignment.id },
+          });
+          if (
+            countsResult &&
+            typeof countsResult === 'object' &&
+            'counts' in (countsResult as Record<string, unknown>)
+          ) {
+            setVerifiedCounts((countsResult as { counts: typeof verifiedCounts }).counts);
+          }
+          setLoadingConsultations(false);
 
-        // Load extension requests
-        const listExtFn = listMyExtensionRequests as unknown as (args: {
-          data: { assignmentId: number; page: number; limit: number };
-        }) => Promise<unknown>;
-        const extResult = await listExtFn({
-          data: { assignmentId: assignment.id, page: extensionPage, limit: 20 },
-        });
-        if (
-          extResult &&
-          typeof extResult === 'object' &&
-          'items' in (extResult as Record<string, unknown>)
-        ) {
-          const extData = extResult as { items: typeof extensionItems; total: number };
-          setExtensionItems(extData.items);
-          setExtensionTotal(extData.total);
+          // Load extension requests
+          const listExtFn = listMyExtensionRequests as unknown as (args: {
+            data: { assignmentId: number; page: number; limit: number };
+          }) => Promise<unknown>;
+          const extResult = await listExtFn({
+            data: { assignmentId: assignment.id, page: extensionPage, limit: 20 },
+          });
+          if (
+            extResult &&
+            typeof extResult === 'object' &&
+            'items' in (extResult as Record<string, unknown>)
+          ) {
+            const extData = extResult as { items: typeof extensionItems; total: number };
+            setExtensionItems(extData.items);
+            setExtensionTotal(extData.total);
+          }
+          setLoadingExtensions(false);
+        } catch {
+          setSideDataError(true);
+          setLoadingConsultations(false);
+          setLoadingExtensions(false);
         }
-        setLoadingExtensions(false);
       };
       loadConsultations();
     }
-  }, [assignment, consultationPage, extensionPage]);
+  }, [assignment, consultationPage, extensionPage, retryTrigger]);
 
   // If a child route is active (e.g., /checkpoints/:checkpointId), render it via Outlet
   // The child route (submission page) has its own full layout and back navigation
@@ -337,7 +346,21 @@ function AssignmentDetailPage() {
 
       {activeTab === 'consultations' && (
         <div className="space-y-6">
-          {loadingConsultations ? (
+          {sideDataError ? (
+            <div className="flex items-center justify-between rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <span>{t('errors.fetchFailed')}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSideDataError(false);
+                  setRetryTrigger((c) => c + 1);
+                }}
+              >
+                {t('common.refresh')}
+              </Button>
+            </div>
+          ) : loadingConsultations ? (
             <div className="space-y-6">
               <div className="rounded-lg border bg-card p-5 shadow-sm">
                 <Skeleton data-testid="skeleton" className="h-6 w-48" />
@@ -381,7 +404,21 @@ function AssignmentDetailPage() {
 
       {activeTab === 'extensions' && (
         <div className="space-y-6">
-          {loadingExtensions ? (
+          {sideDataError ? (
+            <div className="flex items-center justify-between rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <span>{t('errors.fetchFailed')}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSideDataError(false);
+                  setRetryTrigger((c) => c + 1);
+                }}
+              >
+                {t('common.refresh')}
+              </Button>
+            </div>
+          ) : loadingExtensions ? (
             <div className="space-y-6">
               <div className="rounded-lg border bg-card p-5 shadow-sm">
                 <Skeleton data-testid="skeleton" className="h-6 w-48" />

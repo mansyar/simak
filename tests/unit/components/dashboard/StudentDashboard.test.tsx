@@ -46,7 +46,7 @@ describe('StudentDashboard', () => {
 
     render(<StudentDashboard data={data} />);
 
-    expect(screen.getByText('common.error')).toBeDefined();
+    expect(screen.getByText('Failed to load')).toBeDefined();
   });
 
   it('should render empty state for all widgets', () => {
