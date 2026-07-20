@@ -101,7 +101,7 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 ---
 
-## Phase 3: Error Handling (UX-6, UX-7, UX-8, UX-9)
+## Phase 3: Error Handling (UX-6, UX-7, UX-8, UX-9) [checkpoint: fe47f51]
 
 **Goal:** Surface real error messages, add retry on side-data fetch failures, prevent the `openForReview` self-navigation loop, and differentiate network vs server upload errors.
 
