@@ -21,6 +21,7 @@ export function getNotificationRoute(
 ): string | null {
   if (!metadata) return null;
 
+  // Safe assertion: metadata is jsonb from DB (Record<string, unknown>); narrowing to access typed fields
   const meta = metadata as NotificationMetadata;
 
   switch (type) {

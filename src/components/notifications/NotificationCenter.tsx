@@ -86,7 +86,10 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
           <div className="flex items-center gap-2">
             <SheetTitle className="text-lg font-semibold">{t('notifications.title')}</SheetTitle>
             {unreadCount > 0 && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-400">
+              <span
+                data-testid="unread-count"
+                className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-400"
+              >
                 {unreadCount}
               </span>
             )}

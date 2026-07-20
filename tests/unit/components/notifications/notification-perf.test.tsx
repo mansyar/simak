@@ -88,8 +88,8 @@ describe('Notification performance optimizations (NFR-1)', () => {
       const { container } = render(<NotificationCenter isOpen={true} onClose={() => {}} />);
 
       // The mock has 1 unread notification, so the unread count badge should be visible
-      const badge = container.querySelector('.bg-blue-100');
-      expect(badge).toBeDefined();
+      const badge = container.querySelector('[data-testid="unread-count"]');
+      expect(badge).not.toBeNull();
       expect(badge?.textContent).toBe('1');
     });
 
