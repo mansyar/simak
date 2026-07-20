@@ -55,48 +55,48 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 **Goal:** Eliminate blank-screen route loads via `pendingComponent` skeletons, add side-data loading skeletons, and replace plain "Loading..." text with `Loader2` spinners.
 
-- [ ] Task: Read spec.md and workflow.md to re-establish context
-    - [ ] Read `./spec.md`
-    - [ ] Read `../../workflow.md`
-- [ ] Task: Write failing tests for skeleton components and spinners (Red)
-    - [ ] `tests/unit/components/skeletons/dashboard-skeleton.test.tsx` — renders card grid layout
-    - [ ] `tests/unit/components/skeletons/table-skeleton.test.tsx` — renders header + N rows
-    - [ ] `tests/unit/components/skeletons/assignment-detail-skeleton.test.tsx` — renders detail layout
-    - [ ] Tests asserting each of the 7 routes exposes a `pendingComponent` that renders a skeleton/spinner
-    - [ ] Test asserting ConsultationForm submit button shows `Loader2` spinner when `loading` is true
-    - [ ] Tests asserting ProfileSection and VerificationDialog render `Loader2` (not plain "Loading..." text) in loading state
-    - [ ] Test asserting `student/assignments/$id.tsx` shows `Skeleton` in consultations/extensions tabs while `loadingConsultations`/`loadingExtensions` is true
-    - [ ] Run `pnpm test` and confirm new tests fail (Red)
-- [ ] Task: Create 3 reusable skeleton components (Green)
-    - [ ] Create `src/components/skeletons/dashboard-skeleton.tsx` — card + grid layout (student/instructor/admin dashboards)
-    - [ ] Create `src/components/skeletons/table-skeleton.tsx` — header + rows (admin users + audit log)
-    - [ ] Create `src/components/skeletons/assignment-detail-skeleton.tsx` — instructor assignment detail layout
-    - [ ] Run `pnpm test` — skeleton component tests pass (Green)
-- [ ] Task: Add `pendingComponent` to 7 routes (Green)
-    - [ ] `src/routes/_authenticated/student/dashboard.tsx` → `DashboardSkeleton`
-    - [ ] `src/routes/_authenticated/instructor/dashboard.tsx` → `DashboardSkeleton`
-    - [ ] `src/routes/_authenticated/admin/dashboard.tsx` → `DashboardSkeleton`
-    - [ ] `src/routes/_authenticated/admin/users/index.tsx` → `TableSkeleton`
-    - [ ] `src/routes/_authenticated/admin/audit-log.tsx` → `TableSkeleton`
-    - [ ] `src/routes/_authenticated/admin/users/import.tsx` → simple spinner (session-only fetch)
-    - [ ] `src/routes/_authenticated/instructor/assignments/$id.tsx` → `AssignmentDetailSkeleton`
-    - [ ] Run `pnpm test` — route pendingComponent tests pass (Green)
-- [ ] Task: Add side-data loading skeletons (UX-2)
-    - [ ] Add `loadingConsultations`/`loadingExtensions` state to the `useEffect` in `src/routes/_authenticated/student/assignments/$id.tsx`
-    - [ ] Render `Skeleton` in consultations and extensions tabs while loading
-    - [ ] Run `pnpm test` — side-data loading tests pass (Green)
-- [ ] Task: Add `Loader2` spinners (UX-3, UX-4)
-    - [ ] ConsultationForm submit button — `<Loader2 className="mr-2 h-4 w-4 animate-spin" />` when `loading` (match `ReviewForm.tsx`)
-    - [ ] ProfileSection — replace plain "Loading..." text with `Loader2` spinner (match `TwoFactorSettings.tsx`)
-    - [ ] VerificationDialog — replace plain "Loading..." text with `Loader2` spinner
-    - [ ] Run `pnpm test` — spinner tests pass (Green)
-- [ ] Task: Verify quality gates for Phase 2
-    - [ ] `pnpm typecheck` passes
-    - [ ] `pnpm lint` passes (incl. `simak-i18n/no-hardcoded`)
-    - [ ] `pnpm check:i18n` passes (no new keys this phase unless spinner aria-labels need them)
-    - [ ] `pnpm test:coverage` ≥80%
-    - [ ] No file in `src/`/`tests/` exceeds 500 lines
-    - [ ] All 7 routes have a `pendingComponent`
+- [x] Task: Read spec.md and workflow.md to re-establish context
+    - [x] Read `./spec.md`
+    - [x] Read `../../workflow.md`
+- [x] Task: Write failing tests for skeleton components and spinners (Red)
+    - [x] `tests/unit/components/skeletons/dashboard-skeleton.test.tsx` — renders card grid layout
+    - [x] `tests/unit/components/skeletons/table-skeleton.test.tsx` — renders header + N rows
+    - [x] `tests/unit/components/skeletons/assignment-detail-skeleton.test.tsx` — renders detail layout
+    - [x] Tests asserting each of the 7 routes exposes a `pendingComponent` that renders a skeleton/spinner
+    - [x] Test asserting ConsultationForm submit button shows `Loader2` spinner when `loading` is true
+    - [x] Tests asserting ProfileSection and VerificationDialog render `Loader2` (not plain "Loading..." text) in loading state
+    - [x] Test asserting `student/assignments/$id.tsx` shows `Skeleton` in consultations/extensions tabs while `loadingConsultations`/`loadingExtensions` is true
+    - [x] Run `pnpm test` and confirm new tests fail (Red)
+- [x] Task: Create 3 reusable skeleton components (Green)
+    - [x] Create `src/components/skeletons/dashboard-skeleton.tsx` — card + grid layout (student/instructor/admin dashboards)
+    - [x] Create `src/components/skeletons/table-skeleton.tsx` — header + rows (admin users + audit log)
+    - [x] Create `src/components/skeletons/assignment-detail-skeleton.tsx` — instructor assignment detail layout
+    - [x] Run `pnpm test` — skeleton component tests pass (Green)
+- [x] Task: Add `pendingComponent` to 7 routes (Green)
+    - [x] `src/routes/_authenticated/student/dashboard.tsx` → `DashboardSkeleton`
+    - [x] `src/routes/_authenticated/instructor/dashboard.tsx` → `DashboardSkeleton`
+    - [x] `src/routes/_authenticated/admin/dashboard.tsx` → `DashboardSkeleton`
+    - [x] `src/routes/_authenticated/admin/users/index.tsx` → `TableSkeleton`
+    - [x] `src/routes/_authenticated/admin/audit-log.tsx` → `TableSkeleton`
+    - [x] `src/routes/_authenticated/admin/users/import.tsx` → simple spinner (session-only fetch)
+    - [x] `src/routes/_authenticated/instructor/assignments/$id.tsx` → `AssignmentDetailSkeleton`
+    - [x] Run `pnpm test` — route pendingComponent tests pass (Green)
+- [x] Task: Add side-data loading skeletons (UX-2)
+    - [x] Add `loadingConsultations`/`loadingExtensions` state to the `useEffect` in `src/routes/_authenticated/student/assignments/$id.tsx`
+    - [x] Render `Skeleton` in consultations and extensions tabs while loading
+    - [x] Run `pnpm test` — side-data loading tests pass (Green)
+- [x] Task: Add `Loader2` spinners (UX-3, UX-4)
+    - [x] ConsultationForm submit button — `<Loader2 className="mr-2 h-4 w-4 animate-spin" />` when `loading` (match `ReviewForm.tsx`)
+    - [x] ProfileSection — replace plain "Loading..." text with `Loader2` spinner (match `TwoFactorSettings.tsx`)
+    - [x] VerificationDialog — replace plain "Loading..." text with `Loader2` spinner
+    - [x] Run `pnpm test` — spinner tests pass (Green)
+- [x] Task: Verify quality gates for Phase 2
+    - [x] `pnpm typecheck` passes
+    - [x] `pnpm lint` passes (incl. `simak-i18n/no-hardcoded`)
+    - [x] `pnpm check:i18n` passes (no new keys this phase unless spinner aria-labels need them)
+    - [x] `pnpm test:coverage` ≥80%
+    - [x] No file in `src/`/`tests/` exceeds 500 lines
+    - [x] All 7 routes have a `pendingComponent`
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Loading Skeletons & Spinners' (Protocol in workflow.md)
 
 ---
