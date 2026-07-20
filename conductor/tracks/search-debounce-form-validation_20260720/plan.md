@@ -30,7 +30,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Debounce & Clear Filters' (Protocol in workflow.md)
 
-## Phase 2: Form Migration
+## Phase 2: Form Migration [checkpoint: 851319c]
 
 - [x] Task: Read spec.md and workflow.md to refresh context
     - [x] Read `./spec.md` for requirements and acceptance criteria
@@ -60,7 +60,7 @@
     - [x] Run `pnpm test` — confirm tests pass
     - [x] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
 
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Form Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Form Migration' (Protocol in workflow.md)
 
 ## Phase 3: Upload Progress
 
