@@ -1,6 +1,7 @@
 import { useI18n } from '../../routes/__root';
 import type { TranslationKey } from '../../i18n/index';
 import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/format-date';
 
 interface ConsultationItem {
   id: number;
@@ -30,7 +31,7 @@ function getStatusBadgeVariant(status: string): 'warning' | 'success' | 'destruc
 }
 
 export function ConsultationList({ consultations }: ConsultationListProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   if (consultations.length === 0) {
     return (
@@ -57,7 +58,7 @@ export function ConsultationList({ consultations }: ConsultationListProps) {
                 ? `${t('consultations.external')}: ${item.externalConsultantName}`
                 : t('consultations.internal')}
             </span>
-            <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+            <span>{formatDate(item.createdAt, locale, 'short')}</span>
           </div>
         </div>
       ))}
