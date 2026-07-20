@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
-import { getReviewDetail, openForReview } from '@/server/reviews';
+import { getReviewDetail, openForReview, listPendingReviews } from '@/server/reviews';
 import { ReviewDetailHeader } from '@/components/reviews/ReviewDetailHeader';
 import { ReviewFilePreview } from '@/components/reviews/ReviewFilePreview';
 import { ReviewHistory } from '@/components/reviews/ReviewHistory';
@@ -37,6 +37,7 @@ function ReviewDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [transitioned, setTransitioned] = useState(false);
+  const [nextReviewSubmissionId, setNextReviewSubmissionId] = useState<number | null>(null);
 
   // On page load, if checkpoint is 'submitted', call openForReview
   useEffect(() => {
@@ -59,6 +60,26 @@ function ReviewDetailPage() {
     }
   }, [detail, params.submissionId, transitioned, navigate, t]);
 
+  // Fetch next pending review when success screen is shown
+  useEffect(() => {
+    if (!success) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const result = await listPendingReviews({ data: { page: 1, limit: 1 } });
+        if (cancelled || isServerError(result)) return;
+        if (result.items.length > 0) {
+          setNextReviewSubmissionId(result.items[0].submissionId);
+        }
+      } catch {
+        // Silently fail — button just won't show
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [success]);
+
   if (!detail) {
     return (
       <EmptyState
@@ -79,6 +100,19 @@ function ReviewDetailPage() {
       <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
         <CheckCircle2 className="h-12 w-12 text-success" />
         <h2 className="text-xl font-semibold">{t('instructorReviews.reviewSubmitted')}</h2>
+        {nextReviewSubmissionId !== null && (
+          <button
+            onClick={() =>
+              navigate({
+                to: '/instructor/reviews/$submissionId',
+                params: { submissionId: String(nextReviewSubmissionId) },
+              })
+            }
+            className="text-sm text-primary hover:underline"
+          >
+            {t('instructorReviews.nextReview')}
+          </button>
+        )}
         <button
           onClick={() => navigate({ to: '/instructor/reviews', search: { page: 1, limit: 20 } })}
           className="text-sm text-primary hover:underline"

@@ -79,7 +79,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { page, limit, type } = args.data;
+  const { page, limit, type, unreadOnly } = args.data;
   const db = getDb();
 
   try {
@@ -91,6 +91,9 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
     if (type) {
       conditions.push(eq(notifications.type, type));
     }
+    if (unreadOnly) {
+      conditions.push(eq(notifications.read, false));
+    }
 
     // Get total count
     const [{ count }] = await db
@@ -99,6 +102,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
       .where(and(...conditions));
 
     // Fetch paginated results — narrow SELECT to only needed columns (PERF-23)
+    // metadata is included for notification navigation (TRACK-012)
     const items = await db
       .select({
         id: notifications.id,
@@ -107,6 +111,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
         messageKey: notifications.messageKey,
         params: notifications.params,
         read: notifications.read,
+        metadata: notifications.metadata,
         createdAt: notifications.createdAt,
       })
       .from(notifications)
@@ -124,6 +129,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
         messageKey: item.messageKey,
         params: item.params,
         read: item.read,
+        metadata: item.metadata,
         createdAt: item.createdAt,
       };
       if (item.titleKey) {

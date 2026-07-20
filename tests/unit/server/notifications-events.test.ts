@@ -151,6 +151,17 @@ describe('Event trigger notifications', () => {
       expect(result).toEqual({ success: true });
       // Verify notification was created via db.insert(notifications)
       expect(mockTx.insert).toHaveBeenCalled();
+      // Verify metadata is included in the notification INSERT (TRACK-012)
+      expect(mockTx.values).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'submission_received',
+          metadata: expect.objectContaining({
+            checkpointId: 100,
+            assignmentId: 1,
+            submissionId: 42,
+          }),
+        }),
+      );
     });
   });
 
@@ -197,6 +208,17 @@ describe('Event trigger notifications', () => {
       expect(result).toEqual({ success: true });
       // Verify notification was created via mockTx.insert(notifications)
       expect(mockTx.insert).toHaveBeenCalled();
+      // Verify metadata is included in the notification INSERT (TRACK-012)
+      expect(mockTx.values).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'review_completed',
+          metadata: expect.objectContaining({
+            checkpointId: 100,
+            assignmentId: 1,
+            submissionId: 1,
+          }),
+        }),
+      );
     });
   });
 
@@ -244,6 +266,17 @@ describe('Event trigger notifications', () => {
       expect(result).toEqual({ success: true });
       // Verify notification was created via mockTx.insert(notifications)
       expect(mockTx.insert).toHaveBeenCalled();
+      // Verify metadata is included in the notification INSERT (TRACK-012)
+      expect(mockTx.values).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'revision_requested',
+          metadata: expect.objectContaining({
+            checkpointId: 100,
+            assignmentId: 1,
+            submissionId: 1,
+          }),
+        }),
+      );
     });
   });
 });

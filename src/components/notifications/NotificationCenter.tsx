@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { X, CheckSquare, Loader2 } from 'lucide-react';
 import { useI18n } from '@/routes/__root';
 import type { TranslationKey } from '@/i18n/index';
 import { useNotificationsList, useMarkAllRead } from '@/hooks/use-notifications';
 import { NotificationItem, type Notification } from './NotificationItem';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Tabs } from '@/components/ui/tabs';
 
 interface NotificationCenterProps {
   isOpen: boolean;
@@ -36,22 +37,47 @@ const GROUP_CONFIGS = [
 
 export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps) {
   const { t } = useI18n();
-  const { data, isLoading } = useNotificationsList({ page: 1, limit: 50 });
+  const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allItems, setAllItems] = useState<Notification[]>([]);
+  const { data, isLoading, isFetching } = useNotificationsList({
+    page: currentPage,
+    limit: 20,
+    unreadOnly: activeTab === 'unread',
+  });
   const { mutate: markAllRead, isPending: isMarkingAll } = useMarkAllRead();
 
-  const items: Notification[] = (data?.items as Notification[]) || [];
+  // Accumulate items across pages (FR-4 Load More pagination)
+  useEffect(() => {
+    if (!data?.items) return;
+    if (currentPage === 1) {
+      setAllItems(data.items as Notification[]);
+    } else {
+      setAllItems((prev) => {
+        const existingIds = new Set(prev.map((i) => i.id));
+        const newItems = (data.items as Notification[]).filter((i) => !existingIds.has(i.id));
+        return [...prev, ...newItems];
+      });
+    }
+  }, [data, currentPage]);
 
-  // Group notifications
-  const groupedNotifications = GROUP_CONFIGS.map((group) => {
-    const groupItems = items.filter((item) => group.types.includes(item.type));
-    return {
-      ...group,
-      items: groupItems,
-    };
-  }).filter((group) => group.items.length > 0);
+  const items: Notification[] = allItems;
+  const total = data?.total ?? 0;
+  const hasMore = items.length < total;
+
+  // Group notifications (memoized — PERF-27)
+  const groupedNotifications = useMemo(() => {
+    return GROUP_CONFIGS.map((group) => {
+      const groupItems = items.filter((item) => group.types.includes(item.type));
+      return {
+        ...group,
+        items: groupItems,
+      };
+    }).filter((group) => group.items.length > 0);
+  }, [items]);
 
   const hasNotifications = items.length > 0;
-  const unreadCount = items.filter((i) => !i.read).length;
+  const unreadCount = useMemo(() => items.filter((i) => !i.read).length, [items]);
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -60,7 +86,10 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
           <div className="flex items-center gap-2">
             <SheetTitle className="text-lg font-semibold">{t('notifications.title')}</SheetTitle>
             {unreadCount > 0 && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-400">
+              <span
+                data-testid="unread-count"
+                className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-400"
+              >
                 {unreadCount}
               </span>
             )}
@@ -78,9 +107,24 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
           )}
         </SheetHeader>
 
+        {/* Read/Unread filter tabs (FR-3) */}
+        <div className="px-4 pt-2">
+          <Tabs
+            tabs={[
+              { id: 'all', label: t('notifications.filterAll') },
+              { id: 'unread', label: t('notifications.filterUnread') },
+            ]}
+            activeTab={activeTab}
+            onTabChange={(tabId) => {
+              setActiveTab(tabId as 'all' | 'unread');
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+
         {/* Content area */}
         <div className="flex-1 overflow-y-auto">
-          {isLoading ? (
+          {isLoading && allItems.length === 0 ? (
             <div className="flex h-64 items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
@@ -110,6 +154,22 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                   </div>
                 </div>
               ))}
+              {hasMore && (
+                <div className="p-4">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                    disabled={isFetching}
+                    className="w-full rounded border border-border py-2 text-sm font-medium text-primary hover:bg-accent disabled:opacity-50 transition-colors"
+                  >
+                    {isFetching ? (
+                      <Loader2 className="mx-auto h-4 w-4 animate-spin" />
+                    ) : (
+                      t('notifications.loadMore')
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

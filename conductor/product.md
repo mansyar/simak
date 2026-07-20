@@ -393,4 +393,16 @@ Students and instructors lack a centralized system to:
 - **i18n** — 9 new translation keys added (common.clearSearch, consultations.errors.*, extensions.errors.*, settings.password.currentPasswordRequired) in both EN and ID locales
 - **Tests** — 2,622 tests pass across 280 test files; coverage ≥80% on all thresholds
 
+### Track 12: Notifications & File Management UX (July 2026)
+
+- **Notification navigation** — Notifications are now clickable links that navigate to the relevant page based on type and metadata (assignmentId, checkpointId, submissionId); `listNotificationsHandler` returns metadata; `NOTIFICATION_ROUTES` map derives routes; `NotificationItem` uses TanStack Router `<Link>` with `markAsRead` on click
+- **Next Review button** — ReviewDetailPage success screen shows a "Next Review" button that fetches the next pending submission via `listPendingReviews({ data: { page: 1, limit: 1 } })` and navigates to it; hidden when no more reviews exist
+- **Read/Unread filter** — NotificationCenter Sheet header now has "All" / "Unread" tabs (shadcn/ui `Tabs`); "Unread" tab passes `unreadOnly: boolean` to `useNotificationsList`; server handler adds `.where(eq(notifications.read, false))` when `unreadOnly` is true
+- **Load More pagination** — Changed `limit` from 50 to 20; "Load More" button at bottom increments `currentPage` and appends items; hidden when `items.length >= total`
+- **DOCX preview message** — Non-PDF files in `ReviewFilePreview` show a "Preview not available" card with `FileText` icon and download button; PDF files show inline preview as before
+- **Latest version badge** — `FileList` shows a "Latest" badge (`variant: secondary`) on the row with the highest `version` number
+- **Client-side performance** — `useNotificationsList` `staleTime: 30_000`; `useUnreadCount` `refetchInterval: 30000` + `refetchIntervalInBackground: false`; `NotificationItem` wrapped in `React.memo` with `useCallback` for `handleClick`; `NotificationCenter` uses `useMemo` for unread count and `groupedNotifications`
+- **i18n** — 6 new keys in EN and ID: `files.previewNotAvailable`, `instructorReviews.nextReview`, `notifications.filterAll`, `notifications.filterUnread`, `notifications.loadMore`, `files.latest`
+- **Tests** — 2,690 tests pass across 283 test files; coverage ≥80% on all thresholds (lines 88.16%, branches 81.32%, functions 81.68%, statements 87.54%)
+
 </protect>

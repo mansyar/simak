@@ -61,4 +61,25 @@ describe('ReviewFilePreview', () => {
     render(<ReviewFilePreview {...baseProps} fileSize={2_500_000} />);
     expect(screen.getByText(/2\.4 MB/)).toBeDefined();
   });
+
+  it('should show "Preview not available" message for non-PDF files (FR-5)', () => {
+    render(<ReviewFilePreview {...baseProps} fileName="chapter1.docx" />);
+    expect(screen.getByText('files.previewNotAvailable')).toBeDefined();
+  });
+
+  it('should not show "Preview not available" message for PDF files (FR-5)', () => {
+    render(<ReviewFilePreview {...baseProps} />);
+    expect(screen.queryByText('files.previewNotAvailable')).toBeNull();
+  });
+
+  it('should not render embed for non-PDF files', () => {
+    render(<ReviewFilePreview {...baseProps} fileName="chapter1.docx" />);
+    expect(document.querySelector('embed')).toBeNull();
+  });
+
+  it('should still render download button for non-PDF files with preview message (FR-5)', () => {
+    render(<ReviewFilePreview {...baseProps} fileName="chapter1.docx" />);
+    expect(screen.getByText('instructorReviews.downloadFile')).toBeDefined();
+    expect(screen.getByText('files.previewNotAvailable')).toBeDefined();
+  });
 });

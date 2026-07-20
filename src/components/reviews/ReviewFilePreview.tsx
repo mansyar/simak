@@ -53,6 +53,14 @@ export function ReviewFilePreview({
           </div>
         )}
 
+        {/* Preview not available for non-PDF files (FR-5) */}
+        {!isPdf && (
+          <div className="rounded-md border bg-muted/30 p-6 flex flex-col items-center gap-2 text-center">
+            <FileText className="h-8 w-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">{t('files.previewNotAvailable')}</p>
+          </div>
+        )}
+
         {/* Download button */}
         <a
           href={downloadUrl}

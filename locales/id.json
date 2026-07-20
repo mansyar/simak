@@ -300,6 +300,7 @@
     "submitError": "Gagal mengirim review. Silakan coba lagi.",
     "reviewSubmitted": "Review berhasil dikirim!",
     "backToQueue": "Kembali ke Antrean Review",
+    "nextReview": "Ulasan Berikutnya",
     "errors": {
       "feedbackUploadFailed": "Gagal mengunggah file umpan balik",
       "notInSubmittedState": "Checkpoint harus berstatus diserahkan untuk dibuka peninjauannya"
@@ -546,7 +547,9 @@
     "networkError": "Kesalahan jaringan, periksa koneksi Anda",
     "serverError": "Kesalahan server, coba lagi",
     "r2NotConfigured": "Penyimpanan berkas tidak dikonfigurasi. Hubungi administrator Anda.",
-    "objectNotFound": "Berkas yang diunggah tidak ditemukan. Silakan coba unggah kembali."
+    "objectNotFound": "Berkas yang diunggah tidak ditemukan. Silakan coba unggah kembali.",
+    "previewNotAvailable": "Pratinjau tidak tersedia — unduh untuk melihat",
+    "latest": "Terbaru"
   },
   "assignments": {
     "errors": {
@@ -678,6 +681,9 @@
     "closePanel": "Tutup panel",
     "viewNotifications": "Lihat notifikasi",
     "unreadCount": "{count} notifikasi belum dibaca",
+    "filterAll": "Semua",
+    "filterUnread": "Belum Dibaca",
+    "loadMore": "Muat Lainnya",
     "groups": {
       "newReviews": "Ulasan Baru",
       "consultations": "Pembaruan Konsultasi",

@@ -305,6 +305,7 @@ export type Translation = {
     submitError: string
     reviewSubmitted: string
     backToQueue: string
+    nextReview: string
     errors: {
       feedbackUploadFailed: string
       notInSubmittedState: string
@@ -552,6 +553,8 @@ export type Translation = {
     serverError: string
     r2NotConfigured: string
     objectNotFound: string
+    previewNotAvailable: string
+    latest: string
   }
   assignments: {
     errors: {
@@ -683,6 +686,9 @@ export type Translation = {
     closePanel: string
     viewNotifications: string
     unreadCount: string
+    filterAll: string
+    filterUnread: string
+    loadMore: string
     groups: {
       newReviews: string
       consultations: string

@@ -27,30 +27,32 @@ export function useUnreadCount() {
       handleServerError(res, t);
       return res.count;
     },
-    refetchInterval: 15000,
+    refetchInterval: 30000,
+    refetchIntervalInBackground: false,
   });
 }
 
 export function useNotificationsList(
-  options: { page?: number; limit?: number; type?: string } = {},
+  options: { page?: number; limit?: number; type?: string; unreadOnly?: boolean } = {},
 ) {
   const { t } = useI18n();
-  const { page = 1, limit = 20, type } = options;
+  const { page = 1, limit = 20, type, unreadOnly } = options;
   return useQuery({
-    queryKey: ['notifications', 'list', { page, limit, type }],
+    queryKey: ['notifications', 'list', { page, limit, type, unreadOnly }],
     queryFn: async () => {
       const res = await (
         listNotifications as unknown as (args: {
-          data: { page: number; limit: number; type?: string };
+          data: { page: number; limit: number; type?: string; unreadOnly?: boolean };
         }) => Promise<{
           items: unknown[];
           total: number;
           error?: { code: string; message: string };
         }>
-      )({ data: { page, limit, type } });
+      )({ data: { page, limit, type, unreadOnly } });
       handleServerError(res, t);
       return res;
     },
+    staleTime: 30_000,
   });
 }
 

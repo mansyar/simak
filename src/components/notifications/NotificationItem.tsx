@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { Link } from '@tanstack/react-router';
 import { FileUp, CheckCircle, RefreshCw, ClipboardCheck, AlertTriangle, Bell } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 import { useMarkRead } from '@/hooks/use-notifications';
+import { getNotificationRoute } from './notification-routes';
 
 export interface Notification {
   id: number;
@@ -11,6 +13,7 @@ export interface Notification {
   message: string | null;
   read: boolean | null;
   channel: string;
+  metadata: Record<string, unknown> | null;
   createdAt: Date | string | null;
 }
 
@@ -22,7 +25,7 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
   sla_breach: AlertTriangle,
 };
 
-export function NotificationItem({ item }: { item: Notification }) {
+function NotificationItemComponent({ item }: { item: Notification }) {
   const { mutate: markAsRead } = useMarkRead();
 
   const IconComponent = TYPE_ICONS[item.type] || Bell;
@@ -39,20 +42,20 @@ export function NotificationItem({ item }: { item: Notification }) {
 
   const relativeTimeStr = getRelativeTime(item.createdAt) || 'just now';
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (!item.read) {
       markAsRead(item.id);
     }
-  };
+  }, [item.read, item.id, markAsRead]);
 
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={`group flex w-full items-start gap-3 border-b border-border/40 p-4 text-left transition-all duration-200 cursor-pointer ${
-        !item.read ? 'bg-blue-50/50 dark:bg-blue-950/20 font-medium' : 'hover:bg-accent/30'
-      }`}
-    >
+  const route = getNotificationRoute(item.type, item.metadata);
+
+  const className = `group flex w-full items-start gap-3 border-b border-border/40 p-4 text-left transition-all duration-200 cursor-pointer ${
+    !item.read ? 'bg-blue-50/50 dark:bg-blue-950/20 font-medium' : 'hover:bg-accent/30'
+  }`;
+
+  const content = (
+    <>
       <div
         className={`rounded-lg p-2 transition-transform duration-200 group-hover:scale-105 ${
           !item.read
@@ -82,6 +85,22 @@ export function NotificationItem({ item }: { item: Notification }) {
       </div>
 
       {!item.read && <span className="mt-1.5 h-2 w-2 rounded-full bg-blue-500 shrink-0" />}
+    </>
+  );
+
+  if (route) {
+    return (
+      <Link to={route} onClick={handleClick} className={className}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" onClick={handleClick} className={className}>
+      {content}
     </button>
   );
 }
+
+export const NotificationItem = React.memo(NotificationItemComponent);

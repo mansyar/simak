@@ -23,6 +23,15 @@ vi.mock('@/routes/__root', () => ({
   }),
 }));
 
+// Mock TanStack Router Link
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children, to, className, onClick, ...props }: any) => (
+    <a href={to} className={className} onClick={onClick} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
 // Mock the hooks
 vi.mock('@/hooks/use-notifications', () => ({
   useUnreadCount: vi.fn(),
@@ -165,6 +174,7 @@ describe('Notification UI Components', () => {
       message: 'Your thesis chapter has been approved.',
       read: false,
       channel: 'in_app',
+      metadata: null,
       createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(), // 5 mins ago
     };
 
@@ -200,6 +210,7 @@ describe('Notification UI Components', () => {
       message: 'Your thesis chapter has been approved.',
       read: false,
       channel: 'in_app',
+      metadata: null,
       createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
     };
 
