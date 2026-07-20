@@ -113,12 +113,12 @@
     - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
     - [x] Commit: `fix(a11y): Add progressbar ARIA attributes to ConsultationProgress (UX-21)`
 
-- [ ] Task: Add aria-expanded and aria-controls to DeadlineManager (UX-22)
-    - [ ] Write failing tests: assert toggle button has `aria-expanded={isExpanded}` and `aria-controls` matching the content div's `id`; expandable content div has `id={`student-${student.id}-details`}`
-    - [ ] Implement: add `aria-expanded={isExpanded}` and `aria-controls={`student-${student.id}-details`}` to toggle button (~line 206), add matching `id` to expandable content div (~line 228) in `src/components/instructor/DeadlineManager.tsx`
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint` — no errors
-    - [ ] Commit: `fix(a11y): Add aria-expanded/aria-controls to DeadlineManager toggle (UX-22)`
+- [x] Task: Add aria-expanded and aria-controls to DeadlineManager (UX-22) [a7db5f6]
+    - [x] Write failing tests: assert toggle button has `aria-expanded={isExpanded}` and `aria-controls` matching the content div's `id`; expandable content div has `id={`student-${student.id}-details`}`
+    - [x] Implement: add `aria-expanded={isExpanded}` and `aria-controls={`student-${student.id}-details`}` to toggle button (~line 206), add matching `id` to expandable content div (~line 228) in `src/components/instructor/DeadlineManager.tsx`
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
+    - [x] Commit: `fix(a11y): Add aria-expanded/aria-controls to DeadlineManager toggle (UX-22)`
 
 - [ ] Task: Add aria-hidden to CheckpointTimeline decorative elements (UX-24)
     - [ ] Write failing tests: assert decorative connector line div and dot div have `aria-hidden="true"`
