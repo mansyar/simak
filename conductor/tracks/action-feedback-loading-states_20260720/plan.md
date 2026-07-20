@@ -13,40 +13,40 @@ Each task below follows the Standard Task Workflow (workflow.md §"Standard Task
 
 **Goal:** Establish the `showSuccessToast` helper and wire success toasts into all ~8 action `onSuccess` handlers so no user action completes silently.
 
-- [ ] Task: Read spec.md and workflow.md to re-establish context
-    - [ ] Read `./spec.md` (track specification — requirements, acceptance criteria, decisions)
-    - [ ] Read `../../workflow.md` (TDD lifecycle, commit format, phase checkpoint protocol)
-- [ ] Task: Define i18n keys and run codegen
-    - [ ] Add ~12 success-toast i18n keys to `locales/en.json` (e.g., `consultations.logSuccess`, `adminUsers.createSuccess`, `adminUsers.updateSuccess`, `adminUsers.deleteSuccess`, `instructorAssignments.deadlineManager.unlockSuccess`, `instructorAssignments.deadlineManager.extendSuccess`, `consultations.verifySuccess`, `consultations.rejectSuccess`, `extensions.approveSuccess`, `extensions.rejectSuccess`, `settings.profileUpdateSuccess`, `settings.passwordUpdateSuccess`)
-    - [ ] Add matching Indonesian translations to `locales/id.json`
-    - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` + `detect-locale.ts`
-    - [ ] Run `pnpm check:i18n` — confirm EN↔ID parity, no unused keys
-- [ ] Task: Write failing tests for `showSuccessToast` + action handlers (Red)
-    - [ ] Create/update `tests/unit/lib/toast.test.ts` — assert `showSuccessToast(message)` calls `toast.success(message)` (mock `sonner`)
-    - [ ] Add tests per action component asserting `toast.success` (or `showSuccessToast`) is invoked in the `onSuccess` path: ConsultationForm, CreateUserDialog, EditUserSheet, DeleteUserDialog, DeadlineManager (unlock + extend), VerificationDialog (verify + reject), use-assignment-tabs (approve + reject extension)
-    - [ ] Add tests asserting ProfileSection and PasswordSection fire a success toast instead of inline success text
-    - [ ] Run `pnpm test` and confirm new tests fail (Red)
-- [ ] Task: Implement `showSuccessToast` helper (Green)
-    - [ ] Add `showSuccessToast(message: string)` to `src/lib/toast.ts` mirroring `showErrorToast` (calls `toast.success(message)`)
-    - [ ] Run `pnpm test` — helper test passes (Green)
-- [ ] Task: Wire success toasts into all action `onSuccess` handlers (Green)
-    - [ ] ConsultationForm — `toast.success(t('consultations.logSuccess'))` in log mutation `onSuccess`
-    - [ ] CreateUserDialog — `toast.success(t('adminUsers.createSuccess'))`
-    - [ ] EditUserSheet — `toast.success(t('adminUsers.updateSuccess'))`
-    - [ ] DeleteUserDialog — `toast.success(t('adminUsers.deleteSuccess'))`
-    - [ ] DeadlineManager — unlock: `t('instructorAssignments.deadlineManager.unlockSuccess')`; extend: `t('...extendSuccess')`
-    - [ ] VerificationDialog — verify: `t('consultations.verifySuccess')`; reject: `t('consultations.rejectSuccess')`
-    - [ ] use-assignment-tabs — approve: `t('extensions.approveSuccess')`; reject: `t('extensions.rejectSuccess')`
-    - [ ] ProfileSection — replace inline success text with `toast.success(t('settings.profileUpdateSuccess'))`
-    - [ ] PasswordSection — replace inline success text with `toast.success(t('settings.passwordUpdateSuccess'))`
-    - [ ] Run `pnpm test` — all action-handler tests pass (Green)
-- [ ] Task: Verify quality gates for Phase 1
-    - [ ] `pnpm typecheck` passes
-    - [ ] `pnpm lint` passes (incl. `simak-i18n/no-hardcoded`)
-    - [ ] `pnpm check:i18n` passes
-    - [ ] `pnpm test:coverage` ≥80% on lines/stmts/branches/functions
-    - [ ] No file in `src/`/`tests/` exceeds 500 lines
-    - [ ] Grep: no `onSuccess` mutation handler lacks `toast.success` (excluding read-only queries)
+- [x] Task: Read spec.md and workflow.md to re-establish context
+    - [x] Read `./spec.md` (track specification — requirements, acceptance criteria, decisions)
+    - [x] Read `../../workflow.md` (TDD lifecycle, commit format, phase checkpoint protocol)
+- [x] Task: Define i18n keys and run codegen [sha: 172a9c9]
+    - [x] Add 10 success-toast i18n keys to `locales/en.json` (reused existing `settings.profile.nameSuccess` and `settings.password.passwordSuccess` instead of creating new keys — Decision #4)
+    - [x] Add matching Indonesian translations to `locales/id.json`
+    - [x] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` + `detect-locale.ts`
+    - [x] Run `pnpm check:i18n` — 723=723 parity, no unused keys (Phase 3 keys `files.networkError`/`files.serverError` deferred to Phase 3 to avoid unused-key gate failure)
+- [x] Task: Write failing tests for `showSuccessToast` + action handlers (Red) [sha: 172a9c9]
+    - [x] Update `tests/unit/lib/toast.test.ts` — assert `showSuccessToast(message)` calls `toast.success(message)` (mock `sonner`)
+    - [x] Add tests per action component asserting `toast.success` (or `showSuccessToast`) is invoked in the `onSuccess` path: ConsultationForm, CreateUserDialog, EditUserSheet, DeleteUserDialog, DeadlineManager (unlock + extend), VerificationDialog (verify + reject), use-assignment-tabs (approve + reject extension)
+    - [x] Add tests asserting ProfileSection and PasswordSection fire a success toast instead of inline success text
+    - [x] Run `pnpm test` and confirm new tests fail (Red) — 15 failed, 97 passed
+- [x] Task: Implement `showSuccessToast` helper (Green) [sha: 172a9c9]
+    - [x] Add `showSuccessToast(message: string)` to `src/lib/toast.ts` mirroring `showErrorToast` (calls `toast.success(message)`)
+    - [x] Run `pnpm test` — helper test passes (Green)
+- [x] Task: Wire success toasts into all action `onSuccess` handlers (Green) [sha: 172a9c9]
+    - [x] ConsultationForm — `toast.success(t('consultations.logSuccess'))` in log mutation `onSuccess`
+    - [x] CreateUserDialog — `toast.success(t('adminUsers.createSuccess'))`
+    - [x] EditUserSheet — `toast.success(t('adminUsers.updateSuccess'))`
+    - [x] DeleteUserDialog — `toast.success(t('adminUsers.deleteSuccess'))`
+    - [x] DeadlineManager — unlock: `t('instructorAssignments.deadlineManager.unlockSuccess')`; extend: `t('...extendSuccess')`
+    - [x] VerificationDialog — verify: `t('consultations.verifySuccess')`; reject: `t('consultations.rejectSuccess')`
+    - [x] use-assignment-tabs — approve: `t('extensions.approveSuccess')`; reject: `t('extensions.rejectSuccess')`
+    - [x] ProfileSection — replaced inline success text with `toast.success(t('settings.profile.nameSuccess'))`
+    - [x] PasswordSection — replaced inline success text with `toast.success(t('settings.password.passwordSuccess'))`
+    - [x] Run `pnpm test` — all action-handler tests pass (Green) — 112/112
+- [x] Task: Verify quality gates for Phase 1 [sha: 172a9c9]
+    - [x] `pnpm typecheck` passes
+    - [x] `pnpm lint` passes (incl. `simak-i18n/no-hardcoded`) — 0 warnings, 0 errors
+    - [x] `pnpm check:i18n` passes — 723=723, no unused keys
+    - [x] `pnpm test:coverage` ≥80% on lines/stmts/branches/functions — Lines 88.11%, Branches 81.13%, Functions 81.36%, Statements 87.47%
+    - [x] No file in `src/`/`tests/` exceeds 500 lines
+    - [x] Grep: no `onSuccess` mutation handler lacks `toast.success` (excluding read-only queries)
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Toast Infrastructure' (Protocol in workflow.md)
 
 ---
