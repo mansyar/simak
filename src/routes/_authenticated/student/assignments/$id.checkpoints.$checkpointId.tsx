@@ -131,6 +131,7 @@ function CheckpointSubmissionPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | undefined>(undefined);
   const [submissions, setSubmissions] = useState<
     { id: number; version: number; fileName: string; fileSize: number; uploadedAt: Date }[]
   >(data?.submissions ?? []);
@@ -165,6 +166,7 @@ function CheckpointSubmissionPage() {
       setIsUploading(true);
       setUploadError(null);
       setUploadSuccess(false);
+      setUploadProgress(undefined);
 
       try {
         const extension = file.name.split('.').pop()?.toLowerCase() ?? 'pdf';
@@ -190,17 +192,31 @@ function CheckpointSubmissionPage() {
           return;
         }
 
-        // Step 2: Upload file directly to R2
-        const uploadResponse = await fetch(uploadData.uploadUrl, {
-          method: 'PUT',
-          body: file,
-          headers: { 'Content-Type': contentType },
-        });
+        // Step 2: Upload file directly to R2 via XMLHttpRequest (for progress tracking)
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('PUT', uploadData.uploadUrl);
+          xhr.setRequestHeader('Content-Type', contentType);
 
-        if (!uploadResponse.ok) {
-          setUploadError(t('files.serverError'));
-          return;
-        }
+          xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+              setUploadProgress(Math.round((e.loaded / e.total) * 100));
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              setUploadProgress(100);
+              resolve();
+            } else {
+              reject(new Error(`Upload failed: ${xhr.status}`));
+            }
+          };
+
+          xhr.onerror = () => reject(new TypeError('Network error'));
+
+          xhr.send(file);
+        });
 
         // Step 3: Submit checkpoint
         const submitFn = submitCheckpoint as unknown as (args: {
@@ -232,6 +248,7 @@ function CheckpointSubmissionPage() {
           setUploadError(t('files.serverError'));
         }
         setIsUploading(false);
+        setUploadProgress(undefined);
       }
     },
     [params.checkpointId, t, fetchSubmissions, submissionPage],
@@ -294,6 +311,7 @@ function CheckpointSubmissionPage() {
         <FileUploader
           onUploadSuccess={handleUploadSuccess}
           isUploading={isUploading}
+          uploadProgress={uploadProgress}
           uploadError={uploadError}
           uploadSuccess={uploadSuccess}
           onResetSuccess={() => setUploadSuccess(false)}
