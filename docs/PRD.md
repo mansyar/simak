@@ -152,8 +152,11 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - **Email queue inspector:** Admins can monitor the email delivery queue at `/admin/email-queue` — a paginated (20/page), filterable (by status: pending/processing/sent/failed), and searchable (by recipient email or subject) list view with summary statistics. Admins can manually retry failed emails, which resets the email to `pending` status for reprocessing by the background processor. The retry is idempotent — only emails with `status='failed'` can be retried; attempting to retry a non-failed email returns a conflict error.
 - Users receive in-app alerts for submissions, reviews, revision requests, and consultation verifications.
 - SLA breach alerts are sent to Admins via in-app and email notifications.
-- Notification bell in the shared header shows the unread count with 15-second polling.
-- Clicking the bell opens a slide-over panel built on the shadcn `Sheet` primitive (provides focus trapping, Escape-key dismissal, and backdrop-click close). Notifications render as native `<button>` elements for keyboard access. The bell's `aria-label` dynamically includes the unread count and announces changes via an `aria-live="polite"` region.
+- Notification bell in the shared header shows the unread count with 30-second polling (`refetchIntervalInBackground: false` stops polling when the tab is not visible, reducing server load by ~75%). The notification list uses a 30-second `staleTime` to prevent unnecessary refetches on window focus.
+- **Notification navigation:** Notifications are clickable links that navigate to the relevant page based on their type and stored `metadata` (assignmentId, checkpointId, submissionId). A `NOTIFICATION_ROUTES` map derives the route client-side (e.g., `review_completed` → `/student/assignments/{assignmentId}/checkpoints/{checkpointId}`, `submission_received` → `/instructor/reviews/{submissionId}`). Clicking a notification calls `markAsRead` before navigating. If metadata is missing, the item still marks as read but does not navigate.
+- **Read/Unread filter:** The notification center has "All" and "Unread" tabs (shadcn/ui `Tabs`). The "Unread" tab filters server-side via `.where(eq(notifications.read, false))`.
+- **Load More pagination:** The notification list loads 20 items at a time with a "Load More" button that appends the next page. The button is hidden when all items are loaded.
+- Clicking the bell opens a slide-over panel built on the shadcn `Sheet` primitive (provides focus trapping, Escape-key dismissal, and backdrop-click close). Navigable notifications render as TanStack Router `<Link>` elements; non-navigable items fall back to native `<button>` elements. The bell's `aria-label` dynamically includes the unread count and announces changes via an `aria-live="polite"` region.
 - Users can mark individual notifications as read or mark all as read.
 - Notification preferences are `[v2]` — currently all event types are enabled for all users.
 
@@ -184,6 +187,8 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 - Files are accessible within assignment and submission context.
 - Previously submitted files can be downloaded at any time.
+- **File preview:** PDF files show an inline preview in the review detail page. Non-PDF files (e.g., `.docx`) show a "Preview not available" card with a `FileText` icon and a download button — the instructor is explicitly informed why there's no inline preview.
+- **Version history:** The `FileList` component shows all submission versions with a "Latest" badge on the row with the highest version number, making it easy to identify the most recent submission.
 - Role-based access control with audit trails.
 - **Upload-intent trust boundary:** When a client requests a presigned upload URL, the server creates an `upload_intents` record binding the generated file key to the requesting user, the target checkpoint, the upload purpose (`submission` or `review_feedback`), and an expiry. At submit time, the server verifies the intent (ownership, purpose, expiry, single-use) and performs an R2 `HEAD` request to confirm the actual file size — the client-reported size is never trusted. This prevents cross-user file hijacking, fabricated file keys, and size spoofing.
 
