@@ -1,55 +1,58 @@
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { KeyRound } from 'lucide-react';
+import { KeyRound, Loader2 } from 'lucide-react';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { authClient } from '@/lib/auth-client';
 import { useI18n } from '@/routes/__root';
 
 export function PasswordSection() {
   const { t } = useI18n();
 
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isPending, setIsPending] = useState(false);
+  const formSchema = z
+    .object({
+      currentPassword: z.string().min(1, t('settings.password.currentPasswordRequired')),
+      newPassword: z.string().min(8, t('settings.password.passwordMinLength')),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+      message: t('settings.password.passwordMismatch'),
+      path: ['confirmPassword'],
+    });
 
-  const validate = (): string | null => {
-    if (newPassword.length < 8) {
-      return t('settings.password.passwordMinLength');
-    }
-    if (newPassword !== confirmPassword) {
-      return t('settings.password.passwordMismatch');
-    }
-    return null;
-  };
+  type FormValues = z.infer<typeof formSchema>;
 
-  const handleChangePassword = async () => {
-    setError('');
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+    mode: 'onBlur',
+  });
 
-    const validationError = validate();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    setIsPending(true);
+  const handleFormSubmit = async (values: FormValues) => {
     try {
       await authClient.changePassword({
-        currentPassword,
-        newPassword,
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
       });
       toast.success(t('settings.password.passwordSuccess'));
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      form.reset();
     } catch {
-      setError(t('settings.password.passwordError'));
-    } finally {
-      setIsPending(false);
+      form.setError('root', { message: t('settings.password.passwordError') });
     }
   };
 
@@ -62,47 +65,81 @@ export function PasswordSection() {
         </CardTitle>
         <CardDescription>{t('settings.password.description')}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="current-password">{t('settings.password.currentPassword')}</Label>
-          <Input
-            id="current-password"
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            aria-label={t('settings.password.currentPassword')}
-          />
-        </div>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="currentPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('settings.password.currentPassword')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      aria-label={t('settings.password.currentPassword')}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="space-y-2">
-          <Label htmlFor="new-password">{t('settings.password.newPassword')}</Label>
-          <Input
-            id="new-password"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            aria-label={t('settings.password.newPassword')}
-          />
-        </div>
+            <FormField
+              control={form.control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('settings.password.newPassword')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      aria-label={t('settings.password.newPassword')}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="space-y-2">
-          <Label htmlFor="confirm-password">{t('settings.password.confirmPassword')}</Label>
-          <Input
-            id="confirm-password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            aria-label={t('settings.password.confirmPassword')}
-          />
-        </div>
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('settings.password.confirmPassword')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      aria-label={t('settings.password.confirmPassword')}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        {error && (
-          <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>
-        )}
+            {form.formState.errors.root && (
+              <p className="text-sm text-destructive" aria-live="polite">
+                {form.formState.errors.root.message}
+              </p>
+            )}
 
-        <Button onClick={handleChangePassword} disabled={isPending}>
-          {t('settings.password.changePassword')}
-        </Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t('common.loading')}
+                </>
+              ) : (
+                t('settings.password.changePassword')
+              )}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

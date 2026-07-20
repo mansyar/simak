@@ -1,9 +1,20 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useI18n } from '../../../routes/__root';
 import type { TranslationKey } from '../../../i18n/index';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   Select,
   SelectContent,
@@ -36,68 +47,75 @@ export function ExtensionRequestForm({
   onSuccess,
 }: ExtensionRequestFormProps) {
   const { t } = useI18n();
-
-  const [category, setCategory] = useState('');
-  const [reason, setReason] = useState('');
-  const [duration, setDuration] = useState('');
-  const [checkpointId, setCheckpointId] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const isFormValid = category && reason.length >= 10 && duration && Number(duration) >= 1;
+  const formSchema = z.object({
+    category: z.string().min(1, t('extensions.errors.categoryRequired')),
+    reason: z.string().min(10, t('extensions.errors.reasonMin')),
+    duration: z
+      .string()
+      .refine((val) => val !== '' && Number(val) >= 1, t('extensions.errors.durationMin'))
+      .refine(
+        (val) => val !== '' && Number(val) <= maxExtensionDays,
+        t('extensions.errors.durationMax').replace('{max}', String(maxExtensionDays)),
+      ),
+    checkpointId: z.string().optional(),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isFormValid) return;
+  type FormValues = z.infer<typeof formSchema>;
 
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      category: '',
+      reason: '',
+      duration: '',
+      checkpointId: '',
+    },
+    mode: 'onBlur',
+  });
 
-    const fn = requestExtension as unknown as (args: {
-      data: {
-        assignmentId: number;
-        category: string;
-        reason: string;
-        extensionDays: number;
-        checkpointId?: number;
-      };
-    }) => Promise<{ error?: string; extensionRequest?: { id: number } }>;
+  const reasonValue = form.watch('reason') || '';
 
-    const result = await fn({
+  const charDisplay =
+    reasonValue.length > 0 ? (
+      <p className="text-xs text-muted-foreground mt-1 text-right">
+        {reasonValue.length < 10
+          ? t('extensions.reasonMinChars').replace('{count}', '10')
+          : `${reasonValue.length} characters`}
+      </p>
+    ) : null;
+
+  const handleFormSubmit = async (values: FormValues) => {
+    const result = await (
+      requestExtension as unknown as (args: {
+        data: {
+          assignmentId: number;
+          category: string;
+          reason: string;
+          extensionDays: number;
+          checkpointId?: number;
+        };
+      }) => Promise<{ error?: string; extensionRequest?: { id: number } }>
+    )({
       data: {
         assignmentId,
-        category,
-        reason,
-        extensionDays: Number(duration),
-        ...(checkpointId ? { checkpointId: Number(checkpointId) } : {}),
+        category: values.category,
+        reason: values.reason,
+        extensionDays: Number(values.duration),
+        ...(values.checkpointId ? { checkpointId: Number(values.checkpointId) } : {}),
       },
     });
 
     if (result.error) {
-      setError(result.error);
-      setLoading(false);
+      form.setError('root', { message: result.error });
       return;
     }
 
     setSuccess(true);
-    setLoading(false);
-    setCategory('');
-    setReason('');
-    setDuration('');
-    setCheckpointId('');
+    form.reset();
     onSuccess();
   };
-
-  const charDisplay =
-    reason.length > 0 ? (
-      <p className="text-xs text-muted-foreground mt-1 text-right">
-        {reason.length < 10
-          ? t('extensions.reasonMinChars').replace('{count}', '10')
-          : `${reason.length} characters`}
-      </p>
-    ) : null;
 
   if (success) {
     return (
@@ -108,87 +126,116 @@ export function ExtensionRequestForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Category Select */}
-      <div className="space-y-2">
-        <Label htmlFor="category">{t('extensions.category')}</Label>
-        <Select value={category} onValueChange={(val) => setCategory(val ?? '')}>
-          <SelectTrigger id="category">
-            <SelectValue placeholder={t('extensions.categoryPlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            {CATEGORY_OPTIONS.map((cat) => (
-              <SelectItem key={cat} value={cat}>
-                {t(
-                  `extensions.category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as TranslationKey,
-                )}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Reason Textarea */}
-      <div className="space-y-2">
-        <Label htmlFor="reason">{t('extensions.reason')}</Label>
-        <textarea
-          id="reason"
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          rows={4}
-          placeholder={t('extensions.reasonPlaceholder')}
-          className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('extensions.category')}</FormLabel>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('extensions.categoryPlaceholder')} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {CATEGORY_OPTIONS.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {t(
+                        `extensions.category${cat.charAt(0).toUpperCase() + cat.slice(1)}` as TranslationKey,
+                      )}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {charDisplay}
-      </div>
 
-      {/* Duration Input */}
-      <div className="space-y-2">
-        <Label htmlFor="duration">{t('extensions.duration')}</Label>
-        <Input
-          id="duration"
-          type="number"
-          min={1}
-          max={maxExtensionDays}
-          value={duration}
-          onChange={(e) => setDuration(e.target.value)}
-          placeholder="1"
+        <FormField
+          control={form.control}
+          name="reason"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('extensions.reason')}</FormLabel>
+              <FormControl>
+                <textarea
+                  rows={4}
+                  placeholder={t('extensions.reasonPlaceholder')}
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  {...field}
+                />
+              </FormControl>
+              {charDisplay}
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <p className="text-xs text-muted-foreground">
-          {t('extensions.durationHint')} (max {maxExtensionDays})
-        </p>
-      </div>
 
-      {/* Checkpoint Select (optional) */}
-      {checkpoints.length > 0 && (
-        <div className="space-y-2">
-          <Label htmlFor="checkpoint">{t('extensions.checkpoint')}</Label>
-          <Select value={checkpointId} onValueChange={(val) => setCheckpointId(val ?? '')}>
-            <SelectTrigger id="checkpoint">
-              <SelectValue placeholder={t('extensions.checkpointHint')} />
-            </SelectTrigger>
-            <SelectContent>
-              {checkpoints.map((cp) => (
-                <SelectItem key={cp.id} value={String(cp.id)}>
-                  {cp.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+        <FormField
+          control={form.control}
+          name="duration"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('extensions.duration')}</FormLabel>
+              <FormControl>
+                <Input type="number" min={1} max={maxExtensionDays} placeholder="1" {...field} />
+              </FormControl>
+              <p className="text-xs text-muted-foreground">
+                {t('extensions.durationHint')} (max {maxExtensionDays})
+              </p>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      {/* Error Display */}
-      {error && (
-        <p className="text-sm text-destructive" aria-live="polite">
-          {error}
-        </p>
-      )}
+        {checkpoints.length > 0 && (
+          <FormField
+            control={form.control}
+            name="checkpointId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('extensions.checkpoint')}</FormLabel>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('extensions.checkpointHint')} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {checkpoints.map((cp) => (
+                      <SelectItem key={cp.id} value={String(cp.id)}>
+                        {cp.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
-      {/* Submit Button */}
-      <Button type="submit" disabled={!isFormValid || loading}>
-        {loading ? t('extensions.submitting') : t('extensions.submit')}
-      </Button>
-    </form>
+        {form.formState.errors.root && (
+          <p className="text-sm text-destructive" aria-live="polite">
+            {form.formState.errors.root.message}
+          </p>
+        )}
+
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {t('extensions.submitting')}
+            </>
+          ) : (
+            t('extensions.submit')
+          )}
+        </Button>
+      </form>
+    </Form>
   );
 }

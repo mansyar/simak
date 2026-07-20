@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { listAuditLogs } from '@/server/audit-logs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -24,12 +24,13 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { z } from 'zod';
 import { getActionVisualProps, ACTION_TYPES } from '@/lib/admin/audit-actions';
 import { formatDate } from '@/lib/format-date';
 import { isServerError } from '@/lib/errors';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 
 interface AuditLogEntry {
   id: number;
@@ -81,6 +82,7 @@ function AuditLogPage() {
   const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [localSearch, setLocalSearch] = useState(searchParams.search);
 
   const totalPages = Math.ceil(total / searchParams.limit);
 
@@ -95,6 +97,12 @@ function AuditLogPage() {
   const handleSearchChange = (value: string) => {
     navigate({ search: (prev: AuditLogSearchParams) => ({ ...prev, search: value, page: 1 }) });
   };
+
+  const debouncedHandleSearchChange = useDebouncedCallback(handleSearchChange, 300);
+
+  useEffect(() => {
+    setLocalSearch(searchParams.search);
+  }, [searchParams.search]);
 
   const handleActionFilter = (value: string) => {
     navigate({ search: (prev: AuditLogSearchParams) => ({ ...prev, action: value, page: 1 }) });
@@ -136,10 +144,26 @@ function AuditLogPage() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={t('adminAuditLog.searchPlaceholder')}
-              value={searchParams.search}
-              onChange={(e) => handleSearchChange(e.target.value)}
+              value={localSearch}
+              onChange={(e) => {
+                setLocalSearch(e.target.value);
+                debouncedHandleSearchChange(e.target.value);
+              }}
               className="pl-9"
             />
+            {localSearch !== '' && (
+              <button
+                type="button"
+                onClick={() => {
+                  setLocalSearch('');
+                  handleSearchChange('');
+                }}
+                className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                aria-label={t('common.clearSearch')}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
         <Select

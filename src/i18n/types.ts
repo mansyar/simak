@@ -79,6 +79,7 @@ export type Translation = {
     nextPage: string
     pageOf: string
     done: string
+    clearSearch: string
   }
   theme: {
     light: string
@@ -594,6 +595,11 @@ export type Translation = {
     rejectReasonPlaceholder: string
     verifySuccess: string
     rejectSuccess: string
+    errors: {
+      checkpointRequired: string
+      externalConsultantNameRequired: string
+      notesRequired: string
+    }
   }
   landing: {
     hero: {
@@ -754,6 +760,12 @@ export type Translation = {
     submit: string
     submitting: string
     successMessage: string
+    errors: {
+      categoryRequired: string
+      reasonMin: string
+      durationMin: string
+      durationMax: string
+    }
     queueTitle: string
     historyTitle: string
     noHistory: string
@@ -861,6 +873,7 @@ export type Translation = {
       passwordError: string
       passwordMinLength: string
       passwordMismatch: string
+      currentPasswordRequired: string
     }
     appearance: {
       title: string
