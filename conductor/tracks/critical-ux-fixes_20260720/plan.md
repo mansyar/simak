@@ -3,30 +3,30 @@
 
 ## Phase 1: FileUploader Fix (UX-29)
 
-- [ ] Task: Read spec.md and workflow.md to refresh context
-    - [ ] Read `conductor/tracks/critical-ux-fixes_20260720/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read spec.md and workflow.md to refresh context
+    - [x] Read `conductor/tracks/critical-ux-fixes_20260720/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Write failing tests for FileUploader reset flow (Red Phase)
-    - [ ] Create test file `tests/unit/components/files/file-uploader.test.tsx` mirroring `src/components/files/file-uploader.tsx`
-    - [ ] Write test: `onResetSuccess` callback is invoked when `handleReset()` is called
-    - [ ] Write test: after reset, the dropzone reappears (internal state cleared)
-    - [ ] Write test: `onResetSuccess` is optional (component renders without it)
-    - [ ] Run `pnpm test` and confirm the new tests fail as expected
+- [x] Task: Write failing tests for FileUploader reset flow (Red Phase)
+    - [x] Create test file `tests/unit/components/files/file-uploader.test.tsx` mirroring `src/components/files/file-uploader.tsx`
+    - [x] Write test: `onResetSuccess` callback is invoked when `handleReset()` is called
+    - [x] Write test: after reset, the dropzone reappears (internal state cleared)
+    - [x] Write test: `onResetSuccess` is optional (component renders without it)
+    - [x] Run `pnpm test` and confirm the new tests fail as expected
 
-- [ ] Task: Implement `onResetSuccess` callback prop (Green Phase)
-    - [ ] Add `onResetSuccess?: () => void` to `FileUploaderProps` interface in `src/components/files/file-uploader.tsx`
-    - [ ] Call `onResetSuccess?.()` inside `handleReset()` (after clearing internal state)
-    - [ ] Pass `onResetSuccess={() => setUploadSuccess(false)}` from `CheckpointSubmissionPage` in `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx`
-    - [ ] Run `pnpm test` and confirm all tests now pass
+- [x] Task: Implement `onResetSuccess` callback prop (Green Phase)
+    - [x] Add `onResetSuccess?: () => void` to `FileUploaderProps` interface in `src/components/files/file-uploader.tsx`
+    - [x] Call `onResetSuccess?.()` inside `handleReset()` (after clearing internal state)
+    - [x] Pass `onResetSuccess={() => setUploadSuccess(false)}` from `CheckpointSubmissionPage` in `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx`
+    - [x] Run `pnpm test` and confirm all tests now pass
 
-- [ ] Task: Verify quality gates and commit
-    - [ ] Run `pnpm test:coverage` (≥80% on all thresholds)
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint`
-    - [ ] Stage changes and commit with message `fix(files): Add onResetSuccess callback to FileUploader for Upload Another reset (UX-29)`
-    - [ ] Attach git note with task summary to the commit
-    - [ ] Update `plan.md`: mark Phase 1 tasks complete with commit SHA
+- [x] Task: Verify quality gates and commit [f74641c]
+    - [x] Run `pnpm test:coverage` (≥80% on all thresholds)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint`
+    - [x] Stage changes and commit with message `fix(files): Add onResetSuccess callback to FileUploader for Upload Another reset (UX-29)`
+    - [x] Attach git note with task summary to the commit
+    - [x] Update `plan.md`: mark Phase 1 tasks complete with commit SHA
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: FileUploader Fix' (Protocol in workflow.md)
 
