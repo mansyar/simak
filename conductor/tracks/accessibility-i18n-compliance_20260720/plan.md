@@ -106,12 +106,12 @@
     - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
     - [x] Commit: `fix(a11y): Add progressbar ARIA attributes to ProgressTable (UX-21)`
 
-- [ ] Task: Add progressbar ARIA to ConsultationProgress (UX-21)
-    - [ ] Write failing tests: assert summary progress bar has `role="progressbar"`, `aria-valuenow={totalVerified}`, `aria-valuemin={0}`, `aria-valuemax={totalRequired}`, `aria-label={t('consultations.consultationProgress')}`; per-checkpoint bars have similar ARIA
-    - [ ] Implement: add ARIA attributes to summary and per-checkpoint progress bars in `src/components/consultations/ConsultationProgress.tsx` (~line 34)
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint` — no errors
-    - [ ] Commit: `fix(a11y): Add progressbar ARIA attributes to ConsultationProgress (UX-21)`
+- [x] Task: Add progressbar ARIA to ConsultationProgress (UX-21) [f79fdcd]
+    - [x] Write failing tests: assert summary progress bar has `role="progressbar"`, `aria-valuenow={totalVerified}`, `aria-valuemin={0}`, `aria-valuemax={totalRequired}`, `aria-label={t('consultations.consultationProgress')}`; per-checkpoint bars have similar ARIA
+    - [x] Implement: add ARIA attributes to summary and per-checkpoint progress bars in `src/components/consultations/ConsultationProgress.tsx` (~line 34)
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
+    - [x] Commit: `fix(a11y): Add progressbar ARIA attributes to ConsultationProgress (UX-21)`
 
 - [ ] Task: Add aria-expanded and aria-controls to DeadlineManager (UX-22)
     - [ ] Write failing tests: assert toggle button has `aria-expanded={isExpanded}` and `aria-controls` matching the content div's `id`; expandable content div has `id={`student-${student.id}-details`}`
