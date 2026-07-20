@@ -114,7 +114,8 @@ simak/
 │   │   ├── settings/         → SettingsPage, ProfileSection, PasswordSection, AppearanceSection, AccessibilitySection
 │   │   └── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton, email queue inspector subcomponents (summary cards, filters, table, retry dialog)
 │   ├── server/               → Server functions (split: .ts = client-safe stubs + Zod, .server.ts = handlers)
-│   │   ├── auth.ts           → Login, logout, session
+│   │   ├── auth.ts           → Client-safe stub: Session type, getSessionFromHeaders, requireRole, _getSession (dynamic import)
+│   │   ├── auth.server.ts    → Session handler: Better Auth validation, DB query, 5s-TTL in-memory cache
 │   │   ├── users.ts          → User CRUD, invitations
 │   │   ├── assignments.ts    → Assignment CRUD (instructor + student queries)
 │   │   ├── assignments.server.ts → Server-only assignment handlers
@@ -627,6 +628,8 @@ Admin       (creates Instructors and Students)
 
 - Server-side sessions stored in the `session` table (managed by Better-Auth via Drizzle adapter).
 - Session validation via `getSessionFromHeaders()` server function using `auth.api.getSession()` with SSR request headers.
+- **Two-file split (Track: Session Caching & Bundle Safety):** `src/server/auth.ts` is a client-safe stub (43 lines) exporting the `Session` type, `getSessionFromHeaders`, `requireRole`, and `_getSession` (a `createServerFn` that dynamically imports the handler). It contains no DB, schema, or Better-Auth config imports — ensuring `pg`/`drizzle-orm` do not leak into the client bundle. The actual handler logic lives in `src/server/auth.server.ts` (~100 lines): Better Auth session validation, DB query for user role/locale, and the session cache. All 6 route layout files import from `auth.ts` and receive only client-safe code.
+- **Session cache (Track: Session Caching & Bundle Safety):** A 5s-TTL in-memory `Map<string, { role, locale, expiresAt }>` cache sits inside `getSessionHandler` in `auth.server.ts`. After `auth.api.getSession()` returns a valid user ID, the cache is checked. On a hit (not expired), the cached role/locale is returned and the DB query is skipped. On a miss, the DB query runs and the result is cached with a 5s TTL. Expired entries are evicted lazily on cache miss. **Tradeoff:** soft-deleted users and role changes take up to 5s to take effect — acceptable for a university system. The Better Auth `getSession()` call runs on every request (the cache only skips the DB query, not session validation). A `clearSessionCacheForTests` helper is exported for test isolation.
 - Route-level guard via TanStack Router `beforeLoad`:
   - `_unauthenticated` layout redirects authenticated users to their role-specific dashboard via `getRoleDashboard()`.
   - `_authenticated` layout redirects unauthenticated users to `/auth/login`.
