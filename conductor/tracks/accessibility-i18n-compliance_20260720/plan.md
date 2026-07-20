@@ -57,12 +57,12 @@
     - [x] Run `pnpm generate:i18n`
     - [x] Run `pnpm check:i18n` — verify key parity
 
-- [ ] Task: Replace UserTable hardcoded "Status" header (UX-17)
-    - [ ] Write failing tests: assert `UserTable` column header uses `t('adminUsers.table.status')`, no hardcoded `'Status'` string
-    - [ ] Implement: replace `header: 'Status'` with `header: t('adminUsers.table.status')` in `UserTable`
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
-    - [ ] Commit: `fix(i18n): Replace hardcoded UserTable Status header with i18n key (UX-17)`
+- [x] Task: Replace UserTable hardcoded "Status" header (UX-17) [65da9b7]
+    - [x] Write failing tests: assert `UserTable` column header uses `t('adminUsers.table.status')`, no hardcoded `'Status'` string
+    - [x] Implement: replace `header: 'Status'` with `header: t('adminUsers.table.status')` in `UserTable`
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
+    - [x] Commit: `fix(i18n): Replace hardcoded UserTable Status header with i18n key (UX-17)`
 
 - [ ] Task: Replace ExtensionHistoryList hardcoded "days" suffix (UX-18)
     - [ ] Write failing tests: assert `ExtensionHistoryList` renders `t('extensions.daysCount', { count: String(item.extensionDays) })`, no hardcoded `"days"` suffix
