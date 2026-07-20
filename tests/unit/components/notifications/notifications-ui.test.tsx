@@ -10,12 +10,14 @@ import * as hooks from '@/hooks/use-notifications';
 // Mock the i18n context hook
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
-    t: (key: string) => {
+    t: (key: string, params?: Record<string, string>) => {
       if (key === 'notifications.title') return 'Notifications';
       if (key === 'notifications.markAllRead') return 'Mark all read';
       if (key === 'notifications.empty') return 'No notifications yet';
       if (key === 'notifications.groups.newReviews') return 'New Reviews';
       if (key === 'notifications.groups.consultations') return 'Consultation Updates';
+      if (key === 'notifications.unreadCount') return `${params?.count ?? ''} unread notifications`;
+      if (key === 'notifications.viewNotifications') return 'View notifications';
       return key;
     },
   }),
@@ -102,6 +104,55 @@ describe('Notification UI Components', () => {
       const btn = screen.getByRole('button', { name: /notification/i });
       fireEvent.click(btn);
       expect(onOpen).toHaveBeenCalled();
+    });
+  });
+
+  describe('NotificationBadge - dynamic aria-label and aria-live (UX-23, UX-50)', () => {
+    it('aria-label includes unread count when hasUnread is true', () => {
+      vi.mocked(hooks.useUnreadCount).mockReturnValue({
+        data: 5,
+        isSuccess: true,
+      } as any);
+
+      const { container } = render(<NotificationBadge onOpen={vi.fn()} />);
+      const button = container.querySelector('button');
+      expect(button).not.toBeNull();
+      expect(button!.getAttribute('aria-label')).toContain('5');
+      expect(button!.getAttribute('aria-label')).toContain('unread');
+    });
+
+    it('aria-label shows viewNotifications when no unread', () => {
+      vi.mocked(hooks.useUnreadCount).mockReturnValue({
+        data: 0,
+        isSuccess: true,
+      } as any);
+
+      const { container } = render(<NotificationBadge onOpen={vi.fn()} />);
+      const button = container.querySelector('button');
+      expect(button).not.toBeNull();
+      expect(button!.getAttribute('aria-label')).toBe('View notifications');
+    });
+
+    it('count span no longer has role="status"', () => {
+      vi.mocked(hooks.useUnreadCount).mockReturnValue({
+        data: 5,
+        isSuccess: true,
+      } as any);
+
+      render(<NotificationBadge onOpen={vi.fn()} />);
+      expect(screen.queryByRole('status')).toBeNull();
+    });
+
+    it('badge container has aria-live="polite"', () => {
+      vi.mocked(hooks.useUnreadCount).mockReturnValue({
+        data: 5,
+        isSuccess: true,
+      } as any);
+
+      const { container } = render(<NotificationBadge onOpen={vi.fn()} />);
+      const button = container.querySelector('button');
+      expect(button).not.toBeNull();
+      expect(button!.getAttribute('aria-live')).toBe('polite');
     });
   });
 
