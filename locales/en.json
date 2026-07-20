@@ -752,6 +752,12 @@
     "submit": "Submit Request",
     "submitting": "Submitting...",
     "successMessage": "Extension request submitted successfully!",
+    "errors": {
+      "categoryRequired": "Please select a category",
+      "reasonMin": "Reason must be at least 10 characters",
+      "durationMin": "Duration must be at least 1 day",
+      "durationMax": "Duration cannot exceed {max} days"
+    },
     "queueTitle": "Extension Requests",
     "historyTitle": "Extension History",
     "noHistory": "No extension requests yet",

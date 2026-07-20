@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
@@ -10,7 +10,9 @@ vi.mock('@/routes/__root', () => ({
         'extensions.categoryPlaceholder': 'Select a category',
         'extensions.reason': 'Reason',
         'extensions.reasonPlaceholder': 'Explain why you need an extension...',
+        'extensions.reasonMinChars': 'Minimum {count} characters required',
         'extensions.duration': 'Duration (days)',
+        'extensions.durationHint': 'How many extra days do you need?',
         'extensions.checkpoint': 'Checkpoint',
         'extensions.checkpointHint': 'Select the checkpoint to extend (defaults to current)',
         'extensions.submit': 'Submit Request',
@@ -22,6 +24,10 @@ vi.mock('@/routes/__root', () => ({
         'extensions.categoryOther': 'Other',
         'extensions.maxExtensionsReached': 'Maximum {count} extension(s) allowed.',
         'extensions.daysExceeded': 'Extension days cannot exceed {max}.',
+        'extensions.errors.categoryRequired': 'Please select a category',
+        'extensions.errors.reasonMin': 'Reason must be at least 10 characters',
+        'extensions.errors.durationMin': 'Duration must be at least 1 day',
+        'extensions.errors.durationMax': 'Duration cannot exceed {max} days',
         'common.loading': 'Loading...',
       };
       return translations[key] || key;
@@ -34,22 +40,20 @@ vi.mock('@/server/extensions', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, type, onClick, disabled, ...props }: any) => (
-    <button
-      type={type || 'button'}
-      onClick={onClick}
-      disabled={disabled}
-      data-testid="submit-btn"
-      {...props}
-    >
+  Button: ({ children, type, disabled, ...props }: any) => (
+    <button type={type || 'button'} disabled={disabled} data-testid="submit-btn" {...props}>
       {children}
     </button>
   ),
 }));
 
+vi.mock('lucide-react', () => ({
+  Loader2: (props: any) => <svg data-testid="loader2-icon" {...props} />,
+}));
+
 vi.mock('@/components/ui/label', () => ({
-  Label: ({ children, htmlFor }: any) => (
-    <label htmlFor={htmlFor} data-testid="label">
+  Label: ({ children, htmlFor, ...props }: any) => (
+    <label htmlFor={htmlFor} data-testid="label" {...props}>
       {children}
     </label>
   ),
@@ -143,7 +147,7 @@ describe('ExtensionRequestForm', () => {
     expect(screen.getByText('Chapter 1')).toBeDefined();
   });
 
-  it('should disable submit when form is empty', () => {
+  it('should show error when reason is less than 10 characters on blur', async () => {
     render(
       <ExtensionRequestForm
         assignmentId={1}
@@ -153,10 +157,39 @@ describe('ExtensionRequestForm', () => {
         onSuccess={onSuccess}
       />,
     );
-    expect(screen.getByTestId('submit-btn')).toHaveProperty('disabled', true);
+    const textarea = screen.getByPlaceholderText('Explain why you need an extension...');
+    fireEvent.change(textarea, { target: { value: 'short' } });
+    fireEvent.blur(textarea);
+
+    await waitFor(() => {
+      expect(screen.getByText('Reason must be at least 10 characters')).toBeDefined();
+    });
   });
 
-  it('should enable submit when all required fields are filled', () => {
+  it('should show error when category is not selected on submit', async () => {
+    render(
+      <ExtensionRequestForm
+        assignmentId={1}
+        maxExtensionDays={7}
+        maxTotalExtensions={3}
+        checkpoints={checkpoints}
+        onSuccess={onSuccess}
+      />,
+    );
+    const textarea = screen.getByPlaceholderText('Explain why you need an extension...');
+    fireEvent.change(textarea, { target: { value: 'I need more time for research work' } });
+    const input = screen.getByTestId('duration-input');
+    fireEvent.change(input, { target: { value: '3' } });
+
+    const form = screen.getByText('Submit Request').closest('form')!;
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      expect(screen.getByText('Please select a category')).toBeDefined();
+    });
+  });
+
+  it('should show error when duration exceeds maxExtensionDays on submit', async () => {
     render(
       <ExtensionRequestForm
         assignmentId={1}
@@ -169,11 +202,16 @@ describe('ExtensionRequestForm', () => {
     const selects = screen.getAllByTestId('select');
     fireEvent.change(selects[0], { target: { value: 'personal' } });
     const textarea = screen.getByPlaceholderText('Explain why you need an extension...');
-    fireEvent.change(textarea, { target: { value: 'I need more time for research' } });
+    fireEvent.change(textarea, { target: { value: 'I need more time for research work' } });
     const input = screen.getByTestId('duration-input');
-    fireEvent.change(input, { target: { value: '3' } });
+    fireEvent.change(input, { target: { value: '10' } });
 
-    expect(screen.getByTestId('submit-btn')).toHaveProperty('disabled', false);
+    const form = screen.getByText('Submit Request').closest('form')!;
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      expect(screen.getByText('Duration cannot exceed 7 days')).toBeDefined();
+    });
   });
 
   it('should call requestExtension and onSuccess on valid submit', async () => {
@@ -196,10 +234,10 @@ describe('ExtensionRequestForm', () => {
     const input = screen.getByTestId('duration-input');
     fireEvent.change(input, { target: { value: '3' } });
 
-    const form = screen.getByRole('button', { name: 'Submit Request' }).closest('form')!;
+    const form = screen.getByText('Submit Request').closest('form')!;
     fireEvent.submit(form);
 
-    await vi.waitFor(() => {
+    await waitFor(() => {
       expect(requestExtension).toHaveBeenCalledOnce();
     });
     expect(onSuccess).toHaveBeenCalledOnce();
@@ -225,10 +263,10 @@ describe('ExtensionRequestForm', () => {
     const input = screen.getByTestId('duration-input');
     fireEvent.change(input, { target: { value: '3' } });
 
-    const form = screen.getByRole('button', { name: 'Submit Request' }).closest('form')!;
+    const form = screen.getByText('Submit Request').closest('form')!;
     fireEvent.submit(form);
 
-    await vi.waitFor(() => {
+    await waitFor(() => {
       expect(screen.getByText('Failed to request extension')).toBeDefined();
     });
     expect(onSuccess).not.toHaveBeenCalled();
@@ -254,11 +292,39 @@ describe('ExtensionRequestForm', () => {
     const input = screen.getByTestId('duration-input');
     fireEvent.change(input, { target: { value: '3' } });
 
-    const form = screen.getByRole('button', { name: 'Submit Request' }).closest('form')!;
+    const form = screen.getByText('Submit Request').closest('form')!;
     fireEvent.submit(form);
 
-    await vi.waitFor(() => {
+    await waitFor(() => {
       expect(screen.getByText('Extension request submitted successfully!')).toBeDefined();
+    });
+  });
+
+  it('should show Loader2 spinner in submit button when submitting', async () => {
+    const requestExtension = (await import('@/server/extensions')).requestExtension;
+    (requestExtension as any).mockReturnValue(new Promise(() => {}));
+
+    render(
+      <ExtensionRequestForm
+        assignmentId={1}
+        maxExtensionDays={7}
+        maxTotalExtensions={3}
+        checkpoints={checkpoints}
+        onSuccess={onSuccess}
+      />,
+    );
+    const selects = screen.getAllByTestId('select');
+    fireEvent.change(selects[0], { target: { value: 'personal' } });
+    const textarea = screen.getByPlaceholderText('Explain why you need an extension...');
+    fireEvent.change(textarea, { target: { value: 'I need more time for research work' } });
+    const input = screen.getByTestId('duration-input');
+    fireEvent.change(input, { target: { value: '3' } });
+
+    const form = screen.getByText('Submit Request').closest('form')!;
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('loader2-icon')).toBeDefined();
     });
   });
 });

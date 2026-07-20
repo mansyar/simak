@@ -757,6 +757,12 @@ export type Translation = {
     submit: string
     submitting: string
     successMessage: string
+    errors: {
+      categoryRequired: string
+      reasonMin: string
+      durationMin: string
+      durationMax: string
+    }
     queueTitle: string
     historyTitle: string
     noHistory: string

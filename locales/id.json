@@ -752,6 +752,12 @@
     "submit": "Kirim Permintaan",
     "submitting": "Mengirim...",
     "successMessage": "Permintaan perpanjangan berhasil dikirim!",
+    "errors": {
+      "categoryRequired": "Silakan pilih kategori",
+      "reasonMin": "Alasan harus minimal 10 karakter",
+      "durationMin": "Durasi harus minimal 1 hari",
+      "durationMax": "Durasi tidak boleh melebihi {max} hari"
+    },
     "queueTitle": "Permintaan Perpanjangan",
     "historyTitle": "Riwayat Perpanjangan",
     "noHistory": "Belum ada permintaan perpanjangan",
