@@ -52,13 +52,13 @@
     - [x] Run `pnpm test` — confirm tests pass
     - [x] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
 
-- [ ] Task: Migrate PasswordSection to react-hook-form + Zod
-    - [ ] Write failing tests — verify: mismatched `newPassword`/`confirmPassword` shows error on blur, `newPassword` < 8 chars shows error, valid submission calls `authClient.changePassword`
-    - [ ] Add i18n keys for password form error messages to `locales/en.json` and `locales/id.json`
-    - [ ] Run `pnpm generate:i18n`
-    - [ ] Implement: create local Zod schema (`currentPassword` required, `newPassword` min 8, `confirmPassword` must match via `.refine`), replace `useState` with `useForm` + `zodResolver`, add `FormField` components, `onBlur` + `onSubmit` validation
-    - [ ] Run `pnpm test` — confirm tests pass
-    - [ ] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
+- [x] Task: Migrate PasswordSection to react-hook-form + Zod [d5e6aff]
+    - [x] Write failing tests — verify: mismatched `newPassword`/`confirmPassword` shows error on blur, `newPassword` < 8 chars shows error, valid submission calls `authClient.changePassword`
+    - [x] Add i18n keys for password form error messages to `locales/en.json` and `locales/id.json`
+    - [x] Run `pnpm generate:i18n`
+    - [x] Implement: create local Zod schema (`currentPassword` required, `newPassword` min 8, `confirmPassword` must match via `.refine`), replace `useState` with `useForm` + `zodResolver`, add `FormField` components, `onBlur` + `onSubmit` validation
+    - [x] Run `pnpm test` — confirm tests pass
+    - [x] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Form Migration' (Protocol in workflow.md)
 
