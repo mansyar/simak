@@ -4,6 +4,7 @@ import { useI18n } from '@/routes/__root';
 import type { TranslationKey } from '@/i18n/index';
 import { useNotificationsList, useMarkAllRead } from '@/hooks/use-notifications';
 import { NotificationItem, type Notification } from './NotificationItem';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 interface NotificationCenterProps {
   isOpen: boolean;
@@ -38,8 +39,6 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   const { data, isLoading } = useNotificationsList({ page: 1, limit: 50 });
   const { mutate: markAllRead, isPending: isMarkingAll } = useMarkAllRead();
 
-  if (!isOpen) return null;
-
   const items: Notification[] = (data?.items as Notification[]) || [];
 
   // Group notifications
@@ -52,49 +51,32 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   }).filter((group) => group.items.length > 0);
 
   const hasNotifications = items.length > 0;
+  const unreadCount = items.filter((i) => !i.read).length;
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Slide-over panel */}
-      <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-background border-l border-border shadow-2xl transition-all duration-300 ease-in-out">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-border p-4">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent side="right" className="w-full max-w-md gap-0">
+        <SheetHeader className="flex-row items-center justify-between border-b border-border pr-10">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-foreground">{t('notifications.title')}</h2>
-            {items.filter((i) => !i.read).length > 0 && (
+            <SheetTitle className="text-lg font-semibold">{t('notifications.title')}</SheetTitle>
+            {unreadCount > 0 && (
               <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/40 dark:text-blue-400">
-                {items.filter((i) => !i.read).length}
+                {unreadCount}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1.5">
-            {hasNotifications && (
-              <button
-                type="button"
-                onClick={() => markAllRead()}
-                disabled={isMarkingAll || items.every((i) => i.read)}
-                className="inline-flex items-center gap-1 rounded px-2.5 py-1.5 text-xs font-medium text-primary hover:bg-accent disabled:opacity-50 transition-colors"
-              >
-                <CheckSquare className="h-3.5 w-3.5" />
-                {t('notifications.markAllRead')}
-              </button>
-            )}
+          {hasNotifications && (
             <button
               type="button"
-              onClick={onClose}
-              className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-              aria-label={t('notifications.closePanel')}
+              onClick={() => markAllRead()}
+              disabled={isMarkingAll || items.every((i) => i.read)}
+              className="inline-flex items-center gap-1 rounded px-2.5 py-1.5 text-xs font-medium text-primary hover:bg-accent disabled:opacity-50 transition-colors"
             >
-              <X className="h-5 w-5" />
+              <CheckSquare className="h-3.5 w-3.5" />
+              {t('notifications.markAllRead')}
             </button>
-          </div>
-        </div>
+          )}
+        </SheetHeader>
 
         {/* Content area */}
         <div className="flex-1 overflow-y-auto">
@@ -131,7 +113,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
             </div>
           )}
         </div>
-      </div>
-    </>
+      </SheetContent>
+    </Sheet>
   );
 }

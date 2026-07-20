@@ -192,6 +192,7 @@ export type Translation = {
       role: string
       createdAt: string
       actions: string
+      status: string
     }
     empty: string
     emptyPrompt: string
@@ -494,6 +495,7 @@ export type Translation = {
     activeConsultations: string
     recentActivity: string
     noRecentActivity: string
+    noRecentActivityDescription: string
     escalationAlerts: string
     allOnTrack: string
     noEscalationAlerts: string
@@ -680,6 +682,7 @@ export type Translation = {
     empty: string
     closePanel: string
     viewNotifications: string
+    unreadCount: string
     groups: {
       newReviews: string
       consultations: string
@@ -808,6 +811,7 @@ export type Translation = {
     categoryOther: string
     maxExtensionsReached: string
     daysExceeded: string
+    daysCount: string
     approveSuccess: string
     rejectSuccess: string
   }

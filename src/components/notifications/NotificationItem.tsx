@@ -46,9 +46,10 @@ export function NotificationItem({ item }: { item: Notification }) {
   };
 
   return (
-    <div
+    <button
+      type="button"
       onClick={handleClick}
-      className={`group flex items-start gap-3 border-b border-border/40 p-4 transition-all duration-200 cursor-pointer ${
+      className={`group flex w-full items-start gap-3 border-b border-border/40 p-4 text-left transition-all duration-200 cursor-pointer ${
         !item.read ? 'bg-blue-50/50 dark:bg-blue-950/20 font-medium' : 'hover:bg-accent/30'
       }`}
     >
@@ -81,6 +82,6 @@ export function NotificationItem({ item }: { item: Notification }) {
       </div>
 
       {!item.read && <span className="mt-1.5 h-2 w-2 rounded-full bg-blue-500 shrink-0" />}
-    </div>
+    </button>
   );
 }

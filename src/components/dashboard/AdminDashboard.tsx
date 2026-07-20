@@ -221,7 +221,7 @@ export function AdminDashboard({ data }: Props) {
               <EmptyState
                 icon={Bell}
                 title={t('adminDashboard.noRecentActivity')}
-                description="No recent activity to display"
+                description={t('adminDashboard.noRecentActivityDescription')}
               />
             ) : (
               <ul className="space-y-3">

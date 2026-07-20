@@ -41,3 +41,33 @@ describe('CheckpointTimeline', () => {
     expect(cards[2].textContent).toBe('Final');
   });
 });
+
+describe('CheckpointTimeline - aria-hidden on decorative elements (UX-24)', () => {
+  const checkpoints = [
+    { id: 1, name: 'Proposal', order: 1, state: 'passed' as const },
+    { id: 2, name: 'Chapter 1', order: 2, state: 'unlocked' as const },
+    { id: 3, name: 'Final', order: 3, state: 'locked' as const },
+  ];
+
+  it('connector line divs have aria-hidden="true"', () => {
+    const { container } = render(
+      <CheckpointTimeline checkpoints={checkpoints as any} assignmentId={101} />,
+    );
+    const connectorLines = container.querySelectorAll('div.absolute.left-\\[7px\\]');
+    expect(connectorLines.length).toBeGreaterThan(0);
+    connectorLines.forEach((line) => {
+      expect(line.getAttribute('aria-hidden')).toBe('true');
+    });
+  });
+
+  it('dot divs have aria-hidden="true"', () => {
+    const { container } = render(
+      <CheckpointTimeline checkpoints={checkpoints as any} assignmentId={101} />,
+    );
+    const dots = container.querySelectorAll('div.absolute.left-0.top-2');
+    expect(dots.length).toBe(checkpoints.length);
+    dots.forEach((dot) => {
+      expect(dot.getAttribute('aria-hidden')).toBe('true');
+    });
+  });
+});

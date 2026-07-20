@@ -333,3 +333,21 @@ describe('UserTable', () => {
     });
   });
 });
+
+describe('UserTable - i18n Status header (UX-17)', () => {
+  it('should use t("adminUsers.table.status") for the Status column header', () => {
+    render(
+      <UserTable data={mockUsers} onEdit={vi.fn()} onDelete={vi.fn()} onGenerateLink={vi.fn()} />,
+    );
+
+    expect(screen.getByText('adminUsers.table.status')).toBeDefined();
+  });
+
+  it('should not render hardcoded "Status" string', () => {
+    render(
+      <UserTable data={mockUsers} onEdit={vi.fn()} onDelete={vi.fn()} onGenerateLink={vi.fn()} />,
+    );
+
+    expect(screen.queryByText('Status')).toBeNull();
+  });
+});

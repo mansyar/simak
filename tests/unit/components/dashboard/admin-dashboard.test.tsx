@@ -204,4 +204,18 @@ describe('AdminDashboard component', () => {
     expect(cards[0]).toHaveAttribute('href', '/admin/users');
     expect(cards[1]).toHaveAttribute('href', '/admin/templates');
   });
+
+  describe('AdminDashboard - i18n empty-state description (UX-13)', () => {
+    it('renders t("adminDashboard.noRecentActivityDescription") as empty-state description', async () => {
+      const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+      render(<AdminDashboard data={emptyData} />);
+      expect(screen.getByText('adminDashboard.noRecentActivityDescription')).toBeDefined();
+    });
+
+    it('does not render hardcoded "No recent activity to display" string', async () => {
+      const { AdminDashboard } = await import('@/components/dashboard/AdminDashboard');
+      render(<AdminDashboard data={emptyData} />);
+      expect(screen.queryByText('No recent activity to display')).toBeNull();
+    });
+  });
 });

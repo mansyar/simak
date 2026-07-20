@@ -2,6 +2,7 @@ import { useI18n } from '../../routes/__root';
 import { Link } from '@tanstack/react-router';
 import { Clock, FileText, MessageSquare, ClipboardList, Calendar } from 'lucide-react';
 import { formatDateShort } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -155,7 +156,7 @@ export function StudentDashboard({ data }: Props) {
                     >
                       {deadline.dueDate === null
                         ? t('studentDashboard.noDeadline')
-                        : new Date(deadline.dueDate).toLocaleDateString()}
+                        : formatDate(deadline.dueDate, locale, 'short')}
                       {deadline.isOverdue && (
                         <Badge variant="destructive" className="ml-1">
                           {t('studentDashboard.overdue')}
@@ -234,7 +235,7 @@ export function StudentDashboard({ data }: Props) {
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {reminder.consultationDate
-                        ? new Date(reminder.consultationDate).toLocaleDateString()
+                        ? formatDate(reminder.consultationDate, locale, 'short')
                         : ''}
                     </p>
                   </div>

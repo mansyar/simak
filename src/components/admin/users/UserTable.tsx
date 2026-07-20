@@ -72,7 +72,7 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
     },
     {
       accessorKey: 'emailVerified',
-      header: 'Status',
+      header: t('adminUsers.table.status'),
       cell: ({ row }) => {
         const verified = row.original.emailVerified;
         return (

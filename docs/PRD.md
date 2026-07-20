@@ -153,7 +153,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Users receive in-app alerts for submissions, reviews, revision requests, and consultation verifications.
 - SLA breach alerts are sent to Admins via in-app and email notifications.
 - Notification bell in the shared header shows the unread count with 15-second polling.
-- Clicking the bell opens a slide-over panel with grouped notifications, "Mark all read" action, and empty state.
+- Clicking the bell opens a slide-over panel built on the shadcn `Sheet` primitive (provides focus trapping, Escape-key dismissal, and backdrop-click close). Notifications render as native `<button>` elements for keyboard access. The bell's `aria-label` dynamically includes the unread count and announces changes via an `aria-live="polite"` region.
 - Users can mark individual notifications as read or mark all as read.
 - Notification preferences are `[v2]` — currently all event types are enabled for all users.
 
@@ -216,7 +216,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - **Role-based Dashboards**: Each role has a dedicated dashboard page (`/student/dashboard`, `/instructor/dashboard`, `/admin/dashboard`) with metric cards (color-coded top borders, tinted icon backgrounds), summary widgets, and quick actions. Users are redirected to their role's dashboard after login.
 - **Dedicated Pages**: Complex workflows have full-featured dedicated pages linked from the dashboard.
 - **Dark Mode**: Light and dark theme support. System preference detection (`prefers-color-scheme`) with manual toggle. Persisted via `localStorage`. Class strategy: `.dark` on `<html>`.
-- **Accessibility**: Keyboard navigation, screen reader support. WCAG 2.1 AA compliance (contrast, focus, ARIA). Touch targets minimum 44×44px.
+- **Accessibility**: Keyboard navigation, screen reader support. WCAG 2.1 AA compliance (contrast, focus, ARIA). Touch targets minimum 44×44px. Progress bars expose `role="progressbar"` + value attributes; collapsible sections expose `aria-expanded`/`aria-controls`; decorative timeline elements are `aria-hidden`; icon-only buttons (e.g. file download) have `aria-label`; dates render locale-aware via a shared `formatDate` helper.
 - **Sidebar Navigation**: Dark navy sidebar (`#1C2333`) with role-specific navigation, active state indicators (blue left border), and user card with logout.
 - **Typography**: Fraunces (serif) for display/headings, DM Sans (sans-serif) for body text. Self-hosted font files in `public/fonts/`.
 - **Empty States**: Meaningful empty states with 64px icons, dashed borders, headline/description text, and CTA buttons. A `compact` variant is used inside dashboard cards to avoid dominating card height.

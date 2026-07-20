@@ -31,7 +31,14 @@ export function ConsultationProgress({ counts }: ConsultationProgressProps) {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
-            <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+            <div
+              className="flex-1 h-2 bg-muted rounded-full overflow-hidden"
+              role="progressbar"
+              aria-valuenow={totalVerified}
+              aria-valuemin={0}
+              aria-valuemax={totalRequired}
+              aria-label={t('consultations.consultationProgress')}
+            >
               <div
                 className="h-full bg-primary rounded-full transition-all"
                 style={{
@@ -69,7 +76,14 @@ export function ConsultationProgress({ counts }: ConsultationProgressProps) {
                 {cp.verifiedCount}/{cp.minConsultations} {t('consultations.verified')}
               </span>
             </div>
-            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-1.5 bg-muted rounded-full overflow-hidden"
+              role="progressbar"
+              aria-valuenow={cp.verifiedCount}
+              aria-valuemin={0}
+              aria-valuemax={cp.minConsultations}
+              aria-label={cp.checkpointName}
+            >
               <div
                 className={`h-full rounded-full transition-all ${barColor}`}
                 style={{ width: `${progress}%` }}

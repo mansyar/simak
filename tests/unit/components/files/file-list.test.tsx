@@ -81,4 +81,18 @@ describe('FileList', () => {
     render(<FileList submissions={[]} />);
     expect(screen.getByText('files.empty')).toBeDefined();
   });
+
+  describe('FileList - download button aria-label (UX-16)', () => {
+    it('download buttons have accessible name from aria-label', () => {
+      render(<FileList submissions={mockSubmissions} />);
+      const buttons = screen.getAllByRole('button', { name: 'files.download' });
+      expect(buttons).toHaveLength(3);
+    });
+
+    it('download buttons have aria-label={t("files.download")}', () => {
+      const { container } = render(<FileList submissions={mockSubmissions} />);
+      const buttons = container.querySelectorAll('button[aria-label="files.download"]');
+      expect(buttons).toHaveLength(3);
+    });
+  });
 });
