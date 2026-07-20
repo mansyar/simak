@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Critical UX Fixes (Broken Functionality)
 
-## Phase 1: FileUploader Fix (UX-29)
+## Phase 1: FileUploader Fix (UX-29) [checkpoint: 233492a]
 
 - [x] Task: Read spec.md and workflow.md to refresh context
     - [x] Read `conductor/tracks/critical-ux-fixes_20260720/spec.md`
