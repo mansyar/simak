@@ -9,6 +9,11 @@ vi.mock('sonner', () => ({
   },
 }));
 
+vi.mock('lucide-react', () => ({
+  Loader2: (props: any) => <svg data-testid="loader2-icon" {...props} />,
+  User: (props: any) => <svg data-testid="user-icon" {...props} />,
+}));
+
 const mockUseQuery = vi.fn();
 const mockUseMutation = vi.fn();
 const mockInvalidateQueries = vi.fn();
@@ -69,12 +74,13 @@ describe('ProfileSection', () => {
     expect(screen.getByLabelText('Profile Picture')).toBeDefined();
   });
 
-  it('should render loading state', () => {
+  it('should render loading state with Loader2 spinner', () => {
     mockUseQuery.mockReturnValue({ data: null, isLoading: true });
 
     render(<ProfileSection />);
 
-    expect(screen.getByText('common.loading')).toBeDefined();
+    expect(screen.getByTestId('loader2-icon')).toBeDefined();
+    expect(screen.queryByText('common.loading')).toBeNull();
   });
 
   it('should update name via mutation when Save is clicked', async () => {

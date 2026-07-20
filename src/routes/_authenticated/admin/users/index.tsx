@@ -28,6 +28,7 @@ import { Plus, Upload } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
 import { isServerError, ErrorCode } from '@/lib/errors';
+import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
 const UserSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -49,6 +50,7 @@ export const Route = createFileRoute('/_authenticated/admin/users/')({
     return listUsers({ data: deps });
   },
   component: UsersPage,
+  pendingComponent: () => <TableSkeleton />,
 });
 
 function UsersPage() {

@@ -226,6 +226,11 @@ describe('Instructor Routes', () => {
       const { Route } = await import('@/routes/_authenticated/instructor/assignments/$id');
       expect(Route).toHaveProperty('component');
     });
+
+    it('should have pendingComponent in route config', async () => {
+      const { Route } = await import('@/routes/_authenticated/instructor/assignments/$id');
+      expect(Route).toHaveProperty('pendingComponent');
+    });
   });
 
   describe('New Assignment Page', () => {

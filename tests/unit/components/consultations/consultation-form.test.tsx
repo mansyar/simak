@@ -49,6 +49,10 @@ vi.mock('@/components/ui/button', () => ({
   ),
 }));
 
+vi.mock('lucide-react', () => ({
+  Loader2: (props: any) => <svg data-testid="loader2-icon" {...props} />,
+}));
+
 vi.mock('@/components/ui/label', () => ({
   Label: ({ children, htmlFor }: any) => (
     <label htmlFor={htmlFor} data-testid="label">
@@ -201,6 +205,25 @@ describe('ConsultationForm', () => {
 
     await vi.waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('Consultation logged successfully');
+    });
+  });
+
+  it('should show Loader2 spinner in submit button when loading', async () => {
+    const logConsultation = (await import('@/server/consultations')).logConsultation;
+    // Never resolves — keeps the form in loading state
+    (logConsultation as any).mockReturnValue(new Promise(() => {}));
+
+    render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
+    const selects = screen.getAllByTestId('select');
+    fireEvent.change(selects[0], { target: { value: '1' } });
+    const textarea = screen.getByPlaceholderText('Enter consultation notes');
+    fireEvent.change(textarea, { target: { value: 'Met with student' } });
+
+    const form = screen.getByRole('button', { name: 'Log Consultation' }).closest('form')!;
+    fireEvent.submit(form);
+
+    await vi.waitFor(() => {
+      expect(screen.getByTestId('loader2-icon')).toBeDefined();
     });
   });
 });

@@ -9,6 +9,10 @@ vi.mock('sonner', () => ({
   },
 }));
 
+vi.mock('lucide-react', () => ({
+  Loader2: (props: any) => <svg data-testid="loader2-icon" {...props} />,
+}));
+
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
     t: (key: string) => {
@@ -111,6 +115,18 @@ describe('VerificationDialog', () => {
       expect(screen.getByText('Alice Johnson')).toBeDefined();
     });
   }
+
+  it('should show Loader2 spinner instead of plain loading text when loading detail', async () => {
+    // Never resolves — keeps the dialog in loading state
+    const mod = await import('@/server/consultations');
+    (mod.getConsultationDetail as any).mockReturnValue(new Promise(() => {}));
+
+    renderDialog();
+
+    await vi.waitFor(() => {
+      expect(screen.getAllByTestId('loader2-icon').length).toBeGreaterThan(0);
+    });
+  });
 
   it('should not render when closed', () => {
     renderDialog({ open: false, consultationId: null });

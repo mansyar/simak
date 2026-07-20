@@ -5,12 +5,14 @@ import {
   StudentDashboard,
   type StudentDashboardData,
 } from '@/components/dashboard/StudentDashboard';
+import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
 
 export const Route = createFileRoute('/_authenticated/student/dashboard')({
   loader: async () => {
     return getStudentDashboardData();
   },
   component: StudentDashboardPage,
+  pendingComponent: () => <DashboardSkeleton />,
 });
 
 function StudentDashboardPage() {

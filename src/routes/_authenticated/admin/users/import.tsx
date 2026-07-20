@@ -8,7 +8,7 @@ import { generateUserSampleXlsx } from '@/lib/bulk-import/samples';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { AlertBanner } from '@/components/ui/alert-banner';
-import { Upload, Download } from 'lucide-react';
+import { Upload, Download, Loader2 } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { isServerError } from '@/lib/errors';
 
@@ -20,6 +20,11 @@ export const Route = createFileRoute('/_authenticated/admin/users/import')({
     const session = await getSessionFromHeaders();
     return { userRole: session?.user.role ?? 'admin' };
   },
+  pendingComponent: () => (
+    <div className="flex items-center justify-center py-8">
+      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+    </div>
+  ),
 });
 
 interface ImportResult {

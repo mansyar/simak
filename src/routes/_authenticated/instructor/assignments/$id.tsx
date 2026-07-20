@@ -11,12 +11,14 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { FileX } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { isServerError } from '@/lib/errors';
+import { AssignmentDetailSkeleton } from '@/components/skeletons/assignment-detail-skeleton';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id')({
   loader: async ({ params }) => {
     return getAssignmentDetail({ data: { id: Number(params.id) } });
   },
   component: AssignmentDetailPage,
+  pendingComponent: () => <AssignmentDetailSkeleton />,
 });
 
 function AssignmentDetailPage() {

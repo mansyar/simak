@@ -13,6 +13,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { ExtensionRequestForm } from '@/components/student/extensions/ExtensionRequestForm';
 import { ExtensionHistoryList } from '@/components/student/extensions/ExtensionHistoryList';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { isServerError } from '@/lib/errors';
@@ -82,6 +83,8 @@ function AssignmentDetailPage() {
   const [activeTab, setActiveTab] = useState<'timeline' | 'consultations' | 'extensions'>(
     'timeline',
   );
+  const [loadingConsultations, setLoadingConsultations] = useState(true);
+  const [loadingExtensions, setLoadingExtensions] = useState(true);
   const [consultationPage, setConsultationPage] = useState(1);
   const [consultationTotal, setConsultationTotal] = useState(0);
   const [extensionPage, setExtensionPage] = useState(1);
@@ -104,6 +107,8 @@ function AssignmentDetailPage() {
   useEffect(() => {
     if (assignment) {
       const loadConsultations = async () => {
+        setLoadingConsultations(true);
+        setLoadingExtensions(true);
         const listConsFn = listConsultations as unknown as (args: {
           data: { assignmentId: number; page: number; limit: number };
         }) => Promise<unknown>;
@@ -133,6 +138,7 @@ function AssignmentDetailPage() {
         ) {
           setVerifiedCounts((countsResult as { counts: typeof verifiedCounts }).counts);
         }
+        setLoadingConsultations(false);
 
         // Load extension requests
         const listExtFn = listMyExtensionRequests as unknown as (args: {
@@ -150,6 +156,7 @@ function AssignmentDetailPage() {
           setExtensionItems(extData.items);
           setExtensionTotal(extData.total);
         }
+        setLoadingExtensions(false);
       };
       loadConsultations();
     }
@@ -201,6 +208,7 @@ function AssignmentDetailPage() {
   }));
 
   const handleConsultationSuccess = async () => {
+    setLoadingConsultations(true);
     // Refresh consultation data
     const listConsFn = listConsultations as unknown as (args: {
       data: { assignmentId: number; page: number; limit: number };
@@ -231,9 +239,11 @@ function AssignmentDetailPage() {
     ) {
       setVerifiedCounts((countsResult as { counts: typeof verifiedCounts }).counts);
     }
+    setLoadingConsultations(false);
   };
 
   const handleExtensionSuccess = async () => {
+    setLoadingExtensions(true);
     // Refresh extension data
     const listExtFn = listMyExtensionRequests as unknown as (args: {
       data: { assignmentId: number; page: number; limit: number };
@@ -250,6 +260,7 @@ function AssignmentDetailPage() {
       setExtensionItems(extData.items);
       setExtensionTotal(extData.total);
     }
+    setLoadingExtensions(false);
   };
 
   return (
@@ -326,54 +337,84 @@ function AssignmentDetailPage() {
 
       {activeTab === 'consultations' && (
         <div className="space-y-6">
-          <ConsultationProgress counts={verifiedCounts} />
+          {loadingConsultations ? (
+            <div className="space-y-6">
+              <div className="rounded-lg border bg-card p-5 shadow-sm">
+                <Skeleton data-testid="skeleton" className="h-6 w-48" />
+                <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
+              </div>
+              <div className="rounded-lg border bg-card p-5 shadow-sm">
+                <Skeleton data-testid="skeleton" className="h-6 w-48" />
+                <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
+              </div>
+            </div>
+          ) : (
+            <>
+              <ConsultationProgress counts={verifiedCounts} />
 
-          <div className="rounded-lg border bg-card p-5 shadow-sm">
-            <h3 className="text-lg font-semibold text-foreground mb-4">
-              {t('consultations.logConsultation')}
-            </h3>
-            <ConsultationForm
-              assignmentId={assignment.id}
-              checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
-              onSuccess={handleConsultationSuccess}
-            />
-          </div>
+              <div className="rounded-lg border bg-card p-5 shadow-sm">
+                <h3 className="text-lg font-semibold text-foreground mb-4">
+                  {t('consultations.logConsultation')}
+                </h3>
+                <ConsultationForm
+                  assignmentId={assignment.id}
+                  checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
+                  onSuccess={handleConsultationSuccess}
+                />
+              </div>
 
-          <div className="rounded-lg border bg-card p-5 shadow-sm">
-            <h3 className="text-lg font-semibold text-foreground mb-4">
-              {t('consultations.previousSessions')}
-            </h3>
-            <ConsultationList consultations={consultations} />
-            <Pagination
-              currentPage={consultationPage}
-              totalPages={Math.max(1, Math.ceil(consultationTotal / 20))}
-              onPageChange={setConsultationPage}
-            />
-          </div>
+              <div className="rounded-lg border bg-card p-5 shadow-sm">
+                <h3 className="text-lg font-semibold text-foreground mb-4">
+                  {t('consultations.previousSessions')}
+                </h3>
+                <ConsultationList consultations={consultations} />
+                <Pagination
+                  currentPage={consultationPage}
+                  totalPages={Math.max(1, Math.ceil(consultationTotal / 20))}
+                  onPageChange={setConsultationPage}
+                />
+              </div>
+            </>
+          )}
         </div>
       )}
 
       {activeTab === 'extensions' && (
         <div className="space-y-6">
-          <div className="rounded-lg border bg-card p-5 shadow-sm">
-            <h3 className="text-lg font-semibold text-foreground mb-4">
-              {t('extensions.requestTitle')}
-            </h3>
-            <ExtensionRequestForm
-              assignmentId={assignment.id}
-              maxExtensionDays={assignment.maxExtensionDays ?? 7}
-              maxTotalExtensions={assignment.maxTotalExtensions ?? 3}
-              checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
-              onSuccess={handleExtensionSuccess}
-            />
-          </div>
+          {loadingExtensions ? (
+            <div className="space-y-6">
+              <div className="rounded-lg border bg-card p-5 shadow-sm">
+                <Skeleton data-testid="skeleton" className="h-6 w-48" />
+                <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
+              </div>
+              <div className="rounded-lg border bg-card p-5 shadow-sm">
+                <Skeleton data-testid="skeleton" className="h-6 w-48" />
+                <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="rounded-lg border bg-card p-5 shadow-sm">
+                <h3 className="text-lg font-semibold text-foreground mb-4">
+                  {t('extensions.requestTitle')}
+                </h3>
+                <ExtensionRequestForm
+                  assignmentId={assignment.id}
+                  maxExtensionDays={assignment.maxExtensionDays ?? 7}
+                  maxTotalExtensions={assignment.maxTotalExtensions ?? 3}
+                  checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
+                  onSuccess={handleExtensionSuccess}
+                />
+              </div>
 
-          <ExtensionHistoryList items={extensionItems} />
-          <Pagination
-            currentPage={extensionPage}
-            totalPages={Math.max(1, Math.ceil(extensionTotal / 20))}
-            onPageChange={setExtensionPage}
-          />
+              <ExtensionHistoryList items={extensionItems} />
+              <Pagination
+                currentPage={extensionPage}
+                totalPages={Math.max(1, Math.ceil(extensionTotal / 20))}
+                onPageChange={setExtensionPage}
+              />
+            </>
+          )}
         </div>
       )}
     </div>

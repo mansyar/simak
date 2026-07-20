@@ -74,6 +74,11 @@ describe('Dashboard Routes', () => {
       const { Route } = await import('@/routes/_authenticated/admin/dashboard');
       expect(Route).toHaveProperty('component');
     });
+
+    it('should have pendingComponent in route config', async () => {
+      const { Route } = await import('@/routes/_authenticated/admin/dashboard');
+      expect(Route).toHaveProperty('pendingComponent');
+    });
   });
 
   describe('Instructor Dashboard', () => {
@@ -91,6 +96,11 @@ describe('Dashboard Routes', () => {
       const { Route } = await import('@/routes/_authenticated/instructor/dashboard');
       expect(Route).toHaveProperty('component');
     });
+
+    it('should have pendingComponent in route config', async () => {
+      const { Route } = await import('@/routes/_authenticated/instructor/dashboard');
+      expect(Route).toHaveProperty('pendingComponent');
+    });
   });
 
   describe('Student Dashboard', () => {
@@ -107,6 +117,11 @@ describe('Dashboard Routes', () => {
     it('should have component in route config', async () => {
       const { Route } = await import('@/routes/_authenticated/student/dashboard');
       expect(Route).toHaveProperty('component');
+    });
+
+    it('should have pendingComponent in route config', async () => {
+      const { Route } = await import('@/routes/_authenticated/student/dashboard');
+      expect(Route).toHaveProperty('pendingComponent');
     });
   });
 });

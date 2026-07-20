@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { User } from 'lucide-react';
+import { User, Loader2 } from 'lucide-react';
 import { getCurrentUser, updateProfile } from '@/server/settings';
 import { useI18n } from '@/routes/__root';
 
@@ -65,7 +65,7 @@ export function ProfileSection() {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-8">
-          {t('common.loading')}
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     );
