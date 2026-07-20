@@ -28,7 +28,7 @@
     - [x] Attach git note with task summary to the commit
     - [x] Update `plan.md`: mark Phase 1 tasks complete with commit SHA
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: FileUploader Fix' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: FileUploader Fix' (Protocol in workflow.md)
 
 ## Phase 2: Navigation & Pagination Fixes (UX-38, UX-39, UX-57)
 
