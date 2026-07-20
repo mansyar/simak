@@ -9,7 +9,14 @@ const mockRouter = vi.hoisted(() => ({
 }));
 
 const mockLoaderData = vi.hoisted(() => ({
-  users: [] as any[],
+  users: [] as Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    createdAt: string;
+    emailVerified: boolean;
+  }>,
   total: 0,
 }));
 
