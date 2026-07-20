@@ -67,19 +67,13 @@ describe('showSuccessToast', () => {
   it('calls toast.success with the given message', () => {
     showSuccessToast('Operation succeeded');
 
-    expect(toast.success).toHaveBeenCalledWith('Operation succeeded', {
-      duration: 5000,
-      position: 'top-right',
-    });
+    expect(toast.success).toHaveBeenCalledWith('Operation succeeded');
   });
 
-  it('passes sensible default toast options', () => {
+  it('calls toast.success with a single string argument', () => {
     showSuccessToast('Saved');
 
-    expect(toast.success).toHaveBeenCalledWith(expect.any(String), {
-      duration: 5000,
-      position: 'top-right',
-    });
+    expect(toast.success).toHaveBeenCalledWith('Saved');
   });
 });
 
