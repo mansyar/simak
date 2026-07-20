@@ -1,0 +1,19 @@
+{
+  "track_id": "empty-states-date-display-mobile-polish_20260721",
+  "type": "feature",
+  "state": "INIT",
+  "spec": {
+    "approved": true,
+    "approved_at": "2026-07-20T21:15:09Z"
+  },
+  "plan": {
+    "approved": true,
+    "approved_at": "2026-07-20T21:15:09Z",
+    "items_total": 16,
+    "items_completed": 0
+  },
+  "revert_baseline": "ac471e686a17ee149354128f3d4c921a1954835b",
+  "created_at": "2026-07-20T21:15:09Z",
+  "updated_at": "2026-07-20T21:15:09Z",
+  "description": "TRACK-013: Empty States, Date Display & Mobile Polish"
+}

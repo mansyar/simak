@@ -8,3 +8,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Empty States, Date Display & Mobile Polish**
+*Link: [./tracks/empty-states-date-display-mobile-polish_20260721/](./tracks/empty-states-date-display-mobile-polish_20260721/)*
+
