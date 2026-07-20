@@ -8,6 +8,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: TRACK-012: Notifications & File Management UX**
+- [x] **Track: TRACK-012: Notifications & File Management UX**
 *Link: [./tracks/notifications-file-management-ux_20260720/](./tracks/notifications-file-management-ux_20260720/)*
 
