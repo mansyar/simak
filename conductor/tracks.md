@@ -8,3 +8,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: E2E Testing with Playwright**
+*Link: [./tracks/e2e-playwright-tests_20260721/](./tracks/e2e-playwright-tests_20260721/)*
+
+---
+
