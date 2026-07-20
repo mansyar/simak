@@ -75,7 +75,14 @@ export function ProgressTable({ students }: ProgressTableProps) {
       header: t('instructorAssignments.table.progress'),
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <div className="h-2 w-24 overflow-hidden rounded-full bg-secondary">
+          <div
+            className="h-2 w-24 overflow-hidden rounded-full bg-secondary"
+            role="progressbar"
+            aria-valuenow={row.original.progressPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={t('instructorAssignments.table.progress')}
+          >
             <div
               className="h-full bg-primary transition-all duration-300"
               style={{ width: `${row.original.progressPercent}%` }}

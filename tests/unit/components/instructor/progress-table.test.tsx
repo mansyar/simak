@@ -77,3 +77,56 @@ describe('ProgressTable', () => {
     expect(screen.getByText('Passed')).toBeDefined();
   });
 });
+
+describe('ProgressTable - progressbar ARIA attributes (UX-21)', () => {
+  const mockStudents = [
+    {
+      id: 'student-1',
+      name: 'Alice Cooper',
+      email: 'alice@test.com',
+      progressPercent: 50,
+      passedCount: 1,
+      totalCheckpointsCount: 2,
+      activeCheckpoint: { id: 102, name: 'Draft Proposal', state: 'unlocked' },
+    },
+    {
+      id: 'student-2',
+      name: 'Bob Marley',
+      email: 'bob@test.com',
+      progressPercent: 100,
+      passedCount: 2,
+      totalCheckpointsCount: 2,
+      activeCheckpoint: null,
+    },
+  ];
+
+  it('renders progress bar containers with role="progressbar"', () => {
+    render(<ProgressTable students={mockStudents as any} />);
+    const progressbars = screen.getAllByRole('progressbar');
+    expect(progressbars.length).toBe(2);
+  });
+
+  it('progress bars have aria-valuenow matching progressPercent', () => {
+    render(<ProgressTable students={mockStudents as any} />);
+    const progressbars = screen.getAllByRole('progressbar');
+    expect(progressbars[0].getAttribute('aria-valuenow')).toBe('50');
+    expect(progressbars[1].getAttribute('aria-valuenow')).toBe('100');
+  });
+
+  it('progress bars have aria-valuemin=0 and aria-valuemax=100', () => {
+    render(<ProgressTable students={mockStudents as any} />);
+    const progressbars = screen.getAllByRole('progressbar');
+    for (const bar of progressbars) {
+      expect(bar.getAttribute('aria-valuemin')).toBe('0');
+      expect(bar.getAttribute('aria-valuemax')).toBe('100');
+    }
+  });
+
+  it('progress bars have aria-label from t("instructorAssignments.table.progress")', () => {
+    render(<ProgressTable students={mockStudents as any} />);
+    const progressbars = screen.getAllByRole('progressbar');
+    for (const bar of progressbars) {
+      expect(bar.getAttribute('aria-label')).toBe('Progress');
+    }
+  });
+});
