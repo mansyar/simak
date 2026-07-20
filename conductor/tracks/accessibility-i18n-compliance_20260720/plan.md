@@ -9,8 +9,8 @@
 
 ## Phase 1: Notification Center a11y Refactor
 
-- [ ] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
-- [ ] Task: Add Phase 1 i18n keys (`notifications.unreadCount`, `adminDashboard.noRecentActivityDescription`)
+- [x] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
+- [x] Task: Add Phase 1 i18n keys (`notifications.unreadCount`, `adminDashboard.noRecentActivityDescription`) [4d34366]
     - [ ] Add `notifications.unreadCount` (en: "{count} unread notifications", id: "{count} notifikasi belum dibaca") with `{count}` param to both `locales/en.json` and `locales/id.json`
     - [ ] Add `adminDashboard.noRecentActivityDescription` (en: "No recent activity to display", id: "Tidak ada aktivitas terbaru untuk ditampilkan") to both locale files
     - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
