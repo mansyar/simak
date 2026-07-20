@@ -64,5 +64,5 @@
     - [x] Attach git note with task summary to the commit
     - [x] Update `plan.md`: mark Phase 2 tasks complete with commit SHA
 
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Navigation & Pagination Fixes' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Navigation & Pagination Fixes' (Protocol in workflow.md)
 </protect>
