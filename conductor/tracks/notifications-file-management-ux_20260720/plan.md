@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Notifications & File Management UX
 
-## Phase 1: Notification Navigation
+## Phase 1: Notification Navigation [checkpoint: 1c0f556]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
 
