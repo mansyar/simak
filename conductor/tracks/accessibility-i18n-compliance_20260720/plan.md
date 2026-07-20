@@ -48,7 +48,7 @@
 
 ---
 
-## Phase 2: i18n Hardcoded String & Date Formatting Fixes
+## Phase 2: i18n Hardcoded String & Date Formatting Fixes [checkpoint: 7cf3880]
 
 - [x] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
 - [x] Task: Add Phase 2 i18n keys (`adminUsers.table.status`, `extensions.daysCount`) [5cbc7c8]
