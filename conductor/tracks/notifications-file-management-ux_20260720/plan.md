@@ -28,13 +28,13 @@
 
 ## Phase 2: Notification UX
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
 
-- [ ] Task: Add "All" / "Unread" tab filter to NotificationCenter
-    - [ ] Write tests: "All" tab shows all notifications; "Unread" tab filters to `read === false`; default tab is "All"
-    - [ ] Implement: Add shadcn/ui `Tabs` component with "All" and "Unread" tabs to NotificationCenter Sheet header
-    - [ ] Implement: Update `useNotificationsList` to accept `unreadOnly: boolean` param
-    - [ ] Implement: Update server handler to add `.where(eq(notifications.read, false))` when `unreadOnly` is true
+- [x] Task: Add "All" / "Unread" tab filter to NotificationCenter (f2cbeb9)
+    - [x] Write tests: "All" tab shows all notifications; "Unread" tab filters to `read === false`; default tab is "All"
+    - [x] Implement: Add shadcn/ui `Tabs` component with "All" and "Unread" tabs to NotificationCenter Sheet header
+    - [x] Implement: Update `useNotificationsList` to accept `unreadOnly: boolean` param
+    - [x] Implement: Update server handler to add `.where(eq(notifications.read, false))` when `unreadOnly` is true
 
 - [ ] Task: Add "Load More" pagination to NotificationCenter
     - [ ] Write tests: Load More button increments page and appends items; button hidden when all loaded; limit is 20 (not 50)
