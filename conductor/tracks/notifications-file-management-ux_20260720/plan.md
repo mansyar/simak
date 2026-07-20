@@ -62,4 +62,7 @@
     - [x] Implement: Memoize `NotificationCenter` unread count + `groupedNotifications` with `useMemo` (eliminates 4 redundant `items.filter()` calls)
 
 - [x] Task: Conductor - User Manual Verification 'File UX & Client Perf' (Protocol in workflow.md) [checkpoint: 6600d82]
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 586712e
 </protect>
