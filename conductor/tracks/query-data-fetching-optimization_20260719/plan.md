@@ -182,7 +182,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Over-fetch, Parallel & Query Rewrite' (Protocol in workflow.md)
 
-## Phase 4: Verification & Definition of Done
+## Phase 4: Verification & Definition of Done [checkpoint: c65b6f3]
 
 - [x] Task: Read spec.md and workflow.md to prepare for Phase 4 implementation
     - [x] Read `./spec.md` — review all Acceptance Criteria #1–#15 and Verification Strategy
