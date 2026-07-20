@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { NotificationBadge } from '@/components/notifications/NotificationBadge';
 import { NotificationItem } from '@/components/notifications/NotificationItem';
@@ -135,6 +136,82 @@ describe('Notification UI Components', () => {
       expect(itemRow).not.toBeNull();
       fireEvent.click(itemRow!);
 
+      expect(mockMutate).toHaveBeenCalledWith(10);
+    });
+  });
+
+  describe('NotificationItem - native button (UX-14)', () => {
+    const sampleNotification = {
+      id: 10,
+      userId: 'student-1',
+      type: 'review_completed',
+      title: 'Review Passed',
+      message: 'Your thesis chapter has been approved.',
+      read: false,
+      channel: 'in_app',
+      createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    };
+
+    it('renders a native button with type="button"', () => {
+      vi.mocked(hooks.useMarkRead).mockReturnValue({
+        mutate: vi.fn(),
+      } as any);
+
+      const { container } = render(<NotificationItem item={sampleNotification} />);
+      const button = container.querySelector('button[type="button"]');
+      expect(button).not.toBeNull();
+    });
+
+    it('button has text-left and w-full classes for layout', () => {
+      vi.mocked(hooks.useMarkRead).mockReturnValue({
+        mutate: vi.fn(),
+      } as any);
+
+      const { container } = render(<NotificationItem item={sampleNotification} />);
+      const button = container.querySelector('button[type="button"]');
+      expect(button).not.toBeNull();
+      expect(button!.className).toContain('text-left');
+      expect(button!.className).toContain('w-full');
+    });
+
+    it('button is focusable (no tabIndex=-1)', () => {
+      vi.mocked(hooks.useMarkRead).mockReturnValue({
+        mutate: vi.fn(),
+      } as any);
+
+      const { container } = render(<NotificationItem item={sampleNotification} />);
+      const button = container.querySelector<HTMLButtonElement>('button[type="button"]');
+      expect(button).not.toBeNull();
+      expect(button!.tabIndex).not.toBe(-1);
+    });
+
+    it('activates onClick via Enter key', async () => {
+      const mockMutate = vi.fn();
+      vi.mocked(hooks.useMarkRead).mockReturnValue({
+        mutate: mockMutate,
+      } as any);
+
+      const { container } = render(<NotificationItem item={sampleNotification} />);
+      const button = container.querySelector<HTMLButtonElement>('button[type="button"]');
+      expect(button).not.toBeNull();
+      button!.focus();
+      const user = userEvent.setup();
+      await user.keyboard('{Enter}');
+      expect(mockMutate).toHaveBeenCalledWith(10);
+    });
+
+    it('activates onClick via Space key', async () => {
+      const mockMutate = vi.fn();
+      vi.mocked(hooks.useMarkRead).mockReturnValue({
+        mutate: mockMutate,
+      } as any);
+
+      const { container } = render(<NotificationItem item={sampleNotification} />);
+      const button = container.querySelector<HTMLButtonElement>('button[type="button"]');
+      expect(button).not.toBeNull();
+      button!.focus();
+      const user = userEvent.setup();
+      await user.keyboard(' ');
       expect(mockMutate).toHaveBeenCalledWith(10);
     });
   });
