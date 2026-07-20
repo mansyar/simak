@@ -28,9 +28,42 @@ vi.mock('@/hooks/use-notifications', () => ({
   useMarkAllRead: vi.fn(),
 }));
 
+// Capture Sheet props for testing (onOpenChange wiring, side prop)
+const sheetState = vi.hoisted(() => ({
+  onOpenChange: null as ((open: boolean) => void) | null,
+  lastSide: null as string | null,
+}));
+
+// Mock the Sheet component (UX-15 refactor)
+vi.mock('@/components/ui/sheet', () => {
+  const Sheet = ({ children, open, onOpenChange }: any) => {
+    sheetState.onOpenChange = onOpenChange;
+    return open ? <div data-slot="sheet">{children}</div> : null;
+  };
+  const SheetContent = ({ children, side, ...rest }: any) => {
+    sheetState.lastSide = side;
+    return (
+      <div data-slot="sheet-content" data-side={side} {...rest}>
+        {children}
+      </div>
+    );
+  };
+  return {
+    Sheet,
+    SheetContent,
+    SheetHeader: ({ children }: any) => <div data-slot="sheet-header">{children}</div>,
+    SheetFooter: ({ children }: any) => <div data-slot="sheet-footer">{children}</div>,
+    SheetTitle: ({ children }: any) => <h2 data-slot="sheet-title">{children}</h2>,
+    SheetDescription: ({ children }: any) => <p data-slot="sheet-description">{children}</p>,
+    SheetClose: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+  };
+});
+
 describe('Notification UI Components', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    sheetState.onOpenChange = null;
+    sheetState.lastSide = null;
   });
 
   describe('NotificationBadge', () => {
@@ -170,6 +203,82 @@ describe('Notification UI Components', () => {
       const markBtn = screen.getByText('Mark all read');
       fireEvent.click(markBtn);
       expect(mockMarkAllRead).toHaveBeenCalled();
+    });
+  });
+
+  describe('NotificationCenter - Sheet refactor (UX-15)', () => {
+    const setupMocks = (items: any[] = []) => {
+      vi.mocked(hooks.useNotificationsList).mockReturnValue({
+        data: { items, total: items.length },
+        isSuccess: true,
+      } as any);
+      vi.mocked(hooks.useMarkAllRead).mockReturnValue({
+        mutate: vi.fn(),
+      } as any);
+      vi.mocked(hooks.useMarkRead).mockReturnValue({
+        mutate: vi.fn(),
+      } as any);
+    };
+
+    it('renders using Sheet and SheetContent when open', () => {
+      setupMocks();
+      const { container } = render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+      expect(container.querySelector('[data-slot="sheet"]')).not.toBeNull();
+      expect(container.querySelector('[data-slot="sheet-content"]')).not.toBeNull();
+    });
+
+    it('passes side="right" to SheetContent', () => {
+      setupMocks();
+      render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+      expect(sheetState.lastSide).toBe('right');
+    });
+
+    it('passes open and onOpenChange (onClose) to Sheet', () => {
+      setupMocks();
+      const onClose = vi.fn();
+      render(<NotificationCenter isOpen={true} onClose={onClose} />);
+      expect(sheetState.onOpenChange).toBe(onClose);
+    });
+
+    it('does not render Sheet content when closed', () => {
+      setupMocks();
+      const { container } = render(<NotificationCenter isOpen={false} onClose={vi.fn()} />);
+      expect(container.querySelector('[data-slot="sheet"]')).toBeNull();
+    });
+
+    it('has no custom backdrop div or manual X close button', () => {
+      setupMocks();
+      const { container } = render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+      // After refactor, Sheet handles the backdrop — no manual close button with closePanel aria-label
+      expect(container.querySelector('[aria-label="notifications.closePanel"]')).toBeNull();
+    });
+
+    it('calls onClose when Sheet signals close (simulating Escape key)', () => {
+      setupMocks();
+      const onClose = vi.fn();
+      render(<NotificationCenter isOpen={true} onClose={onClose} />);
+      // Simulate Sheet calling onOpenChange(false) — which happens on Escape/backdrop click
+      sheetState.onOpenChange?.(false);
+      expect(onClose).toHaveBeenCalledWith(false);
+    });
+
+    it('renders notification content inside SheetContent', () => {
+      const sampleItems = [
+        {
+          id: 1,
+          type: 'review_completed',
+          title: 'Test Review',
+          message: 'msg',
+          read: false,
+          createdAt: new Date().toISOString(),
+        },
+      ];
+      setupMocks(sampleItems);
+      const { container } = render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+      const sheetContent = container.querySelector('[data-slot="sheet-content"]');
+      expect(sheetContent).not.toBeNull();
+      expect(sheetContent?.textContent).toContain('Notifications');
+      expect(sheetContent?.textContent).toContain('Test Review');
     });
   });
 });
