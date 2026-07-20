@@ -62,7 +62,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Form Migration' (Protocol in workflow.md)
 
-## Phase 3: Upload Progress
+## Phase 3: Upload Progress [checkpoint: 256371f]
 
 - [x] Task: Read spec.md and workflow.md to refresh context
     - [x] Read `./spec.md` for requirements and acceptance criteria
@@ -77,5 +77,5 @@
     - [x] Run `pnpm test` — confirm tests pass
     - [x] Run `pnpm typecheck`, `pnpm lint` — confirm clean
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Upload Progress' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Upload Progress' (Protocol in workflow.md)
 </protect>
