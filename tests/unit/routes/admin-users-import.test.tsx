@@ -292,4 +292,11 @@ describe('Admin Users Import page', () => {
       expect(screen.getByText('bulkImport.common.downloadSample')).toBeInTheDocument();
     });
   });
+
+  describe('pendingComponent', () => {
+    it('should have pendingComponent in route config', async () => {
+      const mod = await import('@/routes/_authenticated/admin/users/import');
+      expect(mod.Route).toHaveProperty('pendingComponent');
+    });
+  });
 });

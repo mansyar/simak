@@ -1,6 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { toast } from 'sonner';
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
+
+vi.mock('lucide-react', () => ({
+  Loader2: (props: any) => <svg data-testid="loader2-icon" {...props} />,
+}));
 
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
@@ -22,6 +33,8 @@ vi.mock('@/routes/__root', () => ({
         'consultations.rejectReasonPlaceholder': 'Enter rejection reason',
         'common.loading': 'Loading...',
         'common.cancel': 'Cancel',
+        'consultations.verifySuccess': 'Consultation verified successfully',
+        'consultations.rejectSuccess': 'Consultation rejected successfully',
       };
       return translations[key] || key;
     },
@@ -102,6 +115,18 @@ describe('VerificationDialog', () => {
       expect(screen.getByText('Alice Johnson')).toBeDefined();
     });
   }
+
+  it('should show Loader2 spinner instead of plain loading text when loading detail', async () => {
+    // Never resolves — keeps the dialog in loading state
+    const mod = await import('@/server/consultations');
+    (mod.getConsultationDetail as any).mockReturnValue(new Promise(() => {}));
+
+    renderDialog();
+
+    await vi.waitFor(() => {
+      expect(screen.getAllByTestId('loader2-icon').length).toBeGreaterThan(0);
+    });
+  });
 
   it('should not render when closed', () => {
     renderDialog({ open: false, consultationId: null });
@@ -319,6 +344,46 @@ describe('VerificationDialog', () => {
 
     await vi.waitFor(() => {
       expect(screen.getByText('Consultation not found')).toBeDefined();
+    });
+  });
+
+  it('should show success toast on verify', async () => {
+    await resolveDetail();
+    const mod = await import('@/server/consultations');
+    (mod.verifyConsultation as any).mockResolvedValue({ success: true });
+
+    renderDialog();
+    await loadDetail();
+
+    const verifyBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Verify');
+    fireEvent.click(verifyBtn!);
+
+    await vi.waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Consultation verified successfully');
+    });
+  });
+
+  it('should show success toast on reject', async () => {
+    await resolveDetail();
+    const mod = await import('@/server/consultations');
+    (mod.rejectConsultation as any).mockResolvedValue({ success: true });
+
+    renderDialog();
+    await loadDetail();
+
+    const rejectBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject');
+    fireEvent.click(rejectBtn!);
+
+    const input = screen.getByTestId('reject-input');
+    fireEvent.change(input, { target: { value: 'Insufficient detail' } });
+
+    const confirmBtn = screen
+      .getAllByTestId('dialog-btn')
+      .find((b) => b.textContent === 'Confirm Reject');
+    fireEvent.click(confirmBtn!);
+
+    await vi.waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Consultation rejected successfully');
     });
   });
 });

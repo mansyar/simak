@@ -29,6 +29,7 @@ import { z } from 'zod';
 import { getActionVisualProps, ACTION_TYPES } from '@/lib/admin/audit-actions';
 import { formatDate } from '@/lib/format-date';
 import { isServerError } from '@/lib/errors';
+import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
 interface AuditLogEntry {
   id: number;
@@ -64,6 +65,7 @@ export const Route = createFileRoute('/_authenticated/admin/audit-log')({
     return listAuditLogs({ data: deps });
   },
   component: AuditLogPage,
+  pendingComponent: () => <TableSkeleton />,
 });
 
 function AuditLogPage() {

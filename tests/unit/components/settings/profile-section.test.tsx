@@ -1,6 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { toast } from 'sonner';
 import { ProfileSection } from '@/components/settings/ProfileSection';
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
+
+vi.mock('lucide-react', () => ({
+  Loader2: (props: any) => <svg data-testid="loader2-icon" {...props} />,
+  User: (props: any) => <svg data-testid="user-icon" {...props} />,
+}));
 
 const mockUseQuery = vi.fn();
 const mockUseMutation = vi.fn();
@@ -62,12 +74,13 @@ describe('ProfileSection', () => {
     expect(screen.getByLabelText('Profile Picture')).toBeDefined();
   });
 
-  it('should render loading state', () => {
+  it('should render loading state with Loader2 spinner', () => {
     mockUseQuery.mockReturnValue({ data: null, isLoading: true });
 
     render(<ProfileSection />);
 
-    expect(screen.getByText('common.loading')).toBeDefined();
+    expect(screen.getByTestId('loader2-icon')).toBeDefined();
+    expect(screen.queryByText('common.loading')).toBeNull();
   });
 
   it('should update name via mutation when Save is clicked', async () => {
@@ -91,7 +104,7 @@ describe('ProfileSection', () => {
     expect(mockMutateAsync).toHaveBeenCalledWith({ name: 'John Updated' });
   });
 
-  it('should show success message after name update', async () => {
+  it('should show success toast after name update', async () => {
     mockUseQuery.mockReturnValue({
       data: {
         user: { id: '1', name: 'John', email: 'john@test.com', image: null },
@@ -107,7 +120,9 @@ describe('ProfileSection', () => {
     fireEvent.change(input, { target: { value: 'John Updated' } });
     fireEvent.click(screen.getByText('Save Name'));
 
-    expect(await screen.findByText('Name updated successfully')).toBeDefined();
+    await vi.waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Name updated successfully');
+    });
   });
 
   it('should show error message on failed name update', async () => {

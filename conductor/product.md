@@ -367,4 +367,14 @@ Students and instructors lack a centralized system to:
 - **Batch audit log inserts** — `bulkExtendHandler` per-checkpoint `logAuditEvent` loop replaced with single batch `db.insert(auditLog).values([...])`.
 - **Tests** — 2,539 tests pass across 269 test files; coverage ≥80% on all thresholds (stmts 87.43%, branches 81.11%, functions 81.26%, lines 88.07%).
 
+### Track 9: Action Feedback & Loading States (July 2026)
+
+- **Success toast infrastructure** — New `showSuccessToast(message)` helper in `src/lib/toast.ts` mirroring `showErrorToast`; wired into ~9 action `onSuccess` handlers across ConsultationForm (log), CreateUserDialog (create), EditUserSheet (update), DeleteUserDialog (delete), DeadlineManager (unlock + extend), VerificationDialog (verify + reject), use-assignment-tabs (approve + reject extension), ProfileSection (name update), PasswordSection (password change)
+- **Loading skeletons** — 3 new reusable skeleton components (`DashboardSkeleton`, `TableSkeleton`, `AssignmentDetailSkeleton`) matching the repo's shared-primitive pattern; `pendingComponent` added to 7 routes (3 dashboards, admin users, admin audit log, admin users import, instructor assignment detail)
+- **Side-data loading skeletons** — `loadingConsultations`/`loadingExtensions` state added to student assignment detail page; Skeleton elements rendered in consultations/extensions tabs while data loads
+- **Loader2 spinners** — Replaced plain "Loading..." text with `Loader2` spinners in ConsultationForm submit button, ProfileSection loading state, and VerificationDialog (detail loading + verify/reject buttons)
+- **Error handling improvements** — StudentDashboard now shows actual `data.error` message instead of generic text; AssignmentDetailPage side-data wrapped in try/catch with error banner + retry button; ReviewDetailPage `openForReview` wrapped in try/catch to prevent self-navigation loop on failure; CheckpointSubmissionPage differentiates network errors (`TypeError` → `files.networkError`) from server errors (non-2xx → `files.serverError`)
+- **i18n** — 12 new success toast keys + 2 new error keys (`files.networkError`, `files.serverError`); removed `files.uploadError` (replaced by the two new keys); total 724 keys
+- **Tests** — 2,591 tests pass across 277 test files; coverage ≥80% on all thresholds (lines 88.13%, branches 81.14%, functions 81.51%, statements 87.49%)
+
 </protect>

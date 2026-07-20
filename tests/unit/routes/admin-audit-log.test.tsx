@@ -153,4 +153,11 @@ describe('Admin Audit Log page', () => {
       expect(table).toBeTruthy();
     });
   });
+
+  describe('pendingComponent', () => {
+    it('should have pendingComponent in route config', async () => {
+      const mod = await import('@/routes/_authenticated/admin/audit-log');
+      expect(mod.Route).toHaveProperty('pendingComponent');
+    });
+  });
 });

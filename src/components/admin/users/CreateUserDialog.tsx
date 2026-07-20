@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -50,9 +51,14 @@ export function CreateUserDialog({ open, onOpenChange, onSubmit }: CreateUserDia
   });
 
   const handleFormSubmit = async (values: CreateUserFormValues) => {
-    await onSubmit(values);
-    form.reset();
-    onOpenChange(false);
+    try {
+      await onSubmit(values);
+      toast.success(t('adminUsers.createSuccess'));
+      form.reset();
+      onOpenChange(false);
+    } catch {
+      // Error handled by parent
+    }
   };
 
   return (

@@ -198,7 +198,7 @@ function CheckpointSubmissionPage() {
         });
 
         if (!uploadResponse.ok) {
-          setUploadError(t('files.uploadError'));
+          setUploadError(t('files.serverError'));
           return;
         }
 
@@ -225,8 +225,12 @@ function CheckpointSubmissionPage() {
 
         // Refresh submissions list
         await fetchSubmissions(submissionPage);
-      } catch {
-        setUploadError(t('files.uploadError'));
+      } catch (error) {
+        if (error instanceof TypeError) {
+          setUploadError(t('files.networkError'));
+        } else {
+          setUploadError(t('files.serverError'));
+        }
         setIsUploading(false);
       }
     },

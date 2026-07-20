@@ -83,9 +83,10 @@ describe('StudentDashboard component', () => {
     expect(screen.getByText('studentDashboard.consultationReminders')).toBeDefined();
   });
 
-  it('should show error state when data has error', async () => {
+  it('should show actual error message when data has error', async () => {
     const { StudentDashboard } = await import('@/components/dashboard/StudentDashboard');
     render(<StudentDashboard data={{ error: 'Unauthorized' } as any} />);
-    expect(screen.getByText('common.error')).toBeDefined();
+    expect(screen.getByText('Unauthorized')).toBeDefined();
+    expect(screen.queryByText('common.error')).toBeNull();
   });
 });

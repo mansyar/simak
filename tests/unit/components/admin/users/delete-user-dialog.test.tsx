@@ -1,6 +1,13 @@
 /** @vitest-environment jsdom */
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { toast } from 'sonner';
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
 
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
@@ -50,7 +57,7 @@ describe('DeleteUserDialog', () => {
   const defaultProps = {
     open: true,
     onOpenChange: vi.fn(),
-    onConfirm: vi.fn(),
+    onConfirm: vi.fn().mockResolvedValue(undefined),
     userName: 'John Doe',
   };
 
@@ -84,5 +91,18 @@ describe('DeleteUserDialog', () => {
   it('should not render when closed', () => {
     render(<DeleteUserDialog {...defaultProps} open={false} />);
     expect(screen.queryByTestId('dialog')).toBeNull();
+  });
+
+  it('should show success toast on successful delete', async () => {
+    const onConfirm = vi.fn().mockResolvedValue(undefined);
+    render(<DeleteUserDialog {...defaultProps} onConfirm={onConfirm} />);
+
+    const buttons = screen.getAllByTestId('button');
+    const deleteButton = buttons.find((b) => b.getAttribute('data-variant') === 'destructive');
+    fireEvent.click(deleteButton!);
+
+    await vi.waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('adminUsers.deleteSuccess');
+    });
   });
 });

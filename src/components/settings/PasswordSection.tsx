@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,6 @@ export function PasswordSection() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [isPending, setIsPending] = useState(false);
 
@@ -28,7 +28,6 @@ export function PasswordSection() {
   };
 
   const handleChangePassword = async () => {
-    setSuccess('');
     setError('');
 
     const validationError = validate();
@@ -43,7 +42,7 @@ export function PasswordSection() {
         currentPassword,
         newPassword,
       });
-      setSuccess(t('settings.password.passwordSuccess'));
+      toast.success(t('settings.password.passwordSuccess'));
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
@@ -97,11 +96,6 @@ export function PasswordSection() {
           />
         </div>
 
-        {success && (
-          <div className="text-sm text-green-600 bg-green-50 dark:bg-green-950 dark:text-green-400 p-3 rounded-md">
-            {success}
-          </div>
-        )}
         {error && (
           <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>
         )}
