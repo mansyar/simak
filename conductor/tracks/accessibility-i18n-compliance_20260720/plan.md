@@ -71,12 +71,12 @@
     - [x] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
     - [x] Commit: `fix(i18n): Replace hardcoded days suffix in ExtensionHistoryList (UX-18)`
 
-- [ ] Task: Replace ExtensionHistoryList toLocaleDateString with shared formatDate (UX-19)
-    - [ ] Write failing tests: assert component uses `formatDate` imported from `@/lib/format-date` with `locale` and `'short'` format, local `formatDate` function is removed
-    - [ ] Implement: remove local `formatDate` function (lines 44-51), import `formatDate` from `@/lib/format-date`, use `formatDate(item.createdAt, locale, 'short')`, obtain `locale` from `useI18n()`
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint` — no errors
-    - [ ] Commit: `fix(i18n): Use shared formatDate in ExtensionHistoryList (UX-19)`
+- [x] Task: Replace ExtensionHistoryList toLocaleDateString with shared formatDate (UX-19) [d01c4a5]
+    - [x] Write failing tests: assert component uses `formatDate` imported from `@/lib/format-date` with `locale` and `'short'` format, local `formatDate` function is removed
+    - [x] Implement: remove local `formatDate` function (lines 44-51), import `formatDate` from `@/lib/format-date`, use `formatDate(item.createdAt, locale, 'short')`, obtain `locale` from `useI18n()`
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
+    - [x] Commit: `fix(i18n): Use shared formatDate in ExtensionHistoryList (UX-19)`
 
 - [ ] Task: Replace StudentDashboard and ConsultationList toLocaleDateString (UX-20)
     - [ ] Write failing tests: assert both `StudentDashboard` and `ConsultationList` use `formatDate(date, locale, 'short')` from `@/lib/format-date`, no `toLocaleDateString()` calls remain
