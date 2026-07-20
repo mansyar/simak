@@ -4,7 +4,7 @@
 **Track ID:** search-debounce-form-validation
 **Audit IDs:** UX-25, UX-26, UX-27, UX-28, UX-54, UX-56
 
-## Phase 1: Debounce & Clear Filters
+## Phase 1: Debounce & Clear Filters [checkpoint: 184b0ba]
 
 - [x] Task: Read spec.md and workflow.md to refresh context
     - [x] Read `./spec.md` for requirements and acceptance criteria
