@@ -483,6 +483,7 @@
     "activeConsultations": "Konsultasi Aktif",
     "recentActivity": "Aktivitas Terbaru",
     "noRecentActivity": "Tidak ada aktivitas dalam 7 hari terakhir",
+    "noRecentActivityDescription": "Tidak ada aktivitas terbaru untuk ditampilkan",
     "escalationAlerts": "Peringatan Eskalasi Tenggat",
     "noEscalationAlerts": "Tidak ada peringatan eskalasi aktif",
     "allOnTrack": "Semua tugas dalam kondisi baik",
@@ -660,6 +661,7 @@
     "empty": "Belum ada notifikasi",
     "closePanel": "Tutup panel",
     "viewNotifications": "Lihat notifikasi",
+    "unreadCount": "{count} notifikasi belum dibaca",
     "groups": {
       "newReviews": "Ulasan Baru",
       "consultations": "Pembaruan Konsultasi",

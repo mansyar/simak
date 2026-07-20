@@ -483,6 +483,7 @@
     "activeConsultations": "Active Consultations",
     "recentActivity": "Recent Activity",
     "noRecentActivity": "No recent activity in the last 7 days",
+    "noRecentActivityDescription": "No recent activity to display",
     "escalationAlerts": "Deadline Escalation Alerts",
     "allOnTrack": "All assignments are on track",
     "noEscalationAlerts": "No active escalation alerts",
@@ -660,6 +661,7 @@
     "empty": "No notifications yet",
     "closePanel": "Close panel",
     "viewNotifications": "View notifications",
+    "unreadCount": "{count} unread notifications",
     "groups": {
       "newReviews": "New Reviews",
       "consultations": "Consultation Updates",

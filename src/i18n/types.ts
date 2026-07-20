@@ -488,6 +488,7 @@ export type Translation = {
     activeConsultations: string
     recentActivity: string
     noRecentActivity: string
+    noRecentActivityDescription: string
     escalationAlerts: string
     allOnTrack: string
     noEscalationAlerts: string
@@ -665,6 +666,7 @@ export type Translation = {
     empty: string
     closePanel: string
     viewNotifications: string
+    unreadCount: string
     groups: {
       newReviews: string
       consultations: string
