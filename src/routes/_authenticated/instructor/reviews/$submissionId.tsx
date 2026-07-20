@@ -10,6 +10,7 @@ import { useI18n } from '../../../__root';
 import { AlertCircle, CheckCircle2, SearchX } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { isServerError, serverError, ErrorCode } from '@/lib/errors';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/_authenticated/instructor/reviews/$submissionId')({
   loader: async ({ params }) => {
@@ -43,16 +44,20 @@ function ReviewDetailPage() {
       setTransitioned(true);
       let cancelled = false;
       (async () => {
-        await openForReview({ data: { submissionId: Number(params.submissionId) } });
-        if (cancelled) return;
-        // Re-fetch detail after transition by navigating to self
-        navigate({ replace: true });
+        try {
+          await openForReview({ data: { submissionId: Number(params.submissionId) } });
+          if (cancelled) return;
+          // Re-fetch detail after transition by navigating to self
+          navigate({ replace: true });
+        } catch {
+          toast.error(t('common.error'));
+        }
       })();
       return () => {
         cancelled = true;
       };
     }
-  }, [detail, params.submissionId, transitioned, navigate]);
+  }, [detail, params.submissionId, transitioned, navigate, t]);
 
   if (!detail) {
     return (

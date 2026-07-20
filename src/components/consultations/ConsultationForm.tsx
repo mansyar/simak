@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { logConsultation } from '@/server/consultations';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -73,6 +75,7 @@ export function ConsultationForm({
     setExternalConsultantName('');
     setNotes('');
     setLoading(false);
+    toast.success(t('consultations.logSuccess'));
     onSuccess();
   };
 
@@ -138,7 +141,14 @@ export function ConsultationForm({
       )}
 
       <Button type="submit" disabled={loading || !checkpointId || !notes}>
-        {loading ? t('common.loading') : t('consultations.logConsultation')}
+        {loading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {t('common.loading')}
+          </>
+        ) : (
+          t('consultations.logConsultation')
+        )}
       </Button>
     </form>
   );

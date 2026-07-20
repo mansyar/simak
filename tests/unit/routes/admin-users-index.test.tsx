@@ -218,4 +218,11 @@ describe('Admin Users index page', () => {
       expect(screen.getByTestId('setup-link-sheet')).toBeInTheDocument();
     });
   });
+
+  describe('pendingComponent', () => {
+    it('should have pendingComponent in route config', async () => {
+      const mod = await import('@/routes/_authenticated/admin/users/index');
+      expect(mod.Route).toHaveProperty('pendingComponent');
+    });
+  });
 });

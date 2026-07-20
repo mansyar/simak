@@ -8,12 +8,13 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
 import { useI18n } from '../../../routes/__root';
 
 interface DeleteUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   userName: string;
 }
 
@@ -25,8 +26,13 @@ export function DeleteUserDialog({
 }: DeleteUserDialogProps) {
   const { t } = useI18n();
 
-  const handleConfirm = () => {
-    onConfirm();
+  const handleConfirm = async () => {
+    try {
+      await onConfirm();
+      toast.success(t('adminUsers.deleteSuccess'));
+    } catch {
+      // Error handled by parent
+    }
     onOpenChange(false);
   };
 

@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { unlockCheckpoint, extendDeadline } from '@/server/assignments';
 import {
   Dialog,
@@ -86,6 +87,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
     onSuccess: () => {
       setUnlockTarget(null);
       setError(null);
+      toast.success(t('instructorAssignments.deadlineManager.unlockSuccess'));
     },
     onError: () => {
       setError(t('instructorAssignments.deadlineManager.unlockError'));
@@ -115,6 +117,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
         return next;
       });
       setError(null);
+      toast.success(t('instructorAssignments.deadlineManager.extendSuccess'));
     },
     onError: () => {
       setError(t('instructorAssignments.deadlineManager.extendError'));

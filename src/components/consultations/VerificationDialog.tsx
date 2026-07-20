@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import {
   getConsultationDetail,
   verifyConsultation,
@@ -6,6 +7,7 @@ import {
 } from '@/server/consultations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -83,6 +85,7 @@ export function VerificationDialog({
       }) => Promise<{ success: boolean; error: string | null }>
     )({ data: { consultationId } });
     if (result.success) {
+      toast.success(t('consultations.verifySuccess'));
       onOpenChange(false);
       onActionComplete();
     } else {
@@ -103,6 +106,7 @@ export function VerificationDialog({
       data: { consultationId, reason: rejectReason.trim() },
     });
     if (result.success) {
+      toast.success(t('consultations.rejectSuccess'));
       onOpenChange(false);
       onActionComplete();
     } else {
@@ -119,7 +123,9 @@ export function VerificationDialog({
         </DialogHeader>
 
         {loading && !detail && (
-          <div className="py-8 text-center text-muted-foreground">{t('common.loading')}</div>
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
         )}
 
         {error && (
@@ -204,7 +210,14 @@ export function VerificationDialog({
                 {t('consultations.reject')}
               </Button>
               <Button type="button" onClick={handleVerify} disabled={loading}>
-                {loading ? t('common.loading') : t('consultations.verify')}
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('common.loading')}
+                  </>
+                ) : (
+                  t('consultations.verify')
+                )}
               </Button>
             </>
           ) : (
@@ -223,7 +236,14 @@ export function VerificationDialog({
                 onClick={handleReject}
                 disabled={loading || !rejectReason.trim()}
               >
-                {loading ? t('common.loading') : t('consultations.confirmReject')}
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('common.loading')}
+                  </>
+                ) : (
+                  t('consultations.confirmReject')
+                )}
               </Button>
             </>
           )}

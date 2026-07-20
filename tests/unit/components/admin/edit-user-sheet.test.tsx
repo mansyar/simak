@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { toast } from 'sonner';
 import { EditUserSheet } from '@/components/admin/users/EditUserSheet';
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
 
 // Mock react-hook-form to bypass validation
 vi.mock('react-hook-form', () => ({
@@ -99,6 +106,7 @@ vi.mock('@/routes/__root', () => ({
         'adminUsers.table.name': 'Name',
         'auth.email': 'Email',
         'common.save': 'Save',
+        'adminUsers.updateSuccess': 'User updated successfully',
       };
       return translations[key] || key;
     },
@@ -182,5 +190,20 @@ describe('EditUserSheet', () => {
     // Sheet renders with empty fields when user is null
     expect(screen.getByTestId('sheet')).toBeDefined();
     expect(screen.getByTestId('form')).toBeDefined();
+  });
+
+  it('should show success toast on successful user update', async () => {
+    const submitFn = vi.fn().mockResolvedValue(undefined);
+    const onClose = vi.fn();
+    const { container } = render(
+      <EditUserSheet user={mockUser} open={true} onOpenChange={onClose} onSubmit={submitFn} />,
+    );
+
+    const formEl = container.querySelector('form');
+    if (formEl) fireEvent.submit(formEl);
+
+    await vi.waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('User updated successfully');
+    });
   });
 });

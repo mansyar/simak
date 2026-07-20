@@ -4,12 +4,14 @@ import { useI18n } from '../../__root';
 import { InstructorDashboard } from '@/components/dashboard/InstructorDashboard';
 import { PageHeader } from '@/components/ui/page-header';
 import { isServerError } from '@/lib/errors';
+import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
 
 export const Route = createFileRoute('/_authenticated/instructor/dashboard')({
   loader: async () => {
     return getInstructorDashboardData();
   },
   component: InstructorDashboardPage,
+  pendingComponent: () => <DashboardSkeleton />,
 });
 
 function InstructorDashboardPage() {

@@ -1,8 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { toast } from 'sonner';
 import { CreateUserDialog } from '@/components/admin/users/CreateUserDialog';
 import { CreateUserSchema } from '@/server/users';
 import { ROLES } from '@/lib/admin/roles';
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
 
 vi.mock('@/lib/admin/roles', () => ({
   ROLES: [
@@ -144,6 +151,7 @@ vi.mock('@/routes/__root', () => ({
         'auth.email': 'Email',
         'common.create': 'Create',
         'common.error': 'Error',
+        'adminUsers.createSuccess': 'User created successfully',
       };
       return translations[key] || key;
     },
@@ -268,5 +276,36 @@ describe('CreateUserDialog', () => {
     // If inline SelectItem values are used, options should have original labels
     expect(screen.getByText('adminUsers.role_admin_custom')).toBeDefined();
     expect(screen.queryByText('adminUsers.role_admin')).toBeNull();
+  });
+
+  it('should show success toast on successful user creation', async () => {
+    const submitFn = vi.fn().mockResolvedValue(undefined);
+    const onClose = vi.fn();
+    const { container } = render(
+      <CreateUserDialog open={true} onOpenChange={onClose} onSubmit={submitFn} />,
+    );
+
+    const formEl = container.querySelector('form');
+    if (formEl) fireEvent.submit(formEl);
+
+    await vi.waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('User created successfully');
+    });
+  });
+
+  it('should not show success toast when onSubmit rejects', async () => {
+    const submitFn = vi.fn().mockRejectedValue(new Error('Server error'));
+    const onClose = vi.fn();
+    const { container } = render(
+      <CreateUserDialog open={true} onOpenChange={onClose} onSubmit={submitFn} />,
+    );
+
+    const formEl = container.querySelector('form');
+    if (formEl) fireEvent.submit(formEl);
+
+    await vi.waitFor(() => {
+      expect(submitFn).toHaveBeenCalledOnce();
+    });
+    expect(toast.success).not.toHaveBeenCalled();
   });
 });
