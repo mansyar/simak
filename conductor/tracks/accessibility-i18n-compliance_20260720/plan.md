@@ -85,7 +85,7 @@
     - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
     - [x] Commit: `fix(i18n): Use shared formatDate in StudentDashboard and ConsultationList (UX-20)`
 
-- [ ] Task: Conductor - User Manual Verification 'i18n Hardcoded String & Date Formatting Fixes' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'i18n Hardcoded String & Date Formatting Fixes' (Protocol in workflow.md)
 
 ---
 
