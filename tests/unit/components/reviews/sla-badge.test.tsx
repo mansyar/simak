@@ -5,6 +5,7 @@ import { SLABadge } from '@/components/reviews/SLABadge';
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
     t: (key: string) => key,
+    locale: 'en' as const,
   }),
 }));
 
@@ -33,5 +34,31 @@ describe('SLABadge', () => {
     fourDaysAgo.setDate(fourDaysAgo.getDate() - 4);
     render(<SLABadge state="under_review" updatedAt={fourDaysAgo} />);
     expect(screen.getByText('instructorReviews.slaBreached')).toBeDefined();
+  });
+
+  it('should have title attribute with relative time for under_review state', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-05T12:00:00'));
+    try {
+      const updatedAt = new Date('2026-03-01T12:00:00'); // 4 days ago
+      render(<SLABadge state="under_review" updatedAt={updatedAt} />);
+      const badge = screen.getByTestId('sla-badge');
+      expect(badge.getAttribute('title')).toBe('4 days ago');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('should have title attribute with relative time for submitted state', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-05T12:00:00'));
+    try {
+      const updatedAt = new Date('2026-03-05T10:00:00'); // about 2 hours ago
+      render(<SLABadge state="submitted" updatedAt={updatedAt} />);
+      const badge = screen.getByTestId('sla-badge');
+      expect(badge.getAttribute('title')).toMatch(/2 hours ago/);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
