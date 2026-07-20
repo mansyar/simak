@@ -44,13 +44,13 @@
 
 ## Phase 3: File UX & Client Perf
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
 
-- [ ] Task: Add DOCX preview message to ReviewFilePreview
-    - [ ] Write tests: non-PDF files show "Preview not available" card with `FileText` icon and download button; PDF files show inline preview as before
-    - [ ] Implement: Add conditional card for non-PDF files in `ReviewFilePreview` with `t('files.previewNotAvailable')` message
+- [x] Task: Add DOCX preview message to ReviewFilePreview (8322289)
+    - [x] Write tests: non-PDF files show "Preview not available" card with `FileText` icon and download button; PDF files show inline preview as before
+    - [x] Implement: Add conditional card for non-PDF files in `ReviewFilePreview` with `t('files.previewNotAvailable')` message
 
-- [ ] Task: Add "Latest" badge to FileList
+- [~] Task: Add "Latest" badge to FileList
     - [ ] Write tests: highest version row shows "Latest" badge; non-highest rows do not show badge
     - [ ] Implement: Compute `maxVersion = Math.max(...submissions.map(s => s.version))`; show `Badge` (`variant: "secondary"`) on row where `version === maxVersion`
 
