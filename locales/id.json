@@ -73,7 +73,8 @@
     "previousPage": "Sebelumnya",
     "nextPage": "Selanjutnya",
     "pageOf": "Halaman {current} dari {total}",
-    "done": "Selesai"
+    "done": "Selesai",
+    "clearSearch": "Hapus pencarian"
   },
   "theme": {
     "light": "Mode Terang",

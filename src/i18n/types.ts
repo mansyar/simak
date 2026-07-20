@@ -79,6 +79,7 @@ export type Translation = {
     nextPage: string
     pageOf: string
     done: string
+    clearSearch: string
   }
   theme: {
     light: string

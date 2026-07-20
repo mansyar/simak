@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { UserFilters } from '@/components/admin/users/UserFilters';
 import { ROLES } from '@/lib/admin/roles';
 
@@ -48,6 +48,7 @@ vi.mock('@/routes/__root', () => ({
         'adminUsers.role_admin': 'Admin',
         'adminUsers.role_instructor': 'Instructor',
         'adminUsers.role_student': 'Student',
+        'common.clearSearch': 'Clear search',
       };
       return translations[key] || key;
     },
@@ -59,7 +60,12 @@ describe('UserFilters', () => {
   const onRoleChange = vi.fn();
 
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should render search input', () => {
@@ -89,7 +95,7 @@ describe('UserFilters', () => {
     expect(screen.getByTestId('role-select')).toBeDefined();
   });
 
-  it('should call onSearchChange when search input value changes', () => {
+  it('should debounce onSearchChange - rapid typing fires only 1 call after delay', () => {
     render(
       <UserFilters
         search=""
@@ -100,8 +106,20 @@ describe('UserFilters', () => {
     );
 
     const searchInput = screen.getByPlaceholderText('Search users by name or email...');
-    fireEvent.change(searchInput, { target: { value: 'john' } });
-    expect(onSearchChange).toHaveBeenCalledWith('john');
+
+    const word = 'algorithm';
+    for (let i = 1; i <= word.length; i++) {
+      fireEvent.change(searchInput, { target: { value: word.slice(0, i) } });
+    }
+
+    expect(onSearchChange).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    expect(onSearchChange).toHaveBeenCalledTimes(1);
+    expect(onSearchChange).toHaveBeenCalledWith('algorithm');
   });
 
   it('should call onRoleChange when role filter select changes', () => {
@@ -171,9 +189,46 @@ describe('UserFilters', () => {
         onRoleChange={onRoleChange}
       />,
     );
-    // If ROLES config is used, options should have custom labels
-    // If inline roleLabels is used, options should have original labels
     expect(screen.getByText('adminUsers.role_admin_custom')).toBeDefined();
     expect(screen.queryByText('adminUsers.role_admin')).toBeNull();
+  });
+
+  it('should show X clear button when search is not empty', () => {
+    render(
+      <UserFilters
+        search="test"
+        onSearchChange={onSearchChange}
+        role="all"
+        onRoleChange={onRoleChange}
+      />,
+    );
+    expect(screen.getByLabelText('Clear search')).toBeDefined();
+  });
+
+  it('should hide X clear button when search is empty', () => {
+    render(
+      <UserFilters
+        search=""
+        onSearchChange={onSearchChange}
+        role="all"
+        onRoleChange={onRoleChange}
+      />,
+    );
+    expect(screen.queryByLabelText('Clear search')).toBeNull();
+  });
+
+  it('should clear search immediately when X button is clicked', () => {
+    render(
+      <UserFilters
+        search="test"
+        onSearchChange={onSearchChange}
+        role="all"
+        onRoleChange={onRoleChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText('Clear search'));
+
+    expect(onSearchChange).toHaveBeenCalledWith('');
   });
 });

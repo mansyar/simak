@@ -73,7 +73,8 @@
     "previousPage": "Previous",
     "nextPage": "Next",
     "pageOf": "Page {current} of {total}",
-    "done": "Done"
+    "done": "Done",
+    "clearSearch": "Clear search"
   },
   "theme": {
     "light": "Light Mode",
