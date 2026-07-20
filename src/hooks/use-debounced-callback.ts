@@ -24,5 +24,7 @@ export function useDebouncedCallback<T extends (...args: never[]) => void>(
       }, delay);
     },
     [callback, delay],
+    // Cast needed: useCallback returns (...args) => void, but T may have a specific return type.
+    // The debounced wrapper intentionally returns void; callers use it for side effects only.
   ) as T;
 }
