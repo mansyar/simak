@@ -1,3 +1,4 @@
+<protect>
 # Track: Search Debounce & Form Validation
 
 **Track ID:** search-debounce-form-validation
@@ -174,3 +175,4 @@ This track addresses 6 UX audit findings related to search input behavior, form 
 - Server handler or database schema changes.
 - Notification navigation (TRACK-012).
 - NotificationCenter a11y refactor (TRACK-010).
+</protect>

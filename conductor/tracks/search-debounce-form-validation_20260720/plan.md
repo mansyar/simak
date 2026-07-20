@@ -1,9 +1,14 @@
+<protect>
 # Implementation Plan: Search Debounce & Form Validation
 
 **Track ID:** search-debounce-form-validation
 **Audit IDs:** UX-25, UX-26, UX-27, UX-28, UX-54, UX-56
 
 ## Phase 1: Debounce & Clear Filters
+
+- [ ] Task: Read spec.md and workflow.md to refresh context
+    - [ ] Read `./spec.md` for requirements and acceptance criteria
+    - [ ] Read `conductor/workflow.md` for TDD lifecycle and checkpoint protocol
 
 - [ ] Task: Create `useDebouncedCallback` hook
     - [ ] Write failing tests in `tests/unit/hooks/use-debounced-callback.test.ts` — verify: callback fires only after delay, re-call resets timer, cleanup clears timer on unmount
@@ -26,6 +31,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Debounce & Clear Filters' (Protocol in workflow.md)
 
 ## Phase 2: Form Migration
+
+- [ ] Task: Read spec.md and workflow.md to refresh context
+    - [ ] Read `./spec.md` for requirements and acceptance criteria
+    - [ ] Read `conductor/workflow.md` for TDD lifecycle and checkpoint protocol
 
 - [ ] Task: Migrate ConsultationForm to react-hook-form + Zod
     - [ ] Write failing tests — verify: empty `notes` shows error on blur, `sessionType: 'external'` with empty `externalConsultantName` shows error, valid submission calls `logConsultation`
@@ -55,6 +64,10 @@
 
 ## Phase 3: Upload Progress
 
+- [ ] Task: Read spec.md and workflow.md to refresh context
+    - [ ] Read `./spec.md` for requirements and acceptance criteria
+    - [ ] Read `conductor/workflow.md` for TDD lifecycle and checkpoint protocol
+
 - [ ] Task: Replace `fetch` with `XMLHttpRequest` + add upload progress bar
     - [ ] Write failing tests for `CheckpointSubmissionPage` — verify: `XMLHttpRequest` is used (not `fetch`), `xhr.upload.onprogress` updates progress state, progress value passed to `FileUploader`
     - [ ] Write failing tests for `FileUploader` — verify: `Progress` bar renders when `isUploading` + `uploadProgress` available, `Loader2` spinner shows as fallback when progress unavailable
@@ -65,3 +78,4 @@
     - [ ] Run `pnpm typecheck`, `pnpm lint` — confirm clean
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Upload Progress' (Protocol in workflow.md)
+</protect>
