@@ -140,3 +140,67 @@ describe('ConsultationProgress', () => {
     expect(summarySpan?.textContent).toContain('5');
   });
 });
+
+describe('ConsultationProgress - progressbar ARIA attributes (UX-21)', () => {
+  const mockCounts = [
+    { checkpointId: 1, checkpointName: 'Proposal', verifiedCount: 2, minConsultations: 3 },
+    { checkpointId: 2, checkpointName: 'Chapter 1', verifiedCount: 1, minConsultations: 2 },
+  ];
+
+  it('summary progress bar has role="progressbar"', () => {
+    const { container } = render(<ConsultationProgress counts={mockCounts} />);
+    const summaryBar = container.querySelector('.flex-1.h-2');
+    expect(summaryBar?.getAttribute('role')).toBe('progressbar');
+  });
+
+  it('summary progress bar has aria-valuenow equal to totalVerified', () => {
+    const { container } = render(<ConsultationProgress counts={mockCounts} />);
+    const summaryBar = container.querySelector('.flex-1.h-2');
+    // totalVerified = 2 + 1 = 3
+    expect(summaryBar?.getAttribute('aria-valuenow')).toBe('3');
+  });
+
+  it('summary progress bar has aria-valuemin=0 and aria-valuemax equal to totalRequired', () => {
+    const { container } = render(<ConsultationProgress counts={mockCounts} />);
+    const summaryBar = container.querySelector('.flex-1.h-2');
+    // totalRequired = 3 + 2 = 5
+    expect(summaryBar?.getAttribute('aria-valuemin')).toBe('0');
+    expect(summaryBar?.getAttribute('aria-valuemax')).toBe('5');
+  });
+
+  it('summary progress bar has aria-label from t("consultations.consultationProgress")', () => {
+    const { container } = render(<ConsultationProgress counts={mockCounts} />);
+    const summaryBar = container.querySelector('.flex-1.h-2');
+    expect(summaryBar?.getAttribute('aria-label')).toBe('Consultation Progress');
+  });
+
+  it('per-checkpoint progress bars have role="progressbar"', () => {
+    const { container } = render(<ConsultationProgress counts={mockCounts} />);
+    // Per-checkpoint bars use h-1.5 class (not h-2 which is the summary bar)
+    const checkpointBars = container.querySelectorAll('.h-1\\.5.bg-muted');
+    expect(checkpointBars.length).toBe(2);
+    checkpointBars.forEach((bar) => {
+      expect(bar.getAttribute('role')).toBe('progressbar');
+    });
+  });
+
+  it('per-checkpoint progress bars have aria-valuenow, aria-valuemin, aria-valuemax', () => {
+    const { container } = render(<ConsultationProgress counts={mockCounts} />);
+    const checkpointBars = container.querySelectorAll('.h-1\\.5.bg-muted');
+    // Checkpoint 1: verifiedCount=2, minConsultations=3
+    expect(checkpointBars[0].getAttribute('aria-valuenow')).toBe('2');
+    expect(checkpointBars[0].getAttribute('aria-valuemin')).toBe('0');
+    expect(checkpointBars[0].getAttribute('aria-valuemax')).toBe('3');
+    // Checkpoint 2: verifiedCount=1, minConsultations=2
+    expect(checkpointBars[1].getAttribute('aria-valuenow')).toBe('1');
+    expect(checkpointBars[1].getAttribute('aria-valuemin')).toBe('0');
+    expect(checkpointBars[1].getAttribute('aria-valuemax')).toBe('2');
+  });
+
+  it('per-checkpoint progress bars have aria-label with checkpoint name', () => {
+    const { container } = render(<ConsultationProgress counts={mockCounts} />);
+    const checkpointBars = container.querySelectorAll('.h-1\\.5.bg-muted');
+    expect(checkpointBars[0].getAttribute('aria-label')).toBe('Proposal');
+    expect(checkpointBars[1].getAttribute('aria-label')).toBe('Chapter 1');
+  });
+});
