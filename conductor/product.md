@@ -346,4 +346,16 @@ Students and instructors lack a centralized system to:
 - **i18n translations** — 31 new keys in EN and ID for admin email queue UI
 - **Tests** — 45 new tests across processor logging, server handlers, and route component; full suite 2,445 tests pass; coverage ≥80%
 
+### Track: Query & Data-Fetching Optimization (July 2026)
+
+- **N+1 query elimination** — Replaced per-row sequential queries with bulk operations in 6 handlers: `listVerifiedCountsHandler` (GROUP BY), `calculateExtensionAdjustment`/`bulkExtendHandler`/`adjustDeadlinesForBreach` (bulk UPDATE), `dispatchSLABreachNotifications` (batch INSERT + `Promise.allSettled` for emails), `bulkCreateUsersHandler` (parallel emails + batch audit INSERT).
+- **Pagination added** — 5 list handlers now accept `page`/`limit` Zod params with `Promise.all` for data + count queries: `listConsultations`, `listPendingConsultations`, `listSubmissions`, `listTemplateAssignments`, `listMyExtensionRequests`. Client routes wired with shared `<Pagination>` component.
+- **Dashboard query safety caps** — Added `.limit(20)` to `activeAssignments` (student dashboard) and `assignmentOverview` (instructor dashboard) to prevent unbounded queries.
+- **Over-fetch reduction** — `listNotificationsHandler` narrowed SELECT to required columns (dropped `metadata`, `channel`, `userId`); removed redundant `SELECT locale FROM users` query (uses `session.user.locale` directly).
+- **Parallel query execution** — `listTemplatesHandler` and `listInstructorAssignmentsHandler` now run data + count queries via `Promise.all` instead of sequentially.
+- **LATERAL join rewrite** — `listPendingReviewsHandler` replaced correlated subquery (`DISTINCT ON` in WHERE) with `INNER JOIN LATERAL` for latest submission per checkpoint — leverages `submissions_checkpoint_version_unq` index.
+- **R2 HEAD check before transaction** (BUG-14) — `getObjectContentLength` moved before `db.transaction()` in `submitCheckpointHandler` and `submitReviewHandler` to avoid holding DB transaction open during network I/O.
+- **Batch audit log inserts** — `bulkExtendHandler` per-checkpoint `logAuditEvent` loop replaced with single batch `db.insert(auditLog).values([...])`.
+- **Tests** — 2,539 tests pass across 269 test files; coverage ≥80% on all thresholds (stmts 87.43%, branches 81.11%, functions 81.26%, lines 88.07%).
+
 </protect>
