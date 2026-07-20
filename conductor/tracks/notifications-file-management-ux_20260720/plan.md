@@ -50,11 +50,11 @@
     - [x] Write tests: non-PDF files show "Preview not available" card with `FileText` icon and download button; PDF files show inline preview as before
     - [x] Implement: Add conditional card for non-PDF files in `ReviewFilePreview` with `t('files.previewNotAvailable')` message
 
-- [~] Task: Add "Latest" badge to FileList
-    - [ ] Write tests: highest version row shows "Latest" badge; non-highest rows do not show badge
-    - [ ] Implement: Compute `maxVersion = Math.max(...submissions.map(s => s.version))`; show `Badge` (`variant: "secondary"`) on row where `version === maxVersion`
+- [x] Task: Add "Latest" badge to FileList (9ef3e6f)
+    - [x] Write tests: highest version row shows "Latest" badge; non-highest rows do not show badge
+    - [x] Implement: Compute `maxVersion = Math.max(...submissions.map(s => s.version))`; show `Badge` (`variant: "secondary"`) on row where `version === maxVersion`
 
-- [ ] Task: Client-side performance optimizations
+- [~] Task: Client-side performance optimizations
     - [ ] Write tests: `useNotificationsList` has `staleTime: 30_000`; `useUnreadCount` has `refetchInterval: 30000` and `refetchIntervalInBackground: false`; `NotificationItem` wrapped in `React.memo`; `NotificationCenter` uses `useMemo` for unread count and groupedNotifications
     - [ ] Implement: Add `staleTime: 30_000` to `useNotificationsList`
     - [ ] Implement: Change `useUnreadCount` `refetchInterval` to `30000` + add `refetchIntervalInBackground: false`
