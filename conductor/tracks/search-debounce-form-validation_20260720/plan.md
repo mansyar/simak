@@ -28,7 +28,7 @@
     - [x] Run `pnpm test` — confirm all tests pass
     - [x] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Debounce & Clear Filters' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Debounce & Clear Filters' (Protocol in workflow.md)
 
 ## Phase 2: Form Migration
 
