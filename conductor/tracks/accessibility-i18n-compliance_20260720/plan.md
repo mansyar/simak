@@ -37,12 +37,12 @@
     - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
     - [x] Commit: `fix(a11y): Dynamic aria-label and aria-live on NotificationBadge (UX-23, UX-50)`
 
-- [ ] Task: Replace AdminDashboard hardcoded string (UX-13)
-    - [ ] Write failing tests: assert `AdminDashboard` renders `t('adminDashboard.noRecentActivityDescription')` as the empty-state description, no hardcoded `"No recent activity to display"` string
-    - [ ] Implement: replace `description="No recent activity to display"` with `description={t('adminDashboard.noRecentActivityDescription')}` in `AdminDashboard`
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
-    - [ ] Commit: `fix(i18n): Replace hardcoded AdminDashboard string with i18n key (UX-13)`
+- [x] Task: Replace AdminDashboard hardcoded string (UX-13) [f21d2cc]
+    - [x] Write failing tests: assert `AdminDashboard` renders `t('adminDashboard.noRecentActivityDescription')` as the empty-state description, no hardcoded `"No recent activity to display"` string
+    - [x] Implement: replace `description="No recent activity to display"` with `description={t('adminDashboard.noRecentActivityDescription')}` in `AdminDashboard`
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
+    - [x] Commit: `fix(i18n): Replace hardcoded AdminDashboard string with i18n key (UX-13)`
 
 - [ ] Task: Conductor - User Manual Verification 'Notification Center a11y Refactor' (Protocol in workflow.md)
 
