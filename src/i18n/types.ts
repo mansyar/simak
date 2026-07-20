@@ -679,6 +679,8 @@ export type Translation = {
     closePanel: string
     viewNotifications: string
     unreadCount: string
+    filterAll: string
+    filterUnread: string
     groups: {
       newReviews: string
       consultations: string

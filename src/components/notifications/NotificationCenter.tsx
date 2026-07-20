@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, CheckSquare, Loader2 } from 'lucide-react';
 import { useI18n } from '@/routes/__root';
 import type { TranslationKey } from '@/i18n/index';
 import { useNotificationsList, useMarkAllRead } from '@/hooks/use-notifications';
 import { NotificationItem, type Notification } from './NotificationItem';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Tabs } from '@/components/ui/tabs';
 
 interface NotificationCenterProps {
   isOpen: boolean;
@@ -36,7 +37,12 @@ const GROUP_CONFIGS = [
 
 export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps) {
   const { t } = useI18n();
-  const { data, isLoading } = useNotificationsList({ page: 1, limit: 50 });
+  const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
+  const { data, isLoading } = useNotificationsList({
+    page: 1,
+    limit: 50,
+    unreadOnly: activeTab === 'unread',
+  });
   const { mutate: markAllRead, isPending: isMarkingAll } = useMarkAllRead();
 
   const items: Notification[] = (data?.items as Notification[]) || [];
@@ -77,6 +83,18 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
             </button>
           )}
         </SheetHeader>
+
+        {/* Read/Unread filter tabs (FR-3) */}
+        <div className="px-4 pt-2">
+          <Tabs
+            tabs={[
+              { id: 'all', label: t('notifications.filterAll') },
+              { id: 'unread', label: t('notifications.filterUnread') },
+            ]}
+            activeTab={activeTab}
+            onTabChange={(tabId) => setActiveTab(tabId as 'all' | 'unread')}
+          />
+        </div>
 
         {/* Content area */}
         <div className="flex-1 overflow-y-auto">

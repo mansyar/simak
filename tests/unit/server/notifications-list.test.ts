@@ -189,6 +189,34 @@ describe('listNotificationsHandler', () => {
     expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
   });
 
+  it('should filter unread notifications when unreadOnly is true (TRACK-012 FR-3)', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(userSession as any);
+    const items = [
+      {
+        id: 1,
+        userId: 'user-1',
+        type: 'test',
+        titleKey: '',
+        messageKey: '',
+        params: null,
+        read: false,
+        channel: 'in_app',
+        metadata: null,
+        createdAt: new Date('2024-01-01'),
+      },
+    ];
+    mockDb.then
+      .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 1 }]).then(fn))
+      .mockImplementationOnce((fn: any) => Promise.resolve(items).then(fn));
+
+    const result = (await listNotificationsHandler({
+      data: { page: 1, limit: 20, unreadOnly: true },
+    })) as any;
+    expect(result.total).toBe(1);
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].read).toBe(false);
+  });
+
   it('should use session.user.locale instead of redundant locale query (PERF-24)', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
       user: { id: 'user-1', role: 'student' as const, locale: 'id' },

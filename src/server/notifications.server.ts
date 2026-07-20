@@ -79,7 +79,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { page, limit, type } = args.data;
+  const { page, limit, type, unreadOnly } = args.data;
   const db = getDb();
 
   try {
@@ -90,6 +90,9 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
     const conditions = [eq(notifications.userId, session.user.id)];
     if (type) {
       conditions.push(eq(notifications.type, type));
+    }
+    if (unreadOnly) {
+      conditions.push(eq(notifications.read, false));
     }
 
     // Get total count

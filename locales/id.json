@@ -674,6 +674,8 @@
     "closePanel": "Tutup panel",
     "viewNotifications": "Lihat notifikasi",
     "unreadCount": "{count} notifikasi belum dibaca",
+    "filterAll": "Semua",
+    "filterUnread": "Belum Dibaca",
     "groups": {
       "newReviews": "Ulasan Baru",
       "consultations": "Pembaruan Konsultasi",

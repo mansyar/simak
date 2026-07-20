@@ -674,6 +674,8 @@
     "closePanel": "Close panel",
     "viewNotifications": "View notifications",
     "unreadCount": "{count} unread notifications",
+    "filterAll": "All",
+    "filterUnread": "Unread",
     "groups": {
       "newReviews": "New Reviews",
       "consultations": "Consultation Updates",

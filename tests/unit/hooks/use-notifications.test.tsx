@@ -86,6 +86,26 @@ describe('Notification query hooks', () => {
         data: { page: 2, limit: 10, type: 'review_completed' },
       });
     });
+
+    it('should pass unreadOnly to listNotifications (TRACK-012 FR-3)', async () => {
+      const mockResult = { items: [{ id: 1, title: 'Test' }], total: 1 };
+      vi.mocked(listNotifications).mockResolvedValue(mockResult as any);
+
+      const { result } = renderHook(
+        () => useNotificationsList({ page: 1, limit: 20, unreadOnly: true }),
+        {
+          wrapper: createWrapper(),
+        },
+      );
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(listNotifications).toHaveBeenCalledWith({
+        data: { page: 1, limit: 20, unreadOnly: true },
+      });
+    });
   });
 
   describe('useMarkRead', () => {
