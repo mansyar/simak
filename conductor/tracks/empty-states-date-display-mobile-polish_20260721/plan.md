@@ -45,15 +45,15 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 
 ## Phase 2: Relative Dates & SLABadge (UX-43, UX-45)
 
-- [ ] Task: Read context — spec.md and workflow.md
-    - [ ] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
+- [x] Task: Read context — spec.md and workflow.md
+    - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
 
-- [ ] Task: Add `formatRelativeTime` helper to `src/lib/format.ts`
-    - [ ] Write failing test: `formatRelativeTime(date, locale)` returns "in 3 days" (future, en) / "3 days ago" (past, en); locale-aware via `localeMap` (e.g., "dalam 3 hari" for id)
-    - [ ] Implement: add `formatRelativeTime(date: Date | string, locale: 'en' | 'id' = 'en')` using `formatDistanceToNow(toDate(date), { addSuffix: true, locale: localeMap[locale] })` from `date-fns` (already a dependency, v4.2.1)
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: Add `formatRelativeTime` helper to `src/lib/format.ts`
+    - [x] Write failing test: `formatRelativeTime(date, locale)` returns "in 3 days" (future, en) / "3 days ago" (past, en); locale-aware via `localeMap` (e.g., "dalam waktu 3 hari" for id)
+    - [x] Implement: add `formatRelativeTime(date: Date | string, locale: 'en' | 'id' = 'en')` using `formatDistanceToNow(toDate(date), { addSuffix: true, locale: localeMap[locale] })` from `date-fns` (already a dependency, v4.2.1)
+    - [x] Verify: `pnpm test` passes (3097dad)
 
-- [ ] Task: CheckpointCard relative date (UX-43)
+- [~] Task: CheckpointCard relative date (UX-43)
     - [ ] Write failing test: `CheckpointCard` due date displays absolute date + parenthesized relative time (e.g., "Mar 5, 2026 (in 3 days)") in the active locale
     - [ ] Implement: append `(${formatRelativeTime(date, locale)})` to the formatted absolute date
     - [ ] Verify: `pnpm test` passes
