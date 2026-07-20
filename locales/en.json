@@ -299,6 +299,7 @@
     "submitError": "Failed to submit review. Please try again.",
     "reviewSubmitted": "Review submitted successfully!",
     "backToQueue": "Back to Review Queue",
+    "nextReview": "Next Review",
     "errors": {
       "feedbackUploadFailed": "Failed to upload feedback file",
       "notInSubmittedState": "Checkpoint must be in submitted state to open for review"
@@ -545,7 +546,8 @@
     "networkError": "Network error, check your connection",
     "serverError": "Server error, try again",
     "r2NotConfigured": "File storage is not configured. Contact your administrator.",
-    "objectNotFound": "The uploaded file could not be found. Please try uploading again."
+    "objectNotFound": "The uploaded file could not be found. Please try uploading again.",
+    "previewNotAvailable": "Preview not available — download to view"
   },
   "assignments": {
     "errors": {

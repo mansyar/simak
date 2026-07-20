@@ -3,9 +3,9 @@
 
 ## Phase 1: Notification Navigation
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
 
-- [ ] Task: Add i18n keys for new UI strings
+- [~] Task: Add i18n keys for new UI strings
     - [ ] Add `files.previewNotAvailable` and `instructorReviews.nextReview` to `locales/en.json` and `locales/id.json`
     - [ ] Run `pnpm generate:i18n` to regenerate types
     - [ ] Verify `pnpm check:i18n` passes
