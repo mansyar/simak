@@ -16,17 +16,17 @@
     - [x] Run `pnpm test` — confirm tests pass
     - [x] Run `pnpm typecheck` and `pnpm lint` — confirm clean
 
-- [ ] Task: Apply debounce + clear button to 4 server-side search inputs
-    - [ ] Write failing tests for `StudentAssignmentFilters` — verify: rapid typing (9 keystrokes) fires 1 `navigate()` call (not 9), X button clears search, X hidden when search empty
-    - [ ] Write failing tests for `UserFilters` — same assertions
-    - [ ] Write failing tests for `AssignmentFilters` — same assertions
-    - [ ] Write failing tests for `audit-log.tsx` — same assertions
-    - [ ] Add i18n key `common.clearSearch` (aria-label for X button) to `locales/en.json` and `locales/id.json`
-    - [ ] Run `pnpm generate:i18n`
-    - [ ] Implement: wrap `onSearchChange`/`handleSearchChange` with `useDebouncedCallback(fn, 300)` in all 4 components
-    - [ ] Implement: add conditional X icon button (`absolute right-2.5 top-2.5`, lucide-react `X`) to all 4 search input wrappers — visible only when `search !== ''`, `onClick` calls `onSearchChange('')`
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
+- [x] Task: Apply debounce + clear button to 4 server-side search inputs [3c9aa8d]
+    - [x] Write failing tests for `StudentAssignmentFilters` — verify: rapid typing (9 keystrokes) fires 1 `navigate()` call (not 9), X button clears search, X hidden when search empty
+    - [x] Write failing tests for `UserFilters` — same assertions
+    - [x] Write failing tests for `AssignmentFilters` — same assertions
+    - [x] Write failing tests for `audit-log.tsx` — same assertions
+    - [x] Add i18n key `common.clearSearch` (aria-label for X button) to `locales/en.json` and `locales/id.json`
+    - [x] Run `pnpm generate:i18n`
+    - [x] Implement: wrap `onSearchChange`/`handleSearchChange` with `useDebouncedCallback(fn, 300)` in all 4 components
+    - [x] Implement: add conditional X icon button (`absolute right-2.5 top-2.5`, lucide-react `X`) to all 4 search input wrappers — visible only when `search !== ''`, `onClick` calls `onSearchChange('')`
+    - [x] Run `pnpm test` — confirm all tests pass
+    - [x] Run `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — confirm clean
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Debounce & Clear Filters' (Protocol in workflow.md)
 
