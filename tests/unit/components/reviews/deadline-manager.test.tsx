@@ -277,4 +277,43 @@ describe('DeadlineManager', () => {
     );
     expect(deadlineLabels.length).toBe(4);
   });
+
+  describe('DeadlineManager - aria-expanded and aria-controls (UX-22)', () => {
+    it('toggle buttons have aria-expanded="false" when collapsed', () => {
+      renderWithQuery(<DeadlineManager students={mockStudents} assignmentId={1} />);
+      const sections = screen.getAllByTestId('student-section');
+      sections.forEach((section) => {
+        const btn = section.querySelector('button');
+        expect(btn?.getAttribute('aria-expanded')).toBe('false');
+      });
+    });
+
+    it('toggle button has aria-expanded="true" when expanded', () => {
+      renderWithQuery(<DeadlineManager students={mockStudents} assignmentId={1} />);
+      const sections = screen.getAllByTestId('student-section');
+      const btn = sections[0].querySelector('button');
+      fireEvent.click(btn!);
+      expect(btn?.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('toggle buttons have aria-controls matching student-{id}-details', () => {
+      renderWithQuery(<DeadlineManager students={mockStudents} assignmentId={1} />);
+      const sections = screen.getAllByTestId('student-section');
+      expect(sections[0].querySelector('button')?.getAttribute('aria-controls')).toBe(
+        'student-student-1-details',
+      );
+      expect(sections[1].querySelector('button')?.getAttribute('aria-controls')).toBe(
+        'student-student-2-details',
+      );
+    });
+
+    it('expandable content div has id matching aria-controls when expanded', () => {
+      renderWithQuery(<DeadlineManager students={mockStudents} assignmentId={1} />);
+      const sections = screen.getAllByTestId('student-section');
+      const btn = sections[0].querySelector('button');
+      fireEvent.click(btn!);
+      const contentDiv = sections[0].querySelector('#student-student-1-details');
+      expect(contentDiv).not.toBeNull();
+    });
+  });
 });

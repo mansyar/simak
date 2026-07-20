@@ -205,6 +205,8 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
             {/* Student header */}
             <button
               onClick={() => toggleStudent(student.id)}
+              aria-expanded={isExpanded}
+              aria-controls={`student-${student.id}-details`}
               className="flex w-full items-center justify-between p-3 hover:bg-muted/50 transition-colors rounded-lg text-left"
             >
               <div className="flex items-center gap-2">
@@ -225,7 +227,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
 
             {/* Checkpoint rows */}
             {isExpanded && (
-              <div className="border-t divide-y">
+              <div id={`student-${student.id}-details`} className="border-t divide-y">
                 {student.checkpoints.map((cp) => (
                   <div
                     key={cp.id}
