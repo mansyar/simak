@@ -16,12 +16,12 @@
     - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
     - [ ] Run `pnpm check:i18n` — verify key parity between EN and ID
 
-- [ ] Task: Refactor NotificationCenter to use shadcn Sheet (UX-15)
-    - [ ] Write failing tests: assert `NotificationCenter` renders `<Sheet>` / `<SheetContent side="right">`, no custom backdrop div or panel div remains, Escape key closes the panel, focus is trapped within the panel (Tab cycles inside)
-    - [ ] Implement: refactor `src/components/notifications/NotificationCenter.tsx` — wrap content in `<Sheet open={isOpen} onOpenChange={onClose}><SheetContent side="right">`, move header/content into `SheetHeader`/`SheetContent`, remove custom backdrop div, panel div, and manual X button (Sheet provides built-in close + focus management)
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint` — no errors
-    - [ ] Commit: `refactor(notifications): Replace custom notification panel with shadcn Sheet (UX-15)`
+- [x] Task: Refactor NotificationCenter to use shadcn Sheet (UX-15) [66276e8]
+    - [x] Write failing tests: assert `NotificationCenter` renders `<Sheet>` / `<SheetContent side="right">`, no custom backdrop div or panel div remains, Escape key closes the panel, focus is trapped within the panel (Tab cycles inside)
+    - [x] Implement: refactor `src/components/notifications/NotificationCenter.tsx` — wrap content in `<Sheet open={isOpen} onOpenChange={onClose}><SheetContent side="right">`, move header/content into `SheetHeader`/`SheetContent`, remove custom backdrop div, panel div, and manual X button (Sheet provides built-in close + focus management)
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
+    - [x] Commit: `refactor(notifications): Replace custom notification panel with shadcn Sheet (UX-15)`
 
 - [ ] Task: Convert NotificationItem to native button (UX-14)
     - [ ] Write failing tests: assert `NotificationItem` renders a `<button type="button">` with `text-left` and `w-full` classes, Tab focuses it, Enter and Space keys activate the `onClick` handler
