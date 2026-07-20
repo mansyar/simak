@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { X, CheckSquare, Loader2 } from 'lucide-react';
 import { useI18n } from '@/routes/__root';
 import type { TranslationKey } from '@/i18n/index';
@@ -65,17 +65,19 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   const total = data?.total ?? 0;
   const hasMore = items.length < total;
 
-  // Group notifications
-  const groupedNotifications = GROUP_CONFIGS.map((group) => {
-    const groupItems = items.filter((item) => group.types.includes(item.type));
-    return {
-      ...group,
-      items: groupItems,
-    };
-  }).filter((group) => group.items.length > 0);
+  // Group notifications (memoized — PERF-27)
+  const groupedNotifications = useMemo(() => {
+    return GROUP_CONFIGS.map((group) => {
+      const groupItems = items.filter((item) => group.types.includes(item.type));
+      return {
+        ...group,
+        items: groupItems,
+      };
+    }).filter((group) => group.items.length > 0);
+  }, [items]);
 
   const hasNotifications = items.length > 0;
-  const unreadCount = items.filter((i) => !i.read).length;
+  const unreadCount = useMemo(() => items.filter((i) => !i.read).length, [items]);
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>

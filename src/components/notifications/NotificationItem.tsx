@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Link } from '@tanstack/react-router';
 import { FileUp, CheckCircle, RefreshCw, ClipboardCheck, AlertTriangle, Bell } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
@@ -25,7 +25,7 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
   sla_breach: AlertTriangle,
 };
 
-export function NotificationItem({ item }: { item: Notification }) {
+function NotificationItemComponent({ item }: { item: Notification }) {
   const { mutate: markAsRead } = useMarkRead();
 
   const IconComponent = TYPE_ICONS[item.type] || Bell;
@@ -42,11 +42,11 @@ export function NotificationItem({ item }: { item: Notification }) {
 
   const relativeTimeStr = getRelativeTime(item.createdAt) || 'just now';
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (!item.read) {
       markAsRead(item.id);
     }
-  };
+  }, [item.read, item.id, markAsRead]);
 
   const route = getNotificationRoute(item.type, item.metadata);
 
@@ -102,3 +102,5 @@ export function NotificationItem({ item }: { item: Notification }) {
     </button>
   );
 }
+
+export const NotificationItem = React.memo(NotificationItemComponent);

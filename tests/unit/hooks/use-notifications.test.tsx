@@ -49,7 +49,7 @@ describe('Notification query hooks', () => {
   });
 
   describe('useUnreadCount', () => {
-    it('should query the unread count and set refetchInterval to 15000', async () => {
+    it('should query the unread count and set refetchInterval to 30000', async () => {
       vi.mocked(getUnreadCount).mockResolvedValue({ count: 5 });
 
       const { result } = renderHook(() => useUnreadCount(), {
@@ -62,6 +62,29 @@ describe('Notification query hooks', () => {
 
       expect(result.current.data).toBe(5);
       expect(getUnreadCount).toHaveBeenCalled();
+    });
+
+    it('should set refetchInterval to 30000 and refetchIntervalInBackground to false (PERF-30)', async () => {
+      vi.mocked(getUnreadCount).mockResolvedValue({ count: 5 });
+
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      );
+
+      const { result } = renderHook(() => useUnreadCount(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      const query = queryClient
+        .getQueryCache()
+        .find({ queryKey: ['notifications', 'unreadCount'] });
+      expect((query?.options as Record<string, unknown>).refetchInterval).toBe(30000);
+      expect((query?.options as Record<string, unknown>).refetchIntervalInBackground).toBe(false);
     });
   });
 
@@ -105,6 +128,35 @@ describe('Notification query hooks', () => {
       expect(listNotifications).toHaveBeenCalledWith({
         data: { page: 1, limit: 20, unreadOnly: true },
       });
+    });
+
+    it('should set staleTime to 30000 (PERF-29)', async () => {
+      const mockResult = { items: [{ id: 1, title: 'Test' }], total: 1 };
+      vi.mocked(listNotifications).mockResolvedValue(mockResult as any);
+
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      );
+
+      const { result } = renderHook(() => useNotificationsList({ page: 1, limit: 20 }), {
+        wrapper,
+      });
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      const queries = queryClient.getQueryCache().getAll();
+      const query = queries.find(
+        (q) =>
+          Array.isArray(q.queryKey) &&
+          q.queryKey[0] === 'notifications' &&
+          q.queryKey[1] === 'list',
+      );
+      expect((query?.options as Record<string, unknown>).staleTime).toBe(30_000);
     });
   });
 

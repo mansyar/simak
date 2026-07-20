@@ -27,7 +27,8 @@ export function useUnreadCount() {
       handleServerError(res, t);
       return res.count;
     },
-    refetchInterval: 15000,
+    refetchInterval: 30000,
+    refetchIntervalInBackground: false,
   });
 }
 
@@ -51,6 +52,7 @@ export function useNotificationsList(
       handleServerError(res, t);
       return res;
     },
+    staleTime: 30_000,
   });
 }
 
