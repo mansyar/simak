@@ -89,7 +89,7 @@
 
 ---
 
-## Phase 3: ARIA Attributes
+## Phase 3: ARIA Attributes [checkpoint: 69940e1]
 
 - [x] Task: Read `./spec.md` and `conductor/workflow.md` before starting phase implementation
 - [x] Task: Add aria-label to FileList download button (UX-16) [c5f3c53]
@@ -127,6 +127,6 @@
     - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
     - [x] Commit: `fix(a11y): Add aria-hidden to CheckpointTimeline decorative elements (UX-24)`
 
-- [ ] Task: Conductor - User Manual Verification 'ARIA Attributes' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'ARIA Attributes' (Protocol in workflow.md) [checkpoint: 69940e1]
 
 </protect>
