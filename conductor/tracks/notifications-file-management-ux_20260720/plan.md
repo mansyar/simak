@@ -36,9 +36,9 @@
     - [x] Implement: Update `useNotificationsList` to accept `unreadOnly: boolean` param
     - [x] Implement: Update server handler to add `.where(eq(notifications.read, false))` when `unreadOnly` is true
 
-- [ ] Task: Add "Load More" pagination to NotificationCenter
-    - [ ] Write tests: Load More button increments page and appends items; button hidden when all loaded; limit is 20 (not 50)
-    - [ ] Implement: Change `limit` from 50 to 20; add "Load More" button with `currentPage` state; append new items on click; hide when `items.length >= total`
+- [x] Task: Add "Load More" pagination to NotificationCenter (d925b1c)
+    - [x] Write tests: Load More button increments page and appends items; button hidden when all loaded; limit is 20 (not 50)
+    - [x] Implement: Change `limit` from 50 to 20; add "Load More" button with `currentPage` state; append new items on click; hide when `items.length >= total`
 
 - [ ] Task: Conductor - User Manual Verification 'Notification UX' (Protocol in workflow.md)
 
