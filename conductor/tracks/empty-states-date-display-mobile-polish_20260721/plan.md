@@ -58,12 +58,12 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
     - [x] Implement: append `(${formatRelativeTime(date, locale)})` to the formatted absolute date
     - [x] Verify: `pnpm test` passes (43c3be9)
 
-- [~] Task: StudentDashboard relative date (UX-43)
-    - [ ] Write failing test: upcoming deadlines display absolute date + parenthesized relative time in the active locale
-    - [ ] Implement: append relative time to the formatted date in the upcoming-deadlines list
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: StudentDashboard relative date (UX-43)
+    - [x] Write failing test: upcoming deadlines display absolute date + parenthesized relative time in the active locale
+    - [x] Implement: append relative time to the formatted date in the upcoming-deadlines list
+    - [x] Verify: `pnpm test` passes (e33e256)
 
-- [ ] Task: SLABadge time-remaining tooltip (UX-45)
+- [~] Task: SLABadge time-remaining tooltip (UX-45)
     - [ ] Write failing test: each `SLABadge` variant has a `title` attribute with locale-aware relative time (e.g., "3 days ago"); badge text (On Time / Approaching / Breached) unchanged
     - [ ] Implement: add `title={formatRelativeTime(updatedAt, locale)}` to each badge variant
     - [ ] Verify: `pnpm test` passes; no `simak-i18n/no-hardcoded` warning on the `title`
