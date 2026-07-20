@@ -1,3 +1,4 @@
+<protect>
 # Track Specification: Notifications & File Management UX
 
 ## Overview
@@ -109,3 +110,4 @@ Add a "Latest" badge to the `FileList` row with the highest `version` number.
 - **Email delivery improvements:** TRACK-004.
 - **Empty states for notifications:** TRACK-013.
 - **Schema migration:** The `metadata` jsonb column already exists — no migration needed.
+</protect>

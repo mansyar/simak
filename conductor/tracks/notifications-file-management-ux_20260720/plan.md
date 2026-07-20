@@ -1,6 +1,9 @@
+<protect>
 # Implementation Plan: Notifications & File Management UX
 
 ## Phase 1: Notification Navigation
+
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
 
 - [ ] Task: Add i18n keys for new UI strings
     - [ ] Add `files.previewNotAvailable` and `instructorReviews.nextReview` to `locales/en.json` and `locales/id.json`
@@ -25,6 +28,8 @@
 
 ## Phase 2: Notification UX
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
+
 - [ ] Task: Add "All" / "Unread" tab filter to NotificationCenter
     - [ ] Write tests: "All" tab shows all notifications; "Unread" tab filters to `read === false`; default tab is "All"
     - [ ] Implement: Add shadcn/ui `Tabs` component with "All" and "Unread" tabs to NotificationCenter Sheet header
@@ -38,6 +43,8 @@
 - [ ] Task: Conductor - User Manual Verification 'Notification UX' (Protocol in workflow.md)
 
 ## Phase 3: File UX & Client Perf
+
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting this phase
 
 - [ ] Task: Add DOCX preview message to ReviewFilePreview
     - [ ] Write tests: non-PDF files show "Preview not available" card with `FileText` icon and download button; PDF files show inline preview as before
@@ -55,3 +62,4 @@
     - [ ] Implement: Memoize `NotificationCenter` unread count + `groupedNotifications` with `useMemo` (eliminates 4 redundant `items.filter()` calls)
 
 - [ ] Task: Conductor - User Manual Verification 'File UX & Client Perf' (Protocol in workflow.md)
+</protect>
