@@ -8,6 +8,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: TRACK-009: Action Feedback & Loading States**
+- [x] **Track: TRACK-009: Action Feedback & Loading States**
 *Link: [./tracks/action-feedback-loading-states_20260720/](./tracks/action-feedback-loading-states_20260720/)*
 
