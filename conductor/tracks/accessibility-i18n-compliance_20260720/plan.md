@@ -99,12 +99,12 @@
     - [x] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
     - [x] Commit: `fix(a11y): Add aria-label to FileList download button (UX-16)`
 
-- [ ] Task: Add progressbar ARIA to ProgressTable (UX-21)
-    - [ ] Write failing tests: assert progress bar container divs have `role="progressbar"`, `aria-valuenow={value}`, `aria-valuemin={0}`, `aria-valuemax={100}`, `aria-label={t('instructorAssignments.table.progress')}`
-    - [ ] Implement: add ARIA attributes to progress bar container divs in `src/components/instructor/ProgressTable.tsx` (~line 78)
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm typecheck` and `pnpm lint` — no errors
-    - [ ] Commit: `fix(a11y): Add progressbar ARIA attributes to ProgressTable (UX-21)`
+- [x] Task: Add progressbar ARIA to ProgressTable (UX-21) [76719b2]
+    - [x] Write failing tests: assert progress bar container divs have `role="progressbar"`, `aria-valuenow={value}`, `aria-valuemin={0}`, `aria-valuemax={100}`, `aria-label={t('instructorAssignments.table.progress')}`
+    - [x] Implement: add ARIA attributes to progress bar container divs in `src/components/instructor/assignments/ProgressTable.tsx` (~line 78)
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm typecheck` and `pnpm lint` — no errors
+    - [x] Commit: `fix(a11y): Add progressbar ARIA attributes to ProgressTable (UX-21)`
 
 - [ ] Task: Add progressbar ARIA to ConsultationProgress (UX-21)
     - [ ] Write failing tests: assert summary progress bar has `role="progressbar"`, `aria-valuenow={totalVerified}`, `aria-valuemin={0}`, `aria-valuemax={totalRequired}`, `aria-label={t('consultations.consultationProgress')}`; per-checkpoint bars have similar ARIA
