@@ -44,7 +44,7 @@
     - [x] Run `pnpm lint` — no `simak-i18n/no-hardcoded` warnings
     - [x] Commit: `fix(i18n): Replace hardcoded AdminDashboard string with i18n key (UX-13)`
 
-- [ ] Task: Conductor - User Manual Verification 'Notification Center a11y Refactor' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Notification Center a11y Refactor' (Protocol in workflow.md)
 
 ---
 
