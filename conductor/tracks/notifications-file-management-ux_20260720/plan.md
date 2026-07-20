@@ -24,7 +24,7 @@
     - [x] Write tests: button navigates to next pending review when reviews exist; button hidden when no more reviews
     - [x] Implement: Add "Next Review" button calling `listPendingReviews({ data: { page: 1, limit: 1 } })`; navigate to `/instructor/reviews/{submissionId}` or hide button when empty
 
-- [ ] Task: Conductor - User Manual Verification 'Notification Navigation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Notification Navigation' (Protocol in workflow.md)
 
 ## Phase 2: Notification UX
 
