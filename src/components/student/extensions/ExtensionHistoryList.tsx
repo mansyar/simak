@@ -1,6 +1,7 @@
 import { useI18n } from '../../../routes/__root';
 import type { TranslationKey } from '../../../i18n/index';
 import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/format-date';
 
 interface ExtensionHistoryItem {
   id: number;
@@ -41,17 +42,8 @@ function getCategoryLabel(category: string): string {
   return map[category] || category;
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
 export function ExtensionHistoryList({ items }: ExtensionHistoryListProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   if (items.length === 0) {
     return (
@@ -88,7 +80,9 @@ export function ExtensionHistoryList({ items }: ExtensionHistoryListProps) {
           <tbody>
             {items.map((item) => (
               <tr key={item.id} className="border-b border-border last:border-b-0">
-                <td className="py-3 pr-4 text-foreground">{formatDate(item.createdAt)}</td>
+                <td className="py-3 pr-4 text-foreground">
+                  {formatDate(item.createdAt, locale, 'short')}
+                </td>
                 <td className="py-3 pr-4 text-foreground">
                   {t(getCategoryLabel(item.category) as TranslationKey)}
                 </td>

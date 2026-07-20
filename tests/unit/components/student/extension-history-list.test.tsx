@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-const { mockT } = vi.hoisted(() => {
+const { mockT, mockFormatDate } = vi.hoisted(() => {
   const translations: Record<string, string> = {
     'extensions.historyTitle': 'Extension History',
     'extensions.noHistory': 'No extension requests yet',
@@ -29,11 +29,18 @@ const { mockT } = vi.hoisted(() => {
       }
       return result;
     }),
+    mockFormatDate: vi.fn(
+      (date: string, locale: string, style: string) => `formatted-${date}-${locale}-${style}`,
+    ),
   };
 });
 
 vi.mock('@/routes/__root', () => ({
-  useI18n: () => ({ t: mockT }),
+  useI18n: () => ({ t: mockT, locale: 'en' }),
+}));
+
+vi.mock('@/lib/format-date', () => ({
+  formatDate: mockFormatDate,
 }));
 
 import { ExtensionHistoryList } from '@/components/student/extensions/ExtensionHistoryList';
@@ -150,6 +157,24 @@ describe('ExtensionHistoryList', () => {
       render(<ExtensionHistoryList items={mockItems} />);
       const daysCountCalls = mockT.mock.calls.filter((call) => call[0] === 'extensions.daysCount');
       expect(daysCountCalls).toHaveLength(3);
+    });
+  });
+
+  describe('shared formatDate (UX-19)', () => {
+    beforeEach(() => {
+      mockFormatDate.mockClear();
+    });
+
+    it('uses shared formatDate from @/lib/format-date with locale and short style', () => {
+      render(<ExtensionHistoryList items={mockItems} />);
+      expect(mockFormatDate).toHaveBeenCalledWith(mockItems[0].createdAt, 'en', 'short');
+      expect(mockFormatDate).toHaveBeenCalledWith(mockItems[1].createdAt, 'en', 'short');
+      expect(mockFormatDate).toHaveBeenCalledWith(mockItems[2].createdAt, 'en', 'short');
+    });
+
+    it('calls shared formatDate once per item', () => {
+      render(<ExtensionHistoryList items={mockItems} />);
+      expect(mockFormatDate).toHaveBeenCalledTimes(mockItems.length);
     });
   });
 });
