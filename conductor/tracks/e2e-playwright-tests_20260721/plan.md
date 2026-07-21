@@ -19,26 +19,26 @@
 
 ## Phase 2: Test Data, Auth & Mock Helpers
 
-- [ ] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
-- [ ] Task: Create E2E seed script
-    - [ ] Create `scripts/seed-e2e.ts` that connects to the test DB and creates: Admin user (`admin@e2e.test`), Instructor user (`instructor@e2e.test`), Student user (`student@e2e.test`), all with password `TestPass123!`
-    - [ ] Seed assignment template (3 checkpoints, type "Thesis", minConsultations: 1 per checkpoint, estimatedDuration per checkpoint)
-    - [ ] Seed assignment from template assigned to student (first checkpoint unlocked, rest locked)
-    - [ ] Use Better Auth's `hashPassword` for password hashing (same as production)
-- [ ] Task: Create DB reset utility
-    - [ ] Create `tests/e2e/helpers/db-reset.ts` that truncates all tables (except schema_migrations) and re-runs the seed script
-    - [ ] Wire it to run before each spec file via a shared `beforeAll` hook or Playwright fixture
-- [ ] Task: Create auth setup with storageState
-    - [ ] Create `tests/e2e/helpers/auth.ts` with a `loginAsRole(page, role)` function that navigates to `/auth/login`, fills credentials, submits, and waits for dashboard redirect
-    - [ ] Implement storageState caching — save authenticated session to `tests/e2e/.auth/{role}.json`
-    - [ ] Create `tests/e2e/setup/auth-setup.ts` that authenticates each role once and saves storageState files
-- [ ] Task: Create R2 mock helpers
-    - [ ] Create `tests/e2e/helpers/r2-mock.ts` with `setupR2Mocks(page)` function
-    - [ ] Intercept `getPresignedUploadUrl` server function → return mock `{ uploadUrl: 'http://localhost:9999/upload', fileKey: 'test-file-key' }`
-    - [ ] Intercept PUT to mock upload URL → return 200
-    - [ ] Intercept `getPresignedDownloadUrl` → return mock download URL
-    - [ ] Intercept R2 HEAD check (`getObjectContentLength`) → return mock file size
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Test Data, Auth & Mock Helpers' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
+- [x] Task: Create E2E seed script
+    - [x] Create `scripts/seed-e2e.ts` that connects to the test DB and creates: Admin user (`admin@e2e.test`), Instructor user (`instructor@e2e.test`), Student user (`student@e2e.test`), all with password `TestPass123!`
+    - [x] Seed assignment template (3 checkpoints, type "Thesis", minConsultations: 1 per checkpoint, estimatedDuration per checkpoint)
+    - [x] Seed assignment from template assigned to student (first checkpoint unlocked, rest locked)
+    - [x] Use Better Auth's `hashPassword` for password hashing (same as production)
+- [x] Task: Create DB reset utility
+    - [x] Create `tests/e2e/helpers/db-reset.ts` that truncates all tables (except schema_migrations) and re-runs the seed script
+    - [x] Wire it to run before each spec file via a shared `beforeAll` hook or Playwright fixture
+- [x] Task: Create auth setup with storageState
+    - [x] Create `tests/e2e/helpers/auth.ts` with a `loginAsRole(page, role)` function that navigates to `/auth/login`, fills credentials, submits, and waits for dashboard redirect
+    - [x] Implement storageState caching — save authenticated session to `tests/e2e/.auth/{role}.json`
+    - [x] Create `tests/e2e/setup/auth-setup.ts` that authenticates each role once and saves storageState files
+- [x] Task: Create R2 mock helpers
+    - [x] Create `tests/e2e/helpers/r2-mock.ts` with `setupR2Mocks(page)` function
+    - [x] Intercept `getPresignedUploadUrl` server function → return mock `{ uploadUrl: 'http://localhost:9999/upload', fileKey: 'test-file-key' }`
+    - [x] Intercept PUT to mock upload URL → return 200
+    - [x] Intercept `getPresignedDownloadUrl` → return mock download URL
+    - [x] Intercept R2 HEAD check (`getObjectContentLength`) → return mock file size
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Test Data, Auth & Mock Helpers' (Protocol in workflow.md)
 
 ## Phase 3: E2E Test Specs
 
