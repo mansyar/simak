@@ -66,16 +66,16 @@
 
 ## Phase 4: Verification & Documentation
 
-- [ ] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
-- [ ] Task: Run full E2E suite and verify all tests pass
-    - [ ] Run `pnpm test:e2e` and confirm all 12-15 tests pass
-    - [ ] Verify test execution completes in under 2 minutes
-- [ ] Task: Verify failure artifacts and DB reset isolation
-    - [ ] Intentionally fail a test and verify screenshot, trace, and console log are captured in `test-results/`
-    - [ ] Verify DB is reset (truncate + re-seed) before each spec file by checking data isolation between specs
-- [ ] Task: Verify no application code regressions
-    - [ ] Run `pnpm test` (unit tests) and confirm all existing tests still pass
-    - [ ] Run `pnpm typecheck` and confirm clean
-    - [ ] Run `pnpm lint` and confirm clean
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Verification & Documentation' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
+- [x] Task: Run full E2E suite and verify all tests pass
+    - [x] Run `pnpm test:e2e` and confirm all 14 tests pass
+    - [x] Verify test execution completes in under 2 minutes (56.5s actual)
+- [x] Task: Verify failure artifacts and DB reset isolation
+    - [x] Intentionally fail a test and verify screenshot, trace, and console log are captured in `test-results/`
+    - [x] Verify DB is reset (truncate + re-seed) before each spec file by checking data isolation between specs
+- [x] Task: Verify no application code regressions
+    - [x] Run `pnpm test` (unit tests) and confirm all existing tests still pass (2683 passed)
+    - [x] Run `pnpm typecheck` and confirm clean
+    - [x] Run `pnpm lint` and confirm clean (0 warnings, 0 errors)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Verification & Documentation' (Protocol in workflow.md)
 </protect>
