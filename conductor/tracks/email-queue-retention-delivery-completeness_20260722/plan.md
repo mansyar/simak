@@ -55,11 +55,11 @@
 
 ## Phase 3: Concurrent Batch Sends (PERF-32/33)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 3
-    - [ ] Read this track's `spec.md` to review all functional requirements and acceptance criteria
-    - [ ] Read `conductor/workflow.md` to review the TDD workflow, quality gates, and phase completion protocol
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 3
+    - [x] Read this track's `spec.md` to review all functional requirements and acceptance criteria
+    - [x] Read `conductor/workflow.md` to review the TDD workflow, quality gates, and phase completion protocol
 
-- [ ] Task: Refactor processor send loop to chunked `Promise.allSettled`
+- [~] Task: Refactor processor send loop to chunked `Promise.allSettled`
     - [ ] Write test verifying emails are sent in chunks of 5
     - [ ] Write test verifying partial failures don't abort the batch
     - [ ] Write test verifying all emails in batch are processed (success and failure UPDATE paths)
