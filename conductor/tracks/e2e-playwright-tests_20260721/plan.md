@@ -42,27 +42,27 @@
 
 ## Phase 3: E2E Test Specs
 
-- [ ] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
-- [ ] Task: Write `tests/e2e/auth.spec.ts` (route guards)
-    - [ ] Test: Unauthenticated user navigates to `/student/assignments` → redirected to `/auth/login`
-    - [ ] Test: Student navigates to `/admin/users` → redirected to `/student/dashboard`
-    - [ ] Test: Valid login with correct credentials → redirected to role-specific dashboard
-- [ ] Task: Write `tests/e2e/admin-users.spec.ts` (user management)
-    - [ ] Test: Admin creates an instructor account → user appears in the user list
-    - [ ] Test: Admin creates a student account → user appears in the user list
-    - [ ] Test: Admin filters users by role → only matching users shown
-- [ ] Task: Write `tests/e2e/instructor-assignments.spec.ts` (assignment creation)
-    - [ ] Test: Instructor creates assignment from template → assignment appears in list
-    - [ ] Test: Verify checkpoint states: first checkpoint is `unlocked`, subsequent checkpoints are `locked`
-- [ ] Task: Write `tests/e2e/student-submission.spec.ts` (file submission)
-    - [ ] Test: Student uploads a file for the first checkpoint → submission appears in version history with version 1
-    - [ ] Test: Student resubmits → new version (version 2) appears in history with "Latest" badge
-- [ ] Task: Write `tests/e2e/instructor-review.spec.ts` (review decision)
-    - [ ] Test: Instructor opens review queue → pending submission appears
-    - [ ] Test: Instructor reviews with Pass → next checkpoint unlocks for student
-    - [ ] Test: Instructor reviews with Revise → revision deadline is set, student sees revise state
-    - [ ] Test: Review history shows both decisions
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: E2E Test Specs' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
+- [x] Task: Write `tests/e2e/auth.spec.ts` (route guards)
+    - [x] Test: Unauthenticated user navigates to `/student/assignments` → redirected to `/auth/login`
+    - [x] Test: Student navigates to `/admin/users` → redirected to `/student/dashboard`
+    - [x] Test: Valid login with correct credentials → redirected to role-specific dashboard
+- [x] Task: Write `tests/e2e/admin-users.spec.ts` (user management)
+    - [x] Test: Admin creates an instructor account → user appears in the user list
+    - [x] Test: Admin creates a student account → user appears in the user list
+    - [x] Test: Admin filters users by role → only matching users shown
+- [x] Task: Write `tests/e2e/instructor-assignments.spec.ts` (assignment creation)
+    - [x] Test: Instructor creates assignment from template → assignment appears in list
+    - [x] Test: Verify checkpoint states: first checkpoint is `unlocked`, subsequent checkpoints are `locked`
+- [x] Task: Write `tests/e2e/student-submission.spec.ts` (file submission)
+    - [x] Test: Student uploads a file for the first checkpoint → submission appears in version history with version 1
+    - [x] Test: Student resubmits → new version (version 2) appears in history with "Latest" badge
+- [x] Task: Write `tests/e2e/instructor-review.spec.ts` (review decision)
+    - [x] Test: Instructor opens review queue → pending submission appears
+    - [x] Test: Instructor reviews with Pass → next checkpoint unlocks for student
+    - [x] Test: Instructor reviews with Revise → revision deadline is set, student sees revise state
+    - [x] Test: Review history shows both decisions
+- [x] Task: Conductor - User Manual Verification 'Phase 3: E2E Test Specs' (Protocol in workflow.md)
 
 ## Phase 4: Verification & Documentation
 
