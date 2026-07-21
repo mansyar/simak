@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { consultationKeys } from '@/lib/query-keys';
 import { VerificationDialog } from '@/components/consultations/VerificationDialog';
+import React from 'react';
 
 vi.mock('sonner', () => ({
   toast: {
@@ -89,19 +92,26 @@ describe('VerificationDialog', () => {
     status: 'pending',
   };
 
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
   });
 
   function renderDialog(overrides: Partial<React.ComponentProps<typeof VerificationDialog>> = {}) {
     return render(
-      <VerificationDialog
-        consultationId={42}
-        open={true}
-        onOpenChange={onOpenChange}
-        onActionComplete={onActionComplete}
-        {...overrides}
-      />,
+      <QueryClientProvider client={queryClient}>
+        <VerificationDialog
+          consultationId={42}
+          open={true}
+          onOpenChange={onOpenChange}
+          onActionComplete={onActionComplete}
+          {...overrides}
+        />
+      </QueryClientProvider>,
     );
   }
 
@@ -384,6 +394,48 @@ describe('VerificationDialog', () => {
 
     await vi.waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('Consultation rejected successfully');
+    });
+  });
+
+  it('should invalidate consultation query on successful verify', async () => {
+    await resolveDetail();
+    const mod = await import('@/server/consultations');
+    (mod.verifyConsultation as any).mockResolvedValue({ success: true });
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    renderDialog();
+    await loadDetail();
+
+    const verifyBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Verify');
+    fireEvent.click(verifyBtn!);
+
+    await vi.waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: consultationKeys.all() });
+    });
+  });
+
+  it('should invalidate consultation query on successful reject', async () => {
+    await resolveDetail();
+    const mod = await import('@/server/consultations');
+    (mod.rejectConsultation as any).mockResolvedValue({ success: true });
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    renderDialog();
+    await loadDetail();
+
+    const rejectBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject');
+    fireEvent.click(rejectBtn!);
+
+    const input = screen.getByTestId('reject-input');
+    fireEvent.change(input, { target: { value: 'Insufficient detail' } });
+
+    const confirmBtn = screen
+      .getAllByTestId('dialog-btn')
+      .find((b) => b.textContent === 'Confirm Reject');
+    fireEvent.click(confirmBtn!);
+
+    await vi.waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: consultationKeys.all() });
     });
   });
 });

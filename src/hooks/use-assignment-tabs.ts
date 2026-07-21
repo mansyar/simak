@@ -3,11 +3,13 @@
  * and exposes state + handlers for the tab subcomponents.
  */
 import { useCallback, useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { listPendingConsultations } from '@/server/consultations';
 import { listExtensionRequests, approveExtension, rejectExtension } from '@/server/extensions';
 import { parseServerError, showErrorToast, showSuccessToast } from '@/lib/toast';
 import { useI18n } from '@/routes/__root';
 import { isServerError } from '@/lib/errors';
+import { consultationKeys } from '@/lib/query-keys';
 import type { PendingConsultation } from '@/components/instructor/assignments/AssignmentConsultationsTab';
 import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
 
@@ -25,22 +27,42 @@ const rejectFn = rejectExtension as unknown as (args: {
 
 export function useAssignmentTabs(assignmentId: number | null) {
   const { t } = useI18n();
-  const [pendingConsultations, setPendingConsultations] = useState<PendingConsultation[]>([]);
+  const queryClient = useQueryClient();
   const [pendingPage, setPendingPage] = useState(1);
-  const [pendingTotal, setPendingTotal] = useState(0);
   const [extensionRequests, setExtensionRequests] = useState<ExtensionRequestItem[]>([]);
   const [extensionsLoading, setExtensionsLoading] = useState(false);
 
+  const consultationsQuery = useQuery({
+    queryKey: consultationKeys.pending(assignmentId ?? -1, pendingPage),
+    queryFn: async () => {
+      if (assignmentId == null) return { consultations: [] as PendingConsultation[], total: 0 };
+      const result = await listPendingConsultations({
+        data: { assignmentId, page: pendingPage, limit: 20 },
+      });
+      if (!isServerError(result) && result.consultations) {
+        return { consultations: result.consultations, total: result.total };
+      }
+      return { consultations: [] as PendingConsultation[], total: 0 };
+    },
+    enabled: assignmentId != null,
+  });
+
+  const pendingConsultations = consultationsQuery.data?.consultations ?? [];
+  const pendingTotal = consultationsQuery.data?.total ?? 0;
+
+  const setPendingConsultations = useCallback(
+    (consultations: PendingConsultation[]) => {
+      queryClient.setQueryData(consultationKeys.pending(assignmentId ?? -1, pendingPage), {
+        consultations,
+        total: consultations.length,
+      });
+    },
+    [queryClient, assignmentId, pendingPage],
+  );
+
   const refreshPendingConsultations = useCallback(async () => {
-    if (assignmentId == null) return;
-    const result = await listPendingConsultations({
-      data: { assignmentId, page: pendingPage, limit: 20 },
-    });
-    if (!isServerError(result) && result.consultations) {
-      setPendingConsultations(result.consultations);
-      setPendingTotal(result.total);
-    }
-  }, [assignmentId, pendingPage]);
+    await queryClient.invalidateQueries({ queryKey: consultationKeys.all() });
+  }, [queryClient]);
 
   const refreshExtensions = useCallback(async () => {
     if (assignmentId == null) return;
@@ -52,21 +74,16 @@ export function useAssignmentTabs(assignmentId: number | null) {
 
   useEffect(() => {
     if (assignmentId == null) return;
-    const load = async () => {
+    const loadExtensions = async () => {
       setExtensionsLoading(true);
-      const [consultResult, extResult] = await Promise.all([
-        listPendingConsultations({ data: { assignmentId, page: pendingPage, limit: 20 } }),
-        listExtensionsFn({ data: { assignmentId, status: 'pending', page: 1, limit: 50 } }),
-      ]);
-      if (!isServerError(consultResult) && consultResult.consultations) {
-        setPendingConsultations(consultResult.consultations);
-        setPendingTotal(consultResult.total);
-      }
+      const extResult = await listExtensionsFn({
+        data: { assignmentId, status: 'pending', page: 1, limit: 50 },
+      });
       if ('items' in extResult) setExtensionRequests(extResult.items);
       setExtensionsLoading(false);
     };
-    load();
-  }, [assignmentId, pendingPage]);
+    loadExtensions();
+  }, [assignmentId]);
 
   const handleApproveExtension = useCallback(
     async (requestId: number, comment?: string) => {
