@@ -112,4 +112,10 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
     - [x] Confirm UX-44 (timezone) and UX-37 (bulk-import) are documented as dropped/out-of-scope in `spec.md` (lines 73-75)
 
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Final Conductor Review & Quality Gates' (Protocol in workflow.md)
+
+---
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions fb6e128
 </protect>
