@@ -14,7 +14,7 @@ import { execSync } from 'node:child_process';
  * All application tables to truncate (excluding drizzle migrations).
  * Order doesn't matter — we use CASCADE.
  */
-const TABLES_TO_TRUNCATE = [
+export const TABLES_TO_TRUNCATE = [
   'email_queue',
   'audit_log',
   'notifications',

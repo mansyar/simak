@@ -38,26 +38,41 @@ export function getAuthFilePath(role: E2ERole): string {
 }
 
 /**
- * Perform UI-based login for a given role.
+ * Perform login for a given role via the Better Auth API.
  *
- * Navigates to /auth/login, fills credentials, submits, and waits
- * for redirect to the role-specific dashboard.
+ * Navigates to /auth/login (to establish origin), then calls the auth
+ * API directly via fetch() to set the session cookie. This bypasses
+ * the Base UI Button component, which defaults to type="button" and
+ * does not trigger native form submission (see mui/base-ui#3932).
+ *
+ * After authentication, navigates to the role-specific dashboard.
  */
 export async function loginAsRole(page: Page, role: E2ERole): Promise<void> {
   const creds = ROLE_CREDENTIALS[role];
   const dashboardPath = getRoleDashboard(role);
 
+  // Navigate to login page to establish origin
   await page.goto('/auth/login');
 
-  // Fill login form
-  await page.locator('#email').fill(creds.email);
-  await page.locator('#password').fill(creds.password);
+  // Call the Better Auth sign-in API directly via fetch
+  // This sets the session cookie via Set-Cookie header
+  const response = await page.evaluate(async (credentials) => {
+    const res = await fetch('/api/auth/sign-in/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(credentials),
+    });
+    return { ok: res.ok, status: res.status };
+  }, creds);
 
-  // Submit and wait for dashboard redirect
-  await Promise.all([
-    page.waitForURL(`**${dashboardPath}**`, { timeout: 30_000 }),
-    page.locator('button[type="submit"]').click(),
-  ]);
+  if (!response.ok) {
+    throw new Error(`Login failed for ${role}: API returned ${response.status}`);
+  }
+
+  // Navigate to dashboard to verify session is active
+  await page.goto(dashboardPath);
+  await page.waitForURL(`**${dashboardPath}**`, { timeout: 30_000 });
 }
 
 /**

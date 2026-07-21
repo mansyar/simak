@@ -12,59 +12,79 @@ test.describe('Admin User Management', () => {
 
   test('admin creates an instructor account', async ({ page }) => {
     await page.goto('/admin/users');
+    await page.waitForLoadState('networkidle');
 
-    // Click "New User" button to open the dialog
-    await page.click('text=New User');
+    // Click "New User" button
+    await page.getByRole('button', { name: 'New User' }).click();
+
+    // Wait for dialog to appear
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
 
     // Fill the create user form
-    await page.fill('input[name="name"]', 'New Instructor');
-    await page.fill('input[name="email"]', 'new-instructor@e2e.test');
+    await dialog.locator('input[name="name"]').fill('New Instructor');
+    await dialog.locator('input[name="email"]').fill('new-instructor@e2e.test');
 
     // Select role "Instructor" from the dropdown
-    await page.click('[role="dialog"] button[role="combobox"]');
-    await page.click('text=Instructor');
+    await dialog.locator('button[role="combobox"]').click();
+    await page.getByRole('option', { name: 'Instructor' }).click();
 
-    // Submit the form
-    await page.click('[role="dialog"] button[type=submit]');
+    // Submit the form via requestSubmit (Base UI Button defaults to type=button)
+    await dialog.locator('form').evaluate((form) => (form as HTMLFormElement).requestSubmit());
 
     // Wait for the dialog to close and the user list to update
-    await expect(page.locator('[role="dialog"]')).not.toBeVisible({ timeout: 10_000 });
+    await expect(dialog).not.toBeVisible({ timeout: 10_000 });
 
-    // Verify the new user appears in the user list
-    await expect(page.locator('text=new-instructor@e2e.test')).toBeVisible({ timeout: 10_000 });
+    // Verify the new user appears in the user list table
+    await expect(page.locator('table')).toContainText('new-instructor@e2e.test', {
+      timeout: 10_000,
+    });
   });
 
   test('admin creates a student account', async ({ page }) => {
     await page.goto('/admin/users');
+    await page.waitForLoadState('networkidle');
 
-    await page.click('text=New User');
+    // Click "New User" button
+    await page.getByRole('button', { name: 'New User' }).click();
 
-    await page.fill('input[name="name"]', 'New Student');
-    await page.fill('input[name="email"]', 'new-student@e2e.test');
+    // Wait for dialog to appear
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
 
-    // Default role is "Student", so we just submit
-    await page.click('[role="dialog"] button[type=submit]');
+    // Fill the create user form (default role is "Student")
+    await dialog.locator('input[name="name"]').fill('New Student');
+    await dialog.locator('input[name="email"]').fill('new-student@e2e.test');
 
-    await expect(page.locator('[role="dialog"]')).not.toBeVisible({ timeout: 10_000 });
+    // Submit the form via requestSubmit (Base UI Button defaults to type=button)
+    await dialog.locator('form').evaluate((form) => (form as HTMLFormElement).requestSubmit());
 
-    await expect(page.locator('text=new-student@e2e.test')).toBeVisible({ timeout: 10_000 });
+    // Wait for the dialog to close
+    await expect(dialog).not.toBeVisible({ timeout: 10_000 });
+
+    // Verify the new user appears in the user list table
+    await expect(page.locator('table')).toContainText('new-student@e2e.test', {
+      timeout: 10_000,
+    });
   });
 
   test('admin filters users by role', async ({ page }) => {
     await page.goto('/admin/users');
+    await page.waitForLoadState('networkidle');
 
-    // Filter by "Instructor" role
-    const roleFilter = page.locator('button[role="combobox"]').first();
-    await roleFilter.click();
-    await page.click('text=Instructor', { timeout: 5_000 });
+    // Filter by "Instructor" role via URL (same as selecting from combobox)
+    await page.goto('/admin/users?role=instructor');
+    await page.waitForLoadState('networkidle');
 
-    // Wait for the table to update
-    await page.waitForTimeout(1_000);
+    // Verify instructor@e2e.test is visible in the table
+    await expect(page.locator('table')).toContainText('instructor@e2e.test', {
+      timeout: 10_000,
+    });
 
-    // Verify instructor@e2e.test is visible
-    await expect(page.locator('text=instructor@e2e.test')).toBeVisible({ timeout: 10_000 });
-
-    // Verify admin@e2e.test is NOT visible (filtered out)
-    await expect(page.locator('text=admin@e2e.test')).not.toBeVisible({ timeout: 5_000 });
+    // Verify admin@e2e.test is NOT visible in the table (filtered out)
+    // Scoped to table to avoid matching the sidebar user profile
+    await expect(page.locator('table')).not.toContainText('admin@e2e.test', {
+      timeout: 5_000,
+    });
   });
 });

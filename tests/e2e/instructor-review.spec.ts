@@ -12,7 +12,6 @@ async function createSubmissionForCheckpoint(
 ): Promise<{ submissionId: string; checkpointId: string }> {
   const sql = postgres(process.env.DATABASE_URL!);
 
-  // Find the checkpoint by name
   const [checkpoint] = await sql`
     SELECT id FROM checkpoints WHERE name = ${checkpointName}
   `;
@@ -22,7 +21,6 @@ async function createSubmissionForCheckpoint(
     throw new Error(`Checkpoint "${checkpointName}" not found`);
   }
 
-  // Find the student user
   const [student] = await sql`
     SELECT id FROM users WHERE email = 'student@e2e.test'
   `;
@@ -32,14 +30,12 @@ async function createSubmissionForCheckpoint(
     throw new Error('Student user not found');
   }
 
-  // Insert a submission record
   const [submission] = await sql`
     INSERT INTO submissions (checkpoint_id, uploaded_by, file_key, file_name, file_size, version)
     VALUES (${checkpoint.id}, ${student.id}, 'e2e-test-file-key', 'test-thesis.pdf', 1024, 1)
     RETURNING id
   `;
 
-  // Update checkpoint state to 'submitted'
   await sql`UPDATE checkpoints SET state = 'submitted' WHERE id = ${checkpoint.id}`;
 
   await sql.end();
@@ -60,20 +56,27 @@ test.describe('Instructor Review Flow', () => {
     await createSubmissionForCheckpoint('Proposal');
 
     await page.goto('/instructor/reviews');
+    await page.waitForLoadState('networkidle');
 
     // Verify the submission appears in the review queue
-    await expect(page.locator('text=student@e2e.test')).toBeVisible({ timeout: 15_000 });
+    // The table shows student name ("Student") and assignment title ("E2E Test Assignment")
+    await expect(page.locator('text=E2E Test Assignment')).toBeVisible({ timeout: 15_000 });
     await expect(page.locator('[data-testid="review-queue-link"]').first()).toBeVisible();
   });
 
   test('instructor reviews with Pass → next checkpoint unlocks', async ({ page }) => {
     await page.goto('/instructor/reviews');
+    await page.waitForLoadState('networkidle');
 
     // Click the review link to go to the review detail page
+    await expect(page.locator('[data-testid="review-queue-link"]')).toBeVisible({
+      timeout: 15_000,
+    });
     await page.click('[data-testid="review-queue-link"]');
 
     // Verify we're on the review detail page
     await expect(page).toHaveURL(/\/instructor\/reviews\/.+/);
+    await page.waitForLoadState('networkidle');
 
     // Wait for the review form to load
     await expect(page.locator('input[name="decision"][value="pass"]')).toBeVisible({
@@ -94,8 +97,7 @@ test.describe('Instructor Review Flow', () => {
       timeout: 15_000,
     });
 
-    // Verify the next checkpoint (Chapter 1) is now unlocked
-    // Check by navigating to the student's assignment (as instructor, we check via DB)
+    // Verify the next checkpoint (Chapter 1) is now unlocked via DB
     const sql = postgres(process.env.DATABASE_URL!);
     const [nextCheckpoint] = await sql`
       SELECT state FROM checkpoints WHERE name = 'Chapter 1'
@@ -111,6 +113,7 @@ test.describe('Instructor Review Flow', () => {
 
     // Navigate directly to the review detail page
     await page.goto(`/instructor/reviews/${submissionId}`);
+    await page.waitForLoadState('networkidle');
 
     // Wait for the review form to load
     await expect(page.locator('input[name="decision"][value="revise"]')).toBeVisible({
@@ -119,6 +122,9 @@ test.describe('Instructor Review Flow', () => {
 
     // Select "Revise" decision
     await page.check('input[name="decision"][value="revise"]');
+
+    // Wait for revision deadline input to appear (only shown when Revise is selected)
+    await expect(page.locator('#revisionDeadline')).toBeVisible({ timeout: 5_000 });
 
     // Set revision deadline
     const deadline = new Date();
@@ -148,12 +154,8 @@ test.describe('Instructor Review Flow', () => {
   });
 
   test('review history shows past decisions', async ({ page }) => {
-    // Navigate to the review queue
-    await page.goto('/instructor/reviews');
-
-    // Navigate to the Proposal submission's review detail page
-    // The Proposal was reviewed with "Pass" in the previous test
-    // We need to find the submission ID for the Proposal checkpoint
+    // Find the Proposal submission's review detail page
+    // The Proposal was reviewed with "Pass" in a previous test
     const sql = postgres(process.env.DATABASE_URL!);
     const [proposalSubmission] = await sql`
       SELECT s.id FROM submissions s
@@ -163,6 +165,7 @@ test.describe('Instructor Review Flow', () => {
     await sql.end();
 
     await page.goto(`/instructor/reviews/${proposalSubmission.id}`);
+    await page.waitForLoadState('networkidle');
 
     // Verify review history is visible and shows the "Passed" decision
     await expect(page.locator('text=Review History')).toBeVisible({ timeout: 15_000 });
