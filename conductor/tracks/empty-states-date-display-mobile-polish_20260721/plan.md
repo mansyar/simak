@@ -87,12 +87,12 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
     - [x] Implement: add `<p className="sm:hidden ...">{steps[currentStep - 1].label}</p>` above form content (used `currentStep - 1` because currentStep is 1-based; spec had off-by-one)
     - [x] Verify: `pnpm test` passes (bd79395)
 
-- [~] Task: ProgressTable mobile card layout (UX-36)
-    - [ ] Write failing test: mobile renders card-based layout (`flex sm:hidden`) with each student as a card (name, progress bar, percentage); desktop renders table (`hidden sm:block`)
-    - [ ] Implement: add card-based mobile layout using `flex sm:hidden` / `hidden sm:block` pattern; desktop table unchanged
-    - [ ] Verify: `pnpm test` passes; layout verified at 375px
+- [x] Task: ProgressTable mobile card layout (UX-36)
+    - [x] Write failing test: mobile renders card-based layout (`flex sm:hidden`) with each student as a card (name, progress bar, percentage); desktop renders table (`hidden sm:block`)
+    - [x] Implement: add card-based mobile layout using `flex sm:hidden` / `hidden sm:block` pattern; desktop table unchanged
+    - [x] Verify: `pnpm test` passes (0d4f195); layout verified at 375px
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Mobile Layout' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Mobile Layout' (Protocol in workflow.md)
 
 ---
 
