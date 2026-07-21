@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import postgres from 'postgres';
-import { resetDatabase } from './helpers/db-reset';
+import { resetDatabase, getDatabaseUrl } from './helpers/db-reset';
 import { ensureAuthFile, getAuthFilePath } from './helpers/auth';
 
 /**
@@ -10,7 +10,7 @@ import { ensureAuthFile, getAuthFilePath } from './helpers/auth';
 async function createSubmissionForCheckpoint(
   checkpointName: string,
 ): Promise<{ submissionId: string; checkpointId: string }> {
-  const sql = postgres(process.env.DATABASE_URL!);
+  const sql = postgres(getDatabaseUrl());
 
   const [checkpoint] = await sql`
     SELECT id FROM checkpoints WHERE name = ${checkpointName}
@@ -98,7 +98,7 @@ test.describe('Instructor Review Flow', () => {
     });
 
     // Verify the next checkpoint (Chapter 1) is now unlocked via DB
-    const sql = postgres(process.env.DATABASE_URL!);
+    const sql = postgres(getDatabaseUrl());
     const [nextCheckpoint] = await sql`
       SELECT state FROM checkpoints WHERE name = 'Chapter 1'
     `;
@@ -144,7 +144,7 @@ test.describe('Instructor Review Flow', () => {
     });
 
     // Verify the checkpoint state is 'revise' in the DB
-    const sql = postgres(process.env.DATABASE_URL!);
+    const sql = postgres(getDatabaseUrl());
     const [checkpoint] = await sql`
       SELECT state FROM checkpoints WHERE name = 'Chapter 1'
     `;
@@ -156,7 +156,7 @@ test.describe('Instructor Review Flow', () => {
   test('review history shows past decisions', async ({ page }) => {
     // Find the Proposal submission's review detail page
     // The Proposal was reviewed with "Pass" in a previous test
-    const sql = postgres(process.env.DATABASE_URL!);
+    const sql = postgres(getDatabaseUrl());
     const [proposalSubmission] = await sql`
       SELECT s.id FROM submissions s
       JOIN checkpoints c ON s.checkpoint_id = c.id

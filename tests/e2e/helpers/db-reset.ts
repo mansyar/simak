@@ -36,18 +36,25 @@ export const TABLES_TO_TRUNCATE = [
 ];
 
 /**
+ * Get the E2E test database URL from the environment.
+ * Throws if DATABASE_URL is not set (set by playwright.config.ts E2E_ENV).
+ */
+export function getDatabaseUrl(): string {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL environment variable is required for E2E tests.');
+  }
+  return databaseUrl;
+}
+
+/**
  * Truncate all application tables and re-seed the test database.
  *
  * Connects directly to the test DB using DATABASE_URL from process.env
  * (set by playwright.config.ts E2E_ENV).
  */
 export async function resetDatabase(): Promise<void> {
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    throw new Error('DATABASE_URL environment variable is required for db reset.');
-  }
-
-  const sql = postgres(databaseUrl);
+  const sql = postgres(getDatabaseUrl());
 
   try {
     // Truncate all tables in one statement with CASCADE

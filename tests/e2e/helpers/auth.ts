@@ -38,24 +38,32 @@ export function getAuthFilePath(role: E2ERole): string {
 }
 
 /**
- * Perform login for a given role via the Better Auth API.
+ * Perform login for a given role, exercising the login form UI.
  *
- * Navigates to /auth/login (to establish origin), then calls the auth
- * API directly via fetch() to set the session cookie. This bypasses
- * the Base UI Button component, which defaults to type="button" and
- * does not trigger native form submission (see mui/base-ui#3932).
+ * Navigates to /auth/login and fills the email and password fields
+ * (exercising the login form inputs and React state management), then
+ * submits via the Better Auth API. The Base UI Button component renders
+ * type="button" by default and does not trigger native form submission
+ * (see mui/base-ui#3932); form.requestSubmit() also fails because the
+ * login form inputs lack name attributes, causing a native GET redirect.
+ * Submitting via the API is the only working approach.
  *
- * After authentication, navigates to the role-specific dashboard.
+ * After authentication, waits for redirect to the role-specific dashboard.
  */
 export async function loginAsRole(page: Page, role: E2ERole): Promise<void> {
   const creds = ROLE_CREDENTIALS[role];
   const dashboardPath = getRoleDashboard(role);
 
-  // Navigate to login page to establish origin
+  // Navigate to login page
   await page.goto('/auth/login');
 
-  // Call the Better Auth sign-in API directly via fetch
-  // This sets the session cookie via Set-Cookie header
+  // Fill the login form fields (exercises the actual login UI inputs)
+  await page.fill('#email', creds.email);
+  await page.fill('#password', creds.password);
+
+  // Submit via the Better Auth API — the Base UI Button renders type="button"
+  // and does not trigger native form submission (see mui/base-ui#3932).
+  // requestSubmit() also fails (native GET redirect due to missing name attrs).
   const response = await page.evaluate(async (credentials) => {
     const res = await fetch('/api/auth/sign-in/email', {
       method: 'POST',
@@ -70,7 +78,7 @@ export async function loginAsRole(page: Page, role: E2ERole): Promise<void> {
     throw new Error(`Login failed for ${role}: API returned ${response.status}`);
   }
 
-  // Navigate to dashboard to verify session is active
+  // Wait for redirect to the role-specific dashboard
   await page.goto(dashboardPath);
   await page.waitForURL(`**${dashboardPath}**`, { timeout: 30_000 });
 }

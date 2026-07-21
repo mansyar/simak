@@ -29,7 +29,7 @@ test.describe('Authentication & Route Guards', () => {
     // Clear cookies to simulate unauthenticated state
     await context.clearCookies();
 
-    // Login via the Better Auth API (bypasses Base UI Button type="button" issue)
+    // Login via the login form (fills form fields, submits via API due to Base UI Button issue)
     await loginAsRole(page, 'student');
 
     await expect(page).toHaveURL(/\/student\/dashboard/);

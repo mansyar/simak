@@ -62,6 +62,7 @@ async function seedSuperAdmin(): Promise<void> {
     name: 'SuperAdmin',
     email,
     role: 'superadmin',
+    emailVerified: true,
     locale: 'en',
   });
 

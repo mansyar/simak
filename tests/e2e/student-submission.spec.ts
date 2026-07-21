@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import postgres from 'postgres';
-import { resetDatabase } from './helpers/db-reset';
+import { resetDatabase, getDatabaseUrl } from './helpers/db-reset';
 import { ensureAuthFile, getAuthFilePath } from './helpers/auth';
 
 /**
@@ -17,7 +17,7 @@ async function createSubmissionForCheckpoint(
   fileName: string,
   version: number,
 ): Promise<string> {
-  const sql = postgres(process.env.DATABASE_URL!);
+  const sql = postgres(getDatabaseUrl());
 
   const [checkpoint] = await sql`
     SELECT id FROM checkpoints WHERE name = ${checkpointName}
@@ -53,7 +53,7 @@ async function createSubmissionForCheckpoint(
  * Set a checkpoint's state directly in the DB.
  */
 async function setCheckpointState(checkpointName: string, state: string): Promise<void> {
-  const sql = postgres(process.env.DATABASE_URL!);
+  const sql = postgres(getDatabaseUrl());
   await sql`UPDATE checkpoints SET state = ${state} WHERE name = ${checkpointName}`;
   await sql.end();
 }
@@ -143,5 +143,8 @@ test.describe('Student File Submission', () => {
 
     // Verify the new submission appears in the file list
     await expect(page.locator('text=test-thesis-v2.pdf')).toBeVisible({ timeout: 10_000 });
+
+    // Verify the "Latest" badge is shown for the most recent submission
+    await expect(page.locator('text=Latest').first()).toBeVisible({ timeout: 10_000 });
   });
 });

@@ -46,7 +46,7 @@ export default defineConfig({
     command: 'pnpm dev',
     url: 'http://localhost:3000',
     timeout: 180_000,
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
     env: E2E_ENV,
   },
   globalSetup: './tests/e2e/global-setup.ts',

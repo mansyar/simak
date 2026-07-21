@@ -15,7 +15,10 @@ import { TABLES_TO_TRUNCATE } from './helpers/db-reset';
  *    (real auth files are created by each spec's beforeAll)
  */
 export default async function globalSetup() {
-  const connectionString = process.env.DATABASE_URL!;
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error('DATABASE_URL environment variable is required for E2E global setup.');
+  }
 
   // 1. Run migrations
   const sql = postgres(connectionString, { max: 1 });
