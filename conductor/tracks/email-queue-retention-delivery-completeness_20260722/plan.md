@@ -32,18 +32,18 @@
 
 ## Phase 2: Retention Cleanup (ENH-OPS-1 / BUG-20)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 2
-    - [ ] Read this track's `spec.md` to review all functional requirements and acceptance criteria
-    - [ ] Read `conductor/workflow.md` to review the TDD workflow, quality gates, and phase completion protocol
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 2
+    - [x] Read this track's `spec.md` to review all functional requirements and acceptance criteria
+    - [x] Read `conductor/workflow.md` to review the TDD workflow, quality gates, and phase completion protocol
 
-- [ ] Task: Create `pruneOldEmails` function in `email-queue-retention.ts`
-    - [ ] Write test verifying `sent` rows older than 90 days are deleted
-    - [ ] Write test verifying `failed` rows older than 180 days are deleted
-    - [ ] Write test verifying `pending` and `processing` rows are never deleted
-    - [ ] Write test verifying recently sent/failed rows (within retention window) are not deleted
-    - [ ] Create `src/lib/email-queue-retention.ts` with `pruneOldEmails()` function implementing the bulk DELETE query
+- [x] Task: Create `pruneOldEmails` function in `email-queue-retention.ts` [e8fae0b]
+    - [x] Write test verifying `sent` rows older than 90 days are deleted
+    - [x] Write test verifying `failed` rows older than 180 days are deleted
+    - [x] Write test verifying `pending` and `processing` rows are never deleted
+    - [x] Write test verifying recently sent/failed rows (within retention window) are not deleted
+    - [x] Create `src/lib/email-queue-retention.ts` with `pruneOldEmails()` function implementing the bulk DELETE query
 
-- [ ] Task: Wire retention trigger into `email-queue-init.ts`
+- [~] Task: Wire retention trigger into `email-queue-init.ts`
     - [ ] Write test verifying `pruneOldEmails` is called when >24h since last prune
     - [ ] Write test verifying `pruneOldEmails` is NOT called when <24h since last prune
     - [ ] Write test verifying `email_queue.retention_pruned` log is emitted with deleted count (no PII)
