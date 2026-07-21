@@ -68,7 +68,7 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
     - [x] Implement: add `title={formatRelativeTime(updatedAt, locale)}` to each badge variant
     - [x] Verify: `pnpm test` passes; no `simak-i18n/no-hardcoded` warning on the `title` (7dbc68c)
 
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Relative Dates & SLABadge' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Relative Dates & SLABadge' (Protocol in workflow.md)
 
 ---
 
