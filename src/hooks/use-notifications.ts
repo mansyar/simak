@@ -67,10 +67,49 @@ export function useMarkRead() {
           data: { notificationId: number };
         }) => Promise<{ error?: { code: string; message: string } }>
       )({ data: { notificationId } });
-      handleServerError(res, t);
+      if ('error' in res) {
+        const parsed = parseServerError(res);
+        const error = new Error(parsed.message) as Error & { code: string };
+        error.code = parsed.code;
+        throw error;
+      }
       return res;
     },
-    onSuccess: () => {
+    onMutate: async (notificationId: number) => {
+      await queryClient.cancelQueries({ queryKey: notificationKeys.all() });
+
+      const previousEntries = queryClient.getQueriesData({
+        queryKey: notificationKeys.all(),
+      });
+
+      queryClient.setQueriesData({ queryKey: notificationKeys.all() }, (old: unknown) => {
+        if (typeof old === 'number') {
+          return Math.max(0, old - 1);
+        }
+        if (old && typeof old === 'object' && 'items' in old) {
+          const listData = old as { items: Array<{ id: number; read: boolean }>; total: number };
+          return {
+            ...listData,
+            items: listData.items.map((item) =>
+              item.id === notificationId ? { ...item, read: true } : item,
+            ),
+          };
+        }
+        return old;
+      });
+
+      return { previousEntries };
+    },
+    onError: (error, _variables, context) => {
+      if (context?.previousEntries) {
+        for (const [queryKey, data] of context.previousEntries) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+      const err = error as Error & { code?: string };
+      showErrorToast(err.code ?? 'UNKNOWN', t);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.all() });
     },
   });
