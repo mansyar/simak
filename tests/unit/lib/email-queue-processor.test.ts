@@ -410,6 +410,83 @@ describe('email-queue-processor', () => {
     });
   });
 
+  describe('concurrent batch sends (PERF-32/33)', () => {
+    it('sends emails in chunks of 5 using Promise.allSettled', async () => {
+      const emails = Array.from({ length: 10 }, (_, i) => makeEmail({ id: i + 1 }));
+      setupDb(emails);
+      let activeCount = 0,
+        maxConcurrent = 0;
+      mockResendSend.mockImplementation(async () => {
+        activeCount++;
+        maxConcurrent = Math.max(maxConcurrent, activeCount);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        activeCount--;
+        return { data: { id: 'sent-1' }, error: null };
+      });
+
+      const result = await processEmailQueue();
+
+      expect(maxConcurrent).toBe(5);
+      expect(result).toMatchObject({ processed: 10, sent: 10 });
+    });
+
+    it('partial failures do not abort the batch', async () => {
+      const emails = Array.from({ length: 5 }, (_, i) => makeEmail({ id: i + 1 }));
+      setupDb(emails);
+      mockResendSend
+        .mockResolvedValueOnce({ data: { id: 'sent-1' }, error: null })
+        .mockRejectedValueOnce(new Error('Fail'))
+        .mockResolvedValueOnce({ data: { id: 'sent-3' }, error: null })
+        .mockRejectedValueOnce(new Error('Fail'))
+        .mockResolvedValueOnce({ data: { id: 'sent-5' }, error: null });
+
+      const result = await processEmailQueue();
+
+      expect(result).toMatchObject({ processed: 5, sent: 3, failed: 2 });
+      expect(mockDb.getRows().map((r) => r.status)).toEqual([
+        'sent',
+        'pending',
+        'sent',
+        'pending',
+        'sent',
+      ]);
+    });
+
+    it('processes all emails across multiple chunks with correct status updates', async () => {
+      setupDb([
+        makeEmail({ id: 1 }),
+        makeEmail({ id: 2 }),
+        makeEmail({ id: 3, attempts: 2 }),
+        makeEmail({ id: 4 }),
+        makeEmail({ id: 5 }),
+        makeEmail({ id: 6 }),
+        makeEmail({ id: 7 }),
+      ]);
+      mockResendSend
+        .mockResolvedValueOnce({ data: { id: 'sent-1' }, error: null })
+        .mockRejectedValueOnce(new Error('Fail'))
+        .mockRejectedValueOnce(new Error('Final fail'))
+        .mockResolvedValueOnce({ data: { id: 'sent-4' }, error: null })
+        .mockResolvedValueOnce({ data: { id: 'sent-5' }, error: null })
+        .mockRejectedValueOnce(new Error('Fail'))
+        .mockResolvedValueOnce({ data: { id: 'sent-7' }, error: null });
+
+      const result = await processEmailQueue();
+
+      expect(result).toMatchObject({ processed: 7, sent: 4, failed: 3 });
+      expect(mockDb.getRows().map((r) => r.status)).toEqual([
+        'sent',
+        'pending',
+        'failed',
+        'sent',
+        'sent',
+        'pending',
+        'sent',
+      ]);
+      expect(mockDb.getRows().find((r) => r.id === 3)?.attempts).toBe(3);
+    });
+  });
+
   describe('AC-21: EMAIL_FROM source', () => {
     it('uses getEnv().EMAIL_FROM with no process.env fallback', () => {
       const filePath = resolve(__dirname, '../../../src/lib/email-queue-processor.ts');

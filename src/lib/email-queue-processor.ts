@@ -22,6 +22,7 @@ const BACKOFF_MS = [0, 30_000, 300_000, 1_800_000];
 // --- Claim / reclaim settings ---
 const CLAIM_LIMIT = 10;
 const STALE_PROCESSING_THRESHOLD_MS = 5 * 60 * 1000;
+const CHUNK_SIZE = 5;
 
 function isDueForRetry(lastAttemptAt: Date | null, attempts: number | null): boolean {
   if (!lastAttemptAt) return true;
@@ -95,56 +96,69 @@ export async function processEmailQueue(): Promise<{
   let sent = 0;
   let failed = 0;
 
-  for (const email of emails) {
-    processed++;
+  for (let i = 0; i < emails.length; i += CHUNK_SIZE) {
+    const chunk = emails.slice(i, i + CHUNK_SIZE);
 
-    try {
-      const fromAddr = getEnv().EMAIL_FROM;
-      const result = await resend.emails.send({
-        from: fromAddr,
-        to: email.recipientEmail,
-        subject: email.subject,
-        html: email.bodyHtml,
-      });
+    const results = await Promise.allSettled(
+      chunk.map(async (email) => {
+        try {
+          const fromAddr = getEnv().EMAIL_FROM;
+          const result = await resend.emails.send({
+            from: fromAddr,
+            to: email.recipientEmail,
+            subject: email.subject,
+            html: email.bodyHtml,
+          });
 
-      if (result.error) {
-        throw new Error(result.error.message);
+          if (result.error) {
+            throw new Error(result.error.message);
+          }
+
+          await db
+            .update(emailQueue)
+            .set({
+              status: 'sent',
+              lastAttemptAt: new Date(),
+              errorMessage: null,
+              resendMessageId: result.data?.id ?? null,
+            })
+            .where(eq(emailQueue.id, email.id));
+
+          return 'sent';
+        } catch (error) {
+          const newAttempts = (email.attempts ?? 0) + 1;
+          const shouldFail = newAttempts >= 3;
+
+          await db
+            .update(emailQueue)
+            .set({
+              attempts: newAttempts,
+              status: shouldFail ? 'failed' : 'pending',
+              lastAttemptAt: new Date(),
+              errorMessage: error instanceof Error ? error.message : 'Unknown error',
+            })
+            .where(eq(emailQueue.id, email.id));
+
+          console.warn({
+            event: 'email_queue.send_failed',
+            emailId: email.id,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            attempts: newAttempts,
+            status: shouldFail ? 'failed' : 'pending',
+          });
+
+          return shouldFail ? 'failed' : 'pending';
+        }
+      }),
+    );
+
+    for (const result of results) {
+      processed++;
+      if (result.status === 'fulfilled' && result.value === 'sent') {
+        sent++;
+      } else {
+        failed++;
       }
-
-      await db
-        .update(emailQueue)
-        .set({
-          status: 'sent',
-          lastAttemptAt: new Date(),
-          errorMessage: null,
-          resendMessageId: result.data?.id ?? null,
-        })
-        .where(eq(emailQueue.id, email.id));
-
-      sent++;
-    } catch (error) {
-      const newAttempts = (email.attempts ?? 0) + 1;
-      const shouldFail = newAttempts >= 3;
-
-      await db
-        .update(emailQueue)
-        .set({
-          attempts: newAttempts,
-          status: shouldFail ? 'failed' : 'pending',
-          lastAttemptAt: new Date(),
-          errorMessage: error instanceof Error ? error.message : 'Unknown error',
-        })
-        .where(eq(emailQueue.id, email.id));
-
-      console.warn({
-        event: 'email_queue.send_failed',
-        emailId: email.id,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        attempts: newAttempts,
-        status: shouldFail ? 'failed' : 'pending',
-      });
-
-      failed++;
     }
   }
 
