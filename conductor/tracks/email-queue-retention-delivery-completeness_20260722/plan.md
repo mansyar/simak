@@ -59,13 +59,13 @@
     - [x] Read this track's `spec.md` to review all functional requirements and acceptance criteria
     - [x] Read `conductor/workflow.md` to review the TDD workflow, quality gates, and phase completion protocol
 
-- [~] Task: Refactor processor send loop to chunked `Promise.allSettled`
-    - [ ] Write test verifying emails are sent in chunks of 5
-    - [ ] Write test verifying partial failures don't abort the batch
-    - [ ] Write test verifying all emails in batch are processed (success and failure UPDATE paths)
-    - [ ] Replace sequential `for` loop with chunked `Promise.allSettled` (batches of 5) in `email-queue-processor.ts`
-    - [ ] Handle each email's success/failure individually in the settled callback (same UPDATE logic as current)
-    - [ ] Verify `isRunning` guard and stale-row reclaim remain unchanged
+- [x] Task: Refactor processor send loop to chunked `Promise.allSettled` [c8253f5]
+    - [x] Write test verifying emails are sent in chunks of 5
+    - [x] Write test verifying partial failures don't abort the batch
+    - [x] Write test verifying all emails in batch are processed (success and failure UPDATE paths)
+    - [x] Replace sequential `for` loop with chunked `Promise.allSettled` (batches of 5) in `email-queue-processor.ts`
+    - [x] Handle each email's success/failure individually in the settled callback (same UPDATE logic as current)
+    - [x] Verify `isRunning` guard and stale-row reclaim remain unchanged
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Concurrent Batch Sends' (Protocol in workflow.md)
 </protect>
