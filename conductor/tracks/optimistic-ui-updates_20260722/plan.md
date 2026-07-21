@@ -1,7 +1,9 @@
+<protect>
 # Implementation Plan: Optimistic UI Updates for Mutations
 
 ## Phase 0: Query-Key Factory + React Query Migration
 
+- [ ] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 0
 - [ ] Task: Create `src/lib/query-keys.ts` with typed key factories
     - [ ] Write failing tests for query-key factory functions (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`) — verify each factory returns the correct key structure
     - [ ] Implement `src/lib/query-keys.ts` with typed key factories for the 5 feature domains
@@ -32,6 +34,7 @@
 
 ## Phase 1: Notification Hooks Optimistic Updates
 
+- [ ] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 1
 - [ ] Task: Add optimistic updates to `useMarkRead` hook
     - [ ] Write failing tests — verify `onMutate` flips `read: true` on targeted notification in `useNotificationsList` cache and decrements `useUnreadCount`; `onError` restores snapshot; `onSettled` invalidates; `toast.error()` shown on rollback
     - [ ] Implement `onMutate`/`onError`/`onSettled` in `useMarkRead` — capture `queryClient.getQueryData` snapshot, mutate cache, return `{ previousData }` context, restore on error, invalidate on settle
@@ -44,6 +47,7 @@
 
 ## Phase 2: Consultation & Extension Hooks Optimistic Updates
 
+- [ ] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 2
 - [ ] Task: Add optimistic updates to `verifyConsultation` hook (after Phase 0 refactor)
     - [ ] Write failing tests — verify `onMutate` flips `status` to `verified` and removes from pending list in consultations cache; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
     - [ ] Implement `onMutate`/`onError`/`onSettled` in `verifyConsultation` mutation
@@ -64,6 +68,7 @@
 
 ## Phase 3: Deadline & User Hooks Optimistic Updates
 
+- [ ] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 3
 - [ ] Task: Add optimistic updates to `unlockCheckpoint` (DeadlineManager.tsx)
     - [ ] Write failing tests — verify `onMutate` reflects state change (checkpoint `locked` → `unlocked`) in assignment detail cache; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
     - [ ] Implement `onMutate`/`onError`/`onSettled` in `unlockMutation`
@@ -80,6 +85,7 @@
 
 ## Phase 4: Audit & Regression
 
+- [ ] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 4
 - [ ] Task: Verify all 9 mutation sites have optimistic logic
     - [ ] Run `grep -r "onMutate" src/` — confirm all 9 mutation hooks have `onMutate` optimistic logic
     - [ ] Run `grep -r "useMutation" src/` — confirm all 9 mutation sites use `useMutation` (no plain `async`+`useState` patterns remain for these features)
@@ -91,3 +97,4 @@
     - [ ] Run `pnpm check:i18n` — confirm parity
     - [ ] Verify all files ≤500 lines
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Audit & Regression' (Protocol in workflow.md)
+</protect>

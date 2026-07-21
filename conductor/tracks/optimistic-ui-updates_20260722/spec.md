@@ -1,3 +1,4 @@
+<protect>
 # Track: Optimistic UI Updates for Mutations
 
 ## Overview
@@ -83,3 +84,4 @@ Add `onMutate`/`onError`/`onSettled` optimistic update logic to all 9 mutation h
 - Migrating the entire codebase to query-key factories — only the 9 mutation sites and their related queries are migrated; other features keep inline keys until touched.
 - Retry button in error toasts (rollback shows error message only, no retry action).
 - Component-level or integration tests for optimistic behavior (hook-level unit tests only).
+</protect>
