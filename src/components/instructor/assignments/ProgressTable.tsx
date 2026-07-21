@@ -136,44 +136,104 @@ export function ProgressTable({ students }: ProgressTableProps) {
   });
 
   return (
-    <Card className="shadow-sm overflow-hidden">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="font-semibold">
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-3">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+    <>
+      {/* Desktop Table (hidden on mobile) */}
+      <Card
+        className="hidden sm:block shadow-sm overflow-hidden"
+        data-testid="desktop-progress-table"
+      >
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="font-semibold">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
                 ))}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center text-muted-foreground"
-              >
-                {t('instructorAssignments.noStudentsAssigned')}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </Card>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="py-3">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  {t('instructorAssignments.noStudentsAssigned')}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+
+      {/* Mobile Card Layout (UX-36) - hidden on sm+ screens */}
+      <div className="flex flex-col gap-4 sm:hidden" data-testid="mobile-progress-cards">
+        {students.length === 0 ? (
+          <Card className="p-4 text-center text-muted-foreground">
+            {t('instructorAssignments.noStudentsAssigned')}
+          </Card>
+        ) : (
+          students.map((student) => (
+            <Card key={student.id} className="p-4 space-y-3" data-testid="student-mobile-card">
+              <div className="flex flex-col">
+                <span className="font-semibold text-foreground">{student.name}</span>
+                <span className="text-xs text-muted-foreground">{student.email}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className="h-2 flex-1 overflow-hidden rounded-full bg-secondary"
+                  role="progressbar"
+                  aria-valuenow={student.progressPercent}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={t('instructorAssignments.table.progress')}
+                >
+                  <div
+                    className="h-full bg-primary transition-all duration-300"
+                    style={{ width: `${student.progressPercent}%` }}
+                  />
+                </div>
+                <span className="text-xs font-medium text-foreground">
+                  {student.progressPercent}%
+                </span>
+              </div>
+              {student.activeCheckpoint ? (
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-foreground">
+                    {student.activeCheckpoint.name}
+                  </span>
+                  <div>{getStatusBadge(student.activeCheckpoint.state)}</div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">—</span>
+                  {getStatusBadge('passed')}
+                </div>
+              )}
+              <span className="text-sm text-muted-foreground block">
+                {student.effectiveDeadline
+                  ? formatDateShort(student.effectiveDeadline, locale)
+                  : '—'}
+              </span>
+            </Card>
+          ))
+        )}
+      </div>
+    </>
   );
 }
