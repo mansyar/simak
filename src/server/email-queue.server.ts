@@ -81,6 +81,7 @@ export async function listEmailQueueHandler(args: {
         attempts: emailQueue.attempts,
         lastAttemptAt: emailQueue.lastAttemptAt,
         errorMessage: emailQueue.errorMessage,
+        resendMessageId: emailQueue.resendMessageId,
         createdAt: emailQueue.createdAt,
       })
       .from(emailQueue)
@@ -120,6 +121,7 @@ export async function listEmailQueueHandler(args: {
         attempts: e.attempts ?? 0,
         lastAttemptAt: e.lastAttemptAt ? new Date(e.lastAttemptAt).toISOString() : null,
         errorMessage: e.errorMessage,
+        resendMessageId: e.resendMessageId,
         createdAt: e.createdAt ? new Date(e.createdAt).toISOString() : null,
       })),
       total: countResult[0]?.total ?? 0,
