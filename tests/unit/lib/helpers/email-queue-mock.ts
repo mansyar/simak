@@ -12,6 +12,7 @@ export interface FakeRow {
   attempts: number | null;
   lastAttemptAt: Date | null;
   errorMessage: string | null;
+  resendMessageId: string | null;
   createdAt: Date;
 }
 
@@ -161,6 +162,7 @@ export function makeEmail(
     attempts: number | null;
     lastAttemptAt: Date | null;
     errorMessage: string | null;
+    resendMessageId: string | null;
     createdAt: Date;
   }> = {},
 ) {
@@ -174,6 +176,7 @@ export function makeEmail(
     attempts: 0,
     lastAttemptAt: null,
     errorMessage: null,
+    resendMessageId: null,
     createdAt: new Date('2026-05-30T00:00:00Z'),
     ...overrides,
   };

@@ -117,6 +117,7 @@ export async function processEmailQueue(): Promise<{
           status: 'sent',
           lastAttemptAt: new Date(),
           errorMessage: null,
+          resendMessageId: result.data?.id ?? null,
         })
         .where(eq(emailQueue.id, email.id));
 

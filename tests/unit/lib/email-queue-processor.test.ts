@@ -387,6 +387,27 @@ describe('email-queue-processor', () => {
       expect(logJson).not.toContain('Secret Subject');
       expect(logJson).not.toContain('Secret Body');
     });
+
+    it('populates resendMessageId from result.data.id on successful send', async () => {
+      setupDb([makeEmail({ id: 1 })], {
+        data: { id: 'resend-msg-abc-123' },
+        error: null,
+      });
+
+      await processEmailQueue();
+
+      const [row] = mockDb.getRows();
+      expect(row.resendMessageId).toBe('resend-msg-abc-123');
+    });
+
+    it('leaves resendMessageId null on send failure', async () => {
+      setupDb([makeEmail({ id: 1 })], new Error('API error'));
+
+      await processEmailQueue();
+
+      const [row] = mockDb.getRows();
+      expect(row.resendMessageId).toBeNull();
+    });
   });
 
   describe('AC-21: EMAIL_FROM source', () => {
