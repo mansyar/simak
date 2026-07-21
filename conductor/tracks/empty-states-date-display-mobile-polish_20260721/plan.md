@@ -111,5 +111,5 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
     - [x] Grep verification: no `return null` empty-state patterns remain in touched component files (only legitimate `.map()` filter in ConsultationProgress line 69); `formatRelativeTime` used in CheckpointCard + StudentDashboard + SLABadge; `CheckpointListEditor` uses `flex-col sm:flex-row`; `ProgressTable` has mobile card layout; `AssignmentWizard` shows step name on mobile
     - [x] Confirm UX-44 (timezone) and UX-37 (bulk-import) are documented as dropped/out-of-scope in `spec.md` (lines 73-75)
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Conductor Review & Quality Gates' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Final Conductor Review & Quality Gates' (Protocol in workflow.md)
 </protect>
