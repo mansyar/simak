@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Optimistic UI Updates for Mutations
 
-## Phase 0: Query-Key Factory + React Query Migration
+## Phase 0: Query-Key Factory + React Query Migration [checkpoint: 20541f9]
 
 - [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 0
 - [x] Task: Create `src/lib/query-keys.ts` with typed key factories [9490335]
