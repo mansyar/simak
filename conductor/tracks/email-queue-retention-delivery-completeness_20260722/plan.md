@@ -28,7 +28,7 @@
     - [x] Render `resendMessageId` as monospace truncated cell with `title` tooltip in `/admin/email-queue` table
     - [x] Write test verifying monospace cell rendering and `title` tooltip
 
-- [~] Task: Conductor - User Manual Verification 'Phase 1: resendMessageId Column' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: resendMessageId Column' (Protocol in workflow.md)
 
 ## Phase 2: Retention Cleanup (ENH-OPS-1 / BUG-20)
 
