@@ -17,6 +17,24 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: simak-postgres-test
+    restart: no
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-simak}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-simak_password}
+      POSTGRES_DB: simak_test
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-simak} -d simak_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # pgadmin:
   #   image: dpage/pgadmin4:latest
   #   container_name: simak-pgadmin
@@ -34,4 +52,5 @@ services:
 
 volumes:
   postgres_data:
+  postgres_test_data:
   # pgadmin_data:

@@ -863,14 +863,42 @@ A checkpoint unlocks when:
 | **File upload flow** | Presigned URL generation → mock upload → metadata persistence.             |
 | **Concurrency**      | Concurrent review/submission race conditions — exactly one succeeds, stale-state rejection for the loser. |
 
-### E2E Tests (Playwright) [v2]
+### E2E Tests (Playwright) [v1]
 
-| Flow                               | What it validates                                                   |
-| ---------------------------------- | ------------------------------------------------------------------- |
-| **Complete submit → review cycle** | Student uploads → instructor reviews → pass/revise reflects in UI.  |
-| **User creation flow**             | Admin creates user → email sent → password setup → login.           |
-| **Consultation flow**              | Student logs consultation → instructor verifies → progress updates. |
-| **Deadline enforcement**           | Overdue checkpoint locks → instructor unlocks → student can submit. |
+E2E tests run against a dedicated test database (`simak_test` on a separate `postgres-test` Docker service, port 5433) to avoid polluting the dev database. The global setup (`tests/e2e/global-setup.ts`) migrates the test DB, truncates all tables, and seeds test users (SuperAdmin, Admin, Instructor, Student — all with `emailVerified: true`) plus an assignment template (3 checkpoints, Thesis, `minConsultations: 1`) and an assignment with the first checkpoint unlocked. Each spec file resets the database (truncate + re-seed) via `resetDatabase()` before execution to ensure isolation.
+
+**Configuration** (`playwright.config.ts`):
+
+- Chromium-only, `workers: 1` (serial execution for DB isolation).
+- `reuseExistingServer: !process.env.CI` — reuses `pnpm dev` server in local dev, starts a fresh server in CI.
+- `globalSetup` runs migrations + truncate + seed + creates placeholder `storageState` files.
+- `webServer` starts `pnpm dev` on port 3000.
+
+**Auth helper** (`tests/e2e/helpers/auth.ts`):
+
+- `loginAsRole(page, role)` fills the login form (`#email`, `#password` inputs) then submits via Better Auth's `/api/auth/sign-in/email` API endpoint. The Base UI Button component renders `type="button"` (not `type="submit"`), so form submission via the button doesn't work — the API call is a workaround while still exercising the form inputs.
+- `storageState` is cached per role to avoid re-authenticating between tests within a spec file.
+
+**DB reset** (`tests/e2e/helpers/db-reset.ts`):
+
+- `resetDatabase()` truncates 18 tables (CASCADE) and re-seeds before each spec file.
+- `getDatabaseUrl()` is exported as a shared helper (no non-null assertions on `process.env`).
+
+**R2 mock** (`tests/e2e/helpers/r2-mock.ts`):
+
+- Known limitation: TanStack Start's server-fn fetcher returns `undefined` for mocked responses, making R2 upload E2E testing infeasible. File submission tests use direct DB insertion as a workaround. Full R2 upload flow (file selection, upload progress bar, success state) is not E2E-tested.
+
+**Spec files** (14 tests across 5 files):
+
+| Spec File                    | Tests | What it validates                                                                               |
+| ---------------------------- | ----- | ----------------------------------------------------------------------------------------------- |
+| `auth.spec.ts`               | 3     | Route guards (student→admin blocked, admin→student blocked, unauthenticated→login redirect) + valid login |
+| `admin-users.spec.ts`        | 3     | Create instructor, create student, filter users by role                                         |
+| `instructor-assignments.spec.ts` | 2 | Create assignment from template, checkpoint state transitions (locked → unlocked → submitted) |
+| `student-submission.spec.ts` | 2     | Upload form visible + version history, resubmit with "Latest" badge                            |
+| `instructor-review.spec.ts`  | 4     | Review queue, Pass unlocks next checkpoint, Revise sets deadline, review history                |
+
+Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode). All 14 tests pass in ~59 seconds.
 
 ---
 
@@ -1101,4 +1129,4 @@ Server functions whose output crosses the network boundary to a route loader dec
 | Deadline extension workflow                                            | ✓        |               |
 | Audit logging                                                          | ✓        |               |
 | Integration tests                                                      |          | ✓             |
-| Playwright E2E tests                                                   |          | ✓             |
+| Playwright E2E tests                                                   | ✓        |               |

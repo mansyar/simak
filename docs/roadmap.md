@@ -821,6 +821,69 @@ All tracks must adhere to the following project constraints:
 
 ---
 
+## Milestone 4: Quality Assurance
+
+> This milestone addresses testing infrastructure. It is not tied to specific audit findings — it implements end-to-end test coverage for critical user flows.
+
+---
+
+### E2E-FEAT-001: E2E Testing with Playwright
+
+- **Status:** `Complete` (archived to `conductor/archive/e2e-playwright-tests_20260721/`)
+- **Dependencies:** None (requires all core features to be implemented)
+- **Estimated Effort:** 3 Days / 1.5 Sprint Loops
+- **Audit IDs:** None (proactive testing infrastructure, not audit-driven)
+- **Decisions:**
+  - **Test database isolation:** Dedicated `postgres-test` Docker service (port 5433, db `simak_test`) separate from the dev database. The global setup migrates, truncates, and seeds before the test suite runs. Each spec file resets the DB (truncate + re-seed) for isolation.
+  - **Auth workaround:** `loginAsRole()` fills the login form (`#email`/`#password`) then submits via Better Auth's `/api/auth/sign-in/email` API endpoint. The Base UI Button renders `type="button"` (not `type="submit"`), so native form submission doesn't work. `storageState` is cached per role.
+  - **R2 mock limitation:** TanStack Start's server-fn fetcher returns `undefined` for mocked responses, making R2 upload E2E testing infeasible. File submission tests use direct DB insertion as a workaround. Full R2 upload flow (file selection, progress bar, success state) is not E2E-tested — accepted as a known limitation.
+  - **CI vs local dev:** `reuseExistingServer: !process.env.CI` — reuses `pnpm dev` server in local dev (faster iteration), starts a fresh server in CI (clean state).
+  - **Serial execution:** `workers: 1` — ensures DB isolation (no concurrent spec files competing for the same test database).
+
+#### Context Anchors (Traceability)
+
+- **PRD Reference:** `docs/PRD.md` (auth flow, user management, assignment creation, file submission, review workflow)
+- **TDD Reference:** `docs/TDD.md` (Section 10: Testing Strategy — E2E Tests)
+
+#### Track Tech Stack
+
+- Playwright (Chromium-only)
+- Dedicated PostgreSQL test database (`postgres-test` Docker service, port 5433)
+- `storageState` for auth session caching
+- `scripts/seed-e2e.ts` (test data seeding)
+
+#### Scope Boundaries
+
+- **In Scope:**
+  - Playwright configuration (`playwright.config.ts`) with Chromium-only, `workers: 1`, `globalSetup`, `webServer`
+  - Test database setup (`postgres-test` in `docker-compose.yml`, port 5433, db `simak_test`)
+  - Seed script (`scripts/seed-e2e.ts`): SuperAdmin (from env), Admin/Instructor/Student (password `TestPass123!`), template (3 checkpoints, Thesis), assignment with first checkpoint unlocked
+  - Auth helper (`tests/e2e/helpers/auth.ts`): `loginAsRole()` fills form fields, submits via API, caches `storageState`
+  - DB reset helper (`tests/e2e/helpers/db-reset.ts`): `resetDatabase()` truncates 18 tables (CASCADE) + re-seeds, exports `getDatabaseUrl()`
+  - R2 mock (`tests/e2e/helpers/r2-mock.ts`): documented as non-functional
+  - 5 spec files, 14 tests: auth route guards (3), admin user management (3), instructor assignment creation (2), student file submission (2), instructor review flow (4)
+  - `pnpm test:e2e` and `pnpm test:e2e:ui` scripts in `package.json`
+- **Out of Scope:**
+  - R2 upload flow E2E testing (known limitation — TanStack Start server-fn fetcher incompatibility)
+  - Consultation flow E2E testing (not implemented in this track)
+  - Firefox/WebKit browser support (Chromium-only for MVP)
+  - Visual regression testing
+  - Performance testing
+
+#### High-Level Execution Vectors
+
+- **Phase 1 (Infrastructure):** Created `playwright.config.ts`, `postgres-test` Docker service, `scripts/seed-e2e.ts`, `tests/e2e/global-setup.ts`, and helper files (`auth.ts`, `db-reset.ts`, `r2-mock.ts`).
+- **Phase 2 (Spec Files):** Implemented 5 spec files covering auth, admin, instructor, and student flows. Each spec resets the DB before running.
+- **Phase 3 (Review Fixes):** Applied review suggestions: login form field filling, `getDatabaseUrl()` helper (no non-null assertions), "Latest" badge assertion, SuperAdmin `emailVerified: true`, CI-conditional `reuseExistingServer`.
+
+#### Verification & Definition of Done (DoD)
+
+- [x] **Manual Checkpoint:** `pnpm test:e2e` — all 14 tests pass in ~59 seconds. Tests cover route guards, user management, assignment creation, file submission, and review workflow.
+- [x] **Automated Tests:** `pnpm test:unit` — 2683 tests pass (no regressions). `pnpm typecheck` — clean. `pnpm lint` — 0 warnings, 0 errors.
+- [x] **Conductor Review:** Review found 1 High (R2 upload not E2E-tested — accepted as known limitation), 1 Medium (login form not exercised — fixed), 4 Low (all fixed: non-null assertions, "Latest" badge, `emailVerified`, `reuseExistingServer`). Track archived to `conductor/archive/e2e-playwright-tests_20260721/`.
+
+---
+
 ## Track Dependency Graph
 
 ```
@@ -842,6 +905,9 @@ Milestone 3: UX & Accessibility
 ├── TRACK-011: Search Debounce & Form Validation [no deps]
 ├── TRACK-012: Notifications & File Management UX [depends on 010]
 └── TRACK-013: Empty States, Date Display & Mobile [coordinate with 010]
+
+Milestone 4: Quality Assurance
+└── E2E-FEAT-001: E2E Testing with Playwright [no deps — requires core features]
 ```
 
 ### Parallelization Strategy
@@ -866,6 +932,7 @@ The following track groups can be worked on simultaneously:
 | 1: Critical Fixes | 4 | ~12 Days |
 | 2: Performance & Optimization | 3 | ~7 Days |
 | 3: UX & Accessibility | 6 | ~13 Days |
-| **Total** | **13** | **~32 Days** |
+| 4: Quality Assurance | 1 | ~3 Days |
+| **Total** | **14** | **~35 Days** |
 
 > Effort estimates assume a single developer. Tracks within the same parallelization group can be distributed across developers to reduce wall-clock time.

@@ -12,6 +12,8 @@
     "test": "vitest run --exclude tests/integration/** --exclude tests/unit/lib/parse-templates-xlsx.test.ts --exclude tests/unit/lib/parse-users-xlsx.test.ts --exclude tests/unit/lib/sample-generators.test.ts && vitest run --pool=threads tests/unit/lib/parse-templates-xlsx.test.ts tests/unit/lib/parse-users-xlsx.test.ts tests/unit/lib/sample-generators.test.ts",
     "test:unit": "vitest run --exclude tests/integration/** --exclude tests/unit/lib/parse-templates-xlsx.test.ts --exclude tests/unit/lib/parse-users-xlsx.test.ts --exclude tests/unit/lib/sample-generators.test.ts && vitest run --pool=threads tests/unit/lib/parse-templates-xlsx.test.ts tests/unit/lib/parse-users-xlsx.test.ts tests/unit/lib/sample-generators.test.ts",
     "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "test:watch": "vitest --exclude tests/integration/** --exclude tests/unit/lib/parse-templates-xlsx.test.ts --exclude tests/unit/lib/parse-users-xlsx.test.ts --exclude tests/unit/lib/sample-generators.test.ts",
     "test:coverage": "vitest run --coverage --pool=threads --exclude tests/integration/**",
     "typecheck": "tsc --noEmit --incremental",
@@ -62,6 +64,7 @@
   },
   "devDependencies": {
     "@hookform/resolvers": "^5.0.0",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/vite": "^4.3.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
