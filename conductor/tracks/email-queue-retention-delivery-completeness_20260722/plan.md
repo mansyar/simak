@@ -19,16 +19,16 @@
     - [x] Write test verifying `resendMessageId` remains `null` on send failure
     - [x] Update `email-queue-processor.ts` send path to capture `result.data.id` and UPDATE the row
 
-- [~] Task: Expose `resendMessageId` in admin email queue UI
-    - [ ] Write test verifying `listEmailQueueHandler` SELECT includes `resendMessageId`
-    - [ ] Add `resendMessageId` to `listEmailQueueHandler` SELECT query
-    - [ ] Add `resendMessageId` to `EmailQueueEntry` type
-    - [ ] Add i18n key for column header to both `en.json` and `id.json`
-    - [ ] Run `pnpm generate:i18n`
-    - [ ] Render `resendMessageId` as monospace truncated cell with `title` tooltip in `/admin/email-queue` table
-    - [ ] Write test verifying monospace cell rendering and `title` tooltip
+- [x] Task: Expose `resendMessageId` in admin email queue UI [5d5d541]
+    - [x] Write test verifying `listEmailQueueHandler` SELECT includes `resendMessageId`
+    - [x] Add `resendMessageId` to `listEmailQueueHandler` SELECT query
+    - [x] Add `resendMessageId` to `EmailQueueEntry` type
+    - [x] Add i18n key for column header to both `en.json` and `id.json`
+    - [x] Run `pnpm generate:i18n`
+    - [x] Render `resendMessageId` as monospace truncated cell with `title` tooltip in `/admin/email-queue` table
+    - [x] Write test verifying monospace cell rendering and `title` tooltip
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: resendMessageId Column' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: resendMessageId Column' (Protocol in workflow.md)
 
 ## Phase 2: Retention Cleanup (ENH-OPS-1 / BUG-20)
 
