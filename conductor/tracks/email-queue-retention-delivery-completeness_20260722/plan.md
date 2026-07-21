@@ -53,7 +53,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Retention Cleanup' (Protocol in workflow.md) [a04f856]
 
-## Phase 3: Concurrent Batch Sends (PERF-32/33)
+## Phase 3: Concurrent Batch Sends (PERF-32/33) [checkpoint: e99c4c7]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 3
     - [x] Read this track's `spec.md` to review all functional requirements and acceptance criteria
