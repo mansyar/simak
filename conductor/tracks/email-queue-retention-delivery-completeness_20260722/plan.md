@@ -1,6 +1,11 @@
+<protect>
 # Implementation Plan: Email Queue Retention & Delivery Completeness
 
 ## Phase 1: resendMessageId Column (BUG-4)
+
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 1
+    - [ ] Read this track's `spec.md` to review all functional requirements and acceptance criteria
+    - [ ] Read `conductor/workflow.md` to review the TDD workflow, quality gates, and phase completion protocol
 
 - [ ] Task: Add `resendMessageId` column to `email_queue` schema
     - [ ] Write test verifying `resendMessageId` column exists in `email_queue` schema definition
@@ -27,6 +32,10 @@
 
 ## Phase 2: Retention Cleanup (ENH-OPS-1 / BUG-20)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 2
+    - [ ] Read this track's `spec.md` to review all functional requirements and acceptance criteria
+    - [ ] Read `conductor/workflow.md` to review the TDD workflow, quality gates, and phase completion protocol
+
 - [ ] Task: Create `pruneOldEmails` function in `email-queue-retention.ts`
     - [ ] Write test verifying `sent` rows older than 90 days are deleted
     - [ ] Write test verifying `failed` rows older than 180 days are deleted
@@ -46,6 +55,10 @@
 
 ## Phase 3: Concurrent Batch Sends (PERF-32/33)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 3
+    - [ ] Read this track's `spec.md` to review all functional requirements and acceptance criteria
+    - [ ] Read `conductor/workflow.md` to review the TDD workflow, quality gates, and phase completion protocol
+
 - [ ] Task: Refactor processor send loop to chunked `Promise.allSettled`
     - [ ] Write test verifying emails are sent in chunks of 5
     - [ ] Write test verifying partial failures don't abort the batch
@@ -55,3 +68,4 @@
     - [ ] Verify `isRunning` guard and stale-row reclaim remain unchanged
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Concurrent Batch Sends' (Protocol in workflow.md)
+</protect>

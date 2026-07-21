@@ -1,3 +1,4 @@
+<protect>
 # Track: Email Queue Retention & Delivery Completeness
 
 ## Overview
@@ -73,3 +74,4 @@ This track addresses three deferred items from the original audit (BUG-4, BUG-20
 - **Prior Track:** `conductor/archive/email-queue-robustness_20260719/` (TRACK-004 — deferred these items)
 - **PRD Reference:** `docs/PRD.md` (email queue architecture, admin email queue management)
 - **TDD Reference:** `docs/TDD.md` (EmailQueue schema, background processor, Resend integration)
+</protect>
