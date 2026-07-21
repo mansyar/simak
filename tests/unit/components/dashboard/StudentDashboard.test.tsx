@@ -164,6 +164,35 @@ describe('StudentDashboard', () => {
     expect(screen.getByText('Thesis Assignment')).toBeDefined();
   });
 
+  it('should display relative time in parentheses after due date in upcoming deadlines', () => {
+    const data = {
+      activeAssignments: [],
+      upcomingDeadlines: [
+        {
+          assignmentId: 1,
+          assignmentTitle: 'Thesis Assignment',
+          checkpointName: 'Chapter 1',
+          dueDate: '2026-06-01',
+          state: 'unlocked',
+          isOverdue: false,
+          daysRemaining: 2,
+        },
+      ],
+      pendingReviews: [],
+      consultationReminders: [],
+    };
+
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-05-30T00:00:00'));
+    try {
+      render(<StudentDashboard data={data} />);
+      // Relative time should appear in parentheses after the absolute date
+      expect(screen.getByText(/\(in 2 days\)/)).toBeDefined();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('should render overdue deadline with badge', () => {
     const data = {
       activeAssignments: [],

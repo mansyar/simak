@@ -217,11 +217,11 @@ describe('AssignmentWizard', () => {
   describe('Initial Render and Step Navigation', () => {
     it('should render all 5 wizard steps in the progress bar', () => {
       render(<AssignmentWizard />);
-      expect(screen.getByText('Select Template')).toBeDefined();
-      expect(screen.getByText('Step 2: Assignment Details')).toBeDefined();
-      expect(screen.getByText('Assign Students')).toBeDefined();
-      expect(screen.getByText('Due Dates')).toBeDefined();
-      expect(screen.getByText('Review & Confirm')).toBeDefined();
+      expect(screen.getAllByText('Select Template').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Step 2: Assignment Details').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Assign Students').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Due Dates').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Review & Confirm').length).toBeGreaterThanOrEqual(1);
     });
 
     it('should start on step 1 (TemplatePicker)', () => {
@@ -277,6 +277,35 @@ describe('AssignmentWizard', () => {
           data: { page: 1, limit: 200, search: '', role: 'student' },
         });
       });
+    });
+  });
+
+  describe('Mobile Step Label (UX-35)', () => {
+    it('should render current step label visible only on mobile (sm:hidden)', () => {
+      render(<AssignmentWizard />);
+      // Step 1 label is 'Select Template'
+      const matches = screen.getAllByText('Select Template');
+      const mobileLabel = matches.find((el) => /\bsm:hidden\b/.test(el.className));
+      expect(mobileLabel).toBeDefined();
+      expect(mobileLabel?.tagName).toBe('P');
+    });
+
+    it('should update mobile step label when navigating to next step', () => {
+      render(<AssignmentWizard />);
+      fireEvent.click(screen.getByTestId('select-thesis-template'));
+      fireEvent.click(screen.getByText('Next'));
+      // Step 2 label is 'Step 2: Assignment Details'
+      const matches = screen.getAllByText('Step 2: Assignment Details');
+      const mobileLabel = matches.find((el) => /\bsm:hidden\b/.test(el.className));
+      expect(mobileLabel).toBeDefined();
+    });
+
+    it('should not render mobile label for non-current steps', () => {
+      render(<AssignmentWizard />);
+      // On step 1, step 2 label should NOT have sm:hidden (only progress bar version exists)
+      const step2Matches = screen.getAllByText('Step 2: Assignment Details');
+      const mobileLabel = step2Matches.find((el) => /\bsm:hidden\b/.test(el.className));
+      expect(mobileLabel).toBeUndefined();
     });
   });
 

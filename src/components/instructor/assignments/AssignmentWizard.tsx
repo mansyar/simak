@@ -273,6 +273,11 @@ export function AssignmentWizard() {
         })}
       </div>
 
+      {/* Mobile Step Label (UX-35) - shows current step name on mobile only */}
+      <p className="sm:hidden text-sm font-semibold tracking-wide uppercase text-primary">
+        {steps[currentStep - 1].label}
+      </p>
+
       {/* Step Components */}
       <div className="min-h-[300px]">
         {currentStep === 1 && (

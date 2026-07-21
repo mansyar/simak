@@ -1,4 +1,4 @@
-import { format, parseISO, isValid } from 'date-fns';
+import { format, parseISO, isValid, formatDistanceToNow } from 'date-fns';
 import { enUS, id } from 'date-fns/locale';
 
 type Locale = 'en' | 'id';
@@ -46,4 +46,13 @@ export function formatDateTimeShort(date: Date | string, locale: Locale = 'en'):
   return format(d, locale === 'id' ? 'd MMM yyyy HH:mm' : 'MMM d, yyyy h:mm a', {
     locale: localeMap[locale],
   });
+}
+
+/**
+ * Format relative time as "in 3 days" (EN) or "dalam 3 hari" (ID)
+ */
+export function formatRelativeTime(date: Date | string, locale: Locale = 'en'): string {
+  const d = toDate(date);
+  if (!isValid(d)) return 'Invalid Date';
+  return formatDistanceToNow(d, { addSuffix: true, locale: localeMap[locale] });
 }

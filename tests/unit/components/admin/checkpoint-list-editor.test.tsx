@@ -144,4 +144,19 @@ describe('CheckpointListEditor', () => {
     expect(moveUpBtns.length).toBeGreaterThan(0);
     expect(moveDownBtns.length).toBeGreaterThan(0);
   });
+
+  it('should hide column headers on mobile (hidden sm:flex)', () => {
+    const { container } = render(<CheckpointListEditor {...defaultProps} />);
+    const columnHeaderRow = container.querySelector('[role="row"]');
+    expect(columnHeaderRow?.className).toMatch(/\bhidden\b/);
+    expect(columnHeaderRow?.className).toMatch(/\bsm:flex\b/);
+  });
+
+  it('should stack checkpoint rows vertically on mobile (flex-col sm:flex-row)', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    const checkpointInput = screen.getByTestId('checkpoint-input-0');
+    const rowDiv = checkpointInput.parentElement?.parentElement;
+    expect(rowDiv?.className).toMatch(/\bflex-col\b/);
+    expect(rowDiv?.className).toMatch(/\bsm:flex-row\b/);
+  });
 });
