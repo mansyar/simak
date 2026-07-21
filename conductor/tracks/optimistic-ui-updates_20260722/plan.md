@@ -9,10 +9,10 @@
     - [x] Implement `src/lib/query-keys.ts` with typed key factories for the 5 feature domains
     - [x] Run `pnpm test` — confirm new tests pass
     - [x] Run `pnpm typecheck` — confirm no type errors
-- [ ] Task: Refactor `verifyConsultation`/`rejectConsultation` to `useMutation`+`useQuery` (VerificationDialog.tsx)
-    - [ ] Write failing tests for the refactored hooks — verify `useMutation` is used, `useQuery` fetches pending consultations, existing behavior preserved (refetch-on-success, no optimistic logic yet)
-    - [ ] Refactor `VerificationDialog.tsx` — replace plain `async`+`useState` with `useMutation` + `useQuery` for pending-consultations cache. Use `consultationKeys` from factory
-    - [ ] Run `pnpm test` — confirm tests pass and existing behavior unchanged
+- [x] Task: Refactor `verifyConsultation`/`rejectConsultation` to `useMutation`+`useQuery` (VerificationDialog.tsx) [652d28c]
+    - [x] Write failing tests for the refactored hooks — verify `useMutation` is used, `useQuery` fetches pending consultations, existing behavior preserved (refetch-on-success, no optimistic logic yet)
+    - [x] Refactor `VerificationDialog.tsx` — replace plain `async`+`useState` with `useMutation` + `useQuery` for pending-consultations cache. Use `consultationKeys` from factory
+    - [x] Run `pnpm test` — confirm tests pass and existing behavior unchanged
 - [ ] Task: Refactor `approveExtension`/`rejectExtension` to `useMutation`+`useQuery` (use-assignment-tabs.ts)
     - [ ] Write failing tests for the refactored hooks — verify `useMutation` is used, `useQuery` fetches extension requests, existing behavior preserved
     - [ ] Refactor `use-assignment-tabs.ts` — replace plain `useCallback`+`useState` with `useMutation` + `useQuery` for extension-requests cache. Use `extensionKeys` from factory
