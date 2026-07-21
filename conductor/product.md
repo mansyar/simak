@@ -405,4 +405,15 @@ Students and instructors lack a centralized system to:
 - **i18n** — 6 new keys in EN and ID: `files.previewNotAvailable`, `instructorReviews.nextReview`, `notifications.filterAll`, `notifications.filterUnread`, `notifications.loadMore`, `files.latest`
 - **Tests** — 2,690 tests pass across 283 test files; coverage ≥80% on all thresholds (lines 88.16%, branches 81.32%, functions 81.68%, statements 87.54%)
 
+### Track: E2E Testing with Playwright (July 2026)
+
+- **Playwright E2E infrastructure** — `@playwright/test` v1.61.1 installed, `playwright.config.ts` with Chromium-only project, single worker, globalSetup for DB migration+seed, webServer auto-start, failure artifacts (screenshots, traces, console logs)
+- **Test database** — `postgres-test` service in docker-compose.yml (port 5433, db `simak_test`); deterministic seed script (`scripts/seed-e2e.ts`) creates 4 users (SuperAdmin, Admin, Instructor, Student), 1 template (3 checkpoints), 1 assignment with per-student checkpoints
+- **DB reset isolation** — `tests/e2e/helpers/db-reset.ts` truncates all 18 tables (except `__drizzle_migrations`) and re-seeds before each spec file via `beforeAll` hook
+- **Auth via API** — `tests/e2e/helpers/auth.ts` uses Better Auth API (`fetch('/api/auth/sign-in/email')`) for login due to Base UI Button `type="button"` override; storageState caching per role in `tests/e2e/.auth/{role}.json`
+- **R2 mock helpers** — `tests/e2e/helpers/r2-mock.ts` intercepts `/_serverFn/**` calls; student-submission tests use direct DB insertion as fallback due to TanStack Start client mock response parsing limitations
+- **5 E2E spec files, 14 tests** — auth.spec.ts (3 tests: route guards, login redirect), admin-users.spec.ts (3 tests: user CRUD, role filter), instructor-assignments.spec.ts (2 tests: assignment creation, checkpoint states), student-submission.spec.ts (2 tests: upload form, resubmit after revise), instructor-review.spec.ts (4 tests: review queue, pass/revise decisions, review history)
+- **Opt-in test scripts** — `pnpm test:e2e` and `pnpm test:e2e:ui` (not part of pre-push gate)
+- **Test runtime** — Full suite passes in 56.5 seconds (well under 2-minute requirement)
+
 </protect>
