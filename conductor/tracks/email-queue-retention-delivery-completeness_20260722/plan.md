@@ -67,5 +67,5 @@
     - [x] Handle each email's success/failure individually in the settled callback (same UPDATE logic as current)
     - [x] Verify `isRunning` guard and stale-row reclaim remain unchanged
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Concurrent Batch Sends' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Concurrent Batch Sends' (Protocol in workflow.md) [c8253f5]
 </protect>
