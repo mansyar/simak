@@ -30,6 +30,7 @@ export interface MockDb {
   for: Mock;
   update: Mock;
   set: Mock;
+  delete: Mock;
   then: Mock;
   transaction: Mock;
   calls: CallRecord[];
@@ -131,6 +132,13 @@ export function createMockDb(rows: FakeRow[] = []): MockDb {
     set: vi.fn((values) => {
       calls.push({ method: 'set', args: [values] });
       pendingSetValues = values;
+      return mockDb;
+    }),
+    delete: vi.fn((table) => {
+      calls.push({ method: 'delete', args: [table] });
+      pendingSetValues = null;
+      isUpdateChain = true;
+      currentRows = [...rows];
       return mockDb;
     }),
     then: vi.fn((onFulfilled) => {
