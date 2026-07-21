@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Email Queue Retention & Delivery Completeness
 
-## Phase 1: resendMessageId Column (BUG-4)
+## Phase 1: resendMessageId Column (BUG-4) [checkpoint: 4ea0aca]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 1
     - [x] Read this track's `spec.md` to review all functional requirements and acceptance criteria
