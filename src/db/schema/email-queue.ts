@@ -14,6 +14,7 @@ export const emailQueue = pgTable(
     attempts: integer('attempts').default(0),
     lastAttemptAt: timestamp('last_attempt_at'),
     errorMessage: text('error_message'),
+    resendMessageId: text('resend_message_id'),
     createdAt: timestamp('created_at').defaultNow(),
   },
   (table) => [index('email_queue_status_created_at_idx').on(table.status, table.createdAt)],
