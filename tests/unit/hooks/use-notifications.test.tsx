@@ -44,6 +44,18 @@ function createWrapper() {
   );
 }
 
+function createOptimisticWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return {
+    queryClient,
+    wrapper: ({ children }: { children: React.ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    ),
+  };
+}
+
 describe('Notification query hooks', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -194,14 +206,8 @@ describe('Notification query hooks', () => {
       };
       vi.mocked(markRead).mockResolvedValue({ success: true } as any);
 
-      const queryClient = new QueryClient({
-        defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-      });
+      const { queryClient, wrapper } = createOptimisticWrapper();
       queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList);
-
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      );
 
       const { result } = renderHook(() => useMarkRead(), { wrapper });
       result.current.mutate(42);
@@ -218,14 +224,8 @@ describe('Notification query hooks', () => {
     it('should optimistically decrement the unread count', async () => {
       vi.mocked(markRead).mockResolvedValue({ success: true } as any);
 
-      const queryClient = new QueryClient({
-        defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-      });
+      const { queryClient, wrapper } = createOptimisticWrapper();
       queryClient.setQueryData(notificationKeys.unreadCount(), 5);
-
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      );
 
       const { result } = renderHook(() => useMarkRead(), { wrapper });
       result.current.mutate(42);
@@ -244,14 +244,8 @@ describe('Notification query hooks', () => {
         error: { code: 'FORBIDDEN', message: 'Forbidden' },
       } as any);
 
-      const queryClient = new QueryClient({
-        defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-      });
+      const { queryClient, wrapper } = createOptimisticWrapper();
       queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList);
-
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      );
 
       const { result } = renderHook(() => useMarkRead(), { wrapper });
       result.current.mutate(42);
@@ -272,14 +266,8 @@ describe('Notification query hooks', () => {
         error: { code: 'FORBIDDEN', message: 'Forbidden' },
       } as any);
 
-      const queryClient = new QueryClient({
-        defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-      });
+      const { queryClient, wrapper } = createOptimisticWrapper();
       queryClient.setQueryData(notificationKeys.unreadCount(), 5);
-
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      );
 
       const { result } = renderHook(() => useMarkRead(), { wrapper });
       result.current.mutate(42);
@@ -297,13 +285,7 @@ describe('Notification query hooks', () => {
         error: { code: 'FORBIDDEN', message: 'Forbidden' },
       } as any);
 
-      const queryClient = new QueryClient({
-        defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-      });
-
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      );
+      const { queryClient, wrapper } = createOptimisticWrapper();
 
       const { result } = renderHook(() => useMarkRead(), { wrapper });
       result.current.mutate(42);
@@ -337,6 +319,113 @@ describe('Notification query hooks', () => {
 
       expect(markAllRead).toHaveBeenCalled();
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: notificationKeys.all() });
+    });
+  });
+
+  describe('useMarkAllRead - optimistic updates', () => {
+    it('should optimistically flip read to true on all notifications in the list cache', async () => {
+      const mockList = {
+        items: [
+          { id: 42, read: false, title: 'Test' },
+          { id: 43, read: false, title: 'Test 2' },
+        ],
+        total: 2,
+      };
+      vi.mocked(markAllRead).mockResolvedValue({ success: true } as any);
+
+      const { queryClient, wrapper } = createOptimisticWrapper();
+      queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList);
+
+      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
+      result.current.mutate();
+
+      await waitFor(() => {
+        const listData = queryClient.getQueryData(
+          notificationKeys.list({ page: 1, limit: 20 }),
+        ) as { items: Array<{ id: number; read: boolean }>; total: number };
+        expect(listData.items[0].read).toBe(true);
+        expect(listData.items[1].read).toBe(true);
+      });
+    });
+
+    it('should optimistically set the unread count to 0', async () => {
+      vi.mocked(markAllRead).mockResolvedValue({ success: true } as any);
+
+      const { queryClient, wrapper } = createOptimisticWrapper();
+      queryClient.setQueryData(notificationKeys.unreadCount(), 5);
+
+      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
+      result.current.mutate();
+
+      await waitFor(() => {
+        expect(queryClient.getQueryData(notificationKeys.unreadCount())).toBe(0);
+      });
+    });
+
+    it('should restore the list cache on error', async () => {
+      const mockList = {
+        items: [
+          { id: 42, read: false, title: 'Test' },
+          { id: 43, read: true, title: 'Test 2' },
+        ],
+        total: 2,
+      };
+      vi.mocked(markAllRead).mockResolvedValue({
+        error: { code: 'FORBIDDEN', message: 'Forbidden' },
+      } as any);
+
+      const { queryClient, wrapper } = createOptimisticWrapper();
+      queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList);
+
+      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
+      result.current.mutate();
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+
+      const listData = queryClient.getQueryData(notificationKeys.list({ page: 1, limit: 20 })) as {
+        items: Array<{ id: number; read: boolean }>;
+        total: number;
+      };
+      expect(listData.items[0].read).toBe(false);
+      expect(listData.items[1].read).toBe(true);
+    });
+
+    it('should restore the unread count on error', async () => {
+      vi.mocked(markAllRead).mockResolvedValue({
+        error: { code: 'FORBIDDEN', message: 'Forbidden' },
+      } as any);
+
+      const { queryClient, wrapper } = createOptimisticWrapper();
+      queryClient.setQueryData(notificationKeys.unreadCount(), 5);
+
+      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
+      result.current.mutate();
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+
+      expect(queryClient.getQueryData(notificationKeys.unreadCount())).toBe(5);
+    });
+
+    it('should show error toast on rollback', async () => {
+      mockShowErrorToast.mockClear();
+      vi.mocked(markAllRead).mockResolvedValue({
+        error: { code: 'FORBIDDEN', message: 'Forbidden' },
+      } as any);
+
+      const { queryClient, wrapper } = createOptimisticWrapper();
+
+      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
+      result.current.mutate();
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+
+      expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
     });
   });
 
