@@ -98,18 +98,18 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 
 ## Phase 4: Final Conductor Review & Quality Gates
 
-- [ ] Task: Read context — spec.md and workflow.md
-    - [ ] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
+- [x] Task: Read context — spec.md and workflow.md
+    - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
 
-- [ ] Task: Run full quality gate suite
-    - [ ] `pnpm test` (unit tests pass)
-    - [ ] `pnpm test:coverage` — ≥80% on lines, statements, branches, functions
-    - [ ] `pnpm typecheck` (tsc --noEmit --incremental)
-    - [ ] `pnpm lint` (oxlint . — including `simak-i18n/no-hardcoded`)
-    - [ ] `pnpm check:i18n` (EN↔ID parity)
-    - [ ] Verify no file in `src/`, `tests/`, `scripts/` exceeds 500 lines (`scripts/check-modularity.js`)
-    - [ ] Grep verification: no `return null` empty-state patterns remain in touched component files; `formatRelativeTime` used in CheckpointCard + StudentDashboard + SLABadge; `CheckpointListEditor` uses `flex-col sm:flex-row`; `ProgressTable` has mobile card layout; `AssignmentWizard` shows step name on mobile
-    - [ ] Confirm UX-44 (timezone) and UX-37 (bulk-import) are documented as dropped/out-of-scope in `spec.md`
+- [x] Task: Run full quality gate suite
+    - [x] `pnpm test` (unit tests pass) — 2739 tests passed
+    - [x] `pnpm test:coverage` — ≥80% on lines, statements, branches, functions — Stmts 87.61%, Branches 81.68%, Functions 82.18%, Lines 88.19%
+    - [x] `pnpm typecheck` (tsc --noEmit --incremental) — PASS
+    - [x] `pnpm lint` (oxlint . — including `simak-i18n/no-hardcoded`) — 0 warnings, 0 errors
+    - [x] `pnpm check:i18n` (EN↔ID parity) — 620 keys used, 745 in en.json, 745 in id.json
+    - [x] Verify no file in `src/`, `tests/`, `scripts/` exceeds 500 lines (`scripts/check-modularity.js`) — only `src/i18n/types.ts` (960 lines, exempt per AGENTS.md)
+    - [x] Grep verification: no `return null` empty-state patterns remain in touched component files (only legitimate `.map()` filter in ConsultationProgress line 69); `formatRelativeTime` used in CheckpointCard + StudentDashboard + SLABadge; `CheckpointListEditor` uses `flex-col sm:flex-row`; `ProgressTable` has mobile card layout; `AssignmentWizard` shows step name on mobile
+    - [x] Confirm UX-44 (timezone) and UX-37 (bulk-import) are documented as dropped/out-of-scope in `spec.md` (lines 73-75)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Conductor Review & Quality Gates' (Protocol in workflow.md)
 </protect>
