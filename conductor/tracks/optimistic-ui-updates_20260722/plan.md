@@ -34,11 +34,11 @@
 
 ## Phase 1: Notification Hooks Optimistic Updates
 
-- [ ] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 1
-- [ ] Task: Add optimistic updates to `useMarkRead` hook
-    - [ ] Write failing tests — verify `onMutate` flips `read: true` on targeted notification in `useNotificationsList` cache and decrements `useUnreadCount`; `onError` restores snapshot; `onSettled` invalidates; `toast.error()` shown on rollback
-    - [ ] Implement `onMutate`/`onError`/`onSettled` in `useMarkRead` — capture `queryClient.getQueryData` snapshot, mutate cache, return `{ previousData }` context, restore on error, invalidate on settle
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 1
+- [x] Task: Add optimistic updates to `useMarkRead` hook (SHA: 4f9e1ab)
+    - [x] Write failing tests — verify `onMutate` flips `read: true` on targeted notification in `useNotificationsList` cache and decrements `useUnreadCount`; `onError` restores snapshot; `onSettled` invalidates; `toast.error()` shown on rollback
+    - [x] Implement `onMutate`/`onError`/`onSettled` in `useMarkRead` — capture `queryClient.getQueryData` snapshot, mutate cache, return `{ previousData }` context, restore on error, invalidate on settle
+    - [x] Run `pnpm test` — confirm tests pass
 - [ ] Task: Add optimistic updates to `useMarkAllRead` hook
     - [ ] Write failing tests — verify `onMutate` flips `read: true` on all notifications in list cache and sets `useUnreadCount` to 0; `onError` restores snapshot; `onSettled` invalidates; `toast.error()` shown on rollback
     - [ ] Implement `onMutate`/`onError`/`onSettled` in `useMarkAllRead` — same pattern as `useMarkRead` but for all items
