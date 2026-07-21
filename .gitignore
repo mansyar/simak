@@ -14,3 +14,7 @@ coverage/
 # Compiled .js output (keep only .ts/.tsx source)
 src/**/*.js
 tests/**/*.js
+# Playwright E2E artifacts
+tests/e2e/.auth/
+test-results/
+playwright-report/
