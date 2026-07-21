@@ -30,7 +30,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: resendMessageId Column' (Protocol in workflow.md)
 
-## Phase 2: Retention Cleanup (ENH-OPS-1 / BUG-20)
+## Phase 2: Retention Cleanup (ENH-OPS-1 / BUG-20) [checkpoint: a04f856]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 2
     - [x] Read this track's `spec.md` to review all functional requirements and acceptance criteria
@@ -51,7 +51,7 @@
     - [x] On each 30s tick, check if >24h since `lastPruneAt`; if so, invoke `pruneOldEmails()` and update `lastPruneAt`
     - [x] Log `email_queue.retention_pruned` with deleted count
 
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Retention Cleanup' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Retention Cleanup' (Protocol in workflow.md) [a04f856]
 
 ## Phase 3: Concurrent Batch Sends (PERF-32/33)
 
