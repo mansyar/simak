@@ -82,12 +82,12 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
     - [x] Implement: change row from `flex items-start gap-2` → `flex flex-col sm:flex-row sm:items-start gap-2`; hide column headers on mobile (`hidden sm:flex`); reorder/remove buttons and inputs reflow vertically
     - [x] Verify: `pnpm test` passes; usable at 375px viewport (595004b)
 
-- [~] Task: AssignmentWizard mobile step label (UX-35)
-    - [ ] Write failing test: current step name renders above form content on mobile (`sm:hidden`); desktop labels (`hidden md:block`) unchanged; step numbers remain visible
-    - [ ] Implement: add `<p className="sm:hidden ...">{steps[currentStep].label}</p>` above form content
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: AssignmentWizard mobile step label (UX-35)
+    - [x] Write failing test: current step name renders above form content on mobile (`sm:hidden`); desktop labels (`hidden md:block`) unchanged; step numbers remain visible
+    - [x] Implement: add `<p className="sm:hidden ...">{steps[currentStep - 1].label}</p>` above form content (used `currentStep - 1` because currentStep is 1-based; spec had off-by-one)
+    - [x] Verify: `pnpm test` passes (bd79395)
 
-- [ ] Task: ProgressTable mobile card layout (UX-36)
+- [~] Task: ProgressTable mobile card layout (UX-36)
     - [ ] Write failing test: mobile renders card-based layout (`flex sm:hidden`) with each student as a card (name, progress bar, percentage); desktop renders table (`hidden sm:block`)
     - [ ] Implement: add card-based mobile layout using `flex sm:hidden` / `hidden sm:block` pattern; desktop table unchanged
     - [ ] Verify: `pnpm test` passes; layout verified at 375px
