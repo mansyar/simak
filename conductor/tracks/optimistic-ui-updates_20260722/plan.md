@@ -25,11 +25,11 @@
     - [x] Write failing test — verify `queryClient.invalidateQueries` is called with the assignment query key in `onSuccess` for both `unlockMutation` and `extendMutation`
     - [x] Add `queryClient.invalidateQueries` call to `onSuccess` in both `unlockMutation` and `extendMutation`. Use `assignmentKeys` from factory
     - [x] Run `pnpm test` — confirm tests pass
-- [ ] Task: Migrate existing inline query keys for the 9 mutation sites to factory keys
-    - [ ] Update `use-notifications.ts` (`useMarkRead`, `useMarkAllRead`, `useNotificationsList`, `useUnreadCount`) to use `notificationKeys` from factory
-    - [ ] Update any remaining inline keys in the 9 mutation sites' related queries to use factory keys
-    - [ ] Run `pnpm test` — confirm all tests pass after key migration
-    - [ ] Run `pnpm typecheck` — confirm no type errors
+- [x] Task: Migrate existing inline query keys for the 9 mutation sites to factory keys
+    - [x] Update `use-notifications.ts` (`useMarkRead`, `useMarkAllRead`, `useNotificationsList`, `useUnreadCount`) to use `notificationKeys` from factory
+    - [x] Update any remaining inline keys in the 9 mutation sites' related queries to use factory keys
+    - [x] Run `pnpm test` — confirm all tests pass after key migration
+    - [x] Run `pnpm typecheck` — confirm no type errors
 - [ ] Task: Conductor - User Manual Verification 'Phase 0: Query-Key Factory + React Query Migration' (Protocol in workflow.md)
 
 ## Phase 1: Notification Hooks Optimistic Updates
