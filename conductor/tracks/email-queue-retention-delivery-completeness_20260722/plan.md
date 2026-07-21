@@ -14,12 +14,12 @@
     - [x] Create rollback file for the migration (SQL styleguide §5.1)
     - [x] Run `pnpm db:migrate` on dev DB
 
-- [~] Task: Populate `resendMessageId` in processor send path
-    - [ ] Write test verifying `resendMessageId` is populated from `result.data.id` on successful send
-    - [ ] Write test verifying `resendMessageId` remains `null` on send failure
-    - [ ] Update `email-queue-processor.ts` send path to capture `result.data.id` and UPDATE the row
+- [x] Task: Populate `resendMessageId` in processor send path [413fdbe]
+    - [x] Write test verifying `resendMessageId` is populated from `result.data.id` on successful send
+    - [x] Write test verifying `resendMessageId` remains `null` on send failure
+    - [x] Update `email-queue-processor.ts` send path to capture `result.data.id` and UPDATE the row
 
-- [ ] Task: Expose `resendMessageId` in admin email queue UI
+- [~] Task: Expose `resendMessageId` in admin email queue UI
     - [ ] Write test verifying `listEmailQueueHandler` SELECT includes `resendMessageId`
     - [ ] Add `resendMessageId` to `listEmailQueueHandler` SELECT query
     - [ ] Add `resendMessageId` to `EmailQueueEntry` type
