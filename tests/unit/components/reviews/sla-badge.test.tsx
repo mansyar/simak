@@ -61,4 +61,17 @@ describe('SLABadge', () => {
       vi.useRealTimers();
     }
   });
+
+  it('should have title attribute with relative time for on_time state', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-05T12:00:00'));
+    try {
+      const updatedAt = new Date('2026-03-05T11:00:00'); // about 1 hour ago → on_time
+      render(<SLABadge state="under_review" updatedAt={updatedAt} />);
+      const badge = screen.getByTestId('sla-badge');
+      expect(badge.getAttribute('title')).toMatch(/1 hour ago/);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

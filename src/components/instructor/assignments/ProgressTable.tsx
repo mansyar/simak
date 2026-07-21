@@ -181,7 +181,8 @@ export function ProgressTable({ students }: ProgressTableProps) {
         </Table>
       </Card>
 
-      {/* Mobile Card Layout (UX-36) - hidden on sm+ screens */}
+      {/* Mobile Card Layout (UX-36) - hidden on sm+ screens.
+          NOTE: keep field rendering in sync with the column defs above (L55-L130). */}
       <div className="flex flex-col gap-4 sm:hidden" data-testid="mobile-progress-cards">
         {students.length === 0 ? (
           <Card className="p-4 text-center text-muted-foreground">

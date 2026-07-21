@@ -1,9 +1,8 @@
-import { format } from 'date-fns/format';
 import { isPast } from 'date-fns/isPast';
 import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
 import type { TranslationKey } from '../../../i18n/index';
-import { formatRelativeTime } from '@/lib/format';
+import { formatRelativeTime, formatDateShort } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, AlertCircle, Users, ExternalLink } from 'lucide-react';
@@ -112,7 +111,7 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
             >
               <Clock className="h-3 w-3" />
               <span>
-                {format(new Date(checkpoint.dueDate), 'MMM d, yyyy')} (
+                {formatDateShort(checkpoint.dueDate, locale)} (
                 {formatRelativeTime(checkpoint.dueDate, locale)})
               </span>
             </div>
