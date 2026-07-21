@@ -43,7 +43,7 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 
 ---
 
-## Phase 2: Relative Dates & SLABadge (UX-43, UX-45)
+## Phase 2: Relative Dates & SLABadge (UX-43, UX-45) [checkpoint: 137ffba]
 
 - [x] Task: Read context — spec.md and workflow.md
     - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
