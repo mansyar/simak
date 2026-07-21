@@ -3,18 +3,18 @@
 
 ## Phase 1: resendMessageId Column (BUG-4)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 1
-    - [ ] Read this track's `spec.md` to review all functional requirements and acceptance criteria
-    - [ ] Read `conductor/workflow.md` to review the TDD workflow, quality gates, and phase completion protocol
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to establish context for Phase 1
+    - [x] Read this track's `spec.md` to review all functional requirements and acceptance criteria
+    - [x] Read `conductor/workflow.md` to review the TDD workflow, quality gates, and phase completion protocol
 
-- [ ] Task: Add `resendMessageId` column to `email_queue` schema
-    - [ ] Write test verifying `resendMessageId` column exists in `email_queue` schema definition
-    - [ ] Add `resendMessageId: text('resend_message_id')` nullable column to `email_queue` schema
-    - [ ] Run `pnpm db:generate` to create migration
-    - [ ] Create rollback file for the migration (SQL styleguide §5.1)
-    - [ ] Run `pnpm db:migrate` on dev DB
+- [x] Task: Add `resendMessageId` column to `email_queue` schema [b326d3c]
+    - [x] Write test verifying `resendMessageId` column exists in `email_queue` schema definition
+    - [x] Add `resendMessageId: text('resend_message_id')` nullable column to `email_queue` schema
+    - [x] Run `pnpm db:generate` to create migration
+    - [x] Create rollback file for the migration (SQL styleguide §5.1)
+    - [x] Run `pnpm db:migrate` on dev DB
 
-- [ ] Task: Populate `resendMessageId` in processor send path
+- [~] Task: Populate `resendMessageId` in processor send path
     - [ ] Write test verifying `resendMessageId` is populated from `result.data.id` on successful send
     - [ ] Write test verifying `resendMessageId` remains `null` on send failure
     - [ ] Update `email-queue-processor.ts` send path to capture `result.data.id` and UPDATE the row
