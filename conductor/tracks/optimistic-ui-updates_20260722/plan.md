@@ -3,12 +3,12 @@
 
 ## Phase 0: Query-Key Factory + React Query Migration
 
-- [ ] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 0
-- [ ] Task: Create `src/lib/query-keys.ts` with typed key factories
-    - [ ] Write failing tests for query-key factory functions (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`) — verify each factory returns the correct key structure
-    - [ ] Implement `src/lib/query-keys.ts` with typed key factories for the 5 feature domains
-    - [ ] Run `pnpm test` — confirm new tests pass
-    - [ ] Run `pnpm typecheck` — confirm no type errors
+- [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 0
+- [x] Task: Create `src/lib/query-keys.ts` with typed key factories [9490335]
+    - [x] Write failing tests for query-key factory functions (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`) — verify each factory returns the correct key structure
+    - [x] Implement `src/lib/query-keys.ts` with typed key factories for the 5 feature domains
+    - [x] Run `pnpm test` — confirm new tests pass
+    - [x] Run `pnpm typecheck` — confirm no type errors
 - [ ] Task: Refactor `verifyConsultation`/`rejectConsultation` to `useMutation`+`useQuery` (VerificationDialog.tsx)
     - [ ] Write failing tests for the refactored hooks — verify `useMutation` is used, `useQuery` fetches pending consultations, existing behavior preserved (refetch-on-success, no optimistic logic yet)
     - [ ] Refactor `VerificationDialog.tsx` — replace plain `async`+`useState` with `useMutation` + `useQuery` for pending-consultations cache. Use `consultationKeys` from factory
