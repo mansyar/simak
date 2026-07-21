@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { DeadlineManager } from '@/components/reviews/DeadlineManager';
+import { assignmentKeys } from '@/lib/query-keys';
 
 vi.mock('sonner', () => ({
   toast: {
@@ -361,6 +362,56 @@ describe('DeadlineManager', () => {
       expect(toast.success).toHaveBeenCalledWith(
         'instructorAssignments.deadlineManager.extendSuccess',
       );
+    });
+  });
+
+  it('should invalidate assignment query on successful unlock', async () => {
+    mockUnlockCheckpoint.mockResolvedValue({ success: true });
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <DeadlineManager students={mockStudents} assignmentId={1} />
+      </QueryClientProvider>,
+    );
+    expandAllStudents();
+
+    const unlockButton = screen.getAllByText('instructorAssignments.deadlineManager.unlock')[0];
+    fireEvent.click(unlockButton);
+
+    const confirmButton = screen.getByText('common.confirm');
+    fireEvent.click(confirmButton);
+
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: assignmentKeys.all() });
+    });
+  });
+
+  it('should invalidate assignment query on successful extend', async () => {
+    mockExtendDeadline.mockResolvedValue({ success: true });
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <DeadlineManager students={mockStudents} assignmentId={1} />
+      </QueryClientProvider>,
+    );
+    expandAllStudents();
+
+    const dateInputs = screen.getAllByTestId(/extend-deadline-input/);
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 7);
+    fireEvent.change(dateInputs[0], { target: { value: futureDate.toISOString().slice(0, 10) } });
+
+    const extendButton = screen.getAllByText('instructorAssignments.deadlineManager.extend')[0];
+    fireEvent.click(extendButton);
+
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: assignmentKeys.all() });
     });
   });
 });

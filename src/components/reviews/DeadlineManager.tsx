@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { unlockCheckpoint, extendDeadline } from '@/server/assignments';
+import { assignmentKeys } from '@/lib/query-keys';
 import {
   Dialog,
   DialogContent,
@@ -65,6 +66,7 @@ function StatusBadge({ state, t }: { state: string; t: (key: TranslationKey) => 
 
 export function DeadlineManager({ students, assignmentId: _assignmentId }: DeadlineManagerProps) {
   const { t } = useI18n();
+  const queryClient = useQueryClient();
   const [expandedStudents, setExpandedStudents] = useState<Set<string>>(new Set());
   const [unlockTarget, setUnlockTarget] = useState<{
     checkpointId: number;
@@ -88,6 +90,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       setUnlockTarget(null);
       setError(null);
       toast.success(t('instructorAssignments.deadlineManager.unlockSuccess'));
+      queryClient.invalidateQueries({ queryKey: assignmentKeys.all() });
     },
     onError: () => {
       setError(t('instructorAssignments.deadlineManager.unlockError'));
@@ -118,6 +121,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       });
       setError(null);
       toast.success(t('instructorAssignments.deadlineManager.extendSuccess'));
+      queryClient.invalidateQueries({ queryKey: assignmentKeys.all() });
     },
     onError: () => {
       setError(t('instructorAssignments.deadlineManager.extendError'));
