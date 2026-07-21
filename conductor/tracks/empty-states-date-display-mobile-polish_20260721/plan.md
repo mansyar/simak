@@ -72,7 +72,7 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 
 ---
 
-## Phase 3: Mobile Layout (UX-34, UX-35, UX-36)
+## Phase 3: Mobile Layout (UX-34, UX-35, UX-36) [checkpoint: a487b58]
 
 - [x] Task: Read context — spec.md and workflow.md
     - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
