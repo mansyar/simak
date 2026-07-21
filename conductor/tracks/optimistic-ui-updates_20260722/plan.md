@@ -14,17 +14,17 @@
     - [x] Refactor `VerificationDialog.tsx` — replace plain `async`+`useState` with `useMutation` + `useQuery` for pending-consultations cache. Use `consultationKeys` from factory
     - [x] Run `pnpm test` — confirm tests pass and existing behavior unchanged
 - [x] Task: Refactor `approveExtension`/`rejectExtension` to `useMutation`+`useQuery` (use-assignment-tabs.ts) [2b7b07c]
-    - [ ] Write failing tests for the refactored hooks — verify `useMutation` is used, `useQuery` fetches extension requests, existing behavior preserved
-    - [ ] Refactor `use-assignment-tabs.ts` — replace plain `useCallback`+`useState` with `useMutation` + `useQuery` for extension-requests cache. Use `extensionKeys` from factory
-    - [ ] Run `pnpm test` — confirm tests pass and existing behavior unchanged
+    - [x] Write failing tests for the refactored hooks — verify `useMutation` is used, `useQuery` fetches extension requests, existing behavior preserved
+    - [x] Refactor `use-assignment-tabs.ts` — replace plain `useCallback`+`useState` with `useMutation` + `useQuery` for extension-requests cache. Use `extensionKeys` from factory
+    - [x] Run `pnpm test` — confirm tests pass and existing behavior unchanged
 - [x] Task: Refactor `deleteUser` to `useMutation`+`useQuery` (admin/users/index.tsx) [52061c1]
-    - [ ] Write failing tests for the refactored hook — verify `useMutation` is used, `useQuery` fetches user list, existing behavior preserved
-    - [ ] Refactor `admin/users/index.tsx` — replace `useServerFn` direct call with `useMutation` + `useQuery` for user-list cache. Use `userKeys` from factory
-    - [ ] Run `pnpm test` — confirm tests pass and existing behavior unchanged
-- [ ] Task: Fix DeadlineManager invalidation (DeadlineManager.tsx)
-    - [ ] Write failing test — verify `queryClient.invalidateQueries` is called with the assignment query key in `onSuccess` for both `unlockMutation` and `extendMutation`
-    - [ ] Add `queryClient.invalidateQueries` call to `onSuccess` in both `unlockMutation` and `extendMutation`. Use `assignmentKeys` from factory
-    - [ ] Run `pnpm test` — confirm tests pass
+    - [x] Write failing tests for the refactored hook — verify `useMutation` is used, `useQuery` fetches user list, existing behavior preserved
+    - [x] Refactor `admin/users/index.tsx` — replace `useServerFn` direct call with `useMutation` + `useQuery` for user-list cache. Use `userKeys` from factory
+    - [x] Run `pnpm test` — confirm tests pass and existing behavior unchanged
+- [x] Task: Fix DeadlineManager invalidation (DeadlineManager.tsx) [29258dd]
+    - [x] Write failing test — verify `queryClient.invalidateQueries` is called with the assignment query key in `onSuccess` for both `unlockMutation` and `extendMutation`
+    - [x] Add `queryClient.invalidateQueries` call to `onSuccess` in both `unlockMutation` and `extendMutation`. Use `assignmentKeys` from factory
+    - [x] Run `pnpm test` — confirm tests pass
 - [ ] Task: Migrate existing inline query keys for the 9 mutation sites to factory keys
     - [ ] Update `use-notifications.ts` (`useMarkRead`, `useMarkAllRead`, `useNotificationsList`, `useUnreadCount`) to use `notificationKeys` from factory
     - [ ] Update any remaining inline keys in the 9 mutation sites' related queries to use factory keys
