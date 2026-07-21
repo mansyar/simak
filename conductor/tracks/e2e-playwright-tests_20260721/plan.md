@@ -3,19 +3,19 @@
 
 ## Phase 1: Playwright Infrastructure & Test Database
 
-- [ ] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
-- [ ] Task: Install Playwright dependencies
-    - [ ] Install `@playwright/test` as devDependency via `pnpm add -D @playwright/test`
-    - [ ] Install Chromium browser binary via `npx playwright install chromium`
-- [ ] Task: Create Playwright configuration
-    - [ ] Create `playwright.config.ts` at project root with: Chromium-only project, `webServer` config (auto-start `pnpm dev` on port 3000, `reuseExistingServer: true` in non-CI), `globalSetup` hook for DB migration + seed, single worker (`workers: 1`), failure artifacts (screenshots `on: 'only'`, traces `on: 'on-first-retry'`, console logs), base URL `http://localhost:3000`
-    - [ ] Configure `webServer.env` with test env vars (DATABASE_URL → port 5433, dummy RESEND_API_KEY, test BETTER_AUTH_SECRET, BETTER_AUTH_URL, SUPERADMIN_EMAIL/PASSWORD)
-- [ ] Task: Add test database to docker-compose
-    - [ ] Add `postgres-test` service to `docker-compose.yml` (postgres:16-alpine, port 5433, database `simak_test`, same credentials as dev)
-- [ ] Task: Update .gitignore and package.json scripts
-    - [ ] Add `tests/e2e/.auth/`, `test-results/`, `playwright-report/` to `.gitignore`
-    - [ ] Add `"test:e2e": "playwright test"` and `"test:e2e:ui": "playwright test --ui"` scripts to `package.json`
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Playwright Infrastructure & Test Database' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md to align with current requirements and TDD protocol
+- [x] Task: Install Playwright dependencies
+    - [x] Install `@playwright/test` as devDependency via `pnpm add -D @playwright/test`
+    - [x] Install Chromium browser binary via `npx playwright install chromium`
+- [x] Task: Create Playwright configuration
+    - [x] Create `playwright.config.ts` at project root with: Chromium-only project, `webServer` config (auto-start `pnpm dev` on port 3000, `reuseExistingServer: false`), `globalSetup` hook for DB migration + seed, single worker (`workers: 1`), failure artifacts (screenshots `only-on-failure`, traces `retain-on-failure`), base URL `http://localhost:3000`
+    - [x] Configure `webServer.env` with test env vars (DATABASE_URL → port 5433, dummy RESEND_API_KEY, test BETTER_AUTH_SECRET, BETTER_AUTH_URL, SUPERADMIN_EMAIL/PASSWORD)
+- [x] Task: Add test database to docker-compose
+    - [x] Add `postgres-test` service to `docker-compose.yml` (postgres:16-alpine, port 5433, database `simak_test`, same credentials as dev)
+- [x] Task: Update .gitignore and package.json scripts
+    - [x] Add `tests/e2e/.auth/`, `test-results/`, `playwright-report/` to `.gitignore`
+    - [x] Add `"test:e2e": "playwright test"` and `"test:e2e:ui": "playwright test --ui"` scripts to `package.json`
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Playwright Infrastructure & Test Database' (Protocol in workflow.md)
 
 ## Phase 2: Test Data, Auth & Mock Helpers
 
