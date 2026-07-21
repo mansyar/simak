@@ -64,6 +64,8 @@
 | `pnpm test` | Run unit tests (excludes integration) |
 | `pnpm test:integration` | Run integration tests only |
 | `pnpm test:coverage` | Unit tests + coverage report |
+| `pnpm test:e2e` | Run Playwright E2E tests (requires Docker for test DB) |
+| `pnpm test:e2e:ui` | Run E2E tests in interactive UI mode |
 | `pnpm typecheck` | TypeScript type checking (`tsc --noEmit`) |
 | `pnpm lint` | Lint with oxlint |
 | `pnpm format` | Format with oxfmt |
@@ -118,6 +120,7 @@ simak/
 
 - **Unit tests** (`tests/unit/`) — Mirror `src/` structure. Default environment is `happy-dom`; server handler tests use `/** @vitest-environment node */`.
 - **Integration tests** (`tests/integration/`) — Excluded from the default test run. Run explicitly with `pnpm test:integration`.
+- **E2E tests** (`tests/e2e/`) — Playwright E2E tests covering critical user flows: auth route guards, admin user management, instructor assignment creation, student file submission, and instructor review workflow. Uses a dedicated test database (`postgres-test` Docker service, port 5433). Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive). The global setup migrates, truncates, and seeds the test DB before each run; each spec file resets the DB for isolation.
 - **Coverage thresholds:** lines, functions, branches, and statements all >= 80%.
 
 ## Deployment
