@@ -74,15 +74,15 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 
 ## Phase 3: Mobile Layout (UX-34, UX-35, UX-36)
 
-- [ ] Task: Read context — spec.md and workflow.md
-    - [ ] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
+- [x] Task: Read context — spec.md and workflow.md
+    - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
 
-- [ ] Task: CheckpointListEditor mobile stacking (UX-34)
-    - [ ] Write failing test: checkpoint row uses `flex-col sm:flex-row` responsive classes; column headers use `hidden sm:flex`
-    - [ ] Implement: change row from `flex items-start gap-2` → `flex flex-col sm:flex-row sm:items-start gap-2`; hide column headers on mobile (`hidden sm:flex`); reorder/remove buttons and inputs reflow vertically
-    - [ ] Verify: `pnpm test` passes; usable at 375px viewport
+- [x] Task: CheckpointListEditor mobile stacking (UX-34)
+    - [x] Write failing test: checkpoint row uses `flex-col sm:flex-row` responsive classes; column headers use `hidden sm:flex`
+    - [x] Implement: change row from `flex items-start gap-2` → `flex flex-col sm:flex-row sm:items-start gap-2`; hide column headers on mobile (`hidden sm:flex`); reorder/remove buttons and inputs reflow vertically
+    - [x] Verify: `pnpm test` passes; usable at 375px viewport (595004b)
 
-- [ ] Task: AssignmentWizard mobile step label (UX-35)
+- [~] Task: AssignmentWizard mobile step label (UX-35)
     - [ ] Write failing test: current step name renders above form content on mobile (`sm:hidden`); desktop labels (`hidden md:block`) unchanged; step numbers remain visible
     - [ ] Implement: add `<p className="sm:hidden ...">{steps[currentStep].label}</p>` above form content
     - [ ] Verify: `pnpm test` passes
