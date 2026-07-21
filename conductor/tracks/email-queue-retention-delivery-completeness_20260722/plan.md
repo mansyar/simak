@@ -43,13 +43,13 @@
     - [x] Write test verifying recently sent/failed rows (within retention window) are not deleted
     - [x] Create `src/lib/email-queue-retention.ts` with `pruneOldEmails()` function implementing the bulk DELETE query
 
-- [~] Task: Wire retention trigger into `email-queue-init.ts`
-    - [ ] Write test verifying `pruneOldEmails` is called when >24h since last prune
-    - [ ] Write test verifying `pruneOldEmails` is NOT called when <24h since last prune
-    - [ ] Write test verifying `email_queue.retention_pruned` log is emitted with deleted count (no PII)
-    - [ ] Add module-level `lastPruneAt` timestamp to `email-queue-init.ts`
-    - [ ] On each 30s tick, check if >24h since `lastPruneAt`; if so, invoke `pruneOldEmails()` and update `lastPruneAt`
-    - [ ] Log `email_queue.retention_pruned` with deleted count
+- [x] Task: Wire retention trigger into `email-queue-init.ts` [17a873a]
+    - [x] Write test verifying `pruneOldEmails` is called when >24h since last prune
+    - [x] Write test verifying `pruneOldEmails` is NOT called when <24h since last prune
+    - [x] Write test verifying `email_queue.retention_pruned` log is emitted with deleted count (no PII)
+    - [x] Add module-level `lastPruneAt` timestamp to `email-queue-init.ts`
+    - [x] On each 30s tick, check if >24h since `lastPruneAt`; if so, invoke `pruneOldEmails()` and update `lastPruneAt`
+    - [x] Log `email_queue.retention_pruned` with deleted count
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Retention Cleanup' (Protocol in workflow.md)
 
