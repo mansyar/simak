@@ -96,7 +96,7 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
 
 ---
 
-## Phase 4: Final Conductor Review & Quality Gates
+## Phase 4: Final Conductor Review & Quality Gates [checkpoint: 42e6e26]
 
 - [x] Task: Read context — spec.md and workflow.md
     - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
