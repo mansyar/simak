@@ -2,14 +2,14 @@
  * Hook for the assignment detail page: loads consultation + extension data
  * and exposes state + handlers for the tab subcomponents.
  */
-import { useCallback, useEffect, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { listPendingConsultations } from '@/server/consultations';
 import { listExtensionRequests, approveExtension, rejectExtension } from '@/server/extensions';
 import { parseServerError, showErrorToast, showSuccessToast } from '@/lib/toast';
 import { useI18n } from '@/routes/__root';
 import { isServerError } from '@/lib/errors';
-import { consultationKeys } from '@/lib/query-keys';
+import { consultationKeys, extensionKeys } from '@/lib/query-keys';
 import type { PendingConsultation } from '@/components/instructor/assignments/AssignmentConsultationsTab';
 import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
 
@@ -29,8 +29,6 @@ export function useAssignmentTabs(assignmentId: number | null) {
   const { t } = useI18n();
   const queryClient = useQueryClient();
   const [pendingPage, setPendingPage] = useState(1);
-  const [extensionRequests, setExtensionRequests] = useState<ExtensionRequestItem[]>([]);
-  const [extensionsLoading, setExtensionsLoading] = useState(false);
 
   const consultationsQuery = useQuery({
     queryKey: consultationKeys.pending(assignmentId ?? -1, pendingPage),
@@ -64,53 +62,70 @@ export function useAssignmentTabs(assignmentId: number | null) {
     await queryClient.invalidateQueries({ queryKey: consultationKeys.all() });
   }, [queryClient]);
 
-  const refreshExtensions = useCallback(async () => {
-    if (assignmentId == null) return;
-    const extResult = await listExtensionsFn({
-      data: { assignmentId, status: 'pending', page: 1, limit: 50 },
-    });
-    if ('items' in extResult) setExtensionRequests(extResult.items);
-  }, [assignmentId]);
-
-  useEffect(() => {
-    if (assignmentId == null) return;
-    const loadExtensions = async () => {
-      setExtensionsLoading(true);
-      const extResult = await listExtensionsFn({
+  const extensionsQuery = useQuery({
+    queryKey: extensionKeys.pending(assignmentId ?? -1),
+    queryFn: async () => {
+      if (assignmentId == null) return { items: [] as ExtensionRequestItem[] };
+      const result = await listExtensionsFn({
         data: { assignmentId, status: 'pending', page: 1, limit: 50 },
       });
-      if ('items' in extResult) setExtensionRequests(extResult.items);
-      setExtensionsLoading(false);
-    };
-    loadExtensions();
-  }, [assignmentId]);
+      if ('items' in result) return { items: result.items };
+      return { items: [] as ExtensionRequestItem[] };
+    },
+    enabled: assignmentId != null,
+  });
+
+  const extensionRequests = extensionsQuery.data?.items ?? [];
+  const extensionsLoading = extensionsQuery.isLoading;
+
+  const approveMutation = useMutation({
+    mutationFn: async (vars: { requestId: number; comment?: string }) => {
+      const result = await approveFn({
+        data: { requestId: vars.requestId, resolutionReason: vars.comment },
+      });
+      if ('error' in result) throw result;
+      return result;
+    },
+    onSuccess: () => {
+      showSuccessToast(t('extensions.approveSuccess'));
+      queryClient.invalidateQueries({ queryKey: extensionKeys.all() });
+    },
+    onError: (error: unknown) => {
+      const parsed = parseServerError(error);
+      showErrorToast(parsed.code, t);
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: async (vars: { requestId: number; reason: string }) => {
+      const result = await rejectFn({
+        data: { requestId: vars.requestId, resolutionReason: vars.reason },
+      });
+      if ('error' in result) throw result;
+      return result;
+    },
+    onSuccess: () => {
+      showSuccessToast(t('extensions.rejectSuccess'));
+      queryClient.invalidateQueries({ queryKey: extensionKeys.all() });
+    },
+    onError: (error: unknown) => {
+      const parsed = parseServerError(error);
+      showErrorToast(parsed.code, t);
+    },
+  });
 
   const handleApproveExtension = useCallback(
     async (requestId: number, comment?: string) => {
-      const result = await approveFn({ data: { requestId, resolutionReason: comment } });
-      if ('error' in result) {
-        const parsed = parseServerError(result);
-        showErrorToast(parsed.code, t);
-        return;
-      }
-      showSuccessToast(t('extensions.approveSuccess'));
-      await refreshExtensions();
+      approveMutation.mutate({ requestId, comment });
     },
-    [refreshExtensions, t],
+    [approveMutation],
   );
 
   const handleRejectExtension = useCallback(
     async (requestId: number, reason: string) => {
-      const result = await rejectFn({ data: { requestId, resolutionReason: reason } });
-      if ('error' in result) {
-        const parsed = parseServerError(result);
-        showErrorToast(parsed.code, t);
-        return;
-      }
-      showSuccessToast(t('extensions.rejectSuccess'));
-      await refreshExtensions();
+      rejectMutation.mutate({ requestId, reason });
     },
-    [refreshExtensions, t],
+    [rejectMutation],
   );
 
   return {
