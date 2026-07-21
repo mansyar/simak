@@ -8,3 +8,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Email Queue Retention & Delivery Completeness**
+*Link: [./tracks/email-queue-retention-delivery-completeness_20260722/](./tracks/email-queue-retention-delivery-completeness_20260722/)*
+
+---
+

@@ -1,0 +1,19 @@
+{
+  "track_id": "email-queue-retention-delivery-completeness_20260722",
+  "type": "chore",
+  "state": "INIT",
+  "spec": {
+    "approved": true,
+    "approved_at": "2026-07-22T02:53:36Z"
+  },
+  "plan": {
+    "approved": true,
+    "approved_at": "2026-07-22T02:53:36Z",
+    "items_total": 10,
+    "items_completed": 0
+  },
+  "revert_baseline": "9775a1098a4109232d2a1c2abd82efaccd84fc6b",
+  "created_at": "2026-07-22T02:53:36Z",
+  "updated_at": "2026-07-22T02:53:36Z",
+  "description": "Email Queue Retention & Delivery Completeness — Adds resendMessageId tracking column (BUG-4), retention cleanup for old sent/failed emails (ENH-OPS-1/BUG-20), and concurrent batch sends via Promise.allSettled (PERF-32/33). Builds on the email queue infra from TRACK-004."
+}
