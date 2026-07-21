@@ -884,6 +884,339 @@ All tracks must adhere to the following project constraints:
 
 ---
 
+## Milestone 5: Post-Audit Enhancements
+
+> These tracks address improvement opportunities identified in a follow-up audit conducted after the completion of Milestones 1–3 (the original 98-issue, 13-track remediation) and Milestone 4 (E2E test coverage). Findings are prefixed `ENH-` to distinguish them from the original `BUG-X`/`PERF-X`/`UX-X` audit IDs. Several tracks also pull in items deliberately deferred from the original audit (BUG-4, BUG-20, PERF-32/33). Tracks are ordered by recommended priority: quick wins first, then operational hygiene, productivity, and finally larger feature builds.
+>
+> **Note:** E2E test coverage (originally a candidate for this milestone) was implemented upstream in Milestone 4 (E2E-FEAT-001) and is therefore excluded here.
+
+---
+
+### TRACK-014: Optimistic UI Updates for Mutations
+
+- **Status:** `Proposed`
+- **Dependencies:** None (self-contained; introduces query-key factory consumed by later tracks)
+- **Estimated Effort:** 7 Days / 3.5 Sprint Loops
+- **Audit IDs:** ENH-PERF-1
+- **Decisions:**
+  - **ENH-PERF-1 (optimistic updates):** No `onMutate`/`useOptimistic` patterns exist in the codebase (`grep` returned zero matches). All TanStack Query mutations wait for the full server round-trip before reflecting state changes, causing perceived latency on every action. Apply optimistic updates with rollback to 9 mutation sites: `useMarkRead`, `useMarkAllRead` (NotificationCenter unread badge snaps immediately), `verifyConsultation`, `rejectConsultation`, `approveExtension`, `rejectExtension`, `unlockCheckpoint`, `extendDeadline`, `deleteUser`. Pattern: `onMutate` updates the query cache optimistically (flip `read` flag / `status` field), `onError` rolls back via the snapshot, `onSettled` refetches to reconcile. Toasts already confirm success — this addresses the *list/badge state* lag, not the toast.
+  - **Architecture refactor (DECISION: full refactor):** Codebase audit found that only 2 of the 9 mutations (`useMarkRead`, `useMarkAllRead`) are proper `useMutation` hooks. `unlockCheckpoint`/`extendDeadline` use `useMutation` inline in `DeadlineManager.tsx` but have NO cache invalidation. The remaining 5 (`verifyConsultation`, `rejectConsultation`, `approveExtension`, `rejectExtension`, `deleteUser`) are plain `async` functions backed by `useState` — there is no query cache to optimistically update. Decision: refactor all 5 to `useMutation` + `useQuery` (introduce query caching for their data) BEFORE adding optimistic logic. This expands the track from 3 to ~7 days but delivers a consistent React Query architecture.
+  - **Query-key factory (DECISION: introduce):** All query keys are currently inline arrays (`['notifications', 'unreadCount']`). Create `src/lib/query-keys.ts` with typed key factories (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`) as a prerequisite. Ensures reliable invalidation across features and is consumed by later tracks (TRACK-018 email notifications, TRACK-019 analytics). ~0.5 day.
+  - **DeadlineManager invalidation fix (DECISION: in scope):** `unlockMutation` and `extendMutation` in `DeadlineManager.tsx` have `onSuccess` that only toasts — they never call `queryClient.invalidateQueries`, leaving the deadline list stale until manual refresh. Fix as a prerequisite to adding optimistic logic (correct invalidation is needed before optimistic flip + reconcile can work).
+  - **Scope guard:** Optimistic updates are applied ONLY where the predicted state is deterministic (e.g., mark-as-read flips `read: true`; verify consultation flips `status: 'verified'`). Do NOT apply optimistic updates to mutations whose server response carries computed/derived data the client can't predict (e.g., `submitReview` which unlocks the next checkpoint and adjusts deadlines server-side). Those keep the current refetch-on-success flow.
+  - **Rollback contract:** Every optimistic mutation must capture the previous cache snapshot in `onMutate` and restore it verbatim in `onError` before refetching. This is the TanStack Query `context.previousData` pattern.
+
+#### Context Anchors (Traceability)
+
+- **PRD Reference:** `docs/PRD.md` (notification system, consultation verification, extension approval, deadline management, user management)
+- **TDD Reference:** `docs/TDD.md` (TanStack Query hooks, mutation patterns)
+
+#### Track Tech Stack
+
+- TanStack Query (`onMutate` optimistic cache update, `onError` rollback, `onSettled` invalidate)
+- `src/lib/query-keys.ts` — typed query-key factories (new file, prerequisite)
+- Existing `useMutation` hooks: `src/hooks/use-notifications.ts` (`useMarkRead`, `useMarkAllRead`)
+- Inline `useMutation` in `src/components/reviews/DeadlineManager.tsx` (`unlockMutation`, `extendMutation`)
+- Mutations to refactor to `useMutation`+`useQuery`: `src/components/consultations/VerificationDialog.tsx` (verify/reject consultation), `src/hooks/use-assignment-tabs.ts` (approve/reject extension), `src/routes/_authenticated/admin/users/index.tsx` (`deleteUser` via `useServerFn`)
+
+#### Scope Boundaries
+
+- **In Scope:**
+  - Create `src/lib/query-keys.ts` with typed key factories (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`). Migrate existing inline keys to use the factory.
+  - Refactor `verifyConsultation`/`rejectConsultation` from plain async+useState (in `VerificationDialog.tsx`) to `useMutation` + `useQuery` for the pending-consultations cache.
+  - Refactor `approveExtension`/`rejectExtension` from plain useCallback+useState (in `use-assignment-tabs.ts`) to `useMutation` + `useQuery` for the extension-requests cache.
+  - Refactor `deleteUser` from `useServerFn` direct call (in `admin/users/index.tsx`) to `useMutation` + `useQuery` for the user-list cache.
+  - Fix `unlockMutation`/`extendMutation` in `DeadlineManager.tsx` — add `queryClient.invalidateQueries` for the parent assignment query key in `onSuccess` (latent staleness bug fix).
+  - Add `onMutate`/`onError`/`onSettled` optimistic update logic to `useMarkRead` and `useMarkAllRead` — flip `read: true` on the targeted notification(s) in the `useNotificationsList` cache; decrement `useUnreadCount` optimistically; rollback on error.
+  - Add optimistic updates to consultation verify/reject (after refactor) — flip `status` field in the pending-consultations cache; remove from pending list optimistically.
+  - Add optimistic updates to extension approve/reject (after refactor) — remove from pending queue optimistically.
+  - Add optimistic updates to `unlockCheckpoint` and `extendDeadline` — reflect state/dueDate change in the assignment detail cache (after invalidation fix).
+  - Add optimistic update to `deleteUser` (after refactor) — remove row from user list optimistically (rollback re-adds if server rejects, e.g., instructor with active assignments).
+- **Out of Scope:**
+  - Optimistic updates for `submitReview`, `submitCheckpoint`, `createAssignment`, `bulkCreateUsers` (server response carries derived data the client can't predict)
+  - Optimistic updates for file upload (R2 PUT is external I/O; success is binary)
+  - WebSocket/SSE real-time push (separate future feature)
+  - Migrating the entire codebase to query-key factories — only the 9 mutation sites and their related queries are migrated; other features keep inline keys until touched
+
+#### High-Level Execution Vectors
+
+- **Phase 0 (Query-key factory + React Query migration):** Create `src/lib/query-keys.ts` with typed key factories. Refactor the 5 non-RQ mutations to `useMutation` + `useQuery`: verify/reject consultation (from `VerificationDialog.tsx`), approve/reject extension (from `use-assignment-tabs.ts`), deleteUser (from `admin/users/index.tsx`). Fix `DeadlineManager.tsx` invalidation (`onSuccess` → `queryClient.invalidateQueries`). Migrate existing inline keys to factory. Verify: all 9 mutations use `useMutation`, data flows through query cache, existing behavior unchanged (refetch-on-success).
+- **Phase 1 (Notification hooks):** Add optimistic `onMutate` to `useMarkRead`/`useMarkAllRead`. Capture `queryClient.getQueryData` snapshot, mutate the cache, return `{ previousData }` context. `onError` restores snapshot. `onSettled` invalidates. Write tests: optimistic flag flips immediately, count decrements, rollback on 500 error.
+- **Phase 2 (Consultation & Extension hooks):** Same pattern for verify/reject consultation and approve/reject extension (now refactored in Phase 0). Optimistic removal from pending list. Write tests for rollback on stale-state errors.
+- **Phase 3 (Deadline & User hooks):** Optimistic state flip for unlock/extend (invalidation already fixed in Phase 0); optimistic row removal for user delete (with rollback re-add). Write tests for instructor-with-assignments rejection rollback.
+- **Phase 4 (Audit & Regression):** Grep to confirm no `console.error`-only error handling remains on these mutations. Verify toast + optimistic state + refetch reconciliation all fire in sequence. Run full suite.
+
+#### Verification & Definition of Done (DoD)
+
+- [ ] **Manual Checkpoint:** Click "Mark all read" — unread badge drops to 0 instantly (before server responds), stays 0 on success, returns to prior count if the server errors. Verify a consultation — it disappears from the pending queue instantly; reappears if the server returns "already processed". Delete a user — row fades out instantly; reappears with an error toast if the instructor has active assignments.
+- [ ] **Automated Tests:** `pnpm test:unit` — new tests for each hook verifying: optimistic cache mutation in `onMutate`, snapshot capture, rollback restoration in `onError`, invalidation in `onSettled`. Coverage ≥80%.
+- [ ] **Architecture Verification:** `grep -r "useMutation" src/` confirms all 9 mutation sites use `useMutation` (no plain async+useState mutation patterns remain for these features). `src/lib/query-keys.ts` exists and all migrated queries reference factory keys.
+- [ ] **Conductor Review:** `grep` for `onMutate` in `src/` confirms all 9 mutation hooks have optimistic logic. No predicted-state mismatch (rollback snapshots verbatim). `pnpm typecheck`, `pnpm lint` clean.
+
+---
+
+### TRACK-015: UI Hygiene & Tech-Debt Quick Wins
+
+- **Status:** `Proposed`
+- **Dependencies:** TRACK-014 (query-key factory from `src/lib/query-keys.ts`)
+- **Estimated Effort:** 1 Day / 0.5 Sprint Loops
+- **Audit IDs:** ENH-UX-1, ENH-TD-1
+- **Decisions:**
+  - **ENH-UX-1 (landing footer dead links):** `src/routes/index.tsx:118,121` render "About" and "Contact" as `<a href="#">` — they navigate nowhere. Replace "About" with a real anchor: `<a href="#how-it-works">` (id already present on line 82). **Remove "Contact" link entirely** — no contact page/route or support email exists in the project (DECISION: remove, not mailto). Replace the hardcoded `&copy; 2026 SIMAK` with an i18n key: `t('landing.footer.copyright', { year: new Date().getFullYear() })` — add `landing.footer.copyright` to both `en.json` and `id.json` (DECISION: i18n key with interpolation, not inline year).
+  - **ENH-TD-1 (eslint-disable exhaustive-deps):** Three `// eslint-disable-next-line react-hooks/exhaustive-deps` suppressions exist in `AssignmentWizard.tsx:82`, `StudentPicker.tsx:61`, `TemplatePicker.tsx:53`. Each suppresses a missing dependency (`t` from `useI18n()`) in a mount-only `useEffect` data fetch. **DECISION: Convert to `useQuery`** (aligns with TRACK-014's React Query migration). Replacing `useEffect`+`useState` fetch with `useQuery` naturally resolves the dependency issue — `useQuery` manages its own lifecycle and doesn't need `useEffect` deps. Uses the query-key factory from TRACK-014.
+  - **ENH-TD-2 REMOVED (invalid finding):** The audit claimed `AssignmentWizard.tsx:77`, `StudentPicker.tsx:53`, `TemplatePicker.tsx:45` had silent `console.error`-only fetch failures. Verification found all 3 files ALREADY call `toast.error(t('errors.fetchFailed'))` alongside `console.error`. The `errors.fetchFailed` i18n key exists in both `en.json:750` and `id.json:750`. No work needed — finding is invalid.
+
+#### Context Anchors (Traceability)
+
+- **PRD Reference:** `docs/PRD.md` (landing page footer links, assignment creation wizard, template/student selection)
+- **TDD Reference:** `docs/TDD.md` (landing page structure, react-hook-form + useEffect patterns, error feedback convention)
+
+#### Track Tech Stack
+
+- TanStack Router `<Link>` / anchor scroll (footer navigation)
+- `react-hooks/exhaustive-deps` lint rule (dependency audit)
+- `sonner` toast + existing `errors.fetchFailed` i18n key (silent-fetch surfacing)
+
+#### Scope Boundaries
+
+- **In Scope:**
+  - Replace the "About" `href="#"` footer link in `src/routes/index.tsx` with `<a href="#how-it-works">`. Remove the "Contact" `href="#"` link entirely. Replace `&copy; 2026 SIMAK` with `t('landing.footer.copyright', { year: new Date().getFullYear() })` — add the i18n key to `en.json` and `id.json`, run `pnpm generate:i18n`.
+  - Convert the 3 mount-only `useEffect`+`useState` data fetches in `AssignmentWizard.tsx`, `StudentPicker.tsx`, `TemplatePicker.tsx` to `useQuery` (using query-key factory from TRACK-014). Remove the `eslint-disable-next-line react-hooks/exhaustive-deps` comments. Replace local `loading`/`error`/`data` state with `useQuery` return values (`isLoading`, `isError`, `data`).
+- **Out of Scope:**
+  - Building a dedicated `/about` or `/contact` page (footer "About" scrolls to existing section instead)
+  - Converting other component fetches beyond the 3 listed (broader React Query migration is TRACK-014's scope)
+  - `console.error` instances in `.server.ts` advisory work and `seed.ts` (intentional server-side diagnostics)
+
+#### High-Level Execution Vectors
+
+- **Phase 1 (Footer Links):** Update `src/routes/index.tsx` footer — "About" → `<a href="#how-it-works">`, remove "Contact" link. Add `landing.footer.copyright` key to `en.json`/`id.json`, replace `&copy; 2026 SIMAK` with `t('landing.footer.copyright', { year: new Date().getFullYear() })`. Run `pnpm generate:i18n`. Write tests verifying no `href="#"` remains and year is dynamic.
+- **Phase 2 (eslint-disable Resolution via useQuery):** Convert the 3 `useEffect`+`useState` fetches in `AssignmentWizard.tsx` (student list), `StudentPicker.tsx`, `TemplatePicker.tsx` to `useQuery` with query-key factory from TRACK-014. Remove `eslint-disable-next-line react-hooks/exhaustive-deps` comments. Replace local `loading`/`error` state with `useQuery` return values. Write tests verifying data loads and error toast fires on rejection (existing behavior preserved).
+
+#### Verification & Definition of Done (DoD)
+
+- [ ] **Manual Checkpoint:** Click "About" in the landing footer — page scrolls to the "How It Works" section (not a no-op). No "Contact" link in footer. Footer year shows the current year. AssignmentWizard student/template pickers — data loads via `useQuery`; if the server is down, a toast appears (existing `toast.error` preserved). `grep -r "eslint-disable" src/components/instructor/assignments/` returns zero matches.
+- [ ] **Automated Tests:** `pnpm test:unit` — new tests for footer link targets (no `href="#"`), dynamic year via i18n key, `useQuery` data loading in 3 components with error toast on rejection. `pnpm lint` — zero `react-hooks/exhaustive-deps` suppressions in the 3 files. Coverage ≥80%.
+- [ ] **Conductor Review:** `grep` for `href="#"` in `src/routes/` returns zero. `grep` for `eslint-disable-next-line react-hooks/exhaustive-deps` in `src/components/instructor/assignments/` returns zero. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` clean.
+
+---
+
+### TRACK-016: Email Queue Retention & Delivery Completeness
+
+- **Status:** `Proposed`
+- **Dependencies:** None (builds on the email queue infra from TRACK-004, now archived)
+- **Estimated Effort:** 2 Days / 1 Sprint Loop
+- **Audit IDs:** ENH-OPS-1, BUG-4, BUG-20, PERF-32, PERF-33 (deferred from original audit)
+- **Decisions:**
+  - **ENH-OPS-1 / BUG-20 (retention cleanup):** The `email_queue` table accumulates `sent`/`failed` rows indefinitely — no retention `DELETE` exists (deferred in TRACK-004). Add a scheduled cleanup that deletes `sent` rows older than 90 days and `failed` rows older than 180 days (longer retention for forensics). **Trigger: tick-embedded check** — track a module-level `lastPruneAt` timestamp in `email-queue-init.ts`; on each 30s tick, if >24h since last prune, invoke `pruneOldEmails()`. This is robust to process restarts (first tick after startup prunes if >24h elapsed). Guard with `DELETE ... WHERE status IN ('sent','failed') AND createdAt < now() - interval '90 days'` — never touch `pending`/`processing`. Log `email_queue.retention_pruned` with deleted count.
+  - **BUG-4 (resendMessageId):** Add a nullable `resendMessageId` column to `email_queue`. Populate it from the Resend API response (`result.data.id`) on successful send in the processor's send path. Enables correlation with Resend's dashboard for delivery/bounce tracking. Migration is additive (nullable column), zero downtime. **Expose in admin UI** — add `resendMessageId` to `listEmailQueueHandler` SELECT, `EmailQueueEntry` type, and render as a monospace cell in the `/admin/email-queue` table so admins can trace deliveries.
+  - **PERF-32/33 (concurrent sends):** The processor currently dequeues up to 10 emails per 30s cycle and sends them sequentially via a `for` loop. Replace with chunked `Promise.allSettled`: split the batch into chunks of 5, run `Promise.allSettled` per chunk sequentially (total cycle time ≈ 2× single-send latency instead of 10×). The existing **batch-level** `FOR UPDATE SKIP LOCKED` claim (all due rows claimed in a single transaction, sends happen outside the transaction) remains unchanged — it is NOT a per-email claim. Already-hardened `isRunning` guard and stale-row reclaim remain unchanged.
+
+#### Context Anchors (Traceability)
+
+- **PRD Reference:** `docs/PRD.md` (email queue architecture, admin email queue management)
+- **TDD Reference:** `docs/TDD.md` (EmailQueue schema, background processor, Resend integration)
+- **Prior Track:** `conductor/archive/email-queue-robustness_20260719/` (TRACK-004 — deferred these items explicitly)
+
+#### Track Tech Stack
+
+- Drizzle ORM (`email_queue` schema, `resendMessageId` column, bulk `DELETE ... WHERE`)
+- Resend API (response `id` field → `resendMessageId`)
+- `Promise.allSettled` (concurrent batch sends)
+- Drizzle Kit migration (`pnpm db:generate` + `pnpm db:migrate`)
+
+#### Scope Boundaries
+
+- **In Scope:**
+  - Add `resendMessageId text` nullable column to `email_queue` schema + migration (BUG-4). Populate from Resend response (`result.data.id`) in the processor's send path. Expose in `listEmailQueueHandler` SELECT, `EmailQueueEntry` type, and `/admin/email-queue` table (monospace cell).
+  - Add retention cleanup — delete `sent` rows >90 days, `failed` rows >180 days. **Tick-embedded trigger**: module-level `lastPruneAt` timestamp in `email-queue-init.ts`; prune on 30s tick if >24h elapsed. Log pruned count (ENH-OPS-1 / BUG-20).
+  - Replace sequential `for` loop with chunked `Promise.allSettled` (batches of 5, sequential chunks) in `email-queue-processor.ts` (PERF-32/33).
+- **Out of Scope:**
+  - External cron/scheduler infrastructure (use the existing in-process loop)
+  - Email template/content changes
+  - Bounce/complaint webhook handling from Resend (separate future feature)
+
+#### High-Level Execution Vectors
+
+- **Phase 1 (resendMessageId):** Add `resendMessageId: text('resend_message_id')` to the `email_queue` schema. Run `pnpm db:generate` + `pnpm db:migrate`. Update the processor send path to capture `result.data.id` from Resend and UPDATE the row. Add `resendMessageId` to `listEmailQueueHandler` SELECT, `EmailQueueEntry` type, and the admin email-queue table (monospace cell). Write tests verifying the column is populated on success and null on failure.
+- **Phase 2 (Retention Cleanup):** Add a `pruneOldEmails()` function in `email-queue-processor.ts` (or a new `email-queue-retention.ts`). `DELETE FROM email_queue WHERE (status='sent' AND createdAt < now() - interval '90 days') OR (status='failed' AND createdAt < now() - interval '180 days')`. Wire into `email-queue-init.ts` via a module-level `lastPruneAt` timestamp — on each 30s tick, if >24h since last prune, invoke `pruneOldEmails()` and update `lastPruneAt`. Log `email_queue.retention_pruned { count }`. Write tests verifying only old sent/failed rows are deleted; pending/processing rows are never touched.
+- **Phase 3 (Concurrent Sends):** Refactor the processor's per-cycle send loop from sequential `for` to chunked `Promise.allSettled`: split the claimed batch into chunks of 5, run `Promise.allSettled` per chunk sequentially. Each email's success/failure is handled individually in the `.then`/`.catch` (same UPDATE logic as current). Write tests verifying concurrent sends complete faster and partial failures don't abort the batch.
+
+#### Verification & Definition of Done (DoD)
+
+- [ ] **Manual Checkpoint:** Send a test email — `resendMessageId` column is populated and visible in `/admin/email-queue` table (monospace cell). After 90+ days, `sent` rows are pruned on the next tick after 24h since last prune; `pending`/`processing` rows are never deleted. Processor logs show `email_queue.retention_pruned { count: N }`. Concurrent batch of 10 emails sends in two chunks of 5 (Resend dashboard shows near-simultaneous timestamps in pairs).
+- [ ] **Automated Tests:** `pnpm test:unit` — new tests for `resendMessageId` population, retention pruning (age thresholds, status guards, tick-embedded trigger), chunked concurrent send behavior (partial failures don't abort batch). `pnpm test:integration` if DB-dependent. Coverage ≥80%.
+- [ ] **Conductor Review:** `resendMessageId` column exists and is populated. `listEmailQueueHandler` SELECT and `EmailQueueEntry` type include `resendMessageId`. Retention `DELETE` never targets `pending`/`processing`. Retention trigger is tick-embedded (`lastPruneAt` in `email-queue-init.ts`). Sends are chunked in batches of 5. All files under 500 lines. Migration has a rollback file (SQL styleguide §5.1). `pnpm typecheck`, `pnpm lint` clean.
+
+---
+
+### TRACK-017: Instructor Productivity: DOCX Preview & Keyboard Shortcuts
+
+- **Status:** `Proposed`
+- **Dependencies:** None
+- **Estimated Effort:** 3 Days / 1.5 Sprint Loops
+- **Audit IDs:** ENH-UX-2, ENH-UX-3, ENH-PERF-2
+- **Decisions:**
+  - **ENH-UX-2 (DOCX inline preview):** The review detail page currently shows a "Preview not available — download to view" card for `.docx` files (UX-51, implemented in TRACK-012). Integrate `mammoth.js` (~30KB gzipped) to convert `.docx` → HTML client-side for an inline preview, eliminating the download round-trip for instructors. Lazy-load `mammoth` only on the review detail route (dynamic `import()`) so the lib isn't in the main bundle. Fetch the `.docx` via the existing presigned download URL, convert with `mammoth.convertToHtml({ arrayBuffer })`, render the HTML in a sandboxed iframe (`sandbox=""`) to prevent any script execution from untrusted document content. PDF preview (existing inline embed) is unchanged. Fallback to the existing "Preview not available" card if conversion fails. **Size guard:** only attempt conversion if `fileSize < 10MB` — above that, show a "file too large for inline preview" message (new i18n key) with the existing download button, preventing browser freezes on edge-case files.
+  - **ENH-UX-3 (keyboard shortcuts):** No global keyboard shortcuts exist. Add a **two-layer** shortcut architecture: (1) **Global hook** in `_authenticated.tsx` layout for `R` (refresh — triggers `queryClient.invalidateQueries`) and `?` (toggle cheat-sheet popover); (2) **Review-specific hook** in `$submissionId.tsx` for `J`/`K` (review-queue navigation). The cheat-sheet popover shows all shortcuts but greys out J/K when not on a review page. Shortcuts are disabled when focus is in an input/textarea/contenteditable. Guard with a `prefers-reduced-motion`-aware cheat-sheet animation.
+  - **ENH-UX-3 (J/K navigation mechanism):** The existing "Next Review" button only appears AFTER successful review completion and fetches only 1 result. **Preload the full pending list on mount** — on review detail page mount, fetch `listPendingReviews({ page: 1, limit: 100 })`, find the current `submissionId`'s index in the result, and track it in state. `J` navigates to the next pending ID, `K` to the previous. This works before AND after review submission, and makes the existing "Next Review" button instant (no post-review server call). Edge case: if the current submission isn't in the pending list (already opened/transitioned), J/K start from index 0.
+  - **ENH-PERF-2 (route prefetch):** No `<Link preload>` or route-level `preload` config exists. Add `preload="intent"` to sidebar navigation `<Link>` components (Dashboard, Assignments, Reviews, Templates, Users, Audit Log, Email Queue) so hovering a nav link prefetches the route's data/loader. Keep `defaultPreload` at the router level as `false` (opt-in per-link) to avoid over-prefetching on the landing page. TanStack Router handles deduplication automatically.
+
+#### Context Anchors (Traceability)
+
+- **PRD Reference:** `docs/PRD.md` (file preview, review workflow, instructor user flow)
+- **TDD Reference:** `docs/TDD.md` (ReviewFilePreview component, route loading, sidebar navigation)
+
+#### Track Tech Stack
+
+- `mammoth` (new dependency — `.docx` → HTML conversion, ~30KB gzipped, lazy-loaded)
+- Sandboxed `<iframe srcDoc={html} sandbox="">` (untrusted content isolation)
+- Native `keydown` listener + `useEffect` (keyboard shortcut layer — no new dep)
+- TanStack Router `<Link preload="intent">` + `defaultPreload` router option
+- shadcn `Popover` (shortcut cheat-sheet)
+
+#### Scope Boundaries
+
+- **In Scope:**
+  - Integrate `mammoth.js` (dynamic import) into `ReviewFilePreview` for `.docx` inline preview in a sandboxed iframe. **Size guard at 10MB** — above that, show "file too large" message (new i18n key) with download button. Fallback to existing "Preview not available" card on conversion error (ENH-UX-2).
+  - Add **two-layer** keyboard shortcut architecture: global hook in `_authenticated.tsx` (`R` refresh, `?` cheat-sheet popover), review-specific hook in `$submissionId.tsx` (`J`/`K` queue navigation). Cheat-sheet greys out J/K when not on review page. Disabled when typing in inputs. Add i18n keys for cheat-sheet labels + "file too large" message (ENH-UX-3).
+  - **Preload pending review list** on `$submissionId.tsx` mount via `listPendingReviews({ page: 1, limit: 100 })`. Track current index in state. `J`/`K` navigate by index. Makes existing "Next Review" button instant.
+  - Add `preload="intent"` to sidebar `<Link>` components in admin/instructor/student layouts (ENH-PERF-2).
+- **Out of Scope:**
+  - PDF preview changes (existing inline embed is sufficient)
+  - Shortcuts for non-review pages (focus on instructor review flow first)
+  - Customizable/remappable shortcuts (fixed bindings initially)
+  - Prefetching on the public landing page
+
+#### High-Level Execution Vectors
+
+- **Phase 1 (DOCX Preview):** Add `mammoth` to `package.json`. In `ReviewFilePreview`, detect `.docx` → check `fileSize < 10MB` guard → dynamic `import('mammoth')` → fetch file via presigned URL → `mammoth.convertToHtml({ arrayBuffer })` → render in `<iframe srcDoc={html} sandbox="" />`. If `fileSize >= 10MB`, show "file too large" message (new i18n key). Loading state with `Loader2`. Error fallback to existing card. Write tests for conversion success/failure, sandbox attribute, and size guard.
+- **Phase 2 (Keyboard Shortcuts — Two-Layer):** Create `src/hooks/use-keyboard-shortcuts.ts` (global: `R`, `?`) mounted in `_authenticated.tsx`. Create `src/hooks/use-review-nav.ts` (review-specific: `J`, `K`) mounted in `$submissionId.tsx`. Review nav hook: on mount, fetch `listPendingReviews({ page: 1, limit: 100 })`, find current submissionId index, store in state. `J`/`K` navigate via `useNavigate` to adjacent IDs. `?` toggles a `Popover` cheat-sheet (greys out J/K when not on review page). Add i18n keys for cheat-sheet content + "file too large" message. Write tests for shortcut firing, input-focus suppression, preload navigation, and cheat-sheet toggle.
+- **Phase 3 (Route Prefetch):** Add `preload="intent"` to sidebar `<Link>` components in the 3 role layouts. Verify no over-prefetching on the landing page (keep `defaultPreload: false`). Write a test confirming `preload="intent"` attribute presence.
+
+#### Verification & Definition of Done (DoD)
+
+- [ ] **Manual Checkpoint:** Open a review with a `.docx` submission (< 10MB) — inline HTML preview renders (no download needed); a `.docx` with macros shows the preview without executing scripts (sandbox). A `.docx` > 10MB shows "file too large for inline preview" with download button. On the review page, press `J` — navigates to next pending review (instant, no server call); `K` — previous; `R` — data refreshes; `?` — cheat-sheet popover appears (J/K greyed out when not on review page). Hover a sidebar link — network tab shows the route prefetch firing. Type in a textarea — shortcuts are suppressed.
+- [ ] **Automated Tests:** `pnpm test:unit` — new tests for mammoth conversion (success, error fallback, sandbox attribute, 10MB size guard), keyboard shortcut layer (global R/? firing, review-specific J/K firing, input suppression, cheat-sheet toggle, greyed-out state when not on review page), pending-list preload + index tracking, `preload="intent"` attribute presence on sidebar links. Coverage ≥80%.
+- [ ] **Conductor Review:** `mammoth` is dynamically imported (not in main client bundle — verify via build output). Sandboxed iframe has `sandbox=""` (no `allow-scripts`). 10MB size guard enforced. Two-layer shortcut architecture: global hook in `_authenticated.tsx`, review-specific hook in `$submissionId.tsx`. Pending list preloaded on mount (limit: 100). Shortcut listeners removed on unmount (no leak). `preload="intent"` only on authenticated sidebar links. New i18n keys (cheat-sheet + "file too large") in both locales. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` clean.
+
+---
+
+### TRACK-018: Event Email Notifications
+
+- **Status:** `Proposed`
+- **Dependencies:** None (leverages the existing email queue infra from TRACK-004; `email_queue` table + background processor already production-hardened)
+- **Estimated Effort:** 4 Days / 2 Sprint Loops
+- **Audit IDs:** ENH-FEAT-1
+- **Decisions:**
+  - **ENH-FEAT-1 (event emails):** Currently only auth-related emails (invitations, password reset, 2FA enable/disable) are sent; all event notifications (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, SLA breach) are in-app only (PRD §21 — event emails are `[v2]`). Extend the existing `enqueueEmail()` helper (from `src/lib/email.ts`) to dispatch event emails alongside the in-app notifications already created in handlers. The email queue processor (30s cycle, retry with backoff, `FOR UPDATE SKIP LOCKED`) is already production-hardened — no new infra. Locale-aware subjects via the existing server-side i18n helper (already used for auth emails per TRACK-008 audit-remediation).
+  - **Advisory-work pattern:** The event handlers currently insert in-app notifications **inside** transactions (`tx.insert(notifications)`). Email enqueue must be **post-commit advisory** — after the transaction commits, wrap `enqueueEmail()` in `try/catch` with `console.error` on failure (modeled after `two-factor.server.ts` lines 96-97, 198-199). The primary operation must succeed even if email enqueue fails. Note: `bulkExtendHandler` already uses this advisory pattern for in-app notifications (line 402, outside tx).
+  - **Template file extraction:** `src/lib/email.ts` is 255 lines. Adding 8 new HTML templates (~50 lines each) would exceed the 500-line file limit. Extract all new templates to `src/lib/email-templates.ts` — template-builder functions that return HTML strings (e.g., `buildSubmissionReceivedHtml(params, locale)`). `email.ts` imports and calls them. Shared header/footer HTML extracted as helper functions in the same file.
+  - **Recipient resolution:** Each event resolves recipients from the existing notification dispatch logic — `submission_received` → instructor; `review_completed`/`revision_requested` → student; `consultation_*` → the other party; `extension_*` → student (or all affected students for `bulkExtendHandler`); `extension_requested` → instructor; `sla_breach` → admins (already emailed via `sendSLAAlertEmail`). Reuse the existing `session.user.locale` for subject/body localization. Skip if the recipient has no verified email or is soft-deleted.
+  - **bulkExtendHandler included:** `bulkExtendHandler` (`extensions-extras.server.ts:312`) extends deadlines for multiple students. It already creates advisory in-app notifications (line 402, outside tx). This track adds `enqueueEmail()` for each affected student (mirroring the in-app behavior). The email queue handles batching (10/cycle). Could be 50+ emails in one operation — acceptable since they're async and queued.
+  - **Opt-in / preferences deferred:** Per PRD §161, notification preferences are `[v2]`. This track sends all event emails to all recipients (mirroring current in-app behavior). A per-user email-preference toggle is a separate future track (ENH-UX-4 / original UX-47). Document this as an explicit out-of-scope.
+
+#### Context Anchors (Traceability)
+
+- **PRD Reference:** `docs/PRD.md` §21 (email notifications `[v2]`), §147-161 (notification system)
+- **TDD Reference:** `docs/TDD.md` §769-794 (email notification matrix, event triggers, channels)
+- **Prior Track:** `conductor/archive/email_queue_20260530/` + `conductor/archive/email-queue-robustness_20260719/` (email queue infra)
+
+#### Track Tech Stack
+
+- Existing `enqueueEmail()` helper (`src/lib/email.ts`) — no new infra
+- New `src/lib/email-templates.ts` — template-builder functions for 8 event types (avoids 500-line limit in `email.ts`)
+- Existing background processor (`src/lib/email-queue-processor.ts`) — 30s cycle, retry, `FOR UPDATE SKIP LOCKED`
+- Server-side i18n helper (locale-aware subject/body — already used for auth emails)
+- Resend API (transactional send)
+- Post-commit advisory pattern (modeled after `two-factor.server.ts`)
+
+#### Scope Boundaries
+
+- **In Scope:**
+  - Add `enqueueEmail()` calls alongside existing in-app notification INSERTs in: `submitCheckpointHandler` (`submission_received` → instructor), `submitReviewHandler` (`review_completed`/`revision_requested` → student), `verifyConsultationHandler`/`rejectConsultationHandler` (`consultation_*` → student), `approveExtensionHandler`/`rejectExtensionHandler` (`extension_*` → student), `requestExtensionHandler` (`extension_requested` → instructor), `bulkExtendHandler` (`extension_approved` → all affected students). SLA breach emails already sent via `sendSLAAlertEmail` — no change.
+  - Create `src/lib/email-templates.ts` with 8 localized HTML email template-builder functions (submission_received, review_completed, revision_requested, consultation_verified, consultation_rejected, extension_approved, extension_rejected, extension_requested). Shared header/footer as helper functions. Locale-aware subject lines via the server-side i18n helper.
+  - Add a `template_type` enum value per event type (extends the existing `CHECK` constraint on `email_queue.template_type` — 4 → 12 values).
+  - All `enqueueEmail()` calls are **post-commit advisory** (after tx.commit, try/catch, `console.error` on failure — primary operation must not roll back).
+- **Out of Scope:**
+  - Per-user email notification preferences / opt-out (ENH-UX-4 / original UX-47 — separate future track)
+  - Email digest/batch mode (immediate send per event)
+  - Resend webhook/bounce handling (separate future feature)
+  - Changes to the email queue processor itself (already production-hardened)
+
+#### High-Level Execution Vectors
+
+- **Phase 1 (Templates):** Create `src/lib/email-templates.ts` with 8 localized HTML email template-builder functions (submission_received, review_completed, revision_requested, consultation_verified, consultation_rejected, extension_approved, extension_rejected, extension_requested). Extract shared header/footer as helper functions. Add locale-aware subject i18n keys. Add `template_type` enum values (4 → 12) + run `pnpm db:generate` + `pnpm db:migrate`.
+- **Phase 2 (Handler Wiring):** Add post-commit advisory `enqueueEmail()` calls in the 8+ handlers listed above, alongside the existing in-app notification INSERTs. Pattern: after `tx.commit()` (or after the transaction block), `try { await enqueueEmail(...) } catch (err) { console.error(...) }`. Resolve recipient email + locale from the session/DB. Skip on soft-deleted/no-email. For `bulkExtendHandler`, loop affected students and enqueue one email per student.
+- **Phase 3 (Tests):** Write handler tests verifying the email is enqueued with correct recipient/subject/template_type alongside the in-app notification. Verify the processor sends the new template types. Verify locale-aware subject resolution. Verify advisory-only failure (primary op succeeds when enqueue throws). Verify `bulkExtendHandler` enqueues one email per student. Coverage ≥80%.
+
+#### Verification & Definition of Done (DoD)
+
+- [ ] **Manual Checkpoint:** As a student, submit a checkpoint — the instructor receives both an in-app notification AND an email (check inbox + `/admin/email-queue` shows the enqueued row). As an instructor, approve an extension — the student receives an email. Trigger a bulk extend — all affected students receive emails. Switch recipient locale to Indonesian — the email subject/body render in Indonesian. The primary operation still succeeds if the email enqueue fails (advisory-only).
+- [ ] **Automated Tests:** `pnpm test:unit` — new tests verifying `enqueueEmail` is called with correct args in each of the 8+ handlers; recipient/locale resolution; soft-delete skip; advisory-only failure (primary op succeeds when enqueue throws); `bulkExtendHandler` enqueues one email per student. Coverage ≥80%.
+- [ ] **Conductor Review:** `enqueueEmail` called in all 8+ event handlers alongside existing in-app notifications. Email enqueue is post-commit advisory (try/catch, no rollback) — modeled after `two-factor.server.ts`. `src/lib/email-templates.ts` exists with 8 template builders. New `template_type` values (12 total) in the CHECK constraint. Locale-aware subjects via the server-side i18n helper. No processor changes. All files under 500 lines. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` clean.
+
+---
+
+### TRACK-019: Analytics & Reporting
+
+- **Status:** `Proposed`
+- **Dependencies:** None (largest-scope feature track; can be decomposed into sub-tracks if needed)
+- **Estimated Effort:** 8 Days / 4 Sprint Loops
+- **Audit IDs:** ENH-FEAT-2
+- **Decisions:**
+  - **ENH-FEAT-2 (analytics & reporting):** PRD §179 defers analytics & reporting to `[v2]`. This is the biggest remaining feature gap — admins have no system-wide insight beyond the audit log and email-queue inspector. Build role-based analytics: admin system metrics (completion rates, SLA compliance, active-user trends), instructor performance metrics (response times, throughput), and on-demand report export (CSV/Excel). Reuse the existing `xlsx` (SheetJS) dependency for client-side export generation (already used for bulk-import preview/sample generation in `src/lib/bulk-import/`).
+  - **Scope boundary with existing dashboards:** Existing dashboards (`src/server/dashboard-admin.server.ts`, `src/server/dashboard-instructor.server.ts`) already show real-time snapshots: user counts by role, active assignments, pending reviews, active consultations, email queue counts, escalation alerts (SLA >3 days), recent activity, pending review items with `waitTimeDays`. Analytics routes do NOT duplicate these. Analytics focuses on: historical trends (time-series with date ranges), NEW metrics not on dashboards (consultation verification rate = verified/total, deadline breach rate, avg response time = `EXTRACT(EPOCH FROM reviewedAt - uploadedAt)`, reviews completed, assignment status distribution by checkpoint state), and CSV/Excel export. Dashboards remain real-time operational snapshots.
+  - **Phased delivery:** Given the scope, deliver in two phases within this track. Phase 1: read-only analytics dashboards (server functions aggregating existing data — no new tables). Phase 2: report export (CSV via server function returning string; Excel via client-side SheetJS). Defer PDF export and scheduled/recurring delivery to a future track (heavy infra: PDF rendering lib, cron scheduler).
+  - **CSV export mechanism:** `createServerFn` returns a CSV string; client creates a `Blob` and triggers download via `URL.createObjectURL`. No new API route or `text/csv` streaming infrastructure needed — follows the existing server-fn pattern. Adequate for datasets up to thousands of rows (audit log, user list, assignment progress).
+  - **File structure:** Mirror the existing dashboard split into 3 handler files: `analytics-admin.server.ts` (admin aggregate queries, ~150-250 lines), `analytics-instructor.server.ts` (instructor-scoped metrics, ~150-250 lines), `analytics-export.server.ts` (CSV string builders for users/audit-log/progress, ~100-200 lines). Each stays well under the 500-line limit.
+  - **Date range filtering:** Use TanStack Router URL search params (`/admin/analytics?range=30d`). Route loader parses search params, passes to server function. Shareable URLs, back/forward navigation works, no client-side state management needed. Predefined ranges: 7d, 30d, 90d, all-time.
+  - **Data sources:** All metrics derive from existing tables (`assignments`, `checkpoints`, `submissions`, `reviews`, `consultations`, `users`, `audit_log`). No new schema required for Phase 1 — aggregate queries with `GROUP BY`/date truncation. If query performance becomes an issue at scale, materialized views or a pre-aggregation table can be added later (out of scope for v1).
+
+#### Context Anchors (Traceability)
+
+- **PRD Reference:** `docs/PRD.md` §179-184 (Analytics & Reporting `[v2]`), §86-92 (admin user flow)
+- **TDD Reference:** `docs/TDD.md` §73 (admin analytics route `[v2]`), §61-62 (instructor analytics/reports routes `[v2]`)
+
+#### Track Tech Stack
+
+- TanStack Start server functions (aggregation queries — `GROUP BY`, `date_trunc`, window functions)
+- Drizzle ORM (`sql` template literals for aggregate SQL)
+- `xlsx` (SheetJS — already a dependency, client-side Excel export)
+- CSV via server function returning string (client-side `Blob` + `URL.createObjectURL` download — no streaming infrastructure)
+- TanStack Router URL search params for date range filtering (`?range=30d`)
+- shadcn/ui `Card` + `MetricCard` + data tables (lightweight — defer a charting lib like Recharts unless needed; start with numeric tables + progress bars)
+- New routes: `/admin/analytics`, `/instructor/analytics`
+- Handler file split: `src/server/analytics-admin.server.ts`, `src/server/analytics-instructor.server.ts`, `src/server/analytics-export.server.ts` + `src/server/analytics.ts` (stubs)
+
+#### Scope Boundaries
+
+- **In Scope:**
+  - **Phase 1 (Analytics dashboards):** Admin analytics at `/admin/analytics?range=30d` — NEW metrics not on existing dashboard: consultation verification rate (verified/total), deadline breach rate (checkpoints where `dueDate < now()` and `state != 'passed'`), assignment status distribution by checkpoint state (locked/unlocked/submitted/under_review/passed/revise), submission/review volume over time (date_trunc daily/weekly), reviews completed count. Instructor analytics at `/instructor/analytics?range=30d` — personal metrics (reviews completed, avg response time via `EXTRACT(EPOCH FROM reviews.reviewedAt - submissions.uploadedAt)`, SLA breach count, students supervised aggregate, assignments active). Read-only server functions with aggregate queries. URL search params for date range (7d/30d/90d/all-time).
+  - **Phase 2 (Report export):** CSV export via server function returning CSV string (client `Blob` + `URL.createObjectURL` download) for admin user list, assignment progress, audit log. Excel export (client-side SheetJS `xlsx.utils.book_new()` + `json_to_sheet()` + `write()`) for the analytics dashboards. "Export" buttons on analytics pages + existing admin list pages (users, audit log).
+  - Sidebar entries + i18n keys (EN/ID) for both analytics routes.
+- **Out of Scope:**
+  - PDF export (requires a rendering lib — defer to future track)
+  - Scheduled/recurring report delivery (requires cron infra — defer)
+  - Student-facing analytics (students have the dashboard; no separate analytics page)
+  - Materialized views / pre-aggregation tables (only if Phase 1 queries are too slow — measure first)
+  - A charting library (start with tables/progress bars; add Recharts only if visual charts are requested)
+
+#### High-Level Execution Vectors
+
+- **Phase 1 (Admin Analytics):** Create `src/server/analytics-admin.server.ts` + `src/server/analytics.ts` (admin-only `getAdminAnalyticsData` — aggregate queries: consultation verification rate, deadline breach rate, assignment status distribution by state, submission/review volume by date via `date_trunc`, reviews completed count). Accept `{ range: '7d' | '30d' | '90d' | 'all' }` input. Create `/admin/analytics` route with URL search param (`?range=30d`) parsed by route loader. `MetricCard` grid + data tables for trend data. Add admin sidebar entry. Write handler + route tests.
+- **Phase 2 (Instructor Analytics):** Create `src/server/analytics-instructor.server.ts` + add `getInstructorAnalyticsData` stub (instructor-scoped — reviews completed, avg response time via `EXTRACT(EPOCH FROM reviewedAt - uploadedAt)`, SLA breaches, student count aggregate). Accept same `{ range }` input. Create `/instructor/analytics` route with URL search param. Add instructor sidebar entry. Write tests.
+- **Phase 3 (CSV Export):** Create `src/server/analytics-export.server.ts` + add `exportUsersCsv`, `exportAuditLogCsv`, `exportAssignmentProgressCsv` stubs. Each server function returns a CSV string; client creates `Blob` + triggers `URL.createObjectURL` download. Add "Export CSV" buttons to admin users, audit log, and instructor assignment detail. Write tests for CSV output format + role guards.
+- **Phase 4 (Excel Export):** Add client-side SheetJS export on analytics pages (reuse existing `xlsx` dependency + sample-generator pattern from `src/lib/bulk-import/samples.ts`). "Export Excel" button uses `xlsx.utils.book_new()` + `json_to_sheet()` + `write()` to download `.xlsx` of current dashboard view. Write tests for the export generation.
+- **Phase 5 (i18n + Polish):** Add all new labels/headers in both `locales/en.json` and `locales/id.json`. Run `pnpm generate:i18n`. Verify `pnpm check:i18n` parity.
+
+#### Verification & Definition of Done (DoD)
+
+- [ ] **Manual Checkpoint:** Admin opens `/admin/analytics?range=30d` — sees NEW metrics (consultation verification rate, deadline breach rate, assignment status distribution, submission volume trend). Instructor opens `/instructor/analytics?range=30d` — sees personal response-time metrics. Change date range to `90d` — URL updates, data refreshes. Click "Export CSV" on the admin users page — downloads a valid CSV. Click "Export Excel" on the analytics page — downloads a valid `.xlsx`. Switch to Indonesian — all labels translate.
+- [ ] **Automated Tests:** `pnpm test:unit` — new tests for `getAdminAnalyticsData`/`getInstructorAnalyticsData` (aggregate correctness with date-range filtering, role guards), CSV export functions (format, headers, role guards, returns string not stream), client-side Excel export generation. Coverage ≥80%.
+- [ ] **Conductor Review:** Analytics server functions are admin/instructor-scoped (role guards). No new DB tables (Phase 1 aggregates only). CSV export via server function returning string + client Blob download (no streaming infrastructure). Excel export reuses existing `xlsx` dep (no new dep). 3-file handler split (`analytics-admin.server.ts`, `analytics-instructor.server.ts`, `analytics-export.server.ts`) each under 500 lines. URL search params for date range (`?range=30d`). New metrics do NOT duplicate existing dashboard metrics. New i18n keys in both locales. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` clean.
+
+---
+
 ## Track Dependency Graph
 
 ```
@@ -908,6 +1241,14 @@ Milestone 3: UX & Accessibility
 
 Milestone 4: Quality Assurance
 └── E2E-FEAT-001: E2E Testing with Playwright [no deps — requires core features]
+
+Milestone 5: Post-Audit Enhancements
+├── TRACK-014: Optimistic UI Updates for Mutations [no deps — introduces query-key factory]
+├── TRACK-015: UI Hygiene & Tech-Debt Quick Wins [depends on 014]
+├── TRACK-016: Email Queue Retention & Delivery Completeness [no deps]
+├── TRACK-017: Instructor Productivity: DOCX Preview & Keyboard Shortcuts [no deps]
+├── TRACK-018: Event Email Notifications [no deps]
+└── TRACK-019: Analytics & Reporting [no deps]
 ```
 
 ### Parallelization Strategy
@@ -922,6 +1263,8 @@ The following track groups can be worked on simultaneously:
 | **D** | TRACK-009, TRACK-010, TRACK-011 | Independent UX tracks — minimal file overlap |
 | **E** | TRACK-012 + TRACK-010 | NotificationCenter refactor in 010 precedes notification UX in 012 |
 | **F** | TRACK-013 + TRACK-010 | Both touch date formatting — coordinate i18n date changes |
+| **G** | TRACK-014, TRACK-016, TRACK-017, TRACK-018, TRACK-019 | Fully independent — no file overlap (distinct domains: mutations, email ops, review UX, notifications, analytics) |
+| **H** | TRACK-015 → TRACK-014 | Sequential — TRACK-015 consumes the query-key factory from TRACK-014 for useQuery conversion |
 
 ---
 
@@ -933,6 +1276,7 @@ The following track groups can be worked on simultaneously:
 | 2: Performance & Optimization | 3 | ~7 Days |
 | 3: UX & Accessibility | 6 | ~13 Days |
 | 4: Quality Assurance | 1 | ~3 Days |
-| **Total** | **14** | **~35 Days** |
+| 5: Post-Audit Enhancements | 6 | ~25 Days |
+| **Total** | **20** | **~60 Days** |
 
 > Effort estimates assume a single developer. Tracks within the same parallelization group can be distributed across developers to reduce wall-clock time.
