@@ -37,7 +37,7 @@ export function CheckpointListEditor({
   return (
     <div className="space-y-3">
       {/* Column headers */}
-      <div className="flex items-start gap-2 px-1" role="row">
+      <div className="hidden sm:flex sm:items-start gap-2 px-1" role="row">
         <div className="w-[52px] shrink-0" /> {/* spacer for reorder buttons */}
         <div className="flex-1" role="columnheader">
           <span className="text-xs font-medium text-muted-foreground">
@@ -58,7 +58,7 @@ export function CheckpointListEditor({
       </div>
       <div className="space-y-2">
         {checkpoints.map((checkpoint, index) => (
-          <div key={index} className="flex items-start gap-2">
+          <div key={index} className="flex flex-col sm:flex-row sm:items-start gap-2">
             <div className="flex flex-col pt-1.5">
               <Button
                 variant="ghost"

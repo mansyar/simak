@@ -61,20 +61,20 @@ describe('ProgressTable', () => {
 
   it('should render student rows', () => {
     render(<ProgressTable students={mockStudents as any} />);
-    expect(screen.getByText('Alice Cooper')).toBeDefined();
+    expect(screen.getAllByText('Alice Cooper').length).toBe(2);
     expect(screen.getAllByText('alice@test.com').length).toBeGreaterThan(0);
-    expect(screen.getByText('50%')).toBeDefined();
-    expect(screen.getByText('Draft Proposal')).toBeDefined();
+    expect(screen.getAllByText('50%').length).toBe(2);
+    expect(screen.getAllByText('Draft Proposal').length).toBe(2);
 
-    expect(screen.getByText('Bob Marley')).toBeDefined();
+    expect(screen.getAllByText('Bob Marley').length).toBe(2);
     expect(screen.getAllByText('bob@test.com').length).toBeGreaterThan(0);
-    expect(screen.getByText('100%')).toBeDefined();
+    expect(screen.getAllByText('100%').length).toBe(2);
   });
 
   it('should display active checkpoint state badge or completed badge', () => {
     render(<ProgressTable students={mockStudents as any} />);
-    expect(screen.getByText('Unlocked')).toBeDefined();
-    expect(screen.getByText('Passed')).toBeDefined();
+    expect(screen.getAllByText('Unlocked').length).toBe(2);
+    expect(screen.getAllByText('Passed').length).toBe(2);
   });
 });
 
@@ -103,14 +103,15 @@ describe('ProgressTable - progressbar ARIA attributes (UX-21)', () => {
   it('renders progress bar containers with role="progressbar"', () => {
     render(<ProgressTable students={mockStudents as any} />);
     const progressbars = screen.getAllByRole('progressbar');
-    expect(progressbars.length).toBe(2);
+    expect(progressbars.length).toBe(4);
   });
 
   it('progress bars have aria-valuenow matching progressPercent', () => {
     render(<ProgressTable students={mockStudents as any} />);
     const progressbars = screen.getAllByRole('progressbar');
-    expect(progressbars[0].getAttribute('aria-valuenow')).toBe('50');
-    expect(progressbars[1].getAttribute('aria-valuenow')).toBe('100');
+    const values = progressbars.map((b) => b.getAttribute('aria-valuenow'));
+    expect(values).toContain('50');
+    expect(values).toContain('100');
   });
 
   it('progress bars have aria-valuemin=0 and aria-valuemax=100', () => {
@@ -128,5 +129,64 @@ describe('ProgressTable - progressbar ARIA attributes (UX-21)', () => {
     for (const bar of progressbars) {
       expect(bar.getAttribute('aria-label')).toBe('Progress');
     }
+  });
+});
+
+describe('ProgressTable - Mobile Card Layout (UX-36)', () => {
+  const mockStudents = [
+    {
+      id: 'student-1',
+      name: 'Alice Cooper',
+      email: 'alice@test.com',
+      progressPercent: 50,
+      passedCount: 1,
+      totalCheckpointsCount: 2,
+      activeCheckpoint: { id: 102, name: 'Draft Proposal', state: 'unlocked' },
+    },
+    {
+      id: 'student-2',
+      name: 'Bob Marley',
+      email: 'bob@test.com',
+      progressPercent: 100,
+      passedCount: 2,
+      totalCheckpointsCount: 2,
+      activeCheckpoint: null,
+    },
+  ];
+
+  it('should render desktop table hidden on mobile (hidden sm:block)', () => {
+    render(<ProgressTable students={mockStudents as any} />);
+    const desktop = screen.getByTestId('desktop-progress-table');
+    expect(desktop.className).toMatch(/\bhidden\b/);
+    expect(desktop.className).toMatch(/\bsm:block\b/);
+  });
+
+  it('should render mobile cards container visible only on mobile (sm:hidden)', () => {
+    render(<ProgressTable students={mockStudents as any} />);
+    const mobile = screen.getByTestId('mobile-progress-cards');
+    expect(mobile.className).toMatch(/\bsm:hidden\b/);
+  });
+
+  it('should render one card per student in mobile layout', () => {
+    render(<ProgressTable students={mockStudents as any} />);
+    const mobile = screen.getByTestId('mobile-progress-cards');
+    const cards = mobile.querySelectorAll('[data-testid="student-mobile-card"]');
+    expect(cards.length).toBe(2);
+  });
+
+  it('should show student name and email in each mobile card', () => {
+    render(<ProgressTable students={mockStudents as any} />);
+    const mobile = screen.getByTestId('mobile-progress-cards');
+    expect(mobile.textContent).toContain('Alice Cooper');
+    expect(mobile.textContent).toContain('alice@test.com');
+    expect(mobile.textContent).toContain('Bob Marley');
+    expect(mobile.textContent).toContain('bob@test.com');
+  });
+
+  it('should show progress bar in mobile cards', () => {
+    render(<ProgressTable students={mockStudents as any} />);
+    const mobile = screen.getByTestId('mobile-progress-cards');
+    const mobileBars = mobile.querySelectorAll('[role="progressbar"]');
+    expect(mobileBars.length).toBe(2);
   });
 });

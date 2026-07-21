@@ -7,6 +7,7 @@ vi.mock('@/routes/__root', () => ({
       if (params) return `${key} ${JSON.stringify(params)}`;
       return key;
     },
+    locale: 'en' as const,
   }),
 }));
 
@@ -89,6 +90,17 @@ describe('CheckpointCard', () => {
   it('should render due date', () => {
     render(<CheckpointCard checkpoint={passedCheckpoint} assignmentId={101} />);
     expect(screen.getByText(/Mar/)).toBeDefined();
+  });
+
+  it('should display relative time in parentheses after absolute date', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-02-26T00:00:00'));
+    try {
+      render(<CheckpointCard checkpoint={passedCheckpoint} assignmentId={101} />);
+      expect(screen.getByText(/Mar 1, 2026 \(in 3 days\)/)).toBeDefined();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('should render submit button for unlocked checkpoints', () => {

@@ -73,7 +73,8 @@ describe('AssignmentOverviewTab', () => {
   it('should render student effective deadline when present', () => {
     render(<AssignmentOverviewTab assignment={baseAssignment} />);
 
-    expect(screen.getByText('Jul 15, 2026')).toBeDefined();
+    // Date appears in both desktop table and mobile card layout (UX-36)
+    expect(screen.getAllByText('Jul 15, 2026').length).toBe(2);
   });
 
   it('should fall back to em dash when student effective deadline is null', () => {

@@ -405,4 +405,13 @@ Students and instructors lack a centralized system to:
 - **i18n** — 6 new keys in EN and ID: `files.previewNotAvailable`, `instructorReviews.nextReview`, `notifications.filterAll`, `notifications.filterUnread`, `notifications.loadMore`, `files.latest`
 - **Tests** — 2,690 tests pass across 283 test files; coverage ≥80% on all thresholds (lines 88.16%, branches 81.32%, functions 81.68%, statements 87.54%)
 
+### Track 13: Empty States, Date Display & Mobile Polish (July 2026)
+
+- **Empty states (UX-10, UX-11, UX-12)** — Replaced `return null`/plain-text patterns with the existing `EmptyState` component in `ConsultationList` (MessageSquare icon), `ReviewHistory` (Card with EmptyState, new i18n key `instructorReviews.noReviewsYet`), and `ConsultationProgress` (Card with message, new i18n key `consultations.noConsultationsRequired`)
+- **Relative dates (UX-43, UX-45)** — Added `formatRelativeTime` helper to `src/lib/format.ts` using `date-fns` `formatDistanceToNow` with locale-aware `localeMap`; appended parenthesized relative time (e.g., "Mar 5, 2026 (in 3 days)") to `CheckpointCard` due dates and `StudentDashboard` upcoming deadlines; added `title` attribute with relative time to all 4 `SLABadge` variants (badge text unchanged)
+- **Mobile layout polish (UX-34, UX-35, UX-36)** — `CheckpointListEditor` rows stack vertically on mobile (`flex-col sm:flex-row`), column headers hidden on mobile (`hidden sm:flex`); `AssignmentWizard` shows current step name above form content on mobile (`sm:hidden`); `ProgressTable` renders card-based layout on mobile (`flex sm:hidden` / `hidden sm:block`) with student name, progress bar, active checkpoint, and effective deadline per card
+- **Out of scope** — UX-44 (timezone display) and UX-37 (bulk-import preview responsive) documented as dropped/out-of-scope
+- **i18n** — 2 new keys in both EN and ID locales; `pnpm check:i18n` passes
+- **Tests** — 2,739 tests pass across 286 test files; coverage ≥80% on all thresholds (stmts 87.61%, branches 81.68%, functions 82.18%, lines 88.19%)
+
 </protect>

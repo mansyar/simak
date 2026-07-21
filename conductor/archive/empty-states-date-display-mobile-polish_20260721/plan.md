@@ -1,0 +1,121 @@
+<protect>
+# Implementation Plan: Empty States, Date Display & Mobile Polish
+
+## Track Metadata
+
+- **Track ID:** empty-states-date-display-mobile-polish_20260721
+- **Type:** Feature
+- **Spec:** `./spec.md` (approved)
+- **Audit IDs:** UX-10, UX-11, UX-12, UX-34, UX-35, UX-36, UX-43, UX-45
+- **Dropped:** UX-44 (timezone), UX-37 (bulk-import preview)
+
+## Methodology
+
+TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (Red) → implement (Green) → run quality gates → commit → attach git note → mark `[x]` with commit SHA. Coverage ≥80% on lines/stmts/branches/funcs.
+
+---
+
+## Phase 1: Empty States (UX-10, UX-11, UX-12) [checkpoint: 88ed767]
+
+- [x] Task: Read context — spec.md and workflow.md
+    - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
+
+- [x] Task: Add empty-state i18n keys
+    - [x] Add `instructorReviews.noReviewsYet` (en: "No previous reviews" / id: "Belum ada ulasan sebelumnya") and `consultations.noConsultationsRequired` (en: "No consultations required for this assignment" / id: "Tidak ada konsultasi yang diperlukan untuk tugas ini") to both `locales/en.json` and `locales/id.json`
+    - [x] Run `pnpm generate:i18n`; verify `pnpm check:i18n` passes (parity)
+
+- [x] Task: ConsultationList empty state (UX-10)
+    - [x] Write failing test: `ConsultationList` renders `<EmptyState>` with `MessageSquare` icon (not a plain-text `<div>`) when there are no consultations
+    - [x] Implement: replace the plain-text `<div>` with `<EmptyState icon={MessageSquare} title={t('consultations.noConsultations')} />` (reuse existing `consultations.noConsultations` key)
+    - [x] Verify: `pnpm test` passes; component does not return `null` for empty state
+
+- [x] Task: ReviewHistory empty state (UX-11)
+    - [x] Write failing test: `ReviewHistory` renders a `Card` with `<EmptyState>` (title resolves to `instructorReviews.noReviewsYet`) instead of returning `null`
+    - [x] Implement: render `Card` with `<EmptyState>` inside in place of `return null`
+    - [x] Verify: `pnpm test` passes
+
+- [x] Task: ConsultationProgress empty state (UX-12)
+    - [x] Write failing test: `ConsultationProgress` renders a `Card` with the `consultations.noConsultationsRequired` message instead of `return null` when `totalRequired === 0`
+    - [x] Implement: render `Card` with message/`<EmptyState>` in place of `return null`
+    - [x] Verify: `pnpm test` passes
+
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Empty States' (Protocol in workflow.md)
+
+---
+
+## Phase 2: Relative Dates & SLABadge (UX-43, UX-45) [checkpoint: 137ffba]
+
+- [x] Task: Read context — spec.md and workflow.md
+    - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
+
+- [x] Task: Add `formatRelativeTime` helper to `src/lib/format.ts`
+    - [x] Write failing test: `formatRelativeTime(date, locale)` returns "in 3 days" (future, en) / "3 days ago" (past, en); locale-aware via `localeMap` (e.g., "dalam waktu 3 hari" for id)
+    - [x] Implement: add `formatRelativeTime(date: Date | string, locale: 'en' | 'id' = 'en')` using `formatDistanceToNow(toDate(date), { addSuffix: true, locale: localeMap[locale] })` from `date-fns` (already a dependency, v4.2.1)
+    - [x] Verify: `pnpm test` passes (3097dad)
+
+- [x] Task: CheckpointCard relative date (UX-43)
+    - [x] Write failing test: `CheckpointCard` due date displays absolute date + parenthesized relative time (e.g., "Mar 5, 2026 (in 3 days)") in the active locale
+    - [x] Implement: append `(${formatRelativeTime(date, locale)})` to the formatted absolute date
+    - [x] Verify: `pnpm test` passes (43c3be9)
+
+- [x] Task: StudentDashboard relative date (UX-43)
+    - [x] Write failing test: upcoming deadlines display absolute date + parenthesized relative time in the active locale
+    - [x] Implement: append relative time to the formatted date in the upcoming-deadlines list
+    - [x] Verify: `pnpm test` passes (e33e256)
+
+- [x] Task: SLABadge time-remaining tooltip (UX-45)
+    - [x] Write failing test: each `SLABadge` variant has a `title` attribute with locale-aware relative time (e.g., "3 days ago"); badge text (On Time / Approaching / Breached) unchanged
+    - [x] Implement: add `title={formatRelativeTime(updatedAt, locale)}` to each badge variant
+    - [x] Verify: `pnpm test` passes; no `simak-i18n/no-hardcoded` warning on the `title` (7dbc68c)
+
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Relative Dates & SLABadge' (Protocol in workflow.md)
+
+---
+
+## Phase 3: Mobile Layout (UX-34, UX-35, UX-36) [checkpoint: a487b58]
+
+- [x] Task: Read context — spec.md and workflow.md
+    - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
+
+- [x] Task: CheckpointListEditor mobile stacking (UX-34)
+    - [x] Write failing test: checkpoint row uses `flex-col sm:flex-row` responsive classes; column headers use `hidden sm:flex`
+    - [x] Implement: change row from `flex items-start gap-2` → `flex flex-col sm:flex-row sm:items-start gap-2`; hide column headers on mobile (`hidden sm:flex`); reorder/remove buttons and inputs reflow vertically
+    - [x] Verify: `pnpm test` passes; usable at 375px viewport (595004b)
+
+- [x] Task: AssignmentWizard mobile step label (UX-35)
+    - [x] Write failing test: current step name renders above form content on mobile (`sm:hidden`); desktop labels (`hidden md:block`) unchanged; step numbers remain visible
+    - [x] Implement: add `<p className="sm:hidden ...">{steps[currentStep - 1].label}</p>` above form content (used `currentStep - 1` because currentStep is 1-based; spec had off-by-one)
+    - [x] Verify: `pnpm test` passes (bd79395)
+
+- [x] Task: ProgressTable mobile card layout (UX-36)
+    - [x] Write failing test: mobile renders card-based layout (`flex sm:hidden`) with each student as a card (name, progress bar, percentage); desktop renders table (`hidden sm:block`)
+    - [x] Implement: add card-based mobile layout using `flex sm:hidden` / `hidden sm:block` pattern; desktop table unchanged
+    - [x] Verify: `pnpm test` passes (0d4f195); layout verified at 375px
+
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Mobile Layout' (Protocol in workflow.md)
+
+---
+
+## Phase 4: Final Conductor Review & Quality Gates [checkpoint: 42e6e26]
+
+- [x] Task: Read context — spec.md and workflow.md
+    - [x] Read `./spec.md` (functional requirements, acceptance criteria) and `conductor/workflow.md` (TDD lifecycle, quality gates, phase-checkpoint protocol) before starting this phase
+
+- [x] Task: Run full quality gate suite
+    - [x] `pnpm test` (unit tests pass) — 2739 tests passed
+    - [x] `pnpm test:coverage` — ≥80% on lines, statements, branches, functions — Stmts 87.61%, Branches 81.68%, Functions 82.18%, Lines 88.19%
+    - [x] `pnpm typecheck` (tsc --noEmit --incremental) — PASS
+    - [x] `pnpm lint` (oxlint . — including `simak-i18n/no-hardcoded`) — 0 warnings, 0 errors
+    - [x] `pnpm check:i18n` (EN↔ID parity) — 620 keys used, 745 in en.json, 745 in id.json
+    - [x] Verify no file in `src/`, `tests/`, `scripts/` exceeds 500 lines (`scripts/check-modularity.js`) — only `src/i18n/types.ts` (960 lines, exempt per AGENTS.md)
+    - [x] Grep verification: no `return null` empty-state patterns remain in touched component files (only legitimate `.map()` filter in ConsultationProgress line 69); `formatRelativeTime` used in CheckpointCard + StudentDashboard + SLABadge; `CheckpointListEditor` uses `flex-col sm:flex-row`; `ProgressTable` has mobile card layout; `AssignmentWizard` shows step name on mobile
+    - [x] Confirm UX-44 (timezone) and UX-37 (bulk-import) are documented as dropped/out-of-scope in `spec.md` (lines 73-75)
+
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Final Conductor Review & Quality Gates' (Protocol in workflow.md)
+
+---
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions fb6e128
+</protect>

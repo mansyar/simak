@@ -1,6 +1,8 @@
 import { useI18n } from '../../routes/__root';
 import type { TranslationKey } from '../../i18n/index';
 import { Badge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/ui/empty-state';
+import { MessageSquare } from 'lucide-react';
 import { formatDate } from '@/lib/format-date';
 
 interface ConsultationItem {
@@ -34,11 +36,7 @@ export function ConsultationList({ consultations }: ConsultationListProps) {
   const { t, locale } = useI18n();
 
   if (consultations.length === 0) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        <p>{t('consultations.noConsultations')}</p>
-      </div>
-    );
+    return <EmptyState icon={MessageSquare} title={t('consultations.noConsultations')} compact />;
   }
 
   return (

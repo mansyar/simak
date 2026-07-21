@@ -290,6 +290,7 @@ export type Translation = {
     downloadPdf: string
     downloadFile: string
     reviewHistory: string
+    noReviewsYet: string
     passed: string
     revise: string
     decision: string
@@ -578,6 +579,7 @@ export type Translation = {
     logSuccess: string
     previousSessions: string
     noConsultations: string
+    noConsultationsRequired: string
     status: {
       pending: string
       verified: string

@@ -1,7 +1,7 @@
 import { useI18n } from '../../routes/__root';
 import { Link } from '@tanstack/react-router';
 import { Clock, FileText, MessageSquare, ClipboardList, Calendar } from 'lucide-react';
-import { formatDateShort } from '@/lib/format';
+import { formatDateShort, formatRelativeTime } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -156,7 +156,7 @@ export function StudentDashboard({ data }: Props) {
                     >
                       {deadline.dueDate === null
                         ? t('studentDashboard.noDeadline')
-                        : formatDate(deadline.dueDate, locale, 'short')}
+                        : `${formatDate(deadline.dueDate, locale, 'short')} (${formatRelativeTime(deadline.dueDate, locale)})`}
                       {deadline.isOverdue && (
                         <Badge variant="destructive" className="ml-1">
                           {t('studentDashboard.overdue')}

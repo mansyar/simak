@@ -24,9 +24,15 @@ const reviseReview = {
 };
 
 describe('ReviewHistory', () => {
-  it('should render nothing when reviews array is empty', () => {
+  it('should render empty state Card when reviews array is empty', () => {
     const { container } = render(<ReviewHistory reviews={[]} />);
-    expect(container.innerHTML).toBe('');
+    expect(container.innerHTML).not.toBe('');
+    expect(screen.getByText('instructorReviews.noReviewsYet')).toBeDefined();
+  });
+
+  it('should render review history title even when reviews are empty', () => {
+    render(<ReviewHistory reviews={[]} />);
+    expect(screen.getByText('instructorReviews.reviewHistory')).toBeDefined();
   });
 
   it('should render review history title', () => {

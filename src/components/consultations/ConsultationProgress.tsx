@@ -1,5 +1,7 @@
 import { useI18n } from '../../routes/__root';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
+import { MessageSquare } from 'lucide-react';
 
 interface CheckpointProgress {
   checkpointId: number;
@@ -19,7 +21,20 @@ export function ConsultationProgress({ counts }: ConsultationProgressProps) {
   const totalVerified = counts.reduce((sum, c) => sum + c.verifiedCount, 0);
 
   if (totalRequired === 0) {
-    return null;
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('consultations.consultationProgress')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EmptyState
+            icon={MessageSquare}
+            title={t('consultations.noConsultationsRequired')}
+            compact
+          />
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

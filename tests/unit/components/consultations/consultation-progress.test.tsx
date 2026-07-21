@@ -8,6 +8,7 @@ vi.mock('@/routes/__root', () => ({
       const translations: Record<string, string> = {
         'consultations.consultationProgress': 'Consultation Progress',
         'consultations.verified': 'verified',
+        'consultations.noConsultationsRequired': 'No consultations required for this assignment',
       };
       return translations[key] || key;
     },
@@ -15,7 +16,7 @@ vi.mock('@/routes/__root', () => ({
 }));
 
 describe('ConsultationProgress', () => {
-  it('should return null when totalRequired is 0', () => {
+  it('should render Card with message when totalRequired is 0', () => {
     const { container } = render(
       <ConsultationProgress
         counts={[
@@ -23,7 +24,19 @@ describe('ConsultationProgress', () => {
         ]}
       />,
     );
-    expect(container.innerHTML).toBe('');
+    expect(container.innerHTML).not.toBe('');
+    expect(screen.getByText('No consultations required for this assignment')).toBeDefined();
+  });
+
+  it('should render consultation progress title when totalRequired is 0', () => {
+    render(
+      <ConsultationProgress
+        counts={[
+          { checkpointId: 1, checkpointName: 'Proposal', verifiedCount: 0, minConsultations: 0 },
+        ]}
+      />,
+    );
+    expect(screen.getByText('Consultation Progress')).toBeDefined();
   });
 
   it('should render summary title', () => {
