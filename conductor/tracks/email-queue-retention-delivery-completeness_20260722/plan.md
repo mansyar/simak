@@ -51,7 +51,7 @@
     - [x] On each 30s tick, check if >24h since `lastPruneAt`; if so, invoke `pruneOldEmails()` and update `lastPruneAt`
     - [x] Log `email_queue.retention_pruned` with deleted count
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Retention Cleanup' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Retention Cleanup' (Protocol in workflow.md)
 
 ## Phase 3: Concurrent Batch Sends (PERF-32/33)
 
