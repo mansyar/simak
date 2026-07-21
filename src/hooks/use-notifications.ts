@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUnreadCount, listNotifications, markRead, markAllRead } from '@/server/notifications';
 import { useI18n } from '@/routes/__root';
 import { parseServerError, showErrorToast } from '@/lib/toast';
+import { notificationKeys } from '@/lib/query-keys';
 
 function handleServerError<T extends { error?: unknown }>(
   res: T,
@@ -17,7 +18,7 @@ function handleServerError<T extends { error?: unknown }>(
 export function useUnreadCount() {
   const { t } = useI18n();
   return useQuery({
-    queryKey: ['notifications', 'unreadCount'],
+    queryKey: notificationKeys.unreadCount(),
     queryFn: async () => {
       const res = await (
         getUnreadCount as unknown as (args: {
@@ -38,7 +39,7 @@ export function useNotificationsList(
   const { t } = useI18n();
   const { page = 1, limit = 20, type, unreadOnly } = options;
   return useQuery({
-    queryKey: ['notifications', 'list', { page, limit, type, unreadOnly }],
+    queryKey: notificationKeys.list({ page, limit, type, unreadOnly }),
     queryFn: async () => {
       const res = await (
         listNotifications as unknown as (args: {
@@ -70,8 +71,7 @@ export function useMarkRead() {
       return res;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications', 'unreadCount'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications', 'list'] });
+      queryClient.invalidateQueries({ queryKey: notificationKeys.all() });
     },
   });
 }
@@ -90,8 +90,7 @@ export function useMarkAllRead() {
       return res;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications', 'unreadCount'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications', 'list'] });
+      queryClient.invalidateQueries({ queryKey: notificationKeys.all() });
     },
   });
 }

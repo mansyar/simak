@@ -9,6 +9,7 @@ import {
   useMarkAllRead,
 } from '@/hooks/use-notifications';
 import { getUnreadCount, listNotifications, markRead, markAllRead } from '@/server/notifications';
+import { notificationKeys } from '@/lib/query-keys';
 
 // Mocks
 const mockShowErrorToast = vi.fn();
@@ -80,9 +81,7 @@ describe('Notification query hooks', () => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      const query = queryClient
-        .getQueryCache()
-        .find({ queryKey: ['notifications', 'unreadCount'] });
+      const query = queryClient.getQueryCache().find({ queryKey: notificationKeys.unreadCount() });
       expect((query?.options as Record<string, unknown>).refetchInterval).toBe(30000);
       expect((query?.options as Record<string, unknown>).refetchIntervalInBackground).toBe(false);
     });
@@ -180,8 +179,7 @@ describe('Notification query hooks', () => {
       });
 
       expect(markRead).toHaveBeenCalledWith({ data: { notificationId: 42 } });
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['notifications', 'unreadCount'] });
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['notifications', 'list'] });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: notificationKeys.all() });
     });
   });
 
@@ -205,8 +203,7 @@ describe('Notification query hooks', () => {
       });
 
       expect(markAllRead).toHaveBeenCalled();
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['notifications', 'unreadCount'] });
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['notifications', 'list'] });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: notificationKeys.all() });
     });
   });
 
