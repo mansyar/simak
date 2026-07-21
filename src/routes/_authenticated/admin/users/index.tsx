@@ -1,6 +1,7 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   listUsers,
   deleteUser,
@@ -28,6 +29,7 @@ import { Plus, Upload } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
 import { isServerError, ErrorCode } from '@/lib/errors';
+import { userKeys } from '@/lib/query-keys';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 
 const UserSearchSchema = z.object({
@@ -55,11 +57,10 @@ export const Route = createFileRoute('/_authenticated/admin/users/')({
 
 function UsersPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData();
-  const { users, total } = isServerError(data) ? { users: [], total: 0 } : data;
+  const loaderData = Route.useLoaderData();
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
-  const router = useRouter();
+  const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
@@ -76,7 +77,6 @@ function UsersPage() {
     { id: string; name: string }[]
   >([]);
 
-  const deleteUserFn = useServerFn(deleteUser);
   const generateSetupLinkFn = useServerFn(generateSetupLink);
   const createUserFn = useServerFn(createUser);
   const updateUserFn = useServerFn(updateUser);
@@ -85,9 +85,49 @@ function UsersPage() {
 
   type UserSearchParams = z.infer<typeof UserSearchSchema>;
 
+  const usersQuery = useQuery({
+    queryKey: userKeys.list({
+      page: searchParams.page,
+      limit: searchParams.limit,
+      search: searchParams.search,
+      role: searchParams.role,
+    }),
+    queryFn: async () => {
+      const result = await listUsers({
+        data: {
+          page: searchParams.page,
+          limit: searchParams.limit,
+          search: searchParams.search,
+          role: searchParams.role,
+        },
+      });
+      if (isServerError(result)) {
+        throw new Error(result.error.message);
+      }
+      return result;
+    },
+    initialData: isServerError(loaderData) ? undefined : loaderData,
+    staleTime: 30_000,
+  });
+
+  const { users, total } = usersQuery.data ?? { users: [], total: 0 };
+
+  const deleteMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const result = await deleteUser({ data: { id: userId } });
+      if (isServerError(result)) {
+        throw result;
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.all() });
+    },
+  });
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await router.invalidate();
+    await queryClient.invalidateQueries({ queryKey: userKeys.all() });
     setIsRefreshing(false);
   };
 
@@ -116,28 +156,33 @@ function UsersPage() {
   };
 
   const handleDelete = async (user: UserRow): Promise<boolean> => {
-    const result = await deleteUserFn({ data: { id: user.id } });
-    if (isServerError(result) && result.error.code === ErrorCode.BAD_REQUEST) {
-      const assignmentsResult = await listInstructorActiveAssignmentsFn({
-        data: { instructorId: user.id },
-      });
-      const instructorsResult = await listUsers({
-        data: { page: 1, limit: 100, search: '', role: 'instructor' },
-      });
-      const instructors = isServerError(instructorsResult)
-        ? []
-        : instructorsResult.users
-            .filter((u) => u.id !== user.id)
-            .map((u) => ({ id: u.id, name: u.name }));
-      setReassignmentAssignments(
-        isServerError(assignmentsResult) ? [] : assignmentsResult.assignments,
-      );
-      setReassignmentInstructors(instructors);
-      setReassignmentUser(user);
-      return false; // reassignment needed
+    try {
+      await deleteMutation.mutateAsync(user.id);
+      return true; // deleted
+    } catch (e) {
+      if (isServerError(e) && e.error.code === ErrorCode.BAD_REQUEST) {
+        const assignmentsResult = await listInstructorActiveAssignmentsFn({
+          data: { instructorId: user.id },
+        });
+        const instructorsResult = await listUsers({
+          data: { page: 1, limit: 100, search: '', role: 'instructor' },
+        });
+        const instructors = isServerError(instructorsResult)
+          ? []
+          : instructorsResult.users
+              .filter((u) => u.id !== user.id)
+              .map((u) => ({ id: u.id, name: u.name }));
+        setReassignmentAssignments(
+          isServerError(assignmentsResult) ? [] : assignmentsResult.assignments,
+        );
+        setReassignmentInstructors(instructors);
+        setReassignmentUser(user);
+        return false; // reassignment needed
+      }
+      // Other server errors — preserve existing behavior (refresh + return true)
+      queryClient.invalidateQueries({ queryKey: userKeys.all() });
+      return true;
     }
-    navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
-    return true; // deleted
   };
 
   const handleGenerateLink = async (user: UserRow) => {
@@ -156,7 +201,7 @@ function UsersPage() {
       setInlineError(`${t('common.error')}: ${result.error.message}`);
       throw new Error(result.error.message);
     }
-    navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
+    queryClient.invalidateQueries({ queryKey: userKeys.all() });
   };
 
   const handleUpdateUser = async (id: string, values: z.infer<typeof UpdateUserSchema>) => {
@@ -165,7 +210,7 @@ function UsersPage() {
       setInlineError(`${t('common.error')}: ${result.error.message}`);
       throw new Error(result.error.message);
     }
-    navigate({ search: (prev: UserSearchParams) => prev }); // Refresh
+    queryClient.invalidateQueries({ queryKey: userKeys.all() });
   };
 
   return (
@@ -248,12 +293,13 @@ function UsersPage() {
         }}
         onDelete={async () => {
           if (reassignmentUser) {
-            const result = await deleteUserFn({ data: { id: reassignmentUser.id } });
-            if (!isServerError(result)) {
+            try {
+              await deleteMutation.mutateAsync(reassignmentUser.id);
               setReassignmentUser(null);
-              navigate({ search: (prev: UserSearchParams) => prev });
-            } else {
-              setInlineError(result.error.message);
+            } catch (e) {
+              if (isServerError(e)) {
+                setInlineError(e.error.message);
+              }
             }
           }
         }}
