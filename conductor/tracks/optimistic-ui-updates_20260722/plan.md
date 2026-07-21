@@ -17,7 +17,7 @@
     - [ ] Write failing tests for the refactored hooks — verify `useMutation` is used, `useQuery` fetches extension requests, existing behavior preserved
     - [ ] Refactor `use-assignment-tabs.ts` — replace plain `useCallback`+`useState` with `useMutation` + `useQuery` for extension-requests cache. Use `extensionKeys` from factory
     - [ ] Run `pnpm test` — confirm tests pass and existing behavior unchanged
-- [ ] Task: Refactor `deleteUser` to `useMutation`+`useQuery` (admin/users/index.tsx)
+- [x] Task: Refactor `deleteUser` to `useMutation`+`useQuery` (admin/users/index.tsx) [52061c1]
     - [ ] Write failing tests for the refactored hook — verify `useMutation` is used, `useQuery` fetches user list, existing behavior preserved
     - [ ] Refactor `admin/users/index.tsx` — replace `useServerFn` direct call with `useMutation` + `useQuery` for user-list cache. Use `userKeys` from factory
     - [ ] Run `pnpm test` — confirm tests pass and existing behavior unchanged
