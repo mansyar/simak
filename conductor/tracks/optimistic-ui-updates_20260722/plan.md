@@ -30,7 +30,7 @@
     - [x] Update any remaining inline keys in the 9 mutation sites' related queries to use factory keys
     - [x] Run `pnpm test` — confirm all tests pass after key migration
     - [x] Run `pnpm typecheck` — confirm no type errors
-- [ ] Task: Conductor - User Manual Verification 'Phase 0: Query-Key Factory + React Query Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 0: Query-Key Factory + React Query Migration' (Protocol in workflow.md)
 
 ## Phase 1: Notification Hooks Optimistic Updates
 
