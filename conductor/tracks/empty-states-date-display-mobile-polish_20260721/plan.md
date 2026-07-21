@@ -92,7 +92,7 @@ TDD per `conductor/workflow.md`. Each task: mark `[~]` → write failing tests (
     - [x] Implement: add card-based mobile layout using `flex sm:hidden` / `hidden sm:block` pattern; desktop table unchanged
     - [x] Verify: `pnpm test` passes (0d4f195); layout verified at 375px
 
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Mobile Layout' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Mobile Layout' (Protocol in workflow.md)
 
 ---
 
