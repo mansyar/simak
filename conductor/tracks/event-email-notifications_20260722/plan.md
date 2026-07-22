@@ -31,7 +31,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Foundation — Templates, Schema & i18n' (Protocol in workflow.md)
 
-## Phase 2: Recipient Resolution & Handler Wiring
+## Phase 2: Recipient Resolution & Handler Wiring [checkpoint: 3aaa5d5]
 
 - [x] Task: Read spec.md and workflow.md to refresh context for this phase
     - [x] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
