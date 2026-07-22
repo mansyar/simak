@@ -1,7 +1,10 @@
-import { FileText, Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { FileText, Download, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDateShort } from '@/lib/format';
 import { useI18n } from '../../routes/__root';
+
+const MAX_DOCX_SIZE = 10 * 1024 * 1024; // 10MB
 
 interface ReviewFilePreviewProps {
   fileName: string;
@@ -20,6 +23,39 @@ export function ReviewFilePreview({
 }: ReviewFilePreviewProps) {
   const { t } = useI18n();
   const isPdf = fileName.toLowerCase().endsWith('.pdf');
+  const isDocx = fileName.toLowerCase().endsWith('.docx');
+  const isDocxTooLarge = isDocx && fileSize > MAX_DOCX_SIZE;
+
+  const [docxState, setDocxState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [docxHtml, setDocxHtml] = useState('');
+
+  useEffect(() => {
+    if (!isDocx || isDocxTooLarge) return;
+
+    let cancelled = false;
+    setDocxState('loading');
+
+    (async () => {
+      try {
+        const response = await fetch(downloadUrl);
+        const arrayBuffer = await response.arrayBuffer();
+        const mammoth = await import('mammoth');
+        const result = await mammoth.convertToHtml({ arrayBuffer });
+        if (!cancelled) {
+          setDocxHtml(result.value);
+          setDocxState('success');
+        }
+      } catch {
+        if (!cancelled) {
+          setDocxState('error');
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isDocx, isDocxTooLarge, downloadUrl]);
 
   return (
     <Card className="shadow-sm">
@@ -53,8 +89,44 @@ export function ReviewFilePreview({
           </div>
         )}
 
-        {/* Preview not available for non-PDF files (FR-5) */}
-        {!isPdf && (
+        {/* DOCX loading state */}
+        {isDocx && !isDocxTooLarge && docxState === 'loading' && (
+          <div className="rounded-md border bg-muted/30 p-6 flex flex-col items-center gap-2 text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">{t('files.convertingDocx')}</p>
+          </div>
+        )}
+
+        {/* DOCX success — sandboxed iframe */}
+        {isDocx && !isDocxTooLarge && docxState === 'success' && (
+          <div className="rounded-md border bg-muted/30 overflow-hidden">
+            <iframe
+              srcDoc={docxHtml}
+              sandbox="allow-same-origin"
+              className="w-full h-96"
+              title={fileName}
+            />
+          </div>
+        )}
+
+        {/* DOCX error state */}
+        {isDocx && !isDocxTooLarge && docxState === 'error' && (
+          <div className="rounded-md border bg-muted/30 p-6 flex flex-col items-center gap-2 text-center">
+            <FileText className="h-8 w-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">{t('files.previewNotAvailable')}</p>
+          </div>
+        )}
+
+        {/* DOCX too large for preview */}
+        {isDocx && isDocxTooLarge && (
+          <div className="rounded-md border bg-muted/30 p-6 flex flex-col items-center gap-2 text-center">
+            <FileText className="h-8 w-8 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">{t('files.tooLargeForPreview')}</p>
+          </div>
+        )}
+
+        {/* Preview not available for non-PDF/non-DOCX files (FR-5) */}
+        {!isPdf && !isDocx && (
           <div className="rounded-md border bg-muted/30 p-6 flex flex-col items-center gap-2 text-center">
             <FileText className="h-8 w-8 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">{t('files.previewNotAvailable')}</p>

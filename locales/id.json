@@ -551,6 +551,8 @@
     "r2NotConfigured": "Penyimpanan berkas tidak dikonfigurasi. Hubungi administrator Anda.",
     "objectNotFound": "Berkas yang diunggah tidak ditemukan. Silakan coba unggah kembali.",
     "previewNotAvailable": "Pratinjau tidak tersedia — unduh untuk melihat",
+    "tooLargeForPreview": "Berkas terlalu besar untuk pratinjau (maks 10 MB) — unduh untuk melihat",
+    "convertingDocx": "Mengonversi dokumen untuk pratinjau...",
     "latest": "Terbaru"
   },
   "assignments": {

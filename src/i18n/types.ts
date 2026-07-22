@@ -556,6 +556,8 @@ export type Translation = {
     r2NotConfigured: string
     objectNotFound: string
     previewNotAvailable: string
+    tooLargeForPreview: string
+    convertingDocx: string
     latest: string
   }
   assignments: {
