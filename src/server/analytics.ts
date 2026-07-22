@@ -50,8 +50,8 @@ export const getInstructorAnalyticsData = createServerFn({ method: 'GET' })
 export const ExportUsersCsvSchema = z.object({});
 
 export const ExportAuditLogCsvSchema = z.object({
-  dateFrom: z.string().optional(),
-  dateTo: z.string().optional(),
+  dateFrom: z.coerce.date().optional(),
+  dateTo: z.coerce.date().optional(),
 });
 
 export const ExportAssignmentProgressCsvSchema = z.object({});

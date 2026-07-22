@@ -126,6 +126,27 @@ describe('CSV Export Handlers', () => {
       expect(lines).toHaveLength(1);
     });
 
+    it('should mitigate CSV formula injection by prefixing dangerous chars', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          {
+            id: 'uuid-1',
+            name: '=HYPERLINK("http://evil.com","click")',
+            email: 'evil@test.com',
+            role: 'student',
+            deletedAt: null,
+            createdAt: new Date('2026-01-01'),
+          },
+        ]).then(onfulfilled),
+      );
+
+      const result = await exportUsersCsvHandler({ data: {} });
+      const csv = result as string;
+      // The name cell must be prefixed with a single quote to neutralize the formula
+      expect(csv).toContain("'=HYPERLINK");
+    });
+
     it('should accept superadmin role', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(superadminSession as any);
       const result = await exportUsersCsvHandler({ data: {} });
@@ -188,7 +209,7 @@ describe('CSV Export Handlers', () => {
       );
 
       await exportAuditLogCsvHandler({
-        data: { dateFrom: '2026-01-01', dateTo: '2026-07-22' },
+        data: { dateFrom: new Date('2026-01-01'), dateTo: new Date('2026-07-22') },
       });
       // Verify where was called (date filtering applied)
       expect(mockDb.where).toHaveBeenCalled();
@@ -335,18 +356,22 @@ describe('CSV Export Handlers', () => {
 
     it('should return CSV string with headers and review rows', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve([
-          {
-            submissionId: 1,
-            studentName: 'John Doe',
-            decision: 'pass',
-            comment: 'Good work',
-            reviewedAt: new Date('2026-01-10'),
-            uploadedAt: new Date('2026-01-08'),
-          },
-        ]).then(onfulfilled),
-      );
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 1 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              submissionId: 1,
+              studentName: 'John Doe',
+              decision: 'pass',
+              comment: 'Good work',
+              reviewedAt: new Date('2026-01-10'),
+              uploadedAt: new Date('2026-01-08'),
+            },
+          ]).then(onfulfilled),
+        );
 
       const result = await exportReviewHistoryCsvHandler({ data: { assignmentId: 1 } });
       expect(typeof result).toBe('string');
@@ -361,6 +386,9 @@ describe('CSV Export Handlers', () => {
 
     it('should return headers only when no reviews', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 1 }]).then(onfulfilled),
+      );
       const result = await exportReviewHistoryCsvHandler({ data: { assignmentId: 1 } });
       expect(typeof result).toBe('string');
       const csv = result as string;
@@ -369,6 +397,18 @@ describe('CSV Export Handlers', () => {
         'Submission ID,Student,Decision,Comment,Reviewed At,Response Time (Hours)',
       );
       expect(lines).toHaveLength(1);
+    });
+
+    it('should reject if assignment does not belong to instructor', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      // Ownership check returns empty (assignment not found or not owned)
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = await exportReviewHistoryCsvHandler({ data: { assignmentId: 999 } });
+      expect(isServerError(result)).toBe(true);
+      if (isServerError(result)) expect(result.error.code).toBe('NOT_FOUND');
     });
   });
 });

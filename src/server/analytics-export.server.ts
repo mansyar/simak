@@ -10,7 +10,7 @@ import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '@/lib/types';
 
 export type ExportUsersCsvInput = Record<string, never>;
-export type ExportAuditLogCsvInput = { dateFrom?: string; dateTo?: string };
+export type ExportAuditLogCsvInput = { dateFrom?: Date; dateTo?: Date };
 export type ExportAssignmentProgressCsvInput = Record<string, never>;
 export type ExportStudentProgressCsvInput = { assignmentId: number };
 export type ExportReviewHistoryCsvInput = { assignmentId: number };
@@ -25,11 +25,13 @@ function isInstructor(session: NonNullableSession | null): session is NonNullabl
 
 function escapeCsvValue(value: unknown): string {
   if (value === null || value === undefined) return '';
+  // Prefix formula-triggering characters to prevent CSV injection (CWE-1236)
   const str = String(value);
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-    return `"${str.replace(/"/g, '""')}"`;
+  const sanitized = /^[=+\-@\t\r]/.test(str) ? `'${str}` : str;
+  if (sanitized.includes(',') || sanitized.includes('"') || sanitized.includes('\n')) {
+    return `"${sanitized.replace(/"/g, '""')}"`;
   }
-  return str;
+  return sanitized;
 }
 
 function buildCsv(headers: string[], rows: unknown[][]): string {
@@ -264,6 +266,17 @@ export async function exportReviewHistoryCsvHandler({
   const db = getDb();
 
   try {
+    // Ownership check: assignment must belong to this instructor
+    const assignment = await db
+      .select({ id: assignments.id })
+      .from(assignments)
+      .where(and(eq(assignments.id, assignmentId), eq(assignments.instructorId, instructorId)))
+      .limit(1);
+
+    if (!assignment[0]) {
+      return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
+    }
+
     const rows = await db
       .select({
         submissionId: submissions.id,
