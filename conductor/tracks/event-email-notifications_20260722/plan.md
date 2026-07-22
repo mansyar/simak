@@ -94,5 +94,5 @@
     - [x] Verify all new/modified files under 500 lines (`scripts/check-modularity.js`)
     - [x] Fix any issues found and re-run gates until clean
 
-- [ ] Task: Conductor - User Manual Verification 'Quality Gates & Final Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Quality Gates & Final Verification' (Protocol in workflow.md)
 </protect>
