@@ -85,16 +85,16 @@
 
 ## Phase 4: Audit & Regression
 
-- [ ] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 4
-- [ ] Task: Verify all 9 mutation sites have optimistic logic
-    - [ ] Run `grep -r "onMutate" src/` — confirm all 9 mutation hooks have `onMutate` optimistic logic
-    - [ ] Run `grep -r "useMutation" src/` — confirm all 9 mutation sites use `useMutation` (no plain `async`+`useState` patterns remain for these features)
-    - [ ] Verify `src/lib/query-keys.ts` exists and all migrated queries reference factory keys
-- [ ] Task: Run full quality gate suite
-    - [ ] Run `pnpm test:coverage` — confirm all tests pass and coverage ≥80% on all four metrics
-    - [ ] Run `pnpm typecheck` — confirm clean
-    - [ ] Run `pnpm lint` — confirm 0 warnings, 0 errors (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n` — confirm parity
-    - [ ] Verify all files ≤500 lines
+- [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 4
+- [x] Task: Verify all 9 mutation sites have optimistic logic
+    - [x] Run `grep -r "onMutate" src/` — confirm all 9 mutation hooks have `onMutate` optimistic logic
+    - [x] Run `grep -r "useMutation" src/` — confirm all 9 mutation sites use `useMutation` (no plain `async`+`useState` patterns remain for these features)
+    - [x] Verify `src/lib/query-keys.ts` exists and all migrated queries reference factory keys
+- [x] Task: Run full quality gate suite
+    - [x] Run `pnpm test:coverage` — confirm all tests pass and coverage ≥80% on all four metrics
+    - [x] Run `pnpm typecheck` — confirm clean
+    - [x] Run `pnpm lint` — confirm 0 warnings, 0 errors (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n` — confirm parity
+    - [x] Verify all files ≤500 lines
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Audit & Regression' (Protocol in workflow.md)
 </protect>
