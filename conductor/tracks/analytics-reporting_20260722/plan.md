@@ -90,13 +90,13 @@
     - [x] Implement `src/lib/excel-export.ts` — reusable utility: `exportToExcel(data, sheetName, fileName)` using `xlsx.utils.book_new()` + `json_to_sheet()` + `write()` + client-side Blob download
     - [x] Run `pnpm test` and confirm all tests pass
 
-- [ ] Task: Add Excel export buttons to analytics pages
-    - [ ] Write failing tests for Excel export button integration on analytics pages
-    - [ ] Add "Export Excel" button to admin analytics page (`/admin/analytics`) — exports current dashboard data
-    - [ ] Add "Export Excel" button to instructor analytics page (`/instructor/analytics`) — exports current dashboard data
-    - [ ] Add i18n keys to both locales for Excel export button labels
-    - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`
-    - [ ] Run `pnpm test` and confirm all tests pass
+- [x] Task: Add Excel export buttons to analytics pages [8e6286f]
+    - [x] Write failing tests for Excel export button integration on analytics pages
+    - [x] Add "Export Excel" button to admin analytics page (`/admin/analytics`) — exports current dashboard data
+    - [x] Add "Export Excel" button to instructor analytics page (`/instructor/analytics`) — exports current dashboard data
+    - [x] Add i18n keys to both locales for Excel export button labels
+    - [x] Run `pnpm generate:i18n` and `pnpm check:i18n`
+    - [x] Run `pnpm test` and confirm all tests pass
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Excel Export' (Protocol in workflow.md)
 
