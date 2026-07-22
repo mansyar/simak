@@ -74,4 +74,8 @@
 - **Commit SHA:** `51cb05d6ed37114f9980a5ca79b85c4a53bdde40`
 - **Commit message:** `refactor(assignments): convert useEffect fetches to useQuery, add templateKeys`
 - **Git notes:** Attached with summary of changes, tests, and quality gate results
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 03e0e30
 </protect>
