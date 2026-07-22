@@ -1,6 +1,6 @@
 # Implementation Plan: TypeScript 7 Upgrade
 
-## Phase 1: Pre-Upgrade Preparation
+## Phase 1: Pre-Upgrade Preparation [checkpoint: 2fa7fc1]
 
 - [x] Task: Update `conductor/tech-stack.md` with TypeScript 7 changelog entry `ffe5aa8`
     - [x] Add a dated changelog entry (2026-07-23) noting the upgrade from TS 5.8 → TS 7.0, the removal of `baseUrl`, and the addition of `--checkers` to the typecheck gate
@@ -15,7 +15,7 @@
     - [x] Attach git note with baseline measurement
     - [x] Record commit SHA in plan.md and mark task complete
 
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Pre-Upgrade Preparation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Pre-Upgrade Preparation' (Protocol in workflow.md)
 
 ## Phase 2: Configuration & Package Upgrade
 
