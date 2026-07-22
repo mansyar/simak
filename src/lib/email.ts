@@ -6,7 +6,19 @@ import { users } from '@/db/schema/users';
 import { resolveEmailSubject } from './i18n-server';
 import type { Locales } from '../i18n/types';
 
-export type TemplateType = 'password_reset' | 'invitation' | 'sla_alert' | 'two_factor';
+export type TemplateType =
+  | 'password_reset'
+  | 'invitation'
+  | 'sla_alert'
+  | 'two_factor'
+  | 'submission_received'
+  | 'review_completed'
+  | 'revision_requested'
+  | 'consultation_verified'
+  | 'consultation_rejected'
+  | 'extension_approved'
+  | 'extension_rejected'
+  | 'extension_requested';
 
 async function getUserLocaleByEmail(email: string): Promise<Locales> {
   try {
