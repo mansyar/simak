@@ -86,13 +86,35 @@ export function useAssignmentTabs(assignmentId: number | null) {
       if ('error' in result) throw result;
       return result;
     },
+    onMutate: async (vars: { requestId: number; comment?: string }) => {
+      await queryClient.cancelQueries({ queryKey: extensionKeys.all() });
+      const previousEntries = queryClient.getQueriesData({ queryKey: extensionKeys.all() });
+      queryClient.setQueriesData({ queryKey: extensionKeys.all() }, (old: unknown) => {
+        if (old && typeof old === 'object' && 'items' in old) {
+          return {
+            items: (old as { items: { id: number }[] }).items.filter(
+              (i) => i.id !== vars.requestId,
+            ),
+          };
+        }
+        return old;
+      });
+      return { previousEntries };
+    },
     onSuccess: () => {
       showSuccessToast(t('extensions.approveSuccess'));
-      queryClient.invalidateQueries({ queryKey: extensionKeys.all() });
     },
-    onError: (error: unknown) => {
+    onError: (error: unknown, _vars, context) => {
+      if (context?.previousEntries) {
+        for (const [queryKey, data] of context.previousEntries) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
       const parsed = parseServerError(error);
       showErrorToast(parsed.code, t);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: extensionKeys.all() });
     },
   });
 

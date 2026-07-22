@@ -169,7 +169,7 @@ describe('useAssignmentTabs', () => {
     });
   });
 
-  it('approveExtensionHandler does not refresh and toasts server error', async () => {
+  it('approveExtensionHandler toasts server error and restores queue on error', async () => {
     mockApproveExtension.mockResolvedValue({ error: { code: 'FORBIDDEN', message: 'Forbidden' } });
     mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
 
@@ -186,9 +186,28 @@ describe('useAssignmentTabs', () => {
     await waitFor(() => {
       expect(mockApproveExtension).toHaveBeenCalledTimes(1);
       expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
     });
-    // Only the initial mount fetch should have occurred — no second refresh
-    expect(mockListExtensionRequests).toHaveBeenCalledTimes(1);
+  });
+
+  it('should optimistically remove the extension from the pending queue', async () => {
+    mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
+    mockApproveExtension.mockReturnValue(new Promise(() => {}));
+
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(42));
+
+    await waitFor(() => {
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
+    });
+
+    await act(async () => {
+      result.current.handleApproveExtension(7, 'looks fine');
+    });
+
+    const cache = queryClient.getQueryData<{ items: (typeof fakeExtension)[] }>(
+      extensionKeys.pending(42),
+    );
+    expect(cache?.items).toEqual([]);
   });
 
   it('rejectExtensionHandler calls the server with the reason and refreshes on success', async () => {
