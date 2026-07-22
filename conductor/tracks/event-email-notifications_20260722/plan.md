@@ -49,7 +49,7 @@
     - [x] Implement post-commit advisory `enqueueEmail` call (after transaction, `try/catch` with `console.error`)
     - [x] Verify tests pass
 
-- [ ] Task: Wire `enqueueEmail` in `submitReviewHandler` (`reviews.server.ts`)
+- [x] Task: Wire `enqueueEmail` in `submitReviewHandler` (`reviews.server.ts`) [5319784]
     - [ ] Write tests for `review_completed` (pass decision) path — student recipient, subject `[SIMAK] Review Completed`, `template_type` `review_completed`
     - [ ] Write tests for `revision_requested` (revise decision) path — student recipient, subject `[SIMAK] Revision Requested`, `template_type` `revision_requested`
     - [ ] Write advisory-only failure test (review succeeds when enqueue throws)
