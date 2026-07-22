@@ -41,7 +41,7 @@
     - [ ] Implement `src/server/analytics-instructor.server.ts` — instructor-scoped queries: reviews completed, avg response time (`AVG(EXTRACT(EPOCH FROM reviewedAt - uploadedAt))`), SLA breach count, students supervised, assignments active
     - [ ] Run `pnpm test` and confirm all tests pass
 
-- [ ] Task: Create instructor analytics route and UI
+- [x] Task: Create instructor analytics route and UI [9942b41]
     - [ ] Write failing tests in `tests/unit/routes/instructor-analytics.test.tsx` for route component — test MetricCard rendering, data table rendering, date range filter UI, sidebar entry
     - [ ] Implement `src/routes/_authenticated/instructor/analytics.tsx` — same URL search params pattern, MetricCard grid (5 metrics), data tables, date range selector
     - [ ] Add instructor sidebar entry with BarChart3 icon linking to `/instructor/analytics`
