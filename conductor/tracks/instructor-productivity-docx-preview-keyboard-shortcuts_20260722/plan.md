@@ -127,15 +127,15 @@
 
 ## Phase 4: Final Verification & Quality Gates
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
-    - [ ] Re-read the track specification for phase-specific requirements
-    - [ ] Re-read workflow rules (TDD, commit format, coverage thresholds)
-- [ ] Task: Run full quality gate suite and verify all pass
-    - [ ] `pnpm test:coverage` — all tests pass, coverage >= 80% on lines/statements/branches/functions
-    - [ ] `pnpm typecheck` — `tsc --noEmit --incremental` passes
-    - [ ] `pnpm lint` — `oxlint .` passes (including `simak-i18n/no-hardcoded` rule)
-    - [ ] `pnpm check:i18n` — EN<->ID key parity, no new unused keys
-    - [ ] Verify no file in `src/`, `tests/`, or `scripts/` exceeds 500 lines
-    - [ ] Verify `mammoth` is dynamically imported (grep build output for `mammoth` in main client chunk -> should only appear in a lazy-loaded chunk)
-- [ ] Task: Conductor - User Manual Verification 'Final Verification & Quality Gates' (Protocol in workflow.md)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
+    - [x] Re-read the track specification for phase-specific requirements
+    - [x] Re-read workflow rules (TDD, commit format, coverage thresholds)
+- [x] Task: Run full quality gate suite and verify all pass
+    - [x] `pnpm test:coverage` — all tests pass, coverage >= 80% on lines/statements/branches/functions
+    - [x] `pnpm typecheck` — `tsc --noEmit --incremental` passes
+    - [x] `pnpm lint` — `oxlint .` passes (including `simak-i18n/no-hardcoded` rule)
+    - [x] `pnpm check:i18n` — EN<->ID key parity, no new unused keys
+    - [x] Verify no file in `src/`, `tests/`, or `scripts/` exceeds 500 lines
+    - [x] Verify `mammoth` is dynamically imported (grep build output for `mammoth` in main client chunk -> should only appear in a lazy-loaded chunk)
+- [x] Task: Conductor - User Manual Verification 'Final Verification & Quality Gates' (Protocol in workflow.md)
 </protect>
