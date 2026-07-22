@@ -125,7 +125,7 @@
     - [x] Add `defaultPreload: false` to the `createRouter({ ... })` options for clarity (prevents over-prefetching on the landing page)
 - [x] Task: Conductor - User Manual Verification 'Route Prefetch' (Protocol in workflow.md)
 
-## Phase 4: Final Verification & Quality Gates
+## Phase 4: Final Verification & Quality Gates [checkpoint: 4436555]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
     - [x] Re-read the track specification for phase-specific requirements
