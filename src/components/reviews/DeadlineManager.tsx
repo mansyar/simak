@@ -84,8 +84,11 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       const result = await (
         unlockCheckpoint as unknown as (args: {
           data: { checkpointId: number };
-        }) => Promise<unknown>
+        }) => Promise<{ success: boolean; error: string | null }>
       )({ data: { checkpointId } });
+      if (!result.success) {
+        throw new Error(result.error ?? 'Unlock failed');
+      }
       return result;
     },
     onMutate: async (checkpointId: number) => {
@@ -134,8 +137,11 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       const result = await (
         extendDeadline as unknown as (args: {
           data: { checkpointId: number; newDueDate: Date };
-        }) => Promise<unknown>
+        }) => Promise<{ success: boolean; error: string | null }>
       )({ data: { checkpointId, newDueDate } });
+      if (!result.success) {
+        throw new Error(result.error ?? 'Extend failed');
+      }
       return result;
     },
     onMutate: async ({ checkpointId, newDueDate }) => {

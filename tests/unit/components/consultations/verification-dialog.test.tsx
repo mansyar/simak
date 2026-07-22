@@ -116,8 +116,11 @@ describe('VerificationDialog', () => {
     );
   }
 
-  const findBtn = (text: string) =>
-    screen.getAllByTestId('dialog-btn').find((b) => b.textContent === text)!;
+  const findBtn = (text: string) => {
+    const b = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === text);
+    if (!b) throw new Error(`Button "${text}" not found`);
+    return b;
+  };
 
   async function resolveDetail(detail = mockDetail) {
     const mod = await import('@/server/consultations');
@@ -193,7 +196,6 @@ describe('VerificationDialog', () => {
     await resolveDetail();
     renderDialog();
     await loadDetail();
-
     expect(findBtn('Verify')).toBeDefined();
     expect(findBtn('Reject')).toBeDefined();
   });
@@ -205,7 +207,6 @@ describe('VerificationDialog', () => {
 
     renderDialog();
     await loadDetail();
-
     fireEvent.click(findBtn('Verify'));
 
     await vi.waitFor(() => {
