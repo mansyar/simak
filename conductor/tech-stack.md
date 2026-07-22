@@ -19,6 +19,7 @@
 | **Forms**      | React Hook Form + Zod | Performant forms with Zod validation resolver                   |
 | **i18n**       | typesafe-i18n         | Type-safe translations with compile-time checks                 |
 | **Client-Side XLSX** | SheetJS (`xlsx`) | Client-side .xlsx parsing + sample-file generation |
+| **DOCX Preview**     | mammoth.js           | `.docx` → HTML conversion, ~30KB gzipped, lazy-loaded via dynamic `import()` |
 
 ## Backend & Data
 
@@ -54,5 +55,9 @@
 - pnpm >= 9
 - PostgreSQL >= 16
 - Docker (for local dev and production build)
+
+## Changelog
+
+- **2026-07-22:** Added `mammoth.js` for client-side `.docx` → HTML conversion on the instructor review detail page. Lazy-loaded via dynamic `import('mammoth')` to keep it out of the main client bundle. Used in `ReviewFilePreview` component (TRACK-017).
 
 </protect>
