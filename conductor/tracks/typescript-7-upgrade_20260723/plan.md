@@ -2,11 +2,11 @@
 
 ## Phase 1: Pre-Upgrade Preparation
 
-- [ ] Task: Update `conductor/tech-stack.md` with TypeScript 7 changelog entry
-    - [ ] Add a dated changelog entry (2026-07-23) noting the upgrade from TS 5.8 → TS 7.0, the removal of `baseUrl`, and the addition of `--checkers` to the typecheck gate
-    - [ ] Commit: `docs(tech-stack): Document TypeScript 7 upgrade`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md and mark task complete
+- [x] Task: Update `conductor/tech-stack.md` with TypeScript 7 changelog entry `ffe5aa8`
+    - [x] Add a dated changelog entry (2026-07-23) noting the upgrade from TS 5.8 → TS 7.0, the removal of `baseUrl`, and the addition of `--checkers` to the typecheck gate
+    - [x] Commit: `docs(tech-stack): Document TypeScript 7 upgrade`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md and mark task complete
 
 - [ ] Task: Measure and record baseline typecheck performance
     - [ ] Run `pnpm typecheck` under TS 5.8 and record wall-clock time (run 3 times, take median)
