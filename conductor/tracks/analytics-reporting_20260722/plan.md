@@ -16,13 +16,13 @@
     - [x] Implement `src/server/analytics-admin.server.ts` — aggregate queries: consultation verification rate, deadline breach rate, assignment status distribution (`GROUP BY state`), submission/review volume (`date_trunc` + `GROUP BY`), reviews completed count, DAU/WAU (`COUNT(DISTINCT actorId) GROUP BY date_trunc` from `audit_log`)
     - [x] Run `pnpm test` and confirm all tests pass
 
-- [~] Task: Create admin analytics route and UI
-    - [ ] Write failing tests in `tests/unit/routes/admin-analytics.test.tsx` for route component — test MetricCard rendering, data table rendering, date range filter UI, sidebar entry
-    - [ ] Implement `src/routes/_authenticated/admin/analytics.tsx` — URL search params (`?range=30d` or `?start=...&end=...`), `validateSearch`/`loaderDeps`/`loader`, MetricCard grid (6 metrics), data tables for trends, progress bars for distribution, date range selector (predefined buttons + custom date picker)
-    - [ ] Add admin sidebar entry with BarChart3 icon linking to `/admin/analytics`
-    - [ ] Add i18n keys to `locales/en.json` and `locales/id.json` for all admin analytics labels, metric names, date range labels, table headers
-    - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`
-    - [ ] Run `pnpm test` and confirm all tests pass
+- [x] Task: Create admin analytics route and UI [7b3e414]
+    - [x] Write failing tests in `tests/unit/routes/admin-analytics.test.tsx` for route component — test MetricCard rendering, data table rendering, date range filter UI, sidebar entry
+    - [x] Implement `src/routes/_authenticated/admin/analytics.tsx` — URL search params (`?range=30d` or `?start=...&end=...`), `validateSearch`/`loaderDeps`/`loader`, MetricCard grid (6 metrics), data tables for trends, progress bars for distribution, date range selector (predefined buttons + custom date picker)
+    - [x] Add admin sidebar entry with BarChart3 icon linking to `/admin/analytics`
+    - [x] Add i18n keys to `locales/en.json` and `locales/id.json` for all admin analytics labels, metric names, date range labels, table headers
+    - [x] Run `pnpm generate:i18n` and `pnpm check:i18n`
+    - [x] Run `pnpm test` and confirm all tests pass
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Admin Analytics Dashboard' (Protocol in workflow.md)
 
