@@ -234,7 +234,7 @@ describe('useAssignmentTabs', () => {
     });
   });
 
-  it('rejectExtensionHandler does not refresh and toasts server error', async () => {
+  it('rejectExtensionHandler toasts server error and restores queue on error', async () => {
     mockRejectExtension.mockResolvedValue({ error: { code: 'FORBIDDEN', message: 'Forbidden' } });
     mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
 
@@ -251,8 +251,28 @@ describe('useAssignmentTabs', () => {
     await waitFor(() => {
       expect(mockRejectExtension).toHaveBeenCalledTimes(1);
       expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
     });
-    expect(mockListExtensionRequests).toHaveBeenCalledTimes(1);
+  });
+
+  it('should optimistically remove the extension from the queue on reject', async () => {
+    mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
+    mockRejectExtension.mockReturnValue(new Promise(() => {}));
+
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(42));
+
+    await waitFor(() => {
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
+    });
+
+    await act(async () => {
+      result.current.handleRejectExtension(7, 'reason is too short');
+    });
+
+    const cache = queryClient.getQueryData<{ items: (typeof fakeExtension)[] }>(
+      extensionKeys.pending(42),
+    );
+    expect(cache?.items).toEqual([]);
   });
 
   it('exposes setPendingConsultations for parent components to update the queue', async () => {
