@@ -3,13 +3,13 @@
 
 ## Phase 1: Admin Analytics Dashboard
 
-- [ ] Task: Read spec.md and workflow.md to refresh context
-    - [ ] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read spec.md and workflow.md to refresh context
+    - [x] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Create analytics server stubs and Zod schemas
-    - [ ] Create `src/server/analytics.ts` with Zod input schemas (date range: predefined `7d|30d|90d|all` + custom `start`/`end` ISO dates) and `createServerFn` stub for `getAdminAnalyticsData` (dynamic import to `analytics-admin.server.ts`)
-    - [ ] Write tests in `tests/unit/server/analytics.test.ts` for Zod schemas (valid/invalid date ranges, predefined + custom) and stub existence
+- [x] Task: Create analytics server stubs and Zod schemas [8941d71]
+    - [x] Create `src/server/analytics.ts` with Zod input schemas (date range: predefined `7d|30d|90d|all` + custom `start`/`end` ISO dates) and `createServerFn` stub for `getAdminAnalyticsData` (dynamic import to `analytics-admin.server.ts`)
+    - [x] Write tests in `tests/unit/server/analytics.test.ts` for Zod schemas (valid/invalid date ranges, predefined + custom) and stub existence
 
 - [ ] Task: Implement admin analytics handler (TDD)
     - [ ] Write failing tests in `tests/unit/server/analytics-admin.test.ts` for `getAdminAnalyticsDataHandler` — mock `@/db/index`, `@/server/auth`; test all 6 metrics (consultation verification rate, deadline breach rate, assignment status distribution, submission/review volume, reviews completed, DAU/WAU); test date range filtering (7d/30d/90d/all + custom); test role guard (non-admin rejected)
