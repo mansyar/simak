@@ -4,3 +4,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: UI Hygiene & Tech-Debt Quick Wins**
+*Link: [./tracks/ui-hygiene-tech-debt-quick-wins_20260722/](./tracks/ui-hygiene-tech-debt-quick-wins_20260722/)*
+
