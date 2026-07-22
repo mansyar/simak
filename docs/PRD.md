@@ -209,9 +209,9 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 ### Landing Page
 
-- Public-facing landing page at `/` with 4 sections: Hero (headline, subtitle, CTA → `/auth/login`), Features Grid (2×3 responsive with lucide-react icons), How It Works (3-step flow), and Footer (with login, about, contact links + copyright).
+- Public-facing landing page at `/` with 4 sections: Hero (headline, subtitle, CTA → `/auth/login`), Features Grid (2×3 responsive with lucide-react icons), How It Works (3-step flow), and Footer (login link + "About" anchor scrolling to `#how-it-works`, and a dynamic copyright rendered via the `landing.footer.copyright` i18n key with `{year}` interpolation).
 - CSS-only decorative elements (gradient blobs, no images).
-- All text bilingual via `t()` translation keys (`landing.*` namespace).
+- All text bilingual via `t()` translation keys (`landing.*` namespace). The footer copyright uses `t('landing.footer.copyright', { year: String(new Date().getFullYear()) })` — no hardcoded year or English text.
 - No new dependencies — uses existing Tailwind + lucide-react.
 - Responsive: mobile-first with `sm`/`lg` breakpoints.
 
