@@ -24,7 +24,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Admins can bulk import users and assignment templates via Excel (.xlsx) files with client-side preview and server-side re-validation.
 - Both students and instructors can view and download previously submitted checkpoint files.
 - Consultation sessions (Kartu Bimbingan) are tracked as a requirement for assignment completion.
-- Admins can view audit logs via the viewer at `/admin/audit-log`. System-wide analytics dashboards are `[v2]`.
+- Admins can view audit logs via the viewer at `/admin/audit-log` and system-wide analytics dashboards at `/admin/analytics`.
 - Students and instructors can request and manage deadline extensions via a configurable approval workflow.
 - Users can enable two-factor authentication (TOTP) for enhanced account security.
 - Assignment templates include estimated duration per checkpoint, allowing auto-calculation of checkpoint dueDates during assignment creation.
@@ -177,12 +177,14 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - **2FA Disable Transaction Safety:** When a user disables 2FA, the DB operations (set `users.twoFactorEnabled = false` and delete the `two_factor` row) are wrapped in a single `db.transaction`. The Better Auth API call (`auth.api.disableTwoFactor`) is invoked **after** the transaction commits as post-commit advisory work in a try/catch — if the API call fails, the DB state is already durable and the system reconciles on the user's next login by checking the DB flag. This follows the SQL styleguide §6.4 pattern for post-commit advisory work.
 - The active sessions list filters out expired sessions automatically.
 
-### Analytics & Reporting `[v2]`
+### Analytics & Reporting
 
-- Role-based analytics dashboards showing progress metrics, completion rates, and engagement data.
-- Reports can be generated on demand or scheduled for recurring delivery.
-- Export formats: PDF, CSV, Excel, JSON.
-- Instructor performance metrics (response times, satisfaction).
+- **Role-based analytics dashboards** (admin + instructor) showing historical trends and metrics that are NOT duplicated on the real-time operational dashboards. URL search params drive the date range (`?range=7d|30d|90d|all`) with optional custom start/end support. Shareable, back/forward-navigable URLs.
+  - **Admin analytics** (`/admin/analytics?range=30d`, admin/superadmin only): consultation verification rate (verified/total), deadline breach rate (checkpoints past due and not passed), assignment status distribution by checkpoint state, submission/review volume trends over time, reviews completed count, and daily/weekly active users (DAU/WAU).
+  - **Instructor analytics** (`/instructor/analytics?range=30d`, instructor only): reviews completed, average response time (`EXTRACT(EPOCH FROM reviewedAt - uploadedAt)`), SLA breach count (reviews exceeding the 3-day SLA), students supervised, assignments active.
+- **Report export:** On-demand CSV export (server function returns a CSV string → client `Blob` download) for the admin user list, audit log (with date filtering), and assignment progress; instructor student-progress and review-history CSVs (with ownership checks). Client-side Excel (`.xlsx`) export via SheetJS on the analytics pages — reuses the existing `xlsx` dependency (no new dependency). CSV cell values are sanitized against formula injection (cells starting with `=`, `+`, `-`, `@`, TAB, or CR are prefixed with `'`).
+- No new database tables — all metrics derive from aggregate queries (`GROUP BY`, `date_trunc`) over existing tables.
+- `[v2]` (deferred): PDF export (requires a rendering library), scheduled/recurring report delivery (requires cron infrastructure), notification preferences.
 
 ### File Management
 
