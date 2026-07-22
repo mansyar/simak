@@ -1,3 +1,4 @@
+<protect>
 # Specification: TRACK-018 — Event Email Notifications
 
 ## Overview
@@ -152,3 +153,4 @@ All new code must meet ≥80% coverage on lines, statements, branches, and funct
 - **Changes to the email queue processor** — already production-hardened.
 - **Migration of existing auth email templates** (invitation, password reset, SLA alert) to `email-templates.ts` — they stay in `email.ts`.
 - **`consultation_logged` email** — only `consultation_verified` and `consultation_rejected` get emails (matching the current in-app notification scope for instructor-facing consultation events).
+</protect>

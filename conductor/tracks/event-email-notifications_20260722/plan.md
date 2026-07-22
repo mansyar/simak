@@ -1,6 +1,11 @@
+<protect>
 # Implementation Plan: TRACK-018 — Event Email Notifications
 
 ## Phase 1: Foundation — Templates, Schema & i18n
+
+- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [ ] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
+    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
 - [ ] Task: Create email template builder module (`src/lib/email-templates.ts`)
     - [ ] Write unit tests for shared `buildEmailHeader(locale)` and `buildEmailFooter(locale)` helpers (SIMAK branding, HTML structure)
@@ -27,6 +32,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Foundation — Templates, Schema & i18n' (Protocol in workflow.md)
 
 ## Phase 2: Recipient Resolution & Handler Wiring
+
+- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [ ] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
+    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
 - [ ] Task: Create recipient resolution helper
     - [ ] Write unit tests for `resolveEmailRecipient(userId)` — returns `{ email, locale }` from DB, returns `null` when user is soft-deleted, returns `null` when `emailVerified` is null/false, defaults locale to `'en'` when null/unsupported
@@ -73,6 +82,10 @@
 
 ## Phase 3: Quality Gates & Final Verification
 
+- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [ ] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
+    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+
 - [ ] Task: Run full quality gate suite and fix issues
     - [ ] Run `pnpm test:coverage` — verify ≥80% on lines, statements, branches, and functions
     - [ ] Run `pnpm typecheck` — verify no type errors
@@ -82,3 +95,4 @@
     - [ ] Fix any issues found and re-run gates until clean
 
 - [ ] Task: Conductor - User Manual Verification 'Quality Gates & Final Verification' (Protocol in workflow.md)
+</protect>
