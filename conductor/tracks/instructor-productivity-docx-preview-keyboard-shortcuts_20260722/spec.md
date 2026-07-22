@@ -1,3 +1,4 @@
+<protect>
 # Track TRACK-017: Instructor Productivity: DOCX Preview & Keyboard Shortcuts
 
 ## Overview
@@ -77,3 +78,4 @@ Enhance instructor review productivity with three improvements: (1) inline DOCX 
 - Customizable/remappable shortcuts (fixed bindings: R, ?, J, K)
 - Prefetching on the public landing page
 - Customizable size guard threshold (fixed at 10MB)
+</protect>

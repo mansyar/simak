@@ -1,7 +1,11 @@
+<protect>
 # Implementation Plan: TRACK-017 — Instructor Productivity: DOCX Preview & Keyboard Shortcuts
 
 ## Phase 0: Tech Stack Update & Dependency Setup
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
+    - [ ] Re-read the track specification for phase-specific requirements
+    - [ ] Re-read workflow rules (TDD, commit format, coverage thresholds)
 - [ ] Task: Add `mammoth` to `conductor/tech-stack.md`
     - [ ] Add entry under Frontend table: `mammoth` — `.docx` -> HTML conversion, ~30KB gzipped, lazy-loaded via dynamic `import()`
     - [ ] Add dated note explaining the new dependency
@@ -12,6 +16,9 @@
 
 ## Phase 1: DOCX Inline Preview (ENH-UX-2)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
+    - [ ] Re-read the track specification for phase-specific requirements
+    - [ ] Re-read workflow rules (TDD, commit format, coverage thresholds)
 - [ ] Task: Write failing tests for DOCX preview in `ReviewFilePreview`
     - [ ] Create/update `tests/unit/components/reviews/review-file-preview.test.tsx`
     - [ ] Test: `.docx` file < 10MB triggers `mammoth.convertToHtml` with the fetched arrayBuffer
@@ -36,6 +43,9 @@
 
 ## Phase 2: Keyboard Shortcuts — Two-Layer Architecture (ENH-UX-3)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
+    - [ ] Re-read the track specification for phase-specific requirements
+    - [ ] Re-read workflow rules (TDD, commit format, coverage thresholds)
 - [ ] Task: Write failing tests for `useKeyboardShortcuts` global hook
     - [ ] Create `tests/unit/hooks/use-keyboard-shortcuts.test.tsx`
     - [ ] Test: pressing `R` calls `queryClient.invalidateQueries()`
@@ -98,6 +108,9 @@
 
 ## Phase 3: Route Prefetch (ENH-PERF-2)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
+    - [ ] Re-read the track specification for phase-specific requirements
+    - [ ] Re-read workflow rules (TDD, commit format, coverage thresholds)
 - [ ] Task: Write failing tests for `preload="intent"` on sidebar links
     - [ ] Create/update `tests/unit/components/layout/admin-sidebar.test.tsx`
     - [ ] Create/update `tests/unit/components/layout/instructor-sidebar.test.tsx`
@@ -115,6 +128,9 @@
 
 ## Phase 4: Final Verification & Quality Gates
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
+    - [ ] Re-read the track specification for phase-specific requirements
+    - [ ] Re-read workflow rules (TDD, commit format, coverage thresholds)
 - [ ] Task: Run full quality gate suite and verify all pass
     - [ ] `pnpm test:coverage` — all tests pass, coverage >= 80% on lines/statements/branches/functions
     - [ ] `pnpm typecheck` — `tsc --noEmit --incremental` passes
@@ -123,3 +139,4 @@
     - [ ] Verify no file in `src/`, `tests/`, or `scripts/` exceeds 500 lines
     - [ ] Verify `mammoth` is dynamically imported (grep build output for `mammoth` in main client chunk -> should only appear in a lazy-loaded chunk)
 - [ ] Task: Conductor - User Manual Verification 'Final Verification & Quality Gates' (Protocol in workflow.md)
+</protect>
