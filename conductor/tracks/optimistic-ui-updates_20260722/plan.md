@@ -64,7 +64,7 @@
     - [x] Write failing tests — verify `onMutate` removes from pending extension queue optimistically; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
     - [x] Implement `onMutate`/`onError`/`onSettled` in `rejectExtension` mutation
     - [x] Run `pnpm test` — confirm tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Consultation & Extension Hooks Optimistic Updates' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Consultation & Extension Hooks Optimistic Updates' (Protocol in workflow.md)
 
 ## Phase 3: Deadline & User Hooks Optimistic Updates
 
