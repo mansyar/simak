@@ -37,3 +37,10 @@ export const getAdminAnalyticsData = createServerFn({ method: 'GET' })
     const { getAdminAnalyticsDataHandler } = await import('./analytics-admin.server');
     return getAdminAnalyticsDataHandler({ data });
   });
+
+export const getInstructorAnalyticsData = createServerFn({ method: 'GET' })
+  .inputValidator(AnalyticsDateRangeSchema)
+  .handler(async ({ data }) => {
+    const { getInstructorAnalyticsDataHandler } = await import('./analytics-instructor.server');
+    return getInstructorAnalyticsDataHandler({ data });
+  });

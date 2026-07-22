@@ -96,5 +96,11 @@ describe('Analytics Schemas', () => {
       expect(getAdminAnalyticsData).toBeDefined();
       expect(typeof getAdminAnalyticsData).toBe('function');
     });
+
+    it('should export getInstructorAnalyticsData function', async () => {
+      const { getInstructorAnalyticsData } = await import('@/server/analytics');
+      expect(getInstructorAnalyticsData).toBeDefined();
+      expect(typeof getInstructorAnalyticsData).toBe('function');
+    });
   });
 });
