@@ -105,7 +105,7 @@
 - [x] Task: Run `pnpm generate:i18n` to regenerate i18n types
 - [x] Task: Conductor - User Manual Verification 'Keyboard Shortcuts' (Protocol in workflow.md)
 
-## Phase 3: Route Prefetch (ENH-PERF-2)
+## Phase 3: Route Prefetch (ENH-PERF-2) [checkpoint: afd93ff]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
     - [x] Re-read the track specification for phase-specific requirements
