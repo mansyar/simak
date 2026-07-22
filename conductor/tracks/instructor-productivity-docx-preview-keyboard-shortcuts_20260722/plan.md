@@ -39,7 +39,7 @@
     - [x] On conversion error, fall back to existing "Preview not available" card
     - [x] Keep PDF `<embed>` path and download button unchanged
 - [x] Task: Run `pnpm generate:i18n` to regenerate i18n types `fe787e7`
-- [ ] Task: Conductor - User Manual Verification 'DOCX Inline Preview' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'DOCX Inline Preview' (Protocol in workflow.md)
 
 ## Phase 2: Keyboard Shortcuts — Two-Layer Architecture (ENH-UX-3)
 
