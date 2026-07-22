@@ -32,6 +32,31 @@ async function getUserLocaleByEmail(email: string): Promise<Locales> {
   }
 }
 
+export async function resolveEmailRecipient(
+  userId: string,
+): Promise<{ email: string; locale: Locales } | null> {
+  try {
+    const [user] = await getDb()
+      .select({
+        email: users.email,
+        locale: users.locale,
+        emailVerified: users.emailVerified,
+        deletedAt: users.deletedAt,
+      })
+      .from(users)
+      .where(eq(users.id, userId));
+
+    if (!user) return null;
+    if (user.deletedAt !== null) return null;
+    if (!user.emailVerified) return null;
+
+    const locale: Locales = user.locale === 'en' || user.locale === 'id' ? user.locale : 'en';
+    return { email: user.email, locale };
+  } catch {
+    return null;
+  }
+}
+
 export function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')

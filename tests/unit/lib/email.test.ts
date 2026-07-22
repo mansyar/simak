@@ -4,6 +4,7 @@ import {
   sendPasswordResetEmail,
   sendSLAAlertEmail,
   escapeHtml,
+  resolveEmailRecipient,
 } from '@/lib/email';
 import { getEnv } from '@/config/env';
 import { getDb } from '@/db/index';
@@ -301,6 +302,106 @@ describe('Email library', () => {
       expect(mockDb.values.mock.calls[0][0].subject).toBe(
         'Peringatan Pelanggaran SLA — Final Project',
       );
+    });
+  });
+
+  describe('resolveEmailRecipient', () => {
+    it('returns { email, locale } for a valid, verified, non-deleted user', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { email: 'user@example.com', locale: 'id', emailVerified: true, deletedAt: null },
+        ]).then(fn),
+      );
+
+      const result = await resolveEmailRecipient('user-1');
+      expect(result).toEqual({ email: 'user@example.com', locale: 'id' });
+    });
+
+    it('defaults locale to "en" when locale is null', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { email: 'user@example.com', locale: null, emailVerified: true, deletedAt: null },
+        ]).then(fn),
+      );
+
+      const result = await resolveEmailRecipient('user-1');
+      expect(result).toEqual({ email: 'user@example.com', locale: 'en' });
+    });
+
+    it('defaults locale to "en" when locale is undefined', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { email: 'user@example.com', locale: undefined, emailVerified: true, deletedAt: null },
+        ]).then(fn),
+      );
+
+      const result = await resolveEmailRecipient('user-1');
+      expect(result).toEqual({ email: 'user@example.com', locale: 'en' });
+    });
+
+    it('defaults locale to "en" when locale is unsupported', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { email: 'user@example.com', locale: 'fr', emailVerified: true, deletedAt: null },
+        ]).then(fn),
+      );
+
+      const result = await resolveEmailRecipient('user-1');
+      expect(result).toEqual({ email: 'user@example.com', locale: 'en' });
+    });
+
+    it('returns null when user is soft-deleted (deletedAt is not null)', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          {
+            email: 'user@example.com',
+            locale: 'en',
+            emailVerified: true,
+            deletedAt: new Date('2026-01-01'),
+          },
+        ]).then(fn),
+      );
+
+      const result = await resolveEmailRecipient('user-1');
+      expect(result).toBeNull();
+    });
+
+    it('returns null when emailVerified is null', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { email: 'user@example.com', locale: 'en', emailVerified: null, deletedAt: null },
+        ]).then(fn),
+      );
+
+      const result = await resolveEmailRecipient('user-1');
+      expect(result).toBeNull();
+    });
+
+    it('returns null when emailVerified is false', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { email: 'user@example.com', locale: 'en', emailVerified: false, deletedAt: null },
+        ]).then(fn),
+      );
+
+      const result = await resolveEmailRecipient('user-1');
+      expect(result).toBeNull();
+    });
+
+    it('returns null when user is not found', async () => {
+      mockDb.then.mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
+
+      const result = await resolveEmailRecipient('nonexistent');
+      expect(result).toBeNull();
+    });
+
+    it('returns null when DB query throws', async () => {
+      mockDb.then.mockImplementationOnce(() => {
+        throw new Error('DB error');
+      });
+
+      const result = await resolveEmailRecipient('user-1');
+      expect(result).toBeNull();
     });
   });
 });
