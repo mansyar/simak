@@ -32,7 +32,7 @@
     - [x] Run `pnpm typecheck` — confirm no type errors
 - [x] Task: Conductor - User Manual Verification 'Phase 0: Query-Key Factory + React Query Migration' (Protocol in workflow.md)
 
-## Phase 1: Notification Hooks Optimistic Updates
+## Phase 1: Notification Hooks Optimistic Updates [checkpoint: 5219cbd]
 
 - [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 1
 - [x] Task: Add optimistic updates to `useMarkRead` hook (SHA: 4f9e1ab)
