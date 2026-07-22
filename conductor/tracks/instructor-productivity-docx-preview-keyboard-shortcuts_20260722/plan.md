@@ -107,22 +107,22 @@
 
 ## Phase 3: Route Prefetch (ENH-PERF-2)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
-    - [ ] Re-read the track specification for phase-specific requirements
-    - [ ] Re-read workflow rules (TDD, commit format, coverage thresholds)
-- [ ] Task: Write failing tests for `preload="intent"` on sidebar links
-    - [ ] Create/update `tests/unit/components/layout/admin-sidebar.test.tsx`
-    - [ ] Create/update `tests/unit/components/layout/instructor-sidebar.test.tsx`
-    - [ ] Create/update `tests/unit/components/layout/student-sidebar.test.tsx`
-    - [ ] Test: each `<Link>` in `mainLinks` and `preferenceLinks` has `preload="intent"` attribute
-- [ ] Task: Add `preload="intent"` to all `<Link>` components in `src/components/layout/admin-sidebar.tsx`
-    - [ ] Add `preload="intent"` to both the `mainLinks` map and `preferenceLinks` map `<Link>` elements
-- [ ] Task: Add `preload="intent"` to all `<Link>` components in `src/components/layout/instructor-sidebar.tsx`
-    - [ ] Add `preload="intent"` to both the `mainLinks` map and `preferenceLinks` map `<Link>` elements
-- [ ] Task: Add `preload="intent"` to all `<Link>` components in `src/components/layout/student-sidebar.tsx`
-    - [ ] Add `preload="intent"` to both the `mainLinks` map and `preferenceLinks` map `<Link>` elements
-- [ ] Task: Explicitly set `defaultPreload: false` in `src/router.tsx` router config
-    - [ ] Add `defaultPreload: false` to the `createRouter({ ... })` options for clarity (prevents over-prefetching on the landing page)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
+    - [x] Re-read the track specification for phase-specific requirements
+    - [x] Re-read workflow rules (TDD, commit format, coverage thresholds)
+- [x] Task: Write failing tests for `preload="intent"` on sidebar links `d5f5212`
+    - [x] Create/update `tests/unit/components/admin-sidebar.test.tsx`
+    - [x] Create/update `tests/unit/components/instructor-sidebar.test.tsx`
+    - [x] Create/update `tests/unit/components/student-sidebar.test.tsx`
+    - [x] Test: each `<Link>` in `mainLinks` and `preferenceLinks` has `preload="intent"` attribute
+- [x] Task: Add `preload="intent"` to all `<Link>` components in `src/components/layout/admin-sidebar.tsx` `d5f5212`
+    - [x] Add `preload="intent"` to both the `mainLinks` map and `preferenceLinks` map `<Link>` elements
+- [x] Task: Add `preload="intent"` to all `<Link>` components in `src/components/layout/instructor-sidebar.tsx` `d5f5212`
+    - [x] Add `preload="intent"` to both the `mainLinks` map and `preferenceLinks` map `<Link>` elements
+- [x] Task: Add `preload="intent"` to all `<Link>` components in `src/components/layout/student-sidebar.tsx` `d5f5212`
+    - [x] Add `preload="intent"` to both the `mainLinks` map and `preferenceLinks` map `<Link>` elements
+- [x] Task: Explicitly set `defaultPreload: false` in `src/router.tsx` router config `d5f5212`
+    - [x] Add `defaultPreload: false` to the `createRouter({ ... })` options for clarity (prevents over-prefetching on the landing page)
 - [ ] Task: Conductor - User Manual Verification 'Route Prefetch' (Protocol in workflow.md)
 
 ## Phase 4: Final Verification & Quality Gates
