@@ -194,9 +194,8 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const allBtns = screen.getAllByTestId('dialog-btn');
-    expect(allBtns.find((b) => b.textContent === 'Verify')).toBeDefined();
-    expect(allBtns.find((b) => b.textContent === 'Reject')).toBeDefined();
+    expect(findBtn('Verify')).toBeDefined();
+    expect(findBtn('Reject')).toBeDefined();
   });
 
   it('should call verifyConsultation and onActionComplete on verify', async () => {
@@ -244,33 +243,14 @@ describe('VerificationDialog', () => {
     expect(screen.getByText('Cancel')).toBeDefined();
   });
 
-  it('should disable confirm reject when no reason entered', async () => {
+  it('should toggle confirm reject disabled state based on reason', async () => {
     await resolveDetail();
     renderDialog();
     await loadDetail();
-
     fireEvent.click(findBtn('Reject'));
-
-    const confirmBtn = screen
-      .getAllByTestId('dialog-btn')
-      .find((b) => b.textContent === 'Confirm Reject');
-    expect(confirmBtn).toHaveProperty('disabled', true);
-  });
-
-  it('should enable confirm reject when reason is entered', async () => {
-    await resolveDetail();
-    renderDialog();
-    await loadDetail();
-
-    fireEvent.click(findBtn('Reject'));
-
-    const input = screen.getByTestId('reject-input');
-    fireEvent.change(input, { target: { value: 'Insufficient detail' } });
-
-    const confirmBtn = screen
-      .getAllByTestId('dialog-btn')
-      .find((b) => b.textContent === 'Confirm Reject');
-    expect(confirmBtn).toHaveProperty('disabled', false);
+    expect(findBtn('Confirm Reject')).toHaveProperty('disabled', true);
+    fireEvent.change(screen.getByTestId('reject-input'), { target: { value: 'x' } });
+    expect(findBtn('Confirm Reject')).toHaveProperty('disabled', false);
   });
 
   it('should call rejectConsultation on confirm reject', async () => {
@@ -414,34 +394,26 @@ describe('VerificationDialog', () => {
     });
   });
 
-  describe('verifyConsultation - optimistic updates', () => {
-    const seedData = {
-      consultations: [
-        {
-          id: 42,
-          studentName: 'Alice',
-          checkpointName: 'Proposal',
-          sessionType: 'internal',
-          externalConsultantName: null,
-          notes: null,
-          createdAt: '2026-01-01',
-        },
-        {
-          id: 43,
-          studentName: 'Bob',
-          checkpointName: 'Draft',
-          sessionType: 'internal',
-          externalConsultantName: null,
-          notes: null,
-          createdAt: '2026-01-02',
-        },
-      ],
-      total: 2,
-    };
-
+  describe('optimistic updates', () => {
+    const mk = (id: number) => ({
+      id,
+      studentName: 'A',
+      checkpointName: 'C',
+      sessionType: 'internal',
+      externalConsultantName: null,
+      notes: null,
+      createdAt: '2026-01-01',
+    });
+    const seedData = { consultations: [mk(42), mk(43)], total: 2 };
     const clickVerify = () => fireEvent.click(findBtn('Verify'));
+    const rejectWithReason = () => {
+      fireEvent.click(findBtn('Reject'));
+      fireEvent.change(screen.getByTestId('reject-input'), { target: { value: 'x' } });
+      fireEvent.click(findBtn('Confirm Reject'));
+    };
+    const getCache = () => queryClient.getQueryData<any>(consultationKeys.pending(1, 1));
 
-    it('should optimistically remove the consultation from the pending list', async () => {
+    it('should optimistically remove consultation on verify', async () => {
       await resolveDetail();
       const mod = await import('@/server/consultations');
       (mod.verifyConsultation as any).mockReturnValue(new Promise(() => {}));
@@ -450,16 +422,13 @@ describe('VerificationDialog', () => {
       await loadDetail();
       clickVerify();
       await vi.waitFor(() => {
-        const data = queryClient.getQueryData<{ consultations: any[]; total: number }>(
-          consultationKeys.pending(1, 1),
-        );
-        expect(data?.consultations).toHaveLength(1);
-        expect(data?.consultations[0].id).toBe(43);
-        expect(data?.total).toBe(1);
+        expect(getCache()?.consultations).toHaveLength(1);
+        expect(getCache()?.consultations[0].id).toBe(43);
+        expect(getCache()?.total).toBe(1);
       });
     });
 
-    it('should restore the consultation list on error', async () => {
+    it('should restore consultation list on verify error', async () => {
       await resolveDetail();
       const mod = await import('@/server/consultations');
       (mod.verifyConsultation as any).mockResolvedValue({ error: 'Already verified' });
@@ -468,15 +437,12 @@ describe('VerificationDialog', () => {
       await loadDetail();
       clickVerify();
       await vi.waitFor(() => {
-        const data = queryClient.getQueryData<{ consultations: any[]; total: number }>(
-          consultationKeys.pending(1, 1),
-        );
-        expect(data?.consultations).toHaveLength(2);
-        expect(data?.total).toBe(2);
+        expect(getCache()?.consultations).toHaveLength(2);
+        expect(getCache()?.total).toBe(2);
       });
     });
 
-    it('should show error toast on rollback', async () => {
+    it('should show error toast on verify rollback', async () => {
       await resolveDetail();
       const mod = await import('@/server/consultations');
       (mod.verifyConsultation as any).mockResolvedValue({ error: 'Already verified' });
@@ -485,6 +451,47 @@ describe('VerificationDialog', () => {
       clickVerify();
       await vi.waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith('Already verified');
+      });
+    });
+
+    it('should optimistically remove consultation on reject', async () => {
+      await resolveDetail();
+      const mod = await import('@/server/consultations');
+      (mod.rejectConsultation as any).mockReturnValue(new Promise(() => {}));
+      queryClient.setQueryData(consultationKeys.pending(1, 1), seedData);
+      renderDialog();
+      await loadDetail();
+      rejectWithReason();
+      await vi.waitFor(() => {
+        expect(getCache()?.consultations).toHaveLength(1);
+        expect(getCache()?.consultations[0].id).toBe(43);
+        expect(getCache()?.total).toBe(1);
+      });
+    });
+
+    it('should restore consultation list on reject error', async () => {
+      await resolveDetail();
+      const mod = await import('@/server/consultations');
+      (mod.rejectConsultation as any).mockResolvedValue({ error: 'Already rejected' });
+      queryClient.setQueryData(consultationKeys.pending(1, 1), seedData);
+      renderDialog();
+      await loadDetail();
+      rejectWithReason();
+      await vi.waitFor(() => {
+        expect(getCache()?.consultations).toHaveLength(2);
+        expect(getCache()?.total).toBe(2);
+      });
+    });
+
+    it('should show error toast on reject rollback', async () => {
+      await resolveDetail();
+      const mod = await import('@/server/consultations');
+      (mod.rejectConsultation as any).mockResolvedValue({ error: 'Already rejected' });
+      renderDialog();
+      await loadDetail();
+      rejectWithReason();
+      await vi.waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Already rejected');
       });
     });
   });
