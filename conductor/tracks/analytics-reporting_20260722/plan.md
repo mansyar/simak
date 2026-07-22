@@ -36,7 +36,7 @@
     - [ ] Add `getInstructorAnalyticsData` Zod schema (same date range input) and `createServerFn` stub to `src/server/analytics.ts` (dynamic import to `analytics-instructor.server.ts`)
     - [ ] Write tests in `tests/unit/server/analytics.test.ts` for the new stub and schema
 
-- [ ] Task: Implement instructor analytics handler (TDD)
+- [x] Task: Implement instructor analytics handler (TDD) [7215c0d]
     - [ ] Write failing tests in `tests/unit/server/analytics-instructor.test.ts` for `getInstructorAnalyticsDataHandler` — test all 5 metrics (reviews completed, avg response time, SLA breach count, students supervised, assignments active); test date range filtering; test role guard (non-instructor rejected); test instructor scoping (only this instructor's data)
     - [ ] Implement `src/server/analytics-instructor.server.ts` — instructor-scoped queries: reviews completed, avg response time (`AVG(EXTRACT(EPOCH FROM reviewedAt - uploadedAt))`), SLA breach count, students supervised, assignments active
     - [ ] Run `pnpm test` and confirm all tests pass
