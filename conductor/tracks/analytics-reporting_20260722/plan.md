@@ -102,22 +102,22 @@
 
 ## Phase 5: i18n Finalization & Quality Verification
 
-- [ ] Task: Read spec.md and workflow.md to refresh context
-    - [ ] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read spec.md and workflow.md to refresh context
+    - [x] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Verify i18n parity and finalize
-    - [ ] Run `pnpm generate:i18n` to regenerate types
-    - [ ] Run `pnpm check:i18n` to verify EN/ID key parity
-    - [ ] Run `pnpm check:i18n:unused` to verify no unused keys introduced
-    - [ ] Fix any parity or unused key issues
+- [x] Task: Verify i18n parity and finalize
+    - [x] Run `pnpm generate:i18n` to regenerate types
+    - [x] Run `pnpm check:i18n` to verify EN/ID key parity
+    - [x] Run `pnpm check:i18n:unused` to verify no unused keys introduced
+    - [x] Fix any parity or unused key issues
 
-- [ ] Task: Final quality gates
-    - [ ] Run `pnpm test:coverage` and verify ≥80% on lines, statements, branches, and functions
-    - [ ] Run `pnpm typecheck` and verify clean
-    - [ ] Run `pnpm lint` and verify clean (including `simak-i18n/no-hardcoded`)
-    - [ ] Verify no file in `src/` or `tests/` exceeds 500 lines (`node scripts/check-modularity.js`)
-    - [ ] Verify all handler files follow two-file split pattern (grep for server-only imports in `analytics.ts`)
+- [x] Task: Final quality gates
+    - [x] Run `pnpm test:coverage` and verify ≥80% on lines, statements, branches, and functions
+    - [x] Run `pnpm typecheck` and verify clean
+    - [x] Run `pnpm lint` and verify clean (including `simak-i18n/no-hardcoded`)
+    - [x] Verify no file in `src/` or `tests/` exceeds 500 lines (`node scripts/check-modularity.js`)
+    - [x] Verify all handler files follow two-file split pattern (grep for server-only imports in `analytics.ts`)
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: i18n Finalization & Quality Verification' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 5: i18n Finalization & Quality Verification' (Protocol in workflow.md)
 </protect>
