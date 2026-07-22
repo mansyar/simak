@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: TRACK-018 — Event Email Notifications
 
-## Phase 1: Foundation — Templates, Schema & i18n
+## Phase 1: Foundation — Templates, Schema & i18n [checkpoint: dd274f6]
 
 - [x] Task: Read spec.md and workflow.md to refresh context for this phase
     - [x] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
@@ -29,7 +29,7 @@
     - [x] Run `pnpm generate:i18n` to regenerate types
     - [x] Verify `pnpm check:i18n` passes (EN↔ID parity)
 
-- [ ] Task: Conductor - User Manual Verification 'Foundation — Templates, Schema & i18n' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Foundation — Templates, Schema & i18n' (Protocol in workflow.md)
 
 ## Phase 2: Recipient Resolution & Handler Wiring
 
