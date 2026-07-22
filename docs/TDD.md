@@ -106,14 +106,15 @@ simak/
 │   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton
 │   │   ├── instructor/
 │   │   │   └── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
-│   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager
+│   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js)
 │   │   ├── consultations/    → Log form, consultation list, progress bar, verification queue item, verification dialog
 │   │   ├── files/            → File upload, preview, file list
 │   │   ├── notifications/    → Notification center, badge, notification-routes (type→route map)
 │   │   ├── analytics/        → Charts, metric cards, export
 │   │   ├── settings/         → SettingsPage, ProfileSection, PasswordSection, AppearanceSection, AccessibilitySection
 │   │   ├── skeletons/        → Reusable loading skeletons (DashboardSkeleton, TableSkeleton, AssignmentDetailSkeleton)
-│   │   └── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton, email queue inspector subcomponents (summary cards, filters, table, retry dialog)
+│   │   ├── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton, email queue inspector subcomponents (summary cards, filters, table, retry dialog)
+│   │   └── keyboard-cheat-sheet.tsx → Popover showing all keyboard shortcuts (greys out review-specific J/K when not on review page)
 │   ├── server/               → Server functions (split: .ts = client-safe stubs + Zod, .server.ts = handlers)
 │   │   ├── auth.ts           → Client-safe stub: Session type, getSessionFromHeaders, requireRole, _getSession (dynamic import)
 │   │   ├── auth.server.ts    → Session handler: Better Auth validation, DB query, 5s-TTL in-memory cache
@@ -162,7 +163,9 @@ simak/
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
     │   │   └── utils.ts          → Shared utilities
 │   ├── hooks/               → Custom React hooks
-│   │   └── use-debounced-callback.ts → Generic debounce hook (setTimeout/clearTimeout, 300ms for search inputs)
+│   │   ├── use-debounced-callback.ts → Generic debounce hook (setTimeout/clearTimeout, 300ms for search inputs)
+│   │   ├── use-keyboard-shortcuts.ts → Global keyboard shortcuts (R=refresh, ?=cheat-sheet) — mounted in _authenticated.tsx
+│   │   └── use-review-nav.ts → Review-specific shortcuts (J/K queue navigation) — preloads pending list on mount
 │   └── config/
 │       └── env.ts            → Validated environment variables
 ├── locales/                  → typesafe-i18n translation files
@@ -234,6 +237,25 @@ All user-initiated mutations and data-fetching surfaces provide consistent feedb
 - **Upload progress (Track: Search Debounce & Form Validation):** File uploads to R2 in `CheckpointSubmissionPage` use `XMLHttpRequest` (not `fetch`) to enable real-time upload progress tracking via `xhr.upload.onprogress` (computing `Math.round((loaded / total) * 100)`). The `FileUploader` component accepts an optional `uploadProgress?: number` prop and displays a determinate `Progress` bar with `showValue` when `isUploading && uploadProgress !== undefined`, falling back to the `Loader2` spinner for browsers that don't support progress events. `xhr.onload` resolves on 2xx, rejects otherwise; `xhr.onerror` rejects with `TypeError('Network error')` — preserving the network-vs-server error differentiation.
 - **Search debounce (Track: Search Debounce & Form Validation):** All 4 server-side search inputs (user list, student assignments, instructor assignments, audit log) use a custom `useDebouncedCallback` hook (`src/hooks/use-debounced-callback.ts`, 300ms delay) to batch rapid keystrokes into a single server request. Each filter component maintains a `localSearch` state synced with the prop via `useEffect` and wraps `onSearchChange` with `useDebouncedCallback(fn, 300)`. A conditional X clear button (`lucide-react` `X` icon, `aria-label={t('common.clearSearch')}`) clears the search immediately (not debounced). Client-side filters (StudentPicker, TemplatePicker) are not debounced — they filter in-memory data with no server fetch.
 - **Form validation (Track: Search Debounce & Form Validation):** All user-facing forms (`ConsultationForm`, `ExtensionRequestForm`, `PasswordSection`) use `react-hook-form` + `zodResolver` with `mode: 'onBlur'` validation and per-field inline errors via `FormMessage`. Zod schemas enforce field-level constraints (required fields, min lengths, password match) and conditional logic (e.g., external consultant name required only when `sessionType === 'external'` via `superRefine`; duration max enforced via `.refine`). The `FormField`/`FormItem`/`FormLabel`/`FormControl`/`FormMessage` pattern matches the existing `EditUserSheet` convention.
+
+### Keyboard Shortcuts [v1]
+
+A two-layer keyboard shortcut architecture improves instructor productivity:
+
+- **Global shortcuts** (`src/hooks/use-keyboard-shortcuts.ts`, mounted in `_authenticated.tsx`):
+  - `R` — triggers `queryClient.invalidateQueries` to refresh all data.
+  - `?` — toggles a cheat-sheet `Popover` (`src/components/keyboard-cheat-sheet.tsx`) showing all available shortcuts. Review-specific shortcuts (J/K) are greyed out when not on a review page.
+- **Review-specific shortcuts** (`src/hooks/use-review-nav.ts`, mounted in `$submissionId.tsx`):
+  - `J` — navigates to the next pending review in the queue.
+  - `K` — navigates to the previous pending review in the queue.
+  - The pending review list is preloaded on mount via `listPendingReviews({ page: 1, limit: 100 })`. The current submission's index is tracked in state, enabling instant navigation without server calls.
+- **Suppression:** All shortcuts are disabled when focus is in an `<input>`, `<textarea>`, or `contenteditable` element (checked via a shared `isInputFocused` helper).
+- **Cheat-sheet component:** `src/components/keyboard-cheat-sheet.tsx` uses `@base-ui/react/popover` (consistent with the codebase's UI primitives). Renders a grid of shortcut keys + descriptions. J/K entries show a disabled visual state when the `isReviewPage` prop is `false`.
+
+### Route Prefetch [v1]
+
+- Sidebar navigation `<Link>` components in all three role layouts (admin, instructor, student) use `preload="intent"` — hovering a link prefetches the route's data/loader via TanStack Router's built-in prefetch mechanism.
+- The router's `defaultPreload` is set to `false` in `src/router.tsx` (opt-in per-link), preventing over-prefetching on the public landing page where sidebar links don't exist.
 
 ---
 
@@ -696,7 +718,7 @@ Admin       (creates Instructors and Students)
 | **Presigned URLs**   | 5 minutes for upload, 1 hour for download.                                                                                                                                                                         |
 | **Size verification**| Server-side via R2 `HEAD` request at submit time. Client-reported size is never trusted (Track: Audit HIGH-Remediation H1). The HEAD check is performed **before** `db.transaction()` opens, so row locks are not held during I/O (BUG-14). |
 | **Versioning**       | Version increments by 1 each time a student resubmits after a REVISE decision. Initial submission is version 1.                                                                                                    |
-| **Preview**          | PDF: in-browser via blob URL. [v2: use range requests to fetch only the first few pages for thumbnail preview instead of downloading the full 25MB file.] DOCX: metadata display only (name, size, date, version). |
+| **Preview**          | PDF: in-browser via blob URL. [v2: use range requests to fetch only the first few pages for thumbnail preview instead of downloading the full 25MB file.] DOCX: inline HTML preview via `mammoth.js` (lazy-loaded via dynamic `import('mammoth')`, converted client-side from the presigned download URL, rendered in a sandboxed `<iframe srcDoc={html} sandbox="">` — no `allow-scripts` or `allow-same-origin`). Size guard: only attempts conversion if `fileSize < 10MB`; above that, shows a "file too large for inline preview" message with download button. Conversion errors fall back to a "Preview not available" card. Other file types: metadata display only (name, size, date, version). |
 | **Permissions**      | Students see own submissions; instructors see all for their assignments; admins see all.                                                                                                                           |
 
 > **File-type validation (Track 8.3):** Instructor feedback uploads (`getPresignedReviewFeedbackUploadUrlHandler`) now enforce the same `.docx`/`.pdf`-only policy via `validateUploadType(extension, contentType)` before presigning — previously skipped, allowing arbitrary file types to be uploaded to R2.
@@ -945,7 +967,8 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 ### Vite Optimizations [v1]
 
 - Automatic code splitting per route (TanStack Router + Vite).
-- Dynamic imports for heavy libraries (chart library, file preview).
+- Dynamic imports for heavy libraries: `mammoth` (`.docx` → HTML conversion, ~30KB gzipped — lazy-loaded only on the review detail route via `import('mammoth')` so it's not in the main bundle), chart library, file preview.
+- **Route prefetch:** Sidebar navigation links use `preload="intent"` so hovering a link prefetches the route's data/loader. The router's `defaultPreload` is `false` (opt-in per-link) to avoid over-prefetching on the public landing page.
 
 ---
 
