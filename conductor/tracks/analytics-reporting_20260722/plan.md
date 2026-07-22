@@ -61,10 +61,10 @@
     - [x] Add 5 CSV export Zod schemas and `createServerFn` stubs to `src/server/analytics.ts`: `exportUsersCsv`, `exportAuditLogCsv`, `exportAssignmentProgressCsv` (admin); `exportStudentProgressCsv`, `exportReviewHistoryCsv` (instructor)
     - [x] Write tests in `tests/unit/server/analytics.test.ts` for new stubs and schemas
 
-- [~] Task: Implement CSV export handlers (TDD)
-    - [ ] Write failing tests in `tests/unit/server/analytics-export.test.ts` for all 5 CSV handlers — test CSV output format (headers, row count, delimiter, quoting); test role guards (admin-only for admin exports, instructor-only for instructor exports); test date range filtering; test empty data handling
-    - [ ] Implement `src/server/analytics-export.server.ts` — 5 CSV string builders: `exportUsersCsvHandler`, `exportAuditLogCsvHandler`, `exportAssignmentProgressCsvHandler`, `exportStudentProgressCsvHandler`, `exportReviewHistoryCsvHandler`
-    - [ ] Run `pnpm test` and confirm all tests pass
+- [x] Task: Implement CSV export handlers (TDD) [7e04d48]
+    - [x] Write failing tests in `tests/unit/server/analytics-export.test.ts` for all 5 CSV handlers — test CSV output format (headers, row count, delimiter, quoting); test role guards (admin-only for admin exports, instructor-only for instructor exports); test date range filtering; test empty data handling
+    - [x] Implement `src/server/analytics-export.server.ts` — 5 CSV string builders: `exportUsersCsvHandler`, `exportAuditLogCsvHandler`, `exportAssignmentProgressCsvHandler`, `exportStudentProgressCsvHandler`, `exportReviewHistoryCsvHandler`
+    - [x] Run `pnpm test` and confirm all tests pass
 
 - [ ] Task: Add CSV export buttons to UI
     - [ ] Write failing tests for export button components — test button rendering, click handler, Blob creation, download trigger
