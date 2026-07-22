@@ -28,11 +28,11 @@
 
 ## Phase 2: Instructor Analytics Dashboard
 
-- [ ] Task: Read spec.md and workflow.md to refresh context
-    - [ ] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read spec.md and workflow.md to refresh context
+    - [x] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Add instructor analytics server stub
+- [x] Task: Add instructor analytics server stub [adfe9bf]
     - [ ] Add `getInstructorAnalyticsData` Zod schema (same date range input) and `createServerFn` stub to `src/server/analytics.ts` (dynamic import to `analytics-instructor.server.ts`)
     - [ ] Write tests in `tests/unit/server/analytics.test.ts` for the new stub and schema
 
