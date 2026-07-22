@@ -35,38 +35,43 @@
 
 ## Phase 2: Resolve eslint-disable via useQuery Conversion (ENH-TD-1)
 
-- [ ] Task: Read spec.md and workflow.md to re-ground before Phase 2 implementation
-    - [ ] Read `conductor/tracks/ui-hygiene-tech-debt-quick-wins_20260722/spec.md` (requirements, acceptance criteria, scope)
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit/git-notes protocol, checkpoint protocol)
-- [ ] Task: Write failing tests for useQuery data loading and error toast (Red)
-    - [ ] Test `StudentPicker` loads students via `useQuery` (no `useEffect` data-fetch) and preserves client-side search filtering
-    - [ ] Test `TemplatePicker` loads templates via `useQuery` and preserves search filtering
-    - [ ] Test `AssignmentWizard` loads students via `useQuery` (mount fetch only); assert `handleSelectTemplate`'s `getTemplate` remains an imperative on-click call
-    - [ ] Test that `toast.error(t('errors.fetchFailed'))` fires on query rejection in all 3 components
-    - [ ] Test that a `templateKeys` factory exists in `src/lib/query-keys.ts`
-    - [ ] Run `pnpm test` and confirm the new tests fail as expected
-- [ ] Task: Extend the query-key factory with templateKeys
-    - [ ] FR-2.4: Add `templateKeys` factory (`{ all, list }`) to `src/lib/query-keys.ts`
-    - [ ] Update the file header comment to reflect 6 domains (templates now touched)
-- [ ] Task: Implement useQuery conversion in StudentPicker (Green)
-    - [ ] FR-2.1: Replace `useEffect`+`useState` students fetch with `useQuery` using `userKeys.list({ page:1, limit:200, search:'', role:'student' })`
-    - [ ] Replace local `loading`/`error`/`students` state with `useQuery` return values (`isLoading`, `isError`, `data`)
-    - [ ] Preserve `toast.error(t('errors.fetchFailed'))` failure path; remove the local hardcoded error string
-    - [ ] Remove the `eslint-disable-next-line react-hooks/exhaustive-deps` comment
-- [ ] Task: Implement useQuery conversion in TemplatePicker (Green)
-    - [ ] FR-2.3: Replace `useEffect`+`useState` templates fetch with `useQuery` using `templateKeys.list({ page:1, limit:100, search:'' })`
-    - [ ] Replace local `loading`/`error`/`templates` state with `useQuery` return values
-    - [ ] Preserve `toast.error(t('errors.fetchFailed'))` failure path; remove the local hardcoded error string
-    - [ ] Remove the `eslint-disable-next-line react-hooks/exhaustive-deps` comment
-- [ ] Task: Implement useQuery conversion in AssignmentWizard mount fetch (Green)
-    - [ ] FR-2.2: Replace the mount-only `loadStudents` `useEffect` with `useQuery` using `userKeys.list(...)`
-    - [ ] Replace local `students` state with the query's `data`; leave `handleSelectTemplate` `getTemplate` unchanged
-    - [ ] Remove the `eslint-disable-next-line react-hooks/exhaustive-deps` comment
-    - [ ] Run `pnpm test` and confirm all tests now pass
-- [ ] Task: Verify quality gates for Phase 2
-    - [ ] Run `pnpm test:coverage` (≥80% on all four metrics)
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint` — confirm zero `react-hooks/exhaustive-deps` suppressions in `src/components/instructor/assignments/`
-    - [ ] Run `pnpm check:i18n`
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Resolve eslint-disable via useQuery Conversion' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md to re-ground before Phase 2 implementation
+    - [x] Read `conductor/tracks/ui-hygiene-tech-debt-quick-wins_20260722/spec.md` (requirements, acceptance criteria, scope)
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit/git-notes protocol, checkpoint protocol)
+- [x] Task: Write failing tests for useQuery data loading and error toast (Red)
+    - [x] Test `StudentPicker` loads students via `useQuery` (no `useEffect` data-fetch) and preserves client-side search filtering
+    - [x] Test `TemplatePicker` loads templates via `useQuery` and preserves search filtering
+    - [x] Test `AssignmentWizard` loads students via `useQuery` (mount fetch only); assert `handleSelectTemplate`'s `getTemplate` remains an imperative on-click call
+    - [x] Test that `toast.error(t('errors.fetchFailed'))` fires on query rejection in all 3 components
+    - [x] Test that a `templateKeys` factory exists in `src/lib/query-keys.ts`
+    - [x] Run `pnpm test` and confirm the new tests fail as expected
+- [x] Task: Extend the query-key factory with templateKeys
+    - [x] FR-2.4: Add `templateKeys` factory (`{ all, list }`) to `src/lib/query-keys.ts`
+    - [x] Update the file header comment to reflect 6 domains (templates now touched)
+- [x] Task: Implement useQuery conversion in StudentPicker (Green)
+    - [x] FR-2.1: Replace `useEffect`+`useState` students fetch with `useQuery` using `userKeys.list({ page:1, limit:200, search:'', role:'student' })`
+    - [x] Replace local `loading`/`error`/`students` state with `useQuery` return values (`isLoading`, `isError`, `data`)
+    - [x] Preserve `toast.error(t('errors.fetchFailed'))` failure path; remove the local hardcoded error string
+    - [x] Remove the `eslint-disable-next-line react-hooks/exhaustive-deps` comment
+- [x] Task: Implement useQuery conversion in TemplatePicker (Green)
+    - [x] FR-2.3: Replace `useEffect`+`useState` templates fetch with `useQuery` using `templateKeys.list({ page:1, limit:100, search:'' })`
+    - [x] Replace local `loading`/`error`/`templates` state with `useQuery` return values
+    - [x] Preserve `toast.error(t('errors.fetchFailed'))` failure path; remove the local hardcoded error string
+    - [x] Remove the `eslint-disable-next-line react-hooks/exhaustive-deps` comment
+- [x] Task: Implement useQuery conversion in AssignmentWizard mount fetch (Green)
+    - [x] FR-2.2: Replace the mount-only `loadStudents` `useEffect` with `useQuery` using `userKeys.list(...)`
+    - [x] Replace local `students` state with the query's `data`; leave `handleSelectTemplate` `getTemplate` unchanged
+    - [x] Remove the `eslint-disable-next-line react-hooks/exhaustive-deps` comment
+    - [x] Run `pnpm test` and confirm all tests now pass
+- [x] Task: Verify quality gates for Phase 2
+    - [x] Run `pnpm test:coverage` (≥80% on all four metrics)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint` — confirm zero `react-hooks/exhaustive-deps` suppressions in `src/components/instructor/assignments/`
+    - [x] Run `pnpm check:i18n`
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Resolve eslint-disable via useQuery Conversion' (Protocol in workflow.md)
+
+### Phase 2 Checkpoint
+- **Commit SHA:** `51cb05d6ed37114f9980a5ca79b85c4a53bdde40`
+- **Commit message:** `refactor(assignments): convert useEffect fetches to useQuery, add templateKeys`
+- **Git notes:** Attached with summary of changes, tests, and quality gate results
 </protect>
