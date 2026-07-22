@@ -116,7 +116,7 @@ describe('ReviewFilePreview', () => {
     await waitFor(() => {
       const iframe = document.querySelector('iframe');
       expect(iframe).toBeDefined();
-      expect(iframe?.getAttribute('sandbox')).toBe('allow-same-origin');
+      expect(iframe?.getAttribute('sandbox')).toBe('');
     });
   });
 

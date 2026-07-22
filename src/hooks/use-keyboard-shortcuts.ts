@@ -21,7 +21,7 @@ export function useKeyboardShortcuts() {
       if (key === 'r') {
         e.preventDefault();
         queryClient.invalidateQueries();
-      } else if (e.key === '?') {
+      } else if (key === '?') {
         e.preventDefault();
         setCheatSheetOpen((prev) => !prev);
       }

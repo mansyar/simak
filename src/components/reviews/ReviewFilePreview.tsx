@@ -100,12 +100,7 @@ export function ReviewFilePreview({
         {/* DOCX success — sandboxed iframe */}
         {isDocx && !isDocxTooLarge && docxState === 'success' && (
           <div className="rounded-md border bg-muted/30 overflow-hidden">
-            <iframe
-              srcDoc={docxHtml}
-              sandbox="allow-same-origin"
-              className="w-full h-96"
-              title={fileName}
-            />
+            <iframe srcDoc={docxHtml} sandbox="" className="w-full h-96" title={fileName} />
           </div>
         )}
 
