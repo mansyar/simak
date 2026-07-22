@@ -41,7 +41,7 @@
 - [x] Task: Run `pnpm generate:i18n` to regenerate i18n types `fe787e7`
 - [x] Task: Conductor - User Manual Verification 'DOCX Inline Preview' (Protocol in workflow.md)
 
-## Phase 2: Keyboard Shortcuts — Two-Layer Architecture (ENH-UX-3)
+## Phase 2: Keyboard Shortcuts — Two-Layer Architecture (ENH-UX-3) [checkpoint: 065c922]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
     - [x] Re-read the track specification for phase-specific requirements
