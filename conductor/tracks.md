@@ -4,5 +4,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Event Email Notifications**
-*Link: [./tracks/event-email-notifications_20260722/](./tracks/event-email-notifications_20260722/)*
+<!-- Archived tracks are in conductor/archive/ -->
