@@ -4,3 +4,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Analytics & Reporting (TRACK-019)**
+*Link: [./tracks/analytics-reporting_20260722/](./tracks/analytics-reporting_20260722/)*
+
