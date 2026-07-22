@@ -1,7 +1,11 @@
+<protect>
 # Implementation Plan: UI Hygiene & Tech-Debt Quick Wins (TRACK-015)
 
 ## Phase 1: Landing Footer Link & Copyright Hygiene (ENH-UX-1)
 
+- [ ] Task: Read spec.md and workflow.md to re-ground before Phase 1 implementation
+    - [ ] Read `conductor/tracks/ui-hygiene-tech-debt-quick-wins_20260722/spec.md` (requirements, acceptance criteria, scope)
+    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit/git-notes protocol, checkpoint protocol)
 - [ ] Task: Write failing tests for footer link targets and dynamic copyright (Red)
     - [ ] Add/extend route test asserting no `href="#"` remains in `src/routes/index.tsx` footer
     - [ ] Assert the "About" link points to `#how-it-works`
@@ -25,6 +29,9 @@
 
 ## Phase 2: Resolve eslint-disable via useQuery Conversion (ENH-TD-1)
 
+- [ ] Task: Read spec.md and workflow.md to re-ground before Phase 2 implementation
+    - [ ] Read `conductor/tracks/ui-hygiene-tech-debt-quick-wins_20260722/spec.md` (requirements, acceptance criteria, scope)
+    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit/git-notes protocol, checkpoint protocol)
 - [ ] Task: Write failing tests for useQuery data loading and error toast (Red)
     - [ ] Test `StudentPicker` loads students via `useQuery` (no `useEffect` data-fetch) and preserves client-side search filtering
     - [ ] Test `TemplatePicker` loads templates via `useQuery` and preserves search filtering
@@ -56,3 +63,4 @@
     - [ ] Run `pnpm lint` — confirm zero `react-hooks/exhaustive-deps` suppressions in `src/components/instructor/assignments/`
     - [ ] Run `pnpm check:i18n`
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Resolve eslint-disable via useQuery Conversion' (Protocol in workflow.md)
+</protect>

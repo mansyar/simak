@@ -1,3 +1,4 @@
+<protect>
 # Track: UI Hygiene & Tech-Debt Quick Wins (TRACK-015)
 
 ## Overview
@@ -65,3 +66,4 @@ Convert the three mount-only `useEffect`+`useState` data fetches to `useQuery`, 
 - ENH-TD-2 (invalid finding — already resolved; the 3 files already call `toast.error`).
 - `console.error` instances in `.server.ts` advisory work and `seed.ts` (intentional server-side diagnostics).
 - Per-user email notification preferences or any backend/server-function changes (this track is frontend-only plus i18n keys).
+</protect>
