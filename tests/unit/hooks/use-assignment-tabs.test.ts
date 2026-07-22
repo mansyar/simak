@@ -1,6 +1,9 @@
 /** @vitest-environment jsdom */
 import { renderHook, act, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
+import { consultationKeys, extensionKeys } from '@/lib/query-keys';
 
 const mockListPendingConsultations = vi.fn();
 const mockListExtensionRequests = vi.fn();
@@ -54,21 +57,37 @@ const fakeExtension = {
 };
 
 describe('useAssignmentTabs', () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     mockListPendingConsultations.mockReset();
     mockListExtensionRequests.mockReset();
     mockApproveExtension.mockReset();
     mockRejectExtension.mockReset();
     mockShowSuccessToast.mockReset();
+    mockShowErrorToast.mockReset();
 
     mockListPendingConsultations.mockResolvedValue({ consultations: [], total: 0 });
     mockListExtensionRequests.mockResolvedValue({ items: [] });
     mockApproveExtension.mockResolvedValue({});
     mockRejectExtension.mockResolvedValue({});
+
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
   });
 
+  function createWrapper() {
+    return ({ children }: { children: React.ReactNode }) =>
+      React.createElement(QueryClientProvider, { client: queryClient }, children);
+  }
+
+  function renderHookWithWrapper<T>(fn: () => T) {
+    return renderHook(fn, { wrapper: createWrapper() });
+  }
+
   it('returns empty arrays and not loading when assignmentId is null', async () => {
-    const { result } = renderHook(() => useAssignmentTabs(null));
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(null));
 
     expect(result.current.pendingConsultations).toEqual([]);
     expect(result.current.extensionRequests).toEqual([]);
@@ -86,13 +105,13 @@ describe('useAssignmentTabs', () => {
     });
     mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
 
-    const { result } = renderHook(() => useAssignmentTabs(42));
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(42));
 
     await waitFor(() => {
       expect(result.current.pendingConsultations).toEqual([fakeConsultation]);
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
+      expect(result.current.extensionsLoading).toBe(false);
     });
-    expect(result.current.extensionRequests).toEqual([fakeExtension]);
-    expect(result.current.extensionsLoading).toBe(false);
 
     expect(mockListPendingConsultations).toHaveBeenCalledWith({
       data: { assignmentId: 42, page: 1, limit: 20 },
@@ -105,7 +124,7 @@ describe('useAssignmentTabs', () => {
   it('handles listPendingConsultations returning no consultations key', async () => {
     mockListPendingConsultations.mockResolvedValue({});
 
-    const { result } = renderHook(() => useAssignmentTabs(1));
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(1));
 
     await waitFor(() => {
       expect(result.current.extensionsLoading).toBe(false);
@@ -118,7 +137,7 @@ describe('useAssignmentTabs', () => {
       error: { code: 'FORBIDDEN', message: 'Forbidden' },
     });
 
-    const { result } = renderHook(() => useAssignmentTabs(1));
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(1));
 
     await waitFor(() => {
       expect(result.current.extensionsLoading).toBe(false);
@@ -131,43 +150,64 @@ describe('useAssignmentTabs', () => {
       .mockResolvedValueOnce({ items: [fakeExtension] })
       .mockResolvedValueOnce({ items: [] });
 
-    const { result } = renderHook(() => useAssignmentTabs(1));
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(1));
 
     await waitFor(() => {
       expect(result.current.extensionRequests).toEqual([fakeExtension]);
     });
 
     await act(async () => {
-      await result.current.handleApproveExtension(7, 'looks fine');
+      result.current.handleApproveExtension(7, 'looks fine');
     });
 
-    expect(mockApproveExtension).toHaveBeenCalledWith({
-      data: { requestId: 7, resolutionReason: 'looks fine' },
-    });
     await waitFor(() => {
+      expect(mockApproveExtension).toHaveBeenCalledWith({
+        data: { requestId: 7, resolutionReason: 'looks fine' },
+      });
       expect(result.current.extensionRequests).toEqual([]);
+      expect(mockShowSuccessToast).toHaveBeenCalledWith('extensions.approveSuccess');
     });
-    expect(mockShowSuccessToast).toHaveBeenCalledWith('extensions.approveSuccess');
   });
 
-  it('approveExtensionHandler does not refresh and toasts server error', async () => {
+  it('approveExtensionHandler toasts server error and restores queue on error', async () => {
     mockApproveExtension.mockResolvedValue({ error: { code: 'FORBIDDEN', message: 'Forbidden' } });
     mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
 
-    const { result } = renderHook(() => useAssignmentTabs(1));
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(1));
 
     await waitFor(() => {
       expect(result.current.extensionRequests).toEqual([fakeExtension]);
     });
 
     await act(async () => {
-      await result.current.handleApproveExtension(7, 'approved');
+      result.current.handleApproveExtension(7, 'approved');
     });
 
-    expect(mockApproveExtension).toHaveBeenCalledTimes(1);
-    // Only the initial mount fetch should have occurred — no second refresh
-    expect(mockListExtensionRequests).toHaveBeenCalledTimes(1);
-    expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
+    await waitFor(() => {
+      expect(mockApproveExtension).toHaveBeenCalledTimes(1);
+      expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
+    });
+  });
+
+  it('should optimistically remove the extension from the pending queue', async () => {
+    mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
+    mockApproveExtension.mockReturnValue(new Promise(() => {}));
+
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(42));
+
+    await waitFor(() => {
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
+    });
+
+    await act(async () => {
+      result.current.handleApproveExtension(7, 'looks fine');
+    });
+
+    const cache = queryClient.getQueryData<{ items: (typeof fakeExtension)[] }>(
+      extensionKeys.pending(42),
+    );
+    expect(cache?.items).toEqual([]);
   });
 
   it('rejectExtensionHandler calls the server with the reason and refreshes on success', async () => {
@@ -175,46 +215,68 @@ describe('useAssignmentTabs', () => {
       .mockResolvedValueOnce({ items: [fakeExtension] })
       .mockResolvedValueOnce({ items: [] });
 
-    const { result } = renderHook(() => useAssignmentTabs(1));
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(1));
 
     await waitFor(() => {
       expect(result.current.extensionRequests).toEqual([fakeExtension]);
     });
 
     await act(async () => {
-      await result.current.handleRejectExtension(7, 'reason is too short to accept');
+      result.current.handleRejectExtension(7, 'reason is too short to accept');
     });
 
-    expect(mockRejectExtension).toHaveBeenCalledWith({
-      data: { requestId: 7, resolutionReason: 'reason is too short to accept' },
-    });
     await waitFor(() => {
+      expect(mockRejectExtension).toHaveBeenCalledWith({
+        data: { requestId: 7, resolutionReason: 'reason is too short to accept' },
+      });
       expect(result.current.extensionRequests).toEqual([]);
+      expect(mockShowSuccessToast).toHaveBeenCalledWith('extensions.rejectSuccess');
     });
-    expect(mockShowSuccessToast).toHaveBeenCalledWith('extensions.rejectSuccess');
   });
 
-  it('rejectExtensionHandler does not refresh and toasts server error', async () => {
+  it('rejectExtensionHandler toasts server error and restores queue on error', async () => {
     mockRejectExtension.mockResolvedValue({ error: { code: 'FORBIDDEN', message: 'Forbidden' } });
     mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
 
-    const { result } = renderHook(() => useAssignmentTabs(1));
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(1));
 
     await waitFor(() => {
       expect(result.current.extensionRequests).toEqual([fakeExtension]);
     });
 
     await act(async () => {
-      await result.current.handleRejectExtension(7, 'reason goes here');
+      result.current.handleRejectExtension(7, 'reason goes here');
     });
 
-    expect(mockRejectExtension).toHaveBeenCalledTimes(1);
-    expect(mockListExtensionRequests).toHaveBeenCalledTimes(1);
-    expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
+    await waitFor(() => {
+      expect(mockRejectExtension).toHaveBeenCalledTimes(1);
+      expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
+    });
+  });
+
+  it('should optimistically remove the extension from the queue on reject', async () => {
+    mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
+    mockRejectExtension.mockReturnValue(new Promise(() => {}));
+
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(42));
+
+    await waitFor(() => {
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
+    });
+
+    await act(async () => {
+      result.current.handleRejectExtension(7, 'reason is too short');
+    });
+
+    const cache = queryClient.getQueryData<{ items: (typeof fakeExtension)[] }>(
+      extensionKeys.pending(42),
+    );
+    expect(cache?.items).toEqual([]);
   });
 
   it('exposes setPendingConsultations for parent components to update the queue', async () => {
-    const { result } = renderHook(() => useAssignmentTabs(1));
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(1));
 
     await waitFor(() => {
       expect(result.current.extensionsLoading).toBe(false);
@@ -224,7 +286,9 @@ describe('useAssignmentTabs', () => {
       result.current.setPendingConsultations([fakeConsultation]);
     });
 
-    expect(result.current.pendingConsultations).toEqual([fakeConsultation]);
+    await waitFor(() => {
+      expect(result.current.pendingConsultations).toEqual([fakeConsultation]);
+    });
   });
 
   it('refreshExtensions does nothing when assignmentId is null', async () => {
@@ -233,17 +297,109 @@ describe('useAssignmentTabs', () => {
     // the guard.
     mockListExtensionRequests.mockResolvedValue({ items: [] });
 
-    const { result } = renderHook(() => useAssignmentTabs(null));
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(null));
 
     // No fetches because assignmentId is null
     expect(mockListExtensionRequests).not.toHaveBeenCalled();
 
     // Setting state and calling the handler should be a no-op
     await act(async () => {
-      await result.current.handleApproveExtension(1, 'ok');
+      result.current.handleApproveExtension(1, 'ok');
     });
 
-    // Still no fetches
+    // Still no fetches — query is disabled and no invalidation triggers a refetch
     expect(mockListExtensionRequests).not.toHaveBeenCalled();
+  });
+
+  it('should register pending consultations query with consultationKeys', async () => {
+    mockListPendingConsultations.mockResolvedValue({
+      consultations: [fakeConsultation],
+      total: 1,
+    });
+
+    renderHookWithWrapper(() => useAssignmentTabs(42));
+
+    await waitFor(() => {
+      const query = queryClient.getQueryCache().find({
+        queryKey: consultationKeys.pending(42, 1),
+      });
+      expect(query).toBeDefined();
+    });
+  });
+
+  it('should invalidate consultation query when refreshPendingConsultations is called', async () => {
+    mockListPendingConsultations.mockResolvedValue({
+      consultations: [fakeConsultation],
+      total: 1,
+    });
+
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(42));
+
+    await waitFor(() => {
+      expect(result.current.pendingConsultations).toEqual([fakeConsultation]);
+    });
+
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    await act(async () => {
+      await result.current.refreshPendingConsultations();
+    });
+
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: consultationKeys.all() });
+  });
+
+  it('should register extensions query with extensionKeys', async () => {
+    mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
+
+    renderHookWithWrapper(() => useAssignmentTabs(42));
+
+    await waitFor(() => {
+      const query = queryClient.getQueryCache().find({
+        queryKey: extensionKeys.pending(42),
+      });
+      expect(query).toBeDefined();
+    });
+  });
+
+  it('should invalidate extensions query on successful approve', async () => {
+    mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
+    mockApproveExtension.mockResolvedValue({});
+
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(42));
+
+    await waitFor(() => {
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
+    });
+
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    await act(async () => {
+      result.current.handleApproveExtension(7, 'looks fine');
+    });
+
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: extensionKeys.all() });
+    });
+  });
+
+  it('should invalidate extensions query on successful reject', async () => {
+    mockListExtensionRequests.mockResolvedValue({ items: [fakeExtension] });
+    mockRejectExtension.mockResolvedValue({});
+
+    const { result } = renderHookWithWrapper(() => useAssignmentTabs(42));
+
+    await waitFor(() => {
+      expect(result.current.extensionRequests).toEqual([fakeExtension]);
+    });
+
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    await act(async () => {
+      result.current.handleRejectExtension(7, 'reason is too short to accept');
+    });
+
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: extensionKeys.all() });
+    });
   });
 });

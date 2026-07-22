@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
   getConsultationDetail,
   verifyConsultation,
   rejectConsultation,
 } from '@/server/consultations';
+import { consultationKeys } from '@/lib/query-keys';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
@@ -42,6 +44,7 @@ export function VerificationDialog({
   onActionComplete,
 }: VerificationDialogProps) {
   const { t } = useI18n();
+  const queryClient = useQueryClient();
   const [detail, setDetail] = useState<DetailData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,45 +78,109 @@ export function VerificationDialog({
     setLoading(false);
   };
 
-  const handleVerify = async () => {
-    if (!consultationId) return;
-    setLoading(true);
-    setError(null);
-    const result = await (
-      verifyConsultation as unknown as (args: {
-        data: { consultationId: number };
-      }) => Promise<{ success: boolean; error: string | null }>
-    )({ data: { consultationId } });
-    if (result.success) {
+  const verifyMutation = useMutation({
+    mutationFn: async () => {
+      if (!consultationId) throw new Error('No consultation selected');
+      const result = await (
+        verifyConsultation as unknown as (args: {
+          data: { consultationId: number };
+        }) => Promise<{ success: boolean; error: string | null }>
+      )({ data: { consultationId } });
+      if (!result.success) {
+        throw new Error(result.error ?? 'Verification failed');
+      }
+      return result;
+    },
+    onMutate: async () => {
+      setError(null);
+      await queryClient.cancelQueries({ queryKey: consultationKeys.all() });
+      const previousEntries = queryClient.getQueriesData({ queryKey: consultationKeys.all() });
+      if (consultationId != null) {
+        queryClient.setQueriesData({ queryKey: consultationKeys.all() }, (old: unknown) => {
+          if (old && typeof old === 'object' && 'consultations' in old) {
+            const data = old as { consultations: { id: number }[]; total: number };
+            return {
+              consultations: data.consultations.filter((c) => c.id !== consultationId),
+              total: Math.max(0, data.total - 1),
+            };
+          }
+          return old;
+        });
+      }
+      return { previousEntries };
+    },
+    onSuccess: () => {
       toast.success(t('consultations.verifySuccess'));
       onOpenChange(false);
       onActionComplete();
-    } else {
-      setError(result.error);
-    }
-    setLoading(false);
-  };
+    },
+    onError: (error: Error, _variables, context) => {
+      if (context?.previousEntries) {
+        for (const [queryKey, data] of context.previousEntries) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+      toast.error(error.message);
+      setError(error.message);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: consultationKeys.all() });
+    },
+  });
 
-  const handleReject = async () => {
-    if (!consultationId || !rejectReason.trim()) return;
-    setLoading(true);
-    setError(null);
-    const result = await (
-      rejectConsultation as unknown as (args: {
-        data: { consultationId: number; reason: string };
-      }) => Promise<{ success: boolean; error: string | null }>
-    )({
-      data: { consultationId, reason: rejectReason.trim() },
-    });
-    if (result.success) {
+  const rejectMutation = useMutation({
+    mutationFn: async () => {
+      if (!consultationId || !rejectReason.trim()) throw new Error('No reason provided');
+      const result = await (
+        rejectConsultation as unknown as (args: {
+          data: { consultationId: number; reason: string };
+        }) => Promise<{ success: boolean; error: string | null }>
+      )({
+        data: { consultationId, reason: rejectReason.trim() },
+      });
+      if (!result.success) {
+        throw new Error(result.error ?? 'Rejection failed');
+      }
+      return result;
+    },
+    onMutate: async () => {
+      setError(null);
+      await queryClient.cancelQueries({ queryKey: consultationKeys.all() });
+      const previousEntries = queryClient.getQueriesData({ queryKey: consultationKeys.all() });
+      if (consultationId != null) {
+        queryClient.setQueriesData({ queryKey: consultationKeys.all() }, (old: unknown) => {
+          if (old && typeof old === 'object' && 'consultations' in old) {
+            const data = old as { consultations: { id: number }[]; total: number };
+            return {
+              consultations: data.consultations.filter((c) => c.id !== consultationId),
+              total: Math.max(0, data.total - 1),
+            };
+          }
+          return old;
+        });
+      }
+      return { previousEntries };
+    },
+    onSuccess: () => {
       toast.success(t('consultations.rejectSuccess'));
       onOpenChange(false);
       onActionComplete();
-    } else {
-      setError(result.error);
-    }
-    setLoading(false);
-  };
+    },
+    onError: (error: Error, _variables, context) => {
+      if (context?.previousEntries) {
+        for (const [queryKey, data] of context.previousEntries) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+      toast.error(error.message);
+      setError(error.message);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: consultationKeys.all() });
+    },
+  });
+
+  const isMutating = verifyMutation.isPending || rejectMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -205,12 +272,16 @@ export function VerificationDialog({
                 variant="outline"
                 type="button"
                 onClick={() => setShowRejectInput(true)}
-                disabled={loading}
+                disabled={loading || isMutating}
               >
                 {t('consultations.reject')}
               </Button>
-              <Button type="button" onClick={handleVerify} disabled={loading}>
-                {loading ? (
+              <Button
+                type="button"
+                onClick={() => verifyMutation.mutate()}
+                disabled={loading || isMutating}
+              >
+                {verifyMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     {t('common.loading')}
@@ -226,17 +297,17 @@ export function VerificationDialog({
                 variant="outline"
                 type="button"
                 onClick={() => setShowRejectInput(false)}
-                disabled={loading}
+                disabled={loading || isMutating}
               >
                 {t('common.cancel')}
               </Button>
               <Button
                 variant="destructive"
                 type="button"
-                onClick={handleReject}
-                disabled={loading || !rejectReason.trim()}
+                onClick={() => rejectMutation.mutate()}
+                disabled={loading || isMutating || !rejectReason.trim()}
               >
-                {loading ? (
+                {rejectMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     {t('common.loading')}

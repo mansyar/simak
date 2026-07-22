@@ -425,6 +425,15 @@ Students and instructors lack a centralized system to:
 - **Opt-in test scripts** — `pnpm test:e2e` and `pnpm test:e2e:ui` (not part of pre-push gate)
 - **Test runtime** — Full suite passes in 56.5 seconds (well under 2-minute requirement)
 
+### Track: Optimistic UI Updates for Mutations (July 2026)
+
+- **Typed query-key factory** — New `src/lib/query-keys.ts` with 5 typed key factory objects (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys) replacing all inline query key arrays
+- **React Query migration** — Refactored 5 plain `async`+`useState` mutation patterns to `useMutation`+`useQuery`: verifyConsultation/rejectConsultation (VerificationDialog), approveExtension/rejectExtension (use-assignment-tabs), deleteUser (admin users page)
+- **Cache invalidation bug fix** — Fixed DeadlineManager `unlockCheckpoint` and `extendDeadline` mutations that were missing `queryClient.invalidateQueries` in `onSuccess` (AC-7)
+- **Optimistic updates with rollback** — All 9 mutation hooks now have `onMutate`/`onError`/`onSettled` optimistic logic: useMarkRead, useMarkAllRead, verifyConsultation, rejectConsultation, approveExtension, rejectExtension, unlockCheckpoint, extendDeadline, deleteUser
+- **Rollback contract** — Every optimistic mutation captures previous cache snapshot in `onMutate`, restores verbatim in `onError`, and shows `toast.error()` with the server's error message on rollback
+- **Tests** — 2,787 tests pass across 287 test files; coverage ≥80% on all thresholds (lines 87.89%, branches 81.75%, functions 83.34%, statements 88.47%)
+
 ### Track: Email Queue Retention & Delivery Completeness (July 2026)
 
 - **Resend message ID tracking (BUG-4)** — Added nullable `resend_message_id` column to `email_queue` schema (migration 0009); processor populates it from `result.data.id` on successful send; exposed in admin email queue inspector as a monospace truncated cell with full value in `title` tooltip

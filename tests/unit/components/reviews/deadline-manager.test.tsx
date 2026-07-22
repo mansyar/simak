@@ -3,10 +3,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { DeadlineManager } from '@/components/reviews/DeadlineManager';
+import { assignmentKeys } from '@/lib/query-keys';
 
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -361,6 +363,127 @@ describe('DeadlineManager', () => {
       expect(toast.success).toHaveBeenCalledWith(
         'instructorAssignments.deadlineManager.extendSuccess',
       );
+    });
+  });
+
+  it('should invalidate assignment query on successful unlock and extend', async () => {
+    mockUnlockCheckpoint.mockResolvedValue({ success: true });
+    mockExtendDeadline.mockResolvedValue({ success: true });
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <DeadlineManager students={mockStudents} assignmentId={1} />
+      </QueryClientProvider>,
+    );
+    expandAllStudents();
+
+    fireEvent.click(screen.getAllByText('instructorAssignments.deadlineManager.unlock')[0]);
+    fireEvent.click(screen.getByText('common.confirm'));
+
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: assignmentKeys.all() });
+    });
+
+    const dateInputs = screen.getAllByTestId(/extend-deadline-input/);
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 7);
+    fireEvent.change(dateInputs[0], { target: { value: futureDate.toISOString().slice(0, 10) } });
+    fireEvent.click(screen.getAllByText('instructorAssignments.deadlineManager.extend')[0]);
+
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: assignmentKeys.all() });
+    });
+  });
+
+  describe('optimistic updates', () => {
+    const setup = () => {
+      renderWithQuery(<DeadlineManager students={mockStudents} assignmentId={1} />);
+      expandAllStudents();
+    };
+    const clickUnlock = () => {
+      fireEvent.click(screen.getAllByText('instructorAssignments.deadlineManager.unlock')[0]);
+      fireEvent.click(screen.getByText('common.confirm'));
+    };
+    const clickExtend = () => {
+      const dateInputs = screen.getAllByTestId(/extend-deadline-input/);
+      fireEvent.change(dateInputs[0], { target: { value: '2026-12-15' } });
+      fireEvent.click(screen.getAllByText('instructorAssignments.deadlineManager.extend')[0]);
+    };
+
+    it('should optimistically change checkpoint state to unlocked', async () => {
+      mockUnlockCheckpoint.mockReturnValue(new Promise(() => {}));
+      setup();
+
+      expect(screen.getAllByText('instructorAssignments.status.locked').length).toBe(2);
+      clickUnlock();
+
+      await waitFor(() => {
+        expect(screen.getAllByText('instructorAssignments.status.locked').length).toBe(1);
+      });
+      expect(screen.getAllByText('instructorAssignments.status.unlocked').length).toBe(2);
+    });
+
+    it('should restore checkpoint state on unlock error', async () => {
+      mockUnlockCheckpoint.mockRejectedValue(new Error('Unlock failed'));
+      setup();
+
+      clickUnlock();
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Unlock failed');
+      });
+      expect(screen.getAllByText('instructorAssignments.status.locked').length).toBe(2);
+    });
+
+    it('should optimistically change dueDate on extend', async () => {
+      mockExtendDeadline.mockReturnValue(new Promise(() => {}));
+      setup();
+
+      expect(screen.getAllByText('May 20, 2026').length).toBe(2);
+      clickExtend();
+
+      await waitFor(() => {
+        expect(screen.getAllByText('May 20, 2026').length).toBe(1);
+      });
+    });
+
+    it('should restore dueDate on extend error', async () => {
+      mockExtendDeadline.mockRejectedValue(new Error('Extend failed'));
+      setup();
+
+      clickExtend();
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Extend failed');
+      });
+      expect(screen.getAllByText('May 20, 2026').length).toBe(2);
+    });
+
+    it('should rollback on server error ({ success: false }) for unlock', async () => {
+      mockUnlockCheckpoint.mockResolvedValue({ success: false, error: 'Server rejected' });
+      setup();
+
+      clickUnlock();
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server rejected');
+      });
+      expect(screen.getAllByText('instructorAssignments.status.locked').length).toBe(2);
+    });
+
+    it('should rollback on server error ({ success: false }) for extend', async () => {
+      mockExtendDeadline.mockResolvedValue({ success: false, error: 'Server rejected' });
+      setup();
+
+      clickExtend();
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server rejected');
+      });
+      expect(screen.getAllByText('May 20, 2026').length).toBe(2);
     });
   });
 });
