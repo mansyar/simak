@@ -434,4 +434,12 @@ Students and instructors lack a centralized system to:
 - **Rollback contract** — Every optimistic mutation captures previous cache snapshot in `onMutate`, restores verbatim in `onError`, and shows `toast.error()` with the server's error message on rollback
 - **Tests** — 2,787 tests pass across 287 test files; coverage ≥80% on all thresholds (lines 87.89%, branches 81.75%, functions 83.34%, statements 88.47%)
 
+### Track: Email Queue Retention & Delivery Completeness (July 2026)
+
+- **Resend message ID tracking (BUG-4)** — Added nullable `resend_message_id` column to `email_queue` schema (migration 0009); processor populates it from `result.data.id` on successful send; exposed in admin email queue inspector as a monospace truncated cell with full value in `title` tooltip
+- **Retention cleanup (ENH-OPS-1 / BUG-20)** — New `src/lib/email-queue-retention.ts` with `pruneOldEmails()` function; deletes `sent` rows older than 90 days and `failed` rows older than 180 days; never touches `pending` or `processing` rows; tick-embedded trigger in `email-queue-init.ts` runs prune if >24h since last prune; logs `email_queue.retention_pruned` with deleted count (no PII)
+- **Concurrent batch sends (PERF-32/33)** — Replaced sequential `for` loop in processor with chunked `Promise.allSettled` (batches of 5); cycle time reduced from 10× to ~2× single-send latency; partial failures handled individually per email; `FOR UPDATE SKIP LOCKED` claim, `isRunning` guard, and stale-row reclaim unchanged
+- **i18n** — 1 new key in EN and ID (`adminEmailQueue.table.resendMessageId`)
+- **Tests** — 2,757 tests pass across 288 test files; coverage ≥80% on all thresholds (stmts 87.68%, branches 81.7%, functions 82.21%, lines 88.26%)
+
 </protect>
