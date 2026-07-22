@@ -11,10 +11,10 @@
     - [x] Create `src/server/analytics.ts` with Zod input schemas (date range: predefined `7d|30d|90d|all` + custom `start`/`end` ISO dates) and `createServerFn` stub for `getAdminAnalyticsData` (dynamic import to `analytics-admin.server.ts`)
     - [x] Write tests in `tests/unit/server/analytics.test.ts` for Zod schemas (valid/invalid date ranges, predefined + custom) and stub existence
 
-- [ ] Task: Implement admin analytics handler (TDD)
-    - [ ] Write failing tests in `tests/unit/server/analytics-admin.test.ts` for `getAdminAnalyticsDataHandler` — mock `@/db/index`, `@/server/auth`; test all 6 metrics (consultation verification rate, deadline breach rate, assignment status distribution, submission/review volume, reviews completed, DAU/WAU); test date range filtering (7d/30d/90d/all + custom); test role guard (non-admin rejected)
-    - [ ] Implement `src/server/analytics-admin.server.ts` — aggregate queries: consultation verification rate, deadline breach rate, assignment status distribution (`GROUP BY state`), submission/review volume (`date_trunc` + `GROUP BY`), reviews completed count, DAU/WAU (`COUNT(DISTINCT actorId) GROUP BY date_trunc` from `audit_log`)
-    - [ ] Run `pnpm test` and confirm all tests pass
+- [x] Task: Implement admin analytics handler (TDD) [a255241]
+    - [x] Write failing tests in `tests/unit/server/analytics-admin.test.ts` for `getAdminAnalyticsDataHandler` — mock `@/db/index`, `@/server/auth`; test all 6 metrics (consultation verification rate, deadline breach rate, assignment status distribution, submission/review volume, reviews completed, DAU/WAU); test date range filtering (7d/30d/90d/all + custom); test role guard (non-admin rejected)
+    - [x] Implement `src/server/analytics-admin.server.ts` — aggregate queries: consultation verification rate, deadline breach rate, assignment status distribution (`GROUP BY state`), submission/review volume (`date_trunc` + `GROUP BY`), reviews completed count, DAU/WAU (`COUNT(DISTINCT actorId) GROUP BY date_trunc` from `audit_log`)
+    - [x] Run `pnpm test` and confirm all tests pass
 
 - [ ] Task: Create admin analytics route and UI
     - [ ] Write failing tests in `tests/unit/routes/admin-analytics.test.tsx` for route component — test MetricCard rendering, data table rendering, date range filter UI, sidebar entry
