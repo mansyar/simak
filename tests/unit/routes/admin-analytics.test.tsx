@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { ComponentType } from 'react';
+import { exportToExcel } from '@/lib/excel-export';
 
 const mocks = vi.hoisted(() => ({
   loaderData: {} as any,
@@ -49,6 +50,10 @@ vi.mock('@/lib/auth-client', () => ({
 
 vi.mock('@/components/skeletons/dashboard-skeleton', () => ({
   DashboardSkeleton: () => <div data-testid="dashboard-skeleton" />,
+}));
+
+vi.mock('@/lib/excel-export', () => ({
+  exportToExcel: vi.fn(),
 }));
 
 const mockAnalyticsData = {
@@ -164,6 +169,25 @@ describe('Admin Analytics Page', () => {
     render(<Page />);
     const emptyStates = screen.getAllByText('adminAnalytics.noData');
     expect(emptyStates.length).toBe(4);
+  });
+
+  it('renders Export Excel button', async () => {
+    const Page = await getAnalyticsPage();
+    render(<Page />);
+    expect(screen.getByText('common.exportExcel')).toBeDefined();
+  });
+
+  it('calls exportToExcel when Export Excel button is clicked', async () => {
+    vi.mocked(exportToExcel).mockClear();
+    const Page = await getAnalyticsPage();
+    render(<Page />);
+    fireEvent.click(screen.getByText('common.exportExcel'));
+    expect(exportToExcel).toHaveBeenCalledTimes(1);
+    expect(exportToExcel).toHaveBeenCalledWith(
+      expect.any(Array),
+      'Admin Analytics',
+      'admin-analytics.xlsx',
+    );
   });
 });
 

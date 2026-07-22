@@ -76,6 +76,7 @@
     "done": "Selesai",
     "clearSearch": "Hapus pencarian",
     "exportCsv": "Ekspor CSV",
+    "exportExcel": "Ekspor Excel",
     "exportStudentProgress": "Ekspor Progres Siswa",
     "exportReviewHistory": "Ekspor Riwayat Review"
   },

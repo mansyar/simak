@@ -76,6 +76,7 @@
     "done": "Done",
     "clearSearch": "Clear search",
     "exportCsv": "Export CSV",
+    "exportExcel": "Export Excel",
     "exportStudentProgress": "Export Student Progress",
     "exportReviewHistory": "Export Review History"
   },

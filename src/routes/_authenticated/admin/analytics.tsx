@@ -19,9 +19,17 @@ import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/ui/empty-state';
 import { isServerError } from '@/lib/errors';
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
-import { ShieldCheck, AlertTriangle, CheckCircle, BarChart3, Download } from 'lucide-react';
+import {
+  ShieldCheck,
+  AlertTriangle,
+  CheckCircle,
+  BarChart3,
+  Download,
+  FileSpreadsheet,
+} from 'lucide-react';
 import { exportAssignmentProgressCsv } from '@/server/analytics';
 import { useCsvDownload } from '@/hooks/use-csv-download';
+import { exportToExcel } from '@/lib/excel-export';
 
 const AnalyticsSearchSchema = z.object({
   range: z.enum(['7d', '30d', '90d', 'all']).optional(),
@@ -120,25 +128,65 @@ function AdminAnalyticsPage() {
     });
   };
 
+  const handleExportExcel = () => {
+    const rows: Record<string, unknown>[] = [
+      { Metric: 'Consultation Verification Rate', Value: `${data.consultationVerificationRate}%` },
+      { Metric: 'Deadline Breach Rate', Value: `${data.deadlineBreachRate}%` },
+      { Metric: 'Reviews Completed', Value: data.reviewsCompleted },
+      ...data.statusDistribution.map((s) => ({
+        Category: 'Status Distribution',
+        State: s.state,
+        Count: s.count,
+      })),
+      ...data.submissionTrend.map((r) => ({
+        Category: 'Submission Trend',
+        Date: r.date,
+        Count: r.count,
+      })),
+      ...data.reviewTrend.map((r) => ({
+        Category: 'Review Trend',
+        Date: r.date,
+        Count: r.count,
+      })),
+      ...data.dauTrend.map((r) => ({
+        Category: 'DAU',
+        Date: r.date,
+        Count: r.activeUsers,
+      })),
+      ...data.wauTrend.map((r) => ({
+        Category: 'WAU',
+        Date: r.date,
+        Count: r.activeUsers,
+      })),
+    ];
+    exportToExcel(rows, 'Admin Analytics', 'admin-analytics.xlsx');
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('adminAnalytics.title')}
         subtitle={t('adminAnalytics.subtitle')}
         action={
-          <Button
-            variant="outline"
-            loading={isExporting}
-            onClick={() =>
-              exportCsv(
-                () => exportAssignmentProgressCsv({ data: {} }) as Promise<unknown>,
-                'assignment-progress.csv',
-              )
-            }
-          >
-            <Download className="mr-2 h-4 w-4" aria-hidden="true" />
-            {t('common.exportCsv')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              loading={isExporting}
+              onClick={() =>
+                exportCsv(
+                  () => exportAssignmentProgressCsv({ data: {} }) as Promise<unknown>,
+                  'assignment-progress.csv',
+                )
+              }
+            >
+              <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t('common.exportCsv')}
+            </Button>
+            <Button variant="outline" onClick={handleExportExcel}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t('common.exportExcel')}
+            </Button>
+          </div>
         }
       />
 

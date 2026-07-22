@@ -81,6 +81,7 @@ export type Translation = {
     done: string
     clearSearch: string
     exportCsv: string
+    exportExcel: string
     exportStudentProgress: string
     exportReviewHistory: string
   }

@@ -8,7 +8,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { isServerError } from '@/lib/errors';
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
-import { CheckCircle, Clock, AlertTriangle, Users, ClipboardList } from 'lucide-react';
+import {
+  CheckCircle,
+  Clock,
+  AlertTriangle,
+  Users,
+  ClipboardList,
+  FileSpreadsheet,
+} from 'lucide-react';
+import { exportToExcel } from '@/lib/excel-export';
 
 const AnalyticsSearchSchema = z.object({
   range: z.enum(['7d', '30d', '90d', 'all']).optional(),
@@ -95,14 +103,32 @@ function InstructorAnalyticsPage() {
     });
   };
 
+  const handleExportExcel = () => {
+    const rows: Record<string, unknown>[] = [
+      { Metric: 'Reviews Completed', Value: data.reviewsCompleted },
+      {
+        Metric: 'Average Response Time (Hours)',
+        Value: data.averageResponseTimeHours ?? 'N/A',
+      },
+      { Metric: 'SLA Breach Count', Value: data.slaBreachCount },
+      { Metric: 'Students Supervised', Value: data.studentsSupervised },
+      { Metric: 'Assignments Active', Value: data.assignmentsActive },
+    ];
+    exportToExcel(rows, 'Instructor Analytics', 'instructor-analytics.xlsx');
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('instructorAnalytics.title')}
         subtitle={t('instructorAnalytics.subtitle')}
+        action={
+          <Button variant="outline" onClick={handleExportExcel}>
+            <FileSpreadsheet className="mr-2 h-4 w-4" aria-hidden="true" />
+            {t('common.exportExcel')}
+          </Button>
+        }
       />
-
-      {/* Date Range Selector */}
       <div className="flex flex-wrap items-center gap-2">
         {RANGE_OPTIONS.map((opt) => (
           <Button
