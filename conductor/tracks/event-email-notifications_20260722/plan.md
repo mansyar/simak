@@ -57,7 +57,7 @@
     - [ ] Implement post-commit advisory `enqueueEmail` call (conditional on decision: pass vs revise)
     - [ ] Verify tests pass
 
-- [ ] Task: Wire `enqueueEmail` in consultation handlers (`consultations.server.ts`)
+- [x] Task: Wire `enqueueEmail` in consultation handlers (`consultations.server.ts`) [bea212b]
     - [ ] Write tests for `verifyConsultationHandler` — `consultation_verified` → student, subject `[SIMAK] Consultation Verified`, correct template_type and body
     - [ ] Write tests for `rejectConsultationHandler` — `consultation_rejected` → student, subject `[SIMAK] Consultation Rejected`, correct template_type and body
     - [ ] Write advisory-only failure tests for both handlers
