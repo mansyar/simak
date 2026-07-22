@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
 import { toast } from 'sonner';
 import { createAssignment } from '@/server/assignments';
 import { getTemplate } from '@/server/templates';
 import { listUsers } from '@/server/users';
+import { userKeys } from '@/lib/query-keys';
 import { TemplatePicker } from './TemplatePicker';
 import { AssignmentDetailsForm } from './AssignmentDetailsForm';
 import { StudentPicker } from './StudentPicker';
@@ -54,33 +56,29 @@ export function AssignmentWizard() {
   // Due date overrides
   const [dueDateOverrides, setDueDateOverrides] = useState<DueDateOverride[]>([]);
 
-  // List of all students for lookup in final review step
-  const [students, setStudents] = useState<Student[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const { data: studentsData, isError } = useQuery({
+    queryKey: userKeys.list({ page: 1, limit: 200, search: '', role: 'student' }),
+    queryFn: async () => {
+      const response = await (
+        listUsers as unknown as (args: {
+          data: { page: number; limit: number; search: string; role?: string };
+        }) => Promise<{ users: Student[] }>
+      )({
+        data: { page: 1, limit: 200, search: '', role: 'student' },
+      });
+      return response;
+    },
+    retry: false,
+  });
+
   useEffect(() => {
-    // Load student list so we have their names/emails for the summary screen
-    async function loadStudents() {
-      try {
-        const response = await (
-          listUsers as unknown as (args: {
-            data: { page: number; limit: number; search: string; role?: string };
-          }) => Promise<{ users: Student[] }>
-        )({
-          data: { page: 1, limit: 200, search: '', role: 'student' },
-        });
-        if (response && response.users) {
-          setStudents(response.users);
-        }
-      } catch (err) {
-        console.error('Failed to pre-fetch student names', err);
-        toast.error(t('errors.fetchFailed'));
-      }
+    if (isError) {
+      toast.error(t('errors.fetchFailed'));
     }
-    loadStudents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isError, t]);
 
   const handleSelectTemplate = async (tpl: Template) => {
     setSelectedTemplate(tpl);
@@ -224,6 +222,7 @@ export function AssignmentWizard() {
   };
 
   // Find student details for selected IDs to display in Review step
+  const students = studentsData?.users ?? [];
   const assignedStudents = students.filter((s) => selectedStudentIds.includes(s.id));
 
   // Step definitions

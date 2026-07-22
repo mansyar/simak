@@ -1,7 +1,7 @@
 /**
  * Typed query-key factories for TanStack Query.
  *
- * Only the 5 feature domains touched by the 9 optimistic-UI mutation sites
+ * Only the 6 feature domains touched by the 9 optimistic-UI mutation sites
  * have factories here. Other features keep inline keys until touched.
  */
 
@@ -32,4 +32,10 @@ export const userKeys = {
   all: () => ['users'] as const,
   list: (filters?: { page?: number; limit?: number; search?: string; role?: string }) =>
     ['users', 'list', filters ?? {}] as const,
+};
+
+export const templateKeys = {
+  all: () => ['templates'] as const,
+  list: (filters?: { page?: number; limit?: number; search?: string; type?: string }) =>
+    ['templates', 'list', filters ?? {}] as const,
 };

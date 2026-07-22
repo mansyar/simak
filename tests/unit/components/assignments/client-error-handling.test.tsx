@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
 import { TemplatePicker } from '@/components/instructor/assignments/TemplatePicker';
 import { StudentPicker } from '@/components/instructor/assignments/StudentPicker';
 import { AssignmentWizard } from '@/components/instructor/assignments/AssignmentWizard';
@@ -135,6 +137,15 @@ async function advanceWizardToReview() {
   fireEvent.click(screen.getByText('Next'));
 }
 
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  };
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -144,7 +155,9 @@ describe('Client fetch error handling', () => {
     it('shows a toast when templates fail to load', async () => {
       vi.mocked(templatesApi.listTemplates).mockRejectedValue(new Error('Network failure'));
 
-      render(<TemplatePicker selectedTemplateId={null} onSelectTemplate={vi.fn()} />);
+      render(<TemplatePicker selectedTemplateId={null} onSelectTemplate={vi.fn()} />, {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => {
         expect(templatesApi.listTemplates).toHaveBeenCalled();
@@ -168,6 +181,7 @@ describe('Client fetch error handling', () => {
           onDeselectAll={vi.fn()}
           errors={{}}
         />,
+        { wrapper: createWrapper() },
       );
 
       await waitFor(() => {
@@ -210,7 +224,7 @@ describe('Client fetch error handling', () => {
     it('shows a toast when the initial student list fails to load', async () => {
       vi.mocked(usersApi.listUsers).mockRejectedValue(new Error('Network failure'));
 
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(usersApi.listUsers).toHaveBeenCalled();
@@ -225,7 +239,7 @@ describe('Client fetch error handling', () => {
       vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockStudents, total: 2 } as any);
       vi.mocked(templatesApi.getTemplate).mockRejectedValue(new Error('Network failure'));
 
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByText('Thesis Template')).toBeDefined();
@@ -247,7 +261,7 @@ describe('Client fetch error handling', () => {
       vi.mocked(templatesApi.getTemplate).mockResolvedValue(mockTemplateDetails as any);
       vi.mocked(assignmentsApi.createAssignment).mockRejectedValue(new Error('Network failure'));
 
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByText('Thesis Template')).toBeDefined();

@@ -5,6 +5,7 @@ import {
   extensionKeys,
   assignmentKeys,
   userKeys,
+  templateKeys,
 } from '@/lib/query-keys';
 
 describe('query-key factories', () => {
@@ -69,6 +70,21 @@ describe('query-key factories', () => {
 
     it('list() with no args returns list key with empty object', () => {
       expect(userKeys.list()).toEqual(['users', 'list', {}]);
+    });
+  });
+
+  describe('templateKeys', () => {
+    it('all() returns root template key', () => {
+      expect(templateKeys.all()).toEqual(['templates']);
+    });
+
+    it('list() returns list key with filters', () => {
+      const filters = { page: 1, limit: 100, search: '' };
+      expect(templateKeys.list(filters)).toEqual(['templates', 'list', filters]);
+    });
+
+    it('list() with no args returns list key with empty object', () => {
+      expect(templateKeys.list()).toEqual(['templates', 'list', {}]);
     });
   });
 });

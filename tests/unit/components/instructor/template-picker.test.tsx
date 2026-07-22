@@ -1,7 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
 import { TemplatePicker } from '@/components/instructor/assignments/TemplatePicker';
 import * as templatesApi from '@/server/templates';
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  };
+}
 
 vi.mock('@/server/templates', () => ({
   listTemplates: vi.fn(),
@@ -57,7 +68,9 @@ describe('TemplatePicker', () => {
   });
 
   it('should render loading skeleton initially and load templates', async () => {
-    render(<TemplatePicker selectedTemplateId={null} onSelectTemplate={onSelectTemplate} />);
+    render(<TemplatePicker selectedTemplateId={null} onSelectTemplate={onSelectTemplate} />, {
+      wrapper: createWrapper(),
+    });
 
     // Should show the title
     expect(screen.getByText('Select Template')).toBeDefined();
@@ -70,7 +83,9 @@ describe('TemplatePicker', () => {
   });
 
   it('should filter templates based on search query', async () => {
-    render(<TemplatePicker selectedTemplateId={null} onSelectTemplate={onSelectTemplate} />);
+    render(<TemplatePicker selectedTemplateId={null} onSelectTemplate={onSelectTemplate} />, {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Thesis Template')).toBeDefined();
@@ -84,7 +99,9 @@ describe('TemplatePicker', () => {
   });
 
   it('should trigger onSelectTemplate when clicking a template card', async () => {
-    render(<TemplatePicker selectedTemplateId={null} onSelectTemplate={onSelectTemplate} />);
+    render(<TemplatePicker selectedTemplateId={null} onSelectTemplate={onSelectTemplate} />, {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Thesis Template')).toBeDefined();
@@ -95,7 +112,9 @@ describe('TemplatePicker', () => {
   });
 
   it('should show the milestones roadmap preview when template is selected', async () => {
-    render(<TemplatePicker selectedTemplateId={1} onSelectTemplate={onSelectTemplate} />);
+    render(<TemplatePicker selectedTemplateId={1} onSelectTemplate={onSelectTemplate} />, {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(screen.getAllByText('Thesis Template')[0]).toBeDefined();

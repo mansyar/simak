@@ -1,7 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
 import { StudentPicker } from '@/components/instructor/assignments/StudentPicker';
 import * as usersApi from '@/server/users';
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  };
+}
 
 vi.mock('@/server/users', () => ({
   listUsers: vi.fn(),
@@ -58,6 +69,7 @@ describe('StudentPicker', () => {
         onDeselectAll={onDeselectAll}
         errors={{}}
       />,
+      { wrapper: createWrapper() },
     );
 
     expect(screen.getByText('Assign Students')).toBeDefined();
@@ -77,6 +89,7 @@ describe('StudentPicker', () => {
         onDeselectAll={onDeselectAll}
         errors={{}}
       />,
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => {
@@ -96,6 +109,7 @@ describe('StudentPicker', () => {
         onDeselectAll={onDeselectAll}
         errors={{}}
       />,
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => {
@@ -118,6 +132,7 @@ describe('StudentPicker', () => {
         onDeselectAll={onDeselectAll}
         errors={{}}
       />,
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => {
@@ -137,6 +152,7 @@ describe('StudentPicker', () => {
         onDeselectAll={onDeselectAll}
         errors={{ studentIds: 'At least one student is required' }}
       />,
+      { wrapper: createWrapper() },
     );
 
     expect(screen.getByText('At least one student is required')).toBeDefined();

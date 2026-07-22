@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { listUsers } from '@/server/users';
+import { userKeys } from '@/lib/query-keys';
 import { useI18n } from '../../../routes/__root';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
@@ -29,37 +31,30 @@ export function StudentPicker({
   errors,
 }: StudentPickerProps) {
   const { t } = useI18n();
-  const [students, setStudents] = useState<Student[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [error, setError] = useState<string | null>(null);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: userKeys.list({ page: 1, limit: 200, search: '', role: 'student' }),
+    queryFn: async () => {
+      const response = await (
+        listUsers as unknown as (args: {
+          data: { page: number; limit: number; search: string; role?: string };
+        }) => Promise<{ users: Student[] }>
+      )({
+        data: { page: 1, limit: 200, search: '', role: 'student' },
+      });
+      return response;
+    },
+    retry: false,
+  });
+
+  const students = data?.users ?? [];
 
   useEffect(() => {
-    async function fetchStudents() {
-      try {
-        setLoading(true);
-        // Request page 1 with high limit to capture all student users
-        const response = await (
-          listUsers as unknown as (args: {
-            data: { page: number; limit: number; search: string; role?: string };
-          }) => Promise<{ users: Student[] }>
-        )({
-          data: { page: 1, limit: 200, search: '', role: 'student' },
-        });
-        if (response && response.users) {
-          setStudents(response.users);
-        }
-      } catch (err) {
-        console.error('Failed to load students', err);
-        toast.error(t('errors.fetchFailed'));
-        setError('Could not load student list.');
-      } finally {
-        setLoading(false);
-      }
+    if (isError) {
+      toast.error(t('errors.fetchFailed'));
     }
-    fetchStudents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isError, t]);
 
   const filteredStudents = students.filter(
     (s) =>
@@ -126,7 +121,7 @@ export function StudentPicker({
         </div>
 
         {/* Select All Toggle Button */}
-        {!loading && filteredStudents.length > 0 && (
+        {!isLoading && filteredStudents.length > 0 && (
           <button
             type="button"
             onClick={handleSelectAllToggle}
@@ -151,7 +146,7 @@ export function StudentPicker({
         <p className="text-xs font-bold text-destructive animate-slide-down">{errors.studentIds}</p>
       )}
 
-      {loading ? (
+      {isLoading ? (
         <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <Card key={n} className="p-4 border-dashed animate-pulse flex items-center gap-3">
@@ -162,10 +157,6 @@ export function StudentPicker({
               </div>
             </Card>
           ))}
-        </div>
-      ) : error ? (
-        <div className="p-4 rounded-lg bg-destructive/10 text-destructive text-sm text-center">
-          {error}
         </div>
       ) : filteredStudents.length === 0 ? (
         <div className="p-8 text-center border rounded-xl border-dashed">
