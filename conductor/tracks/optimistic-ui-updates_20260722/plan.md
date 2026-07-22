@@ -47,11 +47,11 @@
 
 ## Phase 2: Consultation & Extension Hooks Optimistic Updates
 
-- [ ] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 2
-- [ ] Task: Add optimistic updates to `verifyConsultation` hook (after Phase 0 refactor)
-    - [ ] Write failing tests — verify `onMutate` flips `status` to `verified` and removes from pending list in consultations cache; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
-    - [ ] Implement `onMutate`/`onError`/`onSettled` in `verifyConsultation` mutation
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 2
+- [x] Task: Add optimistic updates to `verifyConsultation` hook (after Phase 0 refactor) [f2ac940]
+    - [x] Write failing tests — verify `onMutate` flips `status` to `verified` and removes from pending list in consultations cache; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
+    - [x] Implement `onMutate`/`onError`/`onSettled` in `verifyConsultation` mutation
+    - [x] Run `pnpm test` — confirm tests pass
 - [ ] Task: Add optimistic updates to `rejectConsultation` hook (after Phase 0 refactor)
     - [ ] Write failing tests — verify `onMutate` flips `status` to `rejected` and removes from pending list; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
     - [ ] Implement `onMutate`/`onError`/`onSettled` in `rejectConsultation` mutation
