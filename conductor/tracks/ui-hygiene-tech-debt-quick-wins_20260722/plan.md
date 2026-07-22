@@ -3,29 +3,30 @@
 
 ## Phase 1: Landing Footer Link & Copyright Hygiene (ENH-UX-1)
 
-- [ ] Task: Read spec.md and workflow.md to re-ground before Phase 1 implementation
-    - [ ] Read `conductor/tracks/ui-hygiene-tech-debt-quick-wins_20260722/spec.md` (requirements, acceptance criteria, scope)
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit/git-notes protocol, checkpoint protocol)
-- [ ] Task: Write failing tests for footer link targets and dynamic copyright (Red)
-    - [ ] Add/extend route test asserting no `href="#"` remains in `src/routes/index.tsx` footer
-    - [ ] Assert the "About" link points to `#how-it-works`
-    - [ ] Assert the "Contact" link is absent from the footer
-    - [ ] Assert the copyright renders via the `landing.footer.copyright` i18n key with the current year
-    - [ ] Run `pnpm test` and confirm the new tests fail as expected
-- [ ] Task: Implement footer fixes (Green)
-    - [ ] FR-1.1: Replace the "About" `href="#"` with `<a href="#how-it-works">` in `src/routes/index.tsx`
-    - [ ] FR-1.2: Remove the "Contact" `<a href="#">` link from the footer
-    - [ ] FR-1.3: Replace `&copy; 2026 SIMAK` with `t('landing.footer.copyright', { year: new Date().getFullYear() })`
-    - [ ] FR-1.4: Add `landing.footer.copyright` key to `locales/en.json` and `locales/id.json`
-    - [ ] FR-1.5: Remove `landing.footer.links.contact` key from `locales/en.json` and `locales/id.json`
-    - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `detect-locale.ts`
-    - [ ] Run `pnpm test` and confirm all tests now pass
-- [ ] Task: Verify quality gates for Phase 1
-    - [ ] Run `pnpm test:coverage` (≥80% on lines, statements, branches, functions)
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint` (includes `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n` (EN↔ID parity; no unused keys)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Landing Footer Link & Copyright Hygiene' (Protocol in workflow.md)
+- [x] Task: Read spec.md and workflow.md to re-ground before Phase 1 implementation
+    - [x] Read `conductor/tracks/ui-hygiene-tech-debt-quick-wins_20260722/spec.md` (requirements, acceptance criteria, scope)
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit/git-notes protocol, checkpoint protocol)
+- [x] Task: Write failing tests for footer link targets and dynamic copyright (Red)
+    - [x] Add/extend route test asserting no `href="#"` remains in `src/routes/index.tsx` footer
+    - [x] Assert the "About" link points to `#how-it-works`
+    - [x] Assert the "Contact" link is absent from the footer
+    - [x] Assert the copyright renders via the `landing.footer.copyright` i18n key with the current year
+    - [x] Run `pnpm test` and confirm the new tests fail as expected
+- [x] Task: Implement footer fixes (Green)
+    - [x] FR-1.1: Replace the "About" `href="#"` with `<a href="#how-it-works">` in `src/routes/index.tsx`
+    - [x] FR-1.2: Remove the "Contact" `<a href="#">` link from the footer
+    - [x] FR-1.3: Replace `&copy; 2026 SIMAK` with `t('landing.footer.copyright', { year: new Date().getFullYear() })`
+    - [x] FR-1.4: Add `landing.footer.copyright` key to `locales/en.json` and `locales/id.json`
+    - [x] FR-1.5: Remove `landing.footer.links.contact` key from `locales/en.json` and `locales/id.json`
+    - [x] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `detect-locale.ts`
+    - [x] Run `pnpm test` and confirm all tests now pass
+- [x] Task: Verify quality gates for Phase 1
+    - [x] Run `pnpm test:coverage` (≥80% on lines, statements, branches, functions)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint` (includes `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n` (EN↔ID parity; no unused keys)
+    - [x] NFR-1: Verified zero `href="#"` in `src/routes/`
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Landing Footer Link & Copyright Hygiene' (Protocol in workflow.md)
 
 ## Phase 2: Resolve eslint-disable via useQuery Conversion (ENH-TD-1)
 

@@ -654,10 +654,10 @@
     },
     "footer": {
       "description": "Sistem Informasi & Manajemen Akademik",
+      "copyright": "© {year} SIMAK",
       "links": {
         "login": "Masuk",
-        "about": "Tentang",
-        "contact": "Kontak"
+        "about": "Tentang"
       }
     }
   },

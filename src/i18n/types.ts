@@ -659,10 +659,10 @@ export type Translation = {
     }
     footer: {
       description: string
+      copyright: string
       links: {
         login: string
         about: string
-        contact: string
       }
     }
   }
