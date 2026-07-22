@@ -49,7 +49,7 @@
     - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`
     - [ ] Run `pnpm test` and confirm all tests pass
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Instructor Analytics Dashboard' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Instructor Analytics Dashboard' (Protocol in workflow.md)
 
 ## Phase 3: CSV Export
 
