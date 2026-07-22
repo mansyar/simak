@@ -77,10 +77,10 @@
     - [x] Write failing tests — verify `onMutate` reflects `dueDate` change in assignment detail cache; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
     - [x] Implement `onMutate`/`onError`/`onSettled` in `extendMutation`
     - [x] Run `pnpm test` — confirm tests pass
-- [~] Task: Add optimistic updates to `deleteUser` (admin/users/index.tsx, after Phase 0 refactor)
-    - [ ] Write failing tests — verify `onMutate` removes row from user list cache optimistically; `onError` restores snapshot (re-adds row) + shows `toast.error()`; `onSettled` invalidates
-    - [ ] Implement `onMutate`/`onError`/`onSettled` in `deleteUser` mutation
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Add optimistic updates to `deleteUser` (admin/users/index.tsx, after Phase 0 refactor) [e1fcb58]
+    - [x] Write failing tests — verify `onMutate` removes row from user list cache optimistically; `onError` restores snapshot (re-adds row) + shows `toast.error()`; `onSettled` invalidates
+    - [x] Implement `onMutate`/`onError`/`onSettled` in `deleteUser` mutation
+    - [x] Run `pnpm test` — confirm tests pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Deadline & User Hooks Optimistic Updates' (Protocol in workflow.md)
 
 ## Phase 4: Audit & Regression
