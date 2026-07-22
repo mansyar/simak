@@ -46,6 +46,8 @@ const mockProps = {
 describe('TemplatePicker', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    // `as never` bypasses useQuery's complex return type; mock provides only fields the component reads
     vi.mocked(useQuery).mockReturnValue({
       data: { templates: mockTemplates },
       isLoading: false,
@@ -84,9 +86,24 @@ describe('TemplatePicker', () => {
       data: undefined,
       isLoading: false,
       isError: true,
+      error: new Error('Network failure'),
     } as never);
     render(<TemplatePicker {...mockProps} />);
     expect(toast.error).toHaveBeenCalledWith('errors.fetchFailed');
+    expect(console.error).toHaveBeenCalledWith('Failed to load templates', expect.any(Error));
+  });
+
+  it('triggers onSelectTemplate when a template card is clicked', () => {
+    render(<TemplatePicker {...mockProps} />);
+    fireEvent.click(screen.getByText('Final Project'));
+    expect(mockProps.onSelectTemplate).toHaveBeenCalledWith(mockTemplates[0]);
+  });
+
+  it('shows checkpoint preview when a template is selected', () => {
+    render(<TemplatePicker selectedTemplateId={1} onSelectTemplate={vi.fn()} />);
+    expect(screen.getByText('Proposal')).toBeInTheDocument();
+    expect(screen.getByText('Draft')).toBeInTheDocument();
+    expect(screen.getByText('Final')).toBeInTheDocument();
   });
 
   it('filters templates by search input', () => {

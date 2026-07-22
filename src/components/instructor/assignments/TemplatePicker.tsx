@@ -25,7 +25,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
   const { t } = useI18n();
   const [search, setSearch] = useState('');
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: templateKeys.list({ page: 1, limit: 100, search: '' }),
     queryFn: async () => {
       const response = await (
@@ -44,9 +44,10 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
 
   useEffect(() => {
     if (isError) {
+      console.error('Failed to load templates', error);
       toast.error(t('errors.fetchFailed'));
     }
-  }, [isError, t]);
+  }, [isError, error, t]);
 
   const filteredTemplates = templates.filter(
     (tpl) =>

@@ -148,6 +148,7 @@ function createWrapper() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 describe('Client fetch error handling', () => {

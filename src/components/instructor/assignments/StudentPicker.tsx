@@ -33,7 +33,7 @@ export function StudentPicker({
   const { t } = useI18n();
   const [search, setSearch] = useState('');
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: userKeys.list({ page: 1, limit: 200, search: '', role: 'student' }),
     queryFn: async () => {
       const response = await (
@@ -52,9 +52,10 @@ export function StudentPicker({
 
   useEffect(() => {
     if (isError) {
+      console.error('Failed to load students', error);
       toast.error(t('errors.fetchFailed'));
     }
-  }, [isError, t]);
+  }, [isError, error, t]);
 
   const filteredStudents = students.filter(
     (s) =>

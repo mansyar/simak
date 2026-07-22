@@ -64,6 +64,8 @@ vi.mock('@/components/instructor/assignments/ReviewStep', () => ({
 describe('AssignmentWizard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    // `as never` bypasses useQuery's complex return type; mock provides only fields the component reads
     vi.mocked(useQuery).mockReturnValue({
       data: { users: [] },
       isLoading: false,
@@ -91,8 +93,10 @@ describe('AssignmentWizard', () => {
       data: undefined,
       isLoading: false,
       isError: true,
+      error: new Error('Network failure'),
     } as never);
     render(<AssignmentWizard />);
     expect(toast.error).toHaveBeenCalledWith('errors.fetchFailed');
+    expect(console.error).toHaveBeenCalledWith('Failed to load students', expect.any(Error));
   });
 });

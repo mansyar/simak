@@ -49,6 +49,8 @@ const mockProps = {
 describe('StudentPicker', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    // `as never` bypasses useQuery's complex return type; mock provides only fields the component reads
     vi.mocked(useQuery).mockReturnValue({
       data: { users: mockStudents },
       isLoading: false,
@@ -87,9 +89,30 @@ describe('StudentPicker', () => {
       data: undefined,
       isLoading: false,
       isError: true,
+      error: new Error('Network failure'),
     } as never);
     render(<StudentPicker {...mockProps} />);
     expect(toast.error).toHaveBeenCalledWith('errors.fetchFailed');
+    expect(console.error).toHaveBeenCalledWith('Failed to load students', expect.any(Error));
+  });
+
+  it('triggers onToggleStudent when a student card is clicked', () => {
+    render(<StudentPicker {...mockProps} />);
+    fireEvent.click(screen.getByText('Alice Johnson'));
+    expect(mockProps.onToggleStudent).toHaveBeenCalledWith('1');
+  });
+
+  it('triggers onSelectAll with all student IDs when Select All is clicked', () => {
+    render(<StudentPicker {...mockProps} />);
+    fireEvent.click(screen.getByText('instructorAssignments.selectAll'));
+    expect(mockProps.onSelectAll).toHaveBeenCalledWith(['1', '2', '3']);
+  });
+
+  it('renders validation error when errors.studentIds is present', () => {
+    render(
+      <StudentPicker {...mockProps} errors={{ studentIds: 'At least one student is required' }} />,
+    );
+    expect(screen.getByText('At least one student is required')).toBeInTheDocument();
   });
 
   it('filters students by search input', () => {

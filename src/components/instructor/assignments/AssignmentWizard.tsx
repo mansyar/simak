@@ -59,7 +59,11 @@ export function AssignmentWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { data: studentsData, isError } = useQuery({
+  const {
+    data: studentsData,
+    isError,
+    error,
+  } = useQuery({
     queryKey: userKeys.list({ page: 1, limit: 200, search: '', role: 'student' }),
     queryFn: async () => {
       const response = await (
@@ -76,9 +80,10 @@ export function AssignmentWizard() {
 
   useEffect(() => {
     if (isError) {
+      console.error('Failed to load students', error);
       toast.error(t('errors.fetchFailed'));
     }
-  }, [isError, t]);
+  }, [isError, error, t]);
 
   const handleSelectTemplate = async (tpl: Template) => {
     setSelectedTemplate(tpl);
