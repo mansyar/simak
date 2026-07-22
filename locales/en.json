@@ -946,5 +946,15 @@
       "importButton": "Import {{count}} Templates",
       "createdSkipped": "{{created}} created, {{skipped}} skipped."
     }
+  },
+  "shortcuts": {
+    "cheatSheet": {
+      "title": "Keyboard Shortcuts",
+      "refresh": "Refresh data",
+      "help": "Toggle this help",
+      "nextReview": "Next pending review",
+      "prevReview": "Previous pending review",
+      "notOnReviewPage": "(available on review pages only)"
+    }
   }
 }

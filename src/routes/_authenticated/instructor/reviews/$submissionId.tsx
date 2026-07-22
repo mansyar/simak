@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
-import { getReviewDetail, openForReview, listPendingReviews } from '@/server/reviews';
+import { getReviewDetail, openForReview } from '@/server/reviews';
+import { useReviewNav } from '@/hooks/use-review-nav';
 import { ReviewDetailHeader } from '@/components/reviews/ReviewDetailHeader';
 import { ReviewFilePreview } from '@/components/reviews/ReviewFilePreview';
 import { ReviewHistory } from '@/components/reviews/ReviewHistory';
@@ -34,10 +35,10 @@ function ReviewDetailPage() {
   const detail = data && !isServerError(data) ? data : null;
   const params = Route.useParams();
   const navigate = useNavigate();
+  const { pendingList, currentIndex } = useReviewNav(Number(params.submissionId));
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [transitioned, setTransitioned] = useState(false);
-  const [nextReviewSubmissionId, setNextReviewSubmissionId] = useState<number | null>(null);
 
   // On page load, if checkpoint is 'submitted', call openForReview
   useEffect(() => {
@@ -60,25 +61,10 @@ function ReviewDetailPage() {
     }
   }, [detail, params.submissionId, transitioned, navigate, t]);
 
-  // Fetch next pending review when success screen is shown
-  useEffect(() => {
-    if (!success) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const result = await listPendingReviews({ data: { page: 1, limit: 1 } });
-        if (cancelled || isServerError(result)) return;
-        if (result.items.length > 0) {
-          setNextReviewSubmissionId(result.items[0].submissionId);
-        }
-      } catch {
-        // Silently fail — button just won't show
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [success]);
+  // Compute next review from preloaded list (instant — no server call)
+  const nextIdx = currentIndex < 0 ? 0 : currentIndex + 1;
+  const nextReviewSubmissionId =
+    nextIdx < pendingList.length ? pendingList[nextIdx].submissionId : null;
 
   if (!detail) {
     return (

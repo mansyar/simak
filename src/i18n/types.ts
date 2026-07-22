@@ -952,6 +952,16 @@ export type Translation = {
       createdSkipped: string
     }
   }
+  shortcuts: {
+    cheatSheet: {
+      title: string
+      refresh: string
+      help: string
+      nextReview: string
+      prevReview: string
+      notOnReviewPage: string
+    }
+  }
 }
 
 export type TranslationFunctions = Record<string, (key: string) => string>

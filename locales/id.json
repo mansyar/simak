@@ -946,5 +946,15 @@
       "importButton": "Impor {{count}} Template",
       "createdSkipped": "{{created}} dibuat, {{skipped}} dilewati."
     }
+  },
+  "shortcuts": {
+    "cheatSheet": {
+      "title": "Pintasan Keyboard",
+      "refresh": "Segarkan data",
+      "help": "Tampilkan bantuan ini",
+      "nextReview": "Peninjauan tertunda berikutnya",
+      "prevReview": "Peninjauan tertunda sebelumnya",
+      "notOnReviewPage": "(hanya tersedia di halaman tinjauan)"
+    }
   }
 }
