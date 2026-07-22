@@ -40,12 +40,12 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md and mark task complete
 
-- [ ] Task: Add `--checkers` flag to `lefthook.yml` pre-push typecheck gate
-    - [ ] Update the pre-push typecheck command in `lefthook.yml` from `tsc --noEmit --incremental` to `tsc --noEmit --incremental --checkers`
-    - [ ] Run `pnpm typecheck` with the new flag — confirm it succeeds
-    - [ ] Commit: `chore(ci): Add --checkers flag to typecheck gate for TS 7 multithreading`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md and mark task complete
+- [x] Task: Add `--checkers` flag to `lefthook.yml` pre-push typecheck gate `3d31fb4`
+    - [x] Update the pre-push typecheck command in `lefthook.yml` from `tsc --noEmit --incremental` to `tsc --noEmit --incremental --checkers`
+    - [x] Run `pnpm typecheck` with the new flag — confirm it succeeds
+    - [x] Commit: `chore(ci): Add --checkers flag to typecheck gate for TS 7 multithreading`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md and mark task complete
 
 - [ ] Task: Verify configuration tests pass (Green Phase)
     - [ ] Run `pnpm test` — confirm the configuration verification tests from the Red Phase task now pass
