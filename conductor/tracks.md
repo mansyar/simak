@@ -8,3 +8,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Instructor Productivity: DOCX Preview & Keyboard Shortcuts**
+*Link: [./tracks/instructor-productivity-docx-preview-keyboard-shortcuts_20260722/](./tracks/instructor-productivity-docx-preview-keyboard-shortcuts_20260722/)*
+
+---
+
