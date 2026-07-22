@@ -83,7 +83,7 @@
     - [x] Run `pnpm test` — confirm tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Deadline & User Hooks Optimistic Updates' (Protocol in workflow.md)
 
-## Phase 4: Audit & Regression
+## Phase 4: Audit & Regression (Checkpoint: 5c2ab63)
 
 - [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 4
 - [x] Task: Verify all 9 mutation sites have optimistic logic
@@ -96,5 +96,5 @@
     - [x] Run `pnpm lint` — confirm 0 warnings, 0 errors (including `simak-i18n/no-hardcoded`)
     - [x] Run `pnpm check:i18n` — confirm parity
     - [x] Verify all files ≤500 lines
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Audit & Regression' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Audit & Regression' (Protocol in workflow.md)
 </protect>
