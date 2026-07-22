@@ -8,12 +8,12 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md and mark task complete
 
-- [ ] Task: Measure and record baseline typecheck performance
-    - [ ] Run `pnpm typecheck` under TS 5.8 and record wall-clock time (run 3 times, take median)
-    - [ ] Record the baseline time in a temporary file or commit message for later comparison
-    - [ ] Commit: `chore(bench): Record pre-upgrade typecheck baseline`
-    - [ ] Attach git note with baseline measurement
-    - [ ] Record commit SHA in plan.md and mark task complete
+- [x] Task: Measure and record baseline typecheck performance `172535c`
+    - [x] Run `pnpm typecheck` under TS 5.8 and record wall-clock time (run 3 times, take median)
+    - [x] Record the baseline time in a temporary file or commit message for later comparison
+    - [x] Commit: `chore(bench): Record pre-upgrade typecheck baseline`
+    - [x] Attach git note with baseline measurement
+    - [x] Record commit SHA in plan.md and mark task complete
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Pre-Upgrade Preparation' (Protocol in workflow.md)
 
