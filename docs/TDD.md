@@ -4,6 +4,7 @@
 
 | Layer              | Technology                      | Rationale                                                                                           |
 | ------------------ | ------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **Language**       | TypeScript 7.0                  | Native Go compiler port (~6x faster type-checking). Strict mode, path aliases, incremental builds. |
 | **Framework**      | TanStack Start (Vite + SSR)     | Full-stack React meta-framework with type-safe routing, server functions, and fast Vite dev server. |
 | **Routing**        | TanStack Router                 | File-based routing with type-safe params and search params. Zod integration for runtime validation. |
 | **Server State**   | TanStack Query                  | Native TanStack Start integration. Caching, deduplication, background refetching.                   |
