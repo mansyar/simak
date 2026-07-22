@@ -551,6 +551,8 @@
     "r2NotConfigured": "Penyimpanan berkas tidak dikonfigurasi. Hubungi administrator Anda.",
     "objectNotFound": "Berkas yang diunggah tidak ditemukan. Silakan coba unggah kembali.",
     "previewNotAvailable": "Pratinjau tidak tersedia — unduh untuk melihat",
+    "tooLargeForPreview": "Berkas terlalu besar untuk pratinjau (maks 10 MB) — unduh untuk melihat",
+    "convertingDocx": "Mengonversi dokumen untuk pratinjau...",
     "latest": "Terbaru"
   },
   "assignments": {
@@ -943,6 +945,16 @@
       "minEst": "Min: {{min}}, Est: {{est}}h",
       "importButton": "Impor {{count}} Template",
       "createdSkipped": "{{created}} dibuat, {{skipped}} dilewati."
+    }
+  },
+  "shortcuts": {
+    "cheatSheet": {
+      "title": "Pintasan Keyboard",
+      "refresh": "Segarkan data",
+      "help": "Tampilkan bantuan ini",
+      "nextReview": "Peninjauan tertunda berikutnya",
+      "prevReview": "Peninjauan tertunda sebelumnya",
+      "notOnReviewPage": "(hanya tersedia di halaman tinjauan)"
     }
   }
 }

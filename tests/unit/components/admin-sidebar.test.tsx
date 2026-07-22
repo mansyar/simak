@@ -26,13 +26,21 @@ vi.mock('@tanstack/react-router', () => ({
     children,
     className,
     onClick,
+    preload,
   }: {
     to: string;
     children: React.ReactNode;
     className?: string;
     onClick?: () => void;
+    preload?: string;
   }) => (
-    <a href={to} className={className} data-testid={`sidebar-link-${to}`} onClick={onClick}>
+    <a
+      href={to}
+      className={className}
+      data-testid={`sidebar-link-${to}`}
+      data-preload={preload}
+      onClick={onClick}
+    >
       {children}
     </a>
   ),
@@ -158,5 +166,16 @@ describe('AdminSidebar', () => {
     fireEvent.click(closeButton);
 
     expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it('should set preload="intent" on all sidebar links', () => {
+    mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
+    render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
+
+    const links = document.querySelectorAll('[data-testid^="sidebar-link-"]');
+    expect(links.length).toBeGreaterThan(0);
+    links.forEach((link) => {
+      expect(link.getAttribute('data-preload')).toBe('intent');
+    });
   });
 });

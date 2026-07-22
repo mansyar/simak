@@ -12,6 +12,7 @@ export function getRouter() {
   const router = createRouter({
     routeTree,
     scrollRestoration: true,
+    defaultPreload: false,
   });
 
   return router;

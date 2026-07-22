@@ -442,4 +442,13 @@ Students and instructors lack a centralized system to:
 - **i18n** — 1 new key in EN and ID (`adminEmailQueue.table.resendMessageId`)
 - **Tests** — 2,757 tests pass across 288 test files; coverage ≥80% on all thresholds (stmts 87.68%, branches 81.7%, functions 82.21%, lines 88.26%)
 
+### Track: Instructor Productivity: DOCX Preview & Keyboard Shortcuts (July 2026)
+
+- **DOCX inline preview** — `ReviewFilePreview` component now renders `.docx` files inline in a sandboxed `<iframe>` using `mammoth.js` (dynamic import, lazy-loaded, ~30KB gzipped, not in main client bundle); 10MB size guard shows "file too large" message; loading spinner during conversion; error fallback to existing "Preview not available" card; PDF preview unchanged
+- **Two-layer keyboard shortcuts** — Global shortcuts (R to refresh all queries, ? to toggle cheat-sheet popover) mounted in `_authenticated.tsx`; review-specific shortcuts (J for next pending review, K for previous) mounted in `$submissionId.tsx` with preloaded pending list (limit: 100); input suppression in `<input>`, `<textarea>`, `[contenteditable]`; cheat-sheet popover greys out J/K when not on a review page
+- **Route prefetch** — `preload="intent"` on all sidebar `<Link>` components (admin, instructor, student); `defaultPreload: false` at router level to prevent over-prefetching on the landing page
+- **Next Review button instant** — Preloaded pending list makes the "Next Review" button instant (no post-review server call)
+- **i18n** — 6 new keys in EN and ID (`files.tooLargeForPreview`, `files.convertingDocx`, `shortcuts.cheatSheet.*`)
+- **Tests** — 2,784 tests pass across 290 test files; coverage ≥80% on all thresholds (lines 88.45%, statements 87.82%, branches 81.74%, functions 82.46%)
+
 </protect>

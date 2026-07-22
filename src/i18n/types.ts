@@ -556,6 +556,8 @@ export type Translation = {
     r2NotConfigured: string
     objectNotFound: string
     previewNotAvailable: string
+    tooLargeForPreview: string
+    convertingDocx: string
     latest: string
   }
   assignments: {
@@ -948,6 +950,16 @@ export type Translation = {
       minEst: string
       importButton: string
       createdSkipped: string
+    }
+  }
+  shortcuts: {
+    cheatSheet: {
+      title: string
+      refresh: string
+      help: string
+      nextReview: string
+      prevReview: string
+      notOnReviewPage: string
     }
   }
 }

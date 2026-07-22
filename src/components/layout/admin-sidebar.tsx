@@ -92,6 +92,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 key={link.to}
                 to={link.to as unknown as '.'}
                 onClick={handleLinkClick}
+                preload="intent"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-sidebar-accent text-sidebar-primary-foreground'
@@ -116,6 +117,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 key={link.to}
                 to={link.to as unknown as '.'}
                 onClick={handleLinkClick}
+                preload="intent"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-sidebar-accent text-sidebar-primary-foreground'

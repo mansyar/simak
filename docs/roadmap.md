@@ -1063,7 +1063,7 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-017: Instructor Productivity: DOCX Preview & Keyboard Shortcuts
 
-- **Status:** `Proposed`
+- **Status:** `Complete` (archived to `conductor/archive/instructor-productivity-docx-preview-keyboard-shortcuts_20260722/`)
 - **Dependencies:** None
 - **Estimated Effort:** 3 Days / 1.5 Sprint Loops
 - **Audit IDs:** ENH-UX-2, ENH-UX-3, ENH-PERF-2
@@ -1084,7 +1084,7 @@ All tracks must adhere to the following project constraints:
 - Sandboxed `<iframe srcDoc={html} sandbox="">` (untrusted content isolation)
 - Native `keydown` listener + `useEffect` (keyboard shortcut layer — no new dep)
 - TanStack Router `<Link preload="intent">` + `defaultPreload` router option
-- shadcn `Popover` (shortcut cheat-sheet)
+- `@base-ui/react/popover` (shortcut cheat-sheet — used instead of `@radix-ui/react-popover` for consistency with the codebase's existing UI primitives)
 
 #### Scope Boundaries
 
@@ -1105,11 +1105,20 @@ All tracks must adhere to the following project constraints:
 - **Phase 2 (Keyboard Shortcuts — Two-Layer):** Create `src/hooks/use-keyboard-shortcuts.ts` (global: `R`, `?`) mounted in `_authenticated.tsx`. Create `src/hooks/use-review-nav.ts` (review-specific: `J`, `K`) mounted in `$submissionId.tsx`. Review nav hook: on mount, fetch `listPendingReviews({ page: 1, limit: 100 })`, find current submissionId index, store in state. `J`/`K` navigate via `useNavigate` to adjacent IDs. `?` toggles a `Popover` cheat-sheet (greys out J/K when not on review page). Add i18n keys for cheat-sheet content + "file too large" message. Write tests for shortcut firing, input-focus suppression, preload navigation, and cheat-sheet toggle.
 - **Phase 3 (Route Prefetch):** Add `preload="intent"` to sidebar `<Link>` components in the 3 role layouts. Verify no over-prefetching on the landing page (keep `defaultPreload: false`). Write a test confirming `preload="intent"` attribute presence.
 
+#### Implementation Summary
+
+- **Phase 0 (Dependency Setup):** Added `mammoth ^1.12.0` to `package.json`. Created `src/types/mammoth.d.ts` type declaration. Commit: `784fcd3` → checkpoint `ab79364`.
+- **Phase 1 (DOCX Inline Preview):** Integrated `mammoth.js` into `src/components/reviews/ReviewFilePreview.tsx` via dynamic `import('mammoth')`. Fetches `.docx` via presigned download URL, converts with `mammoth.convertToHtml({ arrayBuffer })`, renders HTML in `<iframe srcDoc={html} sandbox="" />` (no allow-scripts, no allow-same-origin per NFR-2). 10MB size guard — above that, shows "file too large for inline preview" message with download button. Loading state with `Loader2`. Error fallback to existing "Preview not available" card. Added i18n keys for "file too large" message. Commits: Phase 0 → Phase 1 → checkpoint `ab79364`.
+- **Phase 2 (Keyboard Shortcuts — Two-Layer):** Created `src/hooks/use-keyboard-shortcuts.ts` (global: `R` refresh via `queryClient.invalidateQueries`, `?` cheat-sheet popover toggle) mounted in `_authenticated.tsx`. Created `src/hooks/use-review-nav.ts` (review-specific: `J`/`K` queue navigation) mounted in `$submissionId.tsx`. Review nav hook preloads `listPendingReviews({ page: 1, limit: 100 })` on mount, tracks current submission index in state, `J`/`K` navigate via `useNavigate`. Shortcuts disabled when focus is in input/textarea/contenteditable. Cheat-sheet popover (`src/components/keyboard-cheat-sheet.tsx`) shows all shortcuts, greys out J/K when not on a review page. Commits: → checkpoint `065c922`.
+- **Phase 3 (Route Prefetch):** Added `preload="intent"` to sidebar `<Link>` components in admin, instructor, and student sidebar layouts. Set `defaultPreload: false` in router config (`src/router.tsx`) to avoid over-prefetching. Commit: → checkpoint `afd93ff`.
+- **Phase 4 (Final Verification):** All tests pass (287 test files + 3, 2784 tests). `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` clean. Commit: `4436555`.
+- **Review Fixes:** Found 3 issues during Conductor review: (1) **CRITICAL** — iframe used `sandbox="allow-same-origin"` instead of `sandbox=""` (spec NFR-2 violation); fixed in component + test. (2) **LOW** — inconsistent key comparison (`e.key === '?'` vs lowercased `key === 'r'`); fixed to `key === '?'`. (3) **LOW** — duplicate `isInputFocused` helper in two hooks (noted, not fixed). Commit: `8a4bbf7` → plan update `caacdff` → archive `241e430`.
+
 #### Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Open a review with a `.docx` submission (< 10MB) — inline HTML preview renders (no download needed); a `.docx` with macros shows the preview without executing scripts (sandbox). A `.docx` > 10MB shows "file too large for inline preview" with download button. On the review page, press `J` — navigates to next pending review (instant, no server call); `K` — previous; `R` — data refreshes; `?` — cheat-sheet popover appears (J/K greyed out when not on review page). Hover a sidebar link — network tab shows the route prefetch firing. Type in a textarea — shortcuts are suppressed.
-- [ ] **Automated Tests:** `pnpm test:unit` — new tests for mammoth conversion (success, error fallback, sandbox attribute, 10MB size guard), keyboard shortcut layer (global R/? firing, review-specific J/K firing, input suppression, cheat-sheet toggle, greyed-out state when not on review page), pending-list preload + index tracking, `preload="intent"` attribute presence on sidebar links. Coverage ≥80%.
-- [ ] **Conductor Review:** `mammoth` is dynamically imported (not in main client bundle — verify via build output). Sandboxed iframe has `sandbox=""` (no `allow-scripts`). 10MB size guard enforced. Two-layer shortcut architecture: global hook in `_authenticated.tsx`, review-specific hook in `$submissionId.tsx`. Pending list preloaded on mount (limit: 100). Shortcut listeners removed on unmount (no leak). `preload="intent"` only on authenticated sidebar links. New i18n keys (cheat-sheet + "file too large") in both locales. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` clean.
+- [x] **Manual Checkpoint:** Open a review with a `.docx` submission (< 10MB) — inline HTML preview renders (no download needed); a `.docx` with macros shows the preview without executing scripts (sandbox=""). A `.docx` > 10MB shows "file too large for inline preview" with download button. On the review page, press `J` — navigates to next pending review (instant, no server call); `K` — previous; `R` — data refreshes; `?` — cheat-sheet popover appears (J/K greyed out when not on review page). Hover a sidebar link — network tab shows the route prefetch firing. Type in a textarea — shortcuts are suppressed.
+- [x] **Automated Tests:** `pnpm test:unit` — 287 test files + 3, 2,784 tests, all pass. New tests for mammoth conversion (success, error fallback, `sandbox=""` attribute, 10MB size guard), keyboard shortcut layer (global R/? firing, review-specific J/K firing, input suppression, cheat-sheet toggle, greyed-out state when not on review page), pending-list preload + index tracking, `preload="intent"` attribute presence on sidebar links. Coverage ≥80% on all thresholds.
+- [x] **Conductor Review:** `mammoth` is dynamically imported (not in main client bundle). Sandboxed iframe has `sandbox=""` (no allow-scripts, no allow-same-origin — review fixed initial `allow-same-origin` violation). 10MB size guard enforced. Two-layer shortcut architecture: global hook in `_authenticated.tsx`, review-specific hook in `$submissionId.tsx`. Pending list preloaded on mount (limit: 100). Shortcut listeners removed on unmount (no leak). `preload="intent"` only on authenticated sidebar links; `defaultPreload: false` in router config. `@base-ui/react/popover` used for cheat-sheet (consistency with codebase UI primitives — deviation from original `@radix-ui/react-popover` spec documented). New i18n keys (cheat-sheet + "file too large") in both locales. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` clean. Review found 3 issues (1 Critical sandbox fix, 1 Low key comparison fix, 1 Low duplicate helper noted). Track archived to `conductor/archive/instructor-productivity-docx-preview-keyboard-shortcuts_20260722/`.
 
 ---
 
