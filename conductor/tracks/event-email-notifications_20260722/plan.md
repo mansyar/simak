@@ -72,7 +72,7 @@
     - [ ] Implement post-commit advisory `enqueueEmail` calls in all three handlers
     - [ ] Verify tests pass
 
-- [ ] Task: Wire `enqueueEmail` in `bulkExtendHandler` (`extensions-extras.server.ts`)
+- [x] Task: Wire `enqueueEmail` in `bulkExtendHandler` (`extensions-extras.server.ts`) [cddeeb7]
     - [ ] Write test verifying one `enqueueEmail` call per affected student in the bulk extend operation
     - [ ] Write test verifying advisory-only failure — bulk extend succeeds even if individual `enqueueEmail` calls throw (each wrapped in its own `try/catch`)
     - [ ] Implement loop-based `enqueueEmail` calls for each affected student (mirroring the existing advisory in-app notification pattern at line 402)
