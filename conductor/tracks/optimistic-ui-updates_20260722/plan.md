@@ -45,7 +45,7 @@
     - [x] Run `pnpm test` — confirm tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Notification Hooks Optimistic Updates' (Protocol in workflow.md)
 
-## Phase 2: Consultation & Extension Hooks Optimistic Updates
+## Phase 2: Consultation & Extension Hooks Optimistic Updates [checkpoint: f5dfbe2]
 
 - [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 2
 - [x] Task: Add optimistic updates to `verifyConsultation` hook (after Phase 0 refactor) [f2ac940]
