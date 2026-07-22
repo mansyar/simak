@@ -82,17 +82,17 @@
 
 ## Phase 3: Quality Gates & Final Verification
 
-- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
-    - [ ] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [x] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Run full quality gate suite and fix issues
-    - [ ] Run `pnpm test:coverage` — verify ≥80% on lines, statements, branches, and functions
-    - [ ] Run `pnpm typecheck` — verify no type errors
-    - [ ] Run `pnpm lint` — verify 0 warnings, 0 errors (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n` — verify EN↔ID key parity, no new unused keys
-    - [ ] Verify all new/modified files under 500 lines (`scripts/check-modularity.js`)
-    - [ ] Fix any issues found and re-run gates until clean
+- [x] Task: Run full quality gate suite and fix issues
+    - [x] Run `pnpm test:coverage` — verify ≥80% on lines, statements, branches, and functions
+    - [x] Run `pnpm typecheck` — verify no type errors
+    - [x] Run `pnpm lint` — verify 0 warnings, 0 errors (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n` — verify EN↔ID key parity, no new unused keys
+    - [x] Verify all new/modified files under 500 lines (`scripts/check-modularity.js`)
+    - [x] Fix any issues found and re-run gates until clean
 
 - [ ] Task: Conductor - User Manual Verification 'Quality Gates & Final Verification' (Protocol in workflow.md)
 </protect>
