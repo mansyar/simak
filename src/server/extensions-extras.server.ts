@@ -9,6 +9,7 @@ import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '../lib/errors';
 import { logAuditEvent } from '../lib/audit';
 import { getNotificationKeys } from './notifications.server';
+import { sendExtensionApprovedEmail, sendExtensionRejectedEmail } from '../lib/extension-email';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type { ApproveExtensionSchema, RejectExtensionSchema, BulkExtendSchema } from './extensions';
@@ -86,7 +87,14 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
   const db = getDb();
 
   try {
-    let auditData: { assignmentId: number; studentId: string; extensionDays: number } | undefined;
+    let auditData:
+      | {
+          assignmentId: number;
+          studentId: string;
+          extensionDays: number;
+          checkpointId?: number | null;
+        }
+      | undefined;
 
     const result = await db.transaction(async (tx) => {
       const [request] = await tx
@@ -158,6 +166,7 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
         assignmentId: request.assignmentId,
         studentId: request.studentId,
         extensionDays: request.extensionDays,
+        checkpointId: request.checkpointId,
       };
 
       return { success: true };
@@ -181,6 +190,14 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
       } catch (err) {
         console.error('Failed to log extension approved audit event:', err);
       }
+
+      await sendExtensionApprovedEmail({
+        studentId: auditData.studentId,
+        instructorName: session.user.name,
+        assignmentId: auditData.assignmentId,
+        extensionDays: auditData.extensionDays,
+        checkpointId: auditData.checkpointId,
+      });
     }
 
     return result;
@@ -292,6 +309,13 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
       } catch (err) {
         console.error('Failed to log extension rejected audit event:', err);
       }
+
+      await sendExtensionRejectedEmail({
+        studentId: auditData.studentId,
+        instructorName: session.user.name,
+        assignmentId: auditData.assignmentId,
+        rejectionReason: resolutionReason,
+      });
     }
 
     return result;
