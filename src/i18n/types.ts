@@ -752,6 +752,14 @@ export type Translation = {
       password_reset: string
       invitation: string
       sla_alert: string
+      submissionReceived: string
+      reviewCompleted: string
+      revisionRequested: string
+      consultationVerified: string
+      consultationRejected: string
+      extensionApproved: string
+      extensionRejected: string
+      extensionRequested: string
     }
   }
   errors: {

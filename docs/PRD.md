@@ -18,7 +18,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Instructors can assign assignments with structured checkpoints to students.
 - Students can submit work for each checkpoint.
 - Instructors can review, approve, or request revisions on submissions.
-- In-app notifications keep both parties informed of submissions, reviews, revision requests, and missed deadlines. (Email notifications are `[v2]`, except for auth-related emails: invitations, password reset, and 2FA enable/disable).
+- In-app notifications keep both parties informed of submissions, reviews, revision requests, and missed deadlines. Email notifications are now sent for 8 event types (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested) alongside in-app notifications. Auth-related emails (invitations, password reset, 2FA enable/disable) continue as before. Notification **preferences** (per-user opt-out) remain `[v2]`.
 - Checkpoints must be completed in sequential order.
 - Admins can manage users and assignment templates.
 - Admins can bulk import users and assignment templates via Excel (.xlsx) files with client-side preview and server-side re-validation.
@@ -148,7 +148,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 - In-app notification center with read/unread tracking and type-based grouping.
 - In-app notifications are **localized at read time** — the database stores i18n keys (`titleKey`, `messageKey`) and interpolation `params` (jsonb) instead of literal text; the recipient's locale resolves the display strings, so Indonesian users see Indonesian notifications and English users see English.
-- Email delivery via Resend for account invitations and password setup. Email subjects (password reset, invitation, SLA alerts) are **localized** using the recipient's `locale` preference.
+- Email delivery via Resend for account invitations, password setup, 2FA enable/disable, SLA alerts, and **8 event types** (submission received, review completed, revision requested, consultation verified, consultation rejected, extension approved, extension rejected, extension requested). Event emails are dispatched as **post-commit advisory work** alongside existing in-app notifications — the primary operation always succeeds even if email enqueue fails. Email subjects and bodies are **localized** using the recipient's `locale` preference. All user-derived content in email bodies is HTML-escaped to prevent stored XSS. Recipients with no verified email or soft-deleted accounts are silently skipped.
 - **Email queue inspector:** Admins can monitor the email delivery queue at `/admin/email-queue` — a paginated (20/page), filterable (by status: pending/processing/sent/failed), and searchable (by recipient email or subject) list view with summary statistics. Admins can manually retry failed emails, which resets the email to `pending` status for reprocessing by the background processor. The retry is idempotent — only emails with `status='failed'` can be retried; attempting to retry a non-failed email returns a conflict error. Each row displays a `resendMessageId` (populated from the Resend API response on successful send) as a monospace truncated cell with a tooltip, enabling admins to correlate deliveries with Resend's dashboard. The background processor sends emails in concurrent batches of 5 via `Promise.allSettled` (partial failures don't abort the batch), and automatically prunes `sent` rows older than 90 days and `failed` rows older than 180 days on a 24-hour tick-embedded cycle — `pending` and `processing` rows are never deleted.
 - Users receive in-app alerts for submissions, reviews, revision requests, and consultation verifications.
 - SLA breach alerts are sent to Admins via in-app and email notifications.
@@ -159,7 +159,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Clicking the bell opens a slide-over panel built on the shadcn `Sheet` primitive (provides focus trapping, Escape-key dismissal, and backdrop-click close). Navigable notifications render as TanStack Router `<Link>` elements; non-navigable items fall back to native `<button>` elements. The bell's `aria-label` dynamically includes the unread count and announces changes via an `aria-live="polite"` region.
 - Users can mark individual notifications as read or mark all as read.
 - **Optimistic UI updates (Track: Optimistic UI Updates for Mutations):** Marking notifications as read (individual or all) updates the UI instantly via TanStack Query's `onMutate` optimistic cache mutation — the unread badge snaps to zero before the server responds. If the server rejects the mutation, the previous state is restored via snapshot rollback (`onError`). Cache invalidation runs in `onSettled` to reconcile with the authoritative server state.
-- Notification preferences are `[v2]` — currently all event types are enabled for all users.
+- Notification preferences (per-user opt-out per event type / channel) are `[v2]` — currently all event types trigger both in-app and email notifications for all users.
 
 ### Two-Factor Authentication & Session Management
 
