@@ -47,11 +47,11 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md and mark task complete
 
-- [ ] Task: Verify configuration tests pass (Green Phase)
-    - [ ] Run `pnpm test` — confirm the configuration verification tests from the Red Phase task now pass
-    - [ ] Commit: `test(config): Add TS 7 upgrade configuration verification tests`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md and mark task complete
+- [x] Task: Verify configuration tests pass (Green Phase) `1fa5742`
+    - [x] Run `pnpm test` — confirm the configuration verification tests from the Red Phase task now pass
+    - [x] Commit: `test(config): Add TS 7 upgrade configuration verification tests`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md and mark task complete
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Configuration & Package Upgrade' (Protocol in workflow.md)
 
