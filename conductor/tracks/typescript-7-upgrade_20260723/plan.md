@@ -75,7 +75,7 @@
     - [ ] Attach git note with before/after measurements
     - [ ] Record commit SHA in plan.md and mark task complete
 
-- [ ] Task: Smoke test `pnpm dev` and `pnpm build`
+- [x] Task: Smoke test `pnpm dev` and `pnpm build` `ee7fe5c`
     - [ ] Run `pnpm dev` — confirm i18n codegen runs and Vite dev server boots without errors
     - [ ] Run `pnpm build` — confirm full production build succeeds (i18n codegen + vite build + migrate/seed bundles)
     - [ ] Commit: `chore(verify): Smoke test dev and build under TS 7`
