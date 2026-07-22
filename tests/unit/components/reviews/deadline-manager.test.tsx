@@ -8,6 +8,7 @@ import { assignmentKeys } from '@/lib/query-keys';
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -412,6 +413,67 @@ describe('DeadlineManager', () => {
 
     await waitFor(() => {
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: assignmentKeys.all() });
+    });
+  });
+
+  describe('optimistic updates', () => {
+    it('should optimistically change checkpoint state to unlocked', async () => {
+      mockUnlockCheckpoint.mockReturnValue(new Promise(() => {}));
+      renderWithQuery(<DeadlineManager students={mockStudents} assignmentId={1} />);
+      expandAllStudents();
+
+      expect(screen.getAllByText('instructorAssignments.status.locked').length).toBe(2);
+      fireEvent.click(screen.getAllByText('instructorAssignments.deadlineManager.unlock')[0]);
+      fireEvent.click(screen.getByText('common.confirm'));
+
+      await waitFor(() => {
+        expect(screen.getAllByText('instructorAssignments.status.locked').length).toBe(1);
+      });
+      expect(screen.getAllByText('instructorAssignments.status.unlocked').length).toBe(2);
+    });
+
+    it('should restore checkpoint state on unlock error', async () => {
+      mockUnlockCheckpoint.mockRejectedValue(new Error('Unlock failed'));
+      renderWithQuery(<DeadlineManager students={mockStudents} assignmentId={1} />);
+      expandAllStudents();
+
+      fireEvent.click(screen.getAllByText('instructorAssignments.deadlineManager.unlock')[0]);
+      fireEvent.click(screen.getByText('common.confirm'));
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Unlock failed');
+      });
+      expect(screen.getAllByText('instructorAssignments.status.locked').length).toBe(2);
+    });
+
+    it('should optimistically change dueDate on extend', async () => {
+      mockExtendDeadline.mockReturnValue(new Promise(() => {}));
+      renderWithQuery(<DeadlineManager students={mockStudents} assignmentId={1} />);
+      expandAllStudents();
+
+      expect(screen.getAllByText('May 20, 2026').length).toBe(2);
+      const dateInputs = screen.getAllByTestId(/extend-deadline-input/);
+      fireEvent.change(dateInputs[0], { target: { value: '2026-12-15' } });
+      fireEvent.click(screen.getAllByText('instructorAssignments.deadlineManager.extend')[0]);
+
+      await waitFor(() => {
+        expect(screen.getAllByText('May 20, 2026').length).toBe(1);
+      });
+    });
+
+    it('should restore dueDate on extend error', async () => {
+      mockExtendDeadline.mockRejectedValue(new Error('Extend failed'));
+      renderWithQuery(<DeadlineManager students={mockStudents} assignmentId={1} />);
+      expandAllStudents();
+
+      const dateInputs = screen.getAllByTestId(/extend-deadline-input/);
+      fireEvent.change(dateInputs[0], { target: { value: '2026-12-15' } });
+      fireEvent.click(screen.getAllByText('instructorAssignments.deadlineManager.extend')[0]);
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Extend failed');
+      });
+      expect(screen.getAllByText('May 20, 2026').length).toBe(2);
     });
   });
 });

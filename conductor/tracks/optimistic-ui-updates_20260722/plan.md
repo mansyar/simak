@@ -68,8 +68,8 @@
 
 ## Phase 3: Deadline & User Hooks Optimistic Updates
 
-- [ ] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 3
-- [ ] Task: Add optimistic updates to `unlockCheckpoint` (DeadlineManager.tsx)
+- [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 3
+- [~] Task: Add optimistic updates to `unlockCheckpoint` (DeadlineManager.tsx)
     - [ ] Write failing tests — verify `onMutate` reflects state change (checkpoint `locked` → `unlocked`) in assignment detail cache; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
     - [ ] Implement `onMutate`/`onError`/`onSettled` in `unlockMutation`
     - [ ] Run `pnpm test` — confirm tests pass

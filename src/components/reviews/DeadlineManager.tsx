@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { unlockCheckpoint, extendDeadline } from '@/server/assignments';
@@ -67,6 +67,8 @@ function StatusBadge({ state, t }: { state: string; t: (key: TranslationKey) => 
 export function DeadlineManager({ students, assignmentId: _assignmentId }: DeadlineManagerProps) {
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const [localStudents, setLocalStudents] = useState(students);
+  useEffect(() => setLocalStudents(students), [students]);
   const [expandedStudents, setExpandedStudents] = useState<Set<string>>(new Set());
   const [unlockTarget, setUnlockTarget] = useState<{
     checkpointId: number;
@@ -86,14 +88,37 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       )({ data: { checkpointId } });
       return result;
     },
+    onMutate: async (checkpointId: number) => {
+      await queryClient.cancelQueries({ queryKey: assignmentKeys.all() });
+      const previousEntries = queryClient.getQueriesData({ queryKey: assignmentKeys.all() });
+      const previousStudents = localStudents;
+      setLocalStudents((prev) =>
+        prev.map((s) => ({
+          ...s,
+          checkpoints: s.checkpoints.map((cp) =>
+            cp.id === checkpointId ? { ...cp, state: 'unlocked' } : cp,
+          ),
+        })),
+      );
+      return { previousEntries, previousStudents };
+    },
     onSuccess: () => {
       setUnlockTarget(null);
       setError(null);
       toast.success(t('instructorAssignments.deadlineManager.unlockSuccess'));
-      queryClient.invalidateQueries({ queryKey: assignmentKeys.all() });
     },
-    onError: () => {
+    onError: (error, _variables, context) => {
+      if (context?.previousStudents) setLocalStudents(context.previousStudents);
+      if (context?.previousEntries) {
+        for (const [queryKey, data] of context.previousEntries) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+      toast.error(error.message);
       setError(t('instructorAssignments.deadlineManager.unlockError'));
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: assignmentKeys.all() });
     },
   });
 
@@ -113,6 +138,20 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       )({ data: { checkpointId, newDueDate } });
       return result;
     },
+    onMutate: async ({ checkpointId, newDueDate }) => {
+      await queryClient.cancelQueries({ queryKey: assignmentKeys.all() });
+      const previousEntries = queryClient.getQueriesData({ queryKey: assignmentKeys.all() });
+      const previousStudents = localStudents;
+      setLocalStudents((prev) =>
+        prev.map((s) => ({
+          ...s,
+          checkpoints: s.checkpoints.map((cp) =>
+            cp.id === checkpointId ? { ...cp, dueDate: newDueDate } : cp,
+          ),
+        })),
+      );
+      return { previousEntries, previousStudents };
+    },
     onSuccess: (_data, variables) => {
       setExtendDates((prev) => {
         const next = { ...prev };
@@ -121,10 +160,19 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       });
       setError(null);
       toast.success(t('instructorAssignments.deadlineManager.extendSuccess'));
-      queryClient.invalidateQueries({ queryKey: assignmentKeys.all() });
     },
-    onError: () => {
+    onError: (error, _variables, context) => {
+      if (context?.previousStudents) setLocalStudents(context.previousStudents);
+      if (context?.previousEntries) {
+        for (const [queryKey, data] of context.previousEntries) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+      toast.error(error.message);
       setError(t('instructorAssignments.deadlineManager.extendError'));
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: assignmentKeys.all() });
     },
   });
 
@@ -175,7 +223,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
     }
   };
 
-  if (students.length === 0) {
+  if (localStudents.length === 0) {
     return (
       <div className="rounded-md border bg-card p-6 shadow-sm">
         <h3 className="text-base font-semibold text-foreground mb-2">
@@ -203,7 +251,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       )}
 
       {/* Student list */}
-      {students.map((student) => {
+      {localStudents.map((student) => {
         const isExpanded = expandedStudents.has(student.id);
         const lockedCheckpoints = student.checkpoints.filter((cp) => cp.state === 'locked');
 
