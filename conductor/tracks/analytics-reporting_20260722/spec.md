@@ -1,3 +1,4 @@
+<protect>
 # TRACK-019: Analytics & Reporting
 
 ## Overview
@@ -96,3 +97,4 @@ Client-side SheetJS export (reuse existing `xlsx` dependency) of analytics dashb
 - **Materialized views / pre-aggregation tables** — Only if Phase 1 queries are too slow (measure first)
 - **Charting library (Recharts)** — Start with tables/progress bars; add only if visual charts are explicitly requested
 - **Modifications to existing dashboards** — Existing admin/instructor dashboards remain as-is
+</protect>

@@ -1,6 +1,11 @@
+<protect>
 # Implementation Plan: TRACK-019 — Analytics & Reporting
 
 ## Phase 1: Admin Analytics Dashboard
+
+- [ ] Task: Read spec.md and workflow.md to refresh context
+    - [ ] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
+    - [ ] Read `conductor/workflow.md`
 
 - [ ] Task: Create analytics server stubs and Zod schemas
     - [ ] Create `src/server/analytics.ts` with Zod input schemas (date range: predefined `7d|30d|90d|all` + custom `start`/`end` ISO dates) and `createServerFn` stub for `getAdminAnalyticsData` (dynamic import to `analytics-admin.server.ts`)
@@ -23,6 +28,10 @@
 
 ## Phase 2: Instructor Analytics Dashboard
 
+- [ ] Task: Read spec.md and workflow.md to refresh context
+    - [ ] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
+    - [ ] Read `conductor/workflow.md`
+
 - [ ] Task: Add instructor analytics server stub
     - [ ] Add `getInstructorAnalyticsData` Zod schema (same date range input) and `createServerFn` stub to `src/server/analytics.ts` (dynamic import to `analytics-instructor.server.ts`)
     - [ ] Write tests in `tests/unit/server/analytics.test.ts` for the new stub and schema
@@ -43,6 +52,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Instructor Analytics Dashboard' (Protocol in workflow.md)
 
 ## Phase 3: CSV Export
+
+- [ ] Task: Read spec.md and workflow.md to refresh context
+    - [ ] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
+    - [ ] Read `conductor/workflow.md`
 
 - [ ] Task: Add CSV export server stubs
     - [ ] Add 5 CSV export Zod schemas and `createServerFn` stubs to `src/server/analytics.ts`: `exportUsersCsv`, `exportAuditLogCsv`, `exportAssignmentProgressCsv` (admin); `exportStudentProgressCsv`, `exportReviewHistoryCsv` (instructor)
@@ -68,6 +81,10 @@
 
 ## Phase 4: Excel Export
 
+- [ ] Task: Read spec.md and workflow.md to refresh context
+    - [ ] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
+    - [ ] Read `conductor/workflow.md`
+
 - [ ] Task: Implement client-side Excel export utility (TDD)
     - [ ] Write failing tests in `tests/unit/lib/excel-export.test.ts` for Excel export utility — test workbook creation, sheet generation from JSON data, write output format
     - [ ] Implement `src/lib/excel-export.ts` — reusable utility: `exportToExcel(data, sheetName, fileName)` using `xlsx.utils.book_new()` + `json_to_sheet()` + `write()` + client-side Blob download
@@ -85,6 +102,10 @@
 
 ## Phase 5: i18n Finalization & Quality Verification
 
+- [ ] Task: Read spec.md and workflow.md to refresh context
+    - [ ] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
+    - [ ] Read `conductor/workflow.md`
+
 - [ ] Task: Verify i18n parity and finalize
     - [ ] Run `pnpm generate:i18n` to regenerate types
     - [ ] Run `pnpm check:i18n` to verify EN/ID key parity
@@ -99,3 +120,4 @@
     - [ ] Verify all handler files follow two-file split pattern (grep for server-only imports in `analytics.ts`)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: i18n Finalization & Quality Verification' (Protocol in workflow.md)
+</protect>
