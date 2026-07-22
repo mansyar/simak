@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 // Mock useI18n hook
-const mockT = (key: string) => {
+const mockT = (key: string, params?: Record<string, string>) => {
   const translations: Record<string, string> = {
     'app.name': 'SIMAK',
     'landing.hero.headline': 'Manage Academic Assignments with Confidence',
@@ -46,8 +46,13 @@ const mockT = (key: string) => {
     'landing.footer.links.login': 'Login',
     'landing.footer.links.about': 'About',
     'landing.footer.links.contact': 'Contact',
+    'landing.footer.copyright': 'Footer Copyright {year}',
   };
-  return translations[key] || key;
+  let result = translations[key] || key;
+  if (params) {
+    result = result.replace(/\{(\w+)\}/g, (_, p) => params[p] ?? `{${p}}`);
+  }
+  return result;
 };
 
 vi.mock('@/routes/__root', () => ({
@@ -174,11 +179,30 @@ describe('Landing Page', () => {
       expect(screen.getByText('Academic Information & Management System')).toBeDefined();
     });
 
-    it('renders footer links', () => {
+    it('renders Login and About footer links but NOT Contact', () => {
       render(<HomePage />);
       expect(screen.getByText('Login')).toBeDefined();
       expect(screen.getByText('About')).toBeDefined();
-      expect(screen.getByText('Contact')).toBeDefined();
+      expect(screen.queryByText('Contact')).toBeNull();
+    });
+
+    it('About link points to #how-it-works section', () => {
+      render(<HomePage />);
+      const aboutLink = screen.getByText('About').closest('a');
+      expect(aboutLink).toBeDefined();
+      expect(aboutLink?.getAttribute('href')).toBe('#how-it-works');
+    });
+
+    it('has no dead href="#" links in the document', () => {
+      const { container } = render(<HomePage />);
+      const deadLinks = container.querySelectorAll('a[href="#"]');
+      expect(deadLinks.length).toBe(0);
+    });
+
+    it('renders copyright with dynamic year via i18n key', () => {
+      render(<HomePage />);
+      const year = new Date().getFullYear();
+      expect(screen.getByText(`Footer Copyright ${year}`)).toBeDefined();
     });
   });
 });

@@ -656,10 +656,10 @@
     },
     "footer": {
       "description": "Academic Information & Management System",
+      "copyright": "© {year} SIMAK",
       "links": {
         "login": "Login",
-        "about": "About",
-        "contact": "Contact"
+        "about": "About"
       }
     }
   },

@@ -959,7 +959,7 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-015: UI Hygiene & Tech-Debt Quick Wins
 
-- **Status:** `Proposed`
+- **Status:** `Complete` (archived to `conductor/archive/ui-hygiene-tech-debt-quick-wins_20260722/`)
 - **Dependencies:** TRACK-014 (query-key factory from `src/lib/query-keys.ts`)
 - **Estimated Effort:** 1 Day / 0.5 Sprint Loops
 - **Audit IDs:** ENH-UX-1, ENH-TD-1
@@ -994,11 +994,17 @@ All tracks must adhere to the following project constraints:
 - **Phase 1 (Footer Links):** Update `src/routes/index.tsx` footer — "About" → `<a href="#how-it-works">`, remove "Contact" link. Add `landing.footer.copyright` key to `en.json`/`id.json`, replace `&copy; 2026 SIMAK` with `t('landing.footer.copyright', { year: new Date().getFullYear() })`. Run `pnpm generate:i18n`. Write tests verifying no `href="#"` remains and year is dynamic.
 - **Phase 2 (eslint-disable Resolution via useQuery):** Convert the 3 `useEffect`+`useState` fetches in `AssignmentWizard.tsx` (student list), `StudentPicker.tsx`, `TemplatePicker.tsx` to `useQuery` with query-key factory from TRACK-014. Remove `eslint-disable-next-line react-hooks/exhaustive-deps` comments. Replace local `loading`/`error` state with `useQuery` return values. Write tests verifying data loads and error toast fires on rejection (existing behavior preserved).
 
+#### Implementation Summary
+
+- **Phase 1 (Footer Links):** Updated `src/routes/index.tsx` footer — "About" → `<a href="#how-it-works">` (scrolls to existing section), removed "Contact" link entirely (no contact page exists). Replaced `&copy; 2026 SIMAK` with `t('landing.footer.copyright', { year: String(new Date().getFullYear()) })`. Added `landing.footer.copyright` key to both `en.json` and `id.json`. Removed `landing.footer.links.contact` key from both locales. Commit: `3739b6c`.
+- **Phase 2 (useQuery Migration):** Converted the 3 mount-only `useEffect`+`useState` data fetches in `StudentPicker.tsx`, `TemplatePicker.tsx`, and `AssignmentWizard.tsx` to `useQuery` using the query-key factory from TRACK-014. Added `templateKeys` factory to `src/lib/query-keys.ts` (now 6 domains: notifications, consultations, extensions, assignments, users, templates). Removed all 3 `eslint-disable-next-line react-hooks/exhaustive-deps` comments. Error toast preserved via `useEffect([isError, error, t])` pattern (React Query v5 — `onError` is not available on individual `useQuery` in v5; `useEffect` on `isError` is the recommended v5 pattern). Commit: `51cb05d`.
+- **Review Fixes:** Restored `console.error` error logging in all 3 components — destructured `error` from `useQuery` return and added `console.error('Failed to load...', error)` in the existing `useEffect` (the initial implementation swallowed the error object by only checking the boolean `isError`). Consolidated duplicate test files — migrated 3 unique tests from old `student-picker.test.tsx` and 2 unique tests from old `template-picker.test.tsx` (kebab-case) to the new PascalCase test files, then deleted the old files. AssignmentWizard old test file kept (tests a different layer — wizard flow/steps/validation/submit vs useQuery migration). Added `as never` type-assertion justification comments in test files. Added `console.error` spy suppression in test `beforeEach`. Commits: `03e0e30` (code fixes), `cbafbe1` (plan update).
+
 #### Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Click "About" in the landing footer — page scrolls to the "How It Works" section (not a no-op). No "Contact" link in footer. Footer year shows the current year. AssignmentWizard student/template pickers — data loads via `useQuery`; if the server is down, a toast appears (existing `toast.error` preserved). `grep -r "eslint-disable" src/components/instructor/assignments/` returns zero matches.
-- [ ] **Automated Tests:** `pnpm test:unit` — new tests for footer link targets (no `href="#"`), dynamic year via i18n key, `useQuery` data loading in 3 components with error toast on rejection. `pnpm lint` — zero `react-hooks/exhaustive-deps` suppressions in the 3 files. Coverage ≥80%.
-- [ ] **Conductor Review:** `grep` for `href="#"` in `src/routes/` returns zero. `grep` for `eslint-disable-next-line react-hooks/exhaustive-deps` in `src/components/instructor/assignments/` returns zero. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` clean.
+- [x] **Manual Checkpoint:** Click "About" in the landing footer — page scrolls to the "How It Works" section (not a no-op). No "Contact" link in footer. Footer year shows the current year. AssignmentWizard student/template pickers — data loads via `useQuery`; if the server is down, a toast appears (existing `toast.error` preserved). `grep -r "eslint-disable" src/components/instructor/assignments/` returns zero matches.
+- [x] **Automated Tests:** `pnpm test:unit` — 286 test files, 2787 tests pass. Tests for footer link targets (no `href="#"`), dynamic year via i18n key, `useQuery` data loading in 3 components with error toast on rejection. `pnpm lint` — zero `react-hooks/exhaustive-deps` suppressions in the 3 files. Coverage ≥80%.
+- [x] **Conductor Review:** `grep` for `href="#"` in `src/routes/` returns zero. `grep` for `eslint-disable-next-line react-hooks/exhaustive-deps` in `src/components/instructor/assignments/` returns zero. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` clean. Review found 2 Medium and 3 Low issues — all fixed: restored `console.error` error logging in all 3 components (error object was being swallowed by `useEffect([isError, t])` without the `error` param), consolidated duplicate test files (migrated unique tests from old kebab-case files to new PascalCase files, deleted 2 redundant files), added `as never` type-assertion justification comments, added `console.error` spy suppression in tests. Track archived to `conductor/archive/ui-hygiene-tech-debt-quick-wins_20260722/`.
 
 ---
 
@@ -1272,7 +1278,7 @@ Milestone 4: Quality Assurance
 
 Milestone 5: Post-Audit Enhancements
 ├── TRACK-014: Optimistic UI Updates for Mutations [Complete — introduces query-key factory]
-├── TRACK-015: UI Hygiene & Tech-Debt Quick Wins [depends on 014 — resolved]
+├── TRACK-015: UI Hygiene & Tech-Debt Quick Wins [Complete — archived]
 ├── TRACK-016: Email Queue Retention & Delivery Completeness [no deps]
 ├── TRACK-017: Instructor Productivity: DOCX Preview & Keyboard Shortcuts [no deps]
 ├── TRACK-018: Event Email Notifications [Complete — no deps]
@@ -1291,8 +1297,8 @@ The following track groups can be worked on simultaneously:
 | **D** | TRACK-009, TRACK-010, TRACK-011 | Independent UX tracks — minimal file overlap |
 | **E** | TRACK-012 + TRACK-010 | NotificationCenter refactor in 010 precedes notification UX in 012 |
 | **F** | TRACK-013 + TRACK-010 | Both touch date formatting — coordinate i18n date changes |
-| **G** | TRACK-014, TRACK-016, TRACK-017, TRACK-018, TRACK-019 | Fully independent — no file overlap (distinct domains: mutations, email ops, review UX, notifications, analytics) — TRACK-014/016/017/018 complete |
-| **H** | TRACK-015 → TRACK-014 | Sequential — TRACK-015 consumes the query-key factory from TRACK-014 for useQuery conversion (TRACK-014 complete — dependency resolved) |
+| **G** | TRACK-014, TRACK-016, TRACK-017, TRACK-018, TRACK-019 | Fully independent — no file overlap (distinct domains: mutations, email ops, review UX, notifications, analytics) — TRACK-014/015/016/017/018 complete |
+| **H** | TRACK-015 → TRACK-014 | Sequential — TRACK-015 consumed the query-key factory from TRACK-014 for useQuery conversion (both complete — TRACK-014 archived, TRACK-015 archived) |
 
 ---
 

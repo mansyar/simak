@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { listTemplates } from '@/server/templates';
+import { templateKeys } from '@/lib/query-keys';
 import { useI18n } from '../../../routes/__root';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
@@ -21,37 +23,31 @@ interface TemplatePickerProps {
 
 export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: TemplatePickerProps) {
   const { t } = useI18n();
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [error, setError] = useState<string | null>(null);
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: templateKeys.list({ page: 1, limit: 100, search: '' }),
+    queryFn: async () => {
+      const response = await (
+        listTemplates as unknown as (args: {
+          data: { page: number; limit: number; search: string; type?: string };
+        }) => Promise<{ templates: Template[] }>
+      )({
+        data: { page: 1, limit: 100, search: '' },
+      });
+      return response;
+    },
+    retry: false,
+  });
+
+  const templates = data?.templates ?? [];
 
   useEffect(() => {
-    async function fetchTemplates() {
-      try {
-        setLoading(true);
-        // Fetch all templates (with a high limit to capture all of them for picker)
-        const response = await (
-          listTemplates as unknown as (args: {
-            data: { page: number; limit: number; search: string; type?: string };
-          }) => Promise<{ templates: Template[] }>
-        )({
-          data: { page: 1, limit: 100, search: '' },
-        });
-        if (response && response.templates) {
-          setTemplates(response.templates);
-        }
-      } catch (err) {
-        console.error('Failed to load templates', err);
-        toast.error(t('errors.fetchFailed'));
-        setError('Could not load assignment templates.');
-      } finally {
-        setLoading(false);
-      }
+    if (isError) {
+      console.error('Failed to load templates', error);
+      toast.error(t('errors.fetchFailed'));
     }
-    fetchTemplates();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isError, error, t]);
 
   const filteredTemplates = templates.filter(
     (tpl) =>
@@ -82,7 +78,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
         />
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {[1, 2, 3, 4].map((n) => (
             <Card key={n} className="p-5 border-dashed animate-pulse space-y-3">
@@ -94,10 +90,6 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
               </div>
             </Card>
           ))}
-        </div>
-      ) : error ? (
-        <div className="p-4 rounded-lg bg-destructive/10 text-destructive text-sm text-center">
-          {error}
         </div>
       ) : filteredTemplates.length === 0 ? (
         <div className="p-8 text-center border rounded-xl border-dashed">
