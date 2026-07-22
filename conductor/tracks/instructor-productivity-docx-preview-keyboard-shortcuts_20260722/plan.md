@@ -16,29 +16,29 @@
 
 ## Phase 1: DOCX Inline Preview (ENH-UX-2)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
-    - [ ] Re-read the track specification for phase-specific requirements
-    - [ ] Re-read workflow rules (TDD, commit format, coverage thresholds)
-- [ ] Task: Write failing tests for DOCX preview in `ReviewFilePreview`
-    - [ ] Create/update `tests/unit/components/reviews/review-file-preview.test.tsx`
-    - [ ] Test: `.docx` file < 10MB triggers `mammoth.convertToHtml` with the fetched arrayBuffer
-    - [ ] Test: rendered output is a sandboxed `<iframe>` with `sandbox=""` (no `allow-scripts`)
-    - [ ] Test: `.docx` file >= 10MB shows localized "file too large" message (no conversion attempted)
-    - [ ] Test: conversion failure falls back to existing "Preview not available" card
-    - [ ] Test: loading state (`Loader2` spinner) shown while fetching/converting
-    - [ ] Test: PDF preview path remains unchanged (existing `<embed>` still renders)
-- [ ] Task: Add i18n keys for DOCX preview to both `locales/en.json` and `locales/id.json`
-    - [ ] `files.tooLargeForPreview` — "File is too large for inline preview. Download to view."
-    - [ ] `files.convertingDocx` — "Converting document for preview..."
-- [ ] Task: Implement DOCX preview in `ReviewFilePreview` (`src/components/reviews/ReviewFilePreview.tsx`)
-    - [ ] Detect `.docx` extension (case-insensitive) alongside existing `isPdf` check
-    - [ ] Size guard: if `fileSize >= 10MB` (10 * 1024 * 1024), show "file too large" message with download button — skip conversion
-    - [ ] Dynamic `import('mammoth')` -> fetch file via `downloadUrl` -> `mammoth.convertToHtml({ arrayBuffer })`
-    - [ ] Render converted HTML in `<iframe srcDoc={html} sandbox="" />`
-    - [ ] Show `Loader2` spinner during fetch/convert
-    - [ ] On conversion error, fall back to existing "Preview not available" card
-    - [ ] Keep PDF `<embed>` path and download button unchanged
-- [ ] Task: Run `pnpm generate:i18n` to regenerate i18n types
+- [x] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
+    - [x] Re-read the track specification for phase-specific requirements
+    - [x] Re-read workflow rules (TDD, commit format, coverage thresholds)
+- [x] Task: Write failing tests for DOCX preview in `ReviewFilePreview` `fe787e7`
+    - [x] Create/update `tests/unit/components/reviews/review-file-preview.test.tsx`
+    - [x] Test: `.docx` file < 10MB triggers `mammoth.convertToHtml` with the fetched arrayBuffer
+    - [x] Test: rendered output is a sandboxed `<iframe>` with `sandbox=""` (no `allow-scripts`)
+    - [x] Test: `.docx` file >= 10MB shows localized "file too large" message (no conversion attempted)
+    - [x] Test: conversion failure falls back to existing "Preview not available" card
+    - [x] Test: loading state (`Loader2` spinner) shown while fetching/converting
+    - [x] Test: PDF preview path remains unchanged (existing `<embed>` still renders)
+- [x] Task: Add i18n keys for DOCX preview to both `locales/en.json` and `locales/id.json` `fe787e7`
+    - [x] `files.tooLargeForPreview` — "File is too large for inline preview. Download to view."
+    - [x] `files.convertingDocx` — "Converting document for preview..."
+- [x] Task: Implement DOCX preview in `ReviewFilePreview` (`src/components/reviews/ReviewFilePreview.tsx`) `fe787e7`
+    - [x] Detect `.docx` extension (case-insensitive) alongside existing `isPdf` check
+    - [x] Size guard: if `fileSize >= 10MB` (10 * 1024 * 1024), show "file too large" message with download button — skip conversion
+    - [x] Dynamic `import('mammoth')` -> fetch file via `downloadUrl` -> `mammoth.convertToHtml({ arrayBuffer })`
+    - [x] Render converted HTML in `<iframe srcDoc={html} sandbox="" />`
+    - [x] Show `Loader2` spinner during fetch/convert
+    - [x] On conversion error, fall back to existing "Preview not available" card
+    - [x] Keep PDF `<embed>` path and download button unchanged
+- [x] Task: Run `pnpm generate:i18n` to regenerate i18n types `fe787e7`
 - [ ] Task: Conductor - User Manual Verification 'DOCX Inline Preview' (Protocol in workflow.md)
 
 ## Phase 2: Keyboard Shortcuts — Two-Layer Architecture (ENH-UX-3)
