@@ -42,12 +42,12 @@
     - [x] Implement `resolveEmailRecipient(userId)` helper (DB query on `users` table for `email`, `locale`, `emailVerified`, `deletedAt`)
     - [x] Verify tests pass
 
-- [ ] Task: Wire `enqueueEmail` in `submitCheckpointHandler` (`submissions.server.ts`)
-    - [ ] Write tests verifying `enqueueEmail` called with correct recipient (instructor), subject (`[SIMAK] Submission Received`), `template_type` (`submission_received`), and body HTML built from `buildSubmissionReceivedHtml`
-    - [ ] Write test verifying advisory-only failure — primary operation (checkpoint submission) succeeds when `enqueueEmail` throws, `console.error` is called
-    - [ ] Write test verifying skip when instructor is soft-deleted or has no verified email
-    - [ ] Implement post-commit advisory `enqueueEmail` call (after transaction, `try/catch` with `console.error`)
-    - [ ] Verify tests pass
+- [x] Task: Wire `enqueueEmail` in `submitCheckpointHandler` (`submissions.server.ts`) [45b0df4]
+    - [x] Write tests verifying `enqueueEmail` called with correct recipient (instructor), subject (`[SIMAK] Submission Received`), `template_type` (`submission_received`), and body HTML built from `buildSubmissionReceivedHtml`
+    - [x] Write test verifying advisory-only failure — primary operation (checkpoint submission) succeeds when `enqueueEmail` throws, `console.error` is called
+    - [x] Write test verifying skip when instructor is soft-deleted or has no verified email
+    - [x] Implement post-commit advisory `enqueueEmail` call (after transaction, `try/catch` with `console.error`)
+    - [x] Verify tests pass
 
 - [ ] Task: Wire `enqueueEmail` in `submitReviewHandler` (`reviews.server.ts`)
     - [ ] Write tests for `review_completed` (pass decision) path — student recipient, subject `[SIMAK] Review Completed`, `template_type` `review_completed`
