@@ -28,6 +28,11 @@
     - [x] NFR-1: Verified zero `href="#"` in `src/routes/`
 - [~] Task: Conductor - User Manual Verification 'Phase 1: Landing Footer Link & Copyright Hygiene' (Protocol in workflow.md)
 
+### Phase 1 Checkpoint
+- **Commit SHA:** `3739b6cbb2cd1822b1348ab011dd3b1df72eddd0`
+- **Commit message:** `fix(landing): replace dead footer links and hardcoded copyright with i18n key`
+- **Git notes:** Attached with summary of changes, tests, and quality gate results
+
 ## Phase 2: Resolve eslint-disable via useQuery Conversion (ENH-TD-1)
 
 - [ ] Task: Read spec.md and workflow.md to re-ground before Phase 2 implementation
