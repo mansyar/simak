@@ -55,7 +55,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Configuration & Package Upgrade' (Protocol in workflow.md)
 
-## Phase 3: Quality Gate Verification & Benchmarking
+## Phase 3: Quality Gate Verification & Benchmarking [checkpoint: a4ff29e]
 
 - [x] Task: Run full quality gate suite under TS 7 `ecca154`
     - [x] Run `pnpm typecheck` — confirm passes
@@ -68,18 +68,18 @@
     - [x] Record commit SHA in plan.md and mark task complete
 
 - [x] Task: Measure post-upgrade typecheck performance and document speedup `7fbf0b1`
-    - [ ] Run `pnpm typecheck` under TS 7 three times, take median wall-clock time
-    - [ ] Compare against the Phase 1 baseline measurement
-    - [ ] Document the speedup ratio in the commit message and git note
-    - [ ] Commit: `chore(bench): Document TS 7 typecheck speedup`
-    - [ ] Attach git note with before/after measurements
-    - [ ] Record commit SHA in plan.md and mark task complete
+    - [x] Run `pnpm typecheck` under TS 7 three times, take median wall-clock time
+    - [x] Compare against the Phase 1 baseline measurement
+    - [x] Document the speedup ratio in the commit message and git note
+    - [x] Commit: `chore(bench): Document TS 7 typecheck speedup`
+    - [x] Attach git note with before/after measurements
+    - [x] Record commit SHA in plan.md and mark task complete
 
 - [x] Task: Smoke test `pnpm dev` and `pnpm build` `ee7fe5c`
-    - [ ] Run `pnpm dev` — confirm i18n codegen runs and Vite dev server boots without errors
-    - [ ] Run `pnpm build` — confirm full production build succeeds (i18n codegen + vite build + migrate/seed bundles)
-    - [ ] Commit: `chore(verify): Smoke test dev and build under TS 7`
-    - [ ] Attach git note with smoke test results
-    - [ ] Record commit SHA in plan.md and mark task complete
+    - [x] Run `pnpm dev` — confirm i18n codegen runs and Vite dev server boots without errors
+    - [x] Run `pnpm build` — confirm full production build succeeds (i18n codegen + vite build + migrate/seed bundles)
+    - [x] Commit: `chore(verify): Smoke test dev and build under TS 7`
+    - [x] Attach git note with smoke test results
+    - [x] Record commit SHA in plan.md and mark task complete
 
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Quality Gate Verification & Benchmarking' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Quality Gate Verification & Benchmarking' (Protocol in workflow.md)
