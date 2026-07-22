@@ -3,11 +3,11 @@
 
 ## Phase 1: Foundation — Templates, Schema & i18n
 
-- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
-    - [ ] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [x] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Create email template builder module (`src/lib/email-templates.ts`)
+- [x] Task: Create email template builder module (`src/lib/email-templates.ts`) [e921bc1]
     - [ ] Write unit tests for shared `buildEmailHeader(locale)` and `buildEmailFooter(locale)` helpers (SIMAK branding, HTML structure)
     - [ ] Write unit tests for all 8 localized template-builder functions — verify correct output per locale (EN/ID), deep-link URL, contextual params (assignment name, checkpoint name, actor name, result)
     - [ ] Write unit test verifying locale fallback to English when locale is null/unsupported
