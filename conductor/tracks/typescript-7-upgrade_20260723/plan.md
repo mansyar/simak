@@ -15,7 +15,7 @@
     - [x] Attach git note with baseline measurement
     - [x] Record commit SHA in plan.md and mark task complete
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Pre-Upgrade Preparation' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Pre-Upgrade Preparation' (Protocol in workflow.md)
 
 ## Phase 2: Configuration & Package Upgrade
 
