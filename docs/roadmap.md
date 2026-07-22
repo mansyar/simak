@@ -1251,6 +1251,70 @@ All tracks must adhere to the following project constraints:
 
 ---
 
+## Milestone 6: Infrastructure & Tooling
+
+> This milestone addresses proactive infrastructure and tooling upgrades that improve developer experience, build performance, and toolchain currency. These tracks are not audit-driven — they are technology refresh initiatives.
+
+---
+
+### TRACK-020: TypeScript 7 Upgrade
+
+- **Status:** `Proposed`
+- **Dependencies:** None
+- **Estimated Effort:** 1 Day / 0.5 Sprint Loops
+- **Audit IDs:** None (proactive infrastructure upgrade, not audit-driven)
+- **Decisions:**
+  - **Direct upgrade path (5.8 → 7.0):** The project is on TypeScript `^5.8.0`. Microsoft recommends going through TS 6.0 as a bridge, but the project's tsconfig is already 95% TS 7-ready. The only deprecated option in use is `baseUrl: "."` (removed in TS 7). Since `paths` already uses `./src/*` (relative to project root), removing `baseUrl` is a trivial 1-line change with zero functional impact. A direct upgrade is low-risk.
+  - **No Compiler API consumers (confirmed):** Grep across all `.ts/.tsx/.js/.mjs/.cjs` files confirmed zero direct imports of the `typescript` package. The toolchain is fully decoupled from the TS compiler API: oxlint uses its own parser (not typescript-eslint), Vitest transforms via Vite/esbuild, tsx is esbuild-based, and drizzle-kit has its own TS parser. The biggest blocker for most projects (tooling that `import`s from `typescript`) does not apply.
+  - **No blocked frameworks:** No Vue, Svelte, Astro, MDX, or Angular — all of which need the compiler API for template type-checking and are blocked on TS 7.1. Pure React 19 + TanStack Start.
+  - **tsc is type-checking only:** The project uses `tsc --noEmit --incremental` exclusively. Transpilation is handled by Vite/esbuild. No emit path, no downleveling concerns. TS 7's removal of `target: es5` and `module: amd/umd/systemjs/none` is irrelevant.
+  - **`tsconfig.tsbuildinfo` deletion:** The Go compiler's incremental artifacts are incompatible with the JS compiler's. Must be deleted before the first TS 7 run.
+  - **`noUncheckedSideEffectImports` default change:** TS 7 defaults this to `true` — may surface new errors for side-effect imports with typos. Beneficial, but watch during triage.
+  - **No `@typescript/typescript6` side-by-side needed:** The project has no tooling that imports the TS compiler API, so the compatibility shim package is unnecessary. `tsc` alone suffices.
+  - **Expected gains:** 8–12x faster `pnpm typecheck` (the pre-push gate), faster editor/language server experience, new `--checkers`/`--builders` flags for CI parallelism tuning, and a rebuilt `--watch` mode (Parcel-based file watcher).
+
+#### Context Anchors (Traceability)
+
+- **PRD Reference:** N/A (infrastructure upgrade, no product impact)
+- **TDD Reference:** N/A (no architecture change — type-checking logic is structurally identical between TS 6.0 and 7.0)
+- **Toolchain Reference:** `package.json` (devDependencies), `tsconfig.json`, `AGENTS.md` (developer commands)
+
+#### Track Tech Stack
+
+- TypeScript 7.0 (native Go port — `typescript` npm package, `latest` tag)
+- `tsconfig.json` (remove `baseUrl`, verify all other options are TS 7-compatible)
+- `pnpm` (package manager)
+- CI type-checking (`--checkers`, `--builders` flags for parallelism tuning)
+
+#### Scope Boundaries
+
+- **In Scope:**
+  - Remove `baseUrl: "."` from `tsconfig.json` (paths `@/*` → `./src/*` already relative to project root — no functional impact).
+  - Update `package.json`: `"typescript": "^5.8.0"` → `"^7.0.0"`.
+  - Delete `tsconfig.tsbuildinfo` (incompatible incremental format between JS and Go compilers).
+  - Run `pnpm install`, `pnpm typecheck`, `pnpm test`, `pnpm lint`, `pnpm build` — triage any errors from new strict defaults or removed options.
+  - Verify `noUncheckedSideEffectImports: true` (new default) doesn't surface side-effect import typos.
+  - Optionally tune CI `--checkers N` for type-checking parallelism (default 4).
+- **Out of Scope:**
+  - TypeScript 6.0 bridge upgrade (unnecessary — tsconfig is already clean enough for direct upgrade)
+  - `@typescript/typescript6` side-by-side install (no compiler API consumers to bridge)
+  - VS Code extension changes (developer preference, not a project config change)
+  - Refactoring code to accommodate new strict defaults (none expected — `strict: true` already set)
+
+#### High-Level Execution Vectors
+
+- **Phase 1 (Config reconciliation):** Remove `baseUrl: "."` from `tsconfig.json`. Verify all other tsconfig options against the TS 7 removed-options list (`target: es5`, `moduleResolution: node/node10/classic`, `module: amd/umd/systemjs/none`, `downlevelIteration`, `esModuleInterop: false`, `alwaysStrict: false`, `module` keyword in namespaces, `assert` import attributes, `ignoreDeprecations`). All confirmed absent via grep audit.
+- **Phase 2 (Install & typecheck):** Delete `tsconfig.tsbuildinfo`. Update `package.json` TypeScript version to `^7.0.0`. Run `pnpm install`. Run `pnpm typecheck` — triage any errors. Expected: none (config already matches all TS 7 defaults). If `noUncheckedSideEffectImports` surfaces side-effect import issues, fix the import typos.
+- **Phase 3 (Full verification):** Run `pnpm test` (unit + integration), `pnpm lint`, `pnpm build`. Verify all gates pass. Optionally benchmark `pnpm typecheck` before/after to document the speedup. Optionally tune `--checkers N` in CI for parallelism.
+
+#### Verification & Definition of Done (DoD)
+
+- [ ] **Manual Checkpoint:** `pnpm typecheck` passes on TS 7.0 with no errors. `pnpm test` (unit + integration) — all pass. `pnpm build` — prod build succeeds (codegen + vite build + migrate/seed bundles). `pnpm dev` — dev server starts, HMR works, editor shows TS 7 language server. Measure `pnpm typecheck` time before (TS 5.8) and after (TS 7.0) — document the speedup.
+- [ ] **Automated Tests:** `pnpm test:unit` — all existing tests pass unchanged (type-checking logic is structurally identical between TS 6.0 and 7.0). `pnpm test:coverage` ≥80%. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors. `pnpm check:i18n` — parity maintained.
+- [ ] **Conductor Review:** `tsconfig.json` has no `baseUrl`. `tsconfig.tsbuildinfo` deleted and regenerated by TS 7. No deprecated/removed tsconfig options remain (grep for `baseUrl`, `target: es5`, `moduleResolution: node`, `module: amd/umd/systemjs`, `downlevelIteration`, `ignoreDeprecations` — all zero). `package.json` TypeScript version is `^7.0.0`. No `@typescript/typescript6` dependency added (not needed). All pre-push gates pass (`pnpm typecheck` && `pnpm vitest run --coverage`).
+
+---
+
 ## Track Dependency Graph
 
 ```
@@ -1283,6 +1347,9 @@ Milestone 5: Post-Audit Enhancements
 ├── TRACK-017: Instructor Productivity: DOCX Preview & Keyboard Shortcuts [no deps]
 ├── TRACK-018: Event Email Notifications [Complete — no deps]
 └── TRACK-019: Analytics & Reporting [no deps]
+
+Milestone 6: Infrastructure & Tooling
+└── TRACK-020: TypeScript 7 Upgrade [no deps]
 ```
 
 ### Parallelization Strategy
@@ -1299,6 +1366,7 @@ The following track groups can be worked on simultaneously:
 | **F** | TRACK-013 + TRACK-010 | Both touch date formatting — coordinate i18n date changes |
 | **G** | TRACK-014, TRACK-016, TRACK-017, TRACK-018, TRACK-019 | Fully independent — no file overlap (distinct domains: mutations, email ops, review UX, notifications, analytics) — TRACK-014/015/016/017/018 complete |
 | **H** | TRACK-015 → TRACK-014 | Sequential — TRACK-015 consumed the query-key factory from TRACK-014 for useQuery conversion (both complete — TRACK-014 archived, TRACK-015 archived) |
+| **I** | TRACK-020 | Fully independent — only touches `tsconfig.json` and `package.json`, no feature file overlap |
 
 ---
 
@@ -1311,6 +1379,7 @@ The following track groups can be worked on simultaneously:
 | 3: UX & Accessibility | 6 | ~13 Days |
 | 4: Quality Assurance | 1 | ~3 Days |
 | 5: Post-Audit Enhancements | 6 | ~25 Days |
-| **Total** | **20** | **~60 Days** |
+| 6: Infrastructure & Tooling | 1 | ~1 Day |
+| **Total** | **21** | **~61 Days** |
 
 > Effort estimates assume a single developer. Tracks within the same parallelization group can be distributed across developers to reduce wall-clock time.
