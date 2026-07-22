@@ -43,7 +43,7 @@
     - [x] Write failing tests — verify `onMutate` flips `read: true` on all notifications in list cache and sets `useUnreadCount` to 0; `onError` restores snapshot; `onSettled` invalidates; `toast.error()` shown on rollback
     - [x] Implement `onMutate`/`onError`/`onSettled` in `useMarkAllRead` — same pattern as `useMarkRead` but for all items
     - [x] Run `pnpm test` — confirm tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Notification Hooks Optimistic Updates' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Notification Hooks Optimistic Updates' (Protocol in workflow.md)
 
 ## Phase 2: Consultation & Extension Hooks Optimistic Updates
 
