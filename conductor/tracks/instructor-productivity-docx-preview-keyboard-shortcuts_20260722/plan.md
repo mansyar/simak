@@ -123,7 +123,7 @@
     - [x] Add `preload="intent"` to both the `mainLinks` map and `preferenceLinks` map `<Link>` elements
 - [x] Task: Explicitly set `defaultPreload: false` in `src/router.tsx` router config `d5f5212`
     - [x] Add `defaultPreload: false` to the `createRouter({ ... })` options for clarity (prevents over-prefetching on the landing page)
-- [ ] Task: Conductor - User Manual Verification 'Route Prefetch' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Route Prefetch' (Protocol in workflow.md)
 
 ## Phase 4: Final Verification & Quality Gates
 
