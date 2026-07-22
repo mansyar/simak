@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   listUsers,
   deleteUser,
@@ -120,7 +121,32 @@ function UsersPage() {
       }
       return result;
     },
-    onSuccess: () => {
+    onMutate: async (userId: string) => {
+      await queryClient.cancelQueries({ queryKey: userKeys.all() });
+      const previousEntries = queryClient.getQueriesData({ queryKey: userKeys.all() });
+      queryClient.setQueriesData({ queryKey: userKeys.all() }, (old: unknown) => {
+        if (old && typeof old === 'object' && 'users' in old) {
+          const data = old as { users: { id: string }[]; total: number };
+          return {
+            users: data.users.filter((u) => u.id !== userId),
+            total: Math.max(0, data.total - 1),
+          };
+        }
+        return old;
+      });
+      return { previousEntries };
+    },
+    onError: (error, _variables, context) => {
+      if (context?.previousEntries) {
+        for (const [queryKey, data] of context.previousEntries) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+      if (isServerError(error)) {
+        toast.error(error.error.message);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.all() });
     },
   });

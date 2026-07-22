@@ -6,6 +6,7 @@ import '@testing-library/jest-dom/vitest';
 import type { ComponentType, ReactElement } from 'react';
 import { userKeys } from '@/lib/query-keys';
 import { listUsers, deleteUser } from '@/server/users';
+import { toast } from 'sonner';
 
 const mockRouter = vi.hoisted(() => ({
   invalidate: vi.fn(),
@@ -57,6 +58,14 @@ vi.mock('@/server/users', () => ({
 // Mock server assignments
 vi.mock('@/server/assignments', () => ({
   reassignAssignment: vi.fn(),
+}));
+
+// Mock sonner
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
 // Mock __root
@@ -290,6 +299,81 @@ describe('Admin Users index page', () => {
       await waitFor(() => {
         expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: userKeys.all() });
       });
+    });
+  });
+
+  describe('optimistic updates', () => {
+    it('should optimistically remove the user from the list cache', async () => {
+      mockLoaderData.users = [
+        {
+          id: '1',
+          name: 'User 1',
+          email: 'u1@test.com',
+          role: 'student',
+          createdAt: '',
+          emailVerified: false,
+        },
+        {
+          id: '2',
+          name: 'User 2',
+          email: 'u2@test.com',
+          role: 'student',
+          createdAt: '',
+          emailVerified: false,
+        },
+      ];
+      mockLoaderData.total = 2;
+      vi.mocked(deleteUser).mockReturnValue(new Promise(() => {}));
+
+      const Component = await getComponent();
+      renderWithQuery(<Component />);
+
+      const key = userKeys.list({ page: 1, limit: 20, search: '', role: undefined });
+      await waitFor(() => expect(queryClient.getQueryData(key)).toBeDefined());
+
+      fireEvent.click(screen.getByTestId('delete-user-btn'));
+      fireEvent.click(screen.getByTestId('delete-confirm'));
+
+      await waitFor(() => {
+        const data = queryClient.getQueryData<{ users: { id: string }[]; total: number }>(key);
+        expect(data?.users.find((u) => u.id === '1')).toBeUndefined();
+        expect(data?.total).toBe(1);
+      });
+    });
+
+    it('should restore the user on error', async () => {
+      const seedUsers = [
+        {
+          id: '1',
+          name: 'User 1',
+          email: 'u1@test.com',
+          role: 'student',
+          createdAt: '',
+          emailVerified: false,
+        },
+      ];
+      mockLoaderData.users = seedUsers;
+      mockLoaderData.total = 1;
+      vi.mocked(listUsers).mockResolvedValue({ users: seedUsers, total: 1 } as any);
+      vi.mocked(deleteUser).mockResolvedValue({
+        error: { code: 'INTERNAL', message: 'Server error' },
+      } as any);
+
+      const Component = await getComponent();
+      renderWithQuery(<Component />);
+
+      const key = userKeys.list({ page: 1, limit: 20, search: '', role: undefined });
+      await waitFor(() => expect(queryClient.getQueryData(key)).toBeDefined());
+
+      fireEvent.click(screen.getByTestId('delete-user-btn'));
+      fireEvent.click(screen.getByTestId('delete-confirm'));
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server error');
+      });
+      const data = queryClient.getQueryData<{ users: { id: string }[]; total: number }>(key);
+      expect(data?.users.find((u) => u.id === '1')).toBeDefined();
+      expect(data?.total).toBe(1);
     });
   });
 
