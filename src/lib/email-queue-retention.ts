@@ -22,6 +22,7 @@ export async function pruneOldEmails(): Promise<{ deleted: number }> {
   const sentThreshold = new Date(now.getTime() - SENT_RETENTION_DAYS * MS_PER_DAY);
   const failedThreshold = new Date(now.getTime() - FAILED_RETENTION_DAYS * MS_PER_DAY);
 
+  // Drizzle's delete() return type doesn't expose rowCount; cast to access it
   const sentResult = (await db
     .delete(emailQueue)
     .where(
