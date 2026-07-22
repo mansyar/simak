@@ -26,12 +26,14 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Pagination } from '@/components/ui/pagination';
 import { RefreshButton } from '@/components/ui/refresh-button';
 import { AlertBanner } from '@/components/ui/alert-banner';
-import { Plus, Upload } from 'lucide-react';
+import { Plus, Upload, Download } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
 import { isServerError, ErrorCode } from '@/lib/errors';
 import { userKeys } from '@/lib/query-keys';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
+import { exportUsersCsv } from '@/server/analytics';
+import { useCsvDownload } from '@/hooks/use-csv-download';
 
 const UserSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -63,6 +65,7 @@ function UsersPage() {
   const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { exportCsv, isExporting } = useCsvDownload();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | null>(null);
@@ -247,6 +250,16 @@ function UsersPage() {
         action={
           <div className="flex items-center gap-2">
             <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
+            <Button
+              variant="outline"
+              loading={isExporting}
+              onClick={() =>
+                exportCsv(() => exportUsersCsv({ data: {} }) as Promise<unknown>, 'users.csv')
+              }
+            >
+              <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t('common.exportCsv')}
+            </Button>
             <Button variant="outline" onClick={() => navigate({ to: '/admin/users/import' })}>
               <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
               {t('bulkImport.users.button')}

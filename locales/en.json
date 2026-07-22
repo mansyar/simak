@@ -74,7 +74,10 @@
     "nextPage": "Next",
     "pageOf": "Page {current} of {total}",
     "done": "Done",
-    "clearSearch": "Clear search"
+    "clearSearch": "Clear search",
+    "exportCsv": "Export CSV",
+    "exportStudentProgress": "Export Student Progress",
+    "exportReviewHistory": "Export Review History"
   },
   "theme": {
     "light": "Light Mode",

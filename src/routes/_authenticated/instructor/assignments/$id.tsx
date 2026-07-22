@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { getAssignmentDetail } from '@/server/assignments';
+import { exportStudentProgressCsv, exportReviewHistoryCsv } from '@/server/analytics';
 import { AssignmentDetailHeader } from '@/components/instructor/assignments/AssignmentDetailHeader';
 import { AssignmentOverviewTab } from '@/components/instructor/assignments/AssignmentOverviewTab';
 import { AssignmentConsultationsTab } from '@/components/instructor/assignments/AssignmentConsultationsTab';
 import { AssignmentExtensionsTab } from '@/components/instructor/assignments/AssignmentExtensionsTab';
 import { AssignmentDetailTabs } from '@/components/instructor/assignments/AssignmentDetailTabs';
 import { useAssignmentTabs } from '@/hooks/use-assignment-tabs';
+import { useCsvDownload } from '@/hooks/use-csv-download';
 import { EmptyState } from '@/components/ui/empty-state';
-import { FileX } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { FileX, Download } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { isServerError } from '@/lib/errors';
 import { AssignmentDetailSkeleton } from '@/components/skeletons/assignment-detail-skeleton';
@@ -25,6 +28,7 @@ function AssignmentDetailPage() {
   const { t } = useI18n();
   const loaderData = Route.useLoaderData();
   const assignment = loaderData && !isServerError(loaderData) ? loaderData : null;
+  const { exportCsv, isExporting } = useCsvDownload();
 
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedConsultationId, setSelectedConsultationId] = useState<number | null>(null);
@@ -65,6 +69,42 @@ function AssignmentDetailPage() {
         title={assignment.title}
         templateType={assignment.templateType}
         description={assignment.description}
+        action={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              loading={isExporting}
+              onClick={() =>
+                exportCsv(
+                  () =>
+                    exportStudentProgressCsv({
+                      data: { assignmentId: assignment.id },
+                    }) as Promise<unknown>,
+                  'student-progress.csv',
+                )
+              }
+            >
+              <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t('common.exportStudentProgress')}
+            </Button>
+            <Button
+              variant="outline"
+              loading={isExporting}
+              onClick={() =>
+                exportCsv(
+                  () =>
+                    exportReviewHistoryCsv({
+                      data: { assignmentId: assignment.id },
+                    }) as Promise<unknown>,
+                  'review-history.csv',
+                )
+              }
+            >
+              <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t('common.exportReviewHistory')}
+            </Button>
+          </div>
+        }
       />
       <AssignmentDetailTabs tabs={tabList} activeTab={activeTab} onTabChange={setActiveTab} />
       {activeTab === 'overview' && <AssignmentOverviewTab assignment={assignment} />}

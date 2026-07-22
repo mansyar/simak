@@ -74,7 +74,10 @@
     "nextPage": "Selanjutnya",
     "pageOf": "Halaman {current} dari {total}",
     "done": "Selesai",
-    "clearSearch": "Hapus pencarian"
+    "clearSearch": "Hapus pencarian",
+    "exportCsv": "Ekspor CSV",
+    "exportStudentProgress": "Ekspor Progres Siswa",
+    "exportReviewHistory": "Ekspor Riwayat Review"
   },
   "theme": {
     "light": "Mode Terang",

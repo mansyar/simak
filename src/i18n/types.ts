@@ -80,6 +80,9 @@ export type Translation = {
     pageOf: string
     done: string
     clearSearch: string
+    exportCsv: string
+    exportStudentProgress: string
+    exportReviewHistory: string
   }
   theme: {
     light: string

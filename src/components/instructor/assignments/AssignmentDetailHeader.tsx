@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { PageHeader } from '@/components/ui/page-header';
 import { TemplateTypeBadge } from '@/components/ui/template-type-badge';
 import { useI18n } from '@/routes/__root';
@@ -6,12 +7,14 @@ interface AssignmentDetailHeaderProps {
   title: string;
   templateType: string;
   description: string | null;
+  action?: ReactNode;
 }
 
 export function AssignmentDetailHeader({
   title,
   templateType,
   description,
+  action,
 }: AssignmentDetailHeaderProps) {
   const { t } = useI18n();
 
@@ -24,6 +27,7 @@ export function AssignmentDetailHeader({
           label: t('common.back'),
           search: { page: 1, limit: 20, search: '' },
         }}
+        action={action}
       />
 
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">

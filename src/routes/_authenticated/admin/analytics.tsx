@@ -19,7 +19,9 @@ import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/ui/empty-state';
 import { isServerError } from '@/lib/errors';
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
-import { ShieldCheck, AlertTriangle, CheckCircle, BarChart3 } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, CheckCircle, BarChart3, Download } from 'lucide-react';
+import { exportAssignmentProgressCsv } from '@/server/analytics';
+import { useCsvDownload } from '@/hooks/use-csv-download';
 
 const AnalyticsSearchSchema = z.object({
   range: z.enum(['7d', '30d', '90d', 'all']).optional(),
@@ -71,6 +73,7 @@ function AdminAnalyticsPage() {
   const data = Route.useLoaderData() as unknown as AdminAnalyticsData;
   const searchParams = Route.useSearch() as unknown as AnalyticsSearchParams;
   const navigate = Route.useNavigate();
+  const { exportCsv, isExporting } = useCsvDownload();
 
   if (isServerError(data)) {
     return (
@@ -119,7 +122,25 @@ function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title={t('adminAnalytics.title')} subtitle={t('adminAnalytics.subtitle')} />
+      <PageHeader
+        title={t('adminAnalytics.title')}
+        subtitle={t('adminAnalytics.subtitle')}
+        action={
+          <Button
+            variant="outline"
+            loading={isExporting}
+            onClick={() =>
+              exportCsv(
+                () => exportAssignmentProgressCsv({ data: {} }) as Promise<unknown>,
+                'assignment-progress.csv',
+              )
+            }
+          >
+            <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+            {t('common.exportCsv')}
+          </Button>
+        }
+      />
 
       {/* Date Range Selector */}
       <div className="flex flex-wrap items-center gap-2">
