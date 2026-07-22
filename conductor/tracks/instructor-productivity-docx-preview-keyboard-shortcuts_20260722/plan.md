@@ -43,66 +43,66 @@
 
 ## Phase 2: Keyboard Shortcuts — Two-Layer Architecture (ENH-UX-3)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
-    - [ ] Re-read the track specification for phase-specific requirements
-    - [ ] Re-read workflow rules (TDD, commit format, coverage thresholds)
-- [ ] Task: Write failing tests for `useKeyboardShortcuts` global hook
-    - [ ] Create `tests/unit/hooks/use-keyboard-shortcuts.test.tsx`
-    - [ ] Test: pressing `R` calls `queryClient.invalidateQueries()`
-    - [ ] Test: pressing `?` toggles cheat-sheet popover open/closed
-    - [ ] Test: shortcuts suppressed when focus is in `<input>`, `<textarea>`, or `[contenteditable]`
-    - [ ] Test: event listener removed on unmount (no leak)
-- [ ] Task: Write failing tests for `useReviewNav` review-specific hook
-    - [ ] Create `tests/unit/hooks/use-review-nav.test.tsx`
-    - [ ] Test: calls `listPendingReviews({ data: { page: 1, limit: 100 } })` on mount
-    - [ ] Test: `J` key navigates to next pending submissionId in the preloaded list
-    - [ ] Test: `K` key navigates to previous pending submissionId
-    - [ ] Test: edge case — current submissionId not in list -> J/K start from index 0
-    - [ ] Test: J/K suppressed when focus is in input/textarea/contenteditable
-    - [ ] Test: listener removed on unmount
-- [ ] Task: Write failing tests for `KeyboardCheatSheet` popover component
-    - [ ] Create `tests/unit/components/keyboard-cheat-sheet.test.tsx`
-    - [ ] Test: displays all 4 shortcuts (R, ?, J, K) with labels
-    - [ ] Test: J/K entries greyed out (disabled styling) when `isReviewPage` prop is false
-    - [ ] Test: R and ? are always enabled regardless of `isReviewPage`
-- [ ] Task: Add i18n keys for cheat-sheet to both `locales/en.json` and `locales/id.json`
-    - [ ] `shortcuts.cheatSheet.title` — "Keyboard Shortcuts"
-    - [ ] `shortcuts.cheatSheet.refresh` — "Refresh data"
-    - [ ] `shortcuts.cheatSheet.help` — "Toggle this help"
-    - [ ] `shortcuts.cheatSheet.nextReview` — "Next pending review"
-    - [ ] `shortcuts.cheatSheet.prevReview` — "Previous pending review"
-    - [ ] `shortcuts.cheatSheet.notOnReviewPage` — "(available on review pages only)"
-- [ ] Task: Create `src/components/ui/popover.tsx` (shadcn-style wrapper via Base UI)
-    - [ ] Wrap `@base-ui/react/popover` with shadcn-style exports (`Popover`, `PopoverTrigger`, `PopoverContent`) — uses `@base-ui/react/popover` (consistent with all other UI primitives in the codebase; deviation from original plan that specified `@radix-ui/react-popover`)
-- [ ] Task: Implement `src/hooks/use-keyboard-shortcuts.ts` (global hook)
-    - [ ] Use `useQueryClient()` from `@tanstack/react-query` for `R` -> `invalidateQueries()`
-    - [ ] `?` toggles a boolean state for cheat-sheet visibility
-    - [ ] Guard: check `document.activeElement` tag/contenteditable before firing
-    - [ ] `useEffect` with `window.addEventListener('keydown', handler)` and cleanup in return
-    - [ ] Export cheat-sheet open state + a `KeyboardCheatSheet` component
-- [ ] Task: Implement `src/hooks/use-review-nav.ts` (review-specific hook)
-    - [ ] On mount: `listPendingReviews({ data: { page: 1, limit: 100 } })` via server fn call
-    - [ ] Find current `submissionId` index in result items; store list + index in state
-    - [ ] `J` -> `navigate({ to: '/instructor/reviews/$submissionId', params: { submissionId: nextId } })`
-    - [ ] `K` -> same navigate with previous ID
-    - [ ] Guard: same input/textarea/contenteditable suppression
-    - [ ] `useEffect` cleanup removes listener
-- [ ] Task: Implement `src/components/keyboard-cheat-sheet.tsx` (cheat-sheet popover)
-    - [ ] Use `Popover` + `PopoverTrigger` + `PopoverContent` primitives
-    - [ ] Accept `isOpen`, `onClose`, `isReviewPage` props
-    - [ ] Render shortcut rows: R (Refresh), ? (Help), J (Next Review), K (Prev Review)
-    - [ ] Grey out J/K rows with muted text + `shortcuts.cheatSheet.notOnReviewPage` label when `!isReviewPage`
-    - [ ] Respect `prefers-reduced-motion` for animation (CSS or conditional class)
-- [ ] Task: Mount global shortcuts in `src/routes/_authenticated.tsx`
-    - [ ] Call `useKeyboardShortcuts()` inside the layout component
-    - [ ] Render `<KeyboardCheatSheet>` with `isReviewPage={false}` (global level — J/K always greyed)
-- [ ] Task: Mount review-nav hook in `src/routes/_authenticated/instructor/reviews/$submissionId.tsx`
-    - [ ] Call `useReviewNav(submissionId)` inside `ReviewDetailPage`
-    - [ ] Override cheat-sheet `isReviewPage={true}` when on review detail route (so J/K are active in the popover)
-- [ ] Task: Refactor "Next Review" button to use preloaded list
-    - [ ] Replace the post-success `listPendingReviews({ limit: 1 })` fetch with index lookup from the preloaded list
-    - [ ] "Next Review" button navigates instantly (no server call)
-- [ ] Task: Run `pnpm generate:i18n` to regenerate i18n types
+- [x] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
+    - [x] Re-read the track specification for phase-specific requirements
+    - [x] Re-read workflow rules (TDD, commit format, coverage thresholds)
+- [x] Task: Write failing tests for `useKeyboardShortcuts` global hook
+    - [x] Create `tests/unit/hooks/use-keyboard-shortcuts.test.tsx`
+    - [x] Test: pressing `R` calls `queryClient.invalidateQueries()`
+    - [x] Test: pressing `?` toggles cheat-sheet popover open/closed
+    - [x] Test: shortcuts suppressed when focus is in `<input>`, `<textarea>`, or `[contenteditable]`
+    - [x] Test: event listener removed on unmount (no leak)
+- [x] Task: Write failing tests for `useReviewNav` review-specific hook
+    - [x] Create `tests/unit/hooks/use-review-nav.test.tsx`
+    - [x] Test: calls `listPendingReviews({ data: { page: 1, limit: 100 } })` on mount
+    - [x] Test: `J` key navigates to next pending submissionId in the preloaded list
+    - [x] Test: `K` key navigates to previous pending submissionId
+    - [x] Test: edge case — current submissionId not in list -> J/K start from index 0
+    - [x] Test: J/K suppressed when focus is in input/textarea/contenteditable
+    - [x] Test: listener removed on unmount
+- [x] Task: Write failing tests for `KeyboardCheatSheet` popover component
+    - [x] Create `tests/unit/components/keyboard-cheat-sheet.test.tsx`
+    - [x] Test: displays all 4 shortcuts (R, ?, J, K) with labels
+    - [x] Test: J/K entries greyed out (disabled styling) when `isReviewPage` prop is false
+    - [x] Test: R and ? are always enabled regardless of `isReviewPage`
+- [x] Task: Add i18n keys for cheat-sheet to both `locales/en.json` and `locales/id.json`
+    - [x] `shortcuts.cheatSheet.title` — "Keyboard Shortcuts"
+    - [x] `shortcuts.cheatSheet.refresh` — "Refresh data"
+    - [x] `shortcuts.cheatSheet.help` — "Toggle this help"
+    - [x] `shortcuts.cheatSheet.nextReview` — "Next pending review"
+    - [x] `shortcuts.cheatSheet.prevReview` — "Previous pending review"
+    - [x] `shortcuts.cheatSheet.notOnReviewPage` — "(available on review pages only)"
+- [x] Task: Create `src/components/ui/popover.tsx` (shadcn-style wrapper via Base UI)
+    - [x] Wrap `@base-ui/react/popover` with shadcn-style exports (`Popover`, `PopoverTrigger`, `PopoverContent`) — uses `@base-ui/react/popover` (consistent with all other UI primitives in the codebase; deviation from original plan that specified `@radix-ui/react-popover`)
+- [x] Task: Implement `src/hooks/use-keyboard-shortcuts.ts` (global hook)
+    - [x] Use `useQueryClient()` from `@tanstack/react-query` for `R` -> `invalidateQueries()`
+    - [x] `?` toggles a boolean state for cheat-sheet visibility
+    - [x] Guard: check `document.activeElement` tag/contenteditable before firing
+    - [x] `useEffect` with `window.addEventListener('keydown', handler)` and cleanup in return
+    - [x] Export cheat-sheet open state + a `KeyboardCheatSheet` component
+- [x] Task: Implement `src/hooks/use-review-nav.ts` (review-specific hook)
+    - [x] On mount: `listPendingReviews({ data: { page: 1, limit: 100 } })` via server fn call
+    - [x] Find current `submissionId` index in result items; store list + index in state
+    - [x] `J` -> `navigate({ to: '/instructor/reviews/$submissionId', params: { submissionId: nextId } })`
+    - [x] `K` -> same navigate with previous ID
+    - [x] Guard: same input/textarea/contenteditable suppression
+    - [x] `useEffect` cleanup removes listener
+- [x] Task: Implement `src/components/keyboard-cheat-sheet.tsx` (cheat-sheet popover)
+    - [x] Use `Popover` + `PopoverTrigger` + `PopoverContent` primitives
+    - [x] Accept `isOpen`, `onClose`, `isReviewPage` props
+    - [x] Render shortcut rows: R (Refresh), ? (Help), J (Next Review), K (Prev Review)
+    - [x] Grey out J/K rows with muted text + `shortcuts.cheatSheet.notOnReviewPage` label when `!isReviewPage`
+    - [x] Respect `prefers-reduced-motion` for animation (CSS or conditional class)
+- [x] Task: Mount global shortcuts in `src/routes/_authenticated.tsx`
+    - [x] Call `useKeyboardShortcuts()` inside the layout component
+    - [x] Render `<KeyboardCheatSheet>` with `isReviewPage={false}` (global level — J/K always greyed)
+- [x] Task: Mount review-nav hook in `src/routes/_authenticated/instructor/reviews/$submissionId.tsx`
+    - [x] Call `useReviewNav(submissionId)` inside `ReviewDetailPage`
+    - [x] Override cheat-sheet `isReviewPage={true}` when on review detail route (so J/K are active in the popover)
+- [x] Task: Refactor "Next Review" button to use preloaded list
+    - [x] Replace the post-success `listPendingReviews({ limit: 1 })` fetch with index lookup from the preloaded list
+    - [x] "Next Review" button navigates instantly (no server call)
+- [x] Task: Run `pnpm generate:i18n` to regenerate i18n types
 - [ ] Task: Conductor - User Manual Verification 'Keyboard Shortcuts' (Protocol in workflow.md)
 
 ## Phase 3: Route Prefetch (ENH-PERF-2)
