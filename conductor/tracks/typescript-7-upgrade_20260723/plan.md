@@ -31,14 +31,14 @@
     - [x] Verify the `paths` mapping (`"@/*": ["./src/*"]`) remains intact and still resolves correctly
     - [x] Run `pnpm typecheck` — confirm no new path resolution errors (may fail until TS 7 is installed)
 
-- [ ] Task: Upgrade TypeScript package and clean stale cache
-    - [ ] Update `typescript` from `^5.8.0` to `^7.0.0` in `package.json` (devDependencies)
-    - [ ] Delete `tsconfig.tsbuildinfo` (incompatible incremental cache format between major versions)
-    - [ ] Run `pnpm install` to update the lockfile and install TS 7
-    - [ ] Run `pnpm typecheck` — confirm it succeeds under TS 7
-    - [ ] Commit: `chore(deps): Upgrade TypeScript 5.8 → 7.0 and remove baseUrl`
-    - [ ] Attach git note with task summary
-    - [ ] Record commit SHA in plan.md and mark task complete
+- [x] Task: Upgrade TypeScript package and clean stale cache `1827970`
+    - [x] Update `typescript` from `^5.8.0` to `^7.0.0` in `package.json` (devDependencies)
+    - [x] Delete `tsconfig.tsbuildinfo` (incompatible incremental cache format between major versions)
+    - [x] Run `pnpm install` to update the lockfile and install TS 7
+    - [x] Run `pnpm typecheck` — confirm it succeeds under TS 7
+    - [x] Commit: `chore(deps): Upgrade TypeScript 5.8 → 7.0 and remove baseUrl`
+    - [x] Attach git note with task summary
+    - [x] Record commit SHA in plan.md and mark task complete
 
 - [ ] Task: Add `--checkers` flag to `lefthook.yml` pre-push typecheck gate
     - [ ] Update the pre-push typecheck command in `lefthook.yml` from `tsc --noEmit --incremental` to `tsc --noEmit --incremental --checkers`
