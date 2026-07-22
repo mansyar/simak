@@ -64,7 +64,7 @@
     - [ ] Implement post-commit advisory `enqueueEmail` calls in both handlers
     - [ ] Verify tests pass
 
-- [ ] Task: Wire `enqueueEmail` in extension handlers (`extensions-extras.server.ts`)
+- [x] Task: Wire `enqueueEmail` in extension handlers (`extensions-extras.server.ts`) [843732b]
     - [ ] Write tests for `approveExtensionHandler` — `extension_approved` → student, subject `[SIMAK] Extension Approved`, correct template_type and body (includes extension days + new deadline)
     - [ ] Write tests for `rejectExtensionHandler` — `extension_rejected` → student, subject `[SIMAK] Extension Rejected`, correct template_type and body (includes rejection reason)
     - [ ] Write tests for `requestExtensionHandler` — `extension_requested` → instructor, subject `[SIMAK] Extension Requested`, correct template_type and body (includes category + duration)
