@@ -33,14 +33,14 @@
 
 ## Phase 2: Recipient Resolution & Handler Wiring
 
-- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
-    - [ ] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [x] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Create recipient resolution helper
-    - [ ] Write unit tests for `resolveEmailRecipient(userId)` — returns `{ email, locale }` from DB, returns `null` when user is soft-deleted, returns `null` when `emailVerified` is null/false, defaults locale to `'en'` when null/unsupported
-    - [ ] Implement `resolveEmailRecipient(userId)` helper (DB query on `users` table for `email`, `locale`, `emailVerified`, `deletedAt`)
-    - [ ] Verify tests pass
+- [x] Task: Create recipient resolution helper [11f9517]
+    - [x] Write unit tests for `resolveEmailRecipient(userId)` — returns `{ email, locale }` from DB, returns `null` when user is soft-deleted, returns `null` when `emailVerified` is null/false, defaults locale to `'en'` when null/unsupported
+    - [x] Implement `resolveEmailRecipient(userId)` helper (DB query on `users` table for `email`, `locale`, `emailVerified`, `deletedAt`)
+    - [x] Verify tests pass
 
 - [ ] Task: Wire `enqueueEmail` in `submitCheckpointHandler` (`submissions.server.ts`)
     - [ ] Write tests verifying `enqueueEmail` called with correct recipient (instructor), subject (`[SIMAK] Submission Received`), `template_type` (`submission_received`), and body HTML built from `buildSubmissionReceivedHtml`
