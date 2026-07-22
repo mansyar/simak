@@ -14,7 +14,7 @@
     - [x] Verify it has TypeScript type definitions
 - [x] Task: Conductor - User Manual Verification 'Tech Stack Update & Dependency Setup' (Protocol in workflow.md)
 
-## Phase 1: DOCX Inline Preview (ENH-UX-2)
+## Phase 1: DOCX Inline Preview (ENH-UX-2) [checkpoint: ab79364]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
     - [x] Re-read the track specification for phase-specific requirements
