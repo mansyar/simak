@@ -16,7 +16,7 @@
     - [x] Implement `src/server/analytics-admin.server.ts` — aggregate queries: consultation verification rate, deadline breach rate, assignment status distribution (`GROUP BY state`), submission/review volume (`date_trunc` + `GROUP BY`), reviews completed count, DAU/WAU (`COUNT(DISTINCT actorId) GROUP BY date_trunc` from `audit_log`)
     - [x] Run `pnpm test` and confirm all tests pass
 
-- [ ] Task: Create admin analytics route and UI
+- [~] Task: Create admin analytics route and UI
     - [ ] Write failing tests in `tests/unit/routes/admin-analytics.test.tsx` for route component — test MetricCard rendering, data table rendering, date range filter UI, sidebar entry
     - [ ] Implement `src/routes/_authenticated/admin/analytics.tsx` — URL search params (`?range=30d` or `?start=...&end=...`), `validateSearch`/`loaderDeps`/`loader`, MetricCard grid (6 metrics), data tables for trends, progress bars for distribution, date range selector (predefined buttons + custom date picker)
     - [ ] Add admin sidebar entry with BarChart3 icon linking to `/admin/analytics`

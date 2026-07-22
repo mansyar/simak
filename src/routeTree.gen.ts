@@ -30,6 +30,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminEmailQueueRouteImport } from './routes/_authenticated/admin/email-queue'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminAuditLogRouteImport } from './routes/_authenticated/admin/audit-log'
+import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedStudentAssignmentsIndexRouteImport } from './routes/_authenticated/student/assignments/index'
 import { Route as AuthenticatedInstructorReviewsIndexRouteImport } from './routes/_authenticated/instructor/reviews/index'
 import { Route as AuthenticatedInstructorAssignmentsIndexRouteImport } from './routes/_authenticated/instructor/assignments/index'
@@ -161,6 +162,12 @@ const AuthenticatedAdminAuditLogRoute =
     path: '/audit-log',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAnalyticsRoute =
+  AuthenticatedAdminAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedStudentAssignmentsIndexRoute =
   AuthenticatedStudentAssignmentsIndexRouteImport.update({
     id: '/assignments/',
@@ -245,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/student': typeof AuthenticatedStudentRouteWithChildren
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/email-queue': typeof AuthenticatedAdminEmailQueueRoute
@@ -279,6 +287,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/student': typeof AuthenticatedStudentRouteWithChildren
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/email-queue': typeof AuthenticatedAdminEmailQueueRoute
@@ -316,6 +325,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
+  '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/email-queue': typeof AuthenticatedAdminEmailQueueRoute
@@ -352,6 +362,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/instructor'
     | '/student'
+    | '/admin/analytics'
     | '/admin/audit-log'
     | '/admin/dashboard'
     | '/admin/email-queue'
@@ -386,6 +397,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/instructor'
     | '/student'
+    | '/admin/analytics'
     | '/admin/audit-log'
     | '/admin/dashboard'
     | '/admin/email-queue'
@@ -422,6 +434,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/instructor'
     | '/_authenticated/student'
+    | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit-log'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/email-queue'
@@ -608,6 +621,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAuditLogRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/analytics': {
+      id: '/_authenticated/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/student/assignments/': {
       id: '/_authenticated/student/assignments/'
       path: '/assignments'
@@ -703,6 +723,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAuditLogRoute: typeof AuthenticatedAdminAuditLogRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminEmailQueueRoute: typeof AuthenticatedAdminEmailQueueRoute
@@ -715,6 +736,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
   AuthenticatedAdminAuditLogRoute: AuthenticatedAdminAuditLogRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminEmailQueueRoute: AuthenticatedAdminEmailQueueRoute,

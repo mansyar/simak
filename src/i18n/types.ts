@@ -99,6 +99,7 @@ export type Translation = {
     templates: string
     auditLog: string
     emailQueue: string
+    analytics: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -515,6 +516,34 @@ export type Translation = {
       sent: string
       failed: string
     }
+  }
+  adminAnalytics: {
+    title: string
+    subtitle: string
+    verificationRate: string
+    breachRate: string
+    reviewsCompleted: string
+    statusDistribution: string
+    submissionTrend: string
+    reviewTrend: string
+    dauTrend: string
+    wauTrend: string
+    range7d: string
+    range30d: string
+    range90d: string
+    rangeAll: string
+    customStart: string
+    customEnd: string
+    date: string
+    count: string
+    activeUsers: string
+    noData: string
+    statusLocked: string
+    statusUnlocked: string
+    statusSubmitted: string
+    statusUnderReview: string
+    statusPassed: string
+    statusRevise: string
   }
   files: {
     dropzone: {

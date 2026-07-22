@@ -94,6 +94,7 @@
     "templates": "Templat",
     "auditLog": "Log Audit",
     "emailQueue": "Antrian Email",
+    "analytics": "Analitik",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
@@ -510,6 +511,34 @@
       "sent": "Terkirim",
       "failed": "Gagal"
     }
+  },
+  "adminAnalytics": {
+    "title": "Analitik",
+    "subtitle": "Dasbor analitik dan pelaporan sistem",
+    "verificationRate": "Tingkat Verifikasi Konsultasi",
+    "breachRate": "Tingkat Pelanggaran Tenggat",
+    "reviewsCompleted": "Review Selesai",
+    "statusDistribution": "Distribusi Status Tugas",
+    "submissionTrend": "Tren Volume Submission",
+    "reviewTrend": "Tren Volume Review",
+    "dauTrend": "Pengguna Aktif Harian",
+    "wauTrend": "Pengguna Aktif Mingguan",
+    "range7d": "7 Hari",
+    "range30d": "30 Hari",
+    "range90d": "90 Hari",
+    "rangeAll": "Semua Waktu",
+    "customStart": "Tanggal Mulai",
+    "customEnd": "Tanggal Akhir",
+    "date": "Tanggal",
+    "count": "Jumlah",
+    "activeUsers": "Pengguna Aktif",
+    "noData": "Tidak ada data tersedia",
+    "statusLocked": "Terkunci",
+    "statusUnlocked": "Terbuka",
+    "statusSubmitted": "Dikumpulkan",
+    "statusUnderReview": "Dalam Review",
+    "statusPassed": "Lulus",
+    "statusRevise": "Revisi"
   },
   "files": {
     "dropzone": {
