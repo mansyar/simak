@@ -67,7 +67,7 @@
     - [x] Attach git note with quality gate results
     - [x] Record commit SHA in plan.md and mark task complete
 
-- [ ] Task: Measure post-upgrade typecheck performance and document speedup
+- [x] Task: Measure post-upgrade typecheck performance and document speedup `7fbf0b1`
     - [ ] Run `pnpm typecheck` under TS 7 three times, take median wall-clock time
     - [ ] Compare against the Phase 1 baseline measurement
     - [ ] Document the speedup ratio in the commit message and git note
