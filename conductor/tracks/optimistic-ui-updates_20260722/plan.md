@@ -66,7 +66,7 @@
     - [x] Run `pnpm test` — confirm tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Consultation & Extension Hooks Optimistic Updates' (Protocol in workflow.md)
 
-## Phase 3: Deadline & User Hooks Optimistic Updates
+## Phase 3: Deadline & User Hooks Optimistic Updates (Checkpoint: e69f777)
 
 - [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 3
 - [x] Task: Add optimistic updates to `unlockCheckpoint` (DeadlineManager.tsx) [16bfc25]
@@ -81,7 +81,7 @@
     - [x] Write failing tests — verify `onMutate` removes row from user list cache optimistically; `onError` restores snapshot (re-adds row) + shows `toast.error()`; `onSettled` invalidates
     - [x] Implement `onMutate`/`onError`/`onSettled` in `deleteUser` mutation
     - [x] Run `pnpm test` — confirm tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Deadline & User Hooks Optimistic Updates' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Deadline & User Hooks Optimistic Updates' (Protocol in workflow.md)
 
 ## Phase 4: Audit & Regression
 
