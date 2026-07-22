@@ -81,14 +81,14 @@
 
 ## Phase 4: Excel Export
 
-- [ ] Task: Read spec.md and workflow.md to refresh context
-    - [ ] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read spec.md and workflow.md to refresh context
+    - [x] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Implement client-side Excel export utility (TDD)
-    - [ ] Write failing tests in `tests/unit/lib/excel-export.test.ts` for Excel export utility — test workbook creation, sheet generation from JSON data, write output format
-    - [ ] Implement `src/lib/excel-export.ts` — reusable utility: `exportToExcel(data, sheetName, fileName)` using `xlsx.utils.book_new()` + `json_to_sheet()` + `write()` + client-side Blob download
-    - [ ] Run `pnpm test` and confirm all tests pass
+- [x] Task: Implement client-side Excel export utility (TDD) [7be4326]
+    - [x] Write failing tests in `tests/unit/lib/excel-export.test.ts` for Excel export utility — test workbook creation, sheet generation from JSON data, write output format
+    - [x] Implement `src/lib/excel-export.ts` — reusable utility: `exportToExcel(data, sheetName, fileName)` using `xlsx.utils.book_new()` + `json_to_sheet()` + `write()` + client-side Blob download
+    - [x] Run `pnpm test` and confirm all tests pass
 
 - [ ] Task: Add Excel export buttons to analytics pages
     - [ ] Write failing tests for Excel export button integration on analytics pages
