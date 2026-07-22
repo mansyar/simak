@@ -17,7 +17,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Pre-Upgrade Preparation' (Protocol in workflow.md)
 
-## Phase 2: Configuration & Package Upgrade
+## Phase 2: Configuration & Package Upgrade [checkpoint: 69aa9b0]
 
 - [x] Task: Write configuration verification tests (Red Phase)
     - [x] Create `tests/unit/config/typescript-7-upgrade.test.ts` with `/** @vitest-environment node */` header
@@ -53,7 +53,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md and mark task complete
 
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Configuration & Package Upgrade' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Configuration & Package Upgrade' (Protocol in workflow.md)
 
 ## Phase 3: Quality Gate Verification & Benchmarking
 
