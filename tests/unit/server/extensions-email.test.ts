@@ -1,6 +1,10 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { approveExtensionHandler, rejectExtensionHandler } from '@/server/extensions-extras.server';
+import {
+  approveExtensionHandler,
+  rejectExtensionHandler,
+  bulkExtendHandler,
+} from '@/server/extensions-extras.server';
 import { requestExtensionHandler } from '@/server/extensions.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
@@ -364,5 +368,119 @@ describe('Extension email enqueue — requestExtensionHandler', () => {
       expect.any(Error),
     );
     consoleSpy.mockRestore();
+  });
+});
+
+describe('Extension email enqueue — bulkExtendHandler', () => {
+  let mockDb: any;
+  let mockTx: any;
+  const instructorSession = {
+    user: { id: 'instructor-1', name: 'Prof. Smith', role: 'instructor' as const },
+    session: {} as any,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    ({ mockDb, mockTx } = createMockDb());
+    vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
+  });
+
+  function setupBulkExtend() {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { id: 100, dueDate: new Date('2026-06-15'), name: 'Chapter 1' },
+          { id: 101, dueDate: new Date('2026-06-20'), name: 'Chapter 2' },
+        ]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ title: 'Thesis 2026' }]).then(onfulfilled),
+      );
+  }
+
+  it('should enqueue extension_approved email to student on bulk extend', async () => {
+    setupBulkExtend();
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'student@test.com',
+      locale: 'en',
+    });
+    vi.mocked(buildExtensionApprovedHtml).mockReturnValue('<html>approved body</html>');
+
+    const result = await bulkExtendHandler({
+      data: { assignmentId: 1, studentId: 'student-1', extraDays: 3, reason: 'Medical leave' },
+    });
+
+    expect(result).toEqual({ success: true, extendedCount: 2 });
+    expect(resolveEmailRecipient).toHaveBeenCalledWith('student-1');
+    expect(buildExtensionApprovedHtml).toHaveBeenCalledWith(
+      expect.objectContaining({
+        instructorName: 'Prof. Smith',
+        assignmentName: 'Thesis 2026',
+        assignmentId: 1,
+        extensionDays: 3,
+        locale: 'en',
+      }),
+    );
+    expect(enqueueEmail).toHaveBeenCalledWith({
+      recipientEmail: 'student@test.com',
+      subject: '[SIMAK] Extension Approved',
+      bodyHtml: '<html>approved body</html>',
+      templateType: 'extension_approved',
+    });
+  });
+
+  it('should localize email subject for Indonesian student', async () => {
+    setupBulkExtend();
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'student@test.com',
+      locale: 'id',
+    });
+
+    await bulkExtendHandler({
+      data: { assignmentId: 1, studentId: 'student-1', extraDays: 3, reason: 'Medical leave' },
+    });
+
+    expect(enqueueEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: '[SIMAK] Perpanjangan Disetujui',
+      }),
+    );
+  });
+
+  it('should succeed even when enqueueEmail throws (advisory-only)', async () => {
+    setupBulkExtend();
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'student@test.com',
+      locale: 'en',
+    });
+    vi.mocked(enqueueEmail).mockRejectedValueOnce(new Error('email service down'));
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const result = await bulkExtendHandler({
+      data: { assignmentId: 1, studentId: 'student-1', extraDays: 3, reason: 'Medical leave' },
+    });
+
+    expect(result).toEqual({ success: true, extendedCount: 2 });
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Failed to enqueue extension_approved email:',
+      expect.any(Error),
+    );
+    consoleSpy.mockRestore();
+  });
+
+  it('should skip email when student is soft-deleted or has no verified email', async () => {
+    setupBulkExtend();
+    vi.mocked(resolveEmailRecipient).mockResolvedValue(null);
+
+    const result = await bulkExtendHandler({
+      data: { assignmentId: 1, studentId: 'student-1', extraDays: 3, reason: 'Medical leave' },
+    });
+
+    expect(result).toEqual({ success: true, extendedCount: 2 });
+    expect(enqueueEmail).not.toHaveBeenCalled();
   });
 });

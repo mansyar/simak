@@ -442,6 +442,14 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
       console.error('[bulkExtend] notification insert failed:', err);
     }
 
+    // 7. Email notification (post-commit advisory)
+    await sendExtensionApprovedEmail({
+      studentId,
+      instructorName: session.user.name,
+      assignmentId,
+      extensionDays: extraDays,
+    });
+
     return { success: true, extendedCount: unfinishedCheckpoints.length };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
