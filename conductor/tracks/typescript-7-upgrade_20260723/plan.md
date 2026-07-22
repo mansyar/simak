@@ -57,15 +57,15 @@
 
 ## Phase 3: Quality Gate Verification & Benchmarking
 
-- [ ] Task: Run full quality gate suite under TS 7
-    - [ ] Run `pnpm typecheck` — confirm passes
-    - [ ] Run `pnpm test:coverage` — confirm all tests pass and coverage ≥80% on all four metrics (lines, statements, branches, functions)
-    - [ ] Run `pnpm lint` — confirm passes (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n` — confirm EN↔ID key parity
-    - [ ] If any gate fails, debug and fix (maximum 2 attempts per the workflow protocol)
-    - [ ] Commit: `chore(verify): Quality gates pass under TypeScript 7`
-    - [ ] Attach git note with quality gate results
-    - [ ] Record commit SHA in plan.md and mark task complete
+- [x] Task: Run full quality gate suite under TS 7 `ecca154`
+    - [x] Run `pnpm typecheck` — confirm passes
+    - [x] Run `pnpm test:coverage` — confirm all tests pass and coverage ≥80% on all four metrics (lines, statements, branches, functions)
+    - [x] Run `pnpm lint` — confirm passes (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n` — confirm EN↔ID key parity
+    - [x] If any gate fails, debug and fix (maximum 2 attempts per the workflow protocol)
+    - [x] Commit: `chore(verify): Quality gates pass under TypeScript 7`
+    - [x] Attach git note with quality gate results
+    - [x] Record commit SHA in plan.md and mark task complete
 
 - [ ] Task: Measure post-upgrade typecheck performance and document speedup
     - [ ] Run `pnpm typecheck` under TS 7 three times, take median wall-clock time
