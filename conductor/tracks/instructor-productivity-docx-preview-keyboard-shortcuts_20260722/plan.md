@@ -72,9 +72,8 @@
     - [ ] `shortcuts.cheatSheet.nextReview` — "Next pending review"
     - [ ] `shortcuts.cheatSheet.prevReview` — "Previous pending review"
     - [ ] `shortcuts.cheatSheet.notOnReviewPage` — "(available on review pages only)"
-- [ ] Task: Create `src/components/ui/popover.tsx` (shadcn Popover primitive via Radix)
-    - [ ] Wrap `@radix-ui/react-popover` with shadcn-style exports (`Popover`, `PopoverTrigger`, `PopoverContent`)
-    - [ ] Run `pnpm add @radix-ui/react-popover` if not already installed
+- [ ] Task: Create `src/components/ui/popover.tsx` (shadcn-style wrapper via Base UI)
+    - [ ] Wrap `@base-ui/react/popover` with shadcn-style exports (`Popover`, `PopoverTrigger`, `PopoverContent`) — uses `@base-ui/react/popover` (consistent with all other UI primitives in the codebase; deviation from original plan that specified `@radix-ui/react-popover`)
 - [ ] Task: Implement `src/hooks/use-keyboard-shortcuts.ts` (global hook)
     - [ ] Use `useQueryClient()` from `@tanstack/react-query` for `R` -> `invalidateQueries()`
     - [ ] `?` toggles a boolean state for cheat-sheet visibility

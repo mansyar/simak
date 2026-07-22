@@ -59,5 +59,6 @@
 ## Changelog
 
 - **2026-07-22:** Added `mammoth.js` for client-side `.docx` → HTML conversion on the instructor review detail page. Lazy-loaded via dynamic `import('mammoth')` to keep it out of the main client bundle. Used in `ReviewFilePreview` component (TRACK-017).
+- **2026-07-22:** **Deviation from plan** — The plan (Phase 0) specified `@radix-ui/react-popover` for the keyboard cheat-sheet Popover component. However, the entire codebase uses `@base-ui/react` for all UI primitives (Dialog, Sheet, etc.). `@base-ui/react/popover` is already installed and available. Replaced `@radix-ui/react-popover` with `@base-ui/react/popover` for consistency. Uninstalled `@radix-ui/react-popover` (was installed in Phase 0 commit `784fcd3`).
 
 </protect>
