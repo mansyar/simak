@@ -82,4 +82,4 @@
     - [ ] Attach git note with smoke test results
     - [ ] Record commit SHA in plan.md and mark task complete
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Quality Gate Verification & Benchmarking' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Quality Gate Verification & Benchmarking' (Protocol in workflow.md)
