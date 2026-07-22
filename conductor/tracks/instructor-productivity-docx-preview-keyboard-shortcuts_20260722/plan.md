@@ -3,16 +3,16 @@
 
 ## Phase 0: Tech Stack Update & Dependency Setup
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
-    - [ ] Re-read the track specification for phase-specific requirements
-    - [ ] Re-read workflow rules (TDD, commit format, coverage thresholds)
-- [ ] Task: Add `mammoth` to `conductor/tech-stack.md`
-    - [ ] Add entry under Frontend table: `mammoth` — `.docx` -> HTML conversion, ~30KB gzipped, lazy-loaded via dynamic `import()`
-    - [ ] Add dated note explaining the new dependency
-- [ ] Task: Install `mammoth` dependency
-    - [ ] Run `pnpm add mammoth`
-    - [ ] Verify it has TypeScript type definitions
-- [ ] Task: Conductor - User Manual Verification 'Tech Stack Update & Dependency Setup' (Protocol in workflow.md)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` before starting phase implementation
+    - [x] Re-read the track specification for phase-specific requirements
+    - [x] Re-read workflow rules (TDD, commit format, coverage thresholds)
+- [x] Task: Add `mammoth` to `conductor/tech-stack.md`
+    - [x] Add entry under Frontend table: `mammoth` — `.docx` -> HTML conversion, ~30KB gzipped, lazy-loaded via dynamic `import()`
+    - [x] Add dated note explaining the new dependency
+- [x] Task: Install `mammoth` dependency `784fcd3`
+    - [x] Run `pnpm add mammoth`
+    - [x] Verify it has TypeScript type definitions
+- [x] Task: Conductor - User Manual Verification 'Tech Stack Update & Dependency Setup' (Protocol in workflow.md)
 
 ## Phase 1: DOCX Inline Preview (ENH-UX-2)
 
