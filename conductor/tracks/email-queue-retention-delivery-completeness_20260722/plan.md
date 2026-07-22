@@ -68,4 +68,8 @@
     - [x] Verify `isRunning` guard and stale-row reclaim remain unchanged
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Concurrent Batch Sends' (Protocol in workflow.md) [c8253f5]
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [6289499]
 </protect>
