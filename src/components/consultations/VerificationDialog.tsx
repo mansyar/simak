@@ -91,17 +91,40 @@ export function VerificationDialog({
       }
       return result;
     },
-    onMutate: () => {
+    onMutate: async () => {
       setError(null);
+      await queryClient.cancelQueries({ queryKey: consultationKeys.all() });
+      const previousEntries = queryClient.getQueriesData({ queryKey: consultationKeys.all() });
+      if (consultationId != null) {
+        queryClient.setQueriesData({ queryKey: consultationKeys.all() }, (old: unknown) => {
+          if (old && typeof old === 'object' && 'consultations' in old) {
+            const data = old as { consultations: { id: number }[]; total: number };
+            return {
+              consultations: data.consultations.filter((c) => c.id !== consultationId),
+              total: Math.max(0, data.total - 1),
+            };
+          }
+          return old;
+        });
+      }
+      return { previousEntries };
     },
     onSuccess: () => {
       toast.success(t('consultations.verifySuccess'));
       onOpenChange(false);
       onActionComplete();
-      queryClient.invalidateQueries({ queryKey: consultationKeys.all() });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _variables, context) => {
+      if (context?.previousEntries) {
+        for (const [queryKey, data] of context.previousEntries) {
+          queryClient.setQueryData(queryKey, data);
+        }
+      }
+      toast.error(error.message);
       setError(error.message);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: consultationKeys.all() });
     },
   });
 

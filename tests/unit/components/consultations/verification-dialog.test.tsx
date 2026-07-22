@@ -9,6 +9,7 @@ import React from 'react';
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -115,6 +116,9 @@ describe('VerificationDialog', () => {
     );
   }
 
+  const findBtn = (text: string) =>
+    screen.getAllByTestId('dialog-btn').find((b) => b.textContent === text)!;
+
   async function resolveDetail(detail = mockDetail) {
     const mod = await import('@/server/consultations');
     (mod.getConsultationDetail as any).mockResolvedValue({ consultation: detail });
@@ -203,8 +207,7 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const verifyBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Verify');
-    fireEvent.click(verifyBtn!);
+    fireEvent.click(findBtn('Verify'));
 
     await vi.waitFor(() => {
       expect(mod.verifyConsultation).toHaveBeenCalledOnce();
@@ -221,8 +224,7 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const verifyBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Verify');
-    fireEvent.click(verifyBtn!);
+    fireEvent.click(findBtn('Verify'));
 
     await vi.waitFor(() => {
       expect(screen.getByText('Already verified')).toBeDefined();
@@ -235,8 +237,7 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const rejectBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject');
-    fireEvent.click(rejectBtn!);
+    fireEvent.click(findBtn('Reject'));
 
     expect(screen.getByTestId('reject-input')).toBeDefined();
     expect(screen.getByText('Confirm Reject')).toBeDefined();
@@ -248,8 +249,7 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const rejectBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject');
-    fireEvent.click(rejectBtn!);
+    fireEvent.click(findBtn('Reject'));
 
     const confirmBtn = screen
       .getAllByTestId('dialog-btn')
@@ -262,8 +262,7 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const rejectBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject');
-    fireEvent.click(rejectBtn!);
+    fireEvent.click(findBtn('Reject'));
 
     const input = screen.getByTestId('reject-input');
     fireEvent.change(input, { target: { value: 'Insufficient detail' } });
@@ -282,16 +281,12 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const rejectBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject');
-    fireEvent.click(rejectBtn!);
+    fireEvent.click(findBtn('Reject'));
 
     const input = screen.getByTestId('reject-input');
     fireEvent.change(input, { target: { value: 'Insufficient detail' } });
 
-    const confirmBtn = screen
-      .getAllByTestId('dialog-btn')
-      .find((b) => b.textContent === 'Confirm Reject');
-    fireEvent.click(confirmBtn!);
+    fireEvent.click(findBtn('Confirm Reject'));
 
     await vi.waitFor(() => {
       expect(mod.rejectConsultation).toHaveBeenCalledOnce();
@@ -308,16 +303,12 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const rejectBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject');
-    fireEvent.click(rejectBtn!);
+    fireEvent.click(findBtn('Reject'));
 
     const input = screen.getByTestId('reject-input');
     fireEvent.change(input, { target: { value: 'Insufficient detail' } });
 
-    const confirmBtn = screen
-      .getAllByTestId('dialog-btn')
-      .find((b) => b.textContent === 'Confirm Reject');
-    fireEvent.click(confirmBtn!);
+    fireEvent.click(findBtn('Confirm Reject'));
 
     await vi.waitFor(() => {
       expect(screen.getByText('Already verified')).toBeDefined();
@@ -330,20 +321,14 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const rejectBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject');
-    fireEvent.click(rejectBtn!);
+    fireEvent.click(findBtn('Reject'));
     expect(screen.getByTestId('reject-input')).toBeDefined();
 
-    const cancelBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Cancel');
-    fireEvent.click(cancelBtn!);
+    fireEvent.click(findBtn('Cancel'));
 
     expect(screen.queryByTestId('reject-input')).toBeNull();
-    expect(
-      screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Verify'),
-    ).toBeDefined();
-    expect(
-      screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject'),
-    ).toBeDefined();
+    expect(findBtn('Verify')).toBeDefined();
+    expect(findBtn('Reject')).toBeDefined();
   });
 
   it('should show error text when present', async () => {
@@ -365,8 +350,7 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const verifyBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Verify');
-    fireEvent.click(verifyBtn!);
+    fireEvent.click(findBtn('Verify'));
 
     await vi.waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('Consultation verified successfully');
@@ -381,16 +365,12 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const rejectBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject');
-    fireEvent.click(rejectBtn!);
+    fireEvent.click(findBtn('Reject'));
 
     const input = screen.getByTestId('reject-input');
     fireEvent.change(input, { target: { value: 'Insufficient detail' } });
 
-    const confirmBtn = screen
-      .getAllByTestId('dialog-btn')
-      .find((b) => b.textContent === 'Confirm Reject');
-    fireEvent.click(confirmBtn!);
+    fireEvent.click(findBtn('Confirm Reject'));
 
     await vi.waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('Consultation rejected successfully');
@@ -406,8 +386,7 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const verifyBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Verify');
-    fireEvent.click(verifyBtn!);
+    fireEvent.click(findBtn('Verify'));
 
     await vi.waitFor(() => {
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: consultationKeys.all() });
@@ -423,19 +402,90 @@ describe('VerificationDialog', () => {
     renderDialog();
     await loadDetail();
 
-    const rejectBtn = screen.getAllByTestId('dialog-btn').find((b) => b.textContent === 'Reject');
-    fireEvent.click(rejectBtn!);
+    fireEvent.click(findBtn('Reject'));
 
     const input = screen.getByTestId('reject-input');
     fireEvent.change(input, { target: { value: 'Insufficient detail' } });
 
-    const confirmBtn = screen
-      .getAllByTestId('dialog-btn')
-      .find((b) => b.textContent === 'Confirm Reject');
-    fireEvent.click(confirmBtn!);
+    fireEvent.click(findBtn('Confirm Reject'));
 
     await vi.waitFor(() => {
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: consultationKeys.all() });
+    });
+  });
+
+  describe('verifyConsultation - optimistic updates', () => {
+    const seedData = {
+      consultations: [
+        {
+          id: 42,
+          studentName: 'Alice',
+          checkpointName: 'Proposal',
+          sessionType: 'internal',
+          externalConsultantName: null,
+          notes: null,
+          createdAt: '2026-01-01',
+        },
+        {
+          id: 43,
+          studentName: 'Bob',
+          checkpointName: 'Draft',
+          sessionType: 'internal',
+          externalConsultantName: null,
+          notes: null,
+          createdAt: '2026-01-02',
+        },
+      ],
+      total: 2,
+    };
+
+    const clickVerify = () => fireEvent.click(findBtn('Verify'));
+
+    it('should optimistically remove the consultation from the pending list', async () => {
+      await resolveDetail();
+      const mod = await import('@/server/consultations');
+      (mod.verifyConsultation as any).mockReturnValue(new Promise(() => {}));
+      queryClient.setQueryData(consultationKeys.pending(1, 1), seedData);
+      renderDialog();
+      await loadDetail();
+      clickVerify();
+      await vi.waitFor(() => {
+        const data = queryClient.getQueryData<{ consultations: any[]; total: number }>(
+          consultationKeys.pending(1, 1),
+        );
+        expect(data?.consultations).toHaveLength(1);
+        expect(data?.consultations[0].id).toBe(43);
+        expect(data?.total).toBe(1);
+      });
+    });
+
+    it('should restore the consultation list on error', async () => {
+      await resolveDetail();
+      const mod = await import('@/server/consultations');
+      (mod.verifyConsultation as any).mockResolvedValue({ error: 'Already verified' });
+      queryClient.setQueryData(consultationKeys.pending(1, 1), seedData);
+      renderDialog();
+      await loadDetail();
+      clickVerify();
+      await vi.waitFor(() => {
+        const data = queryClient.getQueryData<{ consultations: any[]; total: number }>(
+          consultationKeys.pending(1, 1),
+        );
+        expect(data?.consultations).toHaveLength(2);
+        expect(data?.total).toBe(2);
+      });
+    });
+
+    it('should show error toast on rollback', async () => {
+      await resolveDetail();
+      const mod = await import('@/server/consultations');
+      (mod.verifyConsultation as any).mockResolvedValue({ error: 'Already verified' });
+      renderDialog();
+      await loadDetail();
+      clickVerify();
+      await vi.waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Already verified');
+      });
     });
   });
 });
