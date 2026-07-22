@@ -103,7 +103,7 @@
     - [x] Replace the post-success `listPendingReviews({ limit: 1 })` fetch with index lookup from the preloaded list
     - [x] "Next Review" button navigates instantly (no server call)
 - [x] Task: Run `pnpm generate:i18n` to regenerate i18n types
-- [ ] Task: Conductor - User Manual Verification 'Keyboard Shortcuts' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Keyboard Shortcuts' (Protocol in workflow.md)
 
 ## Phase 3: Route Prefetch (ENH-PERF-2)
 
