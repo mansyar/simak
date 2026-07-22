@@ -80,7 +80,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Recipient Resolution & Handler Wiring' (Protocol in workflow.md)
 
-## Phase 3: Quality Gates & Final Verification
+## Phase 3: Quality Gates & Final Verification [checkpoint: f0aa0a9]
 
 - [x] Task: Read spec.md and workflow.md to refresh context for this phase
     - [x] Read `conductor/tracks/event-email-notifications_20260722/spec.md`
