@@ -161,11 +161,14 @@ simak/
 │   │   ├── route-utils.ts    → Role-based dashboard routing utility
     │   │   ├── role-permissions.ts → Canonical CREATION_ALLOWED_ROLES (shared by user creation + bulk import)
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
+    │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys)
     │   │   └── utils.ts          → Shared utilities
 │   ├── hooks/               → Custom React hooks
 │   │   ├── use-debounced-callback.ts → Generic debounce hook (setTimeout/clearTimeout, 300ms for search inputs)
 │   │   ├── use-keyboard-shortcuts.ts → Global keyboard shortcuts (R=refresh, ?=cheat-sheet) — mounted in _authenticated.tsx
-│   │   └── use-review-nav.ts → Review-specific shortcuts (J/K queue navigation) — preloads pending list on mount
+│   │   ├── use-review-nav.ts → Review-specific shortcuts (J/K queue navigation) — preloads pending list on mount
+│   │   ├── use-notifications.ts → Notification hooks (useMarkRead, useMarkAllRead with optimistic updates, useUnreadCount, useNotificationsList)
+│   │   └── use-assignment-tabs.ts → Assignment tab hooks (approveExtension, rejectExtension with optimistic updates; consultations/extensions via useQuery)
 │   └── config/
 │       └── env.ts            → Validated environment variables
 ├── locales/                  → typesafe-i18n translation files
@@ -256,6 +259,30 @@ A two-layer keyboard shortcut architecture improves instructor productivity:
 
 - Sidebar navigation `<Link>` components in all three role layouts (admin, instructor, student) use `preload="intent"` — hovering a link prefetches the route's data/loader via TanStack Router's built-in prefetch mechanism.
 - The router's `defaultPreload` is set to `false` in `src/router.tsx` (opt-in per-link), preventing over-prefetching on the public landing page where sidebar links don't exist.
+
+### Optimistic UI Updates [v1] (Track: Optimistic UI Updates for Mutations)
+
+All 9 user-initiated mutation sites where the predicted state is deterministic use TanStack Query's `onMutate`/`onError`/`onSettled` optimistic update pattern to reflect changes instantly — before the server round-trip completes:
+
+| Mutation | File | Optimistic Effect | Rollback |
+|----------|------|-------------------|----------|
+| `useMarkRead` | `src/hooks/use-notifications.ts` | Flip `read: true` on the targeted notification; decrement unread count | Restore previous cache snapshot |
+| `useMarkAllRead` | `src/hooks/use-notifications.ts` | Flip `read: true` on all notifications; set unread count to 0 | Restore previous cache snapshot |
+| `verifyConsultation` | `src/components/consultations/VerificationDialog.tsx` | Remove consultation from pending list; flip `status: 'verified'` | Restore previous cache snapshot |
+| `rejectConsultation` | `src/components/consultations/VerificationDialog.tsx` | Remove consultation from pending list; flip `status: 'rejected'` | Restore previous cache snapshot |
+| `approveExtension` | `src/hooks/use-assignment-tabs.ts` | Remove extension from pending queue | Restore previous cache snapshot |
+| `rejectExtension` | `src/hooks/use-assignment-tabs.ts` | Remove extension from pending queue | Restore previous cache snapshot |
+| `unlockCheckpoint` | `src/components/reviews/DeadlineManager.tsx` | Reflect state change in local UI | Restore previous `localStudents` snapshot |
+| `extendDeadline` | `src/components/reviews/DeadlineManager.tsx` | Reflect dueDate change in local UI | Restore previous `localStudents` snapshot |
+| `deleteUser` | `src/routes/_authenticated/admin/users/index.tsx` | Remove row from user list | Restore previous cache snapshot (re-add row) |
+
+**Pattern:** `onMutate` captures the previous cache snapshot via `queryClient.getQueryData()`, mutates the cache optimistically, and returns `{ previousData }` as the mutation context. `onError` restores the snapshot via `queryClient.setQueryData()`. `onSettled` calls `queryClient.invalidateQueries()` to reconcile with the authoritative server state. All mutation functions that return `{ success: boolean; error: string | null }` must throw on `!result.success` — this ensures `onError` (rollback) fires on server-side errors, not just network exceptions.
+
+**Query-key factory:** `src/lib/query-keys.ts` provides typed key factories for 5 domains (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`). All migrated queries reference factory keys instead of inline arrays — ensuring reliable cache invalidation across features. Consumed by later tracks (TRACK-015 UI Hygiene, TRACK-018 Email Notifications, TRACK-019 Analytics).
+
+**Scope guard:** Optimistic updates are applied ONLY where the predicted state is deterministic. Mutations whose server response carries computed/derived data the client can't predict (e.g., `submitReview` which unlocks the next checkpoint and adjusts deadlines server-side) keep the standard refetch-on-success flow.
+
+**DeadlineManager invalidation fix:** Prior to this track, `unlockMutation` and `extendMutation` in `DeadlineManager.tsx` had `onSuccess` that only showed a toast — they never called `queryClient.invalidateQueries`, leaving the deadline list stale until manual refresh. This was fixed as a prerequisite before optimistic logic could work.
 
 ---
 
@@ -809,6 +836,7 @@ A checkpoint unlocks when:
 - **Notification navigation (Track: Notifications & File Management UX):** Notifications are clickable links that navigate to the relevant page based on their `type` and stored `metadata` (assignmentId, checkpointId, submissionId). A `getNotificationRoute(type, metadata)` helper in `src/components/notifications/notification-routes.ts` derives the route client-side (e.g., `review_completed` → `/student/assignments/{assignmentId}/checkpoints/{checkpointId}`). `NotificationItem` renders as a TanStack Router `<Link>` when a route exists, falling back to a `<button>` when no route can be derived. Clicking a notification calls `markAsRead` before navigating.
 - **Read/Unread filter & Load More (Track: Notifications & File Management UX):** The notification center has "All" and "Unread" tabs (shadcn/ui `Tabs`). The "Unread" tab filters server-side via `.where(eq(notifications.read, false))` when `unreadOnly` is true. The list loads 20 items at a time with a "Load More" button that appends the next page (incremental loading with ID deduplication).
 - **Client-side performance (Track: Notifications & File Management UX):** `NotificationItem` is wrapped in `React.memo` with `useCallback` for `handleClick`. `NotificationCenter` uses `useMemo` for `groupedNotifications` and `unreadCount`, eliminating redundant `items.filter()` calls and double unread count computation on every render.
+- **Optimistic mark-as-read (Track: Optimistic UI Updates for Mutations):** `useMarkRead` and `useMarkAllRead` use TanStack Query's `onMutate` to flip the `read` flag and decrement the unread count in the cache instantly — before the server responds. On error, the previous cache snapshot is restored (`onError` rollback). The unread badge drops to zero immediately when "Mark all as read" is clicked. Cache invalidation runs in `onSettled` to reconcile. Query keys use the `notificationKeys` factory from `src/lib/query-keys.ts`.
 - **Notification center UI (Track: Accessibility & i18n Compliance):** The slide-over panel is built on the shadcn `Sheet` primitive (`@base-ui/react/dialog`), which provides built-in focus trapping, Escape-key dismissal, and backdrop-click close — replacing a former custom backdrop div + panel div that lacked focus management. Navigable `NotificationItem`s render as TanStack Router `<Link>` elements; non-navigable items fall back to native `<button type="button">` for keyboard access (Tab focus, Enter/Space activation). The `NotificationBadge` button exposes a dynamic `aria-label` that includes the unread count (e.g. "5 unread notifications") and an `aria-live="polite"` region so screen readers announce count changes without stealing focus. The count `<span>` no longer carries `role="status"` — the button's dynamic `aria-label` conveys the count.
 - Badge indicator on the sidebar.
 
@@ -945,6 +973,8 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 - **Over-fetch prevention:** `listNotificationsHandler` selects only needed columns (`id, type, titleKey, messageKey, params, read, createdAt` — no `metadata`) and constructs response objects explicitly (no `...item` spread leaking raw columns). The redundant `SELECT locale FROM users` query was removed — `session.user.locale` (enriched in `auth.ts` via `_getSession`) is used directly.
 - **R2 HEAD check before transaction:** `getObjectContentLength` (R2 `HeadObjectCommand`) is called **before** `db.transaction()` in both `submitCheckpointHandler` and `submitReviewHandler`, so row locks are not held during slow I/O. The discriminated return type `{ ok: true, size } | { ok: false, reason }` is handled before entering the transaction.
 - **Post-commit advisory work:** All advisory work after a transaction commit (audit logging, notification inserts, email dispatch) is wrapped in try/catch per SQL styleguide §6.4, so a failure in advisory work does not surface a 500 error to the user after the primary mutation has already succeeded.
+- **Typed query-key factory (Track: Optimistic UI Updates for Mutations):** `src/lib/query-keys.ts` centralizes all query cache keys into typed factory functions for 5 domains (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`). This replaces scattered inline key arrays (`['notifications', 'unreadCount']`) and ensures reliable cache invalidation across features — especially for optimistic mutations that need to read and write the correct cache entry by key.
+- **Optimistic UI updates (Track: Optimistic UI Updates for Mutations):** 9 mutation sites use the `onMutate`/`onError`/`onSettled` pattern to reflect predicted state changes before the server responds, eliminating perceived latency on deterministic operations (mark-as-read, verify/reject consultation, approve/reject extension, unlock/extend deadline, delete user). Rollback is guaranteed via snapshot capture/restore. Mutations with unpredictable server responses (e.g., `submitReview`) keep the standard refetch-on-success flow (scope guard).
 
 ### Server-Side Caching [v2]
 

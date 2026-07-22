@@ -894,7 +894,7 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-014: Optimistic UI Updates for Mutations
 
-- **Status:** `Proposed`
+- **Status:** `Complete` (archived to `conductor/archive/optimistic-ui-updates_20260722/`)
 - **Dependencies:** None (self-contained; introduces query-key factory consumed by later tracks)
 - **Estimated Effort:** 7 Days / 3.5 Sprint Loops
 - **Audit IDs:** ENH-PERF-1
@@ -905,6 +905,7 @@ All tracks must adhere to the following project constraints:
   - **DeadlineManager invalidation fix (DECISION: in scope):** `unlockMutation` and `extendMutation` in `DeadlineManager.tsx` have `onSuccess` that only toasts — they never call `queryClient.invalidateQueries`, leaving the deadline list stale until manual refresh. Fix as a prerequisite to adding optimistic logic (correct invalidation is needed before optimistic flip + reconcile can work).
   - **Scope guard:** Optimistic updates are applied ONLY where the predicted state is deterministic (e.g., mark-as-read flips `read: true`; verify consultation flips `status: 'verified'`). Do NOT apply optimistic updates to mutations whose server response carries computed/derived data the client can't predict (e.g., `submitReview` which unlocks the next checkpoint and adjusts deadlines server-side). Those keep the current refetch-on-success flow.
   - **Rollback contract:** Every optimistic mutation must capture the previous cache snapshot in `onMutate` and restore it verbatim in `onError` before refetching. This is the TanStack Query `context.previousData` pattern.
+  - **Review fix (server-error rollback):** During code review, `unlockMutation` and `extendMutation` in `DeadlineManager.tsx` were found to return `Promise<unknown>` without checking `result.success` — `onError` (rollback) only fired on network exceptions, not server-side errors. Fixed by changing the return type to `Promise<{ success: boolean; error: string | null }>` and adding `if (!result.success) throw new Error(result.error ?? '...')` to both mutationFns. This ensures rollback fires on server errors (e.g., instructor with active assignments) — completing the rollback contract for all 9/9 mutation sites. Two new tests added for server-error rollback (unlock + extend).
 
 #### Context Anchors (Traceability)
 
@@ -945,13 +946,14 @@ All tracks must adhere to the following project constraints:
 - **Phase 2 (Consultation & Extension hooks):** Same pattern for verify/reject consultation and approve/reject extension (now refactored in Phase 0). Optimistic removal from pending list. Write tests for rollback on stale-state errors.
 - **Phase 3 (Deadline & User hooks):** Optimistic state flip for unlock/extend (invalidation already fixed in Phase 0); optimistic row removal for user delete (with rollback re-add). Write tests for instructor-with-assignments rejection rollback.
 - **Phase 4 (Audit & Regression):** Grep to confirm no `console.error`-only error handling remains on these mutations. Verify toast + optimistic state + refetch reconciliation all fire in sequence. Run full suite.
+- **Phase 5 (Review Fixes):** Fixed server-error rollback gap in DeadlineManager `unlockMutation`/`extendMutation` — changed return type from `Promise<unknown>` to `Promise<{ success: boolean; error: string | null }>` and added `if (!result.success) throw new Error(...)` to both mutationFns. Added 2 new tests for server-error rollback. Replaced non-null assertion (`!`) in `findBtn` test helper with explicit null check. Refactored test helpers to stay within 500-line limit. Commit: `b76ae7e`.
 
 #### Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Click "Mark all read" — unread badge drops to 0 instantly (before server responds), stays 0 on success, returns to prior count if the server errors. Verify a consultation — it disappears from the pending queue instantly; reappears if the server returns "already processed". Delete a user — row fades out instantly; reappears with an error toast if the instructor has active assignments.
-- [ ] **Automated Tests:** `pnpm test:unit` — new tests for each hook verifying: optimistic cache mutation in `onMutate`, snapshot capture, rollback restoration in `onError`, invalidation in `onSettled`. Coverage ≥80%.
-- [ ] **Architecture Verification:** `grep -r "useMutation" src/` confirms all 9 mutation sites use `useMutation` (no plain async+useState mutation patterns remain for these features). `src/lib/query-keys.ts` exists and all migrated queries reference factory keys.
-- [ ] **Conductor Review:** `grep` for `onMutate` in `src/` confirms all 9 mutation hooks have optimistic logic. No predicted-state mismatch (rollback snapshots verbatim). `pnpm typecheck`, `pnpm lint` clean.
+- [x] **Manual Checkpoint:** Click "Mark all read" — unread badge drops to 0 instantly (before server responds), stays 0 on success, returns to prior count if the server errors. Verify a consultation — it disappears from the pending queue instantly; reappears if the server returns "already processed". Delete a user — row fades out instantly; reappears with an error toast if the instructor has active assignments.
+- [x] **Automated Tests:** `pnpm test:unit` — 2,757 tests pass (284 test files + 3 xlsx-threaded). New tests for each hook verifying: optimistic cache mutation in `onMutate`, snapshot capture, rollback restoration in `onError`, invalidation in `onSettled`, and server-error rollback (throw on `!result.success` in DeadlineManager mutations). Coverage ≥80%.
+- [x] **Architecture Verification:** `grep -r "useMutation" src/` confirms all 9 mutation sites use `useMutation` (no plain async+useState mutation patterns remain for these features). `src/lib/query-keys.ts` exists and all migrated queries reference factory keys.
+- [x] **Conductor Review:** `grep` for `onMutate` in `src/` confirms all 9 mutation hooks have optimistic logic. No predicted-state mismatch (rollback snapshots verbatim). `pnpm typecheck`, `pnpm lint` (0 warnings, 0 errors), `pnpm check:i18n` (620 keys used, 745 in en.json, 745 in id.json, 53 dynamic whitelisted) — all clean. All files ≤500 lines (largest: verification-dialog.test.tsx at 500 lines). Review found 1 Medium (server-error rollback gap in DeadlineManager — fixed) and 1 Low (non-null assertion in test helper — fixed). Track archived to `conductor/archive/optimistic-ui-updates_20260722/`.
 
 ---
 
@@ -1262,8 +1264,8 @@ Milestone 4: Quality Assurance
 └── E2E-FEAT-001: E2E Testing with Playwright [no deps — requires core features]
 
 Milestone 5: Post-Audit Enhancements
-├── TRACK-014: Optimistic UI Updates for Mutations [no deps — introduces query-key factory]
-├── TRACK-015: UI Hygiene & Tech-Debt Quick Wins [depends on 014]
+├── TRACK-014: Optimistic UI Updates for Mutations [Complete — introduces query-key factory]
+├── TRACK-015: UI Hygiene & Tech-Debt Quick Wins [depends on 014 — resolved]
 ├── TRACK-016: Email Queue Retention & Delivery Completeness [no deps]
 ├── TRACK-017: Instructor Productivity: DOCX Preview & Keyboard Shortcuts [no deps]
 ├── TRACK-018: Event Email Notifications [no deps]
@@ -1283,7 +1285,7 @@ The following track groups can be worked on simultaneously:
 | **E** | TRACK-012 + TRACK-010 | NotificationCenter refactor in 010 precedes notification UX in 012 |
 | **F** | TRACK-013 + TRACK-010 | Both touch date formatting — coordinate i18n date changes |
 | **G** | TRACK-014, TRACK-016, TRACK-017, TRACK-018, TRACK-019 | Fully independent — no file overlap (distinct domains: mutations, email ops, review UX, notifications, analytics) |
-| **H** | TRACK-015 → TRACK-014 | Sequential — TRACK-015 consumes the query-key factory from TRACK-014 for useQuery conversion |
+| **H** | TRACK-015 → TRACK-014 | Sequential — TRACK-015 consumes the query-key factory from TRACK-014 for useQuery conversion (TRACK-014 complete — dependency resolved) |
 
 ---
 
