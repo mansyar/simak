@@ -97,4 +97,7 @@
     - [x] Run `pnpm check:i18n` — confirm parity
     - [x] Verify all files ≤500 lines
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Audit & Regression' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions b76ae7e
 </protect>
