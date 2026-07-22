@@ -53,7 +53,7 @@
     - [x] Attach git note with task summary
     - [x] Record commit SHA in plan.md and mark task complete
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Configuration & Package Upgrade' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Configuration & Package Upgrade' (Protocol in workflow.md)
 
 ## Phase 3: Quality Gate Verification & Benchmarking
 
