@@ -138,4 +138,7 @@
     - [x] Verify no file in `src/`, `tests/`, or `scripts/` exceeds 500 lines
     - [x] Verify `mammoth` is dynamically imported (grep build output for `mammoth` in main client chunk -> should only appear in a lazy-loaded chunk)
 - [x] Task: Conductor - User Manual Verification 'Final Verification & Quality Gates' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 8a4bbf7
 </protect>
