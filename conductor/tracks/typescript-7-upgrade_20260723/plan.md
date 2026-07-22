@@ -26,10 +26,10 @@
     - [x] Write test: `lefthook.yml` pre-push typecheck command includes `--checkers` flag
     - [x] Run `pnpm test` and confirm the new tests fail as expected (Red Phase)
 
-- [ ] Task: Remove `baseUrl` from `tsconfig.json`
-    - [ ] Delete the `"baseUrl": "."` line from `tsconfig.json`
-    - [ ] Verify the `paths` mapping (`"@/*": ["./src/*"]`) remains intact and still resolves correctly
-    - [ ] Run `pnpm typecheck` — confirm no new path resolution errors (may fail until TS 7 is installed)
+- [x] Task: Remove `baseUrl` from `tsconfig.json`
+    - [x] Delete the `"baseUrl": "."` line from `tsconfig.json`
+    - [x] Verify the `paths` mapping (`"@/*": ["./src/*"]`) remains intact and still resolves correctly
+    - [x] Run `pnpm typecheck` — confirm no new path resolution errors (may fail until TS 7 is installed)
 
 - [ ] Task: Upgrade TypeScript package and clean stale cache
     - [ ] Update `typescript` from `^5.8.0` to `^7.0.0` in `package.json` (devDependencies)
