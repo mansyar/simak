@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
 import { AssignmentWizard } from '@/components/instructor/assignments/AssignmentWizard';
 
 // Mock navigation
@@ -193,6 +195,15 @@ import * as assignmentsApi from '@/server/assignments';
 import * as templatesApi from '@/server/templates';
 import * as usersApi from '@/server/users';
 
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  };
+}
+
 describe('AssignmentWizard', () => {
   const mockStudents = [
     { id: 'student-1', name: 'Alice Cooper', email: 'alice@test.com' },
@@ -216,7 +227,7 @@ describe('AssignmentWizard', () => {
 
   describe('Initial Render and Step Navigation', () => {
     it('should render all 5 wizard steps in the progress bar', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       expect(screen.getAllByText('Select Template').length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText('Step 2: Assignment Details').length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText('Assign Students').length).toBeGreaterThanOrEqual(1);
@@ -225,20 +236,20 @@ describe('AssignmentWizard', () => {
     });
 
     it('should start on step 1 (TemplatePicker)', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       expect(screen.getByTestId('template-picker')).toBeDefined();
       expect(screen.queryByTestId('details-form')).toBeNull();
       expect(screen.queryByTestId('student-picker')).toBeNull();
     });
 
     it('should show Cancel button on step 1 and navigate back on click', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByText('Cancel'));
       expect(mockNavigate).toHaveBeenCalledWith({ to: '/instructor/assignments' });
     });
 
     it('should advance to step 2 when Next is clicked with template selected', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       fireEvent.click(screen.getByText('Next'));
       expect(screen.getByTestId('details-form')).toBeDefined();
@@ -246,14 +257,14 @@ describe('AssignmentWizard', () => {
     });
 
     it('should prevent advancing past step 1 without selecting a template', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByText('Next'));
       expect(screen.getByTestId('template-picker')).toBeDefined();
       expect(screen.queryByTestId('details-form')).toBeNull();
     });
 
     it('should navigate back from step 2 to step 1', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       fireEvent.click(screen.getByText('Next'));
       expect(screen.getByTestId('details-form')).toBeDefined();
@@ -263,7 +274,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should auto-fill title with template name when selecting a template', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       fireEvent.click(screen.getByText('Next'));
       const titleInput = screen.getByTestId('input-title') as HTMLInputElement;
@@ -271,7 +282,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should load students on mount', async () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       await waitFor(() => {
         expect(usersApi.listUsers).toHaveBeenCalledWith({
           data: { page: 1, limit: 200, search: '', role: 'student' },
@@ -282,7 +293,7 @@ describe('AssignmentWizard', () => {
 
   describe('Mobile Step Label (UX-35)', () => {
     it('should render current step label visible only on mobile (sm:hidden)', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       // Step 1 label is 'Select Template'
       const matches = screen.getAllByText('Select Template');
       const mobileLabel = matches.find((el) => /\bsm:hidden\b/.test(el.className));
@@ -291,7 +302,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should update mobile step label when navigating to next step', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       fireEvent.click(screen.getByText('Next'));
       // Step 2 label is 'Step 2: Assignment Details'
@@ -301,7 +312,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should not render mobile label for non-current steps', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       // On step 1, step 2 label should NOT have sm:hidden (only progress bar version exists)
       const step2Matches = screen.getAllByText('Step 2: Assignment Details');
       const mobileLabel = step2Matches.find((el) => /\bsm:hidden\b/.test(el.className));
@@ -311,7 +322,7 @@ describe('AssignmentWizard', () => {
 
   describe('Step 2 - Assignment Details Validation', () => {
     it('should show title error when Next is clicked without entering a title', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       fireEvent.click(screen.getByText('Next'));
       fireEvent.change(screen.getByTestId('input-title'), { target: { value: '' } });
@@ -323,7 +334,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should show deadline error when Next is clicked without a deadline', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       fireEvent.click(screen.getByText('Next'));
       fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'My Assignment' } });
@@ -334,7 +345,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should fill details and advance to step 3', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       fireEvent.click(screen.getByText('Next'));
       fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
@@ -353,7 +364,7 @@ describe('AssignmentWizard', () => {
 
   describe('Step 3 - Student Selection Validation', () => {
     it('should show error when Next is clicked without selecting students', () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       navigateToStep5({ selectStudents: false });
       expect(screen.getByTestId('error-students').textContent).toBe(
         'instructorAssignments.wizard.errors.studentsRequired',
@@ -362,27 +373,8 @@ describe('AssignmentWizard', () => {
   });
 
   describe('Step 4 - Due Date Preview', () => {
-    it('should show due date preview step with checkpoint names', () => {
-      render(<AssignmentWizard />);
-      // Navigate to step 4 (skip step 3 validation by selecting students)
-      fireEvent.click(screen.getByTestId('select-thesis-template'));
-      fireEvent.click(screen.getByText('Next'));
-      fireEvent.change(screen.getByTestId('input-title'), { target: { value: 'Final Thesis' } });
-      const fd = new Date();
-      fd.setFullYear(fd.getFullYear() + 1);
-      fireEvent.change(screen.getByTestId('input-deadline'), {
-        target: { value: fd.toISOString().slice(0, 16) },
-      });
-      fireEvent.click(screen.getByText('Next'));
-      fireEvent.click(screen.getByTestId('toggle-student-1'));
-      fireEvent.click(screen.getByText('Next'));
-      expect(screen.getByTestId('due-date-preview')).toBeDefined();
-    });
-  });
-
-  describe('DueDatePreview step renders', () => {
     it('should render DueDatePreview on step 4 with checkpoint names', async () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       // Wait for async getTemplate to resolve and set checkpointDetails
       await waitFor(() => {
@@ -417,7 +409,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should show review screen with all details after completing steps', async () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       navigateToStep5();
       await waitFor(() => {
         expect(screen.getAllByText('Review & Confirm').length).toBeGreaterThanOrEqual(2);
@@ -429,7 +421,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should call createAssignment and navigate on successful submit', async () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       navigateToStep5();
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));
@@ -442,7 +434,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should show override button on due date step and submit without overrideDueDates when none set', async () => {
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       // Navigate to step 4
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       fireEvent.click(screen.getByText('Next'));
@@ -473,7 +465,7 @@ describe('AssignmentWizard', () => {
         success: false,
         error: 'Template is no longer available',
       } as any);
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       navigateToStep5();
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));
@@ -485,7 +477,7 @@ describe('AssignmentWizard', () => {
 
     it('should show network error message on exception', async () => {
       vi.mocked(assignmentsApi.createAssignment).mockRejectedValue(new Error('Network failure'));
-      render(<AssignmentWizard />);
+      render(<AssignmentWizard />, { wrapper: createWrapper() });
       navigateToStep5();
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));

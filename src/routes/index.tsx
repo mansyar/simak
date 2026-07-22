@@ -109,17 +109,16 @@ export function HomePage() {
           <div>
             <p className="text-lg font-bold text-foreground">{t('app.name')}</p>
             <p className="text-sm text-muted-foreground">{t('landing.footer.description')}</p>
-            <p className="mt-1 text-xs text-muted-foreground">&copy; 2026 SIMAK</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {t('landing.footer.copyright', { year: String(new Date().getFullYear()) })}
+            </p>
           </div>
           <nav className="flex gap-6 text-sm text-muted-foreground">
             <Link to="/auth/login" className="hover:text-foreground">
               {t('landing.footer.links.login')}
             </Link>
-            <a href="#" className="hover:text-foreground">
+            <a href="#how-it-works" className="hover:text-foreground">
               {t('landing.footer.links.about')}
-            </a>
-            <a href="#" className="hover:text-foreground">
-              {t('landing.footer.links.contact')}
             </a>
           </nav>
         </div>
