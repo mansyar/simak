@@ -6,7 +6,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 <!-- Archived tracks are in conductor/archive/ -->
 
----
-
-- [x] **Track: TypeScript 7 Upgrade**
-*Link: [./tracks/typescript-7-upgrade_20260723/](./tracks/typescript-7-upgrade_20260723/)*
