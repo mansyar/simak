@@ -158,6 +158,7 @@
       "createdAt": "Created",
       "lastAttemptAt": "Last Attempt",
       "errorMessage": "Error",
+      "resendMessageId": "Resend ID",
       "actions": "Actions"
     },
     "template": {

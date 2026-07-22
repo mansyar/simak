@@ -18,6 +18,7 @@ describe('EmailQueue schema', () => {
     expect(emailQueue).toHaveProperty('lastAttemptAt');
     expect(emailQueue).toHaveProperty('errorMessage');
     expect(emailQueue).toHaveProperty('createdAt');
+    expect(emailQueue).toHaveProperty('resendMessageId');
   });
 
   it('should have correct column types', async () => {
@@ -32,6 +33,7 @@ describe('EmailQueue schema', () => {
     expect(emailQueue.lastAttemptAt).toBeDefined();
     expect(emailQueue.errorMessage).toBeDefined();
     expect(emailQueue.createdAt).toBeDefined();
+    expect(emailQueue.resendMessageId).toBeDefined();
   });
 
   it('should include processing in status enum', async () => {

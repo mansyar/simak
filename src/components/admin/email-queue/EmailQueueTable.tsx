@@ -69,13 +69,14 @@ export function EmailQueueTable({
                 <TableHead>{t('adminEmailQueue.table.createdAt')}</TableHead>
                 <TableHead>{t('adminEmailQueue.table.lastAttemptAt')}</TableHead>
                 <TableHead>{t('adminEmailQueue.table.errorMessage')}</TableHead>
+                <TableHead>{t('adminEmailQueue.table.resendMessageId')}</TableHead>
                 <TableHead>{t('adminEmailQueue.table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {entries.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="p-8 text-center text-muted-foreground">
+                  <TableCell colSpan={10} className="p-8 text-center text-muted-foreground">
                     {hasActiveFilters
                       ? t('adminEmailQueue.emptyFiltered')
                       : t('adminEmailQueue.empty')}
@@ -104,6 +105,12 @@ export function EmailQueueTable({
                       title={entry.errorMessage ?? ''}
                     >
                       {entry.errorMessage ?? '-'}
+                    </TableCell>
+                    <TableCell
+                      className="text-xs font-mono max-w-[150px] truncate"
+                      title={entry.resendMessageId ?? ''}
+                    >
+                      {entry.resendMessageId ?? '-'}
                     </TableCell>
                     <TableCell>
                       {entry.status === 'failed' && (

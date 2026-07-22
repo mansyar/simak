@@ -28,6 +28,7 @@ export type EmailQueueEntry = {
   attempts: number;
   lastAttemptAt: string | null;
   errorMessage: string | null;
+  resendMessageId: string | null;
   createdAt: string | null;
 };
 
