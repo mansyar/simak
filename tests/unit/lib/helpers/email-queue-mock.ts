@@ -12,6 +12,7 @@ export interface FakeRow {
   attempts: number | null;
   lastAttemptAt: Date | null;
   errorMessage: string | null;
+  resendMessageId: string | null;
   createdAt: Date;
 }
 
@@ -29,6 +30,7 @@ export interface MockDb {
   for: Mock;
   update: Mock;
   set: Mock;
+  delete: Mock;
   then: Mock;
   transaction: Mock;
   calls: CallRecord[];
@@ -132,6 +134,13 @@ export function createMockDb(rows: FakeRow[] = []): MockDb {
       pendingSetValues = values;
       return mockDb;
     }),
+    delete: vi.fn((table) => {
+      calls.push({ method: 'delete', args: [table] });
+      pendingSetValues = null;
+      isUpdateChain = true;
+      currentRows = [...rows];
+      return mockDb;
+    }),
     then: vi.fn((onFulfilled) => {
       const result = isUpdateChain ? { rowCount: currentRows.length } : currentRows;
       return Promise.resolve(result).then(onFulfilled);
@@ -161,6 +170,7 @@ export function makeEmail(
     attempts: number | null;
     lastAttemptAt: Date | null;
     errorMessage: string | null;
+    resendMessageId: string | null;
     createdAt: Date;
   }> = {},
 ) {
@@ -174,6 +184,7 @@ export function makeEmail(
     attempts: 0,
     lastAttemptAt: null,
     errorMessage: null,
+    resendMessageId: null,
     createdAt: new Date('2026-05-30T00:00:00Z'),
     ...overrides,
   };

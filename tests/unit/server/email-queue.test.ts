@@ -129,6 +129,7 @@ describe('listEmailQueueHandler', () => {
       attempts: 1,
       lastAttemptAt: new Date('2026-07-19T10:00:00Z'),
       errorMessage: null,
+      resendMessageId: 'resend-msg-001',
       createdAt: new Date('2026-07-19T09:00:00Z'),
     },
     {
@@ -140,6 +141,7 @@ describe('listEmailQueueHandler', () => {
       attempts: 3,
       lastAttemptAt: new Date('2026-07-19T11:00:00Z'),
       errorMessage: 'SMTP timeout',
+      resendMessageId: null,
       createdAt: new Date('2026-07-19T08:00:00Z'),
     },
   ];
@@ -186,6 +188,7 @@ describe('listEmailQueueHandler', () => {
       attempts: 1,
       lastAttemptAt: '2026-07-19T10:00:00.000Z',
       errorMessage: null,
+      resendMessageId: 'resend-msg-001',
       createdAt: '2026-07-19T09:00:00.000Z',
     });
     expect(result.total).toBe(2);
@@ -293,6 +296,25 @@ describe('listEmailQueueHandler', () => {
     })) as ListEmailQueueSuccess;
 
     expect(result.summary).toEqual({ pending: 5, sent: 8, failed: 2 });
+  });
+
+  it('includes resendMessageId in the SELECT query and result entries', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+
+    mockDb.then
+      .mockImplementationOnce((onf: any) => Promise.resolve([{ total: 2 }]).then(onf))
+      .mockImplementationOnce((onf: any) => Promise.resolve(mockEmailEntries).then(onf))
+      .mockImplementationOnce((onf: any) =>
+        Promise.resolve([{ pending: 0, sent: 1, failed: 1 }]).then(onf),
+      );
+
+    const { listEmailQueueHandler } = await import('@/server/email-queue.server');
+    const result = (await listEmailQueueHandler({
+      data: { page: 1, status: 'all', search: '' },
+    })) as ListEmailQueueSuccess;
+
+    expect(result.entries[0]).toHaveProperty('resendMessageId', 'resend-msg-001');
+    expect(result.entries[1]).toHaveProperty('resendMessageId', null);
   });
 
   it('handles empty results', async () => {

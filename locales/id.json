@@ -158,6 +158,7 @@
       "createdAt": "Dibuat",
       "lastAttemptAt": "Percobaan Terakhir",
       "errorMessage": "Error",
+      "resendMessageId": "ID Resend",
       "actions": "Aksi"
     },
     "template": {

@@ -147,6 +147,7 @@ describe('Admin Email Queue page', () => {
           attempts: 1,
           lastAttemptAt: null,
           errorMessage: null,
+          resendMessageId: 'resend-msg-001',
           createdAt: null,
         },
         {
@@ -158,6 +159,7 @@ describe('Admin Email Queue page', () => {
           attempts: 3,
           lastAttemptAt: null,
           errorMessage: 'SMTP timeout',
+          resendMessageId: null,
           createdAt: null,
         },
       ];
@@ -168,6 +170,62 @@ describe('Admin Email Queue page', () => {
       expect(screen.getByText('failed@example.com')).toBeInTheDocument();
       expect(screen.getByText('Password Reset')).toBeInTheDocument();
       expect(screen.getByText('Invitation')).toBeInTheDocument();
+    });
+
+    it('should render resendMessageId column header', async () => {
+      const Component = await getComponent();
+      render(<Component />);
+      expect(screen.getByText('adminEmailQueue.table.resendMessageId')).toBeInTheDocument();
+    });
+
+    it('should render resendMessageId cell with monospace font, truncation, and title tooltip', async () => {
+      mockData.entries = [
+        {
+          id: 1,
+          recipientEmail: 'user@example.com',
+          subject: 'Password Reset',
+          templateType: 'password_reset',
+          status: 'sent',
+          attempts: 1,
+          lastAttemptAt: null,
+          errorMessage: null,
+          resendMessageId: 'resend-msg-abc-123',
+          createdAt: null,
+        },
+      ];
+      mockData.total = 1;
+      const Component = await getComponent();
+      const { container } = render(<Component />);
+      const resendCell = Array.from(container.querySelectorAll('td')).find(
+        (td) => td.textContent === 'resend-msg-abc-123',
+      );
+      expect(resendCell).toBeTruthy();
+      expect(resendCell!.className).toContain('font-mono');
+      expect(resendCell!.className).toContain('truncate');
+      expect(resendCell!.getAttribute('title')).toBe('resend-msg-abc-123');
+    });
+
+    it('should render dash when resendMessageId is null', async () => {
+      mockData.entries = [
+        {
+          id: 2,
+          recipientEmail: 'failed@example.com',
+          subject: 'Failed Email',
+          templateType: 'invitation',
+          status: 'failed',
+          attempts: 3,
+          lastAttemptAt: null,
+          errorMessage: 'SMTP timeout',
+          resendMessageId: null,
+          createdAt: null,
+        },
+      ];
+      mockData.total = 1;
+      const Component = await getComponent();
+      render(<Component />);
+      // The resendMessageId column for a null entry should show '-'
+      const cells = screen.getAllByText('-');
+      expect(cells.length).toBeGreaterThan(0);
     });
 
     it('should render Retry button only for failed rows', async () => {

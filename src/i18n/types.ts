@@ -163,6 +163,7 @@ export type Translation = {
       createdAt: string
       lastAttemptAt: string
       errorMessage: string
+      resendMessageId: string
       actions: string
     }
     template: {
