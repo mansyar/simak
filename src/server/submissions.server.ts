@@ -11,9 +11,7 @@ import { MAX_FILE_SIZE, validateUploadFileName } from '../lib/file-validation';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import { getNotificationKeys } from './notifications.server';
-import { enqueueEmail, resolveEmailRecipient } from '../lib/email';
-import { buildSubmissionReceivedHtml } from '../lib/email-templates';
-import { resolveEmailSubject } from '../lib/i18n-server';
+import { sendSubmissionReceivedEmail } from '../lib/submission-email';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -242,28 +240,14 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
     }
 
     // Post-commit advisory: enqueue email notification to instructor.
-    try {
-      if (submissionId && instructorId && assignmentTitle && checkpointName) {
-        const recipient = await resolveEmailRecipient(instructorId);
-        if (recipient) {
-          const subject = `[SIMAK] ${resolveEmailSubject('emails.subjects.submissionReceived', undefined, recipient.locale)}`;
-          const bodyHtml = buildSubmissionReceivedHtml({
-            studentName: session.user.name || 'A student',
-            assignmentName: assignmentTitle,
-            checkpointName,
-            submissionId,
-            locale: recipient.locale,
-          });
-          await enqueueEmail({
-            recipientEmail: recipient.email,
-            subject,
-            bodyHtml,
-            templateType: 'submission_received',
-          });
-        }
-      }
-    } catch (err) {
-      console.error('Failed to enqueue submission_received email:', err);
+    if (submissionId && instructorId && assignmentTitle && checkpointName) {
+      await sendSubmissionReceivedEmail({
+        instructorId,
+        studentName: session.user.name || 'A student',
+        assignmentName: assignmentTitle,
+        checkpointName,
+        submissionId,
+      });
     }
 
     return result;

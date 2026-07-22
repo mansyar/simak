@@ -272,13 +272,16 @@ export function buildExtensionApprovedHtml(params: {
   const locale = normalizeLocale(params.locale);
   const s = STRINGS[locale];
   const url = `${getEnv().BETTER_AUTH_URL}/student/assignments/${params.assignmentId}`;
+  const deadlineRow = params.newDeadline
+    ? detailRow(s.labels.newDeadline, escapeHtml(params.newDeadline))
+    : '';
   const body =
     `<p style="font-size: 16px; color: #374151; margin: 0 0 16px;">${s.extensionApproved}</p>` +
     detailTable(
       detailRow(s.labels.instructor, escapeHtml(params.instructorName)) +
         detailRow(s.labels.assignment, escapeHtml(params.assignmentName)) +
         detailRow(s.labels.extensionDays, String(params.extensionDays)) +
-        detailRow(s.labels.newDeadline, escapeHtml(params.newDeadline)),
+        deadlineRow,
     ) +
     deepLinkButton(url, s.viewInSimak) +
     fallbackLink(url, s.fallback);
