@@ -4,10 +4,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-## Active
-
----
-
-- [x] **Track: Optimistic UI Updates for Mutations**
-*Link: [./tracks/optimistic-ui-updates_20260722/](./tracks/optimistic-ui-updates_20260722/)*
-
