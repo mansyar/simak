@@ -66,7 +66,7 @@
     - [x] Implement `src/server/analytics-export.server.ts` — 5 CSV string builders: `exportUsersCsvHandler`, `exportAuditLogCsvHandler`, `exportAssignmentProgressCsvHandler`, `exportStudentProgressCsvHandler`, `exportReviewHistoryCsvHandler`
     - [x] Run `pnpm test` and confirm all tests pass
 
-- [ ] Task: Add CSV export buttons to UI
+- [x] Task: Add CSV export buttons to UI [5da1449]
     - [ ] Write failing tests for export button components — test button rendering, click handler, Blob creation, download trigger
     - [ ] Create shared `useCsvDownload` hook or utility (server fn call → Blob → `URL.createObjectURL` → anchor click)
     - [ ] Add "Export CSV" button to admin users page (`/admin/users`)
