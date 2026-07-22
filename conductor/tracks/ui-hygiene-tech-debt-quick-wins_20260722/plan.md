@@ -26,7 +26,7 @@
     - [x] Run `pnpm lint` (includes `simak-i18n/no-hardcoded`)
     - [x] Run `pnpm check:i18n` (EN↔ID parity; no unused keys)
     - [x] NFR-1: Verified zero `href="#"` in `src/routes/`
-- [~] Task: Conductor - User Manual Verification 'Phase 1: Landing Footer Link & Copyright Hygiene' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Landing Footer Link & Copyright Hygiene' (Protocol in workflow.md)
 
 ### Phase 1 Checkpoint
 - **Commit SHA:** `3739b6cbb2cd1822b1348ab011dd3b1df72eddd0`
@@ -68,7 +68,7 @@
     - [x] Run `pnpm typecheck`
     - [x] Run `pnpm lint` — confirm zero `react-hooks/exhaustive-deps` suppressions in `src/components/instructor/assignments/`
     - [x] Run `pnpm check:i18n`
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Resolve eslint-disable via useQuery Conversion' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Resolve eslint-disable via useQuery Conversion' (Protocol in workflow.md)
 
 ### Phase 2 Checkpoint
 - **Commit SHA:** `51cb05d6ed37114f9980a5ca79b85c4a53bdde40`
