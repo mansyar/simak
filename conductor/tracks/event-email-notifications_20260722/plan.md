@@ -78,7 +78,7 @@
     - [ ] Implement loop-based `enqueueEmail` calls for each affected student (mirroring the existing advisory in-app notification pattern at line 402)
     - [ ] Verify tests pass
 
-- [ ] Task: Conductor - User Manual Verification 'Recipient Resolution & Handler Wiring' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Recipient Resolution & Handler Wiring' (Protocol in workflow.md)
 
 ## Phase 3: Quality Gates & Final Verification
 
