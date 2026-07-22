@@ -77,7 +77,7 @@
     - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`
     - [ ] Run `pnpm test` and confirm all tests pass
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: CSV Export' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: CSV Export' (Protocol in workflow.md)
 
 ## Phase 4: Excel Export
 
