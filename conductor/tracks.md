@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Event Email Notifications**
+- [~] **Track: Event Email Notifications**
 *Link: [./tracks/event-email-notifications_20260722/](./tracks/event-email-notifications_20260722/)*

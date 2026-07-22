@@ -23,11 +23,11 @@
     - [x] Run `pnpm db:migrate` to apply migration to dev DB — N/A: no migration generated
     - [x] Verify test passes
 
-- [ ] Task: Add i18n email subject keys
-    - [ ] Add 8 subject keys to `locales/en.json` under `emails.subjects.*` (submissionReceived, reviewCompleted, revisionRequested, consultationVerified, consultationRejected, extensionApproved, extensionRejected, extensionRequested)
-    - [ ] Add 8 subject keys to `locales/id.json` with Indonesian translations
-    - [ ] Run `pnpm generate:i18n` to regenerate types
-    - [ ] Verify `pnpm check:i18n` passes (EN↔ID parity)
+- [x] Task: Add i18n email subject keys (commit deferred — i18n-only changes; included in Phase 1 checkpoint)
+    - [x] Add 8 subject keys to `locales/en.json` under `emails.subjects.*` (submissionReceived, reviewCompleted, revisionRequested, consultationVerified, consultationRejected, extensionApproved, extensionRejected, extensionRequested)
+    - [x] Add 8 subject keys to `locales/id.json` with Indonesian translations
+    - [x] Run `pnpm generate:i18n` to regenerate types
+    - [x] Verify `pnpm check:i18n` passes (EN↔ID parity)
 
 - [ ] Task: Conductor - User Manual Verification 'Foundation — Templates, Schema & i18n' (Protocol in workflow.md)
 
