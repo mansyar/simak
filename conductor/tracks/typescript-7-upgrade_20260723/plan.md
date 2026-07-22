@@ -19,12 +19,12 @@
 
 ## Phase 2: Configuration & Package Upgrade
 
-- [ ] Task: Write configuration verification tests (Red Phase)
-    - [ ] Create `tests/unit/config/typescript-7-upgrade.test.ts` with `/** @vitest-environment node */` header
-    - [ ] Write test: `tsconfig.json` does not contain `baseUrl` property
-    - [ ] Write test: `package.json` specifies `typescript` dependency with version `^7.0.0` or higher
-    - [ ] Write test: `lefthook.yml` pre-push typecheck command includes `--checkers` flag
-    - [ ] Run `pnpm test` and confirm the new tests fail as expected (Red Phase)
+- [x] Task: Write configuration verification tests (Red Phase)
+    - [x] Create `tests/unit/config/typescript-7-upgrade.test.ts` with `/** @vitest-environment node */` header
+    - [x] Write test: `tsconfig.json` does not contain `baseUrl` property
+    - [x] Write test: `package.json` specifies `typescript` dependency with version `^7.0.0` or higher
+    - [x] Write test: `lefthook.yml` pre-push typecheck command includes `--checkers` flag
+    - [x] Run `pnpm test` and confirm the new tests fail as expected (Red Phase)
 
 - [ ] Task: Remove `baseUrl` from `tsconfig.json`
     - [ ] Delete the `"baseUrl": "."` line from `tsconfig.json`
