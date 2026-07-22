@@ -15,13 +15,13 @@
     - [ ] Implement 8 template-builder functions: `buildSubmissionReceivedHtml`, `buildReviewCompletedHtml`, `buildRevisionRequestedHtml`, `buildConsultationVerifiedHtml`, `buildConsultationRejectedHtml`, `buildExtensionApprovedHtml`, `buildExtensionRejectedHtml`, `buildExtensionRequestedHtml`
     - [ ] Verify all tests pass and file is under 500 lines
 
-- [ ] Task: Extend `template_type` CHECK constraint on `email_queue` (4 → 12 values)
-    - [ ] Write test verifying all 12 `template_type` values are accepted by the CHECK constraint
-    - [ ] Add 8 new enum values to the `email_queue` schema definition in `src/db/schema/`
-    - [ ] Run `pnpm db:generate` to create migration SQL
-    - [ ] Create rollback SQL file (per SQL styleguide §5.1)
-    - [ ] Run `pnpm db:migrate` to apply migration to dev DB
-    - [ ] Verify test passes
+- [x] Task: Extend `template_type` CHECK constraint on `email_queue` (4 → 12 values) [e93ffa0]
+    - [x] Write test verifying all 12 `template_type` values are accepted by the CHECK constraint
+    - [x] Add 8 new enum values to the `email_queue` schema definition in `src/db/schema/`
+    - [x] Run `pnpm db:generate` to create migration SQL — N/A: Drizzle's text enum is TypeScript-only, no DB CHECK constraint exists, no migration generated
+    - [x] Create rollback SQL file (per SQL styleguide §5.1) — N/A: no migration generated
+    - [x] Run `pnpm db:migrate` to apply migration to dev DB — N/A: no migration generated
+    - [x] Verify test passes
 
 - [ ] Task: Add i18n email subject keys
     - [ ] Add 8 subject keys to `locales/en.json` under `emails.subjects.*` (submissionReceived, reviewCompleted, revisionRequested, consultationVerified, consultationRejected, extensionApproved, extensionRejected, extensionRequested)
