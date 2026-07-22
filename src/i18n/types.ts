@@ -108,6 +108,7 @@ export type Translation = {
     dashboard: string
     assignments: string
     reviews: string
+    analytics: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -544,6 +545,21 @@ export type Translation = {
     statusUnderReview: string
     statusPassed: string
     statusRevise: string
+  }
+  instructorAnalytics: {
+    title: string
+    subtitle: string
+    reviewsCompleted: string
+    avgResponseTime: string
+    slaBreachCount: string
+    studentsSupervised: string
+    assignmentsActive: string
+    range7d: string
+    range30d: string
+    range90d: string
+    rangeAll: string
+    customStart: string
+    customEnd: string
   }
   files: {
     dropzone: {

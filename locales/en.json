@@ -103,6 +103,7 @@
     "dashboard": "Dashboard",
     "assignments": "Assignments",
     "reviews": "Reviews",
+    "analytics": "Analytics",
     "branding": "SIMAK",
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
@@ -539,6 +540,21 @@
     "statusUnderReview": "Under Review",
     "statusPassed": "Passed",
     "statusRevise": "Revise"
+  },
+  "instructorAnalytics": {
+    "title": "Analytics",
+    "subtitle": "Your teaching performance and review analytics",
+    "reviewsCompleted": "Reviews Completed",
+    "avgResponseTime": "Avg Response Time",
+    "slaBreachCount": "SLA Breaches (>3 days)",
+    "studentsSupervised": "Students Supervised",
+    "assignmentsActive": "Active Assignments",
+    "range7d": "7 Days",
+    "range30d": "30 Days",
+    "range90d": "90 Days",
+    "rangeAll": "All Time",
+    "customStart": "Start Date",
+    "customEnd": "End Date"
   },
   "files": {
     "dropzone": {
