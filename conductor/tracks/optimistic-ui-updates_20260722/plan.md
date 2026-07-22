@@ -69,14 +69,14 @@
 ## Phase 3: Deadline & User Hooks Optimistic Updates
 
 - [x] Task: Read `spec.md` and `workflow.md` to review requirements and TDD protocol before starting Phase 3
-- [~] Task: Add optimistic updates to `unlockCheckpoint` (DeadlineManager.tsx)
-    - [ ] Write failing tests — verify `onMutate` reflects state change (checkpoint `locked` → `unlocked`) in assignment detail cache; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
-    - [ ] Implement `onMutate`/`onError`/`onSettled` in `unlockMutation`
-    - [ ] Run `pnpm test` — confirm tests pass
-- [ ] Task: Add optimistic updates to `extendDeadline` (DeadlineManager.tsx)
-    - [ ] Write failing tests — verify `onMutate` reflects `dueDate` change in assignment detail cache; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
-    - [ ] Implement `onMutate`/`onError`/`onSettled` in `extendMutation`
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Add optimistic updates to `unlockCheckpoint` (DeadlineManager.tsx) [16bfc25]
+    - [x] Write failing tests — verify `onMutate` reflects state change (checkpoint `locked` → `unlocked`) in assignment detail cache; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
+    - [x] Implement `onMutate`/`onError`/`onSettled` in `unlockMutation`
+    - [x] Run `pnpm test` — confirm tests pass
+- [x] Task: Add optimistic updates to `extendDeadline` (DeadlineManager.tsx) [16bfc25]
+    - [x] Write failing tests — verify `onMutate` reflects `dueDate` change in assignment detail cache; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
+    - [x] Implement `onMutate`/`onError`/`onSettled` in `extendMutation`
+    - [x] Run `pnpm test` — confirm tests pass
 - [ ] Task: Add optimistic updates to `deleteUser` (admin/users/index.tsx, after Phase 0 refactor)
     - [ ] Write failing tests — verify `onMutate` removes row from user list cache optimistically; `onError` restores snapshot (re-adds row) + shows `toast.error()`; `onSettled` invalidates
     - [ ] Implement `onMutate`/`onError`/`onSettled` in `deleteUser` mutation
