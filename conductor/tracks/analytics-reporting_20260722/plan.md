@@ -53,15 +53,15 @@
 
 ## Phase 3: CSV Export
 
-- [ ] Task: Read spec.md and workflow.md to refresh context
-    - [ ] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read spec.md and workflow.md to refresh context
+    - [x] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Add CSV export server stubs
-    - [ ] Add 5 CSV export Zod schemas and `createServerFn` stubs to `src/server/analytics.ts`: `exportUsersCsv`, `exportAuditLogCsv`, `exportAssignmentProgressCsv` (admin); `exportStudentProgressCsv`, `exportReviewHistoryCsv` (instructor)
-    - [ ] Write tests in `tests/unit/server/analytics.test.ts` for new stubs and schemas
+- [x] Task: Add CSV export server stubs [52e3e02]
+    - [x] Add 5 CSV export Zod schemas and `createServerFn` stubs to `src/server/analytics.ts`: `exportUsersCsv`, `exportAuditLogCsv`, `exportAssignmentProgressCsv` (admin); `exportStudentProgressCsv`, `exportReviewHistoryCsv` (instructor)
+    - [x] Write tests in `tests/unit/server/analytics.test.ts` for new stubs and schemas
 
-- [ ] Task: Implement CSV export handlers (TDD)
+- [~] Task: Implement CSV export handlers (TDD)
     - [ ] Write failing tests in `tests/unit/server/analytics-export.test.ts` for all 5 CSV handlers — test CSV output format (headers, row count, delimiter, quoting); test role guards (admin-only for admin exports, instructor-only for instructor exports); test date range filtering; test empty data handling
     - [ ] Implement `src/server/analytics-export.server.ts` — 5 CSV string builders: `exportUsersCsvHandler`, `exportAuditLogCsvHandler`, `exportAssignmentProgressCsvHandler`, `exportStudentProgressCsvHandler`, `exportReviewHistoryCsvHandler`
     - [ ] Run `pnpm test` and confirm all tests pass
