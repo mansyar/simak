@@ -26,7 +26,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Admin Analytics Dashboard' (Protocol in workflow.md)
 
-## Phase 2: Instructor Analytics Dashboard
+## Phase 2: Instructor Analytics Dashboard [checkpoint: d1fec37]
 
 - [x] Task: Read spec.md and workflow.md to refresh context
     - [x] Read `conductor/tracks/analytics-reporting_20260722/spec.md`
@@ -49,7 +49,7 @@
     - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`
     - [ ] Run `pnpm test` and confirm all tests pass
 
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Instructor Analytics Dashboard' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Instructor Analytics Dashboard' (Protocol in workflow.md)
 
 ## Phase 3: CSV Export
 
