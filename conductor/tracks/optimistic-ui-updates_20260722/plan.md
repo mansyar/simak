@@ -56,10 +56,10 @@
     - [x] Write failing tests — verify `onMutate` flips `status` to `rejected` and removes from pending list; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
     - [x] Implement `onMutate`/`onError`/`onSettled` in `rejectConsultation` mutation
     - [x] Run `pnpm test` — confirm tests pass
-- [ ] Task: Add optimistic updates to `approveExtension` hook (after Phase 0 refactor)
-    - [ ] Write failing tests — verify `onMutate` removes from pending extension queue optimistically; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
-    - [ ] Implement `onMutate`/`onError`/`onSettled` in `approveExtension` mutation
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Add optimistic updates to `approveExtension` hook (after Phase 0 refactor) [64d2d1d]
+    - [x] Write failing tests — verify `onMutate` removes from pending extension queue optimistically; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
+    - [x] Implement `onMutate`/`onError`/`onSettled` in `approveExtension` mutation
+    - [x] Run `pnpm test` — confirm tests pass
 - [ ] Task: Add optimistic updates to `rejectExtension` hook (after Phase 0 refactor)
     - [ ] Write failing tests — verify `onMutate` removes from pending extension queue optimistically; `onError` restores snapshot + shows `toast.error()`; `onSettled` invalidates
     - [ ] Implement `onMutate`/`onError`/`onSettled` in `rejectExtension` mutation
