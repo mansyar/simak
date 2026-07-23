@@ -124,10 +124,10 @@
     - [x] Implement: Extend `analytics-export.server.ts` + `src/lib/excel-export.ts` with rubric score columns
     - [x] Verify: `pnpm test` passes
 
-- [ ] Task: i18n keys for all rubric labels
-    - [ ] Write failing tests: i18n parity test — all new `rubrics.*` keys present in both `locales/en.json` and `locales/id.json`
-    - [ ] Implement: Add i18n keys to both locale files. Run `pnpm generate:i18n`. Wire `t('key')` calls in all new components
-    - [ ] Verify: `pnpm check:i18n` passes, `pnpm lint` passes (no hardcoded strings)
+- [x] Task: i18n keys for all rubric labels
+    - [x] Write failing tests: i18n parity test — all new `rubrics.*` keys present in both `locales/en.json` and `locales/id.json`
+    - [x] Implement: Add i18n keys to both locale files. Run `pnpm generate:i18n`. Wire `t('key')` calls in all new components
+    - [x] Verify: `pnpm check:i18n` passes, `pnpm lint` passes (no hardcoded strings)
 
 - [ ] Task: Final quality gate verification
     - [ ] Run `pnpm test:coverage` — verify ≥80% on all thresholds (lines, statements, branches, functions)
