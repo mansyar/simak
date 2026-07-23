@@ -19,7 +19,7 @@
     - [x] Implement: Run `pnpm db:generate`. Add backfill SQL to migration (UPDATE checkpoints SET templateCheckpointId = ... FROM assignments WHERE ...). Create rollback file per SQL styleguide §5.1
     - [x] Verify: `pnpm db:migrate` applies cleanly, backfill populates correctly, rollback works
 
-- [ ] Task: Refactor `updateTemplateHandler` to upsert/diff
+- [x] Task: Refactor `updateTemplateHandler` to upsert/diff `18f7641`
     - [ ] Write failing tests: Tests for `updateTemplateHandler` — checkpoint IDs preserved on metadata-only edit (name/minConsultations/estimatedDuration change), new IDs created only for new checkpoints, removed checkpoints soft-deleted
     - [ ] Implement: Refactor `src/server/templates.server.ts:267` from delete+reinsert to upsert/diff approach
     - [ ] Verify: `pnpm test` passes, rubric FKs survive template edits
