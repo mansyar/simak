@@ -48,4 +48,8 @@
     - [ ] Verify all new files ≤500 lines (`scripts/check-modularity.js`)
     - [ ] Commit (if any cleanup): `chore(reminders): Final quality gate cleanup`; attach git note; mark task `[x]` with commit SHA
 - [x] Task: Conductor - User Manual Verification 'Email Template, Helper & i18n' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions <ab82079>
 </protect>
