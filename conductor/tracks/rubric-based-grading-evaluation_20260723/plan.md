@@ -69,7 +69,7 @@
     - [ ] Implement: Extend `SubmitReviewSchema` in `src/server/reviews.ts` with `scores: z.array(z.object({ criterionId, score (0–100), rubricLevelId?, comment? })).optional()`
     - [ ] Verify: `pnpm test` passes
 
-- [ ] Task: Extend `getReviewDetailHandler` to return rubric data
+- [x] Task: Extend `getReviewDetailHandler` to return rubric data (47ea15e)
     - [ ] Write failing tests: Handler tests — `getReviewDetailHandler` returns rubric criteria + levels when checkpoint has `grading_type` set (via `checkpoints.templateCheckpointId → template_checkpoints → rubric_criteria/rubric_levels`), returns empty/null when `grading_type` is null
     - [ ] Implement: Extend `getReviewDetailHandler` (`src/server/reviews.server.ts:137`) to fetch and return rubric criteria + levels
     - [ ] Verify: `pnpm test` passes
