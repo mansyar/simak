@@ -137,4 +137,8 @@
     - [x] Verify all files in `src/`, `tests/`, `scripts/` are under 500 lines
 
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Student View, Analytics & i18n' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 03358a9
 </protect>
