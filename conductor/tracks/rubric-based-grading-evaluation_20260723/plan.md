@@ -129,12 +129,12 @@
     - [x] Implement: Add i18n keys to both locale files. Run `pnpm generate:i18n`. Wire `t('key')` calls in all new components
     - [x] Verify: `pnpm check:i18n` passes, `pnpm lint` passes (no hardcoded strings)
 
-- [ ] Task: Final quality gate verification
-    - [ ] Run `pnpm test:coverage` — verify ≥80% on all thresholds (lines, statements, branches, functions)
-    - [ ] Run `pnpm typecheck` — verify clean
-    - [ ] Run `pnpm lint` — verify clean (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n` — verify EN ↔ ID parity
-    - [ ] Verify all files in `src/`, `tests/`, `scripts/` are under 500 lines
+- [x] Task: Final quality gate verification
+    - [x] Run `pnpm test:coverage` — verify ≥80% on all thresholds (lines, statements, branches, functions)
+    - [x] Run `pnpm typecheck` — verify clean
+    - [x] Run `pnpm lint` — verify clean (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n` — verify EN ↔ ID parity
+    - [x] Verify all files in `src/`, `tests/`, `scripts/` are under 500 lines
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Student View, Analytics & i18n' (Protocol in workflow.md)
 </protect>
