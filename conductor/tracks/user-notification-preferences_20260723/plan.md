@@ -71,7 +71,9 @@
     - [x] Run `pnpm test` — confirm all 12 site tests pass (3158 tests, 0 failures)
     - **NOTE:** Created `maybeInsertNotification(db, userId, type, values)` helper in `src/lib/notification-prefs.ts` to reduce `consultations.server.ts` (500→495) and `reviews.server.ts` (500→498) below 500-line limit. Moved skip tests to 3 new files (`consultations-prefs.test.ts`, `extensions-approve-reject-prefs.test.ts`, `submissions-prefs.test.ts`) to keep original test files under 500 lines.
 
-- [ ] Task: Conductor - User Manual Verification 'Preference Gates' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Preference Gates' (Protocol in workflow.md)
+    - Automated tests: 316 files, 3158 tests passed, 0 failures. Coverage: 88.45% stmts, 82.2% branch, 84.11% funcs, 89.03% lines.
+    - Manual verification: Skipped (user confirmed automated tests sufficient).
 
 ## Phase 3: UI & i18n
 
