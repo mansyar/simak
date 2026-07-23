@@ -18,7 +18,10 @@ export const users = pgTable(
     updatedAt: timestamp('updated_at').defaultNow(),
     deletedAt: timestamp('deleted_at'),
     twoFactorEnabled: boolean('two_factor_enabled').default(false),
-    settings: jsonb('settings').$type<{ reducedMotion: boolean }>(),
+    settings: jsonb('settings').$type<{
+      reducedMotion: boolean;
+      notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }>;
+    }>(),
   },
   (table) => [index('users_role_deleted_at_idx').on(table.role, table.deletedAt)],
 );
