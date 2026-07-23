@@ -104,7 +104,7 @@
     - [ ] Implement: Extend `getLatestReviewHandler` (`src/server/reviews-extras.server.ts:89`) to fetch and return `review_scores`
     - [ ] Verify: `pnpm test` passes
 
-- [ ] Task: Student rubric result view UI
+- [x] Task: Student rubric result view UI (7aea19b)
     - [ ] Write failing tests: Component tests for student rubric result — per-criterion score, level label (if qualitative), instructor comment, weighted total (frozen from review time). Soft-deleted criteria visible via snapshot. Rendered alongside existing `SubmissionStatus` component
     - [ ] Implement: Add `RubricResultView.tsx` component on `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx`. Read-only display
     - [ ] Verify: `pnpm test` passes
