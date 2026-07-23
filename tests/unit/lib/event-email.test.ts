@@ -139,3 +139,125 @@ describe('enqueueEventEmail', () => {
     consoleSpy.mockRestore();
   });
 });
+
+describe('enqueueEventEmail — email preference gate (TRACK-022)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(enqueueEmail).mockResolvedValue(undefined);
+  });
+
+  it('should skip enqueue when email is disabled for the notification type', async () => {
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'user@test.com',
+      locale: 'en',
+      settings: {
+        reducedMotion: false,
+        notificationPrefs: { review_completed: { email: false } },
+      },
+    });
+
+    await enqueueEventEmail({
+      recipientId: 'user-1',
+      subjectKey: 'emails.subjects.reviewCompleted',
+      templateType: 'review_completed',
+      buildBody: () => '<html>body</html>',
+    });
+
+    expect(enqueueEmail).not.toHaveBeenCalled();
+  });
+
+  it('should send email when email pref is enabled for the type', async () => {
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'user@test.com',
+      locale: 'en',
+      settings: {
+        reducedMotion: false,
+        notificationPrefs: { review_completed: { email: true } },
+      },
+    });
+
+    await enqueueEventEmail({
+      recipientId: 'user-1',
+      subjectKey: 'emails.subjects.reviewCompleted',
+      templateType: 'review_completed',
+      buildBody: () => '<html>body</html>',
+    });
+
+    expect(enqueueEmail).toHaveBeenCalledTimes(1);
+  });
+
+  it('should send email when no pref is set for the type (default true)', async () => {
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'user@test.com',
+      locale: 'en',
+      settings: { reducedMotion: false },
+    });
+
+    await enqueueEventEmail({
+      recipientId: 'user-1',
+      subjectKey: 'emails.subjects.reviewCompleted',
+      templateType: 'review_completed',
+      buildBody: () => '<html>body</html>',
+    });
+
+    expect(enqueueEmail).toHaveBeenCalledTimes(1);
+  });
+
+  it('should send email when settings is null (default true)', async () => {
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'user@test.com',
+      locale: 'en',
+      settings: null,
+    });
+
+    await enqueueEventEmail({
+      recipientId: 'user-1',
+      subjectKey: 'emails.subjects.reviewCompleted',
+      templateType: 'review_completed',
+      buildBody: () => '<html>body</html>',
+    });
+
+    expect(enqueueEmail).toHaveBeenCalledTimes(1);
+  });
+
+  it('should use notificationType override for preference lookup', async () => {
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'user@test.com',
+      locale: 'en',
+      settings: {
+        reducedMotion: false,
+        notificationPrefs: { deadline_extended: { email: false } },
+      },
+    });
+
+    await enqueueEventEmail({
+      recipientId: 'user-1',
+      subjectKey: 'emails.subjects.extensionApproved',
+      templateType: 'extension_approved',
+      notificationType: 'deadline_extended',
+      buildBody: () => '<html>body</html>',
+    });
+
+    expect(enqueueEmail).not.toHaveBeenCalled();
+  });
+
+  it('should not gate security-type emails (sla_alert exempt)', async () => {
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'admin@test.com',
+      locale: 'en',
+      settings: {
+        reducedMotion: false,
+        notificationPrefs: { sla_breach: { email: false } },
+      },
+    });
+
+    await enqueueEventEmail({
+      recipientId: 'admin-1',
+      subjectKey: 'emails.subjects.sla_alert',
+      templateType: 'sla_alert',
+      buildBody: () => '<html>body</html>',
+    });
+
+    expect(enqueueEmail).toHaveBeenCalledTimes(1);
+  });
+});

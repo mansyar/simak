@@ -31,29 +31,27 @@
     - [x] Read `conductor/workflow.md`
 
 - [x] Task: Create `shouldSendInAppNotification` helper in `src/lib/notification-prefs.ts` [f3590bf]
-    - [ ] Write failing tests (`tests/unit/lib/notification-prefs.test.ts` — returns `false` only when `inApp === false`, returns `true` when absent/undefined, returns `true` for missing type key, returns `true` for null/undefined settings)
-    - [ ] Implement `shouldSendInAppNotification(settings: unknown, type: string): boolean` — pure function
-    - [ ] Run `pnpm test` — confirm helper tests pass
+    - [x] Write failing tests (`tests/unit/lib/notification-prefs.test.ts` — returns `false` only when `inApp === false`, returns `true` when absent/undefined, returns `true` for missing type key, returns `true` for null/undefined settings)
+    - [x] Implement `shouldSendInAppNotification(settings: unknown, type: string): boolean` — pure function
+    - [x] Run `pnpm test` — confirm helper tests pass
 
-- [ ] Task: Extend `resolveEmailRecipient` to SELECT `settings`
-    - [ ] Write failing tests (`tests/unit/lib/email.test.ts` — `resolveEmailRecipient` returns `settings` in result object alongside existing fields)
-    - [ ] Implement: add `settings` to the SELECT query in `src/lib/email.ts:35-58`
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Extend `resolveEmailRecipient` to SELECT `settings`
+    - [x] Write failing tests (`tests/unit/lib/email.test.ts` — `resolveEmailRecipient` returns `settings` in result object alongside existing fields)
+    - [x] Implement: add `settings` to the SELECT query in `src/lib/email.ts:36-59`, export `EmailRecipient` type with optional `settings`
+    - [x] Run `pnpm test` — confirm tests pass
 
-- [ ] Task: Extend `enqueueEventEmail` with preference gate + `notificationType` param
-    - [ ] Write failing tests (`tests/unit/lib/event-email.test.ts` — skips enqueue when email disabled for type, sends when enabled, sends when no pref set, security types not gated, `notificationType` defaults to `templateType`, `notificationType` override works)
-    - [ ] Implement: add optional `notificationType?: string` param (defaults to `templateType`), check `recipient.settings?.notificationPrefs?.[notifType]?.email !== false` before `enqueueEmail`
-    - [ ] Run `pnpm test` — confirm gate tests pass
+- [x] Task: Extend `enqueueEventEmail` with preference gate + `notificationType` param
+    - [x] Write failing tests (`tests/unit/lib/event-email.test.ts` — skips enqueue when email disabled for type, sends when enabled, sends when no pref set, security types not gated, `notificationType` defaults to `templateType`, `notificationType` override works)
+    - [x] Implement: add optional `notificationType?: string` param (defaults to `templateType`), check `recipient.settings?.notificationPrefs?.[notifType]?.email === false` before `enqueueEmail`. Added `EMAIL_GATE_EXEMPT` set for security types (password_reset, invitation, two_factor, sla_alert).
+    - [x] Run `pnpm test` — confirm gate tests pass
 
-- [ ] Task: Update `sendSLAAlertEmail` to pass `notificationType: 'sla_breach'`
-    - [ ] Write failing tests (`tests/unit/lib/email.test.ts` — `sendSLAAlertEmail` passes `notificationType: 'sla_breach'` to `enqueueEventEmail`)
-    - [ ] Implement: add `notificationType: 'sla_breach'` to `enqueueEventEmail` call in `sendSLAAlertEmail`
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Update `sendSLAAlertEmail` to pass `notificationType: 'sla_breach'`
+    - **DEVIATION:** `sendSLAAlertEmail` calls `enqueueEmail` directly (not `enqueueEventEmail`), and `sla_alert` is exempt from email gating (FR-8). No email-side change needed. The `notificationType: 'sla_breach'` mapping applies only to the in-app gate (Task 7, site 11: `review-sla.ts:100`).
 
-- [ ] Task: Update `sendExtensionApprovedEmail` with `notificationType` param + update `bulkExtendHandler` caller
-    - [ ] Write failing tests (`tests/unit/lib/extension-email.test.ts` — `sendExtensionApprovedEmail` accepts optional `notificationType`, defaults to `'extension_approved'`; `bulkExtendHandler` passes `notificationType: 'deadline_extended'`)
-    - [ ] Implement: add optional `notificationType` param to `sendExtensionApprovedEmail` in `src/lib/extension-email.ts`, pass `notificationType: 'deadline_extended'` from `bulkExtendHandler` (`src/server/extensions-extras.server.ts:446`)
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Update `sendExtensionApprovedEmail` with `notificationType` param + update `bulkExtendHandler` caller
+    - [x] Write failing tests (`tests/unit/lib/extension-email.test.ts` — `sendExtensionApprovedEmail` accepts optional `notificationType`, defaults to `'extension_approved'`; `bulkExtendHandler` passes `notificationType: 'deadline_extended'`)
+    - [x] Implement: add optional `notificationType` param to `sendExtensionApprovedEmail` in `src/lib/extension-email.ts`, pass `notificationType: 'deadline_extended'` from `bulkExtendHandler` (`src/server/extensions-extras.server.ts:446`)
+    - [x] Run `pnpm test` — confirm tests pass
 
 - [ ] Task: Apply in-app preference gate at 12 notification creation sites
     - [ ] Write failing tests for conditional skip at representative sites (`tests/unit/server/consultations.test.ts`, `tests/unit/server/extensions.test.ts`, `tests/unit/server/submissions.test.ts`, `tests/unit/server/reviews.test.ts`, `tests/unit/lib/review-sla.test.ts`, `tests/unit/lib/deadline-reminder-scanner.test.ts` — in-app insert skipped when `shouldSendInAppNotification` returns `false`, insert proceeds when `true`)

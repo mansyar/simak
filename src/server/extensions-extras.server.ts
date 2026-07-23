@@ -448,6 +448,7 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
       instructorName: session.user.name,
       assignmentId,
       extensionDays: extraDays,
+      notificationType: 'deadline_extended',
     });
 
     return { success: true, extendedCount: unfinishedCheckpoints.length };
