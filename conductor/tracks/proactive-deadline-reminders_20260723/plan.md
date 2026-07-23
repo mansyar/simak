@@ -42,7 +42,7 @@
     - [ ] Implement (Green): extend `src/components/notifications/notification-routes.ts` `getNotificationRoute()` with `case 'deadline_reminder':`. Add i18n keys to both `locales/en.json` and `locales/id.json`: `notifications.events.deadline_reminder.title`/`.message` (params: `assignmentTitle`, `checkpointName`, `dueDate`), `emails.subjects.deadlineReminder`. Run `pnpm generate:i18n`.
     - [ ] Verify: `pnpm check:i18n` parity (no missing/unused keys); in-app notification is clickable (route derived); notification resolves title/message via `getNotificationKeys`; `pnpm lint` clean (no hardcoded strings)
     - [ ] Commit: `feat(reminders): Add deadline_reminder notification route + i18n keys`; attach git note; mark task `[x]` with commit SHA
-- [ ] Task: Final quality gates + verify `deadlineBreachRate` unaffected
+- [x] Task: Final quality gates + verify `deadlineBreachRate` unaffected [verified]
     - [ ] Run `pnpm test:coverage` (≥80% all thresholds), `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n`, `pnpm check:i18n:unused`
     - [ ] Verify `deadlineBreachRate` analytics metric unaffected (read-only dependency — no query changes)
     - [ ] Verify all new files ≤500 lines (`scripts/check-modularity.js`)
