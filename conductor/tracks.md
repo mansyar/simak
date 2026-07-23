@@ -5,8 +5,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 ---
 
 <!-- Archived tracks are in conductor/archive/ -->
-
----
-
-- [x] **Track: Rubric-Based Grading & Evaluation (TRACK-020)**
-*Link: [./tracks/rubric-based-grading-evaluation_20260723/](./tracks/rubric-based-grading-evaluation_20260723/)*
