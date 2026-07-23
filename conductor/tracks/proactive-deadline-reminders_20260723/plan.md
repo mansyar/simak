@@ -14,7 +14,7 @@
     - [x] Commit: `feat(db): Add deadline_reminders table + checkpoints state/dueDate index`; attach git note; mark task `[x]` with commit SHA
 - [x] Task: Conductor - User Manual Verification 'Schema & Migration' (Protocol in workflow.md)
 
-## Phase 2: Scanner Core
+## Phase 2: Scanner Core [checkpoint: a6a89be]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor on requirements and TDD protocol before starting Phase 2
 - [x] Task: Implement deadline-reminder scanner module (`src/lib/deadline-reminder-scanner.ts`) [195a16f]
