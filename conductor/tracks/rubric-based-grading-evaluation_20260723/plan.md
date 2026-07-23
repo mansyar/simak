@@ -29,7 +29,7 @@
 ## Phase 2: Rubric CRUD — Admin
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 2
-- [ ] Task: Create `rubrics.ts` server function stubs + Zod schemas
+- [x] Task: Create `rubrics.ts` server function stubs + Zod schemas (3d91cd3)
     - [ ] Write failing tests: Zod schema validation tests — weights sum to 100% (application-layer), scores 0–100, grading type consistency (levels only when `qualitative`), criteria title required
     - [ ] Implement: Create `src/server/rubrics.ts` with Zod schemas (`CreateCriterionSchema`, `UpdateCriterionSchema`, `CreateLevelSchema`, `UpdateLevelSchema`, `SaveRubricSchema`) + `createServerFn` stubs (dynamically importing handlers)
     - [ ] Verify: `pnpm test` passes
