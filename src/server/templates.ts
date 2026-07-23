@@ -5,6 +5,7 @@ import { z } from 'zod';
 import type { ServerError } from '@/lib/errors';
 
 export const CheckpointInputSchema = z.object({
+  id: z.coerce.number().int().positive().optional(),
   name: z.string().min(1, 'Checkpoint name is required'),
   minConsultations: z.coerce.number().int().min(0).default(0),
   estimatedDuration: z.coerce.number().int().min(0).default(7),

@@ -9,6 +9,7 @@ import {
   duplicateTemplateHandler,
 } from '@/server/templates.server';
 import { serverError, ErrorCode } from '@/lib/errors';
+import { assignmentTemplates, templateCheckpoints } from '@/db/schema/templates';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 
@@ -314,30 +315,104 @@ describe('Template server functions - Logic & Security', () => {
   });
 
   describe('updateTemplate', () => {
-    const updateData = {
-      name: 'Updated Template',
-      type: 'Thesis',
-      checkpoints: [
-        { name: 'New Ch 1', minConsultations: 0, estimatedDuration: 7 },
-        { name: 'New Ch 2', minConsultations: 0, estimatedDuration: 7 },
-      ],
-    };
-
     it('should fail if unauthorized', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
-      const result = await updateTemplateHandler({ data: { id: 1, ...updateData } });
+      const result = await updateTemplateHandler({
+        data: {
+          id: 1,
+          name: 'Updated',
+          type: 'Thesis',
+          checkpoints: [{ name: 'Ch 1', minConsultations: 0, estimatedDuration: 7 }],
+        },
+      });
       expect(result).toEqual(serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized'));
     });
 
-    it('should update template and replace checkpoints', async () => {
+    it('should preserve existing checkpoint IDs on metadata-only edit', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
 
-      const result = await updateTemplateHandler({ data: { id: 1, ...updateData } });
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            { id: 10, name: 'Old Ch 1', order: 1 },
+            { id: 20, name: 'Old Ch 2', order: 2 },
+          ]).then(onfulfilled),
+        );
 
-      expect(result).toHaveProperty('success');
-      expect(mockDb.update).toHaveBeenCalled();
-      expect(mockDb.delete).toHaveBeenCalled();
-      expect(mockDb.insert).toHaveBeenCalled();
+      const result = await updateTemplateHandler({
+        data: {
+          id: 1,
+          name: 'Updated Template',
+          type: 'Thesis',
+          checkpoints: [
+            { id: 10, name: 'New Ch 1', minConsultations: 2, estimatedDuration: 14 },
+            { id: 20, name: 'New Ch 2', minConsultations: 0, estimatedDuration: 7 },
+          ],
+        },
+      });
+
+      expect(result).toEqual({ success: true });
+      expect(mockDb.update).toHaveBeenCalledWith(assignmentTemplates);
+      expect(mockDb.update).toHaveBeenCalledWith(templateCheckpoints);
+      expect(mockDb.insert).not.toHaveBeenCalledWith(templateCheckpoints);
+      expect(mockDb.delete).not.toHaveBeenCalled();
+    });
+
+    it('should create new checkpoints for checkpoints without IDs', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 10, name: 'Existing Ch', order: 1 }]).then(onfulfilled),
+        );
+
+      const result = await updateTemplateHandler({
+        data: {
+          id: 1,
+          name: 'Updated',
+          type: 'Thesis',
+          checkpoints: [
+            { id: 10, name: 'Existing Ch', minConsultations: 0, estimatedDuration: 7 },
+            { name: 'New Ch', minConsultations: 0, estimatedDuration: 7 },
+          ],
+        },
+      });
+
+      expect(result).toEqual({ success: true });
+      expect(mockDb.insert).toHaveBeenCalledWith(templateCheckpoints);
+      expect(mockDb.delete).not.toHaveBeenCalled();
+    });
+
+    it('should soft-delete removed checkpoints (not hard-delete)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
+
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            { id: 10, name: 'Ch 1', order: 1 },
+            { id: 20, name: 'Ch 2', order: 2 },
+          ]).then(onfulfilled),
+        );
+
+      const result = await updateTemplateHandler({
+        data: {
+          id: 1,
+          name: 'Updated',
+          type: 'Thesis',
+          checkpoints: [{ id: 10, name: 'Ch 1', minConsultations: 0, estimatedDuration: 7 }],
+        },
+      });
+
+      expect(result).toEqual({ success: true });
+      expect(mockDb.delete).not.toHaveBeenCalled();
+      const setCalls = vi.mocked(mockDb.set).mock.calls;
+      const hasDeletedAt = setCalls.some(
+        (call: any[]) => call[0] && call[0].deletedAt !== undefined,
+      );
+      expect(hasDeletedAt).toBe(true);
     });
   });
 

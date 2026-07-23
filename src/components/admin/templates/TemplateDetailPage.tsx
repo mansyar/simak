@@ -54,6 +54,7 @@ export function TemplateDetailPage({
   const [type, setType] = useState(template?.type ?? '');
   const [checkpoints, setCheckpoints] = useState(
     template?.checkpoints.map((cp) => ({
+      id: cp.id,
       name: cp.name,
       minConsultations: cp.minConsultations ?? 0,
       estimatedDuration: cp.estimatedDuration ?? 7,

@@ -26,6 +26,7 @@ export const templateCheckpoints = pgTable(
     estimatedDuration: integer('estimated_duration').default(0),
     gradingType: gradingType('grading_type'),
     createdAt: timestamp('created_at').defaultNow(),
+    deletedAt: timestamp('deleted_at'),
   },
   (table) => [
     index('template_checkpoints_template_id_order_idx').on(table.templateId, table.order),

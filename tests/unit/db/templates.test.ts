@@ -28,6 +28,7 @@ describe('Assignment templates schema', () => {
     expect(templateCheckpoints).toHaveProperty('estimatedDuration');
     expect(templateCheckpoints).toHaveProperty('createdAt');
     expect(templateCheckpoints).toHaveProperty('gradingType');
+    expect(templateCheckpoints).toHaveProperty('deletedAt');
   });
 
   it('should export gradingType enum with numeric and qualitative values', async () => {
