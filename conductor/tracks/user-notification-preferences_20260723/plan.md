@@ -53,22 +53,23 @@
     - [x] Implement: add optional `notificationType` param to `sendExtensionApprovedEmail` in `src/lib/extension-email.ts`, pass `notificationType: 'deadline_extended'` from `bulkExtendHandler` (`src/server/extensions-extras.server.ts:446`)
     - [x] Run `pnpm test` — confirm tests pass
 
-- [ ] Task: Apply in-app preference gate at 12 notification creation sites
-    - [ ] Write failing tests for conditional skip at representative sites (`tests/unit/server/consultations.test.ts`, `tests/unit/server/extensions.test.ts`, `tests/unit/server/submissions.test.ts`, `tests/unit/server/reviews.test.ts`, `tests/unit/lib/review-sla.test.ts`, `tests/unit/lib/deadline-reminder-scanner.test.ts` — in-app insert skipped when `shouldSendInAppNotification` returns `false`, insert proceeds when `true`)
-    - [ ] Implement: at each of the 12 sites, fetch recipient `settings` (if not already available) and conditionally skip `db.insert(notifications)` via `shouldSendInAppNotification`:
-        1. `consultations.server.ts:115` (`consultation_logged`)
-        2. `consultations.server.ts:385` (`consultation_verified`)
-        3. `consultations.server.ts:462` (`consultation_rejected`)
-        4. `extensions.server.ts:212` (`extension_requested`)
-        5. `extensions-extras.server.ts:157` (`extension_approved`)
-        6. `extensions-extras.server.ts:276` (`extension_rejected`)
-        7. `extensions-extras.server.ts:432` (`deadline_extended`)
-        8. `submissions.server.ts:210` (`submission_received`)
-        9. `reviews.server.ts:417` (`review_completed`)
-        10. `reviews.server.ts:433` (`revision_requested`)
-        11. `review-sla.ts:100` (`sla_breach`)
-        12. `deadline-reminder-scanner.ts` (`deadline_reminder`)
-    - [ ] Run `pnpm test` — confirm all 12 site tests pass
+- [x] Task: Apply in-app preference gate at 12 notification creation sites [904a4d9]
+    - [x] Write failing tests for conditional skip at representative sites (`tests/unit/server/consultations.test.ts`, `tests/unit/server/extensions-request.test.ts`, `tests/unit/server/extensions-approve-reject.test.ts`, `tests/unit/server/extensions-bulk.test.ts`, `tests/unit/server/submissions.test.ts`, `tests/unit/server/reviews-handlers.test.ts`, `tests/unit/lib/review-sla.test.ts`, `tests/unit/lib/deadline-reminder-scanner.test.ts` — in-app insert skipped when `shouldSendInAppNotification` returns `false`, insert proceeds when `true`)
+    - [x] Implement: at each of the 12 sites, fetch recipient `settings` (if not already available) and conditionally skip `db.insert(notifications)` via `shouldSendInAppNotification`:
+        1. `consultations.server.ts:115` (`consultation_logged`) — uses `maybeInsertNotification` helper
+        2. `consultations.server.ts:385` (`consultation_verified`) — uses `maybeInsertNotification` helper
+        3. `consultations.server.ts:462` (`consultation_rejected`) — uses `maybeInsertNotification` helper
+        4. `extensions.server.ts:212` (`extension_requested`) — inline pattern
+        5. `extensions-extras.server.ts:157` (`extension_approved`) — inline pattern
+        6. `extensions-extras.server.ts:276` (`extension_rejected`) — inline pattern
+        7. `extensions-extras.server.ts:432` (`deadline_extended`) — inline pattern
+        8. `submissions.server.ts:210` (`submission_received`) — inline pattern
+        9. `reviews.server.ts:417` (`review_completed`) — uses `maybeInsertNotification` helper (shared SELECT with site 10)
+        10. `reviews.server.ts:433` (`revision_requested`) — uses `maybeInsertNotification` helper (shared SELECT with site 9)
+        11. `review-sla.ts:100` (`sla_breach`) — batch: filter `notifiableAdmins` before INSERT, emails to ALL
+        12. `deadline-reminder-scanner.ts` (`deadline_reminder`) — batch: filter `notifiableCheckpoints` before INSERT, emails to ALL
+    - [x] Run `pnpm test` — confirm all 12 site tests pass (3158 tests, 0 failures)
+    - **NOTE:** Created `maybeInsertNotification(db, userId, type, values)` helper in `src/lib/notification-prefs.ts` to reduce `consultations.server.ts` (500→495) and `reviews.server.ts` (500→498) below 500-line limit. Moved skip tests to 3 new files (`consultations-prefs.test.ts`, `extensions-approve-reject-prefs.test.ts`, `submissions-prefs.test.ts`) to keep original test files under 500 lines.
 
 - [ ] Task: Conductor - User Manual Verification 'Preference Gates' (Protocol in workflow.md)
 
