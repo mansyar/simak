@@ -61,7 +61,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Rubric CRUD — Admin' (Protocol in workflow.md)
 
-## Phase 3: Rubric-Based Review — Instructor
+## Phase 3: Rubric-Based Review — Instructor [checkpoint: 8f1859c]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 3
 - [x] Task: Extend `SubmitReviewSchema` with optional `scores` array (bcb7b48)
