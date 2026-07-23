@@ -12,7 +12,7 @@
     - [x] Run `pnpm db:generate` + `pnpm db:migrate`; create rollback migration file (per SQL styleguide §5.1)
     - [x] Verify: migration applies cleanly, rollback works, unique constraint rejects duplicate `(checkpointId, tier)`, index exists, `pnpm typecheck` clean
     - [x] Commit: `feat(db): Add deadline_reminders table + checkpoints state/dueDate index`; attach git note; mark task `[x]` with commit SHA
-- [ ] Task: Conductor - User Manual Verification 'Schema & Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Schema & Migration' (Protocol in workflow.md)
 
 ## Phase 2: Scanner Core
 
