@@ -77,25 +77,26 @@
 
 ## Phase 3: UI & i18n
 
-- [ ] Task: Read `spec.md` and `workflow.md` before starting phase implementation
-    - [ ] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read `spec.md` and `workflow.md` before starting phase implementation
+    - [x] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Create `NotificationPreferencesSection` component
-    - [ ] Write failing tests (`tests/unit/components/settings/NotificationPreferencesSection.test.tsx` — renders all 12 types grouped by 4 `GROUP_CONFIGS` groups, renders Email + In-app `Switch` toggles per type, default state = all switches ON, toggle calls `updateUserSettings` with correct payload, `queryClient.invalidateQueries` on success)
-    - [ ] Implement `src/components/settings/NotificationPreferencesSection.tsx` following `AccessibilitySection.tsx` pattern: `useQuery(['currentUser'])` for data, `useMutation(updateUserSettings)` for saves, `queryClient.invalidateQueries(['currentUser'])` on success. Renders grouped list with inline `Switch` toggles per type × channel.
-    - [ ] Run `pnpm test` — confirm component tests pass
+- [x] Task: Create `NotificationPreferencesSection` component [9f88b1d]
+    - [x] Write failing tests (`tests/unit/components/settings/notification-preferences-section.test.tsx` — renders all 12 types grouped by 4 groups, renders Email + In-app checkbox toggles per type, default state = all checked, toggle calls `updateUserSettings` with correct payload, `queryClient.invalidateQueries` on success)
+    - [x] Implement `src/components/settings/NotificationPreferencesSection.tsx` following `AccessibilitySection.tsx` pattern: `useQuery(['currentUser'])` for data, `useMutation(updateUserSettings)` for saves, `queryClient.invalidateQueries(['currentUser'])` on success. Renders grouped list with inline checkbox toggles per type × channel.
+    - [x] Run `pnpm test` — confirm component tests pass (13/13)
 
-- [ ] Task: Add `NotificationPreferencesSection` to `SettingsPage.tsx` as 7th section
-    - [ ] Write failing tests (`tests/unit/components/settings/SettingsPage.test.tsx` — 7th section renders, section title visible)
-    - [ ] Implement: import and render `<NotificationPreferencesSection />` as 7th section in `src/components/settings/SettingsPage.tsx`
-    - [ ] Run `pnpm test` — confirm integration tests pass
+- [x] Task: Add `NotificationPreferencesSection` to `SettingsPage.tsx` as 7th section [9f88b1d]
+    - [x] Write failing tests (`tests/unit/components/settings/settings-page.test.tsx` — updated from 6 to 7 sections)
+    - [x] Implement: import and render `<NotificationPreferencesSection />` as 7th section in `src/components/settings/SettingsPage.tsx`
+    - [x] Run `pnpm test` — confirm integration tests pass (2/2)
 
-- [ ] Task: Add i18n keys to both locales + run codegen
-    - [ ] Add `settings.notificationPreferences.*` keys to `locales/en.json` (section title, group labels matching `GROUP_CONFIGS` keys, per-type labels matching `notifications.events.*` titles, channel names Email/In-app, descriptions)
-    - [ ] Add matching keys to `locales/id.json` with Indonesian translations
-    - [ ] Run `pnpm generate:i18n` to regenerate types
-    - [ ] Verify: `pnpm check:i18n` — parity EN↔ID passes
+- [x] Task: Add i18n keys to both locales + run codegen [9f88b1d]
+    - [x] Add `settings.notificationPreferences.*` keys to `locales/en.json` (section title, group labels, per-type labels and descriptions, channel names Email/In-app)
+    - [x] Add matching keys to `locales/id.json` with Indonesian translations
+    - [x] Run `pnpm generate:i18n` to regenerate types
+    - [x] Verify: `pnpm check:i18n` — parity EN↔ID passes, 82 dynamic keys whitelisted
+    - [x] Added `/^settings\.notificationPreferences\.types\./` to DYNAMIC_KEY_PATTERNS in `scripts/check-i18n-keys.js`
 
 - [ ] Task: Conductor - User Manual Verification 'UI & i18n' (Protocol in workflow.md)
 </protect>
