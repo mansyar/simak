@@ -557,7 +557,12 @@
     "statusSubmitted": "Dikumpulkan",
     "statusUnderReview": "Dalam Review",
     "statusPassed": "Lulus",
-    "statusRevise": "Revisi"
+    "statusRevise": "Revisi",
+    "rubricTitle": "Analitik Rubrik",
+    "rubricCriterion": "Kriteria",
+    "rubricAvgScore": "Nilai Rata-rata",
+    "rubricPassRate": "Tingkat Kelulusan",
+    "rubricReviewCount": "Ulasan"
   },
   "instructorAnalytics": {
     "title": "Analitik",

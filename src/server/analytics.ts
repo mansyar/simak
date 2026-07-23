@@ -52,6 +52,13 @@ export const getInstructorRubricAnalytics = createServerFn({ method: 'GET' })
     return getInstructorRubricAnalyticsHandler({ data });
   });
 
+export const getAdminRubricAnalytics = createServerFn({ method: 'GET' })
+  .inputValidator(AnalyticsDateRangeSchema)
+  .handler(async ({ data }) => {
+    const { getAdminRubricAnalyticsHandler } = await import('./analytics-admin.server');
+    return getAdminRubricAnalyticsHandler({ data });
+  });
+
 // ---- CSV Export Schemas ----
 
 export const ExportUsersCsvSchema = z.object({});

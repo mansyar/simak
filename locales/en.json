@@ -557,7 +557,12 @@
     "statusSubmitted": "Submitted",
     "statusUnderReview": "Under Review",
     "statusPassed": "Passed",
-    "statusRevise": "Revise"
+    "statusRevise": "Revise",
+    "rubricTitle": "Rubric Analytics",
+    "rubricCriterion": "Criterion",
+    "rubricAvgScore": "Avg Score",
+    "rubricPassRate": "Pass Rate",
+    "rubricReviewCount": "Reviews"
   },
   "instructorAnalytics": {
     "title": "Analytics",

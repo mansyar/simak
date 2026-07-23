@@ -71,6 +71,11 @@ const mockAnalyticsData = {
   dateRange: { start: null, end: null },
 };
 
+const mockRubricData = {
+  criteria: [],
+  dateRange: { start: null, end: null },
+};
+
 async function getAnalyticsPage(): Promise<ComponentType> {
   const mod = await import('@/routes/_authenticated/admin/analytics');
   return (mod.Route as any).component ?? (mod.Route as any).Component;
@@ -78,7 +83,7 @@ async function getAnalyticsPage(): Promise<ComponentType> {
 
 describe('Admin Analytics Page', () => {
   beforeEach(() => {
-    mocks.loaderData = { ...mockAnalyticsData };
+    mocks.loaderData = { analytics: { ...mockAnalyticsData }, rubric: { ...mockRubricData } };
     mocks.search = { range: '30d', start: undefined, end: undefined };
     mocks.navigate.mockClear();
   });
@@ -151,7 +156,10 @@ describe('Admin Analytics Page', () => {
   });
 
   it('renders error state when server returns error', async () => {
-    mocks.loaderData = { error: { code: 'INTERNAL', message: 'Internal Server Error' } };
+    mocks.loaderData = {
+      analytics: { error: { code: 'INTERNAL', message: 'Internal Server Error' } },
+      rubric: { ...mockRubricData },
+    };
     const Page = await getAnalyticsPage();
     render(<Page />);
     expect(screen.getByText('Internal Server Error')).toBeDefined();
@@ -159,11 +167,14 @@ describe('Admin Analytics Page', () => {
 
   it('renders empty state for trends with no data', async () => {
     mocks.loaderData = {
-      ...mockAnalyticsData,
-      submissionTrend: [],
-      reviewTrend: [],
-      dauTrend: [],
-      wauTrend: [],
+      analytics: {
+        ...mockAnalyticsData,
+        submissionTrend: [],
+        reviewTrend: [],
+        dauTrend: [],
+        wauTrend: [],
+      },
+      rubric: { ...mockRubricData },
     };
     const Page = await getAnalyticsPage();
     render(<Page />);
@@ -188,6 +199,38 @@ describe('Admin Analytics Page', () => {
       'Admin Analytics',
       'admin-analytics.xlsx',
     );
+  });
+
+  it('renders rubric analytics section when criteria exist', async () => {
+    mocks.loaderData = {
+      analytics: { ...mockAnalyticsData },
+      rubric: {
+        criteria: [
+          {
+            criterionId: 1,
+            criterionTitle: 'Code Quality',
+            avgScore: 75,
+            passRate: 80,
+            reviewCount: 5,
+          },
+        ],
+        dateRange: { start: null, end: null },
+      },
+    };
+    const Page = await getAnalyticsPage();
+    render(<Page />);
+    expect(screen.getByText('adminAnalytics.rubricTitle')).toBeDefined();
+    expect(screen.getByText('Code Quality')).toBeDefined();
+  });
+
+  it('does not render rubric analytics section when criteria empty', async () => {
+    mocks.loaderData = {
+      analytics: { ...mockAnalyticsData },
+      rubric: { criteria: [], dateRange: { start: null, end: null } },
+    };
+    const Page = await getAnalyticsPage();
+    render(<Page />);
+    expect(screen.queryByText('adminAnalytics.rubricTitle')).toBeNull();
   });
 });
 

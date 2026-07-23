@@ -1,10 +1,11 @@
 // Server-only handler for admin analytics data
-import { and, sql, gte, lte } from 'drizzle-orm';
+import { and, sql, gte, lte, asc, eq } from 'drizzle-orm';
 import { getDb } from '@/db/index';
 import { checkpoints } from '@/db/schema/assignments';
 import { submissions, reviews } from '@/db/schema/submissions';
 import { consultations } from '@/db/schema/consultations';
 import { auditLog } from '@/db/schema/audit-log';
+import { reviewScores } from '@/db/schema/rubrics';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '@/lib/types';
@@ -214,6 +215,67 @@ export async function getAdminAnalyticsDataHandler({ data }: { data: AnalyticsDa
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
       handler: 'getAdminAnalyticsDataHandler',
+    });
+  }
+}
+
+export type AdminRubricAnalytics = {
+  criteria: Array<{
+    criterionId: number;
+    criterionTitle: string;
+    avgScore: number;
+    passRate: number;
+    reviewCount: number;
+  }>;
+  dateRange: { start: string | null; end: string | null };
+};
+
+export async function getAdminRubricAnalyticsHandler({ data }: { data: AnalyticsDateRangeInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isAdmin(session)) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const { startDate, endDate } = resolveDateRange(data);
+  const db = getDb();
+
+  try {
+    const result = await db
+      .select({
+        criterionId: reviewScores.criterionId,
+        criterionTitle: reviewScores.criterionTitle,
+        avgScore: sql<number>`AVG(${reviewScores.score})::float`,
+        reviewCount: sql<number>`count(*)::int`,
+        passRate: sql<number>`CASE WHEN count(*) > 0 THEN count(*) FILTER (WHERE ${reviews.decision} = 'pass')::float / count(*) * 100 ELSE 0 END`,
+      })
+      .from(reviewScores)
+      .innerJoin(reviews, eq(reviewScores.reviewId, reviews.id))
+      .where(
+        and(
+          sql`${reviews.reviewedAt} IS NOT NULL`,
+          dateCondition(reviews.reviewedAt, startDate, endDate),
+        ),
+      )
+      .groupBy(reviewScores.criterionId, reviewScores.criterionTitle)
+      .orderBy(asc(sql`AVG(${reviewScores.score})`));
+
+    return {
+      criteria: result.map((row) => ({
+        criterionId: row.criterionId,
+        criterionTitle: row.criterionTitle,
+        avgScore: Math.round(row.avgScore * 10) / 10,
+        passRate: Math.round(row.passRate * 10) / 10,
+        reviewCount: Number(row.reviewCount),
+      })),
+      dateRange: {
+        start: startDate ? startDate.toISOString() : null,
+        end: endDate ? endDate.toISOString() : null,
+      },
+    };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getAdminRubricAnalyticsHandler',
     });
   }
 }

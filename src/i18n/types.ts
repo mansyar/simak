@@ -563,6 +563,11 @@ export type Translation = {
     statusUnderReview: string
     statusPassed: string
     statusRevise: string
+    rubricTitle: string
+    rubricCriterion: string
+    rubricAvgScore: string
+    rubricPassRate: string
+    rubricReviewCount: string
   }
   instructorAnalytics: {
     title: string
