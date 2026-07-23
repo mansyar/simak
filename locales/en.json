@@ -317,7 +317,12 @@
       "feedbackUploadFailed": "Failed to upload feedback file",
       "notInSubmittedState": "Checkpoint must be in submitted state to open for review"
     },
-    "reviewDateLabel": "Reviewed on {date}"
+    "reviewDateLabel": "Reviewed on {date}",
+    "rubric": {
+      "title": "Rubric Scoring",
+      "weightedTotal": "Weighted Total",
+      "allCriteriaRequired": "All criteria must be scored before submitting"
+    }
   },
   "instructorAssignments": {
     "title": "Assignments",

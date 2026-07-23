@@ -7,15 +7,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { submitReview } from '@/server/reviews';
 import { isServerError } from '@/lib/errors';
 import { getPresignedReviewFeedbackUploadUrl } from '@/server/files';
+import { RubricScoringSection, type ScoreInput } from '@/components/reviews/RubricScoringSection';
+import type { RubricData } from '@/server/rubrics';
 import { Loader2, Upload } from 'lucide-react';
 
 interface ReviewFormProps {
   submissionId: number;
   onComplete: () => void;
   onError: (error: string) => void;
+  rubric?: RubricData | null;
 }
 
-export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProps) {
+export function ReviewForm({ submissionId, onComplete, onError, rubric }: ReviewFormProps) {
   const { t } = useI18n();
   const [decision, setDecision] = useState<'pass' | 'revise' | null>(null);
   const [comment, setComment] = useState('');
@@ -24,6 +27,12 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
   const [revisionDeadline, setRevisionDeadline] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingFeedback, setIsUploadingFeedback] = useState(false);
+  const [scores, setScores] = useState<ScoreInput[]>([]);
+
+  const rubricActive = rubric && rubric.gradingType !== null;
+  const allScored = rubricActive
+    ? rubric!.criteria.every((c) => scores.some((s) => s.criterionId === c.id))
+    : true;
 
   const handleFeedbackFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,6 +101,7 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
             comment: string;
             feedbackFileKey?: string;
             revisionDeadline?: string;
+            scores?: ScoreInput[];
           };
         }) => Promise<{ error?: string }>
       )({
@@ -101,6 +111,7 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
           comment: comment || '',
           feedbackFileKey: feedbackFileKey || undefined,
           revisionDeadline: decision === 'revise' ? revisionDeadline : undefined,
+          scores: rubricActive ? scores : undefined,
         },
       });
 
@@ -115,7 +126,18 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
     } finally {
       setIsSubmitting(false);
     }
-  }, [decision, revisionDeadline, comment, feedbackFileKey, submissionId, onComplete, onError, t]);
+  }, [
+    decision,
+    revisionDeadline,
+    comment,
+    feedbackFileKey,
+    submissionId,
+    onComplete,
+    onError,
+    t,
+    scores,
+    rubricActive,
+  ]);
 
   return (
     <Card className="shadow-sm">
@@ -201,8 +223,17 @@ export function ReviewForm({ submissionId, onComplete, onError }: ReviewFormProp
           </div>
         )}
 
+        {/* Rubric scoring (when rubric is active) */}
+        {rubricActive && (
+          <RubricScoringSection rubric={rubric!} scores={scores} onScoresChange={setScores} />
+        )}
+
         {/* Submit */}
-        <Button onClick={handleSubmit} disabled={!decision || isSubmitting} className="w-full">
+        <Button
+          onClick={handleSubmit}
+          disabled={!decision || isSubmitting || !allScored}
+          className="w-full"
+        >
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

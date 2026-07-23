@@ -317,7 +317,12 @@
       "feedbackUploadFailed": "Gagal mengunggah file umpan balik",
       "notInSubmittedState": "Checkpoint harus berstatus diserahkan untuk dibuka peninjauannya"
     },
-    "reviewDateLabel": "Direview pada {date}"
+    "reviewDateLabel": "Direview pada {date}",
+    "rubric": {
+      "title": "Penilaian Rubrik",
+      "weightedTotal": "Total Terbobot",
+      "allCriteriaRequired": "Semua kriteria harus dinilai sebelum mengirim"
+    }
   },
   "instructorAssignments": {
     "title": "Tugas",

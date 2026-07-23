@@ -323,6 +323,11 @@ export type Translation = {
       notInSubmittedState: string
     }
     reviewDateLabel: string
+    rubric: {
+      title: string
+      weightedTotal: string
+      allCriteriaRequired: string
+    }
   }
   instructorAssignments: {
     title: string
