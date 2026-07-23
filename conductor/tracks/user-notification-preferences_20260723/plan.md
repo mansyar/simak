@@ -75,7 +75,7 @@
     - Automated tests: 316 files, 3158 tests passed, 0 failures. Coverage: 88.45% stmts, 82.2% branch, 84.11% funcs, 89.03% lines.
     - Manual verification: Skipped (user confirmed automated tests sufficient).
 
-## Phase 3: UI & i18n
+## Phase 3: UI & i18n [checkpoint: 3a6b0a6]
 
 - [x] Task: Read `spec.md` and `workflow.md` before starting phase implementation
     - [x] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
