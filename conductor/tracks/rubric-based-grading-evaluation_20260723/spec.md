@@ -1,3 +1,4 @@
+<protect>
 # Track Specification: Rubric-Based Grading & Evaluation (TRACK-020)
 
 ## Overview
@@ -199,3 +200,4 @@ Three grading modes per checkpoint:
 - Grade transcripts / final grade aggregation across checkpoints (separate future track)
 - Reusable rubric fragments across templates (v2)
 - Snapshot-at-review-open rubric model (live lookup chosen instead — simpler and more correct for pending reviews)
+</protect>

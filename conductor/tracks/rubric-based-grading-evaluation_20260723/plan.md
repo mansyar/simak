@@ -1,7 +1,9 @@
+<protect>
 # Implementation Plan: Rubric-Based Grading & Evaluation (TRACK-020)
 
 ## Phase 1: Schema, Migration & Template Handler Refactor
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 1
 - [ ] Task: Add `grading_type` pgEnum and `templateCheckpointId` FK to schema
     - [ ] Write failing tests: Schema tests for `grading_type` pgEnum column on `template_checkpoints` (nullable, defaults to null), `templateCheckpointId` FK on `checkpoints` (nullable)
     - [ ] Implement: Add `gradingType` pgEnum column to `template_checkpoints` schema in `src/db/schema/assignments.ts`. Add `templateCheckpointId` FK column to `checkpoints` table
@@ -26,6 +28,7 @@
 
 ## Phase 2: Rubric CRUD — Admin
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 2
 - [ ] Task: Create `rubrics.ts` server function stubs + Zod schemas
     - [ ] Write failing tests: Zod schema validation tests — weights sum to 100% (application-layer), scores 0–100, grading type consistency (levels only when `qualitative`), criteria title required
     - [ ] Implement: Create `src/server/rubrics.ts` with Zod schemas (`CreateCriterionSchema`, `UpdateCriterionSchema`, `CreateLevelSchema`, `UpdateLevelSchema`, `SaveRubricSchema`) + `createServerFn` stubs (dynamically importing handlers)
@@ -60,6 +63,7 @@
 
 ## Phase 3: Rubric-Based Review — Instructor
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 3
 - [ ] Task: Extend `SubmitReviewSchema` with optional `scores` array
     - [ ] Write failing tests: Zod schema tests — `scores` is optional, required when `grading_type` is not null, rejected when null. Each score object has `criterionId`, `score` (0–100), optional `rubricLevelId`, optional `comment`
     - [ ] Implement: Extend `SubmitReviewSchema` in `src/server/reviews.ts` with `scores: z.array(z.object({ criterionId, score (0–100), rubricLevelId?, comment? })).optional()`
@@ -94,6 +98,7 @@
 
 ## Phase 4: Student View, Analytics & i18n
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 4
 - [ ] Task: Extend `getLatestReviewHandler` to return `review_scores`
     - [ ] Write failing tests: Handler tests — `getLatestReviewHandler` returns `review_scores` including denormalized `criterionTitle`, `levelLabel`, and `weight` snapshot fields. Returns scores for soft-deleted criteria via snapshot
     - [ ] Implement: Extend `getLatestReviewHandler` (`src/server/reviews-extras.server.ts:89`) to fetch and return `review_scores`
@@ -132,3 +137,4 @@
     - [ ] Verify all files in `src/`, `tests/`, `scripts/` are under 500 lines
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Student View, Analytics & i18n' (Protocol in workflow.md)
+</protect>
