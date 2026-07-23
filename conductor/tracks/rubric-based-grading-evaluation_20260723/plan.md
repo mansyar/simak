@@ -74,7 +74,7 @@
     - [ ] Implement: Extend `getReviewDetailHandler` (`src/server/reviews.server.ts:137`) to fetch and return rubric criteria + levels
     - [ ] Verify: `pnpm test` passes
 
-- [ ] Task: Extend `submitReviewHandler` to persist `review_scores`
+- [x] Task: Extend `submitReviewHandler` to persist `review_scores` (3bc9012)
     - [ ] Write failing tests: Handler tests — scores persisted to `review_scores` with denormalized snapshot (`criterionTitle`, `levelLabel`, `weight`), all criteria must be scored (unscored blocks submission), scores optional when `grading_type` is null, re-validates all current criteria at submit time (handles live rubric changes mid-review)
     - [ ] Implement: Extend `submitReviewHandler` (`reviews.server.ts:220`) to accept `scores`, look up criteria + levels for snapshot fields, insert into `review_scores`
     - [ ] Verify: `pnpm test` passes
