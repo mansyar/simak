@@ -1,9 +1,6 @@
-/**
- * Deadline reminder email helper.
- *
- * Stub — fully implemented in Phase 3 (Email Template, Helper & i18n).
- * The scanner imports this function and the test mocks it.
- */
+import type { Locales } from '../i18n/types';
+import { enqueueEventEmail } from './event-email';
+import { buildDeadlineReminderHtml } from './email-templates';
 
 export interface DeadlineReminderEmailOpts {
   recipientId: string;
@@ -16,9 +13,21 @@ export interface DeadlineReminderEmailOpts {
 
 /**
  * Enqueue a deadline-reminder email for a student.
- *
- * Phase 3 will implement this with `enqueueEventEmail` + `buildDeadlineReminderHtml`.
+ * Advisory — never throws.
  */
-export async function sendDeadlineReminderEmail(_opts: DeadlineReminderEmailOpts): Promise<void> {
-  // TODO: Phase 3 — implement with enqueueEventEmail + buildDeadlineReminderHtml
+export async function sendDeadlineReminderEmail(opts: DeadlineReminderEmailOpts): Promise<void> {
+  await enqueueEventEmail({
+    recipientId: opts.recipientId,
+    subjectKey: 'emails.subjects.deadlineReminder',
+    templateType: 'deadline_reminder',
+    buildBody: (locale: Locales) =>
+      buildDeadlineReminderHtml({
+        assignmentTitle: opts.assignmentTitle,
+        checkpointName: opts.checkpointName,
+        assignmentId: opts.assignmentId,
+        checkpointId: opts.checkpointId,
+        dueDate: String(opts.dueDate),
+        locale,
+      }),
+  });
 }

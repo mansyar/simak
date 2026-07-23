@@ -31,8 +31,8 @@
 
 ## Phase 3: Email Template, Helper & i18n
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor on requirements and TDD protocol before starting Phase 3
-- [ ] Task: Email template builder + helper wrapper
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor on requirements and TDD protocol before starting Phase 3
+- [~] Task: Email template builder + helper wrapper
     - [ ] Write Tests (Red): `buildDeadlineReminderHtml` rendering — both locales (en/id), `STRINGS` object intro string, date formatting per locale, HTML escaping, CTA link to `${BETTER_AUTH_URL}/student/assignments/{assignmentId}/checkpoints/{checkpointId}`; `sendDeadlineReminderEmail` wrapper calls `enqueueEventEmail` with correct opts (matching `review-email.ts` pattern)
     - [ ] Implement (Green): add `buildDeadlineReminderHtml` to `src/lib/email-templates.ts` using internal `HEADER_HTML`/`FOOTER_HTML`/`detailRow`/`detailTable`/`deepLinkButton`/`fallbackLink`/`buildEmail` helpers; add `deadlineReminder` intro string to `STRINGS` object for both `en` and `id`. Create `src/lib/deadline-reminder-email.ts` exporting `sendDeadlineReminderEmail(opts)` calling `enqueueEventEmail` with `buildDeadlineReminderHtml`.
     - [ ] Verify: email renders in both locales; helper matches `review-email.ts` pattern; `pnpm typecheck` clean

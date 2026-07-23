@@ -61,6 +61,12 @@ export function getNotificationRoute(
     case 'sla_breach':
       return '/admin/dashboard';
 
+    case 'deadline_reminder':
+      if (meta.assignmentId != null && meta.checkpointId != null) {
+        return `/student/assignments/${meta.assignmentId}/checkpoints/${meta.checkpointId}`;
+      }
+      return null;
+
     default:
       return null;
   }
