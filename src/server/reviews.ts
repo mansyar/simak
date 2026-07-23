@@ -23,6 +23,16 @@ export const SubmitReviewSchema = z.object({
   comment: z.string().optional().default(''),
   feedbackFileKey: z.string().optional(),
   revisionDeadline: z.string().optional(),
+  scores: z
+    .array(
+      z.object({
+        criterionId: z.coerce.number().int().positive(),
+        score: z.coerce.number().int().min(0).max(100),
+        rubricLevelId: z.coerce.number().int().positive().optional(),
+        comment: z.string().optional(),
+      }),
+    )
+    .optional(),
 });
 
 export const GetLatestReviewSchema = z.object({
