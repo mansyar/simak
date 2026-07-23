@@ -17,6 +17,7 @@ import {
   type SLASubmissionFields,
 } from '../lib/review-sla';
 import { getNotificationKeys } from './notifications.server';
+import { sendReviewEmail } from '../lib/review-email';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -212,11 +213,6 @@ export async function getReviewDetailHandler(args: { data: GetReviewDetailInput 
   }
 }
 
-/**
- * Open a submission for review.
- * POST action — transitions checkpoint from submitted to under_review.
- * Called explicitly by the client after loading review detail page.
- */
 /**
  * Submit a review decision (pass/revise) for a submission.
  * Validates ownership, state, and handles checkpoint transitions.
@@ -477,7 +473,16 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
         console.error('Post-commit advisory work failed in submitReviewHandler:', advisoryErr);
       }
     }
-
+    // 5. Email notification (post-commit advisory)
+    await sendReviewEmail({
+      studentId: submission.studentId,
+      decision,
+      reviewerName: session.user.name,
+      assignmentTitle: submission.assignmentTitle,
+      checkpointName: submission.checkpointName,
+      assignmentId: submission.assignmentId,
+      revisionDeadline,
+    });
     return { success: true };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {

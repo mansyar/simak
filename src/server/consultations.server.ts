@@ -11,6 +11,7 @@ import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode, type ServerError } from '../lib/errors';
 import { verifyAssignmentAccess } from './ownership';
 import { getNotificationKeys } from './notifications.server';
+import { sendConsultationEmail } from '../lib/consultation-email';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -318,7 +319,6 @@ export async function listPendingConsultationsHandler(args: {
     });
   }
 }
-
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
 
 async function fetchConsultationForUpdate(tx: Tx, consultationId: number, instructorId: string) {
@@ -343,7 +343,6 @@ async function fetchConsultationForUpdate(tx: Tx, consultationId: number, instru
     .for('update', { of: consultations });
 }
 
-// Instructor verifies a consultation. Sets status to verified, records who verified it and when.
 export async function verifyConsultationHandler(args: { data: VerifyConsultationInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
@@ -407,6 +406,7 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
       } catch (err) {
         console.error('Failed to log consultation verified audit event:', err);
       }
+      await sendConsultationEmail(auditData, session.user.name, consultationId, true);
     }
 
     return result;
@@ -418,7 +418,6 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
   }
 }
 
-// Instructor rejects a consultation with a reason.
 export async function rejectConsultationHandler(args: { data: RejectConsultationInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
@@ -485,6 +484,7 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
       } catch (err) {
         console.error('Failed to log consultation rejected audit event:', err);
       }
+      await sendConsultationEmail(auditData, session.user.name, consultationId, false, reason);
     }
 
     return result;

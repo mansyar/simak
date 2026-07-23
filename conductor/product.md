@@ -41,7 +41,7 @@ Students and instructors lack a centralized system to:
 - **File submissions** — Upload .docx/.pdf files (max 25MB) to Cloudflare R2 via presigned URLs
 - **Review workflow** — Instructors review submissions with Pass/Revise decisions, comments, and optional feedback files
 - **Consultation tracking** — Students log sessions; instructors verify; minimum consultation thresholds gate checkpoint unlocks
-- **In-app notifications** — Real-time alerts for submissions, reviews, revision requests, and deadline reminders
+- **Notifications** — Real-time in-app alerts and email notifications for submissions, reviews, revisions, consultations, extensions, and deadline reminders
 - **Deadline management** — Auto-locking overdue checkpoints, instructor override, SLA breach escalation (3-day review SLA)
 - **Bilingual i18n** — Full English and Indonesian language support
 - **Dark mode & responsive UI** — Light/dark themes, mobile-friendly, accessible (WCAG 2.1 AA)
@@ -450,6 +450,17 @@ Students and instructors lack a centralized system to:
 - **Next Review button instant** — Preloaded pending list makes the "Next Review" button instant (no post-review server call)
 - **i18n** — 6 new keys in EN and ID (`files.tooLargeForPreview`, `files.convertingDocx`, `shortcuts.cheatSheet.*`)
 - **Tests** — 2,784 tests pass across 290 test files; coverage ≥80% on all thresholds (lines 88.45%, statements 87.82%, branches 81.74%, functions 82.46%)
+
+### Track: Event Email Notifications (July 2026)
+
+- **Event email dispatch** — Extended the existing email queue infrastructure to dispatch email notifications for 8 event types: submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected/requested — alongside the existing in-app notifications
+- **Email template builder** — New `src/lib/email-templates.ts` with 8 localized (EN/ID) HTML email template-builder functions, each with full contextual details and a "View in SIMAK" deep-link button
+- **Advisory-only guarantee** — Email enqueue is post-commit and wrapped in try/catch; primary operations (submission, review, consultation, extension) always succeed even if email enqueue fails
+- **Recipient resolution** — New `resolveEmailRecipient(userId)` helper in `email.ts`; skips soft-deleted users and users without verified emails; locale resolved from DB `users.locale` column with English fallback
+- **Template type extension** — Extended `email_queue.template_type` from 4 to 12 values (existing: password_reset, invitation, sla_alert, two_factor; new: 8 event types)
+- **i18n** — 8 new email subject keys in EN and ID under `emails.subjects.*` (camelCase); subjects prefixed with `[SIMAK]` in code
+- **No processor changes** — Existing production-hardened email queue processor (30s cycle, `FOR UPDATE SKIP LOCKED`, exponential backoff) unchanged
+- **Tests** — 2,919 tests pass across 297 test files; coverage ≥80% on all thresholds (lines 88.91%, statements 88.29%, branches 81.78%, functions 84.02%)
 
 ### Track: Analytics & Reporting (TRACK-019) (July 2026)
 

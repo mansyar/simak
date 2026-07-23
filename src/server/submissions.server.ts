@@ -11,6 +11,7 @@ import { MAX_FILE_SIZE, validateUploadFileName } from '../lib/file-validation';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import { getNotificationKeys } from './notifications.server';
+import { sendSubmissionReceivedEmail } from '../lib/submission-email';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -51,6 +52,9 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
     const fileSize = sizeResult.size;
 
     let submissionId: number | undefined;
+    let instructorId: string | undefined;
+    let assignmentTitle: string | undefined;
+    let checkpointName: string | undefined;
 
     const result = await db.transaction(async (tx) => {
       // 1. Verify the checkpoint exists and belongs to the student via assignmentStudents
@@ -59,6 +63,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
           id: checkpoints.id,
           assignmentId: checkpoints.assignmentId,
           studentId: checkpoints.studentId,
+          name: checkpoints.name,
           state: checkpoints.state,
           minConsultations: checkpoints.minConsultations,
         })
@@ -209,6 +214,10 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
             submissionId: submissionRecord.id,
           },
         });
+
+        instructorId = instructorInfo.instructorId;
+        assignmentTitle = instructorInfo.assignmentTitle;
+        checkpointName = checkpoint.name;
       }
 
       return { success: true };
@@ -228,6 +237,17 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
       }
     } catch (err) {
       console.error('Failed to log submission.created audit event:', err);
+    }
+
+    // Post-commit advisory: enqueue email notification to instructor.
+    if (submissionId && instructorId && assignmentTitle && checkpointName) {
+      await sendSubmissionReceivedEmail({
+        instructorId,
+        studentName: session.user.name || 'A student',
+        assignmentName: assignmentTitle,
+        checkpointName,
+        submissionId,
+      });
     }
 
     return result;

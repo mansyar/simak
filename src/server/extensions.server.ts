@@ -6,8 +6,9 @@ import { extensionRequests } from '../db/schema/extensions';
 import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
-import { serverError, ErrorCode } from '../lib/errors';
+import { serverError, ErrorCode, isServerError } from '../lib/errors';
 import { getNotificationKeys } from './notifications.server';
+import { sendExtensionRequestedEmail } from '../lib/extension-email';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -220,6 +221,16 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
 
       return { extensionRequest: { id: request.id } };
     });
+
+    if (!isServerError(result)) {
+      await sendExtensionRequestedEmail({
+        instructorId: assignment.instructorId,
+        studentName: session.user.name,
+        assignmentId,
+        category,
+        durationRequested: extensionDays,
+      });
+    }
 
     return result;
   } catch (err) {

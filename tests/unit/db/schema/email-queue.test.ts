@@ -42,4 +42,28 @@ describe('EmailQueue schema', () => {
     expect(statusEnum).toContain('processing');
     expect(statusEnum).toEqual(expect.arrayContaining(['pending', 'processing', 'sent', 'failed']));
   });
+
+  it('should accept all 12 template_type values (4 existing + 8 new event types)', async () => {
+    const { emailQueue } = await import('@/db/schema/email-queue');
+    const templateTypeEnum = (emailQueue.templateType as any).enumValues as string[];
+    expect(templateTypeEnum).toEqual(
+      expect.arrayContaining([
+        // Existing auth email types
+        'password_reset',
+        'invitation',
+        'sla_alert',
+        'two_factor',
+        // New event email types (TRACK-018)
+        'submission_received',
+        'review_completed',
+        'revision_requested',
+        'consultation_verified',
+        'consultation_rejected',
+        'extension_approved',
+        'extension_rejected',
+        'extension_requested',
+      ]),
+    );
+    expect(templateTypeEnum).toHaveLength(12);
+  });
 });

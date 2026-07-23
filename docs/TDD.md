@@ -159,7 +159,13 @@ simak/
 │   │   └── config.ts         → Better-Auth setup
 │   ├── i18n/                 → Translation init + locale detection
 │   ├── lib/
-│   │   ├── email.ts          → Resend client
+│   │   ├── email.ts          → Resend client + `resolveEmailRecipient()` (returns `{email, locale}` or null for soft-deleted/unverified)
+    │   │   ├── email-templates.ts → 8 localized HTML template builders for event emails + shared header/footer helpers
+    │   │   ├── event-email.ts    → `enqueueEventEmail()` generic post-commit advisory email dispatch (never throws)
+    │   │   ├── submission-email.ts → `sendSubmissionReceivedEmail()` helper
+    │   │   ├── review-email.ts   → `sendReviewEmail()` helper (pass/revise)
+    │   │   ├── consultation-email.ts → `sendConsultationEmail()` helper (verified/rejected)
+    │   │   ├── extension-email.ts → `sendExtensionApprovedEmail()`, `sendExtensionRejectedEmail()`, `sendExtensionRequestedEmail()` helpers
 │   │   ├── storage.ts        → R2 client
 │   │   ├── toast.ts          → Toast helpers (showSuccessToast, showErrorToast) — wraps sonner
 │   │   ├── route-utils.ts    → Role-based dashboard routing utility
@@ -324,7 +330,7 @@ All 9 user-initiated mutation sites where the predicted state is deterministic u
 **NotificationPreference** — per-user, per-event, per-channel toggle. [v2]
 **ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, the affected student's subsequent checkpoint `dueDate` values auto-extend. The assignment-wide `finalDeadline` is immutable after creation and never mutated by extensions.
 **AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v1] — admin viewer at `/admin/audit-log`.
-**EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, and 2FA emails; extended to event notifications in [v2]. Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS. Admin queue inspector at `/admin/email-queue` provides observability — paginated list (20/page) with status filter, search (recipient email/subject), summary stats (pending/sent/failed), and manual retry of failed emails (idempotent: only `status='failed'` can be retried, resets to `pending` inside a `FOR UPDATE` transaction). Each row exposes a `resendMessageId` (populated from the Resend API `result.data.id` on successful send) displayed as a monospace truncated cell, enabling correlation with Resend's delivery dashboard. Processor sends emails in concurrent batches of 5 via `Promise.allSettled` (chunks run sequentially; partial failures don't abort the batch — cycle latency reduced from ~10× to ~2× single-send latency). Automatic retention cleanup prunes `sent` rows older than 90 days and `failed` rows older than 180 days on a tick-embedded 24-hour cycle (`lastPruneAt` timestamp in `email-queue-init.ts`); `pending`/`processing` rows are never deleted. Processor emits structured logs (`email_queue.cycle_start`, `email_queue.cycle_end`, `email_queue.reclaimed`, `email_queue.send_failed`, `email_queue.retention_pruned` — no PII). `EMAIL_FROM` is read from `getEnv().EMAIL_FROM` (Zod-validated in `src/config/env.ts` with default `'SIMAK <noreply@simak.app>'`).
+**EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, 2FA emails, SLA alerts, and **8 event notification types** (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested). Event emails are dispatched as post-commit advisory work via `enqueueEventEmail()` (`src/lib/event-email.ts`) alongside existing in-app notifications — the primary operation always succeeds even if enqueue fails. Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS. Admin queue inspector at `/admin/email-queue` provides observability — paginated list (20/page) with status filter, search (recipient email/subject), summary stats (pending/sent/failed), and manual retry of failed emails (idempotent: only `status='failed'` can be retried, resets to `pending` inside a `FOR UPDATE` transaction). Each row exposes a `resendMessageId` (populated from the Resend API `result.data.id` on successful send) displayed as a monospace truncated cell, enabling correlation with Resend's delivery dashboard. Processor sends emails in concurrent batches of 5 via `Promise.allSettled` (chunks run sequentially; partial failures don't abort the batch — cycle latency reduced from ~10× to ~2× single-send latency). Automatic retention cleanup prunes `sent` rows older than 90 days and `failed` rows older than 180 days on a tick-embedded 24-hour cycle (`lastPruneAt` timestamp in `email-queue-init.ts`); `pending`/`processing` rows are never deleted. Processor emits structured logs (`email_queue.cycle_start`, `email_queue.cycle_end`, `email_queue.reclaimed`, `email_queue.send_failed`, `email_queue.retention_pruned` — no PII). `EMAIL_FROM` is read from `getEnv().EMAIL_FROM` (Zod-validated in `src/config/env.ts` with default `'SIMAK <noreply@simak.app>'`).
 **TwoFactor** — TOTP configuration (secret, backup codes) managed by Better Auth's `twoFactor` plugin.
 **Session** — Better-Auth session token, FK to users, expiresAt.
 **Account** — Better-Auth credential provider entry (stores hashed password).
@@ -600,7 +606,7 @@ Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for t
 | recipientEmail | text, not null     |                                                                 |
 | subject        | text, not null     |                                                                 |
 | bodyHtml       | text, not null     |                                                                 |
-| templateType   | text, not null     | `password_reset` \| `invitation` \| `sla_alert` \| `two_factor` |
+| templateType   | text, not null     | `password_reset` \| `invitation` \| `sla_alert` \| `two_factor` \| `submission_received` \| `review_completed` \| `revision_requested` \| `consultation_verified` \| `consultation_rejected` \| `extension_approved` \| `extension_rejected` \| `extension_requested` (12 values — 4 original + 8 event types added in TRACK-018) |
 | status         | text, not null     | `pending` \| `processing` \| `sent` \| `failed`                 |
 | attempts       | integer, default 0 |                                                                 |
 | lastAttemptAt  | timestamp          | NULLABLE                                                        |
@@ -837,18 +843,21 @@ A checkpoint unlocks when:
 
 ### Events & Channels
 
-| Event                 | Trigger                      | In-app [v1]    | Email [v2]          |
+| Event                 | Trigger                      | In-app [v1]    | Email [v1]          |
 | --------------------- | ---------------------------- | -------------- | ------------------- |
 | invitation_sent       | Admin creates user           | —              | ✓                   |
 | password_setup        | Password set by user         | —              | ✓                   |
 | submission_received   | Student uploads file         | ✓ (instructor) | ✓ (instructor)      |
-| review_completed      | Instructor marks pass/revise | ✓ (student)    | ✓ (student)         |
+| review_completed      | Instructor marks pass/revise | ✓ (student)    | ✓ (student — pass)  |
 | revision_requested    | Instructor marks revise      | ✓ (student)    | ✓ (student)         |
 | deadline_approaching  | 24h / 1h before due date     | ✓              | ✓                   |
 | deadline_missed       | Checkpoint overdue           | ✓              | ✓                   |
-| consultation_verified | Instructor approves log      | ✓ (student)    | —                   |
-| extension_requested   | Student requests extension   | ✓ (instructor) | ✓ (instructor) [v2] |
-| sla_breach            | Instructor misses review SLA | ✓ (admin)      | —                   |
+| consultation_verified | Instructor approves log      | ✓ (student)    | ✓ (student)         |
+| consultation_rejected | Instructor rejects log       | ✓ (student)    | ✓ (student)         |
+| extension_requested   | Student requests extension   | ✓ (instructor) | ✓ (instructor)      |
+| extension_approved    | Instructor approves extension| ✓ (student)    | ✓ (student)         |
+| extension_rejected    | Instructor rejects extension | ✓ (student)    | ✓ (student)         |
+| sla_breach            | Instructor misses review SLA | ✓ (admin)      | ✓ (admin — via `sendSLAAlertEmail`) |
 
 ### In-App Delivery [v1]
 
@@ -863,8 +872,8 @@ A checkpoint unlocks when:
 
 ### Email Delivery
 
-- Sent via Resend API. [v1] for auth-related emails (invitations, password reset, 2FA enable/disable); [v2] for event notification emails (submission, review, deadline alerts).
-- **Localized email subjects:** Password reset, invitation, and SLA alert subjects are resolved from i18n keys (`emails.subjects.*`) using the recipient's `locale` preference via a shared server-side resolver (`resolveEmailSubject`).
+- Sent via Resend API. [v1] for all email types — auth-related emails (invitations, password reset, 2FA enable/disable), SLA alerts, and **8 event notification types** (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested). Event emails are dispatched as **post-commit advisory work** alongside existing in-app notifications via `enqueueEventEmail()` (`src/lib/event-email.ts`) — the primary operation always succeeds even if email enqueue fails. HTML templates are built by domain-specific helper functions in `src/lib/email-templates.ts` (8 builders + shared header/footer). Recipients with no verified email or soft-deleted accounts are silently skipped via `resolveEmailRecipient()` in `src/lib/email.ts`.
+- **Localized email subjects:** Password reset, invitation, SLA alert, and all 8 event notification subjects are resolved from i18n keys (`emails.subjects.*`) using the recipient's `locale` preference via a shared server-side resolver. Event email subjects are prefixed with `[SIMAK]` (e.g., `[SIMAK] New Submission Received`).
 - Email queue (`email_queue` table) with retry logic: 3 attempts with exponential backoff (30s, 5min, 30min).
 - Dead letter after 3 failed attempts (logged, not retried).
 - **Concurrent batch sends:** The processor sends emails in chunks of 5 via `Promise.allSettled` (chunks run sequentially). Each email's success/failure is handled individually in the settled callback (same UPDATE logic). Partial failures don't abort the batch. Cycle latency reduced from ~10× to ~2× single-send latency for a full batch of 10 (TRACK-016, PERF-32/33).
@@ -1163,7 +1172,7 @@ Server functions whose output crosses the network boundary to a route loader dec
 | **Dynamic text**    | Interpolation with parameters                                                    | `t('checkpoint.passed', { name: checkpoint.name })`        |
 | **Notifications**   | Store i18n `titleKey`/`messageKey` + `params` in DB. Resolve display strings at read time using recipient's locale. | `{ titleKey: 'notifications.events.review_completed.title', messageKey: '...', params: { checkpointName } }` |
 | **Date formatting** | Shared `formatDate(date, locale, style)` helper (`src/lib/format-date.ts`) renders dates in the user's locale (`id-ID` or `en-US`); replaces all `toLocaleDateString('en-US')` and bare `toLocaleDateString()` calls (Track: Accessibility & i18n Compliance). A companion module `src/lib/format.ts` exports locale-aware formatters — `formatDateShort` / `formatDateLong` / `formatDateTimeShort` (absolute) and `formatRelativeTime` (relative, via `date-fns` `formatDistanceToNow` + `localeMap`) — used where relative context aids comprehension: checkpoint due dates and student-dashboard upcoming deadlines append parenthesized relative time (e.g., "Mar 5, 2026 (in 3 days)"), and SLA badges expose relative time as a `title` tooltip across all variants (Track: Empty States, Date Display & Mobile Polish). | `formatDate(item.createdAt, locale, 'short')`, `formatDateShort(checkpoint.dueDate, locale)`, `formatRelativeTime(date, locale)` |
-| **Email templates** | Render at send time based on recipient's locale.                                 | Resend email body in `en` or `id`                          |
+| **Email templates** | 8 localized HTML template builders in `src/lib/email-templates.ts` + shared header/footer helpers. All user input HTML-escaped. Subjects via i18n keys (`emails.subjects.*`) prefixed `[SIMAK]`. | Resend email body in `en` or `id` |
 
 ### Files
 
@@ -1199,7 +1208,7 @@ Server functions whose output crosses the network boundary to a route loader dec
 | Vitest unit tests (gating logic, state transitions)                    | ✓        |               |
 | Group assignments                                                      |          | ✓             |
 | Two-factor authentication                                              | ✓        |               |
-| Email notifications (event alerts: submission, review, deadline)       |          | ✓             |
+| Email notifications (event alerts: submission, review, deadline, consultation, extension) | ✓        |             |
 | Push notifications (Web Push)                                          |          | ✓             |
 | Notification preferences                                               |          | ✓             |
 | Analytics dashboards (admin + instructor)                              | ✓        |               |

@@ -795,7 +795,15 @@
     "subjects": {
       "password_reset": "Reset Kata Sandi SIMAK Anda",
       "invitation": "Selamat Datang di SIMAK — Atur Kata Sandi Anda",
-      "sla_alert": "Peringatan Pelanggaran SLA — {assignmentTitle}"
+      "sla_alert": "Peringatan Pelanggaran SLA — {assignmentTitle}",
+      "submissionReceived": "Pengumpulan Tugas Diterima",
+      "reviewCompleted": "Penilaian Selesai",
+      "revisionRequested": "Revisi Diminta",
+      "consultationVerified": "Konsultasi Diverifikasi",
+      "consultationRejected": "Konsultasi Ditolak",
+      "extensionApproved": "Perpanjangan Disetujui",
+      "extensionRejected": "Perpanjangan Ditolak",
+      "extensionRequested": "Perpanjangan Diminta"
     }
   },
   "errors": {

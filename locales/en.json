@@ -795,7 +795,15 @@
     "subjects": {
       "password_reset": "Reset your SIMAK password",
       "invitation": "Welcome to SIMAK — Set up your password",
-      "sla_alert": "SLA Breach Alert — {assignmentTitle}"
+      "sla_alert": "SLA Breach Alert — {assignmentTitle}",
+      "submissionReceived": "Submission Received",
+      "reviewCompleted": "Review Completed",
+      "revisionRequested": "Revision Requested",
+      "consultationVerified": "Consultation Verified",
+      "consultationRejected": "Consultation Rejected",
+      "extensionApproved": "Extension Approved",
+      "extensionRejected": "Extension Rejected",
+      "extensionRequested": "Extension Requested"
     }
   },
   "errors": {

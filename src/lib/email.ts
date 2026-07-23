@@ -6,7 +6,19 @@ import { users } from '@/db/schema/users';
 import { resolveEmailSubject } from './i18n-server';
 import type { Locales } from '../i18n/types';
 
-export type TemplateType = 'password_reset' | 'invitation' | 'sla_alert' | 'two_factor';
+export type TemplateType =
+  | 'password_reset'
+  | 'invitation'
+  | 'sla_alert'
+  | 'two_factor'
+  | 'submission_received'
+  | 'review_completed'
+  | 'revision_requested'
+  | 'consultation_verified'
+  | 'consultation_rejected'
+  | 'extension_approved'
+  | 'extension_rejected'
+  | 'extension_requested';
 
 async function getUserLocaleByEmail(email: string): Promise<Locales> {
   try {
@@ -17,6 +29,31 @@ async function getUserLocaleByEmail(email: string): Promise<Locales> {
     return (user?.locale as Locales) ?? 'en';
   } catch {
     return 'en';
+  }
+}
+
+export async function resolveEmailRecipient(
+  userId: string,
+): Promise<{ email: string; locale: Locales } | null> {
+  try {
+    const [user] = await getDb()
+      .select({
+        email: users.email,
+        locale: users.locale,
+        emailVerified: users.emailVerified,
+        deletedAt: users.deletedAt,
+      })
+      .from(users)
+      .where(eq(users.id, userId));
+
+    if (!user) return null;
+    if (user.deletedAt !== null) return null;
+    if (!user.emailVerified) return null;
+
+    const locale: Locales = user.locale === 'en' || user.locale === 'id' ? user.locale : 'en';
+    return { email: user.email, locale };
+  } catch {
+    return null;
   }
 }
 
