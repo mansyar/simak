@@ -5,13 +5,13 @@
 
 ## Phase 1: Schema & Migration
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor on requirements and TDD protocol before starting Phase 1
-- [ ] Task: Create `deadline_reminders` table, `checkpoints` index, and email-queue enum extension
-    - [ ] Write Tests (Red): schema tests for `deadline_reminders` — table existence, FK cascade behavior (`checkpointId`→`checkpoints.id` onDelete cascade, `studentId`→`users.id` onDelete cascade), unique constraint `(checkpointId, tier)` enforcement (duplicate insert rejected), and `checkpoints_state_due_date_idx` index existence
-    - [ ] Implement (Green): add Drizzle schema for `deadline_reminders` (checkpointId FK, studentId FK, tier text, sentAt timestamp defaultNow, unique `(checkpointId, tier)`); add composite index `checkpoints_state_due_date_idx` on `checkpoints (state, dueDate)`; add `'deadline_reminder'` to the `templateType` array in `src/db/schema/email-queue.ts` (code-only — Drizzle text enum, no `ALTER TYPE`)
-    - [ ] Run `pnpm db:generate` + `pnpm db:migrate`; create rollback migration file (per SQL styleguide §5.1)
-    - [ ] Verify: migration applies cleanly, rollback works, unique constraint rejects duplicate `(checkpointId, tier)`, index exists, `pnpm typecheck` clean
-    - [ ] Commit: `feat(db): Add deadline_reminders table + checkpoints state/dueDate index`; attach git note; mark task `[x]` with commit SHA
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor on requirements and TDD protocol before starting Phase 1 (no code changes — read-only anchoring)
+- [x] Task: Create `deadline_reminders` table, `checkpoints` index, and email-queue enum extension [19fa03f]
+    - [x] Write Tests (Red): schema tests for `deadline_reminders` — table existence, FK cascade behavior (`checkpointId`→`checkpoints.id` onDelete cascade, `studentId`→`users.id` onDelete cascade), unique constraint `(checkpointId, tier)` enforcement (duplicate insert rejected), and `checkpoints_state_due_date_idx` index existence
+    - [x] Implement (Green): add Drizzle schema for `deadline_reminders` (checkpointId FK, studentId FK, tier text, sentAt timestamp defaultNow, unique `(checkpointId, tier)`); add composite index `checkpoints_state_due_date_idx` on `checkpoints (state, dueDate)`; add `'deadline_reminder'` to the `templateType` array in `src/db/schema/email-queue.ts` (code-only — Drizzle text enum, no `ALTER TYPE`)
+    - [x] Run `pnpm db:generate` + `pnpm db:migrate`; create rollback migration file (per SQL styleguide §5.1)
+    - [x] Verify: migration applies cleanly, rollback works, unique constraint rejects duplicate `(checkpointId, tier)`, index exists, `pnpm typecheck` clean
+    - [x] Commit: `feat(db): Add deadline_reminders table + checkpoints state/dueDate index`; attach git note; mark task `[x]` with commit SHA
 - [ ] Task: Conductor - User Manual Verification 'Schema & Migration' (Protocol in workflow.md)
 
 ## Phase 2: Scanner Core
