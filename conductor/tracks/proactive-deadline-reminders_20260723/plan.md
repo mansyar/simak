@@ -29,7 +29,7 @@
     - [ ] Commit: `feat(reminders): Hook deadline scanner into email-queue tick with hourly throttle`; attach git note; mark task `[x]` with commit SHA
 - [x] Task: Conductor - User Manual Verification 'Scanner Core' (Protocol in workflow.md)
 
-## Phase 3: Email Template, Helper & i18n
+## Phase 3: Email Template, Helper & i18n [checkpoint: 66ddba4]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor on requirements and TDD protocol before starting Phase 3
 - [x] Task: Email template builder + helper wrapper [094c78b]
