@@ -32,11 +32,11 @@ describe('0002_unique_submission_version migration', () => {
   });
 });
 
-describe('0010_deadline_reminders migration', () => {
-  const migrationPath = resolve(process.cwd(), 'drizzle/migrations/0010_deadline_reminders.sql');
+describe('0013_deadline_reminders migration', () => {
+  const migrationPath = resolve(process.cwd(), 'drizzle/migrations/0013_deadline_reminders.sql');
   const rollbackPath = resolve(
     process.cwd(),
-    'drizzle/migrations/rollback/0010_deadline_reminders.rollback.sql',
+    'drizzle/migrations/rollback/0013_deadline_reminders.rollback.sql',
   );
 
   it('creates deadline_reminders table with correct columns', () => {
