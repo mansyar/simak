@@ -3,16 +3,16 @@
 
 ## Phase 1: Settings Backend Refactor
 
-- [ ] Task: Read `spec.md` and `workflow.md` before starting phase implementation
-    - [ ] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read `spec.md` and `workflow.md` before starting phase implementation
+    - [x] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Extend `users.settings` type with `notificationPrefs` in schema
-    - [ ] Write failing tests for schema type extension (`tests/unit/db/schema/users.test.ts` — verify `notificationPrefs` field exists in type, defaults to undefined, accepts valid `Record<string, { email?: boolean; inApp?: boolean }>`)
-    - [ ] Implement `.$type<{ reducedMotion: boolean; notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }> }>()` on `users.settings` in `src/db/schema/users.ts:21`
-    - [ ] Run `pnpm test` — confirm new tests pass
+- [x] Task: Extend `users.settings` type with `notificationPrefs` in schema [c11acce]
+    - [x] Write failing tests for schema type extension (`tests/unit/db/schema/users.test.ts` — verify `notificationPrefs` field exists in type, defaults to undefined, accepts valid `Record<string, { email?: boolean; inApp?: boolean }>`)
+    - [x] Implement `.$type<{ reducedMotion: boolean; notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }> }>()` on `users.settings` in `src/db/schema/users.ts:21`
+    - [x] Run `pnpm test` — confirm new tests pass
 
-- [ ] Task: Refactor `updateUserSettingsHandler` from replace to merge (read-modify-write)
+- [~] Task: Refactor `updateUserSettingsHandler` from replace to merge (read-modify-write)
     - [ ] Write failing tests for merge behavior (`tests/unit/server/settings.test.ts` — merge preserves `reducedMotion` when saving `notificationPrefs`, preserves `notificationPrefs` when saving `reducedMotion`, default state when no prefs set)
     - [ ] Implement read-modify-write in `src/server/settings.server.ts:106-128`: `SELECT settings` → spread merge `{ ...existing, ...input }` → `UPDATE users SET settings = merged`
     - [ ] Run `pnpm test` — confirm merge tests pass
