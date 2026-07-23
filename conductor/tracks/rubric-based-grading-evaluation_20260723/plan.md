@@ -119,10 +119,10 @@
     - [x] Implement: Extend `analytics-admin.server.ts` with rubric metrics. Create dedicated rubric analytics view/section
     - [x] Verify: `pnpm test` passes
 
-- [~] Task: CSV/Excel export for per-student criterion scores
-    - [ ] Write failing tests: Export tests — CSV and Excel output includes per-student criterion scores, valid format, CSV injection mitigation
-    - [ ] Implement: Extend `analytics-export.server.ts` + `src/lib/excel-export.ts` with rubric score columns
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: CSV/Excel export for per-student criterion scores (303045c)
+    - [x] Write failing tests: Export tests — CSV and Excel output includes per-student criterion scores, valid format, CSV injection mitigation
+    - [x] Implement: Extend `analytics-export.server.ts` + `src/lib/excel-export.ts` with rubric score columns
+    - [x] Verify: `pnpm test` passes
 
 - [ ] Task: i18n keys for all rubric labels
     - [ ] Write failing tests: i18n parity test — all new `rubrics.*` keys present in both `locales/en.json` and `locales/id.json`
