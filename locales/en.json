@@ -248,7 +248,11 @@
       "minConsPlaceholder": "0",
       "durationPlaceholder": "7",
       "minConsHint": "Verified consultations required before submission",
-      "durationHint": "Days allotted for this checkpoint"
+      "durationHint": "Days allotted for this checkpoint",
+      "gradingType": "Grading Type",
+      "gradingTypeNone": "No Rubric (Pass/Fail)",
+      "gradingTypeNumeric": "Numeric (0–100)",
+      "gradingTypeQualitative": "Qualitative Levels"
     },
     "actions": {
       "edit": "Edit",

@@ -1,12 +1,23 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Plus, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
 
+type GradingType = 'numeric' | 'qualitative' | null;
+
 interface CheckpointData {
+  id?: number;
   name: string;
   minConsultations: number;
   estimatedDuration?: number;
+  gradingType?: GradingType;
 }
 
 interface CheckpointListEditorProps {
@@ -18,6 +29,7 @@ interface CheckpointListEditorProps {
   onEstimatedDurationChange: (index: number, value: number) => void;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
+  onGradingTypeChange?: (index: number, gradingType: GradingType) => void;
   errors?: (string | undefined)[];
 }
 
@@ -30,6 +42,7 @@ export function CheckpointListEditor({
   onEstimatedDurationChange,
   onMoveUp,
   onMoveDown,
+  onGradingTypeChange,
   errors,
 }: CheckpointListEditorProps) {
   const { t } = useI18n();
@@ -58,83 +71,113 @@ export function CheckpointListEditor({
       </div>
       <div className="space-y-2">
         {checkpoints.map((checkpoint, index) => (
-          <div key={index} className="flex flex-col sm:flex-row sm:items-start gap-2">
-            <div className="flex flex-col pt-1.5">
+          <div key={index} className="space-y-1">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-2">
+              <div className="flex flex-col pt-1.5">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  type="button"
+                  onClick={() => onMoveUp(index)}
+                  disabled={index === 0}
+                  className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label={t('adminTemplates.form.moveUp')}
+                >
+                  <ChevronUp className="h-3 w-3" aria-hidden="true" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  type="button"
+                  onClick={() => onMoveDown(index)}
+                  disabled={index === checkpoints.length - 1}
+                  className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label={t('adminTemplates.form.moveDown')}
+                >
+                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                </Button>
+              </div>
+              <div className="flex-1 space-y-1">
+                <Input
+                  value={checkpoint.name}
+                  onChange={(e) => onChange(index, e.target.value)}
+                  placeholder={t('adminTemplates.form.checkpointName')}
+                  data-testid={`checkpoint-input-${index}`}
+                />
+                {errors?.[index] && (
+                  <p className="text-sm text-destructive mt-1">{errors[index]}</p>
+                )}
+              </div>
+              <div className="w-28 space-y-1">
+                <Input
+                  type="number"
+                  min={0}
+                  value={checkpoint.minConsultations}
+                  onChange={(e) =>
+                    onMinConsultationsChange(index, Math.max(0, Number(e.target.value)))
+                  }
+                  placeholder={t('adminTemplates.form.minConsPlaceholder')}
+                  data-testid={`checkpoint-min-cons-${index}`}
+                  aria-label={t('adminTemplates.form.minConsultations')}
+                />
+                <p className="text-[10px] leading-tight text-muted-foreground">
+                  {t('adminTemplates.form.minConsHint')}
+                </p>
+              </div>
+              <div className="w-24 space-y-1">
+                <Input
+                  type="number"
+                  min={0}
+                  value={checkpoint.estimatedDuration ?? 7}
+                  onChange={(e) =>
+                    onEstimatedDurationChange(index, Math.max(0, Number(e.target.value)))
+                  }
+                  placeholder={t('adminTemplates.form.durationPlaceholder')}
+                  data-testid={`checkpoint-duration-${index}`}
+                  aria-label={t('adminTemplates.form.estimatedDuration')}
+                />
+                <p className="text-[10px] leading-tight text-muted-foreground">
+                  {t('adminTemplates.form.durationHint')}
+                </p>
+              </div>
               <Button
+                type="button"
                 variant="ghost"
                 size="icon"
-                type="button"
-                onClick={() => onMoveUp(index)}
-                disabled={index === 0}
-                className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
-                aria-label={t('adminTemplates.form.moveUp')}
+                onClick={() => onRemove(index)}
+                disabled={checkpoints.length <= 1}
+                className="mt-1"
+                aria-label={t('adminTemplates.form.removeCheckpoint')}
               >
-                <ChevronUp className="h-3 w-3" aria-hidden="true" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                type="button"
-                onClick={() => onMoveDown(index)}
-                disabled={index === checkpoints.length - 1}
-                className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
-                aria-label={t('adminTemplates.form.moveDown')}
-              >
-                <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
-            <div className="flex-1 space-y-1">
-              <Input
-                value={checkpoint.name}
-                onChange={(e) => onChange(index, e.target.value)}
-                placeholder={t('adminTemplates.form.checkpointName')}
-                data-testid={`checkpoint-input-${index}`}
-              />
-              {errors?.[index] && <p className="text-sm text-destructive mt-1">{errors[index]}</p>}
-            </div>
-            <div className="w-28 space-y-1">
-              <Input
-                type="number"
-                min={0}
-                value={checkpoint.minConsultations}
-                onChange={(e) =>
-                  onMinConsultationsChange(index, Math.max(0, Number(e.target.value)))
-                }
-                placeholder={t('adminTemplates.form.minConsPlaceholder')}
-                data-testid={`checkpoint-min-cons-${index}`}
-                aria-label={t('adminTemplates.form.minConsultations')}
-              />
-              <p className="text-[10px] leading-tight text-muted-foreground">
-                {t('adminTemplates.form.minConsHint')}
-              </p>
-            </div>
-            <div className="w-24 space-y-1">
-              <Input
-                type="number"
-                min={0}
-                value={checkpoint.estimatedDuration ?? 7}
-                onChange={(e) =>
-                  onEstimatedDurationChange(index, Math.max(0, Number(e.target.value)))
-                }
-                placeholder={t('adminTemplates.form.durationPlaceholder')}
-                data-testid={`checkpoint-duration-${index}`}
-                aria-label={t('adminTemplates.form.estimatedDuration')}
-              />
-              <p className="text-[10px] leading-tight text-muted-foreground">
-                {t('adminTemplates.form.durationHint')}
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => onRemove(index)}
-              disabled={checkpoints.length <= 1}
-              className="mt-1"
-              aria-label={t('adminTemplates.form.removeCheckpoint')}
-            >
-              <X className="h-4 w-4" aria-hidden="true" />
-            </Button>
+            {checkpoint.id !== undefined && (
+              <div className="flex items-center gap-2 pl-12">
+                <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                  {t('adminTemplates.form.gradingType')}
+                </label>
+                <Select
+                  value={checkpoint.gradingType ?? 'none'}
+                  onValueChange={(val) =>
+                    onGradingTypeChange?.(index, val === 'none' ? null : (val as GradingType))
+                  }
+                >
+                  <SelectTrigger size="sm" className="w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t('adminTemplates.form.gradingTypeNone')}</SelectItem>
+                    <SelectItem value="numeric">
+                      {t('adminTemplates.form.gradingTypeNumeric')}
+                    </SelectItem>
+                    <SelectItem value="qualitative">
+                      {t('adminTemplates.form.gradingTypeQualitative')}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
         ))}
       </div>

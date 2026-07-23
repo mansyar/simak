@@ -182,6 +182,7 @@ export async function getTemplateHandler(args: { data: TemplateIdParam }) {
         order: templateCheckpoints.order,
         minConsultations: templateCheckpoints.minConsultations,
         estimatedDuration: templateCheckpoints.estimatedDuration,
+        gradingType: templateCheckpoints.gradingType,
       })
       .from(templateCheckpoints)
       .where(and(eq(templateCheckpoints.templateId, id), isNull(templateCheckpoints.deletedAt)))
@@ -249,6 +250,7 @@ export async function createTemplateHandler(args: { data: CreateTemplateInput })
           order: cp.order,
           minConsultations: cp.minConsultations ?? 0,
           estimatedDuration: cp.estimatedDuration ?? 7,
+          gradingType: null,
         })),
         assignmentCount: 0,
       },
@@ -417,6 +419,7 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
           order: cp.order,
           minConsultations: cp.minConsultations ?? 0,
           estimatedDuration: cp.estimatedDuration ?? 7,
+          gradingType: null,
         })),
         assignmentCount: 0,
       },

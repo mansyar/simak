@@ -248,7 +248,11 @@
       "minConsPlaceholder": "0",
       "durationPlaceholder": "7",
       "minConsHint": "Konsultasi terverifikasi diperlukan sebelum pengumpulan",
-      "durationHint": "Hari yang dialokasikan untuk checkpoint ini"
+      "durationHint": "Hari yang dialokasikan untuk checkpoint ini",
+      "gradingType": "Jenis Penilaian",
+      "gradingTypeNone": "Tanpa Rubrik (Lulus/Revisi)",
+      "gradingTypeNumeric": "Numerik (0–100)",
+      "gradingTypeQualitative": "Level Kualitatif"
     },
     "actions": {
       "edit": "Ubah",

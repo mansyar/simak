@@ -116,6 +116,7 @@ export interface TemplateDetail {
     order: number;
     minConsultations: number | null;
     estimatedDuration: number | null;
+    gradingType: 'numeric' | 'qualitative' | null;
   }[];
   assignmentCount: number;
 }

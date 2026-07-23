@@ -254,6 +254,10 @@ export type Translation = {
       durationPlaceholder: string
       minConsHint: string
       durationHint: string
+      gradingType: string
+      gradingTypeNone: string
+      gradingTypeNumeric: string
+      gradingTypeQualitative: string
     }
     actions: {
       edit: string
