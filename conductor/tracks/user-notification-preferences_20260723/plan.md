@@ -26,11 +26,11 @@
 
 ## Phase 2: Preference Gates
 
-- [ ] Task: Read `spec.md` and `workflow.md` before starting phase implementation
-    - [ ] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read `spec.md` and `workflow.md` before starting phase implementation
+    - [x] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Create `shouldSendInAppNotification` helper in `src/lib/notification-prefs.ts`
+- [x] Task: Create `shouldSendInAppNotification` helper in `src/lib/notification-prefs.ts` [f3590bf]
     - [ ] Write failing tests (`tests/unit/lib/notification-prefs.test.ts` — returns `false` only when `inApp === false`, returns `true` when absent/undefined, returns `true` for missing type key, returns `true` for null/undefined settings)
     - [ ] Implement `shouldSendInAppNotification(settings: unknown, type: string): boolean` — pure function
     - [ ] Run `pnpm test` — confirm helper tests pass
