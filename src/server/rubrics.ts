@@ -112,6 +112,10 @@ export const GetRubricSchema = z.object({
   templateCheckpointId: z.coerce.number().int().positive(),
 });
 
+export const CountPendingReviewsSchema = z.object({
+  templateCheckpointId: z.coerce.number().int().positive(),
+});
+
 // ── Server function stubs ─────────────────────────────────────────
 
 export const saveRubric = createServerFn({ method: 'POST' })
@@ -142,6 +146,13 @@ export const softDeleteLevel = createServerFn({ method: 'POST' })
     return softDeleteLevelHandler({ data });
   });
 
+export const countPendingReviews = createServerFn({ method: 'GET' })
+  .inputValidator(CountPendingReviewsSchema)
+  .handler(async ({ data }) => {
+    const { countPendingReviewsHandler } = await import('./rubrics.server');
+    return countPendingReviewsHandler({ data });
+  });
+
 // ── Return types (for consumers that call via useServerFn) ─────────
 
 export interface RubricCriterion {
@@ -169,3 +180,4 @@ export interface RubricData {
 export type GetRubricResult = RubricData | ServerError;
 export type SaveRubricResult = { success: true } | ServerError;
 export type DeleteResult = { success: true } | ServerError;
+export type CountPendingReviewsResult = { count: number } | ServerError;

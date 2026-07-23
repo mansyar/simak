@@ -3,16 +3,19 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 const mockGetRubric = vi.hoisted(() => vi.fn());
 const mockSaveRubric = vi.hoisted(() => vi.fn());
+const mockCountPendingReviews = vi.hoisted(() => vi.fn());
 
 vi.mock('@/server/rubrics', () => ({
   getRubric: { __rubricFn: 'getRubric' },
   saveRubric: { __rubricFn: 'saveRubric' },
+  countPendingReviews: { __rubricFn: 'countPendingReviews' },
 }));
 
 vi.mock('@tanstack/react-start', () => ({
   useServerFn: vi.fn((fn: any) => {
     if (fn?.__rubricFn === 'getRubric') return mockGetRubric;
     if (fn?.__rubricFn === 'saveRubric') return mockSaveRubric;
+    if (fn?.__rubricFn === 'countPendingReviews') return mockCountPendingReviews;
     return vi.fn();
   }),
   createServerFn: vi.fn().mockReturnValue({
@@ -45,6 +48,10 @@ vi.mock('@/routes/__root', () => ({
         'rubrics.levels.labelPlaceholder': 'Level label',
         'rubrics.levels.descriptionPlaceholder': 'Description (optional)',
         'rubrics.levels.scoreLabel': 'Score',
+        'rubrics.criteria.pendingReviewsTitle': 'Pending Reviews Affected',
+        'rubrics.criteria.pendingReviewsWarning': '{count} pending review(s) will be affected.',
+        'common.cancel': 'Cancel',
+        'common.confirm': 'Confirm',
       };
       let result = translations[key] || key;
       if (params) {
@@ -94,6 +101,16 @@ vi.mock('@/components/admin/templates/RubricLevelsEditor', () => ({
   ),
 }));
 
+vi.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ open, children }: any) =>
+    open ? <div data-testid="confirm-dialog">{children}</div> : null,
+  DialogContent: ({ children }: any) => <div>{children}</div>,
+  DialogHeader: ({ children }: any) => <div>{children}</div>,
+  DialogTitle: ({ children }: any) => <h2>{children}</h2>,
+  DialogDescription: ({ children }: any) => <p>{children}</p>,
+  DialogFooter: ({ children }: any) => <div className="footer">{children}</div>,
+}));
+
 import { RubricCriteriaEditor } from '@/components/admin/templates/RubricCriteriaEditor';
 
 describe('RubricCriteriaEditor', () => {
@@ -101,6 +118,7 @@ describe('RubricCriteriaEditor', () => {
     vi.clearAllMocks();
     mockGetRubric.mockResolvedValue({ gradingType: 'numeric', criteria: [], levels: [] });
     mockSaveRubric.mockResolvedValue({ success: true });
+    mockCountPendingReviews.mockResolvedValue({ count: 0 });
   });
 
   it('should show loading state initially', () => {

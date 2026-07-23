@@ -1,8 +1,9 @@
 // Server-only handler implementations (not bundled for client)
-import { eq, inArray, and, isNull, asc } from 'drizzle-orm';
+import { eq, inArray, and, isNull, asc, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { rubricCriteria, rubricLevels } from '../db/schema/rubrics';
 import { templateCheckpoints } from '../db/schema/templates';
+import { checkpoints } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
@@ -13,15 +14,18 @@ import type {
   DeleteCriterionSchema,
   DeleteLevelSchema,
   GetRubricSchema,
+  CountPendingReviewsSchema,
   SaveRubricResult,
   GetRubricResult,
   DeleteResult,
+  CountPendingReviewsResult,
 } from './rubrics';
 
 type SaveRubricInput = z.infer<typeof SaveRubricSchema>;
 type DeleteCriterionInput = z.infer<typeof DeleteCriterionSchema>;
 type DeleteLevelInput = z.infer<typeof DeleteLevelSchema>;
 type GetRubricInput = z.infer<typeof GetRubricSchema>;
+type CountPendingReviewsInput = z.infer<typeof CountPendingReviewsSchema>;
 
 function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && (session.user.role === 'admin' || session.user.role === 'superadmin');
@@ -396,6 +400,41 @@ export async function softDeleteLevelHandler({
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
       handler: 'softDeleteLevelHandler',
+    });
+  }
+}
+
+/**
+ * Count pending reviews (checkpoints in submitted/under_review state) for a template checkpoint.
+ * Used to warn admins before saving rubric edits that affect in-progress reviews.
+ */
+export async function countPendingReviewsHandler({
+  data,
+}: {
+  data: CountPendingReviewsInput;
+}): Promise<CountPendingReviewsResult> {
+  const session = await getSessionFromHeaders();
+  if (!isAdmin(session)) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+
+  const { templateCheckpointId } = data;
+  const db = getDb();
+
+  try {
+    const [result] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(checkpoints)
+      .where(
+        and(
+          eq(checkpoints.templateCheckpointId, templateCheckpointId),
+          inArray(checkpoints.state, ['submitted', 'under_review']),
+        ),
+      );
+
+    return { count: result?.count ?? 0 };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'countPendingReviewsHandler',
     });
   }
 }

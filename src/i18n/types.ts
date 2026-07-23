@@ -1038,6 +1038,8 @@ export type Translation = {
       weightSum: string
       save: string
       saving: string
+      pendingReviewsTitle: string
+      pendingReviewsWarning: string
     }
     levels: {
       add: string

@@ -5,6 +5,7 @@ import {
   getRubricHandler,
   softDeleteCriterionHandler,
   softDeleteLevelHandler,
+  countPendingReviewsHandler,
 } from '@/server/rubrics.server';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { RubricData } from '@/server/rubrics';
@@ -359,6 +360,60 @@ describe('Rubric server handlers', () => {
 
       expect(result).toEqual({ success: true });
       expect(mockDb.update).toHaveBeenCalledWith(rubricLevels);
+    });
+  });
+
+  // ── countPendingReviewsHandler ────────────────────────────────────
+
+  describe('countPendingReviewsHandler', () => {
+    it('should fail if unauthorized', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+      const result = await countPendingReviewsHandler({ data: { templateCheckpointId: 1 } });
+      expect(result).toEqual(serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized'));
+    });
+
+    it('should fail if non-admin', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession);
+      const result = await countPendingReviewsHandler({ data: { templateCheckpointId: 1 } });
+      expect(result).toEqual(serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized'));
+    });
+
+    it('should return count of pending reviews', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
+      mockThenOnce([{ count: 3 }]);
+
+      const result = await countPendingReviewsHandler({ data: { templateCheckpointId: 1 } });
+
+      expect(result).toEqual({ count: 3 });
+    });
+
+    it('should return 0 when no pending reviews', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
+      mockThenOnce([{ count: 0 }]);
+
+      const result = await countPendingReviewsHandler({ data: { templateCheckpointId: 1 } });
+
+      expect(result).toEqual({ count: 0 });
+    });
+
+    it('should allow superadmin', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(superAdminSession);
+      mockThenOnce([{ count: 5 }]);
+
+      const result = await countPendingReviewsHandler({ data: { templateCheckpointId: 1 } });
+
+      expect(result).toEqual({ count: 5 });
+    });
+
+    it('should return INTERNAL error on failure', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
+      mockDb.then.mockImplementationOnce(() => {
+        throw new Error('DB error');
+      });
+
+      const result = await countPendingReviewsHandler({ data: { templateCheckpointId: 1 } });
+
+      expect(result).toEqual(serverError(ErrorCode.INTERNAL, 'Internal Server Error'));
     });
   });
 });

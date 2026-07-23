@@ -1,8 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useServerFn } from '@tanstack/react-start';
-import { getRubric, saveRubric } from '@/server/rubrics';
+import { getRubric, saveRubric, countPendingReviews } from '@/server/rubrics';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Plus, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { RubricLevelsEditor, type LevelInput } from './RubricLevelsEditor';
 import { useI18n } from '../../../routes/__root';
@@ -27,6 +35,7 @@ export function RubricCriteriaEditor({
   const { t } = useI18n();
   const getRubricFn = useServerFn(getRubric);
   const saveRubricFn = useServerFn(saveRubric);
+  const countPendingReviewsFn = useServerFn(countPendingReviews);
 
   const [criteria, setCriteria] = useState<CriterionInput[]>([]);
   const [levels, setLevels] = useState<LevelInput[]>([]);
@@ -34,6 +43,8 @@ export function RubricCriteriaEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -119,8 +130,7 @@ export function RubricCriteriaEditor({
     });
   }, []);
 
-  const handleSave = async () => {
-    if (!isValid || isSaving) return;
+  const doSave = async () => {
     setIsSaving(true);
     setError(null);
     setSaveSuccess(false);
@@ -143,6 +153,25 @@ export function RubricCriteriaEditor({
       setError(t('rubrics.criteria.saveError'));
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!isValid || isSaving) return;
+    try {
+      const countResult = await countPendingReviewsFn({ data: { templateCheckpointId } });
+      if (countResult && 'error' in countResult) {
+        setError(countResult.error.message);
+        return;
+      }
+      if (countResult.count > 0) {
+        setPendingCount(countResult.count);
+        setShowConfirmDialog(true);
+        return;
+      }
+      await doSave();
+    } catch {
+      setError(t('rubrics.criteria.saveError'));
     }
   };
 
@@ -241,6 +270,35 @@ export function RubricCriteriaEditor({
       >
         {isSaving ? t('rubrics.criteria.saving') : t('rubrics.criteria.save')}
       </Button>
+
+      <Dialog
+        open={showConfirmDialog}
+        onOpenChange={(open) => {
+          if (!open) setShowConfirmDialog(false);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('rubrics.criteria.pendingReviewsTitle')}</DialogTitle>
+            <DialogDescription>
+              {t('rubrics.criteria.pendingReviewsWarning', { count: String(pendingCount) })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              onClick={() => {
+                setShowConfirmDialog(false);
+                doSave();
+              }}
+            >
+              {t('common.confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

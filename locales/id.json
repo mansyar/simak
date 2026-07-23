@@ -1032,7 +1032,9 @@
       "moveDown": "Turun",
       "weightSum": "Jumlah bobot: {sum}/100",
       "save": "Simpan Rubrik",
-      "saving": "Menyimpan..."
+      "saving": "Menyimpan...",
+      "pendingReviewsTitle": "Ulasan Tertunda Terpengaruh",
+      "pendingReviewsWarning": "{count} ulasan tertunda akan terpengaruh oleh perubahan ini."
     },
     "levels": {
       "add": "Tambah Level",

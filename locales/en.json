@@ -1032,7 +1032,9 @@
       "moveDown": "Move Down",
       "weightSum": "Weight sum: {sum}/100",
       "save": "Save Rubric",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "pendingReviewsTitle": "Pending Reviews Affected",
+      "pendingReviewsWarning": "{count} pending review(s) will be affected by this change."
     },
     "levels": {
       "add": "Add Level",
