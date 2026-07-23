@@ -12,15 +12,15 @@
     - [x] Implement `.$type<{ reducedMotion: boolean; notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }> }>()` on `users.settings` in `src/db/schema/users.ts:21`
     - [x] Run `pnpm test` — confirm new tests pass
 
-- [~] Task: Refactor `updateUserSettingsHandler` from replace to merge (read-modify-write)
-    - [ ] Write failing tests for merge behavior (`tests/unit/server/settings.test.ts` — merge preserves `reducedMotion` when saving `notificationPrefs`, preserves `notificationPrefs` when saving `reducedMotion`, default state when no prefs set)
-    - [ ] Implement read-modify-write in `src/server/settings.server.ts:106-128`: `SELECT settings` → spread merge `{ ...existing, ...input }` → `UPDATE users SET settings = merged`
-    - [ ] Run `pnpm test` — confirm merge tests pass
+- [x] Task: Refactor `updateUserSettingsHandler` from replace to merge (read-modify-write) [a7bd19a]
+    - [x] Write failing tests for merge behavior (`tests/unit/server/settings.test.ts` — merge preserves `reducedMotion` when saving `notificationPrefs`, preserves `notificationPrefs` when saving `reducedMotion`, default state when no prefs set)
+    - [x] Implement read-modify-write in `src/server/settings.server.ts:106-128`: `SELECT settings` → spread merge `{ ...existing, ...input }` → `UPDATE users SET settings = merged`
+    - [x] Run `pnpm test` — confirm merge tests pass
 
-- [ ] Task: Extend `UpdateUserSettingsSchema` with optional `notificationPrefs` Zod field
-    - [ ] Write failing tests for Zod validation (`tests/unit/server/settings.test.ts` — accepts valid `notificationPrefs` record, rejects malformed prefs, accepts absent/undefined prefs)
-    - [ ] Implement `notificationPrefs: z.record(z.string(), z.object({ email: z.boolean().optional(), inApp: z.boolean().optional() })).optional()` in `src/server/settings.ts:10-12`
-    - [ ] Run `pnpm test` — confirm Zod validation tests pass
+- [x] Task: Extend `UpdateUserSettingsSchema` with optional `notificationPrefs` Zod field [a7bd19a]
+    - [x] Write failing tests for Zod validation (`tests/unit/server/settings.test.ts` — accepts valid `notificationPrefs` record, rejects malformed prefs, accepts absent/undefined prefs)
+    - [x] Implement `notificationPrefs: z.record(z.string(), z.object({ email: z.boolean().optional(), inApp: z.boolean().optional() })).optional()` in `src/server/settings.ts:10-12`
+    - [x] Run `pnpm test` — confirm Zod validation tests pass
 
 - [ ] Task: Conductor - User Manual Verification 'Settings Backend Refactor' (Protocol in workflow.md)
 
