@@ -1,5 +1,7 @@
-import { pgTable, text, timestamp, serial, integer, index } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, serial, integer, index, pgEnum } from 'drizzle-orm/pg-core';
 import { users } from './users';
+
+export const gradingType = pgEnum('grading_type', ['numeric', 'qualitative']);
 
 export const assignmentTemplates = pgTable('assignment_templates', {
   id: serial('id').primaryKey(),
@@ -22,6 +24,7 @@ export const templateCheckpoints = pgTable(
     order: integer('order').notNull(),
     minConsultations: integer('min_consultations').default(0),
     estimatedDuration: integer('estimated_duration').default(0),
+    gradingType: gradingType('grading_type'),
     createdAt: timestamp('created_at').defaultNow(),
   },
   (table) => [

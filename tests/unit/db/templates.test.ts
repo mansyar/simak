@@ -27,5 +27,12 @@ describe('Assignment templates schema', () => {
     expect(templateCheckpoints).toHaveProperty('minConsultations');
     expect(templateCheckpoints).toHaveProperty('estimatedDuration');
     expect(templateCheckpoints).toHaveProperty('createdAt');
+    expect(templateCheckpoints).toHaveProperty('gradingType');
+  });
+
+  it('should export gradingType enum with numeric and qualitative values', async () => {
+    const { gradingType } = await import('@/db/schema/templates');
+    expect(gradingType).toBeDefined();
+    expect(gradingType.enumValues).toEqual(['numeric', 'qualitative']);
   });
 });
