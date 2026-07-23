@@ -98,7 +98,7 @@
 
 ## Phase 4: Student View, Analytics & i18n
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 4
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 4
 - [ ] Task: Extend `getLatestReviewHandler` to return `review_scores`
     - [ ] Write failing tests: Handler tests — `getLatestReviewHandler` returns `review_scores` including denormalized `criterionTitle`, `levelLabel`, and `weight` snapshot fields. Returns scores for soft-deleted criteria via snapshot
     - [ ] Implement: Extend `getLatestReviewHandler` (`src/server/reviews-extras.server.ts:89`) to fetch and return `review_scores`
