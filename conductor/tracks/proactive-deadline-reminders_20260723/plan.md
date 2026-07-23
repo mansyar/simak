@@ -47,5 +47,5 @@
     - [ ] Verify `deadlineBreachRate` analytics metric unaffected (read-only dependency — no query changes)
     - [ ] Verify all new files ≤500 lines (`scripts/check-modularity.js`)
     - [ ] Commit (if any cleanup): `chore(reminders): Final quality gate cleanup`; attach git note; mark task `[x]` with commit SHA
-- [ ] Task: Conductor - User Manual Verification 'Email Template, Helper & i18n' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Email Template, Helper & i18n' (Protocol in workflow.md)
 </protect>
