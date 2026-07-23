@@ -167,6 +167,137 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
       const result = await getLatestReviewHandler({ data: { checkpointId: 1 } });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     });
+
+    it('should return review_scores with denormalized snapshot fields', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 100 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 10,
+              decision: 'pass',
+              comment: 'Well done',
+              instructorName: 'Dr. Smith',
+              createdAt: new Date('2026-05-23'),
+            },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 1,
+              criterionId: 5,
+              criterionTitle: 'Content Quality',
+              score: 85,
+              weight: 50,
+              rubricLevelId: 3,
+              levelLabel: 'Good',
+              comment: 'Solid content',
+            },
+            {
+              id: 2,
+              criterionId: 6,
+              criterionTitle: 'Structure',
+              score: 90,
+              weight: 50,
+              rubricLevelId: null,
+              levelLabel: null,
+              comment: null,
+            },
+          ]).then(onfulfilled),
+        );
+      const result = (await getLatestReviewHandler({ data: { checkpointId: 100 } })) as any;
+      expect(result.review).toBeDefined();
+      expect(result.scores).toHaveLength(2);
+      expect(result.scores[0]).toMatchObject({
+        criterionTitle: 'Content Quality',
+        score: 85,
+        weight: 50,
+        levelLabel: 'Good',
+      });
+      expect(result.scores[1]).toMatchObject({
+        criterionTitle: 'Structure',
+        score: 90,
+        weight: 50,
+        levelLabel: null,
+      });
+    });
+
+    it('should return scores for soft-deleted criteria via snapshot', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 100 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 10,
+              decision: 'pass',
+              comment: 'Good',
+              instructorName: 'Dr. Smith',
+              createdAt: new Date('2026-05-23'),
+            },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 1,
+              criterionId: 999,
+              criterionTitle: 'Deleted Criterion',
+              score: 75,
+              weight: 100,
+              rubricLevelId: null,
+              levelLabel: null,
+              comment: 'Criterion was later removed',
+            },
+          ]).then(onfulfilled),
+        );
+      const result = (await getLatestReviewHandler({ data: { checkpointId: 100 } })) as any;
+      expect(result.scores).toHaveLength(1);
+      expect(result.scores[0].criterionTitle).toBe('Deleted Criterion');
+      expect(result.scores[0].weight).toBe(100);
+      expect(result.scores[0].criterionId).toBe(999);
+    });
+
+    it('should return empty scores array when no review_scores exist', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 100 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 10,
+              decision: 'pass',
+              comment: 'Good',
+              instructorName: 'Dr. Smith',
+              createdAt: new Date('2026-05-23'),
+            },
+          ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+      const result = (await getLatestReviewHandler({ data: { checkpointId: 100 } })) as any;
+      expect(result.review).toBeDefined();
+      expect(result.scores).toEqual([]);
+    });
+
+    it('should return empty scores array when no review exists', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([{ id: 100 }]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+      const result = (await getLatestReviewHandler({ data: { checkpointId: 100 } })) as any;
+      expect(result.review).toBeNull();
+      expect(result.scores).toEqual([]);
+    });
   });
 
   describe('getReviewDetailHandler', () => {
