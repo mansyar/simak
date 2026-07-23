@@ -58,7 +58,7 @@ Throughout this document, features are tagged as:
 │   ├── /instructor/assignments/new       → Assignment creation wizard [v1]
 │   ├── /instructor/assignments/$id       → Assignment detail (instructor view) [v1]
 │   ├── /instructor/reviews               → Review queue [v1]
-│   ├── /instructor/analytics             → Performance analytics [v2]
+│   ├── /instructor/analytics             → Instructor performance analytics [v1]
 │   └── /instructor/reports               → Report builder & history [v2]
 
 / (authenticated — admin)
@@ -70,7 +70,7 @@ Throughout this document, features are tagged as:
 │   ├── /admin/templates/$id              → Template editor [v1]
 │   ├── /admin/audit-log                  → Audit log viewer
 │   ├── /admin/email-queue                → Email queue inspector (paginated, filterable, retry failed) [v1]
-│   ├── /admin/analytics                  → System analytics [v2]
+│   ├── /admin/analytics                  → System analytics [v1]
 │   └── /admin/settings                   → System configuration [v2]
 
 / (unauthenticated)
@@ -144,7 +144,11 @@ simak/
 │   │   ├── dashboard.server.ts → Re-exports from per-role handler files
 │   │   ├── dashboard-student.server.ts → Student dashboard handler
 │   │   ├── dashboard-instructor.server.ts → Instructor dashboard handler
-    │   │   └── dashboard-admin.server.ts → Admin dashboard handler
+    │   │   ├── dashboard-admin.server.ts → Admin dashboard handler
+    │   │   ├── analytics.ts          → Analytics stubs (admin/instructor data + CSV export) + Zod schemas
+    │   │   ├── analytics-admin.server.ts → Admin aggregate queries (verification rate, breach rate, trends, DAU/WAU)
+    │   │   ├── analytics-instructor.server.ts → Instructor-scoped metrics (response time, SLA breaches)
+    │   │   ├── analytics-export.server.ts → CSV export handlers (users, audit log, progress, review history)
     │   │   ├── bulk-import.ts      → Bulk import server fn stubs + Zod schemas (users, templates)
     │   │   └── bulk-import.server.ts → Server-only bulk import handlers (parse, validate, insert)
 │   ├── db/
@@ -209,6 +213,23 @@ Each role gets a dedicated dashboard page rendered within its role layout (`_stu
 Widget data is fetched via a single **aggregated server function** per role. Each handler verifies session + role, executes multiple Drizzle queries, and returns a pre-shaped payload. All widgets show appropriate empty states when no data is available.
 
 Query key: `['dashboard']` with role differentiation handled server-side.
+
+### Analytics & Reporting [v1] (Track: Analytics & Reporting)
+
+Role-based analytics dashboards complement (do not duplicate) the real-time operational dashboards. Dashboards show current snapshots; analytics show historical trends and NEW metrics over selectable date ranges.
+
+- **Routes:** `/admin/analytics` (admin/superadmin via `requireRole(['admin'])`) and `/instructor/analytics` (instructor via `requireRole(['instructor'])`). Both are linked from their role-specific sidebars (BarChart3 icon).
+- **Date range:** URL search params drive the range (`?range=7d|30d|90d|all`) with optional custom start/end. Routes use `validateSearch` + `loaderDeps` so URLs are shareable and back/forward navigation works. A shared `resolveDateRange` helper converts the range token into `{ dateFrom, dateTo }`, and a `dateCondition` helper builds the `WHERE created_at >= ?` SQL fragment.
+- **Server function split:** `src/server/analytics.ts` exports Zod schemas + `createServerFn` stubs (with `.inputValidator(Schema).handler(...)` builder pattern + dynamic imports). Three handler files:
+  - `analytics-admin.server.ts` — 8 parallel aggregate queries via `Promise.all` (consultation verification rate, deadline breach rate, assignment status distribution by checkpoint state, submission/review volume trends via `date_trunc`, reviews completed, DAU/WAU).
+  - `analytics-instructor.server.ts` — instructor-scoped queries (reviews completed, avg response time via `EXTRACT(EPOCH FROM reviewedAt - uploadedAt)`, SLA breach count where `EXTRACT(EPOCH FROM reviewedAt - uploadedAt) > 259200` (3 days), students supervised, assignments active).
+  - `analytics-export.server.ts` — 5 CSV export handlers (admin: users, audit log with date filtering, assignment progress; instructor: student progress, review history — both with ownership checks returning `NOT_FOUND` if the assignment is not owned).
+- **No new DB tables:** All metrics derive from aggregate queries (`GROUP BY`, `date_trunc`) over existing tables. No migrations required.
+- **CSV export:** Server function returns a CSV string; the client creates a `Blob` + `URL.createObjectURL` download (via `src/lib/download.ts` + `src/hooks/use-csv-download.ts` with loading/error state). CSV cell values are sanitized against formula injection (CWE-1236) — cells starting with `=`, `+`, `-`, `@`, TAB, or CR are prefixed with `'` (via `escapeCsvValue`).
+- **Excel export:** Client-side SheetJS (`src/lib/excel-export.ts`) generates `.xlsx` files via `xlsx.utils.book_new()` + `json_to_sheet()` + `write()`. Reuses the existing `xlsx` dependency (already used for bulk-import) — no new dependency. "Export Excel" buttons on both analytics pages.
+- **Export buttons on existing pages:** "Export CSV" buttons added to `/admin/users`, `/admin/audit-log`, and `/instructor/assignments/$id` (assignment progress / student progress / review history respectively).
+- **UI:** MetricCard grid + trend data tables + progress bars. No charting library — tables and progress bars only (defer Recharts unless visual charts are requested).
+- **i18n:** All labels/headers in both `locales/en.json` and `locales/id.json` (`analytics.*` + `analyticsInstructor.*` namespaces).
 
 ### Hybrid Navigation Pattern
 
@@ -670,7 +691,7 @@ Admin       (creates Instructors and Students)
 | View own progress                   | —          | —     | —          | ✓       |
 | View all progress                   | —          | —     | ✓          | —       |
 | List students (assignment creation) | —          | —     | ✓          | —       |
-| View system analytics               | —          | —     | —          | —       |
+| View system analytics               | ✓          | ✓     | —          | —       |
 | Read audit logs                     | ✓          | ✓     | —          | —       |
 
 ### User Registration Flow [v1]
@@ -1001,7 +1022,7 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 | Dashboard              | SSR for initial data, client revalidation for real-time updates. |
 | Assignment detail      | SSR for checkpoint list.                                         |
 | File management        | Client-rendered (heavily interactive).                           |
-| Analytics              | SSR skeleton + client hydrate (charts need JS).                  |
+| Analytics              | SSR for initial aggregate data (MetricCard grid + trend tables). |
 
 ### Vite Optimizations [v1]
 
@@ -1190,8 +1211,9 @@ Server functions whose output crosses the network boundary to a route loader dec
 | Email notifications (event alerts: submission, review, deadline, consultation, extension) | ✓        |             |
 | Push notifications (Web Push)                                          |          | ✓             |
 | Notification preferences                                               |          | ✓             |
-| Analytics dashboards                                                   |          | ✓             |
-| Reports with scheduling and export                                     |          | ✓             |
+| Analytics dashboards (admin + instructor)                              | ✓        |               |
+| Report export (CSV + Excel)                                            | ✓        |               |
+| Scheduled/PDF report delivery                                          |          | ✓             |
 | Deadline extension workflow                                            | ✓        |               |
 | Audit logging                                                          | ✓        |               |
 | Integration tests                                                      |          | ✓             |

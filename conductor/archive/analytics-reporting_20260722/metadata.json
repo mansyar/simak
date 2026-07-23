@@ -1,0 +1,19 @@
+{
+  "track_id": "analytics-reporting_20260722",
+  "type": "feature",
+  "state": "INIT",
+  "spec": {
+    "approved": false,
+    "approved_at": null
+  },
+  "plan": {
+    "approved": false,
+    "approved_at": null,
+    "items_total": 0,
+    "items_completed": 0
+  },
+  "revert_baseline": "f06afa0b01425173821d7374084af05e16398ce1",
+  "created_at": "2026-07-22T22:28:13Z",
+  "updated_at": "2026-07-22T22:28:13Z",
+  "description": "TRACK-019: Analytics & Reporting — role-based analytics dashboards (admin + instructor) with historical trends, new metrics, and CSV/Excel export"
+}

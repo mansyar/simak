@@ -43,6 +43,30 @@ vi.mock('@tanstack/react-router', () => ({
 // Mock @tanstack/react-start
 vi.mock('@tanstack/react-start', () => ({
   useServerFn: vi.fn().mockImplementation((fn) => fn),
+  createServerFn: vi.fn().mockReturnValue({
+    inputValidator: vi.fn().mockReturnThis(),
+    handler: vi.fn().mockImplementation((fn) => fn),
+  }),
+}));
+
+// Mock server analytics
+vi.mock('@/server/analytics', () => ({
+  exportUsersCsv: vi.fn(),
+  exportAuditLogCsv: vi.fn(),
+  exportAssignmentProgressCsv: vi.fn(),
+  exportStudentProgressCsv: vi.fn(),
+  exportReviewHistoryCsv: vi.fn(),
+  getAdminAnalyticsData: vi.fn(),
+  getInstructorAnalyticsData: vi.fn(),
+  AnalyticsDateRangeSchema: { parse: (data: unknown) => data },
+}));
+
+// Mock CSV download hook
+vi.mock('@/hooks/use-csv-download', () => ({
+  useCsvDownload: vi.fn().mockReturnValue({
+    exportCsv: vi.fn(),
+    isExporting: false,
+  }),
 }));
 
 // Mock server users

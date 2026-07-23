@@ -74,7 +74,11 @@
     "nextPage": "Next",
     "pageOf": "Page {current} of {total}",
     "done": "Done",
-    "clearSearch": "Clear search"
+    "clearSearch": "Clear search",
+    "exportCsv": "Export CSV",
+    "exportExcel": "Export Excel",
+    "exportStudentProgress": "Export Student Progress",
+    "exportReviewHistory": "Export Review History"
   },
   "theme": {
     "light": "Light Mode",
@@ -94,6 +98,7 @@
     "templates": "Templates",
     "auditLog": "Audit Log",
     "emailQueue": "Email Queue",
+    "analytics": "Analytics",
     "branding": "SIMAK",
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
@@ -102,6 +107,7 @@
     "dashboard": "Dashboard",
     "assignments": "Assignments",
     "reviews": "Reviews",
+    "analytics": "Analytics",
     "branding": "SIMAK",
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
@@ -510,6 +516,49 @@
       "sent": "Sent",
       "failed": "Failed"
     }
+  },
+  "adminAnalytics": {
+    "title": "Analytics",
+    "subtitle": "System-wide analytics and reporting dashboard",
+    "verificationRate": "Consultation Verification Rate",
+    "breachRate": "Deadline Breach Rate",
+    "reviewsCompleted": "Reviews Completed",
+    "statusDistribution": "Assignment Status Distribution",
+    "submissionTrend": "Submission Volume Trend",
+    "reviewTrend": "Review Volume Trend",
+    "dauTrend": "Daily Active Users",
+    "wauTrend": "Weekly Active Users",
+    "range7d": "7 Days",
+    "range30d": "30 Days",
+    "range90d": "90 Days",
+    "rangeAll": "All Time",
+    "customStart": "Start Date",
+    "customEnd": "End Date",
+    "date": "Date",
+    "count": "Count",
+    "activeUsers": "Active Users",
+    "noData": "No data available",
+    "statusLocked": "Locked",
+    "statusUnlocked": "Unlocked",
+    "statusSubmitted": "Submitted",
+    "statusUnderReview": "Under Review",
+    "statusPassed": "Passed",
+    "statusRevise": "Revise"
+  },
+  "instructorAnalytics": {
+    "title": "Analytics",
+    "subtitle": "Your teaching performance and review analytics",
+    "reviewsCompleted": "Reviews Completed",
+    "avgResponseTime": "Avg Response Time",
+    "slaBreachCount": "SLA Breaches (>3 days)",
+    "studentsSupervised": "Students Supervised",
+    "assignmentsActive": "Active Assignments",
+    "range7d": "7 Days",
+    "range30d": "30 Days",
+    "range90d": "90 Days",
+    "rangeAll": "All Time",
+    "customStart": "Start Date",
+    "customEnd": "End Date"
   },
   "files": {
     "dropzone": {

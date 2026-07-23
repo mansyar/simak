@@ -80,6 +80,10 @@ export type Translation = {
     pageOf: string
     done: string
     clearSearch: string
+    exportCsv: string
+    exportExcel: string
+    exportStudentProgress: string
+    exportReviewHistory: string
   }
   theme: {
     light: string
@@ -99,6 +103,7 @@ export type Translation = {
     templates: string
     auditLog: string
     emailQueue: string
+    analytics: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -107,6 +112,7 @@ export type Translation = {
     dashboard: string
     assignments: string
     reviews: string
+    analytics: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -515,6 +521,49 @@ export type Translation = {
       sent: string
       failed: string
     }
+  }
+  adminAnalytics: {
+    title: string
+    subtitle: string
+    verificationRate: string
+    breachRate: string
+    reviewsCompleted: string
+    statusDistribution: string
+    submissionTrend: string
+    reviewTrend: string
+    dauTrend: string
+    wauTrend: string
+    range7d: string
+    range30d: string
+    range90d: string
+    rangeAll: string
+    customStart: string
+    customEnd: string
+    date: string
+    count: string
+    activeUsers: string
+    noData: string
+    statusLocked: string
+    statusUnlocked: string
+    statusSubmitted: string
+    statusUnderReview: string
+    statusPassed: string
+    statusRevise: string
+  }
+  instructorAnalytics: {
+    title: string
+    subtitle: string
+    reviewsCompleted: string
+    avgResponseTime: string
+    slaBreachCount: string
+    studentsSupervised: string
+    assignmentsActive: string
+    range7d: string
+    range30d: string
+    range90d: string
+    rangeAll: string
+    customStart: string
+    customEnd: string
   }
   files: {
     dropzone: {

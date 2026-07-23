@@ -462,4 +462,14 @@ Students and instructors lack a centralized system to:
 - **No processor changes** — Existing production-hardened email queue processor (30s cycle, `FOR UPDATE SKIP LOCKED`, exponential backoff) unchanged
 - **Tests** — 2,919 tests pass across 297 test files; coverage ≥80% on all thresholds (lines 88.91%, statements 88.29%, branches 81.78%, functions 84.02%)
 
+### Track: Analytics & Reporting (TRACK-019) (July 2026)
+
+- **Admin Analytics Dashboard** (`/admin/analytics?range=30d`) — 6 NEW metrics not on the existing dashboard: consultation verification rate, deadline breach rate, assignment status distribution (progress bars), submission/review volume trends (daily tables), reviews completed count, DAU/WAU active-user trends; date range filtering via URL search params (7d/30d/90d/all + custom start/end)
+- **Instructor Analytics Dashboard** (`/instructor/analytics?range=30d`) — 5 personal performance metrics: reviews completed, average response time (hours), SLA breach count (>3 days), students supervised, assignments active; same date range filtering
+- **CSV Export** — 5 server-side CSV export handlers returning CSV strings (client creates Blob): admin user list, admin audit log (with date filtering), admin assignment progress, instructor student progress, instructor review history; `useCsvDownload` hook + `downloadCsv` utility for client-side download; export buttons on admin users, audit-log, analytics pages and instructor assignment detail page
+- **Excel Export** — Client-side SheetJS export (`exportToExcel` utility) on both analytics pages; exports current dashboard data to `.xlsx` with `json_to_sheet()`
+- **Navigation & i18n** — Analytics sidebar entries (BarChart3 icon) in both admin and instructor sidebars; 75+ new i18n keys in both EN and ID locales (adminAnalytics, instructorAnalytics sections + export button labels)
+- **Server architecture** — Two-file split: `analytics.ts` (client-safe Zod schemas + createServerFn stubs) + 3 handler files (`analytics-admin.server.ts`, `analytics-instructor.server.ts`, `analytics-export.server.ts`); all handlers use `getSessionFromHeaders` + role guards; aggregate queries with `sql<number>` template literals, `date_trunc`, `GROUP BY`, `COUNT(DISTINCT)`
+- **Tests** — 2,982 tests pass across 301 test files; coverage ≥80% on all thresholds (statements 88.09%, branches 81.98%, functions 83.6%, lines 88.73%)
+
 </protect>
