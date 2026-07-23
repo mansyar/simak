@@ -433,6 +433,10 @@
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
   },
+  "studentRubrics": {
+    "title": "Hasil Rubrik",
+    "weightedTotal": "Total Terbobot"
+  },
   "studentAssignments": {
     "title": "Tugas Saya",
     "subtitle": "Lihat dan lacak kemajuan tugas akademik yang diberikan kepada Anda.",

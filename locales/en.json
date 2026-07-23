@@ -433,6 +433,10 @@
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
   },
+  "studentRubrics": {
+    "title": "Rubric Results",
+    "weightedTotal": "Weighted Total"
+  },
   "studentAssignments": {
     "title": "My Assignments",
     "subtitle": "View and track the progress of your assigned academic work.",

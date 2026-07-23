@@ -438,6 +438,10 @@ export type Translation = {
     sectionMain: string
     sectionPreferences: string
   }
+  studentRubrics: {
+    title: string
+    weightedTotal: string
+  }
   studentAssignments: {
     title: string
     subtitle: string
