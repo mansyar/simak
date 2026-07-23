@@ -3,7 +3,7 @@
 
 > Workflow: TDD per `conductor/workflow.md`. Each task follows Red (write failing tests) → Green (implement to pass) → Verify (coverage + quality gates) → Commit + git note → mark `[x]` in plan. Status markers: `[ ]` pending, `[~]` in progress, `[x]` complete.
 
-## Phase 1: Schema & Migration
+## Phase 1: Schema & Migration [checkpoint: d8b6481]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor on requirements and TDD protocol before starting Phase 1 (no code changes — read-only anchoring)
 - [x] Task: Create `deadline_reminders` table, `checkpoints` index, and email-queue enum extension [19fa03f]
