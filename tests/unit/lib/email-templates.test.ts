@@ -10,6 +10,7 @@ import {
   buildExtensionApprovedHtml,
   buildExtensionRejectedHtml,
   buildExtensionRequestedHtml,
+  buildDeadlineReminderHtml,
 } from '@/lib/email-templates';
 
 vi.mock('@/config/env', () => ({
@@ -402,5 +403,50 @@ describe('Email templates — buildExtensionRequestedHtml', () => {
       durationRequested: 3,
     });
     expect(html).toContain('&lt;script&gt;s&lt;/script&gt;');
+  });
+});
+
+describe('Email templates — buildDeadlineReminderHtml', () => {
+  const params = {
+    assignmentTitle: 'Final Project',
+    checkpointName: 'Draft Review',
+    assignmentId: 5,
+    checkpointId: 12,
+    dueDate: '2026-07-30T23:59:59Z',
+  };
+
+  it('includes assignment title, checkpoint name, and due date', () => {
+    const html = buildDeadlineReminderHtml(params);
+    expect(html).toContain('Final Project');
+    expect(html).toContain('Draft Review');
+    expect(html).toContain('2026-07-30T23:59:59Z');
+  });
+
+  it('includes the deep-link to student checkpoint page', () => {
+    const html = buildDeadlineReminderHtml(params);
+    expect(html).toContain('http://localhost:3000/student/assignments/5/checkpoints/12');
+  });
+
+  it('produces localized body for Indonesian locale', () => {
+    const htmlId = buildDeadlineReminderHtml({ ...params, locale: 'id' });
+    const htmlEn = buildDeadlineReminderHtml({ ...params, locale: 'en' });
+    expect(htmlId).not.toEqual(htmlEn);
+  });
+
+  it('defaults to English when locale is undefined', () => {
+    const htmlUndef = buildDeadlineReminderHtml(params);
+    const htmlEn = buildDeadlineReminderHtml({ ...params, locale: 'en' });
+    expect(htmlUndef).toEqual(htmlEn);
+  });
+
+  it('escapes malicious user input', () => {
+    const html = buildDeadlineReminderHtml({
+      assignmentTitle: '<script>alert(1)</script>',
+      checkpointName: 'Draft',
+      assignmentId: 1,
+      checkpointId: 2,
+      dueDate: '2026-07-30',
+    });
+    expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
   });
 });

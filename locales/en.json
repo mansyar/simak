@@ -812,6 +812,10 @@
       "sla_breach": {
         "title": "SLA Breach",
         "message": "The review SLA for \"{checkpointName}\" in \"{assignmentTitle}\" for {studentName} has been breached by {breachDays} day(s)."
+      },
+      "deadline_reminder": {
+        "title": "Deadline Reminder",
+        "message": "Your checkpoint \"{checkpointName}\" in \"{assignmentTitle}\" is due on {dueDate}."
       }
     }
   },
@@ -827,7 +831,8 @@
       "consultationRejected": "Consultation Rejected",
       "extensionApproved": "Extension Approved",
       "extensionRejected": "Extension Rejected",
-      "extensionRequested": "Extension Requested"
+      "extensionRequested": "Extension Requested",
+      "deadlineReminder": "Deadline Reminder — {assignmentTitle}"
     }
   },
   "errors": {

@@ -818,6 +818,10 @@ export type Translation = {
         title: string
         message: string
       }
+      deadline_reminder: {
+        title: string
+        message: string
+      }
     }
   }
   emails: {
@@ -833,6 +837,7 @@ export type Translation = {
       extensionApproved: string
       extensionRejected: string
       extensionRequested: string
+      deadlineReminder: string
     }
   }
   errors: {

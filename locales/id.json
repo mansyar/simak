@@ -812,6 +812,10 @@
       "sla_breach": {
         "title": "Pelanggaran SLA",
         "message": "SLA ulasan untuk \"{checkpointName}\" di \"{assignmentTitle}\" milik {studentName} telah dilanggar selama {breachDays} hari."
+      },
+      "deadline_reminder": {
+        "title": "Pengingat Batas Waktu",
+        "message": "Checkpoint \"{checkpointName}\" pada \"{assignmentTitle}\" berakhir pada {dueDate}."
       }
     }
   },
@@ -827,7 +831,8 @@
       "consultationRejected": "Konsultasi Ditolak",
       "extensionApproved": "Perpanjangan Disetujui",
       "extensionRejected": "Perpanjangan Ditolak",
-      "extensionRequested": "Perpanjangan Diminta"
+      "extensionRequested": "Perpanjangan Diminta",
+      "deadlineReminder": "Pengingat Batas Waktu — {assignmentTitle}"
     }
   },
   "errors": {

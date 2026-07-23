@@ -12,6 +12,7 @@ export * from './notifications';
 export * from './audit-log';
 export * from './extensions';
 export * from './email-queue';
+export * from './deadline-reminders';
 
 // Import tables for relations
 import { users } from './users';
@@ -24,6 +25,7 @@ import { consultations } from './consultations';
 import { notifications } from './notifications';
 import { extensionRequests } from './extensions';
 import { emailQueue } from './email-queue';
+import { deadlineReminders } from './deadline-reminders';
 
 // ---- Relations ----
 
@@ -197,6 +199,17 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
 }));
 
 export const emailQueueRelations = relations(emailQueue, () => ({}));
+
+export const deadlineRemindersRelations = relations(deadlineReminders, ({ one }) => ({
+  checkpoint: one(checkpoints, {
+    fields: [deadlineReminders.checkpointId],
+    references: [checkpoints.id],
+  }),
+  student: one(users, {
+    fields: [deadlineReminders.studentId],
+    references: [users.id],
+  }),
+}));
 
 export const extensionRequestsRelations = relations(extensionRequests, ({ one }) => ({
   assignment: one(assignments, {
