@@ -114,10 +114,10 @@
     - [x] Implement: Extend `analytics-instructor.server.ts` with rubric metrics. Create dedicated rubric analytics view/section
     - [x] Verify: `pnpm test` passes
 
-- [ ] Task: Rubric analytics — admin metrics
-    - [ ] Write failing tests: Handler tests for admin rubric analytics — cross-instructor criterion performance, class-wide weakness identification (lowest avg criteria across all instructors)
-    - [ ] Implement: Extend `analytics-admin.server.ts` with rubric metrics. Create dedicated rubric analytics view/section
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: Rubric analytics — admin metrics [db74942]
+    - [x] Write failing tests: Handler tests for admin rubric analytics — cross-instructor criterion performance, class-wide weakness identification (lowest avg criteria across all instructors)
+    - [x] Implement: Extend `analytics-admin.server.ts` with rubric metrics. Create dedicated rubric analytics view/section
+    - [x] Verify: `pnpm test` passes
 
 - [ ] Task: CSV/Excel export for per-student criterion scores
     - [ ] Write failing tests: Export tests — CSV and Excel output includes per-student criterion scores, valid format, CSV injection mitigation
