@@ -61,7 +61,7 @@ export function RubricLevelsEditor({ levels, onLevelsChange }: RubricLevelsEdito
   return (
     <div className="space-y-3 pl-12">
       {levels.map((level, index) => (
-        <div key={index} className="space-y-1 rounded border p-2">
+        <div key={level.id ?? `new-${index}`} className="space-y-1 rounded border p-2">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"

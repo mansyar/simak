@@ -53,6 +53,7 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
       innerJoin: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
       set: vi.fn().mockReturnThis(),
       for: vi.fn().mockReturnThis(),

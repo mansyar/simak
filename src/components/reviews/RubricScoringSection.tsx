@@ -79,7 +79,7 @@ export function RubricScoringSection({
           return (
             <div key={criterion.id} className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label>{criterion.title}</Label>
+                <Label htmlFor={`score-${criterion.id}`}>{criterion.title}</Label>
                 <span className="text-xs text-muted-foreground">{criterion.weight}%</span>
               </div>
               {criterion.description && (
@@ -93,7 +93,7 @@ export function RubricScoringSection({
                   }
                   onValueChange={(value) => value && handleLevelChange(criterion.id, value)}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id={`score-${criterion.id}`} className="w-full">
                     <SelectValue placeholder={t('instructorReviews.rubric.selectLevel')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -113,6 +113,7 @@ export function RubricScoringSection({
                     value={score ?? ''}
                     onChange={(e) => handleScoreChange(criterion.id, e.target.value)}
                     className="w-24"
+                    id={`score-${criterion.id}`}
                   />
                   <span className="text-sm text-muted-foreground">/ 100</span>
                 </div>
@@ -120,7 +121,7 @@ export function RubricScoringSection({
             </div>
           );
         })}
-        <div className="flex items-center justify-between border-t pt-2">
+        <div className="flex items-center justify-between border-t pt-2" aria-live="polite">
           <span className="text-sm font-medium">{t('instructorReviews.rubric.weightedTotal')}</span>
           <span className="text-sm font-medium">{`${Math.round(weightedTotal)} / 100`}</span>
         </div>

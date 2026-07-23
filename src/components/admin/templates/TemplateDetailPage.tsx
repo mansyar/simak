@@ -117,6 +117,7 @@ export function TemplateDetailPage({
   const handleGradingTypeChange = useCallback(
     async (index: number, gradingType: 'numeric' | 'qualitative' | null) => {
       const checkpointId = checkpoints[index]?.id;
+      const prevGradingType = checkpoints[index]?.gradingType ?? null;
 
       setCheckpoints((prev) => {
         const updated = [...prev];
@@ -127,16 +128,7 @@ export function TemplateDetailPage({
       // When clearing rubric (null), immediately persist to DB
       if (gradingType === null && checkpointId) {
         try {
-          await (
-            saveRubricFn as unknown as (args: {
-              data: {
-                templateCheckpointId: number;
-                gradingType: null;
-                criteria: never[];
-                levels: never[];
-              };
-            }) => Promise<{ success?: boolean; error?: { message: string } }>
-          )({
+          const result = await saveRubricFn({
             data: {
               templateCheckpointId: checkpointId,
               gradingType: null,
@@ -144,12 +136,25 @@ export function TemplateDetailPage({
               levels: [],
             },
           });
+          if (result && 'error' in result) {
+            setSaveError(result.error.message);
+            setCheckpoints((prev) => {
+              const updated = [...prev];
+              updated[index] = { ...updated[index], gradingType: prevGradingType };
+              return updated;
+            });
+          }
         } catch {
-          // Silently ignore — user can retry via full template save
+          setSaveError(t('adminTemplates.detail.saveError'));
+          setCheckpoints((prev) => {
+            const updated = [...prev];
+            updated[index] = { ...updated[index], gradingType: prevGradingType };
+            return updated;
+          });
         }
       }
     },
-    [checkpoints, saveRubricFn],
+    [checkpoints, saveRubricFn, t],
   );
 
   const handleMoveUp = useCallback((index: number) => {

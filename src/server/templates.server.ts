@@ -5,7 +5,7 @@ import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates
 import { assignments, assignmentStudents } from '../db/schema/assignments';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
-import { logAuditEvent } from '../lib/audit';
+import { logAuditEvent, safeAuditLog } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import { syncTemplateCheckpoints } from './template-checkpoint-sync.server';
 import type { NonNullableSession } from '../lib/types';
@@ -270,14 +270,15 @@ export async function updateTemplateHandler(args: { data: UpdateTemplateInput & 
   const db = getDb();
 
   try {
-    await db
-      .update(assignmentTemplates)
-      .set({ name, type, updatedAt: new Date() })
-      .where(eq(assignmentTemplates.id, id));
+    await db.transaction(async (tx) => {
+      await tx
+        .update(assignmentTemplates)
+        .set({ name, type, updatedAt: new Date() })
+        .where(eq(assignmentTemplates.id, id));
 
-    await syncTemplateCheckpoints(db, id, checkpoints);
-
-    await logAuditEvent({
+      await syncTemplateCheckpoints(tx, id, checkpoints);
+    });
+    await safeAuditLog('updateTemplateHandler', {
       actorId: session.user.id,
       action: 'template.updated',
       entityType: 'template',

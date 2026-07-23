@@ -45,6 +45,7 @@ describe('Rubric server handlers', () => {
     delete: vi.fn().mockReturnThis(),
     innerJoin: vi.fn().mockReturnThis(),
     leftJoin: vi.fn().mockReturnThis(),
+    for: vi.fn().mockReturnThis(),
     transaction: vi.fn(async (cb: any) => cb(mockDb)),
     then: vi.fn(function (onfulfilled: any) {
       return Promise.resolve([]).then(onfulfilled);

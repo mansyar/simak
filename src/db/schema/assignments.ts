@@ -99,5 +99,6 @@ export const checkpoints = pgTable(
     index('checkpoints_assignment_id_idx').on(table.assignmentId),
     index('checkpoints_student_id_idx').on(table.studentId),
     index('checkpoints_state_assignment_id_idx').on(table.state, table.assignmentId),
+    index('checkpoints_template_checkpoint_id_idx').on(table.templateCheckpointId),
   ],
 );

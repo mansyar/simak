@@ -5,7 +5,7 @@ import { rubricCriteria, rubricLevels } from '../db/schema/rubrics';
 import { templateCheckpoints } from '../db/schema/templates';
 import { checkpoints } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
-import { logAuditEvent } from '../lib/audit';
+import { safeAuditLog } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -47,24 +47,26 @@ export async function saveRubricHandler({
   const db = getDb();
 
   try {
-    // 1. Verify template checkpoint exists (non-deleted)
-    const [checkpoint] = await db
-      .select({ id: templateCheckpoints.id })
-      .from(templateCheckpoints)
-      .where(
-        and(
-          eq(templateCheckpoints.id, templateCheckpointId),
-          isNull(templateCheckpoints.deletedAt),
-        ),
-      )
-      .limit(1);
-
-    if (!checkpoint) {
-      return serverError(ErrorCode.NOT_FOUND, 'Template checkpoint not found');
-    }
-
-    // 2. Update gradingType + sync criteria/levels in transaction
+    // 1. Update gradingType + sync criteria/levels in transaction.
+    // Existence check is inside the tx with FOR UPDATE to avoid TOCTOU race
+    // (SQL styleguide §6: state-dependent reads inside the transaction).
     await db.transaction(async (tx) => {
+      const [checkpoint] = await tx
+        .select({ id: templateCheckpoints.id })
+        .from(templateCheckpoints)
+        .where(
+          and(
+            eq(templateCheckpoints.id, templateCheckpointId),
+            isNull(templateCheckpoints.deletedAt),
+          ),
+        )
+        .limit(1)
+        .for('update');
+
+      if (!checkpoint) {
+        throw new Error('TEMPLATE_CHECKPOINT_NOT_FOUND');
+      }
+
       await tx
         .update(templateCheckpoints)
         .set({ gradingType })
@@ -218,21 +220,19 @@ export async function saveRubricHandler({
       }
     });
 
-    // 3. Log audit (after commit)
-    await logAuditEvent({
+    await safeAuditLog('saveRubricHandler', {
       actorId: session.user.id,
       action: 'rubric.saved',
       entityType: 'template_checkpoint',
       entityId: templateCheckpointId.toString(),
-      details: {
-        gradingType,
-        criteriaCount: criteria.length,
-        levelsCount: levels.length,
-      },
+      details: { gradingType, criteriaCount: criteria.length, levelsCount: levels.length },
     });
 
     return { success: true };
   } catch (err) {
+    if (err instanceof Error && err.message === 'TEMPLATE_CHECKPOINT_NOT_FOUND') {
+      return serverError(ErrorCode.NOT_FOUND, 'Template checkpoint not found');
+    }
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
       handler: 'saveRubricHandler',
@@ -288,22 +288,25 @@ export async function getRubricHandler({
       )
       .orderBy(asc(rubricCriteria.order));
 
-    const levels = await db
-      .select({
-        id: rubricLevels.id,
-        label: rubricLevels.label,
-        description: rubricLevels.description,
-        score: rubricLevels.score,
-        order: rubricLevels.order,
-      })
-      .from(rubricLevels)
-      .where(
-        and(
-          eq(rubricLevels.templateCheckpointId, templateCheckpointId),
-          isNull(rubricLevels.deletedAt),
-        ),
-      )
-      .orderBy(asc(rubricLevels.order));
+    const levels =
+      checkpoint.gradingType === 'qualitative'
+        ? await db
+            .select({
+              id: rubricLevels.id,
+              label: rubricLevels.label,
+              description: rubricLevels.description,
+              score: rubricLevels.score,
+              order: rubricLevels.order,
+            })
+            .from(rubricLevels)
+            .where(
+              and(
+                eq(rubricLevels.templateCheckpointId, templateCheckpointId),
+                isNull(rubricLevels.deletedAt),
+              ),
+            )
+            .orderBy(asc(rubricLevels.order))
+        : [];
 
     return {
       gradingType: checkpoint.gradingType,
@@ -401,7 +404,7 @@ export async function softDeleteCriterionHandler({
 
     await db.update(rubricCriteria).set({ deletedAt: new Date() }).where(eq(rubricCriteria.id, id));
 
-    await logAuditEvent({
+    await safeAuditLog('softDeleteCriterionHandler', {
       actorId: session.user.id,
       action: 'rubric.criterion_deleted',
       entityType: 'rubric_criterion',
@@ -444,7 +447,7 @@ export async function softDeleteLevelHandler({
 
     await db.update(rubricLevels).set({ deletedAt: new Date() }).where(eq(rubricLevels.id, id));
 
-    await logAuditEvent({
+    await safeAuditLog('softDeleteLevelHandler', {
       actorId: session.user.id,
       action: 'rubric.level_deleted',
       entityType: 'rubric_level',

@@ -72,7 +72,7 @@ export function CheckpointListEditor({
       </div>
       <div className="space-y-2">
         {checkpoints.map((checkpoint, index) => (
-          <div key={index} className="space-y-1">
+          <div key={checkpoint.id ?? `new-${index}`} className="space-y-1">
             <div className="flex flex-col sm:flex-row sm:items-start gap-2">
               <div className="flex flex-col pt-1.5">
                 <Button
@@ -155,7 +155,10 @@ export function CheckpointListEditor({
             </div>
             {checkpoint.id !== undefined && (
               <div className="flex items-center gap-2 pl-12">
-                <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                <label
+                  htmlFor={`grading-type-${checkpoint.id}`}
+                  className="text-xs font-medium text-muted-foreground whitespace-nowrap"
+                >
                   {t('adminTemplates.form.gradingType')}
                 </label>
                 <Select
@@ -164,7 +167,11 @@ export function CheckpointListEditor({
                     onGradingTypeChange?.(index, val === 'none' ? null : (val as GradingType))
                   }
                 >
-                  <SelectTrigger size="sm" className="w-[200px]">
+                  <SelectTrigger
+                    id={`grading-type-${checkpoint.id}`}
+                    size="sm"
+                    className="w-[200px]"
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

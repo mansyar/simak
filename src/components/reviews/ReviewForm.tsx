@@ -29,10 +29,11 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
   const [isUploadingFeedback, setIsUploadingFeedback] = useState(false);
   const [scores, setScores] = useState<ScoreInput[]>([]);
 
-  const rubricActive = rubric && rubric.gradingType !== null;
-  const allScored = rubricActive
-    ? rubric!.criteria.every((c) => scores.some((s) => s.criterionId === c.id))
-    : true;
+  const rubricActive = !!rubric && rubric.gradingType !== null;
+  const allScored =
+    rubric && rubric.gradingType !== null
+      ? rubric.criteria.every((c) => scores.some((s) => s.criterionId === c.id))
+      : true;
 
   const handleFeedbackFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -224,8 +225,8 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
         )}
 
         {/* Rubric scoring (when rubric is active) */}
-        {rubricActive && (
-          <RubricScoringSection rubric={rubric!} scores={scores} onScoresChange={setScores} />
+        {rubricActive && rubric && (
+          <RubricScoringSection rubric={rubric} scores={scores} onScoresChange={setScores} />
         )}
 
         {/* Submit */}

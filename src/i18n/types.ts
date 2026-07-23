@@ -1051,6 +1051,7 @@ export type Translation = {
       saveSuccess: string
       titlePlaceholder: string
       descriptionPlaceholder: string
+      weightLabel: string
       add: string
       remove: string
       moveUp: string

@@ -1,0 +1,2 @@
+CREATE INDEX "checkpoints_template_checkpoint_id_idx" ON "checkpoints" USING btree ("template_checkpoint_id");--> statement-breakpoint
+CREATE INDEX "review_scores_criterion_id_idx" ON "review_scores" USING btree ("criterion_id");

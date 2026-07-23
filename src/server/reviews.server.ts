@@ -19,7 +19,7 @@ import {
 import { getNotificationKeys } from './notifications.server';
 import { sendReviewEmail } from '../lib/review-email';
 import { fetchRubric } from './rubrics.server';
-import { persistReviewScores } from './review-scores.server';
+import { validateReviewScores, insertReviewScores } from './review-scores.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -294,6 +294,12 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
         return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in a reviewable state');
       }
 
+      // 2c. Validate rubric scores BEFORE any write (SQL styleguide §6:
+      // a validation failure must not commit partial writes). The rubric read
+      // is inside the transaction for stability.
+      const scoresError = await validateReviewScores(tx, submission.templateCheckpointId, scores);
+      if (scoresError) return scoresError;
+
       let breachDays = 0;
       const slaFields: SLASubmissionFields = {
         checkpointId: submission.checkpointId,
@@ -341,24 +347,25 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           .where(eq(uploadIntents.fileKey, feedbackFileKey));
       }
 
-      // 2d. Insert review record
-      await tx.insert(reviews).values({
-        submissionId,
-        instructorId: session.user.id,
-        decision,
-        comment: comment || null,
-        feedbackFileKey: feedbackFileKey || null,
-        revisionDeadline:
-          decision === 'revise' && revisionDeadline ? new Date(revisionDeadline) : null,
-        reviewedAt: new Date(),
-      });
-      const se = await persistReviewScores(
-        tx,
-        submissionId,
-        submission.templateCheckpointId,
-        scores,
-      );
-      if (se) return se;
+      // 2d. Insert review record (capture ID via .returning — SQL styleguide §6.3)
+      const [review] = await tx
+        .insert(reviews)
+        .values({
+          submissionId,
+          instructorId: session.user.id,
+          decision,
+          comment: comment || null,
+          feedbackFileKey: feedbackFileKey || null,
+          revisionDeadline:
+            decision === 'revise' && revisionDeadline ? new Date(revisionDeadline) : null,
+          reviewedAt: new Date(),
+        })
+        .returning({ id: reviews.id });
+
+      // 2e. Insert rubric scores (reviewId captured above — no separate SELECT)
+      if (submission.templateCheckpointId && scores && scores.length > 0) {
+        await insertReviewScores(tx, review.id, submission.templateCheckpointId, scores);
+      }
 
       if (decision === 'pass') {
         // 2e. Set checkpoint to passed

@@ -1046,6 +1046,7 @@
       "saveSuccess": "Rubric saved successfully",
       "titlePlaceholder": "Criterion title",
       "descriptionPlaceholder": "Description (optional)",
+      "weightLabel": "Weight",
       "add": "Add Criterion",
       "remove": "Remove",
       "moveUp": "Move Up",

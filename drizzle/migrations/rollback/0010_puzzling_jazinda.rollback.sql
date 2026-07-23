@@ -30,6 +30,7 @@ ALTER TABLE "review_scores" DROP CONSTRAINT IF EXISTS "review_scores_rubric_leve
 ALTER TABLE "rubric_criteria" DROP CONSTRAINT IF EXISTS "rubric_criteria_template_checkpoint_id_template_checkpoints_id_fk";
 ALTER TABLE "rubric_levels" DROP CONSTRAINT IF EXISTS "rubric_levels_template_checkpoint_id_template_checkpoints_id_fk";
 
+-- WARNING: dropping these tables permanently deletes any rubric definitions and scores.
 -- Drop tables (review_scores first since it references rubric_criteria and rubric_levels)
 DROP TABLE IF EXISTS "review_scores";
 DROP TABLE IF EXISTS "rubric_criteria";

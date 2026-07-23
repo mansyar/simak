@@ -47,11 +47,11 @@ describe('Template server functions - Logic & Security', () => {
     groupBy: vi.fn().mockReturnThis(),
     innerJoin: vi.fn().mockReturnThis(),
     leftJoin: vi.fn().mockReturnThis(),
+    transaction: vi.fn(async (cb: any) => cb(mockDb)),
     then: vi.fn(function (onfulfilled: any) {
       return Promise.resolve([]).then(onfulfilled);
     }),
   };
-
   function mockReturning(data: any) {
     returningResult = data;
     mockDb.returning.mockReturnValue({

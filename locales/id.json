@@ -1046,6 +1046,7 @@
       "saveSuccess": "Rubrik berhasil disimpan",
       "titlePlaceholder": "Judul kriteria",
       "descriptionPlaceholder": "Deskripsi (opsional)",
+      "weightLabel": "Bobot",
       "add": "Tambah Kriteria",
       "remove": "Hapus",
       "moveUp": "Naik",

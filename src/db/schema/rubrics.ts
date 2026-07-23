@@ -61,5 +61,8 @@ export const reviewScores = pgTable(
     comment: text('comment'),
     createdAt: timestamp('created_at').defaultNow(),
   },
-  (table) => [index('review_scores_review_id_idx').on(table.reviewId)],
+  (table) => [
+    index('review_scores_review_id_idx').on(table.reviewId),
+    index('review_scores_criterion_id_idx').on(table.criterionId),
+  ],
 );

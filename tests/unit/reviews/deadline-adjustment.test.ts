@@ -45,6 +45,7 @@ describe('Deadline adjustment in submitReview', () => {
       innerJoin: vi.fn().mockReturnThis(),
       insert: vi.fn().mockReturnThis(),
       values: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
       set: vi.fn().mockReturnThis(),
       then: vi.fn((onfulfilled: any) => Promise.resolve([]).then(onfulfilled)),

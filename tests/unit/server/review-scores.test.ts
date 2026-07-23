@@ -5,35 +5,26 @@ vi.mock('@/server/rubrics.server', () => ({
   fetchRubric: vi.fn(),
 }));
 
-import { persistReviewScores } from '@/server/review-scores.server';
+import { validateReviewScores, insertReviewScores } from '@/server/review-scores.server';
 import { fetchRubric } from '@/server/rubrics.server';
 import { reviewScores } from '@/db/schema/rubrics';
 
-describe('persistReviewScores', () => {
+describe('validateReviewScores', () => {
   let mockTx: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockTx = {
-      select: vi.fn().mockReturnThis(),
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
-      insert: vi.fn().mockReturnThis(),
-      values: vi.fn().mockReturnThis(),
-      then: vi.fn((onfulfilled: any) => Promise.resolve([]).then(onfulfilled)),
-    };
+    mockTx = {};
   });
 
   it('should return null when no templateCheckpointId and no scores', async () => {
-    const result = await persistReviewScores(mockTx, 1, null, undefined);
+    const result = await validateReviewScores(mockTx, null, undefined);
     expect(result).toBeNull();
     expect(fetchRubric).not.toHaveBeenCalled();
   });
 
   it('should return error when scores provided but no templateCheckpointId', async () => {
-    const result = await persistReviewScores(mockTx, 1, null, [{ criterionId: 1, score: 80 }]);
+    const result = await validateReviewScores(mockTx, null, [{ criterionId: 1, score: 80 }]);
     expect(result).toEqual({
       error: { code: 'BAD_REQUEST', message: 'Scores provided but checkpoint has no rubric' },
     });
@@ -41,13 +32,13 @@ describe('persistReviewScores', () => {
 
   it('should return null when rubric is null (grading_type null) and no scores', async () => {
     vi.mocked(fetchRubric).mockResolvedValue(null);
-    const result = await persistReviewScores(mockTx, 1, 42, undefined);
+    const result = await validateReviewScores(mockTx, 42, undefined);
     expect(result).toBeNull();
   });
 
   it('should return error when scores provided but grading_type is null', async () => {
     vi.mocked(fetchRubric).mockResolvedValue(null);
-    const result = await persistReviewScores(mockTx, 1, 42, [{ criterionId: 1, score: 80 }]);
+    const result = await validateReviewScores(mockTx, 42, [{ criterionId: 1, score: 80 }]);
     expect(result).toEqual({
       error: { code: 'BAD_REQUEST', message: 'Scores provided but checkpoint has no rubric' },
     });
@@ -59,7 +50,7 @@ describe('persistReviewScores', () => {
       criteria: [{ id: 1, title: 'Quality', description: null, weight: 100, order: 0 }],
       levels: [],
     });
-    const result = await persistReviewScores(mockTx, 1, 42, undefined);
+    const result = await validateReviewScores(mockTx, 42, undefined);
     expect(result).toEqual({
       error: { code: 'BAD_REQUEST', message: 'Scores required for rubric-based checkpoint' },
     });
@@ -74,25 +65,71 @@ describe('persistReviewScores', () => {
       ],
       levels: [],
     });
-    const result = await persistReviewScores(mockTx, 1, 42, [{ criterionId: 1, score: 80 }]);
+    const result = await validateReviewScores(mockTx, 42, [{ criterionId: 1, score: 80 }]);
     expect(result).toEqual({
       error: { code: 'BAD_REQUEST', message: 'Criterion "Clarity" not scored' },
     });
   });
 
-  it('should persist scores with denormalized snapshot for numeric rubric', async () => {
+  it('should return error on duplicate criterion scores', async () => {
     vi.mocked(fetchRubric).mockResolvedValue({
       gradingType: 'numeric',
       criteria: [{ id: 1, title: 'Quality', description: null, weight: 100, order: 0 }],
       levels: [],
     });
-    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ id: 42 }]).then(onfulfilled),
-    );
-    const result = await persistReviewScores(mockTx, 10, 1, [
-      { criterionId: 1, score: 85, comment: 'Good work' },
+    const result = await validateReviewScores(mockTx, 42, [
+      { criterionId: 1, score: 80 },
+      { criterionId: 1, score: 90 },
     ]);
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Duplicate criterion scores provided' },
+    });
+  });
+
+  it('should return error when rubricLevelId does not belong to rubric', async () => {
+    vi.mocked(fetchRubric).mockResolvedValue({
+      gradingType: 'qualitative',
+      criteria: [{ id: 1, title: 'Quality', description: null, weight: 100, order: 0 }],
+      levels: [{ id: 10, label: 'Excellent', description: null, score: 90, order: 0 }],
+    });
+    const result = await validateReviewScores(mockTx, 42, [
+      { criterionId: 1, score: 90, rubricLevelId: 999 },
+    ]);
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Invalid rubric level for this checkpoint' },
+    });
+  });
+
+  it('should return null when all criteria are scored (valid)', async () => {
+    vi.mocked(fetchRubric).mockResolvedValue({
+      gradingType: 'numeric',
+      criteria: [{ id: 1, title: 'Quality', description: null, weight: 100, order: 0 }],
+      levels: [],
+    });
+    const result = await validateReviewScores(mockTx, 42, [{ criterionId: 1, score: 85 }]);
     expect(result).toBeNull();
+  });
+});
+
+describe('insertReviewScores', () => {
+  let mockTx: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockTx = {
+      insert: vi.fn().mockReturnThis(),
+      values: vi.fn().mockReturnThis(),
+      then: vi.fn((onfulfilled: any) => Promise.resolve([]).then(onfulfilled)),
+    };
+  });
+
+  it('should insert scores with denormalized snapshot for numeric rubric', async () => {
+    vi.mocked(fetchRubric).mockResolvedValue({
+      gradingType: 'numeric',
+      criteria: [{ id: 1, title: 'Quality', description: null, weight: 100, order: 0 }],
+      levels: [],
+    });
+    await insertReviewScores(mockTx, 42, 1, [{ criterionId: 1, score: 85, comment: 'Good work' }]);
     expect(mockTx.insert).toHaveBeenCalledWith(reviewScores);
     expect(mockTx.values).toHaveBeenCalledWith([
       {
@@ -108,7 +145,7 @@ describe('persistReviewScores', () => {
     ]);
   });
 
-  it('should persist scores with level label for qualitative rubric', async () => {
+  it('should insert scores with level label for qualitative rubric', async () => {
     vi.mocked(fetchRubric).mockResolvedValue({
       gradingType: 'qualitative',
       criteria: [{ id: 1, title: 'Quality', description: null, weight: 100, order: 0 }],
@@ -117,13 +154,7 @@ describe('persistReviewScores', () => {
         { id: 11, label: 'Good', description: null, score: 70, order: 1 },
       ],
     });
-    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ id: 42 }]).then(onfulfilled),
-    );
-    const result = await persistReviewScores(mockTx, 10, 1, [
-      { criterionId: 1, score: 90, rubricLevelId: 10 },
-    ]);
-    expect(result).toBeNull();
+    await insertReviewScores(mockTx, 42, 1, [{ criterionId: 1, score: 90, rubricLevelId: 10 }]);
     expect(mockTx.values).toHaveBeenCalledWith([
       {
         reviewId: 42,
@@ -147,14 +178,10 @@ describe('persistReviewScores', () => {
       ],
       levels: [],
     });
-    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ id: 42 }]).then(onfulfilled),
-    );
-    const result = await persistReviewScores(mockTx, 10, 1, [
+    await insertReviewScores(mockTx, 42, 1, [
       { criterionId: 1, score: 80 },
       { criterionId: 2, score: 90, comment: 'Well written' },
     ]);
-    expect(result).toBeNull();
     const inserted = mockTx.values.mock.calls[0][0];
     expect(inserted).toHaveLength(2);
     expect(inserted[0].weight).toBe(60);
@@ -171,14 +198,10 @@ describe('persistReviewScores', () => {
       criteria: [{ id: 1, title: 'Quality', description: null, weight: 100, order: 0 }],
       levels: [],
     });
-    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ id: 42 }]).then(onfulfilled),
-    );
-    const result = await persistReviewScores(mockTx, 10, 1, [
+    await insertReviewScores(mockTx, 42, 1, [
       { criterionId: 1, score: 80 },
       { criterionId: 999, score: 50 },
     ]);
-    expect(result).toBeNull();
     const inserted = mockTx.values.mock.calls[0][0];
     expect(inserted).toHaveLength(1);
     expect(inserted[0].criterionId).toBe(1);
@@ -190,27 +213,16 @@ describe('persistReviewScores', () => {
       criteria: [{ id: 1, title: 'Quality', description: null, weight: 100, order: 0 }],
       levels: [],
     });
-    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ id: 42 }]).then(onfulfilled),
-    );
-    const result = await persistReviewScores(mockTx, 10, 1, [{ criterionId: 1, score: 75 }]);
-    expect(result).toBeNull();
+    await insertReviewScores(mockTx, 42, 1, [{ criterionId: 1, score: 75 }]);
     const inserted = mockTx.values.mock.calls[0][0];
     expect(inserted[0].rubricLevelId).toBeNull();
     expect(inserted[0].levelLabel).toBeNull();
     expect(inserted[0].comment).toBeNull();
   });
 
-  it('should return INTERNAL error when review ID not found', async () => {
-    vi.mocked(fetchRubric).mockResolvedValue({
-      gradingType: 'numeric',
-      criteria: [{ id: 1, title: 'Quality', description: null, weight: 100, order: 0 }],
-      levels: [],
-    });
-    // mockTx.then returns [] by default — review not found
-    const result = await persistReviewScores(mockTx, 999, 1, [{ criterionId: 1, score: 80 }]);
-    expect(result).toEqual({
-      error: { code: 'INTERNAL', message: 'Failed to retrieve review ID' },
-    });
+  it('should not insert when rubric is null', async () => {
+    vi.mocked(fetchRubric).mockResolvedValue(null);
+    await insertReviewScores(mockTx, 42, 1, [{ criterionId: 1, score: 80 }]);
+    expect(mockTx.insert).not.toHaveBeenCalled();
   });
 });

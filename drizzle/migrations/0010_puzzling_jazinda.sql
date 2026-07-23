@@ -51,7 +51,7 @@ ALTER TABLE "checkpoints" ADD CONSTRAINT "checkpoints_template_checkpoint_id_tem
 -- Matches via assignments.templateId + order to template_checkpoints.
 UPDATE checkpoints
 SET template_checkpoint_id = tc.id
-FROM assignments a, template_checkpoints tc
+FROM assignments a
+INNER JOIN template_checkpoints tc ON tc.template_id = a.template_id
 WHERE checkpoints.assignment_id = a.id
-  AND tc.template_id = a.template_id
   AND tc."order" = checkpoints."order";

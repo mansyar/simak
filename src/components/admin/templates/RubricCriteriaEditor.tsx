@@ -181,11 +181,19 @@ export function RubricCriteriaEditor({
 
   return (
     <div className="space-y-3 pl-12">
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      {saveSuccess && <p className="text-sm text-green-600">{t('rubrics.criteria.saveSuccess')}</p>}
+      {error && (
+        <p className="text-sm text-destructive" aria-live="polite">
+          {error}
+        </p>
+      )}
+      {saveSuccess && (
+        <p className="text-sm text-success" aria-live="polite">
+          {t('rubrics.criteria.saveSuccess')}
+        </p>
+      )}
 
       {criteria.map((criterion, index) => (
-        <div key={index} className="space-y-1 rounded border p-2">
+        <div key={criterion.id ?? `new-${index}`} className="space-y-1 rounded border p-2">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -213,6 +221,7 @@ export function RubricCriteriaEditor({
               value={criterion.title}
               onChange={(e) => handleChange(index, 'title', e.target.value)}
               placeholder={t('rubrics.criteria.titlePlaceholder')}
+              aria-label={t('rubrics.criteria.titlePlaceholder')}
               data-testid={`criterion-title-${index}`}
             />
             <Input
@@ -224,6 +233,7 @@ export function RubricCriteriaEditor({
                 handleChange(index, 'weight', Math.max(0, Math.min(100, Number(e.target.value))))
               }
               className="w-20"
+              aria-label={t('rubrics.criteria.weightLabel')}
               data-testid={`criterion-weight-${index}`}
             />
             <Button
@@ -240,6 +250,7 @@ export function RubricCriteriaEditor({
             value={criterion.description}
             onChange={(e) => handleChange(index, 'description', e.target.value)}
             placeholder={t('rubrics.criteria.descriptionPlaceholder')}
+            aria-label={t('rubrics.criteria.descriptionPlaceholder')}
             data-testid={`criterion-description-${index}`}
           />
         </div>
@@ -251,7 +262,7 @@ export function RubricCriteriaEditor({
           {t('rubrics.criteria.add')}
         </Button>
         <span
-          className={weightSum === 100 ? 'text-sm text-green-600' : 'text-sm text-destructive'}
+          className={weightSum === 100 ? 'text-sm text-success' : 'text-sm text-destructive'}
           data-testid="weight-sum"
         >
           {t('rubrics.criteria.weightSum', { sum: String(weightSum) })}

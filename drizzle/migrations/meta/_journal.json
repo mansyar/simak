@@ -85,6 +85,13 @@
       "when": 1784786560270,
       "tag": "0011_serious_supreme_intelligence",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1784835483162,
+      "tag": "0012_serious_nextwave",
+      "breakpoints": true
     }
   ]
 }
