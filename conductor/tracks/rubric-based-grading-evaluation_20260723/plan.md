@@ -63,7 +63,7 @@
 
 ## Phase 3: Rubric-Based Review — Instructor
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 3
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 3
 - [ ] Task: Extend `SubmitReviewSchema` with optional `scores` array
     - [ ] Write failing tests: Zod schema tests — `scores` is optional, required when `grading_type` is not null, rejected when null. Each score object has `criterionId`, `score` (0–100), optional `rubricLevelId`, optional `comment`
     - [ ] Implement: Extend `SubmitReviewSchema` in `src/server/reviews.ts` with `scores: z.array(z.object({ criterionId, score (0–100), rubricLevelId?, comment? })).optional()`
