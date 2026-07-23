@@ -18,6 +18,7 @@ import {
 } from '../lib/review-sla';
 import { getNotificationKeys } from './notifications.server';
 import { sendReviewEmail } from '../lib/review-email';
+import { fetchRubric } from './rubrics.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -162,6 +163,7 @@ export async function getReviewDetailHandler(args: { data: GetReviewDetailInput 
         uploadedAt: submissions.uploadedAt,
         checkpointState: checkpoints.state,
         checkpointUpdatedAt: checkpoints.updatedAt,
+        templateCheckpointId: checkpoints.templateCheckpointId,
       })
       .from(submissions)
       .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
@@ -198,13 +200,10 @@ export async function getReviewDetailHandler(args: { data: GetReviewDetailInput 
       .where(eq(submissions.checkpointId, submission.checkpointId))
       .orderBy(desc(reviews.createdAt));
 
-    return {
-      submission: {
-        ...submission,
-        downloadUrl,
-      },
-      reviewHistory,
-    };
+    const rubric = submission.templateCheckpointId
+      ? await fetchRubric(db, submission.templateCheckpointId)
+      : null;
+    return { submission: { ...submission, downloadUrl }, reviewHistory, rubric };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

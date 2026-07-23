@@ -319,6 +319,62 @@ export async function getRubricHandler({
 }
 
 /**
+ * Fetch rubric data for a template checkpoint (no auth guard).
+ * Returns null if checkpoint doesn't exist or has no rubric (gradingType is null).
+ * Used by getReviewDetailHandler to provide rubric data to the instructor review UI.
+ */
+export async function fetchRubric(db: ReturnType<typeof getDb>, templateCheckpointId: number) {
+  const [checkpoint] = await db
+    .select({ gradingType: templateCheckpoints.gradingType })
+    .from(templateCheckpoints)
+    .where(
+      and(eq(templateCheckpoints.id, templateCheckpointId), isNull(templateCheckpoints.deletedAt)),
+    )
+    .limit(1);
+
+  if (!checkpoint || !checkpoint.gradingType) return null;
+
+  const criteria = await db
+    .select({
+      id: rubricCriteria.id,
+      title: rubricCriteria.title,
+      description: rubricCriteria.description,
+      weight: rubricCriteria.weight,
+      order: rubricCriteria.order,
+    })
+    .from(rubricCriteria)
+    .where(
+      and(
+        eq(rubricCriteria.templateCheckpointId, templateCheckpointId),
+        isNull(rubricCriteria.deletedAt),
+      ),
+    )
+    .orderBy(asc(rubricCriteria.order));
+
+  const levels =
+    checkpoint.gradingType === 'qualitative'
+      ? await db
+          .select({
+            id: rubricLevels.id,
+            label: rubricLevels.label,
+            description: rubricLevels.description,
+            score: rubricLevels.score,
+            order: rubricLevels.order,
+          })
+          .from(rubricLevels)
+          .where(
+            and(
+              eq(rubricLevels.templateCheckpointId, templateCheckpointId),
+              isNull(rubricLevels.deletedAt),
+            ),
+          )
+          .orderBy(asc(rubricLevels.order))
+      : [];
+
+  return { gradingType: checkpoint.gradingType, criteria, levels };
+}
+
+/**
  * Soft-delete a single rubric criterion by ID.
  */
 export async function softDeleteCriterionHandler({
