@@ -96,7 +96,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Rubric-Based Review — Instructor' (Protocol in workflow.md)
 
-## Phase 4: Student View, Analytics & i18n
+## Phase 4: Student View, Analytics & i18n [checkpoint: 64570ee]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 4
 - [x] Task: Extend `getLatestReviewHandler` to return `review_scores` (e1c261f)
