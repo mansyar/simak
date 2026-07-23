@@ -79,10 +79,10 @@
     - [ ] Implement: Extend `submitReviewHandler` (`reviews.server.ts:220`) to accept `scores`, look up criteria + levels for snapshot fields, insert into `review_scores`
     - [ ] Verify: `pnpm test` passes
 
-- [ ] Task: Instructor rubric scoring UI — numeric scoring
-    - [ ] Write failing tests: Component tests for numeric criterion scoring — `Input`/`Slider` (0–100) per criterion, weighted total auto-computed and displayed, all criteria must be scored before submit
-    - [ ] Implement: Add numeric scoring section to `src/components/reviews/ReviewForm.tsx` (or extract `RubricScoringSection.tsx` sub-component if file exceeds 500 lines). Auto-compute weighted total client-side
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: Instructor rubric scoring UI — numeric scoring (7e068fc)
+    - [x] Write failing tests: Component tests for numeric criterion scoring — `Input`/`Slider` (0–100) per criterion, weighted total auto-computed and displayed, all criteria must be scored before submit
+    - [x] Implement: Add numeric scoring section to `src/components/reviews/ReviewForm.tsx` (or extract `RubricScoringSection.tsx` sub-component if file exceeds 500 lines). Auto-compute weighted total client-side
+    - [x] Verify: `pnpm test` passes
 
 - [ ] Task: Instructor rubric scoring UI — qualitative scoring
     - [ ] Write failing tests: Component tests for qualitative criterion scoring — `Select` per criterion (level → score mapping), weighted total auto-computed, all criteria must be scored before submit
