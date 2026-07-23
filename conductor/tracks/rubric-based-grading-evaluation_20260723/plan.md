@@ -136,5 +136,5 @@
     - [x] Run `pnpm check:i18n` — verify EN ↔ ID parity
     - [x] Verify all files in `src/`, `tests/`, `scripts/` are under 500 lines
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Student View, Analytics & i18n' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Student View, Analytics & i18n' (Protocol in workflow.md)
 </protect>
