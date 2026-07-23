@@ -89,7 +89,7 @@
     - [x] Implement: Add qualitative scoring to `RubricScoringSection.tsx` — `Select` component mapping levels to scores
     - [x] Verify: `pnpm test` passes
 
-- [ ] Task: Skip rubric UI when `grading_type` is null
+- [x] Task: Skip rubric UI when `grading_type` is null [de774a6]
     - [ ] Write failing tests: Component test — `ReviewForm` renders no rubric UI when `grading_type` is null, current pass/fail flow unchanged
     - [ ] Implement: Conditionally render rubric scoring section only when `grading_type` is not null
     - [ ] Verify: `pnpm test` passes, backward compatibility confirmed
