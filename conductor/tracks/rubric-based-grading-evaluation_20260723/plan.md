@@ -59,7 +59,7 @@
     - [ ] Implement: Add `countPendingReviewsForTemplate` server function. Add confirmation dialog in rubric builder UI showing affected count before save
     - [ ] Verify: `pnpm test` passes
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Rubric CRUD — Admin' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Rubric CRUD — Admin' (Protocol in workflow.md)
 
 ## Phase 3: Rubric-Based Review — Instructor
 

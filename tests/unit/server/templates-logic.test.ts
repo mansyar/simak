@@ -281,13 +281,15 @@ describe('Template server functions - Logic & Security', () => {
           Promise.resolve([{ assignmentCount: 0 }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 1, name: 'Ch 1', order: 1 }]).then(onfulfilled),
+          Promise.resolve([{ id: 1, name: 'Ch 1', order: 1, gradingType: 'numeric' }]).then(
+            onfulfilled,
+          ),
         );
 
       const result = await getTemplateHandler({ data: { id: 1 } });
-
       expect(result).not.toBeNull();
       expect(result).toHaveProperty('checkpoints');
+      expect((result as any)?.checkpoints?.[0]?.gradingType).toBe('numeric');
     });
 
     it('should return null for non-existent template', async () => {
