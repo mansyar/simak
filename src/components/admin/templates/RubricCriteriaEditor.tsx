@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { getRubric, saveRubric } from '@/server/rubrics';
-import type { RubricLevel } from '@/server/rubrics';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { RubricLevelsEditor, type LevelInput } from './RubricLevelsEditor';
 import { useI18n } from '../../../routes/__root';
 
 interface CriterionInput {
@@ -29,7 +29,7 @@ export function RubricCriteriaEditor({
   const saveRubricFn = useServerFn(saveRubric);
 
   const [criteria, setCriteria] = useState<CriterionInput[]>([]);
-  const [levels, setLevels] = useState<RubricLevel[]>([]);
+  const [levels, setLevels] = useState<LevelInput[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +55,15 @@ export function RubricCriteriaEditor({
               order: c.order,
             })),
           );
-          setLevels(result.levels ?? []);
+          setLevels(
+            result.levels.map((l) => ({
+              id: l.id,
+              label: l.label,
+              description: l.description ?? '',
+              score: l.score,
+              order: l.order,
+            })),
+          );
         }
       } catch {
         if (!cancelled) setError(t('rubrics.criteria.loadError'));
@@ -71,7 +79,8 @@ export function RubricCriteriaEditor({
   }, [templateCheckpointId]);
 
   const weightSum = criteria.reduce((sum, c) => sum + c.weight, 0);
-  const isValid = criteria.length > 0 && weightSum === 100;
+  const isValid =
+    criteria.length > 0 && weightSum === 100 && (gradingType === 'numeric' || levels.length > 0);
 
   const handleAdd = useCallback(() => {
     setCriteria((prev) => [...prev, { title: '', description: '', weight: 0, order: prev.length }]);
@@ -121,13 +130,7 @@ export function RubricCriteriaEditor({
           templateCheckpointId,
           gradingType,
           criteria,
-          levels: levels.map((l) => ({
-            id: l.id,
-            label: l.label,
-            description: l.description ?? undefined,
-            score: l.score,
-            order: l.order,
-          })),
+          levels,
         },
       });
       if (result && 'error' in result) {
@@ -225,6 +228,10 @@ export function RubricCriteriaEditor({
           {t('rubrics.criteria.weightSum', { sum: String(weightSum) })}
         </span>
       </div>
+
+      {gradingType === 'qualitative' && (
+        <RubricLevelsEditor levels={levels} onLevelsChange={setLevels} />
+      )}
 
       <Button
         type="button"

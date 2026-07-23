@@ -1033,6 +1033,15 @@
       "weightSum": "Weight sum: {sum}/100",
       "save": "Save Rubric",
       "saving": "Saving..."
+    },
+    "levels": {
+      "add": "Add Level",
+      "remove": "Remove",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "labelPlaceholder": "Level label",
+      "descriptionPlaceholder": "Description (optional)",
+      "scoreLabel": "Score"
     }
   }
 }

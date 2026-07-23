@@ -1039,6 +1039,15 @@ export type Translation = {
       save: string
       saving: string
     }
+    levels: {
+      add: string
+      remove: string
+      moveUp: string
+      moveDown: string
+      labelPlaceholder: string
+      descriptionPlaceholder: string
+      scoreLabel: string
+    }
   }
 }
 

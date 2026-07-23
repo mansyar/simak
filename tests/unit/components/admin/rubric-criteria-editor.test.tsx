@@ -38,6 +38,13 @@ vi.mock('@/routes/__root', () => ({
         'rubrics.criteria.weightSum': 'Weight sum: {sum}/100',
         'rubrics.criteria.save': 'Save Rubric',
         'rubrics.criteria.saving': 'Saving...',
+        'rubrics.levels.add': 'Add Level',
+        'rubrics.levels.remove': 'Remove',
+        'rubrics.levels.moveUp': 'Move Up',
+        'rubrics.levels.moveDown': 'Move Down',
+        'rubrics.levels.labelPlaceholder': 'Level label',
+        'rubrics.levels.descriptionPlaceholder': 'Description (optional)',
+        'rubrics.levels.scoreLabel': 'Score',
       };
       let result = translations[key] || key;
       if (params) {
@@ -67,6 +74,24 @@ vi.mock('lucide-react', () => ({
   X: () => <span data-testid="icon-x" />,
   ChevronUp: () => <span data-testid="icon-chevron-up" />,
   ChevronDown: () => <span data-testid="icon-chevron-down" />,
+}));
+
+vi.mock('@/components/admin/templates/RubricLevelsEditor', () => ({
+  RubricLevelsEditor: ({ levels, onLevelsChange }: any) => (
+    <div data-testid="rubric-levels-editor" data-levels-count={levels.length}>
+      <button
+        type="button"
+        onClick={() =>
+          onLevelsChange([
+            ...levels,
+            { label: 'New', description: '', score: 50, order: levels.length },
+          ])
+        }
+      >
+        Mock Add Level
+      </button>
+    </div>
+  ),
 }));
 
 import { RubricCriteriaEditor } from '@/components/admin/templates/RubricCriteriaEditor';
@@ -312,6 +337,113 @@ describe('RubricCriteriaEditor', () => {
     fireEvent.click(screen.getByTestId('save-rubric'));
     await waitFor(() => {
       expect(screen.getByText('Invalid weights')).toBeDefined();
+    });
+  });
+
+  it('should render RubricLevelsEditor when gradingType is qualitative', async () => {
+    mockGetRubric.mockResolvedValue({
+      gradingType: 'qualitative',
+      criteria: [{ id: 1, title: 'A', description: null, weight: 100, order: 0 }],
+      levels: [{ id: 1, label: 'Excellent', description: null, score: 90, order: 0 }],
+    });
+    render(<RubricCriteriaEditor templateCheckpointId={1} gradingType="qualitative" />);
+    await waitFor(() => {
+      expect(screen.getByTestId('rubric-levels-editor')).toBeDefined();
+    });
+  });
+
+  it('should not render RubricLevelsEditor when gradingType is numeric', async () => {
+    mockGetRubric.mockResolvedValue({
+      gradingType: 'numeric',
+      criteria: [{ id: 1, title: 'A', description: null, weight: 100, order: 0 }],
+      levels: [],
+    });
+    render(<RubricCriteriaEditor templateCheckpointId={1} gradingType="numeric" />);
+    await waitFor(() => {
+      expect(screen.getByTestId('save-rubric')).toBeDefined();
+    });
+    expect(screen.queryByTestId('rubric-levels-editor')).toBeNull();
+  });
+
+  it('should disable Save Rubric when qualitative and no levels', async () => {
+    mockGetRubric.mockResolvedValue({
+      gradingType: 'qualitative',
+      criteria: [{ id: 1, title: 'A', description: null, weight: 100, order: 0 }],
+      levels: [],
+    });
+    render(<RubricCriteriaEditor templateCheckpointId={1} gradingType="qualitative" />);
+    await waitFor(() => {
+      expect(screen.getByTestId('save-rubric')).toBeDefined();
+    });
+    expect((screen.getByTestId('save-rubric') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('should enable Save Rubric when qualitative with levels and weights sum to 100', async () => {
+    mockGetRubric.mockResolvedValue({
+      gradingType: 'qualitative',
+      criteria: [{ id: 1, title: 'A', description: null, weight: 100, order: 0 }],
+      levels: [{ id: 1, label: 'Excellent', description: null, score: 90, order: 0 }],
+    });
+    render(<RubricCriteriaEditor templateCheckpointId={1} gradingType="qualitative" />);
+    await waitFor(() => {
+      expect((screen.getByTestId('save-rubric') as HTMLButtonElement).disabled).toBe(false);
+    });
+  });
+
+  it('should call saveRubric with levels when qualitative', async () => {
+    mockGetRubric.mockResolvedValue({
+      gradingType: 'qualitative',
+      criteria: [{ id: 1, title: 'A', description: null, weight: 100, order: 0 }],
+      levels: [{ id: 1, label: 'Excellent', description: 'Outstanding', score: 90, order: 0 }],
+    });
+    render(<RubricCriteriaEditor templateCheckpointId={5} gradingType="qualitative" />);
+    await waitFor(() => {
+      expect(screen.getByTestId('save-rubric')).toBeDefined();
+    });
+    fireEvent.click(screen.getByTestId('save-rubric'));
+    await waitFor(() => {
+      expect(mockSaveRubric).toHaveBeenCalledWith({
+        data: {
+          templateCheckpointId: 5,
+          gradingType: 'qualitative',
+          criteria: [{ id: 1, title: 'A', description: '', weight: 100, order: 0 }],
+          levels: [{ id: 1, label: 'Excellent', description: 'Outstanding', score: 90, order: 0 }],
+        },
+      });
+    });
+  });
+
+  it('should update levels when RubricLevelsEditor calls onLevelsChange', async () => {
+    mockGetRubric.mockResolvedValue({
+      gradingType: 'qualitative',
+      criteria: [{ id: 1, title: 'A', description: null, weight: 100, order: 0 }],
+      levels: [{ id: 1, label: 'Good', description: null, score: 70, order: 0 }],
+    });
+    render(<RubricCriteriaEditor templateCheckpointId={1} gradingType="qualitative" />);
+    await waitFor(() => {
+      expect(screen.getByTestId('rubric-levels-editor')).toBeDefined();
+    });
+    // Save should be enabled (1 level + weights = 100)
+    expect((screen.getByTestId('save-rubric') as HTMLButtonElement).disabled).toBe(false);
+    // Remove the level via mock (simulate empty levels)
+    // Click "Mock Add Level" to add a new level
+    fireEvent.click(screen.getByText('Mock Add Level'));
+    await waitFor(() => {
+      expect(mockSaveRubric).not.toHaveBeenCalled();
+    });
+    // Now save
+    fireEvent.click(screen.getByTestId('save-rubric'));
+    await waitFor(() => {
+      expect(mockSaveRubric).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            levels: expect.arrayContaining([
+              expect.objectContaining({ label: 'Good' }),
+              expect.objectContaining({ label: 'New' }),
+            ]),
+          }),
+        }),
+      );
     });
   });
 });

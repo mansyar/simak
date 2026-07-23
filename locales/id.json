@@ -1033,6 +1033,15 @@
       "weightSum": "Jumlah bobot: {sum}/100",
       "save": "Simpan Rubrik",
       "saving": "Menyimpan..."
+    },
+    "levels": {
+      "add": "Tambah Level",
+      "remove": "Hapus",
+      "moveUp": "Naik",
+      "moveDown": "Turun",
+      "labelPlaceholder": "Label level",
+      "descriptionPlaceholder": "Deskripsi (opsional)",
+      "scoreLabel": "Skor"
     }
   }
 }
