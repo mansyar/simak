@@ -39,10 +39,10 @@
     - [ ] Implement: Create `src/server/rubrics.server.ts` with handlers: `saveRubricHandler` (create/update criteria + levels per checkpoint), `softDeleteCriterionHandler`, `softDeleteLevelHandler`. Admin-only via local `isAdmin` type guard (matching `templates.server.ts:24`)
     - [ ] Verify: `pnpm test` passes
 
-- [ ] Task: Admin rubric builder UI — grading type selector
-    - [ ] Write failing tests: Component tests for grading type selector (null/numeric/qualitative dropdown), renders only when checkpoint is selected
-    - [ ] Implement: Add grading type `Select` to `src/components/admin/templates/CheckpointListEditor.tsx`. Wire to `saveRubric` server function
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: Admin rubric builder UI — grading type selector [074fcdb]
+    - [x] Write failing tests: Component tests for grading type selector (null/numeric/qualitative dropdown), renders only when checkpoint is selected
+    - [x] Implement: Add grading type `Select` to `src/components/admin/templates/CheckpointListEditor.tsx`. Wire to `saveRubric` server function
+    - [x] Verify: `pnpm test` passes
 
 - [ ] Task: Admin rubric builder UI — criteria editor
     - [ ] Write failing tests: Component tests for criteria editor — add/remove/reorder criteria, title/description/weight inputs, weight sum validation display (must = 100%), strict validation on save
