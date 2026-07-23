@@ -14,10 +14,10 @@
     - [x] Implement: Create new schema files for the three tables with FKs, CHECK constraints, and soft-delete columns
     - [x] Verify: `pnpm test` passes
 
-- [ ] Task: Generate migration, backfill `templateCheckpointId`, and create rollback file
-    - [ ] Write failing tests: Migration backfill test — `templateCheckpointId` correctly populated for existing checkpoints via `assignments.templateId + order` matching
-    - [ ] Implement: Run `pnpm db:generate`. Add backfill SQL to migration (UPDATE checkpoints SET templateCheckpointId = ... FROM assignments WHERE ...). Create rollback file per SQL styleguide §5.1
-    - [ ] Verify: `pnpm db:migrate` applies cleanly, backfill populates correctly, rollback works
+- [x] Task: Generate migration, backfill `templateCheckpointId`, and create rollback file [1c33638]
+    - [x] Write failing tests: Migration backfill test — `templateCheckpointId` correctly populated for existing checkpoints via `assignments.templateId + order` matching
+    - [x] Implement: Run `pnpm db:generate`. Add backfill SQL to migration (UPDATE checkpoints SET templateCheckpointId = ... FROM assignments WHERE ...). Create rollback file per SQL styleguide §5.1
+    - [x] Verify: `pnpm db:migrate` applies cleanly, backfill populates correctly, rollback works
 
 - [ ] Task: Refactor `updateTemplateHandler` to upsert/diff
     - [ ] Write failing tests: Tests for `updateTemplateHandler` — checkpoint IDs preserved on metadata-only edit (name/minConsultations/estimatedDuration change), new IDs created only for new checkpoints, removed checkpoints soft-deleted
