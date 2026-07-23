@@ -5,12 +5,17 @@ vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({ RESEND_API_KEY: 'test-key' }),
 }));
 
-const { pruneMock } = vi.hoisted(() => ({
+const { pruneMock, scannerMock } = vi.hoisted(() => ({
   pruneMock: vi.fn(),
+  scannerMock: vi.fn(),
 }));
 
 vi.mock('@/lib/email-queue-retention', () => ({
   pruneOldEmails: pruneMock,
+}));
+
+vi.mock('@/lib/deadline-reminder-scanner', () => ({
+  processDeadlineReminders: scannerMock,
 }));
 
 describe('email-queue-init', () => {
@@ -20,6 +25,8 @@ describe('email-queue-init', () => {
     vi.clearAllMocks();
     pruneMock.mockReset();
     pruneMock.mockResolvedValue({ deleted: 0 });
+    scannerMock.mockReset();
+    scannerMock.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -154,6 +161,88 @@ describe('email-queue-init', () => {
     expect(logJson).not.toContain('@');
     expect(logJson).not.toContain('recipient');
     expect(logJson).not.toContain('subject');
+    stopEmailQueue();
+  });
+
+  it('calls processDeadlineReminders on first tick (lastReminderScanAt is null)', async () => {
+    mockProcessor(() => Promise.resolve());
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(scannerMock).toHaveBeenCalledTimes(1);
+    stopEmailQueue();
+  });
+
+  it('does not call processDeadlineReminders again within 1h of last scan', async () => {
+    mockProcessor(() => Promise.resolve());
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(scannerMock).toHaveBeenCalledTimes(1);
+
+    for (let i = 0; i < 5; i++) {
+      vi.advanceTimersByTime(30_000);
+      await vi.advanceTimersByTimeAsync(0);
+    }
+    expect(scannerMock).toHaveBeenCalledTimes(1);
+
+    stopEmailQueue();
+  });
+
+  it('calls processDeadlineReminders again after >1h since last scan', async () => {
+    mockProcessor(() => Promise.resolve());
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(scannerMock).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(60 * 60 * 1000 + 1_000);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(scannerMock).toHaveBeenCalledTimes(2);
+
+    stopEmailQueue();
+  });
+
+  it('scanner failure is isolated — email processing continues on next tick', async () => {
+    const processMock = mockProcessor(() => Promise.resolve());
+    scannerMock.mockRejectedValueOnce(new Error('scanner failed'));
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(processMock).toHaveBeenCalledTimes(1);
+    expect(scannerMock).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(30_000);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(processMock).toHaveBeenCalledTimes(2);
+
+    stopEmailQueue();
+  });
+
+  it('logs structured error when scanner throws but tick continues to prune', async () => {
+    mockProcessor(() => Promise.resolve());
+    scannerMock.mockRejectedValueOnce(new Error('scanner failed'));
+    pruneMock.mockResolvedValue({ deleted: 7 });
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+
+    const errorLog = (console.error as Mock).mock.calls.find(
+      (call: any[]) => call[0]?.event === 'deadline_reminder.scan_error',
+    );
+    expect(errorLog).toBeTruthy();
+    expect(errorLog![0]).toMatchObject({
+      event: 'deadline_reminder.scan_error',
+      error: 'scanner failed',
+    });
+
+    expect(pruneMock).toHaveBeenCalledTimes(1);
     stopEmailQueue();
   });
 });
