@@ -109,10 +109,10 @@
     - [ ] Implement: Add `RubricResultView.tsx` component on `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx`. Read-only display
     - [ ] Verify: `pnpm test` passes
 
-- [ ] Task: Rubric analytics — instructor metrics
-    - [ ] Write failing tests: Handler tests for instructor rubric analytics — avg score per criterion, criterion-level pass/fail rates. Returns metrics for instructor's assignments only
-    - [ ] Implement: Extend `analytics-instructor.server.ts` with rubric metrics. Create dedicated rubric analytics view/section
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: Rubric analytics — instructor metrics [5d9a4ce]
+    - [x] Write failing tests: Handler tests for instructor rubric analytics — avg score per criterion, criterion-level pass/fail rates. Returns metrics for instructor's assignments only
+    - [x] Implement: Extend `analytics-instructor.server.ts` with rubric metrics. Create dedicated rubric analytics view/section
+    - [x] Verify: `pnpm test` passes
 
 - [ ] Task: Rubric analytics — admin metrics
     - [ ] Write failing tests: Handler tests for admin rubric analytics — cross-instructor criterion performance, class-wide weakness identification (lowest avg criteria across all instructors)
