@@ -8,5 +8,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Proactive Deadline Reminder System**
+- [x] **Track: Proactive Deadline Reminder System**
 *Link: [./tracks/proactive-deadline-reminders_20260723/](./tracks/proactive-deadline-reminders_20260723/)*
