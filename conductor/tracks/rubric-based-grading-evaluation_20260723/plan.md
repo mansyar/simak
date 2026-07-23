@@ -24,7 +24,7 @@
     - [ ] Implement: Refactor `src/server/templates.server.ts:267` from delete+reinsert to upsert/diff approach
     - [ ] Verify: `pnpm test` passes, rubric FKs survive template edits
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Schema, Migration & Template Handler Refactor' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Schema, Migration & Template Handler Refactor' (Protocol in workflow.md)
 
 ## Phase 2: Rubric CRUD — Admin
 

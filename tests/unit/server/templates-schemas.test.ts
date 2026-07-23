@@ -52,6 +52,38 @@ describe('Template Schemas', () => {
       });
       expect(result.success).toBe(false);
     });
+
+    it('should accept checkpoint with valid id', () => {
+      const result = CheckpointInputSchema.safeParse({
+        id: 5,
+        name: 'Chapter 1',
+        minConsultations: 0,
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.id).toBe(5);
+      }
+    });
+
+    it('should accept checkpoint without id (optional)', () => {
+      const result = CheckpointInputSchema.safeParse({
+        name: 'Chapter 1',
+        minConsultations: 0,
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.id).toBeUndefined();
+      }
+    });
+
+    it('should reject non-positive id', () => {
+      const result = CheckpointInputSchema.safeParse({
+        id: 0,
+        name: 'Chapter 1',
+        minConsultations: 0,
+      });
+      expect(result.success).toBe(false);
+    });
   });
 
   describe('CreateTemplateSchema', () => {
