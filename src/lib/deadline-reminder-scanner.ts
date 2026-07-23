@@ -21,6 +21,7 @@ import { notifications } from '@/db/schema/notifications';
 import { deadlineReminders } from '@/db/schema/deadline-reminders';
 import { getNotificationKeys } from '@/lib/i18n-server';
 import { sendDeadlineReminderEmail } from '@/lib/deadline-reminder-email';
+import { shouldSendInAppNotification } from '@/lib/notification-prefs';
 
 const REMINDER_TIERS = [
   { tier: '7d', leadDays: 7 },
@@ -46,6 +47,7 @@ export async function processDeadlineReminders(): Promise<void> {
           checkpointName: checkpoints.name,
           dueDate: checkpoints.dueDate,
           studentId: checkpoints.studentId,
+          settings: users.settings,
         })
         .from(checkpoints)
         .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
@@ -88,25 +90,32 @@ export async function processDeadlineReminders(): Promise<void> {
         const toSend = dueCheckpoints.filter((c) => winnerIds.has(c.checkpointId));
 
         // Batch insert in-app notifications (single INSERT)
-        const keys = getNotificationKeys('deadline_reminder');
-        const notificationValues = toSend.map((c) => ({
-          userId: c.studentId,
-          type: 'deadline_reminder',
-          titleKey: keys.titleKey,
-          messageKey: keys.messageKey,
-          params: {
-            assignmentTitle: c.assignmentTitle,
-            checkpointName: c.checkpointName,
-            dueDate: String(c.dueDate),
-          },
-          channel: 'in_app',
-          metadata: {
-            assignmentId: c.assignmentId,
-            checkpointId: c.checkpointId,
-          },
-        }));
+        // Only for students who haven't disabled in-app notifications for deadline_reminder
+        const notifiableCheckpoints = toSend.filter((c) =>
+          shouldSendInAppNotification(c.settings, 'deadline_reminder'),
+        );
 
-        await tx.insert(notifications).values(notificationValues);
+        if (notifiableCheckpoints.length > 0) {
+          const keys = getNotificationKeys('deadline_reminder');
+          const notificationValues = notifiableCheckpoints.map((c) => ({
+            userId: c.studentId,
+            type: 'deadline_reminder',
+            titleKey: keys.titleKey,
+            messageKey: keys.messageKey,
+            params: {
+              assignmentTitle: c.assignmentTitle,
+              checkpointName: c.checkpointName,
+              dueDate: String(c.dueDate),
+            },
+            channel: 'in_app',
+            metadata: {
+              assignmentId: c.assignmentId,
+              checkpointId: c.checkpointId,
+            },
+          }));
+
+          await tx.insert(notifications).values(notificationValues);
+        }
         return toSend;
       });
 

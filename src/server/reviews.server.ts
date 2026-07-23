@@ -4,7 +4,6 @@ import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews, uploadIntents } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
-import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode, isServerError } from '../lib/errors';
@@ -18,6 +17,7 @@ import {
 } from '../lib/review-sla';
 import { getNotificationKeys } from './notifications.server';
 import { sendReviewEmail } from '../lib/review-email';
+import { maybeInsertNotification } from '../lib/notification-prefs';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -408,7 +408,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
 
       if (decision === 'pass') {
         const reviewCompletedKeys = getNotificationKeys('review_completed');
-        await tx.insert(notifications).values({
+        await maybeInsertNotification(tx, submission.studentId, 'review_completed', {
           userId: submission.studentId,
           type: 'review_completed',
           titleKey: reviewCompletedKeys.titleKey,
@@ -424,7 +424,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
         });
       } else if (decision === 'revise') {
         const revisionRequestedKeys = getNotificationKeys('revision_requested');
-        await tx.insert(notifications).values({
+        await maybeInsertNotification(tx, submission.studentId, 'revision_requested', {
           userId: submission.studentId,
           type: 'revision_requested',
           titleKey: revisionRequestedKeys.titleKey,

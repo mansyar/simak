@@ -299,4 +299,47 @@ describe('requestExtensionHandler', () => {
       'notification insert failed',
     );
   });
+
+  it('should skip notification when inApp preference is false', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([
+          { maxExtensionDays: 7, maxTotalExtensions: 3, instructorId: 'instructor-1' },
+        ]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 10, dueDate: new Date('2026-06-15'), order: 1 }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ dueDate: new Date('2026-06-15') }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ count: 0 }]).then(onfulfilled),
+      )
+      .mockImplementation((onfulfilled: any) =>
+        Promise.resolve([
+          {
+            settings: {
+              notificationPrefs: { extension_requested: { inApp: false } },
+            },
+          },
+        ]).then(onfulfilled),
+      );
+
+    mockDb.returning.mockResolvedValue([{ id: 100 }]);
+
+    await requestExtensionHandler({ data: validInput });
+
+    // Only the extension request INSERT, no notification INSERT
+    expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    const valuesCalls = vi.mocked(mockDb.values).mock.calls;
+    const notificationValues = valuesCalls.find(
+      (call: any) => call[0]?.type === 'extension_requested',
+    );
+    expect(notificationValues).toBeUndefined();
+  });
 });
