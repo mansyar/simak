@@ -960,6 +960,70 @@ export type Translation = {
       reducedMotionLabel: string
       reducedMotionHint: string
     }
+    notificationPreferences: {
+      title: string
+      description: string
+      channels: {
+        email: string
+        inApp: string
+      }
+      groups: {
+        reviews: string
+        consultations: string
+        submissions: string
+        system: string
+      }
+      types: {
+        review_completed: {
+          label: string
+          description: string
+        }
+        revision_requested: {
+          label: string
+          description: string
+        }
+        consultation_logged: {
+          label: string
+          description: string
+        }
+        consultation_verified: {
+          label: string
+          description: string
+        }
+        consultation_rejected: {
+          label: string
+          description: string
+        }
+        submission_received: {
+          label: string
+          description: string
+        }
+        extension_requested: {
+          label: string
+          description: string
+        }
+        extension_approved: {
+          label: string
+          description: string
+        }
+        extension_rejected: {
+          label: string
+          description: string
+        }
+        deadline_extended: {
+          label: string
+          description: string
+        }
+        deadline_reminder: {
+          label: string
+          description: string
+        }
+        sla_breach: {
+          label: string
+          description: string
+        }
+      }
+    }
   }
   bulkImport: {
     common: {
