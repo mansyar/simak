@@ -246,6 +246,51 @@ All tracks must adhere to the following project constraints:
 *   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. New tests for: schema validation (`grading_type` pgEnum, individual CHECK on `weight 0–100` and `score 0–100`, FK integrity, `deletedAt` soft-delete), `updateTemplateHandler` upsert (checkpoint IDs preserved on metadata edit, new IDs only for new checkpoints), `templateCheckpointId` backfill correctness, rubric CRUD handlers (create/update/soft-delete, admin-only via local `isAdmin`, weight-sum validation at application layer, qualitative-only levels), review scoring (numeric input, qualitative level mapping, weighted total computation, all-criteria-scored validation, `scores` optional when `grading_type` is `null`, denormalized snapshot unaffected by later rubric edits — criterion title and level label preserved after soft-delete), `getReviewDetailHandler` returns rubric data, `getLatestReviewHandler` returns review_scores, student view rendering, analytics aggregation (avg per criterion, cross-instructor comparison). `pnpm check:i18n` — parity for all new keys. `pnpm test:coverage` >= 80% on all thresholds.
 *   [ ] **Conductor Review:** `grading_type` pgEnum column on `template_checkpoints` (nullable). `templateCheckpointId` FK on `checkpoints` (nullable, backfilled). `rubric_criteria` and `rubric_levels` have `deletedAt` (soft-delete). `review_scores` stores full denormalized snapshot (`criterionTitle`, `levelLabel` — historical reviews unaffected by rubric edits). Weight-sum validation at Zod application layer (not DB CHECK — spans multiple rows). `updateTemplateHandler` refactored to upsert (checkpoint IDs preserved). Server function two-file split followed (`rubrics.ts` + `rubrics.server.ts`). Existing handlers extended in-place (`reviews.ts`, `reviews.server.ts`, `reviews-extras.server.ts`). All files under 500 lines. Migration has rollback file. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` all clean.
 
+### TRACK-021: Proactive Deadline Reminder System
+
+*   **Status:** `Pending`
+*   **Dependencies:** None
+*   **Estimated Effort:** 5 Days / 3 Sprint Loops
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** `docs/PRD.md#checkpoints--submissions` (checkpoint lifecycle — students submit per checkpoint with due dates), `docs/PRD.md#analytics--reporting` (existing `deadlineBreachRate` metric measures the gap this track closes)
+*   **TDD Reference:** `docs/TDD.md` `checkpoints` table (`src/db/schema/assignments.ts:77` — has `dueDate` timestamp + `state` pgEnum), `email_queue` table (`src/db/schema/email-queue.ts:3` — `templateType` enum, `status` lifecycle), `notifications` table (`src/db/schema/notifications.ts:13` — `type`, `titleKey`, `messageKey`, `channel`); `src/lib/email-queue-init.ts` (existing 30s polling loop — extension point), `src/lib/email-queue-processor.ts` (existing `FOR UPDATE SKIP LOCKED` pattern — concurrency model), `src/lib/review-sla.ts` (closest analog — reactive scan that dispatches batch notifications + emails), `src/lib/event-email.ts` (`enqueueEventEmail` advisory pattern), `src/server/dashboard-student.server.ts:49-67` (upcoming-deadlines query shape — reused by scanner)
+
+#### Track Tech Stack
+*   Drizzle ORM — new table: `deadline_reminders` (dedup tracking: `checkpointId` FK, `studentId` FK, `tier` text, `sentAt` timestamp, unique constraint `(checkpointId, tier)` for multi-instance safety via `ON CONFLICT DO NOTHING`)
+*   Drizzle Kit migration (`pnpm db:generate` + `pnpm db:migrate` + rollback file per SQL styleguide §5.1)
+*   Existing `email_queue.templateType` enum extended: add `deadline_reminder` (currently 12 values, `src/db/schema/email-queue.ts:10-24`)
+*   New scanner module: `src/lib/deadline-reminder-scanner.ts` — queries checkpoints due within tier windows, dedup-inserts into `deadline_reminders`, enqueues emails + creates in-app notifications
+*   Existing file extension: `src/lib/email-queue-init.ts` — add `processDeadlineReminders()` call to the existing `tick()` function (runs alongside `processEmailQueue()` + `pruneOldEmails()`)
+*   Existing email infrastructure reuse: `enqueueEmail` (`src/lib/email.ts:69`), `enqueueEventEmail` (`src/lib/event-email.ts:12`), `getNotificationKeys` (`src/lib/i18n-server.ts:44`), shared `HEADER_HTML`/`FOOTER_HTML` from `src/lib/email-templates.ts`
+*   i18n codegen — new keys in both `locales/en.json` and `locales/id.json` (`notifications.events.deadline_reminder.*`, `emails.deadline_reminder.*`, `emails.subjects.deadline_reminder`)
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Schema — deadline_reminders:** Create table: `checkpointId` (FK to `checkpoints.id`, `onDelete: cascade`), `studentId` (FK to `users.id`, `onDelete: cascade`), `tier` (text — `'7d'`/`'3d'`/`'1d'`), `sentAt` (timestamp, `defaultNow`). Unique constraint on `(checkpointId, tier)` — guarantees at-most-once delivery per tier per checkpoint, even across multiple server instances
+    *   **Email queue enum extension:** Add `'deadline_reminder'` to `templateType` enum in `src/db/schema/email-queue.ts` (migration extends the existing pg enum)
+    *   **Scanner module:** New `src/lib/deadline-reminder-scanner.ts` exporting `processDeadlineReminders()`. Tier constants: `[{ tier: '7d', leadDays: 7 }, { tier: '3d', leadDays: 3 }, { tier: '1d', leadDays: 1 }]`. For each tier, query `checkpoints` JOIN `assignments` JOIN `users` WHERE `state IN ('unlocked', 'revise')` (student needs to act — submit or resubmit) AND `dueDate IS NOT NULL` AND `dueDate` within tier window (`dueDate <= NOW() + leadDays AND dueDate > NOW()`) AND `assignments.deletedAt IS NULL` AND `users.deletedAt IS NULL`. Dedup via `INSERT INTO deadline_reminders ... ON CONFLICT (checkpointId, tier) DO NOTHING RETURNING *` — only process rows where the insert succeeded (this instance won the race). For each winning row, create in-app notification (batch `db.insert(notifications).values(...)` with `getNotificationKeys('deadline_reminder')` — same pattern as `review-sla.ts:94-111`) + enqueue email via `enqueueEventEmail` (advisory, never throws)
+    *   **Poller hook:** Add `processDeadlineReminders()` call to `email-queue-init.ts` `tick()` — runs after `processEmailQueue()`, before the prune check. Same 30s cadence. Guarded by `try/catch` (advisory — scanner failure must not break email processing). Throttle: scanner queries only checkpoints with `dueDate` in the next 7 days max, so the query is bounded
+    *   **Email template:** New `buildDeadlineReminderEmail` function in `src/lib/email-templates.ts` — uses shared `HEADER_HTML`/`FOOTER_HTML`/`detailRow` helpers, shows assignment title, checkpoint name, due date (formatted per locale), link to checkpoint page. Locale resolved via `resolveEmailRecipient` (already handles student locale + soft-delete skip)
+    *   **i18n keys:** `notifications.events.deadline_reminder.title`/`.message` (params: `assignmentTitle`, `checkpointName`, `dueDate`), `emails.subjects.deadline_reminder`, `emails.deadline_reminder.body`/`.cta` — added to both `locales/en.json` and `locales/id.json`, run `pnpm generate:i18n`
+    *   **Unit tests:** Scanner logic — tier window calculation, state filter (`unlocked`/`revise` only), dedup (second run produces zero new reminders), soft-delete skip (assignment/student deleted → no reminder), `ON CONFLICT` behavior (at-most-once), notification creation, email enqueue. Email template rendering. Verify `deadlineBreachRate` metric unaffected (read-only dependency)
+*   **Out of Scope:**
+    *   Admin-configurable lead times (v1 uses constants in scanner module — `REMINDER_TIERS`; v2 adds admin settings UI at `src/routes/_authenticated/admin/settings.tsx` if a settings table exists, or env var override)
+    *   Instructor review-pending reminders ("you have N reviews awaiting" — same scanner pattern but different trigger/query — deferred to a follow-up track)
+    *   Per-user notification preferences / opt-out (deferred from TRACK-018 — depends on a preferences table that doesn't exist yet)
+    *   SMS / push notification channels (email + in-app only in v1)
+    *   Reminder for checkpoints with `dueDate IS NULL` (no due date → no reminder — correct behavior)
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Schema & Migration):** Create `deadline_reminders` table with FKs to `checkpoints` + `users` and unique constraint `(checkpointId, tier)`. Add `deadline_reminder` to `email_queue.templateType` pg enum. Run `pnpm db:generate` + `pnpm db:migrate`. Create rollback file. Write schema tests (table existence, FK cascade behavior, unique constraint enforcement). Verify: migration applies cleanly, rollback works, unique constraint rejects duplicate `(checkpointId, tier)`.
+*   **Phase 2 (Scanner Core):** Create `src/lib/deadline-reminder-scanner.ts` with `processDeadlineReminders()`. Implement tier-window query (checkpoints due within 7d/3d/1d, `state IN ('unlocked', 'revise')`, not soft-deleted). Implement dedup via `INSERT ... ON CONFLICT DO NOTHING RETURNING *`. For each winning insert: create in-app notification (batch insert with `getNotificationKeys('deadline_reminder')`, `channel: 'in_app'`, `metadata: { assignmentId, checkpointId, tier, dueDate }`) + enqueue email via `enqueueEventEmail`. Add `processDeadlineReminders()` call to `email-queue-init.ts` `tick()` with `try/catch` guard. Write unit tests for scanner (tier selection, state filter, dedup, soft-delete skip, notification creation, email enqueue — mock `@/db/index`, `@/lib/email`, `@/lib/i18n-server`). Verify: scanner produces zero reminders when no checkpoints are due, produces exactly one per tier per checkpoint when due, dedup prevents re-send on subsequent ticks, soft-deleted assignments/users skipped.
+*   **Phase 3 (Email Template & i18n):** Add `buildDeadlineReminderEmail` to `src/lib/email-templates.ts` (shared header/footer, assignment title, checkpoint name, due date, CTA link to `/student/assignments/{id}/checkpoints/{checkpointId}`). Add i18n keys to both `locales/en.json` + `locales/id.json` (`notifications.events.deadline_reminder.*`, `emails.deadline_reminder.*`, `emails.subjects.deadline_reminder`). Run `pnpm generate:i18n`. Verify: `pnpm check:i18n` parity, email renders correctly in both locales, notification resolves title/message via `getNotificationKeys`.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** A student has a checkpoint due in 2 days with state `unlocked` — after the scanner tick fires, they receive an in-app notification + email. The same checkpoint due in 2 days triggers the `3d` tier reminder but not the `7d` tier (already past). A second tick does not produce duplicate notifications (dedup via `deadline_reminders` unique constraint). A checkpoint with state `passed` produces no reminder. A checkpoint with state `submitted`/`under_review` produces no reminder (student already acted). A checkpoint with state `revise` (instructor asked for resubmission) produces a reminder. A soft-deleted assignment's checkpoints produce no reminders. The existing email queue processing is unaffected by scanner failures (try/catch isolation). The `deadlineBreachRate` analytics metric continues to compute correctly.
+*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. New tests for: `deadline_reminders` schema (unique constraint, FK cascade), scanner tier-window calculation (7d/3d/1d boundaries), scanner state filter (`unlocked`/`revise` included, `locked`/`submitted`/`under_review`/`passed` excluded), scanner dedup (second run = zero new reminders), scanner soft-delete skip (assignment + user), scanner notification creation (correct `type`, `titleKey`, `messageKey`, `params`, `channel`), scanner email enqueue (advisory, never throws), `email-queue-init.ts` tick integration (scanner runs alongside email processing, failure isolated), email template rendering (both locales, date formatting, HTML escaping). `pnpm check:i18n` — parity for all new keys. `pnpm test:coverage` >= 80% on all thresholds.
+*   [ ] **Conductor Review:** `deadline_reminders` table has unique constraint `(checkpointId, tier)` for at-most-once delivery. `deadline_reminder` added to `email_queue.templateType` enum. Scanner uses `INSERT ... ON CONFLICT DO NOTHING RETURNING *` for multi-instance safety (no `FOR UPDATE` needed — dedup is insert-based, not claim-based). Scanner queries bounded to `dueDate <= NOW() + 7 days` (no full-table scan). Scanner failure isolated via `try/catch` in `tick()` — email processing unaffected. Scanner reuses existing patterns: `getNotificationKeys` for i18n keys, `enqueueEventEmail` for advisory email, batch `db.insert(notifications)` for in-app (same as `review-sla.ts`). All files under 500 lines. Migration has rollback file. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` all clean.
+
 ---
 
 ## Track Dependency Graph
@@ -282,7 +327,8 @@ Milestone 5: Post-Audit Enhancements
 └── TRACK-019: Analytics & Reporting [no deps]
 
 Milestone 6: New Features
-└── TRACK-020: Rubric-Based Grading & Evaluation [no deps]
+├── TRACK-020: Rubric-Based Grading & Evaluation [no deps]
+└── TRACK-021: Proactive Deadline Reminder System [no deps]
 ```
 
 ### Parallelization Strategy
@@ -300,6 +346,7 @@ The following track groups can be worked on simultaneously:
 | **G** | TRACK-014, TRACK-016, TRACK-017, TRACK-018, TRACK-019 | Fully independent — no file overlap (distinct domains: mutations, email ops, review UX, notifications, analytics) |
 | **H** | TRACK-015 → TRACK-014 | Sequential — TRACK-015 consumed the query-key factory from TRACK-014 for useQuery conversion |
 | **I** | TRACK-020 | Independent — new domain (rubrics/grading), extends completed tracks (template editor, review screen, analytics) but no concurrent work |
+| **J** | TRACK-021 | Independent — extends existing email-queue polling loop + notifications, no file overlap with TRACK-020 (different domain: deadline reminders vs grading) |
 
 ---
 
@@ -312,8 +359,8 @@ The following track groups can be worked on simultaneously:
 | 3: UX & Accessibility | 6 | ~13 Days |
 | 4: Quality Assurance | 1 | ~3 Days |
 | 5: Post-Audit Enhancements | 6 | ~25 Days |
-| 6: New Features | 1 | ~10 Days |
-| **Total** | **21** | **~70 Days** |
+| 6: New Features | 2 | ~15 Days |
+| **Total** | **22** | **~75 Days** |
 
 > Effort estimates assume a single developer. Tracks within the same parallelization group can be distributed across developers to reduce wall-clock time.
 
