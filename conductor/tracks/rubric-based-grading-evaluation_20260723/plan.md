@@ -4,7 +4,7 @@
 ## Phase 1: Schema, Migration & Template Handler Refactor
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 1
-- [~] Task: Add `grading_type` pgEnum and `templateCheckpointId` FK to schema
+- [x] Task: Add `grading_type` pgEnum and `templateCheckpointId` FK to schema (d5ed75d)
     - [ ] Write failing tests: Schema tests for `grading_type` pgEnum column on `template_checkpoints` (nullable, defaults to null), `templateCheckpointId` FK on `checkpoints` (nullable)
     - [ ] Implement: Add `gradingType` pgEnum column to `template_checkpoints` schema in `src/db/schema/assignments.ts`. Add `templateCheckpointId` FK column to `checkpoints` table
     - [ ] Verify: `pnpm test` passes
