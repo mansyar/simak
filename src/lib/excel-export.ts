@@ -25,3 +25,30 @@ export function exportToExcel(
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+export interface RubricScoreExportRow {
+  studentName: string;
+  checkpointName: string;
+  criterionTitle: string;
+  score: number;
+  weight: number;
+  levelLabel: string | null;
+  comment: string | null;
+}
+
+/**
+ * Exports per-student rubric criterion scores as an .xlsx file.
+ * Maps the rubric score data to human-readable column headers.
+ */
+export function exportRubricScoresToExcel(data: RubricScoreExportRow[], fileName: string): void {
+  const rows = data.map((r) => ({
+    Student: r.studentName,
+    Checkpoint: r.checkpointName,
+    Criterion: r.criterionTitle,
+    Score: r.score,
+    Weight: r.weight,
+    Level: r.levelLabel ?? '',
+    Comment: r.comment ?? '',
+  }));
+  exportToExcel(rows, 'Rubric Scores', fileName);
+}

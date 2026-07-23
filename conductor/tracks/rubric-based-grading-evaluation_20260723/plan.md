@@ -119,7 +119,7 @@
     - [x] Implement: Extend `analytics-admin.server.ts` with rubric metrics. Create dedicated rubric analytics view/section
     - [x] Verify: `pnpm test` passes
 
-- [ ] Task: CSV/Excel export for per-student criterion scores
+- [~] Task: CSV/Excel export for per-student criterion scores
     - [ ] Write failing tests: Export tests — CSV and Excel output includes per-student criterion scores, valid format, CSV injection mitigation
     - [ ] Implement: Extend `analytics-export.server.ts` + `src/lib/excel-export.ts` with rubric score columns
     - [ ] Verify: `pnpm test` passes
