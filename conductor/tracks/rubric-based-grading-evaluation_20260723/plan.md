@@ -84,10 +84,10 @@
     - [x] Implement: Add numeric scoring section to `src/components/reviews/ReviewForm.tsx` (or extract `RubricScoringSection.tsx` sub-component if file exceeds 500 lines). Auto-compute weighted total client-side
     - [x] Verify: `pnpm test` passes
 
-- [ ] Task: Instructor rubric scoring UI — qualitative scoring
-    - [ ] Write failing tests: Component tests for qualitative criterion scoring — `Select` per criterion (level → score mapping), weighted total auto-computed, all criteria must be scored before submit
-    - [ ] Implement: Add qualitative scoring to `RubricScoringSection.tsx` — `Select` component mapping levels to scores
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: Instructor rubric scoring UI — qualitative scoring
+    - [x] Write failing tests: Component tests for qualitative criterion scoring — `Select` per criterion (level → score mapping), weighted total auto-computed, all criteria must be scored before submit
+    - [x] Implement: Add qualitative scoring to `RubricScoringSection.tsx` — `Select` component mapping levels to scores
+    - [x] Verify: `pnpm test` passes
 
 - [ ] Task: Skip rubric UI when `grading_type` is null
     - [ ] Write failing tests: Component test — `ReviewForm` renders no rubric UI when `grading_type` is null, current pass/fail flow unchanged
