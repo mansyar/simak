@@ -6,6 +6,7 @@ import {
   softDeleteCriterionHandler,
   softDeleteLevelHandler,
   countPendingReviewsHandler,
+  fetchRubric,
 } from '@/server/rubrics.server';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { RubricData } from '@/server/rubrics';
@@ -414,6 +415,65 @@ describe('Rubric server handlers', () => {
       const result = await countPendingReviewsHandler({ data: { templateCheckpointId: 1 } });
 
       expect(result).toEqual(serverError(ErrorCode.INTERNAL, 'Internal Server Error'));
+    });
+  });
+
+  // ── fetchRubric ────────────────────────────────────────────────────
+
+  describe('fetchRubric', () => {
+    it('should return null when checkpoint not found', async () => {
+      mockThenOnce([]);
+
+      const result = await fetchRubric(mockDb as any, 1);
+
+      expect(result).toBeNull();
+    });
+
+    it('should return null when gradingType is null', async () => {
+      mockThenOnce([{ gradingType: null }]);
+
+      const result = await fetchRubric(mockDb as any, 1);
+
+      expect(result).toBeNull();
+    });
+
+    it('should return criteria with empty levels when gradingType is numeric', async () => {
+      mockThenOnce([{ gradingType: 'numeric' }]);
+      mockThenOnce([
+        { id: 1, title: 'Criterion 1', description: null, weight: 60, order: 0 },
+        { id: 2, title: 'Criterion 2', description: 'desc', weight: 40, order: 1 },
+      ]);
+
+      const result = await fetchRubric(mockDb as any, 1);
+
+      expect(result).toEqual({
+        gradingType: 'numeric',
+        criteria: [
+          { id: 1, title: 'Criterion 1', description: null, weight: 60, order: 0 },
+          { id: 2, title: 'Criterion 2', description: 'desc', weight: 40, order: 1 },
+        ],
+        levels: [],
+      });
+    });
+
+    it('should return criteria and levels when gradingType is qualitative', async () => {
+      mockThenOnce([{ gradingType: 'qualitative' }]);
+      mockThenOnce([{ id: 1, title: 'C1', description: null, weight: 100, order: 0 }]);
+      mockThenOnce([
+        { id: 1, label: 'Excellent', description: null, score: 100, order: 0 },
+        { id: 2, label: 'Good', description: 'desc', score: 75, order: 1 },
+      ]);
+
+      const result = await fetchRubric(mockDb as any, 1);
+
+      expect(result).toEqual({
+        gradingType: 'qualitative',
+        criteria: [{ id: 1, title: 'C1', description: null, weight: 100, order: 0 }],
+        levels: [
+          { id: 1, label: 'Excellent', description: null, score: 100, order: 0 },
+          { id: 2, label: 'Good', description: 'desc', score: 75, order: 1 },
+        ],
+      });
     });
   });
 });

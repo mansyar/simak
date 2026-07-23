@@ -94,7 +94,7 @@
     - [ ] Implement: Conditionally render rubric scoring section only when `grading_type` is not null
     - [ ] Verify: `pnpm test` passes, backward compatibility confirmed
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Rubric-Based Review — Instructor' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Rubric-Based Review — Instructor' (Protocol in workflow.md)
 
 ## Phase 4: Student View, Analytics & i18n
 
