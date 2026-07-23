@@ -54,7 +54,7 @@
     - [ ] Implement: Add qualitative level configurator to `CheckpointListEditor.tsx` (or extract `RubricLevelsEditor.tsx` sub-component). Wire to `saveRubric` server function
     - [ ] Verify: `pnpm test` passes
 
-- [ ] Task: Edit warning for pending reviews
+- [x] Task: Edit warning for pending reviews (c08cbf4)
     - [ ] Write failing tests: Test for pending-review count query — returns count of checkpoints in `submitted`/`under_review` state for a given template. Test for confirmation dialog rendering when count > 0
     - [ ] Implement: Add `countPendingReviewsForTemplate` server function. Add confirmation dialog in rubric builder UI showing affected count before save
     - [ ] Verify: `pnpm test` passes
