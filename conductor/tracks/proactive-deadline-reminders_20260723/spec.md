@@ -1,3 +1,4 @@
+<protect>
 # Track: TRACK-021 — Proactive Deadline Reminder System
 
 ## Overview
@@ -90,3 +91,4 @@ The scanner reuses the existing email-queue poller (`src/lib/email-queue-init.ts
 - SMS / push notification channels (email + in-app only in v1).
 - Overdue reminders (deadline already passed — `deadlineBreachRate` analytics tracks these; v1 sends pre-deadline reminders only via `dueDate > NOW()`).
 - Reminders for checkpoints with `dueDate IS NULL` (no due date → no reminder).
+</protect>

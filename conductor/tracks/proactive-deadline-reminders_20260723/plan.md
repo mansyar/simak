@@ -1,9 +1,11 @@
+<protect>
 # Implementation Plan: TRACK-021 — Proactive Deadline Reminder System
 
 > Workflow: TDD per `conductor/workflow.md`. Each task follows Red (write failing tests) → Green (implement to pass) → Verify (coverage + quality gates) → Commit + git note → mark `[x]` in plan. Status markers: `[ ]` pending, `[~]` in progress, `[x]` complete.
 
 ## Phase 1: Schema & Migration
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor on requirements and TDD protocol before starting Phase 1
 - [ ] Task: Create `deadline_reminders` table, `checkpoints` index, and email-queue enum extension
     - [ ] Write Tests (Red): schema tests for `deadline_reminders` — table existence, FK cascade behavior (`checkpointId`→`checkpoints.id` onDelete cascade, `studentId`→`users.id` onDelete cascade), unique constraint `(checkpointId, tier)` enforcement (duplicate insert rejected), and `checkpoints_state_due_date_idx` index existence
     - [ ] Implement (Green): add Drizzle schema for `deadline_reminders` (checkpointId FK, studentId FK, tier text, sentAt timestamp defaultNow, unique `(checkpointId, tier)`); add composite index `checkpoints_state_due_date_idx` on `checkpoints (state, dueDate)`; add `'deadline_reminder'` to the `templateType` array in `src/db/schema/email-queue.ts` (code-only — Drizzle text enum, no `ALTER TYPE`)
@@ -14,6 +16,7 @@
 
 ## Phase 2: Scanner Core
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor on requirements and TDD protocol before starting Phase 2
 - [ ] Task: Implement deadline-reminder scanner module (`src/lib/deadline-reminder-scanner.ts`)
     - [ ] Write Tests (Red): scanner logic — non-overlapping tier band boundaries (7d fires at 4–7 days, 3d at 2–3 days, 1d at 0–1 day, verify NO overlap at boundaries); state filter (`unlocked`/`revise` included, `locked`/`submitted`/`under_review`/`passed` excluded); dedup (second run produces zero new reminders); soft-delete skip (assignment + user deleted → no reminder); `ON CONFLICT DO NOTHING` at-most-once behavior; notification creation (correct `type`, `titleKey`, `messageKey`, `params` all strings, `channel: 'in_app'`); parallel email enqueue via `Promise.allSettled` (advisory, never throws). Mock `@/db/index`, `@/lib/email`, `@/lib/i18n-server`.
     - [ ] Implement (Green): create `src/lib/deadline-reminder-scanner.ts` exporting `processDeadlineReminders()`. Tier constants `REMINDER_TIERS = [{tier:'7d',leadDays:7},{tier:'3d',leadDays:3},{tier:'1d',leadDays:1}]`. Non-overlapping bands (7d: `dueDate <= NOW()+7d AND > NOW()+3d`; 3d: `<= NOW()+3d AND > NOW()+1d`; 1d: `<= NOW()+1d AND > NOW()`). Query `checkpoints JOIN assignments JOIN users WHERE state IN ('unlocked','revise') AND dueDate in band AND assignments.deletedAt IS NULL AND users.deletedAt IS NULL`. Dedup via `INSERT ... ON CONFLICT (checkpointId, tier) DO NOTHING RETURNING *`. For winning rows: batch `db.insert(notifications)` with `getNotificationKeys('deadline_reminder')` (params stringified) + `Promise.allSettled` calling `sendDeadlineReminderEmail`.
@@ -28,6 +31,7 @@
 
 ## Phase 3: Email Template, Helper & i18n
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor on requirements and TDD protocol before starting Phase 3
 - [ ] Task: Email template builder + helper wrapper
     - [ ] Write Tests (Red): `buildDeadlineReminderHtml` rendering — both locales (en/id), `STRINGS` object intro string, date formatting per locale, HTML escaping, CTA link to `${BETTER_AUTH_URL}/student/assignments/{assignmentId}/checkpoints/{checkpointId}`; `sendDeadlineReminderEmail` wrapper calls `enqueueEventEmail` with correct opts (matching `review-email.ts` pattern)
     - [ ] Implement (Green): add `buildDeadlineReminderHtml` to `src/lib/email-templates.ts` using internal `HEADER_HTML`/`FOOTER_HTML`/`detailRow`/`detailTable`/`deepLinkButton`/`fallbackLink`/`buildEmail` helpers; add `deadlineReminder` intro string to `STRINGS` object for both `en` and `id`. Create `src/lib/deadline-reminder-email.ts` exporting `sendDeadlineReminderEmail(opts)` calling `enqueueEventEmail` with `buildDeadlineReminderHtml`.
@@ -44,3 +48,4 @@
     - [ ] Verify all new files ≤500 lines (`scripts/check-modularity.js`)
     - [ ] Commit (if any cleanup): `chore(reminders): Final quality gate cleanup`; attach git note; mark task `[x]` with commit SHA
 - [ ] Task: Conductor - User Manual Verification 'Email Template, Helper & i18n' (Protocol in workflow.md)
+</protect>
