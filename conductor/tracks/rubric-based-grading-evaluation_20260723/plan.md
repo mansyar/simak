@@ -34,7 +34,7 @@
     - [ ] Implement: Create `src/server/rubrics.ts` with Zod schemas (`CreateCriterionSchema`, `UpdateCriterionSchema`, `CreateLevelSchema`, `UpdateLevelSchema`, `SaveRubricSchema`) + `createServerFn` stubs (dynamically importing handlers)
     - [ ] Verify: `pnpm test` passes
 
-- [ ] Task: Create `rubrics.server.ts` handlers for rubric CRUD
+- [x] Task: Create `rubrics.server.ts` handlers for rubric CRUD [8530978]
     - [ ] Write failing tests: Handler tests — create/update/soft-delete criteria + levels, admin-only via local `isAdmin` guard (non-admin rejected), weight-sum validation enforced, grading type consistency enforced
     - [ ] Implement: Create `src/server/rubrics.server.ts` with handlers: `saveRubricHandler` (create/update criteria + levels per checkpoint), `softDeleteCriterionHandler`, `softDeleteLevelHandler`. Admin-only via local `isAdmin` type guard (matching `templates.server.ts:24`)
     - [ ] Verify: `pnpm test` passes
