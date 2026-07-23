@@ -24,7 +24,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Settings Backend Refactor' (Protocol in workflow.md)
 
-## Phase 2: Preference Gates
+## Phase 2: Preference Gates [checkpoint: ab4cfd7]
 
 - [x] Task: Read `spec.md` and `workflow.md` before starting phase implementation
     - [x] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
