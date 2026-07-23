@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Rubric-Based Grading & Evaluation (TRACK-020)
 
-## Phase 1: Schema, Migration & Template Handler Refactor
+## Phase 1: Schema, Migration & Template Handler Refactor [checkpoint: 74ec52e]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 1
 - [x] Task: Add `grading_type` pgEnum and `templateCheckpointId` FK to schema (d5ed75d)
