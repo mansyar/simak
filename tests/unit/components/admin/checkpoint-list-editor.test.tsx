@@ -60,6 +60,12 @@ vi.mock('@/components/ui/select', () => ({
   SelectValue: () => null,
 }));
 
+vi.mock('@/components/admin/templates/RubricCriteriaEditor', () => ({
+  RubricCriteriaEditor: ({ templateCheckpointId, gradingType }: any) => (
+    <div data-testid={`rubric-editor-${templateCheckpointId}`} data-grading-type={gradingType} />
+  ),
+}));
+
 describe('CheckpointListEditor', () => {
   const defaultProps = {
     checkpoints: [
@@ -239,5 +245,42 @@ describe('CheckpointListEditor', () => {
     const select = screen.getByTestId('grading-type-select') as HTMLSelectElement;
     const options = Array.from(select.options).map((o) => o.value);
     expect(options).toEqual(['none', 'numeric', 'qualitative']);
+  });
+
+  it('should render RubricCriteriaEditor when gradingType is set', () => {
+    render(
+      <CheckpointListEditor
+        {...defaultProps}
+        checkpoints={[
+          {
+            id: 5,
+            name: 'Chapter 1',
+            minConsultations: 0,
+            estimatedDuration: 7,
+            gradingType: 'numeric',
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByTestId('rubric-editor-5')).toBeDefined();
+    expect(screen.getByTestId('rubric-editor-5').getAttribute('data-grading-type')).toBe('numeric');
+  });
+
+  it('should not render RubricCriteriaEditor when gradingType is null', () => {
+    render(
+      <CheckpointListEditor
+        {...defaultProps}
+        checkpoints={[
+          {
+            id: 5,
+            name: 'Chapter 1',
+            minConsultations: 0,
+            estimatedDuration: 7,
+            gradingType: null,
+          },
+        ]}
+      />,
+    );
+    expect(screen.queryByTestId('rubric-editor-5')).toBeNull();
   });
 });

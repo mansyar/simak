@@ -1023,6 +1023,23 @@ export type Translation = {
       notOnReviewPage: string
     }
   }
+  rubrics: {
+    criteria: {
+      loading: string
+      loadError: string
+      saveError: string
+      saveSuccess: string
+      titlePlaceholder: string
+      descriptionPlaceholder: string
+      add: string
+      remove: string
+      moveUp: string
+      moveDown: string
+      weightSum: string
+      save: string
+      saving: string
+    }
+  }
 }
 
 export type TranslationFunctions = Record<string, (key: string) => string>

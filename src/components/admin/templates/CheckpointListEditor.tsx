@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Plus, X, ChevronUp, ChevronDown } from 'lucide-react';
+import { RubricCriteriaEditor } from './RubricCriteriaEditor';
 import { useI18n } from '../../../routes/__root';
 
 type GradingType = 'numeric' | 'qualitative' | null;
@@ -178,6 +179,12 @@ export function CheckpointListEditor({
                 </Select>
               </div>
             )}
+            {checkpoint.id !== undefined && checkpoint.gradingType ? (
+              <RubricCriteriaEditor
+                templateCheckpointId={checkpoint.id}
+                gradingType={checkpoint.gradingType}
+              />
+            ) : null}
           </div>
         ))}
       </div>

@@ -1017,5 +1017,22 @@
       "prevReview": "Previous pending review",
       "notOnReviewPage": "(available on review pages only)"
     }
+  },
+  "rubrics": {
+    "criteria": {
+      "loading": "Loading rubric...",
+      "loadError": "Failed to load rubric",
+      "saveError": "Failed to save rubric",
+      "saveSuccess": "Rubric saved successfully",
+      "titlePlaceholder": "Criterion title",
+      "descriptionPlaceholder": "Description (optional)",
+      "add": "Add Criterion",
+      "remove": "Remove",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "weightSum": "Weight sum: {sum}/100",
+      "save": "Save Rubric",
+      "saving": "Saving..."
+    }
   }
 }

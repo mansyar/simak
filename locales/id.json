@@ -1017,5 +1017,22 @@
       "prevReview": "Peninjauan tertunda sebelumnya",
       "notOnReviewPage": "(hanya tersedia di halaman tinjauan)"
     }
+  },
+  "rubrics": {
+    "criteria": {
+      "loading": "Memuat rubrik...",
+      "loadError": "Gagal memuat rubrik",
+      "saveError": "Gagal menyimpan rubrik",
+      "saveSuccess": "Rubrik berhasil disimpan",
+      "titlePlaceholder": "Judul kriteria",
+      "descriptionPlaceholder": "Deskripsi (opsional)",
+      "add": "Tambah Kriteria",
+      "remove": "Hapus",
+      "moveUp": "Naik",
+      "moveDown": "Turun",
+      "weightSum": "Jumlah bobot: {sum}/100",
+      "save": "Simpan Rubrik",
+      "saving": "Menyimpan..."
+    }
   }
 }
