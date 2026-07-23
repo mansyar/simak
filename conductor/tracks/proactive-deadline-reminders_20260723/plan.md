@@ -27,7 +27,7 @@
     - [ ] Implement (Green): add `processDeadlineReminders()` call to `email-queue-init.ts` `tick()` after `processEmailQueue()`, before prune check. Add `lastReminderScanAt` timestamp (same pattern as `lastPruneAt` at line 8) + `REMINDER_SCAN_INTERVAL_MS = 60 * 60 * 1000`. Guard with `try/catch`.
     - [ ] Verify: scanner throttled hourly (not every 30s); email processing unaffected by scanner failure
     - [ ] Commit: `feat(reminders): Hook deadline scanner into email-queue tick with hourly throttle`; attach git note; mark task `[x]` with commit SHA
-- [ ] Task: Conductor - User Manual Verification 'Scanner Core' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Scanner Core' (Protocol in workflow.md)
 
 ## Phase 3: Email Template, Helper & i18n
 
