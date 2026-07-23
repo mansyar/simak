@@ -9,10 +9,10 @@
     - [ ] Implement: Add `gradingType` pgEnum column to `template_checkpoints` schema in `src/db/schema/assignments.ts`. Add `templateCheckpointId` FK column to `checkpoints` table
     - [ ] Verify: `pnpm test` passes
 
-- [ ] Task: Create `rubric_criteria`, `rubric_levels`, and `review_scores` tables
-    - [ ] Write failing tests: Schema tests for `rubric_criteria` (FK to `template_checkpoints.id`, `weight` 0–100 CHECK, `deletedAt` soft-delete), `rubric_levels` (FK to `template_checkpoints.id`, `score` 0–100 CHECK, `deletedAt` soft-delete), `review_scores` (FK to `reviews.id`, denormalized `criterionTitle`/`levelLabel`/`weight` snapshot fields, `criterionId` FK, `rubricLevelId` nullable FK)
-    - [ ] Implement: Create new schema files for the three tables with FKs, CHECK constraints, and soft-delete columns
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: Create `rubric_criteria`, `rubric_levels`, and `review_scores` tables [3e873b9]
+    - [x] Write failing tests: Schema tests for `rubric_criteria` (FK to `template_checkpoints.id`, `weight` 0–100 CHECK, `deletedAt` soft-delete), `rubric_levels` (FK to `template_checkpoints.id`, `score` 0–100 CHECK, `deletedAt` soft-delete), `review_scores` (FK to `reviews.id`, denormalized `criterionTitle`/`levelLabel`/`weight` snapshot fields, `criterionId` FK, `rubricLevelId` nullable FK)
+    - [x] Implement: Create new schema files for the three tables with FKs, CHECK constraints, and soft-delete columns
+    - [x] Verify: `pnpm test` passes
 
 - [ ] Task: Generate migration, backfill `templateCheckpointId`, and create rollback file
     - [ ] Write failing tests: Migration backfill test — `templateCheckpointId` correctly populated for existing checkpoints via `assignments.templateId + order` matching
