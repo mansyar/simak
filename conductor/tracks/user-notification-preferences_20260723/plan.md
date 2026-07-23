@@ -1,6 +1,11 @@
+<protect>
 # Implementation Plan: User Notification Preferences
 
 ## Phase 1: Settings Backend Refactor
+
+- [ ] Task: Read `spec.md` and `workflow.md` before starting phase implementation
+    - [ ] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
+    - [ ] Read `conductor/workflow.md`
 
 - [ ] Task: Extend `users.settings` type with `notificationPrefs` in schema
     - [ ] Write failing tests for schema type extension (`tests/unit/db/schema/users.test.ts` — verify `notificationPrefs` field exists in type, defaults to undefined, accepts valid `Record<string, { email?: boolean; inApp?: boolean }>`)
@@ -20,6 +25,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Settings Backend Refactor' (Protocol in workflow.md)
 
 ## Phase 2: Preference Gates
+
+- [ ] Task: Read `spec.md` and `workflow.md` before starting phase implementation
+    - [ ] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
+    - [ ] Read `conductor/workflow.md`
 
 - [ ] Task: Create `shouldSendInAppNotification` helper in `src/lib/notification-prefs.ts`
     - [ ] Write failing tests (`tests/unit/lib/notification-prefs.test.ts` — returns `false` only when `inApp === false`, returns `true` when absent/undefined, returns `true` for missing type key, returns `true` for null/undefined settings)
@@ -67,6 +76,10 @@
 
 ## Phase 3: UI & i18n
 
+- [ ] Task: Read `spec.md` and `workflow.md` before starting phase implementation
+    - [ ] Read `conductor/tracks/user-notification-preferences_20260723/spec.md`
+    - [ ] Read `conductor/workflow.md`
+
 - [ ] Task: Create `NotificationPreferencesSection` component
     - [ ] Write failing tests (`tests/unit/components/settings/NotificationPreferencesSection.test.tsx` — renders all 12 types grouped by 4 `GROUP_CONFIGS` groups, renders Email + In-app `Switch` toggles per type, default state = all switches ON, toggle calls `updateUserSettings` with correct payload, `queryClient.invalidateQueries` on success)
     - [ ] Implement `src/components/settings/NotificationPreferencesSection.tsx` following `AccessibilitySection.tsx` pattern: `useQuery(['currentUser'])` for data, `useMutation(updateUserSettings)` for saves, `queryClient.invalidateQueries(['currentUser'])` on success. Renders grouped list with inline `Switch` toggles per type × channel.
@@ -84,3 +97,4 @@
     - [ ] Verify: `pnpm check:i18n` — parity EN↔ID passes
 
 - [ ] Task: Conductor - User Manual Verification 'UI & i18n' (Protocol in workflow.md)
+</protect>

@@ -1,3 +1,4 @@
+<protect>
 # Track: User Notification Preferences
 
 ## Overview
@@ -133,3 +134,4 @@ Only the 12 event-notification types are configurable.
 - Do-not-disturb time windows (v2 — suppress notifications during configured hours)
 - Admin-enforced minimum notification requirements (v2 — admin can lock certain types as non-mutable)
 - Notification frequency caps (v2 — max N emails per hour per user)
+</protect>
