@@ -44,10 +44,10 @@
     - [x] Implement: Add grading type `Select` to `src/components/admin/templates/CheckpointListEditor.tsx`. Wire to `saveRubric` server function
     - [x] Verify: `pnpm test` passes
 
-- [ ] Task: Admin rubric builder UI — criteria editor
-    - [ ] Write failing tests: Component tests for criteria editor — add/remove/reorder criteria, title/description/weight inputs, weight sum validation display (must = 100%), strict validation on save
-    - [ ] Implement: Add criteria editor section to `CheckpointListEditor.tsx` (or extract `RubricCriteriaEditor.tsx` sub-component if file exceeds 500 lines). Wire to `saveRubric` server function
-    - [ ] Verify: `pnpm test` passes
+- [x] Task: Admin rubric builder UI — criteria editor [6020cc1]
+    - [x] Write failing tests: Component tests for criteria editor — add/remove/reorder criteria, title/description/weight inputs, weight sum validation display (must = 100%), strict validation on save
+    - [x] Implement: Add criteria editor section to `CheckpointListEditor.tsx` (or extract `RubricCriteriaEditor.tsx` sub-component if file exceeds 500 lines). Wire to `saveRubric` server function
+    - [x] Verify: `pnpm test` passes
 
 - [ ] Task: Admin rubric builder UI — qualitative level configurator
     - [ ] Write failing tests: Component tests for level configurator — add/remove/reorder levels, label/score/description inputs, shown only when `grading_type` is `qualitative`, score 0–100 validation
