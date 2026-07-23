@@ -18,7 +18,8 @@ export type TemplateType =
   | 'consultation_rejected'
   | 'extension_approved'
   | 'extension_rejected'
-  | 'extension_requested';
+  | 'extension_requested'
+  | 'deadline_reminder';
 
 async function getUserLocaleByEmail(email: string): Promise<Locales> {
   try {
