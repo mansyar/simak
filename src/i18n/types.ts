@@ -254,6 +254,10 @@ export type Translation = {
       durationPlaceholder: string
       minConsHint: string
       durationHint: string
+      gradingType: string
+      gradingTypeNone: string
+      gradingTypeNumeric: string
+      gradingTypeQualitative: string
     }
     actions: {
       edit: string
@@ -319,6 +323,12 @@ export type Translation = {
       notInSubmittedState: string
     }
     reviewDateLabel: string
+    rubric: {
+      title: string
+      weightedTotal: string
+      allCriteriaRequired: string
+      selectLevel: string
+    }
   }
   instructorAssignments: {
     title: string
@@ -427,6 +437,10 @@ export type Translation = {
     branding: string
     sectionMain: string
     sectionPreferences: string
+  }
+  studentRubrics: {
+    title: string
+    weightedTotal: string
   }
   studentAssignments: {
     title: string
@@ -549,6 +563,11 @@ export type Translation = {
     statusUnderReview: string
     statusPassed: string
     statusRevise: string
+    rubricTitle: string
+    rubricCriterion: string
+    rubricAvgScore: string
+    rubricPassRate: string
+    rubricReviewCount: string
   }
   instructorAnalytics: {
     title: string
@@ -564,6 +583,11 @@ export type Translation = {
     rangeAll: string
     customStart: string
     customEnd: string
+    rubricTitle: string
+    rubricCriterion: string
+    rubricAvgScore: string
+    rubricPassRate: string
+    rubricReviewCount: string
   }
   files: {
     dropzone: {
@@ -1022,6 +1046,35 @@ export type Translation = {
       nextReview: string
       prevReview: string
       notOnReviewPage: string
+    }
+  }
+  rubrics: {
+    criteria: {
+      loading: string
+      loadError: string
+      saveError: string
+      saveSuccess: string
+      titlePlaceholder: string
+      descriptionPlaceholder: string
+      weightLabel: string
+      add: string
+      remove: string
+      moveUp: string
+      moveDown: string
+      weightSum: string
+      save: string
+      saving: string
+      pendingReviewsTitle: string
+      pendingReviewsWarning: string
+    }
+    levels: {
+      add: string
+      remove: string
+      moveUp: string
+      moveDown: string
+      labelPlaceholder: string
+      descriptionPlaceholder: string
+      scoreLabel: string
     }
   }
 }

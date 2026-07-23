@@ -15,6 +15,10 @@ vi.mock('@/routes/__root', () => ({
         'adminTemplates.form.addCheckpoint': 'Add Checkpoint',
         'adminTemplates.form.minConsHint': 'Verified consultations required before submission',
         'adminTemplates.form.durationHint': 'Days allotted for this checkpoint',
+        'adminTemplates.form.gradingType': 'Grading Type',
+        'adminTemplates.form.gradingTypeNone': 'No Rubric',
+        'adminTemplates.form.gradingTypeNumeric': 'Numeric',
+        'adminTemplates.form.gradingTypeQualitative': 'Qualitative',
       };
       return translations[key] || key;
     },
@@ -37,6 +41,28 @@ vi.mock('@/components/ui/button', () => ({
     >
       {children}
     </button>
+  ),
+}));
+
+vi.mock('@/components/ui/select', () => ({
+  Select: ({ value, onValueChange, children }: any) => (
+    <select
+      value={value ?? 'none'}
+      onChange={(e) => onValueChange?.(e.target.value)}
+      data-testid="grading-type-select"
+    >
+      {children}
+    </select>
+  ),
+  SelectTrigger: ({ children }: any) => <>{children}</>,
+  SelectContent: ({ children }: any) => <>{children}</>,
+  SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
+  SelectValue: () => null,
+}));
+
+vi.mock('@/components/admin/templates/RubricCriteriaEditor', () => ({
+  RubricCriteriaEditor: ({ templateCheckpointId, gradingType }: any) => (
+    <div data-testid={`rubric-editor-${templateCheckpointId}`} data-grading-type={gradingType} />
   ),
 }));
 
@@ -158,5 +184,103 @@ describe('CheckpointListEditor', () => {
     const rowDiv = checkpointInput.parentElement?.parentElement;
     expect(rowDiv?.className).toMatch(/\bflex-col\b/);
     expect(rowDiv?.className).toMatch(/\bsm:flex-row\b/);
+  });
+
+  it('should render grading type selector when checkpoint has an id', () => {
+    render(
+      <CheckpointListEditor
+        {...defaultProps}
+        checkpoints={[{ id: 1, name: 'Chapter 1', minConsultations: 0, estimatedDuration: 7 }]}
+      />,
+    );
+    expect(screen.getByTestId('grading-type-select')).toBeDefined();
+  });
+
+  it('should not render grading type selector when checkpoint has no id', () => {
+    render(<CheckpointListEditor {...defaultProps} />);
+    expect(screen.queryByTestId('grading-type-select')).toBeNull();
+  });
+
+  it('should call onGradingTypeChange when grading type changes to numeric', () => {
+    const onGradingTypeChange = vi.fn();
+    render(
+      <CheckpointListEditor
+        {...defaultProps}
+        checkpoints={[{ id: 1, name: 'Chapter 1', minConsultations: 0, estimatedDuration: 7 }]}
+        onGradingTypeChange={onGradingTypeChange}
+      />,
+    );
+    fireEvent.change(screen.getByTestId('grading-type-select'), { target: { value: 'numeric' } });
+    expect(onGradingTypeChange).toHaveBeenCalledWith(0, 'numeric');
+  });
+
+  it('should call onGradingTypeChange with null when none is selected', () => {
+    const onGradingTypeChange = vi.fn();
+    render(
+      <CheckpointListEditor
+        {...defaultProps}
+        checkpoints={[
+          {
+            id: 1,
+            name: 'Chapter 1',
+            minConsultations: 0,
+            estimatedDuration: 7,
+            gradingType: 'numeric',
+          },
+        ]}
+        onGradingTypeChange={onGradingTypeChange}
+      />,
+    );
+    fireEvent.change(screen.getByTestId('grading-type-select'), { target: { value: 'none' } });
+    expect(onGradingTypeChange).toHaveBeenCalledWith(0, null);
+  });
+
+  it('should render all three grading type options', () => {
+    render(
+      <CheckpointListEditor
+        {...defaultProps}
+        checkpoints={[{ id: 1, name: 'Chapter 1', minConsultations: 0, estimatedDuration: 7 }]}
+      />,
+    );
+    const select = screen.getByTestId('grading-type-select') as HTMLSelectElement;
+    const options = Array.from(select.options).map((o) => o.value);
+    expect(options).toEqual(['none', 'numeric', 'qualitative']);
+  });
+
+  it('should render RubricCriteriaEditor when gradingType is set', () => {
+    render(
+      <CheckpointListEditor
+        {...defaultProps}
+        checkpoints={[
+          {
+            id: 5,
+            name: 'Chapter 1',
+            minConsultations: 0,
+            estimatedDuration: 7,
+            gradingType: 'numeric',
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByTestId('rubric-editor-5')).toBeDefined();
+    expect(screen.getByTestId('rubric-editor-5').getAttribute('data-grading-type')).toBe('numeric');
+  });
+
+  it('should not render RubricCriteriaEditor when gradingType is null', () => {
+    render(
+      <CheckpointListEditor
+        {...defaultProps}
+        checkpoints={[
+          {
+            id: 5,
+            name: 'Chapter 1',
+            minConsultations: 0,
+            estimatedDuration: 7,
+            gradingType: null,
+          },
+        ]}
+      />,
+    );
+    expect(screen.queryByTestId('rubric-editor-5')).toBeNull();
   });
 });

@@ -4,6 +4,7 @@ import { getDb } from '@/db/index';
 import { users } from '@/db/schema/users';
 import { assignments, assignmentStudents, checkpoints } from '@/db/schema/assignments';
 import { submissions, reviews } from '@/db/schema/submissions';
+import { reviewScores } from '@/db/schema/rubrics';
 import { auditLog } from '@/db/schema/audit-log';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
@@ -14,6 +15,7 @@ export type ExportAuditLogCsvInput = { dateFrom?: Date; dateTo?: Date };
 export type ExportAssignmentProgressCsvInput = Record<string, never>;
 export type ExportStudentProgressCsvInput = { assignmentId: number };
 export type ExportReviewHistoryCsvInput = { assignmentId: number };
+export type ExportRubricScoresCsvInput = { assignmentId: number };
 
 function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
@@ -324,6 +326,74 @@ export async function exportReviewHistoryCsvHandler({
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
       handler: 'exportReviewHistoryCsvHandler',
+    });
+  }
+}
+
+export async function exportRubricScoresCsvHandler({ data }: { data: ExportRubricScoresCsvInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isInstructor(session)) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const instructorId = session.user.id;
+  const { assignmentId } = data;
+  const db = getDb();
+
+  try {
+    // Ownership check: assignment must belong to this instructor
+    const assignment = await db
+      .select({ id: assignments.id })
+      .from(assignments)
+      .where(and(eq(assignments.id, assignmentId), eq(assignments.instructorId, instructorId)))
+      .limit(1);
+
+    if (!assignment[0]) {
+      return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
+    }
+
+    const rows = await db
+      .select({
+        studentName: users.name,
+        checkpointName: checkpoints.name,
+        criterionTitle: reviewScores.criterionTitle,
+        score: reviewScores.score,
+        weight: reviewScores.weight,
+        levelLabel: reviewScores.levelLabel,
+        comment: reviewScores.comment,
+      })
+      .from(reviewScores)
+      .innerJoin(reviews, eq(reviewScores.reviewId, reviews.id))
+      .innerJoin(submissions, eq(submissions.id, reviews.submissionId))
+      .innerJoin(checkpoints, eq(checkpoints.id, submissions.checkpointId))
+      .innerJoin(users, eq(users.id, submissions.uploadedBy))
+      .where(
+        and(
+          eq(checkpoints.assignmentId, assignmentId),
+          eq(reviews.instructorId, instructorId),
+          sql`${reviews.reviewedAt} IS NOT NULL`,
+        ),
+      )
+      .orderBy(users.name, checkpoints.order, reviewScores.criterionTitle);
+
+    const csvRows = rows.map((r) => [
+      r.studentName,
+      r.checkpointName,
+      r.criterionTitle,
+      r.score,
+      r.weight,
+      r.levelLabel ?? '',
+      r.comment ?? '',
+    ]);
+
+    return buildCsv(
+      ['Student', 'Checkpoint', 'Criterion', 'Score', 'Weight', 'Level', 'Comment'],
+      csvRows,
+    );
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'exportRubricScoresCsvHandler',
     });
   }
 }

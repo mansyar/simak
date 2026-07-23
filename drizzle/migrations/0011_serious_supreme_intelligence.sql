@@ -1,0 +1,1 @@
+ALTER TABLE "template_checkpoints" ADD COLUMN "deleted_at" timestamp;

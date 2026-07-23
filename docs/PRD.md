@@ -108,6 +108,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Each template has a `type` label (e.g., Thesis, Research Paper).
 - Templates can be duplicated, filtered, and reused when creating assignments.
 - Each template checkpoint includes an `estimatedDuration` (days). During assignment creation, checkpoint dueDates are auto-calculated from the base date + cumulative durations. Instructors can override before finalizing.
+- Each template checkpoint can optionally have a **grading type** (`null` = pass/fail only, `numeric` = direct 0–100 scoring per criterion, `qualitative` = level-based scoring with configurable numeric mapping). When a grading type is set, admins define a rubric: criteria (title, description, weight 0–100, order) and—for qualitative checkpoints—performance levels (label, description, score 0–100, order). Weights must sum to 100%. Rubric data is soft-deleted (never hard-deleted) and looked up live from the template at review time via `checkpoints.templateCheckpointId`.
 
 ### Assignment Management
 
@@ -122,7 +123,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Checkpoints are completed in sequential order — each unlocks only after the previous is passed.
 - Students upload `.docx` or `.pdf` files per checkpoint. **Maximum file size is restricted to 25MB** to balance quality and storage limits.
 - Each submission has an audit trail with file versioning. Resubmitting creates a new immutable record in the audit trail.
-- Instructors review and mark as Pass or Revise with comments.
+- Instructors review and mark as Pass or Revise with comments. For checkpoints with a rubric (`grading_type` is `numeric` or `qualitative`), instructors score each criterion (0–100 numeric input or qualitative level selection), and the system auto-computes a weighted checkpoint total. All criteria must be scored before submission. Rubric scores are stored as a full denormalized snapshot (`criterionTitle`, `levelLabel`, `score`, `weight`) so completed reviews are unaffected by later rubric edits. Checkpoints without a rubric (`grading_type: null`) use the current pass/fail flow unchanged.
 - Instructors can attach feedback files to reviews.
 - Late submissions are controlled: overdue checkpoints lock automatically; instructors can unlock them.
 - **SLA & Escalation (Addressing the Instructor Bottleneck):** To ensure students aren't unfairly blocked, if an instructor does not review a submission within a defined SLA (e.g., 3 days), an automated escalation alert is sent to the Admin, and the student's subsequent deadlines are **automatically extended by the number of days the review was delayed** (breach duration is added to affected deadlines). The SLA timer is anchored at `submissions.uploadedAt` (when the student uploaded), ensuring the breach duration reflects the actual delay the student experienced.
@@ -184,6 +185,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
   - **Admin analytics** (`/admin/analytics?range=30d`, admin/superadmin only): consultation verification rate (verified/total), deadline breach rate (checkpoints past due and not passed), assignment status distribution by checkpoint state, submission/review volume trends over time, reviews completed count, and daily/weekly active users (DAU/WAU).
   - **Instructor analytics** (`/instructor/analytics?range=30d`, instructor only): reviews completed, average response time (`EXTRACT(EPOCH FROM reviewedAt - uploadedAt)`), SLA breach count (reviews exceeding the 3-day SLA), students supervised, assignments active.
 - **Report export:** On-demand CSV export (server function returns a CSV string → client `Blob` download) for the admin user list, audit log (with date filtering), and assignment progress; instructor student-progress and review-history CSVs (with ownership checks). Client-side Excel (`.xlsx`) export via SheetJS on the analytics pages — reuses the existing `xlsx` dependency (no new dependency). CSV cell values are sanitized against formula injection (cells starting with `=`, `+`, `-`, `@`, TAB, or CR are prefixed with `'`).
+- **Rubric analytics:** Instructor and admin analytics dashboards include rubric-level metrics — average score per criterion, criterion-level pass/fail rates, cross-instructor criterion performance comparisons, and class-wide weakness identification. CSV/Excel exports include per-student criterion scores (with formula-injection sanitization on both CSV and Excel paths).
 - No new database tables — all metrics derive from aggregate queries (`GROUP BY`, `date_trunc`) over existing tables.
 - `[v2]` (deferred): PDF export (requires a rendering library), scheduled/recurring report delivery (requires cron infrastructure), notification preferences.
 
@@ -255,7 +257,10 @@ Core entities:
 - **AssignmentGroupMember** `[v2]` — maps students to group assignments.
 - **Checkpoint** — one per assignment stage; tracks state, due date, description, and required consultations.
 - **Submission** — files uploaded by student per checkpoint (`.docx` or `.pdf`). Append-only log: each resubmission creates a new row with an auto-incremented version number.
-- **Review** — instructor decision (pass/revise) + comments + deadline + optional feedback file.
+- **Review** — instructor decision (pass/revise) + comments + deadline + optional feedback file. For rubric-graded checkpoints, associated `review_scores` store a full denormalized snapshot (criterion title, level label, score, weight, comment).
+- **RubricCriterion** — rubric criterion definition (title, description, weight 0–100, order) per template checkpoint. Soft-deleted (`deletedAt`), never hard-deleted.
+- **RubricLevel** — qualitative performance level (label, description, score 0–100, order) shared across all criteria in a checkpoint. Soft-deleted (`deletedAt`).
+- **ReviewScore** — denormalized snapshot of a criterion score within a review (criterionId, criterionTitle, score, rubricLevelId, levelLabel, weight, comment). Full snapshot so historical reviews are unaffected by later rubric edits.
 - **Consultation** — log entry for a student-instructor session tied to a specific checkpoint.
 - **Notification** — in-app and/or email event logs.
 - **AuditLog** — immutable record of all meaningful system actions (user created/deleted, template CRUD, assignment creation, review decisions, deadline changes, unlock actions, consultation verifications/rejections). Includes actor, action type, entity reference, and JSON details. Implemented with an admin viewer at `/admin/audit-log`.

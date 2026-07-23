@@ -106,7 +106,7 @@ simak/
 │   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton
 │   │   ├── instructor/
 │   │   │   └── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
-│   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js)
+│   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js), RubricScoringSection (instructor scoring UI), RubricResultView (student view)
 │   │   ├── consultations/    → Log form, consultation list, progress bar, verification queue item, verification dialog
 │   │   ├── files/            → File upload, preview, file list
 │   │   ├── notifications/    → Notification center, badge, notification-routes (type→route map)
@@ -128,6 +128,9 @@ simak/
 │   │   ├── notifications.server.ts → Server-only notification handlers
 │   │   ├── templates.ts      → Template CRUD
 │   │   ├── templates.server.ts → Server-only template handlers
+│   │   ├── rubrics.ts         → Rubric CRUD stubs + Zod schemas (saveRubric, getRubric, soft-delete)
+│   │   ├── rubrics.server.ts  → Server-only rubric handlers (criteria/levels CRUD, admin-only)
+│   │   ├── review-scores.server.ts → Review score validation + insertion helpers (validateReviewScores, insertReviewScores)
     │   │   ├── audit-logs.ts      → Audit log query stubs + Zod schemas
     │   │   ├── audit-logs.server.ts → Server-only audit log handlers
     │   │   ├── email-queue.ts      → Email queue inspector stubs (listEmailQueue, retryEmail) + Zod schemas + shared types
@@ -232,6 +235,7 @@ Role-based analytics dashboards complement (do not duplicate) the real-time oper
 - **Export buttons on existing pages:** "Export CSV" buttons added to `/admin/users`, `/admin/audit-log`, and `/instructor/assignments/$id` (assignment progress / student progress / review history respectively).
 - **UI:** MetricCard grid + trend data tables + progress bars. No charting library — tables and progress bars only (defer Recharts unless visual charts are requested).
 - **i18n:** All labels/headers in both `locales/en.json` and `locales/id.json` (`analytics.*` + `analyticsInstructor.*` namespaces).
+- **Rubric analytics (Track: Rubric-Based Grading):** Instructor and admin analytics extended with rubric-level metrics — average score per criterion, criterion-level weakness analysis, and cross-instructor criterion performance comparison. CSV/Excel exports include per-student criterion scores. The Excel export path sanitizes string cells against formula injection (matching the CSV path's `escapeCsvValue` mitigation).
 
 ### Hybrid Navigation Pattern
 
@@ -442,7 +446,9 @@ All 9 user-initiated mutation sites where the predicted state is deterministic u
 | order             | integer, not null                   | Position in sequence                  |
 | minConsultations  | integer, default 0                  | Required for checkpoint unlock/submit |
 | estimatedDuration | integer, default 0                  | Days allotted for this checkpoint     |
+| gradingType       | pgEnum (grading_type), nullable     | `null` = no rubric (pass/fail only), `numeric` = direct 0–100 scoring per criterion, `qualitative` = level-based scoring (Track: Rubric-Based Grading) |
 | createdAt         | timestamp                           |                                       |
+| deletedAt         | timestamp                           | Soft delete (Track: Rubric-Based Grading) |
 
 #### assignments
 
@@ -478,6 +484,7 @@ _Note: Each row represents one student's individual participation. Group assignm
 | id               | serial (PK)                |                                                                             |
 | assignmentId     | integer (FK → assignments) |                                                                             |
 | studentId        | text (FK → users)          | Per-student checkpoint state (independent progress per student)             |
+| templateCheckpointId | integer (FK → template_checkpoints), nullable | Links per-student checkpoint to its template checkpoint for rubric lookup. Backfilled via `assignments.templateId + order` matching at migration time (Track: Rubric-Based Grading) |
 | name             | text, not null             | Copied from template                                                        |
 | order            | integer, not null          |                                                                             |
 | dueDate          | timestamp                  | Per-checkpoint deadline (auto-calculated from template `estimatedDuration`) |
@@ -518,6 +525,53 @@ _Note: Each row represents one student's individual participation. Group assignm
 | reviewedAt       | timestamp                          | When instructor submitted the review (for SLA calculation) |
 
 > **Atomic review submission (Track: review-atomic_20260704):** `submitReviewHandler` (`src/server/reviews.server.ts`) wraps the checkpoint state read, ownership validation, review insert, checkpoint state mutation, next-checkpoint unlock, SLA adjustment, and in-app notification inserts in a single `db.transaction(async (tx) => { ... })` block. The checkpoint row is locked with `FOR UPDATE OF checkpoints` and re-validated against `REVIEWABLE_STATES` post-lock. All error returns occur before any writes (safe empty-commit pattern). Post-commit advisory work (audit logging, SLA breach notifications) runs after the transaction commits, wrapped in try/catch. This follows SQL style guide §6.
+
+> **Rubric score validation (Track: Rubric-Based Grading):** For checkpoints with a rubric (`grading_type` is not `null`), `validateReviewScores` runs **before** the review INSERT (inside the transaction) — checking that all current criteria are scored, no duplicates exist, and `rubricLevelId` values belong to the correct rubric. Only after validation passes does the review INSERT execute with `.returning({ id: reviews.id })` (capturing the generated ID directly — no separate SELECT-after-INSERT per SQL styleguide §6.3). `insertReviewScores` then writes the denormalized snapshot rows using the captured `review.id`. This prevents the orphaned-review bug where a score-validation failure after the INSERT would commit the review row without transitioning the checkpoint.
+
+#### rubric_criteria
+
+| Column              | Type                                | Notes                                              |
+| ------------------- | ----------------------------------- | -------------------------------------------------- |
+| id                  | serial (PK)                         |                                                    |
+| templateCheckpointId| integer (FK → template_checkpoints) | Which checkpoint this criterion belongs to         |
+| title               | text, not null                      | Criterion title (e.g. "Content Quality")           |
+| description         | text                                | What this criterion evaluates                      |
+| weight              | integer, not null                   | 0–100 (CHECK constraint). Weights must sum to 100% (enforced at Zod application layer — spans multiple rows) |
+| order               | integer, not null                   | Display order                                      |
+| createdAt           | timestamp                           |                                                    |
+| updatedAt           | timestamp                           |                                                    |
+| deletedAt           | timestamp                           | Soft delete — never hard-deleted (preserves FK integrity for `review_scores` snapshots) |
+
+#### rubric_levels
+
+| Column              | Type                                | Notes                                              |
+| ------------------- | ----------------------------------- | -------------------------------------------------- |
+| id                  | serial (PK)                         |                                                    |
+| templateCheckpointId| integer (FK → template_checkpoints) | Shared across all criteria in this checkpoint (v1)  |
+| label               | text, not null                      | e.g. "Below Expectations", "Meets", "Exceeds"      |
+| description         | text                                | What this level means                              |
+| score               | integer, not null                   | 0–100 (CHECK constraint). Numeric mapping for qualitative grading |
+| order               | integer, not null                   | Display order                                      |
+| createdAt           | timestamp                           |                                                    |
+| updatedAt           | timestamp                           |                                                    |
+| deletedAt           | timestamp                           | Soft delete — never hard-deleted                   |
+
+#### review_scores
+
+| Column        | Type                                | Notes                                                                   |
+| ------------- | ----------------------------------- | ----------------------------------------------------------------------- |
+| id            | serial (PK)                         |                                                                         |
+| reviewId      | integer (FK → reviews)              | The review this score belongs to                                       |
+| criterionId   | integer (FK → rubric_criteria)     | NOT NULL — which criterion was scored                                   |
+| criterionTitle| text, not null                      | Denormalized snapshot — preserved even if criterion is soft-deleted    |
+| score         | integer, not null                   | 0–100 (CHECK constraint). Denormalized snapshot                         |
+| weight        | integer, not null                   | 0–100. Denormalized snapshot of criterion weight at review time         |
+| rubricLevelId | integer (FK → rubric_levels)        | NULLABLE — set only for qualitative grading                             |
+| levelLabel    | text                                | NULLABLE — denormalized snapshot of level label                         |
+| comment       | text                                | NULLABLE — per-criterion instructor comment                            |
+| createdAt     | timestamp                           |                                                                         |
+
+> **Denormalized snapshot (Track: Rubric-Based Grading):** `review_scores` stores a full denormalized snapshot (`criterionTitle`, `levelLabel`, `score`, `weight`) so completed reviews are unaffected by later rubric edits. If an admin soft-deletes a criterion or changes its title/weight, historical reviews retain their original snapshot values. The rubric is looked up live from the template at review time via `checkpoints.templateCheckpointId → template_checkpoints → rubric_criteria/rubric_levels`; only at persistence time is the snapshot captured.
 
 #### consultations
 
@@ -676,8 +730,10 @@ Composite index `checkpoints_state_due_date_idx` on `checkpoints (state, dueDate
 | `email_queue`        | `status`                 | b-tree           | Pick pending emails for delivery             |
 | `upload_intents`     | `fileKey`                | b-tree (unique)  | Intent lookup at submit time                 |
 | `upload_intents`     | `userId`                 | b-tree           | User's pending upload intents                 |
+| `checkpoints`        | `templateCheckpointId`  | b-tree           | Rubric lookup via FK join (TRACK-020)         |
+| `review_scores`      | `criterionId`           | b-tree           | Analytics queries joining on criterion (TRACK-020) |
 
-All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
+All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Migrations `0010`–`0012` (TRACK-020) added rubric tables (`rubric_criteria`, `rubric_levels`, `review_scores`), `grading_type` pgEnum, `checkpoints.templateCheckpointId` FK + backfill, `template_checkpoints.deletedAt`, and the two rubric-related indexes. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
 
 ---
 
@@ -1217,6 +1273,7 @@ Server functions whose output crosses the network boundary to a route loader dec
 | Assignment template CRUD                                               | ✓        |               |
 | Assignment creation with student selection                             | ✓        |               |
 | Checkpoint submission (sequential, pass/revise)                        | ✓        |               |
+| Rubric-based grading & evaluation (criteria, levels, weighted scores)   | ✓        |               |
 | File upload to R2 (single student)                                     | ✓        |               |
 | File preview (PDF) and download                                        | ✓        |               |
 | In-app notification center                                             | ✓        |               |

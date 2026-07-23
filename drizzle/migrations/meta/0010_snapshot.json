@@ -1,5 +1,5 @@
 {
-  "id": "4b198169-6c42-4fcc-95f0-2334e6f13b78",
+  "id": "1932e80f-b540-4fda-bc5f-a1954132d11b",
   "prevId": "5993eb3d-a4e7-4638-b6a2-90673b3695df",
   "version": "7",
   "dialect": "postgresql",
@@ -570,6 +570,13 @@
           "notNull": false,
           "default": 0
         },
+        "grading_type": {
+          "name": "grading_type",
+          "type": "grading_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -913,6 +920,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "template_checkpoint_id": {
+          "name": "template_checkpoint_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -979,27 +992,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "checkpoints_state_due_date_idx": {
-          "name": "checkpoints_state_due_date_idx",
-          "columns": [
-            {
-              "expression": "state",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "due_date",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -1022,6 +1014,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "student_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "checkpoints_template_checkpoint_id_template_checkpoints_id_fk": {
+          "name": "checkpoints_template_checkpoint_id_template_checkpoints_id_fk",
+          "tableFrom": "checkpoints",
+          "tableTo": "template_checkpoints",
+          "columnsFrom": [
+            "template_checkpoint_id"
           ],
           "columnsTo": [
             "id"
@@ -1423,6 +1428,330 @@
       },
       "policies": {},
       "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.review_scores": {
+      "name": "review_scores",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "review_id": {
+          "name": "review_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criterion_id": {
+          "name": "criterion_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criterion_title": {
+          "name": "criterion_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "weight": {
+          "name": "weight",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rubric_level_id": {
+          "name": "rubric_level_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "level_label": {
+          "name": "level_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "comment": {
+          "name": "comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "review_scores_review_id_idx": {
+          "name": "review_scores_review_id_idx",
+          "columns": [
+            {
+              "expression": "review_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "review_scores_review_id_reviews_id_fk": {
+          "name": "review_scores_review_id_reviews_id_fk",
+          "tableFrom": "review_scores",
+          "tableTo": "reviews",
+          "columnsFrom": [
+            "review_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "review_scores_criterion_id_rubric_criteria_id_fk": {
+          "name": "review_scores_criterion_id_rubric_criteria_id_fk",
+          "tableFrom": "review_scores",
+          "tableTo": "rubric_criteria",
+          "columnsFrom": [
+            "criterion_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "review_scores_rubric_level_id_rubric_levels_id_fk": {
+          "name": "review_scores_rubric_level_id_rubric_levels_id_fk",
+          "tableFrom": "review_scores",
+          "tableTo": "rubric_levels",
+          "columnsFrom": [
+            "rubric_level_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.rubric_criteria": {
+      "name": "rubric_criteria",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "template_checkpoint_id": {
+          "name": "template_checkpoint_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weight": {
+          "name": "weight",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "rubric_criteria_template_checkpoint_id_idx": {
+          "name": "rubric_criteria_template_checkpoint_id_idx",
+          "columns": [
+            {
+              "expression": "template_checkpoint_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "rubric_criteria_template_checkpoint_id_template_checkpoints_id_fk": {
+          "name": "rubric_criteria_template_checkpoint_id_template_checkpoints_id_fk",
+          "tableFrom": "rubric_criteria",
+          "tableTo": "template_checkpoints",
+          "columnsFrom": [
+            "template_checkpoint_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "rubric_criteria_weight_range": {
+          "name": "rubric_criteria_weight_range",
+          "value": "\"rubric_criteria\".\"weight\" >= 0 AND \"rubric_criteria\".\"weight\" <= 100"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.rubric_levels": {
+      "name": "rubric_levels",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "template_checkpoint_id": {
+          "name": "template_checkpoint_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "score": {
+          "name": "score",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "rubric_levels_template_checkpoint_id_idx": {
+          "name": "rubric_levels_template_checkpoint_id_idx",
+          "columns": [
+            {
+              "expression": "template_checkpoint_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "rubric_levels_template_checkpoint_id_template_checkpoints_id_fk": {
+          "name": "rubric_levels_template_checkpoint_id_template_checkpoints_id_fk",
+          "tableFrom": "rubric_levels",
+          "tableTo": "template_checkpoints",
+          "columnsFrom": [
+            "template_checkpoint_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "rubric_levels_score_range": {
+          "name": "rubric_levels_score_range",
+          "value": "\"rubric_levels\".\"score\" >= 0 AND \"rubric_levels\".\"score\" <= 100"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.consultations": {
@@ -2150,86 +2479,6 @@
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
-    },
-    "public.deadline_reminders": {
-      "name": "deadline_reminders",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "checkpoint_id": {
-          "name": "checkpoint_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "student_id": {
-          "name": "student_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "tier": {
-          "name": "tier",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sent_at": {
-          "name": "sent_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "deadline_reminders_checkpoint_id_checkpoints_id_fk": {
-          "name": "deadline_reminders_checkpoint_id_checkpoints_id_fk",
-          "tableFrom": "deadline_reminders",
-          "tableTo": "checkpoints",
-          "columnsFrom": [
-            "checkpoint_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "deadline_reminders_student_id_users_id_fk": {
-          "name": "deadline_reminders_student_id_users_id_fk",
-          "tableFrom": "deadline_reminders",
-          "tableTo": "users",
-          "columnsFrom": [
-            "student_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "deadline_reminders_checkpoint_id_tier_unq": {
-          "name": "deadline_reminders_checkpoint_id_tier_unq",
-          "nullsNotDistinct": false,
-          "columns": [
-            "checkpoint_id",
-            "tier"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
     }
   },
   "enums": {
@@ -2241,6 +2490,14 @@
         "admin",
         "instructor",
         "student"
+      ]
+    },
+    "public.grading_type": {
+      "name": "grading_type",
+      "schema": "public",
+      "values": [
+        "numeric",
+        "qualitative"
       ]
     },
     "public.checkpoint_state": {

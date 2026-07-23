@@ -65,6 +65,11 @@ const mockAnalyticsData = {
   dateRange: { start: null, end: null },
 };
 
+const mockRubricData = {
+  criteria: [],
+  dateRange: { start: null, end: null },
+};
+
 async function getAnalyticsPage(): Promise<ComponentType> {
   const mod = await import('@/routes/_authenticated/instructor/analytics');
   return (mod.Route as any).component ?? (mod.Route as any).Component;
@@ -72,7 +77,7 @@ async function getAnalyticsPage(): Promise<ComponentType> {
 
 describe('Instructor Analytics Page', () => {
   beforeEach(() => {
-    mocks.loaderData = { ...mockAnalyticsData };
+    mocks.loaderData = { analytics: { ...mockAnalyticsData }, rubric: { ...mockRubricData } };
     mocks.search = { range: '30d', start: undefined, end: undefined };
     mocks.navigate.mockClear();
   });
@@ -100,7 +105,10 @@ describe('Instructor Analytics Page', () => {
   });
 
   it('renders N/A for null average response time', async () => {
-    mocks.loaderData = { ...mockAnalyticsData, averageResponseTimeHours: null };
+    mocks.loaderData = {
+      analytics: { ...mockAnalyticsData, averageResponseTimeHours: null },
+      rubric: { ...mockRubricData },
+    };
     const Page = await getAnalyticsPage();
     render(<Page />);
     expect(screen.getByText('N/A')).toBeDefined();
@@ -135,7 +143,10 @@ describe('Instructor Analytics Page', () => {
   });
 
   it('renders error state when server returns error', async () => {
-    mocks.loaderData = { error: { code: 'INTERNAL', message: 'Internal Server Error' } };
+    mocks.loaderData = {
+      analytics: { error: { code: 'INTERNAL', message: 'Internal Server Error' } },
+      rubric: { ...mockRubricData },
+    };
     const Page = await getAnalyticsPage();
     render(<Page />);
     expect(screen.getByText('Internal Server Error')).toBeDefined();

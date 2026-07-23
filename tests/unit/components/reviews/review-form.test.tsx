@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
+import { submitReview } from '@/server/reviews';
 
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
@@ -14,6 +15,14 @@ vi.mock('@/server/reviews', () => ({
 
 vi.mock('@/server/files', () => ({
   getPresignedReviewFeedbackUploadUrl: vi.fn(),
+}));
+
+vi.mock('@/lib/errors', () => ({
+  isServerError: vi.fn(() => false),
+}));
+
+vi.mock('@/components/reviews/RubricScoringSection', () => ({
+  RubricScoringSection: () => <div data-testid="rubric-scoring-section" />,
 }));
 
 describe('ReviewForm', () => {
@@ -86,5 +95,37 @@ describe('ReviewForm', () => {
     const passRadio = screen.getByDisplayValue('pass');
     fireEvent.click(passRadio);
     expect(screen.queryByText('instructorReviews.revisionDeadline')).toBeNull();
+  });
+
+  // --- Skip rubric UI when grading_type is null (backward compatibility) ---
+
+  it('should not render RubricScoringSection when rubric is null', () => {
+    render(<ReviewForm {...baseProps} rubric={null} />);
+    expect(screen.queryByTestId('rubric-scoring-section')).toBeNull();
+  });
+
+  it('should not render RubricScoringSection when rubric gradingType is null', () => {
+    render(<ReviewForm {...baseProps} rubric={{ gradingType: null, criteria: [], levels: [] }} />);
+    expect(screen.queryByTestId('rubric-scoring-section')).toBeNull();
+  });
+
+  it('should not disable submit by unscored criteria when rubric is null', () => {
+    render(<ReviewForm {...baseProps} rubric={null} />);
+    fireEvent.click(screen.getByDisplayValue('pass'));
+    const button = screen.getByText('instructorReviews.submitReview').closest('button');
+    expect(button).toHaveProperty('disabled', false);
+  });
+
+  it('should not send scores when rubric is null', async () => {
+    render(<ReviewForm {...baseProps} rubric={null} />);
+    fireEvent.click(screen.getByDisplayValue('pass'));
+    fireEvent.click(screen.getByText('instructorReviews.submitReview'));
+    await waitFor(() => {
+      expect(submitReview).toHaveBeenCalledTimes(1);
+    });
+    const callArgs = vi.mocked(submitReview).mock.calls[0][0] as {
+      data: { scores?: unknown };
+    };
+    expect(callArgs.data.scores).toBeUndefined();
   });
 });

@@ -25,3 +25,15 @@ export async function logAuditEvent(event: {
     details: event.details ?? null,
   });
 }
+
+/**
+ * Wraps logAuditEvent in a try/catch so advisory audit failures
+ * do not fail the request (SQL styleguide §6.4 — post-commit advisory work).
+ */
+export async function safeAuditLog(label: string, event: Parameters<typeof logAuditEvent>[0]) {
+  try {
+    await logAuditEvent(event);
+  } catch (e) {
+    console.error(`Post-commit advisory work failed in ${label}:`, e);
+  }
+}
