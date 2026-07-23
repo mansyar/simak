@@ -22,7 +22,7 @@
     - [x] Implement `notificationPrefs: z.record(z.string(), z.object({ email: z.boolean().optional(), inApp: z.boolean().optional() })).optional()` in `src/server/settings.ts:10-12`
     - [x] Run `pnpm test` — confirm Zod validation tests pass
 
-- [ ] Task: Conductor - User Manual Verification 'Settings Backend Refactor' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Settings Backend Refactor' (Protocol in workflow.md)
 
 ## Phase 2: Preference Gates
 
