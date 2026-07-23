@@ -14,11 +14,12 @@ export async function enqueueEventEmail(opts: {
   subjectKey: string;
   templateType: TemplateType;
   buildBody: (locale: Locales) => string;
+  subjectParams?: Record<string, string>;
 }): Promise<void> {
   try {
     const recipient = await resolveEmailRecipient(opts.recipientId);
     if (!recipient) return;
-    const subject = `[SIMAK] ${resolveEmailSubject(opts.subjectKey, undefined, recipient.locale)}`;
+    const subject = `[SIMAK] ${resolveEmailSubject(opts.subjectKey, opts.subjectParams, recipient.locale)}`;
     await enqueueEmail({
       recipientEmail: recipient.email,
       subject,

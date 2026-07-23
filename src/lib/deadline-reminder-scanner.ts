@@ -62,50 +62,57 @@ export async function processDeadlineReminders(): Promise<void> {
 
       if (dueCheckpoints.length === 0) continue;
 
-      // Dedup: INSERT INTO deadline_reminders ON CONFLICT DO NOTHING RETURNING *
-      // Only rows where the insert succeeded (this instance won the race) are returned
-      const winners = await db
-        .insert(deadlineReminders)
-        .values(
-          dueCheckpoints.map((c) => ({
+      // Dedup + notification insert: atomic (SQL styleguide §6.1)
+      // Email dispatch: post-commit advisory (SQL styleguide §6.4)
+      const remindersToSend = await db.transaction(async (tx) => {
+        // Dedup: INSERT INTO deadline_reminders ON CONFLICT DO NOTHING RETURNING *
+        // Only rows where the insert succeeded (this instance won the race) are returned
+        const winners = await tx
+          .insert(deadlineReminders)
+          .values(
+            dueCheckpoints.map((c) => ({
+              checkpointId: c.checkpointId,
+              studentId: c.studentId,
+              tier,
+            })),
+          )
+          .onConflictDoNothing({
+            target: [deadlineReminders.checkpointId, deadlineReminders.tier],
+          })
+          .returning();
+
+        if (winners.length === 0) return [];
+
+        // Match winners back to checkpoint data for notification/email content
+        const winnerIds = new Set(winners.map((w) => w.checkpointId));
+        const toSend = dueCheckpoints.filter((c) => winnerIds.has(c.checkpointId));
+
+        // Batch insert in-app notifications (single INSERT)
+        const keys = getNotificationKeys('deadline_reminder');
+        const notificationValues = toSend.map((c) => ({
+          userId: c.studentId,
+          type: 'deadline_reminder',
+          titleKey: keys.titleKey,
+          messageKey: keys.messageKey,
+          params: {
+            assignmentTitle: c.assignmentTitle,
+            checkpointName: c.checkpointName,
+            dueDate: String(c.dueDate),
+          },
+          channel: 'in_app',
+          metadata: {
+            assignmentId: c.assignmentId,
             checkpointId: c.checkpointId,
-            studentId: c.studentId,
-            tier,
-          })),
-        )
-        .onConflictDoNothing({
-          target: [deadlineReminders.checkpointId, deadlineReminders.tier],
-        })
-        .returning();
+          },
+        }));
 
-      if (winners.length === 0) continue;
+        await tx.insert(notifications).values(notificationValues);
+        return toSend;
+      });
 
-      // Match winners back to checkpoint data for notification/email content
-      const winnerIds = new Set(winners.map((w) => w.checkpointId));
-      const remindersToSend = dueCheckpoints.filter((c) => winnerIds.has(c.checkpointId));
+      if (remindersToSend.length === 0) continue;
 
-      // Batch insert in-app notifications (single INSERT)
-      const keys = getNotificationKeys('deadline_reminder');
-      const notificationValues = remindersToSend.map((c) => ({
-        userId: c.studentId,
-        type: 'deadline_reminder',
-        titleKey: keys.titleKey,
-        messageKey: keys.messageKey,
-        params: {
-          assignmentTitle: c.assignmentTitle,
-          checkpointName: c.checkpointName,
-          dueDate: String(c.dueDate),
-        },
-        channel: 'in_app',
-        metadata: {
-          assignmentId: c.assignmentId,
-          checkpointId: c.checkpointId,
-        },
-      }));
-
-      await db.insert(notifications).values(notificationValues);
-
-      // Send emails concurrently — failures don't short-circuit (advisory)
+      // Send emails concurrently — failures don't short-circuit (advisory, post-commit)
       await Promise.allSettled(
         remindersToSend.map((c) =>
           sendDeadlineReminderEmail({

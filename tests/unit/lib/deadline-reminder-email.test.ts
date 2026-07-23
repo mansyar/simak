@@ -36,6 +36,13 @@ describe('sendDeadlineReminderEmail', () => {
     expect(call.templateType).toBe('deadline_reminder');
   });
 
+  it('passes assignmentTitle as subjectParams for interpolation', async () => {
+    await sendDeadlineReminderEmail(opts);
+
+    const call = vi.mocked(enqueueEventEmail).mock.calls[0][0];
+    expect(call.subjectParams).toEqual({ assignmentTitle: 'Final Project' });
+  });
+
   it('passes a buildBody function that returns HTML', async () => {
     await sendDeadlineReminderEmail(opts);
 

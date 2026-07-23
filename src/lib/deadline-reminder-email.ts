@@ -20,6 +20,7 @@ export async function sendDeadlineReminderEmail(opts: DeadlineReminderEmailOpts)
     recipientId: opts.recipientId,
     subjectKey: 'emails.subjects.deadlineReminder',
     templateType: 'deadline_reminder',
+    subjectParams: { assignmentTitle: opts.assignmentTitle },
     buildBody: (locale: Locales) =>
       buildDeadlineReminderHtml({
         assignmentTitle: opts.assignmentTitle,

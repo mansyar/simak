@@ -41,6 +41,7 @@ describe('processDeadlineReminders', () => {
       onConflictDoNothing: vi.fn().mockReturnThis(),
       returning: vi.fn().mockReturnThis(),
       then: vi.fn((onfulfilled: any) => Promise.resolve([]).then(onfulfilled)),
+      transaction: vi.fn(async (cb: any) => cb(mockDb)),
     };
     vi.mocked(getDb).mockReturnValue(mockDb as any);
   });
@@ -77,6 +78,16 @@ describe('processDeadlineReminders', () => {
 
       expect(mockDb.insert).not.toHaveBeenCalled();
       expect(sendDeadlineReminderEmail).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('transaction wrapping', () => {
+    it('should wrap dedup + notification inserts in db.transaction', async () => {
+      queueOnlyTier1HasResults();
+
+      await processDeadlineReminders();
+
+      expect(mockDb.transaction).toHaveBeenCalledTimes(1);
     });
   });
 
