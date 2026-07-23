@@ -1,6 +1,9 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getInstructorAnalyticsDataHandler } from '@/server/analytics-instructor.server';
+import {
+  getInstructorAnalyticsDataHandler,
+  getInstructorRubricAnalyticsHandler,
+} from '@/server/analytics-instructor.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 
@@ -250,6 +253,156 @@ describe('getInstructorAnalyticsDataHandler', () => {
       });
 
       const result = await getInstructorAnalyticsDataHandler({ data: { range: '30d' } });
+      expect(result).toEqual({
+        error: {
+          code: 'INTERNAL',
+          message: 'Internal Server Error',
+        },
+      });
+    });
+  });
+});
+
+describe('getInstructorRubricAnalyticsHandler', () => {
+  let mockDb: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb = {
+      select: vi.fn().mockReturnThis(),
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      offset: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockReturnThis(),
+      then: vi.fn(function (onfulfilled: any) {
+        return Promise.resolve([]).then(onfulfilled);
+      }),
+    };
+    vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
+  });
+
+  function mockRubricResult(rows: any[]) {
+    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve(rows).then(onfulfilled),
+    );
+  }
+
+  describe('role guard', () => {
+    it('should reject if unauthorized (no session)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+      const result = await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
+    });
+
+    it('should reject if admin', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+      const result = await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
+    });
+
+    it('should reject if student', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+      const result = await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
+    });
+
+    it('should accept instructor role', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockRubricResult([]);
+      const result = (await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result).not.toHaveProperty('error');
+      expect(result).toHaveProperty('criteria');
+    });
+  });
+
+  describe('rubric metrics', () => {
+    beforeEach(() => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    });
+
+    it('should return avg score per criterion', async () => {
+      mockRubricResult([
+        {
+          criterionId: 1,
+          criterionTitle: 'Code Quality',
+          avgScore: 85,
+          reviewCount: 10,
+          passRate: 70,
+        },
+        {
+          criterionId: 2,
+          criterionTitle: 'Documentation',
+          avgScore: 72,
+          reviewCount: 10,
+          passRate: 50,
+        },
+      ]);
+      const result = (await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result.criteria).toHaveLength(2);
+      expect(result.criteria[0].avgScore).toBe(85);
+      expect(result.criteria[1].avgScore).toBe(72);
+    });
+
+    it('should return criterion-level pass rate', async () => {
+      mockRubricResult([
+        {
+          criterionId: 1,
+          criterionTitle: 'Code Quality',
+          avgScore: 85,
+          reviewCount: 10,
+          passRate: 80,
+        },
+      ]);
+      const result = (await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result.criteria[0].passRate).toBe(80);
+    });
+
+    it('should return review count per criterion', async () => {
+      mockRubricResult([
+        {
+          criterionId: 1,
+          criterionTitle: 'Code Quality',
+          avgScore: 85,
+          reviewCount: 15,
+          passRate: 70,
+        },
+      ]);
+      const result = (await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result.criteria[0].reviewCount).toBe(15);
+    });
+
+    it('should return empty criteria array when no rubric scores', async () => {
+      mockRubricResult([]);
+      const result = (await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result.criteria).toEqual([]);
+    });
+
+    it('should return dateRange in result', async () => {
+      mockRubricResult([]);
+      const result = (await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result).toHaveProperty('dateRange');
+      expect(result.dateRange.start).not.toBeNull();
+      expect(result.dateRange.end).not.toBeNull();
+    });
+
+    it('should use session user id for instructor-scoped queries', async () => {
+      mockRubricResult([]);
+      await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } });
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('error handling', () => {
+    it('should return INTERNAL error on DB failure', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockDb.then.mockImplementation(() => {
+        throw new Error('DB connection failed');
+      });
+
+      const result = await getInstructorRubricAnalyticsHandler({ data: { range: '30d' } });
       expect(result).toEqual({
         error: {
           code: 'INTERNAL',

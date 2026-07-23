@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { getInstructorAnalyticsData } from '@/server/analytics';
+import { getInstructorAnalyticsData, getInstructorRubricAnalytics } from '@/server/analytics';
 import { useI18n } from '../../__root';
 import { PageHeader } from '@/components/ui/page-header';
 import { MetricCard } from '@/components/ui/metric-card';
@@ -39,7 +39,11 @@ export const Route = createFileRoute('/_authenticated/instructor/analytics')({
     end: search.end,
   }),
   loader: async ({ deps }) => {
-    return getInstructorAnalyticsData({ data: deps });
+    const [analytics, rubric] = await Promise.all([
+      getInstructorAnalyticsData({ data: deps }),
+      getInstructorRubricAnalytics({ data: deps }),
+    ]);
+    return { analytics, rubric };
   },
   component: InstructorAnalyticsPage,
   pendingComponent: () => <DashboardSkeleton />,
@@ -54,6 +58,19 @@ type InstructorAnalyticsData = {
   dateRange: { start: string | null; end: string | null };
 };
 
+type RubricCriterionMetric = {
+  criterionId: number;
+  criterionTitle: string;
+  avgScore: number;
+  reviewCount: number;
+  passRate: number;
+};
+
+type InstructorRubricAnalytics = {
+  criteria: RubricCriterionMetric[];
+  dateRange: { start: string | null; end: string | null };
+};
+
 type AnalyticsSearchParams = {
   range?: '7d' | '30d' | '90d' | 'all';
   start?: string;
@@ -62,7 +79,12 @@ type AnalyticsSearchParams = {
 
 function InstructorAnalyticsPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as unknown as InstructorAnalyticsData;
+  const loaderData = Route.useLoaderData() as unknown as {
+    analytics: InstructorAnalyticsData;
+    rubric: InstructorRubricAnalytics | { error: { code: string; message: string } };
+  };
+  const data = loaderData.analytics;
+  const rubricData = loaderData.rubric;
   const searchParams = Route.useSearch() as unknown as AnalyticsSearchParams;
   const navigate = Route.useNavigate();
 
@@ -193,6 +215,43 @@ function InstructorAnalyticsPage() {
           color="primary"
         />
       </div>
+
+      {/* Rubric Analytics Section */}
+      {'criteria' in rubricData && rubricData.criteria.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold">{t('instructorAnalytics.rubricTitle')}</h2>
+          <div className="rounded-md border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-muted/50">
+                  <th className="p-3 text-left font-medium">
+                    {t('instructorAnalytics.rubricCriterion')}
+                  </th>
+                  <th className="p-3 text-right font-medium">
+                    {t('instructorAnalytics.rubricAvgScore')}
+                  </th>
+                  <th className="p-3 text-right font-medium">
+                    {t('instructorAnalytics.rubricPassRate')}
+                  </th>
+                  <th className="p-3 text-right font-medium">
+                    {t('instructorAnalytics.rubricReviewCount')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rubricData.criteria.map((c) => (
+                  <tr key={c.criterionId} className="border-b last:border-0">
+                    <td className="p-3">{c.criterionTitle}</td>
+                    <td className="p-3 text-right">{c.avgScore}</td>
+                    <td className="p-3 text-right">{c.passRate}%</td>
+                    <td className="p-3 text-right">{c.reviewCount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

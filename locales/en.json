@@ -572,7 +572,12 @@
     "range90d": "90 Days",
     "rangeAll": "All Time",
     "customStart": "Start Date",
-    "customEnd": "End Date"
+    "customEnd": "End Date",
+    "rubricTitle": "Rubric Analytics",
+    "rubricCriterion": "Criterion",
+    "rubricAvgScore": "Avg Score",
+    "rubricPassRate": "Pass Rate",
+    "rubricReviewCount": "Reviews"
   },
   "files": {
     "dropzone": {

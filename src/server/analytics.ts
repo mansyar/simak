@@ -45,6 +45,13 @@ export const getInstructorAnalyticsData = createServerFn({ method: 'GET' })
     return getInstructorAnalyticsDataHandler({ data });
   });
 
+export const getInstructorRubricAnalytics = createServerFn({ method: 'GET' })
+  .inputValidator(AnalyticsDateRangeSchema)
+  .handler(async ({ data }) => {
+    const { getInstructorRubricAnalyticsHandler } = await import('./analytics-instructor.server');
+    return getInstructorRubricAnalyticsHandler({ data });
+  });
+
 // ---- CSV Export Schemas ----
 
 export const ExportUsersCsvSchema = z.object({});

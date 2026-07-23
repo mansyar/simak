@@ -578,6 +578,11 @@ export type Translation = {
     rangeAll: string
     customStart: string
     customEnd: string
+    rubricTitle: string
+    rubricCriterion: string
+    rubricAvgScore: string
+    rubricPassRate: string
+    rubricReviewCount: string
   }
   files: {
     dropzone: {

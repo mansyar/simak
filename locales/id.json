@@ -572,7 +572,12 @@
     "range90d": "90 Hari",
     "rangeAll": "Semua Waktu",
     "customStart": "Tanggal Mulai",
-    "customEnd": "Tanggal Akhir"
+    "customEnd": "Tanggal Akhir",
+    "rubricTitle": "Analitik Rubrik",
+    "rubricCriterion": "Kriteria",
+    "rubricAvgScore": "Nilai Rata-rata",
+    "rubricPassRate": "Tingkat Kelulusan",
+    "rubricReviewCount": "Ulasan"
   },
   "files": {
     "dropzone": {
