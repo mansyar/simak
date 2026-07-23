@@ -49,7 +49,7 @@
     - [x] Implement: Add criteria editor section to `CheckpointListEditor.tsx` (or extract `RubricCriteriaEditor.tsx` sub-component if file exceeds 500 lines). Wire to `saveRubric` server function
     - [x] Verify: `pnpm test` passes
 
-- [ ] Task: Admin rubric builder UI — qualitative level configurator
+- [x] Task: Admin rubric builder UI — qualitative level configurator (6aa8801)
     - [ ] Write failing tests: Component tests for level configurator — add/remove/reorder levels, label/score/description inputs, shown only when `grading_type` is `qualitative`, score 0–100 validation
     - [ ] Implement: Add qualitative level configurator to `CheckpointListEditor.tsx` (or extract `RubricLevelsEditor.tsx` sub-component). Wire to `saveRubric` server function
     - [ ] Verify: `pnpm test` passes
