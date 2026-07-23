@@ -19,6 +19,7 @@ import {
 import { getNotificationKeys } from './notifications.server';
 import { sendReviewEmail } from '../lib/review-email';
 import { fetchRubric } from './rubrics.server';
+import { persistReviewScores } from './review-scores.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -222,7 +223,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { submissionId, decision, comment, feedbackFileKey, revisionDeadline } = args.data;
+  const { submissionId, decision, comment, feedbackFileKey, revisionDeadline, scores } = args.data;
   const db = getDb();
 
   try {
@@ -264,6 +265,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           checkpointDueDate: checkpoints.dueDate,
           checkpointOrder: checkpoints.order,
           finalDeadline: assignments.finalDeadline,
+          templateCheckpointId: checkpoints.templateCheckpointId,
         })
         .from(submissions)
         .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
@@ -350,6 +352,13 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           decision === 'revise' && revisionDeadline ? new Date(revisionDeadline) : null,
         reviewedAt: new Date(),
       });
+      const se = await persistReviewScores(
+        tx,
+        submissionId,
+        submission.templateCheckpointId,
+        scores,
+      );
+      if (se) return se;
 
       if (decision === 'pass') {
         // 2e. Set checkpoint to passed
@@ -400,44 +409,25 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       }
 
       // 2i. Create notification for the student (review_completed or revision_requested)
-      const reviewParams = {
-        checkpointName: submission.checkpointName,
-        assignmentTitle: submission.assignmentTitle,
-      };
-
-      if (decision === 'pass') {
-        const reviewCompletedKeys = getNotificationKeys('review_completed');
-        await tx.insert(notifications).values({
-          userId: submission.studentId,
-          type: 'review_completed',
-          titleKey: reviewCompletedKeys.titleKey,
-          messageKey: reviewCompletedKeys.messageKey,
-          params: reviewParams,
-          channel: 'in_app',
-          metadata: {
-            checkpointId: submission.checkpointId,
-            assignmentId: submission.assignmentId,
-            submissionId,
-            decision,
-          },
-        });
-      } else if (decision === 'revise') {
-        const revisionRequestedKeys = getNotificationKeys('revision_requested');
-        await tx.insert(notifications).values({
-          userId: submission.studentId,
-          type: 'revision_requested',
-          titleKey: revisionRequestedKeys.titleKey,
-          messageKey: revisionRequestedKeys.messageKey,
-          params: reviewParams,
-          channel: 'in_app',
-          metadata: {
-            checkpointId: submission.checkpointId,
-            assignmentId: submission.assignmentId,
-            submissionId,
-            decision,
-          },
-        });
-      }
+      const notifType = decision === 'pass' ? 'review_completed' : 'revision_requested';
+      const notifKeys = getNotificationKeys(notifType);
+      await tx.insert(notifications).values({
+        userId: submission.studentId,
+        type: notifType,
+        titleKey: notifKeys.titleKey,
+        messageKey: notifKeys.messageKey,
+        params: {
+          checkpointName: submission.checkpointName,
+          assignmentTitle: submission.assignmentTitle,
+        },
+        channel: 'in_app',
+        metadata: {
+          checkpointId: submission.checkpointId,
+          assignmentId: submission.assignmentId,
+          submissionId,
+          decision,
+        },
+      });
 
       return { success: true, submission, breachDays, slaFields };
     });
