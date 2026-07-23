@@ -85,6 +85,67 @@ describe('Settings schemas', () => {
       const result = UpdateUserSettingsSchema.safeParse({});
       expect(result.success).toBe(false);
     });
+
+    it('should accept valid notificationPrefs record (TRACK-022)', () => {
+      const result = UpdateUserSettingsSchema.safeParse({
+        reducedMotion: true,
+        notificationPrefs: { review_completed: { email: false, inApp: true } },
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.notificationPrefs).toEqual({
+          review_completed: { email: false, inApp: true },
+        });
+      }
+    });
+
+    it('should accept absent notificationPrefs (optional) (TRACK-022)', () => {
+      const result = UpdateUserSettingsSchema.safeParse({ reducedMotion: true });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.notificationPrefs).toBeUndefined();
+      }
+    });
+
+    it('should accept undefined notificationPrefs (TRACK-022)', () => {
+      const result = UpdateUserSettingsSchema.safeParse({
+        reducedMotion: true,
+        notificationPrefs: undefined,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept partial prefs with only email (TRACK-022)', () => {
+      const result = UpdateUserSettingsSchema.safeParse({
+        reducedMotion: true,
+        notificationPrefs: { submission_received: { email: false } },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept partial prefs with only inApp (TRACK-022)', () => {
+      const result = UpdateUserSettingsSchema.safeParse({
+        reducedMotion: true,
+        notificationPrefs: { sla_breach: { inApp: false } },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject non-boolean email in notificationPrefs (TRACK-022)', () => {
+      const result = UpdateUserSettingsSchema.safeParse({
+        reducedMotion: true,
+        notificationPrefs: { review_completed: { email: 'yes' } },
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject non-boolean inApp in notificationPrefs (TRACK-022)', () => {
+      const result = UpdateUserSettingsSchema.safeParse({
+        reducedMotion: true,
+        notificationPrefs: { review_completed: { inApp: 1 } },
+      });
+      expect(result.success).toBe(false);
+    });
   });
 
   describe('GetPresignedAvatarUploadUrlSchema', () => {
@@ -280,6 +341,86 @@ describe('Settings handlers', () => {
       mockDb.returning.mockReturnValue({
         then: (_onfulfilled: any, onrejected: any) =>
           Promise.reject(new Error('DB error')).catch(onrejected),
+      });
+
+      const result = await updateUserSettingsHandler({ data: { reducedMotion: false } });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
+    });
+
+    it('AC-5: should preserve notificationPrefs when saving reducedMotion (merge)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+
+      const existingSettings = {
+        reducedMotion: true,
+        notificationPrefs: { review_completed: { email: false } },
+      };
+      const expectedMerged = {
+        reducedMotion: false,
+        notificationPrefs: { review_completed: { email: false } },
+      };
+
+      // Select query returns existing settings (first then call)
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ settings: existingSettings }]).then(fn),
+      );
+      // Update returning returns merged settings
+      mockDb.returning.mockReturnValue({
+        then: (fn: any) => Promise.resolve([{ settings: expectedMerged }]).then(fn),
+      });
+
+      const result = await updateUserSettingsHandler({ data: { reducedMotion: false } });
+
+      expect(mockDb.set).toHaveBeenCalledWith({ settings: expectedMerged });
+      expect(result).toEqual(expectedMerged);
+    });
+
+    it('AC-6: should preserve reducedMotion when saving notificationPrefs (merge)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+
+      const existingSettings = { reducedMotion: true };
+      const newPrefs = { review_completed: { email: false, inApp: true } };
+      const expectedMerged = {
+        reducedMotion: true,
+        notificationPrefs: newPrefs,
+      };
+
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ settings: existingSettings }]).then(fn),
+      );
+      mockDb.returning.mockReturnValue({
+        then: (fn: any) => Promise.resolve([{ settings: expectedMerged }]).then(fn),
+      });
+
+      const result = await updateUserSettingsHandler({
+        data: { reducedMotion: true, notificationPrefs: newPrefs },
+      });
+
+      expect(mockDb.set).toHaveBeenCalledWith({ settings: expectedMerged });
+      expect(result).toEqual(expectedMerged);
+    });
+
+    it('AC-7: should use default settings when no existing settings (merge)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+
+      // Select returns empty (default mockDb.then returns [])
+      const expectedMerged = { reducedMotion: true };
+
+      mockDb.returning.mockReturnValue({
+        then: (fn: any) => Promise.resolve([{ settings: expectedMerged }]).then(fn),
+      });
+
+      const result = await updateUserSettingsHandler({ data: { reducedMotion: true } });
+
+      // Default { reducedMotion: false } merged with input { reducedMotion: true }
+      expect(mockDb.set).toHaveBeenCalledWith({ settings: { reducedMotion: true } });
+      expect(result).toEqual(expectedMerged);
+    });
+
+    it('should handle select query failure gracefully', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+
+      mockDb.then.mockImplementationOnce(() => {
+        throw new Error('DB select error');
       });
 
       const result = await updateUserSettingsHandler({ data: { reducedMotion: false } });
