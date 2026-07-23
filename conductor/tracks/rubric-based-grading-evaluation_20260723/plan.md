@@ -26,7 +26,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Schema, Migration & Template Handler Refactor' (Protocol in workflow.md)
 
-## Phase 2: Rubric CRUD — Admin
+## Phase 2: Rubric CRUD — Admin [checkpoint: 60e01ff]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before starting Phase 2
 - [x] Task: Create `rubrics.ts` server function stubs + Zod schemas (3d91cd3)
