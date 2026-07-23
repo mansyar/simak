@@ -321,7 +321,8 @@
     "rubric": {
       "title": "Penilaian Rubrik",
       "weightedTotal": "Total Terbobot",
-      "allCriteriaRequired": "Semua kriteria harus dinilai sebelum mengirim"
+      "allCriteriaRequired": "Semua kriteria harus dinilai sebelum mengirim",
+      "selectLevel": "Pilih tingkat"
     }
   },
   "instructorAssignments": {

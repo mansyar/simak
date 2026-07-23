@@ -321,7 +321,8 @@
     "rubric": {
       "title": "Rubric Scoring",
       "weightedTotal": "Weighted Total",
-      "allCriteriaRequired": "All criteria must be scored before submitting"
+      "allCriteriaRequired": "All criteria must be scored before submitting",
+      "selectLevel": "Select a level"
     }
   },
   "instructorAssignments": {

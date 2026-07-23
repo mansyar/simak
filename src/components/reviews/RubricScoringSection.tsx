@@ -2,6 +2,13 @@ import { useI18n } from '@/routes/__root';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import type { RubricData } from '@/server/rubrics';
 
 export interface ScoreInput {
@@ -37,6 +44,22 @@ export function RubricScoringSection({
     }
   };
 
+  const handleLevelChange = (criterionId: number, levelIdStr: string) => {
+    const levelId = Number(levelIdStr);
+    const level = rubric.levels.find((l) => l.id === levelId);
+    if (!level) return;
+    const existing = scores.find((s) => s.criterionId === criterionId);
+    if (existing) {
+      onScoresChange(
+        scores.map((s) =>
+          s.criterionId === criterionId ? { ...s, score: level.score, rubricLevelId: level.id } : s,
+        ),
+      );
+    } else {
+      onScoresChange([...scores, { criterionId, score: level.score, rubricLevelId: level.id }]);
+    }
+  };
+
   const weightedTotal = rubric.criteria.reduce((sum, criterion) => {
     const score = scores.find((s) => s.criterionId === criterion.id)?.score;
     if (score === undefined) return sum;
@@ -62,17 +85,38 @@ export function RubricScoringSection({
               {criterion.description && (
                 <p className="text-xs text-muted-foreground">{criterion.description}</p>
               )}
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={score ?? ''}
-                  onChange={(e) => handleScoreChange(criterion.id, e.target.value)}
-                  className="w-24"
-                />
-                <span className="text-sm text-muted-foreground">/ 100</span>
-              </div>
+              {rubric.gradingType === 'qualitative' ? (
+                <Select
+                  value={
+                    scores.find((s) => s.criterionId === criterion.id)?.rubricLevelId?.toString() ??
+                    ''
+                  }
+                  onValueChange={(value) => value && handleLevelChange(criterion.id, value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={t('instructorReviews.rubric.selectLevel')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rubric.levels.map((level) => (
+                      <SelectItem key={level.id} value={level.id.toString()}>
+                        {level.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={score ?? ''}
+                    onChange={(e) => handleScoreChange(criterion.id, e.target.value)}
+                    className="w-24"
+                  />
+                  <span className="text-sm text-muted-foreground">/ 100</span>
+                </div>
+              )}
             </div>
           );
         })}

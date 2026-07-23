@@ -24,6 +24,22 @@ vi.mock('@/components/ui/label', () => ({
   Label: ({ children }: { children: React.ReactNode }) => <label>{children}</label>,
 }));
 
+vi.mock('@/components/ui/select', () => ({
+  Select: ({ value, onValueChange, children }: any) => (
+    <select
+      value={value ?? ''}
+      onChange={(e) => onValueChange?.(e.target.value)}
+      data-testid="level-select"
+    >
+      {children}
+    </select>
+  ),
+  SelectTrigger: ({ children }: any) => <>{children}</>,
+  SelectContent: ({ children }: any) => <>{children}</>,
+  SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
+  SelectValue: () => null,
+}));
+
 const numericRubric: RubricData = {
   gradingType: 'numeric',
   criteria: [
@@ -151,6 +167,113 @@ describe('RubricScoringSection - Numeric Scoring', () => {
   });
 
   it('shows weighted total as 0 when no scores entered', () => {
+    render(<RubricScoringSection {...baseProps} />);
+    expect(screen.getByText('0 / 100')).toBeDefined();
+  });
+});
+
+const qualitativeRubric: RubricData = {
+  gradingType: 'qualitative',
+  criteria: [
+    { id: 1, title: 'Code Quality', description: 'Assess code quality', weight: 50, order: 0 },
+    { id: 2, title: 'Documentation', description: 'Assess documentation', weight: 50, order: 1 },
+  ],
+  levels: [
+    { id: 10, label: 'Excellent', description: 'Outstanding work', score: 100, order: 0 },
+    { id: 11, label: 'Good', description: 'Solid work', score: 75, order: 1 },
+    { id: 12, label: 'Needs Work', description: 'Room for improvement', score: 50, order: 2 },
+  ],
+};
+
+describe('RubricScoringSection - Qualitative Scoring', () => {
+  const baseProps = {
+    rubric: qualitativeRubric,
+    scores: [] as Array<{ criterionId: number; score: number }>,
+    onScoresChange: vi.fn(),
+  };
+
+  it('renders level Select per criterion', () => {
+    render(<RubricScoringSection {...baseProps} />);
+    expect(screen.getAllByTestId('level-select')).toHaveLength(2);
+  });
+
+  it('renders level options in each select', () => {
+    render(<RubricScoringSection {...baseProps} />);
+    expect(screen.getAllByText('Excellent')).toHaveLength(2);
+    expect(screen.getAllByText('Good')).toHaveLength(2);
+    expect(screen.getAllByText('Needs Work')).toHaveLength(2);
+  });
+
+  it('does not render numeric input when qualitative', () => {
+    render(<RubricScoringSection {...baseProps} />);
+    expect(screen.queryAllByTestId('score-input')).toHaveLength(0);
+  });
+
+  it('calls onScoresChange with score and rubricLevelId when level selected', () => {
+    const onScoresChange = vi.fn();
+    render(<RubricScoringSection {...baseProps} onScoresChange={onScoresChange} />);
+    const selects = screen.getAllByTestId('level-select');
+    fireEvent.change(selects[0], { target: { value: '10' } });
+    expect(onScoresChange).toHaveBeenCalledWith([
+      { criterionId: 1, score: 100, rubricLevelId: 10 },
+    ]);
+  });
+
+  it('updates existing score and rubricLevelId when different level selected', () => {
+    const onScoresChange = vi.fn();
+    render(
+      <RubricScoringSection
+        rubric={qualitativeRubric}
+        scores={[{ criterionId: 1, score: 100, rubricLevelId: 10 }]}
+        onScoresChange={onScoresChange}
+      />,
+    );
+    const selects = screen.getAllByTestId('level-select');
+    fireEvent.change(selects[0], { target: { value: '11' } });
+    expect(onScoresChange).toHaveBeenCalledWith([{ criterionId: 1, score: 75, rubricLevelId: 11 }]);
+  });
+
+  it('computes weighted total when all criteria scored via levels', () => {
+    render(
+      <RubricScoringSection
+        rubric={qualitativeRubric}
+        scores={[
+          { criterionId: 1, score: 100, rubricLevelId: 10 },
+          { criterionId: 2, score: 75, rubricLevelId: 11 },
+        ]}
+        onScoresChange={vi.fn()}
+      />,
+    );
+    // weighted total = 100*50/100 + 75*50/100 = 50 + 37.5 = 87.5 → round to 88
+    expect(screen.getByText('88 / 100')).toBeDefined();
+  });
+
+  it('shows warning when not all criteria scored', () => {
+    render(
+      <RubricScoringSection
+        rubric={qualitativeRubric}
+        scores={[{ criterionId: 1, score: 100, rubricLevelId: 10 }]}
+        onScoresChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('instructorReviews.rubric.allCriteriaRequired')).toBeDefined();
+  });
+
+  it('does not show warning when all criteria scored via levels', () => {
+    render(
+      <RubricScoringSection
+        rubric={qualitativeRubric}
+        scores={[
+          { criterionId: 1, score: 100, rubricLevelId: 10 },
+          { criterionId: 2, score: 75, rubricLevelId: 11 },
+        ]}
+        onScoresChange={vi.fn()}
+      />,
+    );
+    expect(screen.queryByText('instructorReviews.rubric.allCriteriaRequired')).toBeNull();
+  });
+
+  it('shows weighted total as 0 when no levels selected', () => {
     render(<RubricScoringSection {...baseProps} />);
     expect(screen.getByText('0 / 100')).toBeDefined();
   });

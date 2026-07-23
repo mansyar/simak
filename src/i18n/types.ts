@@ -327,6 +327,7 @@ export type Translation = {
       title: string
       weightedTotal: string
       allCriteriaRequired: string
+      selectLevel: string
     }
   }
   instructorAssignments: {
