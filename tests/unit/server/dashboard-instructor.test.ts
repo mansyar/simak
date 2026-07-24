@@ -71,6 +71,7 @@ describe('getInstructorDashboardDataHandler', () => {
       pendingReviewItems: [],
       recentSubmissions: [],
       assignments: [],
+      atRiskStudents: [],
     });
   });
 
@@ -352,5 +353,133 @@ describe('getInstructorDashboardDataHandler', () => {
     const result = await getInstructorDashboardDataHandler();
     expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     consoleSpy.mockRestore();
+  });
+
+  // --- At-Risk Students tests ---
+
+  function queueStandardQueries(db: any, studentCount = 1) {
+    db.then
+      .mockImplementationOnce((fn: any) => Promise.resolve([{ id: 1 }]).then(fn))
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          { id: 1, title: 'Thesis', finalDeadline: null, createdAt: new Date() },
+        ]).then(fn),
+      )
+      .mockImplementationOnce((fn: any) => Promise.resolve([{ count: 0 }]).then(fn))
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ assignmentId: 1, count: studentCount }]).then(fn),
+      )
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ assignmentId: 1, count: 0 }]).then(fn),
+      )
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ assignmentId: 1, totalCount: 5, passedCount: 0 }]).then(fn),
+      );
+  }
+
+  function makeCp(opts: {
+    checkpointId: number;
+    checkpointState: string;
+    dueDate: Date;
+    minConsultations?: number;
+    studentId?: string;
+    studentName?: string;
+  }) {
+    return {
+      minConsultations: 1,
+      studentId: 'student-1',
+      studentName: 'Alice',
+      assignmentId: 1,
+      assignmentTitle: 'Thesis',
+      ...opts,
+    };
+  }
+
+  it('should return at-risk students sorted by severity (high before medium)', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    const now = new Date();
+    const DAY = 24 * 60 * 60 * 1000;
+    const overdueDate = new Date(now.getTime() - 2 * DAY);
+    const approachingDate = new Date(now.getTime() + 2 * DAY);
+
+    queueStandardQueries(mockDb, 2);
+    mockDb.then
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          makeCp({ checkpointId: 10, checkpointState: 'unlocked', dueDate: overdueDate }),
+          makeCp({
+            checkpointId: 20,
+            checkpointState: 'unlocked',
+            dueDate: approachingDate,
+            studentId: 'student-2',
+            studentName: 'Bob',
+          }),
+        ]).then(fn),
+      )
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
+
+    const result = (await getInstructorDashboardDataHandler()) as any;
+    expect(result.atRiskStudents).toHaveLength(2);
+    expect(result.atRiskStudents[0].studentName).toBe('Alice');
+    expect(result.atRiskStudents[0].riskLevel).toBe('high');
+    expect(result.atRiskStudents[1].studentName).toBe('Bob');
+    expect(result.atRiskStudents[1].riskLevel).toBe('medium');
+  });
+
+  it('should return empty atRiskStudents when no risk factors', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    const now = new Date();
+    const DAY = 24 * 60 * 60 * 1000;
+    const futureDate = new Date(now.getTime() + 14 * DAY);
+
+    queueStandardQueries(mockDb);
+    mockDb.then
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          makeCp({ checkpointId: 10, checkpointState: 'unlocked', dueDate: futureDate }),
+        ]).then(fn),
+      )
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ checkpointId: 10, count: 1 }]).then(fn),
+      )
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn))
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
+
+    const result = (await getInstructorDashboardDataHandler()) as any;
+    expect(result.atRiskStudents).toEqual([]);
+  });
+
+  it('should detect stalled review as low risk', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    const now = new Date();
+    const DAY = 24 * 60 * 60 * 1000;
+    const futureDate = new Date(now.getTime() + 14 * DAY);
+    const oldSubmissionDate = new Date(now.getTime() - 5 * DAY);
+
+    queueStandardQueries(mockDb);
+    mockDb.then
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          makeCp({ checkpointId: 10, checkpointState: 'under_review', dueDate: futureDate }),
+        ]).then(fn),
+      )
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ checkpointId: 10, count: 1 }]).then(fn),
+      )
+      .mockImplementationOnce((fn: any) =>
+        Promise.resolve([{ checkpointId: 10, count: 1, latestDate: oldSubmissionDate }]).then(fn),
+      )
+      .mockImplementationOnce((fn: any) => Promise.resolve([]).then(fn));
+
+    const result = (await getInstructorDashboardDataHandler()) as any;
+    expect(result.atRiskStudents).toHaveLength(1);
+    expect(result.atRiskStudents[0].studentName).toBe('Alice');
+    expect(result.atRiskStudents[0].riskLevel).toBe('low');
+    expect(result.atRiskStudents[0].factors).toHaveLength(1);
+    expect(result.atRiskStudents[0].factors[0].type).toBe('stalled_review');
   });
 });
