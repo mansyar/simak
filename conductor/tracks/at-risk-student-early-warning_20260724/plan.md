@@ -27,7 +27,7 @@
     - [x] Run `pnpm test` — confirm all tests pass
     - [x] Run `pnpm test:coverage` — verify ≥80% on risk-scoring.ts
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Risk Scoring Engine' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Risk Scoring Engine' (Protocol in workflow.md) [checkpoint: b702277]
 
 ## Phase 2: Dashboard Integration + Event-Driven Alerts + Scanner Integration
 
