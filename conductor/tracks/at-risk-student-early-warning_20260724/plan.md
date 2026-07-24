@@ -109,7 +109,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Dashboard + Alerts + Scanner' (Protocol in workflow.md) [checkpoint: 15d1744]
 
-## Phase 3: UI, Email & i18n
+## Phase 3: UI, Email & i18n [checkpoint: 56ad74f2]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
 - [x] Task: Write tests for email template (Red) [commit: 0dda8b4]
@@ -165,5 +165,5 @@
     - [x] Verify all files under 500 lines
     - [x] Refactored: wired `at-risk-email.ts` wrapper into `risk-alerts.ts` to eliminate dead code
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: UI, Email & i18n' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: UI, Email & i18n' (Protocol in workflow.md) [checkpoint: 56ad74f2]
 </protect>
