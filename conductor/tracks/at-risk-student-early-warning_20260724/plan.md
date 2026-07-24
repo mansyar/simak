@@ -64,17 +64,18 @@
     - [x] Fire in-app notification + email via `Promise.allSettled` (matching `review-sla.ts` pattern)
     - [x] Run `pnpm test` — confirm tests pass
 
-- [ ] Task: Write tests for `submitReviewHandler` integration (Red)
-    - [ ] Extend `tests/unit/server/reviews.test.ts` (or mirror path)
-    - [ ] Test revise decision triggers `checkAndFireRiskAlert` (if medium/high)
-    - [ ] Test pass review does NOT trigger alert
-    - [ ] Test SLA breach triggers alert
-    - [ ] Test advisory try/catch doesn't affect review transaction
-    - [ ] Run `pnpm test` — confirm tests fail as expected
+- [x] Task: Write tests for `submitReviewHandler` integration (Red) [57d3da9]
+    - [x] Extend `tests/unit/server/reviews-advisory-isolation.test.ts`
+    - [x] Test revise decision triggers `checkAndFireRiskAlert` (if medium/high)
+    - [x] Test pass review does NOT trigger alert
+    - [x] Test SLA breach triggers alert
+    - [x] Test advisory try/catch doesn't affect review transaction
+    - [x] Run `pnpm test` — confirm tests fail as expected
 
-- [ ] Task: Implement `submitReviewHandler` integration (Green)
-    - [ ] Extend `submitReviewHandler` (`reviews.server.ts:220`) — post-commit, when `decision === 'revise'` OR SLA breach, call `checkAndFireRiskAlert` (advisory, outside transaction)
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Implement `submitReviewHandler` integration (Green) [57d3da9]
+    - [x] Extend `submitReviewHandler` (`reviews.server.ts:220`) — post-commit, when `decision === 'revise'` OR SLA breach, call `checkAndFireRiskAlert` (advisory, outside transaction)
+    - [x] Extracted to `src/lib/review-risk-alert.ts` helper to stay within 500-line file limit
+    - [x] Run `pnpm test` — confirm tests pass
 
 - [ ] Task: Write tests for TRACK-021 scanner integration (Red)
     - [ ] Extend `tests/unit/lib/deadline-reminder-scanner.test.ts` (or mirror path)
