@@ -91,15 +91,21 @@
     - [x] Run `pnpm test` — confirm tests pass
     - Commit: `0aacc54b`
 
-- [ ] Task: Write tests for admin analytics extension (Red)
-    - [ ] Extend `tests/unit/server/analytics-admin.test.ts` (or mirror path)
-    - [ ] Test aggregate counts correct per signal
-    - [ ] Test `atRiskSummary: { high, medium, low }` structure
-    - [ ] Run `pnpm test` — confirm tests fail as expected
+- [x] Task: Write tests for admin analytics extension (Red) [242797c]
+    - [x] Created `tests/unit/server/analytics-at-risk.test.ts` (separate file to stay within 500-line limit)
+    - [x] Updated `emptyResults` in `analytics-admin.test.ts` to include 9th entry for at-risk query
+    - [x] Added `atRiskSummary` property check to "all expected fields" test
+    - [x] Test atRiskSummary with high/medium/low counts
+    - [x] Test zero counts when no at-risk students
+    - [x] Test defaults to zeros when query returns empty
+    - [x] Test atRiskSummary values are numbers
 
-- [ ] Task: Implement admin analytics extension (Green)
-    - [ ] Extend `getAdminAnalyticsDataHandler` (`analytics-admin.server.ts`) with `atRiskSummary` (simplified SQL counting distinct students per signal)
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Implement admin analytics extension (Green) [242797c]
+    - [x] Extend `getAdminAnalyticsDataHandler` (`analytics-admin.server.ts`) with `atRiskSummary` (simplified SQL counting distinct students per signal)
+    - [x] Added `inArray` import, `atRiskSummary` to `AdminAnalyticsData` type
+    - [x] Single query with CASE WHEN expressions counting DISTINCT students per risk level
+    - [x] Null-safe defaults (`atRiskRow?.high ?? 0`)
+    - [x] Run `pnpm test` — confirm all 3424 tests pass across 329 files
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Dashboard + Alerts + Scanner' (Protocol in workflow.md)
 
