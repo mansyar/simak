@@ -3,6 +3,7 @@ import { and, eq, isNull, sql, gte, lte } from 'drizzle-orm';
 import { getDb } from '@/db/index';
 import { assignments, assignmentStudents } from '@/db/schema/assignments';
 import { submissions, reviews } from '@/db/schema/submissions';
+import { reviewScores } from '@/db/schema/rubrics';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '@/lib/types';
@@ -130,6 +131,73 @@ export async function getInstructorAnalyticsDataHandler({
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
       handler: 'getInstructorAnalyticsDataHandler',
+    });
+  }
+}
+
+export type InstructorRubricAnalytics = {
+  criteria: Array<{
+    criterionId: number;
+    criterionTitle: string;
+    avgScore: number;
+    reviewCount: number;
+    passRate: number;
+  }>;
+  dateRange: { start: string | null; end: string | null };
+};
+
+export async function getInstructorRubricAnalyticsHandler({
+  data,
+}: {
+  data: AnalyticsDateRangeInput;
+}) {
+  const session = await getSessionFromHeaders();
+  if (!isInstructor(session)) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const instructorId = session.user.id;
+  const { startDate, endDate } = resolveDateRange(data);
+  const db = getDb();
+
+  try {
+    const result = await db
+      .select({
+        criterionId: reviewScores.criterionId,
+        criterionTitle: reviewScores.criterionTitle,
+        avgScore: sql<number>`AVG(${reviewScores.score})::float`,
+        reviewCount: sql<number>`count(*)::int`,
+        passRate: sql<number>`CASE WHEN count(*) > 0 THEN count(*) FILTER (WHERE ${reviews.decision} = 'pass')::float / count(*) * 100 ELSE 0 END`,
+      })
+      .from(reviewScores)
+      .innerJoin(reviews, eq(reviewScores.reviewId, reviews.id))
+      .where(
+        and(
+          eq(reviews.instructorId, instructorId),
+          sql`${reviews.reviewedAt} IS NOT NULL`,
+          dateCondition(reviews.reviewedAt, startDate, endDate),
+        ),
+      )
+      .groupBy(reviewScores.criterionId, reviewScores.criterionTitle)
+      .orderBy(reviewScores.criterionTitle);
+
+    return {
+      criteria: result.map((row) => ({
+        criterionId: Number(row.criterionId),
+        criterionTitle: row.criterionTitle,
+        avgScore: Math.round(Number(row.avgScore) * 10) / 10,
+        reviewCount: Number(row.reviewCount),
+        passRate: Math.round(Number(row.passRate) * 10) / 10,
+      })),
+      dateRange: {
+        start: startDate ? startDate.toISOString() : null,
+        end: endDate ? endDate.toISOString() : null,
+      },
+    };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getInstructorRubricAnalyticsHandler',
     });
   }
 }

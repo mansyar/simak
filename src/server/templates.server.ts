@@ -5,8 +5,9 @@ import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates
 import { assignments, assignmentStudents } from '../db/schema/assignments';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
-import { logAuditEvent } from '../lib/audit';
+import { logAuditEvent, safeAuditLog } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
+import { syncTemplateCheckpoints } from './template-checkpoint-sync.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -90,7 +91,12 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
           count: sql<number>`count(*)::int`,
         })
         .from(templateCheckpoints)
-        .where(inArray(templateCheckpoints.templateId, templateIds))
+        .where(
+          and(
+            inArray(templateCheckpoints.templateId, templateIds),
+            isNull(templateCheckpoints.deletedAt),
+          ),
+        )
         .groupBy(templateCheckpoints.templateId);
 
       checkpointCounts = new Map(counts.map((c) => [c.templateId, Number(c.count)]));
@@ -101,7 +107,12 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
           name: templateCheckpoints.name,
         })
         .from(templateCheckpoints)
-        .where(inArray(templateCheckpoints.templateId, templateIds))
+        .where(
+          and(
+            inArray(templateCheckpoints.templateId, templateIds),
+            isNull(templateCheckpoints.deletedAt),
+          ),
+        )
         .orderBy(templateCheckpoints.order);
 
       allCheckpoints.forEach((cp) => {
@@ -171,9 +182,10 @@ export async function getTemplateHandler(args: { data: TemplateIdParam }) {
         order: templateCheckpoints.order,
         minConsultations: templateCheckpoints.minConsultations,
         estimatedDuration: templateCheckpoints.estimatedDuration,
+        gradingType: templateCheckpoints.gradingType,
       })
       .from(templateCheckpoints)
-      .where(eq(templateCheckpoints.templateId, id))
+      .where(and(eq(templateCheckpoints.templateId, id), isNull(templateCheckpoints.deletedAt)))
       .orderBy(templateCheckpoints.order);
 
     return { ...template, checkpoints, assignmentCount: Number(assignmentCount) };
@@ -238,6 +250,7 @@ export async function createTemplateHandler(args: { data: CreateTemplateInput })
           order: cp.order,
           minConsultations: cp.minConsultations ?? 0,
           estimatedDuration: cp.estimatedDuration ?? 7,
+          gradingType: null,
         })),
         assignmentCount: 0,
       },
@@ -251,32 +264,21 @@ export async function createTemplateHandler(args: { data: CreateTemplateInput })
 }
 export async function updateTemplateHandler(args: { data: UpdateTemplateInput & { id: number } }) {
   const session = await getSessionFromHeaders();
-  if (!isAdmin(session)) {
-    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
-  }
+  if (!isAdmin(session)) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { id, name, type, checkpoints } = args.data;
   const db = getDb();
 
   try {
-    await db
-      .update(assignmentTemplates)
-      .set({ name, type, updatedAt: new Date() })
-      .where(eq(assignmentTemplates.id, id));
+    await db.transaction(async (tx) => {
+      await tx
+        .update(assignmentTemplates)
+        .set({ name, type, updatedAt: new Date() })
+        .where(eq(assignmentTemplates.id, id));
 
-    await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, id));
-
-    const checkpointRows = checkpoints.map((cp, index) => ({
-      templateId: id,
-      name: cp.name,
-      order: index + 1,
-      minConsultations: cp.minConsultations ?? 0,
-      estimatedDuration: cp.estimatedDuration ?? 7,
-    }));
-
-    await db.insert(templateCheckpoints).values(checkpointRows);
-
-    await logAuditEvent({
+      await syncTemplateCheckpoints(tx, id, checkpoints);
+    });
+    await safeAuditLog('updateTemplateHandler', {
       actorId: session.user.id,
       action: 'template.updated',
       entityType: 'template',
@@ -390,7 +392,7 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
         estimatedDuration: templateCheckpoints.estimatedDuration,
       })
       .from(templateCheckpoints)
-      .where(eq(templateCheckpoints.templateId, id))
+      .where(and(eq(templateCheckpoints.templateId, id), isNull(templateCheckpoints.deletedAt)))
       .orderBy(templateCheckpoints.order);
 
     const checkpointRows = originalCheckpoints.map((cp) => ({
@@ -418,6 +420,7 @@ export async function duplicateTemplateHandler(args: { data: TemplateIdParam }) 
           order: cp.order,
           minConsultations: cp.minConsultations ?? 0,
           estimatedDuration: cp.estimatedDuration ?? 7,
+          gradingType: null,
         })),
         assignmentCount: 0,
       },

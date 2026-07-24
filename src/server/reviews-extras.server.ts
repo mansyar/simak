@@ -3,6 +3,7 @@ import { eq, and, desc, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews } from '../db/schema/submissions';
+import { reviewScores } from '../db/schema/rubrics';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { verifyCheckpointAccess } from './ownership';
@@ -118,7 +119,24 @@ export async function getLatestReviewHandler(args: { data: GetLatestReviewInput 
       .orderBy(desc(reviews.createdAt))
       .limit(1);
 
-    return { review: latestReview ?? null };
+    // Fetch review_scores (denormalized snapshot) for the latest review
+    const scores = latestReview
+      ? await db
+          .select({
+            id: reviewScores.id,
+            criterionId: reviewScores.criterionId,
+            criterionTitle: reviewScores.criterionTitle,
+            score: reviewScores.score,
+            weight: reviewScores.weight,
+            rubricLevelId: reviewScores.rubricLevelId,
+            levelLabel: reviewScores.levelLabel,
+            comment: reviewScores.comment,
+          })
+          .from(reviewScores)
+          .where(eq(reviewScores.reviewId, latestReview.id))
+      : [];
+
+    return { review: latestReview ?? null, scores };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

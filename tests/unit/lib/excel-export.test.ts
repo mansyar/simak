@@ -104,4 +104,67 @@ describe('exportToExcel', () => {
     expect(rows.length).toBe(1);
     expect(rows[0]).toEqual({ metric: 'Reviews', value: 42 });
   });
+
+  it('should export rubric score rows with correct columns via exportRubricScoresToExcel', async () => {
+    const { exportRubricScoresToExcel } = await import('@/lib/excel-export');
+    const data = [
+      {
+        studentName: 'John Doe',
+        checkpointName: 'Proposal Review',
+        criterionTitle: 'Technical Quality',
+        score: 85,
+        weight: 50,
+        levelLabel: null,
+        comment: 'Good work',
+      },
+      {
+        studentName: 'Jane Smith',
+        checkpointName: 'Proposal Review',
+        criterionTitle: 'Technical Quality',
+        score: 70,
+        weight: 50,
+        levelLabel: 'Good',
+        comment: null,
+      },
+    ];
+    exportRubricScoresToExcel(data, 'rubric-scores.xlsx');
+
+    expect(capturedBlob).not.toBeNull();
+    const wb = await readCapturedBlob();
+    expect(wb.SheetNames).toEqual(['Rubric Scores']);
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = utils.sheet_to_json<Record<string, unknown>>(ws);
+
+    expect(rows.length).toBe(2);
+    expect(rows[0]).toEqual({
+      Student: 'John Doe',
+      Checkpoint: 'Proposal Review',
+      Criterion: 'Technical Quality',
+      Score: 85,
+      Weight: 50,
+      Level: '',
+      Comment: 'Good work',
+    });
+    expect(rows[1]).toEqual({
+      Student: 'Jane Smith',
+      Checkpoint: 'Proposal Review',
+      Criterion: 'Technical Quality',
+      Score: 70,
+      Weight: 50,
+      Level: 'Good',
+      Comment: '',
+    });
+  });
+
+  it('should handle empty rubric score data via exportRubricScoresToExcel', async () => {
+    const { exportRubricScoresToExcel } = await import('@/lib/excel-export');
+    exportRubricScoresToExcel([], 'empty-rubric.xlsx');
+
+    expect(capturedBlob).not.toBeNull();
+    const wb = await readCapturedBlob();
+    expect(wb.SheetNames).toEqual(['Rubric Scores']);
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = utils.sheet_to_json(ws);
+    expect(rows.length).toBe(0);
+  });
 });

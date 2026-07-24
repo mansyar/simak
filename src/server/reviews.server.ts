@@ -18,6 +18,8 @@ import {
 import { getNotificationKeys } from './notifications.server';
 import { sendReviewEmail } from '../lib/review-email';
 import { maybeInsertNotification } from '../lib/notification-prefs';
+import { fetchRubric } from './rubrics.server';
+import { validateReviewScores, insertReviewScores } from './review-scores.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -162,6 +164,7 @@ export async function getReviewDetailHandler(args: { data: GetReviewDetailInput 
         uploadedAt: submissions.uploadedAt,
         checkpointState: checkpoints.state,
         checkpointUpdatedAt: checkpoints.updatedAt,
+        templateCheckpointId: checkpoints.templateCheckpointId,
       })
       .from(submissions)
       .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
@@ -198,13 +201,10 @@ export async function getReviewDetailHandler(args: { data: GetReviewDetailInput 
       .where(eq(submissions.checkpointId, submission.checkpointId))
       .orderBy(desc(reviews.createdAt));
 
-    return {
-      submission: {
-        ...submission,
-        downloadUrl,
-      },
-      reviewHistory,
-    };
+    const rubric = submission.templateCheckpointId
+      ? await fetchRubric(db, submission.templateCheckpointId)
+      : null;
+    return { submission: { ...submission, downloadUrl }, reviewHistory, rubric };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
@@ -223,7 +223,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { submissionId, decision, comment, feedbackFileKey, revisionDeadline } = args.data;
+  const { submissionId, decision, comment, feedbackFileKey, revisionDeadline, scores } = args.data;
   const db = getDb();
 
   try {
@@ -265,6 +265,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           checkpointDueDate: checkpoints.dueDate,
           checkpointOrder: checkpoints.order,
           finalDeadline: assignments.finalDeadline,
+          templateCheckpointId: checkpoints.templateCheckpointId,
         })
         .from(submissions)
         .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
@@ -292,6 +293,12 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       ) {
         return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in a reviewable state');
       }
+
+      // 2c. Validate rubric scores BEFORE any write (SQL styleguide §6:
+      // a validation failure must not commit partial writes). The rubric read
+      // is inside the transaction for stability.
+      const scoresError = await validateReviewScores(tx, submission.templateCheckpointId, scores);
+      if (scoresError) return scoresError;
 
       let breachDays = 0;
       const slaFields: SLASubmissionFields = {
@@ -340,17 +347,25 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           .where(eq(uploadIntents.fileKey, feedbackFileKey));
       }
 
-      // 2d. Insert review record
-      await tx.insert(reviews).values({
-        submissionId,
-        instructorId: session.user.id,
-        decision,
-        comment: comment || null,
-        feedbackFileKey: feedbackFileKey || null,
-        revisionDeadline:
-          decision === 'revise' && revisionDeadline ? new Date(revisionDeadline) : null,
-        reviewedAt: new Date(),
-      });
+      // 2d. Insert review record (capture ID via .returning — SQL styleguide §6.3)
+      const [review] = await tx
+        .insert(reviews)
+        .values({
+          submissionId,
+          instructorId: session.user.id,
+          decision,
+          comment: comment || null,
+          feedbackFileKey: feedbackFileKey || null,
+          revisionDeadline:
+            decision === 'revise' && revisionDeadline ? new Date(revisionDeadline) : null,
+          reviewedAt: new Date(),
+        })
+        .returning({ id: reviews.id });
+
+      // 2e. Insert rubric scores (reviewId captured above — no separate SELECT)
+      if (submission.templateCheckpointId && scores && scores.length > 0) {
+        await insertReviewScores(tx, review.id, submission.templateCheckpointId, scores);
+      }
 
       if (decision === 'pass') {
         // 2e. Set checkpoint to passed
@@ -401,44 +416,25 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       }
 
       // 2i. Create notification for the student (review_completed or revision_requested)
-      const reviewParams = {
-        checkpointName: submission.checkpointName,
-        assignmentTitle: submission.assignmentTitle,
-      };
-
-      if (decision === 'pass') {
-        const reviewCompletedKeys = getNotificationKeys('review_completed');
-        await maybeInsertNotification(tx, submission.studentId, 'review_completed', {
-          userId: submission.studentId,
-          type: 'review_completed',
-          titleKey: reviewCompletedKeys.titleKey,
-          messageKey: reviewCompletedKeys.messageKey,
-          params: reviewParams,
-          channel: 'in_app',
-          metadata: {
-            checkpointId: submission.checkpointId,
-            assignmentId: submission.assignmentId,
-            submissionId,
-            decision,
-          },
-        });
-      } else if (decision === 'revise') {
-        const revisionRequestedKeys = getNotificationKeys('revision_requested');
-        await maybeInsertNotification(tx, submission.studentId, 'revision_requested', {
-          userId: submission.studentId,
-          type: 'revision_requested',
-          titleKey: revisionRequestedKeys.titleKey,
-          messageKey: revisionRequestedKeys.messageKey,
-          params: reviewParams,
-          channel: 'in_app',
-          metadata: {
-            checkpointId: submission.checkpointId,
-            assignmentId: submission.assignmentId,
-            submissionId,
-            decision,
-          },
-        });
-      }
+      const notifType = decision === 'pass' ? 'review_completed' : 'revision_requested';
+      const notifKeys = getNotificationKeys(notifType);
+      await maybeInsertNotification(tx, submission.studentId, notifType, {
+        userId: submission.studentId,
+        type: notifType,
+        titleKey: notifKeys.titleKey,
+        messageKey: notifKeys.messageKey,
+        params: {
+          checkpointName: submission.checkpointName,
+          assignmentTitle: submission.assignmentTitle,
+        },
+        channel: 'in_app',
+        metadata: {
+          checkpointId: submission.checkpointId,
+          assignmentId: submission.assignmentId,
+          submissionId,
+          decision,
+        },
+      });
 
       return { success: true, submission, breachDays, slaFields };
     });

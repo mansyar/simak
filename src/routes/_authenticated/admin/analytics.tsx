@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { getAdminAnalyticsData } from '@/server/analytics';
+import { getAdminAnalyticsData, getAdminRubricAnalytics } from '@/server/analytics';
 import { useI18n } from '../../__root';
 import { PageHeader } from '@/components/ui/page-header';
 import { MetricCard } from '@/components/ui/metric-card';
@@ -52,7 +52,11 @@ export const Route = createFileRoute('/_authenticated/admin/analytics')({
     end: search.end,
   }),
   loader: async ({ deps }) => {
-    return getAdminAnalyticsData({ data: deps });
+    const [analytics, rubric] = await Promise.all([
+      getAdminAnalyticsData({ data: deps }),
+      getAdminRubricAnalytics({ data: deps }),
+    ]);
+    return { analytics, rubric };
   },
   component: AdminAnalyticsPage,
   pendingComponent: () => <DashboardSkeleton />,
@@ -70,6 +74,14 @@ type AdminAnalyticsData = {
   dateRange: { start: string | null; end: string | null };
 };
 
+type RubricCriterionMetric = {
+  criterionId: number;
+  criterionTitle: string;
+  avgScore: number;
+  passRate: number;
+  reviewCount: number;
+};
+
 type AnalyticsSearchParams = {
   range?: '7d' | '30d' | '90d' | 'all';
   start?: string;
@@ -78,7 +90,15 @@ type AnalyticsSearchParams = {
 
 function AdminAnalyticsPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as unknown as AdminAnalyticsData;
+  const loaderData = Route.useLoaderData() as unknown as {
+    analytics: AdminAnalyticsData;
+    rubric: {
+      criteria: RubricCriterionMetric[];
+      dateRange: { start: string | null; end: string | null };
+    };
+  };
+  const data = loaderData.analytics;
+  const rubricData = loaderData.rubric;
   const searchParams = Route.useSearch() as unknown as AnalyticsSearchParams;
   const navigate = Route.useNavigate();
   const { exportCsv, isExporting } = useCsvDownload();
@@ -377,6 +397,37 @@ function AdminAnalyticsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Rubric Analytics */}
+      {'criteria' in rubricData && rubricData.criteria.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('adminAnalytics.rubricTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('adminAnalytics.rubricCriterion')}</TableHead>
+                  <TableHead>{t('adminAnalytics.rubricAvgScore')}</TableHead>
+                  <TableHead>{t('adminAnalytics.rubricPassRate')}</TableHead>
+                  <TableHead>{t('adminAnalytics.rubricReviewCount')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rubricData.criteria.map((c: RubricCriterionMetric) => (
+                  <TableRow key={c.criterionId}>
+                    <TableCell>{c.criterionTitle}</TableCell>
+                    <TableCell>{c.avgScore}</TableCell>
+                    <TableCell>{c.passRate}%</TableCell>
+                    <TableCell>{c.reviewCount}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

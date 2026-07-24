@@ -248,7 +248,11 @@
       "minConsPlaceholder": "0",
       "durationPlaceholder": "7",
       "minConsHint": "Konsultasi terverifikasi diperlukan sebelum pengumpulan",
-      "durationHint": "Hari yang dialokasikan untuk checkpoint ini"
+      "durationHint": "Hari yang dialokasikan untuk checkpoint ini",
+      "gradingType": "Jenis Penilaian",
+      "gradingTypeNone": "Tanpa Rubrik (Lulus/Revisi)",
+      "gradingTypeNumeric": "Numerik (0–100)",
+      "gradingTypeQualitative": "Level Kualitatif"
     },
     "actions": {
       "edit": "Ubah",
@@ -313,7 +317,13 @@
       "feedbackUploadFailed": "Gagal mengunggah file umpan balik",
       "notInSubmittedState": "Checkpoint harus berstatus diserahkan untuk dibuka peninjauannya"
     },
-    "reviewDateLabel": "Direview pada {date}"
+    "reviewDateLabel": "Direview pada {date}",
+    "rubric": {
+      "title": "Penilaian Rubrik",
+      "weightedTotal": "Total Terbobot",
+      "allCriteriaRequired": "Semua kriteria harus dinilai sebelum mengirim",
+      "selectLevel": "Pilih tingkat"
+    }
   },
   "instructorAssignments": {
     "title": "Tugas",
@@ -422,6 +432,10 @@
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
+  },
+  "studentRubrics": {
+    "title": "Hasil Rubrik",
+    "weightedTotal": "Total Terbobot"
   },
   "studentAssignments": {
     "title": "Tugas Saya",
@@ -543,7 +557,12 @@
     "statusSubmitted": "Dikumpulkan",
     "statusUnderReview": "Dalam Review",
     "statusPassed": "Lulus",
-    "statusRevise": "Revisi"
+    "statusRevise": "Revisi",
+    "rubricTitle": "Analitik Rubrik",
+    "rubricCriterion": "Kriteria",
+    "rubricAvgScore": "Nilai Rata-rata",
+    "rubricPassRate": "Tingkat Kelulusan",
+    "rubricReviewCount": "Ulasan"
   },
   "instructorAnalytics": {
     "title": "Analitik",
@@ -558,7 +577,12 @@
     "range90d": "90 Hari",
     "rangeAll": "Semua Waktu",
     "customStart": "Tanggal Mulai",
-    "customEnd": "Tanggal Akhir"
+    "customEnd": "Tanggal Akhir",
+    "rubricTitle": "Analitik Rubrik",
+    "rubricCriterion": "Kriteria",
+    "rubricAvgScore": "Nilai Rata-rata",
+    "rubricPassRate": "Tingkat Kelulusan",
+    "rubricReviewCount": "Ulasan"
   },
   "files": {
     "dropzone": {
@@ -1081,6 +1105,35 @@
       "nextReview": "Peninjauan tertunda berikutnya",
       "prevReview": "Peninjauan tertunda sebelumnya",
       "notOnReviewPage": "(hanya tersedia di halaman tinjauan)"
+    }
+  },
+  "rubrics": {
+    "criteria": {
+      "loading": "Memuat rubrik...",
+      "loadError": "Gagal memuat rubrik",
+      "saveError": "Gagal menyimpan rubrik",
+      "saveSuccess": "Rubrik berhasil disimpan",
+      "titlePlaceholder": "Judul kriteria",
+      "descriptionPlaceholder": "Deskripsi (opsional)",
+      "weightLabel": "Bobot",
+      "add": "Tambah Kriteria",
+      "remove": "Hapus",
+      "moveUp": "Naik",
+      "moveDown": "Turun",
+      "weightSum": "Jumlah bobot: {sum}/100",
+      "save": "Simpan Rubrik",
+      "saving": "Menyimpan...",
+      "pendingReviewsTitle": "Ulasan Tertunda Terpengaruh",
+      "pendingReviewsWarning": "{count} ulasan tertunda akan terpengaruh oleh perubahan ini."
+    },
+    "levels": {
+      "add": "Tambah Level",
+      "remove": "Hapus",
+      "moveUp": "Naik",
+      "moveDown": "Turun",
+      "labelPlaceholder": "Label level",
+      "descriptionPlaceholder": "Deskripsi (opsional)",
+      "scoreLabel": "Skor"
     }
   }
 }

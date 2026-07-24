@@ -1,6 +1,9 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getAdminAnalyticsDataHandler } from '@/server/analytics-admin.server';
+import {
+  getAdminAnalyticsDataHandler,
+  getAdminRubricAnalyticsHandler,
+} from '@/server/analytics-admin.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 
@@ -313,6 +316,162 @@ describe('getAdminAnalyticsDataHandler', () => {
           message: 'Internal Server Error',
         },
       });
+    });
+  });
+});
+
+const instructorSession = {
+  user: { id: 'instructor-1', role: 'instructor' as const },
+  session: {} as any,
+};
+
+describe('getAdminRubricAnalyticsHandler', () => {
+  let mockDb: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb = {
+      select: vi.fn().mockReturnThis(),
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockReturnThis(),
+      then: vi.fn(function (onfulfilled: any) {
+        return Promise.resolve([]).then(onfulfilled);
+      }),
+    };
+    vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
+  });
+
+  function mockResult(rows: any[]) {
+    mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve(rows).then(onfulfilled),
+    );
+  }
+
+  describe('role guard', () => {
+    it('should reject if unauthorized (no session)', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+      const result = await getAdminRubricAnalyticsHandler({ data: { range: '30d' } });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
+    });
+
+    it('should reject if student', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
+      const result = await getAdminRubricAnalyticsHandler({ data: { range: '30d' } });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
+    });
+
+    it('should reject if instructor', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      const result = await getAdminRubricAnalyticsHandler({ data: { range: '30d' } });
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
+    });
+
+    it('should accept admin role', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+      mockResult([]);
+      const result = (await getAdminRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result).not.toHaveProperty('error');
+      expect(result).toHaveProperty('criteria');
+    });
+
+    it('should accept superadmin role', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(superadminSession as any);
+      mockResult([]);
+      const result = (await getAdminRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result).not.toHaveProperty('error');
+      expect(result).toHaveProperty('criteria');
+    });
+  });
+
+  describe('rubric metrics', () => {
+    beforeEach(() => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+    });
+
+    it('should return criteria with avg score, pass rate, and review count', async () => {
+      mockResult([
+        {
+          criterionId: 1,
+          criterionTitle: 'Code Quality',
+          avgScore: 85.5,
+          passRate: 90.0,
+          reviewCount: 10,
+        },
+      ]);
+      const result = (await getAdminRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result.criteria).toHaveLength(1);
+      expect(result.criteria[0].criterionId).toBe(1);
+      expect(result.criteria[0].criterionTitle).toBe('Code Quality');
+      expect(result.criteria[0].avgScore).toBe(85.5);
+      expect(result.criteria[0].passRate).toBe(90.0);
+      expect(result.criteria[0].reviewCount).toBe(10);
+    });
+
+    it('should return empty criteria when no rubric scores', async () => {
+      mockResult([]);
+      const result = (await getAdminRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result.criteria).toHaveLength(0);
+    });
+
+    it('should return criteria sorted by avgScore ascending (weakness identification)', async () => {
+      mockResult([
+        { criterionId: 1, criterionTitle: 'Low', avgScore: 45.0, passRate: 30.0, reviewCount: 5 },
+        {
+          criterionId: 2,
+          criterionTitle: 'Medium',
+          avgScore: 65.0,
+          passRate: 60.0,
+          reviewCount: 7,
+        },
+        { criterionId: 3, criterionTitle: 'High', avgScore: 90.0, passRate: 95.0, reviewCount: 8 },
+      ]);
+      const result = (await getAdminRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result.criteria).toHaveLength(3);
+      expect(result.criteria[0].avgScore).toBeLessThanOrEqual(result.criteria[1].avgScore);
+      expect(result.criteria[1].avgScore).toBeLessThanOrEqual(result.criteria[2].avgScore);
+    });
+
+    it('should round avgScore and passRate to 1 decimal', async () => {
+      mockResult([
+        {
+          criterionId: 1,
+          criterionTitle: 'Test',
+          avgScore: 85.567,
+          passRate: 72.334,
+          reviewCount: 3,
+        },
+      ]);
+      const result = (await getAdminRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result.criteria[0].avgScore).toBe(85.6);
+      expect(result.criteria[0].passRate).toBe(72.3);
+    });
+
+    it('should return dateRange with non-null start/end for 30d range', async () => {
+      mockResult([]);
+      const result = (await getAdminRubricAnalyticsHandler({ data: { range: '30d' } })) as any;
+      expect(result.dateRange.start).not.toBeNull();
+      expect(result.dateRange.end).not.toBeNull();
+    });
+
+    it('should return null dateRange for "all" range', async () => {
+      mockResult([]);
+      const result = (await getAdminRubricAnalyticsHandler({ data: { range: 'all' } })) as any;
+      expect(result.dateRange.start).toBeNull();
+      expect(result.dateRange.end).toBeNull();
+    });
+  });
+
+  describe('error handling', () => {
+    it('should return INTERNAL error on DB failure', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+      mockDb.then.mockImplementation(() => {
+        throw new Error('DB error');
+      });
+      const result = await getAdminRubricAnalyticsHandler({ data: { range: '30d' } });
+      expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
     });
   });
 });

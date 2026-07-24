@@ -148,6 +148,7 @@ function ReviewDetailPage() {
         submissionId={Number(params.submissionId)}
         onComplete={() => setSuccess(true)}
         onError={(msg) => setError(msg)}
+        rubric={detail.rubric ?? null}
       />
     </div>
   );

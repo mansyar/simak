@@ -45,6 +45,20 @@ export const getInstructorAnalyticsData = createServerFn({ method: 'GET' })
     return getInstructorAnalyticsDataHandler({ data });
   });
 
+export const getInstructorRubricAnalytics = createServerFn({ method: 'GET' })
+  .inputValidator(AnalyticsDateRangeSchema)
+  .handler(async ({ data }) => {
+    const { getInstructorRubricAnalyticsHandler } = await import('./analytics-instructor.server');
+    return getInstructorRubricAnalyticsHandler({ data });
+  });
+
+export const getAdminRubricAnalytics = createServerFn({ method: 'GET' })
+  .inputValidator(AnalyticsDateRangeSchema)
+  .handler(async ({ data }) => {
+    const { getAdminRubricAnalyticsHandler } = await import('./analytics-admin.server');
+    return getAdminRubricAnalyticsHandler({ data });
+  });
+
 // ---- CSV Export Schemas ----
 
 export const ExportUsersCsvSchema = z.object({});
@@ -61,6 +75,10 @@ export const ExportStudentProgressCsvSchema = z.object({
 });
 
 export const ExportReviewHistoryCsvSchema = z.object({
+  assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
+});
+
+export const ExportRubricScoresCsvSchema = z.object({
   assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
 });
 
@@ -99,4 +117,11 @@ export const exportReviewHistoryCsv = createServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const { exportReviewHistoryCsvHandler } = await import('./analytics-export.server');
     return exportReviewHistoryCsvHandler({ data });
+  });
+
+export const exportRubricScoresCsv = createServerFn({ method: 'GET' })
+  .inputValidator(ExportRubricScoresCsvSchema)
+  .handler(async ({ data }) => {
+    const { exportRubricScoresCsvHandler } = await import('./analytics-export.server');
+    return exportRubricScoresCsvHandler({ data });
   });

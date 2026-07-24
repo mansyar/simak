@@ -14,6 +14,7 @@ vi.mock('@/db/index', () => ({
 
 vi.mock('@/lib/audit', () => ({
   logAuditEvent: vi.fn(),
+  safeAuditLog: vi.fn(),
 }));
 
 vi.mock('@tanstack/react-start', () => ({
@@ -37,6 +38,8 @@ describe('Template handlers audit logging', () => {
     delete: vi.fn().mockReturnThis(),
     orderBy: vi.fn().mockReturnThis(),
     leftJoin: vi.fn().mockReturnThis(),
+    innerJoin: vi.fn().mockReturnThis(),
+    transaction: vi.fn(async (cb: any) => cb(mockDb)),
     then: vi.fn(function (onfulfilled) {
       return Promise.resolve([]).then(onfulfilled);
     }),
@@ -97,7 +100,7 @@ describe('Template handlers audit logging', () => {
         },
       });
 
-      expect(auditMod.logAuditEvent).toHaveBeenCalledWith({
+      expect(auditMod.safeAuditLog).toHaveBeenCalledWith('updateTemplateHandler', {
         actorId: 'admin-1',
         action: 'template.updated',
         entityType: 'template',

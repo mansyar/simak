@@ -137,6 +137,84 @@ describe('Review Schemas', () => {
       });
       expect(result.success).toBe(true);
     });
+
+    it('should accept optional scores array', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'pass',
+        scores: [{ criterionId: 1, score: 85 }],
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept scores with all fields', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'pass',
+        scores: [{ criterionId: 1, score: 85, rubricLevelId: 2, comment: 'Good' }],
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept scores with optional rubricLevelId and comment omitted', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'pass',
+        scores: [
+          { criterionId: 1, score: 90 },
+          { criterionId: 2, score: 80, rubricLevelId: 1 },
+          { criterionId: 3, score: 70, comment: 'Needs work' },
+        ],
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept submission without scores (backward compatible)', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'pass',
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.scores).toBeUndefined();
+      }
+    });
+
+    it('should reject score with missing criterionId', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'pass',
+        scores: [{ score: 85 }],
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject score below 0', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'pass',
+        scores: [{ criterionId: 1, score: -1 }],
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject score above 100', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'pass',
+        scores: [{ criterionId: 1, score: 101 }],
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject scores that is not an array', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'pass',
+        scores: 'not an array',
+      });
+      expect(result.success).toBe(false);
+    });
   });
 
   describe('GetLatestReviewSchema', () => {

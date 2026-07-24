@@ -248,7 +248,11 @@
       "minConsPlaceholder": "0",
       "durationPlaceholder": "7",
       "minConsHint": "Verified consultations required before submission",
-      "durationHint": "Days allotted for this checkpoint"
+      "durationHint": "Days allotted for this checkpoint",
+      "gradingType": "Grading Type",
+      "gradingTypeNone": "No Rubric (Pass/Fail)",
+      "gradingTypeNumeric": "Numeric (0–100)",
+      "gradingTypeQualitative": "Qualitative Levels"
     },
     "actions": {
       "edit": "Edit",
@@ -313,7 +317,13 @@
       "feedbackUploadFailed": "Failed to upload feedback file",
       "notInSubmittedState": "Checkpoint must be in submitted state to open for review"
     },
-    "reviewDateLabel": "Reviewed on {date}"
+    "reviewDateLabel": "Reviewed on {date}",
+    "rubric": {
+      "title": "Rubric Scoring",
+      "weightedTotal": "Weighted Total",
+      "allCriteriaRequired": "All criteria must be scored before submitting",
+      "selectLevel": "Select a level"
+    }
   },
   "instructorAssignments": {
     "title": "Assignments",
@@ -422,6 +432,10 @@
     "branding": "SIMAK",
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
+  },
+  "studentRubrics": {
+    "title": "Rubric Results",
+    "weightedTotal": "Weighted Total"
   },
   "studentAssignments": {
     "title": "My Assignments",
@@ -543,7 +557,12 @@
     "statusSubmitted": "Submitted",
     "statusUnderReview": "Under Review",
     "statusPassed": "Passed",
-    "statusRevise": "Revise"
+    "statusRevise": "Revise",
+    "rubricTitle": "Rubric Analytics",
+    "rubricCriterion": "Criterion",
+    "rubricAvgScore": "Avg Score",
+    "rubricPassRate": "Pass Rate",
+    "rubricReviewCount": "Reviews"
   },
   "instructorAnalytics": {
     "title": "Analytics",
@@ -558,7 +577,12 @@
     "range90d": "90 Days",
     "rangeAll": "All Time",
     "customStart": "Start Date",
-    "customEnd": "End Date"
+    "customEnd": "End Date",
+    "rubricTitle": "Rubric Analytics",
+    "rubricCriterion": "Criterion",
+    "rubricAvgScore": "Avg Score",
+    "rubricPassRate": "Pass Rate",
+    "rubricReviewCount": "Reviews"
   },
   "files": {
     "dropzone": {
@@ -1081,6 +1105,35 @@
       "nextReview": "Next pending review",
       "prevReview": "Previous pending review",
       "notOnReviewPage": "(available on review pages only)"
+    }
+  },
+  "rubrics": {
+    "criteria": {
+      "loading": "Loading rubric...",
+      "loadError": "Failed to load rubric",
+      "saveError": "Failed to save rubric",
+      "saveSuccess": "Rubric saved successfully",
+      "titlePlaceholder": "Criterion title",
+      "descriptionPlaceholder": "Description (optional)",
+      "weightLabel": "Weight",
+      "add": "Add Criterion",
+      "remove": "Remove",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "weightSum": "Weight sum: {sum}/100",
+      "save": "Save Rubric",
+      "saving": "Saving...",
+      "pendingReviewsTitle": "Pending Reviews Affected",
+      "pendingReviewsWarning": "{count} pending review(s) will be affected by this change."
+    },
+    "levels": {
+      "add": "Add Level",
+      "remove": "Remove",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "labelPlaceholder": "Level label",
+      "descriptionPlaceholder": "Description (optional)",
+      "scoreLabel": "Score"
     }
   }
 }

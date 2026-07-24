@@ -6,6 +6,10 @@ const mockAssignmentsFn = vi.hoisted(() => vi.fn().mockResolvedValue({ assignmen
 
 vi.mock('@tanstack/react-start', () => ({
   useServerFn: vi.fn(() => mockAssignmentsFn),
+  createServerFn: vi.fn().mockReturnValue({
+    inputValidator: vi.fn().mockReturnThis(),
+    handler: vi.fn().mockImplementation((fn) => fn),
+  }),
 }));
 
 vi.mock('@tanstack/react-router', () => ({
@@ -175,8 +179,22 @@ const mockTemplate = {
   updatedAt: new Date('2026-01-01'),
   assignmentCount: 2,
   checkpoints: [
-    { id: 1, name: 'Chapter 1', order: 1, minConsultations: 1, estimatedDuration: 7 },
-    { id: 2, name: 'Chapter 2', order: 2, minConsultations: 0, estimatedDuration: 14 },
+    {
+      id: 1,
+      name: 'Chapter 1',
+      order: 1,
+      minConsultations: 1,
+      estimatedDuration: 7,
+      gradingType: null,
+    },
+    {
+      id: 2,
+      name: 'Chapter 2',
+      order: 2,
+      minConsultations: 0,
+      estimatedDuration: 14,
+      gradingType: null,
+    },
   ],
 };
 

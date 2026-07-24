@@ -191,60 +191,9 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-020: Rubric-Based Grading & Evaluation
-
-*   **Status:** `Pending`
-*   **Dependencies:** None
-*   **Estimated Effort:** 10 Days / 5 Sprint Loops
-
-#### Context Anchors (Traceability)
-*   **PRD Reference:** `docs/PRD.md#assignment-templates` (template + checkpoint definition — admin-owned), `docs/PRD.md#checkpoints--submissions` (review workflow — currently pass/revise with comments, no structured evaluation), `docs/PRD.md#analytics--reporting` (rubric analytics extension point)
-*   **TDD Reference:** `docs/TDD.md` line 432 `template_checkpoints` table (extend with `grading_type`), line 503 `reviews` table (extend with criterion scores via `review_scores` join), line 316 §3 Data Model (new tables: `rubric_criteria`, `rubric_levels`, `review_scores`); `src/db/schema/assignments.ts` `checkpoints` table (add `templateCheckpointId` FK); `src/server/templates.server.ts:267` `updateTemplateHandler` (refactor from delete+reinsert to upsert)
-
-#### Track Tech Stack
-*   Drizzle ORM — new tables: `rubric_criteria` (with `deletedAt` for soft-delete), `rubric_levels` (with `deletedAt` for soft-delete), `review_scores` (full denormalized snapshot); new columns: `template_checkpoints.grading_type` (pgEnum, nullable), `checkpoints.templateCheckpointId` (FK, nullable, backfill existing via `assignments.templateId + order` matching)
-*   Drizzle Kit migration (`pnpm db:generate` + `pnpm db:migrate` + rollback file per SQL styleguide §5.1) — includes `checkpoints.templateCheckpointId` backfill
-*   Existing file refactor: `src/server/templates.server.ts` `updateTemplateHandler` (line 267) — change from delete+reinsert to upsert/diff to preserve checkpoint IDs
-*   Existing file extensions: `src/server/reviews.ts` (Zod schema for `SubmitReviewSchema`), `src/server/reviews.server.ts` (`getReviewDetailHandler` + `submitReviewHandler`), `src/server/reviews-extras.server.ts` (`getLatestReviewHandler`)
-*   TanStack Start server functions — two-file split: `rubrics.ts` (stubs + Zod schemas) + `rubrics.server.ts` (handlers)
-*   shadcn/ui components — `Slider`/`Select` for scoring, `Card` for rubric display, `Table` for analytics; integrate into `src/components/admin/templates/CheckpointListEditor.tsx`
-*   i18n codegen — new keys in both `locales/en.json` and `locales/id.json` (`rubrics.*` namespace)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Schema — grading_type:** Add `grading_type` pgEnum column to `template_checkpoints` (nullable, defaults to `null`): `null` = no rubric (pass/fail only, current behavior), `'numeric'` = direct 0–100 scoring per criterion, `'qualitative'` = level-based scoring with configurable numeric mapping per checkpoint
-    *   **Schema — checkpoints FK:** Add `templateCheckpointId` FK column to `checkpoints` table (nullable for backward compat, backfill existing rows via `assignments.templateId + order` matching at migration time). Enables direct FK lookup of rubric data from per-student checkpoints
-    *   **Schema — rubric_criteria:** Create table (FK to `template_checkpoints.id`): `title`, `description`, `weight` (0–100, individual CHECK), `order`, `deletedAt` (nullable — soft-delete, never hard-delete, consistent with `assignments`/`assignmentTemplates` pattern)
-    *   **Schema — rubric_levels:** Create table (FK to `template_checkpoints.id`, qualitative only): `label`, `description`, `score` (0–100, individual CHECK), `order`, `deletedAt` (nullable — soft-delete). Shared across all criteria in that checkpoint (v1 — per-criterion levels deferred to v2)
-    *   **Schema — review_scores:** Create table (FK to `reviews.id`): `criterionId` (FK to `rubric_criteria.id`), `criterionTitle` (denormalized string snapshot), `score` (0–100, denormalized), `rubricLevelId` (nullable FK to `rubric_levels.id` — qualitative only), `levelLabel` (denormalized string snapshot, nullable), `comment`. Full denormalized snapshot so historical reviews are unaffected by later rubric edits — deleted criteria/levels remain visible via snapshot fields
-    *   **Refactor — updateTemplateHandler:** Refactor `src/server/templates.server.ts:267` from delete+reinsert (`db.delete(templateCheckpoints)` + `db.insert`) to upsert/diff approach — preserve existing checkpoint IDs when only metadata changes (name, minConsultations, estimatedDuration). Only create new IDs for genuinely new checkpoints, soft-delete removed checkpoints. Required so rubric FKs survive template edits
-    *   **Rubric lookup model:** Rubric is always looked up live from the template at review time via `checkpoints.templateCheckpointId → template_checkpoints → rubric_criteria/rubric_levels`. Admin edits to rubric propagate to all pending reviews. `review_scores` stores a full denormalized snapshot (score + criterion title + level label) so completed reviews are preserved
-    *   **Admin UI:** Rubric builder integrated into `src/components/admin/templates/CheckpointListEditor.tsx` (used by `CreateTemplateDialog.tsx` and `TemplateCheckpointSection.tsx`) — grading type selector per checkpoint, criteria editor (title/description/weight/order), qualitative level configurator (label/score/description). Weight sum validation (must = 100%, enforced at Zod application layer — not a DB CHECK constraint since it spans multiple rows)
-    *   **Instructor UI:** Rubric scoring integrated into `src/components/reviews/ReviewForm.tsx` (rendered on `src/routes/_authenticated/instructor/reviews/$submissionId.tsx`) — render criteria alongside `ReviewFilePreview`, score each criterion (numeric `Slider`/`Input` or qualitative `Select` based on `grading_type`), auto-compute weighted checkpoint total. All criteria must be scored before review submission. Skip rubric UI entirely when `grading_type` is `null` (current pass/fail behavior unchanged)
-    *   **Instructor data fetch:** Extend `getReviewDetailHandler` (`src/server/reviews.server.ts:137`) to also return rubric criteria + levels for the checkpoint being reviewed (via `checkpoints.templateCheckpointId → template_checkpoints → rubric_criteria/rubric_levels`)
-    *   **Instructor submit:** Extend `SubmitReviewSchema` in `src/server/reviews.ts` with optional `scores` array: `z.array(z.object({ criterionId, score (0–100), rubricLevelId?, comment? })).optional()`. Required when `grading_type` is not `null`, rejected when `null`. Extend `submitReviewHandler` (`reviews.server.ts:220`) to persist scores via `review_scores` (with denormalized snapshot fields)
-    *   **Student UI:** Rubric result view on `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx` — per-criterion score, level label (if qualitative), instructor comment, weighted total. Read-only, rendered alongside existing `SubmissionStatus` component
-    *   **Student data fetch:** Extend `getLatestReviewHandler` (`src/server/reviews-extras.server.ts:89`) to also return `review_scores` for the latest review (including denormalized `criterionTitle` and `levelLabel` snapshot fields)
-    *   **Rubric analytics:** Extend `analytics-instructor.server.ts` (avg score per criterion, criterion-level pass/fail rates) and `analytics-admin.server.ts` (cross-instructor criterion performance, class-wide weakness identification)
-    *   **CSV/Excel export:** Extend `analytics-export.server.ts` + `src/lib/excel-export.ts` (from TRACK-019) for per-student criterion scores
-    *   i18n keys for all new labels in both locales
-*   **Out of Scope:**
-    *   Instructor-owned rubric library (rubrics are template-bound, admin-owned — centralized control per design decision)
-    *   Per-criterion qualitative levels (v1 levels are per-checkpoint, shared across all criteria — per-criterion levels deferred to v2)
-    *   Instructor weight adjustment (v2 — instructor can re-weight criteria per assignment but cannot add/remove criteria)
-    *   Rubric revision proposal workflow (v2 — instructor suggests criteria changes, admin approves)
-    *   Grade transcripts / final grade aggregation across checkpoints (separate future track)
-    *   Reusable rubric fragments across templates (v2)
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Schema, Migration & Refactor):** Add `grading_type` pgEnum column to `template_checkpoints` (nullable, defaults to `null`). Add `templateCheckpointId` FK to `checkpoints` (nullable, backfill existing via `assignments.templateId + order` matching). Create `rubric_criteria` (with `deletedAt`), `rubric_levels` (with `deletedAt`), `review_scores` (with full denormalized snapshot: `criterionTitle`, `levelLabel`) tables with FKs to `template_checkpoints` and `reviews`. Refactor `updateTemplateHandler` (`src/server/templates.server.ts:267`) from delete+reinsert to upsert/diff — preserve checkpoint IDs. Run `pnpm db:generate` + `pnpm db:migrate`. Create rollback file. Write schema tests (column existence, individual CHECK constraints for `weight 0–100` and `score 0–100`, FK integrity, `deletedAt` soft-delete behavior). Verify: migration applies cleanly, backfill populates `templateCheckpointId` correctly, rollback works, `updateTemplateHandler` preserves checkpoint IDs on edit.
-*   **Phase 2 (Rubric CRUD — Admin):** Create `rubrics.ts` (Zod schemas + `createServerFn` stubs) + `rubrics.server.ts` (handlers) for rubric CRUD: create/update/soft-delete criteria + levels per template checkpoint. Admin-only (local `isAdmin` type guard, matching pattern in `templates.server.ts:24`). Zod validation: weights sum to 100% (application-layer, not DB CHECK — spans multiple rows), scores 0–100, grading type consistency (levels only when `qualitative`). Integrate into `src/components/admin/templates/CheckpointListEditor.tsx` — grading type selector, criteria editor, qualitative level configurator. Verify: admin can create/edit/soft-delete rubrics, non-admins rejected, weight validation enforced, rubric survives template metadata edits (checkpoint IDs preserved).
-*   **Phase 3 (Rubric-Based Review — Instructor):** Extend `SubmitReviewSchema` in `src/server/reviews.ts` with optional `scores: z.array(z.object({ criterionId, score (0–100), rubricLevelId?, comment? })).optional()`. Extend `submitReviewHandler` (`src/server/reviews.server.ts:220`) to accept + persist criterion scores via `review_scores` (with denormalized `criterionTitle` + `levelLabel` snapshot fields). Extend `getReviewDetailHandler` (`reviews.server.ts:137`) to also return rubric criteria + levels (via `checkpoints.templateCheckpointId → template_checkpoints → rubric_criteria/rubric_levels`). Render rubric criteria in `src/components/reviews/ReviewForm.tsx` — numeric `Input` (0–100) or qualitative `Select` (level → score) based on `grading_type`. Auto-compute weighted checkpoint total. Validate all criteria are scored before submission (skip validation when `grading_type` is `null`). Review state machine (pass/revise) unchanged — rubric scores are additive metadata. Verify: instructor can score criteria, weighted total computed correctly, unscored criteria block submission, qualitative level selection maps to numeric score, checkpoints without rubric (`grading_type: null`) use current pass/fail flow unchanged.
-*   **Phase 4 (Student View & Analytics):** Extend `getLatestReviewHandler` (`src/server/reviews-extras.server.ts:89`) to also return `review_scores` (including `criterionTitle` + `levelLabel` snapshot). Student checkpoint detail (`src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx`) shows rubric results — per-criterion score, level label (if qualitative), instructor comment, weighted total. Extend `analytics-instructor.server.ts` + `analytics-admin.server.ts` with rubric metrics (avg per criterion, criterion-level weakness analysis, cross-instructor comparison). Extend `analytics-export.server.ts` + `src/lib/excel-export.ts` for per-student criterion scores CSV/Excel export. Add all i18n keys to both locales. Run `pnpm generate:i18n`. Verify: student sees scores (including for soft-deleted criteria via snapshot), analytics show criterion performance, exports are valid, `pnpm check:i18n` parity.
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** Admin creates a template checkpoint with `numeric` grading type and 3 criteria (weights sum to 100%) — saved. Admin creates a checkpoint with `qualitative` grading type and 3 levels (Below: 40, Meets: 70, Exceeds: 95) — saved. A checkpoint with no grading type stays simple pass/fail. Admin edits a checkpoint name (metadata only) — rubric data survives (checkpoint ID preserved by upsert). Admin soft-deletes a criterion — it disappears from new reviews but remains visible in historical reviews via snapshot. Instructor reviews a numeric checkpoint — enters scores per criterion, sees weighted total. Instructor reviews a qualitative checkpoint — picks levels, sees weighted total. Instructor reviews a checkpoint with no rubric — current pass/fail flow, no rubric UI. Student views their checkpoint — sees per-criterion scores, comments, and weighted total (including for soft-deleted criteria). Analytics page shows criterion-level performance averages. CSV/Excel export downloads per-student criterion scores.
-*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. New tests for: schema validation (`grading_type` pgEnum, individual CHECK on `weight 0–100` and `score 0–100`, FK integrity, `deletedAt` soft-delete), `updateTemplateHandler` upsert (checkpoint IDs preserved on metadata edit, new IDs only for new checkpoints), `templateCheckpointId` backfill correctness, rubric CRUD handlers (create/update/soft-delete, admin-only via local `isAdmin`, weight-sum validation at application layer, qualitative-only levels), review scoring (numeric input, qualitative level mapping, weighted total computation, all-criteria-scored validation, `scores` optional when `grading_type` is `null`, denormalized snapshot unaffected by later rubric edits — criterion title and level label preserved after soft-delete), `getReviewDetailHandler` returns rubric data, `getLatestReviewHandler` returns review_scores, student view rendering, analytics aggregation (avg per criterion, cross-instructor comparison). `pnpm check:i18n` — parity for all new keys. `pnpm test:coverage` >= 80% on all thresholds.
-*   [ ] **Conductor Review:** `grading_type` pgEnum column on `template_checkpoints` (nullable). `templateCheckpointId` FK on `checkpoints` (nullable, backfilled). `rubric_criteria` and `rubric_levels` have `deletedAt` (soft-delete). `review_scores` stores full denormalized snapshot (`criterionTitle`, `levelLabel` — historical reviews unaffected by rubric edits). Weight-sum validation at Zod application layer (not DB CHECK — spans multiple rows). `updateTemplateHandler` refactored to upsert (checkpoint IDs preserved). Server function two-file split followed (`rubrics.ts` + `rubrics.server.ts`). Existing handlers extended in-place (`reviews.ts`, `reviews.server.ts`, `reviews-extras.server.ts`). All files under 500 lines. Migration has rollback file. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` all clean.
+- **Status:** Complete | **Audit IDs:** None (new feature) | **Deps:** None
+- **Key decisions:** `grading_type` pgEnum (nullable) on `template_checkpoints` (`null`/`numeric`/`qualitative`); `checkpoints.templateCheckpointId` FK (nullable, backfilled); `rubric_criteria`/`rubric_levels` with soft-delete; `review_scores` with full denormalized snapshot (`criterionTitle`, `levelLabel`, `score`, `weight`); `updateTemplateHandler` refactored from delete+reinsert to upsert/diff (preserves checkpoint IDs); weight-sum (100%) validation at Zod application layer; live rubric lookup at review time + frozen snapshot for completed reviews; rubric analytics (avg per criterion, cross-instructor comparison, CSV/Excel export); review fixes: validation-before-insert to prevent orphaned reviews, `.returning()` for review ID, TOCTOU lock on `saveRubricHandler`, `safeAuditLog` helper, Excel injection mitigation, a11y (aria-live, accessible labels, stable React keys)
+- **Detail:** `conductor/archive/rubric-based-grading-evaluation_20260723/` (spec.md, plan.md)
 
 ### TRACK-021: Proactive Deadline Reminder System
 - **Status:** ✅ Complete · **Deps:** None
@@ -317,6 +266,84 @@ All tracks must adhere to the following project constraints:
 
 ---
 
+## Milestone 7: Infrastructure & Tooling
+
+> This milestone addresses proactive infrastructure and tooling upgrades that improve developer experience, build performance, and toolchain currency. These tracks are not audit-driven — they are technology refresh initiatives.
+
+---
+
+### TRACK-024: TypeScript 7 Upgrade
+
+- **Status:** `Complete`
+- **Dependencies:** None
+- **Estimated Effort:** 1 Day / 0.5 Sprint Loops
+- **Audit IDs:** None (proactive infrastructure upgrade, not audit-driven)
+- **Completed:** 2026-07-23 (Conductor track `typescript-7-upgrade_20260723`, archived to `conductor/archive/`)
+- **Decisions:**
+  - **Direct upgrade path (5.8 → 7.0):** The project is on TypeScript `^5.8.0`. Microsoft recommends going through TS 6.0 as a bridge, but the project's tsconfig is already 95% TS 7-ready. The only deprecated option in use is `baseUrl: "."` (removed in TS 7). Since `paths` already uses `./src/*` (relative to project root), removing `baseUrl` is a trivial 1-line change with zero functional impact. A direct upgrade is low-risk.
+  - **No Compiler API consumers (confirmed):** Grep across all `.ts/.tsx/.js/.mjs/.cjs` files confirmed zero direct imports of the `typescript` package. The toolchain is fully decoupled from the TS compiler API: oxlint uses its own parser (not typescript-eslint), Vitest transforms via Vite/esbuild, tsx is esbuild-based, and drizzle-kit has its own TS parser. The biggest blocker for most projects (tooling that `import`s from `typescript`) does not apply.
+  - **No blocked frameworks:** No Vue, Svelte, Astro, MDX, or Angular — all of which need the compiler API for template type-checking and are blocked on TS 7.1. Pure React 19 + TanStack Start.
+  - **tsc is type-checking only:** The project uses `tsc --noEmit --incremental` exclusively. Transpilation is handled by Vite/esbuild. No emit path, no downleveling concerns. TS 7's removal of `target: es5` and `module: amd/umd/systemjs/none` is irrelevant.
+  - **`tsconfig.tsbuildinfo` deletion:** The Go compiler's incremental artifacts are incompatible with the JS compiler's. Must be deleted before the first TS 7 run.
+  - **`noUncheckedSideEffectImports` default change:** TS 7 defaults this to `true` — may surface new errors for side-effect imports with typos. Beneficial, but watch during triage.
+  - **No `@typescript/typescript6` side-by-side needed:** The project has no tooling that imports the TS compiler API, so the compatibility shim package is unnecessary. `tsc` alone suffices.
+  - **Expected gains:** 8–12x faster `pnpm typecheck` (the pre-push gate), faster editor/language server experience, new `--checkers`/`--builders` flags for CI parallelism tuning, and a rebuilt `--watch` mode (Parcel-based file watcher).
+
+#### Completion Summary
+
+- **TypeScript version:** `^5.8.0` → `^7.0.0` (resolved to 7.0.2). Native Go compiler port.
+- **tsconfig.json:** Removed `baseUrl: "."` (removed in TS 7). Path alias `"@/*": ["./src/*"]` resolves relative to project root — zero functional impact.
+- **tsconfig.tsbuildinfo:** Deleted (incompatible incremental cache format between JS and Go compilers). Regenerated by first TS 7 run.
+- **CI typecheck gate (`lefthook.yml`):** Pre-push typecheck updated from `pnpm typecheck` to `pnpm exec tsc --noEmit --incremental --checkers 4` — explicitly enables TS 7 shared-memory multithreading with 4 workers (TS 7 default).
+- **Benchmark:** `pnpm typecheck` median time: **8.85s (TS 5.8) → 1.40s (TS 7.0.2)** — **~6.3x speedup** (slightly below the 8–12x estimate, likely due to incremental cache being warm for both measurements).
+- **Quality gates (all pass under TS 7):** `pnpm typecheck` (0 errors), `pnpm test:coverage` (299 files, 2937 tests; coverage Stmts 88.26%, Branches 81.9%, Functions 84.08%, Lines 88.88% — all ≥80%), `pnpm lint` (0 warnings, 0 errors across 272 files), `pnpm check:i18n` (EN↔ID parity confirmed, 629 keys used / 762 in each locale).
+- **Smoke tests:** `pnpm dev` (dev server starts, i18n codegen passes, Vite ready in ~1.8s), `pnpm build` (client build 3918 modules in 3.08s, SSR build 1116 modules in 1.74s, migrate/seed bundles generated).
+- **Config verification tests:** Added `tests/unit/config/typescript-7-upgrade.test.ts` (4 tests: no `baseUrl` in tsconfig, TS version ≥7.0, `--checkers` flag in lefthook.yml, paths alias regression guard).
+- **Code commits:** `1827970` (TS upgrade + baseUrl removal), `3d31fb4` (--checkers flag), `1fa5742` (config verification tests).
+- **No regressions:** All 2937 existing tests pass unchanged. `noUncheckedSideEffectImports` (new TS 7 default) surfaced zero side-effect import typos.
+
+#### Context Anchors (Traceability)
+
+- **PRD Reference:** N/A (infrastructure upgrade, no product impact)
+- **TDD Reference:** N/A (no architecture change — type-checking logic is structurally identical between TS 6.0 and 7.0)
+- **Toolchain Reference:** `package.json` (devDependencies), `tsconfig.json`, `AGENTS.md` (developer commands)
+
+#### Track Tech Stack
+
+- TypeScript 7.0 (native Go port — `typescript` npm package, `latest` tag)
+- `tsconfig.json` (remove `baseUrl`, verify all other options are TS 7-compatible)
+- `pnpm` (package manager)
+- CI type-checking (`--checkers`, `--builders` flags for parallelism tuning)
+
+#### Scope Boundaries
+
+- **In Scope:**
+  - Remove `baseUrl: "."` from `tsconfig.json` (paths `@/*` → `./src/*` already relative to project root — no functional impact).
+  - Update `package.json`: `"typescript": "^5.8.0"` → `"^7.0.0"`.
+  - Delete `tsconfig.tsbuildinfo` (incompatible incremental format between JS and Go compilers).
+  - Run `pnpm install`, `pnpm typecheck`, `pnpm test`, `pnpm lint`, `pnpm build` — triage any errors from new strict defaults or removed options.
+  - Verify `noUncheckedSideEffectImports: true` (new default) doesn't surface side-effect import typos.
+  - Optionally tune CI `--checkers N` for type-checking parallelism (default 4).
+- **Out of Scope:**
+  - TypeScript 6.0 bridge upgrade (unnecessary — tsconfig is already clean enough for direct upgrade)
+  - `@typescript/typescript6` side-by-side install (no compiler API consumers to bridge)
+  - VS Code extension changes (developer preference, not a project config change)
+  - Refactoring code to accommodate new strict defaults (none expected — `strict: true` already set)
+
+#### High-Level Execution Vectors
+
+- **Phase 1 (Config reconciliation):** Remove `baseUrl: "."` from `tsconfig.json`. Verify all other tsconfig options against the TS 7 removed-options list (`target: es5`, `moduleResolution: node/node10/classic`, `module: amd/umd/systemjs/none`, `downlevelIteration`, `esModuleInterop: false`, `alwaysStrict: false`, `module` keyword in namespaces, `assert` import attributes, `ignoreDeprecations`). All confirmed absent via grep audit.
+- **Phase 2 (Install & typecheck):** Delete `tsconfig.tsbuildinfo`. Update `package.json` TypeScript version to `^7.0.0`. Run `pnpm install`. Run `pnpm typecheck` — triage any errors. Expected: none (config already matches all TS 7 defaults). If `noUncheckedSideEffectImports` surfaces side-effect import issues, fix the import typos.
+- **Phase 3 (Full verification):** Run `pnpm test` (unit + integration), `pnpm lint`, `pnpm build`. Verify all gates pass. Optionally benchmark `pnpm typecheck` before/after to document the speedup. Optionally tune `--checkers N` in CI for parallelism.
+
+#### Verification & Definition of Done (DoD)
+
+- [x] **Manual Checkpoint:** `pnpm typecheck` passes on TS 7.0 with no errors. `pnpm test` (unit + integration) — all pass. `pnpm build` — prod build succeeds (codegen + vite build + migrate/seed bundles). `pnpm dev` — dev server starts, HMR works, editor shows TS 7 language server. Measure `pnpm typecheck` time before (TS 5.8) and after (TS 7.0) — document the speedup.
+- [x] **Automated Tests:** `pnpm test:unit` — all existing tests pass unchanged (type-checking logic is structurally identical between TS 6.0 and 7.0). `pnpm test:coverage` ≥80%. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors. `pnpm check:i18n` — parity maintained.
+- [x] **Conductor Review:** `tsconfig.json` has no `baseUrl`. `tsconfig.tsbuildinfo` deleted and regenerated by TS 7. No deprecated/removed tsconfig options remain (grep for `baseUrl`, `target: es5`, `moduleResolution: node`, `module: amd/umd/systemjs`, `downlevelIteration`, `ignoreDeprecations` — all zero). `package.json` TypeScript version is `^7.0.0`. No `@typescript/typescript6` dependency added (not needed). All pre-push gates pass (`pnpm typecheck` && `pnpm vitest run --coverage`).
+
+---
+
 ## Track Dependency Graph
 
 ```
@@ -351,10 +378,13 @@ Milestone 5: Post-Audit Enhancements
 └── TRACK-019: Analytics & Reporting [no deps]
 
 Milestone 6: New Features
-├── TRACK-020: Rubric-Based Grading & Evaluation [no deps]
+├── TRACK-020: Rubric-Based Grading & Evaluation [Complete — archived]
 ├── TRACK-021: Proactive Deadline Reminder System [no deps — recommended after 022]
 ├── TRACK-022: User Notification Preferences [Complete — no deps]
 └── TRACK-023: At-Risk Student Identification [no deps — complementary to 021]
+
+Milestone 7: Infrastructure & Tooling
+└── TRACK-024: TypeScript 7 Upgrade [Complete — archived]
 ```
 
 ### Parallelization Strategy
@@ -369,12 +399,13 @@ The following track groups can be worked on simultaneously:
 | **D** | TRACK-009, TRACK-010, TRACK-011 | Independent UX tracks — minimal file overlap |
 | **E** | TRACK-012 + TRACK-010 | NotificationCenter refactor in 010 precedes notification UX in 012 |
 | **F** | TRACK-013 + TRACK-010 | Both touch date formatting — coordinate i18n date changes |
-| **G** | TRACK-014, TRACK-016, TRACK-017, TRACK-018, TRACK-019 | Fully independent — no file overlap (distinct domains: mutations, email ops, review UX, notifications, analytics) |
-| **H** | TRACK-015 → TRACK-014 | Sequential — TRACK-015 consumed the query-key factory from TRACK-014 for useQuery conversion |
+| **G** | TRACK-014, TRACK-016, TRACK-017, TRACK-018, TRACK-019 | Fully independent — no file overlap (distinct domains: mutations, email ops, review UX, notifications, analytics) — TRACK-014/015/016/017/018 complete |
+| **H** | TRACK-015 → TRACK-014 | Sequential — TRACK-015 consumed the query-key factory from TRACK-014 for useQuery conversion (both complete — TRACK-014 archived, TRACK-015 archived) |
 | **I** | TRACK-020 | Independent — new domain (rubrics/grading), extends completed tracks (template editor, review screen, analytics) but no concurrent work |
 | **J** | TRACK-021 | Independent — extends existing email-queue polling loop + notifications, no file overlap with TRACK-020 (different domain: deadline reminders vs grading) |
 | **K** | TRACK-022 | Complete — extends existing `users.settings` JSONB + `enqueueEventEmail` chokepoint + 12 notification sites with per-type per-channel preference gating. Implemented alongside TRACK-021 so `deadline_reminder` type respects user prefs from day one |
 | **L** | TRACK-023 | Independent — new risk-scoring module + dashboard widget + event-driven alerts at `submitReviewHandler`. No file overlap with TRACK-020/021/022 (different domain: risk identification vs grading/reminders/preferences). Complementary to TRACK-021 (event-driven catches discrete risk moments, scanner catches time-based risk). Minor overlap with TRACK-022 on notification type registry — coordinate if parallelized |
+| **M** | TRACK-024 | Fully independent — only touches `tsconfig.json` and `package.json`, no feature file overlap (complete — archived) |
 
 ---
 
@@ -388,7 +419,8 @@ The following track groups can be worked on simultaneously:
 | 4: Quality Assurance | 1 | ~3 Days |
 | 5: Post-Audit Enhancements | 6 | ~25 Days |
 | 6: New Features | 4 | ~25 Days |
-| **Total** | **24** | **~85 Days** |
+| 7: Infrastructure & Tooling | 1 | ~1 Day |
+| **Total** | **25** | **~86 Days** |
 
 > Effort estimates assume a single developer. Tracks within the same parallelization group can be distributed across developers to reduce wall-clock time.
 
