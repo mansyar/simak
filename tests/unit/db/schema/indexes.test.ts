@@ -148,4 +148,10 @@ describe('Database indexes — PERF-7 through PERF-14', () => {
     const indexes = getIndexes(asTable(reviews));
     expect(indexes.find((i) => i.name === 'reviews_submission_id_idx')).toBeUndefined();
   });
+
+  // TRACK-021: deadline reminder scanner query support
+  it('checkpoints has (state, dueDate) composite index for deadline scanner', async () => {
+    const { checkpoints } = await import('@/db/schema/assignments');
+    expectIndex(asTable(checkpoints), 'checkpoints_state_due_date_idx', ['state', 'due_date']);
+  });
 });

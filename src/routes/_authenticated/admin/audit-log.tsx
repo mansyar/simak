@@ -15,7 +15,10 @@ import {
 import { useI18n } from '../../__root';
 import type { TranslationKey } from '@/i18n/index';
 import { PageHeader } from '@/components/ui/page-header';
+import { Button } from '@/components/ui/button';
 import { RefreshButton } from '@/components/ui/refresh-button';
+import { exportAuditLogCsv } from '@/server/analytics';
+import { useCsvDownload } from '@/hooks/use-csv-download';
 import { Pagination } from '@/components/ui/pagination';
 import {
   Select,
@@ -24,7 +27,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Search, X } from 'lucide-react';
+import { Search, X, Download } from 'lucide-react';
 import { z } from 'zod';
 import { getActionVisualProps, ACTION_TYPES } from '@/lib/admin/audit-actions';
 import { formatDate } from '@/lib/format-date';
@@ -81,6 +84,7 @@ function AuditLogPage() {
   const navigate = Route.useNavigate();
   const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { exportCsv, isExporting } = useCsvDownload();
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [localSearch, setLocalSearch] = useState(searchParams.search);
 
@@ -134,7 +138,30 @@ function AuditLogPage() {
       <PageHeader
         title={t('adminAuditLog.title')}
         subtitle={t('adminAuditLog.subtitle')}
-        action={<RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />}
+        action={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              loading={isExporting}
+              onClick={() =>
+                exportCsv(
+                  () =>
+                    exportAuditLogCsv({
+                      data: {
+                        dateFrom: searchParams.dateFrom || undefined,
+                        dateTo: searchParams.dateTo || undefined,
+                      },
+                    }) as Promise<unknown>,
+                  'audit-log.csv',
+                )
+              }
+            >
+              <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t('common.exportCsv')}
+            </Button>
+            <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
+          </div>
+        }
       />
 
       {/* Filters */}

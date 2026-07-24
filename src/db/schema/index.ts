@@ -6,11 +6,13 @@ export * from './auth';
 export * from './templates';
 export * from './assignments';
 export * from './submissions';
+export * from './rubrics';
 export * from './consultations';
 export * from './notifications';
 export * from './audit-log';
 export * from './extensions';
 export * from './email-queue';
+export * from './deadline-reminders';
 
 // Import tables for relations
 import { users } from './users';
@@ -18,10 +20,12 @@ import { session, account, verification, twoFactor } from './auth';
 import { assignmentTemplates, templateCheckpoints } from './templates';
 import { assignments, assignmentStudents, checkpoints } from './assignments';
 import { submissions, reviews } from './submissions';
+import { rubricCriteria, rubricLevels, reviewScores } from './rubrics';
 import { consultations } from './consultations';
 import { notifications } from './notifications';
 import { extensionRequests } from './extensions';
 import { emailQueue } from './email-queue';
+import { deadlineReminders } from './deadline-reminders';
 
 // ---- Relations ----
 
@@ -67,11 +71,13 @@ export const assignmentTemplatesRelations = relations(assignmentTemplates, ({ ma
   }),
 }));
 
-export const templateCheckpointsRelations = relations(templateCheckpoints, ({ one }) => ({
+export const templateCheckpointsRelations = relations(templateCheckpoints, ({ one, many }) => ({
   template: one(assignmentTemplates, {
     fields: [templateCheckpoints.templateId],
     references: [assignmentTemplates.id],
   }),
+  rubricCriteria: many(rubricCriteria),
+  rubricLevels: many(rubricLevels),
 }));
 
 export const assignmentsRelations = relations(assignments, ({ many, one }) => ({
@@ -123,7 +129,7 @@ export const submissionsRelations = relations(submissions, ({ many, one }) => ({
   reviews: many(reviews),
 }));
 
-export const reviewsRelations = relations(reviews, ({ one }) => ({
+export const reviewsRelations = relations(reviews, ({ one, many }) => ({
   submission: one(submissions, {
     fields: [reviews.submissionId],
     references: [submissions.id],
@@ -131,6 +137,38 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   instructor: one(users, {
     fields: [reviews.instructorId],
     references: [users.id],
+  }),
+  reviewScores: many(reviewScores),
+}));
+
+export const rubricCriteriaRelations = relations(rubricCriteria, ({ one, many }) => ({
+  templateCheckpoint: one(templateCheckpoints, {
+    fields: [rubricCriteria.templateCheckpointId],
+    references: [templateCheckpoints.id],
+  }),
+  reviewScores: many(reviewScores),
+}));
+
+export const rubricLevelsRelations = relations(rubricLevels, ({ one, many }) => ({
+  templateCheckpoint: one(templateCheckpoints, {
+    fields: [rubricLevels.templateCheckpointId],
+    references: [templateCheckpoints.id],
+  }),
+  reviewScores: many(reviewScores),
+}));
+
+export const reviewScoresRelations = relations(reviewScores, ({ one }) => ({
+  review: one(reviews, {
+    fields: [reviewScores.reviewId],
+    references: [reviews.id],
+  }),
+  criterion: one(rubricCriteria, {
+    fields: [reviewScores.criterionId],
+    references: [rubricCriteria.id],
+  }),
+  rubricLevel: one(rubricLevels, {
+    fields: [reviewScores.rubricLevelId],
+    references: [rubricLevels.id],
   }),
 }));
 
@@ -161,6 +199,17 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
 }));
 
 export const emailQueueRelations = relations(emailQueue, () => ({}));
+
+export const deadlineRemindersRelations = relations(deadlineReminders, ({ one }) => ({
+  checkpoint: one(checkpoints, {
+    fields: [deadlineReminders.checkpointId],
+    references: [checkpoints.id],
+  }),
+  student: one(users, {
+    fields: [deadlineReminders.studentId],
+    references: [users.id],
+  }),
+}));
 
 export const extensionRequestsRelations = relations(extensionRequests, ({ one }) => ({
   assignment: one(assignments, {

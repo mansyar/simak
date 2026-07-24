@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { updateTemplate, deleteTemplate, listTemplateAssignments } from '@/server/templates';
+import { saveRubric } from '@/server/rubrics';
 import { TemplateMetadata } from './TemplateMetadata';
 import { TemplateCheckpointSection } from './TemplateCheckpointSection';
 import { TemplateLinkedAssignments } from './TemplateLinkedAssignments';
@@ -25,6 +26,7 @@ interface TemplateData {
     order: number;
     minConsultations: number | null;
     estimatedDuration: number | null;
+    gradingType: 'numeric' | 'qualitative' | null;
   }[];
 }
 
@@ -36,7 +38,13 @@ interface AssignmentData {
   createdAt: Date | null;
 }
 
-const defaultCheckpoint = () => ({ name: '', minConsultations: 0, estimatedDuration: 7 });
+const defaultCheckpoint = () => ({
+  id: undefined as number | undefined,
+  name: '',
+  minConsultations: 0,
+  estimatedDuration: 7,
+  gradingType: null as 'numeric' | 'qualitative' | null,
+});
 
 export function TemplateDetailPage({
   template,
@@ -54,9 +62,11 @@ export function TemplateDetailPage({
   const [type, setType] = useState(template?.type ?? '');
   const [checkpoints, setCheckpoints] = useState(
     template?.checkpoints.map((cp) => ({
+      id: cp.id,
       name: cp.name,
       minConsultations: cp.minConsultations ?? 0,
       estimatedDuration: cp.estimatedDuration ?? 7,
+      gradingType: cp.gradingType ?? null,
     })) ?? [defaultCheckpoint()],
   );
   const [isSaving, setIsSaving] = useState(false);
@@ -69,6 +79,7 @@ export function TemplateDetailPage({
   const updateTemplateFn = useServerFn(updateTemplate);
   const deleteTemplateFn = useServerFn(deleteTemplate);
   const listTemplateAssignmentsFn = useServerFn(listTemplateAssignments);
+  const saveRubricFn = useServerFn(saveRubric);
 
   // Checkpoint handlers
   const handleAddCheckpoint = useCallback(() => {
@@ -102,6 +113,49 @@ export function TemplateDetailPage({
       return updated;
     });
   }, []);
+
+  const handleGradingTypeChange = useCallback(
+    async (index: number, gradingType: 'numeric' | 'qualitative' | null) => {
+      const checkpointId = checkpoints[index]?.id;
+      const prevGradingType = checkpoints[index]?.gradingType ?? null;
+
+      setCheckpoints((prev) => {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], gradingType };
+        return updated;
+      });
+
+      // When clearing rubric (null), immediately persist to DB
+      if (gradingType === null && checkpointId) {
+        try {
+          const result = await saveRubricFn({
+            data: {
+              templateCheckpointId: checkpointId,
+              gradingType: null,
+              criteria: [],
+              levels: [],
+            },
+          });
+          if (result && 'error' in result) {
+            setSaveError(result.error.message);
+            setCheckpoints((prev) => {
+              const updated = [...prev];
+              updated[index] = { ...updated[index], gradingType: prevGradingType };
+              return updated;
+            });
+          }
+        } catch {
+          setSaveError(t('adminTemplates.detail.saveError'));
+          setCheckpoints((prev) => {
+            const updated = [...prev];
+            updated[index] = { ...updated[index], gradingType: prevGradingType };
+            return updated;
+          });
+        }
+      }
+    },
+    [checkpoints, saveRubricFn, t],
+  );
 
   const handleMoveUp = useCallback((index: number) => {
     if (index === 0) return;
@@ -212,6 +266,7 @@ export function TemplateDetailPage({
         onEstimatedDurationChange={handleEstimatedDurationChange}
         onMoveUp={handleMoveUp}
         onMoveDown={handleMoveDown}
+        onGradingTypeChange={handleGradingTypeChange}
         onSave={handleSave}
         isSaving={isSaving}
       />

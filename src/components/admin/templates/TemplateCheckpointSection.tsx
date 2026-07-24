@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { useI18n } from '../../../routes/__root';
 
 interface Checkpoint {
+  id?: number;
   name: string;
   minConsultations: number;
   estimatedDuration: number;
+  gradingType?: 'numeric' | 'qualitative' | null;
 }
 
 interface TemplateCheckpointSectionProps {
@@ -19,6 +21,7 @@ interface TemplateCheckpointSectionProps {
   onEstimatedDurationChange: (index: number, value: number) => void;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
+  onGradingTypeChange?: (index: number, gradingType: 'numeric' | 'qualitative' | null) => void;
   onSave: () => void;
   isSaving: boolean;
 }
@@ -32,6 +35,7 @@ export function TemplateCheckpointSection({
   onEstimatedDurationChange,
   onMoveUp,
   onMoveDown,
+  onGradingTypeChange,
   onSave,
   isSaving,
 }: TemplateCheckpointSectionProps) {
@@ -52,6 +56,7 @@ export function TemplateCheckpointSection({
           onEstimatedDurationChange={onEstimatedDurationChange}
           onMoveUp={onMoveUp}
           onMoveDown={onMoveDown}
+          onGradingTypeChange={onGradingTypeChange}
         />
         <div className="flex gap-2 pt-2">
           <Button onClick={onSave} disabled={isSaving} data-testid="save-template">

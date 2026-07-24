@@ -67,6 +67,28 @@ describe('getNotificationRoute', () => {
     expect(route).toBe('/admin/dashboard');
   });
 
+  it('derives deadline_reminder route from type + metadata', () => {
+    const route = getNotificationRoute('deadline_reminder', {
+      assignmentId: 5,
+      checkpointId: 12,
+    });
+    expect(route).toBe('/student/assignments/5/checkpoints/12');
+  });
+
+  it('returns null for deadline_reminder when assignmentId is missing', () => {
+    const route = getNotificationRoute('deadline_reminder', {
+      checkpointId: 12,
+    });
+    expect(route).toBeNull();
+  });
+
+  it('returns null for deadline_reminder when checkpointId is missing', () => {
+    const route = getNotificationRoute('deadline_reminder', {
+      assignmentId: 5,
+    });
+    expect(route).toBeNull();
+  });
+
   it('returns null when metadata is missing', () => {
     const route = getNotificationRoute('review_completed', null);
     expect(route).toBeNull();

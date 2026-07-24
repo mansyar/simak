@@ -42,8 +42,13 @@ vi.mock('@/components/ui/button', () => ({
   ),
 }));
 
+let capturedProps: any = null;
+
 vi.mock('@/components/admin/templates/CheckpointListEditor', () => ({
-  CheckpointListEditor: (props: any) => <div data-testid="checkpoint-list-editor" />,
+  CheckpointListEditor: (props: any) => {
+    capturedProps = props;
+    return <div data-testid="checkpoint-list-editor" />;
+  },
 }));
 
 const checkpoints = [
@@ -111,5 +116,27 @@ describe('TemplateCheckpointSection', () => {
       />,
     );
     expect(screen.getByText('common.saving')).toBeInTheDocument();
+  });
+
+  it('should pass onGradingTypeChange through to CheckpointListEditor', async () => {
+    const { TemplateCheckpointSection } =
+      await import('@/components/admin/templates/TemplateCheckpointSection');
+    const onGradingTypeChange = vi.fn();
+    render(
+      <TemplateCheckpointSection
+        checkpoints={checkpoints}
+        onAdd={() => {}}
+        onRemove={() => {}}
+        onChange={() => {}}
+        onMinConsultationsChange={() => {}}
+        onEstimatedDurationChange={() => {}}
+        onMoveUp={() => {}}
+        onMoveDown={() => {}}
+        onSave={() => {}}
+        isSaving={false}
+        onGradingTypeChange={onGradingTypeChange}
+      />,
+    );
+    expect(capturedProps.onGradingTypeChange).toBe(onGradingTypeChange);
   });
 });

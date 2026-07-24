@@ -71,6 +71,34 @@
       "when": 1784654147156,
       "tag": "0009_familiar_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1784785793667,
+      "tag": "0010_puzzling_jazinda",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1784786560270,
+      "tag": "0011_serious_supreme_intelligence",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1784835483162,
+      "tag": "0012_serious_nextwave",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1784785594513,
+      "tag": "0013_deadline_reminders",
+      "breakpoints": true
     }
   ]
 }

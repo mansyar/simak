@@ -42,6 +42,7 @@ describe('Assignments schema', () => {
     expect(checkpoints).toHaveProperty('state');
     expect(checkpoints).toHaveProperty('createdAt');
     expect(checkpoints).toHaveProperty('updatedAt');
+    expect(checkpoints).toHaveProperty('templateCheckpointId');
   });
 
   it('should export checkpointState enum', async () => {

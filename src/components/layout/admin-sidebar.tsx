@@ -10,6 +10,7 @@ import {
   X,
   GraduationCap,
   Mail,
+  BarChart3,
 } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 
@@ -31,6 +32,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { to: '/admin/templates', label: 'adminSidebar.templates', icon: FileType },
     { to: '/admin/audit-log', label: 'adminSidebar.auditLog', icon: ScrollText },
     { to: '/admin/email-queue', label: 'adminSidebar.emailQueue', icon: Mail },
+    { to: '/admin/analytics', label: 'adminSidebar.analytics', icon: BarChart3 },
   ] as const;
 
   const preferenceLinks = [

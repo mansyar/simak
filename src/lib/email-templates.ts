@@ -77,6 +77,7 @@ type EmailStrings = {
     newDeadline: string;
     category: string;
     durationRequested: string;
+    dueDate: string;
   };
   results: { pass: string; revise: string };
   submissionReceived: string;
@@ -87,6 +88,7 @@ type EmailStrings = {
   extensionApproved: string;
   extensionRejected: string;
   extensionRequested: string;
+  deadlineReminder: string;
 };
 
 const STRINGS: Record<Locales, EmailStrings> = {
@@ -106,6 +108,7 @@ const STRINGS: Record<Locales, EmailStrings> = {
       newDeadline: 'New Deadline',
       category: 'Category',
       durationRequested: 'Duration Requested (days)',
+      dueDate: 'Due Date',
     },
     results: { pass: 'Pass', revise: 'Revise' },
     submissionReceived: 'A student has submitted a checkpoint for review.',
@@ -116,6 +119,7 @@ const STRINGS: Record<Locales, EmailStrings> = {
     extensionApproved: 'Your extension request has been approved.',
     extensionRejected: 'Your extension request has been rejected.',
     extensionRequested: 'A student has requested an extension.',
+    deadlineReminder: 'Your checkpoint deadline is approaching.',
   },
   id: {
     viewInSimak: 'Lihat di SIMAK',
@@ -133,6 +137,7 @@ const STRINGS: Record<Locales, EmailStrings> = {
       newDeadline: 'Batas Waktu Baru',
       category: 'Kategori',
       durationRequested: 'Durasi yang Diminta (hari)',
+      dueDate: 'Batas Waktu',
     },
     results: { pass: 'Lulus', revise: 'Revisi' },
     submissionReceived: 'Seorang mahasiswa telah mengirimkan checkpoint untuk ditinjau.',
@@ -144,6 +149,7 @@ const STRINGS: Record<Locales, EmailStrings> = {
     extensionApproved: 'Permintaan perpanjangan Anda telah disetujui.',
     extensionRejected: 'Permohonan perpanjangan Anda telah ditolak.',
     extensionRequested: 'Seorang mahasiswa telah meminta perpanjangan.',
+    deadlineReminder: 'Batas waktu checkpoint Anda akan tiba.',
   },
 };
 
@@ -328,6 +334,29 @@ export function buildExtensionRequestedHtml(params: {
         detailRow(s.labels.assignment, escapeHtml(params.assignmentName)) +
         detailRow(s.labels.category, escapeHtml(params.category)) +
         detailRow(s.labels.durationRequested, String(params.durationRequested)),
+    ) +
+    deepLinkButton(url, s.viewInSimak) +
+    fallbackLink(url, s.fallback);
+  return buildEmail(locale, body);
+}
+
+export function buildDeadlineReminderHtml(params: {
+  assignmentTitle: string;
+  checkpointName: string;
+  assignmentId: number;
+  checkpointId: number;
+  dueDate: string;
+  locale?: Locales | null;
+}): string {
+  const locale = normalizeLocale(params.locale);
+  const s = STRINGS[locale];
+  const url = `${getEnv().BETTER_AUTH_URL}/student/assignments/${params.assignmentId}/checkpoints/${params.checkpointId}`;
+  const body =
+    `<p style="font-size: 16px; color: #374151; margin: 0 0 16px;">${s.deadlineReminder}</p>` +
+    detailTable(
+      detailRow(s.labels.assignment, escapeHtml(params.assignmentTitle)) +
+        detailRow(s.labels.checkpoint, escapeHtml(params.checkpointName)) +
+        detailRow(s.labels.dueDate, escapeHtml(params.dueDate)),
     ) +
     deepLinkButton(url, s.viewInSimak) +
     fallbackLink(url, s.fallback);

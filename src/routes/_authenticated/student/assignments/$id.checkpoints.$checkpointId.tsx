@@ -7,6 +7,7 @@ import { getLatestReview } from '@/server/reviews';
 import { FileUploader } from '@/components/files/file-uploader';
 import { FileList } from '@/components/files/file-list';
 import { SubmissionStatus } from '@/components/files/submission-status';
+import { RubricResultView } from '@/components/student/rubric-result-view';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Pagination } from '@/components/ui/pagination';
@@ -55,6 +56,16 @@ export const Route = createFileRoute(
             revisionDeadline: string | null;
             createdAt: string | null;
           } | null;
+          scores?: Array<{
+            id: number;
+            criterionId: number;
+            criterionTitle: string;
+            score: number;
+            weight: number;
+            rubricLevelId: number | null;
+            levelLabel: string | null;
+            comment: string | null;
+          }>;
         }>
       )({ data: { checkpointId: Number(checkpointId) } });
       const latestReview = reviewData?.review
@@ -85,6 +96,7 @@ export const Route = createFileRoute(
           ).submissions ?? [],
         submissionTotal: (submissionsData as { total?: number })?.total ?? 0,
         latestReview,
+        rubricScores: reviewData?.scores ?? [],
       };
     } catch (err) {
       console.error('Failed to load submission page:', err);
@@ -320,6 +332,9 @@ function CheckpointSubmissionPage() {
 
       {/* Review status */}
       <SubmissionStatus review={data.latestReview} />
+
+      {/* Rubric results */}
+      <RubricResultView scores={data.rubricScores ?? []} />
 
       {/* Submission history */}
       <div>

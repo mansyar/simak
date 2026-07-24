@@ -42,7 +42,7 @@ Students and instructors lack a centralized system to:
 - **Review workflow** — Instructors review submissions with Pass/Revise decisions, comments, and optional feedback files
 - **Consultation tracking** — Students log sessions; instructors verify; minimum consultation thresholds gate checkpoint unlocks
 - **Notifications** — Real-time in-app alerts and email notifications for submissions, reviews, revisions, consultations, extensions, and deadline reminders
-- **Deadline management** — Auto-locking overdue checkpoints, instructor override, SLA breach escalation (3-day review SLA)
+- **Deadline management** — Auto-locking overdue checkpoints, instructor override, SLA breach escalation (3-day review SLA), proactive deadline reminders (7-day/3-day/1-day lead times via hourly background scanner)
 - **Bilingual i18n** — Full English and Indonesian language support
 - **Dark mode & responsive UI** — Light/dark themes, mobile-friendly, accessible (WCAG 2.1 AA)
 - **Settings Hub** — Unified settings page accessible from all role sidebars with Profile (name editing, avatar upload), Password (inline change form), Security (2FA + Session Management), Appearance (language EN/ID, theme light/dark), and Accessibility (reduced motion toggle); persisted via `users.settings` jsonb
@@ -461,5 +461,41 @@ Students and instructors lack a centralized system to:
 - **i18n** — 8 new email subject keys in EN and ID under `emails.subjects.*` (camelCase); subjects prefixed with `[SIMAK]` in code
 - **No processor changes** — Existing production-hardened email queue processor (30s cycle, `FOR UPDATE SKIP LOCKED`, exponential backoff) unchanged
 - **Tests** — 2,919 tests pass across 297 test files; coverage ≥80% on all thresholds (lines 88.91%, statements 88.29%, branches 81.78%, functions 84.02%)
+
+### Track: Analytics & Reporting (TRACK-019) (July 2026)
+
+- **Admin Analytics Dashboard** (`/admin/analytics?range=30d`) — 6 NEW metrics not on the existing dashboard: consultation verification rate, deadline breach rate, assignment status distribution (progress bars), submission/review volume trends (daily tables), reviews completed count, DAU/WAU active-user trends; date range filtering via URL search params (7d/30d/90d/all + custom start/end)
+- **Instructor Analytics Dashboard** (`/instructor/analytics?range=30d`) — 5 personal performance metrics: reviews completed, average response time (hours), SLA breach count (>3 days), students supervised, assignments active; same date range filtering
+- **CSV Export** — 5 server-side CSV export handlers returning CSV strings (client creates Blob): admin user list, admin audit log (with date filtering), admin assignment progress, instructor student progress, instructor review history; `useCsvDownload` hook + `downloadCsv` utility for client-side download; export buttons on admin users, audit-log, analytics pages and instructor assignment detail page
+- **Excel Export** — Client-side SheetJS export (`exportToExcel` utility) on both analytics pages; exports current dashboard data to `.xlsx` with `json_to_sheet()`
+- **Navigation & i18n** — Analytics sidebar entries (BarChart3 icon) in both admin and instructor sidebars; 75+ new i18n keys in both EN and ID locales (adminAnalytics, instructorAnalytics sections + export button labels)
+- **Server architecture** — Two-file split: `analytics.ts` (client-safe Zod schemas + createServerFn stubs) + 3 handler files (`analytics-admin.server.ts`, `analytics-instructor.server.ts`, `analytics-export.server.ts`); all handlers use `getSessionFromHeaders` + role guards; aggregate queries with `sql<number>` template literals, `date_trunc`, `GROUP BY`, `COUNT(DISTINCT)`
+- **Tests** — 2,982 tests pass across 301 test files; coverage ≥80% on all thresholds (statements 88.09%, branches 81.98%, functions 83.6%, lines 88.73%)
+
+### Track: Rubric-Based Grading & Evaluation (TRACK-020) (July 2026)
+
+- **Schema & migration** — 3 new tables (`rubric_criteria`, `rubric_levels`, `review_scores`) with CHECK constraints (weight 0–100, score 0–100), soft-delete (`deletedAt`), and FKs to `template_checkpoints` and `reviews`; `grading_type` pgEnum column on `template_checkpoints` (null/numeric/qualitative); `templateCheckpointId` FK on `checkpoints` (nullable, backfilled via `assignments.templateId + order` matching); migration 0010 with backfill + rollback file
+- **Template handler refactor** — `updateTemplateHandler` refactored from delete+reinsert to upsert/diff approach, preserving checkpoint IDs on metadata-only edits and soft-deleting removed checkpoints; ensures rubric FKs survive template edits; extracted `syncTemplateCheckpoints` helper
+- **Admin rubric builder** — Per-checkpoint grading type selector (null/numeric/qualitative) integrated into `CheckpointListEditor`; `RubricCriteriaEditor` (add/remove/reorder criteria, weight sum validation must = 100%, strict validation on every save); `RubricLevelsEditor` (qualitative level configurator with label/score/description); edit warning dialog showing affected pending review count before saving rubric edits
+- **Rubric CRUD server functions** — `rubrics.ts` (Zod schemas with `superRefine` cross-field validation) + `rubrics.server.ts` (handlers: `saveRubricHandler` transactional create/update/soft-delete, `getRubricHandler`, `softDeleteCriterionHandler`, `softDeleteLevelHandler`, `countPendingReviewsHandler`); admin-only via `isAdmin` guard
+- **Instructor rubric scoring** — `RubricScoringSection` integrated into `ReviewForm` with numeric (Input 0–100) and qualitative (Select level→score) scoring modes; auto-computed weighted total; all criteria must be scored before submit; backward compatible (null grading_type = current pass/fail flow); `review_scores` persisted with full denormalized snapshot (criterionTitle, levelLabel, weight) freezing historical reviews
+- **Student rubric result view** — `RubricResultView` component on student checkpoint page showing per-criterion scores, level labels, instructor comments, and weighted total (frozen from review time); soft-deleted criteria visible via snapshot fields
+- **Rubric analytics** — Dedicated rubric analytics sections on both instructor and admin analytics dashboards; instructor sees avg score per criterion + pass/fail rates; admin sees cross-instructor criterion performance sorted by lowest avg score (weakness identification)
+- **CSV/Excel export** — `exportRubricScoresCsvHandler` (instructor-only, per-student criterion scores with CSV injection mitigation) + `exportRubricScoresToExcel` helper (client-side .xlsx with human-readable column headers)
+- **i18n** — 849 keys in both EN and ID locales across `rubrics.criteria`, `rubrics.levels`, `studentRubrics`, `instructorReviews.rubric`, `instructorAnalytics`, and `adminAnalytics` namespaces
+- **Tests** — 3,317 tests pass across 322 test files; coverage ≥80% on all thresholds (stmts 88.29%, branches 82.11%, funcs 84.12%, lines 88.94%)
+
+### Track: Proactive Deadline Reminder System (TRACK-021) (July 2026)
+
+- **Background scanner** — Hourly `processDeadlineReminders()` scans for student checkpoints approaching their due date and dispatches tiered reminders at 7-day, 3-day, and 1-day lead times (non-overlapping bands prevent multi-tier firing for the same checkpoint)
+- **Dedup tracking** — New `deadline_reminders` table with unique constraint `(checkpointId, tier)` ensures at-most-once delivery per tier per checkpoint, even across multiple server instances (`ON CONFLICT DO NOTHING`)
+- **Tiered notifications** — For each checkpoint due within a tier's band (state `unlocked` or `revise`), creates in-app notifications (with `getNotificationKeys`, params stringified) and enqueues advisory emails via `Promise.allSettled`
+- **Scanner integration** — Scanner hooked into the existing email-queue poller's `tick()` with hourly throttle (`REMINDER_SCAN_INTERVAL_MS`); failure isolated via `try/catch` (email processing unaffected)
+- **Email template** — `buildDeadlineReminderHtml` with assignment title, checkpoint name, due date, and deep-link CTA to the checkpoint page; `sendDeadlineReminderEmail` helper wrapper following the `review-email.ts` pattern
+- **Notification routing** — In-app `deadline_reminder` notifications are clickable, navigating to `/student/assignments/{assignmentId}/checkpoints/{checkpointId}`
+- **Index optimization** — New composite index `checkpoints_state_due_date_idx` on `(state, dueDate)` supports the scanner's `WHERE state IN (...) AND dueDate BETWEEN ...` query
+- **Email-queue enum extension** — Added `deadline_reminder` to `templateType` text enum (code-only, no `ALTER TYPE` migration)
+- **i18n** — New EN/ID keys for notification title/message (params: assignmentTitle, checkpointName, dueDate) and email subject
+- **Tests** — 3,110 tests pass across 310 test files; coverage ≥80% on all thresholds (statements 88.36%, branches 82%, functions 84.04%, lines 88.96%)
 
 </protect>

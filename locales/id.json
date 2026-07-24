@@ -74,7 +74,11 @@
     "nextPage": "Selanjutnya",
     "pageOf": "Halaman {current} dari {total}",
     "done": "Selesai",
-    "clearSearch": "Hapus pencarian"
+    "clearSearch": "Hapus pencarian",
+    "exportCsv": "Ekspor CSV",
+    "exportExcel": "Ekspor Excel",
+    "exportStudentProgress": "Ekspor Progres Siswa",
+    "exportReviewHistory": "Ekspor Riwayat Review"
   },
   "theme": {
     "light": "Mode Terang",
@@ -94,6 +98,7 @@
     "templates": "Templat",
     "auditLog": "Log Audit",
     "emailQueue": "Antrian Email",
+    "analytics": "Analitik",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
@@ -102,6 +107,7 @@
     "dashboard": "Dasbor",
     "assignments": "Tugas",
     "reviews": "Review",
+    "analytics": "Analitik",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
@@ -242,7 +248,11 @@
       "minConsPlaceholder": "0",
       "durationPlaceholder": "7",
       "minConsHint": "Konsultasi terverifikasi diperlukan sebelum pengumpulan",
-      "durationHint": "Hari yang dialokasikan untuk checkpoint ini"
+      "durationHint": "Hari yang dialokasikan untuk checkpoint ini",
+      "gradingType": "Jenis Penilaian",
+      "gradingTypeNone": "Tanpa Rubrik (Lulus/Revisi)",
+      "gradingTypeNumeric": "Numerik (0–100)",
+      "gradingTypeQualitative": "Level Kualitatif"
     },
     "actions": {
       "edit": "Ubah",
@@ -307,7 +317,13 @@
       "feedbackUploadFailed": "Gagal mengunggah file umpan balik",
       "notInSubmittedState": "Checkpoint harus berstatus diserahkan untuk dibuka peninjauannya"
     },
-    "reviewDateLabel": "Direview pada {date}"
+    "reviewDateLabel": "Direview pada {date}",
+    "rubric": {
+      "title": "Penilaian Rubrik",
+      "weightedTotal": "Total Terbobot",
+      "allCriteriaRequired": "Semua kriteria harus dinilai sebelum mengirim",
+      "selectLevel": "Pilih tingkat"
+    }
   },
   "instructorAssignments": {
     "title": "Tugas",
@@ -417,6 +433,10 @@
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
   },
+  "studentRubrics": {
+    "title": "Hasil Rubrik",
+    "weightedTotal": "Total Terbobot"
+  },
   "studentAssignments": {
     "title": "Tugas Saya",
     "subtitle": "Lihat dan lacak kemajuan tugas akademik yang diberikan kepada Anda.",
@@ -510,6 +530,59 @@
       "sent": "Terkirim",
       "failed": "Gagal"
     }
+  },
+  "adminAnalytics": {
+    "title": "Analitik",
+    "subtitle": "Dasbor analitik dan pelaporan sistem",
+    "verificationRate": "Tingkat Verifikasi Konsultasi",
+    "breachRate": "Tingkat Pelanggaran Tenggat",
+    "reviewsCompleted": "Review Selesai",
+    "statusDistribution": "Distribusi Status Tugas",
+    "submissionTrend": "Tren Volume Submission",
+    "reviewTrend": "Tren Volume Review",
+    "dauTrend": "Pengguna Aktif Harian",
+    "wauTrend": "Pengguna Aktif Mingguan",
+    "range7d": "7 Hari",
+    "range30d": "30 Hari",
+    "range90d": "90 Hari",
+    "rangeAll": "Semua Waktu",
+    "customStart": "Tanggal Mulai",
+    "customEnd": "Tanggal Akhir",
+    "date": "Tanggal",
+    "count": "Jumlah",
+    "activeUsers": "Pengguna Aktif",
+    "noData": "Tidak ada data tersedia",
+    "statusLocked": "Terkunci",
+    "statusUnlocked": "Terbuka",
+    "statusSubmitted": "Dikumpulkan",
+    "statusUnderReview": "Dalam Review",
+    "statusPassed": "Lulus",
+    "statusRevise": "Revisi",
+    "rubricTitle": "Analitik Rubrik",
+    "rubricCriterion": "Kriteria",
+    "rubricAvgScore": "Nilai Rata-rata",
+    "rubricPassRate": "Tingkat Kelulusan",
+    "rubricReviewCount": "Ulasan"
+  },
+  "instructorAnalytics": {
+    "title": "Analitik",
+    "subtitle": "Analitik performa pengajaran dan review Anda",
+    "reviewsCompleted": "Review Selesai",
+    "avgResponseTime": "Rata-rata Waktu Respons",
+    "slaBreachCount": "Pelanggaran SLA (>3 hari)",
+    "studentsSupervised": "Mahasiswa Bimbingan",
+    "assignmentsActive": "Tugas Aktif",
+    "range7d": "7 Hari",
+    "range30d": "30 Hari",
+    "range90d": "90 Hari",
+    "rangeAll": "Semua Waktu",
+    "customStart": "Tanggal Mulai",
+    "customEnd": "Tanggal Akhir",
+    "rubricTitle": "Analitik Rubrik",
+    "rubricCriterion": "Kriteria",
+    "rubricAvgScore": "Nilai Rata-rata",
+    "rubricPassRate": "Tingkat Kelulusan",
+    "rubricReviewCount": "Ulasan"
   },
   "files": {
     "dropzone": {
@@ -739,6 +812,10 @@
       "sla_breach": {
         "title": "Pelanggaran SLA",
         "message": "SLA ulasan untuk \"{checkpointName}\" di \"{assignmentTitle}\" milik {studentName} telah dilanggar selama {breachDays} hari."
+      },
+      "deadline_reminder": {
+        "title": "Pengingat Batas Waktu",
+        "message": "Checkpoint \"{checkpointName}\" pada \"{assignmentTitle}\" berakhir pada {dueDate}."
       }
     }
   },
@@ -754,7 +831,8 @@
       "consultationRejected": "Konsultasi Ditolak",
       "extensionApproved": "Perpanjangan Disetujui",
       "extensionRejected": "Perpanjangan Ditolak",
-      "extensionRequested": "Perpanjangan Diminta"
+      "extensionRequested": "Perpanjangan Diminta",
+      "deadlineReminder": "Pengingat Batas Waktu — {assignmentTitle}"
     }
   },
   "errors": {
@@ -963,6 +1041,35 @@
       "nextReview": "Peninjauan tertunda berikutnya",
       "prevReview": "Peninjauan tertunda sebelumnya",
       "notOnReviewPage": "(hanya tersedia di halaman tinjauan)"
+    }
+  },
+  "rubrics": {
+    "criteria": {
+      "loading": "Memuat rubrik...",
+      "loadError": "Gagal memuat rubrik",
+      "saveError": "Gagal menyimpan rubrik",
+      "saveSuccess": "Rubrik berhasil disimpan",
+      "titlePlaceholder": "Judul kriteria",
+      "descriptionPlaceholder": "Deskripsi (opsional)",
+      "weightLabel": "Bobot",
+      "add": "Tambah Kriteria",
+      "remove": "Hapus",
+      "moveUp": "Naik",
+      "moveDown": "Turun",
+      "weightSum": "Jumlah bobot: {sum}/100",
+      "save": "Simpan Rubrik",
+      "saving": "Menyimpan...",
+      "pendingReviewsTitle": "Ulasan Tertunda Terpengaruh",
+      "pendingReviewsWarning": "{count} ulasan tertunda akan terpengaruh oleh perubahan ini."
+    },
+    "levels": {
+      "add": "Tambah Level",
+      "remove": "Hapus",
+      "moveUp": "Naik",
+      "moveDown": "Turun",
+      "labelPlaceholder": "Label level",
+      "descriptionPlaceholder": "Deskripsi (opsional)",
+      "scoreLabel": "Skor"
     }
   }
 }

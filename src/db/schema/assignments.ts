@@ -10,7 +10,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users';
-import { assignmentTemplates } from './templates';
+import { assignmentTemplates, templateCheckpoints } from './templates';
 
 export const checkpointState = pgEnum('checkpoint_state', [
   'locked',
@@ -89,6 +89,9 @@ export const checkpoints = pgTable(
     dueDate: timestamp('due_date'),
     minConsultations: integer('min_consultations').default(0),
     state: checkpointState('state').notNull(),
+    templateCheckpointId: integer('template_checkpoint_id').references(
+      () => templateCheckpoints.id,
+    ),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
   },
@@ -96,5 +99,7 @@ export const checkpoints = pgTable(
     index('checkpoints_assignment_id_idx').on(table.assignmentId),
     index('checkpoints_student_id_idx').on(table.studentId),
     index('checkpoints_state_assignment_id_idx').on(table.state, table.assignmentId),
+    index('checkpoints_template_checkpoint_id_idx').on(table.templateCheckpointId),
+    index('checkpoints_state_due_date_idx').on(table.state, table.dueDate),
   ],
 );

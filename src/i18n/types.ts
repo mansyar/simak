@@ -80,6 +80,10 @@ export type Translation = {
     pageOf: string
     done: string
     clearSearch: string
+    exportCsv: string
+    exportExcel: string
+    exportStudentProgress: string
+    exportReviewHistory: string
   }
   theme: {
     light: string
@@ -99,6 +103,7 @@ export type Translation = {
     templates: string
     auditLog: string
     emailQueue: string
+    analytics: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -107,6 +112,7 @@ export type Translation = {
     dashboard: string
     assignments: string
     reviews: string
+    analytics: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -248,6 +254,10 @@ export type Translation = {
       durationPlaceholder: string
       minConsHint: string
       durationHint: string
+      gradingType: string
+      gradingTypeNone: string
+      gradingTypeNumeric: string
+      gradingTypeQualitative: string
     }
     actions: {
       edit: string
@@ -313,6 +323,12 @@ export type Translation = {
       notInSubmittedState: string
     }
     reviewDateLabel: string
+    rubric: {
+      title: string
+      weightedTotal: string
+      allCriteriaRequired: string
+      selectLevel: string
+    }
   }
   instructorAssignments: {
     title: string
@@ -422,6 +438,10 @@ export type Translation = {
     sectionMain: string
     sectionPreferences: string
   }
+  studentRubrics: {
+    title: string
+    weightedTotal: string
+  }
   studentAssignments: {
     title: string
     subtitle: string
@@ -515,6 +535,59 @@ export type Translation = {
       sent: string
       failed: string
     }
+  }
+  adminAnalytics: {
+    title: string
+    subtitle: string
+    verificationRate: string
+    breachRate: string
+    reviewsCompleted: string
+    statusDistribution: string
+    submissionTrend: string
+    reviewTrend: string
+    dauTrend: string
+    wauTrend: string
+    range7d: string
+    range30d: string
+    range90d: string
+    rangeAll: string
+    customStart: string
+    customEnd: string
+    date: string
+    count: string
+    activeUsers: string
+    noData: string
+    statusLocked: string
+    statusUnlocked: string
+    statusSubmitted: string
+    statusUnderReview: string
+    statusPassed: string
+    statusRevise: string
+    rubricTitle: string
+    rubricCriterion: string
+    rubricAvgScore: string
+    rubricPassRate: string
+    rubricReviewCount: string
+  }
+  instructorAnalytics: {
+    title: string
+    subtitle: string
+    reviewsCompleted: string
+    avgResponseTime: string
+    slaBreachCount: string
+    studentsSupervised: string
+    assignmentsActive: string
+    range7d: string
+    range30d: string
+    range90d: string
+    rangeAll: string
+    customStart: string
+    customEnd: string
+    rubricTitle: string
+    rubricCriterion: string
+    rubricAvgScore: string
+    rubricPassRate: string
+    rubricReviewCount: string
   }
   files: {
     dropzone: {
@@ -745,6 +818,10 @@ export type Translation = {
         title: string
         message: string
       }
+      deadline_reminder: {
+        title: string
+        message: string
+      }
     }
   }
   emails: {
@@ -760,6 +837,7 @@ export type Translation = {
       extensionApproved: string
       extensionRejected: string
       extensionRequested: string
+      deadlineReminder: string
     }
   }
   errors: {
@@ -968,6 +1046,35 @@ export type Translation = {
       nextReview: string
       prevReview: string
       notOnReviewPage: string
+    }
+  }
+  rubrics: {
+    criteria: {
+      loading: string
+      loadError: string
+      saveError: string
+      saveSuccess: string
+      titlePlaceholder: string
+      descriptionPlaceholder: string
+      weightLabel: string
+      add: string
+      remove: string
+      moveUp: string
+      moveDown: string
+      weightSum: string
+      save: string
+      saving: string
+      pendingReviewsTitle: string
+      pendingReviewsWarning: string
+    }
+    levels: {
+      add: string
+      remove: string
+      moveUp: string
+      moveDown: string
+      labelPlaceholder: string
+      descriptionPlaceholder: string
+      scoreLabel: string
     }
   }
 }

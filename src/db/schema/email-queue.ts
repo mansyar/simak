@@ -21,6 +21,7 @@ export const emailQueue = pgTable(
         'extension_approved',
         'extension_rejected',
         'extension_requested',
+        'deadline_reminder',
       ],
     }).notNull(),
     status: text('status', { enum: ['pending', 'processing', 'sent', 'failed'] }).notNull(),

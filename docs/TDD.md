@@ -59,7 +59,7 @@ Throughout this document, features are tagged as:
 │   ├── /instructor/assignments/new       → Assignment creation wizard [v1]
 │   ├── /instructor/assignments/$id       → Assignment detail (instructor view) [v1]
 │   ├── /instructor/reviews               → Review queue [v1]
-│   ├── /instructor/analytics             → Performance analytics [v2]
+│   ├── /instructor/analytics             → Instructor performance analytics [v1]
 │   └── /instructor/reports               → Report builder & history [v2]
 
 / (authenticated — admin)
@@ -71,7 +71,7 @@ Throughout this document, features are tagged as:
 │   ├── /admin/templates/$id              → Template editor [v1]
 │   ├── /admin/audit-log                  → Audit log viewer
 │   ├── /admin/email-queue                → Email queue inspector (paginated, filterable, retry failed) [v1]
-│   ├── /admin/analytics                  → System analytics [v2]
+│   ├── /admin/analytics                  → System analytics [v1]
 │   └── /admin/settings                   → System configuration [v2]
 
 / (unauthenticated)
@@ -107,7 +107,7 @@ simak/
 │   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton
 │   │   ├── instructor/
 │   │   │   └── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
-│   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js)
+│   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js), RubricScoringSection (instructor scoring UI), RubricResultView (student view)
 │   │   ├── consultations/    → Log form, consultation list, progress bar, verification queue item, verification dialog
 │   │   ├── files/            → File upload, preview, file list
 │   │   ├── notifications/    → Notification center, badge, notification-routes (type→route map)
@@ -129,6 +129,9 @@ simak/
 │   │   ├── notifications.server.ts → Server-only notification handlers
 │   │   ├── templates.ts      → Template CRUD
 │   │   ├── templates.server.ts → Server-only template handlers
+│   │   ├── rubrics.ts         → Rubric CRUD stubs + Zod schemas (saveRubric, getRubric, soft-delete)
+│   │   ├── rubrics.server.ts  → Server-only rubric handlers (criteria/levels CRUD, admin-only)
+│   │   ├── review-scores.server.ts → Review score validation + insertion helpers (validateReviewScores, insertReviewScores)
     │   │   ├── audit-logs.ts      → Audit log query stubs + Zod schemas
     │   │   ├── audit-logs.server.ts → Server-only audit log handlers
     │   │   ├── email-queue.ts      → Email queue inspector stubs (listEmailQueue, retryEmail) + Zod schemas + shared types
@@ -145,7 +148,11 @@ simak/
 │   │   ├── dashboard.server.ts → Re-exports from per-role handler files
 │   │   ├── dashboard-student.server.ts → Student dashboard handler
 │   │   ├── dashboard-instructor.server.ts → Instructor dashboard handler
-    │   │   └── dashboard-admin.server.ts → Admin dashboard handler
+    │   │   ├── dashboard-admin.server.ts → Admin dashboard handler
+    │   │   ├── analytics.ts          → Analytics stubs (admin/instructor data + CSV export) + Zod schemas
+    │   │   ├── analytics-admin.server.ts → Admin aggregate queries (verification rate, breach rate, trends, DAU/WAU)
+    │   │   ├── analytics-instructor.server.ts → Instructor-scoped metrics (response time, SLA breaches)
+    │   │   ├── analytics-export.server.ts → CSV export handlers (users, audit log, progress, review history)
     │   │   ├── bulk-import.ts      → Bulk import server fn stubs + Zod schemas (users, templates)
     │   │   └── bulk-import.server.ts → Server-only bulk import handlers (parse, validate, insert)
 │   ├── db/
@@ -157,12 +164,14 @@ simak/
 │   ├── i18n/                 → Translation init + locale detection
 │   ├── lib/
 │   │   ├── email.ts          → Resend client + `resolveEmailRecipient()` (returns `{email, locale}` or null for soft-deleted/unverified)
-    │   │   ├── email-templates.ts → 8 localized HTML template builders for event emails + shared header/footer helpers
-    │   │   ├── event-email.ts    → `enqueueEventEmail()` generic post-commit advisory email dispatch (never throws)
-    │   │   ├── submission-email.ts → `sendSubmissionReceivedEmail()` helper
-    │   │   ├── review-email.ts   → `sendReviewEmail()` helper (pass/revise)
-    │   │   ├── consultation-email.ts → `sendConsultationEmail()` helper (verified/rejected)
-    │   │   ├── extension-email.ts → `sendExtensionApprovedEmail()`, `sendExtensionRejectedEmail()`, `sendExtensionRequestedEmail()` helpers
+│   │   ├── email-templates.ts → 9 localized HTML template builders for event emails + shared header/footer helpers
+│   │   ├── event-email.ts    → `enqueueEventEmail()` generic post-commit advisory email dispatch (never throws; supports `subjectParams` for email subject interpolation)
+│   │   ├── submission-email.ts → `sendSubmissionReceivedEmail()` helper
+│   │   ├── review-email.ts   → `sendReviewEmail()` helper (pass/revise)
+│   │   ├── consultation-email.ts → `sendConsultationEmail()` helper (verified/rejected)
+│   │   ├── extension-email.ts → `sendExtensionApprovedEmail()`, `sendExtensionRejectedEmail()`, `sendExtensionRequestedEmail()` helpers
+│   │   ├── deadline-reminder-scanner.ts → `processDeadlineReminders()` — hourly background scanner for tiered deadline reminders (7d/3d/1d), dedup via `deadline_reminders` table
+│   │   ├── deadline-reminder-email.ts → `sendDeadlineReminderEmail()` helper (wraps `enqueueEventEmail` with `buildDeadlineReminderHtml`)
 │   │   ├── storage.ts        → R2 client
 │   │   ├── toast.ts          → Toast helpers (showSuccessToast, showErrorToast) — wraps sonner
 │   │   ├── route-utils.ts    → Role-based dashboard routing utility
@@ -210,6 +219,24 @@ Each role gets a dedicated dashboard page rendered within its role layout (`_stu
 Widget data is fetched via a single **aggregated server function** per role. Each handler verifies session + role, executes multiple Drizzle queries, and returns a pre-shaped payload. All widgets show appropriate empty states when no data is available.
 
 Query key: `['dashboard']` with role differentiation handled server-side.
+
+### Analytics & Reporting [v1] (Track: Analytics & Reporting)
+
+Role-based analytics dashboards complement (do not duplicate) the real-time operational dashboards. Dashboards show current snapshots; analytics show historical trends and NEW metrics over selectable date ranges.
+
+- **Routes:** `/admin/analytics` (admin/superadmin via `requireRole(['admin'])`) and `/instructor/analytics` (instructor via `requireRole(['instructor'])`). Both are linked from their role-specific sidebars (BarChart3 icon).
+- **Date range:** URL search params drive the range (`?range=7d|30d|90d|all`) with optional custom start/end. Routes use `validateSearch` + `loaderDeps` so URLs are shareable and back/forward navigation works. A shared `resolveDateRange` helper converts the range token into `{ dateFrom, dateTo }`, and a `dateCondition` helper builds the `WHERE created_at >= ?` SQL fragment.
+- **Server function split:** `src/server/analytics.ts` exports Zod schemas + `createServerFn` stubs (with `.inputValidator(Schema).handler(...)` builder pattern + dynamic imports). Three handler files:
+  - `analytics-admin.server.ts` — 8 parallel aggregate queries via `Promise.all` (consultation verification rate, deadline breach rate, assignment status distribution by checkpoint state, submission/review volume trends via `date_trunc`, reviews completed, DAU/WAU).
+  - `analytics-instructor.server.ts` — instructor-scoped queries (reviews completed, avg response time via `EXTRACT(EPOCH FROM reviewedAt - uploadedAt)`, SLA breach count where `EXTRACT(EPOCH FROM reviewedAt - uploadedAt) > 259200` (3 days), students supervised, assignments active).
+  - `analytics-export.server.ts` — 5 CSV export handlers (admin: users, audit log with date filtering, assignment progress; instructor: student progress, review history — both with ownership checks returning `NOT_FOUND` if the assignment is not owned).
+- **No new DB tables:** All metrics derive from aggregate queries (`GROUP BY`, `date_trunc`) over existing tables. No migrations required.
+- **CSV export:** Server function returns a CSV string; the client creates a `Blob` + `URL.createObjectURL` download (via `src/lib/download.ts` + `src/hooks/use-csv-download.ts` with loading/error state). CSV cell values are sanitized against formula injection (CWE-1236) — cells starting with `=`, `+`, `-`, `@`, TAB, or CR are prefixed with `'` (via `escapeCsvValue`).
+- **Excel export:** Client-side SheetJS (`src/lib/excel-export.ts`) generates `.xlsx` files via `xlsx.utils.book_new()` + `json_to_sheet()` + `write()`. Reuses the existing `xlsx` dependency (already used for bulk-import) — no new dependency. "Export Excel" buttons on both analytics pages.
+- **Export buttons on existing pages:** "Export CSV" buttons added to `/admin/users`, `/admin/audit-log`, and `/instructor/assignments/$id` (assignment progress / student progress / review history respectively).
+- **UI:** MetricCard grid + trend data tables + progress bars. No charting library — tables and progress bars only (defer Recharts unless visual charts are requested).
+- **i18n:** All labels/headers in both `locales/en.json` and `locales/id.json` (`analytics.*` + `analyticsInstructor.*` namespaces).
+- **Rubric analytics (Track: Rubric-Based Grading):** Instructor and admin analytics extended with rubric-level metrics — average score per criterion, criterion-level weakness analysis, and cross-instructor criterion performance comparison. CSV/Excel exports include per-student criterion scores. The Excel export path sanitizes string cells against formula injection (matching the CSV path's `escapeCsvValue` mitigation).
 
 ### Hybrid Navigation Pattern
 
@@ -309,8 +336,9 @@ All 9 user-initiated mutation sites where the predicted state is deterministic u
 **Notification** — in-app event log.
 **NotificationPreference** — per-user, per-event, per-channel toggle. [v2]
 **ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, the affected student's subsequent checkpoint `dueDate` values auto-extend. The assignment-wide `finalDeadline` is immutable after creation and never mutated by extensions.
+**DeadlineReminder** — dedup tracking table for proactive deadline reminders. Records `checkpointId` (FK, cascade delete), `studentId` (FK, cascade delete), `tier` (`'7d'`/`'3d'`/`'1d'`), and `sentAt`. Unique constraint on `(checkpointId, tier)` ensures at-most-once delivery per tier per checkpoint across multiple server instances. Used by the hourly background scanner (`processDeadlineReminders()`) to deduplicate via `INSERT ... ON CONFLICT DO NOTHING RETURNING *`.
 **AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v1] — admin viewer at `/admin/audit-log`.
-**EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, 2FA emails, SLA alerts, and **8 event notification types** (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested). Event emails are dispatched as post-commit advisory work via `enqueueEventEmail()` (`src/lib/event-email.ts`) alongside existing in-app notifications — the primary operation always succeeds even if enqueue fails. Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS. Admin queue inspector at `/admin/email-queue` provides observability — paginated list (20/page) with status filter, search (recipient email/subject), summary stats (pending/sent/failed), and manual retry of failed emails (idempotent: only `status='failed'` can be retried, resets to `pending` inside a `FOR UPDATE` transaction). Each row exposes a `resendMessageId` (populated from the Resend API `result.data.id` on successful send) displayed as a monospace truncated cell, enabling correlation with Resend's delivery dashboard. Processor sends emails in concurrent batches of 5 via `Promise.allSettled` (chunks run sequentially; partial failures don't abort the batch — cycle latency reduced from ~10× to ~2× single-send latency). Automatic retention cleanup prunes `sent` rows older than 90 days and `failed` rows older than 180 days on a tick-embedded 24-hour cycle (`lastPruneAt` timestamp in `email-queue-init.ts`); `pending`/`processing` rows are never deleted. Processor emits structured logs (`email_queue.cycle_start`, `email_queue.cycle_end`, `email_queue.reclaimed`, `email_queue.send_failed`, `email_queue.retention_pruned` — no PII). `EMAIL_FROM` is read from `getEnv().EMAIL_FROM` (Zod-validated in `src/config/env.ts` with default `'SIMAK <noreply@simak.app>'`).
+**EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, 2FA emails, SLA alerts, and **9 event notification types** (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, deadline reminder). Event emails are dispatched as post-commit advisory work via `enqueueEventEmail()` (`src/lib/event-email.ts`) alongside existing in-app notifications — the primary operation always succeeds even if enqueue fails. `enqueueEventEmail` supports optional `subjectParams` for interpolating dynamic values into email subjects (e.g., `{assignmentTitle}` in deadline reminder subjects). A proactive deadline reminder scanner (`processDeadlineReminders()` in `src/lib/deadline-reminder-scanner.ts`) runs hourly alongside the email queue processor — it queries checkpoints with upcoming due dates, dispatches tiered (7d/3d/1d) in-app notifications + emails, and uses a `deadline_reminders` dedup table with `ON CONFLICT DO NOTHING` for at-most-once delivery per tier per checkpoint. The dedup insert and notification creation are wrapped in a single `db.transaction` (atomicity); email dispatch runs post-commit via `Promise.allSettled` (advisory). Scanner failure is isolated via `try/catch` and does not affect email processing. Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS. Admin queue inspector at `/admin/email-queue` provides observability — paginated list (20/page) with status filter, search (recipient email/subject), summary stats (pending/sent/failed), and manual retry of failed emails (idempotent: only `status='failed'` can be retried, resets to `pending` inside a `FOR UPDATE` transaction). Each row exposes a `resendMessageId` (populated from the Resend API `result.data.id` on successful send) displayed as a monospace truncated cell, enabling correlation with Resend's delivery dashboard. Processor sends emails in concurrent batches of 5 via `Promise.allSettled` (chunks run sequentially; partial failures don't abort the batch — cycle latency reduced from ~10× to ~2× single-send latency). Automatic retention cleanup prunes `sent` rows older than 90 days and `failed` rows older than 180 days on a tick-embedded 24-hour cycle (`lastPruneAt` timestamp in `email-queue-init.ts`); `pending`/`processing` rows are never deleted. Processor emits structured logs (`email_queue.cycle_start`, `email_queue.cycle_end`, `email_queue.reclaimed`, `email_queue.send_failed`, `email_queue.retention_pruned` — no PII). `EMAIL_FROM` is read from `getEnv().EMAIL_FROM` (Zod-validated in `src/config/env.ts` with default `'SIMAK <noreply@simak.app>'`).
 **TwoFactor** — TOTP configuration (secret, backup codes) managed by Better Auth's `twoFactor` plugin.
 **Session** — Better-Auth session token, FK to users, expiresAt.
 **Account** — Better-Auth credential provider entry (stores hashed password).
@@ -419,7 +447,9 @@ All 9 user-initiated mutation sites where the predicted state is deterministic u
 | order             | integer, not null                   | Position in sequence                  |
 | minConsultations  | integer, default 0                  | Required for checkpoint unlock/submit |
 | estimatedDuration | integer, default 0                  | Days allotted for this checkpoint     |
+| gradingType       | pgEnum (grading_type), nullable     | `null` = no rubric (pass/fail only), `numeric` = direct 0–100 scoring per criterion, `qualitative` = level-based scoring (Track: Rubric-Based Grading) |
 | createdAt         | timestamp                           |                                       |
+| deletedAt         | timestamp                           | Soft delete (Track: Rubric-Based Grading) |
 
 #### assignments
 
@@ -455,6 +485,7 @@ _Note: Each row represents one student's individual participation. Group assignm
 | id               | serial (PK)                |                                                                             |
 | assignmentId     | integer (FK → assignments) |                                                                             |
 | studentId        | text (FK → users)          | Per-student checkpoint state (independent progress per student)             |
+| templateCheckpointId | integer (FK → template_checkpoints), nullable | Links per-student checkpoint to its template checkpoint for rubric lookup. Backfilled via `assignments.templateId + order` matching at migration time (Track: Rubric-Based Grading) |
 | name             | text, not null             | Copied from template                                                        |
 | order            | integer, not null          |                                                                             |
 | dueDate          | timestamp                  | Per-checkpoint deadline (auto-calculated from template `estimatedDuration`) |
@@ -495,6 +526,53 @@ _Note: Each row represents one student's individual participation. Group assignm
 | reviewedAt       | timestamp                          | When instructor submitted the review (for SLA calculation) |
 
 > **Atomic review submission (Track: review-atomic_20260704):** `submitReviewHandler` (`src/server/reviews.server.ts`) wraps the checkpoint state read, ownership validation, review insert, checkpoint state mutation, next-checkpoint unlock, SLA adjustment, and in-app notification inserts in a single `db.transaction(async (tx) => { ... })` block. The checkpoint row is locked with `FOR UPDATE OF checkpoints` and re-validated against `REVIEWABLE_STATES` post-lock. All error returns occur before any writes (safe empty-commit pattern). Post-commit advisory work (audit logging, SLA breach notifications) runs after the transaction commits, wrapped in try/catch. This follows SQL style guide §6.
+
+> **Rubric score validation (Track: Rubric-Based Grading):** For checkpoints with a rubric (`grading_type` is not `null`), `validateReviewScores` runs **before** the review INSERT (inside the transaction) — checking that all current criteria are scored, no duplicates exist, and `rubricLevelId` values belong to the correct rubric. Only after validation passes does the review INSERT execute with `.returning({ id: reviews.id })` (capturing the generated ID directly — no separate SELECT-after-INSERT per SQL styleguide §6.3). `insertReviewScores` then writes the denormalized snapshot rows using the captured `review.id`. This prevents the orphaned-review bug where a score-validation failure after the INSERT would commit the review row without transitioning the checkpoint.
+
+#### rubric_criteria
+
+| Column              | Type                                | Notes                                              |
+| ------------------- | ----------------------------------- | -------------------------------------------------- |
+| id                  | serial (PK)                         |                                                    |
+| templateCheckpointId| integer (FK → template_checkpoints) | Which checkpoint this criterion belongs to         |
+| title               | text, not null                      | Criterion title (e.g. "Content Quality")           |
+| description         | text                                | What this criterion evaluates                      |
+| weight              | integer, not null                   | 0–100 (CHECK constraint). Weights must sum to 100% (enforced at Zod application layer — spans multiple rows) |
+| order               | integer, not null                   | Display order                                      |
+| createdAt           | timestamp                           |                                                    |
+| updatedAt           | timestamp                           |                                                    |
+| deletedAt           | timestamp                           | Soft delete — never hard-deleted (preserves FK integrity for `review_scores` snapshots) |
+
+#### rubric_levels
+
+| Column              | Type                                | Notes                                              |
+| ------------------- | ----------------------------------- | -------------------------------------------------- |
+| id                  | serial (PK)                         |                                                    |
+| templateCheckpointId| integer (FK → template_checkpoints) | Shared across all criteria in this checkpoint (v1)  |
+| label               | text, not null                      | e.g. "Below Expectations", "Meets", "Exceeds"      |
+| description         | text                                | What this level means                              |
+| score               | integer, not null                   | 0–100 (CHECK constraint). Numeric mapping for qualitative grading |
+| order               | integer, not null                   | Display order                                      |
+| createdAt           | timestamp                           |                                                    |
+| updatedAt           | timestamp                           |                                                    |
+| deletedAt           | timestamp                           | Soft delete — never hard-deleted                   |
+
+#### review_scores
+
+| Column        | Type                                | Notes                                                                   |
+| ------------- | ----------------------------------- | ----------------------------------------------------------------------- |
+| id            | serial (PK)                         |                                                                         |
+| reviewId      | integer (FK → reviews)              | The review this score belongs to                                       |
+| criterionId   | integer (FK → rubric_criteria)     | NOT NULL — which criterion was scored                                   |
+| criterionTitle| text, not null                      | Denormalized snapshot — preserved even if criterion is soft-deleted    |
+| score         | integer, not null                   | 0–100 (CHECK constraint). Denormalized snapshot                         |
+| weight        | integer, not null                   | 0–100. Denormalized snapshot of criterion weight at review time         |
+| rubricLevelId | integer (FK → rubric_levels)        | NULLABLE — set only for qualitative grading                             |
+| levelLabel    | text                                | NULLABLE — denormalized snapshot of level label                         |
+| comment       | text                                | NULLABLE — per-criterion instructor comment                            |
+| createdAt     | timestamp                           |                                                                         |
+
+> **Denormalized snapshot (Track: Rubric-Based Grading):** `review_scores` stores a full denormalized snapshot (`criterionTitle`, `levelLabel`, `score`, `weight`) so completed reviews are unaffected by later rubric edits. If an admin soft-deletes a criterion or changes its title/weight, historical reviews retain their original snapshot values. The rubric is looked up live from the template at review time via `checkpoints.templateCheckpointId → template_checkpoints → rubric_criteria/rubric_levels`; only at persistence time is the snapshot captured.
 
 #### consultations
 
@@ -586,13 +664,29 @@ Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for t
 | recipientEmail | text, not null     |                                                                 |
 | subject        | text, not null     |                                                                 |
 | bodyHtml       | text, not null     |                                                                 |
-| templateType   | text, not null     | `password_reset` \| `invitation` \| `sla_alert` \| `two_factor` \| `submission_received` \| `review_completed` \| `revision_requested` \| `consultation_verified` \| `consultation_rejected` \| `extension_approved` \| `extension_rejected` \| `extension_requested` (12 values — 4 original + 8 event types added in TRACK-018) |
+| templateType   | text, not null     | `password_reset` \| `invitation` \| `sla_alert` \| `two_factor` \| `submission_received` \| `review_completed` \| `revision_requested` \| `consultation_verified` \| `consultation_rejected` \| `extension_approved` \| `extension_rejected` \| `extension_requested` \| `deadline_reminder` (13 values — 4 original + 9 event types; `deadline_reminder` added in TRACK-021) |
 | status         | text, not null     | `pending` \| `processing` \| `sent` \| `failed`                 |
 | attempts       | integer, default 0 |                                                                 |
 | lastAttemptAt  | timestamp          | NULLABLE                                                        |
 | errorMessage   | text               | NULLABLE — last failure reason                                  |
 | resendMessageId | text             | NULLABLE — Resend API message ID for delivery correlation (TRACK-016) |
 | createdAt      | timestamp          | DEFAULT NOW()                                                   |
+
+#### deadline_reminders
+
+| Column       | Type                       | Notes                                                             |
+| ------------ | -------------------------- | ----------------------------------------------------------------- |
+| id           | serial (PK)                |                                                                   |
+| checkpointId | integer (FK → checkpoints) | `onDelete: cascade`                                               |
+| studentId    | text (FK → users)          | `onDelete: cascade`                                               |
+| tier         | text, not null             | `'7d'` \| `'3d'` \| `'1d'` — reminder lead time                   |
+| sentAt       | timestamp                  | DEFAULT NOW()                                                      |
+
+Unique constraint on `(checkpointId, tier)` — guarantees at-most-once delivery per tier per checkpoint across multiple server instances. The scanner uses `INSERT ... ON CONFLICT (checkpointId, tier) DO NOTHING RETURNING *` to atomically deduplicate — only winning inserts (where this instance won the race) proceed to notification creation and email dispatch.
+
+Composite index `checkpoints_state_due_date_idx` on `checkpoints (state, dueDate)` — supports the scanner's WHERE `state IN ('unlocked', 'revise') AND dueDate BETWEEN ...` query (added in TRACK-021; no existing index covered `dueDate`).
+
+> **Transactional write boundary (Track: Proactive Deadline Reminder System):** The `processDeadlineReminders()` scanner in `src/lib/deadline-reminder-scanner.ts` wraps the dedup INSERT (into `deadline_reminders`) and the batch notification INSERT (into `notifications`) in a single `db.transaction(async (tx) => { ... })`. If the notification insert fails, the dedup row is rolled back, allowing the tier to retry on the next hourly scan. Email dispatch runs **post-commit** via `Promise.allSettled` (advisory — never throws, following SQL styleguide §6.4). This follows the same transactional pattern as `requestExtensionHandler` (extension request + notification inserts in one transaction).
 
 #### upload_intents
 
@@ -637,8 +731,10 @@ Index on `(created_at DESC)` for time-ordered queries. Index on `(action)` for t
 | `email_queue`        | `status`                 | b-tree           | Pick pending emails for delivery             |
 | `upload_intents`     | `fileKey`                | b-tree (unique)  | Intent lookup at submit time                 |
 | `upload_intents`     | `userId`                 | b-tree           | User's pending upload intents                 |
+| `checkpoints`        | `templateCheckpointId`  | b-tree           | Rubric lookup via FK join (TRACK-020)         |
+| `review_scores`      | `criterionId`           | b-tree           | Analytics queries joining on criterion (TRACK-020) |
 
-All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
+All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Migrations `0010`–`0012` (TRACK-020) added rubric tables (`rubric_criteria`, `rubric_levels`, `review_scores`), `grading_type` pgEnum, `checkpoints.templateCheckpointId` FK + backfill, `template_checkpoints.deletedAt`, and the two rubric-related indexes. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
 
 ---
 
@@ -671,7 +767,7 @@ Admin       (creates Instructors and Students)
 | View own progress                   | —          | —     | —          | ✓       |
 | View all progress                   | —          | —     | ✓          | —       |
 | List students (assignment creation) | —          | —     | ✓          | —       |
-| View system analytics               | —          | —     | —          | —       |
+| View system analytics               | ✓          | ✓     | —          | —       |
 | Read audit logs                     | ✓          | ✓     | —          | —       |
 
 ### User Registration Flow [v1]
@@ -852,8 +948,8 @@ A checkpoint unlocks when:
 
 ### Email Delivery
 
-- Sent via Resend API. [v1] for all email types — auth-related emails (invitations, password reset, 2FA enable/disable), SLA alerts, and **8 event notification types** (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested). Event emails are dispatched as **post-commit advisory work** alongside existing in-app notifications via `enqueueEventEmail()` (`src/lib/event-email.ts`) — the primary operation always succeeds even if email enqueue fails. HTML templates are built by domain-specific helper functions in `src/lib/email-templates.ts` (8 builders + shared header/footer). Recipients with no verified email or soft-deleted accounts are silently skipped via `resolveEmailRecipient()` in `src/lib/email.ts`.
-- **Localized email subjects:** Password reset, invitation, SLA alert, and all 8 event notification subjects are resolved from i18n keys (`emails.subjects.*`) using the recipient's `locale` preference via a shared server-side resolver. Event email subjects are prefixed with `[SIMAK]` (e.g., `[SIMAK] New Submission Received`).
+- Sent via Resend API. [v1] for all email types — auth-related emails (invitations, password reset, 2FA enable/disable), SLA alerts, and **9 event notification types** (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, deadline reminder). Event emails are dispatched as **post-commit advisory work** alongside existing in-app notifications via `enqueueEventEmail()` (`src/lib/event-email.ts`) — the primary operation always succeeds even if email enqueue fails. HTML templates are built by domain-specific helper functions in `src/lib/email-templates.ts` (9 builders + shared header/footer). Recipients with no verified email or soft-deleted accounts are silently skipped via `resolveEmailRecipient()` in `src/lib/email.ts`.
+- **Localized email subjects:** Password reset, invitation, SLA alert, and all 9 event notification subjects are resolved from i18n keys (`emails.subjects.*`) using the recipient's `locale` preference via a shared server-side resolver. Event email subjects are prefixed with `[SIMAK]` (e.g., `[SIMAK] New Submission Received`). Subjects support parameter interpolation (e.g., `{assignmentTitle}` in the deadline reminder subject) via optional `subjectParams` on `enqueueEventEmail`.
 - Email queue (`email_queue` table) with retry logic: 3 attempts with exponential backoff (30s, 5min, 30min).
 - Dead letter after 3 failed attempts (logged, not retried).
 - **Concurrent batch sends:** The processor sends emails in chunks of 5 via `Promise.allSettled` (chunks run sequentially). Each email's success/failure is handled individually in the settled callback (same UPDATE logic). Partial failures don't abort the batch. Cycle latency reduced from ~10× to ~2× single-send latency for a full batch of 10 (TRACK-016, PERF-32/33).
@@ -1002,7 +1098,7 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 | Dashboard              | SSR for initial data, client revalidation for real-time updates. |
 | Assignment detail      | SSR for checkpoint list.                                         |
 | File management        | Client-rendered (heavily interactive).                           |
-| Analytics              | SSR skeleton + client hydrate (charts need JS).                  |
+| Analytics              | SSR for initial aggregate data (MetricCard grid + trend tables). |
 
 ### Vite Optimizations [v1]
 
@@ -1178,6 +1274,7 @@ Server functions whose output crosses the network boundary to a route loader dec
 | Assignment template CRUD                                               | ✓        |               |
 | Assignment creation with student selection                             | ✓        |               |
 | Checkpoint submission (sequential, pass/revise)                        | ✓        |               |
+| Rubric-based grading & evaluation (criteria, levels, weighted scores)   | ✓        |               |
 | File upload to R2 (single student)                                     | ✓        |               |
 | File preview (PDF) and download                                        | ✓        |               |
 | In-app notification center                                             | ✓        |               |
@@ -1191,8 +1288,9 @@ Server functions whose output crosses the network boundary to a route loader dec
 | Email notifications (event alerts: submission, review, deadline, consultation, extension) | ✓        |             |
 | Push notifications (Web Push)                                          |          | ✓             |
 | Notification preferences                                               |          | ✓             |
-| Analytics dashboards                                                   |          | ✓             |
-| Reports with scheduling and export                                     |          | ✓             |
+| Analytics dashboards (admin + instructor)                              | ✓        |               |
+| Report export (CSV + Excel)                                            | ✓        |               |
+| Scheduled/PDF report delivery                                          |          | ✓             |
 | Deadline extension workflow                                            | ✓        |               |
 | Audit logging                                                          | ✓        |               |
 | Integration tests                                                      |          | ✓             |
