@@ -1,12 +1,30 @@
 import { useI18n } from '../../routes/__root';
 import type { TranslationKey } from '../../i18n/index';
 import { Link } from '@tanstack/react-router';
-import { ClipboardList, ClipboardCheck, FileText, ArrowRight, Users, BookOpen } from 'lucide-react';
+import {
+  ClipboardList,
+  ClipboardCheck,
+  FileText,
+  ArrowRight,
+  Users,
+  BookOpen,
+  AlertTriangle,
+} from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { MetricCard } from '@/components/ui/metric-card';
 import { SLABadge } from '@/components/reviews/SLABadge';
+import type { RiskLevel, RiskFactor } from '@/lib/risk-scoring';
+
+export interface AtRiskStudentEntry {
+  studentName: string;
+  studentId: string;
+  assignmentTitle: string;
+  assignmentId: number;
+  riskLevel: RiskLevel;
+  factors: RiskFactor[];
+}
 
 interface PendingReviewItem {
   submissionId: number;
@@ -39,6 +57,7 @@ export interface InstructorDashboardData {
   pendingReviewItems: PendingReviewItem[];
   recentSubmissions: RecentSubmission[];
   assignments: AssignmentOverview[];
+  atRiskStudents: AtRiskStudentEntry[];
   error?: string;
 }
 
@@ -69,6 +88,28 @@ function getStatusBadgeText(status: string, t: (key: TranslationKey) => string) 
       return t('studentAssignments.status.passed');
     default:
       return t('studentAssignments.status.revise');
+  }
+}
+
+function getRiskBadgeVariant(level: RiskLevel) {
+  switch (level) {
+    case 'high':
+      return 'destructive' as const;
+    case 'medium':
+      return 'warning' as const;
+    default:
+      return 'info' as const;
+  }
+}
+
+function getRiskLevelText(level: RiskLevel, t: (key: TranslationKey) => string) {
+  switch (level) {
+    case 'high':
+      return t('instructorDashboard.atRisk.levels.high');
+    case 'medium':
+      return t('instructorDashboard.atRisk.levels.medium');
+    default:
+      return t('instructorDashboard.atRisk.levels.low');
   }
 }
 
@@ -156,6 +197,53 @@ export function InstructorDashboard({ data }: Props) {
                   {t('common.viewAll')}
                 </Link>
               )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* At-Risk Students */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('instructorDashboard.atRisk.title')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {d.atRiskStudents.length === 0 ? (
+            <EmptyState
+              icon={AlertTriangle}
+              title={t('instructorDashboard.atRisk.empty')}
+              description=""
+            />
+          ) : (
+            <div className="space-y-2">
+              {d.atRiskStudents.map((student) => (
+                <Link
+                  key={`${student.studentId}-${student.assignmentId}`}
+                  to={`/instructor/assignments/${student.assignmentId}` as never}
+                  className="block rounded-lg border p-3 hover:bg-accent/50 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {student.studentName}
+                    </p>
+                    <Badge variant={getRiskBadgeVariant(student.riskLevel)}>
+                      {getRiskLevelText(student.riskLevel, t)}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {student.assignmentTitle}
+                  </p>
+                  {student.factors.length > 0 && (
+                    <ul className="mt-2 space-y-1">
+                      {student.factors.map((factor, idx) => (
+                        <li key={`${factor.type}-${idx}`} className="text-xs text-muted-foreground">
+                          {factor.description}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Link>
+              ))}
             </div>
           )}
         </CardContent>

@@ -500,7 +500,16 @@
     "reviewQueueDesc": "Review pending student submissions",
     "manageAssignments": "Manage Assignments",
     "manageAssignmentsDesc": "Create and manage your assignments",
-    "pendingCount": "{count} pending"
+    "pendingCount": "{count} pending",
+    "atRisk": {
+      "title": "At-Risk Students",
+      "empty": "No students at risk",
+      "levels": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      }
+    }
   },
   "adminDashboard": {
     "title": "Dashboard",
@@ -816,6 +825,10 @@
       "deadline_reminder": {
         "title": "Deadline Reminder",
         "message": "Your checkpoint \"{checkpointName}\" in \"{assignmentTitle}\" is due on {dueDate}."
+      },
+      "student_at_risk": {
+        "title": "Student At Risk",
+        "message": "Student {studentName} in \"{assignmentTitle}\" is at {riskLevel} risk. Factors: {riskFactors}"
       }
     }
   },
@@ -832,7 +845,8 @@
       "extensionApproved": "Extension Approved",
       "extensionRejected": "Extension Rejected",
       "extensionRequested": "Extension Requested",
-      "deadlineReminder": "Deadline Reminder — {assignmentTitle}"
+      "deadlineReminder": "Deadline Reminder — {assignmentTitle}",
+      "studentAtRisk": "Student At Risk — {assignmentTitle}"
     }
   },
   "errors": {

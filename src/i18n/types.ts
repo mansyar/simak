@@ -506,6 +506,15 @@ export type Translation = {
     manageAssignments: string
     manageAssignmentsDesc: string
     pendingCount: string
+    atRisk: {
+      title: string
+      empty: string
+      levels: {
+        high: string
+        medium: string
+        low: string
+      }
+    }
   }
   adminDashboard: {
     title: string
@@ -822,6 +831,10 @@ export type Translation = {
         title: string
         message: string
       }
+      student_at_risk: {
+        title: string
+        message: string
+      }
     }
   }
   emails: {
@@ -838,6 +851,7 @@ export type Translation = {
       extensionRejected: string
       extensionRequested: string
       deadlineReminder: string
+      studentAtRisk: string
     }
   }
   errors: {

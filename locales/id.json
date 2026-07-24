@@ -500,7 +500,16 @@
     "reviewQueueDesc": "Review pengumpulan mahasiswa yang tertunda",
     "manageAssignments": "Kelola Tugas",
     "manageAssignmentsDesc": "Buat dan kelola tugas Anda",
-    "pendingCount": "{count} tertunda"
+    "pendingCount": "{count} tertunda",
+    "atRisk": {
+      "title": "Mahasiswa Berisiko",
+      "empty": "Tidak ada mahasiswa berisiko",
+      "levels": {
+        "high": "Tinggi",
+        "medium": "Sedang",
+        "low": "Rendah"
+      }
+    }
   },
   "adminDashboard": {
     "title": "Dasbor",
@@ -816,6 +825,10 @@
       "deadline_reminder": {
         "title": "Pengingat Batas Waktu",
         "message": "Checkpoint \"{checkpointName}\" pada \"{assignmentTitle}\" berakhir pada {dueDate}."
+      },
+      "student_at_risk": {
+        "title": "Mahasiswa Berisiko",
+        "message": "Mahasiswa {studentName} pada \"{assignmentTitle}\" berisiko {riskLevel}. Faktor: {riskFactors}"
       }
     }
   },
@@ -832,7 +845,8 @@
       "extensionApproved": "Perpanjangan Disetujui",
       "extensionRejected": "Perpanjangan Ditolak",
       "extensionRequested": "Perpanjangan Diminta",
-      "deadlineReminder": "Pengingat Batas Waktu — {assignmentTitle}"
+      "deadlineReminder": "Pengingat Batas Waktu — {assignmentTitle}",
+      "studentAtRisk": "Mahasiswa Berisiko — {assignmentTitle}"
     }
   },
   "errors": {
