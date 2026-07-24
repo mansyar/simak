@@ -126,16 +126,16 @@
     - [x] Add `'student_at_risk'` to `templateType` array in `email-queue.ts` (code-only)
     - [x] Run `pnpm test` — confirm tests pass
 
-- [ ] Task: Write tests for notification routes + GROUP_CONFIGS (Red)
-    - [ ] Extend `tests/unit/lib/notification-routes.test.ts` (or mirror path)
-    - [ ] Test `student_at_risk` route derives `/instructor/assignments/${meta.assignmentId}`
-    - [ ] Test `student_at_risk` added to `system` group in `GROUP_CONFIGS`
-    - [ ] Run `pnpm test` — confirm tests fail as expected
+- [x] Task: Write tests for notification routes + GROUP_CONFIGS (Red) [commit: 511581f]
+    - [x] Extend `tests/unit/lib/notification-routes.test.ts` (or mirror path)
+    - [x] Test `student_at_risk` route derives `/instructor/assignments/${meta.assignmentId}`
+    - [x] Test `student_at_risk` added to `system` group in `GROUP_CONFIGS`
+    - [x] Run `pnpm test` — confirm tests fail as expected
 
-- [ ] Task: Implement notification routes + GROUP_CONFIGS (Green)
-    - [ ] Extend `notification-routes.ts` `getNotificationRoute()` with `case 'student_at_risk':` returning `/instructor/assignments/${meta.assignmentId}`
-    - [ ] Add `student_at_risk` to `system` group in `GROUP_CONFIGS` (`NotificationCenter.tsx`)
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Implement notification routes + GROUP_CONFIGS (Green) [commit: 511581f]
+    - [x] Extend `notification-routes.ts` `getNotificationRoute()` with `case 'student_at_risk':` returning `/instructor/assignments/${meta.assignmentId}`
+    - [x] Add `student_at_risk` to `system` group in `GROUP_CONFIGS` (`NotificationCenter.tsx`)
+    - [x] Run `pnpm test` — confirm tests pass
 
 - [ ] Task: Write tests for dashboard widget (Red)
     - [ ] Create `tests/unit/routes/_authenticated/instructor/dashboard.test.tsx` (or mirror path)
