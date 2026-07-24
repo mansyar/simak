@@ -9,18 +9,18 @@
     - [x] Export the `computeStudentRisk` function signature (stub returning `{ level: 'low', factors: [] }`)
     - [x] Run `pnpm typecheck` — verify types compile
 
-- [ ] Task: Write unit tests for `computeStudentRisk` (Red)
-    - [ ] Create `tests/unit/lib/risk-scoring.test.ts`
-    - [ ] Test signal 1 (overdue checkpoint → High, student_inaction)
-    - [ ] Test signal 2 (approaching deadline, no submission → Medium, student_inaction)
-    - [ ] Test signal 3 (insufficient consultations → Medium, student_inaction)
-    - [ ] Test signal 4 (repeated revise ≥ 2 → Medium, student_inaction)
-    - [ ] Test signal 5 (SLA stall > 3 days → Low, pending_review)
-    - [ ] Test multi-factor aggregation (2+ active signals → highest severity, all factors listed)
-    - [ ] Test no-risk student (all checkpoints passed → level: 'low', empty factors[])
-    - [ ] Run `pnpm test` — confirm tests fail as expected
+- [x] Task: Write unit tests for `computeStudentRisk` (Red) [14e175c]
+    - [x] Create `tests/unit/lib/risk-scoring.test.ts`
+    - [x] Test signal 1 (overdue checkpoint → High, student_inaction)
+    - [x] Test signal 2 (approaching deadline, no submission → Medium, student_inaction)
+    - [x] Test signal 3 (insufficient consultations → Medium, student_inaction)
+    - [x] Test signal 4 (repeated revise ≥ 2 → Medium, student_inaction)
+    - [x] Test signal 5 (SLA stall > 3 days → Low, pending_review)
+    - [x] Test multi-factor aggregation (2+ active signals → highest severity, all factors listed)
+    - [x] Test no-risk student (all checkpoints passed → level: 'low', empty factors[])
+    - [x] Run `pnpm test` — confirm tests fail as expected
 
-- [ ] Task: Implement `computeStudentRisk` function (Green)
+- [~] Task: Implement `computeStudentRisk` function (Green)
     - [ ] Implement all 5 signal checks with thresholds
     - [ ] Implement severity escalation (overall level = highest active signal)
     - [ ] Implement category labeling (signals 1-4 = student_inaction, signal 5 = pending_review)
