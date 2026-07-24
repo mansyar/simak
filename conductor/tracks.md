@@ -8,8 +8,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: TRACK-022: User Notification Preferences**
-*Link: [./tracks/user-notification-preferences_20260723/](./tracks/user-notification-preferences_20260723/)*
-
----
-
