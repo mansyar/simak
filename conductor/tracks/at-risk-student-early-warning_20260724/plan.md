@@ -1,7 +1,9 @@
+<protect>
 # Implementation Plan: At-Risk Student Identification & Early Warning System
 
 ## Phase 1: Risk Scoring Engine
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
 - [ ] Task: Define risk scoring types and interfaces
     - [ ] Create `src/lib/risk-scoring.ts` with type definitions: `RiskLevel`, `RiskCategory`, `RiskFactor`, `StudentRiskInput`, `RiskAssessment`
     - [ ] Export the `computeStudentRisk` function signature (stub returning `{ level: 'low', factors: [] }`)
@@ -29,6 +31,7 @@
 
 ## Phase 2: Dashboard Integration + Event-Driven Alerts + Scanner Integration
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
 - [ ] Task: Write tests for instructor dashboard handler extension (Red)
     - [ ] Extend `tests/unit/server/dashboard-instructor.test.ts` (or mirror path)
     - [ ] Test at-risk list populated correctly from batch query
@@ -99,6 +102,7 @@
 
 ## Phase 3: UI, Email & i18n
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
 - [ ] Task: Write tests for email template (Red)
     - [ ] Create/extend `tests/unit/lib/email-templates.test.ts`
     - [ ] Test `buildStudentAtRiskHtml` renders in both EN and ID locales
@@ -152,3 +156,4 @@
     - [ ] Verify all files under 500 lines
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: UI, Email & i18n' (Protocol in workflow.md)
+</protect>

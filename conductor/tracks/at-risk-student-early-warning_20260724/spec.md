@@ -1,3 +1,4 @@
+<protect>
 # Track: At-Risk Student Identification & Early Warning System
 
 ## Overview
@@ -141,3 +142,4 @@ Feature
 - Inline actions in at-risk widget (no "extend deadline" or "message student" buttons).
 - Admin drill-down to individual at-risk students (v1 is aggregate counts only).
 - Risk-based prioritization of TRACK-021 deadline reminders (v2).
+</protect>
