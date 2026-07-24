@@ -31,38 +31,38 @@
 
 ## Phase 2: Dashboard Integration + Event-Driven Alerts + Scanner Integration
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
-- [ ] Task: Write tests for instructor dashboard handler extension (Red)
-    - [ ] Extend `tests/unit/server/dashboard-instructor.test.ts` (or mirror path)
-    - [ ] Test at-risk list populated correctly from batch query
-    - [ ] Test sorted by severity (high → medium → low)
-    - [ ] Test `passed`/`locked` checkpoints excluded
-    - [ ] Test empty when no risk
-    - [ ] Run `pnpm test` — confirm tests fail as expected
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+- [x] Task: Write tests for instructor dashboard handler extension (Red) [1eaa022]
+    - [x] Extend `tests/unit/server/dashboard-instructor.test.ts` (or mirror path)
+    - [x] Test at-risk list populated correctly from batch query
+    - [x] Test sorted by severity (high → medium → low)
+    - [x] Test `passed`/`locked` checkpoints excluded
+    - [x] Test empty when no risk
+    - [x] Run `pnpm test` — confirm tests fail as expected
 
-- [ ] Task: Implement instructor dashboard handler extension (Green)
-    - [ ] Extend `getInstructorDashboardDataHandler` with batch join query (checkpoints + assignments + assignment_students + users + consultations + submissions + reviews)
-    - [ ] Filter to states `('unlocked','revise','under_review','submitted')`
-    - [ ] Pass per-student data to `computeStudentRisk`
-    - [ ] Add `atRiskStudents` to response (level ≥ low, sorted high→medium→low)
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Implement instructor dashboard handler extension (Green) [1eaa022]
+    - [x] Extend `getInstructorDashboardDataHandler` with batch join query (checkpoints + assignments + assignment_students + users + consultations + submissions + reviews)
+    - [x] Filter to states `('unlocked','revise','under_review','submitted')`
+    - [x] Pass per-student data to `computeStudentRisk`
+    - [x] Add `atRiskStudents` to response (level ≥ low, sorted high→medium→low)
+    - [x] Run `pnpm test` — confirm tests pass
 
-- [ ] Task: Write tests for `risk-alerts.ts` (Red)
-    - [ ] Create `tests/unit/lib/risk-alerts.test.ts`
-    - [ ] Test fires when risk ≥ medium
-    - [ ] Test skips when risk = low
-    - [ ] Test dedup skips when notification exists within 7 days
-    - [ ] Test advisory try/catch doesn't throw
-    - [ ] Test `Promise.allSettled` for parallel notification + email
-    - [ ] Run `pnpm test` — confirm tests fail as expected
+- [x] Task: Write tests for `risk-alerts.ts` (Red) [6e0de47]
+    - [x] Create `tests/unit/lib/risk-alerts.test.ts`
+    - [x] Test fires when risk ≥ medium
+    - [x] Test skips when risk = low
+    - [x] Test dedup skips when notification exists within 7 days
+    - [x] Test advisory try/catch doesn't throw
+    - [x] Test `Promise.allSettled` for parallel notification + email
+    - [x] Run `pnpm test` — confirm tests fail as expected
 
-- [ ] Task: Implement `risk-alerts.ts` (Green)
-    - [ ] Create `src/lib/risk-alerts.ts` with `checkAndFireRiskAlert(db, opts)`
-    - [ ] Fetch student checkpoint data for the assignment
-    - [ ] Call `computeStudentRisk`
-    - [ ] Check 7-day dedup via `notifications` table query
-    - [ ] Fire in-app notification + email via `Promise.allSettled` (matching `review-sla.ts` pattern)
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Implement `risk-alerts.ts` (Green) [7619028]
+    - [x] Create `src/lib/risk-alerts.ts` with `checkAndFireRiskAlert(db, opts)`
+    - [x] Fetch student checkpoint data for the assignment
+    - [x] Call `computeStudentRisk`
+    - [x] Check 7-day dedup via `notifications` table query
+    - [x] Fire in-app notification + email via `Promise.allSettled` (matching `review-sla.ts` pattern)
+    - [x] Run `pnpm test` — confirm tests pass
 
 - [ ] Task: Write tests for `submitReviewHandler` integration (Red)
     - [ ] Extend `tests/unit/server/reviews.test.ts` (or mirror path)
