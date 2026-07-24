@@ -21,6 +21,7 @@ import { notifications } from '@/db/schema/notifications';
 import { deadlineReminders } from '@/db/schema/deadline-reminders';
 import { getNotificationKeys } from '@/lib/i18n-server';
 import { sendDeadlineReminderEmail } from '@/lib/deadline-reminder-email';
+import { checkAndFireRiskAlert } from '@/lib/risk-alerts';
 
 const REMINDER_TIERS = [
   { tier: '7d', leadDays: 7 },
@@ -46,6 +47,8 @@ export async function processDeadlineReminders(): Promise<void> {
           checkpointName: checkpoints.name,
           dueDate: checkpoints.dueDate,
           studentId: checkpoints.studentId,
+          studentName: users.name,
+          instructorId: assignments.instructorId,
         })
         .from(checkpoints)
         .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
@@ -122,6 +125,19 @@ export async function processDeadlineReminders(): Promise<void> {
             checkpointName: c.checkpointName,
             checkpointId: c.checkpointId,
             dueDate: c.dueDate,
+          }),
+        ),
+      );
+
+      // Fire risk alerts for each student-checkpoint (advisory, post-commit)
+      await Promise.allSettled(
+        remindersToSend.map((c) =>
+          checkAndFireRiskAlert(db, {
+            studentId: c.studentId,
+            studentName: c.studentName,
+            assignmentId: c.assignmentId,
+            assignmentTitle: c.assignmentTitle,
+            instructorId: c.instructorId,
           }),
         ),
       );
