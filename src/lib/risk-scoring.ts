@@ -57,6 +57,11 @@ export interface RiskAssessment {
   factors: RiskFactor[];
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Severity ranking for comparison (higher = more severe). */
+const SEVERITY_RANK: Record<RiskLevel, number> = { high: 3, medium: 2, low: 1 };
+
 /**
  * Compute a student's risk assessment from checkpoint data.
  *
@@ -71,5 +76,86 @@ export interface RiskAssessment {
  * Checkpoints in 'locked' or 'passed' state are excluded.
  */
 export function computeStudentRisk(data: StudentRiskInput): RiskAssessment {
-  return { level: 'low', factors: [] };
+  const factors: RiskFactor[] = [];
+
+  for (const cp of data.checkpoints) {
+    // Skip checkpoints that are locked or passed — no risk
+    if (cp.state === 'locked' || cp.state === 'passed') continue;
+
+    const nowMs = data.now.getTime();
+    const dueMs = cp.dueDate.getTime();
+
+    // Signal 1: Overdue checkpoint (High, student_inaction)
+    if ((cp.state === 'unlocked' || cp.state === 'revise') && dueMs < nowMs) {
+      factors.push({
+        type: 'overdue_checkpoint',
+        severity: 'high',
+        category: 'student_inaction',
+        checkpointId: cp.checkpointId,
+        description: 'Checkpoint is overdue',
+      });
+    }
+
+    // Signal 2: Approaching deadline, no submission (Medium, student_inaction)
+    // Only for future deadlines — overdue checkpoints are caught by signal 1
+    if (
+      cp.state === 'unlocked' &&
+      dueMs > nowMs &&
+      dueMs <= nowMs + 3 * DAY_MS &&
+      cp.submissionCount === 0
+    ) {
+      factors.push({
+        type: 'approaching_deadline_no_submission',
+        severity: 'medium',
+        category: 'student_inaction',
+        checkpointId: cp.checkpointId,
+        description: 'Deadline approaching with no submission',
+      });
+    }
+
+    // Signal 3: Insufficient consultations, deadline approaching (Medium, student_inaction)
+    if (cp.verifiedConsultationCount < cp.minConsultations && dueMs <= nowMs + 7 * DAY_MS) {
+      factors.push({
+        type: 'insufficient_consultations',
+        severity: 'medium',
+        category: 'student_inaction',
+        checkpointId: cp.checkpointId,
+        description: 'Insufficient consultations before deadline',
+      });
+    }
+
+    // Signal 4: Repeated revise (Medium, student_inaction)
+    if (cp.reviseCount >= 2) {
+      factors.push({
+        type: 'repeated_revise',
+        severity: 'medium',
+        category: 'student_inaction',
+        checkpointId: cp.checkpointId,
+        description: 'Checkpoint has been revised multiple times',
+      });
+    }
+
+    // Signal 5: Stalled review beyond SLA (Low, pending_review)
+    if (
+      cp.state === 'under_review' &&
+      cp.underReviewWaitDays !== null &&
+      cp.underReviewWaitDays > 3
+    ) {
+      factors.push({
+        type: 'stalled_review',
+        severity: 'low',
+        category: 'pending_review',
+        checkpointId: cp.checkpointId,
+        description: 'Submission awaiting review beyond SLA',
+      });
+    }
+  }
+
+  // Overall level = highest severity among active factors
+  const level: RiskLevel = factors.reduce<RiskLevel>(
+    (highest, f) => (SEVERITY_RANK[f.severity] > SEVERITY_RANK[highest] ? f.severity : highest),
+    'low',
+  );
+
+  return { level, factors };
 }
