@@ -101,4 +101,8 @@
 - [x] Task: Conductor - User Manual Verification 'UI & i18n' (Protocol in workflow.md)
     - Automated tests: 317 files, 3171 tests passed, 0 failures. Coverage: 88.4% stmts, 82.23% branch, 83.98% funcs, 88.99% lines.
     - Manual verification: Skipped (user confirmed automated tests sufficient).
-</protect>
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [d473133]
+
