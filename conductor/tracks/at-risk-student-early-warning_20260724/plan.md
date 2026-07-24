@@ -158,11 +158,12 @@
     - [x] Run `pnpm check:i18n` — verify parity
     - [x] Run `pnpm check:i18n:unused` — verify no new unused keys
 
-- [ ] Task: Final quality gate verification
-    - [ ] Run `pnpm test:coverage` — verify ≥80% on all thresholds
-    - [ ] Run `pnpm typecheck` — verify no errors
-    - [ ] Run `pnpm lint` — verify no warnings/errors (including `simak-i18n/no-hardcoded`)
-    - [ ] Verify all files under 500 lines
+- [x] Task: Final quality gate verification [commit: 4a5fcf0]
+    - [x] Run `pnpm test:coverage` — 3441 tests pass, 88.28% stmts, 82.28% branches, 83.83% funcs, 88.92% lines
+    - [x] Run `pnpm typecheck` — PASS
+    - [x] Run `pnpm lint` — 0 errors (2 pre-existing warnings)
+    - [x] Verify all files under 500 lines
+    - [x] Refactored: wired `at-risk-email.ts` wrapper into `risk-alerts.ts` to eliminate dead code
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: UI, Email & i18n' (Protocol in workflow.md)
 </protect>
