@@ -77,17 +77,19 @@
     - [x] Extracted to `src/lib/review-risk-alert.ts` helper to stay within 500-line file limit
     - [x] Run `pnpm test` — confirm tests pass
 
-- [ ] Task: Write tests for TRACK-021 scanner integration (Red)
-    - [ ] Extend `tests/unit/lib/deadline-reminder-scanner.test.ts` (or mirror path)
-    - [ ] Test scanner calls `checkAndFireRiskAlert` for students with approaching deadlines
-    - [ ] Test signals 2 & 3 coverage (approaching deadline + insufficient consultations)
-    - [ ] Test 7-day dedup prevents alert fatigue
-    - [ ] Test scanner failure isolation (risk alert errors don't affect reminder processing)
-    - [ ] Run `pnpm test` — confirm tests fail as expected
+- [x] Task: Write tests for TRACK-021 scanner integration (Red)
+    - [x] Extend `tests/unit/lib/deadline-reminder-scanner.test.ts` (or mirror path)
+    - [x] Test scanner calls `checkAndFireRiskAlert` for students with approaching deadlines
+    - [x] Test signals 2 & 3 coverage (approaching deadline + insufficient consultations)
+    - [x] Test 7-day dedup prevents alert fatigue
+    - [x] Test scanner failure isolation (risk alert errors don't affect reminder processing)
+    - [x] Run `pnpm test` — confirm tests fail as expected
+    - Commit: `0aacc54b`
 
-- [ ] Task: Implement TRACK-021 scanner integration (Green)
-    - [ ] Extend `processDeadlineReminders()` in `src/lib/deadline-reminder-scanner.ts` — for each student-checkpoint processed, call `checkAndFireRiskAlert` (advisory, try/catch)
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Implement TRACK-021 scanner integration (Green)
+    - [x] Extend `processDeadlineReminders()` in `src/lib/deadline-reminder-scanner.ts` — for each student-checkpoint processed, call `checkAndFireRiskAlert` (advisory, try/catch)
+    - [x] Run `pnpm test` — confirm tests pass
+    - Commit: `0aacc54b`
 
 - [ ] Task: Write tests for admin analytics extension (Red)
     - [ ] Extend `tests/unit/server/analytics-admin.test.ts` (or mirror path)
