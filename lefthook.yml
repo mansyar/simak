@@ -16,7 +16,7 @@ pre-commit:
 pre-push:
   commands:
     typecheck:
-      run: pnpm typecheck
+      run: pnpm exec tsc --noEmit --incremental --checkers 4
     test:
       run: pnpm test:coverage
     i18n_unused:

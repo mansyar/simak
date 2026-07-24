@@ -6,6 +6,7 @@
 
 | Layer | Technology |
 |-------|-----------|
+| Language | TypeScript 7.0 (native Go compiler, ~6x faster type-checking) |
 | Framework | TanStack Start (Vite + SSR) |
 | Routing | TanStack Router (file-based, type-safe) |
 | UI | shadcn/ui (Radix UI) + Tailwind CSS v4 |
