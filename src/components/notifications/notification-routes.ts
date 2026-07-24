@@ -67,6 +67,12 @@ export function getNotificationRoute(
       }
       return null;
 
+    case 'student_at_risk':
+      if (meta.assignmentId != null) {
+        return `/instructor/assignments/${meta.assignmentId}`;
+      }
+      return null;
+
     default:
       return null;
   }
