@@ -202,6 +202,52 @@ describe('processDeadlineReminders', () => {
       expect(Array.isArray(notifValues)).toBe(true);
       expect(notifValues).toHaveLength(2);
     });
+
+    it('should skip in-app notification for students with inApp=false', async () => {
+      const twoCheckpointsWithPrefs = [
+        {
+          checkpointId: 1,
+          assignmentId: 10,
+          assignmentTitle: 'A1',
+          checkpointName: 'C1',
+          dueDate: new Date('2026-07-28T00:00:00Z'),
+          studentId: 's1',
+          settings: { notificationPrefs: { deadline_reminder: { inApp: false } } },
+        },
+        {
+          checkpointId: 2,
+          assignmentId: 11,
+          assignmentTitle: 'A2',
+          checkpointName: 'C2',
+          dueDate: new Date('2026-07-29T00:00:00Z'),
+          studentId: 's2',
+          settings: null,
+        },
+      ];
+      const twoWinners = [
+        { id: 1, checkpointId: 1, studentId: 's1', tier: '7d', sentAt: new Date() },
+        { id: 2, checkpointId: 2, studentId: 's2', tier: '7d', sentAt: new Date() },
+      ];
+
+      mockDb.then
+        .mockImplementationOnce((onf: any) => Promise.resolve(twoCheckpointsWithPrefs).then(onf))
+        .mockImplementationOnce((onf: any) => Promise.resolve(twoWinners).then(onf))
+        .mockImplementationOnce((onf: any) => Promise.resolve(undefined).then(onf))
+        .mockImplementationOnce((onf: any) => Promise.resolve([]).then(onf))
+        .mockImplementationOnce((onf: any) => Promise.resolve([]).then(onf));
+
+      await processDeadlineReminders();
+
+      // Only 1 in-app notification (s2), s1 skipped
+      expect(mockDb.insert).toHaveBeenCalledTimes(2); // dedup + notifications
+      const notifValues = mockDb.values.mock.calls[1][0];
+      expect(Array.isArray(notifValues)).toBe(true);
+      expect(notifValues).toHaveLength(1);
+      expect(notifValues[0].userId).toBe('s2');
+
+      // Email still sent to ALL winners
+      expect(sendDeadlineReminderEmail).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('email dispatch', () => {

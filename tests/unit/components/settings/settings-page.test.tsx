@@ -86,6 +86,9 @@ vi.mock('@/routes/__root', () => ({
         'settings.accessibility.reducedMotionLabel': 'Reduced Motion',
         'settings.accessibility.reducedMotionHint':
           'Reduce animations and transitions throughout the app',
+        'settings.notificationPreferences.title': 'Notification Preferences',
+        'settings.notificationPreferences.description':
+          'Choose how you want to be notified for each event type.',
         'theme.light': 'Light',
         'theme.dark': 'Dark',
         'theme.toggle': 'Toggle theme',
@@ -125,7 +128,7 @@ describe('SettingsPage', () => {
     });
   });
 
-  it('should render all 6 section titles in correct order', () => {
+  it('should render all 7 section titles in correct order', () => {
     const { container } = render(<SettingsPage />);
 
     const sectionTitles = container.querySelectorAll('[data-slot="card-title"]');
@@ -135,6 +138,7 @@ describe('SettingsPage', () => {
     expect(sectionTitles[3].textContent).toBe('Active Sessions');
     expect(sectionTitles[4].textContent).toBe('Appearance');
     expect(sectionTitles[5].textContent).toBe('Accessibility');
+    expect(sectionTitles[6].textContent).toBe('Notification Preferences');
   });
 
   it('should render in a container with correct CSS classes', () => {

@@ -2,6 +2,7 @@ import { ProfileSection } from './ProfileSection';
 import { PasswordSection } from './PasswordSection';
 import { AppearanceSection } from './AppearanceSection';
 import { AccessibilitySection } from './AccessibilitySection';
+import { NotificationPreferencesSection } from './NotificationPreferencesSection';
 import { TwoFactorSettings } from './TwoFactorSettings';
 import { SessionManagement } from './SessionManagement';
 
@@ -14,6 +15,7 @@ export function SettingsPage() {
       <SessionManagement />
       <AppearanceSection />
       <AccessibilitySection />
+      <NotificationPreferencesSection />
     </div>
   );
 }

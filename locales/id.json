@@ -978,6 +978,70 @@
       "description": "Pengaturan aksesibilitas untuk pengalaman yang lebih baik",
       "reducedMotionLabel": "Gerakan Dikurangi",
       "reducedMotionHint": "Kurangi animasi dan transisi di seluruh aplikasi"
+    },
+    "notificationPreferences": {
+      "title": "Preferensi Notifikasi",
+      "description": "Pilih bagaimana Anda ingin diberi tahu untuk setiap jenis peristiwa.",
+      "channels": {
+        "email": "Email",
+        "inApp": "Di Aplikasi"
+      },
+      "groups": {
+        "reviews": "Ulasan",
+        "consultations": "Konsultasi",
+        "submissions": "Pengumpulan & Perpanjangan",
+        "system": "Sistem"
+      },
+      "types": {
+        "review_completed": {
+          "label": "Ulasan Selesai",
+          "description": "Ketika pengumpulan Anda lulus ulasan"
+        },
+        "revision_requested": {
+          "label": "Revisi Diminta",
+          "description": "Ketika revisi diminta untuk pengumpulan Anda"
+        },
+        "consultation_logged": {
+          "label": "Konsultasi Dicatat",
+          "description": "Ketika konsultasi baru dicatat"
+        },
+        "consultation_verified": {
+          "label": "Konsultasi Terverifikasi",
+          "description": "Ketika konsultasi Anda terverifikasi"
+        },
+        "consultation_rejected": {
+          "label": "Konsultasi Ditolak",
+          "description": "Ketika konsultasi Anda ditolak"
+        },
+        "submission_received": {
+          "label": "Pengumpulan Diterima",
+          "description": "Ketika siswa mengumpulkan pekerjaan"
+        },
+        "extension_requested": {
+          "label": "Perpanjangan Diminta",
+          "description": "Ketika perpanjangan diminta"
+        },
+        "extension_approved": {
+          "label": "Perpanjangan Disetujui",
+          "description": "Ketika permohonan perpanjangan Anda disetujui"
+        },
+        "extension_rejected": {
+          "label": "Perpanjangan Ditolak",
+          "description": "Ketika permohonan perpanjangan Anda ditolak"
+        },
+        "deadline_extended": {
+          "label": "Tenggat Diperpanjang",
+          "description": "Ketika tenggat waktu diperpanjang"
+        },
+        "deadline_reminder": {
+          "label": "Pengingat Tenggat",
+          "description": "Pengingat sebelum tenggat waktu"
+        },
+        "sla_breach": {
+          "label": "Pelanggaran SLA",
+          "description": "Ketika SLA ulasan dilanggar"
+        }
+      }
     }
   },
   "bulkImport": {

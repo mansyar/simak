@@ -9,6 +9,9 @@ export const UpdateProfileSchema = z.object({
 
 export const UpdateUserSettingsSchema = z.object({
   reducedMotion: z.boolean(),
+  notificationPrefs: z
+    .record(z.string(), z.object({ email: z.boolean().optional(), inApp: z.boolean().optional() }))
+    .optional(),
 });
 
 export const GetPresignedAvatarUploadUrlSchema = z.object({

@@ -403,5 +403,26 @@ describe('Email library', () => {
       const result = await resolveEmailRecipient('user-1');
       expect(result).toBeNull();
     });
+
+    it('includes settings in the return object (TRACK-022)', async () => {
+      const settings = {
+        reducedMotion: false,
+        notificationPrefs: { review_completed: { email: false } },
+      };
+      mockDb.then.mockImplementationOnce((fn: any) =>
+        Promise.resolve([
+          {
+            email: 'user@example.com',
+            locale: 'en',
+            emailVerified: true,
+            deletedAt: null,
+            settings,
+          },
+        ]).then(fn),
+      );
+
+      const result = await resolveEmailRecipient('user-1');
+      expect(result).toEqual({ email: 'user@example.com', locale: 'en', settings });
+    });
   });
 });

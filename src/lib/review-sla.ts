@@ -10,6 +10,7 @@ import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
 import { sendSLAAlertEmail } from './email';
 import { getNotificationKeys } from './i18n-server';
+import { shouldSendInAppNotification } from './notification-prefs';
 import type { Db } from '../db/index';
 
 export interface SLASubmissionFields {
@@ -76,7 +77,7 @@ export async function dispatchSLABreachNotifications(
 ): Promise<void> {
   try {
     const adminUsers = await db
-      .select({ id: users.id, name: users.name, email: users.email })
+      .select({ id: users.id, name: users.name, email: users.email, settings: users.settings })
       .from(users)
       .where(and(sql`${users.role} IN ('superadmin', 'admin')`, isNull(users.deletedAt)));
 
@@ -91,24 +92,31 @@ export async function dispatchSLABreachNotifications(
     const slaKeys = getNotificationKeys('sla_breach');
 
     // Batch in-app notifications into a single INSERT (PERF-5)
-    const notificationValues = adminUsers.map((admin) => ({
-      userId: admin.id,
-      type: 'sla_breach',
-      titleKey: slaKeys.titleKey,
-      messageKey: slaKeys.messageKey,
-      params: slaParams,
-      channel: 'in_app',
-      metadata: {
-        assignmentId: submission.assignmentId,
-        checkpointId: submission.checkpointId,
-        breachDays,
-        assignmentTitle: submission.assignmentTitle,
-        studentName: submission.studentName,
-        checkpointName: submission.checkpointName,
-      },
-    }));
+    // Only insert for admins who haven't disabled in-app notifications for sla_breach
+    const notifiableAdmins = adminUsers.filter((admin) =>
+      shouldSendInAppNotification(admin.settings, 'sla_breach'),
+    );
 
-    await db.insert(notifications).values(notificationValues);
+    if (notifiableAdmins.length > 0) {
+      const notificationValues = notifiableAdmins.map((admin) => ({
+        userId: admin.id,
+        type: 'sla_breach',
+        titleKey: slaKeys.titleKey,
+        messageKey: slaKeys.messageKey,
+        params: slaParams,
+        channel: 'in_app',
+        metadata: {
+          assignmentId: submission.assignmentId,
+          checkpointId: submission.checkpointId,
+          breachDays,
+          assignmentTitle: submission.assignmentTitle,
+          studentName: submission.studentName,
+          checkpointName: submission.checkpointName,
+        },
+      }));
+
+      await db.insert(notifications).values(notificationValues);
+    }
 
     // Send emails concurrently — failures don't short-circuit (PERF-5)
     await Promise.allSettled(

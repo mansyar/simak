@@ -14,6 +14,7 @@ export async function sendExtensionApprovedEmail(opts: {
   assignmentId: number;
   extensionDays: number;
   checkpointId?: number | null;
+  notificationType?: string;
 }): Promise<void> {
   try {
     const db = getDb();
@@ -39,6 +40,7 @@ export async function sendExtensionApprovedEmail(opts: {
       recipientId: opts.studentId,
       subjectKey: 'emails.subjects.extensionApproved',
       templateType: 'extension_approved',
+      notificationType: opts.notificationType,
       buildBody: (locale) =>
         buildExtensionApprovedHtml({
           instructorName: opts.instructorName,
