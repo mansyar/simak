@@ -64,8 +64,10 @@ describe('EmailQueue schema', () => {
         'extension_requested',
         // Deadline reminder (TRACK-021)
         'deadline_reminder',
+        // Student at risk (TRACK-023)
+        'student_at_risk',
       ]),
     );
-    expect(templateTypeEnum).toHaveLength(13);
+    expect(templateTypeEnum).toHaveLength(14);
   });
 });

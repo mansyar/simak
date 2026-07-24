@@ -200,6 +200,7 @@ describe('getInstructorDashboardDataHandler — parallel query execution', () =>
       pendingReviewItems: [],
       recentSubmissions: [],
       assignments: [],
+      atRiskStudents: [],
     });
   });
 });
