@@ -137,26 +137,26 @@
     - [x] Add `student_at_risk` to `system` group in `GROUP_CONFIGS` (`NotificationCenter.tsx`)
     - [x] Run `pnpm test` — confirm tests pass
 
-- [ ] Task: Write tests for dashboard widget (Red)
-    - [ ] Create `tests/unit/routes/_authenticated/instructor/dashboard.test.tsx` (or mirror path)
-    - [ ] Test widget renders risk levels with correct Badge colors (yellow/orange/red)
-    - [ ] Test student name, assignment title, factor count + descriptions displayed
-    - [ ] Test link to `/instructor/assignments/${assignmentId}`
-    - [ ] Test empty state ("No students at risk" via `EmptyState`)
-    - [ ] Test sorted by severity
-    - [ ] Run `pnpm test` — confirm tests fail as expected
+- [x] Task: Write tests for dashboard widget (Red) [commit: af2753e]
+    - [x] Create `tests/unit/routes/_authenticated/instructor/dashboard.test.tsx` (or mirror path)
+    - [x] Test widget renders risk levels with correct Badge colors (yellow/orange/red)
+    - [x] Test student name, assignment title, factor count + descriptions displayed
+    - [x] Test link to `/instructor/assignments/${assignmentId}`
+    - [x] Test empty state ("No students at risk" via `EmptyState`)
+    - [x] Test sorted by severity
+    - [x] Run `pnpm test` — confirm tests fail as expected
 
-- [ ] Task: Implement dashboard widget (Green)
-    - [ ] Create at-risk widget component on instructor dashboard (`src/routes/_authenticated/instructor/dashboard.tsx`)
-    - [ ] `Badge` (yellow/orange/red), `Tooltip` for factor details, `EmptyState` when empty
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Implement dashboard widget (Green) [commit: af2753e]
+    - [x] Create at-risk widget component on instructor dashboard (`src/routes/_authenticated/instructor/dashboard.tsx`)
+    - [x] `Badge` (yellow/orange/red), `Tooltip` for factor details, `EmptyState` when empty
+    - [x] Run `pnpm test` — confirm tests pass
 
-- [ ] Task: Add i18n keys and validate
-    - [ ] Add keys to `locales/en.json`: `notifications.events.student_at_risk.title`/`.message`, `emails.subjects.studentAtRisk`, `dashboard.atRisk.title`/`.empty`/`.factorCount`, `dashboard.atRisk.factors.*`, `analytics.atRiskSummary`
-    - [ ] Add same keys to `locales/id.json` with Indonesian translations
-    - [ ] Run `pnpm generate:i18n`
-    - [ ] Run `pnpm check:i18n` — verify parity
-    - [ ] Run `pnpm check:i18n:unused` — verify no new unused keys
+- [x] Task: Add i18n keys and validate [commit: af2753e]
+    - [x] Add keys to `locales/en.json`: `notifications.events.student_at_risk.title`/`.message`, `emails.subjects.studentAtRisk`, `dashboard.atRisk.title`/`.empty`/`.factorCount`, `dashboard.atRisk.factors.*`, `analytics.atRiskSummary`
+    - [x] Add same keys to `locales/id.json` with Indonesian translations
+    - [x] Run `pnpm generate:i18n`
+    - [x] Run `pnpm check:i18n` — verify parity
+    - [x] Run `pnpm check:i18n:unused` — verify no new unused keys
 
 - [ ] Task: Final quality gate verification
     - [ ] Run `pnpm test:coverage` — verify ≥80% on all thresholds
