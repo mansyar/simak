@@ -18,7 +18,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Instructors can assign assignments with structured checkpoints to students.
 - Students can submit work for each checkpoint.
 - Instructors can review, approve, or request revisions on submissions.
-- In-app notifications keep both parties informed of submissions, reviews, revision requests, and missed deadlines. Email notifications are now sent for 9 event types (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, deadline reminder) alongside in-app notifications. Auth-related emails (invitations, password reset, 2FA enable/disable) continue as before. Proactive deadline reminders (7-day, 3-day, 1-day lead times) are dispatched by a background scanner that runs hourly alongside the email queue processor. Notification **preferences** (per-user opt-out) remain `[v2]`.
+- In-app notifications keep both parties informed of submissions, reviews, revision requests, and missed deadlines. Email notifications are now sent for 9 event types (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, deadline reminder) alongside in-app notifications. Auth-related emails (invitations, password reset, 2FA enable/disable) continue as before. Proactive deadline reminders (7-day, 3-day, 1-day lead times) are dispatched by a background scanner that runs hourly alongside the email queue processor. Notification **preferences** (per-user, per-type, per-channel opt-out) are configurable in the Settings Hub — 12 notification types across 4 groups (Reviews, Consultations, Submissions, System) with independent Email and In-app toggles. All preferences default to enabled (opt-out). Security-critical emails (password reset, invitations, 2FA) are exempt from preference gating.
 - Checkpoints must be completed in sequential order.
 - Admins can manage users and assignment templates.
 - Admins can bulk import users and assignment templates via Excel (.xlsx) files with client-side preview and server-side re-validation.
@@ -160,7 +160,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Clicking the bell opens a slide-over panel built on the shadcn `Sheet` primitive (provides focus trapping, Escape-key dismissal, and backdrop-click close). Navigable notifications render as TanStack Router `<Link>` elements; non-navigable items fall back to native `<button>` elements. The bell's `aria-label` dynamically includes the unread count and announces changes via an `aria-live="polite"` region.
 - Users can mark individual notifications as read or mark all as read.
 - **Optimistic UI updates (Track: Optimistic UI Updates for Mutations):** Marking notifications as read (individual or all) updates the UI instantly via TanStack Query's `onMutate` optimistic cache mutation — the unread badge snaps to zero before the server responds. If the server rejects the mutation, the previous state is restored via snapshot rollback (`onError`). Cache invalidation runs in `onSettled` to reconcile with the authoritative server state.
-- Notification preferences (per-user opt-out per event type / channel) are `[v2]` — currently all event types trigger both in-app and email notifications for all users.
+- Users can configure per-type, per-channel notification preferences (Email / In-app) in the Settings Hub. 12 notification types are organized into 4 groups (Reviews, Consultations, Submissions, System). All preferences default to enabled (opt-out model). Security-critical emails (password reset, invitations, 2FA) are exempt from preference gating — they are always sent. SLA breach email alerts to admins are also always sent (exempt), but in-app SLA breach notifications can be disabled. Preferences are stored in the existing `users.settings` JSONB column — no separate table needed.
 
 ### Two-Factor Authentication & Session Management
 
@@ -185,7 +185,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
   - **Instructor analytics** (`/instructor/analytics?range=30d`, instructor only): reviews completed, average response time (`EXTRACT(EPOCH FROM reviewedAt - uploadedAt)`), SLA breach count (reviews exceeding the 3-day SLA), students supervised, assignments active.
 - **Report export:** On-demand CSV export (server function returns a CSV string → client `Blob` download) for the admin user list, audit log (with date filtering), and assignment progress; instructor student-progress and review-history CSVs (with ownership checks). Client-side Excel (`.xlsx`) export via SheetJS on the analytics pages — reuses the existing `xlsx` dependency (no new dependency). CSV cell values are sanitized against formula injection (cells starting with `=`, `+`, `-`, `@`, TAB, or CR are prefixed with `'`).
 - No new database tables — all metrics derive from aggregate queries (`GROUP BY`, `date_trunc`) over existing tables.
-- `[v2]` (deferred): PDF export (requires a rendering library), scheduled/recurring report delivery (requires cron infrastructure), notification preferences.
+- `[v2]` (deferred): PDF export (requires a rendering library), scheduled/recurring report delivery (requires cron infrastructure).
 
 ### File Management
 
@@ -249,7 +249,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 Core entities:
 
-- **User** — with role (SuperAdmin, Admin, Instructor, Student) and optional `settings` jsonb column for storing profile, theme, and accessibility preferences (e.g., reduced motion).
+- **User** — with role (SuperAdmin, Admin, Instructor, Student) and optional `settings` jsonb column for storing profile, theme, accessibility preferences (e.g., reduced motion), and notification preferences (per-type, per-channel opt-out).
 - **AssignmentTemplate** — defines type + ordered checkpoint names.
 - **Assignment** — ties template to one or more students + final deadline + title + description.
 - **AssignmentGroupMember** `[v2]` — maps students to group assignments.
