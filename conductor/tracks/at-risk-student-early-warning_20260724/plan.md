@@ -20,12 +20,12 @@
     - [x] Test no-risk student (all checkpoints passed → level: 'low', empty factors[])
     - [x] Run `pnpm test` — confirm tests fail as expected
 
-- [~] Task: Implement `computeStudentRisk` function (Green)
-    - [ ] Implement all 5 signal checks with thresholds
-    - [ ] Implement severity escalation (overall level = highest active signal)
-    - [ ] Implement category labeling (signals 1-4 = student_inaction, signal 5 = pending_review)
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run `pnpm test:coverage` — verify ≥80% on risk-scoring.ts
+- [x] Task: Implement `computeStudentRisk` function (Green) [606e555]
+    - [x] Implement all 5 signal checks with thresholds
+    - [x] Implement severity escalation (overall level = highest active signal)
+    - [x] Implement category labeling (signals 1-4 = student_inaction, signal 5 = pending_review)
+    - [x] Run `pnpm test` — confirm all tests pass
+    - [x] Run `pnpm test:coverage` — verify ≥80% on risk-scoring.ts
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Risk Scoring Engine' (Protocol in workflow.md)
 
