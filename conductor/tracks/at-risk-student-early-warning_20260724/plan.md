@@ -3,11 +3,11 @@
 
 ## Phase 1: Risk Scoring Engine
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
-- [ ] Task: Define risk scoring types and interfaces
-    - [ ] Create `src/lib/risk-scoring.ts` with type definitions: `RiskLevel`, `RiskCategory`, `RiskFactor`, `StudentRiskInput`, `RiskAssessment`
-    - [ ] Export the `computeStudentRisk` function signature (stub returning `{ level: 'low', factors: [] }`)
-    - [ ] Run `pnpm typecheck` — verify types compile
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+- [x] Task: Define risk scoring types and interfaces [9555d04]
+    - [x] Create `src/lib/risk-scoring.ts` with type definitions: `RiskLevel`, `RiskCategory`, `RiskFactor`, `StudentRiskInput`, `RiskAssessment`
+    - [x] Export the `computeStudentRisk` function signature (stub returning `{ level: 'low', factors: [] }`)
+    - [x] Run `pnpm typecheck` — verify types compile
 
 - [ ] Task: Write unit tests for `computeStudentRisk` (Red)
     - [ ] Create `tests/unit/lib/risk-scoring.test.ts`
