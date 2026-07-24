@@ -98,7 +98,7 @@ describe('NotificationPreferencesSection', () => {
     }
   });
 
-  it('should render 24 checkboxes (12 types x 2 channels)', () => {
+  it('should render 23 checkboxes (11 types x 2 channels + sla_breach in-app only)', () => {
     mockUseQuery.mockReturnValue({
       data: { user: { id: '1' }, settings: null },
       isLoading: false,
@@ -107,7 +107,7 @@ describe('NotificationPreferencesSection', () => {
     render(<NotificationPreferencesSection />);
 
     const checkboxes = screen.getAllByRole('checkbox');
-    expect(checkboxes).toHaveLength(24);
+    expect(checkboxes).toHaveLength(23);
   });
 
   it('should default all checkboxes to checked when settings are null', () => {
@@ -178,8 +178,9 @@ describe('NotificationPreferencesSection', () => {
     const inAppCheckbox = container.querySelector('#notif-sla_breach-inApp') as HTMLInputElement;
     expect(inAppCheckbox.checked).toBe(false);
 
-    const emailCheckbox = container.querySelector('#notif-sla_breach-email') as HTMLInputElement;
-    expect(emailCheckbox.checked).toBe(true);
+    // sla_breach email toggle is hidden (emailAlwaysOn — sla_alert exempt per FR-8)
+    const emailCheckbox = container.querySelector('#notif-sla_breach-email');
+    expect(emailCheckbox).toBeNull();
   });
 
   it('should call updateUserSettings with full prefs when email checkbox toggled off', () => {

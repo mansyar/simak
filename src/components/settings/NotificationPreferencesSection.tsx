@@ -8,7 +8,19 @@ import type { TranslationKey } from '@/i18n/index';
 type NotificationChannel = 'email' | 'inApp';
 type NotificationPrefs = Record<string, { email?: boolean; inApp?: boolean }>;
 
-const NOTIFICATION_PREF_GROUPS = [
+type NotificationTypeConfig = {
+  type: string;
+  labelKey: TranslationKey;
+  descKey: TranslationKey;
+  emailAlwaysOn?: boolean;
+};
+
+type NotificationPrefGroup = {
+  labelKey: TranslationKey;
+  types: NotificationTypeConfig[];
+};
+
+const NOTIFICATION_PREF_GROUPS: NotificationPrefGroup[] = [
   {
     labelKey: 'settings.notificationPreferences.groups.reviews',
     types: [
@@ -86,6 +98,7 @@ const NOTIFICATION_PREF_GROUPS = [
         type: 'sla_breach',
         labelKey: 'settings.notificationPreferences.types.sla_breach.label',
         descKey: 'settings.notificationPreferences.types.sla_breach.description',
+        emailAlwaysOn: true,
       },
     ],
   },
@@ -129,7 +142,7 @@ export function NotificationPreferencesSection() {
   const handleToggle = (type: string, channel: NotificationChannel, current: boolean) => {
     const newPrefs: NotificationPrefs = { ...prefs };
     newPrefs[type] = { ...newPrefs[type], [channel]: !current };
-    updateSettingsMutation.mutateAsync({ notificationPrefs: newPrefs });
+    updateSettingsMutation.mutateAsync({ notificationPrefs: newPrefs }).catch(() => {});
   };
 
   if (isLoading) {
@@ -154,40 +167,36 @@ export function NotificationPreferencesSection() {
       <CardContent className="space-y-6">
         {NOTIFICATION_PREF_GROUPS.map((group) => (
           <div key={group.labelKey} className="space-y-3">
-            <h3 className="text-sm font-semibold text-muted-foreground">
-              {t(group.labelKey as TranslationKey)}
-            </h3>
+            <h3 className="text-sm font-semibold text-muted-foreground">{t(group.labelKey)}</h3>
             <div className="space-y-4">
-              {group.types.map(({ type, labelKey, descKey }) => {
+              {group.types.map(({ type, labelKey, descKey, emailAlwaysOn }) => {
                 const typePrefs = prefs[type] ?? {};
                 const emailEnabled = typePrefs.email !== false;
                 const inAppEnabled = typePrefs.inApp !== false;
                 return (
                   <div key={type} className="flex items-center justify-between">
                     <div className="space-y-0.5">
-                      <p className="text-sm font-medium leading-none">
-                        {t(labelKey as TranslationKey)}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {t(descKey as TranslationKey)}
-                      </p>
+                      <p className="text-sm font-medium leading-none">{t(labelKey)}</p>
+                      <p className="text-sm text-muted-foreground">{t(descKey)}</p>
                     </div>
                     <div className="flex gap-4">
-                      <div className="flex items-center gap-2">
-                        <input
-                          id={`notif-${type}-email`}
-                          type="checkbox"
-                          checked={emailEnabled}
-                          onChange={() => handleToggle(type, 'email', emailEnabled)}
-                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                        />
-                        <label
-                          htmlFor={`notif-${type}-email`}
-                          className="text-sm text-muted-foreground"
-                        >
-                          {t('settings.notificationPreferences.channels.email')}
-                        </label>
-                      </div>
+                      {emailAlwaysOn ? null : (
+                        <div className="flex items-center gap-2">
+                          <input
+                            id={`notif-${type}-email`}
+                            type="checkbox"
+                            checked={emailEnabled}
+                            onChange={() => handleToggle(type, 'email', emailEnabled)}
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                          />
+                          <label
+                            htmlFor={`notif-${type}-email`}
+                            className="text-sm text-muted-foreground"
+                          >
+                            {t('settings.notificationPreferences.channels.email')}
+                          </label>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2">
                         <input
                           id={`notif-${type}-inApp`}

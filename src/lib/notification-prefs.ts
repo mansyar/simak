@@ -1,8 +1,14 @@
 import { eq } from 'drizzle-orm';
 import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
+import type { Db } from '../db/index';
 
 type NotificationInsert = typeof notifications.$inferInsert;
+type NotificationPrefs = Record<string, { inApp?: boolean }>;
+
+function hasNotificationPrefs(s: unknown): s is { notificationPrefs?: NotificationPrefs } {
+  return typeof s === 'object' && s !== null && 'notificationPrefs' in s;
+}
 
 /**
  * Checks whether an in-app notification should be created for the given
@@ -10,10 +16,9 @@ type NotificationInsert = typeof notifications.$inferInsert;
  * true). Only returns false when `inApp` is explicitly `false` for the type.
  */
 export function shouldSendInAppNotification(settings: unknown, type: string): boolean {
-  if (!settings || typeof settings !== 'object') return true;
+  if (!hasNotificationPrefs(settings)) return true;
 
-  const prefs = (settings as { notificationPrefs?: Record<string, { inApp?: boolean }> })
-    ?.notificationPrefs;
+  const prefs = settings.notificationPrefs;
   if (!prefs) return true;
 
   const typePref = prefs[type];
@@ -28,7 +33,7 @@ export function shouldSendInAppNotification(settings: unknown, type: string): bo
  * settings SELECT and conditional INSERT for single-notification sites.
  */
 export async function maybeInsertNotification(
-  db: any,
+  db: Db,
   userId: string,
   type: string,
   values: NotificationInsert,
