@@ -107,7 +107,7 @@
     - [x] Null-safe defaults (`atRiskRow?.high ?? 0`)
     - [x] Run `pnpm test` — confirm all 3424 tests pass across 329 files
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Dashboard + Alerts + Scanner' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Dashboard + Alerts + Scanner' (Protocol in workflow.md) [checkpoint: 15d1744]
 
 ## Phase 3: UI, Email & i18n
 
