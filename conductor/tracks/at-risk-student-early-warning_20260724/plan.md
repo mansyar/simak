@@ -111,20 +111,20 @@
 
 ## Phase 3: UI, Email & i18n
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
-- [ ] Task: Write tests for email template (Red)
-    - [ ] Create/extend `tests/unit/lib/email-templates.test.ts`
-    - [ ] Test `buildStudentAtRiskHtml` renders in both EN and ID locales
-    - [ ] Test `STRINGS` object content for `studentAtRisk`
-    - [ ] Test factor descriptions rendered
-    - [ ] Test CTA link to `${BETTER_AUTH_URL}/instructor/assignments/${assignmentId}`
-    - [ ] Run `pnpm test` — confirm tests fail as expected
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to review requirements and TDD protocol for this phase
+- [x] Task: Write tests for email template (Red) [commit: 0dda8b4]
+    - [x] Create/extend `tests/unit/lib/email-templates.test.ts`
+    - [x] Test `buildStudentAtRiskHtml` renders in both EN and ID locales
+    - [x] Test `STRINGS` object content for `studentAtRisk`
+    - [x] Test factor descriptions rendered
+    - [x] Test CTA link to `${BETTER_AUTH_URL}/instructor/assignments/${assignmentId}`
+    - [x] Run `pnpm test` — confirm tests fail as expected
 
-- [ ] Task: Implement email template + wrapper (Green)
-    - [ ] Add `buildStudentAtRiskHtml` to `email-templates.ts` (internal helpers + `STRINGS[locale].studentAtRisk`)
-    - [ ] Create `src/lib/at-risk-email.ts` (`sendStudentAtRiskEmail` calling `enqueueEventEmail`)
-    - [ ] Add `'student_at_risk'` to `templateType` array in `email-queue.ts` (code-only)
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Implement email template + wrapper (Green) [commit: 0dda8b4]
+    - [x] Add `buildStudentAtRiskHtml` to `email-templates.ts` (internal helpers + `STRINGS[locale].studentAtRisk`)
+    - [x] Create `src/lib/at-risk-email.ts` (`sendStudentAtRiskEmail` calling `enqueueEventEmail`)
+    - [x] Add `'student_at_risk'` to `templateType` array in `email-queue.ts` (code-only)
+    - [x] Run `pnpm test` — confirm tests pass
 
 - [ ] Task: Write tests for notification routes + GROUP_CONFIGS (Red)
     - [ ] Extend `tests/unit/lib/notification-routes.test.ts` (or mirror path)
