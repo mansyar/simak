@@ -8,6 +8,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: At-Risk Student Identification & Early Warning System**
+- [~] **Track: At-Risk Student Identification & Early Warning System**
 *Link: [./tracks/at-risk-student-early-warning_20260724/](./tracks/at-risk-student-early-warning_20260724/)*
 
