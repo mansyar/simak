@@ -44,7 +44,7 @@ describe('checkAndFireRiskAlert', () => {
     level: 'high' as const,
     factors: [
       {
-        type: 'overdue' as const,
+        type: 'overdue_checkpoint' as const,
         severity: 'high' as const,
         category: 'student_inaction' as const,
         checkpointId: 1,
@@ -57,7 +57,7 @@ describe('checkAndFireRiskAlert', () => {
     level: 'medium' as const,
     factors: [
       {
-        type: 'approaching_deadline' as const,
+        type: 'approaching_deadline_no_submission' as const,
         severity: 'medium' as const,
         category: 'student_inaction' as const,
         checkpointId: 1,
@@ -327,7 +327,7 @@ describe('checkAndFireRiskAlert', () => {
       level: 'high' as const,
       factors: [
         {
-          type: 'overdue' as const,
+          type: 'overdue_checkpoint' as const,
           severity: 'high' as const,
           category: 'student_inaction' as const,
           checkpointId: 1,
