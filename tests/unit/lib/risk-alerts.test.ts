@@ -2,14 +2,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { checkAndFireRiskAlert } from '@/lib/risk-alerts';
 import { computeStudentRisk } from '@/lib/risk-scoring';
-import { enqueueEventEmail } from '@/lib/event-email';
+import { sendStudentAtRiskEmail } from '@/lib/at-risk-email';
 
 vi.mock('@/lib/risk-scoring', () => ({
   computeStudentRisk: vi.fn(),
 }));
 
-vi.mock('@/lib/event-email', () => ({
-  enqueueEventEmail: vi.fn().mockResolvedValue(undefined),
+vi.mock('@/lib/at-risk-email', () => ({
+  sendStudentAtRiskEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('@/lib/i18n-server', () => ({
@@ -122,7 +122,7 @@ describe('checkAndFireRiskAlert', () => {
     await checkAndFireRiskAlert(mockDb, baseOpts);
 
     expect(mockDb.insert).toHaveBeenCalledTimes(1);
-    expect(enqueueEventEmail).toHaveBeenCalledTimes(1);
+    expect(sendStudentAtRiskEmail).toHaveBeenCalledTimes(1);
   });
 
   it('should fire alert when risk is medium', async () => {
@@ -132,7 +132,7 @@ describe('checkAndFireRiskAlert', () => {
     await checkAndFireRiskAlert(mockDb, baseOpts);
 
     expect(mockDb.insert).toHaveBeenCalledTimes(1);
-    expect(enqueueEventEmail).toHaveBeenCalledTimes(1);
+    expect(sendStudentAtRiskEmail).toHaveBeenCalledTimes(1);
   });
 
   it('should skip when risk is low', async () => {
@@ -142,7 +142,7 @@ describe('checkAndFireRiskAlert', () => {
     await checkAndFireRiskAlert(mockDb, baseOpts);
 
     expect(mockDb.insert).not.toHaveBeenCalled();
-    expect(enqueueEventEmail).not.toHaveBeenCalled();
+    expect(sendStudentAtRiskEmail).not.toHaveBeenCalled();
   });
 
   it('should skip when no risk factors', async () => {
@@ -152,7 +152,7 @@ describe('checkAndFireRiskAlert', () => {
     await checkAndFireRiskAlert(mockDb, baseOpts);
 
     expect(mockDb.insert).not.toHaveBeenCalled();
-    expect(enqueueEventEmail).not.toHaveBeenCalled();
+    expect(sendStudentAtRiskEmail).not.toHaveBeenCalled();
   });
 
   it('should skip when no checkpoints found', async () => {
@@ -164,7 +164,7 @@ describe('checkAndFireRiskAlert', () => {
 
     // No aggregate queries, no dedup, no insert, no email
     expect(mockDb.insert).not.toHaveBeenCalled();
-    expect(enqueueEventEmail).not.toHaveBeenCalled();
+    expect(sendStudentAtRiskEmail).not.toHaveBeenCalled();
     // computeStudentRisk should not be called
     expect(computeStudentRisk).not.toHaveBeenCalled();
   });
@@ -176,7 +176,7 @@ describe('checkAndFireRiskAlert', () => {
     await checkAndFireRiskAlert(mockDb, baseOpts);
 
     expect(mockDb.insert).not.toHaveBeenCalled();
-    expect(enqueueEventEmail).not.toHaveBeenCalled();
+    expect(sendStudentAtRiskEmail).not.toHaveBeenCalled();
   });
 
   it('should fire when no dedup exists', async () => {
@@ -186,7 +186,7 @@ describe('checkAndFireRiskAlert', () => {
     await checkAndFireRiskAlert(mockDb, baseOpts);
 
     expect(mockDb.insert).toHaveBeenCalledTimes(1);
-    expect(enqueueEventEmail).toHaveBeenCalledTimes(1);
+    expect(sendStudentAtRiskEmail).toHaveBeenCalledTimes(1);
   });
 
   it('should catch DB error without throwing (advisory)', async () => {
@@ -208,7 +208,7 @@ describe('checkAndFireRiskAlert', () => {
     queueStandardQueries();
 
     // Make email reject
-    vi.mocked(enqueueEventEmail).mockRejectedValueOnce(new Error('Email failed'));
+    vi.mocked(sendStudentAtRiskEmail).mockRejectedValueOnce(new Error('Email failed'));
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -218,7 +218,7 @@ describe('checkAndFireRiskAlert', () => {
     // Notification insert should still have been called
     expect(mockDb.insert).toHaveBeenCalledTimes(1);
     // Email should have been attempted
-    expect(enqueueEventEmail).toHaveBeenCalledTimes(1);
+    expect(sendStudentAtRiskEmail).toHaveBeenCalledTimes(1);
 
     consoleSpy.mockRestore();
   });
@@ -294,32 +294,29 @@ describe('checkAndFireRiskAlert', () => {
     });
   });
 
-  it('should call enqueueEventEmail with instructor as recipient', async () => {
+  it('should call sendStudentAtRiskEmail with instructor as recipient', async () => {
     vi.mocked(computeStudentRisk).mockReturnValue(highRiskAssessment);
     queueStandardQueries();
 
     await checkAndFireRiskAlert(mockDb, baseOpts);
 
-    expect(enqueueEventEmail).toHaveBeenCalledTimes(1);
-    const call = vi.mocked(enqueueEventEmail).mock.calls[0][0];
+    expect(sendStudentAtRiskEmail).toHaveBeenCalledTimes(1);
+    const call = vi.mocked(sendStudentAtRiskEmail).mock.calls[0][0];
     expect(call.recipientId).toBe('instructor-1');
-    expect(call.templateType).toBe('student_at_risk');
-    expect(call.subjectKey).toBe('emails.subjects.studentAtRisk');
+    expect(call.studentName).toBe('Alice');
+    expect(call.assignmentTitle).toBe('Thesis');
+    expect(call.assignmentId).toBe(10);
   });
 
-  it('should include risk params in email subject', async () => {
+  it('should include risk level and factors in email params', async () => {
     vi.mocked(computeStudentRisk).mockReturnValue(highRiskAssessment);
     queueStandardQueries();
 
     await checkAndFireRiskAlert(mockDb, baseOpts);
 
-    const call = vi.mocked(enqueueEventEmail).mock.calls[0][0];
-    expect(call.subjectParams).toEqual({
-      studentName: 'Alice',
-      assignmentTitle: 'Thesis',
-      riskLevel: 'high',
-      riskFactors: 'Checkpoint is overdue',
-    });
+    const call = vi.mocked(sendStudentAtRiskEmail).mock.calls[0][0];
+    expect(call.riskLevel).toBe('high');
+    expect(call.riskFactors).toBe('Checkpoint is overdue');
   });
 
   it('should join multiple factor descriptions with comma', async () => {

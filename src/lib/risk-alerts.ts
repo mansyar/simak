@@ -12,8 +12,7 @@ import { submissions, reviews } from '../db/schema/submissions';
 import { notifications } from '../db/schema/notifications';
 import { computeStudentRisk } from './risk-scoring';
 import type { CheckpointRiskData } from './risk-scoring';
-import { enqueueEventEmail } from './event-email';
-import { buildStudentAtRiskHtml } from './email-templates';
+import { sendStudentAtRiskEmail } from './at-risk-email';
 import { getNotificationKeys } from './i18n-server';
 import type { Db } from '../db/index';
 
@@ -172,20 +171,13 @@ export async function checkAndFireRiskAlert(db: Db, opts: RiskAlertOpts): Promis
           factors: assessment.factors,
         },
       }),
-      enqueueEventEmail({
+      sendStudentAtRiskEmail({
         recipientId: opts.instructorId,
-        subjectKey: 'emails.subjects.studentAtRisk',
-        templateType: 'student_at_risk',
-        subjectParams: riskParams,
-        buildBody: (locale) =>
-          buildStudentAtRiskHtml({
-            studentName: opts.studentName,
-            assignmentTitle: opts.assignmentTitle,
-            assignmentId: opts.assignmentId,
-            riskLevel: assessment.level,
-            riskFactors: riskParams.riskFactors,
-            locale,
-          }),
+        studentName: opts.studentName,
+        assignmentTitle: opts.assignmentTitle,
+        assignmentId: opts.assignmentId,
+        riskLevel: assessment.level,
+        riskFactors: riskParams.riskFactors,
       }),
     ]);
   } catch (err) {
