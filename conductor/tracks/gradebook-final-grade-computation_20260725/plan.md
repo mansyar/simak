@@ -15,7 +15,7 @@
     - [x] Generate migration via `pnpm db:generate` (include backfill of default `assignment_grade_config` rows for existing assignments)
     - [x] Verify: migration applies cleanly to dev DB (`pnpm db:push`)
 
-- [ ] Task: Write failing tests for grade computation engine
+- [~] Task: Write failing tests for grade computation engine
     - [ ] Create `tests/unit/lib/grade-computation.test.ts`
     - [ ] Test equal_weight scheme: simple average of checkpoint scores
     - [ ] Test custom_weight scheme: weighted by templateCheckpointId map
