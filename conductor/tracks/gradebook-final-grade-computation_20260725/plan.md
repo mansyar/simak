@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Gradebook & Final Grade Computation (TRACK-025)
 
-## Phase 1: Schema & Computation Engine
+## Phase 1: Schema & Computation Engine [checkpoint: 0dbdc859]
 
 - [x] Task: Read spec.md and workflow.md to re-establish context before implementation
     - [x] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
