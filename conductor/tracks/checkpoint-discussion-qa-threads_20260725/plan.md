@@ -70,10 +70,11 @@
     - [x] Run `pnpm test` — confirm all component tests pass
     - **Commit:** `b7493a9d` — feat(ui): Add DiscussionPanel with Avatar and ScrollArea components
 
-- [ ] Task: Mount `DiscussionPanel` on student checkpoint detail page
-    - [ ] Write failing test asserting `DiscussionPanel` renders below the submission/review section on `/student/assignments/$id.checkpoints.$checkpointId.tsx`
-    - [ ] Import and render `DiscussionPanel` with `checkpointId` and `assignmentId` props below the submission section
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Mount `DiscussionPanel` on student checkpoint detail page
+    - [x] Write failing test asserting `DiscussionPanel` renders below the submission/review section on `/student/assignments/$id.checkpoints.$checkpointId.tsx`
+    - [x] Import and render `DiscussionPanel` with `checkpointId` and `assignmentId` props below the submission section
+    - [x] Run `pnpm test` — confirm tests pass
+    - **Commit:** `1a22b99f` — feat(ui): Mount DiscussionPanel on student checkpoint detail page
 
 - [ ] Task: Add "Discussions" tab on instructor assignment detail page
     - [ ] Write failing test asserting the Discussions tab renders and shows messages grouped by checkpoint
