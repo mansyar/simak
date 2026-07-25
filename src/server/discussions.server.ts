@@ -215,6 +215,53 @@ export async function postDiscussionMessageHandler({ data }: { data: PostDiscuss
   }
 }
 
+const DELETION_WINDOW_MS = 15 * 60 * 1000;
+
 export async function deleteOwnMessageHandler({ data }: { data: DeleteOwnMessageInput }) {
-  throw new Error('deleteOwnMessageHandler not implemented');
+  const session = await getSessionFromHeaders();
+  if (!isStudentOrInstructor(session)) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const { messageId } = data;
+  const db = getDb();
+
+  try {
+    // 1. Fetch message (only non-deleted)
+    const [message] = await db
+      .select({
+        userId: checkpointDiscussions.userId,
+        createdAt: checkpointDiscussions.createdAt,
+      })
+      .from(checkpointDiscussions)
+      .where(and(eq(checkpointDiscussions.id, messageId), isNull(checkpointDiscussions.deletedAt)))
+      .limit(1);
+
+    if (!message) {
+      return serverError(ErrorCode.NOT_FOUND, 'Message not found');
+    }
+
+    // 2. Verify author
+    if (message.userId !== session.user.id) {
+      return serverError(ErrorCode.FORBIDDEN, 'You can only delete your own messages');
+    }
+
+    // 3. Check 15-minute deletion window
+    if (!message.createdAt || Date.now() - message.createdAt.getTime() > DELETION_WINDOW_MS) {
+      return serverError(ErrorCode.FORBIDDEN, 'Deletion window expired');
+    }
+
+    // 4. Soft-delete (replies are preserved — list handler excludes only deleted top-level messages)
+    await db
+      .update(checkpointDiscussions)
+      .set({ deletedAt: new Date() })
+      .where(eq(checkpointDiscussions.id, messageId));
+
+    return { success: true };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'deleteOwnMessageHandler',
+    });
+  }
 }
