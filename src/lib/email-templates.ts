@@ -80,6 +80,7 @@ type EmailStrings = {
     dueDate: string;
     riskLevel: string;
     riskFactors: string;
+    messagePreview: string;
   };
   results: { pass: string; revise: string };
   riskLevels: { high: string; medium: string; low: string };
@@ -93,6 +94,7 @@ type EmailStrings = {
   extensionRequested: string;
   deadlineReminder: string;
   studentAtRisk: string;
+  discussionReply: string;
 };
 
 const STRINGS: Record<Locales, EmailStrings> = {
@@ -115,6 +117,7 @@ const STRINGS: Record<Locales, EmailStrings> = {
       dueDate: 'Due Date',
       riskLevel: 'Risk Level',
       riskFactors: 'Risk Factors',
+      messagePreview: 'Message',
     },
     results: { pass: 'Pass', revise: 'Revise' },
     riskLevels: { high: 'High', medium: 'Medium', low: 'Low' },
@@ -128,6 +131,7 @@ const STRINGS: Record<Locales, EmailStrings> = {
     extensionRequested: 'A student has requested an extension.',
     deadlineReminder: 'Your checkpoint deadline is approaching.',
     studentAtRisk: 'A student in your assignment is at risk of falling behind.',
+    discussionReply: 'You have a new reply in a checkpoint discussion.',
   },
   id: {
     viewInSimak: 'Lihat di SIMAK',
@@ -148,6 +152,7 @@ const STRINGS: Record<Locales, EmailStrings> = {
       dueDate: 'Batas Waktu',
       riskLevel: 'Tingkat Risiko',
       riskFactors: 'Faktor Risiko',
+      messagePreview: 'Pesan',
     },
     results: { pass: 'Lulus', revise: 'Revisi' },
     riskLevels: { high: 'Tinggi', medium: 'Sedang', low: 'Rendah' },
@@ -162,6 +167,7 @@ const STRINGS: Record<Locales, EmailStrings> = {
     extensionRequested: 'Seorang mahasiswa telah meminta perpanjangan.',
     deadlineReminder: 'Batas waktu checkpoint Anda akan tiba.',
     studentAtRisk: 'Seorang mahasiswa di tugas Anda berisiko tertinggal.',
+    discussionReply: 'Anda memiliki balasan baru di diskusi checkpoint.',
   },
 };
 
@@ -395,6 +401,40 @@ export function buildStudentAtRiskHtml(params: {
         detailRow(s.labels.assignment, escapeHtml(params.assignmentTitle)) +
         detailRow(s.labels.riskLevel, escapeHtml(riskLevelLabel)) +
         detailRow(s.labels.riskFactors, escapeHtml(params.riskFactors)),
+    ) +
+    deepLinkButton(url, s.viewInSimak) +
+    fallbackLink(url, s.fallback);
+  return buildEmail(locale, body);
+}
+
+export function buildDiscussionReplyHtml(params: {
+  authorName: string;
+  checkpointName: string;
+  assignmentTitle: string;
+  messagePreview: string;
+  assignmentId: number;
+  checkpointId: number;
+  target: 'student' | 'instructor';
+  locale?: Locales | null;
+}): string {
+  const locale = normalizeLocale(params.locale);
+  const s = STRINGS[locale];
+  const url =
+    params.target === 'student'
+      ? `${getEnv().BETTER_AUTH_URL}/student/assignments/${params.assignmentId}/checkpoints/${params.checkpointId}`
+      : `${getEnv().BETTER_AUTH_URL}/instructor/assignments/${params.assignmentId}`;
+  const authorLabel = params.target === 'student' ? s.labels.instructor : s.labels.student;
+  const truncatedPreview =
+    params.messagePreview.length > 100
+      ? params.messagePreview.slice(0, 100)
+      : params.messagePreview;
+  const body =
+    `<p style="font-size: 16px; color: #374151; margin: 0 0 16px;">${s.discussionReply}</p>` +
+    detailTable(
+      detailRow(authorLabel, escapeHtml(params.authorName)) +
+        detailRow(s.labels.assignment, escapeHtml(params.assignmentTitle)) +
+        detailRow(s.labels.checkpoint, escapeHtml(params.checkpointName)) +
+        detailRow(s.labels.messagePreview, escapeHtml(truncatedPreview)),
     ) +
     deepLinkButton(url, s.viewInSimak) +
     fallbackLink(url, s.fallback);
