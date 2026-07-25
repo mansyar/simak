@@ -4,7 +4,6 @@ import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews, uploadIntents } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
-import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode, isServerError } from '../lib/errors';
@@ -19,6 +18,7 @@ import {
 import { getNotificationKeys } from './notifications.server';
 import { sendReviewEmail } from '../lib/review-email';
 import { maybeFireReviewRiskAlert } from '../lib/review-risk-alert';
+import { maybeInsertNotification } from '../lib/notification-prefs';
 import { fetchRubric } from './rubrics.server';
 import { validateReviewScores, insertReviewScores } from './review-scores.server';
 import type { NonNullableSession } from '../lib/types';
@@ -419,7 +419,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       // 2i. Create notification for the student (review_completed or revision_requested)
       const notifType = decision === 'pass' ? 'review_completed' : 'revision_requested';
       const notifKeys = getNotificationKeys(notifType);
-      await tx.insert(notifications).values({
+      await maybeInsertNotification(tx, submission.studentId, notifType, {
         userId: submission.studentId,
         type: notifType,
         titleKey: notifKeys.titleKey,

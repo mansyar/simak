@@ -112,7 +112,7 @@ simak/
 │   │   ├── files/            → File upload, preview, file list
 │   │   ├── notifications/    → Notification center, badge, notification-routes (type→route map)
 │   │   ├── analytics/        → Charts, metric cards, export
-│   │   ├── settings/         → SettingsPage, ProfileSection, PasswordSection, AppearanceSection, AccessibilitySection
+│   │   ├── settings/         → SettingsPage, ProfileSection, PasswordSection, AppearanceSection, AccessibilitySection, NotificationPreferencesSection
 │   │   ├── skeletons/        → Reusable loading skeletons (DashboardSkeleton, TableSkeleton, AssignmentDetailSkeleton)
 │   │   ├── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton, email queue inspector subcomponents (summary cards, filters, table, retry dialog)
 │   │   └── keyboard-cheat-sheet.tsx → Popover showing all keyboard shortcuts (greys out review-specific J/K when not on review page)
@@ -163,13 +163,14 @@ simak/
 │   │   └── config.ts         → Better-Auth setup
 │   ├── i18n/                 → Translation init + locale detection
 │   ├── lib/
-│   │   ├── email.ts          → Resend client + `resolveEmailRecipient()` (returns `{email, locale}` or null for soft-deleted/unverified)
+│   │   ├── email.ts          → Resend client + `resolveEmailRecipient()` (returns `{email, locale, settings}` or null for soft-deleted/unverified — `settings` included for notification preference gating)
 │   │   ├── email-templates.ts → 10 localized HTML template builders for event emails (including `buildStudentAtRiskHtml`) + shared header/footer helpers
-│   │   ├── event-email.ts    → `enqueueEventEmail()` generic post-commit advisory email dispatch (never throws; supports `subjectParams` for email subject interpolation)
+│   │   ├── event-email.ts    → `enqueueEventEmail()` generic post-commit advisory email dispatch (never throws; supports `subjectParams` for email subject interpolation; preference gate — skips enqueue when `recipient.settings.notificationPrefs[notifType].email === false`; security types exempt via `EMAIL_GATE_EXEMPT` set; optional `notificationType` param for type-mismatch resolution)
 │   │   ├── submission-email.ts → `sendSubmissionReceivedEmail()` helper
 │   │   ├── review-email.ts   → `sendReviewEmail()` helper (pass/revise)
 │   │   ├── consultation-email.ts → `sendConsultationEmail()` helper (verified/rejected)
-│   │   ├── extension-email.ts → `sendExtensionApprovedEmail()`, `sendExtensionRejectedEmail()`, `sendExtensionRequestedEmail()` helpers
+│   │   ├── extension-email.ts → `sendExtensionApprovedEmail()`, `sendExtensionRejectedEmail()`, `sendExtensionRequestedEmail()` helpers (with optional `notificationType` param for preference-gate type-mismatch resolution)
+│   │   ├── notification-prefs.ts → `shouldSendInAppNotification(settings, type)` pure helper + `maybeInsertNotification(db, userId, type, values)` helper (conditional in-app notification insert). Used at 12 notification creation sites to gate in-app delivery on user preferences.
 │   │   ├── deadline-reminder-scanner.ts → `processDeadlineReminders()` — hourly background scanner for tiered deadline reminders (7d/3d/1d), dedup via `deadline_reminders` table
 │   │   ├── deadline-reminder-email.ts → `sendDeadlineReminderEmail()` helper (wraps `enqueueEventEmail` with `buildDeadlineReminderHtml`)
 │   │   ├── risk-scoring.ts   → Pure function `computeStudentRisk(data): RiskAssessment` — 5 risk signals (overdue, approaching deadline, insufficient consultations, repeated revise, stalled review); ephemeral, never persisted
@@ -338,7 +339,7 @@ All 9 user-initiated mutation sites where the predicted state is deterministic u
 **Review** — instructor decision (pass/revise) with comments and optional feedback file.
 **Consultation** — student-instructor meeting log, tied to a specific checkpoint.
 **Notification** — in-app event log.
-**NotificationPreference** — per-user, per-event, per-channel toggle. [v2]
+**NotificationPreference** — per-user, per-type, per-channel toggle stored in `users.settings` JSONB column (no separate table). Keyed by notification `type` string (e.g., `submission_received`), with `{ email?: boolean; inApp?: boolean }` values. Absent key or absent sub-field = default `true` (enabled). 12 types across 4 groups (Reviews, Consultations, Submissions, System). Security types (password_reset, invitation, two_factor, sla_alert) are exempt from email gating.
 **ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, the affected student's subsequent checkpoint `dueDate` values auto-extend. The assignment-wide `finalDeadline` is immutable after creation and never mutated by extensions.
 **DeadlineReminder** — dedup tracking table for proactive deadline reminders. Records `checkpointId` (FK, cascade delete), `studentId` (FK, cascade delete), `tier` (`'7d'`/`'3d'`/`'1d'`), and `sentAt`. Unique constraint on `(checkpointId, tier)` ensures at-most-once delivery per tier per checkpoint across multiple server instances. Used by the hourly background scanner (`processDeadlineReminders()`) to deduplicate via `INSERT ... ON CONFLICT DO NOTHING RETURNING *`.
 **AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v1] — admin viewer at `/admin/audit-log`.
@@ -359,7 +360,7 @@ All 9 user-initiated mutation sites where the predicted state is deterministic u
 | email            | text, unique, not null | Login identifier                                                                    |
 | role             | enum, not null         | superadmin \| admin \| instructor \| student                                        |
 | locale           | text, default 'en'     | Language preference: 'en' \| 'id'. Used for UI, notifications, and email templates. |
-| settings         | jsonb                  | NULLABLE — `{ reducedMotion: boolean }`. Profile, theme, and accessibility prefs.   |
+| settings         | jsonb                  | NULLABLE — `{ reducedMotion: boolean; notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }> }`. Profile, theme, accessibility, and notification preferences. |
 | createdAt        | timestamp              |                                                                                     |
 | updatedAt        | timestamp              |                                                                                     |
 | deletedAt        | timestamp              | Soft delete                                                                         |
@@ -611,16 +612,23 @@ _Note: Each row represents one student's individual participation. Group assignm
 | metadata  | jsonb                  | Event-specific data (e.g. assignmentId) |
 | createdAt | timestamp              |                                         |
 
-#### notification_preferences [v2]
+#### notification preferences (stored in `users.settings` JSONB)
 
-| Column            | Type                         | Notes                                  |
-| ----------------- | ---------------------------- | -------------------------------------- |
-| id                | serial (PK)                  |                                        |
-| userId            | text (FK → users)            |                                        |
-| eventType         | text, not null               | e.g. review_completed, deadline_missed |
-| channel           | text, not null               | in_app \| email                        |
-| enabled           | boolean, default true        |                                        |
-| Unique constraint | (userId, eventType, channel) | One preference per combination         |
+No separate table. Notification preferences are stored as a `notificationPrefs` key inside the `users.settings` JSONB column:
+
+```typescript
+settings: {
+  reducedMotion: boolean;
+  notificationPrefs?: Record<string, {
+    email?: boolean;  // default true when absent
+    inApp?: boolean;  // default true when absent
+  }>
+}
+```
+
+The `notificationPrefs` key maps notification `type` strings (e.g., `submission_received`, `review_completed`, `sla_breach`) to per-channel booleans. Absent key or absent sub-field = enabled (opt-out model).
+
+The `updateUserSettingsHandler` in `src/server/settings.server.ts` uses a read-modify-write merge pattern (SELECT existing settings → spread new values → UPDATE) to prevent `notificationPrefs` from overwriting `reducedMotion` and vice versa.
 
 #### extension_requests
 
@@ -963,10 +971,17 @@ A checkpoint unlocks when:
 - **Concurrency hardening:** rows are claimed inside a transaction using `FOR UPDATE SKIP LOCKED` and marked `processing`; the Resend send occurs **outside** the transaction so no long-lived lock is held. An in-process `isRunning` guard prevents overlapping ticks. Rows stuck in `processing` for > 5 minutes are reclaimed to `pending` at the start of each tick, preventing lockup on worker crash.
 - **XSS hardening:** all user-derived interpolations in email bodies are passed through an `escapeHtml` helper before rendering, preventing stored-XSS via user-controlled fields (name, email, subject context).
 
-### Preferences [v2]
+### Preferences [v1] (Track: User Notification Preferences)
 
-- Users control notification delivery per event type and per channel via the `notification_preferences` table.
-- Default: all enabled. Users can opt out of specific event types or channels.
+- Users control notification delivery per event type and per channel via the `notificationPrefs` key in `users.settings` JSONB column (no separate table).
+- **12 notification types** organized into 4 groups: Reviews (review_completed, revision_requested), Consultations (consultation_logged, consultation_verified, consultation_rejected), Submissions (submission_received, extension_requested, extension_approved, extension_rejected, deadline_extended), System (sla_breach, deadline_reminder).
+- **Per-channel toggles:** Each type has independent Email and In-app toggle checkboxes (default all ON — opt-out model).
+- **Email preference gate:** `enqueueEventEmail` (`src/lib/event-email.ts`) checks `recipient.settings?.notificationPrefs?.[notifType]?.email === false` before enqueuing. Security types (`password_reset`, `invitation`, `two_factor`, `sla_alert`) are exempt via `EMAIL_GATE_EXEMPT` set — always sent regardless of preferences.
+- **In-app preference gate:** `shouldSendInAppNotification(settings, type)` helper (`src/lib/notification-prefs.ts`) returns `false` only when `settings.notificationPrefs[type].inApp === false`. Applied at all 12 notification creation sites (inline pattern for single-insert sites, batch filter for scanner/batch sites).
+- **Type mismatch resolution:** `sla_breach` in-app type maps to `sla_alert` email templateType — `notificationType` param on `enqueueEventEmail` resolves the mismatch. `deadline_extended` in-app type sends email via `sendExtensionApprovedEmail` with `notificationType: 'deadline_extended'` override.
+- **SLA breach exemption:** `sendSLAAlertEmail` calls `enqueueEmail` directly (not `enqueueEventEmail`), so `sla_breach` email alerts are always sent to admins regardless of preferences. The in-app `sla_breach` notification IS gated. The UI hides the Email toggle for `sla_breach` (since it cannot be disabled).
+- **Settings handler merge:** `updateUserSettingsHandler` (`src/server/settings.server.ts`) was refactored from a replace pattern to a read-modify-write merge — SELECT existing settings → `{ ...existing, ...new }` → UPDATE. This prevents `notificationPrefs` from overwriting `reducedMotion` and vice versa.
+- **UI:** `NotificationPreferencesSection` component (`src/components/settings/NotificationPreferencesSection.tsx`) follows the `AccessibilitySection.tsx` pattern — `useQuery(['currentUser'])` for data, `useMutation(updateUserSettings)` for saves, `queryClient.invalidateQueries(['currentUser'])` on success. Rendered as 7th section in `SettingsPage.tsx`. Grouped by 4 categories with Email + In-app checkboxes per type.
 
 ---
 

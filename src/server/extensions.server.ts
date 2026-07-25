@@ -9,6 +9,7 @@ import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode, isServerError } from '../lib/errors';
 import { getNotificationKeys } from './notifications.server';
 import { sendExtensionRequestedEmail } from '../lib/extension-email';
+import { shouldSendInAppNotification } from '../lib/notification-prefs';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -203,21 +204,28 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
       // 9. Notify the instructor
       const requestedParams = { extensionDays: String(extensionDays) };
       const requestedKeys = getNotificationKeys('extension_requested');
-      await tx.insert(notifications).values({
-        userId: assignment.instructorId,
-        type: 'extension_requested',
-        titleKey: requestedKeys.titleKey,
-        messageKey: requestedKeys.messageKey,
-        params: requestedParams,
-        channel: 'in_app',
-        metadata: {
-          extensionRequestId: request.id,
-          assignmentId,
-          checkpointId: targetCheckpointId,
-          extensionDays,
-          category,
-        },
-      });
+      const [instructorSettings] = await tx
+        .select({ settings: users.settings })
+        .from(users)
+        .where(eq(users.id, assignment.instructorId))
+        .limit(1);
+      if (shouldSendInAppNotification(instructorSettings?.settings, 'extension_requested')) {
+        await tx.insert(notifications).values({
+          userId: assignment.instructorId,
+          type: 'extension_requested',
+          titleKey: requestedKeys.titleKey,
+          messageKey: requestedKeys.messageKey,
+          params: requestedParams,
+          channel: 'in_app',
+          metadata: {
+            extensionRequestId: request.id,
+            assignmentId,
+            checkpointId: targetCheckpointId,
+            extensionDays,
+            category,
+          },
+        });
+      }
 
       return { extensionRequest: { id: request.id } };
     });

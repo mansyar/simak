@@ -313,6 +313,83 @@ describe('Review handlers - Logic & Security', () => {
       expect(mockTx.for).toHaveBeenCalledWith('update', { of: checkpoints });
     });
 
+    it('should skip review_completed notification when inApp preference is false', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockTx.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              checkpointId: 100,
+              checkpointState: 'under_review',
+              assignmentId: 1,
+              instructorId: 'instructor-1',
+              studentId: 'student-1',
+            },
+          ]).then(onfulfilled),
+        )
+        .mockImplementation((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              settings: {
+                notificationPrefs: { review_completed: { inApp: false } },
+              },
+            },
+          ]).then(onfulfilled),
+        );
+
+      const result = await submitReviewHandler({
+        data: { submissionId: 1, decision: 'pass', comment: 'Well done!' },
+      });
+      expect(result).toEqual({ success: true });
+
+      // Only the review INSERT, no notification INSERT
+      expect(mockTx.insert).toHaveBeenCalledTimes(1);
+      const valuesCalls = vi.mocked(mockTx.values).mock.calls.map((c: any[]) => c[0]);
+      const notificationValues = valuesCalls.find((v: any) => v?.type === 'review_completed');
+      expect(notificationValues).toBeUndefined();
+    });
+
+    it('should skip revision_requested notification when inApp preference is false', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+      mockTx.then
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              checkpointId: 100,
+              checkpointState: 'under_review',
+              assignmentId: 1,
+              instructorId: 'instructor-1',
+              studentId: 'student-1',
+            },
+          ]).then(onfulfilled),
+        )
+        .mockImplementation((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              settings: {
+                notificationPrefs: { revision_requested: { inApp: false } },
+              },
+            },
+          ]).then(onfulfilled),
+        );
+
+      const result = await submitReviewHandler({
+        data: {
+          submissionId: 1,
+          decision: 'revise',
+          comment: 'Needs more details',
+          revisionDeadline: '2026-06-01T00:00:00Z',
+        },
+      });
+      expect(result).toEqual({ success: true });
+
+      // Only the review INSERT, no notification INSERT
+      expect(mockTx.insert).toHaveBeenCalledTimes(1);
+      const valuesCalls = vi.mocked(mockTx.values).mock.calls.map((c: any[]) => c[0]);
+      const notificationValues = valuesCalls.find((v: any) => v?.type === 'revision_requested');
+      expect(notificationValues).toBeUndefined();
+    });
+
     describe('SLA anchoring at submission time', () => {
       const fiveDaysAgo = new Date('2026-06-10T12:00:00Z');
 

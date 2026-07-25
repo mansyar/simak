@@ -25,6 +25,8 @@ const DYNAMIC_KEY_PATTERNS = [
   /^extensions\.status(Pending|Approved|Rejected)$/,
   /^notifications\.groups\./,
   /^notifications\.events\./,
+  // Notification preference type labels/descriptions are resolved via config maps
+  /^settings\.notificationPreferences\.types\./,
   /^error\.(unauthorized|forbidden|validation|badRequest|conflict|internal|network|default)$/,
   /^studentAssignments\.status\.(locked|unlocked)$/,
   // Sidebar labels are passed dynamically to t(link.label)

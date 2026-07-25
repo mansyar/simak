@@ -371,4 +371,61 @@ describe('dispatchSLABreachNotifications', () => {
     expect(consoleSpy).toHaveBeenCalledWith('Failed to send SLA notifications:', dbError);
     consoleSpy.mockRestore();
   });
+
+  it('should skip in-app notification for admins with inApp=false but still email all', async () => {
+    const adminsWithPrefs = [
+      {
+        id: 'admin-1',
+        name: 'Admin One',
+        email: 'admin1@test.com',
+        settings: { notificationPrefs: { sla_breach: { inApp: false } } },
+      },
+      { id: 'admin-2', name: 'Admin Two', email: 'admin2@test.com', settings: null },
+    ];
+    mockDb.then.mockImplementation((onfulfilled: any) =>
+      Promise.resolve(adminsWithPrefs).then(onfulfilled),
+    );
+
+    await dispatchSLABreachNotifications(mockDb, baseSubmission, 3);
+
+    // Only 1 in-app notification (admin-2), admin-1 skipped
+    expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    const valuesArg = mockDb.values.mock.calls[0][0];
+    expect(Array.isArray(valuesArg)).toBe(true);
+    expect(valuesArg).toHaveLength(1);
+    expect(valuesArg[0].userId).toBe('admin-2');
+
+    // Email still sent to ALL admins (sla_alert exempt from email gate per FR-8)
+    const { sendSLAAlertEmail } = await import('@/lib/email');
+    expect(sendSLAAlertEmail).toHaveBeenCalledTimes(2);
+  });
+
+  it('should skip all in-app notifications when all admins have inApp=false', async () => {
+    const allDisabled = [
+      {
+        id: 'admin-1',
+        name: 'Admin One',
+        email: 'admin1@test.com',
+        settings: { notificationPrefs: { sla_breach: { inApp: false } } },
+      },
+      {
+        id: 'admin-2',
+        name: 'Admin Two',
+        email: 'admin2@test.com',
+        settings: { notificationPrefs: { sla_breach: { inApp: false } } },
+      },
+    ];
+    mockDb.then.mockImplementation((onfulfilled: any) =>
+      Promise.resolve(allDisabled).then(onfulfilled),
+    );
+
+    await dispatchSLABreachNotifications(mockDb, baseSubmission, 3);
+
+    // No notification INSERT at all
+    expect(mockDb.insert).not.toHaveBeenCalled();
+
+    // Email still sent to ALL admins
+    const { sendSLAAlertEmail } = await import('@/lib/email');
+    expect(sendSLAAlertEmail).toHaveBeenCalledTimes(2);
+  });
 });

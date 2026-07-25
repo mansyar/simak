@@ -498,6 +498,17 @@ Students and instructors lack a centralized system to:
 - **i18n** — New EN/ID keys for notification title/message (params: assignmentTitle, checkpointName, dueDate) and email subject
 - **Tests** — 3,110 tests pass across 310 test files; coverage ≥80% on all thresholds (statements 88.36%, branches 82%, functions 84.04%, lines 88.96%)
 
+### Track: User Notification Preferences (TRACK-022) (July 2026)
+
+- **Notification preferences settings** — New `NotificationPreferencesSection` in the Settings Hub (7th section) with per-event-type Email and In-app toggle checkboxes, grouped into 4 categories (Reviews, Consultations, Submissions & Extensions, System) covering all 12 configurable event types
+- **Settings backend merge** — `updateUserSettingsHandler` refactored from replace to read-modify-write merge pattern, preserving existing settings fields when updating notification preferences; `UpdateUserSettingsSchema` extended with `notificationPrefs` Zod field
+- **Email preference gate** — `enqueueEventEmail` checks recipient `settings.notificationPrefs[type].email` before dispatching; security-critical email types (password_reset, invitation, two_factor, sla_alert) are exempt from the gate
+- **In-app preference gate** — `shouldSendInAppNotification` helper applied at all 12 notification creation sites across consultations, extensions, submissions, reviews, SLA breach, and deadline reminder handlers; batch sites filter arrays before INSERT while email dispatch sends to all recipients
+- **Type mismatch resolution** — `sla_breach` in-app type maps to `sla_alert` email template; `deadline_extended` in-app type maps to `extension_approved` email template via explicit `notificationType` parameter
+- **Default enabled** — All notifications are enabled by default (absent key = enabled); no data migration required
+- **i18n** — 30+ new keys in both EN and ID locales under `settings.notificationPreferences.*` (title, description, channel labels, group labels, per-type labels and descriptions)
+- **Tests** — 3,171 tests pass across 317 test files; coverage ≥80% on all thresholds (statements 88.4%, branches 82.23%, functions 83.98%, lines 88.99%)
+
 ### Track: At-Risk Student Identification & Early Warning System (TRACK-023) (July 2026)
 
 - **Risk scoring engine** — New `src/lib/risk-scoring.ts` with pure function `computeStudentRisk(data): RiskAssessment` evaluating 5 risk signals: overdue checkpoint (High), approaching deadline with no submission (Medium), insufficient consultations with deadline approaching (Medium), repeated revise (Medium), stalled review beyond SLA (Low). Risk score is ephemeral — never persisted to DB.

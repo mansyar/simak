@@ -3,6 +3,7 @@ import { eq, and, desc, sql, gt, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints, assignmentStudents } from '../db/schema/assignments';
 import { notifications } from '../db/schema/notifications';
+import { users } from '../db/schema/users';
 import { submissions, uploadIntents } from '../db/schema/submissions';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
@@ -12,6 +13,7 @@ import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import { getNotificationKeys } from './notifications.server';
 import { sendSubmissionReceivedEmail } from '../lib/submission-email';
+import { shouldSendInAppNotification } from '../lib/notification-prefs';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -201,19 +203,26 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
           assignmentTitle: instructorInfo.assignmentTitle,
         };
         const receivedKeys = getNotificationKeys('submission_received');
-        await tx.insert(notifications).values({
-          userId: instructorInfo.instructorId,
-          type: 'submission_received',
-          titleKey: receivedKeys.titleKey,
-          messageKey: receivedKeys.messageKey,
-          params: receivedParams,
-          channel: 'in_app',
-          metadata: {
-            checkpointId,
-            assignmentId: checkpoint.assignmentId,
-            submissionId: submissionRecord.id,
-          },
-        });
+        const [instructorSettings] = await tx
+          .select({ settings: users.settings })
+          .from(users)
+          .where(eq(users.id, instructorInfo.instructorId))
+          .limit(1);
+        if (shouldSendInAppNotification(instructorSettings?.settings, 'submission_received')) {
+          await tx.insert(notifications).values({
+            userId: instructorInfo.instructorId,
+            type: 'submission_received',
+            titleKey: receivedKeys.titleKey,
+            messageKey: receivedKeys.messageKey,
+            params: receivedParams,
+            channel: 'in_app',
+            metadata: {
+              checkpointId,
+              assignmentId: checkpoint.assignmentId,
+              submissionId: submissionRecord.id,
+            },
+          });
+        }
 
         instructorId = instructorInfo.instructorId;
         assignmentTitle = instructorInfo.assignmentTitle;

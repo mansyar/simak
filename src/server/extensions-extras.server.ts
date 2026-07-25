@@ -5,11 +5,13 @@ import { assignments, checkpoints } from '../db/schema/assignments';
 import { auditLog } from '../db/schema/audit-log';
 import { extensionRequests } from '../db/schema/extensions';
 import { notifications } from '../db/schema/notifications';
+import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '../lib/errors';
 import { logAuditEvent } from '../lib/audit';
 import { getNotificationKeys } from './notifications.server';
 import { sendExtensionApprovedEmail, sendExtensionRejectedEmail } from '../lib/extension-email';
+import { shouldSendInAppNotification } from '../lib/notification-prefs';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type { ApproveExtensionSchema, RejectExtensionSchema, BulkExtendSchema } from './extensions';
@@ -148,19 +150,26 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
 
       const approvedParams = { extensionDays: String(request.extensionDays) };
       const approvedKeys = getNotificationKeys('extension_approved');
-      await tx.insert(notifications).values({
-        userId: request.studentId,
-        type: 'extension_approved',
-        titleKey: approvedKeys.titleKey,
-        messageKey: approvedKeys.messageKey,
-        params: approvedParams,
-        channel: 'in_app',
-        metadata: {
-          extensionRequestId: requestId,
-          assignmentId: request.assignmentId,
-          extensionDays: request.extensionDays,
-        },
-      });
+      const [studentSettings] = await tx
+        .select({ settings: users.settings })
+        .from(users)
+        .where(eq(users.id, request.studentId))
+        .limit(1);
+      if (shouldSendInAppNotification(studentSettings?.settings, 'extension_approved')) {
+        await tx.insert(notifications).values({
+          userId: request.studentId,
+          type: 'extension_approved',
+          titleKey: approvedKeys.titleKey,
+          messageKey: approvedKeys.messageKey,
+          params: approvedParams,
+          channel: 'in_app',
+          metadata: {
+            extensionRequestId: requestId,
+            assignmentId: request.assignmentId,
+            extensionDays: request.extensionDays,
+          },
+        });
+      }
 
       auditData = {
         assignmentId: request.assignmentId,
@@ -267,20 +276,27 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
         resolutionReason,
       };
       const rejectedKeys = getNotificationKeys('extension_rejected');
-      await tx.insert(notifications).values({
-        userId: request.studentId,
-        type: 'extension_rejected',
-        titleKey: rejectedKeys.titleKey,
-        messageKey: rejectedKeys.messageKey,
-        params: rejectedParams,
-        channel: 'in_app',
-        metadata: {
-          extensionRequestId: requestId,
-          assignmentId: request.assignmentId,
-          extensionDays: request.extensionDays,
-          resolutionReason,
-        },
-      });
+      const [studentSettings] = await tx
+        .select({ settings: users.settings })
+        .from(users)
+        .where(eq(users.id, request.studentId))
+        .limit(1);
+      if (shouldSendInAppNotification(studentSettings?.settings, 'extension_rejected')) {
+        await tx.insert(notifications).values({
+          userId: request.studentId,
+          type: 'extension_rejected',
+          titleKey: rejectedKeys.titleKey,
+          messageKey: rejectedKeys.messageKey,
+          params: rejectedParams,
+          channel: 'in_app',
+          metadata: {
+            extensionRequestId: requestId,
+            assignmentId: request.assignmentId,
+            extensionDays: request.extensionDays,
+            resolutionReason,
+          },
+        });
+      }
 
       auditData = {
         assignmentId: request.assignmentId,
@@ -423,21 +439,28 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
     };
     const extendedKeys = getNotificationKeys('deadline_extended');
     try {
-      await db.insert(notifications).values({
-        userId: studentId,
-        type: 'deadline_extended',
-        titleKey: extendedKeys.titleKey,
-        messageKey: extendedKeys.messageKey,
-        params: extendedParams,
-        channel: 'in_app',
-        metadata: {
-          assignmentId,
-          extraDays,
-          checkpointCount: unfinishedCheckpoints.length,
-          checkpointIds: unfinishedCheckpoints.map((cp) => cp.id),
-          reason,
-        },
-      });
+      const [studentSettings] = await db
+        .select({ settings: users.settings })
+        .from(users)
+        .where(eq(users.id, studentId))
+        .limit(1);
+      if (shouldSendInAppNotification(studentSettings?.settings, 'deadline_extended')) {
+        await db.insert(notifications).values({
+          userId: studentId,
+          type: 'deadline_extended',
+          titleKey: extendedKeys.titleKey,
+          messageKey: extendedKeys.messageKey,
+          params: extendedParams,
+          channel: 'in_app',
+          metadata: {
+            assignmentId,
+            extraDays,
+            checkpointCount: unfinishedCheckpoints.length,
+            checkpointIds: unfinishedCheckpoints.map((cp) => cp.id),
+            reason,
+          },
+        });
+      }
     } catch (err) {
       console.error('[bulkExtend] notification insert failed:', err);
     }
@@ -448,6 +471,7 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
       instructorName: session.user.name,
       assignmentId,
       extensionDays: extraDays,
+      notificationType: 'deadline_extended',
     });
 
     return { success: true, extendedCount: unfinishedCheckpoints.length };

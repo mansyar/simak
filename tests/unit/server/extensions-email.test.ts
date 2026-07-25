@@ -275,6 +275,7 @@ describe('Extension email enqueue — requestExtensionHandler', () => {
         Promise.resolve([{ count: 0 }]).then(onfulfilled),
       )
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ title: 'Thesis 2026' }]).then(onfulfilled),
       );
@@ -395,6 +396,7 @@ describe('Extension email enqueue — bulkExtendHandler', () => {
           { id: 101, dueDate: new Date('2026-06-20'), name: 'Chapter 2' },
         ]).then(onfulfilled),
       )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
       .mockImplementationOnce((onfulfilled: any) =>

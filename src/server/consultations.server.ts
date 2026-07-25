@@ -4,7 +4,6 @@ import { getDb } from '../db/index';
 import type { Db } from '../db/index';
 import { consultations } from '../db/schema/consultations';
 import { checkpoints, assignments, assignmentStudents } from '../db/schema/assignments';
-import { notifications } from '../db/schema/notifications';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
@@ -12,6 +11,7 @@ import { serverError, ErrorCode, type ServerError } from '../lib/errors';
 import { verifyAssignmentAccess } from './ownership';
 import { getNotificationKeys } from './notifications.server';
 import { sendConsultationEmail } from '../lib/consultation-email';
+import { maybeInsertNotification } from '../lib/notification-prefs';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -105,13 +105,12 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
       .returning({ id: consultations.id });
 
     const loggedKeys = getNotificationKeys('consultation_logged');
-    const loggedParams = { sessionType: sessionType ?? 'general' };
-    await db.insert(notifications).values({
+    await maybeInsertNotification(db, checkpoint.assignmentInstructorId, 'consultation_logged', {
       userId: checkpoint.assignmentInstructorId,
       type: 'consultation_logged',
       titleKey: loggedKeys.titleKey,
       messageKey: loggedKeys.messageKey,
-      params: loggedParams,
+      params: { sessionType: sessionType ?? 'general' },
       channel: 'in_app',
       metadata: {
         consultationId: inserted.id,
@@ -376,17 +375,14 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
         .where(eq(consultations.id, consultationId));
 
       const verifiedKeys = getNotificationKeys('consultation_verified');
-      await tx.insert(notifications).values({
+      await maybeInsertNotification(tx, consultation.studentId, 'consultation_verified', {
         userId: consultation.studentId,
         type: 'consultation_verified',
         titleKey: verifiedKeys.titleKey,
         messageKey: verifiedKeys.messageKey,
         params: null,
         channel: 'in_app',
-        metadata: {
-          consultationId,
-          assignmentId: consultation.assignmentId,
-        },
+        metadata: { consultationId, assignmentId: consultation.assignmentId },
       });
 
       auditData = { assignmentId: consultation.assignmentId, studentId: consultation.studentId };
@@ -451,14 +447,13 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
         })
         .where(eq(consultations.id, consultationId));
 
-      const rejectedParams = { reason };
       const rejectedKeys = getNotificationKeys('consultation_rejected');
-      await tx.insert(notifications).values({
+      await maybeInsertNotification(tx, consultation.studentId, 'consultation_rejected', {
         userId: consultation.studentId,
         type: 'consultation_rejected',
         titleKey: rejectedKeys.titleKey,
         messageKey: rejectedKeys.messageKey,
-        params: rejectedParams,
+        params: { reason },
         channel: 'in_app',
         metadata: {
           consultationId,

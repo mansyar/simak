@@ -108,13 +108,20 @@ export async function updateUserSettingsHandler(args: { data: UpdateUserSettings
   if (!session) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { user } = session;
-  const { reducedMotion } = args.data;
 
   try {
     const db = getDb();
+    // Read-modify-write (merge pattern): preserves unspecified settings fields
+    const [existing] = await db
+      .select({ settings: users.settings })
+      .from(users)
+      .where(eq(users.id, user.id));
+    const existingSettings = existing?.settings ?? { reducedMotion: false };
+    const mergedSettings = { ...existingSettings, ...args.data };
+
     const [updated] = await db
       .update(users)
-      .set({ settings: { reducedMotion } })
+      .set({ settings: mergedSettings })
       .where(eq(users.id, user.id))
       .returning({ settings: users.settings });
 

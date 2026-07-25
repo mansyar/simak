@@ -34,9 +34,16 @@ async function getUserLocaleByEmail(email: string): Promise<Locales> {
   }
 }
 
-export async function resolveEmailRecipient(
-  userId: string,
-): Promise<{ email: string; locale: Locales } | null> {
+export type EmailRecipient = {
+  email: string;
+  locale: Locales;
+  settings?: {
+    reducedMotion?: boolean;
+    notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }>;
+  } | null;
+};
+
+export async function resolveEmailRecipient(userId: string): Promise<EmailRecipient | null> {
   try {
     const [user] = await getDb()
       .select({
@@ -44,6 +51,7 @@ export async function resolveEmailRecipient(
         locale: users.locale,
         emailVerified: users.emailVerified,
         deletedAt: users.deletedAt,
+        settings: users.settings,
       })
       .from(users)
       .where(eq(users.id, userId));
@@ -53,7 +61,7 @@ export async function resolveEmailRecipient(
     if (!user.emailVerified) return null;
 
     const locale: Locales = user.locale === 'en' || user.locale === 'id' ? user.locale : 'en';
-    return { email: user.email, locale };
+    return { email: user.email, locale, settings: user.settings };
   } catch {
     return null;
   }

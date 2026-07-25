@@ -320,4 +320,36 @@ describe('bulkExtendHandler', () => {
       },
     });
   });
+
+  it('should skip notification when inApp preference is false', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+
+    const checkpoints = [
+      { id: 10, dueDate: new Date('2026-06-15'), name: 'CP1' },
+      { id: 11, dueDate: new Date('2026-07-01'), name: 'CP2' },
+    ];
+
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([{ id: 1 }]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve(checkpoints).then(onfulfilled))
+      .mockImplementation((onfulfilled: any) =>
+        Promise.resolve([
+          {
+            settings: {
+              notificationPrefs: { deadline_extended: { inApp: false } },
+            },
+          },
+        ]).then(onfulfilled),
+      );
+
+    await bulkExtendHandler({ data: validInput });
+
+    // Only the batch audit INSERT, no notification INSERT
+    expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    const valuesCalls = vi.mocked(mockDb.values).mock.calls;
+    const notificationValues = valuesCalls.find(
+      (call: any) => call[0]?.type === 'deadline_extended',
+    );
+    expect(notificationValues).toBeUndefined();
+  });
 });

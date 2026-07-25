@@ -1004,6 +1004,70 @@
       "description": "Accessibility settings for a better experience",
       "reducedMotionLabel": "Reduced Motion",
       "reducedMotionHint": "Reduce animations and transitions throughout the app"
+    },
+    "notificationPreferences": {
+      "title": "Notification Preferences",
+      "description": "Choose how you want to be notified for each event type.",
+      "channels": {
+        "email": "Email",
+        "inApp": "In-app"
+      },
+      "groups": {
+        "reviews": "Reviews",
+        "consultations": "Consultations",
+        "submissions": "Submissions & Extensions",
+        "system": "System"
+      },
+      "types": {
+        "review_completed": {
+          "label": "Review Completed",
+          "description": "When your submission passes review"
+        },
+        "revision_requested": {
+          "label": "Revision Requested",
+          "description": "When a revision is requested on your submission"
+        },
+        "consultation_logged": {
+          "label": "Consultation Logged",
+          "description": "When a new consultation is logged"
+        },
+        "consultation_verified": {
+          "label": "Consultation Verified",
+          "description": "When your consultation is verified"
+        },
+        "consultation_rejected": {
+          "label": "Consultation Rejected",
+          "description": "When your consultation is rejected"
+        },
+        "submission_received": {
+          "label": "Submission Received",
+          "description": "When a student submits work"
+        },
+        "extension_requested": {
+          "label": "Extension Requested",
+          "description": "When an extension is requested"
+        },
+        "extension_approved": {
+          "label": "Extension Approved",
+          "description": "When your extension request is approved"
+        },
+        "extension_rejected": {
+          "label": "Extension Rejected",
+          "description": "When your extension request is rejected"
+        },
+        "deadline_extended": {
+          "label": "Deadline Extended",
+          "description": "When a deadline is extended"
+        },
+        "deadline_reminder": {
+          "label": "Deadline Reminder",
+          "description": "Reminders before deadlines"
+        },
+        "sla_breach": {
+          "label": "SLA Breach",
+          "description": "When a review SLA is breached"
+        }
+      }
     }
   },
   "bulkImport": {
