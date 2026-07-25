@@ -30,10 +30,11 @@
     - [x] Run `pnpm test` — confirm tests pass
     - **Commit:** `21b9e112` — feat(server): Add discussions Zod schemas and server function stubs
 
-- [ ] Task: Implement `listDiscussionMessagesHandler` (`src/server/discussions.server.ts`)
-    - [ ] Write failing tests: paginated 20/page, ordered by createdAt ASC, includes author name + role via JOIN, ownership verified (student can't view other students' discussions, instructor can view all in their assignments), soft-deleted messages excluded from list but replies to them included
-    - [ ] Implement handler — paginated query with JOIN to `users` for author name/role, ownership guard via `assignmentStudents` join for students and `assignments.instructorId` for instructors, exclude `deletedAt IS NOT NULL` from top-level but include replies to deleted parents
-    - [ ] Run `pnpm test` — confirm all handler tests pass
+- [x] Task: Implement `listDiscussionMessagesHandler` (`src/server/discussions.server.ts`)
+    - [x] Write failing tests: paginated 20/page, ordered by createdAt ASC, includes author name + role via JOIN, ownership verified (student can't view other students' discussions, instructor can view all in their assignments), soft-deleted messages excluded from list but replies to them included
+    - [x] Implement handler — paginated query with JOIN to `users` for author name/role, ownership guard via `assignmentStudents` join for students and `assignments.instructorId` for instructors, exclude `deletedAt IS NOT NULL` from top-level but include replies to deleted parents
+    - [x] Run `pnpm test` — confirm all handler tests pass
+    - **Commit:** `a1ed2908` — feat(server): Implement listDiscussionMessagesHandler with pagination and ownership guard
 
 - [ ] Task: Implement `postDiscussionMessageHandler` (`src/server/discussions.server.ts`)
     - [ ] Write failing tests: validates message length 1–2000, rejects empty, rejects > 2000, verifies ownership (student owns checkpoint OR instructor owns assignment), inserts message, fires `discussion_reply` notification to the other party via `maybeInsertNotification` with `metadata.target` set to recipient role, fires email via `enqueueEventEmail` advisory post-commit try/catch, `parentMessageId` validated to same checkpoint
