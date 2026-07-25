@@ -56,7 +56,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Schema & Server Functions' (Protocol in workflow.md)
 
-## Phase 2: UI Components & Notifications
+## Phase 2: UI Components & Notifications [checkpoint: 72088a36]
 
 - [x] Task: Read `spec.md` and `workflow.md` to re-establish context before starting Phase 2 implementation
     - [x] Read `conductor/tracks/checkpoint-discussion-qa-threads_20260725/spec.md`
@@ -97,7 +97,7 @@
     - [x] Run `pnpm test` — confirm all notification integration tests pass
     - **Commit:** `98628402` — feat(notifications): Integrate discussion_reply notification type
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: UI Components & Notifications' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: UI Components & Notifications' (Protocol in workflow.md)
 
 ## Phase 3: Email, i18n & Polish
 
