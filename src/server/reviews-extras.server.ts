@@ -212,3 +212,20 @@ export async function recomputeStudentGrade(
       },
     });
 }
+
+/**
+ * Advisory grade recomputation after a review pass decision.
+ * Non-blocking — errors are logged but do not fail the request.
+ */
+export async function advisoryRecomputeGrade(
+  db: ReturnType<typeof getDb>,
+  decision: string,
+  submission: { assignmentId: number; studentId: string },
+): Promise<void> {
+  if (decision !== 'pass') return;
+  try {
+    await recomputeStudentGrade(db, submission.assignmentId, submission.studentId);
+  } catch (e) {
+    console.error('Post-commit advisory work failed in submitReviewHandler:', e);
+  }
+}

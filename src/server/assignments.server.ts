@@ -9,6 +9,7 @@ import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode, type ServerError } from '../lib/errors';
 import { translateKey } from '../lib/i18n-server';
 import { calculateDueDates, validateDueDates } from './due-dates.server';
+import { createDefaultGradeConfig } from './assignments-extras.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -177,7 +178,7 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
         }
         await tx.insert(checkpoints).values(checkpointRows);
       }
-
+      await createDefaultGradeConfig(tx, assignmentId);
       return { success: true, assignmentId };
     });
 

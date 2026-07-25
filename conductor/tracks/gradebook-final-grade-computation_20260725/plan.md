@@ -65,12 +65,12 @@
     - [x] Test `createDefaultGradeConfig`: inserts default config inside transaction
     - [x] Run `pnpm test` and confirm tests fail
 
-- [ ] Task: Implement grade recomputation + default config helpers
-    - [ ] Add `recomputeStudentGrade(db, assignmentId, studentId)` to `src/server/reviews-extras.server.ts`
-    - [ ] Add `createDefaultGradeConfig(tx, assignmentId)` to `src/server/assignments-extras.server.ts`
-    - [ ] Run `pnpm test` and confirm tests pass
+- [x] Task: Implement grade recomputation + default config helpers [0979d473]
+    - [x] Add `recomputeStudentGrade(db, assignmentId, studentId)` to `src/server/reviews-extras.server.ts`
+    - [x] Add `createDefaultGradeConfig(tx, assignmentId)` to `src/server/assignments-extras.server.ts`
+    - [x] Run `pnpm test` and confirm tests pass
 
-- [ ] Task: Wire triggers into existing handlers
+- [x] Task: Wire triggers into existing handlers
     - [ ] Extend `submitReviewHandler` in `reviews.server.ts` post-commit advisory: call `recomputeStudentGrade` wrapped in try/catch, only when `decision === 'pass'` (~5 lines)
     - [ ] Extend `createAssignmentHandler` in `assignments.server.ts` inside transaction: call `createDefaultGradeConfig(tx, assignmentId)` (1-line call)
     - [ ] Update existing tests for both handlers to mock the new advisory calls

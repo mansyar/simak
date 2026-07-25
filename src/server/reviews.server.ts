@@ -20,6 +20,7 @@ import { sendReviewEmail } from '../lib/review-email';
 import { maybeInsertNotification } from '../lib/notification-prefs';
 import { fetchRubric } from './rubrics.server';
 import { validateReviewScores, insertReviewScores } from './review-scores.server';
+import { advisoryRecomputeGrade } from './reviews-extras.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -479,6 +480,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       assignmentId: submission.assignmentId,
       revisionDeadline,
     });
+    await advisoryRecomputeGrade(db, decision, submission);
     return { success: true };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
