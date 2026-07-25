@@ -1,3 +1,4 @@
+<protect>
 # TRACK-026: Checkpoint Discussion / Q&A Threads
 
 ## Overview
@@ -138,3 +139,4 @@ Add lightweight, async Q&A discussion threads to checkpoint detail pages, enabli
 - Read receipts (v2)
 - Search within discussion threads (v2)
 - Deeper reply nesting beyond 1 level (v2)
+</protect>
