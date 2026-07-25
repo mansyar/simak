@@ -173,6 +173,9 @@ vi.mock('@/components/reviews/DeadlineManager', () => ({
 vi.mock('@/components/reviews/ReviewFilePreview', () => ({
   ReviewFilePreview: () => <div data-testid="review-file-preview" />,
 }));
+vi.mock('@/components/discussions/discussion-panel', () => ({
+  DiscussionPanel: () => <div data-testid="discussion-panel" />,
+}));
 vi.mock('@/components/settings/SettingsPage', () => ({
   SettingsPage: () => <div data-testid="settings-page" />,
 }));

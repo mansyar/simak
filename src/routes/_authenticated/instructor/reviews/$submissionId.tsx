@@ -7,6 +7,7 @@ import { ReviewFilePreview } from '@/components/reviews/ReviewFilePreview';
 import { ReviewHistory } from '@/components/reviews/ReviewHistory';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
 import { ReviewQueueSkeleton } from '@/components/reviews/ReviewQueueSkeleton';
+import { DiscussionPanel } from '@/components/discussions/discussion-panel';
 import { useI18n } from '../../../__root';
 import { AlertCircle, CheckCircle2, SearchX } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -133,6 +134,13 @@ function ReviewDetailPage() {
         version={submission.version ?? 0}
         uploadedAt={submission.uploadedAt ?? new Date()}
         downloadUrl={submission.downloadUrl}
+      />
+
+      {/* Discussion panel */}
+      <DiscussionPanel
+        checkpointId={submission.checkpointId}
+        assignmentId={submission.assignmentId}
+        instructorView
       />
 
       {/* Review history */}
