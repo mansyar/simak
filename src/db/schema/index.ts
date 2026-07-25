@@ -13,6 +13,7 @@ export * from './audit-log';
 export * from './extensions';
 export * from './email-queue';
 export * from './deadline-reminders';
+export * from './gradebook';
 
 // Import tables for relations
 import { users } from './users';
@@ -26,6 +27,7 @@ import { notifications } from './notifications';
 import { extensionRequests } from './extensions';
 import { emailQueue } from './email-queue';
 import { deadlineReminders } from './deadline-reminders';
+import { assignmentGradeConfig, finalGrades } from './gradebook';
 
 // ---- Relations ----
 
@@ -60,6 +62,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   consultationsAsStudent: many(consultations),
   consultationsAsVerifier: many(consultations),
   twoFactor: many(twoFactor),
+  finalGrades: many(finalGrades),
 }));
 
 export const assignmentTemplatesRelations = relations(assignmentTemplates, ({ many, one }) => ({
@@ -92,6 +95,8 @@ export const assignmentsRelations = relations(assignments, ({ many, one }) => ({
   assignmentStudents: many(assignmentStudents),
   checkpoints: many(checkpoints),
   consultations: many(consultations),
+  assignmentGradeConfig: one(assignmentGradeConfig),
+  finalGrades: many(finalGrades),
 }));
 
 export const assignmentStudentsRelations = relations(assignmentStudents, ({ one }) => ({
@@ -226,6 +231,24 @@ export const extensionRequestsRelations = relations(extensionRequests, ({ one })
   }),
   resolver: one(users, {
     fields: [extensionRequests.resolvedBy],
+    references: [users.id],
+  }),
+}));
+
+export const assignmentGradeConfigRelations = relations(assignmentGradeConfig, ({ one }) => ({
+  assignment: one(assignments, {
+    fields: [assignmentGradeConfig.assignmentId],
+    references: [assignments.id],
+  }),
+}));
+
+export const finalGradesRelations = relations(finalGrades, ({ one }) => ({
+  assignment: one(assignments, {
+    fields: [finalGrades.assignmentId],
+    references: [assignments.id],
+  }),
+  student: one(users, {
+    fields: [finalGrades.studentId],
     references: [users.id],
   }),
 }));

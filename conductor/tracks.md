@@ -8,6 +8,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Gradebook & Final Grade Computation**
+- [~] **Track: Gradebook & Final Grade Computation**
 *Link: [./tracks/gradebook-final-grade-computation_20260725/](./tracks/gradebook-final-grade-computation_20260725/)*
 

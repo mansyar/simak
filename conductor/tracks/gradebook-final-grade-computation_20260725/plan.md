@@ -3,11 +3,11 @@
 
 ## Phase 1: Schema & Computation Engine
 
-- [ ] Task: Read spec.md and workflow.md to re-establish context before implementation
-    - [ ] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to re-establish context before implementation
+    - [x] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Create gradebook database schema
+- [~] Task: Create gradebook database schema
     - [ ] Create `src/db/schema/gradebook.ts` with `assignment_grade_config` table (assignmentId FK unique cascade, gradingScheme pgEnum `equal_weight`|`custom_weight`, customWeights jsonb nullable, letterGradeBounds jsonb, createdAt, updatedAt)
     - [ ] Create `final_grades` table in same file (id serial PK, assignmentId FK cascade, studentId FK→users, numericScore numeric(5,2) nullable, letterGrade text nullable, status pgEnum `complete`|`incomplete`|`in_progress`, contributingCheckpoints jsonb, computedAt, updatedAt, unique `(assignmentId, studentId)`)
     - [ ] Define relations: `assignmentGradeConfigRelations`, `finalGradesRelations`
