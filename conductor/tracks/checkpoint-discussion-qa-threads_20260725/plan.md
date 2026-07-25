@@ -1,7 +1,7 @@
 <protect>
 # TRACK-026: Checkpoint Discussion / Q&A Threads — Implementation Plan
 
-## Phase 1: Schema & Server Functions
+## Phase 1: Schema & Server Functions [checkpoint: ec13b93c]
 
 - [x] Task: Read `spec.md` and `workflow.md` to re-establish context before starting Phase 1 implementation
     - [x] Read `conductor/tracks/checkpoint-discussion-qa-threads_20260725/spec.md`
