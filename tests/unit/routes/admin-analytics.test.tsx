@@ -68,6 +68,7 @@ const mockAnalyticsData = {
   reviewsCompleted: 42,
   dauTrend: [{ date: '2024-01-03', activeUsers: 501 }],
   wauTrend: [{ date: '2024-01-04', activeUsers: 999 }],
+  atRiskSummary: { high: 2, medium: 5, low: 8 },
   dateRange: { start: null, end: null },
 };
 
@@ -231,6 +232,31 @@ describe('Admin Analytics Page', () => {
     const Page = await getAnalyticsPage();
     render(<Page />);
     expect(screen.queryByText('adminAnalytics.rubricTitle')).toBeNull();
+  });
+
+  it('renders at-risk summary card with correct counts', async () => {
+    const Page = await getAnalyticsPage();
+    render(<Page />);
+    expect(screen.getByText('adminAnalytics.atRiskTitle')).toBeDefined();
+    expect(screen.getByText('adminAnalytics.atRiskHigh')).toBeDefined();
+    expect(screen.getByText('adminAnalytics.atRiskMedium')).toBeDefined();
+    expect(screen.getByText('adminAnalytics.atRiskLow')).toBeDefined();
+    expect(screen.getByText('2')).toBeDefined();
+    expect(screen.getByText('5')).toBeDefined();
+    expect(screen.getByText('8')).toBeDefined();
+  });
+
+  it('renders at-risk empty state when all counts are zero', async () => {
+    mocks.loaderData = {
+      analytics: {
+        ...mockAnalyticsData,
+        atRiskSummary: { high: 0, medium: 0, low: 0 },
+      },
+      rubric: { ...mockRubricData },
+    };
+    const Page = await getAnalyticsPage();
+    render(<Page />);
+    expect(screen.getByText('adminAnalytics.atRiskEmpty')).toBeDefined();
   });
 });
 
