@@ -76,11 +76,12 @@
     - [x] Run `pnpm test` — confirm tests pass
     - **Commit:** `1a22b99f` — feat(ui): Mount DiscussionPanel on student checkpoint detail page
 
-- [ ] Task: Add "Discussions" tab on instructor assignment detail page
-    - [ ] Write failing test asserting the Discussions tab renders and shows messages grouped by checkpoint
-    - [ ] Add `{ id: 'discussions', label: t('discussions.title') }` to `tabList` array in instructor assignment detail route
-    - [ ] Add conditional render block for discussions tab — `DiscussionPanel` with `instructorView` prop, showing all checkpoint discussions grouped by checkpoint
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Add "Discussions" tab on instructor assignment detail page
+    - [x] Write failing test asserting the Discussions tab renders and shows messages grouped by checkpoint
+    - [x] Add `{ id: 'discussions', label: t('discussions.title') }` to `tabList` array in instructor assignment detail route
+    - [x] Add conditional render block for discussions tab — `DiscussionPanel` with `instructorView` prop, showing all checkpoint discussions grouped by checkpoint
+    - [x] Run `pnpm test` — confirm tests pass
+    - **Commit:** `d2056669` — feat(ui): Add Discussions tab on instructor assignment detail page
 
 - [ ] Task: Add inline `DiscussionPanel` on review detail page
     - [ ] Write failing test asserting `DiscussionPanel` renders below the file preview section on `/instructor/reviews/$submissionId.tsx`
