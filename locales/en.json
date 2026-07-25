@@ -698,6 +698,24 @@
       "notesRequired": "Notes are required"
     }
   },
+  "discussions": {
+    "title": "Discussions",
+    "placeholder": "Write a message...",
+    "send": "Send",
+    "reply": "Reply",
+    "delete": "Delete",
+    "deleted": "[deleted]",
+    "deleteWindowExpired": "Deletion window expired",
+    "loading": "Loading messages...",
+    "empty": {
+      "title": "No messages yet",
+      "description": "Ask a question about this checkpoint"
+    },
+    "errors": {
+      "required": "Message cannot be empty",
+      "tooLong": "Message must be 2000 characters or less"
+    }
+  },
   "landing": {
     "hero": {
       "headline": "Manage Academic Assignments with Confidence",

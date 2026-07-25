@@ -703,6 +703,24 @@ export type Translation = {
       notesRequired: string
     }
   }
+  discussions: {
+    title: string
+    placeholder: string
+    send: string
+    reply: string
+    delete: string
+    deleted: string
+    deleteWindowExpired: string
+    loading: string
+    empty: {
+      title: string
+      description: string
+    }
+    errors: {
+      required: string
+      tooLong: string
+    }
+  }
   landing: {
     hero: {
       headline: string
