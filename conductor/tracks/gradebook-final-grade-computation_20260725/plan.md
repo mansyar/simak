@@ -1,6 +1,11 @@
+<protect>
 # Implementation Plan: Gradebook & Final Grade Computation (TRACK-025)
 
 ## Phase 1: Schema & Computation Engine
+
+- [ ] Task: Read spec.md and workflow.md to re-establish context before implementation
+    - [ ] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
+    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
 - [ ] Task: Create gradebook database schema
     - [ ] Create `src/db/schema/gradebook.ts` with `assignment_grade_config` table (assignmentId FK unique cascade, gradingScheme pgEnum `equal_weight`|`custom_weight`, customWeights jsonb nullable, letterGradeBounds jsonb, createdAt, updatedAt)
@@ -37,6 +42,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Schema & Computation Engine' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions & Grade Recomputation
+
+- [ ] Task: Read spec.md and workflow.md to re-establish context before implementation
+    - [ ] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
+    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
 - [ ] Task: Write failing tests for gradebook server handlers
     - [ ] Create `tests/unit/server/gradebook.test.ts` with `@vitest-environment node` + mock `@tanstack/react-start` builder chain + mock `@/server/auth`, `@/db/index`
@@ -78,6 +87,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions & Grade Recomputation' (Protocol in workflow.md)
 
 ## Phase 3: UI, Export & i18n
+
+- [ ] Task: Read spec.md and workflow.md to re-establish context before implementation
+    - [ ] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
+    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
 - [ ] Task: Add i18n keys
     - [ ] Add `gradebook.*` keys to `locales/en.json` (title, finalGrade, letterGrade.A/B/C/D/F, status.complete/in_progress/incomplete, settings.scheme/equalWeight/customWeight/letterBounds/customWeights, exportCsv/exportExcel, empty/noGrades, configSummary, recomputeAll, staleWeightsWarning, analytics.gradeDistribution)
@@ -158,3 +171,4 @@
     - [ ] Verify all files ≤500 lines (`check-modularity.js`)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: UI, Export & i18n' (Protocol in workflow.md)
+</protect>

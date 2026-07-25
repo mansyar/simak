@@ -1,3 +1,4 @@
+<protect>
 # Track: Gradebook & Final Grade Computation (TRACK-025)
 
 ## Overview
@@ -157,3 +158,4 @@ Aggregates rubric-based review scores (from TRACK-020) and pass/fail checkpoint 
 - Automated grade import from external systems / LMS integration (v2)
 - Student notification on grade update (v2 — students see their grade when they open the assignment page)
 - `passThreshold` / numeric pass override (instructor's pass/revise decision already determines checkpoint completion)
+</protect>
