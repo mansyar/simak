@@ -96,8 +96,8 @@ export function groupRowsToCheckpoints(rows: ScoreRow[]): CheckpointGradeInput[]
   return Array.from(map.values());
 }
 
-/** Group flat rows by studentId, returning Map<studentId, CheckpointGradeInput[]>. */
-function groupRowsByStudent(
+/** Group flat rows by studentId, returning Map<studentId, { studentName, checkpoints }>. */
+export function groupRowsByStudent(
   rows: ScoreRow[],
 ): Map<string, { studentName: string; checkpoints: CheckpointGradeInput[] }> {
   const byStudent = new Map<string, ScoreRow[]>();
