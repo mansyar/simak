@@ -70,19 +70,19 @@
     - [x] Add `createDefaultGradeConfig(tx, assignmentId)` to `src/server/assignments-extras.server.ts`
     - [x] Run `pnpm test` and confirm tests pass
 
-- [x] Task: Wire triggers into existing handlers
-    - [ ] Extend `submitReviewHandler` in `reviews.server.ts` post-commit advisory: call `recomputeStudentGrade` wrapped in try/catch, only when `decision === 'pass'` (~5 lines)
-    - [ ] Extend `createAssignmentHandler` in `assignments.server.ts` inside transaction: call `createDefaultGradeConfig(tx, assignmentId)` (1-line call)
-    - [ ] Update existing tests for both handlers to mock the new advisory calls
-    - [ ] Run `pnpm test` and confirm all tests pass
+- [x] Task: Wire triggers into existing handlers [c1d20a4a]
+    - [x] Extend `submitReviewHandler` in `reviews.server.ts` post-commit advisory: call `advisoryRecomputeGrade` (wrapper in reviews-extras.server.ts, only when `decision === 'pass'`)
+    - [x] Extend `createAssignmentHandler` in `assignments.server.ts` inside transaction: call `createDefaultGradeConfig(tx, assignmentId)`
+    - [x] No test mock updates needed — advisory calls are naturally no-ops with empty mock DB results
+    - [x] Run `pnpm test` and confirm all tests pass
 
-- [ ] Task: Write failing tests for CSV export handler
-    - [ ] Test `exportGradebookCsvHandler`: CSV format correct (headers, student rows), formula injection mitigated via `escapeCsvValue`, admin ownership verified
-    - [ ] Run `pnpm test` and confirm tests fail
+- [x] Task: Write failing tests for CSV export handler [ed796294]
+    - [x] Test `exportGradebookCsvHandler`: CSV format correct (headers, student rows), formula injection mitigated via `escapeCsvValue`, admin ownership verified
+    - [x] Run `pnpm test` and confirm tests fail
 
-- [ ] Task: Implement CSV export handler
-    - [ ] Add `exportGradebookCsvHandler` to `src/server/analytics-export.server.ts` (admin-only, per-assignment, uses existing private `escapeCsvValue` + `buildCsv`)
-    - [ ] Run `pnpm test` and confirm tests pass
+- [x] Task: Implement CSV export handler [ed796294]
+    - [x] Add `exportGradebookCsvHandler` to `src/server/analytics-export.server.ts` (admin-only, per-assignment, uses existing private `escapeCsvValue` + `buildCsv`, dynamic checkpoint columns)
+    - [x] Run `pnpm test` and confirm tests pass
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions & Grade Recomputation' (Protocol in workflow.md)
 
