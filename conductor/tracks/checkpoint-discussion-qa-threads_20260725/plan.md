@@ -36,10 +36,11 @@
     - [x] Run `pnpm test` — confirm all handler tests pass
     - **Commit:** `a1ed2908` — feat(server): Implement listDiscussionMessagesHandler with pagination and ownership guard
 
-- [ ] Task: Implement `postDiscussionMessageHandler` (`src/server/discussions.server.ts`)
-    - [ ] Write failing tests: validates message length 1–2000, rejects empty, rejects > 2000, verifies ownership (student owns checkpoint OR instructor owns assignment), inserts message, fires `discussion_reply` notification to the other party via `maybeInsertNotification` with `metadata.target` set to recipient role, fires email via `enqueueEventEmail` advisory post-commit try/catch, `parentMessageId` validated to same checkpoint
-    - [ ] Implement handler — Zod validation, ownership guard, message insert, post-commit advisory notification + email dispatch (try/catch), parentMessageId validation
-    - [ ] Run `pnpm test` — confirm all handler tests pass
+- [x] Task: Implement `postDiscussionMessageHandler` (`src/server/discussions.server.ts`)
+    - [x] Write failing tests: validates message length 1–2000, rejects empty, rejects > 2000, verifies ownership (student owns checkpoint OR instructor owns assignment), inserts message, fires `discussion_reply` notification to the other party via `maybeInsertNotification` with `metadata.target` set to recipient role, fires email via `enqueueEventEmail` advisory post-commit try/catch, `parentMessageId` validated to same checkpoint
+    - [x] Implement handler — Zod validation, ownership guard, message insert, post-commit advisory notification + email dispatch (try/catch), parentMessageId validation
+    - [x] Run `pnpm test` — confirm all handler tests pass
+    - **Commit:** `302d3187` — feat(server): Implement postDiscussionMessageHandler with notifications and email
 
 - [ ] Task: Implement `deleteOwnMessageHandler` (`src/server/discussions.server.ts`)
     - [ ] Write failing tests: verifies requesting user is author, rejects after 15-min deletion window, soft-deletes via `deletedAt`, preserves reply threading (replies to deleted message still render)
