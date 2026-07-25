@@ -89,12 +89,13 @@
     - [x] Run `pnpm test` — confirm tests pass
     - **Commit:** `37e59afe` — feat(ui): Mount DiscussionPanel inline on instructor review detail page
 
-- [ ] Task: Integrate `discussion_reply` notification type
-    - [ ] Write failing tests: notification route for `discussion_reply` returns correct path for student target (`/student/assignments/{id}/checkpoints/{checkpointId}`) and instructor target (`/instructor/assignments/{id}`), missing target returns null
-    - [ ] Add `case 'discussion_reply':` to `getNotificationRoute()` in `src/components/notifications/notification-routes.ts` — checks `metadata.target` to return student or instructor route
-    - [ ] Add `discussion_reply: MessageCircle` to `TYPE_ICONS` in `src/components/notifications/NotificationItem.tsx`
-    - [ ] Add `discussion_reply` to `consultations` group in `GROUP_CONFIGS` in `src/components/notifications/NotificationCenter.tsx`
-    - [ ] Run `pnpm test` — confirm all notification integration tests pass
+- [x] Task: Integrate `discussion_reply` notification type
+    - [x] Write failing tests: notification route for `discussion_reply` returns correct path for student target (`/student/assignments/{id}/checkpoints/{checkpointId}`) and instructor target (`/instructor/assignments/{id}`), missing target returns null
+    - [x] Add `case 'discussion_reply':` to `getNotificationRoute()` in `src/components/notifications/notification-routes.ts` — checks `metadata.target` to return student or instructor route
+    - [x] Add `discussion_reply: MessageCircle` to `TYPE_ICONS` in `src/components/notifications/NotificationItem.tsx`
+    - [x] Add `discussion_reply` to `consultations` group in `GROUP_CONFIGS` in `src/components/notifications/NotificationCenter.tsx`
+    - [x] Run `pnpm test` — confirm all notification integration tests pass
+    - **Commit:** `98628402` — feat(notifications): Integrate discussion_reply notification type
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: UI Components & Notifications' (Protocol in workflow.md)
 
