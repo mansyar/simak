@@ -83,10 +83,11 @@
     - [x] Run `pnpm test` — confirm tests pass
     - **Commit:** `d2056669` — feat(ui): Add Discussions tab on instructor assignment detail page
 
-- [ ] Task: Add inline `DiscussionPanel` on review detail page
-    - [ ] Write failing test asserting `DiscussionPanel` renders below the file preview section on `/instructor/reviews/$submissionId.tsx`
-    - [ ] Import and render `DiscussionPanel` below the file preview section with `checkpointId` derived from the submission's checkpoint
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Add inline `DiscussionPanel` on review detail page
+    - [x] Write failing test asserting `DiscussionPanel` renders below the file preview section on `/instructor/reviews/$submissionId.tsx`
+    - [x] Import and render `DiscussionPanel` below the file preview section with `checkpointId` derived from the submission's checkpoint
+    - [x] Run `pnpm test` — confirm tests pass
+    - **Commit:** `37e59afe` — feat(ui): Mount DiscussionPanel inline on instructor review detail page
 
 - [ ] Task: Integrate `discussion_reply` notification type
     - [ ] Write failing tests: notification route for `discussion_reply` returns correct path for student target (`/student/assignments/{id}/checkpoints/{checkpointId}`) and instructor target (`/instructor/assignments/{id}`), missing target returns null
