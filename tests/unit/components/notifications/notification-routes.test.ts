@@ -130,6 +130,54 @@ describe('getNotificationRoute', () => {
     });
     expect(route).toBeNull();
   });
+
+  it('derives discussion_reply route to student checkpoint page when target is student', () => {
+    const route = getNotificationRoute('discussion_reply', {
+      target: 'student',
+      assignmentId: 5,
+      checkpointId: 10,
+    });
+    expect(route).toBe('/student/assignments/5/checkpoints/10');
+  });
+
+  it('derives discussion_reply route to instructor assignment page when target is instructor', () => {
+    const route = getNotificationRoute('discussion_reply', {
+      target: 'instructor',
+      assignmentId: 7,
+    });
+    expect(route).toBe('/instructor/assignments/7');
+  });
+
+  it('returns null for discussion_reply when target is missing', () => {
+    const route = getNotificationRoute('discussion_reply', {
+      assignmentId: 5,
+      checkpointId: 10,
+    });
+    expect(route).toBeNull();
+  });
+
+  it('returns null for discussion_reply with student target when checkpointId is missing', () => {
+    const route = getNotificationRoute('discussion_reply', {
+      target: 'student',
+      assignmentId: 5,
+    });
+    expect(route).toBeNull();
+  });
+
+  it('returns null for discussion_reply with student target when assignmentId is missing', () => {
+    const route = getNotificationRoute('discussion_reply', {
+      target: 'student',
+      checkpointId: 10,
+    });
+    expect(route).toBeNull();
+  });
+
+  it('returns null for discussion_reply with instructor target when assignmentId is missing', () => {
+    const route = getNotificationRoute('discussion_reply', {
+      target: 'instructor',
+    });
+    expect(route).toBeNull();
+  });
 });
 
 describe('GROUP_CONFIGS', () => {
@@ -137,5 +185,11 @@ describe('GROUP_CONFIGS', () => {
     const systemGroup = GROUP_CONFIGS.find((g) => g.key === 'system');
     expect(systemGroup).toBeDefined();
     expect(systemGroup!.types).toContain('student_at_risk');
+  });
+
+  it('includes discussion_reply in the consultations group', () => {
+    const consultationsGroup = GROUP_CONFIGS.find((g) => g.key === 'consultations');
+    expect(consultationsGroup).toBeDefined();
+    expect(consultationsGroup!.types).toContain('discussion_reply');
   });
 });
