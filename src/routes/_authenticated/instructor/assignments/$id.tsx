@@ -7,6 +7,7 @@ import { AssignmentOverviewTab } from '@/components/instructor/assignments/Assig
 import { AssignmentConsultationsTab } from '@/components/instructor/assignments/AssignmentConsultationsTab';
 import { AssignmentExtensionsTab } from '@/components/instructor/assignments/AssignmentExtensionsTab';
 import { AssignmentDetailTabs } from '@/components/instructor/assignments/AssignmentDetailTabs';
+import { DiscussionPanel } from '@/components/discussions/discussion-panel';
 import { useAssignmentTabs } from '@/hooks/use-assignment-tabs';
 import { useCsvDownload } from '@/hooks/use-csv-download';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -61,6 +62,7 @@ function AssignmentDetailPage() {
       count: tabs.pendingConsultations.length,
     },
     { id: 'extensions', label: t('extensions.queueTitle'), count: tabs.extensionRequests.length },
+    { id: 'discussions', label: t('discussions.title') },
   ];
 
   return (
@@ -128,6 +130,20 @@ function AssignmentDetailPage() {
           onApprove={tabs.handleApproveExtension}
           onReject={tabs.handleRejectExtension}
         />
+      )}
+      {activeTab === 'discussions' && (
+        <div className="space-y-6">
+          {assignment.students.map((student) =>
+            student.checkpoints.map((cp) => (
+              <div key={cp.id} className="space-y-2">
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  {student.name} — {cp.name}
+                </h3>
+                <DiscussionPanel checkpointId={cp.id} assignmentId={assignment.id} instructorView />
+              </div>
+            )),
+          )}
+        </div>
       )}
     </div>
   );
