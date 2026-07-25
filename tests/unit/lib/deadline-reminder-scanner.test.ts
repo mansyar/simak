@@ -5,10 +5,14 @@ vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
 vi.mock('@/lib/deadline-reminder-email', () => ({
   sendDeadlineReminderEmail: vi.fn().mockResolvedValue(undefined),
 }));
+vi.mock('@/lib/risk-alerts', () => ({
+  checkAndFireRiskAlert: vi.fn().mockResolvedValue(undefined),
+}));
 
 import { processDeadlineReminders } from '@/lib/deadline-reminder-scanner';
 import { getDb } from '@/db/index';
 import { sendDeadlineReminderEmail } from '@/lib/deadline-reminder-email';
+import { checkAndFireRiskAlert } from '@/lib/risk-alerts';
 
 describe('processDeadlineReminders', () => {
   let mockDb: any;
@@ -21,6 +25,8 @@ describe('processDeadlineReminders', () => {
       checkpointName: 'Checkpoint 1',
       dueDate: new Date('2026-07-28T00:00:00Z'),
       studentId: 'student-1',
+      studentName: 'Alice',
+      instructorId: 'instructor-1',
     },
   ];
 
@@ -394,6 +400,66 @@ describe('processDeadlineReminders', () => {
       expect(mockDb.insert).toHaveBeenCalledTimes(4);
       // 2 emails (one per winning checkpoint)
       expect(sendDeadlineReminderEmail).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('risk alert integration', () => {
+    it('should call checkAndFireRiskAlert for each winning checkpoint', async () => {
+      queueOnlyTier1HasResults();
+
+      await processDeadlineReminders();
+
+      expect(checkAndFireRiskAlert).toHaveBeenCalledTimes(1);
+      expect(checkAndFireRiskAlert).toHaveBeenCalledWith(
+        mockDb,
+        expect.objectContaining({
+          studentId: 'student-1',
+          studentName: 'Alice',
+          assignmentId: 10,
+          assignmentTitle: 'Assignment 1',
+          instructorId: 'instructor-1',
+        }),
+      );
+    });
+
+    it('should not call checkAndFireRiskAlert when no winners (dedup)', async () => {
+      mockDb.then
+        .mockImplementationOnce((onf: any) => Promise.resolve(dueCheckpoints).then(onf)) // 7d SELECT
+        .mockImplementationOnce((onf: any) => Promise.resolve([]).then(onf)) // 7d INSERT dedup (no winners)
+        .mockImplementationOnce((onf: any) => Promise.resolve([]).then(onf)) // 3d SELECT
+        .mockImplementationOnce((onf: any) => Promise.resolve([]).then(onf)); // 1d SELECT
+
+      await processDeadlineReminders();
+
+      expect(checkAndFireRiskAlert).not.toHaveBeenCalled();
+    });
+
+    it('should not call checkAndFireRiskAlert when no checkpoints due', async () => {
+      mockDb.then
+        .mockImplementationOnce((onf: any) => Promise.resolve([]).then(onf)) // 7d SELECT
+        .mockImplementationOnce((onf: any) => Promise.resolve([]).then(onf)) // 3d SELECT
+        .mockImplementationOnce((onf: any) => Promise.resolve([]).then(onf)); // 1d SELECT
+
+      await processDeadlineReminders();
+
+      expect(checkAndFireRiskAlert).not.toHaveBeenCalled();
+    });
+
+    it('should isolate risk alert failures — Promise.allSettled prevents throw', async () => {
+      queueOnlyTier1HasResults();
+      vi.mocked(checkAndFireRiskAlert).mockRejectedValueOnce(new Error('Risk alert failed'));
+
+      await expect(processDeadlineReminders()).resolves.toBeUndefined();
+
+      expect(checkAndFireRiskAlert).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call checkAndFireRiskAlert with the db instance from getDb', async () => {
+      queueOnlyTier1HasResults();
+
+      await processDeadlineReminders();
+
+      expect(checkAndFireRiskAlert).toHaveBeenCalledWith(mockDb, expect.any(Object));
     });
   });
 });

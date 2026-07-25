@@ -17,6 +17,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Badge } from '@/components/ui/badge';
 import { isServerError } from '@/lib/errors';
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
 import {
@@ -72,6 +73,7 @@ type AdminAnalyticsData = {
   dauTrend: { date: string; activeUsers: number }[];
   wauTrend: { date: string; activeUsers: number }[];
   dateRange: { start: string | null; end: string | null };
+  atRiskSummary: { high: number; medium: number; low: number };
 };
 
 type RubricCriterionMetric = {
@@ -261,6 +263,41 @@ function AdminAnalyticsPage() {
           color="primary"
         />
       </div>
+
+      {/* At-Risk Students Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('adminAnalytics.atRiskTitle')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {data.atRiskSummary.high === 0 &&
+          data.atRiskSummary.medium === 0 &&
+          data.atRiskSummary.low === 0 ? (
+            <EmptyState icon={CheckCircle} title={t('adminAnalytics.atRiskEmpty')} />
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <span className="text-sm font-medium text-foreground">
+                  {t('adminAnalytics.atRiskHigh')}
+                </span>
+                <Badge variant="destructive">{data.atRiskSummary.high}</Badge>
+              </div>
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <span className="text-sm font-medium text-foreground">
+                  {t('adminAnalytics.atRiskMedium')}
+                </span>
+                <Badge variant="warning">{data.atRiskSummary.medium}</Badge>
+              </div>
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <span className="text-sm font-medium text-foreground">
+                  {t('adminAnalytics.atRiskLow')}
+                </span>
+                <Badge variant="info">{data.atRiskSummary.low}</Badge>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Status Distribution */}
       <Card>

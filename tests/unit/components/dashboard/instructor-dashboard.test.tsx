@@ -27,6 +27,7 @@ const emptyData = {
   pendingReviewItems: [],
   recentSubmissions: [],
   assignments: [],
+  atRiskStudents: [],
 };
 
 describe('InstructorDashboard component', () => {
@@ -186,5 +187,139 @@ describe('InstructorDashboard component', () => {
     };
     render(<InstructorDashboard data={dataWithItems} />);
     expect(screen.getByText('instructorReviews.slaBreached')).toBeDefined();
+  });
+
+  it('should render at-risk students section title', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    render(<InstructorDashboard data={emptyData} />);
+    expect(screen.getByText('instructorDashboard.atRisk.title')).toBeDefined();
+  });
+
+  it('should show empty state when no at-risk students', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    render(<InstructorDashboard data={emptyData} />);
+    expect(screen.getByText('instructorDashboard.atRisk.empty')).toBeDefined();
+  });
+
+  it('should render at-risk student name and assignment title', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const dataWithRisk = {
+      ...emptyData,
+      atRiskStudents: [
+        {
+          studentName: 'Alice Johnson',
+          studentId: 'student-1',
+          assignmentTitle: 'Thesis 2026',
+          assignmentId: 1,
+          riskLevel: 'high' as const,
+          factors: [
+            {
+              type: 'overdue_checkpoint' as const,
+              severity: 'high' as const,
+              category: 'student_inaction' as const,
+              checkpointId: 1,
+              description: 'Overdue checkpoint',
+            },
+          ],
+        },
+      ],
+    };
+    render(<InstructorDashboard data={dataWithRisk} />);
+    expect(screen.getByText('Alice Johnson')).toBeDefined();
+    expect(screen.getByText('Thesis 2026')).toBeDefined();
+  });
+
+  it('should render risk level badge text for high risk', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const dataWithRisk = {
+      ...emptyData,
+      atRiskStudents: [
+        {
+          studentName: 'Alice',
+          studentId: 'student-1',
+          assignmentTitle: 'Thesis',
+          assignmentId: 1,
+          riskLevel: 'high' as const,
+          factors: [],
+        },
+      ],
+    };
+    render(<InstructorDashboard data={dataWithRisk} />);
+    expect(screen.getByText('instructorDashboard.atRisk.levels.high')).toBeDefined();
+  });
+
+  it('should render risk level badge text for medium risk', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const dataWithRisk = {
+      ...emptyData,
+      atRiskStudents: [
+        {
+          studentName: 'Bob',
+          studentId: 'student-2',
+          assignmentTitle: 'Project',
+          assignmentId: 2,
+          riskLevel: 'medium' as const,
+          factors: [],
+        },
+      ],
+    };
+    render(<InstructorDashboard data={dataWithRisk} />);
+    expect(screen.getByText('instructorDashboard.atRisk.levels.medium')).toBeDefined();
+  });
+
+  it('should render risk level badge text for low risk', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const dataWithRisk = {
+      ...emptyData,
+      atRiskStudents: [
+        {
+          studentName: 'Charlie',
+          studentId: 'student-3',
+          assignmentTitle: 'Essay',
+          assignmentId: 3,
+          riskLevel: 'low' as const,
+          factors: [],
+        },
+      ],
+    };
+    render(<InstructorDashboard data={dataWithRisk} />);
+    expect(screen.getByText('instructorDashboard.atRisk.levels.low')).toBeDefined();
+  });
+
+  it('should render factor descriptions for at-risk students', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const dataWithRisk = {
+      ...emptyData,
+      atRiskStudents: [
+        {
+          studentName: 'Alice',
+          studentId: 'student-1',
+          assignmentTitle: 'Thesis 2026',
+          assignmentId: 1,
+          riskLevel: 'high' as const,
+          factors: [
+            {
+              type: 'overdue_checkpoint' as const,
+              severity: 'high' as const,
+              category: 'student_inaction' as const,
+              checkpointId: 1,
+              description: 'Checkpoint is overdue',
+            },
+            {
+              type: 'insufficient_consultations' as const,
+              severity: 'medium' as const,
+              category: 'student_inaction' as const,
+              checkpointId: 1,
+              description: 'Not enough consultations',
+            },
+          ],
+        },
+      ],
+    };
+    render(<InstructorDashboard data={dataWithRisk} />);
+    expect(screen.getByText('instructorDashboard.atRisk.factors.overdue_checkpoint')).toBeDefined();
+    expect(
+      screen.getByText('instructorDashboard.atRisk.factors.insufficient_consultations'),
+    ).toBeDefined();
   });
 });

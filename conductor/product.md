@@ -509,4 +509,18 @@ Students and instructors lack a centralized system to:
 - **i18n** — 30+ new keys in both EN and ID locales under `settings.notificationPreferences.*` (title, description, channel labels, group labels, per-type labels and descriptions)
 - **Tests** — 3,171 tests pass across 317 test files; coverage ≥80% on all thresholds (statements 88.4%, branches 82.23%, functions 83.98%, lines 88.99%)
 
+### Track: At-Risk Student Identification & Early Warning System (TRACK-023) (July 2026)
+
+- **Risk scoring engine** — New `src/lib/risk-scoring.ts` with pure function `computeStudentRisk(data): RiskAssessment` evaluating 5 risk signals: overdue checkpoint (High), approaching deadline with no submission (Medium), insufficient consultations with deadline approaching (Medium), repeated revise (Medium), stalled review beyond SLA (Low). Risk score is ephemeral — never persisted to DB.
+- **Instructor dashboard widget** — At-Risk Students card on `/instructor/dashboard` showing students with active risk factors, sorted by severity (High → Medium → Low), with risk-level Badges (red/amber/blue) and factor descriptions. Empty state when no at-risk students.
+- **Event-driven alerts** — New `src/lib/risk-alerts.ts` with `checkAndFireRiskAlert(db, opts)`: fetches student checkpoint data, computes risk, fires in-app notification + email to instructor when risk ≥ medium. 7-day dedup per student+assignment pair prevents alert fatigue.
+- **Review handler integration** — `submitReviewHandler` post-commit advisory call to `checkAndFireRiskAlert` when decision is 'revise' or SLA breach occurred (advisory, outside transaction, never affects review outcome).
+- **Scanner integration** — TRACK-021's `processDeadlineReminders()` extended to call `checkAndFireRiskAlert` for each student-checkpoint processed, covering time-based signals (approaching deadlines, insufficient consultations).
+- **Admin analytics** — `atRiskSummary: { high, medium, low }` added to admin analytics dashboard, counting distinct students per risk level via simplified SQL (CASE WHEN expressions, no per-student function call).
+- **Notification type** — New `student_at_risk` notification type targeting instructors, routed to `/instructor/assignments/${assignmentId}`, added to `system` group in NotificationCenter.
+- **Email template** — `buildStudentAtRiskHtml` in `email-templates.ts` with student name, assignment title, risk level, factor descriptions, and CTA link. `sendStudentAtRiskEmail` wrapper in `src/lib/at-risk-email.ts`.
+- **i18n** — New EN/ID keys for notification title/message, email subject, dashboard widget labels, and risk level labels.
+- **No new DB tables/migrations** — All risk computed from existing data (checkpoints, consultations, submissions, reviews).
+- **Tests** — 3,441 tests pass across 330 test files; coverage ≥80% on all thresholds (stmts 88.28%, branches 82.28%, functions 83.83%, lines 88.92%).
+
 </protect>

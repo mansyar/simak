@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getNotificationRoute } from '@/components/notifications/notification-routes';
+import { GROUP_CONFIGS } from '@/components/notifications/NotificationCenter';
 
 describe('getNotificationRoute', () => {
   it('derives review_completed route from type + metadata', () => {
@@ -113,5 +114,28 @@ describe('getNotificationRoute', () => {
   it('returns null for consultation_logged (instructor-only, no direct navigation)', () => {
     const route = getNotificationRoute('consultation_logged', { assignmentId: 1 });
     expect(route).toBeNull();
+  });
+
+  it('derives student_at_risk route to instructor assignment page', () => {
+    const route = getNotificationRoute('student_at_risk', {
+      assignmentId: 9,
+      studentId: 'student-1',
+    });
+    expect(route).toBe('/instructor/assignments/9');
+  });
+
+  it('returns null for student_at_risk when assignmentId is missing', () => {
+    const route = getNotificationRoute('student_at_risk', {
+      studentId: 'student-1',
+    });
+    expect(route).toBeNull();
+  });
+});
+
+describe('GROUP_CONFIGS', () => {
+  it('includes student_at_risk in the system group', () => {
+    const systemGroup = GROUP_CONFIGS.find((g) => g.key === 'system');
+    expect(systemGroup).toBeDefined();
+    expect(systemGroup!.types).toContain('student_at_risk');
   });
 });

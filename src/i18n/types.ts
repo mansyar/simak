@@ -506,6 +506,22 @@ export type Translation = {
     manageAssignments: string
     manageAssignmentsDesc: string
     pendingCount: string
+    atRisk: {
+      title: string
+      empty: string
+      levels: {
+        high: string
+        medium: string
+        low: string
+      }
+      factors: {
+        overdue_checkpoint: string
+        approaching_deadline_no_submission: string
+        insufficient_consultations: string
+        repeated_revise: string
+        stalled_review: string
+      }
+    }
   }
   adminDashboard: {
     title: string
@@ -568,6 +584,11 @@ export type Translation = {
     rubricAvgScore: string
     rubricPassRate: string
     rubricReviewCount: string
+    atRiskTitle: string
+    atRiskHigh: string
+    atRiskMedium: string
+    atRiskLow: string
+    atRiskEmpty: string
   }
   instructorAnalytics: {
     title: string
@@ -822,6 +843,10 @@ export type Translation = {
         title: string
         message: string
       }
+      student_at_risk: {
+        title: string
+        message: string
+      }
     }
   }
   emails: {
@@ -838,6 +863,7 @@ export type Translation = {
       extensionRejected: string
       extensionRequested: string
       deadlineReminder: string
+      studentAtRisk: string
     }
   }
   errors: {

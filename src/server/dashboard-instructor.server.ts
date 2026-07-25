@@ -2,11 +2,18 @@
 import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
-import { submissions } from '../db/schema/submissions';
+import { submissions, reviews } from '../db/schema/submissions';
+import { consultations } from '../db/schema/consultations';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode, type ServerError } from '@/lib/errors';
 import type { NonNullableSession } from '../lib/types';
+import {
+  computeStudentRisk,
+  type RiskLevel,
+  type RiskFactor,
+  type CheckpointRiskData,
+} from '../lib/risk-scoring';
 
 function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && session.user.role === 'instructor';
@@ -40,11 +47,21 @@ type DashboardRecentSubmission = {
   status: string;
 };
 
+type AtRiskStudentEntry = {
+  studentName: string;
+  studentId: string;
+  assignmentTitle: string;
+  assignmentId: number;
+  riskLevel: RiskLevel;
+  factors: RiskFactor[];
+};
+
 export type InstructorDashboardSuccess = {
   pendingReviewCount: number;
   pendingReviewItems: DashboardPendingReviewItem[];
   recentSubmissions: DashboardRecentSubmission[];
   assignments: DashboardAssignmentOverview[];
+  atRiskStudents: AtRiskStudentEntry[];
 };
 
 /**
@@ -215,6 +232,140 @@ export async function getInstructorDashboardDataHandler(): Promise<
       overallProgressPercent: progressMap.get(a.id) ?? 0,
     }));
 
+    // At-risk students (depends on assignmentIds)
+    let atRiskStudents: AtRiskStudentEntry[] = [];
+
+    if (assignmentIds.length > 0) {
+      const atRiskCheckpoints = await db
+        .select({
+          checkpointId: checkpoints.id,
+          checkpointState: checkpoints.state,
+          dueDate: checkpoints.dueDate,
+          minConsultations: checkpoints.minConsultations,
+          studentId: checkpoints.studentId,
+          studentName: users.name,
+          assignmentId: assignments.id,
+          assignmentTitle: assignments.title,
+        })
+        .from(checkpoints)
+        .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+        .innerJoin(users, eq(checkpoints.studentId, users.id))
+        .where(
+          and(
+            inArray(checkpoints.assignmentId, assignmentIds),
+            sql`${checkpoints.state} IN ('unlocked', 'revise', 'under_review', 'submitted')`,
+          ),
+        );
+
+      if (atRiskCheckpoints.length > 0) {
+        const checkpointIds = atRiskCheckpoints.map((c) => c.checkpointId);
+
+        const [consultationCounts, submissionData, reviseCounts] = await Promise.all([
+          db
+            .select({
+              checkpointId: consultations.checkpointId,
+              count: sql<number>`count(*)::int`,
+            })
+            .from(consultations)
+            .where(
+              and(
+                inArray(consultations.checkpointId, checkpointIds),
+                eq(consultations.status, 'verified'),
+              ),
+            )
+            .groupBy(consultations.checkpointId),
+          db
+            .select({
+              checkpointId: submissions.checkpointId,
+              count: sql<number>`count(*)::int`,
+              latestDate: sql<Date>`max(${submissions.uploadedAt})`,
+            })
+            .from(submissions)
+            .where(inArray(submissions.checkpointId, checkpointIds))
+            .groupBy(submissions.checkpointId),
+          db
+            .select({
+              checkpointId: submissions.checkpointId,
+              count: sql<number>`count(*)::int`,
+            })
+            .from(reviews)
+            .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
+            .where(
+              and(inArray(submissions.checkpointId, checkpointIds), eq(reviews.decision, 'revise')),
+            )
+            .groupBy(submissions.checkpointId),
+        ]);
+
+        const consultationMap = new Map(consultationCounts.map((c) => [c.checkpointId, c.count]));
+        const submissionMap = new Map(
+          submissionData.map((s) => [s.checkpointId, { count: s.count, latestDate: s.latestDate }]),
+        );
+        const reviseMap = new Map(reviseCounts.map((r) => [r.checkpointId, r.count]));
+
+        const studentAssignmentGroups = new Map<
+          string,
+          {
+            studentId: string;
+            studentName: string;
+            assignmentId: number;
+            assignmentTitle: string;
+            checkpoints: CheckpointRiskData[];
+          }
+        >();
+
+        for (const cp of atRiskCheckpoints) {
+          const key = `${cp.studentId}:${cp.assignmentId}`;
+          if (!studentAssignmentGroups.has(key)) {
+            studentAssignmentGroups.set(key, {
+              studentId: cp.studentId,
+              studentName: cp.studentName,
+              assignmentId: cp.assignmentId,
+              assignmentTitle: cp.assignmentTitle,
+              checkpoints: [],
+            });
+          }
+          const subInfo = submissionMap.get(cp.checkpointId);
+          const underReviewWaitDays =
+            cp.checkpointState === 'under_review' && subInfo?.latestDate
+              ? Math.floor((Date.now() - subInfo.latestDate.getTime()) / (1000 * 60 * 60 * 24))
+              : null;
+
+          studentAssignmentGroups.get(key)!.checkpoints.push({
+            checkpointId: cp.checkpointId,
+            state: cp.checkpointState,
+            dueDate: cp.dueDate ?? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            minConsultations: cp.minConsultations ?? 0,
+            verifiedConsultationCount: consultationMap.get(cp.checkpointId) ?? 0,
+            submissionCount: subInfo?.count ?? 0,
+            latestSubmissionDate: subInfo?.latestDate ?? null,
+            reviseCount: reviseMap.get(cp.checkpointId) ?? 0,
+            underReviewWaitDays,
+          });
+        }
+
+        const now = new Date();
+        const severityOrder: Record<RiskLevel, number> = { high: 0, medium: 1, low: 2 };
+        atRiskStudents = Array.from(studentAssignmentGroups.values())
+          .map((group) => {
+            const assessment = computeStudentRisk({
+              studentId: group.studentId,
+              now,
+              checkpoints: group.checkpoints,
+            });
+            return {
+              studentName: group.studentName,
+              studentId: group.studentId,
+              assignmentTitle: group.assignmentTitle,
+              assignmentId: group.assignmentId,
+              riskLevel: assessment.level,
+              factors: assessment.factors,
+            };
+          })
+          .filter((entry) => entry.factors.length > 0)
+          .sort((a, b) => severityOrder[a.riskLevel] - severityOrder[b.riskLevel]);
+      }
+    }
+
     const statusLabel = (state: string) =>
       state === 'submitted'
         ? 'Submitted'
@@ -245,6 +396,7 @@ export async function getInstructorDashboardDataHandler(): Promise<
         status: statusLabel(rs.checkpointState),
       })),
       assignments: assignmentsWithDetails,
+      atRiskStudents,
     };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
