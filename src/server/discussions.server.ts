@@ -3,8 +3,12 @@ import { eq, and, asc, isNull, isNotNull, or, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { checkpointDiscussions } from '../db/schema/discussions';
 import { users } from '../db/schema/users';
+import { checkpoints, assignments } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
 import { verifyCheckpointAccess } from './ownership';
+import { getNotificationKeys } from './notifications.server';
+import { maybeInsertNotification } from '../lib/notification-prefs';
+import { enqueueEventEmail } from '../lib/event-email';
 import { serverError, ErrorCode } from '../lib/errors';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -98,7 +102,117 @@ export async function listDiscussionMessagesHandler({
 }
 
 export async function postDiscussionMessageHandler({ data }: { data: PostDiscussionMessageInput }) {
-  throw new Error('postDiscussionMessageHandler not implemented');
+  const session = await getSessionFromHeaders();
+  if (!isStudentOrInstructor(session)) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const { checkpointId, message, parentMessageId } = data;
+  const db = getDb();
+
+  try {
+    // 1. Verify checkpoint ownership
+    const accessError = await verifyCheckpointAccess(db, checkpointId, session);
+    if (accessError) return accessError;
+
+    // 2. Fetch checkpoint details (assignmentId, studentId)
+    const [checkpoint] = await db
+      .select({
+        assignmentId: checkpoints.assignmentId,
+        studentId: checkpoints.studentId,
+      })
+      .from(checkpoints)
+      .where(eq(checkpoints.id, checkpointId))
+      .limit(1);
+
+    if (!checkpoint) {
+      return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+    }
+
+    // 3. Validate parentMessageId belongs to same checkpoint (if provided)
+    if (parentMessageId !== undefined) {
+      const [parent] = await db
+        .select({ id: checkpointDiscussions.id })
+        .from(checkpointDiscussions)
+        .where(
+          and(
+            eq(checkpointDiscussions.id, parentMessageId),
+            eq(checkpointDiscussions.checkpointId, checkpointId),
+          ),
+        )
+        .limit(1);
+
+      if (!parent) {
+        return serverError(ErrorCode.NOT_FOUND, 'Parent message not found');
+      }
+    }
+
+    // 4. Fetch assignment details (instructorId)
+    const [assignment] = await db
+      .select({ instructorId: assignments.instructorId })
+      .from(assignments)
+      .where(eq(assignments.id, checkpoint.assignmentId))
+      .limit(1);
+
+    if (!assignment) {
+      return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
+    }
+
+    // 5. Determine notification recipient
+    const isStudentPoster = session.user.role === 'student';
+    const recipientId = isStudentPoster ? assignment.instructorId : checkpoint.studentId;
+
+    // 6. Insert message + notification in transaction
+    const txResult = await db.transaction(async (tx) => {
+      const [inserted] = await tx
+        .insert(checkpointDiscussions)
+        .values({
+          checkpointId,
+          assignmentId: checkpoint.assignmentId,
+          userId: session.user.id,
+          message,
+          parentMessageId: parentMessageId ?? null,
+        })
+        .returning();
+
+      // Fire notification to the other party (skip self-reply)
+      if (recipientId !== session.user.id) {
+        const notifKeys = getNotificationKeys('discussion_reply');
+        await maybeInsertNotification(tx, recipientId, 'discussion_reply', {
+          userId: recipientId,
+          type: 'discussion_reply',
+          titleKey: notifKeys.titleKey,
+          messageKey: notifKeys.messageKey,
+          params: {},
+          channel: 'in_app',
+          metadata: {
+            checkpointId,
+            assignmentId: checkpoint.assignmentId,
+            target: isStudentPoster ? 'instructor' : 'student',
+          },
+        });
+      }
+
+      return { inserted };
+    });
+
+    // 7. Post-commit email (advisory — never throws)
+    if (recipientId !== session.user.id) {
+      await enqueueEventEmail({
+        recipientId,
+        subjectKey: 'emails.subjects.discussionReply',
+        templateType: 'discussion_reply',
+        buildBody: () => '<p>New discussion reply</p>',
+      });
+    }
+
+    return { success: true, message: txResult.inserted };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'postDiscussionMessageHandler',
+    });
+  }
 }
 
 export async function deleteOwnMessageHandler({ data }: { data: DeleteOwnMessageInput }) {
