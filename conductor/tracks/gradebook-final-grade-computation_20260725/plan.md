@@ -39,7 +39,7 @@
     - [x] Implement stale weights detection → fallback to equal_weight + warning flag in result
     - [x] Run `pnpm test` and confirm all tests pass
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Schema & Computation Engine' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Schema & Computation Engine' (Protocol in workflow.md)
 
 ## Phase 2: Server Functions & Grade Recomputation
 
