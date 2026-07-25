@@ -3,17 +3,18 @@
 
 ## Phase 1: Schema & Server Functions
 
-- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context before starting Phase 1 implementation
-    - [ ] Read `conductor/tracks/checkpoint-discussion-qa-threads_20260725/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read `spec.md` and `workflow.md` to re-establish context before starting Phase 1 implementation
+    - [x] Read `conductor/tracks/checkpoint-discussion-qa-threads_20260725/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Create `checkpoint_discussions` database schema
-    - [ ] Write failing tests for schema definition (table exists, FKs cascade, indexes present, soft-delete column, self-referencing parentMessageId)
-    - [ ] Implement `src/db/schema/discussions.ts` with `checkpoint_discussions` table — `id` (serial PK), `checkpointId` (integer FK → checkpoints `onDelete: cascade`), `assignmentId` (integer FK → assignments `onDelete: cascade`), `userId` (text FK → users), `message` (text not null), `parentMessageId` (integer FK self-ref nullable), `createdAt`, `updatedAt`, `deletedAt` (nullable soft-delete). Indexes: `(checkpointId, createdAt ASC)`, `(assignmentId, createdAt DESC)`, `(parentMessageId)`
-    - [ ] Register in `src/db/schema/index.ts` re-exports + `checkpointDiscussionsRelations`
-    - [ ] Run `pnpm test` — confirm schema tests pass
-    - [ ] Run `pnpm db:generate` to generate migration
-    - [ ] Run `pnpm db:push` to apply to dev DB
+- [x] Task: Create `checkpoint_discussions` database schema
+    - [x] Write failing tests for schema definition (table exists, FKs cascade, indexes present, soft-delete column, self-referencing parentMessageId)
+    - [x] Implement `src/db/schema/discussions.ts` with `checkpoint_discussions` table — `id` (serial PK), `checkpointId` (integer FK → checkpoints `onDelete: cascade`), `assignmentId` (integer FK → assignments `onDelete: cascade`), `userId` (text FK → users), `message` (text not null), `parentMessageId` (integer FK self-ref nullable), `createdAt`, `updatedAt`, `deletedAt` (nullable soft-delete). Indexes: `(checkpointId, createdAt ASC)`, `(assignmentId, createdAt DESC)`, `(parentMessageId)`
+    - [x] Register in `src/db/schema/index.ts` re-exports + `checkpointDiscussionsRelations`
+    - [x] Run `pnpm test` — confirm schema tests pass
+    - [x] Run `pnpm db:generate` to generate migration
+    - [x] Run `pnpm db:push` to apply to dev DB (applied via psql — drizzle-kit push requires TTY)
+    - **Commit:** `88a5cac4` — feat(db): Add checkpoint_discussions table schema
 
 - [ ] Task: Add `'discussion_reply'` to email queue template type enums
     - [ ] Write failing test asserting `'discussion_reply'` is in the `templateType` enum array in `email-queue.ts` and in the `TemplateType` union in `email.ts`
