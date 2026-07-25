@@ -48,10 +48,11 @@
     - [x] Run `pnpm test` — confirm all handler tests pass
     - **Commit:** `f98f72ca` — feat(server): Implement deleteOwnMessageHandler with 15-min deletion window
 
-- [ ] Task: Add `discussionKeys` factory to `src/lib/query-keys.ts`
-    - [ ] Write failing test asserting `discussionKeys` factory exists with `list(checkpointId, page)` and `detail(checkpointId)` methods
-    - [ ] Implement `discussionKeys` factory matching `notificationKeys`/`consultationKeys` pattern
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Add `discussionKeys` factory to `src/lib/query-keys.ts`
+    - [x] Write failing test asserting `discussionKeys` factory exists with `list(checkpointId, page)` and `detail(checkpointId)` methods
+    - [x] Implement `discussionKeys` factory matching `notificationKeys`/`consultationKeys` pattern
+    - [x] Run `pnpm test` — confirm tests pass
+    - **Commit:** `a566e4f4` — feat(lib): Add discussionKeys query-key factory for checkpoint discussions
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Schema & Server Functions' (Protocol in workflow.md)
 
