@@ -514,6 +514,13 @@ export type Translation = {
         medium: string
         low: string
       }
+      factors: {
+        overdue_checkpoint: string
+        approaching_deadline_no_submission: string
+        insufficient_consultations: string
+        repeated_revise: string
+        stalled_review: string
+      }
     }
   }
   adminDashboard: {
@@ -577,6 +584,11 @@ export type Translation = {
     rubricAvgScore: string
     rubricPassRate: string
     rubricReviewCount: string
+    atRiskTitle: string
+    atRiskHigh: string
+    atRiskMedium: string
+    atRiskLow: string
+    atRiskEmpty: string
   }
   instructorAnalytics: {
     title: string

@@ -508,6 +508,13 @@
         "high": "Tinggi",
         "medium": "Sedang",
         "low": "Rendah"
+      },
+      "factors": {
+        "overdue_checkpoint": "Checkpoint telah lewat tenggat",
+        "approaching_deadline_no_submission": "Tenggat mendekati tanpa pengumpulan",
+        "insufficient_consultations": "Konsultasi tidak mencukupi sebelum tenggat",
+        "repeated_revise": "Checkpoint telah direvisi berkali-kali",
+        "stalled_review": "Pengumpulan menunggu review melebihi SLA"
       }
     }
   },
@@ -571,7 +578,12 @@
     "rubricCriterion": "Kriteria",
     "rubricAvgScore": "Nilai Rata-rata",
     "rubricPassRate": "Tingkat Kelulusan",
-    "rubricReviewCount": "Ulasan"
+    "rubricReviewCount": "Ulasan",
+    "atRiskTitle": "Mahasiswa Berisiko",
+    "atRiskHigh": "Risiko Tinggi",
+    "atRiskMedium": "Risiko Sedang",
+    "atRiskLow": "Risiko Rendah",
+    "atRiskEmpty": "Tidak ada mahasiswa berisiko"
   },
   "instructorAnalytics": {
     "title": "Analitik",

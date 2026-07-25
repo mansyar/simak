@@ -508,6 +508,13 @@
         "high": "High",
         "medium": "Medium",
         "low": "Low"
+      },
+      "factors": {
+        "overdue_checkpoint": "Checkpoint is overdue",
+        "approaching_deadline_no_submission": "Deadline approaching with no submission",
+        "insufficient_consultations": "Insufficient consultations before deadline",
+        "repeated_revise": "Checkpoint has been revised multiple times",
+        "stalled_review": "Submission awaiting review beyond SLA"
       }
     }
   },
@@ -571,7 +578,12 @@
     "rubricCriterion": "Criterion",
     "rubricAvgScore": "Avg Score",
     "rubricPassRate": "Pass Rate",
-    "rubricReviewCount": "Reviews"
+    "rubricReviewCount": "Reviews",
+    "atRiskTitle": "At-Risk Students",
+    "atRiskHigh": "High Risk",
+    "atRiskMedium": "Medium Risk",
+    "atRiskLow": "Low Risk",
+    "atRiskEmpty": "No students at risk"
   },
   "instructorAnalytics": {
     "title": "Analytics",

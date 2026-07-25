@@ -15,7 +15,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { MetricCard } from '@/components/ui/metric-card';
 import { SLABadge } from '@/components/reviews/SLABadge';
-import type { RiskLevel, RiskFactor } from '@/lib/risk-scoring';
+import type { RiskLevel, RiskFactor, RiskSignalType } from '@/lib/risk-scoring';
 
 export interface AtRiskStudentEntry {
   studentName: string;
@@ -110,6 +110,21 @@ function getRiskLevelText(level: RiskLevel, t: (key: TranslationKey) => string) 
       return t('instructorDashboard.atRisk.levels.medium');
     default:
       return t('instructorDashboard.atRisk.levels.low');
+  }
+}
+
+function getRiskFactorText(type: RiskSignalType, t: (key: TranslationKey) => string) {
+  switch (type) {
+    case 'overdue_checkpoint':
+      return t('instructorDashboard.atRisk.factors.overdue_checkpoint');
+    case 'approaching_deadline_no_submission':
+      return t('instructorDashboard.atRisk.factors.approaching_deadline_no_submission');
+    case 'insufficient_consultations':
+      return t('instructorDashboard.atRisk.factors.insufficient_consultations');
+    case 'repeated_revise':
+      return t('instructorDashboard.atRisk.factors.repeated_revise');
+    case 'stalled_review':
+      return t('instructorDashboard.atRisk.factors.stalled_review');
   }
 }
 
@@ -237,7 +252,7 @@ export function InstructorDashboard({ data }: Props) {
                     <ul className="mt-2 space-y-1">
                       {student.factors.map((factor, idx) => (
                         <li key={`${factor.type}-${idx}`} className="text-xs text-muted-foreground">
-                          {factor.description}
+                          {getRiskFactorText(factor.type, t)}
                         </li>
                       ))}
                     </ul>

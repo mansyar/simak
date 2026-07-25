@@ -317,7 +317,9 @@ describe('InstructorDashboard component', () => {
       ],
     };
     render(<InstructorDashboard data={dataWithRisk} />);
-    expect(screen.getByText('Checkpoint is overdue')).toBeDefined();
-    expect(screen.getByText('Not enough consultations')).toBeDefined();
+    expect(screen.getByText('instructorDashboard.atRisk.factors.overdue_checkpoint')).toBeDefined();
+    expect(
+      screen.getByText('instructorDashboard.atRisk.factors.insufficient_consultations'),
+    ).toBeDefined();
   });
 });
