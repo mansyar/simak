@@ -58,16 +58,17 @@
 
 ## Phase 2: UI Components & Notifications
 
-- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context before starting Phase 2 implementation
-    - [ ] Read `conductor/tracks/checkpoint-discussion-qa-threads_20260725/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read `spec.md` and `workflow.md` to re-establish context before starting Phase 2 implementation
+    - [x] Read `conductor/tracks/checkpoint-discussion-qa-threads_20260725/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Create `DiscussionPanel` component (`src/components/discussions/discussion-panel.tsx`)
-    - [ ] Write failing tests: renders message list, send button disabled on empty input, delete button visible within 15-min window only on own messages, deleted messages show "[deleted]" placeholder, empty state renders `EmptyState` with `icon` prop, loading state renders `Skeleton`, optimistic insert on send, optimistic soft-delete on delete, role-based message alignment (student left / instructor right), 1-level reply threading with indentation
-    - [ ] Implement `DiscussionPanel` — `ScrollArea` with message bubbles (role-based alignment), `Avatar` with initials, `formatRelativeTime` timestamps, reply threading via `parentMessageId` (1 level indented), `Textarea` + send `Button` (react-hook-form + Zod `mode: 'onSubmit'`), delete button on own messages within 15-min window, deleted messages as muted placeholder, `EmptyState` with `MessageCircle` icon, `Skeleton` loading
-    - [ ] Implement `useQuery` with `discussionKeys.list(checkpointId, page)` and 30s `refetchInterval`
-    - [ ] Implement `useMutation` for post (optimistic insert via `onMutate`/`onError`/`onSettled` matching TRACK-014 pattern) and delete (optimistic soft-delete)
-    - [ ] Run `pnpm test` — confirm all component tests pass
+- [x] Task: Create `DiscussionPanel` component (`src/components/discussions/discussion-panel.tsx`)
+    - [x] Write failing tests: renders message list, send button disabled on empty input, delete button visible within 15-min window only on own messages, deleted messages show "[deleted]" placeholder, empty state renders `EmptyState` with `icon` prop, loading state renders `Skeleton`, optimistic insert on send, optimistic soft-delete on delete, role-based message alignment (student left / instructor right), 1-level reply threading with indentation
+    - [x] Implement `DiscussionPanel` — `ScrollArea` with message bubbles (role-based alignment), `Avatar` with initials, `formatRelativeTime` timestamps, reply threading via `parentMessageId` (1 level indented), `Textarea` + send `Button` (react-hook-form + Zod `mode: 'onSubmit'`), delete button on own messages within 15-min window, deleted messages as muted placeholder, `EmptyState` with `MessageCircle` icon, `Skeleton` loading
+    - [x] Implement `useQuery` with `discussionKeys.list(checkpointId, page)` and 30s `refetchInterval`
+    - [x] Implement `useMutation` for post (optimistic insert via `onMutate`/`onError`/`onSettled` matching TRACK-014 pattern) and delete (optimistic soft-delete)
+    - [x] Run `pnpm test` — confirm all component tests pass
+    - **Commit:** `b7493a9d` — feat(ui): Add DiscussionPanel with Avatar and ScrollArea components
 
 - [ ] Task: Mount `DiscussionPanel` on student checkpoint detail page
     - [ ] Write failing test asserting `DiscussionPanel` renders below the submission/review section on `/student/assignments/$id.checkpoints.$checkpointId.tsx`
