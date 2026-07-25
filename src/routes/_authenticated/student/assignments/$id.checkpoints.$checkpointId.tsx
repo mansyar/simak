@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Pagination } from '@/components/ui/pagination';
 import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
+import { DiscussionPanel } from '@/components/discussions/discussion-panel';
 import { SearchX, ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { useState, useCallback } from 'react';
@@ -351,6 +352,12 @@ function CheckpointSubmissionPage() {
           />
         )}
       </div>
+
+      {/* Discussion panel */}
+      <DiscussionPanel
+        checkpointId={Number(params.checkpointId)}
+        assignmentId={data.assignmentId}
+      />
     </div>
   );
 }
