@@ -43,22 +43,22 @@
 
 ## Phase 2: Server Functions & Grade Recomputation
 
-- [ ] Task: Read spec.md and workflow.md to re-establish context before implementation
-    - [ ] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to re-establish context before implementation
+    - [x] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Write failing tests for gradebook server handlers
-    - [ ] Create `tests/unit/server/gradebook.test.ts` with `@vitest-environment node` + mock `@tanstack/react-start` builder chain + mock `@/server/auth`, `@/db/index`
-    - [ ] Test `getStudentFinalGradeHandler`: returns computed grade, returns null when no config, ownership verified (student can't access another student's grade), does NOT auto-create config on read
-    - [ ] Test `getAssignmentGradebookHandler`: returns all students with per-checkpoint scores, sorted by name, instructor ownership verified
-    - [ ] Test `saveGradeConfigHandler`: admin-only (rejects instructor/student), validates custom weights sum to 100 via `superRefine` when `custom_weight`, upserts config, audit logs
-    - [ ] Test `recomputeAllGradesHandler`: admin-only, recomputes all students' `final_grades`
-    - [ ] Run `pnpm test` and confirm all new tests fail
+- [x] Task: Write failing tests for gradebook server handlers
+    - [x] Create `tests/unit/server/gradebook.test.ts` with `@vitest-environment node` + mock `@tanstack/react-start` builder chain + mock `@/server/auth`, `@/db/index`
+    - [x] Test `getStudentFinalGradeHandler`: returns computed grade, returns null when no config, ownership verified (student can't access another student's grade), does NOT auto-create config on read
+    - [x] Test `getAssignmentGradebookHandler`: returns all students with per-checkpoint scores, sorted by name, instructor ownership verified
+    - [x] Test `saveGradeConfigHandler`: admin-only (rejects instructor/student), validates custom weights sum to 100 via `superRefine` when `custom_weight`, upserts config, audit logs
+    - [x] Test `recomputeAllGradesHandler`: admin-only, recomputes all students' `final_grades`
+    - [x] Run `pnpm test` and confirm all new tests fail
 
-- [ ] Task: Implement gradebook server functions
-    - [ ] Create `src/server/gradebook.ts` with Zod schemas (`GetStudentFinalGradeSchema`, `GetAssignmentGradebookSchema`, `SaveGradeConfigSchema` with `superRefine`, `RecomputeAllGradesSchema`) + `createServerFn` stubs with `.inputValidator(Schema).handler(...)`
-    - [ ] Create `src/server/gradebook.server.ts` with handlers: `getStudentFinalGradeHandler` (ownership-verified, reads from cache or computes on-demand if stale), `getAssignmentGradebookHandler` (instructor ownership-verified, batch query), `saveGradeConfigHandler` (admin-only via `isAdmin`, validates, upserts, audit logs), `recomputeAllGradesHandler` (admin-only, recomputes all students)
-    - [ ] Run `pnpm test` and confirm all tests pass
+- [x] Task: Implement gradebook server functions
+    - [x] Create `src/server/gradebook.ts` with Zod schemas (`GetStudentFinalGradeSchema`, `GetAssignmentGradebookSchema`, `SaveGradeConfigSchema` with `superRefine`, `RecomputeAllGradesSchema`) + `createServerFn` stubs with `.inputValidator(Schema).handler(...)`
+    - [x] Create `src/server/gradebook.server.ts` with handlers: `getStudentFinalGradeHandler` (ownership-verified, reads from cache or computes on-demand if stale), `getAssignmentGradebookHandler` (instructor ownership-verified, batch query), `saveGradeConfigHandler` (admin-only via `isAdmin`, validates, upserts, audit logs), `recomputeAllGradesHandler` (admin-only, recomputes all students)
+    - [x] Run `pnpm test` and confirm all tests pass
 
 - [ ] Task: Write failing tests for grade recomputation + default config helpers
     - [ ] Test `recomputeStudentGrade`: fetches student checkpoint data, calls `computeFinalGrade`, upserts `final_grades` row
