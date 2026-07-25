@@ -41,7 +41,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Schema & Computation Engine' (Protocol in workflow.md)
 
-## Phase 2: Server Functions & Grade Recomputation
+## Phase 2: Server Functions & Grade Recomputation [checkpoint: fe58d65e]
 
 - [x] Task: Read spec.md and workflow.md to re-establish context before implementation
     - [x] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
