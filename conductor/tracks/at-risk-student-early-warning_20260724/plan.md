@@ -166,4 +166,8 @@
     - [x] Refactored: wired `at-risk-email.ts` wrapper into `risk-alerts.ts` to eliminate dead code
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: UI, Email & i18n' (Protocol in workflow.md) [checkpoint: 56ad74f2]
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions <427f6da7>
+
 </protect>
