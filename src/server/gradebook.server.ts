@@ -27,7 +27,7 @@ function isInstructor(session: NonNullableSession | null): session is NonNullabl
 // ---- Shared Helpers ----
 
 /** Shape of a flat checkpoint+review_score query row (from left joins). */
-interface ScoreRow {
+export interface ScoreRow {
   studentId?: string;
   studentName?: string;
   checkpointId: number;
@@ -45,7 +45,7 @@ interface ScoreRow {
 }
 
 /** Fetch and cast grade config for an assignment. Returns null if no config exists. */
-async function fetchGradeConfig(
+export async function fetchGradeConfig(
   db: ReturnType<typeof getDb>,
   assignmentId: number,
 ): Promise<AssignmentGradeConfig | null> {
@@ -68,7 +68,7 @@ async function fetchGradeConfig(
 }
 
 /** Group flat query rows into CheckpointGradeInput[] (grouped by checkpointId). */
-function groupRowsToCheckpoints(rows: ScoreRow[]): CheckpointGradeInput[] {
+export function groupRowsToCheckpoints(rows: ScoreRow[]): CheckpointGradeInput[] {
   const map = new Map<number, CheckpointGradeInput>();
   for (const row of rows) {
     if (!map.has(row.checkpointId)) {

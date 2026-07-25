@@ -60,10 +60,10 @@
     - [x] Create `src/server/gradebook.server.ts` with handlers: `getStudentFinalGradeHandler` (ownership-verified, reads from cache or computes on-demand if stale), `getAssignmentGradebookHandler` (instructor ownership-verified, batch query), `saveGradeConfigHandler` (admin-only via `isAdmin`, validates, upserts, audit logs), `recomputeAllGradesHandler` (admin-only, recomputes all students)
     - [x] Run `pnpm test` and confirm all tests pass
 
-- [ ] Task: Write failing tests for grade recomputation + default config helpers
-    - [ ] Test `recomputeStudentGrade`: fetches student checkpoint data, calls `computeFinalGrade`, upserts `final_grades` row
-    - [ ] Test `createDefaultGradeConfig`: inserts default config inside transaction
-    - [ ] Run `pnpm test` and confirm tests fail
+- [x] Task: Write failing tests for grade recomputation + default config helpers
+    - [x] Test `recomputeStudentGrade`: fetches student checkpoint data, calls `computeFinalGrade`, upserts `final_grades` row
+    - [x] Test `createDefaultGradeConfig`: inserts default config inside transaction
+    - [x] Run `pnpm test` and confirm tests fail
 
 - [ ] Task: Implement grade recomputation + default config helpers
     - [ ] Add `recomputeStudentGrade(db, assignmentId, studentId)` to `src/server/reviews-extras.server.ts`

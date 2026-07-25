@@ -4,7 +4,12 @@ import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews } from '../db/schema/submissions';
 import { reviewScores } from '../db/schema/rubrics';
+import { templateCheckpoints } from '../db/schema/templates';
+import { finalGrades } from '../db/schema/gradebook';
 import { users } from '../db/schema/users';
+import { fetchGradeConfig, groupRowsToCheckpoints } from './gradebook.server';
+import { computeFinalGrade } from '../lib/grade-computation';
+import type { ScoreRow } from './gradebook.server';
 import { getSessionFromHeaders } from './auth';
 import { verifyCheckpointAccess } from './ownership';
 import { serverError, ErrorCode } from '../lib/errors';
@@ -143,4 +148,67 @@ export async function getLatestReviewHandler(args: { data: GetLatestReviewInput 
       handler: 'getLatestReviewHandler',
     });
   }
+}
+
+/**
+ * Recompute a student's final grade after a review is submitted.
+ * Called as a post-commit advisory — wrapped in try/catch by the caller.
+ */
+export async function recomputeStudentGrade(
+  db: ReturnType<typeof getDb>,
+  assignmentId: number,
+  studentId: string,
+): Promise<void> {
+  const config = await fetchGradeConfig(db, assignmentId);
+  if (!config) return;
+
+  const rows = (await db
+    .select({
+      checkpointId: checkpoints.id,
+      checkpointName: checkpoints.name,
+      templateCheckpointId: checkpoints.templateCheckpointId,
+      order: checkpoints.order,
+      state: checkpoints.state,
+      gradingType: templateCheckpoints.gradingType,
+      criterionId: reviewScores.criterionId,
+      criterionTitle: reviewScores.criterionTitle,
+      score: reviewScores.score,
+      weight: reviewScores.weight,
+      rubricLevelId: reviewScores.rubricLevelId,
+      levelLabel: reviewScores.levelLabel,
+    })
+    .from(checkpoints)
+    .leftJoin(templateCheckpoints, eq(templateCheckpoints.id, checkpoints.templateCheckpointId))
+    .leftJoin(submissions, eq(submissions.checkpointId, checkpoints.id))
+    .leftJoin(reviews, eq(reviews.submissionId, submissions.id))
+    .leftJoin(reviewScores, eq(reviewScores.reviewId, reviews.id))
+    .where(and(eq(checkpoints.assignmentId, assignmentId), eq(checkpoints.studentId, studentId)))
+    .orderBy(checkpoints.order)) as unknown as ScoreRow[];
+
+  const result = computeFinalGrade(groupRowsToCheckpoints(rows), config);
+  const numericScore = result.numericScore !== null ? String(result.numericScore) : null;
+
+  await db
+    .insert(finalGrades)
+    .values({
+      assignmentId,
+      studentId,
+      numericScore,
+      letterGrade: result.letterGrade,
+      status: result.status,
+      contributingCheckpoints: result.contributingCheckpoints,
+      computedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [finalGrades.assignmentId, finalGrades.studentId],
+      set: {
+        numericScore,
+        letterGrade: result.letterGrade,
+        status: result.status,
+        contributingCheckpoints: result.contributingCheckpoints,
+        computedAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
 }
