@@ -15,29 +15,29 @@
     - [x] Generate migration via `pnpm db:generate` (include backfill of default `assignment_grade_config` rows for existing assignments)
     - [x] Verify: migration applies cleanly to dev DB (`pnpm db:push`)
 
-- [~] Task: Write failing tests for grade computation engine
-    - [ ] Create `tests/unit/lib/grade-computation.test.ts`
-    - [ ] Test equal_weight scheme: simple average of checkpoint scores
-    - [ ] Test custom_weight scheme: weighted by templateCheckpointId map
-    - [ ] Test pass/fail checkpoints (gradingType null): score = `state === 'passed'` ? 100 : 0
-    - [ ] Test rubric checkpoints (numeric/qualitative): aggregate review_scores weighted by criterion weight
-    - [ ] Test incomplete assignment → status `incomplete`
-    - [ ] Test mixed (some passed) → status `in_progress`
-    - [ ] Test all passed → status `complete`
-    - [ ] Test letter grade boundaries: score exactly 90 → "A", 89.99 → "B", below D bound → "F"
-    - [ ] Test stale custom weights (sum ≠ 100 or missing checkpoints) → falls back to equal_weight
-    - [ ] Test null config → uses defaults
-    - [ ] Run `pnpm test` and confirm all new tests fail
+- [x] Task: Write failing tests for grade computation engine [a40ef8e]
+    - [x] Create `tests/unit/lib/grade-computation.test.ts`
+    - [x] Test equal_weight scheme: simple average of checkpoint scores
+    - [x] Test custom_weight scheme: weighted by templateCheckpointId map
+    - [x] Test pass/fail checkpoints (gradingType null): score = `state === 'passed'` ? 100 : 0
+    - [x] Test rubric checkpoints (numeric/qualitative): aggregate review_scores weighted by criterion weight
+    - [x] Test incomplete assignment → status `incomplete`
+    - [x] Test mixed (some passed) → status `in_progress`
+    - [x] Test all passed → status `complete`
+    - [x] Test letter grade boundaries: score exactly 90 → "A", 89.99 → "B", below D bound → "F"
+    - [x] Test stale custom weights (sum ≠ 100 or missing checkpoints) → falls back to equal_weight
+    - [x] Test null config → uses defaults
+    - [x] Run `pnpm test` and confirm all new tests fail
 
-- [ ] Task: Implement grade computation engine
-    - [ ] Create `src/lib/grade-computation.ts` with types: `GradingScheme`, `CheckpointGradeInput`, `FinalGradeResult`, `ContributingCheckpoint`, `AssignmentGradeConfig`
-    - [ ] Implement `computeFinalGrade(checkpoints, config): FinalGradeResult` pure function
-    - [ ] Implement per-checkpoint scoring (pass/fail vs rubric)
-    - [ ] Implement equal_weight and custom_weight schemes
-    - [ ] Implement letter grade derivation from `letterGradeBounds` with "F" fallback
-    - [ ] Implement status derivation (complete/in_progress/incomplete)
-    - [ ] Implement stale weights detection → fallback to equal_weight + warning flag in result
-    - [ ] Run `pnpm test` and confirm all tests pass
+- [x] Task: Implement grade computation engine [a40ef8e]
+    - [x] Create `src/lib/grade-computation.ts` with types: `GradingScheme`, `CheckpointGradeInput`, `FinalGradeResult`, `ContributingCheckpoint`, `AssignmentGradeConfig`
+    - [x] Implement `computeFinalGrade(checkpoints, config): FinalGradeResult` pure function
+    - [x] Implement per-checkpoint scoring (pass/fail vs rubric)
+    - [x] Implement equal_weight and custom_weight schemes
+    - [x] Implement letter grade derivation from `letterGradeBounds` with "F" fallback
+    - [x] Implement status derivation (complete/in_progress/incomplete)
+    - [x] Implement stale weights detection → fallback to equal_weight + warning flag in result
+    - [x] Run `pnpm test` and confirm all tests pass
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Schema & Computation Engine' (Protocol in workflow.md)
 
