@@ -23,11 +23,12 @@
     - [x] Run `pnpm test` — confirm tests pass
     - **Commit:** `569a64ea` — feat(email): Add discussion_reply template type for checkpoint Q&A emails
 
-- [ ] Task: Create Zod schemas and server function stubs (`src/server/discussions.ts`)
-    - [ ] Write failing test asserting stubs exist and are callable (mock `createServerFn` builder chain per `submissions.test.ts` pattern)
-    - [ ] Implement `ListDiscussionMessagesSchema` (checkpointId + page/limit pagination), `PostDiscussionMessageSchema` (checkpointId + message min 1 max 2000 + optional parentMessageId), `DeleteOwnMessageSchema` (messageId)
-    - [ ] Implement `createServerFn` stubs with `.inputValidator(Schema).handler(...)` builder pattern — `listDiscussionMessages`, `postDiscussionMessage`, `deleteOwnMessage`
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Create Zod schemas and server function stubs (`src/server/discussions.ts`)
+    - [x] Write failing test asserting stubs exist and are callable (mock `createServerFn` builder chain per `submissions.test.ts` pattern)
+    - [x] Implement `ListDiscussionMessagesSchema` (checkpointId + page/limit pagination), `PostDiscussionMessageSchema` (checkpointId + message min 1 max 2000 + optional parentMessageId), `DeleteOwnMessageSchema` (messageId)
+    - [x] Implement `createServerFn` stubs with `.inputValidator(Schema).handler(...)` builder pattern — `listDiscussionMessages`, `postDiscussionMessage`, `deleteOwnMessage`
+    - [x] Run `pnpm test` — confirm tests pass
+    - **Commit:** `21b9e112` — feat(server): Add discussions Zod schemas and server function stubs
 
 - [ ] Task: Implement `listDiscussionMessagesHandler` (`src/server/discussions.server.ts`)
     - [ ] Write failing tests: paginated 20/page, ordered by createdAt ASC, includes author name + role via JOIN, ownership verified (student can't view other students' discussions, instructor can view all in their assignments), soft-deleted messages excluded from list but replies to them included
