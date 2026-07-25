@@ -16,11 +16,12 @@
     - [x] Run `pnpm db:push` to apply to dev DB (applied via psql — drizzle-kit push requires TTY)
     - **Commit:** `88a5cac4` — feat(db): Add checkpoint_discussions table schema
 
-- [ ] Task: Add `'discussion_reply'` to email queue template type enums
-    - [ ] Write failing test asserting `'discussion_reply'` is in the `templateType` enum array in `email-queue.ts` and in the `TemplateType` union in `email.ts`
-    - [ ] Add `'discussion_reply'` to `templateType` enum array in `src/db/schema/email-queue.ts`
-    - [ ] Add `'discussion_reply'` to `TemplateType` union in `src/lib/email.ts`
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Add `'discussion_reply'` to email queue template type enums
+    - [x] Write failing test asserting `'discussion_reply'` is in the `templateType` enum array in `email-queue.ts` and in the `TemplateType` union in `email.ts`
+    - [x] Add `'discussion_reply'` to `templateType` enum array in `src/db/schema/email-queue.ts`
+    - [x] Add `'discussion_reply'` to `TemplateType` union in `src/lib/email.ts`
+    - [x] Run `pnpm test` — confirm tests pass
+    - **Commit:** `569a64ea` — feat(email): Add discussion_reply template type for checkpoint Q&A emails
 
 - [ ] Task: Create Zod schemas and server function stubs (`src/server/discussions.ts`)
     - [ ] Write failing test asserting stubs exist and are callable (mock `createServerFn` builder chain per `submissions.test.ts` pattern)
