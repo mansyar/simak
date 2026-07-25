@@ -42,10 +42,11 @@
     - [x] Run `pnpm test` — confirm all handler tests pass
     - **Commit:** `302d3187` — feat(server): Implement postDiscussionMessageHandler with notifications and email
 
-- [ ] Task: Implement `deleteOwnMessageHandler` (`src/server/discussions.server.ts`)
-    - [ ] Write failing tests: verifies requesting user is author, rejects after 15-min deletion window, soft-deletes via `deletedAt`, preserves reply threading (replies to deleted message still render)
-    - [ ] Implement handler — author verification, 15-min window check (`createdAt` vs `now()`), soft-delete via `deletedAt` update
-    - [ ] Run `pnpm test` — confirm all handler tests pass
+- [x] Task: Implement `deleteOwnMessageHandler` (`src/server/discussions.server.ts`)
+    - [x] Write failing tests: verifies requesting user is author, rejects after 15-min deletion window, soft-deletes via `deletedAt`, preserves reply threading (replies to deleted message still render)
+    - [x] Implement handler — author verification, 15-min window check (`createdAt` vs `now()`), soft-delete via `deletedAt` update
+    - [x] Run `pnpm test` — confirm all handler tests pass
+    - **Commit:** `f98f72ca` — feat(server): Implement deleteOwnMessageHandler with 15-min deletion window
 
 - [ ] Task: Add `discussionKeys` factory to `src/lib/query-keys.ts`
     - [ ] Write failing test asserting `discussionKeys` factory exists with `list(checkpointId, page)` and `detail(checkpointId)` methods
