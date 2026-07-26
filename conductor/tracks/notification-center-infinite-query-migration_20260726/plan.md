@@ -1,0 +1,59 @@
+# Implementation Plan: NotificationCenter Infinite Query Migration (TRACK-030)
+
+## Phase 1: Hook Conversion (useQuery → useInfiniteQuery)
+
+- [ ] Task: Write failing tests for `useNotificationsList` with `useInfiniteQuery`
+    - [ ] Update `tests/unit/hooks/use-notifications.test.tsx` — replace `useNotificationsList` tests to assert `useInfiniteQuery` behavior: `initialPageParam: 1`, `getNextPageParam` returns next page when `total > accumulated items`, returns `undefined` when all loaded, `queryKey` excludes `page` (uses `notificationKeys.list({ limit, type, unreadOnly })`), `staleTime: 30_000` preserved, `fetchNextPage` available on result
+    - [ ] Add test: `getNextPageParam` returns `2` when page 1 has fewer items than `total`
+    - [ ] Add test: `getNextPageParam` returns `undefined` when all items loaded
+    - [ ] Add test: `listNotifications` called with `page` from `pageParam` (not from options)
+    - [ ] Run `pnpm test` — confirm new tests fail (Red phase)
+- [ ] Task: Update `notificationKeys.list` factory to remove `page` from type signature
+    - [ ] Edit `src/lib/query-keys.ts` line 11 — change `list` filter type from `{ page?, limit?, type?, unreadOnly? }` to `{ limit?, type?, unreadOnly? }`
+    - [ ] Run `pnpm typecheck` — confirm type errors in `use-notifications.ts` and `NotificationCenter.tsx` (callers passing `page`)
+- [ ] Task: Convert `useNotificationsList` to `useInfiniteQuery`
+    - [ ] Edit `src/hooks/use-notifications.ts` lines 36-58 — replace `useQuery` import with `useInfiniteQuery`, update `useNotificationsList` to use `useInfiniteQuery` with `initialPageParam: 1`, `getNextPageParam: (lastPage, allPages) => { const totalItems = allPages.reduce((sum, p) => sum + p.items.length, 0); return totalItems < lastPage.total ? allPages.length + 1 : undefined; }`, `queryKey: notificationKeys.list({ limit, type, unreadOnly })` (no `page`), `queryFn` receives `{ pageParam }` and passes `page: pageParam` to `listNotifications`, keep `staleTime: 30_000`
+    - [ ] Run `pnpm test` — confirm hook tests pass (Green phase)
+    - [ ] Run `pnpm typecheck` — confirm no type errors in hook file (component will still error — fixed in Phase 2)
+- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+
+## Phase 2: Component Refactor (NotificationCenter)
+
+- [ ] Task: Write failing tests for `NotificationCenter` with infinite query data shape
+    - [ ] Update `tests/unit/components/notifications/notification-pagination.test.tsx` — mock `useInfiniteQuery` returning `{ pages: [{ items: [...], total: N }], pageParams: [1] }`, assert "Load More" button calls `fetchNextPage` (not `setCurrentPage`), assert accumulated items include all pages via `data.pages.flatMap`, assert `hasNextPage` controls button visibility, assert `isFetchingNextPage` shows spinner on Load More button only
+    - [ ] Update `tests/unit/components/notifications/notification-filter.test.tsx` — verify tab switch resets infinite query to page 1 (filter change creates new query entry)
+    - [ ] Run `pnpm test` — confirm new/updated component tests fail (Red phase)
+- [ ] Task: Refactor `NotificationCenter` component to use infinite query data
+    - [ ] Edit `src/components/notifications/NotificationCenter.tsx` — remove `useState<Notification[]>(allItems)` (line 47), remove `useEffect` accumulation/dedup (lines 56-67), remove `currentPage` state (line 46)
+    - [ ] Replace `items` computation: `const items = data?.pages.flatMap((p) => p.items) ?? []` (was `allItems`)
+    - [ ] Replace `total`: `const total = data?.pages[0]?.total ?? 0`
+    - [ ] Replace `hasMore` with `hasNextPage` from `useNotificationsList` return
+    - [ ] Replace Load More button `onClick`: `setCurrentPage((p) => p + 1)` → `fetchNextPage()`
+    - [ ] Replace Load More spinner: `isFetching` → `isFetchingNextPage`
+    - [ ] Replace Load More visibility: `hasMore` → `hasNextPage`
+    - [ ] Update `useNotificationsList` call: remove `page: currentPage` from options (no longer accepts `page`)
+    - [ ] Run `pnpm test` — confirm component tests pass (Green phase)
+    - [ ] Run `pnpm typecheck` — confirm no type errors
+- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+
+## Phase 3: Optimistic Mutation Rewrite + Full Test Suite
+
+- [ ] Task: Write failing tests for optimistic mutations with infinite query shape
+    - [ ] Update `tests/unit/hooks/use-notifications.test.tsx` — `useMarkRead`/`useMarkAllRead` optimistic tests: replace `queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList)` with infinite query shape `{ pages: [{ items: [...], total: N }], pageParams: [1] }`, assert optimistic update modifies items within `pages[0].items` (not top-level `items`), assert rollback restores full `{ pages, pageParams }` structure, assert `useUnreadCount` (number type) still decrements/zeroes correctly
+    - [ ] Add test: optimistic `markRead` updates the correct item across multiple pages (not just page 1)
+    - [ ] Add test: optimistic `markAllRead` updates items in all loaded pages
+    - [ ] Run `pnpm test` — confirm optimistic tests fail (Red phase — `'items' in old` check no-ops against `{ pages, pageParams }` shape)
+- [ ] Task: Rewrite `useMarkRead` and `useMarkAllRead` optimistic callbacks for infinite query shape
+    - [ ] Edit `src/hooks/use-notifications.ts` `useMarkRead` `onMutate` (line 85-99) — replace `'items' in old` check with `'pages' in old`, then map over `old.pages` to update `items` within each page: `old.pages.map(page => ({ ...page, items: page.items.map(item => item.id === notificationId ? { ...item, read: true } : item) }))`
+    - [ ] Edit `src/hooks/use-notifications.ts` `useMarkAllRead` `onMutate` (line 143-155) — same pattern: check `'pages' in old`, map over `old.pages` to set all items `read: true`
+    - [ ] Preserve `typeof old === 'number'` check for `useUnreadCount` (unchanged)
+    - [ ] Preserve `onError` rollback and `onSettled` invalidation (unchanged — `notificationKeys.all()` still works)
+    - [ ] Run `pnpm test` — confirm all optimistic tests pass (Green phase)
+- [ ] Task: Quality gate verification
+    - [ ] Run `pnpm test:coverage` — verify ≥80% on lines, statements, branches, functions
+    - [ ] Run `pnpm typecheck` — clean
+    - [ ] Run `pnpm lint` — 0 warnings, 0 errors (including `simak-i18n/no-hardcoded`)
+    - [ ] Run `pnpm check:i18n` — parity maintained (no new keys expected)
+    - [ ] Verify all files under 500 lines: `use-notifications.ts`, `NotificationCenter.tsx`, `query-keys.ts`, all test files
+    - [ ] Grep verification: `allItems` and `existingIds` return zero matches in `NotificationCenter.tsx`; `'items' in old` returns zero matches in `use-notifications.ts`; `setCurrentPage` returns zero matches in `NotificationCenter.tsx`
+- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
