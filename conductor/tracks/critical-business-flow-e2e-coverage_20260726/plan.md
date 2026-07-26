@@ -38,11 +38,11 @@
     - [x] Write extension rejection test (instructor rejects with reason ≥20 chars → "rejected" badge → deadline NOT extended)
     - [x] Write bulk extension test (adapted: instructor extends checkpoint deadline via DeadlineManager UI since no bulk extension UI exists — `bulkExtend` server fn exists but no UI calls it)
     - [x] Run `pnpm test:e2e tests/e2e/extension.spec.ts` and verify all tests pass (Red→Green) — 3 tests pass, verified non-flaky on 3 runs
-- [ ] Task: Create `tests/e2e/password-setup.spec.ts` (FR3)
-    - [ ] Write password setup test (admin creates user via create-user dialog → extract token via `SELECT value FROM verification WHERE identifier = ...` → navigate to `/auth/setup-password?token=<token>` → fill & submit → redirect to login → login with new credentials via `loginAsRole` → redirect to role-specific dashboard)
-    - [ ] Write token reuse test (reuse the same token → verify "Invalid or expired token" error)
-    - [ ] Write expired token test (insert an expired token in DB → navigate to setup-password → verify same error)
-    - [ ] Run `pnpm test:e2e tests/e2e/password-setup.spec.ts` and verify all tests pass (Red→Green)
+- [x] Task: Create `tests/e2e/password-setup.spec.ts` (FR3)
+    - [x] Write password setup test (admin creates user via create-user dialog → extract token via `SELECT value FROM verification WHERE identifier = ...` → navigate to `/auth/setup-password?token=<token>` → fill & submit → redirect to login → login with new credentials via `loginWithCredentials` → redirect to role-specific dashboard)
+    - [x] Write token reuse test (reuse the same token → verify "Invalid or expired token" error)
+    - [x] Write expired token test (insert an expired token in DB → navigate to setup-password → verify same error)
+    - [x] Run `pnpm test:e2e tests/e2e/password-setup.spec.ts` and verify all tests pass (Red→Green) — 3 tests pass, verified non-flaky on 3 runs
 - [ ] Task: Verify full suite and test count increase
     - [ ] Run `pnpm test:e2e` full suite and verify all tests pass
     - [ ] Confirm test count increased from 14 to ~28
