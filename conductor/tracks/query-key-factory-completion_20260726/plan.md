@@ -3,24 +3,24 @@
 
 ## Phase 1: Query-Key Factory Completion + Settings Migration
 
-- [ ] Task: Read `spec.md` and `workflow.md` to ground implementation context
-    - [ ] Re-read `conductor/tracks/query-key-factory-completion_20260726/spec.md`
-    - [ ] Re-read `conductor/workflow.md` (TDD lifecycle, Phase Completion Verification & Checkpointing Protocol)
+- [x] Task: Read `spec.md` and `workflow.md` to ground implementation context
+    - [x] Re-read `conductor/tracks/query-key-factory-completion_20260726/spec.md`
+    - [x] Re-read `conductor/workflow.md` (TDD lifecycle, Phase Completion Verification & Checkpointing Protocol)
 
-- [ ] Task: Write unit tests for `settingsKeys` and `gradebookKeys` factory functions
-    - [ ] Create `tests/unit/lib/query-keys.test.ts` (or extend if exists)
-    - [ ] Test `settingsKeys.currentUser()` returns `['settings', 'currentUser'] as const`
-    - [ ] Test `settingsKeys.activeSessions()` returns `['settings', 'activeSessions'] as const`
-    - [ ] Test `settingsKeys.twoFactorStatus()` returns `['settings', 'twoFactorStatus'] as const`
-    - [ ] Test `settingsKeys.accessibility()` returns `['settings', 'accessibility'] as const`
-    - [ ] Test `gradebookKeys.studentFinalGrade(assignmentId)` returns `['gradebook', 'studentFinalGrade', assignmentId] as const`
-    - [ ] Run `pnpm test` — confirm tests fail (factories don't exist yet)
+- [x] Task: Write unit tests for `settingsKeys` and `gradebookKeys` factory functions [91e3e93]
+    - [x] Create `tests/unit/lib/query-keys.test.ts` (or extend if exists)
+    - [x] Test `settingsKeys.currentUser()` returns `['settings', 'currentUser'] as const`
+    - [x] Test `settingsKeys.activeSessions()` returns `['settings', 'activeSessions'] as const`
+    - [x] Test `settingsKeys.twoFactorStatus()` returns `['settings', 'twoFactorStatus'] as const`
+    - [x] Test `settingsKeys.accessibility()` returns `['settings', 'accessibility'] as const`
+    - [x] Test `gradebookKeys.studentFinalGrade(assignmentId)` returns `['gradebook', 'studentFinalGrade', assignmentId] as const`
+    - [x] Run `pnpm test` — confirm tests fail (factories don't exist yet)
 
-- [ ] Task: Implement `settingsKeys` and `gradebookKeys` in `src/lib/query-keys.ts`
-    - [ ] Add `settingsKeys` factory with 4 sub-keys (`currentUser`, `activeSessions`, `twoFactorStatus`, `accessibility`) following existing pattern (`as const` return types)
-    - [ ] Add `gradebookKeys` factory with `studentFinalGrade(assignmentId: number)` sub-key
-    - [ ] Run `pnpm test` — confirm factory unit tests now pass
-    - [ ] Run `pnpm typecheck` — confirm no type errors
+- [x] Task: Implement `settingsKeys` and `gradebookKeys` in `src/lib/query-keys.ts` [91e3e93]
+    - [x] Add `settingsKeys` factory with 4 sub-keys (`currentUser`, `activeSessions`, `twoFactorStatus`, `accessibility`) following existing pattern (`as const` return types)
+    - [x] Add `gradebookKeys` factory with `studentFinalGrade(assignmentId: number)` sub-key
+    - [x] Run `pnpm test` — confirm factory unit tests now pass
+    - [x] Run `pnpm typecheck` — confirm no type errors
 
 - [ ] Task: Write/update tests for settings components migration
     - [ ] Update `tests/unit/components/settings/profile-section.test.tsx` (or create if missing) — assert `useQuery` uses `settingsKeys.currentUser()`, assert `updateNameMutation` has `onSettled` invalidation calling `queryClient.invalidateQueries({ queryKey: settingsKeys.currentUser() })`
