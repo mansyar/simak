@@ -7,6 +7,8 @@ import {
   userKeys,
   templateKeys,
   discussionKeys,
+  settingsKeys,
+  gradebookKeys,
 } from '@/lib/query-keys';
 
 describe('query-key factories', () => {
@@ -100,6 +102,30 @@ describe('query-key factories', () => {
 
     it('detail() returns detail key with checkpointId', () => {
       expect(discussionKeys.detail(42)).toEqual(['discussions', 'detail', 42]);
+    });
+  });
+
+  describe('settingsKeys', () => {
+    it('currentUser() returns settings currentUser key', () => {
+      expect(settingsKeys.currentUser()).toEqual(['settings', 'currentUser']);
+    });
+
+    it('activeSessions() returns settings activeSessions key', () => {
+      expect(settingsKeys.activeSessions()).toEqual(['settings', 'activeSessions']);
+    });
+
+    it('twoFactorStatus() returns settings twoFactorStatus key', () => {
+      expect(settingsKeys.twoFactorStatus()).toEqual(['settings', 'twoFactorStatus']);
+    });
+
+    it('accessibility() returns settings accessibility key', () => {
+      expect(settingsKeys.accessibility()).toEqual(['settings', 'accessibility']);
+    });
+  });
+
+  describe('gradebookKeys', () => {
+    it('studentFinalGrade() returns gradebook studentFinalGrade key with assignmentId', () => {
+      expect(gradebookKeys.studentFinalGrade(42)).toEqual(['gradebook', 'studentFinalGrade', 42]);
     });
   });
 });
