@@ -425,6 +425,17 @@ Students and instructors lack a centralized system to:
 - **Opt-in test scripts** — `pnpm test:e2e` and `pnpm test:e2e:ui` (not part of pre-push gate)
 - **Test runtime** — Full suite passes in 56.5 seconds (well under 2-minute requirement)
 
+### Track: Critical Business Flow E2E Coverage (TRACK-027) (July 2026)
+
+- **E2E coverage expansion** — Raised test count from 14 to 31 across 8 spec files (up from 5); full suite runtime ~2.2 minutes (under 3-minute NFR); verified non-flaky on 3 consecutive runs
+- **New spec files** — `consultation.spec.ts` (3 tests: log→verify→count increments, reject→rejected badge, gating UI blocking reasons), `extension.spec.ts` (3 tests: request→approve→dueDate extended, reject→deadline NOT extended, DeadlineManager individual extension), `password-setup.spec.ts` (3 tests: admin creates user→password setup→login, token reuse→error, expired token→error)
+- **Notification delivery assertions (FR4)** — Added post-action notification tests to existing specs: `submission_received` (instructor), `review_completed` (student), `consultation_verified` (student); verified bell badge count, notification center items, and mark-all-read functionality
+- **Upload UI validation (FR5)** — Expanded `student-submission.spec.ts` with file type validation (.txt→error) and file size validation (>25MB→error) tests exercising the FileUploader component
+- **Negative test cases (FR6)** — Invalid login credentials (inline error), locked checkpoint (no submit button / no FileUploader), cross-student access denial (student3 sees "Assignment not found"), admin role creation options (Admin/Instructor/Student visible, Super Admin hidden)
+- **Instructor-review decoupling (FR7)** — Refactored 4 tests so each sets up its own submission state via DB helpers; all 4 pass independently via `--grep`
+- **Seed data expansion (FR8)** — Added `student2@e2e.test` (enrolled, for multi-student scenarios), `student3@e2e.test` (NOT enrolled, for access denial tests), and one pending consultation on Proposal checkpoint for instructor verification queue
+- **No new dependencies** — All tests use existing `@playwright/test`, `postgres`, and helper infrastructure; no `src/` application code changes
+
 ### Track: Optimistic UI Updates for Mutations (July 2026)
 
 - **Typed query-key factory** — New `src/lib/query-keys.ts` with 5 typed key factory objects (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys) replacing all inline query key arrays
