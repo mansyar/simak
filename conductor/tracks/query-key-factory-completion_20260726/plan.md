@@ -22,20 +22,20 @@
     - [x] Run `pnpm test` — confirm factory unit tests now pass
     - [x] Run `pnpm typecheck` — confirm no type errors
 
-- [ ] Task: Write/update tests for settings components migration
-    - [ ] Update `tests/unit/components/settings/profile-section.test.tsx` (or create if missing) — assert `useQuery` uses `settingsKeys.currentUser()`, assert `updateNameMutation` has `onSettled` invalidation calling `queryClient.invalidateQueries({ queryKey: settingsKeys.currentUser() })`
-    - [ ] Update tests for `SessionManagement`, `TwoFactorSettings`, `AccessibilitySection`, `NotificationPreferencesSection` — assert factory keys used instead of inline arrays
-    - [ ] Run `pnpm test` — confirm updated tests fail (components still use inline keys)
+- [x] Task: Write/update tests for settings components migration [8a753fe4]
+    - [x] Update `tests/unit/components/settings/profile-section.test.tsx` (or create if missing) — assert `useQuery` uses `settingsKeys.currentUser()`, assert `updateNameMutation` has `onSettled` invalidation calling `queryClient.invalidateQueries({ queryKey: settingsKeys.currentUser() })`
+    - [x] Update tests for `SessionManagement`, `TwoFactorSettings`, `AccessibilitySection`, `NotificationPreferencesSection` — assert factory keys used instead of inline arrays
+    - [x] Run `pnpm test` — confirm updated tests fail (components still use inline keys)
 
-- [ ] Task: Migrate 5 settings components to factory keys + fix ProfileSection invalidation bug
-    - [ ] `ProfileSection.tsx`: Replace `queryKey: ['currentUser']` with `settingsKeys.currentUser()`; add `onSettled: () => queryClient.invalidateQueries({ queryKey: settingsKeys.currentUser() })` to `updateNameMutation`
-    - [ ] `SessionManagement.tsx`: Replace `queryKey: ['activeSessions']` with `settingsKeys.activeSessions()`; update `invalidateQueries` calls
-    - [ ] `TwoFactorSettings.tsx`: Replace `queryKey: ['twoFactorStatus']` with `settingsKeys.twoFactorStatus()`; update `invalidateQueries` calls
-    - [ ] `AccessibilitySection.tsx`: Replace inline key with `settingsKeys.accessibility()`; update `invalidateQueries` calls
-    - [ ] `NotificationPreferencesSection.tsx`: Replace `queryKey: ['currentUser']` with `settingsKeys.currentUser()` (line 112); update `invalidateQueries` call (line 138)
-    - [ ] Run `pnpm test` — confirm all settings tests pass
-    - [ ] Run `pnpm typecheck` — confirm no type errors
-    - [ ] Grep `src/components/settings/` for `queryKey: ['` — confirm zero matches
+- [x] Task: Migrate 5 settings components to factory keys + fix ProfileSection invalidation bug [8a753fe4]
+    - [x] `ProfileSection.tsx`: Replace `queryKey: ['currentUser']` with `settingsKeys.currentUser()`; add `onSettled: () => queryClient.invalidateQueries({ queryKey: settingsKeys.currentUser() })` to `updateNameMutation`
+    - [x] `SessionManagement.tsx`: Replace `queryKey: ['activeSessions']` with `settingsKeys.activeSessions()`; update `invalidateQueries` calls
+    - [x] `TwoFactorSettings.tsx`: Replace `queryKey: ['twoFactorStatus']` with `settingsKeys.twoFactorStatus()`; update `invalidateQueries` calls
+    - [x] `AccessibilitySection.tsx`: Replace inline key with `settingsKeys.accessibility()`; update `invalidateQueries` calls
+    - [x] `NotificationPreferencesSection.tsx`: Replace `queryKey: ['currentUser']` with `settingsKeys.currentUser()` (line 112); update `invalidateQueries` call (line 138)
+    - [x] Run `pnpm test` — confirm all settings tests pass
+    - [x] Run `pnpm typecheck` — confirm no type errors
+    - [x] Grep `src/components/settings/` for `queryKey: ['` — confirm zero matches
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Query-Key Factory Completion + Settings Migration' (Protocol in workflow.md)
 
