@@ -41,31 +41,31 @@
 
 ## Phase 2: Gradebook TanStack Query Migration
 
-- [ ] Task: Read `spec.md` and `workflow.md` to ground implementation context
-    - [ ] Re-read `conductor/tracks/query-key-factory-completion_20260726/spec.md`
-    - [ ] Re-read `conductor/workflow.md` (TDD lifecycle, Phase Completion Verification & Checkpointing Protocol)
+- [x] Task: Read `spec.md` and `workflow.md` to ground implementation context
+    - [x] Re-read `conductor/tracks/query-key-factory-completion_20260726/spec.md`
+    - [x] Re-read `conductor/workflow.md` (TDD lifecycle, Phase Completion Verification & Checkpointing Protocol)
 
-- [ ] Task: Write/update tests for `StudentFinalGradeCard` using `useQuery`
-    - [ ] Update `tests/unit/components/student-final-grade-card.test.tsx` (or create if missing) — wrap in `QueryClientProvider`, assert `useQuery` with `gradebookKeys.studentFinalGrade(assignmentId)`, assert skeleton shown while loading, assert grade shown on success, assert error state on failure
-    - [ ] Run `pnpm test` — confirm tests fail (component still uses `useState`/`useEffect`)
+- [x] Task: Write/update tests for `StudentFinalGradeCard` using `useQuery` [5669a090]
+    - [x] Update `tests/unit/components/student-final-grade-card.test.tsx` (or create if missing) — wrap in `QueryClientProvider`, assert `useQuery` with `gradebookKeys.studentFinalGrade(assignmentId)`, assert skeleton shown while loading, assert grade shown on success, assert error state on failure
+    - [x] Run `pnpm test` — confirm tests fail (component still uses `useState`/`useEffect`)
 
-- [ ] Task: Migrate `StudentFinalGradeCard.tsx` from `useState`/`useEffect` to `useQuery`
-    - [ ] Replace `useState(grade)` + `useState(loading)` + `useState(error)` + `useEffect` manual fetch (lines 14-36) with `useQuery({ queryKey: gradebookKeys.studentFinalGrade(assignmentId), queryFn: ... })`
-    - [ ] Update loading/error rendering to use `isPending`/`isError` from `useQuery`
-    - [ ] Run `pnpm test` — confirm StudentFinalGradeCard tests pass
-    - [ ] Run `pnpm typecheck` — confirm no type errors
+- [x] Task: Migrate `StudentFinalGradeCard.tsx` from `useState`/`useEffect` to `useQuery` [5669a090]
+    - [x] Replace `useState(grade)` + `useState(loading)` + `useState(error)` + `useEffect` manual fetch (lines 14-36) with `useQuery({ queryKey: gradebookKeys.studentFinalGrade(assignmentId), queryFn: ... })`
+    - [x] Update loading/error rendering to use `isPending`/`isError` from `useQuery`
+    - [x] Run `pnpm test` — confirm StudentFinalGradeCard tests pass
+    - [x] Run `pnpm typecheck` — confirm no type errors
 
-- [ ] Task: Write/update tests for `RecomputeGradesButton` using `useMutation` with dual invalidation
-    - [ ] Update `tests/unit/components/recompute-grades-button.test.tsx` (or create if missing) — assert `useMutation` used, assert `onSuccess` calls both `queryClient.invalidateQueries({ queryKey: gradebookKeys.studentFinalGrade(assignmentId) })` AND `router.invalidate()`, assert error toast on `onError`
-    - [ ] Run `pnpm test` — confirm tests fail (component still uses `useState`/`async`)
+- [x] Task: Write/update tests for `RecomputeGradesButton` using `useMutation` with dual invalidation [5669a090]
+    - [x] Update `tests/unit/components/recompute-grades-button.test.tsx` (or create if missing) — assert `useMutation` used, assert `onSuccess` calls both `queryClient.invalidateQueries({ queryKey: gradebookKeys.studentFinalGrade(assignmentId) })` AND `router.invalidate()`, assert error toast on `onError`
+    - [x] Run `pnpm test` — confirm tests fail (component still uses `useState`/`async`)
 
-- [ ] Task: Migrate `RecomputeGradesButton.tsx` from `useState`/`async` to `useMutation`
-    - [ ] Replace `useState(loading)` + inline async handler with try/catch/finally (lines 24-43) with `useMutation`
-    - [ ] Add `onSuccess` callback calling both `queryClient.invalidateQueries({ queryKey: gradebookKeys.studentFinalGrade(assignmentId) })` and `router.invalidate()`
-    - [ ] Add `onError` callback for error toast (verify existing i18n key or add `gradebook.recomputeError` to both locales if missing)
-    - [ ] Run `pnpm test` — confirm RecomputeGradesButton tests pass
-    - [ ] Run `pnpm typecheck` — confirm no type errors
-    - [ ] Verify gradebook route page (`$id.gradebook.tsx`) `handleSaveConfig` is unchanged (keeps `router.invalidate()` for SSR loader data)
+- [x] Task: Migrate `RecomputeGradesButton.tsx` from `useState`/`async` to `useMutation` [5669a090]
+    - [x] Replace `useState(loading)` + inline async handler with try/catch/finally (lines 24-43) with `useMutation`
+    - [x] Add `onSuccess` callback calling both `queryClient.invalidateQueries({ queryKey: gradebookKeys.studentFinalGrade(assignmentId) })` and `router.invalidate()`
+    - [x] Add `onError` callback for error toast (verify existing i18n key or add `gradebook.recomputeError` to both locales if missing)
+    - [x] Run `pnpm test` — confirm RecomputeGradesButton tests pass
+    - [x] Run `pnpm typecheck` — confirm no type errors
+    - [x] Verify gradebook route page (`$id.gradebook.tsx`) `handleSaveConfig` is unchanged (keeps `router.invalidate()` for SSR loader data)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Gradebook TanStack Query Migration' (Protocol in workflow.md)
 
