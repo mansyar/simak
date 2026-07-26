@@ -90,6 +90,35 @@ async function verifyConsultationInDb(consultationId: number): Promise<void> {
   await sql.end();
 }
 
+async function cleanupNotifications(): Promise<void> {
+  const sql = postgres(getDatabaseUrl());
+  await sql`DELETE FROM notifications`;
+  await sql.end();
+}
+
+async function createNotification(
+  userEmail: string,
+  type: string,
+  params: Record<string, string> = {},
+): Promise<void> {
+  const sql = postgres(getDatabaseUrl());
+  const titleKey = `notifications.events.${type}.title`;
+  const messageKey = `notifications.events.${type}.message`;
+  await sql`
+    INSERT INTO notifications (user_id, type, title_key, message_key, params, channel, read)
+    VALUES (
+      (SELECT id FROM users WHERE email = ${userEmail}),
+      ${type},
+      ${titleKey},
+      ${messageKey},
+      ${JSON.stringify(params)}::jsonb,
+      'in_app',
+      false
+    )
+  `;
+  await sql.end();
+}
+
 // ---------------------------------------------------------------------------
 // Navigation Helpers
 // ---------------------------------------------------------------------------
@@ -293,6 +322,46 @@ test.describe('Consultation Lifecycle', () => {
 
     // Proposal checkpoint should now show "Consultations: 1/1"
     await expect(studentPage.locator('text=Consultations: 1/1').first()).toBeVisible({
+      timeout: 10_000,
+    });
+
+    await studentCtx.close();
+  });
+
+  test('student receives consultation_verified notification + mark-all-read', async ({
+    browser,
+  }) => {
+    await cleanupConsultations();
+    await cleanupNotifications();
+
+    // Insert two notifications for the student via DB
+    await createNotification('student@e2e.test', 'consultation_verified');
+    await createNotification('student@e2e.test', 'consultation_logged');
+
+    const studentCtx = await browser.newContext({ storageState: getAuthFilePath('student') });
+    const studentPage = await studentCtx.newPage();
+    await studentPage.goto('/student/dashboard');
+    await studentPage.waitForLoadState('networkidle');
+
+    // Verify bell shows unread count
+    await expect(studentPage.getByRole('button', { name: /unread/i })).toBeVisible({
+      timeout: 15_000,
+    });
+
+    // Open notification center
+    await studentPage.getByRole('button', { name: /notification/i }).click();
+    await expect(studentPage.getByText('Notifications')).toBeVisible({ timeout: 10_000 });
+
+    // Verify both notifications appear
+    await expect(studentPage.getByText('Consultation Verified')).toBeVisible({
+      timeout: 10_000,
+    });
+
+    // Click "Mark all read"
+    await studentPage.getByRole('button', { name: 'Mark all read' }).click();
+
+    // Verify bell now shows no unread
+    await expect(studentPage.getByRole('button', { name: 'View notifications' })).toBeVisible({
       timeout: 10_000,
     });
 

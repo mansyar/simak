@@ -111,10 +111,39 @@ async function insertReview(
   await sql.end();
 }
 
+async function cleanupNotifications(): Promise<void> {
+  const sql = postgres(getDatabaseUrl());
+  await sql`DELETE FROM notifications`;
+  await sql.end();
+}
+
+async function createNotification(
+  userEmail: string,
+  type: string,
+  params: Record<string, string> = {},
+): Promise<void> {
+  const sql = postgres(getDatabaseUrl());
+  const titleKey = `notifications.events.${type}.title`;
+  const messageKey = `notifications.events.${type}.message`;
+  await sql`
+    INSERT INTO notifications (user_id, type, title_key, message_key, params, channel, read)
+    VALUES (
+      (SELECT id FROM users WHERE email = ${userEmail}),
+      ${type},
+      ${titleKey},
+      ${messageKey},
+      ${JSON.stringify(params)}::jsonb,
+      'in_app',
+      false
+    )
+  `;
+  await sql.end();
+}
+
 test.describe('Instructor Review Flow', () => {
   test.beforeAll(async ({ browser }) => {
     await resetDatabase();
-    await ensureAuthFile(browser, 'instructor');
+    await Promise.all([ensureAuthFile(browser, 'instructor'), ensureAuthFile(browser, 'student')]);
   });
 
   test.use({ storageState: getAuthFilePath('instructor') });
@@ -235,5 +264,35 @@ test.describe('Instructor Review Flow', () => {
     // Verify review history is visible and shows the "Passed" decision
     await expect(page.locator('text=Review History')).toBeVisible({ timeout: 15_000 });
     await expect(page.locator('text=Passed').first()).toBeVisible({ timeout: 10_000 });
+  });
+
+  test('student receives review_completed notification after Pass review', async ({ browser }) => {
+    await cleanupNotifications();
+
+    // Simulate what the server does after a Pass review: insert review_completed notification
+    await createNotification('student@e2e.test', 'review_completed', {
+      checkpointName: 'Proposal',
+      assignmentTitle: 'E2E Test Assignment',
+    });
+
+    // Open student dashboard
+    const studentCtx = await browser.newContext({ storageState: getAuthFilePath('student') });
+    const studentPage = await studentCtx.newPage();
+    await studentPage.goto('/student/dashboard');
+    await studentPage.waitForLoadState('networkidle');
+
+    // Verify bell shows unread count
+    await expect(studentPage.getByRole('button', { name: /unread/i })).toBeVisible({
+      timeout: 15_000,
+    });
+
+    // Open notification center
+    await studentPage.getByRole('button', { name: /notification/i }).click();
+    await expect(studentPage.getByText('Notifications')).toBeVisible({ timeout: 10_000 });
+
+    // Verify the review_completed notification appears
+    await expect(studentPage.getByText('Review Completed')).toBeVisible({ timeout: 10_000 });
+
+    await studentCtx.close();
   });
 });

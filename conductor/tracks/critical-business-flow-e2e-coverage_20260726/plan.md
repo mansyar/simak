@@ -52,7 +52,7 @@
 
 ## Phase 3: Notification Assertions, Upload UI, Negative Cases
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor context before implementing this phase
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor context before implementing this phase
 - [ ] Task: Add notification delivery assertions to existing specs (FR4)
     - [ ] `student-submission.spec.ts`: after submission, log in as instructor, verify notification badge count incremented and `submission_received` notification item appears in NotificationCenter
     - [ ] `instructor-review.spec.ts`: after Pass review, log in as student, verify `review_completed` notification appears
