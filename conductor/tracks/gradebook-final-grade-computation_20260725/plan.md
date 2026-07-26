@@ -169,12 +169,12 @@
     - [x] Wire to Excel export button on gradebook page (already wired in Task 4)
     - [x] Run `pnpm test` and confirm tests pass
 
-- [ ] Task: Final quality gate verification
-    - [ ] Run `pnpm test:coverage` — confirm ≥80% on all thresholds
-    - [ ] Run `pnpm typecheck` — confirm clean
-    - [ ] Run `pnpm lint` — confirm clean (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n` — confirm parity
-    - [ ] Verify all files ≤500 lines (`check-modularity.js`)
+- [x] Task: Final quality gate verification
+    - [x] Run `pnpm test:coverage` — confirm ≥80% on all thresholds (stmts 87.95%, branches 81.89%, funcs 83.54%, lines 88.56%)
+    - [x] Run `pnpm typecheck` — confirm clean
+    - [x] Run `pnpm lint` — confirm clean (0 errors, 2 pre-existing warnings)
+    - [x] Run `pnpm check:i18n` — confirm parity (927=927, 0 unused keys)
+    - [x] Verify all files ≤500 lines (`check-modularity.js`)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: UI, Export & i18n' (Protocol in workflow.md)
 </protect>
