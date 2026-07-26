@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ErrorCode } from '@/lib/errors';
 
 const mockRouterInvalidate = vi.fn();
 vi.mock('@tanstack/react-router', () => ({
@@ -36,7 +37,7 @@ function renderWithQuery(ui: React.ReactElement, queryClient?: QueryClient) {
   };
 }
 
-const mockServerError = { error: { code: 'INTERNAL', message: 'Failed' } };
+const mockServerError = { error: { code: ErrorCode.INTERNAL, message: 'Failed' } };
 
 describe('RecomputeGradesButton', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -60,7 +61,7 @@ describe('RecomputeGradesButton', () => {
   });
 
   it('calls recomputeAllGrades on confirm', async () => {
-    vi.mocked(recomputeAllGrades).mockResolvedValue({ count: 5 });
+    vi.mocked(recomputeAllGrades).mockResolvedValue({ success: true, count: 5 });
     renderWithQuery(<RecomputeGradesButton assignmentId={1} isAdmin={true} />);
     fireEvent.click(screen.getByText('gradebook.recomputeAll'));
     fireEvent.click(screen.getByText('common.confirm'));
@@ -70,7 +71,7 @@ describe('RecomputeGradesButton', () => {
   });
 
   it('shows success toast on success', async () => {
-    vi.mocked(recomputeAllGrades).mockResolvedValue({ count: 5 });
+    vi.mocked(recomputeAllGrades).mockResolvedValue({ success: true, count: 5 });
     renderWithQuery(<RecomputeGradesButton assignmentId={1} isAdmin={true} />);
     fireEvent.click(screen.getByText('gradebook.recomputeAll'));
     fireEvent.click(screen.getByText('common.confirm'));
@@ -100,7 +101,7 @@ describe('RecomputeGradesButton', () => {
   });
 
   it('invalidates gradebook query and router on success (dual invalidation)', async () => {
-    vi.mocked(recomputeAllGrades).mockResolvedValue({ count: 5 });
+    vi.mocked(recomputeAllGrades).mockResolvedValue({ success: true, count: 5 });
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
     renderWithQuery(<RecomputeGradesButton assignmentId={42} isAdmin={true} />, queryClient);
@@ -115,7 +116,7 @@ describe('RecomputeGradesButton', () => {
   });
 
   it('closes dialog on success', async () => {
-    vi.mocked(recomputeAllGrades).mockResolvedValue({ count: 5 });
+    vi.mocked(recomputeAllGrades).mockResolvedValue({ success: true, count: 5 });
     renderWithQuery(<RecomputeGradesButton assignmentId={1} isAdmin={true} />);
     fireEvent.click(screen.getByText('gradebook.recomputeAll'));
     fireEvent.click(screen.getByText('common.confirm'));
