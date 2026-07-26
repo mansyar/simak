@@ -38,7 +38,7 @@
     - [x] Write extension rejection test (instructor rejects with reason ≥20 chars → "rejected" badge → deadline NOT extended)
     - [x] Write bulk extension test (adapted: instructor extends checkpoint deadline via DeadlineManager UI since no bulk extension UI exists — `bulkExtend` server fn exists but no UI calls it)
     - [x] Run `pnpm test:e2e tests/e2e/extension.spec.ts` and verify all tests pass (Red→Green) — 3 tests pass, verified non-flaky on 3 runs
-- [x] Task: Create `tests/e2e/password-setup.spec.ts` (FR3)
+- [x] Task: Create `tests/e2e/password-setup.spec.ts` (FR3) [5f04419]
     - [x] Write password setup test (admin creates user via create-user dialog → extract token via `SELECT value FROM verification WHERE identifier = ...` → navigate to `/auth/setup-password?token=<token>` → fill & submit → redirect to login → login with new credentials via `loginWithCredentials` → redirect to role-specific dashboard)
     - [x] Write token reuse test (reuse the same token → verify "Invalid or expired token" error)
     - [x] Write expired token test (insert an expired token in DB → navigate to setup-password → verify same error)
