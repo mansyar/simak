@@ -78,4 +78,10 @@
     - [x] Run `pnpm check:i18n` — parity maintained (739 used, 919 in en/id)
     - [x] Verify all new test files ≤ 500 lines (`scripts/check-modularity.js`) — max 299 lines
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Notification Assertions, Upload UI, Negative Cases' (Protocol in workflow.md) [checkpoint: 093080f]
+
+---
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions d6c13d3
 </protect>
