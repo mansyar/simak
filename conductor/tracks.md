@@ -7,7 +7,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 <!-- Archived tracks are in conductor/archive/ -->
 
 ---
-
-- [x] **Track: Gradebook & Final Grade Computation**
-*Link: [./tracks/gradebook-final-grade-computation_20260725/](./tracks/gradebook-final-grade-computation_20260725/)*
-
