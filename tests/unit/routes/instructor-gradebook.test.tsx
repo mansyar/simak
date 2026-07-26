@@ -100,7 +100,7 @@ const mockStudents = [
 
 describe('GradebookTable', () => {
   it('renders student rows with names and checkpoint column headers', () => {
-    renderWithQuery(<GradebookTable students={mockStudents} config={mockConfig} />);
+    renderWithQuery(<GradebookTable students={mockStudents} />);
     expect(screen.getByText('Alice')).toBeDefined();
     expect(screen.getByText('Bob')).toBeDefined();
     expect(screen.getByText('Checkpoint 1')).toBeDefined();
@@ -108,7 +108,7 @@ describe('GradebookTable', () => {
   });
 
   it('shows pass/fail badge for non-rubric and score for rubric checkpoints', () => {
-    renderWithQuery(<GradebookTable students={mockStudents} config={mockConfig} />);
+    renderWithQuery(<GradebookTable students={mockStudents} />);
     // Alice CP1: passed → badge
     expect(screen.getByText('gradebook.passed')).toBeDefined();
     // Alice CP2: rubric → numeric score
@@ -118,7 +118,7 @@ describe('GradebookTable', () => {
   });
 
   it('renders final grade column with score, letter, and status badge', () => {
-    renderWithQuery(<GradebookTable students={mockStudents} config={mockConfig} />);
+    renderWithQuery(<GradebookTable students={mockStudents} />);
     expect(screen.getByText('93.75')).toBeDefined();
     expect(screen.getByText('A')).toBeDefined();
     expect(screen.getByText('gradebook.status.complete')).toBeDefined();
@@ -127,7 +127,7 @@ describe('GradebookTable', () => {
   });
 
   it('shows empty state when no students', () => {
-    renderWithQuery(<GradebookTable students={[]} config={mockConfig} />);
+    renderWithQuery(<GradebookTable students={[]} />);
     expect(screen.getByText('gradebook.empty')).toBeDefined();
   });
 });
