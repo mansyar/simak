@@ -40,7 +40,7 @@ export default async function globalSetup() {
   const authDir = join(process.cwd(), 'tests', 'e2e', '.auth');
   mkdirSync(authDir, { recursive: true });
   const placeholder = JSON.stringify({ cookies: [], origins: [] });
-  for (const role of ['admin', 'instructor', 'student', 'superadmin']) {
+  for (const role of ['admin', 'instructor', 'student', 'student2', 'student3', 'superadmin']) {
     writeFileSync(join(authDir, `${role}.json`), placeholder);
   }
 }

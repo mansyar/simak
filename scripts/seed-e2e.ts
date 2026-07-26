@@ -5,16 +5,19 @@
  *   - SuperAdmin (superadmin@e2e.test) — reads from SUPERADMIN_EMAIL/PASSWORD env vars
  *   - Admin (admin@e2e.test)
  *   - Instructor (instructor@e2e.test)
- *   - Student (student@e2e.test)
+ *   - Student (student@e2e.test) — enrolled in E2E assignment
+ *   - Student Two (student2@e2e.test) — enrolled in E2E assignment (multi-student scenarios)
+ *   - Student Three (student3@e2e.test) — NOT enrolled (cross-student access denial tests)
  *   All with password: TestPass123!
  *
  *   - Assignment template: "E2E Thesis Template" (3 checkpoints, type thesis, minConsultations: 1)
- *   - Assignment from template, assigned to student (first checkpoint unlocked, rest locked)
+ *   - Assignment from template, assigned to student1 & student2 (first checkpoint unlocked, rest locked)
+ *   - One pending consultation on Proposal checkpoint for student1 (instructor verification queue)
  *
  * Run via: npx tsx scripts/seed-e2e.ts
  * Requires DATABASE_URL env var pointing to the test database (port 5433).
  */
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { getDb } from '../src/db/index';
 import {
   users,
@@ -24,6 +27,7 @@ import {
   assignments,
   assignmentStudents,
   checkpoints,
+  consultations,
 } from '../src/db/schema/index';
 import { hashPassword } from 'better-auth/crypto';
 import crypto from 'node:crypto';
@@ -34,6 +38,8 @@ const E2E_USERS = [
   { name: 'Admin', email: 'admin@e2e.test', role: 'admin' as const },
   { name: 'Instructor', email: 'instructor@e2e.test', role: 'instructor' as const },
   { name: 'Student', email: 'student@e2e.test', role: 'student' as const },
+  { name: 'Student Two', email: 'student2@e2e.test', role: 'student' as const },
+  { name: 'Student Three', email: 'student3@e2e.test', role: 'student' as const },
 ];
 
 const E2E_TEMPLATE_CHECKPOINTS = [
@@ -117,13 +123,14 @@ async function seedE2EUsers(): Promise<void> {
 async function seedTemplateAndAssignment(): Promise<void> {
   const db = getDb();
 
-  // Find the E2E instructor and student
+  // Find the E2E instructor and students
   const [instructorUser] = await db
     .select()
     .from(users)
     .where(eq(users.email, 'instructor@e2e.test'));
 
   const [studentUser] = await db.select().from(users).where(eq(users.email, 'student@e2e.test'));
+  const [student2User] = await db.select().from(users).where(eq(users.email, 'student2@e2e.test'));
 
   if (!instructorUser || !studentUser) {
     throw new Error('E2E instructor or student not found. Run seedE2EUsers() first.');
@@ -197,6 +204,53 @@ async function seedTemplateAndAssignment(): Promise<void> {
   }
 
   console.log(`[E2E Seed] Created ${E2E_TEMPLATE_CHECKPOINTS.length} per-student checkpoints.`);
+
+  // --- Enroll student2 and create their checkpoints ---
+  if (student2User) {
+    await db.insert(assignmentStudents).values({
+      assignmentId: assignment.id,
+      studentId: student2User.id,
+    });
+
+    console.log(`[E2E Seed] Student2 enrolled: ${student2User.email}.`);
+
+    for (const cp of E2E_TEMPLATE_CHECKPOINTS) {
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + cp.estimatedDuration);
+      const state = cp.order === 1 ? 'unlocked' : 'locked';
+
+      await db.insert(checkpoints).values({
+        assignmentId: assignment.id,
+        studentId: student2User.id,
+        name: cp.name,
+        order: cp.order,
+        dueDate,
+        minConsultations: cp.minConsultations,
+        state,
+      });
+    }
+
+    console.log(`[E2E Seed] Created checkpoints for student2.`);
+  }
+
+  // --- Create one pending consultation on Proposal checkpoint for student1 ---
+  const [proposalCheckpoint] = await db
+    .select()
+    .from(checkpoints)
+    .where(and(eq(checkpoints.name, 'Proposal'), eq(checkpoints.studentId, studentUser.id)));
+
+  if (proposalCheckpoint) {
+    await db.insert(consultations).values({
+      assignmentId: assignment.id,
+      checkpointId: proposalCheckpoint.id,
+      studentId: studentUser.id,
+      status: 'pending',
+      sessionType: 'internal',
+      notes: 'E2E seed consultation for verification queue.',
+    });
+
+    console.log(`[E2E Seed] Created pending consultation on Proposal checkpoint.`);
+  }
 }
 
 // --- Entry point ---

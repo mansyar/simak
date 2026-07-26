@@ -8,7 +8,7 @@
 import type { Browser, Page } from '@playwright/test';
 import { getRoleDashboard } from '../../../src/lib/route-utils';
 
-export type E2ERole = 'superadmin' | 'admin' | 'instructor' | 'student';
+export type E2ERole = 'superadmin' | 'admin' | 'instructor' | 'student' | 'student2' | 'student3';
 
 /**
  * Login credentials for each E2E role.
@@ -22,6 +22,8 @@ export const ROLE_CREDENTIALS: Record<E2ERole, { email: string; password: string
   admin: { email: 'admin@e2e.test', password: 'TestPass123!' },
   instructor: { email: 'instructor@e2e.test', password: 'TestPass123!' },
   student: { email: 'student@e2e.test', password: 'TestPass123!' },
+  student2: { email: 'student2@e2e.test', password: 'TestPass123!' },
+  student3: { email: 'student3@e2e.test', password: 'TestPass123!' },
 };
 
 /**

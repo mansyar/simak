@@ -87,4 +87,31 @@ test.describe('Admin User Management', () => {
       timeout: 5_000,
     });
   });
+
+  test('create-user dialog shows Admin, Instructor, Student roles but not Super Admin', async ({
+    page,
+  }) => {
+    await page.goto('/admin/users');
+    await page.waitForLoadState('networkidle');
+
+    // Click "New User" button
+    await page.getByRole('button', { name: 'New User' }).click();
+
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 10_000 });
+
+    // Open the role dropdown
+    await dialog.locator('button[role="combobox"]').click();
+
+    // Verify Admin, Instructor, Student are available
+    await expect(page.getByRole('option', { name: 'Admin' })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('option', { name: 'Instructor' })).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole('option', { name: 'Student' })).toBeVisible({ timeout: 5_000 });
+
+    // Verify Super Admin is NOT available
+    await expect(page.getByRole('option', { name: 'Super Admin' })).not.toBeVisible();
+
+    // Close dialog by pressing Escape
+    await page.keyboard.press('Escape');
+  });
 });
