@@ -152,15 +152,17 @@
     - [x] Mount on `/student/assignments/$id` page
     - [x] Run `pnpm test` and confirm tests pass
 
-- [ ] Task: Write failing tests for admin grade distribution analytics
-    - [ ] Create/update `tests/unit/routes/admin-analytics.test.tsx`
-    - [ ] Test "Grade Distribution" section renders with A/B/C/D/F progress bars
-    - [ ] Run `pnpm test` and confirm tests fail
+- [x] Task: Write failing tests for admin grade distribution analytics
+    - [x] Create `tests/unit/server/analytics-grade-distribution.test.ts` (3 handler tests)
+    - [x] Update `tests/unit/routes/admin-analytics.test.tsx` (2 route tests + mock data)
+    - [x] Test "Grade Distribution" section renders with A/B/C/D/F progress bars
+    - [x] Run `pnpm test` and confirm tests fail
 
-- [ ] Task: Implement admin grade distribution analytics
-    - [ ] Extend `getAdminAnalyticsDataHandler` with `gradeDistribution: { A, B, C, D, F }` aggregate query
-    - [ ] Add "Grade Distribution" section to admin analytics page (`/admin/analytics`)
-    - [ ] Run `pnpm test` and confirm tests pass
+- [x] Task: Implement admin grade distribution analytics
+    - [x] Extend `getAdminAnalyticsDataHandler` with `gradeDistribution: { A, B, C, D, F }` aggregate query (9th query in Promise.all)
+    - [x] Add "Grade Distribution" section to admin analytics page (`/admin/analytics`) with Progress bars
+    - [x] Add `gradebook.analytics.gradeDistribution` i18n key to both locales
+    - [x] Run `pnpm test` and confirm tests pass
 
 - [ ] Task: Implement Excel export helper
     - [ ] Add `exportGradebookToExcel` to `src/lib/excel-export.ts` (client-side `.xlsx`, human-readable column headers, uses `sanitizeCell`)

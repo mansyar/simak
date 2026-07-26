@@ -1189,6 +1189,9 @@ export type Translation = {
       checkpoint: string
       score: string
     }
+    analytics: {
+      gradeDistribution: string
+    }
   }
 }
 

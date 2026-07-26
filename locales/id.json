@@ -1183,6 +1183,9 @@
       "breakdown": "Tampilkan Rincian",
       "checkpoint": "Checkpoint",
       "score": "Skor"
+    },
+    "analytics": {
+      "gradeDistribution": "Distribusi Nilai"
     }
   }
 }

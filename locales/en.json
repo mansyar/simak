@@ -1183,6 +1183,9 @@
       "breakdown": "Show Breakdown",
       "checkpoint": "Checkpoint",
       "score": "Score"
+    },
+    "analytics": {
+      "gradeDistribution": "Grade Distribution"
     }
   }
 }

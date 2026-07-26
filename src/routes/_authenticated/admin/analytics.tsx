@@ -72,6 +72,7 @@ type AdminAnalyticsData = {
   dauTrend: { date: string; activeUsers: number }[];
   wauTrend: { date: string; activeUsers: number }[];
   dateRange: { start: string | null; end: string | null };
+  gradeDistribution: { A: number; B: number; C: number; D: number; F: number };
 };
 
 type RubricCriterionMetric = {
@@ -428,6 +429,40 @@ function AdminAnalyticsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Grade Distribution */}
+      {data.gradeDistribution &&
+        data.gradeDistribution.A +
+          data.gradeDistribution.B +
+          data.gradeDistribution.C +
+          data.gradeDistribution.D +
+          data.gradeDistribution.F >
+          0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('gradebook.analytics.gradeDistribution')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {(() => {
+                const totalGrades =
+                  data.gradeDistribution.A +
+                  data.gradeDistribution.B +
+                  data.gradeDistribution.C +
+                  data.gradeDistribution.D +
+                  data.gradeDistribution.F;
+                return (['A', 'B', 'C', 'D', 'F'] as const).map((letter) => (
+                  <Progress
+                    key={letter}
+                    label={letter}
+                    value={data.gradeDistribution[letter]}
+                    max={totalGrades || 1}
+                    showValue
+                  />
+                ));
+              })()}
+            </CardContent>
+          </Card>
+        )}
     </div>
   );
 }

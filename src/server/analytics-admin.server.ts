@@ -6,6 +6,7 @@ import { submissions, reviews } from '@/db/schema/submissions';
 import { consultations } from '@/db/schema/consultations';
 import { auditLog } from '@/db/schema/audit-log';
 import { reviewScores } from '@/db/schema/rubrics';
+import { finalGrades } from '@/db/schema/gradebook';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '@/lib/types';
@@ -26,6 +27,7 @@ export type AdminAnalyticsData = {
   dauTrend: { date: string; activeUsers: number }[];
   wauTrend: { date: string; activeUsers: number }[];
   dateRange: { start: string | null; end: string | null };
+  gradeDistribution: { A: number; B: number; C: number; D: number; F: number };
 };
 
 function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
@@ -85,6 +87,7 @@ export async function getAdminAnalyticsDataHandler({ data }: { data: AnalyticsDa
       [reviewCount],
       dauTrend,
       wauTrend,
+      gradeDistributionRows,
     ] = await Promise.all([
       // 1. Consultation verification rate
       db
@@ -170,6 +173,16 @@ export async function getAdminAnalyticsDataHandler({ data }: { data: AnalyticsDa
         .where(dateCondition(auditLog.createdAt, startDate, endDate))
         .groupBy(sql`date_trunc('week', ${auditLog.createdAt})`)
         .orderBy(sql`date_trunc('week', ${auditLog.createdAt})`),
+
+      // 9. Grade distribution (letter grade counts from final_grades)
+      db
+        .select({
+          letterGrade: finalGrades.letterGrade,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(finalGrades)
+        .where(sql`${finalGrades.letterGrade} IS NOT NULL`)
+        .groupBy(finalGrades.letterGrade),
     ]);
 
     const consultationVerificationRate =
@@ -209,6 +222,13 @@ export async function getAdminAnalyticsDataHandler({ data }: { data: AnalyticsDa
       dateRange: {
         start: startDate ? startDate.toISOString() : null,
         end: endDate ? endDate.toISOString() : null,
+      },
+      gradeDistribution: {
+        A: Number(gradeDistributionRows.find((g) => g.letterGrade === 'A')?.count ?? 0),
+        B: Number(gradeDistributionRows.find((g) => g.letterGrade === 'B')?.count ?? 0),
+        C: Number(gradeDistributionRows.find((g) => g.letterGrade === 'C')?.count ?? 0),
+        D: Number(gradeDistributionRows.find((g) => g.letterGrade === 'D')?.count ?? 0),
+        F: Number(gradeDistributionRows.find((g) => g.letterGrade === 'F')?.count ?? 0),
       },
     };
   } catch (err) {
