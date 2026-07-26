@@ -98,24 +98,28 @@
     - [x] Run `pnpm generate:i18n`
     - [x] Verify: `pnpm check:i18n` passes (parity EN↔ID — 48 keys added to both, parity confirmed; unused keys expected until UI is implemented in subsequent tasks)
 
-- [ ] Task: Write failing tests for instructor gradebook route
-    - [ ] Create `tests/unit/routes/instructor-gradebook.test.tsx`
-    - [ ] Test gradebook table renders with student rows, checkpoint columns, final grade column
-    - [ ] Test pass/fail Badge for non-rubric checkpoints, numeric score for rubric checkpoints
-    - [ ] Test read-only grade config summary at top (scheme, weights, bounds)
-    - [ ] Test export CSV + Excel buttons present
-    - [ ] Test admin-only "Recompute All Grades" button visible only to admins
-    - [ ] Test stale weights warning badge
-    - [ ] Run `pnpm test` and confirm tests fail
+- [x] Task: Write failing tests for instructor gradebook route
+    - [x] Create `tests/unit/routes/instructor-gradebook.test.tsx`
+    - [x] Test gradebook table renders with student rows, checkpoint columns, final grade column
+    - [x] Test pass/fail Badge for non-rubric checkpoints, numeric score for rubric checkpoints
+    - [x] Test read-only grade config summary at top (scheme, weights, bounds)
+    - [x] Test export CSV + Excel buttons present
+    - [x] Test admin-only "Recompute All Grades" button visible only to admins
+    - [x] Test stale weights warning badge
+    - [x] Run `pnpm test` and confirm tests fail
 
-- [ ] Task: Implement instructor gradebook route + components
-    - [ ] Create route `src/routes/_authenticated/instructor/assignments/$id/gradebook.tsx`
-    - [ ] Create `src/components/gradebook/GradebookTable.tsx` (students × checkpoints table)
-    - [ ] Create `src/components/gradebook/GradeConfigSummary.tsx` (read-only config summary)
-    - [ ] Create `src/components/gradebook/RecomputeGradesButton.tsx` (admin-only, with confirmation)
-    - [ ] Wire export CSV (via `useCsvDownload` + `exportGradebookCsv`) and Excel (via `exportGradebookToExcel`) buttons
-    - [ ] Add "Gradebook" link on instructor assignment detail page
-    - [ ] Run `pnpm test` and confirm tests pass
+- [x] Task: Implement instructor gradebook route + components [0eb6f46d]
+    - [x] Create route `src/routes/_authenticated/instructor/assignments/$id.gradebook.tsx`
+    - [x] Create `src/components/gradebook/GradebookTable.tsx` (students × checkpoints table)
+    - [x] Create `src/components/gradebook/GradeConfigSummary.tsx` (read-only config summary)
+    - [x] Create `src/components/gradebook/RecomputeGradesButton.tsx` (admin-only, with confirmation + toast)
+    - [x] Create `src/components/gradebook/GradebookExportButtons.tsx` (CSV + Excel export)
+    - [x] Wire export CSV (via `useCsvDownload` + `exportGradebookCsv`) and Excel (via `exportGradebookToExcel`) buttons
+    - [x] Add "Gradebook" link on instructor assignment detail page
+    - [x] Modified `getAssignmentGradebookHandler` to allow admins + return `isAdmin`
+    - [x] Added `exportGradebookCsv` server function stub in `analytics.ts`
+    - [x] Changed instructor layout `requireRole` to include admin/superadmin
+    - [x] Run `pnpm test` and confirm tests pass
 
 - [ ] Task: Write failing tests for admin grade settings dialog
     - [ ] Create `tests/unit/components/gradebook-settings-dialog.test.tsx`
