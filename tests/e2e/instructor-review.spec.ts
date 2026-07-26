@@ -3,36 +3,66 @@ import postgres from 'postgres';
 import { resetDatabase, getDatabaseUrl } from './helpers/db-reset';
 import { ensureAuthFile, getAuthFilePath } from './helpers/auth';
 
+const STUDENT_EMAIL = 'student@e2e.test';
+
+/**
+ * Resolve a checkpoint by name for a specific student.
+ * Filters by student email to avoid ambiguity when multiple students share
+ * checkpoint names (e.g., both student1 and student2 have a "Proposal" checkpoint).
+ */
+async function getCheckpointId(
+  checkpointName: string,
+  studentEmail = STUDENT_EMAIL,
+): Promise<number> {
+  const sql = postgres(getDatabaseUrl());
+  const [row] = await sql`
+    SELECT c.id FROM checkpoints c
+    JOIN users u ON c.student_id = u.id
+    WHERE c.name = ${checkpointName} AND u.email = ${studentEmail}
+  `;
+  await sql.end();
+  if (!row) throw new Error(`Checkpoint "${checkpointName}" for ${studentEmail} not found`);
+  return row.id;
+}
+
 /**
  * Create a submission record directly in the DB and set checkpoint to 'submitted'.
+ * Cleans up any existing submissions/reviews for the checkpoint first to ensure
+ * test isolation (unique constraint on checkpointId + version).
+ *
  * Returns the submission ID for navigation.
  */
 async function createSubmissionForCheckpoint(
   checkpointName: string,
-): Promise<{ submissionId: string; checkpointId: string }> {
+  studentEmail = STUDENT_EMAIL,
+): Promise<{ submissionId: number; checkpointId: number }> {
   const sql = postgres(getDatabaseUrl());
 
   const [checkpoint] = await sql`
-    SELECT id FROM checkpoints WHERE name = ${checkpointName}
+    SELECT c.id FROM checkpoints c
+    JOIN users u ON c.student_id = u.id
+    WHERE c.name = ${checkpointName} AND u.email = ${studentEmail}
   `;
 
   if (!checkpoint) {
     await sql.end();
-    throw new Error(`Checkpoint "${checkpointName}" not found`);
+    throw new Error(`Checkpoint "${checkpointName}" for ${studentEmail} not found`);
   }
 
-  const [student] = await sql`
-    SELECT id FROM users WHERE email = 'student@e2e.test'
-  `;
-
-  if (!student) {
-    await sql.end();
-    throw new Error('Student user not found');
-  }
+  // Clean up any existing submissions and reviews for this checkpoint
+  await sql`DELETE FROM reviews WHERE submission_id IN (SELECT id FROM submissions WHERE checkpoint_id = ${checkpoint.id})`;
+  await sql`DELETE FROM submissions WHERE checkpoint_id = ${checkpoint.id}`;
 
   const [submission] = await sql`
     INSERT INTO submissions (checkpoint_id, uploaded_by, file_key, file_name, file_size, version)
-    VALUES (${checkpoint.id}, ${student.id}, 'e2e-test-file-key', 'test-thesis.pdf', 1024, 1)
+    VALUES (
+      ${checkpoint.id},
+      (SELECT id FROM users WHERE email = ${studentEmail}),
+      'e2e-test-file-key',
+      'test-thesis.pdf',
+      1024,
+      1
+    )
     RETURNING id
   `;
 
@@ -41,6 +71,44 @@ async function createSubmissionForCheckpoint(
   await sql.end();
 
   return { submissionId: submission.id, checkpointId: checkpoint.id };
+}
+
+/**
+ * Set a checkpoint's state directly in the DB.
+ */
+async function setCheckpointState(
+  checkpointName: string,
+  state: string,
+  studentEmail = STUDENT_EMAIL,
+): Promise<void> {
+  const sql = postgres(getDatabaseUrl());
+  await sql`
+    UPDATE checkpoints SET state = ${state}
+    WHERE id = (
+      SELECT c.id FROM checkpoints c
+      JOIN users u ON c.student_id = u.id
+      WHERE c.name = ${checkpointName} AND u.email = ${studentEmail}
+    )
+  `;
+  await sql.end();
+}
+
+/**
+ * Insert a review record directly in the DB for a given submission.
+ * Used to set up review history state without going through the UI.
+ */
+async function insertReview(
+  submissionId: number,
+  decision: 'pass' | 'revise',
+  comment: string,
+): Promise<void> {
+  const sql = postgres(getDatabaseUrl());
+  const [instructor] = await sql`SELECT id FROM users WHERE email = 'instructor@e2e.test'`;
+  await sql`
+    INSERT INTO reviews (submission_id, instructor_id, decision, comment, reviewed_at)
+    VALUES (${submissionId}, ${instructor.id}, ${decision}, ${comment}, NOW())
+  `;
+  await sql.end();
 }
 
 test.describe('Instructor Review Flow', () => {
@@ -65,6 +133,9 @@ test.describe('Instructor Review Flow', () => {
   });
 
   test('instructor reviews with Pass → next checkpoint unlocks', async ({ page }) => {
+    // Set up own submission state (decoupled from other tests)
+    await createSubmissionForCheckpoint('Proposal');
+
     await page.goto('/instructor/reviews');
     await page.waitForLoadState('networkidle');
 
@@ -98,17 +169,18 @@ test.describe('Instructor Review Flow', () => {
     });
 
     // Verify the next checkpoint (Chapter 1) is now unlocked via DB
+    const nextCheckpointId = await getCheckpointId('Chapter 1');
     const sql = postgres(getDatabaseUrl());
-    const [nextCheckpoint] = await sql`
-      SELECT state FROM checkpoints WHERE name = 'Chapter 1'
-    `;
+    const [nextCheckpoint] =
+      await sql`SELECT state FROM checkpoints WHERE id = ${nextCheckpointId}`;
     await sql.end();
 
     expect(nextCheckpoint.state).toBe('unlocked');
   });
 
   test('instructor reviews with Revise → revision deadline set', async ({ page }) => {
-    // Set up a submission on Chapter 1 (now unlocked after Pass review)
+    // Set up own state: unlock Chapter 1 and create a submission
+    await setCheckpointState('Chapter 1', 'unlocked');
     const { submissionId } = await createSubmissionForCheckpoint('Chapter 1');
 
     // Navigate directly to the review detail page
@@ -144,27 +216,20 @@ test.describe('Instructor Review Flow', () => {
     });
 
     // Verify the checkpoint state is 'revise' in the DB
+    const checkpointId = await getCheckpointId('Chapter 1');
     const sql = postgres(getDatabaseUrl());
-    const [checkpoint] = await sql`
-      SELECT state FROM checkpoints WHERE name = 'Chapter 1'
-    `;
+    const [checkpoint] = await sql`SELECT state FROM checkpoints WHERE id = ${checkpointId}`;
     await sql.end();
 
     expect(checkpoint.state).toBe('revise');
   });
 
   test('review history shows past decisions', async ({ page }) => {
-    // Find the Proposal submission's review detail page
-    // The Proposal was reviewed with "Pass" in a previous test
-    const sql = postgres(getDatabaseUrl());
-    const [proposalSubmission] = await sql`
-      SELECT s.id FROM submissions s
-      JOIN checkpoints c ON s.checkpoint_id = c.id
-      WHERE c.name = 'Proposal'
-    `;
-    await sql.end();
+    // Set up own state: create submission and insert a Pass review via DB
+    const { submissionId } = await createSubmissionForCheckpoint('Proposal');
+    await insertReview(submissionId, 'pass', 'Good work, approved!');
 
-    await page.goto(`/instructor/reviews/${proposalSubmission.id}`);
+    await page.goto(`/instructor/reviews/${submissionId}`);
     await page.waitForLoadState('networkidle');
 
     // Verify review history is visible and shows the "Passed" decision

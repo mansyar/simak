@@ -7,6 +7,9 @@ import { ensureAuthFile, getAuthFilePath } from './helpers/auth';
  * Create a submission record directly in the DB and set checkpoint state.
  * Returns the submission ID.
  *
+ * Filters by student email to avoid ambiguity when multiple students share
+ * checkpoint names (e.g., both student1 and student2 have a "Proposal" checkpoint).
+ *
  * Note: We use direct DB insertion because the R2 mock via page.route()
  * does not work with TanStack Start's server function response format.
  * The client returns `undefined` for mocked responses, preventing the
@@ -20,26 +23,26 @@ async function createSubmissionForCheckpoint(
   const sql = postgres(getDatabaseUrl());
 
   const [checkpoint] = await sql`
-    SELECT id FROM checkpoints WHERE name = ${checkpointName}
+    SELECT c.id FROM checkpoints c
+    JOIN users u ON c.student_id = u.id
+    WHERE c.name = ${checkpointName} AND u.email = 'student@e2e.test'
   `;
 
   if (!checkpoint) {
     await sql.end();
-    throw new Error(`Checkpoint "${checkpointName}" not found`);
-  }
-
-  const [student] = await sql`
-    SELECT id FROM users WHERE email = 'student@e2e.test'
-  `;
-
-  if (!student) {
-    await sql.end();
-    throw new Error('Student user not found');
+    throw new Error(`Checkpoint "${checkpointName}" for student@e2e.test not found`);
   }
 
   const [submission] = await sql`
     INSERT INTO submissions (checkpoint_id, uploaded_by, file_key, file_name, file_size, version)
-    VALUES (${checkpoint.id}, ${student.id}, 'e2e-test-file-key', ${fileName}, 1024, ${version})
+    VALUES (
+      ${checkpoint.id},
+      (SELECT id FROM users WHERE email = 'student@e2e.test'),
+      'e2e-test-file-key',
+      ${fileName},
+      1024,
+      ${version}
+    )
     RETURNING id
   `;
 
@@ -54,7 +57,14 @@ async function createSubmissionForCheckpoint(
  */
 async function setCheckpointState(checkpointName: string, state: string): Promise<void> {
   const sql = postgres(getDatabaseUrl());
-  await sql`UPDATE checkpoints SET state = ${state} WHERE name = ${checkpointName}`;
+  await sql`
+    UPDATE checkpoints SET state = ${state}
+    WHERE id = (
+      SELECT c.id FROM checkpoints c
+      JOIN users u ON c.student_id = u.id
+      WHERE c.name = ${checkpointName} AND u.email = 'student@e2e.test'
+    )
+  `;
   await sql.end();
 }
 

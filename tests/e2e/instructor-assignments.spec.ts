@@ -90,7 +90,7 @@ test.describe('Instructor Assignment Management', () => {
     await expect(page).toHaveURL(/\/instructor\/assignments\/.+/, { timeout: 10_000 });
 
     // Verify checkpoint states — first checkpoint should be "Unlocked", rest "Locked"
-    await expect(page.locator('text=Proposal')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('text=Proposal').first()).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('text=Unlocked').first()).toBeVisible();
     await expect(page.locator('text=Locked').first()).toBeVisible();
   });
