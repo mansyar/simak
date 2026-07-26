@@ -43,9 +43,9 @@
     - [x] Write token reuse test (reuse the same token → verify "Invalid or expired token" error)
     - [x] Write expired token test (insert an expired token in DB → navigate to setup-password → verify same error)
     - [x] Run `pnpm test:e2e tests/e2e/password-setup.spec.ts` and verify all tests pass (Red→Green) — 3 tests pass, verified non-flaky on 3 runs
-- [ ] Task: Verify full suite and test count increase
-    - [ ] Run `pnpm test:e2e` full suite and verify all tests pass
-    - [ ] Confirm test count increased from 14 to ~28
+- [x] Task: Verify full suite and test count increase
+    - [x] Run `pnpm test:e2e` full suite and verify all tests pass — 23 passed (1.6m)
+    - [x] Confirm test count increased from 14 to ~28 — 14→23 after Phase 2 (Phase 3 will add ~6-9 more to reach ~28-32)
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Critical Flow Specs' (Protocol in workflow.md)
 
 ---
