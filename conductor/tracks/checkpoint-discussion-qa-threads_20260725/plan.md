@@ -101,14 +101,15 @@
 
 ## Phase 3: Email, i18n & Polish
 
-- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context before starting Phase 3 implementation
-    - [ ] Read `conductor/tracks/checkpoint-discussion-qa-threads_20260725/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read `spec.md` and `workflow.md` to re-establish context before starting Phase 3 implementation
+    - [x] Read `conductor/tracks/checkpoint-discussion-qa-threads_20260725/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Create `buildDiscussionReplyHtml` email template
-    - [ ] Write failing tests: email renders both locales, uses `STRINGS` object, message preview truncated to 100 chars + HTML-escaped, CTA link correct (student → checkpoint page, instructor → assignment page)
-    - [ ] Implement `buildDiscussionReplyHtml` in `src/lib/email-templates.ts` — internal helpers, `STRINGS[locale].discussionReply` for intro, message preview truncated + HTML-escaped, CTA link
-    - [ ] Run `pnpm test` — confirm email template tests pass
+- [x] Task: Create `buildDiscussionReplyHtml` email template
+    - [x] Write failing tests: email renders both locales, uses `STRINGS` object, message preview truncated to 100 chars + HTML-escaped, CTA link correct (student → checkpoint page, instructor → assignment page)
+    - [x] Implement `buildDiscussionReplyHtml` in `src/lib/email-templates.ts` — internal helpers, `STRINGS[locale].discussionReply` for intro, message preview truncated + HTML-escaped, CTA link
+    - [x] Run `pnpm test` — confirm email template tests pass
+    - **Commit:** `3d44e33a` — feat(email): Add buildDiscussionReplyHtml template for discussion reply emails
 
 - [ ] Task: Create `sendDiscussionReplyEmail` helper (`src/lib/discussion-email.ts`)
     - [ ] Write failing test asserting the helper calls `enqueueEventEmail` with correct params (templateType: `'discussion_reply'`, recipient, subject, body)
