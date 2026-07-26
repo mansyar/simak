@@ -28,7 +28,7 @@
 ## Phase 2: Critical Flow Specs — Consultation, Extension, Password Setup
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor context before implementing this phase
-- [x] Task: Create `tests/e2e/consultation.spec.ts` (FR1)
+- [x] Task: Create `tests/e2e/consultation.spec.ts` (FR1) [69992d6]
     - [x] Write consultation logging test (student logs consultation → "pending" badge in ConsultationList → instructor verification queue on `/instructor/assignments/$id` → instructor verifies via VerificationDialog → state transitions to "verified" in DB → count increments in ConsultationProgress)
     - [x] Write consultation rejection test (instructor rejects a second consultation with a reason → "rejected" badge appears)
     - [x] Write consultation gating UI test (locked checkpoint shows "insufficient verified consultations (0/1)" blocking reason alongside "previous checkpoint not passed"; after instructor verifies a consultation, reload and verify count updates to (1/1))
