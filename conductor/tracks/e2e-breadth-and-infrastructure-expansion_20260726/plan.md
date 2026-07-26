@@ -30,14 +30,14 @@
 
 ## Phase 2: Settings, User Edit/Delete, Remaining Route Smoke Tests
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
-- [ ] Task: Write `tests/e2e/settings.spec.ts` — settings hub tests
-    - [ ] Profile test: edit name → verify it persists after reload and appears in sidebar.
-    - [ ] Password test: change password → verify old password no longer works, new password works.
-    - [ ] Language test: toggle from EN to ID → verify a known UI string changes (sidebar label or page heading).
-    - [ ] Theme test: toggle from light to dark → verify `dark` class is applied to `<html>`.
-    - [ ] Notification preferences test: toggle off an event type email → verify the checkbox state persists after reload.
-    - [ ] Verify: `pnpm test:e2e settings.spec.ts` passes on Chromium.
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
+- [x] Task: Write `tests/e2e/settings.spec.ts` — settings hub tests [1b376b2]
+    - [x] Profile test: edit name → verify it persists after reload and appears in sidebar.
+    - [x] Password test: change password → verify old password no longer works, new password works.
+    - [x] Language test: toggle from EN to ID → verify a known UI string changes (sidebar label or page heading).
+    - [x] Theme test: toggle from light to dark → verify `dark` class is applied to `<html>`.
+    - [x] Notification preferences test: toggle off an event type email → verify the checkbox state persists after reload.
+    - [x] Verify: `pnpm test:e2e settings.spec.ts` passes on Chromium.
 - [ ] Task: Expand `tests/e2e/admin-users.spec.ts` with edit and delete tests
     - [ ] Edit user test: open edit sheet, change name, submit, verify change in table.
     - [ ] Delete with reassignment test: delete an instructor with active assignments → verify `ReassignmentDialog` appears → select replacement instructor → confirm → verify assignment is reassigned (instructor changed in DB).
