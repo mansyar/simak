@@ -23,6 +23,7 @@ export const emailQueue = pgTable(
         'extension_requested',
         'deadline_reminder',
         'student_at_risk',
+        'discussion_reply',
       ],
     }).notNull(),
     status: text('status', { enum: ['pending', 'processing', 'sent', 'failed'] }).notNull(),

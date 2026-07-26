@@ -38,6 +38,9 @@ vi.mock('@/components/reviews/ReviewDetailHeader', () => ({
 vi.mock('@/components/reviews/ReviewFilePreview', () => ({
   ReviewFilePreview: () => null,
 }));
+vi.mock('@/components/discussions/discussion-panel', () => ({
+  DiscussionPanel: () => null,
+}));
 vi.mock('@/components/reviews/ReviewHistory', () => ({
   ReviewHistory: () => null,
 }));

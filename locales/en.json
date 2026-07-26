@@ -698,6 +698,25 @@
       "notesRequired": "Notes are required"
     }
   },
+  "discussions": {
+    "title": "Discussions",
+    "placeholder": "Write a message...",
+    "send": "Send",
+    "reply": "Reply",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "deleted": "[deleted]",
+    "deleteWindowExpired": "Deletion window expired",
+    "loading": "Loading messages...",
+    "empty": {
+      "title": "No messages yet",
+      "description": "Ask a question about this checkpoint"
+    },
+    "errors": {
+      "required": "Message cannot be empty",
+      "tooLong": "Message must be 2000 characters or less"
+    }
+  },
   "landing": {
     "hero": {
       "headline": "Manage Academic Assignments with Confidence",
@@ -841,6 +860,10 @@
       "student_at_risk": {
         "title": "Student At Risk",
         "message": "Student {studentName} in \"{assignmentTitle}\" is at {riskLevel} risk. Factors: {riskFactors}"
+      },
+      "discussion_reply": {
+        "title": "New Discussion Reply",
+        "message": "{authorName} replied in checkpoint \"{checkpointName}\" ({assignmentTitle}): \"{messagePreview}\""
       }
     }
   },
@@ -858,7 +881,8 @@
       "extensionRejected": "Extension Rejected",
       "extensionRequested": "Extension Requested",
       "deadlineReminder": "Deadline Reminder — {assignmentTitle}",
-      "studentAtRisk": "Student At Risk — {assignmentTitle}"
+      "studentAtRisk": "Student At Risk — {assignmentTitle}",
+      "discussionReply": "New Discussion Reply — {assignmentTitle}"
     }
   },
   "errors": {

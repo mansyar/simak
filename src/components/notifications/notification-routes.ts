@@ -73,6 +73,21 @@ export function getNotificationRoute(
       }
       return null;
 
+    case 'discussion_reply':
+      if (meta.target === 'student') {
+        if (meta.assignmentId != null && meta.checkpointId != null) {
+          return `/student/assignments/${meta.assignmentId}/checkpoints/${meta.checkpointId}`;
+        }
+        return null;
+      }
+      if (meta.target === 'instructor') {
+        if (meta.assignmentId != null) {
+          return `/instructor/assignments/${meta.assignmentId}`;
+        }
+        return null;
+      }
+      return null;
+
     default:
       return null;
   }

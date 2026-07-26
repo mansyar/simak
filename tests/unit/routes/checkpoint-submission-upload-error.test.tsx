@@ -98,6 +98,9 @@ vi.mock('@/components/ui/pagination', () => ({
 vi.mock('@/components/student/assignments/StudentAssignmentLoadingSkeleton', () => ({
   StudentAssignmentLoadingSkeleton: () => null,
 }));
+vi.mock('@/components/discussions/discussion-panel', () => ({
+  DiscussionPanel: () => <div data-testid="discussion-panel" />,
+}));
 vi.mock('lucide-react', () => ({
   SearchX: () => null,
   ChevronLeft: () => null,

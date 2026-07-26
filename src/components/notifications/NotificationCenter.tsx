@@ -21,7 +21,12 @@ export const GROUP_CONFIGS = [
   {
     key: 'consultations',
     labelKey: 'notifications.groups.consultations',
-    types: ['consultation_verified', 'consultation_logged', 'consultation_rejected'],
+    types: [
+      'consultation_verified',
+      'consultation_logged',
+      'consultation_rejected',
+      'discussion_reply',
+    ],
   },
   {
     key: 'submissions',

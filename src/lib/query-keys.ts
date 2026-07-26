@@ -39,3 +39,10 @@ export const templateKeys = {
   list: (filters?: { page?: number; limit?: number; search?: string; type?: string }) =>
     ['templates', 'list', filters ?? {}] as const,
 };
+
+export const discussionKeys = {
+  all: () => ['discussions'] as const,
+  list: (checkpointId: number, page: number) =>
+    ['discussions', 'list', checkpointId, page] as const,
+  detail: (checkpointId: number) => ['discussions', 'detail', checkpointId] as const,
+};

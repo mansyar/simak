@@ -698,6 +698,25 @@
       "notesRequired": "Catatan diperlukan"
     }
   },
+  "discussions": {
+    "title": "Diskusi",
+    "placeholder": "Tulis pesan...",
+    "send": "Kirim",
+    "reply": "Balas",
+    "delete": "Hapus",
+    "cancel": "Batal",
+    "deleted": "[dihapus]",
+    "deleteWindowExpired": "Jendela penghapusan berakhir",
+    "loading": "Memuat pesan...",
+    "empty": {
+      "title": "Belum ada pesan",
+      "description": "Ajukan pertanyaan tentang checkpoint ini"
+    },
+    "errors": {
+      "required": "Pesan tidak boleh kosong",
+      "tooLong": "Pesan harus 2000 karakter atau kurang"
+    }
+  },
   "landing": {
     "hero": {
       "headline": "Kelola Tugas Akademik dengan Percaya Diri",
@@ -841,6 +860,10 @@
       "student_at_risk": {
         "title": "Mahasiswa Berisiko",
         "message": "Mahasiswa {studentName} pada \"{assignmentTitle}\" berisiko {riskLevel}. Faktor: {riskFactors}"
+      },
+      "discussion_reply": {
+        "title": "Balasan Diskusi Baru",
+        "message": "{authorName} membalas di checkpoint \"{checkpointName}\" ({assignmentTitle}): \"{messagePreview}\""
       }
     }
   },
@@ -858,7 +881,8 @@
       "extensionRejected": "Perpanjangan Ditolak",
       "extensionRequested": "Perpanjangan Diminta",
       "deadlineReminder": "Pengingat Batas Waktu — {assignmentTitle}",
-      "studentAtRisk": "Mahasiswa Berisiko — {assignmentTitle}"
+      "studentAtRisk": "Mahasiswa Berisiko — {assignmentTitle}",
+      "discussionReply": "Balasan Diskusi Baru — {assignmentTitle}"
     }
   },
   "errors": {

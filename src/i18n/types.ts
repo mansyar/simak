@@ -703,6 +703,25 @@ export type Translation = {
       notesRequired: string
     }
   }
+  discussions: {
+    title: string
+    placeholder: string
+    send: string
+    reply: string
+    delete: string
+    cancel: string
+    deleted: string
+    deleteWindowExpired: string
+    loading: string
+    empty: {
+      title: string
+      description: string
+    }
+    errors: {
+      required: string
+      tooLong: string
+    }
+  }
   landing: {
     hero: {
       headline: string
@@ -847,6 +866,10 @@ export type Translation = {
         title: string
         message: string
       }
+      discussion_reply: {
+        title: string
+        message: string
+      }
     }
   }
   emails: {
@@ -864,6 +887,7 @@ export type Translation = {
       extensionRequested: string
       deadlineReminder: string
       studentAtRisk: string
+      discussionReply: string
     }
   }
   errors: {
