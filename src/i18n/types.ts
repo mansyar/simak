@@ -865,6 +865,10 @@ export type Translation = {
         title: string
         message: string
       }
+      discussion_reply: {
+        title: string
+        message: string
+      }
     }
   }
   emails: {
@@ -882,6 +886,7 @@ export type Translation = {
       extensionRequested: string
       deadlineReminder: string
       studentAtRisk: string
+      discussionReply: string
     }
   }
   errors: {

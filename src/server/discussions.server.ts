@@ -184,7 +184,12 @@ export async function postDiscussionMessageHandler({ data }: { data: PostDiscuss
           type: 'discussion_reply',
           titleKey: notifKeys.titleKey,
           messageKey: notifKeys.messageKey,
-          params: {},
+          params: {
+            authorName: session.user.name,
+            checkpointName: checkpoint.name,
+            assignmentTitle: assignment.title,
+            messagePreview: message.slice(0, 100),
+          },
           channel: 'in_app',
           metadata: {
             checkpointId,

@@ -859,6 +859,10 @@
       "student_at_risk": {
         "title": "Mahasiswa Berisiko",
         "message": "Mahasiswa {studentName} pada \"{assignmentTitle}\" berisiko {riskLevel}. Faktor: {riskFactors}"
+      },
+      "discussion_reply": {
+        "title": "Balasan Diskusi Baru",
+        "message": "{authorName} membalas di checkpoint \"{checkpointName}\" ({assignmentTitle}): \"{messagePreview}\""
       }
     }
   },
@@ -876,7 +880,8 @@
       "extensionRejected": "Perpanjangan Ditolak",
       "extensionRequested": "Perpanjangan Diminta",
       "deadlineReminder": "Pengingat Batas Waktu — {assignmentTitle}",
-      "studentAtRisk": "Mahasiswa Berisiko — {assignmentTitle}"
+      "studentAtRisk": "Mahasiswa Berisiko — {assignmentTitle}",
+      "discussionReply": "Balasan Diskusi Baru — {assignmentTitle}"
     }
   },
   "errors": {

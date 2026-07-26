@@ -859,6 +859,10 @@
       "student_at_risk": {
         "title": "Student At Risk",
         "message": "Student {studentName} in \"{assignmentTitle}\" is at {riskLevel} risk. Factors: {riskFactors}"
+      },
+      "discussion_reply": {
+        "title": "New Discussion Reply",
+        "message": "{authorName} replied in checkpoint \"{checkpointName}\" ({assignmentTitle}): \"{messagePreview}\""
       }
     }
   },
@@ -876,7 +880,8 @@
       "extensionRejected": "Extension Rejected",
       "extensionRequested": "Extension Requested",
       "deadlineReminder": "Deadline Reminder — {assignmentTitle}",
-      "studentAtRisk": "Student At Risk — {assignmentTitle}"
+      "studentAtRisk": "Student At Risk — {assignmentTitle}",
+      "discussionReply": "New Discussion Reply — {assignmentTitle}"
     }
   },
   "errors": {
