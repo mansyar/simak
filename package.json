@@ -64,6 +64,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@hookform/resolvers": "^5.0.0",
     "@playwright/test": "^1.61.1",
     "@tailwindcss/vite": "^4.3.0",
