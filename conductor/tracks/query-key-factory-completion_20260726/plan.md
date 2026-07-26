@@ -1,6 +1,11 @@
+<protect>
 # Implementation Plan: Query-Key Factory Completion & Client Data-Fetching Consistency (TRACK-029)
 
 ## Phase 1: Query-Key Factory Completion + Settings Migration
+
+- [ ] Task: Read `spec.md` and `workflow.md` to ground implementation context
+    - [ ] Re-read `conductor/tracks/query-key-factory-completion_20260726/spec.md`
+    - [ ] Re-read `conductor/workflow.md` (TDD lifecycle, Phase Completion Verification & Checkpointing Protocol)
 
 - [ ] Task: Write unit tests for `settingsKeys` and `gradebookKeys` factory functions
     - [ ] Create `tests/unit/lib/query-keys.test.ts` (or extend if exists)
@@ -36,6 +41,10 @@
 
 ## Phase 2: Gradebook TanStack Query Migration
 
+- [ ] Task: Read `spec.md` and `workflow.md` to ground implementation context
+    - [ ] Re-read `conductor/tracks/query-key-factory-completion_20260726/spec.md`
+    - [ ] Re-read `conductor/workflow.md` (TDD lifecycle, Phase Completion Verification & Checkpointing Protocol)
+
 - [ ] Task: Write/update tests for `StudentFinalGradeCard` using `useQuery`
     - [ ] Update `tests/unit/components/student-final-grade-card.test.tsx` (or create if missing) — wrap in `QueryClientProvider`, assert `useQuery` with `gradebookKeys.studentFinalGrade(assignmentId)`, assert skeleton shown while loading, assert grade shown on success, assert error state on failure
     - [ ] Run `pnpm test` — confirm tests fail (component still uses `useState`/`useEffect`)
@@ -61,6 +70,10 @@
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Gradebook TanStack Query Migration' (Protocol in workflow.md)
 
 ## Phase 3: Full Audit + Final Verification
+
+- [ ] Task: Read `spec.md` and `workflow.md` to ground implementation context
+    - [ ] Re-read `conductor/tracks/query-key-factory-completion_20260726/spec.md`
+    - [ ] Re-read `conductor/workflow.md` (TDD lifecycle, Phase Completion Verification & Checkpointing Protocol)
 
 - [ ] Task: Audit all `src/**/*.tsx` files for remaining inline query keys
     - [ ] Grep for `queryKey: ['` across all `.tsx` files in `src/`
@@ -88,3 +101,4 @@
     - [ ] Verify pre-push gate passes (`pnpm typecheck && pnpm vitest run --coverage`)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Full Audit + Final Verification' (Protocol in workflow.md)
+</protect>

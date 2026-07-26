@@ -1,3 +1,4 @@
+<protect>
 # Specification: Query-Key Factory Completion & Client Data-Fetching Consistency (TRACK-029)
 
 ## Overview
@@ -148,3 +149,4 @@ If a key is intentionally inline (e.g., a one-off query with no reuse), document
 - New product features.
 - i18n key additions (unless an error toast key is genuinely missing — verify first).
 - TRACK-030 (NotificationCenter Infinite Query Migration) — separate track.
+</protect>
