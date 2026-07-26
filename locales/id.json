@@ -1141,13 +1141,6 @@
     "studentName": "Nama Mahasiswa",
     "finalGrade": "Nilai Akhir",
     "numericScore": "Skor",
-    "letterGrade": {
-      "A": "A",
-      "B": "B",
-      "C": "C",
-      "D": "D",
-      "F": "F"
-    },
     "status": {
       "complete": "Selesai",
       "in_progress": "Sedang Berjalan",
@@ -1171,29 +1164,6 @@
     "exportCsv": "Ekspor CSV",
     "exportExcel": "Ekspor Excel",
     "loading": "Memuat buku nilai...",
-    "loadError": "Gagal memuat buku nilai",
-    "settings": {
-      "title": "Pengaturan Penilaian",
-      "scheme": "Skema Penilaian",
-      "equalWeight": "Bobot Sama",
-      "customWeight": "Bobot Kustom",
-      "letterBounds": "Batas Nilai Huruf",
-      "customWeights": "Bobot Kustom",
-      "weightsSum": "Jumlah bobot: {sum}/100",
-      "save": "Simpan Pengaturan",
-      "saving": "Menyimpan...",
-      "saveSuccess": "Pengaturan penilaian berhasil disimpan",
-      "saveError": "Gagal menyimpan pengaturan penilaian"
-    },
-    "student": {
-      "finalGrade": "Nilai Akhir",
-      "currentProgress": "Progres Saat Ini",
-      "breakdown": "Rincian Skor",
-      "checkpoint": "Checkpoint",
-      "score": "Skor"
-    },
-    "analytics": {
-      "gradeDistribution": "Distribusi Nilai"
-    }
+    "loadError": "Gagal memuat buku nilai"
   }
 }

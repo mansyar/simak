@@ -10,7 +10,7 @@ import { AssignmentDetailTabs } from '@/components/instructor/assignments/Assign
 import { useAssignmentTabs } from '@/hooks/use-assignment-tabs';
 import { useCsvDownload } from '@/hooks/use-csv-download';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { FileX, Download } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { isServerError } from '@/lib/errors';
@@ -71,6 +71,13 @@ function AssignmentDetailPage() {
         description={assignment.description}
         action={
           <div className="flex items-center gap-2">
+            <Link
+              to="/instructor/assignments/$id/gradebook"
+              params={{ id: String(assignment.id) }}
+              className={buttonVariants({ variant: 'outline', size: 'sm' })}
+            >
+              {t('gradebook.title')}
+            </Link>
             <Button
               variant="outline"
               loading={isExporting}

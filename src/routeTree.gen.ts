@@ -44,6 +44,7 @@ import { Route as AuthenticatedInstructorAssignmentsIdRouteImport } from './rout
 import { Route as AuthenticatedAdminUsersImportRouteImport } from './routes/_authenticated/admin/users/import'
 import { Route as AuthenticatedAdminTemplatesImportRouteImport } from './routes/_authenticated/admin/templates/import'
 import { Route as AuthenticatedAdminTemplatesTemplateIdRouteImport } from './routes/_authenticated/admin/templates/$templateId'
+import { Route as AuthenticatedInstructorAssignmentsIdGradebookRouteImport } from './routes/_authenticated/instructor/assignments/$id.gradebook'
 import { Route as AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRouteImport } from './routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId'
 
 const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
@@ -247,6 +248,12 @@ const AuthenticatedAdminTemplatesTemplateIdRoute =
     path: '/templates/$templateId',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedInstructorAssignmentsIdGradebookRoute =
+  AuthenticatedInstructorAssignmentsIdGradebookRouteImport.update({
+    id: '/gradebook',
+    path: '/gradebook',
+    getParentRoute: () => AuthenticatedInstructorAssignmentsIdRoute,
+  } as any)
 const AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute =
   AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRouteImport.update({
     id: '/checkpoints/$checkpointId',
@@ -279,7 +286,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
   '/admin/templates/import': typeof AuthenticatedAdminTemplatesImportRoute
   '/admin/users/import': typeof AuthenticatedAdminUsersImportRoute
-  '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
+  '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRouteWithChildren
   '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/instructor/reviews/$submissionId': typeof AuthenticatedInstructorReviewsSubmissionIdRoute
   '/student/assignments/$id': typeof AuthenticatedStudentAssignmentsIdRouteWithChildren
@@ -288,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/instructor/assignments/': typeof AuthenticatedInstructorAssignmentsIndexRoute
   '/instructor/reviews/': typeof AuthenticatedInstructorReviewsIndexRoute
   '/student/assignments/': typeof AuthenticatedStudentAssignmentsIndexRoute
+  '/instructor/assignments/$id/gradebook': typeof AuthenticatedInstructorAssignmentsIdGradebookRoute
   '/student/assignments/$id/checkpoints/$checkpointId': typeof AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute
 }
 export interface FileRoutesByTo {
@@ -315,7 +323,7 @@ export interface FileRoutesByTo {
   '/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
   '/admin/templates/import': typeof AuthenticatedAdminTemplatesImportRoute
   '/admin/users/import': typeof AuthenticatedAdminUsersImportRoute
-  '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
+  '/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRouteWithChildren
   '/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/instructor/reviews/$submissionId': typeof AuthenticatedInstructorReviewsSubmissionIdRoute
   '/student/assignments/$id': typeof AuthenticatedStudentAssignmentsIdRouteWithChildren
@@ -324,6 +332,7 @@ export interface FileRoutesByTo {
   '/instructor/assignments': typeof AuthenticatedInstructorAssignmentsIndexRoute
   '/instructor/reviews': typeof AuthenticatedInstructorReviewsIndexRoute
   '/student/assignments': typeof AuthenticatedStudentAssignmentsIndexRoute
+  '/instructor/assignments/$id/gradebook': typeof AuthenticatedInstructorAssignmentsIdGradebookRoute
   '/student/assignments/$id/checkpoints/$checkpointId': typeof AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute
 }
 export interface FileRoutesById {
@@ -354,7 +363,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
   '/_authenticated/admin/templates/import': typeof AuthenticatedAdminTemplatesImportRoute
   '/_authenticated/admin/users/import': typeof AuthenticatedAdminUsersImportRoute
-  '/_authenticated/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRoute
+  '/_authenticated/instructor/assignments/$id': typeof AuthenticatedInstructorAssignmentsIdRouteWithChildren
   '/_authenticated/instructor/assignments/new': typeof AuthenticatedInstructorAssignmentsNewRoute
   '/_authenticated/instructor/reviews/$submissionId': typeof AuthenticatedInstructorReviewsSubmissionIdRoute
   '/_authenticated/student/assignments/$id': typeof AuthenticatedStudentAssignmentsIdRouteWithChildren
@@ -363,6 +372,7 @@ export interface FileRoutesById {
   '/_authenticated/instructor/assignments/': typeof AuthenticatedInstructorAssignmentsIndexRoute
   '/_authenticated/instructor/reviews/': typeof AuthenticatedInstructorReviewsIndexRoute
   '/_authenticated/student/assignments/': typeof AuthenticatedStudentAssignmentsIndexRoute
+  '/_authenticated/instructor/assignments/$id/gradebook': typeof AuthenticatedInstructorAssignmentsIdGradebookRoute
   '/_authenticated/student/assignments/$id/checkpoints/$checkpointId': typeof AuthenticatedStudentAssignmentsIdCheckpointsCheckpointIdRoute
 }
 export interface FileRouteTypes {
@@ -401,6 +411,7 @@ export interface FileRouteTypes {
     | '/instructor/assignments/'
     | '/instructor/reviews/'
     | '/student/assignments/'
+    | '/instructor/assignments/$id/gradebook'
     | '/student/assignments/$id/checkpoints/$checkpointId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -437,6 +448,7 @@ export interface FileRouteTypes {
     | '/instructor/assignments'
     | '/instructor/reviews'
     | '/student/assignments'
+    | '/instructor/assignments/$id/gradebook'
     | '/student/assignments/$id/checkpoints/$checkpointId'
   id:
     | '__root__'
@@ -475,6 +487,7 @@ export interface FileRouteTypes {
     | '/_authenticated/instructor/assignments/'
     | '/_authenticated/instructor/reviews/'
     | '/_authenticated/student/assignments/'
+    | '/_authenticated/instructor/assignments/$id/gradebook'
     | '/_authenticated/student/assignments/$id/checkpoints/$checkpointId'
   fileRoutesById: FileRoutesById
 }
@@ -732,6 +745,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminTemplatesTemplateIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/instructor/assignments/$id/gradebook': {
+      id: '/_authenticated/instructor/assignments/$id/gradebook'
+      path: '/gradebook'
+      fullPath: '/instructor/assignments/$id/gradebook'
+      preLoaderRoute: typeof AuthenticatedInstructorAssignmentsIdGradebookRouteImport
+      parentRoute: typeof AuthenticatedInstructorAssignmentsIdRoute
+    }
     '/_authenticated/student/assignments/$id/checkpoints/$checkpointId': {
       id: '/_authenticated/student/assignments/$id/checkpoints/$checkpointId'
       path: '/checkpoints/$checkpointId'
@@ -773,11 +793,26 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedInstructorAssignmentsIdRouteChildren {
+  AuthenticatedInstructorAssignmentsIdGradebookRoute: typeof AuthenticatedInstructorAssignmentsIdGradebookRoute
+}
+
+const AuthenticatedInstructorAssignmentsIdRouteChildren: AuthenticatedInstructorAssignmentsIdRouteChildren =
+  {
+    AuthenticatedInstructorAssignmentsIdGradebookRoute:
+      AuthenticatedInstructorAssignmentsIdGradebookRoute,
+  }
+
+const AuthenticatedInstructorAssignmentsIdRouteWithChildren =
+  AuthenticatedInstructorAssignmentsIdRoute._addFileChildren(
+    AuthenticatedInstructorAssignmentsIdRouteChildren,
+  )
+
 interface AuthenticatedInstructorRouteChildren {
   AuthenticatedInstructorAnalyticsRoute: typeof AuthenticatedInstructorAnalyticsRoute
   AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
   AuthenticatedInstructorSettingsRoute: typeof AuthenticatedInstructorSettingsRoute
-  AuthenticatedInstructorAssignmentsIdRoute: typeof AuthenticatedInstructorAssignmentsIdRoute
+  AuthenticatedInstructorAssignmentsIdRoute: typeof AuthenticatedInstructorAssignmentsIdRouteWithChildren
   AuthenticatedInstructorAssignmentsNewRoute: typeof AuthenticatedInstructorAssignmentsNewRoute
   AuthenticatedInstructorReviewsSubmissionIdRoute: typeof AuthenticatedInstructorReviewsSubmissionIdRoute
   AuthenticatedInstructorAssignmentsIndexRoute: typeof AuthenticatedInstructorAssignmentsIndexRoute
@@ -792,7 +827,7 @@ const AuthenticatedInstructorRouteChildren: AuthenticatedInstructorRouteChildren
       AuthenticatedInstructorDashboardRoute,
     AuthenticatedInstructorSettingsRoute: AuthenticatedInstructorSettingsRoute,
     AuthenticatedInstructorAssignmentsIdRoute:
-      AuthenticatedInstructorAssignmentsIdRoute,
+      AuthenticatedInstructorAssignmentsIdRouteWithChildren,
     AuthenticatedInstructorAssignmentsNewRoute:
       AuthenticatedInstructorAssignmentsNewRoute,
     AuthenticatedInstructorReviewsSubmissionIdRoute:

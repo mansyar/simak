@@ -82,6 +82,10 @@ export const ExportRubricScoresCsvSchema = z.object({
   assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
 });
 
+export const ExportGradebookCsvSchema = z.object({
+  assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
+});
+
 // ---- CSV Export Server Function Stubs ----
 
 export const exportUsersCsv = createServerFn({ method: 'GET' })
@@ -124,4 +128,11 @@ export const exportRubricScoresCsv = createServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const { exportRubricScoresCsvHandler } = await import('./analytics-export.server');
     return exportRubricScoresCsvHandler({ data });
+  });
+
+export const exportGradebookCsv = createServerFn({ method: 'GET' })
+  .inputValidator(ExportGradebookCsvSchema)
+  .handler(async ({ data }) => {
+    const { exportGradebookCsvHandler } = await import('./analytics-export.server');
+    return exportGradebookCsvHandler({ data });
   });

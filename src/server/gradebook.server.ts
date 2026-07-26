@@ -177,10 +177,11 @@ export async function getStudentFinalGradeHandler({ data }: { data: { assignment
   }
 }
 
-/** Get gradebook view for an assignment. Instructor ownership-verified. */
+/** Get gradebook view for an assignment. Instructor ownership-verified; admin can view any. */
 export async function getAssignmentGradebookHandler({ data }: { data: { assignmentId: number } }) {
   const session = await getSessionFromHeaders();
-  if (!isInstructor(session)) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  if (!isInstructor(session) && !isAdmin(session))
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { assignmentId } = data;
   const db = getDb();
@@ -189,7 +190,11 @@ export async function getAssignmentGradebookHandler({ data }: { data: { assignme
     const assignment = await db
       .select({ id: assignments.id })
       .from(assignments)
-      .where(and(eq(assignments.id, assignmentId), eq(assignments.instructorId, session.user.id)))
+      .where(
+        isInstructor(session)
+          ? and(eq(assignments.id, assignmentId), eq(assignments.instructorId, session.user.id))
+          : eq(assignments.id, assignmentId),
+      )
       .limit(1);
 
     if (!assignment[0]) return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
@@ -233,7 +238,7 @@ export async function getAssignmentGradebookHandler({ data }: { data: { assignme
     );
     students.sort((a, b) => a.studentName.localeCompare(b.studentName));
 
-    return { config, students };
+    return { config, students, isAdmin: isAdmin(session) };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

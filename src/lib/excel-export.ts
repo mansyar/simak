@@ -62,3 +62,8 @@ export function exportRubricScoresToExcel(data: RubricScoreExportRow[], fileName
   }));
   exportToExcel(rows, 'Rubric Scores', fileName);
 }
+
+/**
+ * Stub — full implementation in Task 11 (Excel export for gradebook).
+ */
+export async function exportGradebookToExcel(_assignmentId: number): Promise<void> {}
