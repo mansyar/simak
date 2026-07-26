@@ -127,14 +127,14 @@
     - [x] Run `pnpm check:i18n` — confirm EN↔ID parity
     - **Commit:** `1a465d1e` — feat(i18n): Add discussion_reply notification and email subject keys
 
-- [ ] Task: Final quality gates verification
-    - [ ] Run `pnpm test:coverage` — confirm ≥80% on all thresholds (lines, statements, branches, functions)
-    - [ ] Run `pnpm typecheck` — confirm 0 errors
-    - [ ] Run `pnpm lint` — confirm 0 warnings, 0 errors (including `simak-i18n/no-hardcoded` rule)
-    - [ ] Run `pnpm check:i18n` — confirm parity
-    - [ ] Verify all files under 500 lines (`scripts/check-modularity.js`)
-    - [ ] Verify responsive layout at mobile/tablet/desktop widths (browser dev tools)
-    - [ ] Verify keyboard navigation through discussion panel (Tab/Enter/Space)
+- [x] Task: Final quality gates verification
+    - [x] Run `pnpm test:coverage` — confirm ≥80% on all thresholds (lines, statements, branches, functions)
+    - [x] Run `pnpm typecheck` — confirm 0 errors
+    - [x] Run `pnpm lint` — confirm 0 warnings, 0 errors (including `simak-i18n/no-hardcoded` rule)
+    - [x] Run `pnpm check:i18n` — confirm parity
+    - [x] Verify all files under 500 lines (`scripts/check-modularity.js`)
+    - [x] Verify responsive layout at mobile/tablet/desktop widths (browser dev tools) — skipped (user discretion, automated tests sufficient)
+    - [x] Verify keyboard navigation through discussion panel (Tab/Enter/Space) — skipped (user discretion, automated tests sufficient)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Email, i18n & Polish' (Protocol in workflow.md)
 </protect>
