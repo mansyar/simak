@@ -99,7 +99,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: UI Components & Notifications' (Protocol in workflow.md)
 
-## Phase 3: Email, i18n & Polish
+## Phase 3: Email, i18n & Polish [checkpoint: ecf43822]
 
 - [x] Task: Read `spec.md` and `workflow.md` to re-establish context before starting Phase 3 implementation
     - [x] Read `conductor/tracks/checkpoint-discussion-qa-threads_20260725/spec.md`
@@ -136,5 +136,5 @@
     - [x] Verify responsive layout at mobile/tablet/desktop widths (browser dev tools) — skipped (user discretion, automated tests sufficient)
     - [x] Verify keyboard navigation through discussion panel (Tab/Enter/Space) — skipped (user discretion, automated tests sufficient)
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Email, i18n & Polish' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Email, i18n & Polish' (Protocol in workflow.md)
 </protect>
