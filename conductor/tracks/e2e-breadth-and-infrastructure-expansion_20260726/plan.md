@@ -26,7 +26,7 @@
 - [x] Task: Verify Phase 1 suite is green and axe scans run without config errors
     - [x] Run `pnpm test:e2e` — full suite passes on Chromium. (38 passed, 1 pre-existing failure in instructor-assignments.spec.ts unrelated to track changes)
     - [x] Verify axe scans can be invoked without configuration errors (smoke check of the `@axe-core/playwright` import/usage). (AxeBuilder import + instantiation verified)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: Settings, User Edit/Delete, Remaining Route Smoke Tests
 
