@@ -704,6 +704,7 @@
     "send": "Send",
     "reply": "Reply",
     "delete": "Delete",
+    "cancel": "Cancel",
     "deleted": "[deleted]",
     "deleteWindowExpired": "Deletion window expired",
     "loading": "Loading messages...",

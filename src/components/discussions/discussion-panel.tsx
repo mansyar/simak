@@ -265,14 +265,16 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
               </button>
             )}
             {windowExpired && <span>{t('discussions.deleteWindowExpired')}</span>}
-            <button
-              type="button"
-              onClick={() => setReplyTo(msg.id)}
-              className="hover:text-primary"
-              aria-label={t('discussions.reply')}
-            >
-              <CornerDownRight className="size-4" />
-            </button>
+            {!msg.deletedAt && (
+              <button
+                type="button"
+                onClick={() => setReplyTo(msg.id)}
+                className="hover:text-primary"
+                aria-label={t('discussions.reply')}
+              >
+                <CornerDownRight className="size-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -309,7 +311,7 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
             type="button"
             onClick={() => setReplyTo(null)}
             className="text-primary hover:underline"
-            aria-label={t('discussions.delete')}
+            aria-label={t('discussions.cancel')}
           >
             <X className="size-4" />
           </button>

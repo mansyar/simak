@@ -704,6 +704,7 @@
     "send": "Kirim",
     "reply": "Balas",
     "delete": "Hapus",
+    "cancel": "Batal",
     "deleted": "[dihapus]",
     "deleteWindowExpired": "Jendela penghapusan berakhir",
     "loading": "Memuat pesan...",

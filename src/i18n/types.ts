@@ -709,6 +709,7 @@ export type Translation = {
     send: string
     reply: string
     delete: string
+    cancel: string
     deleted: string
     deleteWindowExpired: string
     loading: string

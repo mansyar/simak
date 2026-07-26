@@ -202,18 +202,22 @@ export async function postDiscussionMessageHandler({ data }: { data: PostDiscuss
       return { inserted };
     });
 
-    // 7. Post-commit email (advisory — never throws)
+    // 7. Post-commit email (advisory — never surfaces error to user)
     if (recipientId !== session.user.id) {
-      await sendDiscussionReplyEmail({
-        recipientId,
-        authorName: session.user.name,
-        checkpointName: checkpoint.name,
-        assignmentTitle: assignment.title,
-        messagePreview: message.slice(0, 100),
-        assignmentId: checkpoint.assignmentId,
-        checkpointId,
-        target: isStudentPoster ? 'instructor' : 'student',
-      });
+      try {
+        await sendDiscussionReplyEmail({
+          recipientId,
+          authorName: session.user.name,
+          checkpointName: checkpoint.name,
+          assignmentTitle: assignment.title,
+          messagePreview: message.slice(0, 100),
+          assignmentId: checkpoint.assignmentId,
+          checkpointId,
+          target: isStudentPoster ? 'instructor' : 'student',
+        });
+      } catch (emailErr) {
+        console.error('Discussion reply email failed after successful transaction:', emailErr);
+      }
     }
 
     return { success: true, message: txResult.inserted };
