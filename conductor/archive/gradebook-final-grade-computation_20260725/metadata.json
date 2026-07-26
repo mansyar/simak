@@ -1,0 +1,19 @@
+{
+  "track_id": "gradebook-final-grade-computation_20260725",
+  "type": "feature",
+  "state": "INIT",
+  "spec": {
+    "approved": true,
+    "approved_at": "2026-07-25T07:43:02Z"
+  },
+  "plan": {
+    "approved": true,
+    "approved_at": "2026-07-25T07:43:02Z",
+    "items_total": 24,
+    "items_completed": 0
+  },
+  "revert_baseline": "987c7232b6f31bcdff40ecf897dda9dcc12397f3",
+  "created_at": "2026-07-25T07:43:02Z",
+  "updated_at": "2026-07-25T07:43:02Z",
+  "description": "Gradebook & Final Grade Computation (TRACK-025)"
+}

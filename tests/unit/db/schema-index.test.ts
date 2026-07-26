@@ -26,4 +26,20 @@ describe('Schema barrel exports', () => {
   it('should export reviewScoresRelations', () => {
     expect(schema.reviewScoresRelations).toBeDefined();
   });
+
+  it('should export assignmentGradeConfig table', () => {
+    expect(schema.assignmentGradeConfig).toBeDefined();
+  });
+
+  it('should export finalGrades table', () => {
+    expect(schema.finalGrades).toBeDefined();
+  });
+
+  it('should export assignmentGradeConfigRelations', () => {
+    expect(schema.assignmentGradeConfigRelations).toBeDefined();
+  });
+
+  it('should export finalGradesRelations', () => {
+    expect(schema.finalGradesRelations).toBeDefined();
+  });
 });

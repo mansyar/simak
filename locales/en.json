@@ -1185,5 +1185,57 @@
       "descriptionPlaceholder": "Description (optional)",
       "scoreLabel": "Score"
     }
+  },
+  "gradebook": {
+    "title": "Gradebook",
+    "studentName": "Student Name",
+    "finalGrade": "Final Grade",
+    "numericScore": "Score",
+    "status": {
+      "complete": "Complete",
+      "in_progress": "In Progress",
+      "incomplete": "Incomplete"
+    },
+    "passed": "Passed",
+    "notPassed": "Not Passed",
+    "empty": "No students assigned to this assignment yet",
+    "noGrades": "No grades computed yet",
+    "configSummary": "Grade Configuration",
+    "configScheme": "Grading Scheme",
+    "equalWeight": "Equal Weight",
+    "customWeight": "Custom Weight",
+    "letterBounds": "Letter Grade Bounds",
+    "customWeights": "Custom Weights",
+    "staleWeightsWarning": "Custom weights are stale (template changed). Falling back to equal weight.",
+    "recomputeAll": "Recompute All Grades",
+    "recomputeConfirm": "Are you sure you want to recompute all grades for this assignment?",
+    "recomputeSuccess": "All grades recomputed successfully ({count} students)",
+    "recomputeError": "Failed to recompute grades",
+    "exportCsv": "Export CSV",
+    "exportExcel": "Export Excel",
+    "loading": "Loading gradebook...",
+    "loadError": "Failed to load gradebook",
+    "settings": {
+      "title": "Grade Settings",
+      "scheme": "Grading Scheme",
+      "equalWeight": "Equal Weight",
+      "customWeight": "Custom Weight",
+      "letterBounds": "Letter Grade Bounds",
+      "customWeights": "Custom Weights",
+      "save": "Save",
+      "saving": "Saving...",
+      "saveSuccess": "Grade settings saved successfully",
+      "saveError": "Failed to save grade settings"
+    },
+    "student": {
+      "finalGrade": "Final Grade",
+      "currentProgress": "Current Progress",
+      "breakdown": "Show Breakdown",
+      "checkpoint": "Checkpoint",
+      "score": "Score"
+    },
+    "analytics": {
+      "gradeDistribution": "Grade Distribution"
+    }
   }
 }

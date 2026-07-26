@@ -17,7 +17,7 @@ const adminSession = {
   session: {} as any,
 };
 
-describe('getAdminAnalyticsDataHandler - at-risk summary', () => {
+describe('getAdminAnalyticsDataHandler - grade distribution', () => {
   let mockDb: any;
 
   beforeEach(() => {
@@ -39,10 +39,10 @@ describe('getAdminAnalyticsDataHandler - at-risk summary', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
   });
 
-  /** Queue 10 query results for Promise.all (9) + at-risk summary (10th).
+  /** Set up 9 query results for Promise.all, in order:
    * 0: consultation stats, 1: deadline stats, 2: status distribution,
    * 3: submission trend, 4: review trend, 5: reviews count,
-   * 6: DAU trend, 7: WAU trend, 8: grade distribution, 9: at-risk summary */
+   * 6: DAU trend, 7: WAU trend, 8: grade distribution */
   function mockResults(results: any[][]) {
     results.forEach((result) => {
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
@@ -51,7 +51,7 @@ describe('getAdminAnalyticsDataHandler - at-risk summary', () => {
     });
   }
 
-  const emptyStandard = [
+  const emptyResults = [
     [{ total: 0, verified: 0 }],
     [{ total: 0, breached: 0 }],
     [],
@@ -63,30 +63,41 @@ describe('getAdminAnalyticsDataHandler - at-risk summary', () => {
     [],
   ];
 
-  it('should return atRiskSummary with high, medium, and low counts', async () => {
-    mockResults([...emptyStandard, [{ high: 5, medium: 3, low: 7 }]]);
+  it('should return gradeDistribution with correct counts when data exists', async () => {
+    mockResults([
+      [{ total: 0, verified: 0 }],
+      [{ total: 0, breached: 0 }],
+      [],
+      [],
+      [],
+      [{ count: 0 }],
+      [],
+      [],
+      [
+        { letterGrade: 'A', count: 5 },
+        { letterGrade: 'B', count: 3 },
+        { letterGrade: 'C', count: 2 },
+        { letterGrade: 'D', count: 1 },
+        { letterGrade: 'F', count: 1 },
+      ],
+    ]);
     const result = (await getAdminAnalyticsDataHandler({ data: { range: '30d' } })) as any;
-    expect(result.atRiskSummary).toEqual({ high: 5, medium: 3, low: 7 });
+    expect(result.gradeDistribution).toEqual({ A: 5, B: 3, C: 2, D: 1, F: 1 });
   });
 
-  it('should return zero counts when no at-risk students', async () => {
-    mockResults([...emptyStandard, [{ high: 0, medium: 0, low: 0 }]]);
+  it('should default gradeDistribution to all zeros when no data', async () => {
+    mockResults(emptyResults);
     const result = (await getAdminAnalyticsDataHandler({ data: { range: '30d' } })) as any;
-    expect(result.atRiskSummary).toEqual({ high: 0, medium: 0, low: 0 });
+    expect(result.gradeDistribution).toEqual({ A: 0, B: 0, C: 0, D: 0, F: 0 });
   });
 
-  it('should default to zeros when query returns empty array', async () => {
-    mockResults([...emptyStandard, []]);
+  it('should include all 5 letter grade keys in gradeDistribution', async () => {
+    mockResults([...emptyResults.slice(0, 8), [{ letterGrade: 'A', count: 10 }]]);
     const result = (await getAdminAnalyticsDataHandler({ data: { range: '30d' } })) as any;
-    expect(result.atRiskSummary).toEqual({ high: 0, medium: 0, low: 0 });
-  });
-
-  it('should include atRiskSummary as numbers in response', async () => {
-    mockResults([...emptyStandard, [{ high: 2, medium: 4, low: 1 }]]);
-    const result = (await getAdminAnalyticsDataHandler({ data: { range: '30d' } })) as any;
-    expect(result.atRiskSummary).toBeDefined();
-    expect(typeof result.atRiskSummary.high).toBe('number');
-    expect(typeof result.atRiskSummary.medium).toBe('number');
-    expect(typeof result.atRiskSummary.low).toBe('number');
+    expect(result.gradeDistribution).toHaveProperty('A', 10);
+    expect(result.gradeDistribution).toHaveProperty('B', 0);
+    expect(result.gradeDistribution).toHaveProperty('C', 0);
+    expect(result.gradeDistribution).toHaveProperty('D', 0);
+    expect(result.gradeDistribution).toHaveProperty('F', 0);
   });
 });

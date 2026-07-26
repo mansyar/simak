@@ -1191,6 +1191,58 @@ export type Translation = {
       scoreLabel: string
     }
   }
+  gradebook: {
+    title: string
+    studentName: string
+    finalGrade: string
+    numericScore: string
+    status: {
+      complete: string
+      in_progress: string
+      incomplete: string
+    }
+    passed: string
+    notPassed: string
+    empty: string
+    noGrades: string
+    configSummary: string
+    configScheme: string
+    equalWeight: string
+    customWeight: string
+    letterBounds: string
+    customWeights: string
+    staleWeightsWarning: string
+    recomputeAll: string
+    recomputeConfirm: string
+    recomputeSuccess: string
+    recomputeError: string
+    exportCsv: string
+    exportExcel: string
+    loading: string
+    loadError: string
+    settings: {
+      title: string
+      scheme: string
+      equalWeight: string
+      customWeight: string
+      letterBounds: string
+      customWeights: string
+      save: string
+      saving: string
+      saveSuccess: string
+      saveError: string
+    }
+    student: {
+      finalGrade: string
+      currentProgress: string
+      breakdown: string
+      checkpoint: string
+      score: string
+    }
+    analytics: {
+      gradeDistribution: string
+    }
+  }
 }
 
 export type TranslationFunctions = Record<string, (key: string) => string>

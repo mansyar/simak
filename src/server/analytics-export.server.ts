@@ -5,10 +5,13 @@ import { users } from '@/db/schema/users';
 import { assignments, assignmentStudents, checkpoints } from '@/db/schema/assignments';
 import { submissions, reviews } from '@/db/schema/submissions';
 import { reviewScores } from '@/db/schema/rubrics';
+import { templateCheckpoints } from '@/db/schema/templates';
 import { auditLog } from '@/db/schema/audit-log';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { NonNullableSession } from '@/lib/types';
+import { fetchGradeConfig, groupRowsByStudent, type ScoreRow } from './gradebook.server';
+import { computeFinalGrade } from '@/lib/grade-computation';
 
 export type ExportUsersCsvInput = Record<string, never>;
 export type ExportAuditLogCsvInput = { dateFrom?: Date; dateTo?: Date };
@@ -16,6 +19,7 @@ export type ExportAssignmentProgressCsvInput = Record<string, never>;
 export type ExportStudentProgressCsvInput = { assignmentId: number };
 export type ExportReviewHistoryCsvInput = { assignmentId: number };
 export type ExportRubricScoresCsvInput = { assignmentId: number };
+export type ExportGradebookCsvInput = { assignmentId: number };
 
 function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
   return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
@@ -394,6 +398,94 @@ export async function exportRubricScoresCsvHandler({ data }: { data: ExportRubri
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
       handler: 'exportRubricScoresCsvHandler',
+    });
+  }
+}
+
+export async function exportGradebookCsvHandler({ data }: { data: ExportGradebookCsvInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isAdmin(session)) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const { assignmentId } = data;
+  const db = getDb();
+
+  try {
+    const assignment = await db
+      .select({ id: assignments.id })
+      .from(assignments)
+      .where(eq(assignments.id, assignmentId))
+      .limit(1);
+
+    if (!assignment[0]) {
+      return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
+    }
+
+    const config = await fetchGradeConfig(db, assignmentId);
+
+    const rows = (await db
+      .select({
+        studentId: users.id,
+        studentName: users.name,
+        checkpointId: checkpoints.id,
+        checkpointName: checkpoints.name,
+        templateCheckpointId: checkpoints.templateCheckpointId,
+        order: checkpoints.order,
+        state: checkpoints.state,
+        gradingType: templateCheckpoints.gradingType,
+        criterionId: reviewScores.criterionId,
+        criterionTitle: reviewScores.criterionTitle,
+        score: reviewScores.score,
+        weight: reviewScores.weight,
+        rubricLevelId: reviewScores.rubricLevelId,
+        levelLabel: reviewScores.levelLabel,
+      })
+      .from(checkpoints)
+      .innerJoin(users, eq(users.id, checkpoints.studentId))
+      .leftJoin(templateCheckpoints, eq(templateCheckpoints.id, checkpoints.templateCheckpointId))
+      .leftJoin(submissions, eq(submissions.checkpointId, checkpoints.id))
+      .leftJoin(reviews, eq(reviews.submissionId, submissions.id))
+      .leftJoin(reviewScores, eq(reviewScores.reviewId, reviews.id))
+      .where(eq(checkpoints.assignmentId, assignmentId))
+      .orderBy(users.name, checkpoints.order)) as unknown as ScoreRow[];
+
+    const studentMap = groupRowsByStudent(rows);
+
+    const studentGrades = Array.from(studentMap.values()).map(
+      ({ studentName, checkpoints: cps }) => ({
+        studentName,
+        result: computeFinalGrade(cps, config),
+      }),
+    );
+
+    const checkpointCols = new Map<string, number>();
+    for (const cp of studentGrades.flatMap((s) => s.result.contributingCheckpoints))
+      if (!checkpointCols.has(cp.checkpointName)) checkpointCols.set(cp.checkpointName, cp.order);
+    const sortedCols = Array.from(checkpointCols.entries())
+      .sort(([, a], [, b]) => a - b)
+      .map(([name]) => name);
+
+    const headers = ['Student Name', ...sortedCols, 'Final Score', 'Letter Grade', 'Status'];
+
+    const csvRows = studentGrades.map(({ studentName, result }) => {
+      const scoreMap = new Map(
+        result.contributingCheckpoints.map((cp) => [cp.checkpointName, cp.score]),
+      );
+      return [
+        studentName,
+        ...sortedCols.map((c) => scoreMap.get(c) ?? ''),
+        result.numericScore ?? '',
+        result.letterGrade ?? '',
+        result.status,
+      ];
+    });
+
+    return buildCsv(headers, csvRows);
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'exportGradebookCsvHandler',
     });
   }
 }

@@ -211,10 +211,9 @@ All tracks must adhere to the following project constraints:
 - **Detail:** conductor/archive/at-risk-student-early-warning_20260724/ (spec.md, plan.md)
 
 ### TRACK-025: Gradebook & Final Grade Computation
-
-*   **Status:** `Pending`
-*   **Dependencies:** TRACK-020 (Rubric-Based Grading — provides `review_scores` with denormalized weight/score snapshots that the gradebook aggregates). Can be implemented independently of TRACK-023.
-*   **Estimated Effort:** 5 Days / 3 Sprint Loops
+- **Status:** ✅ Complete · **Audit IDs:** None (new feature) · **Deps:** TRACK-020 (Rubric-Based Grading — provides `review_scores` with denormalized weight/score snapshots)
+- **Key decisions:** Pure `computeFinalGrade` function (no DB access); `assignment_grade_config` (1:1 with assignments, cascade-deleted) + `final_grades` cache table (upserted, never individually deleted); auto-created default config on assignment creation + migration backfill for pre-existing assignments; `equal_weight`/`custom_weight` schemes with stale-weight fallback (sum≠100, missing/extra checkpoint entries → equal_weight + warning badge); post-commit advisory grade recomputation on `pass` review decision (try/catch, never affects review transaction); admin-only `recomputeAllGrades` wrapped in `db.transaction` for atomicity; CSV export with formula-injection mitigation (`escapeCsvValue`); client-side Excel via SheetJS (`sanitizeCell`); admin grade distribution analytics (A/B/C/D/F progress bars); review fixes applied: stale-weight detection for removed checkpoints (key-count check), `logAuditEvent` awaited in try/catch (SQL §6.4), `recomputeAllGradesHandler` transaction wrapping, redundant `computeFinalGrade`/`computeCheckpointScore` calls eliminated, migration rollback file created (SQL §5.1)
+- **Detail:** `conductor/archive/gradebook-final-grade-computation_20260725/` (spec.md, plan.md)
 
 #### Context Anchors (Traceability)
 *   **PRD Reference:** `docs/PRD.md#checkpoints--submissions` (review workflow with rubric scoring — the data source for grade computation), `docs/PRD.md#analytics--reporting` (CSV/Excel export infrastructure — extension point for gradebook exports), `docs/PRD.md#data-model-summary` (`ReviewScore` entity — denormalized snapshot of criterion score/weight at review time)
@@ -419,6 +418,100 @@ All tracks must adhere to the following project constraints:
 
 ---
 
+## Milestone 9: Client Architecture Consistency
+
+> This milestone addresses client-side data-fetching architectural inconsistencies identified after the completion of the gradebook feature (TRACK-025). The TanStack Query architecture established in TRACK-014 (query-key factory + `useQuery`/`useMutation` with optimistic updates) is followed by most domains, but two gaps remain: (1) the query-key factory covers only 7 of ~13 data domains, with 5 settings components and the entire gradebook feature using inline string-array keys or pre-React-Query `useState`/`useEffect` patterns, and (2) the NotificationCenter reimplements infinite-scroll pagination by hand instead of using TanStack Query's native `useInfiniteQuery`. These tracks are consistency/tech-debt work — no new product features, no backend changes, no schema migrations.
+
+---
+
+### TRACK-029: Query-Key Factory Completion & Client Data-Fetching Consistency
+
+*   **Status:** `Pending`
+*   **Dependencies:** TRACK-014 (Optimistic UI Updates — introduced the query-key factory pattern). Can be implemented independently of TRACK-030.
+*   **Estimated Effort:** 2 Days / 1 Sprint Loop
+*   **Audit IDs:** None (architectural consistency / tech-debt remediation — identified in post-TRACK-025 code review)
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** `docs/PRD.md` — Settings hub (profile, password, 2FA, appearance, accessibility, notification preferences — 5 sections with inline query keys), Gradebook & Final Grade Computation (TRACK-025 — 3 components using `useState`/`useEffect` instead of `useQuery`/`useMutation`)
+*   **TDD Reference:** `conductor/tech-stack.md` (TanStack Query — "Caching, deduplication, background refetching, polling for notifications"), `src/lib/query-keys.ts` (48 lines — 7 domain factories: `notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`, `templateKeys`, `discussionKeys`), `src/components/settings/ProfileSection.tsx:16` (`queryKey: ['currentUser']` — inline, no invalidation on name update), `src/components/settings/SessionManagement.tsx:51` (`queryKey: ['activeSessions']` — inline), `src/components/settings/TwoFactorSettings.tsx:40` (`queryKey: ['twoFactorStatus']` — inline), `src/components/settings/AccessibilitySection.tsx:11` (`useQuery` with inline key), `src/components/settings/NotificationPreferencesSection.tsx:112` (`queryKey: ['currentUser']` — shared with ProfileSection, invalidates via inline `['currentUser']` on line 138), `src/components/gradebook/StudentFinalGradeCard.tsx:14-36` (`useState`+`useEffect`+manual `async` fetch — no cache, no dedup, no background refetch), `src/components/gradebook/RecomputeGradesButton.tsx:24-43` (`useState(loading)` + inline `async` handler — no `useMutation`, no optimistic UI, no cache invalidation), `src/routes/_authenticated/instructor/assignments/$id.gradebook.tsx:16-31` (route uses TanStack Router SSR `loader` + `Route.useLoaderData()` — NOT TanStack Query; `router.invalidate()` on line 57 is the correct pattern for refetching SSR loader data, not a bug to fix)
+*   **Product Spec Reference:** `conductor/archive/optimistic-ui-updates_20260722/spec.md` (TRACK-014 — FR-1: query-key factory for 5 feature domains; "Other features keep inline keys until touched"), `conductor/archive/gradebook-final-grade-computation_20260725/` (TRACK-025 — gradebook feature built without TanStack Query, diverging from the established pattern)
+
+#### Track Tech Stack
+*   TanStack Query (`@tanstack/react-query`) — `useQuery`, `useMutation`, `useQueryClient`. Already installed, no new dependency.
+*   `src/lib/query-keys.ts` — Typed query-key factory. Extending with new domain entries following the existing pattern (e.g., `notificationKeys`, `assignmentKeys`).
+*   No backend changes — all server function stubs (`getAssignmentGradebook`, `saveGradeConfig`, `recomputeAllGrades`, `getStudentFinalGrade`, `getCurrentUser`, `listActiveSessions`, `getTwoFactorStatus`) already exist and are unchanged.
+*   No new dependencies, no schema migrations, no i18n keys.
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Complete query-key factory:** Add `settingsKeys` (with `currentUser()`, `activeSessions()`, `twoFactorStatus()` sub-keys), `gradebookKeys` (with `studentFinalGrade(assignmentId)` sub-key only — the gradebook route page uses SSR loader, not TanStack Query, so `detail`/`config` keys are not needed) to `src/lib/query-keys.ts`. These are the two domains with confirmed inline-key usage. Other domains (reviews, analytics, submissions, dashboard) use route loaders or `useQuery` with factory keys already — audit and add factories only if inline keys are found.
+    *   **Migrate settings components to factory keys:** Replace inline `queryKey: ['currentUser']` with `settingsKeys.currentUser()` in `ProfileSection.tsx` (line 16) and `NotificationPreferencesSection.tsx` (line 112). Replace `queryKey: ['activeSessions']` with `settingsKeys.activeSessions()` in `SessionManagement.tsx` (line 51). Replace `queryKey: ['twoFactorStatus']` with `settingsKeys.twoFactorStatus()` in `TwoFactorSettings.tsx` (line 40). Replace inline key in `AccessibilitySection.tsx` (line 11). Update all `queryClient.invalidateQueries` calls in these files to use the factory.
+    *   **Fix ProfileSection missing invalidation:** `ProfileSection.tsx` `updateNameMutation` (line 36-43) has no `onSuccess`/`onSettled` invalidation — after a name update, the `['currentUser']` cache is stale and the UI shows the old name until the next refetch. Add `onSettled: () => queryClient.invalidateQueries({ queryKey: settingsKeys.currentUser() })`.
+    *   **Migrate StudentFinalGradeCard to useQuery:** Replace `useState(grade)` + `useState(loading)` + `useState(error)` + `useEffect` manual fetch (lines 14-36) with `useQuery({ queryKey: gradebookKeys.studentFinalGrade(assignmentId), queryFn: ... })`. Removes manual loading/error state management. Provides cache, deduplication, and background refetch.
+    *   **Migrate RecomputeGradesButton to useMutation:** Replace `useState(loading)` + inline `async` handler with try/catch/finally (lines 24-43) with `useMutation`. Add `onSuccess` to call `queryClient.invalidateQueries({ queryKey: gradebookKeys.studentFinalGrade(assignmentId) })` (refetches `StudentFinalGradeCard`'s client-side query) AND `router.invalidate()` (refetches the route's SSR loader data — the gradebook table). Both are needed because the gradebook table comes from the route loader and `StudentFinalGradeCard` fetches independently via `useQuery`. Add `onError` for toast.
+    *   **Keep gradebook route's `router.invalidate()`:** The route page uses TanStack Router's SSR `loader` + `Route.useLoaderData()` (lines 16-31), not TanStack Query. `router.invalidate()` is the correct pattern for refetching SSR loader data — `queryClient.invalidateQueries` would NOT refetch route loader data. The route page's `handleSaveConfig` stays as-is. Only the sub-components (`StudentFinalGradeCard`, `RecomputeGradesButton`) are migrated to TanStack Query.
+    *   **Unit tests:** Update existing tests for migrated components. Add tests verifying that `RecomputeGradesButton`'s `useMutation` `onSuccess` calls both `queryClient.invalidateQueries({ queryKey: gradebookKeys.studentFinalGrade(assignmentId) })` and `router.invalidate()`. Verify `ProfileSection` name update now triggers cache invalidation (regression test for the missing-invalidation bug).
+*   **Out of Scope:**
+    *   Migrating route-loader-based data fetching (dashboard, assignment detail, **gradebook route page**) to `useQuery` — these use TanStack Router's `loader` + `Route.useLoaderData()` pattern, which is a valid SSR-first approach. `router.invalidate()` is the correct refetch mechanism for SSR loader data. Only client-side `useState`/`useEffect` fetches and inline-key `useQuery` calls are in scope.
+    *   Optimistic UI for gradebook mutations — deferred to a future track (the priority is cache consistency, not perceived latency).
+    *   Adding factories for domains that already use `useQuery` with factory keys correctly (notifications, consultations, extensions, assignments, users, templates, discussions — these are already migrated per TRACK-014).
+    *   Any backend/server-function changes — all server stubs and handlers are unchanged.
+    *   i18n changes — no new user-visible strings.
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Query-key factory completion + settings migration):** Add `settingsKeys` and `gradebookKeys` to `src/lib/query-keys.ts` following the existing factory pattern. Migrate all 5 settings components from inline string-array keys to factory calls. Fix the `ProfileSection` missing-invalidation bug by adding `onSettled` invalidation. Update all `queryClient.invalidateQueries` calls in settings components to use factory keys. Update existing unit tests for settings components to mock the factory. Verify: `pnpm typecheck` clean, `pnpm test:unit` passes, `pnpm lint` clean, grep for inline `['currentUser']`/`['activeSessions']`/`['twoFactorStatus']` returns zero matches in `src/components/settings/`.
+*   **Phase 2 (Gradebook TanStack Query migration):** Migrate `StudentFinalGradeCard.tsx` from `useState`+`useEffect` to `useQuery` with `gradebookKeys.studentFinalGrade(assignmentId)`. Migrate `RecomputeGradesButton.tsx` from `useState`+`async` to `useMutation` with `onSuccess` calling both `queryClient.invalidateQueries({ queryKey: gradebookKeys.studentFinalGrade(assignmentId) })` and `router.invalidate()` (the route's SSR loader data must be refetched via `router.invalidate()`, not TanStack Query). The route page's `handleSaveConfig` stays as-is — `router.invalidate()` is correct for SSR loader data. Update existing gradebook tests (`tests/unit/components/student-final-grade-card.test.tsx`, `tests/unit/routes/instructor-gradebook.test.tsx`) to use `QueryClientProvider` wrapper pattern. Verify: `pnpm typecheck` clean, `pnpm test:unit` passes, `pnpm test:coverage` ≥80%, `RecomputeGradesButton` uses `useMutation` with dual invalidation (query cache + router).
+*   **Phase 3 (Audit + verification):** Grep the entire `src/` directory for remaining inline query key patterns (`queryKey: ['` in `.tsx` files). Migrate any found to factory calls or document why they're intentionally inline (e.g., one-off queries). Run full quality gate: `pnpm typecheck`, `pnpm test:coverage`, `pnpm lint`, `pnpm check:i18n`. Verify: zero inline string-array query keys in `src/components/` (excluding factory file itself), all mutations have `onSettled`/`onSuccess` invalidation using factory keys.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Open `/student/assignments/$id` — the `StudentFinalGradeCard` loads with a skeleton, then shows the grade. Navigate away and back — the cached grade appears instantly (no refetch spinner) if within `staleTime`. Open `/instructor/assignments/$id/gradebook` — the gradebook table loads via SSR. Admin changes grade config (scheme/weights) → saves → `router.invalidate()` refetches the route loader data and the gradebook table updates. Admin clicks "Recompute All Grades" → the recompute succeeds → `router.invalidate()` refetches the gradebook table AND `queryClient.invalidateQueries` refetches any visible `StudentFinalGradeCard` components. Open `/settings` → edit profile name → save → the name updates in the UI immediately (no stale display — regression test for the missing-invalidation bug). Toggle a notification preference → the preference persists after reload. Enable/disable 2FA → the status card updates immediately.
+*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. Updated tests for: `StudentFinalGradeCard` (renders with `useQuery` wrapper, shows skeleton while loading, shows grade on success, shows error state on failure), `RecomputeGradesButton` (calls `useMutation`, `onSuccess` calls both `queryClient.invalidateQueries(gradebookKeys.studentFinalGrade)` and `router.invalidate()`, shows error toast on failure). Route page `handleSaveConfig` unchanged (still uses `router.invalidate()` — correct for SSR loader data). `ProfileSection` (name update triggers `settingsKeys.currentUser()` invalidation). `pnpm test:coverage` ≥80% on all thresholds. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors. `pnpm check:i18n` — parity maintained.
+*   [ ] **Conductor Review:** `src/lib/query-keys.ts` has `settingsKeys` and `gradebookKeys` factories following the existing pattern (nested sub-keys, `as const` return types). `gradebookKeys` has only `studentFinalGrade(assignmentId)` (no `detail`/`config` — route uses SSR loader). Zero inline string-array query keys in `src/components/settings/` (grep `queryKey: \['` returns no matches). Zero `useState`/`useEffect` manual-fetch patterns in `src/components/gradebook/` (grep `useEffect` in gradebook returns no matches in data-fetching context). `$id.gradebook.tsx` route keeps `router.invalidate()` (correct for SSR loader data — route uses `Route.useLoaderData()`, not TanStack Query). `RecomputeGradesButton` `useMutation` `onSuccess` calls both `queryClient.invalidateQueries(gradebookKeys.studentFinalGrade)` and `router.invalidate()`. `ProfileSection` `updateNameMutation` has `onSettled` invalidation. All files under 500 lines. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` pass. Pre-push gate (`pnpm typecheck` && `pnpm vitest run --coverage`) passes.
+
+---
+
+### TRACK-030: NotificationCenter Infinite Query Migration
+
+*   **Status:** `Pending`
+*   **Dependencies:** TRACK-014 (query-key factory — `notificationKeys`), TRACK-012 (Notifications & File Management UX — introduced the "Load More" pagination pattern). Can be implemented independently of TRACK-029.
+*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
+*   **Audit IDs:** None (architectural consistency / tech-debt remediation)
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** `docs/PRD.md` — In-App Notification System (notification center with All/Unread tabs, grouped notifications, "Load More" pagination)
+*   **TDD Reference:** `src/hooks/use-notifications.ts:36-58` (`useNotificationsList` — uses `useQuery` with `notificationKeys.list({ page, limit, type, unreadOnly })`, `staleTime: 30_000`), `src/components/notifications/NotificationCenter.tsx:47-71` (manual accumulation: `useState<Notification[]>([])` + `useEffect` that appends items across pages with `Set`-based dedup — lines 56-67, `hasMore` derived from `items.length < total` on line 71), `src/hooks/use-notifications.ts:60-116` (`useMarkRead` — optimistic `onMutate`/`onError`/`onSettled` with `notificationKeys.all()` invalidation), `src/hooks/use-notifications.ts:118-172` (`useMarkAllRead` — same optimistic pattern)
+*   **Product Spec Reference:** `conductor/archive/notifications-file-management-ux_20260720/spec.md` (TRACK-012 — FR-4: "Load More" pagination), `conductor/archive/optimistic-ui-updates_20260722/spec.md` (TRACK-014 — optimistic `markRead`/`markAllRead` mutations with `notificationKeys` factory)
+
+#### Track Tech Stack
+*   TanStack Query (`@tanstack/react-query`) — `useInfiniteQuery`. Already installed, no new dependency.
+*   Existing `listNotifications` server function — already returns `{ items, total }` with `page`/`limit` params. Already structured for infinite query (no backend changes needed — `getNextPageParam` derives `page` from `total` and current `items` count).
+*   No new dependencies, no schema migrations, no i18n keys, no backend changes.
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Convert `useNotificationsList` to `useInfiniteQuery`:** Replace `useQuery` (with `page` param) in `src/hooks/use-notifications.ts` with `useInfiniteQuery`. The `queryKey` uses `notificationKeys.list({ limit, type, unreadOnly })` (no `page` — `useInfiniteQuery` manages page tracking via `pageParam`/`getNextPageParam`). `getNextPageParam` returns the next page number when `total > accumulated items count`, or `undefined` when all pages are loaded. `initialPageParam: 1`.
+    *   **Refactor `NotificationCenter` component:** Remove the manual accumulation `useState<Notification[]>(allItems)` (line 47) and the `useEffect` append/dedup logic (lines 56-67). Replace with `data.pages.flatMap(page => page.items)` to flatten the infinite query's pages into a single array. Replace `setCurrentPage((p) => p + 1)` "Load More" button (line 166) with `fetchNextPage()`. Use `isFetching` for the Load More button spinner, `hasNextPage` for button visibility, and `isFetchingNextPage` for the load-more-specific loading state.
+    *   **Rewrite optimistic mutation callbacks for infinite query shape:** The existing `useMarkRead` and `useMarkAllRead` optimistic mutations (lines 60-172) use `queryClient.setQueriesData` with a callback that checks `'items' in old` — this matches the `useQuery` data shape (`{ items, total }`) but NOT the `useInfiniteQuery` shape (`{ pages: Array<{ items, total }>, pageParams: number[] }`). The `'items' in old` check silently falls through to `return old` (no-op), breaking the optimistic update. Rewrite both callbacks to check `'pages' in old` and map over `old.pages` to update `items` within each page. The `typeof old === 'number'` check (for `useUnreadCount` — still uses `useQuery`) is preserved unchanged. The `onSettled` `invalidateQueries({ queryKey: notificationKeys.all() })` works unchanged.
+    *   **Update `notificationKeys.list` factory:** Remove `page` from the factory's `list` filter type signature. The current factory accepts `{ page?, limit?, type?, unreadOnly? }` — with `useInfiniteQuery`, `page` is managed by `pageParam` and should not be part of the cache key (all pages of the same filter share one cache entry). This is a breaking API change to the factory type signature, which is intentional — it forces any callers passing `page` to migrate.
+    *   **Unit tests:** Update `tests/unit/hooks/use-notifications.test.tsx` and `tests/unit/components/notification-center.test.tsx` to use `useInfiniteQuery` mock pattern. Verify: initial page loads, "Load More" fetches next page, accumulated items include all pages, `hasNextPage` is `false` when all items loaded, optimistic `markRead`/`markAllRead` still updates items across pages, invalidation refetches all pages.
+*   **Out of Scope:**
+    *   Cursor-based pagination — the server function uses offset pagination (`page`/`limit`). `useInfiniteQuery` works with offset pagination via `pageParam`. Migrating to cursor-based is a separate backend concern (deferred per TRACK-006 v2 note).
+    *   Changing the `staleTime` or `refetchInterval` — the existing `staleTime: 30_000` and `refetchInterval: 30_000` (on `useUnreadCount`) are preserved.
+    *   Notification grouping logic (`GROUP_CONFIGS` in `NotificationCenter.tsx`) — unchanged. The grouping operates on the flattened items array, which is the same regardless of pagination mechanism.
+    *   Any UI/UX changes to the notification center layout — this is a pure internal refactor (same user-visible behavior, better state management).
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Hook conversion):** Convert `useNotificationsList` in `src/hooks/use-notifications.ts` from `useQuery` to `useInfiniteQuery`. Set `initialPageParam: 1`, `getNextPageParam: (lastPage, allPages) => { const totalItems = allPages.reduce((sum, p) => sum + p.items.length, 0); return totalItems < lastPage.total ? allPages.length + 1 : undefined; }`. Update the query key to exclude `page` (the page is managed by `pageParam`). Keep `staleTime: 30_000`. Verify: hook compiles, `data.pages` is an array of `{ items, total }`, `fetchNextPage` is available, `hasNextPage` and `isFetchingNextPage` are derived correctly.
+*   **Phase 2 (Component refactor):** Refactor `NotificationCenter.tsx` — remove `allItems` state and the `useEffect` accumulation. Compute `items` via `data?.pages.flatMap(p => p.items) ?? []`. Compute `total` via `data?.pages[0]?.total ?? 0`. Replace `setCurrentPage((p) => p + 1)` with `fetchNextPage()`. Replace `hasMore` with `hasNextPage`. Replace `isFetching` on the Load More button with `isFetchingNextPage`. Verify: component renders identical UI, Load More fetches the next page, accumulated items include all fetched pages, navigating away and back preserves cached pages (no refetch of already-loaded pages within `staleTime`).
+*   **Phase 3 (Optimistic mutation rewrite + tests):** Rewrite `useMarkRead` and `useMarkAllRead` `onMutate` `setQueriesData` callbacks to handle the `useInfiniteQuery` data shape. Replace the `'items' in old` check with `'pages' in old`, then map over `old.pages` to update `items` within each page. The `typeof old === 'number'` check (for `useUnreadCount`) stays unchanged. Update unit tests to mock `useInfiniteQuery` and verify: pages accumulate, Load More triggers `fetchNextPage`, optimistic `markRead` updates the correct item across all pages (not just the first), `onError` rolls back the entire `{ pages, pageParams }` structure, `onSettled` invalidation refetches all pages. Verify: `pnpm typecheck`, `pnpm test:unit`, `pnpm test:coverage` ≥80%, `pnpm lint`.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Open the NotificationCenter (bell icon) — notifications load on page 1. Click "Load More" — the next page loads and appends to the existing list (no flicker, no duplicate items). Click "Mark All Read" — all visible items across all loaded pages transition to read state immediately (optimistic). Navigate away and reopen the NotificationCenter — previously loaded pages are cached (instant render within `staleTime`), and the scroll position is at the top (acceptable — scroll restoration is out of scope). Toggle between "All" and "Unread" tabs — the infinite query resets to page 1 for the new filter. Verify no console errors during any of these actions.
+*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. Updated tests for: `useNotificationsList` (returns `useInfiniteQuery` with correct `queryKey`, `initialPageParam: 1`, `getNextPageParam` returns next page when `total > accumulated`, returns `undefined` when all loaded), `NotificationCenter` (renders page 1 items, "Load More" calls `fetchNextPage`, accumulated items include all pages, `hasNextPage` controls Load More visibility, `isFetchingNextPage` shows spinner on Load More button only), `useMarkRead`/`useMarkAllRead` (optimistic `setQueriesData` updates items in the infinite query page structure, `onError` rolls back, `onSettled` invalidates). `pnpm test:coverage` ≥80%. `pnpm typecheck` clean. `pnpm lint` clean. `pnpm check:i18n` parity maintained.
+*   [ ] **Conductor Review:** `useNotificationsList` uses `useInfiniteQuery` (not `useQuery`). `NotificationCenter.tsx` has no `useState` for items accumulation and no `useEffect` for append/dedup (grep `allItems` and `existingIds` returns zero matches). `items` is computed via `data?.pages.flatMap(...)` (not `useState`). Load More button calls `fetchNextPage()` (not `setCurrentPage`). `hasNextPage` and `isFetchingNextPage` are used (not manually computed `hasMore`). `useMarkRead`/`useMarkAllRead` `onMutate` `setQueriesData` callback checks `'pages' in old` (not `'items' in old`) and maps over `old.pages` to update items within each page. The `typeof old === 'number'` check for `useUnreadCount` is preserved. `notificationKeys.list` factory type signature no longer accepts `page` (managed by `pageParam`). All files under 500 lines. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` pass. Pre-push gate passes.
+
+---
+
 ## Track Dependency Graph
 
 ```
@@ -466,6 +559,10 @@ Milestone 7: Infrastructure & Tooling
 Milestone 8: E2E Coverage Expansion
 ├── TRACK-027: Critical Business Flow E2E Coverage [Complete — archived]
 └── TRACK-028: E2E Breadth & Infrastructure Expansion [depends on E2E-FEAT-001, recommended after 027]
+
+Milestone 9: Client Architecture Consistency
+├── TRACK-029: Query-Key Factory Completion & Client Data-Fetching Consistency [depends on 014 — extends query-key factory]
+└── TRACK-030: NotificationCenter Infinite Query Migration [depends on 014 — notificationKeys factory]
 ```
 
 ### Parallelization Strategy
@@ -490,6 +587,7 @@ The following track groups can be worked on simultaneously:
 | **N** | TRACK-025 | Depends on TRACK-020 (complete) — extends `review_scores` data and analytics export infrastructure. No file overlap with TRACK-023 (different domain: grade computation vs risk scoring). Minor overlap with analytics dashboards — coordinate if parallelized with TRACK-023 admin analytics extension |
 | **O** | TRACK-026 | Complete — new domain (discussions), extended notification infrastructure (TRACK-022) and email queue (TRACK-018). No file overlap with TRACK-025 (different domain: discussions vs grading). Archived |
 | **P** | TRACK-027 → TRACK-028 | TRACK-027 complete (archived) — expanded seed data (student2, student3, consultation seed) + decoupled instructor-review tests + 3 new specs + notification/upload/negative test assertions. TRACK-028 builds on this expanded seed data and decoupled patterns. No file overlap with feature tracks (TRACK-025/026) — only touches `tests/e2e/`, `scripts/seed-e2e.ts`, and `playwright.config.ts` |
+| **Q** | TRACK-029, TRACK-030 | Independent of each other — TRACK-029 touches `query-keys.ts` + settings + gradebook components; TRACK-030 touches `use-notifications.ts` + `NotificationCenter.tsx`. Both depend on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files |
 
 ---
 
@@ -505,7 +603,8 @@ The following track groups can be worked on simultaneously:
 | 6: New Features | 6 | ~34 Days |
 | 7: Infrastructure & Tooling | 1 | ~1 Day |
 | 8: E2E Coverage Expansion | 2 | ~9 Days |
-| **Total** | **29** | **~104 Days** |
+| 9: Client Architecture Consistency | 2 | ~3 Days |
+| **Total** | **31** | **~107 Days** |
 
 > Effort estimates assume a single developer. Tracks within the same parallelization group can be distributed across developers to reduce wall-clock time.
 
