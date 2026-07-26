@@ -88,15 +88,15 @@
 
 ## Phase 3: UI, Export & i18n
 
-- [ ] Task: Read spec.md and workflow.md to re-establish context before implementation
-    - [ ] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to re-establish context before implementation
+    - [x] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Add i18n keys
-    - [ ] Add `gradebook.*` keys to `locales/en.json` (title, finalGrade, letterGrade.A/B/C/D/F, status.complete/in_progress/incomplete, settings.scheme/equalWeight/customWeight/letterBounds/customWeights, exportCsv/exportExcel, empty/noGrades, configSummary, recomputeAll, staleWeightsWarning, analytics.gradeDistribution)
-    - [ ] Add same keys to `locales/id.json` with Indonesian translations
-    - [ ] Run `pnpm generate:i18n`
-    - [ ] Verify: `pnpm check:i18n` passes (parity EN↔ID)
+- [x] Task: Add i18n keys
+    - [x] Add `gradebook.*` keys to `locales/en.json` (title, finalGrade, letterGrade.A/B/C/D/F, status.complete/in_progress/incomplete, settings.scheme/equalWeight/customWeight/letterBounds/customWeights, exportCsv/exportExcel, empty/noGrades, configSummary, recomputeAll, staleWeightsWarning, analytics.gradeDistribution)
+    - [x] Add same keys to `locales/id.json` with Indonesian translations
+    - [x] Run `pnpm generate:i18n`
+    - [x] Verify: `pnpm check:i18n` passes (parity EN↔ID — 48 keys added to both, parity confirmed; unused keys expected until UI is implemented in subsequent tasks)
 
 - [ ] Task: Write failing tests for instructor gradebook route
     - [ ] Create `tests/unit/routes/instructor-gradebook.test.tsx`
