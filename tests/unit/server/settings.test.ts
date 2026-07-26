@@ -81,9 +81,9 @@ describe('Settings schemas', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should reject missing reducedMotion', () => {
+    it('should accept missing reducedMotion (optional for partial updates)', () => {
       const result = UpdateUserSettingsSchema.safeParse({});
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
 
     it('should accept valid notificationPrefs record (TRACK-022)', () => {
