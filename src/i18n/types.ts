@@ -1182,6 +1182,13 @@ export type Translation = {
       saveSuccess: string
       saveError: string
     }
+    student: {
+      finalGrade: string
+      currentProgress: string
+      breakdown: string
+      checkpoint: string
+      score: string
+    }
   }
 }
 

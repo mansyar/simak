@@ -1176,6 +1176,13 @@
       "saving": "Saving...",
       "saveSuccess": "Grade settings saved successfully",
       "saveError": "Failed to save grade settings"
+    },
+    "student": {
+      "finalGrade": "Final Grade",
+      "currentProgress": "Current Progress",
+      "breakdown": "Show Breakdown",
+      "checkpoint": "Checkpoint",
+      "score": "Score"
     }
   }
 }

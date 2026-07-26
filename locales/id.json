@@ -1176,6 +1176,13 @@
       "saving": "Menyimpan...",
       "saveSuccess": "Pengaturan nilai berhasil disimpan",
       "saveError": "Gagal menyimpan pengaturan nilai"
+    },
+    "student": {
+      "finalGrade": "Nilai Akhir",
+      "currentProgress": "Progres Saat Ini",
+      "breakdown": "Tampilkan Rincian",
+      "checkpoint": "Checkpoint",
+      "score": "Skor"
     }
   }
 }

@@ -137,20 +137,20 @@
     - [x] Add "Grade Settings" button to admin template editor or admin analytics page
     - [x] Run `pnpm test` and confirm tests pass
 
-- [ ] Task: Write failing tests for student final grade card
-    - [ ] Create `tests/unit/components/student-final-grade-card.test.tsx`
-    - [ ] Test complete assignment: shows numeric score + letter badge
-    - [ ] Test in_progress assignment: shows current progress score + "in progress" status
-    - [ ] Test incomplete assignment: shows "incomplete" status
-    - [ ] Test collapsible per-checkpoint breakdown
-    - [ ] Test read-only (no edit controls)
-    - [ ] Run `pnpm test` and confirm tests fail
+- [x] Task: Write failing tests for student final grade card
+    - [x] Create `tests/unit/components/student-final-grade-card.test.tsx`
+    - [x] Test complete assignment: shows numeric score + letter badge
+    - [x] Test in_progress assignment: shows current progress score + "in progress" status
+    - [x] Test incomplete assignment: shows "incomplete" status
+    - [x] Test collapsible per-checkpoint breakdown
+    - [x] Test read-only (no edit controls)
+    - [x] Run `pnpm test` and confirm tests fail
 
-- [ ] Task: Implement student final grade card
-    - [ ] Create `src/components/gradebook/StudentFinalGradeCard.tsx` (Card with score + letter Badge, collapsible breakdown)
-    - [ ] Wire to `getStudentFinalGrade` server function
-    - [ ] Mount on `/student/assignments/$id` page
-    - [ ] Run `pnpm test` and confirm tests pass
+- [x] Task: Implement student final grade card
+    - [x] Create `src/components/gradebook/StudentFinalGradeCard.tsx` (Card with score + letter Badge, collapsible breakdown)
+    - [x] Wire to `getStudentFinalGrade` server function
+    - [x] Mount on `/student/assignments/$id` page
+    - [x] Run `pnpm test` and confirm tests pass
 
 - [ ] Task: Write failing tests for admin grade distribution analytics
     - [ ] Create/update `tests/unit/routes/admin-analytics.test.tsx`
