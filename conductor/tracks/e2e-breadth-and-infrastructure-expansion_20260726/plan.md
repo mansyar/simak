@@ -16,13 +16,13 @@
     - [x] Instructor dashboard test: navigate to `/instructor/dashboard`, wait for `networkidle`, verify 4 widgets (pending review queue with SLA badges, recent submissions, assignment overview, at-risk students), assert no console errors.
     - [x] Admin dashboard test: navigate to `/admin/dashboard`, wait for `networkidle`, verify widgets (system metrics, activity feed, deadline escalation alerts, email queue stats), assert no console errors.
     - [x] Verify: `pnpm test:e2e dashboards.spec.ts` passes on Chromium.
-- [ ] Task: Write `tests/e2e/admin-templates.spec.ts` — template CRUD tests
-    - [ ] Create test: admin creates a template (name, type, 3 checkpoints with add/remove/reorder) → verify it appears in the template list.
-    - [ ] Edit test: admin edits the template at `/admin/templates/$templateId` → verify changes persist after reload.
-    - [ ] Duplicate test: admin duplicates the template → verify "(Copy)" suffix appears.
-    - [ ] Delete-blocked test: admin attempts to delete a template in use by an assignment → verify deletion is blocked with usage count.
-    - [ ] Delete-unused test: admin deletes an unused template (type "DELETE" confirmation) → verify it disappears from the list.
-    - [ ] Verify: `pnpm test:e2e admin-templates.spec.ts` passes on Chromium.
+- [x] Task: Write `tests/e2e/admin-templates.spec.ts` — template CRUD tests [977d26b]
+    - [x] Create test: admin creates a template (name, type, 3 checkpoints with add/remove/reorder) → verify it appears in the template list.
+    - [x] Edit test: admin edits the template at `/admin/templates/$templateId` → verify changes persist after reload.
+    - [x] Duplicate test: admin duplicates the template → verify "(Copy)" suffix appears.
+    - [x] Delete-blocked test: admin attempts to delete a template in use by an assignment → verify deletion is blocked with usage count.
+    - [x] Delete-unused test: admin deletes an unused template (type "DELETE" confirmation) → verify it disappears from the list.
+    - [x] Verify: `pnpm test:e2e admin-templates.spec.ts` passes on Chromium.
 - [ ] Task: Verify Phase 1 suite is green and axe scans run without config errors
     - [ ] Run `pnpm test:e2e` — full suite passes on Chromium.
     - [ ] Verify axe scans can be invoked without configuration errors (smoke check of the `@axe-core/playwright` import/usage).
