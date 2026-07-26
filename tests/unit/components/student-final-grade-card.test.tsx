@@ -167,4 +167,18 @@ describe('StudentFinalGradeCard', () => {
     const buttons = container.querySelectorAll('button');
     expect(buttons.length).toBe(1);
   });
+
+  it('uses gradebookKeys.studentFinalGrade(assignmentId) as query key', async () => {
+    (getStudentFinalGrade as any).mockResolvedValue(completeGrade);
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <StudentFinalGradeCard assignmentId={42} />
+      </QueryClientProvider>,
+    );
+    await waitFor(() => {
+      expect(screen.getByText('gradebook.student.finalGrade')).toBeDefined();
+    });
+    expect(queryClient.getQueryData(['gradebook', 'studentFinalGrade', 42])).toEqual(completeGrade);
+  });
 });

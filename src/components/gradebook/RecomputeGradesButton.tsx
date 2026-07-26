@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +14,7 @@ import {
 import { useI18n } from '@/routes/__root';
 import { recomputeAllGrades } from '@/server/gradebook';
 import { isServerError } from '@/lib/errors';
+import { gradebookKeys } from '@/lib/query-keys';
 
 interface RecomputeGradesButtonProps {
   assignmentId: number;
@@ -20,27 +23,26 @@ interface RecomputeGradesButtonProps {
 
 export function RecomputeGradesButton({ assignmentId, isAdmin }: RecomputeGradesButtonProps) {
   const { t } = useI18n();
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+
+  const recomputeMutation = useMutation({
+    mutationFn: async () => {
+      const result = await recomputeAllGrades({ data: { assignmentId } });
+      if (isServerError(result)) throw result;
+      return result;
+    },
+    onSuccess: (result) => {
+      toast.success(t('gradebook.recomputeSuccess', { count: String(result.count) }));
+      queryClient.invalidateQueries({ queryKey: gradebookKeys.studentFinalGrade(assignmentId) });
+      router.invalidate();
+      setOpen(false);
+    },
+    onError: () => toast.error(t('gradebook.recomputeError')),
+  });
 
   if (!isAdmin) return null;
-
-  const handleRecompute = async () => {
-    setLoading(true);
-    try {
-      const result = await recomputeAllGrades({ data: { assignmentId } });
-      if (isServerError(result)) {
-        toast.error(t('gradebook.recomputeError'));
-      } else {
-        toast.success(t('gradebook.recomputeSuccess', { count: String(result.count) }));
-        setOpen(false);
-      }
-    } catch {
-      toast.error(t('gradebook.recomputeError'));
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <>
@@ -62,7 +64,10 @@ export function RecomputeGradesButton({ assignmentId, isAdmin }: RecomputeGrades
             <Button variant="outline" onClick={() => setOpen(false)}>
               {t('common.cancel')}
             </Button>
-            <Button onClick={handleRecompute} loading={loading}>
+            <Button
+              onClick={() => recomputeMutation.mutate()}
+              loading={recomputeMutation.isPending}
+            >
               {t('common.confirm')}
             </Button>
           </DialogFooter>
