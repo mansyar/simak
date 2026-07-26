@@ -1,7 +1,7 @@
 <protect>
 # TRACK-028: E2E Breadth & Infrastructure Expansion — Implementation Plan
 
-## Phase 1: Dashboard + Admin Template Smoke Tests + Config
+## Phase 1: Dashboard + Admin Template Smoke Tests + Config [checkpoint: 647fa9e]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
 - [x] Task: Add `retries: 1` config and `firefox` project to `playwright.config.ts` [f15fcc8]
