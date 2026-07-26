@@ -8,5 +8,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Query-Key Factory Completion & Client Data-Fetching Consistency (TRACK-029)**
-*Link: [./tracks/query-key-factory-completion_20260726/](./tracks/query-key-factory-completion_20260726/)*
