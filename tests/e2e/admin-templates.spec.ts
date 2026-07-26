@@ -40,7 +40,7 @@ test.describe('Admin Template Management', () => {
     await dialog.getByTestId('checkpoint-input-1').fill('Methodology');
     await dialog.getByTestId('checkpoint-input-2').fill('Conclusion');
 
-    await dialog.locator('form').evaluate((form) => form.requestSubmit());
+    await dialog.locator('form').evaluate((form) => (form as HTMLFormElement).requestSubmit());
 
     await page.waitForURL(/\/admin\/templates\/\d+/, { timeout: 15000 });
     await page.waitForLoadState('networkidle');
