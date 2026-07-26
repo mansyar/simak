@@ -8,11 +8,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useI18n } from '@/routes/__root';
-import type {
-  AssignmentGradeConfig,
-  ContributingCheckpoint,
-  FinalGradeResult,
-} from '@/lib/grade-computation';
+import type { ContributingCheckpoint, FinalGradeResult } from '@/lib/grade-computation';
 
 interface StudentGrade {
   studentId: string;
@@ -23,10 +19,9 @@ interface StudentGrade {
 
 interface GradebookTableProps {
   students: StudentGrade[];
-  config: AssignmentGradeConfig | null;
 }
 
-export function GradebookTable({ students, config: _config }: GradebookTableProps) {
+export function GradebookTable({ students }: GradebookTableProps) {
   const { t } = useI18n();
 
   const checkpointCols = new Map<string, number>();

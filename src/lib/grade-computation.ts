@@ -145,6 +145,9 @@ function areCustomWeightsValid(
 ): customWeights is Record<string, number> {
   if (!customWeights) return false;
 
+  // No extra entries for removed checkpoints
+  if (Object.keys(customWeights).length !== checkpoints.length) return false;
+
   // Every checkpoint must have a weight entry
   for (const cp of checkpoints) {
     if (cp.templateCheckpointId === null) return false;
@@ -215,10 +218,10 @@ export function computeFinalGrade(
   if (useCustomWeights && customWeights) {
     // Weighted average using custom weights
     let weightedSum = 0;
-    for (const cp of checkpoints) {
-      const key = String(cp.templateCheckpointId);
+    for (let i = 0; i < checkpoints.length; i++) {
+      const key = String(checkpoints[i].templateCheckpointId);
       const weight = customWeights[key];
-      weightedSum += computeCheckpointScore(cp) * weight;
+      weightedSum += contributingCheckpoints[i].score * weight;
     }
     numericScore = weightedSum / 100;
   } else {

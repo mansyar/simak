@@ -229,12 +229,15 @@ export async function getAssignmentGradebookHandler({ data }: { data: { assignme
 
     const studentMap = groupRowsByStudent(rows);
     const students = Array.from(studentMap.entries()).map(
-      ([studentId, { studentName, checkpoints: cp }]) => ({
-        studentId,
-        studentName,
-        checkpoints: config ? computeFinalGrade(cp, config).contributingCheckpoints : [],
-        finalGrade: config ? computeFinalGrade(cp, config) : null,
-      }),
+      ([studentId, { studentName, checkpoints: cp }]) => {
+        const result = config ? computeFinalGrade(cp, config) : null;
+        return {
+          studentId,
+          studentName,
+          checkpoints: result?.contributingCheckpoints ?? [],
+          finalGrade: result,
+        };
+      },
     );
     students.sort((a, b) => a.studentName.localeCompare(b.studentName));
 
@@ -289,16 +292,20 @@ export async function saveGradeConfigHandler({
         set: { gradingScheme, customWeights, letterGradeBounds, updatedAt: new Date() },
       });
 
-    logAuditEvent({
-      actorId: session.user.id,
-      action: 'gradebook.config_updated',
-      entityType: 'assignment_grade_config',
-      entityId: String(assignmentId),
-      details: {
-        previous: existing[0] ?? null,
-        new: { gradingScheme, customWeights, letterGradeBounds },
-      },
-    });
+    try {
+      await logAuditEvent({
+        actorId: session.user.id,
+        action: 'gradebook.config_updated',
+        entityType: 'assignment_grade_config',
+        entityId: String(assignmentId),
+        details: {
+          previous: existing[0] ?? null,
+          new: { gradingScheme, customWeights, letterGradeBounds },
+        },
+      });
+    } catch (auditErr) {
+      console.error('Audit log failed after successful config save:', auditErr);
+    }
 
     return { success: true };
   } catch (err) {
@@ -355,36 +362,38 @@ export async function recomputeAllGradesHandler({ data }: { data: { assignmentId
 
     const studentMap = groupRowsByStudent(rows);
     let count = 0;
-    for (const { studentId } of students) {
-      const checkpointInputs = studentMap.get(studentId)?.checkpoints ?? [];
-      const result = computeFinalGrade(checkpointInputs, config);
-      const numericScore = result.numericScore !== null ? String(result.numericScore) : null;
+    await db.transaction(async (tx) => {
+      for (const { studentId } of students) {
+        const checkpointInputs = studentMap.get(studentId)?.checkpoints ?? [];
+        const result = computeFinalGrade(checkpointInputs, config);
+        const numericScore = result.numericScore !== null ? String(result.numericScore) : null;
 
-      await db
-        .insert(finalGrades)
-        .values({
-          assignmentId,
-          studentId,
-          numericScore,
-          letterGrade: result.letterGrade,
-          status: result.status,
-          contributingCheckpoints: result.contributingCheckpoints,
-          computedAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .onConflictDoUpdate({
-          target: [finalGrades.assignmentId, finalGrades.studentId],
-          set: {
+        await tx
+          .insert(finalGrades)
+          .values({
+            assignmentId,
+            studentId,
             numericScore,
             letterGrade: result.letterGrade,
             status: result.status,
             contributingCheckpoints: result.contributingCheckpoints,
             computedAt: new Date(),
             updatedAt: new Date(),
-          },
-        });
-      count++;
-    }
+          })
+          .onConflictDoUpdate({
+            target: [finalGrades.assignmentId, finalGrades.studentId],
+            set: {
+              numericScore,
+              letterGrade: result.letterGrade,
+              status: result.status,
+              contributingCheckpoints: result.contributingCheckpoints,
+              computedAt: new Date(),
+              updatedAt: new Date(),
+            },
+          });
+        count++;
+      }
+    });
 
     return { success: true, count };
   } catch (err) {

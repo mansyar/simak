@@ -95,7 +95,7 @@ function GradebookPage() {
           </Button>
         )}
       </div>
-      <GradebookTable students={data.students} config={data.config} />
+      <GradebookTable students={data.students} />
       {data.isAdmin && (
         <GradeSettingsDialog
           open={settingsOpen}
