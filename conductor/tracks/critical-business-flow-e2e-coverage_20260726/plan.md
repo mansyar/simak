@@ -72,7 +72,7 @@
     - [x] Run affected specs and verify they pass
 - [x] Task: Final verification — full suite green, runtime, flakiness, quality gates [acfe53c]
     - [x] Run `pnpm test:e2e` — all tests pass; full suite runtime ≤ 3 minutes — 31 passed (2.2m)
-    - [ ] Run the full e2e suite 3 consecutive times — confirm no flaky tests
+    - [x] Run the full e2e suite 3 consecutive times — confirm no flaky tests — 31 passed ×3 (2.2m, 2.5m, 2.1m)
     - [x] Run `pnpm test:unit` — all existing unit tests still pass (3567 pass, 4 XLSX pre-existing failures)
     - [x] Run `pnpm typecheck` — clean
     - [x] Run `pnpm check:i18n` — parity maintained (739 used, 919 in en/id)
