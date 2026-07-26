@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan: TRACK-027 — Critical Business Flow E2E Coverage
 
 > **Methodology:** TDD per `conductor/workflow.md`. For an E2E test track, the test spec IS the deliverable — the Red→Green cycle is "write the spec → run it (fails if the app misbehaves or the spec is wrong) → fix until green." Seed/decoupling work is verified by re-running the seed and confirming existing specs stay green. Each phase ends with the mandatory Phase Completion Verification & Checkpointing Protocol.
@@ -6,6 +7,7 @@
 
 ## Phase 1: Seed Data Expansion + Test Decoupling
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor context before implementing this phase
 - [ ] Task: Expand `scripts/seed-e2e.ts` with new seed data (FR8)
     - [ ] Add `student2@e2e.test` enrolled in the existing assignment (for multi-student review queue scenarios)
     - [ ] Add `student3@e2e.test` NOT enrolled in any assignment (for cross-student access denial tests)
@@ -25,6 +27,7 @@
 
 ## Phase 2: Critical Flow Specs — Consultation, Extension, Password Setup
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor context before implementing this phase
 - [ ] Task: Create `tests/e2e/consultation.spec.ts` (FR1)
     - [ ] Write consultation logging test (student logs consultation → "pending" badge in ConsultationList → instructor verification queue on `/instructor/assignments/$id` → instructor verifies via VerificationDialog → state transitions to "verified" in DB → count increments in ConsultationProgress)
     - [ ] Write consultation rejection test (instructor rejects a second consultation with a reason → "rejected" badge appears)
@@ -49,6 +52,7 @@
 
 ## Phase 3: Notification Assertions, Upload UI, Negative Cases
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor context before implementing this phase
 - [ ] Task: Add notification delivery assertions to existing specs (FR4)
     - [ ] `student-submission.spec.ts`: after submission, log in as instructor, verify notification badge count incremented and `submission_received` notification item appears in NotificationCenter
     - [ ] `instructor-review.spec.ts`: after Pass review, log in as student, verify `review_completed` notification appears
@@ -74,3 +78,4 @@
     - [ ] Run `pnpm check:i18n` — parity maintained
     - [ ] Verify all new test files ≤ 500 lines (`scripts/check-modularity.js`)
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Notification Assertions, Upload UI, Negative Cases' (Protocol in workflow.md)
+</protect>

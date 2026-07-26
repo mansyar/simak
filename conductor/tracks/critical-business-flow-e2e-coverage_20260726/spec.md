@@ -1,3 +1,4 @@
+<protect>
 # Track: TRACK-027 — Critical Business Flow E2E Coverage
 
 ## Metadata
@@ -109,3 +110,4 @@ This track closes the P0 gaps in untested core flows. It is paired with TRACK-02
 - 2FA login flow e2e (deferred to TRACK-028 — requires TOTP secret seeding).
 - Email delivery verification (Resend API mocking — separate concern if needed).
 - Performance/load testing (separate concern).
+</protect>
