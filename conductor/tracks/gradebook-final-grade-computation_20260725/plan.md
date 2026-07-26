@@ -84,9 +84,9 @@
     - [x] Add `exportGradebookCsvHandler` to `src/server/analytics-export.server.ts` (admin-only, per-assignment, uses existing private `escapeCsvValue` + `buildCsv`, dynamic checkpoint columns)
     - [x] Run `pnpm test` and confirm tests pass
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Server Functions & Grade Recomputation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Server Functions & Grade Recomputation' (Protocol in workflow.md)
 
-## Phase 3: UI, Export & i18n
+## Phase 3: UI, Export & i18n [checkpoint: 15742107]
 
 - [x] Task: Read spec.md and workflow.md to re-establish context before implementation
     - [x] Read `conductor/tracks/gradebook-final-grade-computation_20260725/spec.md`
@@ -176,5 +176,5 @@
     - [x] Run `pnpm check:i18n` — confirm parity (927=927, 0 unused keys)
     - [x] Verify all files ≤500 lines (`check-modularity.js`)
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: UI, Export & i18n' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: UI, Export & i18n' (Protocol in workflow.md)
 </protect>
