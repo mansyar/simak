@@ -37,7 +37,7 @@
     - [x] Run `pnpm typecheck` — confirm no type errors
     - [x] Grep `src/components/settings/` for `queryKey: ['` — confirm zero matches
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Query-Key Factory Completion + Settings Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Query-Key Factory Completion + Settings Migration' (Protocol in workflow.md) [checkpoint: 3b6cfd87]
 
 ## Phase 2: Gradebook TanStack Query Migration
 
