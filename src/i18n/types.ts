@@ -1170,6 +1170,18 @@ export type Translation = {
     exportExcel: string
     loading: string
     loadError: string
+    settings: {
+      title: string
+      scheme: string
+      equalWeight: string
+      customWeight: string
+      letterBounds: string
+      customWeights: string
+      save: string
+      saving: string
+      saveSuccess: string
+      saveError: string
+    }
   }
 }
 

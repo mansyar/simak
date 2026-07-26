@@ -1164,6 +1164,18 @@
     "exportCsv": "Ekspor CSV",
     "exportExcel": "Ekspor Excel",
     "loading": "Memuat buku nilai...",
-    "loadError": "Gagal memuat buku nilai"
+    "loadError": "Gagal memuat buku nilai",
+    "settings": {
+      "title": "Pengaturan Nilai",
+      "scheme": "Skema Penilaian",
+      "equalWeight": "Bobot Sama",
+      "customWeight": "Bobot Kustom",
+      "letterBounds": "Batas Nilai Huruf",
+      "customWeights": "Bobot Kustom",
+      "save": "Simpan",
+      "saving": "Menyimpan...",
+      "saveSuccess": "Pengaturan nilai berhasil disimpan",
+      "saveError": "Gagal menyimpan pengaturan nilai"
+    }
   }
 }

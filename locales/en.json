@@ -1164,6 +1164,18 @@
     "exportCsv": "Export CSV",
     "exportExcel": "Export Excel",
     "loading": "Loading gradebook...",
-    "loadError": "Failed to load gradebook"
+    "loadError": "Failed to load gradebook",
+    "settings": {
+      "title": "Grade Settings",
+      "scheme": "Grading Scheme",
+      "equalWeight": "Equal Weight",
+      "customWeight": "Custom Weight",
+      "letterBounds": "Letter Grade Bounds",
+      "customWeights": "Custom Weights",
+      "save": "Save",
+      "saving": "Saving...",
+      "saveSuccess": "Grade settings saved successfully",
+      "saveError": "Failed to save grade settings"
+    }
   }
 }

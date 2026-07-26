@@ -121,21 +121,21 @@
     - [x] Changed instructor layout `requireRole` to include admin/superadmin
     - [x] Run `pnpm test` and confirm tests pass
 
-- [ ] Task: Write failing tests for admin grade settings dialog
-    - [ ] Create `tests/unit/components/gradebook-settings-dialog.test.tsx`
-    - [ ] Test scheme Select (equal_weight / custom_weight)
-    - [ ] Test custom weight Inputs appear only when `custom_weight` selected
-    - [ ] Test letter bound Inputs
-    - [ ] Test validation: custom weights must sum to 100 (error shown if not)
-    - [ ] Test save calls `saveGradeConfig` server function
-    - [ ] Run `pnpm test` and confirm tests fail
+- [x] Task: Write failing tests for admin grade settings dialog
+    - [x] Create `tests/unit/components/gradebook-settings-dialog.test.tsx`
+    - [x] Test scheme Select (equal_weight / custom_weight)
+    - [x] Test custom weight Inputs appear only when `custom_weight` selected
+    - [x] Test letter bound Inputs
+    - [x] Test validation: custom weights must sum to 100 (error shown if not)
+    - [x] Test save calls `saveGradeConfig` server function
+    - [x] Run `pnpm test` and confirm tests fail
 
-- [ ] Task: Implement admin grade settings dialog
-    - [ ] Create `src/components/gradebook/GradeSettingsDialog.tsx` (Select for scheme, conditional Inputs for custom weights, Inputs for letter bounds)
-    - [ ] Use react-hook-form + Zod resolver (matching existing form patterns)
-    - [ ] Wire to `saveGradeConfig` server function
-    - [ ] Add "Grade Settings" button to admin template editor or admin analytics page
-    - [ ] Run `pnpm test` and confirm tests pass
+- [x] Task: Implement admin grade settings dialog
+    - [x] Create `src/components/gradebook/GradeSettingsDialog.tsx` (Select for scheme, conditional Inputs for custom weights, Inputs for letter bounds)
+    - [x] Use react-hook-form + Zod resolver (matching existing form patterns)
+    - [x] Wire to `saveGradeConfig` server function
+    - [x] Add "Grade Settings" button to admin template editor or admin analytics page
+    - [x] Run `pnpm test` and confirm tests pass
 
 - [ ] Task: Write failing tests for student final grade card
     - [ ] Create `tests/unit/components/student-final-grade-card.test.tsx`
