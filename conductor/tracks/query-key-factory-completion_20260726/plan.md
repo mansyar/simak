@@ -71,34 +71,37 @@
 
 ## Phase 3: Full Audit + Final Verification
 
-- [ ] Task: Read `spec.md` and `workflow.md` to ground implementation context
-    - [ ] Re-read `conductor/tracks/query-key-factory-completion_20260726/spec.md`
-    - [ ] Re-read `conductor/workflow.md` (TDD lifecycle, Phase Completion Verification & Checkpointing Protocol)
+- [x] Task: Read `spec.md` and `workflow.md` to ground implementation context
+    - [x] Re-read `conductor/tracks/query-key-factory-completion_20260726/spec.md`
+    - [x] Re-read `conductor/workflow.md` (TDD lifecycle, Phase Completion Verification & Checkpointing Protocol)
 
-- [ ] Task: Audit all `src/**/*.tsx` files for remaining inline query keys
-    - [ ] Grep for `queryKey: ['` across all `.tsx` files in `src/`
-    - [ ] Document all found instances and their domains
-    - [ ] For each found inline key, determine the appropriate factory domain (add new factory entries to `query-keys.ts` if needed)
+- [x] Task: Audit all `src/**/*.tsx` files for remaining inline query keys
+    - [x] Grep for `queryKey: ['` across all `.tsx` files in `src/`
+    - [x] Document all found instances and their domains
+    - [x] For each found inline key, determine the appropriate factory domain (add new factory entries to `query-keys.ts` if needed)
+    - [x] Result: ZERO inline query keys found — all `queryKey:` usages already use factory function calls across all 9 domains
 
-- [ ] Task: Write tests for any newly discovered inline-key migrations
-    - [ ] For each additional domain found in the audit, write/update tests asserting factory key usage
-    - [ ] Run `pnpm test` — confirm tests fail for un-migrated components
+- [x] Task: Write tests for any newly discovered inline-key migrations
+    - [x] For each additional domain found in the audit, write/update tests asserting factory key usage
+    - [x] Run `pnpm test` — confirm tests fail for un-migrated components
+    - [x] Result: No-op — no newly discovered inline keys to write tests for
 
-- [ ] Task: Migrate all remaining inline keys to factory calls
-    - [ ] Replace each found inline `queryKey: ['...']` with appropriate factory call
-    - [ ] Update all associated `queryClient.invalidateQueries` calls to use factory keys
-    - [ ] If a key is intentionally inline (one-off query), add a code comment documenting the exception
-    - [ ] Run `pnpm test` — confirm all tests pass
-    - [ ] Run `pnpm typecheck` — confirm no type errors
-    - [ ] Grep `src/**/*.tsx` for `queryKey: ['` — confirm zero matches (excluding documented exceptions)
+- [x] Task: Migrate all remaining inline keys to factory calls
+    - [x] Replace each found inline `queryKey: ['...']` with appropriate factory call
+    - [x] Update all associated `queryClient.invalidateQueries` calls to use factory keys
+    - [x] If a key is intentionally inline (one-off query), add a code comment documenting the exception
+    - [x] Run `pnpm test` — confirm all tests pass
+    - [x] Run `pnpm typecheck` — confirm no type errors
+    - [x] Grep `src/**/*.tsx` for `queryKey: ['` — confirm zero matches (excluding documented exceptions)
+    - [x] Result: No-op — no remaining inline keys to migrate
 
-- [ ] Task: Run full quality gate suite
-    - [ ] Run `pnpm test:coverage` — confirm ≥80% on all thresholds (lines/stmts/branches/funcs)
-    - [ ] Run `pnpm typecheck` — confirm clean
-    - [ ] Run `pnpm lint` — confirm 0 warnings, 0 errors
-    - [ ] Run `pnpm check:i18n` — confirm EN↔ID parity maintained
-    - [ ] Verify all files under 500 lines (`node scripts/check-modularity.js`)
-    - [ ] Verify pre-push gate passes (`pnpm typecheck && pnpm vitest run --coverage`)
+- [x] Task: Run full quality gate suite
+    - [x] Run `pnpm test:coverage` — confirm ≥80% on all thresholds (lines/stmts/branches/funcs)
+    - [x] Run `pnpm typecheck` — confirm clean
+    - [x] Run `pnpm lint` — confirm 0 warnings, 0 errors
+    - [x] Run `pnpm check:i18n` — confirm EN↔ID parity maintained
+    - [x] Verify all files under 500 lines (`node scripts/check-modularity.js`)
+    - [x] Verify pre-push gate passes (`pnpm typecheck && pnpm vitest run --coverage`)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Full Audit + Final Verification' (Protocol in workflow.md)
 </protect>
