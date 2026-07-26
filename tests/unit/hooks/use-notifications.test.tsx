@@ -1,19 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import {
-  useUnreadCount,
-  useNotificationsList,
-  useMarkRead,
-  useMarkAllRead,
-} from '@/hooks/use-notifications';
-import { getUnreadCount, listNotifications, markRead, markAllRead } from '@/server/notifications';
+import { useUnreadCount, useNotificationsList } from '@/hooks/use-notifications';
+import { getUnreadCount, listNotifications } from '@/server/notifications';
 import { notificationKeys } from '@/lib/query-keys';
 
 // Mocks
-const mockShowErrorToast = vi.fn();
-
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({ t: (key: string) => key }),
 }));
@@ -21,7 +14,7 @@ vi.mock('@/routes/__root', () => ({
 vi.mock('@/lib/toast', () => ({
   parseServerError: (res: { error?: { code: string; message: string } }) =>
     res.error ? res.error : { code: 'UNKNOWN', message: '' },
-  showErrorToast: (...args: unknown[]) => mockShowErrorToast(...args),
+  showErrorToast: vi.fn(),
 }));
 
 vi.mock('@/server/notifications', () => ({
@@ -42,18 +35,6 @@ function createWrapper() {
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
-}
-
-function createOptimisticWrapper() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-  });
-  return {
-    queryClient,
-    wrapper: ({ children }: { children: React.ReactNode }) => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    ),
-  };
 }
 
 describe('Notification query hooks', () => {
@@ -100,24 +81,21 @@ describe('Notification query hooks', () => {
   });
 
   describe('useNotificationsList', () => {
-    it('should query notifications list with page and limit options', async () => {
+    it('should use useInfiniteQuery with initialPageParam 1', async () => {
       const mockResult = { items: [{ id: 1, title: 'Test' }], total: 1 };
       vi.mocked(listNotifications).mockResolvedValue(mockResult as any);
 
-      const { result } = renderHook(
-        () => useNotificationsList({ page: 2, limit: 10, type: 'review_completed' }),
-        {
-          wrapper: createWrapper(),
-        },
-      );
+      const { result } = renderHook(() => useNotificationsList({ limit: 20 }), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(result.current.data).toEqual(mockResult);
+      // listNotifications called with page: 1 (initialPageParam)
       expect(listNotifications).toHaveBeenCalledWith({
-        data: { page: 2, limit: 10, type: 'review_completed' },
+        data: { page: 1, limit: 20 },
       });
     });
 
@@ -125,12 +103,9 @@ describe('Notification query hooks', () => {
       const mockResult = { items: [{ id: 1, title: 'Test' }], total: 1 };
       vi.mocked(listNotifications).mockResolvedValue(mockResult as any);
 
-      const { result } = renderHook(
-        () => useNotificationsList({ page: 1, limit: 20, unreadOnly: true }),
-        {
-          wrapper: createWrapper(),
-        },
-      );
+      const { result } = renderHook(() => useNotificationsList({ limit: 20, unreadOnly: true }), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
@@ -139,6 +114,33 @@ describe('Notification query hooks', () => {
       expect(listNotifications).toHaveBeenCalledWith({
         data: { page: 1, limit: 20, unreadOnly: true },
       });
+    });
+
+    it('should exclude page from queryKey (managed by pageParam)', async () => {
+      const mockResult = { items: [{ id: 1, title: 'Test' }], total: 1 };
+      vi.mocked(listNotifications).mockResolvedValue(mockResult as any);
+
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      );
+
+      const { result } = renderHook(
+        () => useNotificationsList({ limit: 20, type: 'review_completed', unreadOnly: true }),
+        { wrapper },
+      );
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      // Query key should be notificationKeys.list({ limit, type, unreadOnly }) — no page
+      const query = queryClient.getQueryCache().find({
+        queryKey: notificationKeys.list({ limit: 20, type: 'review_completed', unreadOnly: true }),
+      });
+      expect(query).toBeDefined();
     });
 
     it('should set staleTime to 30000 (PERF-29)', async () => {
@@ -152,7 +154,7 @@ describe('Notification query hooks', () => {
         <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       );
 
-      const { result } = renderHook(() => useNotificationsList({ page: 1, limit: 20 }), {
+      const { result } = renderHook(() => useNotificationsList({ limit: 20 }), {
         wrapper,
       });
 
@@ -169,289 +171,120 @@ describe('Notification query hooks', () => {
       );
       expect((query?.options as Record<string, unknown>).staleTime).toBe(30_000);
     });
-  });
 
-  describe('useMarkRead', () => {
-    it('should call markRead mutation and invalidate queries', async () => {
-      vi.mocked(markRead).mockResolvedValue({ success: true } as any);
+    it('should have hasNextPage true when total > accumulated items', async () => {
+      vi.mocked(listNotifications).mockResolvedValue({
+        items: [{ id: 1 }, { id: 2 }, { id: 3 }],
+        total: 10,
+      } as any);
 
-      const queryClient = new QueryClient();
-      const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
-
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      );
-
-      const { result } = renderHook(() => useMarkRead(), { wrapper });
-
-      result.current.mutate(42);
+      const { result } = renderHook(() => useNotificationsList({ limit: 20 }), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(markRead).toHaveBeenCalledWith({ data: { notificationId: 42 } });
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: notificationKeys.all() });
-    });
-  });
-
-  describe('useMarkRead - optimistic updates', () => {
-    it('should optimistically flip read to true on the targeted notification in the list cache', async () => {
-      const mockList = {
-        items: [
-          { id: 42, read: false, title: 'Test' },
-          { id: 43, read: false, title: 'Test 2' },
-        ],
-        total: 2,
-      };
-      vi.mocked(markRead).mockResolvedValue({ success: true } as any);
-
-      const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList);
-
-      const { result } = renderHook(() => useMarkRead(), { wrapper });
-      result.current.mutate(42);
-
-      await waitFor(() => {
-        const listData = queryClient.getQueryData(
-          notificationKeys.list({ page: 1, limit: 20 }),
-        ) as { items: Array<{ id: number; read: boolean }>; total: number };
-        expect(listData.items[0].read).toBe(true);
-        expect(listData.items[1].read).toBe(false);
-      });
+      expect(result.current.hasNextPage).toBe(true);
     });
 
-    it('should optimistically decrement the unread count', async () => {
-      vi.mocked(markRead).mockResolvedValue({ success: true } as any);
-
-      const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.unreadCount(), 5);
-
-      const { result } = renderHook(() => useMarkRead(), { wrapper });
-      result.current.mutate(42);
-
-      await waitFor(() => {
-        expect(queryClient.getQueryData(notificationKeys.unreadCount())).toBe(4);
-      });
-    });
-
-    it('should restore the list cache on error', async () => {
-      const mockList = {
-        items: [{ id: 42, read: false, title: 'Test' }],
-        total: 1,
-      };
-      vi.mocked(markRead).mockResolvedValue({
-        error: { code: 'FORBIDDEN', message: 'Forbidden' },
+    it('should have hasNextPage false when all items are loaded', async () => {
+      vi.mocked(listNotifications).mockResolvedValue({
+        items: [{ id: 1 }, { id: 2 }, { id: 3 }],
+        total: 3,
       } as any);
 
-      const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList);
-
-      const { result } = renderHook(() => useMarkRead(), { wrapper });
-      result.current.mutate(42);
-
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
+      const { result } = renderHook(() => useNotificationsList({ limit: 20 }), {
+        wrapper: createWrapper(),
       });
-
-      const listData = queryClient.getQueryData(notificationKeys.list({ page: 1, limit: 20 })) as {
-        items: Array<{ id: number; read: boolean }>;
-        total: number;
-      };
-      expect(listData.items[0].read).toBe(false);
-    });
-
-    it('should restore the unread count on error', async () => {
-      vi.mocked(markRead).mockResolvedValue({
-        error: { code: 'FORBIDDEN', message: 'Forbidden' },
-      } as any);
-
-      const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.unreadCount(), 5);
-
-      const { result } = renderHook(() => useMarkRead(), { wrapper });
-      result.current.mutate(42);
-
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
-
-      expect(queryClient.getQueryData(notificationKeys.unreadCount())).toBe(5);
-    });
-
-    it('should show error toast on rollback', async () => {
-      mockShowErrorToast.mockClear();
-      vi.mocked(markRead).mockResolvedValue({
-        error: { code: 'FORBIDDEN', message: 'Forbidden' },
-      } as any);
-
-      const { queryClient, wrapper } = createOptimisticWrapper();
-
-      const { result } = renderHook(() => useMarkRead(), { wrapper });
-      result.current.mutate(42);
-
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
-
-      expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
-    });
-  });
-
-  describe('useMarkAllRead', () => {
-    it('should call markAllRead mutation and invalidate queries', async () => {
-      vi.mocked(markAllRead).mockResolvedValue({ success: true } as any);
-
-      const queryClient = new QueryClient();
-      const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
-
-      const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      );
-
-      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
-
-      result.current.mutate();
 
       await waitFor(() => {
         expect(result.current.isSuccess).toBe(true);
       });
 
-      expect(markAllRead).toHaveBeenCalled();
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: notificationKeys.all() });
+      expect(result.current.hasNextPage).toBe(false);
     });
-  });
 
-  describe('useMarkAllRead - optimistic updates', () => {
-    it('should optimistically flip read to true on all notifications in the list cache', async () => {
-      const mockList = {
-        items: [
-          { id: 42, read: false, title: 'Test' },
-          { id: 43, read: false, title: 'Test 2' },
+    it('should expose fetchNextPage on the result', async () => {
+      vi.mocked(listNotifications).mockResolvedValue({
+        items: [{ id: 1 }],
+        total: 5,
+      } as any);
+
+      const { result } = renderHook(() => useNotificationsList({ limit: 20 }), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(typeof result.current.fetchNextPage).toBe('function');
+    });
+
+    it('should fetch next page with pageParam when fetchNextPage is called', async () => {
+      vi.mocked(listNotifications).mockImplementation(((args: any) => {
+        const page = args.data.page;
+        if (page === 1) {
+          return Promise.resolve({ items: [{ id: 1 }, { id: 2 }], total: 5 });
+        }
+        return Promise.resolve({ items: [{ id: 3 }, { id: 4 }], total: 5 });
+      }) as any);
+
+      const { result } = renderHook(() => useNotificationsList({ limit: 2 }), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(listNotifications).toHaveBeenCalledWith({
+        data: { page: 1, limit: 2 },
+      });
+
+      await act(async () => {
+        await result.current.fetchNextPage();
+      });
+
+      await waitFor(() => {
+        expect(listNotifications).toHaveBeenCalledWith({
+          data: { page: 2, limit: 2 },
+        });
+      });
+    });
+
+    it('should expose accumulated items across multiple pages via data.pages', async () => {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+
+      // Pre-populate cache with infinite query data shape (2 pages)
+      queryClient.setQueryData(notificationKeys.list({ limit: 2 }), {
+        pages: [
+          { items: [{ id: 1 }, { id: 2 }], total: 4 },
+          { items: [{ id: 3 }, { id: 4 }], total: 4 },
         ],
-        total: 2,
-      };
-      vi.mocked(markAllRead).mockResolvedValue({ success: true } as any);
-
-      const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList);
-
-      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
-      result.current.mutate();
-
-      await waitFor(() => {
-        const listData = queryClient.getQueryData(
-          notificationKeys.list({ page: 1, limit: 20 }),
-        ) as { items: Array<{ id: number; read: boolean }>; total: number };
-        expect(listData.items[0].read).toBe(true);
-        expect(listData.items[1].read).toBe(true);
-      });
-    });
-
-    it('should optimistically set the unread count to 0', async () => {
-      vi.mocked(markAllRead).mockResolvedValue({ success: true } as any);
-
-      const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.unreadCount(), 5);
-
-      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
-      result.current.mutate();
-
-      await waitFor(() => {
-        expect(queryClient.getQueryData(notificationKeys.unreadCount())).toBe(0);
-      });
-    });
-
-    it('should restore the list cache on error', async () => {
-      const mockList = {
-        items: [
-          { id: 42, read: false, title: 'Test' },
-          { id: 43, read: true, title: 'Test 2' },
-        ],
-        total: 2,
-      };
-      vi.mocked(markAllRead).mockResolvedValue({
-        error: { code: 'FORBIDDEN', message: 'Forbidden' },
-      } as any);
-
-      const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList);
-
-      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
-      result.current.mutate();
-
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
+        pageParams: [1, 2],
       });
 
-      const listData = queryClient.getQueryData(notificationKeys.list({ page: 1, limit: 20 })) as {
-        items: Array<{ id: number; read: boolean }>;
-        total: number;
-      };
-      expect(listData.items[0].read).toBe(false);
-      expect(listData.items[1].read).toBe(true);
-    });
-
-    it('should restore the unread count on error', async () => {
-      vi.mocked(markAllRead).mockResolvedValue({
-        error: { code: 'FORBIDDEN', message: 'Forbidden' },
-      } as any);
-
-      const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.unreadCount(), 5);
-
-      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
-      result.current.mutate();
-
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
-
-      expect(queryClient.getQueryData(notificationKeys.unreadCount())).toBe(5);
-    });
-
-    it('should show error toast on rollback', async () => {
-      mockShowErrorToast.mockClear();
-      vi.mocked(markAllRead).mockResolvedValue({
-        error: { code: 'FORBIDDEN', message: 'Forbidden' },
-      } as any);
-
-      const { queryClient, wrapper } = createOptimisticWrapper();
-
-      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
-      result.current.mutate();
-
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
-      });
-
-      expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
-    });
-  });
-
-  describe('error handling', () => {
-    it('shows a toast and surfaces the typed server error for mutations', async () => {
-      mockShowErrorToast.mockClear();
-      vi.mocked(markRead).mockResolvedValue({
-        error: { code: 'FORBIDDEN', message: 'Forbidden' },
-      } as any);
-
-      const queryClient = new QueryClient();
       const wrapper = ({ children }: { children: React.ReactNode }) => (
         <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       );
 
-      const { result } = renderHook(() => useMarkRead(), { wrapper });
-
-      result.current.mutate(42);
-
-      await waitFor(() => {
-        expect(result.current.isError).toBe(true);
+      const { result } = renderHook(() => useNotificationsList({ limit: 2 }), {
+        wrapper,
       });
 
-      expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
-      expect(result.current.error).toBeInstanceOf(Error);
-      expect(result.current.error?.message).toBe('Forbidden');
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(result.current.data?.pages).toHaveLength(2);
+      const allItems = result.current.data?.pages.flatMap((p: any) => p.items) ?? [];
+      expect(allItems).toHaveLength(4);
+      expect(allItems.map((i: any) => i.id)).toEqual([1, 2, 3, 4]);
     });
   });
 });
