@@ -11,11 +11,11 @@
 - [x] Task: Install `@axe-core/playwright` devDependency [f15fcc8]
     - [x] Run `pnpm add -D @axe-core/playwright`.
     - [x] Verify: dependency appears in `package.json` devDependencies, `pnpm install` succeeds.
-- [ ] Task: Write `tests/e2e/dashboards.spec.ts` — 3 role dashboard smoke tests
-    - [ ] Student dashboard test: navigate to `/student/dashboard`, wait for `networkidle`, verify 4 widgets render (active assignments, upcoming deadlines, pending reviews, consultation reminders), assert key seed data visible ("E2E Test Assignment"), assert no console errors.
-    - [ ] Instructor dashboard test: navigate to `/instructor/dashboard`, wait for `networkidle`, verify 4 widgets (pending review queue with SLA badges, recent submissions, assignment overview, at-risk students), assert no console errors.
-    - [ ] Admin dashboard test: navigate to `/admin/dashboard`, wait for `networkidle`, verify widgets (system metrics, activity feed, deadline escalation alerts, email queue stats), assert no console errors.
-    - [ ] Verify: `pnpm test:e2e dashboards.spec.ts` passes on Chromium.
+- [x] Task: Write `tests/e2e/dashboards.spec.ts` — 3 role dashboard smoke tests [5a8449]
+    - [x] Student dashboard test: navigate to `/student/dashboard`, wait for `networkidle`, verify 4 widgets render (active assignments, upcoming deadlines, pending reviews, consultation reminders), assert key seed data visible ("E2E Test Assignment"), assert no console errors.
+    - [x] Instructor dashboard test: navigate to `/instructor/dashboard`, wait for `networkidle`, verify 4 widgets (pending review queue with SLA badges, recent submissions, assignment overview, at-risk students), assert no console errors.
+    - [x] Admin dashboard test: navigate to `/admin/dashboard`, wait for `networkidle`, verify widgets (system metrics, activity feed, deadline escalation alerts, email queue stats), assert no console errors.
+    - [x] Verify: `pnpm test:e2e dashboards.spec.ts` passes on Chromium.
 - [ ] Task: Write `tests/e2e/admin-templates.spec.ts` — template CRUD tests
     - [ ] Create test: admin creates a template (name, type, 3 checkpoints with add/remove/reorder) → verify it appears in the template list.
     - [ ] Edit test: admin edits the template at `/admin/templates/$templateId` → verify changes persist after reload.
