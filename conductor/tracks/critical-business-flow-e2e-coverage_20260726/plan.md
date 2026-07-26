@@ -7,20 +7,20 @@
 
 ## Phase 1: Seed Data Expansion + Test Decoupling
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor context before implementing this phase
-- [ ] Task: Expand `scripts/seed-e2e.ts` with new seed data (FR8)
-    - [ ] Add `student2@e2e.test` enrolled in the existing assignment (for multi-student review queue scenarios)
-    - [ ] Add `student3@e2e.test` NOT enrolled in any assignment (for cross-student access denial tests)
-    - [ ] Add one pending consultation on the Proposal checkpoint for the instructor verification queue
-    - [ ] Run the seed script and verify it completes without errors
-    - [ ] Verify backward compatibility: run existing specs and confirm they still pass
-- [ ] Task: Decouple `tests/e2e/instructor-review.spec.ts` (FR7)
-    - [ ] Refactor each of the 4 tests to set up its own submission state via the `createSubmissionForCheckpoint` DB helper
-    - [ ] Remove the implicit order dependency (Revise test no longer relies on the Pass test having unlocked Chapter 1)
-    - [ ] Run each test independently via `--grep` and verify each passes in isolation
-- [ ] Task: Update unit test mocks for seed script changes
-    - [ ] Run `pnpm test:unit` and fix any unit test mocks broken by the seed script changes
-    - [ ] Run `pnpm typecheck` and verify clean
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-anchor context before implementing this phase
+- [x] Task: Expand `scripts/seed-e2e.ts` with new seed data (FR8) [46c0641]
+    - [x] Add `student2@e2e.test` enrolled in the existing assignment (for multi-student review queue scenarios)
+    - [x] Add `student3@e2e.test` NOT enrolled in any assignment (for cross-student access denial tests)
+    - [x] Add one pending consultation on the Proposal checkpoint for the instructor verification queue
+    - [x] Run the seed script and verify it completes without errors
+    - [x] Verify backward compatibility: run existing specs and confirm they still pass
+- [x] Task: Decouple `tests/e2e/instructor-review.spec.ts` (FR7) [46c0641]
+    - [x] Refactor each of the 4 tests to set up its own submission state via the `createSubmissionForCheckpoint` DB helper
+    - [x] Remove the implicit order dependency (Revise test no longer relies on the Pass test having unlocked Chapter 1)
+    - [x] Run each test independently via `--grep` and verify each passes in isolation
+- [x] Task: Update unit test mocks for seed script changes [46c0641]
+    - [x] Run `pnpm test:unit` and fix any unit test mocks broken by the seed script changes (3607 tests pass)
+    - [x] Run `pnpm typecheck` and verify clean
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Seed Data Expansion + Test Decoupling' (Protocol in workflow.md)
 
 ---
