@@ -118,13 +118,14 @@
     - [x] Run `pnpm test` — confirm tests pass
     - **Commits:** `f85e7a95` — feat(email): Add sendDiscussionReplyEmail helper wrapping enqueueEventEmail, `b680d059` — feat(server): Wire postDiscussionMessageHandler to use sendDiscussionReplyEmail
 
-- [ ] Task: Add i18n keys to both locales
-    - [ ] Add `discussions.*` keys to `locales/en.json`: `title`, `placeholder`, `send`, `reply`, `delete`, `deleted`, `empty.title`, `empty.description`, `deleteWindowExpired`, `loading`
-    - [ ] Add same keys to `locales/id.json` with Indonesian translations
-    - [ ] Add `notifications.events.discussion_reply.title`/`.message` to both locales (params: authorName, checkpointName, assignmentTitle, messagePreview)
-    - [ ] Add `emails.subjects.discussionReply` to both locales
-    - [ ] Run `pnpm generate:i18n` to regenerate types
-    - [ ] Run `pnpm check:i18n` — confirm EN↔ID parity
+- [x] Task: Add i18n keys to both locales
+    - [x] Add `discussions.*` keys to `locales/en.json`: `title`, `placeholder`, `send`, `reply`, `delete`, `deleted`, `empty.title`, `empty.description`, `deleteWindowExpired`, `loading`
+    - [x] Add same keys to `locales/id.json` with Indonesian translations
+    - [x] Add `notifications.events.discussion_reply.title`/`.message` to both locales (params: authorName, checkpointName, assignmentTitle, messagePreview)
+    - [x] Add `emails.subjects.discussionReply` to both locales
+    - [x] Run `pnpm generate:i18n` to regenerate types
+    - [x] Run `pnpm check:i18n` — confirm EN↔ID parity
+    - **Commit:** `1a465d1e` — feat(i18n): Add discussion_reply notification and email subject keys
 
 - [ ] Task: Final quality gates verification
     - [ ] Run `pnpm test:coverage` — confirm ≥80% on all thresholds (lines, statements, branches, functions)
