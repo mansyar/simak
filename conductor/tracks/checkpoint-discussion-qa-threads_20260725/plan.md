@@ -137,4 +137,8 @@
     - [x] Verify keyboard navigation through discussion panel (Tab/Enter/Space) — skipped (user discretion, automated tests sufficient)
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Email, i18n & Polish' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions 1a508321
 </protect>
