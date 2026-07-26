@@ -111,10 +111,12 @@
     - [x] Run `pnpm test` — confirm email template tests pass
     - **Commit:** `3d44e33a` — feat(email): Add buildDiscussionReplyHtml template for discussion reply emails
 
-- [ ] Task: Create `sendDiscussionReplyEmail` helper (`src/lib/discussion-email.ts`)
-    - [ ] Write failing test asserting the helper calls `enqueueEventEmail` with correct params (templateType: `'discussion_reply'`, recipient, subject, body)
-    - [ ] Implement `sendDiscussionReplyEmail()` wrapping `enqueueEventEmail` (matching `review-email.ts` pattern — receives all data as params, no DB lookup needed)
-    - [ ] Run `pnpm test` — confirm tests pass
+- [x] Task: Create `sendDiscussionReplyEmail` helper (`src/lib/discussion-email.ts`)
+    - [x] Write failing test asserting the helper calls `enqueueEventEmail` with correct params (templateType: `'discussion_reply'`, recipient, subject, body)
+    - [x] Implement `sendDiscussionReplyEmail()` wrapping `enqueueEventEmail` (matching `review-email.ts` pattern — receives all data as params, no DB lookup needed)
+    - [x] Wire up `postDiscussionMessageHandler` to use `sendDiscussionReplyEmail` instead of placeholder `enqueueEventEmail` call
+    - [x] Run `pnpm test` — confirm tests pass
+    - **Commits:** `f85e7a95` — feat(email): Add sendDiscussionReplyEmail helper wrapping enqueueEventEmail, `b680d059` — feat(server): Wire postDiscussionMessageHandler to use sendDiscussionReplyEmail
 
 - [ ] Task: Add i18n keys to both locales
     - [ ] Add `discussions.*` keys to `locales/en.json`: `title`, `placeholder`, `send`, `reply`, `delete`, `deleted`, `empty.title`, `empty.description`, `deleteWindowExpired`, `loading`
