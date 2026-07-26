@@ -164,10 +164,10 @@
     - [x] Add `gradebook.analytics.gradeDistribution` i18n key to both locales
     - [x] Run `pnpm test` and confirm tests pass
 
-- [ ] Task: Implement Excel export helper
-    - [ ] Add `exportGradebookToExcel` to `src/lib/excel-export.ts` (client-side `.xlsx`, human-readable column headers, uses `sanitizeCell`)
-    - [ ] Wire to Excel export button on gradebook page
-    - [ ] Run `pnpm test` and confirm tests pass
+- [x] Task: Implement Excel export helper
+    - [x] Add `exportGradebookToExcel` to `src/lib/excel-export.ts` (client-side `.xlsx`, human-readable column headers, uses `sanitizeCell`)
+    - [x] Wire to Excel export button on gradebook page (already wired in Task 4)
+    - [x] Run `pnpm test` and confirm tests pass
 
 - [ ] Task: Final quality gate verification
     - [ ] Run `pnpm test:coverage` — confirm ≥80% on all thresholds

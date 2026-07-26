@@ -64,6 +64,45 @@ export function exportRubricScoresToExcel(data: RubricScoreExportRow[], fileName
 }
 
 /**
- * Stub — full implementation in Task 11 (Excel export for gradebook).
+ * Exports the gradebook for an assignment as an .xlsx file.
+ * Fetches gradebook data via server function, maps to human-readable
+ * columns (Student Name, checkpoint scores, Final Score, Letter Grade, Status),
+ * and triggers a client-side download. String fields are sanitized via sanitizeCell.
  */
-export async function exportGradebookToExcel(_assignmentId: number): Promise<void> {}
+export async function exportGradebookToExcel(assignmentId: number): Promise<void> {
+  const { getAssignmentGradebook } = await import('@/server/gradebook');
+  const { isServerError } = await import('@/lib/errors');
+  const result = await getAssignmentGradebook({ data: { assignmentId } });
+  if (isServerError(result)) return;
+
+  const { students } = result;
+  const checkpointCols = new Map<string, number>();
+  for (const s of students) {
+    for (const cp of s.finalGrade?.contributingCheckpoints ?? []) {
+      if (!checkpointCols.has(cp.checkpointName)) {
+        checkpointCols.set(cp.checkpointName, cp.order);
+      }
+    }
+  }
+  const sortedCols = Array.from(checkpointCols.entries())
+    .sort(([, a], [, b]) => a - b)
+    .map(([name]) => name);
+
+  const rows = students.map((s) => {
+    const row: Record<string, string | number> = {
+      'Student Name': sanitizeCell(s.studentName),
+    };
+    const scoreMap = new Map(
+      (s.finalGrade?.contributingCheckpoints ?? []).map((cp) => [cp.checkpointName, cp.score]),
+    );
+    for (const col of sortedCols) {
+      row[col] = scoreMap.get(col) ?? '';
+    }
+    row['Final Score'] = s.finalGrade?.numericScore ?? '';
+    row['Letter Grade'] = s.finalGrade?.letterGrade ?? '';
+    row['Status'] = s.finalGrade?.status ?? '';
+    return row;
+  });
+
+  exportToExcel(rows, 'Gradebook', `gradebook-${assignmentId}.xlsx`);
+}
