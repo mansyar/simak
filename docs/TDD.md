@@ -1111,7 +1111,7 @@ A checkpoint unlocks when:
 
 ### E2E Tests (Playwright) [v1]
 
-E2E tests run against a dedicated test database (`simak_test` on a separate `postgres-test` Docker service, port 5433) to avoid polluting the dev database. The global setup (`tests/e2e/global-setup.ts`) migrates the test DB, truncates all tables, and seeds test users (SuperAdmin, Admin, Instructor, Student — all with `emailVerified: true`) plus an assignment template (3 checkpoints, Thesis, `minConsultations: 1`) and an assignment with the first checkpoint unlocked. Each spec file resets the database (truncate + re-seed) via `resetDatabase()` before execution to ensure isolation.
+E2E tests run against a dedicated test database (`simak_test` on a separate `postgres-test` Docker service, port 5433) to avoid polluting the dev database. The global setup (`tests/e2e/global-setup.ts`) migrates the test DB, truncates all tables, and seeds test users (SuperAdmin, Admin, Instructor, Student, Student2, Student3 — all with `emailVerified: true`) plus an assignment template (3 checkpoints, Thesis, `minConsultations: 1`), an assignment with the first checkpoint unlocked (Student + Student2 enrolled; Student3 not enrolled — for cross-student access denial tests), and a pending consultation on the Proposal checkpoint. Each spec file resets the database (truncate + re-seed) via `resetDatabase()` before execution to ensure isolation.
 
 **Configuration** (`playwright.config.ts`):
 
@@ -1134,17 +1134,24 @@ E2E tests run against a dedicated test database (`simak_test` on a separate `pos
 
 - Known limitation: TanStack Start's server-fn fetcher returns `undefined` for mocked responses, making R2 upload E2E testing infeasible. File submission tests use direct DB insertion as a workaround. Full R2 upload flow (file selection, upload progress bar, success state) is not E2E-tested.
 
-**Spec files** (14 tests across 5 files):
+**Notification helper** (`tests/e2e/helpers/notifications.ts`):
+
+- Shared `createNotification()` and `cleanupNotifications()` helpers for notification assertion setup (extracted from duplicated code in consultation and instructor-review specs). Used by `student-submission.spec.ts` to insert `submission_received` notifications and by `consultation.spec.ts` to insert `consultation_verified` notifications for post-action assertion.
+
+**Spec files** (~28 tests across 8 files):
 
 | Spec File                    | Tests | What it validates                                                                               |
 | ---------------------------- | ----- | ----------------------------------------------------------------------------------------------- |
-| `auth.spec.ts`               | 3     | Route guards (student→admin blocked, admin→student blocked, unauthenticated→login redirect) + valid login |
-| `admin-users.spec.ts`        | 3     | Create instructor, create student, filter users by role                                         |
+| `auth.spec.ts`               | 4     | Route guards (student→admin blocked, admin→student blocked, unauthenticated→login redirect) + valid login + invalid credentials inline error |
+| `admin-users.spec.ts`        | 4     | Create instructor, create student, filter users by role, superadmin role-creation rule (Admin/Instructor/Student available, Super Admin not) |
 | `instructor-assignments.spec.ts` | 2 | Create assignment from template, checkpoint state transitions (locked → unlocked → submitted) |
-| `student-submission.spec.ts` | 2     | Upload form visible + version history, resubmit with "Latest" badge                            |
-| `instructor-review.spec.ts`  | 4     | Review queue, Pass unlocks next checkpoint, Revise sets deadline, review history                |
+| `student-submission.spec.ts` | 5     | Upload form visible + version history, resubmit with "Latest" badge, notification assertion (`submission_received`), upload UI validation (file type + size), locked checkpoint + cross-student access denial |
+| `instructor-review.spec.ts`  | 5     | Review queue, Pass unlocks next checkpoint, Revise sets deadline, review history (4 tests decoupled — each sets up own state via `createSubmissionForCheckpoint`) + notification assertion (`review_completed`) |
+| `consultation.spec.ts`       | 3     | Consultation lifecycle (log → verify → gating UI: "insufficient verified consultations (0/1)" → (1/1)), consultation rejection, notification assertion (`consultation_verified`) |
+| `extension.spec.ts`          | 3     | Extension request → approve (checkpoint `dueDate` extended in DB), reject (deadline NOT extended), instructor bulk extension (all unfinished checkpoints extended) |
+| `password-setup.spec.ts`     | 2     | Password setup lifecycle (admin creates user → extract token from DB → setup password → login → redirect to dashboard), token reuse + expired token rejection |
 
-Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode). All 14 tests pass in ~59 seconds.
+Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode). All tests pass in ~2 minutes.
 
 ---
 

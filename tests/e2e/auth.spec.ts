@@ -34,4 +34,24 @@ test.describe('Authentication & Route Guards', () => {
 
     await expect(page).toHaveURL(/\/student\/dashboard/);
   });
+
+  test('invalid login credentials show inline error', async ({ page, context }) => {
+    // Clear cookies to simulate unauthenticated state
+    await context.clearCookies();
+
+    // Navigate to login page
+    await page.goto('/auth/login');
+    await page.waitForLoadState('networkidle');
+
+    // Fill in valid email but wrong password
+    await page.fill('#email', 'student@e2e.test');
+    await page.fill('#password', 'WrongPassword123!');
+
+    // Submit the form via requestSubmit (Base UI Button defaults to type=button)
+    await page.locator('form').evaluate((form) => (form as HTMLFormElement).requestSubmit());
+
+    // Verify inline error message appears
+    await expect(page.locator('#login-error')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('#login-error')).toContainText(/invalid email or password/i);
+  });
 });
