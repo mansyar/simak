@@ -8,7 +8,7 @@ import { getSessionFromHeaders } from './auth';
 import { verifyCheckpointAccess } from './ownership';
 import { getNotificationKeys } from './notifications.server';
 import { maybeInsertNotification } from '../lib/notification-prefs';
-import { enqueueEventEmail } from '../lib/event-email';
+import { sendDiscussionReplyEmail } from '../lib/discussion-email';
 import { serverError, ErrorCode } from '../lib/errors';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -115,11 +115,12 @@ export async function postDiscussionMessageHandler({ data }: { data: PostDiscuss
     const accessError = await verifyCheckpointAccess(db, checkpointId, session);
     if (accessError) return accessError;
 
-    // 2. Fetch checkpoint details (assignmentId, studentId)
+    // 2. Fetch checkpoint details (assignmentId, studentId, name)
     const [checkpoint] = await db
       .select({
         assignmentId: checkpoints.assignmentId,
         studentId: checkpoints.studentId,
+        name: checkpoints.name,
       })
       .from(checkpoints)
       .where(eq(checkpoints.id, checkpointId))
@@ -147,9 +148,9 @@ export async function postDiscussionMessageHandler({ data }: { data: PostDiscuss
       }
     }
 
-    // 4. Fetch assignment details (instructorId)
+    // 4. Fetch assignment details (instructorId, title)
     const [assignment] = await db
-      .select({ instructorId: assignments.instructorId })
+      .select({ instructorId: assignments.instructorId, title: assignments.title })
       .from(assignments)
       .where(eq(assignments.id, checkpoint.assignmentId))
       .limit(1);
@@ -198,11 +199,15 @@ export async function postDiscussionMessageHandler({ data }: { data: PostDiscuss
 
     // 7. Post-commit email (advisory — never throws)
     if (recipientId !== session.user.id) {
-      await enqueueEventEmail({
+      await sendDiscussionReplyEmail({
         recipientId,
-        subjectKey: 'emails.subjects.discussionReply',
-        templateType: 'discussion_reply',
-        buildBody: () => '<p>New discussion reply</p>',
+        authorName: session.user.name,
+        checkpointName: checkpoint.name,
+        assignmentTitle: assignment.title,
+        messagePreview: message.slice(0, 100),
+        assignmentId: checkpoint.assignmentId,
+        checkpointId,
+        target: isStudentPoster ? 'instructor' : 'student',
       });
     }
 

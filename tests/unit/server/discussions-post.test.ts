@@ -4,7 +4,7 @@ import { postDiscussionMessageHandler } from '@/server/discussions.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import { maybeInsertNotification } from '@/lib/notification-prefs';
-import { enqueueEventEmail } from '@/lib/event-email';
+import { sendDiscussionReplyEmail } from '@/lib/discussion-email';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -18,8 +18,8 @@ vi.mock('@/lib/notification-prefs', () => ({
   maybeInsertNotification: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('@/lib/event-email', () => ({
-  enqueueEventEmail: vi.fn().mockResolvedValue(undefined),
+vi.mock('@/lib/discussion-email', () => ({
+  sendDiscussionReplyEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('@tanstack/react-start', () => ({
@@ -34,11 +34,11 @@ describe('postDiscussionMessageHandler', () => {
   let mockTx: any;
 
   const studentSession = {
-    user: { id: 'student-1', role: 'student' as const },
+    user: { id: 'student-1', name: 'John', role: 'student' as const },
     session: {} as any,
   };
   const instructorSession = {
-    user: { id: 'instructor-1', role: 'instructor' as const },
+    user: { id: 'instructor-1', name: 'Jane', role: 'instructor' as const },
     session: {} as any,
   };
 
@@ -120,11 +120,13 @@ describe('postDiscussionMessageHandler', () => {
     );
     // [1] query checkpoint (assignmentId, studentId)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ assignmentId: 10, studentId: 'student-1' }]).then(onfulfilled),
+      Promise.resolve([{ assignmentId: 10, name: 'Checkpoint 1', studentId: 'student-1' }]).then(
+        onfulfilled,
+      ),
     );
     // [2] query assignment (instructorId)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ instructorId: 'instructor-1' }]).then(onfulfilled),
+      Promise.resolve([{ instructorId: 'instructor-1', title: 'Assignment 1' }]).then(onfulfilled),
     );
     // [3] transaction — insert returning
     mockTx.then.mockImplementationOnce((onfulfilled: any) =>
@@ -148,11 +150,13 @@ describe('postDiscussionMessageHandler', () => {
     );
     // [1] query checkpoint (assignmentId, studentId)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ assignmentId: 10, studentId: 'student-1' }]).then(onfulfilled),
+      Promise.resolve([{ assignmentId: 10, name: 'Checkpoint 1', studentId: 'student-1' }]).then(
+        onfulfilled,
+      ),
     );
     // [2] query assignment (instructorId)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ instructorId: 'instructor-1' }]).then(onfulfilled),
+      Promise.resolve([{ instructorId: 'instructor-1', title: 'Assignment 1' }]).then(onfulfilled),
     );
     // [3] transaction — insert returning
     mockTx.then.mockImplementationOnce((onfulfilled: any) =>
@@ -176,11 +180,13 @@ describe('postDiscussionMessageHandler', () => {
     );
     // [1] query checkpoint (assignmentId, studentId)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ assignmentId: 10, studentId: 'student-1' }]).then(onfulfilled),
+      Promise.resolve([{ assignmentId: 10, name: 'Checkpoint 1', studentId: 'student-1' }]).then(
+        onfulfilled,
+      ),
     );
     // [2] query assignment (instructorId)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ instructorId: 'instructor-1' }]).then(onfulfilled),
+      Promise.resolve([{ instructorId: 'instructor-1', title: 'Assignment 1' }]).then(onfulfilled),
     );
     // [3] transaction — insert returning
     mockTx.then.mockImplementationOnce((onfulfilled: any) =>
@@ -210,11 +216,13 @@ describe('postDiscussionMessageHandler', () => {
     );
     // [1] query checkpoint (assignmentId, studentId)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ assignmentId: 10, studentId: 'student-1' }]).then(onfulfilled),
+      Promise.resolve([{ assignmentId: 10, name: 'Checkpoint 1', studentId: 'student-1' }]).then(
+        onfulfilled,
+      ),
     );
     // [2] query assignment (instructorId)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ instructorId: 'instructor-1' }]).then(onfulfilled),
+      Promise.resolve([{ instructorId: 'instructor-1', title: 'Assignment 1' }]).then(onfulfilled),
     );
     // [3] transaction — insert returning
     mockTx.then.mockImplementationOnce((onfulfilled: any) =>
@@ -244,7 +252,9 @@ describe('postDiscussionMessageHandler', () => {
     );
     // [1] query checkpoint (assignmentId, studentId)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ assignmentId: 10, studentId: 'student-1' }]).then(onfulfilled),
+      Promise.resolve([{ assignmentId: 10, name: 'Checkpoint 1', studentId: 'student-1' }]).then(
+        onfulfilled,
+      ),
     );
     // [2] parentMessageId validation — returns empty (parent not found in this checkpoint)
     mockDb.then.mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
@@ -268,11 +278,13 @@ describe('postDiscussionMessageHandler', () => {
     );
     // [1] query checkpoint — studentId is student-1 (same as poster)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ assignmentId: 10, studentId: 'student-1' }]).then(onfulfilled),
+      Promise.resolve([{ assignmentId: 10, name: 'Checkpoint 1', studentId: 'student-1' }]).then(
+        onfulfilled,
+      ),
     );
     // [2] query assignment — instructorId is student-1 (same as poster, edge case)
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ instructorId: 'student-1' }]).then(onfulfilled),
+      Promise.resolve([{ instructorId: 'student-1', title: 'Assignment 1' }]).then(onfulfilled),
     );
     // [3] transaction — insert returning
     mockTx.then.mockImplementationOnce((onfulfilled: any) =>
@@ -284,10 +296,10 @@ describe('postDiscussionMessageHandler', () => {
     });
 
     expect(maybeInsertNotification).not.toHaveBeenCalled();
-    expect(enqueueEventEmail).not.toHaveBeenCalled();
+    expect(sendDiscussionReplyEmail).not.toHaveBeenCalled();
   });
 
-  it('should call enqueueEventEmail post-commit', async () => {
+  it('should call sendDiscussionReplyEmail post-commit', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
     // [0] verifyCheckpointAccess — granted
@@ -296,11 +308,13 @@ describe('postDiscussionMessageHandler', () => {
     );
     // [1] query checkpoint
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ assignmentId: 10, studentId: 'student-1' }]).then(onfulfilled),
+      Promise.resolve([{ assignmentId: 10, name: 'Checkpoint 1', studentId: 'student-1' }]).then(
+        onfulfilled,
+      ),
     );
     // [2] query assignment
     mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-      Promise.resolve([{ instructorId: 'instructor-1' }]).then(onfulfilled),
+      Promise.resolve([{ instructorId: 'instructor-1', title: 'Assignment 1' }]).then(onfulfilled),
     );
     // [3] transaction — insert returning
     mockTx.then.mockImplementationOnce((onfulfilled: any) =>
@@ -311,10 +325,16 @@ describe('postDiscussionMessageHandler', () => {
       data: { checkpointId: 1, message: 'Hello' },
     });
 
-    expect(enqueueEventEmail).toHaveBeenCalledWith(
+    expect(sendDiscussionReplyEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         recipientId: 'instructor-1',
-        templateType: 'discussion_reply',
+        authorName: 'John',
+        checkpointName: 'Checkpoint 1',
+        assignmentTitle: 'Assignment 1',
+        messagePreview: 'Hello',
+        assignmentId: 10,
+        checkpointId: 1,
+        target: 'instructor',
       }),
     );
   });
