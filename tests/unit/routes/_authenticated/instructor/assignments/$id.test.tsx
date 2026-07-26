@@ -111,6 +111,7 @@ vi.mock('@/hooks/use-csv-download', () => ({
 
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+  buttonVariants: ({ variant, size }: any) => `button-variants-${variant}-${size}`,
 }));
 
 vi.mock('@/components/ui/empty-state', () => ({

@@ -58,6 +58,7 @@ Throughout this document, features are tagged as:
 │   ├── /instructor/assignments           → All assignments [v1]
 │   ├── /instructor/assignments/new       → Assignment creation wizard [v1]
 │   ├── /instructor/assignments/$id       → Assignment detail (instructor view) [v1]
+│   │   └── /instructor/assignments/$id/gradebook → Gradebook view (students × checkpoints → final grade) [v1]
 │   ├── /instructor/reviews               → Review queue [v1]
 │   ├── /instructor/analytics             → Instructor performance analytics [v1]
 │   └── /instructor/reports               → Report builder & history [v2]
@@ -108,6 +109,7 @@ simak/
 │   │   ├── instructor/
 │   │   │   └── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
 │   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js), RubricScoringSection (instructor scoring UI), RubricResultView (student view)
+│   │   ├── gradebook/        → GradebookTable, GradeConfigSummary, GradeSettingsDialog, StudentFinalGradeCard, GradebookExportButtons, RecomputeGradesButton
 │   │   ├── consultations/    → Log form, consultation list, progress bar, verification queue item, verification dialog
 │   │   ├── discussions/      → DiscussionPanel (ScrollArea, Avatar, message bubbles, optimistic mutations, 30s refetchInterval)
 │   │   ├── files/            → File upload, preview, file list
@@ -158,6 +160,8 @@ simak/
     │   │   ├── analytics-export.server.ts → CSV export handlers (users, audit log, progress, review history)
     │   │   ├── bulk-import.ts      → Bulk import server fn stubs + Zod schemas (users, templates)
     │   │   └── bulk-import.server.ts → Server-only bulk import handlers (parse, validate, insert)
+    │   │   ├── gradebook.ts         → Gradebook server fn stubs (getStudentFinalGrade, getAssignmentGradebook, saveGradeConfig, recomputeAllGrades) + Zod schemas
+    │   │   └── gradebook.server.ts  → Server-only gradebook handlers (student grade, gradebook view, config upsert, batch recompute)
 │   ├── db/
 │   │   ├── schema/           → Drizzle schema (split by domain)
 │   │   ├── index.ts          → Database client
@@ -183,6 +187,7 @@ simak/
 │   │   ├── at-risk-email.ts  → `sendStudentAtRiskEmail(opts)` helper (wraps `enqueueEventEmail` with `buildStudentAtRiskHtml`)
 │   │   ├── storage.ts        → R2 client
 │   │   ├── toast.ts          → Toast helpers (showSuccessToast, showErrorToast) — wraps sonner
+│   │   ├── grade-computation.ts → Pure grade computation engine (computeFinalGrade, types: GradingScheme, CheckpointGradeInput, FinalGradeResult, ContributingCheckpoint, AssignmentGradeConfig). No DB access.
 │   │   ├── route-utils.ts    → Role-based dashboard routing utility
     │   │   ├── role-permissions.ts → Canonical CREATION_ALLOWED_ROLES (shared by user creation + bulk import)
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
@@ -742,6 +747,37 @@ Composite index `checkpoints_state_due_date_idx` on `checkpoints (state, dueDate
 
 > **Trust boundary (Track: Audit HIGH-Remediation H1):** Presigned upload URLs are never issued without a corresponding `upload_intents` row. At submit time, the handler verifies the intent exists, belongs to the requesting user, matches the expected purpose and checkpoint, has not expired, and has not already been consumed. The server then issues an R2 `HeadObjectCommand` to read the actual `ContentLength` — the client-reported `fileSize` is never trusted. This prevents cross-user file hijacking, fabricated file keys, and size spoofing.
 
+#### assignment_grade_config (Track: Gradebook & Final Grade Computation)
+
+| Column           | Type                               | Notes                                                              |
+| ---------------- | ---------------------------------- | ------------------------------------------------------------------ |
+| assignmentId     | integer (FK → assignments), unique | 1:1 with assignments. `onDelete: cascade` — deleted with assignment |
+| gradingScheme    | grading_scheme enum, not null      | `equal_weight` \| `custom_weight`. Default `equal_weight`          |
+| customWeights    | jsonb, nullable                    | `{ [templateCheckpointId]: weight }` map, values 0–100. Used only when `custom_weight` |
+| letterGradeBounds| jsonb, not null                    | `{ "A": 90, "B": 80, "C": 70, "D": 60 }` configurable lower bounds |
+| createdAt        | timestamp                          | DEFAULT NOW()                                                      |
+| updatedAt        | timestamp                          | DEFAULT NOW()                                                      |
+
+Auto-created inside `createAssignmentHandler` transaction via `createDefaultGradeConfig(tx, assignmentId)` helper. Pre-existing assignments backfilled by migration `0014_youthful_morg.sql`. Admin-only config changes audit-logged via `logAuditEvent` (action: `gradebook.config_updated`). The `logAuditEvent` call is awaited and wrapped in try/catch per SQL styleguide §6.4 (post-commit advisory pattern).
+
+> **Stale weights detection (Track: Gradebook — Review Fix):** `areCustomWeightsValid` in `src/lib/grade-computation.ts` checks that (1) customWeights is not null, (2) the number of keys matches the number of checkpoints (no extra entries for removed checkpoints), (3) every checkpoint has a weight entry, and (4) weights sum to exactly 100. If any check fails, computation falls back to `equal_weight` averaging and sets `staleWeights: true` on the result.
+
+#### final_grades (Track: Gradebook & Final Grade Computation)
+
+| Column                | Type                       | Notes                                                                                    |
+| --------------------- | -------------------------- | ---------------------------------------------------------------------------------------- |
+| id                    | serial (PK)                |                                                                                          |
+| assignmentId          | integer (FK → assignments) | `onDelete: cascade`                                                                       |
+| studentId             | text (FK → users)          | No `onDelete` — users are soft-deleted, never hard-deleted                               |
+| numericScore          | numeric(5,2), nullable     | Null if assignment is incomplete                                                          |
+| letterGrade            | text, nullable             | A/B/C/D/F (or null if incomplete)                                                        |
+| status                | final_grade_status enum, not null | `complete` \| `incomplete` \| `in_progress`                                      |
+| contributingCheckpoints | jsonb, nullable           | Array of `{ checkpointId, checkpointName, templateCheckpointId, order, state, score, isRubric, weight }` |
+| computedAt            | timestamp                  | DEFAULT NOW() — when the grade was last computed                                        |
+| updatedAt             | timestamp                  | DEFAULT NOW()                                                                              |
+
+Unique constraint on `(assignmentId, studentId)`. Indexes on `assignmentId` and `studentId`. Upserted (never individually deleted) — cache table for computed grades. Recomputed on `pass` review decision via `recomputeStudentGrade` (post-commit advisory in `reviews-extras.server.ts`, try/catch, never affects review transaction). Admin "Recompute All Grades" wraps all student upserts in a single `db.transaction` for atomicity (SQL styleguide §6 — if one student's grade computation fails, all updates roll back).
+
 ### Database Indexes
 
 | Table                | Column(s)                | Type             | Purpose                                      |
@@ -759,6 +795,8 @@ Composite index `checkpoints_state_due_date_idx` on `checkpoints (state, dueDate
 | `template_checkpoints`| `templateId`, `order`   | composite b-tree | Template checkpoint ordering (TRACK-005)     |
 | `users`              | `role`, `deletedAt`      | composite b-tree | Admin user list filtering by role + active (TRACK-005) |
 | `verification`       | `value`                  | b-tree           | Token lookup on password setup/reset         |
+| `final_grades`       | `assignmentId`            | b-tree           | Gradebook query per assignment (TRACK-025)   |
+| `final_grades`       | `studentId`              | b-tree           | Student grade lookup (TRACK-025)             |
 | `audit_log`          | `createdAt`              | b-tree           | Time-ordered queries                         |
 | `audit_log`          | `action`                 | b-tree           | Type filtering                               |
 | `audit_log`          | `entityType`, `entityId` | composite b-tree | Entity-specific history                      |

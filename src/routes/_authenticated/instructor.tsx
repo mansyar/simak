@@ -7,7 +7,7 @@ import { NotificationCenter } from '../../components/notifications/NotificationC
 
 export const Route = createFileRoute('/_authenticated/instructor')({
   beforeLoad: async () => {
-    await requireRole(['instructor']);
+    await requireRole(['instructor', 'admin', 'superadmin']);
   },
   component: InstructorLayout,
 });

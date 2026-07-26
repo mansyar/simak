@@ -1,0 +1,141 @@
+import { useState, useEffect } from 'react';
+import { useI18n } from '@/routes/__root';
+import { getStudentFinalGrade } from '@/server/gradebook';
+import { isServerError } from '@/lib/errors';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import type { FinalGradeResult } from '@/lib/grade-computation';
+
+export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }) {
+  const { t } = useI18n();
+  const [grade, setGrade] = useState<FinalGradeResult | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [showBreakdown, setShowBreakdown] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      setError(false);
+      try {
+        const result = await getStudentFinalGrade({ data: { assignmentId } });
+        if (isServerError(result)) {
+          setError(true);
+        } else {
+          setGrade(result);
+        }
+      } catch {
+        setError(true);
+      }
+      setLoading(false);
+    };
+    load();
+  }, [assignmentId]);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton data-testid="grade-card-skeleton" className="h-6 w-40" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-4 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="py-6 text-center text-sm text-muted-foreground">
+          {t('gradebook.loadError')}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!grade) {
+    return null;
+  }
+
+  const statusBadge: Record<
+    string,
+    { variant: 'success' | 'warning' | 'secondary'; label: string }
+  > = {
+    complete: { variant: 'success', label: t('gradebook.status.complete') },
+    in_progress: { variant: 'warning', label: t('gradebook.status.in_progress') },
+    incomplete: { variant: 'secondary', label: t('gradebook.status.incomplete') },
+  };
+  const status = statusBadge[grade.status] ?? statusBadge.incomplete;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('gradebook.student.finalGrade')}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center gap-3">
+          {grade.status === 'complete' && (
+            <>
+              <span className="text-2xl font-bold">{grade.numericScore}</span>
+              <Badge variant="success">{grade.letterGrade}</Badge>
+            </>
+          )}
+          {grade.status === 'in_progress' && (
+            <>
+              <span className="text-2xl font-bold">{grade.numericScore}</span>
+              <span className="text-sm text-muted-foreground">
+                {t('gradebook.student.currentProgress')}
+              </span>
+            </>
+          )}
+          <Badge variant={status.variant}>{status.label}</Badge>
+        </div>
+
+        {grade.contributingCheckpoints.length > 0 && (
+          <>
+            <Button variant="ghost" size="sm" onClick={() => setShowBreakdown(!showBreakdown)}>
+              {t('gradebook.student.breakdown')}
+              {showBreakdown ? (
+                <ChevronUp className="ml-1 h-4 w-4" />
+              ) : (
+                <ChevronDown className="ml-1 h-4 w-4" />
+              )}
+            </Button>
+
+            {showBreakdown && (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="py-2 text-left font-medium">
+                      {t('gradebook.student.checkpoint')}
+                    </th>
+                    <th className="py-2 text-right font-medium">{t('gradebook.student.score')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {grade.contributingCheckpoints.map((cp) => (
+                    <tr key={cp.checkpointId} className="border-b">
+                      <td className="py-2">{cp.checkpointName}</td>
+                      <td className="py-2 text-right">
+                        {cp.isRubric
+                          ? (cp.score ?? '—')
+                          : cp.state === 'passed'
+                            ? t('gradebook.passed')
+                            : t('gradebook.notPassed')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

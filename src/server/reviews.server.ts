@@ -21,6 +21,7 @@ import { maybeFireReviewRiskAlert } from '../lib/review-risk-alert';
 import { maybeInsertNotification } from '../lib/notification-prefs';
 import { fetchRubric } from './rubrics.server';
 import { validateReviewScores, insertReviewScores } from './review-scores.server';
+import { advisoryRecomputeGrade } from './reviews-extras.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -480,8 +481,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       assignmentId: submission.assignmentId,
       revisionDeadline,
     });
-
-    // 6. Risk alert (post-commit advisory — fires on revise or SLA breach)
+    await advisoryRecomputeGrade(db, decision, submission);
     await maybeFireReviewRiskAlert(db, decision, breachDays, slaFields, session.user.id);
     return { success: true };
   } catch (err) {

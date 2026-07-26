@@ -70,6 +70,7 @@ const mockAnalyticsData = {
   wauTrend: [{ date: '2024-01-04', activeUsers: 999 }],
   atRiskSummary: { high: 2, medium: 5, low: 8 },
   dateRange: { start: null, end: null },
+  gradeDistribution: { A: 5, B: 3, C: 2, D: 1, F: 1 },
 };
 
 const mockRubricData = {
@@ -234,6 +235,18 @@ describe('Admin Analytics Page', () => {
     expect(screen.queryByText('adminAnalytics.rubricTitle')).toBeNull();
   });
 
+  it('renders grade distribution section with A/B/C/D/F progress bars', async () => {
+    const Page = await getAnalyticsPage();
+    render(<Page />);
+    expect(screen.getByText('gradebook.analytics.gradeDistribution')).toBeDefined();
+    const progressbars = screen.getAllByRole('progressbar');
+    const gradeLabels = ['A', 'B', 'C', 'D', 'F'];
+    for (const letter of gradeLabels) {
+      const found = progressbars.some((pb) => pb.textContent?.includes(letter));
+      expect(found).toBe(true);
+    }
+  });
+
   it('renders at-risk summary card with correct counts', async () => {
     const Page = await getAnalyticsPage();
     render(<Page />);
@@ -244,6 +257,19 @@ describe('Admin Analytics Page', () => {
     expect(screen.getByText('2')).toBeDefined();
     expect(screen.getByText('5')).toBeDefined();
     expect(screen.getByText('8')).toBeDefined();
+  });
+
+  it('does not render grade distribution section when all zeros', async () => {
+    mocks.loaderData = {
+      analytics: {
+        ...mockAnalyticsData,
+        gradeDistribution: { A: 0, B: 0, C: 0, D: 0, F: 0 },
+      },
+      rubric: { ...mockRubricData },
+    };
+    const Page = await getAnalyticsPage();
+    render(<Page />);
+    expect(screen.queryByText('gradebook.analytics.gradeDistribution')).toBeNull();
   });
 
   it('renders at-risk empty state when all counts are zero', async () => {

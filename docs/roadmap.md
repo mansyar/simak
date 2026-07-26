@@ -211,10 +211,9 @@ All tracks must adhere to the following project constraints:
 - **Detail:** conductor/archive/at-risk-student-early-warning_20260724/ (spec.md, plan.md)
 
 ### TRACK-025: Gradebook & Final Grade Computation
-
-*   **Status:** `Pending`
-*   **Dependencies:** TRACK-020 (Rubric-Based Grading — provides `review_scores` with denormalized weight/score snapshots that the gradebook aggregates). Can be implemented independently of TRACK-023.
-*   **Estimated Effort:** 5 Days / 3 Sprint Loops
+- **Status:** ✅ Complete · **Audit IDs:** None (new feature) · **Deps:** TRACK-020 (Rubric-Based Grading — provides `review_scores` with denormalized weight/score snapshots)
+- **Key decisions:** Pure `computeFinalGrade` function (no DB access); `assignment_grade_config` (1:1 with assignments, cascade-deleted) + `final_grades` cache table (upserted, never individually deleted); auto-created default config on assignment creation + migration backfill for pre-existing assignments; `equal_weight`/`custom_weight` schemes with stale-weight fallback (sum≠100, missing/extra checkpoint entries → equal_weight + warning badge); post-commit advisory grade recomputation on `pass` review decision (try/catch, never affects review transaction); admin-only `recomputeAllGrades` wrapped in `db.transaction` for atomicity; CSV export with formula-injection mitigation (`escapeCsvValue`); client-side Excel via SheetJS (`sanitizeCell`); admin grade distribution analytics (A/B/C/D/F progress bars); review fixes applied: stale-weight detection for removed checkpoints (key-count check), `logAuditEvent` awaited in try/catch (SQL §6.4), `recomputeAllGradesHandler` transaction wrapping, redundant `computeFinalGrade`/`computeCheckpointScore` calls eliminated, migration rollback file created (SQL §5.1)
+- **Detail:** `conductor/archive/gradebook-final-grade-computation_20260725/` (spec.md, plan.md)
 
 #### Context Anchors (Traceability)
 *   **PRD Reference:** `docs/PRD.md#checkpoints--submissions` (review workflow with rubric scoring — the data source for grade computation), `docs/PRD.md#analytics--reporting` (CSV/Excel export infrastructure — extension point for gradebook exports), `docs/PRD.md#data-model-summary` (`ReviewScore` entity — denormalized snapshot of criterion score/weight at review time)

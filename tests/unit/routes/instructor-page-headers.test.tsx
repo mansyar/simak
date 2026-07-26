@@ -183,6 +183,7 @@ vi.mock('@/components/settings/SettingsPage', () => ({
 // UI primitives
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+  buttonVariants: () => '',
 }));
 
 /* ------------------------------------------------------------------ */

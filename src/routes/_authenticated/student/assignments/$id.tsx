@@ -3,6 +3,7 @@ import { createFileRoute, Link, Outlet, useMatchRoute } from '@tanstack/react-ro
 import { getStudentAssignmentDetail } from '@/server/assignments';
 import { listConsultations, listVerifiedCounts } from '@/server/consultations';
 import { listMyExtensionRequests } from '@/server/extensions';
+import { StudentFinalGradeCard } from '@/components/gradebook/StudentFinalGradeCard';
 import { AssignmentDetailHeader } from '@/components/student/assignments/AssignmentDetailHeader';
 import { CheckpointTimeline } from '@/components/student/assignments/CheckpointTimeline';
 import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignments/StudentAssignmentLoadingSkeleton';
@@ -294,6 +295,8 @@ function AssignmentDetailPage() {
       </div>
 
       <AssignmentDetailHeader detail={detail} />
+
+      <StudentFinalGradeCard assignmentId={assignment.id} />
 
       {/* Tab Navigation */}
       <div className="border-b border-border">

@@ -1185,5 +1185,57 @@
       "descriptionPlaceholder": "Deskripsi (opsional)",
       "scoreLabel": "Skor"
     }
+  },
+  "gradebook": {
+    "title": "Buku Nilai",
+    "studentName": "Nama Mahasiswa",
+    "finalGrade": "Nilai Akhir",
+    "numericScore": "Skor",
+    "status": {
+      "complete": "Selesai",
+      "in_progress": "Sedang Berjalan",
+      "incomplete": "Belum Selesai"
+    },
+    "passed": "Lulus",
+    "notPassed": "Belum Lulus",
+    "empty": "Belum ada mahasiswa yang ditugaskan untuk tugas ini",
+    "noGrades": "Belum ada nilai yang dihitung",
+    "configSummary": "Konfigurasi Penilaian",
+    "configScheme": "Skema Penilaian",
+    "equalWeight": "Bobot Sama",
+    "customWeight": "Bobot Kustom",
+    "letterBounds": "Batas Nilai Huruf",
+    "customWeights": "Bobot Kustom",
+    "staleWeightsWarning": "Bobot kustom sudah kedaluwarsa (template berubah). Kembali ke bobot sama.",
+    "recomputeAll": "Hitung Ulang Semua Nilai",
+    "recomputeConfirm": "Apakah Anda yakin ingin menghitung ulang semua nilai untuk tugas ini?",
+    "recomputeSuccess": "Semua nilai berhasil dihitung ulang ({count} mahasiswa)",
+    "recomputeError": "Gagal menghitung ulang nilai",
+    "exportCsv": "Ekspor CSV",
+    "exportExcel": "Ekspor Excel",
+    "loading": "Memuat buku nilai...",
+    "loadError": "Gagal memuat buku nilai",
+    "settings": {
+      "title": "Pengaturan Nilai",
+      "scheme": "Skema Penilaian",
+      "equalWeight": "Bobot Sama",
+      "customWeight": "Bobot Kustom",
+      "letterBounds": "Batas Nilai Huruf",
+      "customWeights": "Bobot Kustom",
+      "save": "Simpan",
+      "saving": "Menyimpan...",
+      "saveSuccess": "Pengaturan nilai berhasil disimpan",
+      "saveError": "Gagal menyimpan pengaturan nilai"
+    },
+    "student": {
+      "finalGrade": "Nilai Akhir",
+      "currentProgress": "Progres Saat Ini",
+      "breakdown": "Tampilkan Rincian",
+      "checkpoint": "Checkpoint",
+      "score": "Skor"
+    },
+    "analytics": {
+      "gradeDistribution": "Distribusi Nilai"
+    }
   }
 }

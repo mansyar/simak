@@ -8,6 +8,7 @@ import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import { consultations } from '../db/schema/consultations';
+import { assignmentGradeConfig } from '../db/schema/gradebook';
 import { computeEffectiveDeadline } from './due-dates.server';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
@@ -452,4 +453,20 @@ export async function getStudentAssignmentDetailHandler(args: { data: StudentAss
       handler: 'getStudentAssignmentDetailHandler',
     });
   }
+}
+
+/**
+ * Create a default grade config for a newly created assignment.
+ * Called inside the assignment creation transaction.
+ */
+export async function createDefaultGradeConfig(
+  tx: ReturnType<typeof getDb>,
+  assignmentId: number,
+): Promise<void> {
+  await tx.insert(assignmentGradeConfig).values({
+    assignmentId,
+    gradingScheme: 'equal_weight',
+    customWeights: null,
+    letterGradeBounds: { A: 90, B: 80, C: 70, D: 60 },
+  });
 }

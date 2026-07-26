@@ -73,6 +73,7 @@ type AdminAnalyticsData = {
   dauTrend: { date: string; activeUsers: number }[];
   wauTrend: { date: string; activeUsers: number }[];
   dateRange: { start: string | null; end: string | null };
+  gradeDistribution: { A: number; B: number; C: number; D: number; F: number };
   atRiskSummary: { high: number; medium: number; low: number };
 };
 
@@ -104,6 +105,14 @@ function AdminAnalyticsPage() {
   const searchParams = Route.useSearch() as unknown as AnalyticsSearchParams;
   const navigate = Route.useNavigate();
   const { exportCsv, isExporting } = useCsvDownload();
+
+  const gradeTotal = data.gradeDistribution
+    ? data.gradeDistribution.A +
+      data.gradeDistribution.B +
+      data.gradeDistribution.C +
+      data.gradeDistribution.D +
+      data.gradeDistribution.F
+    : 0;
 
   if (isServerError(data)) {
     return (
@@ -462,6 +471,26 @@ function AdminAnalyticsPage() {
                 ))}
               </TableBody>
             </Table>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Grade Distribution */}
+      {gradeTotal > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('gradebook.analytics.gradeDistribution')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {(['A', 'B', 'C', 'D', 'F'] as const).map((letter) => (
+              <Progress
+                key={letter}
+                label={letter}
+                value={data.gradeDistribution![letter]}
+                max={gradeTotal}
+                showValue
+              />
+            ))}
           </CardContent>
         </Card>
       )}
