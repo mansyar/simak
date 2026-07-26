@@ -33,7 +33,7 @@
     - [x] Write consultation rejection test (instructor rejects a second consultation with a reason → "rejected" badge appears)
     - [x] Write consultation gating UI test (locked checkpoint shows "insufficient verified consultations (0/1)" blocking reason alongside "previous checkpoint not passed"; after instructor verifies a consultation, reload and verify count updates to (1/1))
     - [x] Run `pnpm test:e2e tests/e2e/consultation.spec.ts` and verify all tests pass (Red→Green) — 3 tests pass, verified non-flaky on 3 runs
-- [x] Task: Create `tests/e2e/extension.spec.ts` (FR2)
+- [x] Task: Create `tests/e2e/extension.spec.ts` (FR2) [aa6f2ba]
     - [x] Write extension request test (student submits request: category/reason≥10/duration 1–7 days → "pending" in history → instructor approves with optional comment → `dueDate` extended in DB by requested duration → "approved" badge)
     - [x] Write extension rejection test (instructor rejects with reason ≥20 chars → "rejected" badge → deadline NOT extended)
     - [x] Write bulk extension test (adapted: instructor extends checkpoint deadline via DeadlineManager UI since no bulk extension UI exists — `bulkExtend` server fn exists but no UI calls it)
