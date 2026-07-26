@@ -60,7 +60,7 @@ describe('RecomputeGradesButton', () => {
   });
 
   it('calls recomputeAllGrades on confirm', async () => {
-    (recomputeAllGrades as any).mockResolvedValue({ count: 5 });
+    vi.mocked(recomputeAllGrades).mockResolvedValue({ count: 5 });
     renderWithQuery(<RecomputeGradesButton assignmentId={1} isAdmin={true} />);
     fireEvent.click(screen.getByText('gradebook.recomputeAll'));
     fireEvent.click(screen.getByText('common.confirm'));
@@ -70,7 +70,7 @@ describe('RecomputeGradesButton', () => {
   });
 
   it('shows success toast on success', async () => {
-    (recomputeAllGrades as any).mockResolvedValue({ count: 5 });
+    vi.mocked(recomputeAllGrades).mockResolvedValue({ count: 5 });
     renderWithQuery(<RecomputeGradesButton assignmentId={1} isAdmin={true} />);
     fireEvent.click(screen.getByText('gradebook.recomputeAll'));
     fireEvent.click(screen.getByText('common.confirm'));
@@ -80,7 +80,7 @@ describe('RecomputeGradesButton', () => {
   });
 
   it('shows error toast on server error', async () => {
-    (recomputeAllGrades as any).mockResolvedValue(mockServerError);
+    vi.mocked(recomputeAllGrades).mockResolvedValue(mockServerError);
     renderWithQuery(<RecomputeGradesButton assignmentId={1} isAdmin={true} />);
     fireEvent.click(screen.getByText('gradebook.recomputeAll'));
     fireEvent.click(screen.getByText('common.confirm'));
@@ -90,7 +90,7 @@ describe('RecomputeGradesButton', () => {
   });
 
   it('shows error toast on exception', async () => {
-    (recomputeAllGrades as any).mockRejectedValue(new Error('Network'));
+    vi.mocked(recomputeAllGrades).mockRejectedValue(new Error('Network'));
     renderWithQuery(<RecomputeGradesButton assignmentId={1} isAdmin={true} />);
     fireEvent.click(screen.getByText('gradebook.recomputeAll'));
     fireEvent.click(screen.getByText('common.confirm'));
@@ -100,7 +100,7 @@ describe('RecomputeGradesButton', () => {
   });
 
   it('invalidates gradebook query and router on success (dual invalidation)', async () => {
-    (recomputeAllGrades as any).mockResolvedValue({ count: 5 });
+    vi.mocked(recomputeAllGrades).mockResolvedValue({ count: 5 });
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
     renderWithQuery(<RecomputeGradesButton assignmentId={42} isAdmin={true} />, queryClient);
@@ -115,7 +115,7 @@ describe('RecomputeGradesButton', () => {
   });
 
   it('closes dialog on success', async () => {
-    (recomputeAllGrades as any).mockResolvedValue({ count: 5 });
+    vi.mocked(recomputeAllGrades).mockResolvedValue({ count: 5 });
     renderWithQuery(<RecomputeGradesButton assignmentId={1} isAdmin={true} />);
     fireEvent.click(screen.getByText('gradebook.recomputeAll'));
     fireEvent.click(screen.getByText('common.confirm'));
