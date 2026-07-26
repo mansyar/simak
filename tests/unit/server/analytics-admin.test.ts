@@ -72,6 +72,7 @@ describe('getAdminAnalyticsDataHandler', () => {
     [{ count: 0 }],
     [],
     [],
+    [{ high: 0, medium: 0, low: 0 }],
   ];
 
   describe('role guard', () => {
@@ -299,6 +300,7 @@ describe('getAdminAnalyticsDataHandler', () => {
       expect(result).toHaveProperty('dauTrend');
       expect(result).toHaveProperty('wauTrend');
       expect(result).toHaveProperty('dateRange');
+      expect(result).toHaveProperty('atRiskSummary');
     });
   });
 

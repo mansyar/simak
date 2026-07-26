@@ -12,7 +12,7 @@ interface NotificationCenterProps {
   onClose: () => void;
 }
 
-const GROUP_CONFIGS = [
+export const GROUP_CONFIGS = [
   {
     key: 'newReviews',
     labelKey: 'notifications.groups.newReviews',
@@ -21,7 +21,12 @@ const GROUP_CONFIGS = [
   {
     key: 'consultations',
     labelKey: 'notifications.groups.consultations',
-    types: ['consultation_verified', 'consultation_logged', 'consultation_rejected'],
+    types: [
+      'consultation_verified',
+      'consultation_logged',
+      'consultation_rejected',
+      'discussion_reply',
+    ],
   },
   {
     key: 'submissions',
@@ -31,7 +36,7 @@ const GROUP_CONFIGS = [
   {
     key: 'system',
     labelKey: 'notifications.groups.system',
-    types: ['sla_breach'],
+    types: ['sla_breach', 'student_at_risk'],
   },
 ];
 

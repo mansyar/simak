@@ -500,7 +500,23 @@
     "reviewQueueDesc": "Review pengumpulan mahasiswa yang tertunda",
     "manageAssignments": "Kelola Tugas",
     "manageAssignmentsDesc": "Buat dan kelola tugas Anda",
-    "pendingCount": "{count} tertunda"
+    "pendingCount": "{count} tertunda",
+    "atRisk": {
+      "title": "Mahasiswa Berisiko",
+      "empty": "Tidak ada mahasiswa berisiko",
+      "levels": {
+        "high": "Tinggi",
+        "medium": "Sedang",
+        "low": "Rendah"
+      },
+      "factors": {
+        "overdue_checkpoint": "Checkpoint telah lewat tenggat",
+        "approaching_deadline_no_submission": "Tenggat mendekati tanpa pengumpulan",
+        "insufficient_consultations": "Konsultasi tidak mencukupi sebelum tenggat",
+        "repeated_revise": "Checkpoint telah direvisi berkali-kali",
+        "stalled_review": "Pengumpulan menunggu review melebihi SLA"
+      }
+    }
   },
   "adminDashboard": {
     "title": "Dasbor",
@@ -562,7 +578,12 @@
     "rubricCriterion": "Kriteria",
     "rubricAvgScore": "Nilai Rata-rata",
     "rubricPassRate": "Tingkat Kelulusan",
-    "rubricReviewCount": "Ulasan"
+    "rubricReviewCount": "Ulasan",
+    "atRiskTitle": "Mahasiswa Berisiko",
+    "atRiskHigh": "Risiko Tinggi",
+    "atRiskMedium": "Risiko Sedang",
+    "atRiskLow": "Risiko Rendah",
+    "atRiskEmpty": "Tidak ada mahasiswa berisiko"
   },
   "instructorAnalytics": {
     "title": "Analitik",
@@ -675,6 +696,25 @@
       "checkpointRequired": "Silakan pilih checkpoint",
       "externalConsultantNameRequired": "Nama konsultan eksternal wajib diisi",
       "notesRequired": "Catatan diperlukan"
+    }
+  },
+  "discussions": {
+    "title": "Diskusi",
+    "placeholder": "Tulis pesan...",
+    "send": "Kirim",
+    "reply": "Balas",
+    "delete": "Hapus",
+    "cancel": "Batal",
+    "deleted": "[dihapus]",
+    "deleteWindowExpired": "Jendela penghapusan berakhir",
+    "loading": "Memuat pesan...",
+    "empty": {
+      "title": "Belum ada pesan",
+      "description": "Ajukan pertanyaan tentang checkpoint ini"
+    },
+    "errors": {
+      "required": "Pesan tidak boleh kosong",
+      "tooLong": "Pesan harus 2000 karakter atau kurang"
     }
   },
   "landing": {
@@ -816,6 +856,14 @@
       "deadline_reminder": {
         "title": "Pengingat Batas Waktu",
         "message": "Checkpoint \"{checkpointName}\" pada \"{assignmentTitle}\" berakhir pada {dueDate}."
+      },
+      "student_at_risk": {
+        "title": "Mahasiswa Berisiko",
+        "message": "Mahasiswa {studentName} pada \"{assignmentTitle}\" berisiko {riskLevel}. Faktor: {riskFactors}"
+      },
+      "discussion_reply": {
+        "title": "Balasan Diskusi Baru",
+        "message": "{authorName} membalas di checkpoint \"{checkpointName}\" ({assignmentTitle}): \"{messagePreview}\""
       }
     }
   },
@@ -832,7 +880,9 @@
       "extensionApproved": "Perpanjangan Disetujui",
       "extensionRejected": "Perpanjangan Ditolak",
       "extensionRequested": "Perpanjangan Diminta",
-      "deadlineReminder": "Pengingat Batas Waktu — {assignmentTitle}"
+      "deadlineReminder": "Pengingat Batas Waktu — {assignmentTitle}",
+      "studentAtRisk": "Mahasiswa Berisiko — {assignmentTitle}",
+      "discussionReply": "Balasan Diskusi Baru — {assignmentTitle}"
     }
   },
   "errors": {

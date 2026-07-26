@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
   },
   fileUploaderProps: {} as Record<string, any>,
   xhrInstances: [] as any[],
+  discussionPanelProps: {} as Record<string, any>,
 }));
 
 // Mock XMLHttpRequest with instance tracking
@@ -73,6 +74,13 @@ vi.mock('@/components/ui/pagination', () => ({
 
 vi.mock('@/components/student/assignments/StudentAssignmentLoadingSkeleton', () => ({
   StudentAssignmentLoadingSkeleton: () => null,
+}));
+
+vi.mock('@/components/discussions/discussion-panel', () => ({
+  DiscussionPanel: (props: any) => {
+    mocks.discussionPanelProps = props;
+    return <div data-testid="discussion-panel" />;
+  },
 }));
 
 vi.mock('@/server/assignments', () => ({
@@ -217,6 +225,22 @@ describe('CheckpointSubmissionPage - upload progress', () => {
     await act(async () => {
       xhr.onload!();
       await uploadPromise;
+    });
+  });
+});
+
+describe('CheckpointSubmissionPage - discussion panel', () => {
+  beforeEach(() => {
+    cleanup();
+    mocks.discussionPanelProps = {};
+  });
+
+  it('should render DiscussionPanel with checkpointId and assignmentId props', () => {
+    render(<CheckpointSubmissionPage />);
+
+    expect(mocks.discussionPanelProps).toEqual({
+      checkpointId: 1,
+      assignmentId: 1,
     });
   });
 });

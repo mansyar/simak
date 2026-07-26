@@ -17,6 +17,7 @@ import {
 } from '../lib/review-sla';
 import { getNotificationKeys } from './notifications.server';
 import { sendReviewEmail } from '../lib/review-email';
+import { maybeFireReviewRiskAlert } from '../lib/review-risk-alert';
 import { maybeInsertNotification } from '../lib/notification-prefs';
 import { fetchRubric } from './rubrics.server';
 import { validateReviewScores, insertReviewScores } from './review-scores.server';
@@ -481,6 +482,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       revisionDeadline,
     });
     await advisoryRecomputeGrade(db, decision, submission);
+    await maybeFireReviewRiskAlert(db, decision, breachDays, slaFields, session.user.id);
     return { success: true };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {

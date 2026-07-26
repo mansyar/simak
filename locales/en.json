@@ -500,7 +500,23 @@
     "reviewQueueDesc": "Review pending student submissions",
     "manageAssignments": "Manage Assignments",
     "manageAssignmentsDesc": "Create and manage your assignments",
-    "pendingCount": "{count} pending"
+    "pendingCount": "{count} pending",
+    "atRisk": {
+      "title": "At-Risk Students",
+      "empty": "No students at risk",
+      "levels": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "factors": {
+        "overdue_checkpoint": "Checkpoint is overdue",
+        "approaching_deadline_no_submission": "Deadline approaching with no submission",
+        "insufficient_consultations": "Insufficient consultations before deadline",
+        "repeated_revise": "Checkpoint has been revised multiple times",
+        "stalled_review": "Submission awaiting review beyond SLA"
+      }
+    }
   },
   "adminDashboard": {
     "title": "Dashboard",
@@ -562,7 +578,12 @@
     "rubricCriterion": "Criterion",
     "rubricAvgScore": "Avg Score",
     "rubricPassRate": "Pass Rate",
-    "rubricReviewCount": "Reviews"
+    "rubricReviewCount": "Reviews",
+    "atRiskTitle": "At-Risk Students",
+    "atRiskHigh": "High Risk",
+    "atRiskMedium": "Medium Risk",
+    "atRiskLow": "Low Risk",
+    "atRiskEmpty": "No students at risk"
   },
   "instructorAnalytics": {
     "title": "Analytics",
@@ -675,6 +696,25 @@
       "checkpointRequired": "Please select a checkpoint",
       "externalConsultantNameRequired": "External consultant name is required",
       "notesRequired": "Notes are required"
+    }
+  },
+  "discussions": {
+    "title": "Discussions",
+    "placeholder": "Write a message...",
+    "send": "Send",
+    "reply": "Reply",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "deleted": "[deleted]",
+    "deleteWindowExpired": "Deletion window expired",
+    "loading": "Loading messages...",
+    "empty": {
+      "title": "No messages yet",
+      "description": "Ask a question about this checkpoint"
+    },
+    "errors": {
+      "required": "Message cannot be empty",
+      "tooLong": "Message must be 2000 characters or less"
     }
   },
   "landing": {
@@ -816,6 +856,14 @@
       "deadline_reminder": {
         "title": "Deadline Reminder",
         "message": "Your checkpoint \"{checkpointName}\" in \"{assignmentTitle}\" is due on {dueDate}."
+      },
+      "student_at_risk": {
+        "title": "Student At Risk",
+        "message": "Student {studentName} in \"{assignmentTitle}\" is at {riskLevel} risk. Factors: {riskFactors}"
+      },
+      "discussion_reply": {
+        "title": "New Discussion Reply",
+        "message": "{authorName} replied in checkpoint \"{checkpointName}\" ({assignmentTitle}): \"{messagePreview}\""
       }
     }
   },
@@ -832,7 +880,9 @@
       "extensionApproved": "Extension Approved",
       "extensionRejected": "Extension Rejected",
       "extensionRequested": "Extension Requested",
-      "deadlineReminder": "Deadline Reminder — {assignmentTitle}"
+      "deadlineReminder": "Deadline Reminder — {assignmentTitle}",
+      "studentAtRisk": "Student At Risk — {assignmentTitle}",
+      "discussionReply": "New Discussion Reply — {assignmentTitle}"
     }
   },
   "errors": {

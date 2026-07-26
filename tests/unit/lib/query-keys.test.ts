@@ -6,6 +6,7 @@ import {
   assignmentKeys,
   userKeys,
   templateKeys,
+  discussionKeys,
 } from '@/lib/query-keys';
 
 describe('query-key factories', () => {
@@ -85,6 +86,20 @@ describe('query-key factories', () => {
 
     it('list() with no args returns list key with empty object', () => {
       expect(templateKeys.list()).toEqual(['templates', 'list', {}]);
+    });
+  });
+
+  describe('discussionKeys', () => {
+    it('all() returns root discussion key', () => {
+      expect(discussionKeys.all()).toEqual(['discussions']);
+    });
+
+    it('list() returns list key with checkpointId and page', () => {
+      expect(discussionKeys.list(42, 1)).toEqual(['discussions', 'list', 42, 1]);
+    });
+
+    it('detail() returns detail key with checkpointId', () => {
+      expect(discussionKeys.detail(42)).toEqual(['discussions', 'detail', 42]);
     });
   });
 });

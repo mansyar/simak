@@ -14,6 +14,7 @@ export * from './extensions';
 export * from './email-queue';
 export * from './deadline-reminders';
 export * from './gradebook';
+export * from './discussions';
 
 // Import tables for relations
 import { users } from './users';
@@ -28,6 +29,7 @@ import { extensionRequests } from './extensions';
 import { emailQueue } from './email-queue';
 import { deadlineReminders } from './deadline-reminders';
 import { assignmentGradeConfig, finalGrades } from './gradebook';
+import { checkpointDiscussions } from './discussions';
 
 // ---- Relations ----
 
@@ -251,4 +253,25 @@ export const finalGradesRelations = relations(finalGrades, ({ one }) => ({
     fields: [finalGrades.studentId],
     references: [users.id],
   }),
+}));
+
+export const checkpointDiscussionsRelations = relations(checkpointDiscussions, ({ one, many }) => ({
+  checkpoint: one(checkpoints, {
+    fields: [checkpointDiscussions.checkpointId],
+    references: [checkpoints.id],
+  }),
+  assignment: one(assignments, {
+    fields: [checkpointDiscussions.assignmentId],
+    references: [assignments.id],
+  }),
+  user: one(users, {
+    fields: [checkpointDiscussions.userId],
+    references: [users.id],
+  }),
+  parentMessage: one(checkpointDiscussions, {
+    fields: [checkpointDiscussions.parentMessageId],
+    references: [checkpointDiscussions.id],
+    relationName: 'discussion_replies',
+  }),
+  replies: many(checkpointDiscussions),
 }));

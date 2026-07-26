@@ -17,6 +17,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Badge } from '@/components/ui/badge';
 import { isServerError } from '@/lib/errors';
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
 import {
@@ -73,6 +74,7 @@ type AdminAnalyticsData = {
   wauTrend: { date: string; activeUsers: number }[];
   dateRange: { start: string | null; end: string | null };
   gradeDistribution: { A: number; B: number; C: number; D: number; F: number };
+  atRiskSummary: { high: number; medium: number; low: number };
 };
 
 type RubricCriterionMetric = {
@@ -103,6 +105,14 @@ function AdminAnalyticsPage() {
   const searchParams = Route.useSearch() as unknown as AnalyticsSearchParams;
   const navigate = Route.useNavigate();
   const { exportCsv, isExporting } = useCsvDownload();
+
+  const gradeTotal = data.gradeDistribution
+    ? data.gradeDistribution.A +
+      data.gradeDistribution.B +
+      data.gradeDistribution.C +
+      data.gradeDistribution.D +
+      data.gradeDistribution.F
+    : 0;
 
   if (isServerError(data)) {
     return (
@@ -262,6 +272,41 @@ function AdminAnalyticsPage() {
           color="primary"
         />
       </div>
+
+      {/* At-Risk Students Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('adminAnalytics.atRiskTitle')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {data.atRiskSummary.high === 0 &&
+          data.atRiskSummary.medium === 0 &&
+          data.atRiskSummary.low === 0 ? (
+            <EmptyState icon={CheckCircle} title={t('adminAnalytics.atRiskEmpty')} />
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <span className="text-sm font-medium text-foreground">
+                  {t('adminAnalytics.atRiskHigh')}
+                </span>
+                <Badge variant="destructive">{data.atRiskSummary.high}</Badge>
+              </div>
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <span className="text-sm font-medium text-foreground">
+                  {t('adminAnalytics.atRiskMedium')}
+                </span>
+                <Badge variant="warning">{data.atRiskSummary.medium}</Badge>
+              </div>
+              <div className="flex items-center justify-between rounded-lg border p-4">
+                <span className="text-sm font-medium text-foreground">
+                  {t('adminAnalytics.atRiskLow')}
+                </span>
+                <Badge variant="info">{data.atRiskSummary.low}</Badge>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Status Distribution */}
       <Card>
@@ -431,38 +476,24 @@ function AdminAnalyticsPage() {
       )}
 
       {/* Grade Distribution */}
-      {data.gradeDistribution &&
-        data.gradeDistribution.A +
-          data.gradeDistribution.B +
-          data.gradeDistribution.C +
-          data.gradeDistribution.D +
-          data.gradeDistribution.F >
-          0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('gradebook.analytics.gradeDistribution')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {(() => {
-                const totalGrades =
-                  data.gradeDistribution.A +
-                  data.gradeDistribution.B +
-                  data.gradeDistribution.C +
-                  data.gradeDistribution.D +
-                  data.gradeDistribution.F;
-                return (['A', 'B', 'C', 'D', 'F'] as const).map((letter) => (
-                  <Progress
-                    key={letter}
-                    label={letter}
-                    value={data.gradeDistribution[letter]}
-                    max={totalGrades || 1}
-                    showValue
-                  />
-                ));
-              })()}
-            </CardContent>
-          </Card>
-        )}
+      {gradeTotal > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('gradebook.analytics.gradeDistribution')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {(['A', 'B', 'C', 'D', 'F'] as const).map((letter) => (
+              <Progress
+                key={letter}
+                label={letter}
+                value={data.gradeDistribution![letter]}
+                max={gradeTotal}
+                showValue
+              />
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

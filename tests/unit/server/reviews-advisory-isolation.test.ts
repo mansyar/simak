@@ -5,6 +5,7 @@ import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import { logAuditEvent } from '@/lib/audit';
 import { dispatchSLABreachNotifications } from '@/lib/review-sla';
+import { checkAndFireRiskAlert } from '@/lib/risk-alerts';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -16,6 +17,10 @@ vi.mock('@/db/index', () => ({
 
 vi.mock('@/lib/audit', () => ({
   logAuditEvent: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/risk-alerts', () => ({
+  checkAndFireRiskAlert: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('@/lib/review-sla', async (importOriginal) => {
@@ -87,6 +92,28 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
           checkpointState: 'under_review',
           checkpointUpdatedAt: underReviewAt,
           uploadedAt: underReviewAt,
+          checkpointName: 'Chapter 1',
+          checkpointDueDate: new Date('2026-06-01'),
+          checkpointOrder: 1,
+          assignmentId: 1,
+          assignmentTitle: 'Thesis 2026',
+          instructorId: 'instructor-1',
+          studentId: 'student-1',
+          studentName: 'Alice',
+          finalDeadline: new Date('2026-08-01'),
+        },
+      ]).then(onfulfilled),
+    );
+  }
+
+  function setupNoBreachSubmission() {
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([
+        {
+          checkpointId: 100,
+          checkpointState: 'under_review',
+          checkpointUpdatedAt: new Date(),
+          uploadedAt: new Date(),
           checkpointName: 'Chapter 1',
           checkpointDueDate: new Date('2026-06-01'),
           checkpointOrder: 1,
@@ -195,5 +222,78 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
     expect(result).toEqual({ success: true });
     expect(logAuditEvent).toHaveBeenCalledTimes(1);
     expect(dispatchSLABreachNotifications).toHaveBeenCalledTimes(1);
+  });
+
+  // --- checkAndFireRiskAlert integration ---
+
+  it('should call checkAndFireRiskAlert on revise decision', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    setupNoBreachSubmission();
+
+    await submitReviewHandler({
+      data: {
+        submissionId: 1,
+        decision: 'revise',
+        comment: 'Needs work',
+        revisionDeadline: '2026-08-15',
+      },
+    });
+
+    expect(checkAndFireRiskAlert).toHaveBeenCalledTimes(1);
+    expect(checkAndFireRiskAlert).toHaveBeenCalledWith(expect.any(Object), {
+      studentId: 'student-1',
+      studentName: 'Alice',
+      assignmentId: 1,
+      assignmentTitle: 'Thesis 2026',
+      instructorId: 'instructor-1',
+    });
+  });
+
+  it('should not call checkAndFireRiskAlert on pass decision without SLA breach', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    setupNoBreachSubmission();
+
+    await submitReviewHandler({
+      data: { submissionId: 1, decision: 'pass', comment: 'Well done!' },
+    });
+
+    expect(checkAndFireRiskAlert).not.toHaveBeenCalled();
+  });
+
+  it('should call checkAndFireRiskAlert on SLA breach even with pass decision', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    setupPassSubmission(7);
+
+    await submitReviewHandler({
+      data: { submissionId: 1, decision: 'pass', comment: 'Well done!' },
+    });
+
+    expect(checkAndFireRiskAlert).toHaveBeenCalledTimes(1);
+  });
+
+  it('should return success true when checkAndFireRiskAlert throws', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    vi.mocked(checkAndFireRiskAlert).mockRejectedValueOnce(new Error('risk alert failed'));
+    setupNoBreachSubmission();
+
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const result = await submitReviewHandler({
+      data: {
+        submissionId: 1,
+        decision: 'revise',
+        comment: 'Needs work',
+        revisionDeadline: '2026-08-15',
+      },
+    });
+
+    expect(result).toEqual({ success: true });
+    expect(checkAndFireRiskAlert).toHaveBeenCalled();
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Post-commit advisory work failed in submitReviewHandler:',
+      expect.any(Error),
+    );
+
+    errorSpy.mockRestore();
   });
 });

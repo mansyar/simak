@@ -41,7 +41,7 @@ Students and instructors lack a centralized system to:
 - **File submissions** — Upload .docx/.pdf files (max 25MB) to Cloudflare R2 via presigned URLs
 - **Review workflow** — Instructors review submissions with Pass/Revise decisions, comments, and optional feedback files
 - **Consultation tracking** — Students log sessions; instructors verify; minimum consultation thresholds gate checkpoint unlocks
-- **Notifications** — Real-time in-app alerts and email notifications for submissions, reviews, revisions, consultations, extensions, and deadline reminders
+- **Notifications** — Real-time in-app alerts and email notifications for submissions, reviews, revisions, consultations, extensions, deadline reminders, and discussion replies
 - **Deadline management** — Auto-locking overdue checkpoints, instructor override, SLA breach escalation (3-day review SLA), proactive deadline reminders (7-day/3-day/1-day lead times via hourly background scanner)
 - **Bilingual i18n** — Full English and Indonesian language support
 - **Dark mode & responsive UI** — Light/dark themes, mobile-friendly, accessible (WCAG 2.1 AA)
@@ -523,5 +523,33 @@ Students and instructors lack a centralized system to:
 - **Role-based access** — Instructor layout (`instructor.tsx`) extended to allow admin/superadmin for gradebook access; `RecomputeGradesButton` and `GradeSettingsDialog` only render when `isAdmin=true` in gradebook data
 - **i18n** — 27 new keys in both EN and ID locales under `gradebook.*` namespace (title, studentName, finalGrade, numericScore, status.*, passed/notPassed, empty/noGrades, configSummary, configScheme, equalWeight/customWeight, letterBounds, customWeights, staleWeightsWarning, recomputeAll/recomputeConfirm/recomputeSuccess/recomputeError, exportCsv/exportExcel, loading/loadError, settings.*, student.*, analytics.gradeDistribution)
 - **Tests** — 3,537 tests pass across 344 test files; coverage ≥80% on all thresholds (stmts 87.95%, branches 81.89%, funcs 83.54%, lines 88.56%)
+
+### Track: At-Risk Student Identification & Early Warning System (TRACK-023) (July 2026)
+
+- **Risk scoring engine** — New `src/lib/risk-scoring.ts` with pure function `computeStudentRisk(data): RiskAssessment` evaluating 5 risk signals: overdue checkpoint (High), approaching deadline with no submission (Medium), insufficient consultations with deadline approaching (Medium), repeated revise (Medium), stalled review beyond SLA (Low). Risk score is ephemeral — never persisted to DB.
+- **Instructor dashboard widget** — At-Risk Students card on `/instructor/dashboard` showing students with active risk factors, sorted by severity (High → Medium → Low), with risk-level Badges (red/amber/blue) and factor descriptions. Empty state when no at-risk students.
+- **Event-driven alerts** — New `src/lib/risk-alerts.ts` with `checkAndFireRiskAlert(db, opts)`: fetches student checkpoint data, computes risk, fires in-app notification + email to instructor when risk ≥ medium. 7-day dedup per student+assignment pair prevents alert fatigue.
+- **Review handler integration** — `submitReviewHandler` post-commit advisory call to `checkAndFireRiskAlert` when decision is 'revise' or SLA breach occurred (advisory, outside transaction, never affects review outcome).
+- **Scanner integration** — TRACK-021's `processDeadlineReminders()` extended to call `checkAndFireRiskAlert` for each student-checkpoint processed, covering time-based signals (approaching deadlines, insufficient consultations).
+- **Admin analytics** — `atRiskSummary: { high, medium, low }` added to admin analytics dashboard, counting distinct students per risk level via simplified SQL (CASE WHEN expressions, no per-student function call).
+- **Notification type** — New `student_at_risk` notification type targeting instructors, routed to `/instructor/assignments/${assignmentId}`, added to `system` group in NotificationCenter.
+- **Email template** — `buildStudentAtRiskHtml` in `email-templates.ts` with student name, assignment title, risk level, factor descriptions, and CTA link. `sendStudentAtRiskEmail` wrapper in `src/lib/at-risk-email.ts`.
+- **i18n** — New EN/ID keys for notification title/message, email subject, dashboard widget labels, and risk level labels.
+- **No new DB tables/migrations** — All risk computed from existing data (checkpoints, consultations, submissions, reviews).
+- **Tests** — 3,441 tests pass across 330 test files; coverage ≥80% on all thresholds (stmts 88.28%, branches 82.28%, functions 83.83%, lines 88.92%).
+
+### Track: Checkpoint Discussion / Q&A Threads (TRACK-026) (July 2026)
+
+- **Async Q&A discussion threads** — Students and instructors can exchange messages on checkpoint detail pages; student messages align left, instructor messages align right (role-based, regardless of viewer); 1-level reply threading with visual indentation; 15-minute deletion window with soft-delete preserving replies
+- **`checkpoint_discussions` database table** — Serial PK, FKs to checkpoints (cascade), assignments (cascade), users; self-referencing `parentMessageId` for reply threading; `deletedAt` soft-delete; 3 indexes (checkpointId+createdAt, assignmentId+createdAt, parentMessageId)
+- **Server functions** — Two-file split: `discussions.ts` (Zod schemas + createServerFn stubs) + `discussions.server.ts` (handlers: listDiscussionMessages with pagination+ownership guard, postDiscussionMessage with notification+email dispatch, deleteOwnMessage with 15-min window)
+- **DiscussionPanel component** — `ScrollArea` with role-based message bubbles, `Avatar` with initials, `formatRelativeTime` timestamps, reply threading, `Textarea` + send `Button` (react-hook-form + Zod `mode: 'onSubmit'`), delete button within 15-min window, optimistic insert/delete with rollback, `EmptyState` with `MessageCircle` icon, `Skeleton` loading, 30s `refetchInterval` polling
+- **Student checkpoint page** — DiscussionPanel mounted below submission/review section
+- **Instructor assignment detail** — New "Discussions" tab showing all checkpoint discussions grouped by student + checkpoint name, with `instructorView` prop
+- **Instructor review detail** — Inline DiscussionPanel between file preview and review history
+- **Notification integration** — `discussion_reply` type with `MessageCircle` icon, routed by `metadata.target` (student → checkpoint page, instructor → assignment page); grouped in `consultations` group
+- **Email integration** — `buildDiscussionReplyHtml` template with author name, checkpoint name, assignment title, message preview (truncated 100 chars), deep-link CTA; `sendDiscussionReplyEmail` helper wrapping `enqueueEventEmail`; `discussion_reply` added to email queue template type enum
+- **i18n** — `discussions.*` namespace (12 keys), `notifications.events.discussion_reply.title/.message` with params, `emails.subjects.discussionReply` — in both EN and ID locales
+- **Tests** — 3,607 tests pass across 351 test files; coverage ≥80% on all thresholds (stmts 88.27%, branches 82.41%, functions 83.66%, lines 88.92%)
 
 </protect>

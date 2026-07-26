@@ -1,6 +1,14 @@
 import React, { useCallback } from 'react';
 import { Link } from '@tanstack/react-router';
-import { FileUp, CheckCircle, RefreshCw, ClipboardCheck, AlertTriangle, Bell } from 'lucide-react';
+import {
+  FileUp,
+  CheckCircle,
+  RefreshCw,
+  ClipboardCheck,
+  AlertTriangle,
+  Bell,
+  MessageCircle,
+} from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 import { useMarkRead } from '@/hooks/use-notifications';
 import { getNotificationRoute } from './notification-routes';
@@ -22,6 +30,7 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
   review_completed: CheckCircle,
   revision_requested: RefreshCw,
   consultation_verified: ClipboardCheck,
+  discussion_reply: MessageCircle,
   sla_breach: AlertTriangle,
 };
 
