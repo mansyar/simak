@@ -3,14 +3,14 @@
 
 ## Phase 1: Dashboard + Admin Template Smoke Tests + Config
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
-- [ ] Task: Add `retries: 1` config and `firefox` project to `playwright.config.ts`
-    - [ ] Set `retries: 1` in the Playwright config (reduces flaky-test noise without masking real failures). Consider `retries: 2` for CI-only via a `CI` env check.
-    - [ ] Add `firefox` project using `devices['Desktop Firefox']` to the `projects` array.
-    - [ ] Verify: `playwright.config.ts` is valid, `pnpm test:e2e --list` lists the firefox project, file stays under 500 lines.
-- [ ] Task: Install `@axe-core/playwright` devDependency
-    - [ ] Run `pnpm add -D @axe-core/playwright`.
-    - [ ] Verify: dependency appears in `package.json` devDependencies, `pnpm install` succeeds.
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
+- [x] Task: Add `retries: 1` config and `firefox` project to `playwright.config.ts` [f15fcc8]
+    - [x] Set `retries: 1` in the Playwright config (reduces flaky-test noise without masking real failures). Consider `retries: 2` for CI-only via a `CI` env check.
+    - [x] Add `firefox` project using `devices['Desktop Firefox']` to the `projects` array.
+    - [x] Verify: `playwright.config.ts` is valid, `pnpm test:e2e --list` lists the firefox project, file stays under 500 lines.
+- [x] Task: Install `@axe-core/playwright` devDependency [f15fcc8]
+    - [x] Run `pnpm add -D @axe-core/playwright`.
+    - [x] Verify: dependency appears in `package.json` devDependencies, `pnpm install` succeeds.
 - [ ] Task: Write `tests/e2e/dashboards.spec.ts` — 3 role dashboard smoke tests
     - [ ] Student dashboard test: navigate to `/student/dashboard`, wait for `networkidle`, verify 4 widgets render (active assignments, upcoming deadlines, pending reviews, consultation reminders), assert key seed data visible ("E2E Test Assignment"), assert no console errors.
     - [ ] Instructor dashboard test: navigate to `/instructor/dashboard`, wait for `networkidle`, verify 4 widgets (pending review queue with SLA badges, recent submissions, assignment overview, at-risk students), assert no console errors.
