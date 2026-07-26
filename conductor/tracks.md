@@ -7,3 +7,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 <!-- Archived tracks are in conductor/archive/ -->
 
 ---
+
+- [ ] **Track: TRACK-027: Critical Business Flow E2E Coverage**
+*Link: [./tracks/critical-business-flow-e2e-coverage_20260726/](./tracks/critical-business-flow-e2e-coverage_20260726/)*
