@@ -77,5 +77,5 @@
     - [x] Run `pnpm typecheck` — clean
     - [x] Run `pnpm check:i18n` — parity maintained (739 used, 919 in en/id)
     - [x] Verify all new test files ≤ 500 lines (`scripts/check-modularity.js`) — max 299 lines
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Notification Assertions, Upload UI, Negative Cases' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Notification Assertions, Upload UI, Negative Cases' (Protocol in workflow.md) [checkpoint: pending]
 </protect>
