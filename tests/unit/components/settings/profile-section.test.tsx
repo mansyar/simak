@@ -178,4 +178,43 @@ describe('ProfileSection', () => {
     expect(img).toBeDefined();
     expect(img.src).toBe('https://example.com/avatar.jpg');
   });
+
+  it('should use settingsKeys.currentUser() as query key', () => {
+    mockUseQuery.mockReturnValue({
+      data: {
+        user: { id: '1', name: 'John', email: 'john@test.com', image: null },
+        settings: null,
+      },
+      isLoading: false,
+    });
+
+    render(<ProfileSection />);
+
+    expect(mockUseQuery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: ['settings', 'currentUser'],
+      }),
+    );
+  });
+
+  it('should invalidate currentUser query on name update settled', () => {
+    mockUseQuery.mockReturnValue({
+      data: {
+        user: { id: '1', name: 'John', email: 'john@test.com', image: null },
+        settings: null,
+      },
+      isLoading: false,
+    });
+
+    render(<ProfileSection />);
+
+    const mutationConfig = mockUseMutation.mock.calls[0][0] as {
+      onSettled?: () => void;
+    };
+    expect(mutationConfig.onSettled).toBeDefined();
+    mutationConfig.onSettled?.();
+    expect(mockInvalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['settings', 'currentUser'],
+    });
+  });
 });

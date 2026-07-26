@@ -5,11 +5,12 @@ import { NotificationPreferencesSection } from '@/components/settings/Notificati
 const mockUseQuery = vi.fn();
 const mockUseMutation = vi.fn();
 const mockMutateAsync = vi.fn();
+const mockInvalidateQueries = vi.fn();
 
 vi.mock('@tanstack/react-query', () => ({
   useQuery: (...args: unknown[]) => mockUseQuery(...args),
   useMutation: (...args: unknown[]) => mockUseMutation(...args),
-  useQueryClient: () => ({ invalidateQueries: vi.fn() }),
+  useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
 }));
 
 vi.mock('@/server/settings', () => ({
@@ -265,6 +266,39 @@ describe('NotificationPreferencesSection', () => {
 
     expect(mockMutateAsync).toHaveBeenCalledWith({
       notificationPrefs: { review_completed: { email: true } },
+    });
+  });
+
+  it('should use settingsKeys.currentUser() as query key', () => {
+    mockUseQuery.mockReturnValue({
+      data: { user: { id: '1' }, settings: null },
+      isLoading: false,
+    });
+
+    render(<NotificationPreferencesSection />);
+
+    expect(mockUseQuery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: ['settings', 'currentUser'],
+      }),
+    );
+  });
+
+  it('should invalidate currentUser query on notification preferences update success', () => {
+    mockUseQuery.mockReturnValue({
+      data: { user: { id: '1' }, settings: null },
+      isLoading: false,
+    });
+
+    render(<NotificationPreferencesSection />);
+
+    const mutationConfig = mockUseMutation.mock.calls[0][0] as {
+      onSuccess?: () => void;
+    };
+    expect(mutationConfig.onSuccess).toBeDefined();
+    mutationConfig.onSuccess?.();
+    expect(mockInvalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['settings', 'currentUser'],
     });
   });
 });

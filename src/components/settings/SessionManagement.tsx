@@ -14,6 +14,7 @@ import {
 import { Monitor, Smartphone, Tablet, RefreshCw, LogOut, LogOutIcon } from 'lucide-react';
 import { listActiveSessions, revokeSession, revokeAllOtherSessions } from '@/server/sessions';
 import { useI18n } from '@/routes/__root';
+import { settingsKeys } from '@/lib/query-keys';
 
 type SessionDevice = { browser: string; os: string; device: string };
 type SessionItem = {
@@ -48,7 +49,7 @@ export function SessionManagement() {
   const [isRevokeAllOpen, setIsRevokeAllOpen] = useState(false);
 
   const { data: sessionsData, isLoading } = useQuery({
-    queryKey: ['activeSessions'],
+    queryKey: settingsKeys.activeSessions(),
     queryFn: async () => {
       const result = await (listActiveSessions as unknown as () => Promise<unknown>)();
       return result as { sessions: SessionItem[]; total: number };
@@ -64,7 +65,7 @@ export function SessionManagement() {
     },
     onSuccess: (data) => {
       if (data.error) return;
-      queryClient.invalidateQueries({ queryKey: ['activeSessions'] });
+      queryClient.invalidateQueries({ queryKey: settingsKeys.activeSessions() });
       setRevokeTarget(null);
     },
   });
@@ -80,7 +81,7 @@ export function SessionManagement() {
     },
     onSuccess: (data) => {
       if (data.error) return;
-      queryClient.invalidateQueries({ queryKey: ['activeSessions'] });
+      queryClient.invalidateQueries({ queryKey: settingsKeys.activeSessions() });
       setIsRevokeAllOpen(false);
     },
   });

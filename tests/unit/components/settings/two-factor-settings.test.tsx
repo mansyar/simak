@@ -8,12 +8,14 @@ const {
   mockEnableTwoFactor,
   mockDisableTwoFactor,
   mockUseQuery,
+  mockInvalidateQueries,
 } = vi.hoisted(() => ({
   mockGetTwoFactorStatus: vi.fn().mockResolvedValue({ enabled: false }),
   mockGenerateTwoFactorSetup: vi.fn().mockRejectedValue(new Error('No setup config')),
   mockEnableTwoFactor: vi.fn().mockRejectedValue(new Error('No enable config')),
   mockDisableTwoFactor: vi.fn().mockRejectedValue(new Error('No disable config')),
   mockUseQuery: vi.fn(),
+  mockInvalidateQueries: vi.fn(),
 }));
 
 vi.mock('@tanstack/react-query', () => ({
@@ -41,7 +43,7 @@ vi.mock('@tanstack/react-query', () => ({
     },
     isPending: false,
   }),
-  useQueryClient: () => ({ invalidateQueries: vi.fn() }),
+  useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
 }));
 
 vi.mock('@/server/two-factor', () => ({
@@ -243,6 +245,9 @@ describe('TwoFactorSettings', () => {
 
     await vi.waitFor(() => {
       expect(screen.queryByText('Enable Two-Factor Authentication')).toBeNull();
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({
+        queryKey: ['settings', 'twoFactorStatus'],
+      });
     });
   });
 
@@ -285,6 +290,9 @@ describe('TwoFactorSettings', () => {
 
     await vi.waitFor(() => {
       expect(screen.queryByText('Disable Two-Factor Authentication')).toBeNull();
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({
+        queryKey: ['settings', 'twoFactorStatus'],
+      });
     });
   });
 
@@ -411,5 +419,11 @@ describe('TwoFactorSettings', () => {
 
     fireEvent.click(screen.getByText('Enable'));
     expect(screen.getByText('Enable Two-Factor Authentication')).toBeDefined();
+  });
+
+  // ---------- 19. Query Key Factory ----------
+  it('should use settingsKeys.twoFactorStatus() as query key', () => {
+    render(<TwoFactorSettings />);
+    expect(mockUseQuery.mock.calls[0][0].queryKey).toEqual(['settings', 'twoFactorStatus']);
   });
 });

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,12 +8,14 @@ import { Label } from '@/components/ui/label';
 import { User, Loader2 } from 'lucide-react';
 import { getCurrentUser, updateProfile } from '@/server/settings';
 import { useI18n } from '@/routes/__root';
+import { settingsKeys } from '@/lib/query-keys';
 
 export function ProfileSection() {
   const { t } = useI18n();
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['currentUser'],
+    queryKey: settingsKeys.currentUser(),
     queryFn: async () => {
       const result = await (getCurrentUser as unknown as () => Promise<unknown>)();
       return result as {
@@ -39,6 +41,9 @@ export function ProfileSection() {
         updateProfile as unknown as (args: { data: { name: string } }) => Promise<unknown>
       )({ data: { name: args.name } });
       return result as { name?: string; error?: string };
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: settingsKeys.currentUser() });
     },
   });
 
