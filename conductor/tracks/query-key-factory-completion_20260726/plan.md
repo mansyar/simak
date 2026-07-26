@@ -67,7 +67,7 @@
     - [x] Run `pnpm typecheck` — confirm no type errors
     - [x] Verify gradebook route page (`$id.gradebook.tsx`) `handleSaveConfig` is unchanged (keeps `router.invalidate()` for SSR loader data)
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Gradebook TanStack Query Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Gradebook TanStack Query Migration' (Protocol in workflow.md) [checkpoint: 16014dfc]
 
 ## Phase 3: Full Audit + Final Verification
 
