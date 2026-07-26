@@ -177,4 +177,7 @@
     - [x] Verify all files ≤500 lines (`check-modularity.js`)
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: UI, Export & i18n' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions dd83945e
 </protect>
