@@ -3,21 +3,22 @@
 
 ## Phase 1: Hook Conversion (useQuery → useInfiniteQuery)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before implementation
-- [ ] Task: Write failing tests for `useNotificationsList` with `useInfiniteQuery`
-    - [ ] Update `tests/unit/hooks/use-notifications.test.tsx` — replace `useNotificationsList` tests to assert `useInfiniteQuery` behavior: `initialPageParam: 1`, `getNextPageParam` returns next page when `total > accumulated items`, returns `undefined` when all loaded, `queryKey` excludes `page` (uses `notificationKeys.list({ limit, type, unreadOnly })`), `staleTime: 30_000` preserved, `fetchNextPage` available on result
-    - [ ] Add test: `getNextPageParam` returns `2` when page 1 has fewer items than `total`
-    - [ ] Add test: `getNextPageParam` returns `undefined` when all items loaded
-    - [ ] Add test: `listNotifications` called with `page` from `pageParam` (not from options)
-    - [ ] Run `pnpm test` — confirm new tests fail (Red phase)
-- [ ] Task: Update `notificationKeys.list` factory to remove `page` from type signature
-    - [ ] Edit `src/lib/query-keys.ts` line 11 — change `list` filter type from `{ page?, limit?, type?, unreadOnly? }` to `{ limit?, type?, unreadOnly? }`
-    - [ ] Run `pnpm typecheck` — confirm type errors in `use-notifications.ts` and `NotificationCenter.tsx` (callers passing `page`)
-- [ ] Task: Convert `useNotificationsList` to `useInfiniteQuery`
-    - [ ] Edit `src/hooks/use-notifications.ts` lines 36-58 — replace `useQuery` import with `useInfiniteQuery`, update `useNotificationsList` to use `useInfiniteQuery` with `initialPageParam: 1`, `getNextPageParam: (lastPage, allPages) => { const totalItems = allPages.reduce((sum, p) => sum + p.items.length, 0); return totalItems < lastPage.total ? allPages.length + 1 : undefined; }`, `queryKey: notificationKeys.list({ limit, type, unreadOnly })` (no `page`), `queryFn` receives `{ pageParam }` and passes `page: pageParam` to `listNotifications`, keep `staleTime: 30_000`
-    - [ ] Run `pnpm test` — confirm hook tests pass (Green phase)
-    - [ ] Run `pnpm typecheck` — confirm no type errors in hook file (component will still error — fixed in Phase 2)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before implementation
+- [x] Task: Write failing tests for `useNotificationsList` with `useInfiniteQuery` [SHA: 32a3c868]
+    - [x] Update `tests/unit/hooks/use-notifications.test.tsx` — replace `useNotificationsList` tests to assert `useInfiniteQuery` behavior: `initialPageParam: 1`, `getNextPageParam` returns next page when `total > accumulated items`, returns `undefined` when all loaded, `queryKey` excludes `page` (uses `notificationKeys.list({ limit, type, unreadOnly })`), `staleTime: 30_000` preserved, `fetchNextPage` available on result
+    - [x] Add test: `getNextPageParam` returns `2` when page 1 has fewer items than `total`
+    - [x] Add test: `getNextPageParam` returns `undefined` when all items loaded
+    - [x] Add test: `listNotifications` called with `page` from `pageParam` (not from options)
+    - [x] Run `pnpm test` — confirm new tests fail (Red phase)
+- [x] Task: Update `notificationKeys.list` factory to remove `page` from type signature [SHA: 32a3c868]
+    - [x] Edit `src/lib/query-keys.ts` line 11 — change `list` filter type from `{ page?, limit?, type?, unreadOnly? }` to `{ limit?, type?, unreadOnly? }`
+    - [x] Run `pnpm typecheck` — confirm type errors in `NotificationCenter.tsx` (callers passing `page`); hook file clean
+- [x] Task: Convert `useNotificationsList` to `useInfiniteQuery` [SHA: 32a3c868]
+    - [x] Edit `src/hooks/use-notifications.ts` — replace `useQuery` with `useInfiniteQuery`, update `useNotificationsList` to use `useInfiniteQuery` with `initialPageParam: 1`, `getNextPageParam`, `queryKey` without `page`, `queryFn` receives `{ pageParam }`, keep `staleTime: 30_000`
+    - [x] Run `pnpm test` — confirm hook tests pass (Green phase)
+    - [x] Run `pnpm typecheck` — confirm no type errors in hook file (component will still error — fixed in Phase 2)
+    - [x] Split test file into `use-notifications.test.tsx` and `use-notifications-mutations.test.tsx` to stay under 500-line limit
+- [~] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: Component Refactor (NotificationCenter)
 
