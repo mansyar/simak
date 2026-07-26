@@ -21,7 +21,7 @@
 - [x] Task: Update unit test mocks for seed script changes [46c0641]
     - [x] Run `pnpm test:unit` and fix any unit test mocks broken by the seed script changes (3607 tests pass)
     - [x] Run `pnpm typecheck` and verify clean
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Seed Data Expansion + Test Decoupling' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Seed Data Expansion + Test Decoupling' (Protocol in workflow.md) [checkpoint: 69cb81f]
 
 ---
 
