@@ -1,7 +1,9 @@
+<protect>
 # TRACK-028: E2E Breadth & Infrastructure Expansion — Implementation Plan
 
 ## Phase 1: Dashboard + Admin Template Smoke Tests + Config
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
 - [ ] Task: Add `retries: 1` config and `firefox` project to `playwright.config.ts`
     - [ ] Set `retries: 1` in the Playwright config (reduces flaky-test noise without masking real failures). Consider `retries: 2` for CI-only via a `CI` env check.
     - [ ] Add `firefox` project using `devices['Desktop Firefox']` to the `projects` array.
@@ -28,6 +30,7 @@
 
 ## Phase 2: Settings, User Edit/Delete, Remaining Route Smoke Tests
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
 - [ ] Task: Write `tests/e2e/settings.spec.ts` — settings hub tests
     - [ ] Profile test: edit name → verify it persists after reload and appears in sidebar.
     - [ ] Password test: change password → verify old password no longer works, new password works.
@@ -69,6 +72,7 @@
 
 ## Phase 3: Cross-Role Lifecycle + Mobile + A11y + Firefox
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
 - [ ] Task: Write `tests/e2e/cross-role-lifecycle.spec.ts` — full lifecycle integration test
     - [ ] Single serial test: admin creates template → instructor creates assignment from template → student logs consultation → instructor verifies → student submits (via DB helper) → instructor reviews with Pass → verify next checkpoint unlocks → student submits → instructor reviews with Revise → student resubmits → instructor reviews with Pass → verify assignment completion state.
     - [ ] Set timeout to 120s, mark as serial, runs last.
@@ -99,3 +103,4 @@
     - [ ] Verify all new test files under 500 lines, `playwright.config.ts` under 500 lines.
     - [ ] Verify `r2-mock.ts` remains unchanged (limitation documented).
 - [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+</protect>

@@ -1,3 +1,4 @@
+<protect>
 # TRACK-028: E2E Breadth & Infrastructure Expansion
 
 ## Overview
@@ -130,3 +131,4 @@ This track expands the end-to-end (E2E) test coverage from 10/30 to 28+/30 page 
 - Cross-browser testing beyond Chromium + Firefox (no WebKit/Safari project — can be added later if needed).
 - Full keyboard navigation e2e (axe covers some a11y; comprehensive keyboard nav testing deferred).
 - Fixing moderate/minor axe violations (documented only, not fixed in this track).
+</protect>
