@@ -1,7 +1,9 @@
+<protect>
 # Implementation Plan: NotificationCenter Infinite Query Migration (TRACK-030)
 
 ## Phase 1: Hook Conversion (useQuery → useInfiniteQuery)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before implementation
 - [ ] Task: Write failing tests for `useNotificationsList` with `useInfiniteQuery`
     - [ ] Update `tests/unit/hooks/use-notifications.test.tsx` — replace `useNotificationsList` tests to assert `useInfiniteQuery` behavior: `initialPageParam: 1`, `getNextPageParam` returns next page when `total > accumulated items`, returns `undefined` when all loaded, `queryKey` excludes `page` (uses `notificationKeys.list({ limit, type, unreadOnly })`), `staleTime: 30_000` preserved, `fetchNextPage` available on result
     - [ ] Add test: `getNextPageParam` returns `2` when page 1 has fewer items than `total`
@@ -19,6 +21,7 @@
 
 ## Phase 2: Component Refactor (NotificationCenter)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before implementation
 - [ ] Task: Write failing tests for `NotificationCenter` with infinite query data shape
     - [ ] Update `tests/unit/components/notifications/notification-pagination.test.tsx` — mock `useInfiniteQuery` returning `{ pages: [{ items: [...], total: N }], pageParams: [1] }`, assert "Load More" button calls `fetchNextPage` (not `setCurrentPage`), assert accumulated items include all pages via `data.pages.flatMap`, assert `hasNextPage` controls button visibility, assert `isFetchingNextPage` shows spinner on Load More button only
     - [ ] Update `tests/unit/components/notifications/notification-filter.test.tsx` — verify tab switch resets infinite query to page 1 (filter change creates new query entry)
@@ -38,6 +41,7 @@
 
 ## Phase 3: Optimistic Mutation Rewrite + Full Test Suite
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before implementation
 - [ ] Task: Write failing tests for optimistic mutations with infinite query shape
     - [ ] Update `tests/unit/hooks/use-notifications.test.tsx` — `useMarkRead`/`useMarkAllRead` optimistic tests: replace `queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList)` with infinite query shape `{ pages: [{ items: [...], total: N }], pageParams: [1] }`, assert optimistic update modifies items within `pages[0].items` (not top-level `items`), assert rollback restores full `{ pages, pageParams }` structure, assert `useUnreadCount` (number type) still decrements/zeroes correctly
     - [ ] Add test: optimistic `markRead` updates the correct item across multiple pages (not just page 1)
@@ -57,3 +61,4 @@
     - [ ] Verify all files under 500 lines: `use-notifications.ts`, `NotificationCenter.tsx`, `query-keys.ts`, all test files
     - [ ] Grep verification: `allItems` and `existingIds` return zero matches in `NotificationCenter.tsx`; `'items' in old` returns zero matches in `use-notifications.ts`; `setCurrentPage` returns zero matches in `NotificationCenter.tsx`
 - [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+</protect>
