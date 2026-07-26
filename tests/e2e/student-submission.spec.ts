@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import postgres from 'postgres';
 import { resetDatabase, getDatabaseUrl } from './helpers/db-reset';
 import { ensureAuthFile, getAuthFilePath } from './helpers/auth';
+import { cleanupNotifications, createNotification } from './helpers/notifications';
 
 /**
  * Create a submission record directly in the DB and set checkpoint state.
@@ -166,8 +167,8 @@ test.describe('Student File Submission', () => {
     browser,
   }) => {
     // Clean up notifications + existing submissions for Proposal
+    await cleanupNotifications();
     const sql = postgres(getDatabaseUrl());
-    await sql`DELETE FROM notifications`;
     await sql`DELETE FROM reviews WHERE submission_id IN (SELECT id FROM submissions WHERE checkpoint_id IN (SELECT c.id FROM checkpoints c JOIN users u ON c.student_id = u.id WHERE c.name = 'Proposal' AND u.email = 'student@e2e.test'))`;
     await sql`DELETE FROM submissions WHERE checkpoint_id IN (SELECT c.id FROM checkpoints c JOIN users u ON c.student_id = u.id WHERE c.name = 'Proposal' AND u.email = 'student@e2e.test')`;
     await sql.end();
@@ -176,20 +177,10 @@ test.describe('Student File Submission', () => {
     await createSubmissionForCheckpoint('Proposal', 'notif-test.pdf', 1);
 
     // Insert submission_received notification for the instructor via DB
-    const sql2 = postgres(getDatabaseUrl());
-    await sql2`
-      INSERT INTO notifications (user_id, type, title_key, message_key, params, channel, read)
-      VALUES (
-        (SELECT id FROM users WHERE email = 'instructor@e2e.test'),
-        'submission_received',
-        'notifications.events.submission_received.title',
-        'notifications.events.submission_received.message',
-        ${JSON.stringify({ studentName: 'Student', assignmentTitle: 'E2E Test Assignment' })}::jsonb,
-        'in_app',
-        false
-      )
-    `;
-    await sql2.end();
+    await createNotification('instructor@e2e.test', 'submission_received', {
+      studentName: 'Student',
+      assignmentTitle: 'E2E Test Assignment',
+    });
 
     // Open instructor dashboard
     const instructorCtx = await browser.newContext({

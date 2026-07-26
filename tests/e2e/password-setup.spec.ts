@@ -89,7 +89,7 @@ test.describe('Password Setup Lifecycle', () => {
   });
 
   test('admin creates user → password setup → login with new credentials', async ({ browser }) => {
-    const testEmail = `setup-user@e2e.test`;
+    const testEmail = 'setup-user@e2e.test';
     const testPassword = 'NewPass123!';
 
     // === Step 1: Admin creates user via create-user dialog ===
@@ -144,7 +144,7 @@ test.describe('Password Setup Lifecycle', () => {
   });
 
   test('token reuse after setup → Invalid or expired token error', async ({ browser }) => {
-    const testEmail = `reuse-token@e2e.test`;
+    const testEmail = 'reuse-token@e2e.test';
     const testPassword = 'NewPass123!';
 
     // Create user and valid token via DB
@@ -176,7 +176,7 @@ test.describe('Password Setup Lifecycle', () => {
   });
 
   test('expired token → Invalid or expired token error', async ({ browser }) => {
-    const testEmail = `expired-token@e2e.test`;
+    const testEmail = 'expired-token@e2e.test';
     const testPassword = 'NewPass123!';
 
     // Create user and expired token via DB

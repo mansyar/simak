@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import postgres from 'postgres';
 import { resetDatabase, getDatabaseUrl } from './helpers/db-reset';
 import { ensureAuthFile, getAuthFilePath } from './helpers/auth';
+import { cleanupNotifications, createNotification } from './helpers/notifications';
 
 const STUDENT_EMAIL = 'student@e2e.test';
 
@@ -107,35 +108,6 @@ async function insertReview(
   await sql`
     INSERT INTO reviews (submission_id, instructor_id, decision, comment, reviewed_at)
     VALUES (${submissionId}, ${instructor.id}, ${decision}, ${comment}, NOW())
-  `;
-  await sql.end();
-}
-
-async function cleanupNotifications(): Promise<void> {
-  const sql = postgres(getDatabaseUrl());
-  await sql`DELETE FROM notifications`;
-  await sql.end();
-}
-
-async function createNotification(
-  userEmail: string,
-  type: string,
-  params: Record<string, string> = {},
-): Promise<void> {
-  const sql = postgres(getDatabaseUrl());
-  const titleKey = `notifications.events.${type}.title`;
-  const messageKey = `notifications.events.${type}.message`;
-  await sql`
-    INSERT INTO notifications (user_id, type, title_key, message_key, params, channel, read)
-    VALUES (
-      (SELECT id FROM users WHERE email = ${userEmail}),
-      ${type},
-      ${titleKey},
-      ${messageKey},
-      ${JSON.stringify(params)}::jsonb,
-      'in_app',
-      false
-    )
   `;
   await sql.end();
 }

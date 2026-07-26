@@ -210,7 +210,9 @@ test.describe('Extension Request Lifecycle', () => {
     // Verify DB: checkpoint dueDate extended (new date is later than original)
     const newDueDate = await getCheckpointDueDate('Proposal');
     expect(newDueDate).not.toBeNull();
-    expect(newDueDate!.getTime()).toBeGreaterThan(originalDueDate!.getTime());
+    if (newDueDate && originalDueDate) {
+      expect(newDueDate.getTime()).toBeGreaterThan(originalDueDate.getTime());
+    }
 
     // === STUDENT: Verify "Approved" badge ===
     await studentPage.reload();
@@ -274,7 +276,9 @@ test.describe('Extension Request Lifecycle', () => {
     // Verify DB: checkpoint dueDate NOT extended (still the same known date)
     const dueDateAfter = await getCheckpointDueDate('Proposal');
     expect(dueDateAfter).not.toBeNull();
-    expect(dueDateAfter!.toDateString()).toBe(knownDate.toDateString());
+    if (dueDateAfter) {
+      expect(dueDateAfter.toDateString()).toBe(knownDate.toDateString());
+    }
 
     // === STUDENT: Verify "Rejected" badge ===
     const studentCtx = await browser.newContext({ storageState: getAuthFilePath('student') });
