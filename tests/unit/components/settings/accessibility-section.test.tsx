@@ -5,11 +5,12 @@ import { AccessibilitySection } from '@/components/settings/AccessibilitySection
 const mockUseQuery = vi.fn();
 const mockUseMutation = vi.fn();
 const mockMutateAsync = vi.fn();
+const mockInvalidateQueries = vi.fn();
 
 vi.mock('@tanstack/react-query', () => ({
   useQuery: (...args: unknown[]) => mockUseQuery(...args),
   useMutation: (...args: unknown[]) => mockUseMutation(...args),
-  useQueryClient: () => ({ invalidateQueries: vi.fn() }),
+  useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
 }));
 
 vi.mock('@/server/settings', () => ({
@@ -125,5 +126,44 @@ describe('AccessibilitySection', () => {
 
     const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
     expect(checkbox.checked).toBe(false);
+  });
+
+  it('should use settingsKeys.accessibility() as query key', () => {
+    mockUseQuery.mockReturnValue({
+      data: {
+        user: { id: '1', name: 'John', email: 'john@test.com', image: null },
+        settings: { reducedMotion: false },
+      },
+      isLoading: false,
+    });
+
+    render(<AccessibilitySection />);
+
+    expect(mockUseQuery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: ['settings', 'accessibility'],
+      }),
+    );
+  });
+
+  it('should invalidate accessibility query on settings update success', () => {
+    mockUseQuery.mockReturnValue({
+      data: {
+        user: { id: '1', name: 'John', email: 'john@test.com', image: null },
+        settings: { reducedMotion: false },
+      },
+      isLoading: false,
+    });
+
+    render(<AccessibilitySection />);
+
+    const mutationConfig = mockUseMutation.mock.calls[0][0] as {
+      onSuccess?: () => void;
+    };
+    expect(mutationConfig.onSuccess).toBeDefined();
+    mutationConfig.onSuccess?.();
+    expect(mockInvalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['settings', 'accessibility'],
+    });
   });
 });

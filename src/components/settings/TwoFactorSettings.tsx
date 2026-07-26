@@ -22,6 +22,7 @@ import {
   disableTwoFactor,
 } from '@/server/two-factor';
 import { useI18n } from '@/routes/__root';
+import { settingsKeys } from '@/lib/query-keys';
 
 export function TwoFactorSettings() {
   const { t } = useI18n();
@@ -37,7 +38,7 @@ export function TwoFactorSettings() {
   const [setupStep, setSetupStep] = useState<'password' | 'qr' | 'verify'>('password');
 
   const { data: statusData, isLoading: statusLoading } = useQuery({
-    queryKey: ['twoFactorStatus'],
+    queryKey: settingsKeys.twoFactorStatus(),
     queryFn: async () => {
       const result = await (
         getTwoFactorStatus as unknown as (args: { data: Record<string, never> }) => Promise<unknown>
@@ -84,7 +85,7 @@ export function TwoFactorSettings() {
         setError(data.error);
         return;
       }
-      queryClient.invalidateQueries({ queryKey: ['twoFactorStatus'] });
+      queryClient.invalidateQueries({ queryKey: settingsKeys.twoFactorStatus() });
       setIsEnableDialogOpen(false);
       resetSetup();
     },
@@ -105,7 +106,7 @@ export function TwoFactorSettings() {
         setError(data.error);
         return;
       }
-      queryClient.invalidateQueries({ queryKey: ['twoFactorStatus'] });
+      queryClient.invalidateQueries({ queryKey: settingsKeys.twoFactorStatus() });
       setIsDisableDialogOpen(false);
       setPassword('');
       setError('');

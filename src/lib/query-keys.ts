@@ -1,8 +1,8 @@
 /**
  * Typed query-key factories for TanStack Query.
  *
- * Only the 6 feature domains touched by the 9 optimistic-UI mutation sites
- * have factories here. Other features keep inline keys until touched.
+ * Covers notification, consultation, extension, assignment, user, template,
+ * discussion, settings, and gradebook domains.
  */
 
 export const notificationKeys = {
@@ -45,4 +45,16 @@ export const discussionKeys = {
   list: (checkpointId: number, page: number) =>
     ['discussions', 'list', checkpointId, page] as const,
   detail: (checkpointId: number) => ['discussions', 'detail', checkpointId] as const,
+};
+
+export const settingsKeys = {
+  currentUser: () => ['settings', 'currentUser'] as const,
+  activeSessions: () => ['settings', 'activeSessions'] as const,
+  twoFactorStatus: () => ['settings', 'twoFactorStatus'] as const,
+  accessibility: () => ['settings', 'accessibility'] as const,
+};
+
+export const gradebookKeys = {
+  studentFinalGrade: (assignmentId: number) =>
+    ['gradebook', 'studentFinalGrade', assignmentId] as const,
 };

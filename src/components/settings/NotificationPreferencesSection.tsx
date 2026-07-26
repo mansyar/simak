@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Bell } from 'lucide-react';
 import { getCurrentUser, updateUserSettings } from '@/server/settings';
 import { useI18n } from '@/routes/__root';
+import { settingsKeys } from '@/lib/query-keys';
 import type { TranslationKey } from '@/i18n/index';
 
 type NotificationChannel = 'email' | 'inApp';
@@ -109,7 +110,7 @@ export function NotificationPreferencesSection() {
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['currentUser'],
+    queryKey: settingsKeys.currentUser(),
     queryFn: async () => {
       const result = await (getCurrentUser as unknown as () => Promise<unknown>)();
       return result as {
@@ -135,7 +136,7 @@ export function NotificationPreferencesSection() {
       return result as { notificationPrefs?: NotificationPrefs; error?: string };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      queryClient.invalidateQueries({ queryKey: settingsKeys.currentUser() });
     },
   });
 

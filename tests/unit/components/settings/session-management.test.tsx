@@ -225,7 +225,9 @@ describe('SessionManagement', () => {
     fireEvent.click(revokeBtn[revokeBtn.length - 1]);
     await vi.waitFor(() => {
       expect(mockRevokeSession).toHaveBeenCalledWith({ data: { sessionId: 'session-2' } });
-      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['activeSessions'] });
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({
+        queryKey: ['settings', 'activeSessions'],
+      });
     });
   });
 
@@ -258,7 +260,9 @@ describe('SessionManagement', () => {
     fireEvent.click(screen.getByText('Revoke All'));
     await vi.waitFor(() => {
       expect(mockRevokeAllOtherSessions).toHaveBeenCalledOnce();
-      expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['activeSessions'] });
+      expect(mockInvalidateQueries).toHaveBeenCalledWith({
+        queryKey: ['settings', 'activeSessions'],
+      });
     });
   });
 
@@ -271,5 +275,12 @@ describe('SessionManagement', () => {
     const cancelButtons = screen.getAllByText('Cancel');
     fireEvent.click(cancelButtons[0]);
     expect(screen.queryByText('Revoke All')).toBeNull();
+  });
+
+  // ---------- 15. Query Key Factory ----------
+  it('should use settingsKeys.activeSessions() as query key', () => {
+    mockUseQuery.mockReturnValue({ data: { sessions: [], total: 0 }, isLoading: false });
+    render(<SessionManagement />);
+    expect(mockUseQuery.mock.calls[0][0].queryKey).toEqual(['settings', 'activeSessions']);
   });
 });

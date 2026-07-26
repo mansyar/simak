@@ -67,6 +67,9 @@ vi.mock('@/components/student/extensions/ExtensionRequestForm', () => ({
 vi.mock('@/components/student/extensions/ExtensionHistoryList', () => ({
   ExtensionHistoryList: () => null,
 }));
+vi.mock('@/components/gradebook/StudentFinalGradeCard', () => ({
+  StudentFinalGradeCard: () => null,
+}));
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
 }));

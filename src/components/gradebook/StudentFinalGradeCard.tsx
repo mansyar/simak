@@ -1,41 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useI18n } from '@/routes/__root';
 import { getStudentFinalGrade } from '@/server/gradebook';
 import { isServerError } from '@/lib/errors';
+import { gradebookKeys } from '@/lib/query-keys';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import type { FinalGradeResult } from '@/lib/grade-computation';
 
 export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }) {
   const { t } = useI18n();
-  const [grade, setGrade] = useState<FinalGradeResult | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(false);
+  const {
+    data: grade,
+    isPending,
+    isError,
+  } = useQuery({
+    queryKey: gradebookKeys.studentFinalGrade(assignmentId),
+    queryFn: async () => {
+      const result = await getStudentFinalGrade({ data: { assignmentId } });
+      if (isServerError(result)) throw result;
+      return result;
+    },
+  });
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      setError(false);
-      try {
-        const result = await getStudentFinalGrade({ data: { assignmentId } });
-        if (isServerError(result)) {
-          setError(true);
-        } else {
-          setGrade(result);
-        }
-      } catch {
-        setError(true);
-      }
-      setLoading(false);
-    };
-    load();
-  }, [assignmentId]);
-
-  if (loading) {
+  if (isPending) {
     return (
       <Card>
         <CardHeader>
@@ -48,7 +39,7 @@ export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <Card>
         <CardContent className="py-6 text-center text-sm text-muted-foreground">

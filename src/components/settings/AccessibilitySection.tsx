@@ -3,13 +3,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Accessibility } from 'lucide-react';
 import { getCurrentUser, updateUserSettings } from '@/server/settings';
 import { useI18n } from '@/routes/__root';
+import { settingsKeys } from '@/lib/query-keys';
 
 export function AccessibilitySection() {
   const { t } = useI18n();
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['currentUser'],
+    queryKey: settingsKeys.accessibility(),
     queryFn: async () => {
       const result = await (getCurrentUser as unknown as () => Promise<unknown>)();
       return result as {
@@ -32,7 +33,7 @@ export function AccessibilitySection() {
       return result as { reducedMotion?: boolean; error?: string };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      queryClient.invalidateQueries({ queryKey: settingsKeys.accessibility() });
     },
   });
 
