@@ -46,7 +46,7 @@
 - [x] Task: Verify full suite and test count increase
     - [x] Run `pnpm test:e2e` full suite and verify all tests pass — 23 passed (1.6m)
     - [x] Confirm test count increased from 14 to ~28 — 14→23 after Phase 2 (Phase 3 will add ~6-9 more to reach ~28-32)
-- [x] Task: Conductor - User Manual Verification 'Phase 2: Critical Flow Specs' (Protocol in workflow.md) [checkpoint: pending]
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Critical Flow Specs' (Protocol in workflow.md) [checkpoint: ad70c55]
 
 ---
 
