@@ -61,8 +61,13 @@ describe('NotificationCenter - Read/Unread Filter (FR-3)', () => {
 
   const setupMocks = (items: any[] = []) => {
     vi.mocked(hooks.useNotificationsList).mockReturnValue({
-      data: { items, total: items.length },
+      data: { pages: [{ items, total: items.length }], pageParams: [1] },
       isSuccess: true,
+      isFetching: false,
+      hasNextPage: false,
+      isFetchingNextPage: false,
+      fetchNextPage: vi.fn(),
+      isLoading: false,
     } as any);
     vi.mocked(hooks.useMarkAllRead).mockReturnValue({
       mutate: vi.fn(),
