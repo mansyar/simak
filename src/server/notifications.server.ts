@@ -4,7 +4,8 @@ import { getDb } from '../db/index';
 import { notifications } from '../db/schema/notifications';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
-import type { NonNullableSession } from '../lib/types';
+import { resolveNotificationContent, getNotificationKeys } from '../lib/i18n-server';
+import { isAdmin, isAuthenticated } from '../lib/session-guards';
 import type { Locales } from '../i18n/types';
 import type { z } from 'zod';
 import type {
@@ -14,7 +15,6 @@ import type {
   MarkAllReadSchema,
   GetUnreadCountSchema,
 } from './notifications';
-import { resolveNotificationContent, getNotificationKeys } from '../lib/i18n-server';
 
 export { resolveNotificationContent, getNotificationKeys };
 
@@ -23,14 +23,6 @@ type ListNotificationsInput = z.infer<typeof ListNotificationsSchema>;
 type MarkReadInput = z.infer<typeof MarkReadSchema>;
 type MarkAllReadInput = z.infer<typeof MarkAllReadSchema>;
 type GetUnreadCountInput = z.infer<typeof GetUnreadCountSchema>;
-
-function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
-}
-
-function isAuthenticated(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session;
-}
 
 /**
  * Create a notification row.

@@ -12,7 +12,7 @@ import { verifyAssignmentAccess } from './ownership';
 import { getNotificationKeys } from './notifications.server';
 import { sendConsultationEmail } from '../lib/consultation-email';
 import { maybeInsertNotification } from '../lib/notification-prefs';
-import type { NonNullableSession } from '../lib/types';
+import { isStudent, isInstructor } from '../lib/session-guards';
 import type { z } from 'zod';
 import type {
   LogConsultationSchema,
@@ -46,14 +46,6 @@ export type ListPendingConsultationsSuccess = {
   consultations: PendingConsultationItem[];
   total: number;
 };
-
-function isStudent(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'student';
-}
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
 
 /** Student logs a consultation session tied to a specific checkpoint. */
 export async function logConsultationHandler(args: { data: LogConsultationInput }) {

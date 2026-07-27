@@ -12,17 +12,7 @@ import { serverError, ErrorCode } from '@/lib/errors';
 import { logAuditEvent } from '@/lib/audit';
 import { computeFinalGrade } from '@/lib/grade-computation';
 import type { CheckpointGradeInput, AssignmentGradeConfig } from '@/lib/grade-computation';
-import type { NonNullableSession } from '@/lib/types';
-
-// ---- Type Guards ----
-
-function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
-}
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
+import { isAdmin, isInstructor } from '@/lib/session-guards';
 
 // ---- Shared Helpers ----
 

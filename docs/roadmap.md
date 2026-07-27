@@ -403,41 +403,9 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-031: Server-Side Guard Consolidation & Env Type Consolidation
-
-*   **Status:** `Pending`
-*   **Dependencies:** None
-*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
-*   **Audit IDs:** INFRA-1 (role-check helper duplication), INFRA-7 (redundant Env type reconstruction in `env.ts`)
-
-#### Context Anchors (Traceability)
-*   **PRD Reference:** N/A (infrastructure refactor, no product impact)
-*   **TDD Reference:** `AGENTS.md` → "Server function split" (handlers in `*.server.ts`); `src/lib/types.ts` (already exports `NonNullableSession` type used by all guards); `src/lib/errors.ts` (centralized error infrastructure pattern — guards should follow the same single-source principle)
-
-#### Track Tech Stack
-*   TypeScript (shared module creation — no new dependencies)
-*   `src/lib/types.ts` (existing — `NonNullableSession` type already defined here)
-*   `src/server/*.server.ts` (20 files with duplicate guard definitions to refactor)
-*   `src/config/env.ts` (Env type consolidation — replace manual type reconstruction)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   Create a shared `src/lib/session-guards.ts` module exporting `isAdmin`, `isInstructor`, `isStudent`, `isAuthenticated` type-guard functions (all accept `NonNullableSession | null` and return `session is NonNullableSession`)
-    *   Replace 28 duplicate inline definitions across 20 `*.server.ts` files with imports from the shared module
-    *   Consolidate `Env` type derivation in `src/config/env.ts` — replace the manual type reconstruction (`z.infer<typeof baseSchema> & Partial<z.infer<typeof r2Schema>> & { MIGRATE_DATABASE_URL?: string; EMAIL_FROM: string }`) with `z.infer<typeof envSchema>`, then remove the now-redundant `r2Schema` and `baseSchema` constants (their detailed validation messages were never surfaced — `envSchema` redefined those fields with plain `.optional()`)
-*   **Out of Scope:**
-    *   Refactoring the `createServerFn` type system (deferred to TRACK-032)
-    *   Changes to `NonNullableSession` type itself (already correct in `src/lib/types.ts`)
-    *   Any behavioral change to the guards (identical logic, just centralized)
-    *   Adding new guard functions not already duplicated in the codebase
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Shared module):** Create `src/lib/session-guards.ts` with the 4 guard functions extracted from any existing `*.server.ts` file (they're identical). Write unit tests verifying each guard accepts the correct role and rejects others. Verify: `pnpm test:unit` passes for new tests.
-*   **Phase 2 (Migration & Env consolidation):** Remove inline guard definitions from all 20 `*.server.ts` files, replace with `import { isAdmin, isInstructor, ... } from '../lib/session-guards'`. In `src/config/env.ts`, replace the manual `Env` type reconstruction with `export type Env = z.infer<typeof envSchema>`, then remove the now-redundant `r2Schema` and `baseSchema` constants. Verify: `pnpm typecheck` clean (the `Env` type shape must match — all R2 fields optional, `MIGRATE_DATABASE_URL` optional, `EMAIL_FROM` required with default), `pnpm test:unit` passes, `pnpm lint` clean, grep for `function isAdmin(` in `src/server/` returns zero matches.
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** Run `pnpm dev` — app starts, login works for all roles (superadmin, admin, instructor, student), role-guarded routes redirect correctly (e.g., student accessing `/admin` → redirect to student dashboard). Run `pnpm typecheck` — 0 errors. Verify `src/config/env.ts` no longer contains `r2Schema` or `baseSchema` constants, and `Env` type is `z.infer<typeof envSchema>`.
-*   [ ] **Automated Tests:** `pnpm test:unit` — all existing tests pass unchanged. New tests for `src/lib/session-guards.ts` (each guard: accepts correct role, rejects wrong role, handles null). Existing `tests/unit/config/env.test.ts` passes unchanged (validates the `Env` type shape is identical). `pnpm test:coverage` ≥80%. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
-*   [ ] **Conductor Review:** `src/lib/session-guards.ts` exists with 4 exported functions. Grep `function (isAdmin|isInstructor|isStudent|isAuthenticated)\(` in `src/server/` returns zero matches (all replaced with imports). `src/config/env.ts` has no `r2Schema` or `baseSchema` constants (grep returns zero matches). `Env` type is `z.infer<typeof envSchema>` (single source of truth). All files under 500 lines. Pre-push gate passes.
+- **Status:** ✅ Complete · **Audit IDs:** INFRA-1 (role-check helper duplication), INFRA-7 (redundant Env type reconstruction in `env.ts`) · **Deps:** None
+- **Key decisions:** Created `src/lib/session-guards.ts` shared module with 4 client-safe type-guard functions (`isAdmin`, `isInstructor`, `isStudent`, `isAuthenticated` — all accept `NonNullableSession | null`, return `session is NonNullableSession`); replaced 28 duplicate inline guard definitions across 20 `*.server.ts` files with imports from the shared module; refactored `requireRole` in `src/server/auth.ts` to use `isAuthenticated`; consolidated `Env` type in `src/config/env.ts` — replaced manual `z.infer<typeof baseSchema> & Partial<z.infer<typeof r2Schema>> & {...}` with `z.infer<typeof envSchema>`, removed dead `baseSchema` and `r2Schema` constants (their validation messages were never surfaced — `envSchema` redefined R2 fields with plain `.optional()`); `templates.server.ts` retains `NonNullableSession` import for out-of-scope `isInstructorOrAdmin` (array membership, not single-role narrowing); 20 new unit tests in `tests/unit/lib/session-guards.test.ts`; all 3,773 tests pass, typecheck clean, lint clean (4 pre-existing warnings unrelated)
+- **Detail:** `conductor/archive/server-guard-env-consolidation_20260727/` (spec.md, plan.md)
 
 ---
 
@@ -670,7 +638,7 @@ Milestone 9: Client Architecture Consistency
 └── TRACK-030: NotificationCenter Infinite Query Migration [Complete — depends on 014 — notificationKeys factory]
 
 Milestone 10: Infrastructure Consistency & Tech Debt Remediation
-├── TRACK-031: Server-Side Guard Consolidation & Dead Code Removal [no deps]
+├── TRACK-031: Server-Side Guard Consolidation & Env Type Consolidation [Complete — archived]
 ├── TRACK-032: Type-Safety Restoration — Eliminate `as unknown as` Casts [recommended after 031]
 ├── TRACK-033: Server-Function Architecture Standardization [coordinate with 032]
 ├── TRACK-034: i18n & Email Localization Completeness [Complete — archived]

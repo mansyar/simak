@@ -9,6 +9,7 @@ import { logAuditEvent, safeAuditLog } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import { syncTemplateCheckpoints } from './template-checkpoint-sync.server';
 import type { NonNullableSession } from '../lib/types';
+import { isAdmin } from '../lib/session-guards';
 import type { z } from 'zod';
 import type {
   CreateTemplateSchema,
@@ -22,9 +23,6 @@ type UpdateTemplateInput = z.infer<typeof UpdateTemplateSchema>;
 type ListTemplatesInput = z.infer<typeof ListTemplatesSchema>;
 type TemplateIdParam = z.infer<typeof TemplateIdParamSchema>;
 type ListTemplateAssignmentsInput = z.infer<typeof ListTemplateAssignmentsSchema>;
-function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && (session.user.role === 'admin' || session.user.role === 'superadmin');
-}
 function isInstructorOrAdmin(session: NonNullableSession | null): session is NonNullableSession {
   return (
     !!session &&

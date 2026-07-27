@@ -10,13 +10,9 @@ import { emailQueue } from '../db/schema/email-queue';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
 import { resolveNotificationContent } from '../lib/i18n-server';
-import type { NonNullableSession } from '../lib/types';
+import { isAdmin } from '@/lib/session-guards';
 
 const instructorUsers = aliasedTable(users, 'instructor');
-
-function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
-}
 
 /**
  * Get all data for the admin dashboard.

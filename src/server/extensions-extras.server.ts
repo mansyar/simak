@@ -12,17 +12,13 @@ import { logAuditEvent } from '../lib/audit';
 import { getNotificationKeys } from './notifications.server';
 import { sendExtensionApprovedEmail, sendExtensionRejectedEmail } from '../lib/extension-email';
 import { shouldSendInAppNotification } from '../lib/notification-prefs';
-import type { NonNullableSession } from '../lib/types';
+import { isInstructor } from '../lib/session-guards';
 import type { z } from 'zod';
 import type { ApproveExtensionSchema, RejectExtensionSchema, BulkExtendSchema } from './extensions';
 
 type ApproveExtensionInput = z.infer<typeof ApproveExtensionSchema>;
 type RejectExtensionInput = z.infer<typeof RejectExtensionSchema>;
 type BulkExtendInput = z.infer<typeof BulkExtendSchema>;
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
 
 /**
  * Calculate and apply extension adjustment.

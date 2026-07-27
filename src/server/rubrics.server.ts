@@ -7,7 +7,7 @@ import { checkpoints } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
 import { safeAuditLog } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
-import type { NonNullableSession } from '../lib/types';
+import { isAdmin } from '../lib/session-guards';
 import type { z } from 'zod';
 import type {
   SaveRubricSchema,
@@ -26,10 +26,6 @@ type DeleteCriterionInput = z.infer<typeof DeleteCriterionSchema>;
 type DeleteLevelInput = z.infer<typeof DeleteLevelSchema>;
 type GetRubricInput = z.infer<typeof GetRubricSchema>;
 type CountPendingReviewsInput = z.infer<typeof CountPendingReviewsSchema>;
-
-function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && (session.user.role === 'admin' || session.user.role === 'superadmin');
-}
 
 /**
  * Save (create/update/soft-delete) rubric criteria + levels for a template checkpoint.

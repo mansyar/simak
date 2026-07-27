@@ -11,7 +11,7 @@ import {
   generatePresignedDownloadUrl,
 } from '../lib/storage';
 import { validateUploadType } from '../lib/file-validation';
-import type { NonNullableSession } from '../lib/types';
+import { isStudent, isInstructor } from '../lib/session-guards';
 import type { z } from 'zod';
 import type {
   GetPresignedUploadUrlSchema,
@@ -24,10 +24,6 @@ type GetPresignedDownloadUrlInput = z.infer<typeof GetPresignedDownloadUrlSchema
 type GetPresignedReviewFeedbackUploadUrlInput = z.infer<
   typeof GetPresignedReviewFeedbackUploadUrlSchema
 >;
-
-function isStudent(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'student';
-}
 
 const SUBMITTABLE_STATES = ['unlocked', 'revise'] as const;
 
@@ -186,8 +182,4 @@ export async function getPresignedReviewFeedbackUploadUrlHandler(args: {
       handler: 'getPresignedReviewFeedbackUploadUrlHandler',
     });
   }
-}
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
 }

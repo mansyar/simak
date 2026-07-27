@@ -22,7 +22,7 @@ import { maybeInsertNotification } from '../lib/notification-prefs';
 import { fetchRubric } from './rubrics.server';
 import { validateReviewScores, insertReviewScores } from './review-scores.server';
 import { advisoryRecomputeGrade } from './reviews-extras.server';
-import type { NonNullableSession } from '../lib/types';
+import { isInstructor } from '../lib/session-guards';
 import type { z } from 'zod';
 import type {
   ListPendingReviewsSchema,
@@ -33,10 +33,6 @@ import type {
 type ListPendingReviewsInput = z.infer<typeof ListPendingReviewsSchema>;
 type GetReviewDetailInput = z.infer<typeof GetReviewDetailSchema>;
 type SubmitReviewInput = z.infer<typeof SubmitReviewSchema>;
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
 
 const REVIEWABLE_STATES = ['submitted', 'under_review'] as const;
 

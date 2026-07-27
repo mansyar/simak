@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import { redirect } from '@tanstack/react-router';
 import { getRoleDashboard } from '../lib/route-utils';
+import { isAuthenticated } from '../lib/session-guards';
 
 export type Session = {
   user: {
@@ -31,7 +32,7 @@ export async function getSessionFromHeaders(): Promise<Session> {
 export async function requireRole(roles: string[]): Promise<Session> {
   const session = await getSessionFromHeaders();
 
-  if (!session) {
+  if (!isAuthenticated(session)) {
     throw redirect({ to: '/auth/login' as unknown as '.' });
   }
 

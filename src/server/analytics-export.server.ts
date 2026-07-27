@@ -9,7 +9,7 @@ import { templateCheckpoints } from '@/db/schema/templates';
 import { auditLog } from '@/db/schema/audit-log';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
-import type { NonNullableSession } from '@/lib/types';
+import { isAdmin, isInstructor } from '@/lib/session-guards';
 import { fetchGradeConfig, groupRowsByStudent, type ScoreRow } from './gradebook.server';
 import { computeFinalGrade } from '@/lib/grade-computation';
 
@@ -20,14 +20,6 @@ export type ExportStudentProgressCsvInput = { assignmentId: number };
 export type ExportReviewHistoryCsvInput = { assignmentId: number };
 export type ExportRubricScoresCsvInput = { assignmentId: number };
 export type ExportGradebookCsvInput = { assignmentId: number };
-
-function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
-}
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
 
 function escapeCsvValue(value: unknown): string {
   if (value === null || value === undefined) return '';

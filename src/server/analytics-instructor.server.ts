@@ -6,7 +6,7 @@ import { submissions, reviews } from '@/db/schema/submissions';
 import { reviewScores } from '@/db/schema/rubrics';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
-import type { NonNullableSession } from '@/lib/types';
+import { isInstructor } from '@/lib/session-guards';
 
 type AnalyticsDateRangeInput = {
   range?: '7d' | '30d' | '90d' | 'all';
@@ -22,10 +22,6 @@ export type InstructorAnalyticsData = {
   assignmentsActive: number;
   dateRange: { start: string | null; end: string | null };
 };
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
 
 function resolveDateRange(data: AnalyticsDateRangeInput): {
   startDate: Date | null;

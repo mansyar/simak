@@ -190,6 +190,7 @@ simak/
 │   │   ├── grade-computation.ts → Pure grade computation engine (computeFinalGrade, types: GradingScheme, CheckpointGradeInput, FinalGradeResult, ContributingCheckpoint, AssignmentGradeConfig). No DB access.
 │   │   ├── route-utils.ts    → Role-based dashboard routing utility
     │   │   ├── role-permissions.ts → Canonical CREATION_ALLOWED_ROLES (shared by user creation + bulk import)
+    │   │   ├── session-guards.ts → Shared client-safe type-guard functions (isAdmin, isInstructor, isStudent, isAuthenticated) — accept `NonNullableSession | null`, return `session is NonNullableSession` (TRACK-031)
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
     │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys, discussionKeys, settingsKeys, gradebookKeys)
     │   │   └── utils.ts          → Shared utilities
@@ -200,7 +201,7 @@ simak/
 │   │   ├── use-notifications.ts → Notification hooks (useMarkRead, useMarkAllRead with optimistic updates on useInfiniteQuery page shape, useUnreadCount, useNotificationsList via useInfiniteQuery)
 │   │   └── use-assignment-tabs.ts → Assignment tab hooks (approveExtension, rejectExtension with optimistic updates; consultations/extensions via useQuery)
 │   └── config/
-│       └── env.ts            → Validated environment variables
+│       └── env.ts            → Validated environment variables (Zod `envSchema`; `Env` type = `z.infer<typeof envSchema>` — single source of truth, TRACK-031)
 ├── locales/                  → typesafe-i18n translation files
 │   ├── en.json               → English translations
 │   └── id.json               → Indonesian translations
@@ -891,7 +892,7 @@ Admin       (creates Instructors and Students)
 - Route-level guard via TanStack Router `beforeLoad`:
   - `_unauthenticated` layout redirects authenticated users to their role-specific dashboard via `getRoleDashboard()`.
   - `_authenticated` layout redirects unauthenticated users to `/auth/login`.
-- Role-based access via `requireRole(roles)` helper — wraps session check with role validation. Unauthorized users are redirected to their own dashboard.
+- Role-based access via `requireRole(roles)` helper — wraps session check with role validation. Unauthorized users are redirected to their own dashboard. `requireRole` uses `isAuthenticated` from the shared `src/lib/session-guards.ts` module (Track: Server-Side Guard Consolidation). All 20 `*.server.ts` handler files import `isAdmin`/`isInstructor`/`isStudent`/`isAuthenticated` type-guards from this shared module instead of defining inline duplicates — the guards accept `NonNullableSession | null` and return `session is NonNullableSession`, and the module is client-safe (no server-only imports).
 - Password hashing uses Better-Auth's built-in scrypt via `better-auth/crypto`.
 - File downloads check ownership and role before generating a presigned URL.
 
