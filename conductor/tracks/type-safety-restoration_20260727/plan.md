@@ -44,16 +44,16 @@
     - [x] Run `pnpm test` — confirm tests fail (wrapper doesn't exist yet)
     - [x] Verify: tests fail as expected
 
-- [~] Task: Implement `src/lib/server-fn.ts` with `typedServerFn` wrapper (Green Phase)
-    - [ ] Create `src/lib/server-fn.ts` exporting `typedServerFn` that wraps `createServerFn` with proper generic return-type inference
-    - [ ] The wrapper must preserve the `.inputValidator(Schema).handler(fn)` builder chain API
-    - [ ] The wrapper must propagate the handler's return type to the callable stub (no `unknown` at call sites)
-    - [ ] The wrapper must be a type-only change at runtime (delegates to `createServerFn`)
-    - [ ] Run `pnpm test` — confirm wrapper tests pass
-    - [ ] Run `pnpm typecheck` — confirm no new type errors
-    - [ ] Verify: wrapper tests pass, typecheck clean
+- [x] Task: Implement `src/lib/server-fn.ts` with `typedServerFn` wrapper (Green Phase) [1048c14]
+    - [x] Create `src/lib/server-fn.ts` exporting `typedServerFn` that wraps `createServerFn` with proper generic return-type inference
+    - [x] The wrapper must preserve the `.inputValidator(Schema).handler(fn)` builder chain API
+    - [x] The wrapper must propagate the handler's return type to the callable stub (no `unknown` at call sites)
+    - [x] The wrapper must be a type-only change at runtime (delegates to `createServerFn`)
+    - [x] Run `pnpm test` — confirm wrapper tests pass
+    - [x] Run `pnpm typecheck` — confirm no new type errors
+    - [x] Verify: wrapper tests pass, typecheck clean
 
-- [ ] Task: Update type-level test to verify `typedServerFn` fixes the gap
+- [~] Task: Update type-level test to verify `typedServerFn` fixes the gap
     - [ ] Update `tests/unit/types/server-fn-types.test-d.ts` to assert that `typedServerFn` stub's return type propagates correctly (no longer `unknown`)
     - [ ] Run `pnpm typecheck` — confirm type-level test now passes
     - [ ] Verify: type-level test passes, confirming the fix works
