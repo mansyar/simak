@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan: Type-Safety Restoration — Eliminate `as unknown as` Casts
 
 **Track ID:** type-safety-restoration_20260727  
@@ -7,6 +8,11 @@
 ---
 
 ## Phase 1: Root-Cause Diagnosis & Type-Level Test
+
+- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [ ] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
+    - [ ] Read `conductor/workflow.md` for TDD lifecycle and quality gates
+    - [ ] Verify: context is refreshed and understood
 
 - [ ] Task: Diagnose the `createServerFn` type-gap root cause
     - [ ] Read `src/server/assignments.ts` (typed-builder pattern) and `src/server/submissions.ts` (inline-parse pattern) to understand both stub patterns
@@ -26,6 +32,11 @@
 ---
 
 ## Phase 2: Type Fix at Source
+
+- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [ ] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
+    - [ ] Read `conductor/workflow.md` for TDD lifecycle and quality gates
+    - [ ] Verify: context is refreshed and understood
 
 - [ ] Task: Write unit test for `typedServerFn` wrapper (Red Phase)
     - [ ] Create `tests/unit/lib/server-fn.test.ts` (or `test-d.ts` for type-level assertions)
@@ -84,6 +95,11 @@
 ---
 
 ## Phase 3: Cast Elimination
+
+- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [ ] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
+    - [ ] Read `conductor/workflow.md` for TDD lifecycle and quality gates
+    - [ ] Verify: context is refreshed and understood
 
 - [ ] Task: Remove `as unknown as` casts from hooks (7 casts, 2 files)
     - [ ] Remove 4 casts from `src/hooks/use-notifications.ts` — server fn calls should now have proper return types via `typedServerFn`
@@ -165,3 +181,4 @@
     - [ ] Verify: all quality gates pass, no regressions
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Cast Elimination' (Protocol in workflow.md)
+</protect>

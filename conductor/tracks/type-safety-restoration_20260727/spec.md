@@ -1,3 +1,4 @@
+<protect>
 # Track: Type-Safety Restoration — Eliminate `as unknown as` Casts
 
 **Track ID:** type-safety-restoration_20260727  
@@ -165,3 +166,4 @@ The codebase has accumulated ~78 `as unknown as` type casts across 36 files in `
 6. **Quality gates pass** — `pnpm typecheck`, `pnpm test:coverage`, `pnpm lint` all clean.
 7. **No `@ts-expect-error` or `as any` added** — grep confirms zero new directives.
 8. **Manual smoke test** — `pnpm dev` runs, all pages render without console errors, settings/review/upload/gradebook flows work.
+</protect>
