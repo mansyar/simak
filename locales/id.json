@@ -882,7 +882,9 @@
       "extensionRequested": "Perpanjangan Diminta",
       "deadlineReminder": "Pengingat Batas Waktu — {assignmentTitle}",
       "studentAtRisk": "Mahasiswa Berisiko — {assignmentTitle}",
-      "discussionReply": "Balasan Diskusi Baru — {assignmentTitle}"
+      "discussionReply": "Balasan Diskusi Baru — {assignmentTitle}",
+      "twoFactorEnabled": "Autentikasi Dua Faktor Diaktifkan",
+      "twoFactorDisabled": "Autentikasi Dua Faktor Dinonaktifkan"
     }
   },
   "errors": {

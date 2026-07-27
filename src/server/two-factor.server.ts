@@ -7,9 +7,11 @@ import { users, twoFactor } from '../db/schema/index';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { enqueueEmail, escapeHtml } from '../lib/email';
+import { resolveEmailSubject } from '../lib/i18n-server';
 import { revokeUserSessions } from '../lib/auth-session';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { z } from 'zod';
+import type { Locales } from '../i18n/types';
 import type {
   EnableTwoFactorSchema,
   DisableTwoFactorSchema,
@@ -96,7 +98,11 @@ export async function enableTwoFactorHandler(args: { data: VerifyTwoFactorInput 
     try {
       await enqueueEmail({
         recipientEmail: session.user.email,
-        subject: 'Two-Factor Authentication Enabled',
+        subject: resolveEmailSubject(
+          'emails.subjects.twoFactorEnabled',
+          undefined,
+          session.user.locale as Locales,
+        ),
         bodyHtml: `
           <!DOCTYPE html>
           <html>
@@ -198,7 +204,11 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
     try {
       await enqueueEmail({
         recipientEmail: session.user.email,
-        subject: 'Two-Factor Authentication Disabled',
+        subject: resolveEmailSubject(
+          'emails.subjects.twoFactorDisabled',
+          undefined,
+          session.user.locale as Locales,
+        ),
         bodyHtml: `
           <!DOCTYPE html>
           <html>

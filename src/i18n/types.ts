@@ -888,6 +888,8 @@ export type Translation = {
       deadlineReminder: string
       studentAtRisk: string
       discussionReply: string
+      twoFactorEnabled: string
+      twoFactorDisabled: string
     }
   }
   errors: {
