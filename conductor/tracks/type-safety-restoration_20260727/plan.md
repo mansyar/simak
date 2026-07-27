@@ -128,13 +128,13 @@
     - [x] Run `pnpm typecheck` after each file
     - [x] Verify: typecheck clean, zero casts in these components
 
-- [ ] Task: Remove `as unknown as` casts from admin/instructor components (8 casts, 4 files)
-    - [ ] Remove 3 casts from `src/components/admin/templates/TemplateDetailPage.tsx`
-    - [ ] Remove 3 casts from `src/components/instructor/assignments/AssignmentWizard.tsx`
-    - [ ] Remove 1 cast from `src/components/instructor/assignments/StudentPicker.tsx`
-    - [ ] Remove 1 cast from `src/components/instructor/assignments/TemplatePicker.tsx`
-    - [ ] Run `pnpm typecheck` after each file
-    - [ ] Verify: typecheck clean, zero casts in admin/instructor components
+- [x] Task: Remove `as unknown as` casts from admin/instructor components (8 casts, 4 files) [83060e7e]
+    - [x] Remove 3 casts from `src/components/admin/templates/TemplateDetailPage.tsx`
+    - [x] Remove 3 casts from `src/components/instructor/assignments/AssignmentWizard.tsx`
+    - [x] Remove 1 cast from `src/components/instructor/assignments/StudentPicker.tsx`
+    - [x] Remove 1 cast from `src/components/instructor/assignments/TemplatePicker.tsx`
+    - [x] Run `pnpm typecheck` after each file
+    - [x] Verify: typecheck clean, zero casts in admin/instructor components
 
 - [ ] Task: Remove `as unknown as` casts from routes (11 casts, 6 files)
     - [ ] Remove 1 cast from `src/routes/_authenticated/student/dashboard.tsx` (loader data cast)
