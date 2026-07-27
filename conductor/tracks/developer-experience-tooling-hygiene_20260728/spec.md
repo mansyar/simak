@@ -1,3 +1,4 @@
+<protect>
 # Track: Developer Experience & Tooling Hygiene
 
 ## Overview
@@ -101,3 +102,4 @@ Update `AGENTS.md` to reflect all configuration changes:
 - Pagination UI consolidation
 - Any `src/` source code changes beyond formatting fixes surfaced by expanded glob scope
 - Adding new lint rules or oxfmt configuration options
+</protect>

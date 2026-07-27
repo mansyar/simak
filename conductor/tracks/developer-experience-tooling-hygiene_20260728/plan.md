@@ -1,7 +1,11 @@
+<protect>
 # Implementation Plan: Developer Experience & Tooling Hygiene
 
 ## Phase 1: Configuration Alignment
 
+- [ ] Task: Read `spec.md` and `workflow.md` to establish context
+    - [ ] Read `./spec.md` for track requirements and acceptance criteria
+    - [ ] Read `../../workflow.md` for TDD lifecycle and phase completion protocol
 - [ ] Task: Align format, lint, and typecheck configuration in `lefthook.yml` and `package.json`
     - [ ] Update `package.json` `format` script: `oxfmt --write "src/**/*.{ts,tsx,css}"` → `oxfmt --write "*.{js,jsx,ts,tsx,css}"`
     - [ ] Update `lefthook.yml` `format` glob: `"*.{js,jsx,ts,tsx}"` → `"*.{js,jsx,ts,tsx,css}"`
@@ -25,6 +29,9 @@
 
 ## Phase 2: SocratiCode Context Artifacts
 
+- [ ] Task: Read `spec.md` and `workflow.md` to establish context
+    - [ ] Read `./spec.md` for track requirements and acceptance criteria
+    - [ ] Read `../../workflow.md` for TDD lifecycle and phase completion protocol
 - [ ] Task: Create `.socraticodecontextartifacts.json`
     - [ ] Create `.socraticodecontextartifacts.json` at project root with 7 artifact entries (`conductor/product.md`, `conductor/tech-stack.md`, `conductor/workflow.md`, `conductor/product-guidelines.md`, `drizzle/migrations/`, `docs/PRD.md`, `docs/TDD.md`)
 - [ ] Task: Index artifacts and verify semantic search
@@ -39,3 +46,4 @@
     - [ ] Commit with message `chore(tooling): Configure SocratiCode context artifacts`
     - [ ] Attach git note with task summary
 - [ ] Task: Conductor - User Manual Verification 'SocratiCode Context Artifacts' (Protocol in workflow.md)
+</protect>
