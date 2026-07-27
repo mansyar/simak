@@ -55,10 +55,10 @@
     - [x] Bulk user import (`/admin/users/import`): verify upload zone and template download button render.
     - [x] Bulk template import (`/admin/templates/import`): verify upload zone renders.
     - [x] Verify: `pnpm test:e2e smoke-routes.spec.ts` passes on Chromium.
-- [ ] Task: Create `tests/e2e/helpers/rubric-setup.ts` and write `tests/e2e/rubric-grading.spec.ts`
-    - [ ] Create `tests/e2e/helpers/rubric-setup.ts`: dedicated helper that sets up rubric criteria + sets `gradingType: 'numeric'` on the Proposal template checkpoint via DB helper at test start.
-    - [ ] Rubric grading test: set up rubric criteria + `gradingType` via the helper → instructor reviews with rubric scoring → add numeric scores per criterion → verify weighted total auto-computes → submit → verify `review_scores` persisted in DB.
-    - [ ] Verify: `pnpm test:e2e rubric-grading.spec.ts` passes on Chromium.
+- [x] Task: Create `tests/e2e/helpers/rubric-setup.ts` and write `tests/e2e/rubric-grading.spec.ts` [2b7be46]
+    - [x] Create `tests/e2e/helpers/rubric-setup.ts`: dedicated helper that sets up rubric criteria + sets `gradingType: 'numeric'` on the Proposal template checkpoint via DB helper at test start.
+    - [x] Rubric grading test: set up rubric criteria + `gradingType` via the helper → instructor reviews with rubric scoring → add numeric scores per criterion → verify weighted total auto-computes → submit → verify `review_scores` persisted in DB.
+    - [x] Verify: `pnpm test:e2e rubric-grading.spec.ts` passes on Chromium.
 - [ ] Task: Write `tests/e2e/discussions.spec.ts` — checkpoint discussion Q&A tests
     - [ ] Student posts a message on checkpoint page → verify it appears.
     - [ ] Instructor sees it in Discussions tab → instructor replies → verify reply appears with indentation.
