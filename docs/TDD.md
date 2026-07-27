@@ -902,7 +902,7 @@ Admin       (creates Instructors and Students)
 - Login prompts for 6-digit TOTP code when 2FA is enabled; backup code works as fallback.
 - Per-user enable/disable with current password confirmation.
 - Active sessions dashboard showing device, IP, and timestamp per session. Users can revoke specific sessions or all other sessions.
-- Email notification sent on 2FA enable/disable via the email queue.
+- Email notification sent on 2FA enable/disable via the email queue. Subjects are localized via `resolveEmailSubject()` using the user's `locale` (TRACK-034).
 - All 2FA and session actions logged to the audit log.
 
 ---
@@ -1030,7 +1030,7 @@ A checkpoint unlocks when:
 ### Email Delivery
 
 - Sent via Resend API. [v1] for all email types — auth-related emails (invitations, password reset, 2FA enable/disable), SLA alerts, and **11 event notification types** (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, deadline reminder, student at risk, discussion reply). Event emails are dispatched as **post-commit advisory work** alongside existing in-app notifications via `enqueueEventEmail()` (`src/lib/event-email.ts`) — the primary operation always succeeds even if email enqueue fails. HTML templates are built by domain-specific helper functions in `src/lib/email-templates.ts` (11 builders + shared header/footer). Recipients with no verified email or soft-deleted accounts are silently skipped via `resolveEmailRecipient()` in `src/lib/email.ts`.
-- **Localized email subjects:** Password reset, invitation, SLA alert, and all 9 event notification subjects are resolved from i18n keys (`emails.subjects.*`) using the recipient's `locale` preference via a shared server-side resolver. Event email subjects are prefixed with `[SIMAK]` (e.g., `[SIMAK] New Submission Received`). Subjects support parameter interpolation (e.g., `{assignmentTitle}` in the deadline reminder subject) via optional `subjectParams` on `enqueueEventEmail`.
+- **Localized email subjects:** Password reset, invitation, 2FA enable/disable, SLA alert, and all 9 event notification subjects are resolved from i18n keys (`emails.subjects.*`) using the recipient's `locale` preference via `resolveEmailSubject()` in `src/lib/i18n-server.ts` (falls back to raw key if not found — non-crashing). Event email subjects are prefixed with `[SIMAK]` (e.g., `[SIMAK] New Submission Received`). Subjects support parameter interpolation (e.g., `{assignmentTitle}` in the deadline reminder subject) via optional `subjectParams` on `enqueueEventEmail`.
 - Email queue (`email_queue` table) with retry logic: 3 attempts with exponential backoff (30s, 5min, 30min).
 - Dead letter after 3 failed attempts (logged, not retried).
 - **Concurrent batch sends:** The processor sends emails in chunks of 5 via `Promise.allSettled` (chunks run sequentially). Each email's success/failure is handled individually in the settled callback (same UPDATE logic). Partial failures don't abort the batch. Cycle latency reduced from ~10× to ~2× single-send latency for a full batch of 10 (TRACK-016, PERF-32/33).
