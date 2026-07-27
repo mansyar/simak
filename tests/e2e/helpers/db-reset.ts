@@ -20,6 +20,7 @@ export const TABLES_TO_TRUNCATE = [
   'notifications',
   'extension_requests',
   'consultations',
+  'checkpoint_discussions',
   'upload_intents',
   'review_scores',
   'reviews',
