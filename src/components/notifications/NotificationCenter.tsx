@@ -49,7 +49,7 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
   });
   const { mutate: markAllRead, isPending: isMarkingAll } = useMarkAllRead();
 
-  const items: Notification[] = (data?.pages.flatMap((p) => p.items) ?? []) as Notification[];
+  const items = (data?.pages.flatMap((p) => p.items) ?? []) as Notification[];
   const hasNotifications = items.length > 0;
 
   // Group notifications (memoized — PERF-27)
