@@ -42,24 +42,24 @@
 
 ## Phase 3: Optimistic Mutation Rewrite + Full Test Suite
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before implementation
-- [ ] Task: Write failing tests for optimistic mutations with infinite query shape
-    - [ ] Update `tests/unit/hooks/use-notifications.test.tsx` — `useMarkRead`/`useMarkAllRead` optimistic tests: replace `queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList)` with infinite query shape `{ pages: [{ items: [...], total: N }], pageParams: [1] }`, assert optimistic update modifies items within `pages[0].items` (not top-level `items`), assert rollback restores full `{ pages, pageParams }` structure, assert `useUnreadCount` (number type) still decrements/zeroes correctly
-    - [ ] Add test: optimistic `markRead` updates the correct item across multiple pages (not just page 1)
-    - [ ] Add test: optimistic `markAllRead` updates items in all loaded pages
-    - [ ] Run `pnpm test` — confirm optimistic tests fail (Red phase — `'items' in old` check no-ops against `{ pages, pageParams }` shape)
-- [ ] Task: Rewrite `useMarkRead` and `useMarkAllRead` optimistic callbacks for infinite query shape
-    - [ ] Edit `src/hooks/use-notifications.ts` `useMarkRead` `onMutate` (line 85-99) — replace `'items' in old` check with `'pages' in old`, then map over `old.pages` to update `items` within each page: `old.pages.map(page => ({ ...page, items: page.items.map(item => item.id === notificationId ? { ...item, read: true } : item) }))`
-    - [ ] Edit `src/hooks/use-notifications.ts` `useMarkAllRead` `onMutate` (line 143-155) — same pattern: check `'pages' in old`, map over `old.pages` to set all items `read: true`
-    - [ ] Preserve `typeof old === 'number'` check for `useUnreadCount` (unchanged)
-    - [ ] Preserve `onError` rollback and `onSettled` invalidation (unchanged — `notificationKeys.all()` still works)
-    - [ ] Run `pnpm test` — confirm all optimistic tests pass (Green phase)
-- [ ] Task: Quality gate verification
-    - [ ] Run `pnpm test:coverage` — verify ≥80% on lines, statements, branches, functions
-    - [ ] Run `pnpm typecheck` — clean
-    - [ ] Run `pnpm lint` — 0 warnings, 0 errors (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n` — parity maintained (no new keys expected)
-    - [ ] Verify all files under 500 lines: `use-notifications.ts`, `NotificationCenter.tsx`, `query-keys.ts`, all test files
-    - [ ] Grep verification: `allItems` and `existingIds` return zero matches in `NotificationCenter.tsx`; `'items' in old` returns zero matches in `use-notifications.ts`; `setCurrentPage` returns zero matches in `NotificationCenter.tsx`
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before implementation
+- [x] Task: Write failing tests for optimistic mutations with infinite query shape [SHA: 73305425]
+    - [x] Update `tests/unit/hooks/use-notifications-mutations.test.tsx` — `useMarkRead`/`useMarkAllRead` optimistic tests: replace `queryClient.setQueryData(notificationKeys.list({ page: 1, limit: 20 }), mockList)` with infinite query shape `{ pages: [{ items: [...], total: N }], pageParams: [1] }`, assert optimistic update modifies items within `pages[0].items` (not top-level `items`), assert rollback restores full `{ pages, pageParams }` structure, assert `useUnreadCount` (number type) still decrements/zeroes correctly
+    - [x] Add test: optimistic `markRead` updates the correct item across multiple pages (not just page 1)
+    - [x] Add test: optimistic `markAllRead` updates items in all loaded pages
+    - [x] Run `pnpm test` — confirm optimistic tests fail (Red phase — `'items' in old` check no-ops against `{ pages, pageParams }` shape)
+- [x] Task: Rewrite `useMarkRead` and `useMarkAllRead` optimistic callbacks for infinite query shape [SHA: 73305425]
+    - [x] Edit `src/hooks/use-notifications.ts` `useMarkRead` `onMutate` — replace `'items' in old` check with `'pages' in old`, then map over `old.pages` to update `items` within each page: `old.pages.map(page => ({ ...page, items: page.items.map(item => item.id === notificationId ? { ...item, read: true } : item) }))`
+    - [x] Edit `src/hooks/use-notifications.ts` `useMarkAllRead` `onMutate` — same pattern: check `'pages' in old`, map over `old.pages` to set all items `read: true`
+    - [x] Preserve `typeof old === 'number'` check for `useUnreadCount` (unchanged)
+    - [x] Preserve `onError` rollback and `onSettled` invalidation (unchanged — `notificationKeys.all()` still works)
+    - [x] Run `pnpm test` — confirm all optimistic tests pass (Green phase)
+- [x] Task: Quality gate verification [SHA: 73305425]
+    - [x] Run `pnpm test:coverage` — verify ≥80% on lines, statements, branches, functions
+    - [x] Run `pnpm typecheck` — clean
+    - [x] Run `pnpm lint` — 0 warnings, 0 errors (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n` — parity maintained (no new keys expected)
+    - [x] Verify all files under 500 lines: `use-notifications.ts`, `NotificationCenter.tsx`, `query-keys.ts`, all test files
+    - [x] Grep verification: `allItems` and `existingIds` return zero matches in `NotificationCenter.tsx`; `'items' in old` returns zero matches in `use-notifications.ts`; `setCurrentPage` returns zero matches in `NotificationCenter.tsx`
 - [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 </protect>
