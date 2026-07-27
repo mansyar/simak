@@ -7,26 +7,26 @@
 
 ## Phase 1: Vitest Config & Script Consolidation
 
-- [ ] Task: Read `./spec.md` and `../../workflow.md` to re-establish context for this phase
+- [x] Task: Read `./spec.md` and `../../workflow.md` to re-establish context for this phase
 
-- [ ] Task: Restructure `vitest.config.ts` to use a `projects` array
-    - [ ] Hoist shared config (resolve.alias `@`, extensions, globals, environment `happy-dom`, env loading, onConsoleLog, reporters, coverage block with ≥80% thresholds) so both projects inherit it
-    - [ ] Add **unit project**: `pool: 'vmThreads'` (inherited), `include: ['tests/**/*.test.{ts,tsx}']`, `exclude: ['node_modules', 'dist', 'tests/integration/**', 'tests/unit/lib/parse-templates-xlsx.test.ts', 'tests/unit/lib/parse-users-xlsx.test.ts', 'tests/unit/lib/sample-generators.test.ts', 'tests/unit/lib/excel-export.test.ts']`
-    - [ ] Add **xlsx project**: `pool: 'threads'`, `include: ['tests/unit/lib/parse-templates-xlsx.test.ts', 'tests/unit/lib/parse-users-xlsx.test.ts', 'tests/unit/lib/sample-generators.test.ts', 'tests/unit/lib/excel-export.test.ts']`, `exclude: ['node_modules', 'dist']`
-    - [ ] Smoke-verify config parses & both projects are discovered: `pnpm exec vitest run --no-coverage` (expect unit tests run on vmThreads, xlsx on threads)
+- [x] Task: Restructure `vitest.config.ts` to use a `projects` array [e6a1085]
+    - [x] Hoist shared config (resolve.alias `@`, extensions, globals, environment `happy-dom`, env loading, onConsoleLog, reporters, coverage block with ≥80% thresholds) so both projects inherit it
+    - [x] Add **unit project**: `pool: 'vmThreads'` (inherited), `include: ['tests/**/*.test.{ts,tsx}']`, `exclude: ['node_modules', 'dist', 'tests/integration/**', 'tests/unit/lib/parse-templates-xlsx.test.ts', 'tests/unit/lib/parse-users-xlsx.test.ts', 'tests/unit/lib/sample-generators.test.ts', 'tests/unit/lib/excel-export.test.ts']`
+    - [x] Add **xlsx project**: `pool: 'threads'`, `include: ['tests/unit/lib/parse-templates-xlsx.test.ts', 'tests/unit/lib/parse-users-xlsx.test.ts', 'tests/unit/lib/sample-generators.test.ts', 'tests/unit/lib/excel-export.test.ts']`, `exclude: ['node_modules', 'dist']`
+    - [x] Smoke-verify config parses & both projects are discovered: `pnpm exec vitest run --no-coverage` (expect unit tests run on vmThreads, xlsx on threads)
 
-- [ ] Task: Create `vitest.config.integration.ts`
-    - [ ] Minimal config sharing base settings (alias `@`, env loading, globals, environment `happy-dom`) with the main config — extract a shared base module if it avoids drift, otherwise standalone ~15-line config
-    - [ ] `include: ['tests/integration/**/*.test.{ts,tsx}']`, `exclude: ['node_modules', 'dist']`, pool inherited (`vmThreads`, matching current behavior)
-    - [ ] Smoke-verify it loads: `pnpm exec vitest run --config vitest.config.integration.ts --no-coverage` (confirm config parses; full run needs DB)
+- [x] Task: Create `vitest.config.integration.ts` [e6a1085]
+    - [x] Minimal config sharing base settings (alias `@`, env loading, globals, environment `happy-dom`) with the main config — extract a shared base module if it avoids drift, otherwise standalone ~15-line config
+    - [x] `include: ['tests/integration/**/*.test.{ts,tsx}']`, `exclude: ['node_modules', 'dist']`, pool inherited (`vmThreads`, matching current behavior)
+    - [x] Smoke-verify it loads: `pnpm exec vitest run --config vitest.config.integration.ts --no-coverage` (confirm config parses; full run needs DB)
 
-- [ ] Task: Simplify `package.json` test scripts
-    - [ ] Set `test` to `vitest run`
-    - [ ] Set `test:unit` to `pnpm test` (thin alias)
-    - [ ] Set `test:watch` to `vitest`
-    - [ ] Set `test:coverage` to `vitest run --coverage` (remove `--pool=threads` global override and all `--exclude` flags)
-    - [ ] Set `test:integration` to `vitest run --config vitest.config.integration.ts tests/integration`
-    - [ ] Leave `test:e2e`, `test:e2e:ui` unchanged (Playwright — out of scope)
+- [x] Task: Simplify `package.json` test scripts [e6a1085]
+    - [x] Set `test` to `vitest run`
+    - [x] Set `test:unit` to `pnpm test` (thin alias)
+    - [x] Set `test:watch` to `vitest`
+    - [x] Set `test:coverage` to `vitest run --coverage` (remove `--pool=threads` global override and all `--exclude` flags)
+    - [x] Set `test:integration` to `vitest run --config vitest.config.integration.ts tests/integration`
+    - [x] Leave `test:e2e`, `test:e2e:ui` unchanged (Playwright — out of scope)
 
 - [ ] Task: Behavioral verification of consolidated config + scripts
     - [ ] **AC-1:** Run bare `pnpm exec vitest run` (not `pnpm test`) → confirm integration tests excluded (no `tests/integration/**` executes)
