@@ -67,21 +67,23 @@
     - [x] Run `pnpm typecheck` after each file — catch any inference gaps immediately
     - [x] Verify: typecheck clean after batch 1 — typecheck 0 errors, 3780 tests pass, lint 0 errors
 
-- [ ] Task: Migrate server-function stubs to `typedServerFn` (batch 2: remaining stubs)
-    - [ ] Migrate `src/server/consultations.ts`
-    - [ ] Migrate `src/server/extensions.ts`
-    - [ ] Migrate `src/server/discussions.ts`
-    - [ ] Migrate `src/server/gradebook.ts`
-    - [ ] Migrate `src/server/dashboard.ts`
-    - [ ] Migrate `src/server/templates.ts`
-    - [ ] Migrate `src/server/users.ts`
-    - [ ] Migrate `src/server/email-queue.ts`
-    - [ ] Migrate `src/server/audit-logs.ts`
-    - [ ] Migrate `src/server/analytics.ts`
-    - [ ] Migrate any other `src/server/*.ts` stub files found via grep
-    - [ ] Run `pnpm typecheck` after each file
-    - [ ] Run `pnpm test:unit` — confirm all existing tests pass (test mocks for `@tanstack/react-start` should still work since `typedServerFn` delegates to `createServerFn` at runtime)
-    - [ ] Verify: typecheck clean, all tests pass
+- [x] Task: Migrate server-function stubs to `typedServerFn` (batch 2: remaining stubs) [16d62f6]
+    - [x] Migrate `src/server/consultations.ts`
+    - [x] Migrate `src/server/extensions.ts`
+    - [x] Migrate `src/server/discussions.ts`
+    - [x] Migrate `src/server/gradebook.ts`
+    - [x] Migrate `src/server/dashboard.ts`
+    - [x] Migrate `src/server/templates.ts`
+    - [x] Migrate `src/server/users.ts`
+    - [x] Migrate `src/server/email-queue.ts`
+    - [x] Migrate `src/server/audit-logs.ts`
+    - [x] Migrate `src/server/analytics.ts`
+    - [x] Migrate other `src/server/*.ts` stub files found via grep: auth.ts, bulk-import.ts, files.ts, instructor-assignments-filter.ts, rubrics.ts, two-factor.ts, setup-password.ts, sessions.ts (8 additional files)
+    - [x] Fix `OptionalFetcher` type in `src/lib/server-fn.ts` for handler-only fns called with 0 args
+    - [x] Run `pnpm typecheck` after migration — 0 errors (fixed 5 TS2554 errors from handler-only fns)
+    - [x] Run `pnpm test:unit` — 3780 tests pass (0 failures)
+    - [x] Run `pnpm lint` — 0 errors, 4 pre-existing warnings
+    - [x] Verify: typecheck clean, all tests pass, all 23 server stub files migrated
 
 - [ ] Task: Verify quality gates for Phase 2
     - [ ] Run `pnpm typecheck` — 0 errors
