@@ -33,18 +33,18 @@
 
 ## Phase 2: Type Fix at Source
 
-- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
-    - [ ] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
-    - [ ] Read `conductor/workflow.md` for TDD lifecycle and quality gates
-    - [ ] Verify: context is refreshed and understood
+- [x] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [x] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
+    - [x] Read `conductor/workflow.md` for TDD lifecycle and quality gates
+    - [x] Verify: context is refreshed and understood
 
-- [ ] Task: Write unit test for `typedServerFn` wrapper (Red Phase)
-    - [ ] Create `tests/unit/lib/server-fn.test.ts` (or `test-d.ts` for type-level assertions)
-    - [ ] Write tests asserting: (1) `typedServerFn` preserves the `.inputValidator(Schema).handler(fn)` builder chain API, (2) the handler's return type propagates to the callable stub, (3) runtime behavior is identical to `createServerFn`
-    - [ ] Run `pnpm test` — confirm tests fail (wrapper doesn't exist yet)
-    - [ ] Verify: tests fail as expected
+- [x] Task: Write unit test for `typedServerFn` wrapper (Red Phase) [8ed44dc]
+    - [x] Create `tests/unit/lib/server-fn.test.ts` (or `test-d.ts` for type-level assertions)
+    - [x] Write tests asserting: (1) `typedServerFn` preserves the `.inputValidator(Schema).handler(fn)` builder chain API, (2) the handler's return type propagates to the callable stub, (3) runtime behavior is identical to `createServerFn`
+    - [x] Run `pnpm test` — confirm tests fail (wrapper doesn't exist yet)
+    - [x] Verify: tests fail as expected
 
-- [ ] Task: Implement `src/lib/server-fn.ts` with `typedServerFn` wrapper (Green Phase)
+- [~] Task: Implement `src/lib/server-fn.ts` with `typedServerFn` wrapper (Green Phase)
     - [ ] Create `src/lib/server-fn.ts` exporting `typedServerFn` that wraps `createServerFn` with proper generic return-type inference
     - [ ] The wrapper must preserve the `.inputValidator(Schema).handler(fn)` builder chain API
     - [ ] The wrapper must propagate the handler's return type to the callable stub (no `unknown` at call sites)
