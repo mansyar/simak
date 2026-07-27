@@ -72,8 +72,8 @@
 
 ## Phase 3: Cross-Role Lifecycle + Mobile + A11y + Firefox
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
-- [ ] Task: Write `tests/e2e/cross-role-lifecycle.spec.ts` — full lifecycle integration test
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
+- [x] Task: Write `tests/e2e/cross-role-lifecycle.spec.ts` — full lifecycle integration test [f2d8bd4]
     - [ ] Single serial test: admin creates template → instructor creates assignment from template → student logs consultation → instructor verifies → student submits (via DB helper) → instructor reviews with Pass → verify next checkpoint unlocks → student submits → instructor reviews with Revise → student resubmits → instructor reviews with Pass → verify assignment completion state.
     - [ ] Set timeout to 120s, mark as serial, runs last.
     - [ ] Browser context management: single context, clear cookies + storageState between role switches, login as new role via Better Auth API (`loginAsRole` pattern).
