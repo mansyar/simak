@@ -8,3 +8,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Server-Side Guard Consolidation & Env Type Consolidation**
+*Link: [./tracks/server-guard-env-consolidation_20260727/](./tracks/server-guard-env-consolidation_20260727/)*
+
