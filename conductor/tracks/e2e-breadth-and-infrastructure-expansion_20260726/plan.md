@@ -82,11 +82,11 @@
     - [ ] Add `mobile-chrome` project using `devices['Pixel 7']` (or `devices['iPhone 14']`).
     - [ ] Run dashboard and assignment detail tests on mobile viewport to verify responsive layouts (card-based `ProgressTable`, stacked `CheckpointListEditor`, mobile step indicator in wizard).
     - [ ] Verify: mobile tests pass, `playwright.config.ts` stays under 500 lines.
-- [ ] Task: Implement axe accessibility scans on 6 key pages
-    - [ ] Run axe scans on: login page, student dashboard, student assignment detail, instructor review detail, admin users, admin templates.
-    - [ ] Assert zero critical and serious violations.
-    - [ ] Document moderate/minor violations in `docs/a11y-violations.md`.
-    - [ ] Verify: axe scans pass (zero critical/serious), violations doc created.
+- [x] Task: Implement axe accessibility scans on 6 key pages [a4665f5]
+    - [x] Run axe scans on: login page, student dashboard, student assignment detail, instructor review detail, admin users, admin templates.
+    - [x] Assert zero critical and serious violations.
+    - [x] Document moderate/minor violations in `docs/a11y-violations.md`.
+    - [x] Verify: axe scans pass (zero critical/serious), violations doc created.
 - [ ] Task: Run full suite on Firefox and fix any browser-specific failures
     - [ ] Run `pnpm test:e2e` on Firefox project.
     - [ ] Triage and fix any Firefox-specific failures within this track (do not skip or defer).
