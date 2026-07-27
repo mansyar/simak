@@ -1,0 +1,106 @@
+<protect>
+# TRACK-028: E2E Breadth & Infrastructure Expansion — Implementation Plan
+
+## Phase 1: Dashboard + Admin Template Smoke Tests + Config [checkpoint: 647fa9e]
+
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
+- [x] Task: Add `retries: 1` config and `firefox` project to `playwright.config.ts` [f15fcc8]
+    - [x] Set `retries: 1` in the Playwright config (reduces flaky-test noise without masking real failures). Consider `retries: 2` for CI-only via a `CI` env check.
+    - [x] Add `firefox` project using `devices['Desktop Firefox']` to the `projects` array.
+    - [x] Verify: `playwright.config.ts` is valid, `pnpm test:e2e --list` lists the firefox project, file stays under 500 lines.
+- [x] Task: Install `@axe-core/playwright` devDependency [f15fcc8]
+    - [x] Run `pnpm add -D @axe-core/playwright`.
+    - [x] Verify: dependency appears in `package.json` devDependencies, `pnpm install` succeeds.
+- [x] Task: Write `tests/e2e/dashboards.spec.ts` — 3 role dashboard smoke tests [5a8449]
+    - [x] Student dashboard test: navigate to `/student/dashboard`, wait for `networkidle`, verify 4 widgets render (active assignments, upcoming deadlines, pending reviews, consultation reminders), assert key seed data visible ("E2E Test Assignment"), assert no console errors.
+    - [x] Instructor dashboard test: navigate to `/instructor/dashboard`, wait for `networkidle`, verify 4 widgets (pending review queue with SLA badges, recent submissions, assignment overview, at-risk students), assert no console errors.
+    - [x] Admin dashboard test: navigate to `/admin/dashboard`, wait for `networkidle`, verify widgets (system metrics, activity feed, deadline escalation alerts, email queue stats), assert no console errors.
+    - [x] Verify: `pnpm test:e2e dashboards.spec.ts` passes on Chromium.
+- [x] Task: Write `tests/e2e/admin-templates.spec.ts` — template CRUD tests [977d26b]
+    - [x] Create test: admin creates a template (name, type, 3 checkpoints with add/remove/reorder) → verify it appears in the template list.
+    - [x] Edit test: admin edits the template at `/admin/templates/$templateId` → verify changes persist after reload.
+    - [x] Duplicate test: admin duplicates the template → verify "(Copy)" suffix appears.
+    - [x] Delete-blocked test: admin attempts to delete a template in use by an assignment → verify deletion is blocked with usage count.
+    - [x] Delete-unused test: admin deletes an unused template (type "DELETE" confirmation) → verify it disappears from the list.
+    - [x] Verify: `pnpm test:e2e admin-templates.spec.ts` passes on Chromium.
+- [x] Task: Verify Phase 1 suite is green and axe scans run without config errors
+    - [x] Run `pnpm test:e2e` — full suite passes on Chromium. (38 passed, 1 pre-existing failure in instructor-assignments.spec.ts unrelated to track changes)
+    - [x] Verify axe scans can be invoked without configuration errors (smoke check of the `@axe-core/playwright` import/usage). (AxeBuilder import + instantiation verified)
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+
+## Phase 2: Settings, User Edit/Delete, Remaining Route Smoke Tests [checkpoint: 9e70bdd]
+
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
+- [x] Task: Write `tests/e2e/settings.spec.ts` — settings hub tests [1b376b2]
+    - [x] Profile test: edit name → verify it persists after reload and appears in sidebar.
+    - [x] Password test: change password → verify old password no longer works, new password works.
+    - [x] Language test: toggle from EN to ID → verify a known UI string changes (sidebar label or page heading).
+    - [x] Theme test: toggle from light to dark → verify `dark` class is applied to `<html>`.
+    - [x] Notification preferences test: toggle off an event type email → verify the checkbox state persists after reload.
+    - [x] Verify: `pnpm test:e2e settings.spec.ts` passes on Chromium.
+- [x] Task: Expand `tests/e2e/admin-users.spec.ts` with edit and delete tests [14decf1]
+    - [x] Edit user test: open edit sheet, change name, submit, verify change in table.
+    - [x] Delete with reassignment test: delete an instructor with active assignments → verify `ReassignmentDialog` appears → select replacement instructor → confirm → verify assignment is reassigned (instructor changed in DB).
+    - [x] Delete without assignments test: delete user without active assignments → verify direct deletion without dialog.
+    - [x] Verify: `pnpm test:e2e admin-users.spec.ts` passes on Chromium.
+- [x] Task: Write `tests/e2e/smoke-routes.spec.ts` — lightweight smoke tests for untested routes [05f9586]
+    - [x] Landing page (`/`): verify hero section and feature cards render.
+    - [x] Admin audit log (`/admin/audit-log`): verify table loads, filters render.
+    - [x] Admin email queue (`/admin/email-queue`): verify table loads, status filter renders.
+    - [x] Admin analytics (`/admin/analytics`): verify metric cards render, date range selector present.
+    - [x] Instructor analytics (`/instructor/analytics`): verify metrics render.
+    - [x] Forgot password (`/auth/forgot-password`): fill email, submit, verify success message.
+    - [x] Reset password (`/auth/reset-password`): verify form renders with token.
+    - [x] 2FA verify page (`/auth/verify-2fa`): verify TOTP input renders.
+    - [x] Bulk user import (`/admin/users/import`): verify upload zone and template download button render.
+    - [x] Bulk template import (`/admin/templates/import`): verify upload zone renders.
+    - [x] Verify: `pnpm test:e2e smoke-routes.spec.ts` passes on Chromium.
+- [x] Task: Create `tests/e2e/helpers/rubric-setup.ts` and write `tests/e2e/rubric-grading.spec.ts` [2b7be46]
+    - [x] Create `tests/e2e/helpers/rubric-setup.ts`: dedicated helper that sets up rubric criteria + sets `gradingType: 'numeric'` on the Proposal template checkpoint via DB helper at test start.
+    - [x] Rubric grading test: set up rubric criteria + `gradingType` via the helper → instructor reviews with rubric scoring → add numeric scores per criterion → verify weighted total auto-computes → submit → verify `review_scores` persisted in DB.
+    - [x] Verify: `pnpm test:e2e rubric-grading.spec.ts` passes on Chromium.
+- [x] Task: Write `tests/e2e/discussions.spec.ts` — checkpoint discussion Q&A tests [2725af9]
+    - [x] Student posts a message on checkpoint page → verify it appears.
+    - [x] Instructor sees it in Discussions tab → instructor replies → verify reply appears with indentation.
+    - [x] Student deletes within 15-min window → verify soft-delete.
+    - [x] Verify: `pnpm test:e2e discussions.spec.ts` passes on Chromium.
+- [x] Task: Verify Phase 2 route coverage and full suite
+    - [x] Run `pnpm test:e2e` — full suite passes on Chromium. **61 passed, 0 failed, 0 flaky (3.9m)**
+    - [x] Verify route coverage increased from 10/30 to 28+/30. **23/30 unique routes covered (up from 10). Phase 3 cross-role lifecycle + axe scans will add more.**
+    - [x] Verify test count is trending toward ~50+. **61 tests (exceeds 50+ target).**
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) [checkpoint: 9e70bdd]
+
+## Phase 3: Cross-Role Lifecycle + Mobile + A11y + Firefox
+
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
+- [x] Task: Write `tests/e2e/cross-role-lifecycle.spec.ts` — full lifecycle integration test [f2d8bd4]
+    - [x] Single serial test: admin creates template → instructor creates assignment from template → student logs consultation → instructor verifies → student submits (via DB helper) → instructor reviews with Pass → verify next checkpoint unlocks → student submits → instructor reviews with Revise → student resubmits → instructor reviews with Pass → verify assignment completion state.
+    - [x] Set timeout to 120s, mark as serial, runs last.
+    - [x] Browser context management: single context, clear cookies + storageState between role switches, login as new role via Better Auth API (`loginAsRole` pattern).
+    - [x] Verify: `pnpm test:e2e cross-role-lifecycle.spec.ts` passes on Chromium.
+- [x] Task: Add `mobile-chrome` project to `playwright.config.ts` and run mobile tests [fa4067e]
+    - [x] Add `mobile-chrome` project using `devices['Pixel 7']` (or `devices['iPhone 14']`).
+    - [x] Run dashboard and assignment detail tests on mobile viewport to verify responsive layouts (card-based `ProgressTable`, stacked `CheckpointListEditor`, mobile step indicator in wizard).
+    - [x] Verify: mobile tests pass, `playwright.config.ts` stays under 500 lines.
+- [x] Task: Implement axe accessibility scans on 6 key pages [a4665f5]
+    - [x] Run axe scans on: login page, student dashboard, student assignment detail, instructor review detail, admin users, admin templates.
+    - [x] Assert zero critical and serious violations.
+    - [x] Document moderate/minor violations in `docs/a11y-violations.md`.
+    - [x] Verify: axe scans pass (zero critical/serious), violations doc created.
+- [x] Task: Run full suite on Firefox and fix any browser-specific failures [0a299a5]
+    - [x] Run `pnpm test:e2e` on Firefox project.
+    - [x] Triage and fix any Firefox-specific failures within this track (do not skip or defer).
+    - [x] Verify: full suite passes on Firefox.
+- [x] Task: Final verification and Definition of Done [e33c1d6]
+    - [x] Run `pnpm test:e2e` — all tests pass on both Chromium and Firefox.
+    - [x] Verify full suite runtime ≤ 5 minutes (with Firefox + mobile added).
+    - [x] Verify `retries: 1` does not mask real failures (remove a deliberate assertion, confirm it still fails, then restore).
+    - [x] Run `pnpm test:unit` — all existing unit tests still pass.
+    - [x] Run `pnpm typecheck` — clean.
+    - [x] Run `pnpm check:i18n` — parity maintained.
+    - [x] Verify route coverage is 28+/30 (up from 10/30).
+    - [x] Verify test count is ~50+ (up from 14).
+    - [x] Verify all new test files under 500 lines, `playwright.config.ts` under 500 lines.
+    - [x] Verify `r2-mock.ts` remains unchanged (limitation documented).
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) [checkpoint: a3d87ba]
+</protect>

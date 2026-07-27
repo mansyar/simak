@@ -37,6 +37,7 @@ const E2E_PASSWORD = 'TestPass123!';
 const E2E_USERS = [
   { name: 'Admin', email: 'admin@e2e.test', role: 'admin' as const },
   { name: 'Instructor', email: 'instructor@e2e.test', role: 'instructor' as const },
+  { name: 'Instructor Two', email: 'instructor2@e2e.test', role: 'instructor' as const },
   { name: 'Student', email: 'student@e2e.test', role: 'student' as const },
   { name: 'Student Two', email: 'student2@e2e.test', role: 'student' as const },
   { name: 'Student Three', email: 'student3@e2e.test', role: 'student' as const },

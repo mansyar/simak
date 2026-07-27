@@ -25,6 +25,7 @@ function Progress({
   return (
     <div
       role="progressbar"
+      aria-label={label || 'Progress'}
       aria-valuenow={value}
       aria-valuemax={max}
       aria-valuemin={0}

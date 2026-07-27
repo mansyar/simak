@@ -39,7 +39,7 @@ export function TemplateFilters({
       </div>
       <div className="w-full sm:w-[180px]">
         <Select value={type} onValueChange={(val) => onTypeChange(val || 'all')}>
-          <SelectTrigger>
+          <SelectTrigger aria-label={t('adminTemplates.filterByType')}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

@@ -79,7 +79,7 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
         {/* Navigation */}
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-4 pb-4">
           {/* MAIN section */}
-          <span className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">
+          <span className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/90">
             {t('instructorSidebar.sectionMain')}
           </span>
           {mainLinks.map((link) => {
@@ -104,7 +104,7 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
           })}
 
           {/* PREFERENCES section */}
-          <span className="px-3 pb-1 pt-5 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">
+          <span className="px-3 pb-1 pt-5 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/90">
             {t('instructorSidebar.sectionPreferences')}
           </span>
           {preferenceLinks.map((link) => {

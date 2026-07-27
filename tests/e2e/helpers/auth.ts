@@ -83,6 +83,7 @@ export async function loginAsRole(page: Page, role: E2ERole): Promise<void> {
   // Wait for redirect to the role-specific dashboard
   await page.goto(dashboardPath);
   await page.waitForURL(`**${dashboardPath}**`, { timeout: 30_000 });
+  await page.waitForLoadState('networkidle');
 }
 
 /**

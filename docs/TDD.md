@@ -18,7 +18,7 @@
 | **File Storage**   | Cloudflare R2                   | S3-compatible object storage with presigned URL uploads.                                            |
 | **Email**          | Resend                          | Transactional email API for invitations and password setup.                                         |
 | **i18n**           | typesafe-i18n                   | Type-safe translations with compile-time checks. Works in both client and server functions.         |
-| **Testing**        | Vitest + Playwright             | Vitest for unit and integration tests; Playwright for E2E.                                          |
+| **Testing**        | Vitest + Playwright + @axe-core/playwright | Vitest for unit and integration tests; Playwright for E2E (chromium + firefox + mobile-chrome projects); @axe-core/playwright for automated WCAG 2.1 AA accessibility scanning in E2E tests. |
 | **Deployment**     | Docker + Coolify                | Self-hosted on a VPS.                                                                               |
 
 ### MVP Scope Legend
@@ -207,7 +207,7 @@ simak/
 ├── tests/
 │   ├── unit/                 → Vitest unit tests
 │   ├── integration/          → Vitest integration tests
-│   └── e2e/                  → Playwright E2E tests
+│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, ~73 tests across 14 spec files, includes @axe-core/playwright a11y scans)
 ├── docker/
 │   └── Dockerfile
 ├── drizzle.config.ts

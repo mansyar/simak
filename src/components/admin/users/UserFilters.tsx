@@ -57,7 +57,7 @@ export function UserFilters({ search, onSearchChange, role, onRoleChange }: User
       </div>
       <div className="w-full sm:w-[180px]">
         <Select value={role} onValueChange={(val) => onRoleChange(val || 'all')}>
-          <SelectTrigger>
+          <SelectTrigger aria-label={t('adminUsers.allRoles')}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
