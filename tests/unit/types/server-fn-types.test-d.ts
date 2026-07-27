@@ -1,19 +1,20 @@
 /**
- * Type-level test: demonstrates that `createServerFn` does not propagate
+ * Type-level test: verifies that `typedServerFn` properly propagates
  * the handler's return type to the callable stub.
  *
- * Root cause: `createServerFn`'s `handler` method has generic `<TNewResponse>`,
- * but the `ServerFnReturnType` conditional type (which applies
- * `ValidateSerializableInput`) prevents TypeScript from inferring `TNewResponse`.
- * It defaults to `unknown`, making the `Fetcher` return type `Promise<unknown>`.
+ * Background: `createServerFn` does not propagate the return type — its
+ * `handler` method has generic `<TNewResponse>`, but `ServerFnReturnType`
+ * applies `ValidateSerializableInput` (a recursive conditional type) that
+ * prevents TypeScript from inferring `TNewResponse`. It defaults to `unknown`,
+ * making the `Fetcher` return type `Promise<unknown>`.
  *
- * Before the `typedServerFn` fix: Tests 1-2 FAIL (type error) because
- * the return type is `unknown`. Test 3 PASSES because input type IS inferred.
- * After the fix: All tests PASS because the return type is properly inferred.
+ * The `typedServerFn` wrapper fixes this by providing explicit return-type
+ * inference via the `TypedFetcher` type. All three tests below PASS with
+ * `typedServerFn`, confirming the fix works for both server-fn patterns.
  */
 
 import { expectTypeOf } from 'vitest';
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 // --- Test fixtures ---
@@ -23,14 +24,14 @@ const TestSchema = z.object({
 });
 
 // Pattern 1: Typed builder (inputValidator + handler) — used by assignments.ts
-const typedBuilderFn = createServerFn({ method: 'GET' })
+const typedBuilderFn = typedServerFn({ method: 'GET' })
   .inputValidator(TestSchema)
   .handler(async ({ data }) => {
     return { count: 1, name: data.name };
   });
 
 // Pattern 2: Inline parse (handler with unknown data) — used by notifications.ts
-const inlineParseFn = createServerFn({ method: 'GET' }).handler(async (args: { data: unknown }) => {
+const inlineParseFn = typedServerFn({ method: 'GET' }).handler(async (args: { data: unknown }) => {
   const data = TestSchema.parse(args.data);
   return { count: 1, name: data.name };
 });
@@ -44,5 +45,4 @@ expectTypeOf(typedBuilderFn).returns.resolves.toEqualTypeOf<{ count: number; nam
 expectTypeOf(inlineParseFn).returns.resolves.toEqualTypeOf<{ count: number; name: string }>();
 
 // Test 3: Typed-builder input parameter type — data should include { name: string }
-// (This PASSES even before the fix — input types ARE properly inferred)
 expectTypeOf(typedBuilderFn).parameter(0).toMatchTypeOf<{ data: { name: string } }>();
