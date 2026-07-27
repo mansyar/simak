@@ -61,5 +61,5 @@
     - [x] Run `pnpm check:i18n` — parity maintained (no new keys expected)
     - [x] Verify all files under 500 lines: `use-notifications.ts`, `NotificationCenter.tsx`, `query-keys.ts`, all test files
     - [x] Grep verification: `allItems` and `existingIds` return zero matches in `NotificationCenter.tsx`; `'items' in old` returns zero matches in `use-notifications.ts`; `setCurrentPage` returns zero matches in `NotificationCenter.tsx`
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 </protect>
