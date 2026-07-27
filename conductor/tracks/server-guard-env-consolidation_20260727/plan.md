@@ -1,9 +1,13 @@
+<protect>
 # Implementation Plan: Server-Side Guard Consolidation & Env Type Consolidation (TRACK-031)
 
 ## Phase 1: Shared Module & Unit Tests
 
 **Objective:** Create the shared `src/lib/session-guards.ts` module with 4 type-guard functions using TDD, and verify it in isolation.
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to establish full context for Phase 1
+    - [ ] Read this track's `spec.md` — review scope boundaries, acceptance criteria, and DoD
+    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, quality gates, and checkpoint protocol
 - [ ] Task: Create `src/lib/session-guards.ts` with 4 type-guard functions (TDD)
     - [ ] **Red Phase:** Write failing tests in `tests/unit/lib/session-guards.test.ts` — `isAdmin` accepts superadmin+admin, rejects instructor+student+null; `isInstructor` accepts instructor, rejects admin+student+null; `isStudent` accepts student, rejects admin+instructor+null; `isAuthenticated` accepts any non-null session, rejects null
     - [ ] Run `pnpm vitest run tests/unit/lib/session-guards.test.ts` — confirm tests fail (module does not exist yet)
@@ -21,6 +25,9 @@
 
 **Objective:** Replace all 28 duplicate inline guard definitions across 20 `*.server.ts` files with imports from the shared module, refactor `requireRole` to use `isAuthenticated`, and consolidate the `Env` type derivation in `env.ts`.
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to establish full context for Phase 2
+    - [ ] Read this track's `spec.md` — review scope boundaries, acceptance criteria, and DoD
+    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, quality gates, and checkpoint protocol
 - [ ] Task: Migrate 20 server files to shared guards, refactor `requireRole`, and consolidate `Env` type
     - [ ] Migrate analytics files: `analytics-admin.server.ts`, `analytics-export.server.ts`, `analytics-instructor.server.ts` — remove inline guard definitions, add `import { ... } from '../lib/session-guards'`
     - [ ] Migrate assignment files: `assignments.server.ts`, `assignments-extras.server.ts`
@@ -47,3 +54,4 @@
     - [ ] Attach git note with task summary to the commit
     - [ ] Update `plan.md`: mark task `[x]` with commit SHA
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Guard Migration, requireRole Refactor & Env Consolidation' (Protocol in workflow.md)
+</protect>

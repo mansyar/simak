@@ -1,3 +1,4 @@
+<protect>
 # Track: Server-Side Guard Consolidation & Env Type Consolidation (TRACK-031)
 
 ## Overview
@@ -106,3 +107,4 @@ Infrastructure refactor to eliminate duplicated role-check helper functions acro
 - [ ] `Env` type is `z.infer<typeof envSchema>` (single source of truth)
 - [ ] All files under 500 lines
 - [ ] Pre-push gate passes
+</protect>
