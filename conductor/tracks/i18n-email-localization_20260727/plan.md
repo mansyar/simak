@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan: TRACK-034 — i18n & Email Localization Completeness
 
 **Branch:** `track-034/i18n-email-localization`
@@ -6,6 +7,10 @@
 ---
 
 ## Phase 1: 2FA Email Subject Localization
+
+- [ ] Task: Read spec.md and workflow.md to orient before Phase 1 implementation
+    - [ ] Read `conductor/tracks/i18n-email-localization_20260727/spec.md` — review Functional Requirements, Acceptance Criteria, and Out of Scope
+    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, Quality Gates, and Phase Completion Verification protocol
 
 - [ ] Task: Add i18n keys for 2FA email subjects to locale files
     - [ ] Add `emails.subjects.twoFactorEnabled` (`"Two-Factor Authentication Enabled"`) and `emails.subjects.twoFactorDisabled` (`"Two-Factor Authentication Disabled"`) to `locales/en.json` under the existing `emails.subjects` namespace
@@ -35,6 +40,10 @@
 
 ## Phase 2: Full Audit of enqueueEmail Call Sites
 
+- [ ] Task: Read spec.md and workflow.md to orient before Phase 2 implementation
+    - [ ] Read `conductor/tracks/i18n-email-localization_20260727/spec.md` — review FR-3 (audit scope) and Acceptance Criteria
+    - [ ] Read `conductor/workflow.md` — review Quality Gates and Phase Completion Verification protocol
+
 - [ ] Task: Grep audit all enqueueEmail call sites for hardcoded subjects
     - [ ] Run grep for `subject:\s*['"]` across `src/server/**/*.ts` and `src/lib/**/*.ts` to find any remaining hardcoded subject string literals
     - [ ] Document findings — confirm no hardcoded subjects remain beyond the 2 fixed in Phase 1
@@ -50,3 +59,4 @@
     - [ ] Attach git note with audit summary to the commit
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+</protect>

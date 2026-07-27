@@ -1,3 +1,4 @@
+<protect>
 # Track: i18n & Email Localization Completeness (TRACK-034)
 
 **Branch:** `track-034/i18n-email-localization`
@@ -88,3 +89,4 @@ New keys must be added to both `locales/en.json` and `locales/id.json`. `pnpm ch
 - [ ] **Manual Checkpoint:** Enable 2FA with an Indonesian-locale user (`locale: 'id'`) — verify the email subject is `"Autentikasi Dua Faktor Diaktifkan"`. Disable 2FA — verify the email subject is `"Autentikasi Dua Faktor Dinonaktifkan"`. Enable 2FA with an English-locale user — verify the subject is `"Two-Factor Authentication Enabled"`.
 - [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. Updated tests for `two-factor.server.ts` verifying `resolveEmailSubject` is called with correct key and locale. `pnpm check:i18n` — parity for new keys. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
 - [ ] **Conductor Review:** `src/server/two-factor.server.ts` imports `resolveEmailSubject` from `../lib/i18n-server` and `Locales` type from `../i18n/types`. Both hardcoded subject strings replaced with `resolveEmailSubject()` calls using `session.user.locale`. New keys in `emails.subjects.*` namespace in both locale files. `pnpm generate:i18n` run. Grep audit confirms no remaining hardcoded `subject:` string literals in `src/server/` or `src/lib/`. All files under 500 lines. Pre-push gate passes.
+</protect>
