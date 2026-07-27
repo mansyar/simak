@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { X, CheckSquare, Loader2 } from 'lucide-react';
 import { useI18n } from '@/routes/__root';
 import type { TranslationKey } from '@/i18n/index';
@@ -43,32 +43,14 @@ export const GROUP_CONFIGS = [
 export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps) {
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [allItems, setAllItems] = useState<Notification[]>([]);
-  const { data, isLoading, isFetching } = useNotificationsList({
-    page: currentPage,
+  const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useNotificationsList({
     limit: 20,
     unreadOnly: activeTab === 'unread',
   });
   const { mutate: markAllRead, isPending: isMarkingAll } = useMarkAllRead();
 
-  // Accumulate items across pages (FR-4 Load More pagination)
-  useEffect(() => {
-    if (!data?.items) return;
-    if (currentPage === 1) {
-      setAllItems(data.items as Notification[]);
-    } else {
-      setAllItems((prev) => {
-        const existingIds = new Set(prev.map((i) => i.id));
-        const newItems = (data.items as Notification[]).filter((i) => !existingIds.has(i.id));
-        return [...prev, ...newItems];
-      });
-    }
-  }, [data, currentPage]);
-
-  const items: Notification[] = allItems;
-  const total = data?.total ?? 0;
-  const hasMore = items.length < total;
+  const items = (data?.pages.flatMap((p) => p.items) ?? []) as Notification[];
+  const hasNotifications = items.length > 0;
 
   // Group notifications (memoized — PERF-27)
   const groupedNotifications = useMemo(() => {
@@ -81,7 +63,6 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
     }).filter((group) => group.items.length > 0);
   }, [items]);
 
-  const hasNotifications = items.length > 0;
   const unreadCount = useMemo(() => items.filter((i) => !i.read).length, [items]);
 
   return (
@@ -122,14 +103,13 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
             activeTab={activeTab}
             onTabChange={(tabId) => {
               setActiveTab(tabId as 'all' | 'unread');
-              setCurrentPage(1);
             }}
           />
         </div>
 
         {/* Content area */}
         <div className="flex-1 overflow-y-auto">
-          {isLoading && allItems.length === 0 ? (
+          {isLoading ? (
             <div className="flex h-64 items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
@@ -159,15 +139,15 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
                   </div>
                 </div>
               ))}
-              {hasMore && (
+              {hasNextPage && (
                 <div className="p-4">
                   <button
                     type="button"
-                    onClick={() => setCurrentPage((p) => p + 1)}
-                    disabled={isFetching}
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
                     className="w-full rounded border border-border py-2 text-sm font-medium text-primary hover:bg-accent disabled:opacity-50 transition-colors"
                   >
-                    {isFetching ? (
+                    {isFetchingNextPage ? (
                       <Loader2 className="mx-auto h-4 w-4 animate-spin" />
                     ) : (
                       t('notifications.loadMore')

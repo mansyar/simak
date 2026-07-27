@@ -60,11 +60,28 @@ describe('NotificationCenter - Load More Pagination (FR-4)', () => {
     vi.clearAllMocks();
   });
 
-  const setupMocks = (items: any[] = [], total: number = items.length) => {
+  const makeItem = (id: number) => ({
+    id,
+    type: 'review_completed',
+    title: `Test ${id}`,
+    message: 'msg',
+    read: false,
+    createdAt: new Date().toISOString(),
+  });
+
+  const setupMocks = (
+    pages: Array<{ items: any[]; total: number }> = [],
+    opts: { hasNextPage?: boolean; isFetchingNextPage?: boolean; isLoading?: boolean } = {},
+  ) => {
+    const fetchNextPage = vi.fn();
     vi.mocked(hooks.useNotificationsList).mockReturnValue({
-      data: { items, total },
+      data: { pages, pageParams: pages.map((_, i) => i + 1) },
       isSuccess: true,
       isFetching: false,
+      hasNextPage: opts.hasNextPage ?? false,
+      isFetchingNextPage: opts.isFetchingNextPage ?? false,
+      fetchNextPage,
+      isLoading: opts.isLoading ?? false,
     } as any);
     vi.mocked(hooks.useMarkAllRead).mockReturnValue({
       mutate: vi.fn(),
@@ -72,73 +89,55 @@ describe('NotificationCenter - Load More Pagination (FR-4)', () => {
     vi.mocked(hooks.useMarkRead).mockReturnValue({
       mutate: vi.fn(),
     } as any);
+    return { fetchNextPage };
   };
 
   it('uses limit of 20 (not 50)', () => {
-    setupMocks([]);
+    setupMocks([{ items: [], total: 0 }]);
     render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
     expect(hooks.useNotificationsList).toHaveBeenCalledWith(expect.objectContaining({ limit: 20 }));
   });
 
-  it('shows Load More button when there are more items to load', () => {
-    setupMocks(
-      [
-        {
-          id: 1,
-          type: 'review_completed',
-          title: 'Test',
-          message: 'msg',
-          read: false,
-          createdAt: new Date().toISOString(),
-        },
-      ],
-      10,
-    );
+  it('does not pass page to useNotificationsList', () => {
+    setupMocks([{ items: [], total: 0 }]);
+    render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+    const callArgs = vi.mocked(hooks.useNotificationsList).mock.calls[0][0] as any;
+    expect(callArgs).not.toHaveProperty('page');
+  });
+
+  it('shows Load More button when hasNextPage is true', () => {
+    setupMocks([{ items: [makeItem(1)], total: 10 }], { hasNextPage: true });
     render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
     expect(screen.getByText('Load More')).toBeDefined();
   });
 
-  it('hides Load More button when all items are loaded', () => {
-    setupMocks(
-      [
-        {
-          id: 1,
-          type: 'review_completed',
-          title: 'Test',
-          message: 'msg',
-          read: false,
-          createdAt: new Date().toISOString(),
-        },
-      ],
-      1,
-    );
+  it('hides Load More button when hasNextPage is false', () => {
+    setupMocks([{ items: [makeItem(1)], total: 1 }], { hasNextPage: false });
     render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
     expect(screen.queryByText('Load More')).toBeNull();
   });
 
-  it('increments page when Load More is clicked', () => {
+  it('calls fetchNextPage when Load More is clicked', () => {
+    const { fetchNextPage } = setupMocks([{ items: [makeItem(1)], total: 10 }], {
+      hasNextPage: true,
+    });
+    render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+    fireEvent.click(screen.getByText('Load More'));
+    expect(fetchNextPage).toHaveBeenCalled();
+  });
+
+  it('renders items from all pages via data.pages.flatMap', () => {
     setupMocks(
       [
-        {
-          id: 1,
-          type: 'review_completed',
-          title: 'Test',
-          message: 'msg',
-          read: false,
-          createdAt: new Date().toISOString(),
-        },
+        { items: [makeItem(1), makeItem(2)], total: 4 },
+        { items: [makeItem(3), makeItem(4)], total: 4 },
       ],
-      10,
+      { hasNextPage: false },
     );
     render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
-
-    // Initial call should have page: 1
-    expect(hooks.useNotificationsList).toHaveBeenCalledWith(expect.objectContaining({ page: 1 }));
-
-    // Click Load More
-    fireEvent.click(screen.getByText('Load More'));
-
-    // Should now be called with page: 2
-    expect(hooks.useNotificationsList).toHaveBeenCalledWith(expect.objectContaining({ page: 2 }));
+    expect(screen.getByText('Test 1')).toBeDefined();
+    expect(screen.getByText('Test 2')).toBeDefined();
+    expect(screen.getByText('Test 3')).toBeDefined();
+    expect(screen.getByText('Test 4')).toBeDefined();
   });
 });

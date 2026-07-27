@@ -8,7 +8,7 @@
 export const notificationKeys = {
   all: () => ['notifications'] as const,
   unreadCount: () => ['notifications', 'unreadCount'] as const,
-  list: (filters?: { page?: number; limit?: number; type?: string; unreadOnly?: boolean }) =>
+  list: (filters?: { limit?: number; type?: string; unreadOnly?: boolean }) =>
     ['notifications', 'list', filters ?? {}] as const,
 };
 

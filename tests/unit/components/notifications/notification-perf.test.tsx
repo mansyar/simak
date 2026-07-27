@@ -11,24 +11,32 @@ vi.mock('@/routes/__root', () => ({
 
 vi.mock('@/hooks/use-notifications', () => {
   const mockData = {
-    items: [
+    pages: [
       {
-        id: 1,
-        type: 'review_completed',
-        title: 'Test',
-        message: 'Test message',
-        read: false,
-        metadata: { assignmentId: 1, checkpointId: 1 },
-        createdAt: new Date(),
+        items: [
+          {
+            id: 1,
+            type: 'review_completed',
+            title: 'Test',
+            message: 'Test message',
+            read: false,
+            metadata: { assignmentId: 1, checkpointId: 1 },
+            createdAt: new Date(),
+          },
+        ],
+        total: 1,
       },
     ],
-    total: 1,
+    pageParams: [1],
   };
   return {
     useNotificationsList: () => ({
       data: mockData,
       isLoading: false,
       isFetching: false,
+      hasNextPage: false,
+      isFetchingNextPage: false,
+      fetchNextPage: vi.fn(),
     }),
     useMarkAllRead: () => ({ mutate: vi.fn(), isPending: false }),
     useMarkRead: () => ({ mutate: vi.fn() }),

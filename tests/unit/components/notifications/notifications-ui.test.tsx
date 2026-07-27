@@ -281,8 +281,13 @@ describe('Notification UI Components', () => {
   describe('NotificationCenter', () => {
     it('shows empty state when there are no notifications', () => {
       vi.mocked(hooks.useNotificationsList).mockReturnValue({
-        data: { items: [], total: 0 },
+        data: { pages: [{ items: [], total: 0 }], pageParams: [1] },
         isSuccess: true,
+        isFetching: false,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+        fetchNextPage: vi.fn(),
+        isLoading: false,
       } as any);
 
       vi.mocked(hooks.useMarkAllRead).mockReturnValue({
@@ -315,8 +320,13 @@ describe('Notification UI Components', () => {
       ];
 
       vi.mocked(hooks.useNotificationsList).mockReturnValue({
-        data: { items: sampleItems, total: 2 },
+        data: { pages: [{ items: sampleItems, total: 2 }], pageParams: [1] },
         isSuccess: true,
+        isFetching: false,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+        fetchNextPage: vi.fn(),
+        isLoading: false,
       } as any);
 
       const mockMarkAllRead = vi.fn();
@@ -348,8 +358,13 @@ describe('Notification UI Components', () => {
   describe('NotificationCenter - Sheet refactor (UX-15)', () => {
     const setupMocks = (items: any[] = []) => {
       vi.mocked(hooks.useNotificationsList).mockReturnValue({
-        data: { items, total: items.length },
+        data: { pages: [{ items, total: items.length }], pageParams: [1] },
         isSuccess: true,
+        isFetching: false,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+        fetchNextPage: vi.fn(),
+        isLoading: false,
       } as any);
       vi.mocked(hooks.useMarkAllRead).mockReturnValue({
         mutate: vi.fn(),

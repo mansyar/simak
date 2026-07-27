@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUnreadCount, listNotifications, markRead, markAllRead } from '@/server/notifications';
 import { useI18n } from '@/routes/__root';
 import { parseServerError, showErrorToast } from '@/lib/toast';
@@ -34,13 +34,13 @@ export function useUnreadCount() {
 }
 
 export function useNotificationsList(
-  options: { page?: number; limit?: number; type?: string; unreadOnly?: boolean } = {},
+  options: { limit?: number; type?: string; unreadOnly?: boolean } = {},
 ) {
   const { t } = useI18n();
-  const { page = 1, limit = 20, type, unreadOnly } = options;
-  return useQuery({
-    queryKey: notificationKeys.list({ page, limit, type, unreadOnly }),
-    queryFn: async () => {
+  const { limit = 20, type, unreadOnly } = options;
+  return useInfiniteQuery({
+    queryKey: notificationKeys.list({ limit, type, unreadOnly }),
+    queryFn: async ({ pageParam }: { pageParam: number }) => {
       const res = await (
         listNotifications as unknown as (args: {
           data: { page: number; limit: number; type?: string; unreadOnly?: boolean };
@@ -49,9 +49,14 @@ export function useNotificationsList(
           total: number;
           error?: { code: string; message: string };
         }>
-      )({ data: { page, limit, type, unreadOnly } });
+      )({ data: { page: pageParam, limit, type, unreadOnly } });
       handleServerError(res, t);
       return res;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const totalItems = allPages.reduce((sum, p) => sum + p.items.length, 0);
+      return totalItems < lastPage.total ? allPages.length + 1 : undefined;
     },
     staleTime: 30_000,
   });
@@ -86,13 +91,19 @@ export function useMarkRead() {
         if (typeof old === 'number') {
           return Math.max(0, old - 1);
         }
-        if (old && typeof old === 'object' && 'items' in old) {
-          const listData = old as { items: Array<{ id: number; read: boolean }>; total: number };
+        if (old && typeof old === 'object' && 'pages' in old) {
+          const infiniteData = old as {
+            pages: Array<{ items: Array<{ id: number; read: boolean }>; total: number }>;
+            pageParams: number[];
+          };
           return {
-            ...listData,
-            items: listData.items.map((item) =>
-              item.id === notificationId ? { ...item, read: true } : item,
-            ),
+            ...infiniteData,
+            pages: infiniteData.pages.map((page) => ({
+              ...page,
+              items: page.items.map((item) =>
+                item.id === notificationId ? { ...item, read: true } : item,
+              ),
+            })),
           };
         }
         return old;
@@ -144,11 +155,17 @@ export function useMarkAllRead() {
         if (typeof old === 'number') {
           return 0;
         }
-        if (old && typeof old === 'object' && 'items' in old) {
-          const listData = old as { items: Array<{ id: number; read: boolean }>; total: number };
+        if (old && typeof old === 'object' && 'pages' in old) {
+          const infiniteData = old as {
+            pages: Array<{ items: Array<{ id: number; read: boolean }>; total: number }>;
+            pageParams: number[];
+          };
           return {
-            ...listData,
-            items: listData.items.map((item) => ({ ...item, read: true })),
+            ...infiniteData,
+            pages: infiniteData.pages.map((page) => ({
+              ...page,
+              items: page.items.map((item) => ({ ...item, read: true })),
+            })),
           };
         }
         return old;
