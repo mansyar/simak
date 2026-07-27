@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Server-Side Guard Consolidation & Env Type Consolidation (TRACK-031)
 
-## Phase 1: Shared Module & Unit Tests
+## Phase 1: Shared Module & Unit Tests [checkpoint: 3d3088b]
 
 **Objective:** Create the shared `src/lib/session-guards.ts` module with 4 type-guard functions using TDD, and verify it in isolation.
 
