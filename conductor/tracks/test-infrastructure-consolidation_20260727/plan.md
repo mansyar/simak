@@ -50,11 +50,11 @@
     - [x] "Testing Requirements → Test Layout": update the xlsx note from "separate `--pool=threads` invocation (see the test script in package.json)" to "xlsx project in `vitest.config.ts` `projects` array (pool: `threads`)"
     - [x] Pre-push gate block: align `pnpm typecheck && pnpm vitest run --coverage` → `pnpm typecheck && pnpm test:coverage` (match `lefthook.yml`)
 
-- [ ] Task: Final Definition of Done verification
-    - [ ] **AC-3:** Run `pnpm test:coverage` → passes ≥80% on all four thresholds, uses `vmThreads` for unit (no global `--pool=threads`), excludes integration; confirm xlsx tests counted in coverage
-    - [ ] **AC-5:** Run `pnpm test:integration` → runs integration tests via `vitest.config.integration.ts` (requires `docker compose up -d`)
-    - [ ] **AC-8:** Run `pnpm typecheck` → clean; `pnpm lint` → clean; run `node scripts/check-modularity.js` on changed files → all under 500 lines; `pnpm check:i18n` sanity (no i18n changes expected)
-    - [ ] Final review of `package.json` scripts against FR-4 (exact script strings) and confirm `lefthook.yml` unchanged (TRACK-036 territory)
+- [x] Task: Final Definition of Done verification
+    - [x] **AC-3:** Run `pnpm test:coverage` → passes ≥80% on all four thresholds, uses `vmThreads` for unit (no global `--pool=threads`), excludes integration; confirm xlsx tests counted in coverage
+    - [x] **AC-5:** Run `pnpm test:integration` → runs integration tests via `vitest.config.integration.ts` (requires `docker compose up -d`)
+    - [x] **AC-8:** Run `pnpm typecheck` → clean; `pnpm lint` → clean; run `node scripts/check-modularity.js` on changed files → all under 500 lines; `pnpm check:i18n` sanity (no i18n changes expected)
+    - [x] Final review of `package.json` scripts against FR-4 (exact script strings) and confirm `lefthook.yml` unchanged (TRACK-036 territory)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Documentation Alignment & Final DoD' (Protocol in workflow.md)
 </protect>
