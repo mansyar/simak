@@ -5,20 +5,20 @@
 
 **Objective:** Create the shared `src/lib/session-guards.ts` module with 4 type-guard functions using TDD, and verify it in isolation.
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to establish full context for Phase 1
-    - [ ] Read this track's `spec.md` — review scope boundaries, acceptance criteria, and DoD
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, quality gates, and checkpoint protocol
-- [ ] Task: Create `src/lib/session-guards.ts` with 4 type-guard functions (TDD)
-    - [ ] **Red Phase:** Write failing tests in `tests/unit/lib/session-guards.test.ts` — `isAdmin` accepts superadmin+admin, rejects instructor+student+null; `isInstructor` accepts instructor, rejects admin+student+null; `isStudent` accepts student, rejects admin+instructor+null; `isAuthenticated` accepts any non-null session, rejects null
-    - [ ] Run `pnpm vitest run tests/unit/lib/session-guards.test.ts` — confirm tests fail (module does not exist yet)
-    - [ ] **Green Phase:** Implement `src/lib/session-guards.ts` — import `NonNullableSession` from `./types`, export `isAdmin`, `isInstructor`, `isStudent`, `isAuthenticated` (all accept `NonNullableSession | null`, return `session is NonNullableSession`)
-    - [ ] Run `pnpm vitest run tests/unit/lib/session-guards.test.ts` — confirm all tests pass
-    - [ ] Run `pnpm typecheck` — 0 errors
-    - [ ] Run `pnpm lint` — 0 warnings, 0 errors
-    - [ ] Run `pnpm test:coverage` — ≥80% on all thresholds (lines, functions, branches, statements)
-    - [ ] Commit: `refactor(guards): Create shared session-guards module with 4 type-guard functions`
-    - [ ] Attach git note with task summary to the commit
-    - [ ] Update `plan.md`: mark task `[x]` with commit SHA
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to establish full context for Phase 1
+    - [x] Read this track's `spec.md` — review scope boundaries, acceptance criteria, and DoD
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, quality gates, and checkpoint protocol
+- [x] Task: Create `src/lib/session-guards.ts` with 4 type-guard functions (TDD) [71f2d03]
+    - [x] **Red Phase:** Write failing tests in `tests/unit/lib/session-guards.test.ts` — `isAdmin` accepts superadmin+admin, rejects instructor+student+null; `isInstructor` accepts instructor, rejects admin+student+null; `isStudent` accepts student, rejects admin+instructor+null; `isAuthenticated` accepts any non-null session, rejects null
+    - [x] Run `pnpm vitest run tests/unit/lib/session-guards.test.ts` — confirm tests fail (module does not exist yet)
+    - [x] **Green Phase:** Implement `src/lib/session-guards.ts` — import `NonNullableSession` from `./types`, export `isAdmin`, `isInstructor`, `isStudent`, `isAuthenticated` (all accept `NonNullableSession | null`, return `session is NonNullableSession`)
+    - [x] Run `pnpm vitest run tests/unit/lib/session-guards.test.ts` — confirm all tests pass
+    - [x] Run `pnpm typecheck` — 0 errors
+    - [x] Run `pnpm lint` — 0 warnings, 0 errors
+    - [x] Run `pnpm test:coverage` — ≥80% on all thresholds (lines, functions, branches, statements)
+    - [x] Commit: `refactor(guards): Create shared session-guards module with 4 type-guard functions`
+    - [x] Attach git note with task summary to the commit
+    - [x] Update `plan.md`: mark task `[x]` with commit SHA
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Shared Module & Unit Tests' (Protocol in workflow.md)
 
 ## Phase 2: Guard Migration, requireRole Refactor & Env Consolidation
