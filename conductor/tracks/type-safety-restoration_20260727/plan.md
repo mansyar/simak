@@ -98,16 +98,16 @@
 
 ## Phase 3: Cast Elimination
 
-- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
-    - [ ] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
-    - [ ] Read `conductor/workflow.md` for TDD lifecycle and quality gates
-    - [ ] Verify: context is refreshed and understood
+- [x] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [x] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
+    - [x] Read `conductor/workflow.md` for TDD lifecycle and quality gates
+    - [x] Verify: context is refreshed and understood
 
-- [ ] Task: Remove `as unknown as` casts from hooks (7 casts, 2 files)
-    - [ ] Remove 4 casts from `src/hooks/use-notifications.ts` — server fn calls should now have proper return types via `typedServerFn`
-    - [ ] Remove 3 casts from `src/hooks/use-assignment-tabs.ts`
-    - [ ] Run `pnpm typecheck` after each file — confirm no type errors
-    - [ ] Verify: zero `as unknown as` in `src/hooks/`
+- [x] Task: Remove `as unknown as` casts from hooks (7 casts, 2 files) [a9973ab]
+    - [x] Remove 4 casts from `src/hooks/use-notifications.ts` — server fn calls should now have proper return types via `typedServerFn`
+    - [x] Remove 3 casts from `src/hooks/use-assignment-tabs.ts`
+    - [x] Run `pnpm typecheck` after each file — confirm no type errors
+    - [x] Verify: zero `as unknown as` in `src/hooks/`
 
 - [ ] Task: Remove `as unknown as` casts from settings components (13 casts, 5 files)
     - [ ] Remove 4 casts from `src/components/settings/TwoFactorSettings.tsx`
