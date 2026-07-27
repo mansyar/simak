@@ -46,7 +46,8 @@
 | Component                  | Technology                           | Purpose                                                 |
 | -------------------------- | ------------------------------------ | ------------------------------------------------------- |
 | **Unit/Integration Tests** | Vitest                               | Fast unit and integration tests with coverage reporting |
-| **E2E Tests**              | Playwright                           | End-to-end browser tests (v2)                           |
+| **E2E Tests**              | Playwright                           | End-to-end browser tests (chromium + firefox + mobile) |
+| **Accessibility Scanning** | @axe-core/playwright                 | Automated WCAG 2.1 AA accessibility audits in E2E tests |
 | **Code Quality**           | oxlint + oxfmt + Lefthook            | Pre-commit linting/formatting/modularity; pre-push typecheck & coverage |
 
 ## Version Requirements
@@ -61,5 +62,6 @@
 - **2026-07-22:** Added `mammoth.js` for client-side `.docx` → HTML conversion on the instructor review detail page. Lazy-loaded via dynamic `import('mammoth')` to keep it out of the main client bundle. Used in `ReviewFilePreview` component (TRACK-017).
 - **2026-07-22:** **Deviation from plan** — The plan (Phase 0) specified `@radix-ui/react-popover` for the keyboard cheat-sheet Popover component. However, the entire codebase uses `@base-ui/react` for all UI primitives (Dialog, Sheet, etc.). `@base-ui/react/popover` is already installed and available. Replaced `@radix-ui/react-popover` with `@base-ui/react/popover` for consistency. Uninstalled `@radix-ui/react-popover` (was installed in Phase 0 commit `784fcd3`).
 - **2026-07-23:** Upgraded TypeScript from 5.8 to 7.0 (native Go compiler port). Removed `baseUrl: "."` from `tsconfig.json` (option removed in TS 7; `paths` mapping is already relative). Added `--checkers` flag to the pre-push typecheck gate in `lefthook.yml` to leverage TS 7's shared-memory multithreading. No source code changes required (zero Compiler API consumers, no blocked frameworks).
+- **2026-07-27:** Added `@axe-core/playwright` for automated accessibility scanning in E2E tests. Added Firefox and mobile-chrome (Pixel 7) projects to Playwright config. Fixed 8 critical/serious WCAG violations (color contrast, aria-labels, button names) across 10 source files (TRACK-028).
 
 </protect>
