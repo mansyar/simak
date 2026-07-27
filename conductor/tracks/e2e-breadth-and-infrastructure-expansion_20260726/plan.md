@@ -74,14 +74,14 @@
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
 - [x] Task: Write `tests/e2e/cross-role-lifecycle.spec.ts` — full lifecycle integration test [f2d8bd4]
-    - [ ] Single serial test: admin creates template → instructor creates assignment from template → student logs consultation → instructor verifies → student submits (via DB helper) → instructor reviews with Pass → verify next checkpoint unlocks → student submits → instructor reviews with Revise → student resubmits → instructor reviews with Pass → verify assignment completion state.
-    - [ ] Set timeout to 120s, mark as serial, runs last.
-    - [ ] Browser context management: single context, clear cookies + storageState between role switches, login as new role via Better Auth API (`loginAsRole` pattern).
-    - [ ] Verify: `pnpm test:e2e cross-role-lifecycle.spec.ts` passes on Chromium.
+    - [x] Single serial test: admin creates template → instructor creates assignment from template → student logs consultation → instructor verifies → student submits (via DB helper) → instructor reviews with Pass → verify next checkpoint unlocks → student submits → instructor reviews with Revise → student resubmits → instructor reviews with Pass → verify assignment completion state.
+    - [x] Set timeout to 120s, mark as serial, runs last.
+    - [x] Browser context management: single context, clear cookies + storageState between role switches, login as new role via Better Auth API (`loginAsRole` pattern).
+    - [x] Verify: `pnpm test:e2e cross-role-lifecycle.spec.ts` passes on Chromium.
 - [x] Task: Add `mobile-chrome` project to `playwright.config.ts` and run mobile tests [fa4067e]
-    - [ ] Add `mobile-chrome` project using `devices['Pixel 7']` (or `devices['iPhone 14']`).
-    - [ ] Run dashboard and assignment detail tests on mobile viewport to verify responsive layouts (card-based `ProgressTable`, stacked `CheckpointListEditor`, mobile step indicator in wizard).
-    - [ ] Verify: mobile tests pass, `playwright.config.ts` stays under 500 lines.
+    - [x] Add `mobile-chrome` project using `devices['Pixel 7']` (or `devices['iPhone 14']`).
+    - [x] Run dashboard and assignment detail tests on mobile viewport to verify responsive layouts (card-based `ProgressTable`, stacked `CheckpointListEditor`, mobile step indicator in wizard).
+    - [x] Verify: mobile tests pass, `playwright.config.ts` stays under 500 lines.
 - [x] Task: Implement axe accessibility scans on 6 key pages [a4665f5]
     - [x] Run axe scans on: login page, student dashboard, student assignment detail, instructor review detail, admin users, admin templates.
     - [x] Assert zero critical and serious violations.
@@ -91,16 +91,16 @@
     - [x] Run `pnpm test:e2e` on Firefox project.
     - [x] Triage and fix any Firefox-specific failures within this track (do not skip or defer).
     - [x] Verify: full suite passes on Firefox.
-- [ ] Task: Final verification and Definition of Done
-    - [ ] Run `pnpm test:e2e` — all tests pass on both Chromium and Firefox.
-    - [ ] Verify full suite runtime ≤ 5 minutes (with Firefox + mobile added).
-    - [ ] Verify `retries: 1` does not mask real failures (remove a deliberate assertion, confirm it still fails, then restore).
-    - [ ] Run `pnpm test:unit` — all existing unit tests still pass.
-    - [ ] Run `pnpm typecheck` — clean.
-    - [ ] Run `pnpm check:i18n` — parity maintained.
-    - [ ] Verify route coverage is 28+/30 (up from 10/30).
-    - [ ] Verify test count is ~50+ (up from 14).
-    - [ ] Verify all new test files under 500 lines, `playwright.config.ts` under 500 lines.
-    - [ ] Verify `r2-mock.ts` remains unchanged (limitation documented).
+- [x] Task: Final verification and Definition of Done [e33c1d6]
+    - [x] Run `pnpm test:e2e` — all tests pass on both Chromium and Firefox.
+    - [x] Verify full suite runtime ≤ 5 minutes (with Firefox + mobile added).
+    - [x] Verify `retries: 1` does not mask real failures (remove a deliberate assertion, confirm it still fails, then restore).
+    - [x] Run `pnpm test:unit` — all existing unit tests still pass.
+    - [x] Run `pnpm typecheck` — clean.
+    - [x] Run `pnpm check:i18n` — parity maintained.
+    - [x] Verify route coverage is 28+/30 (up from 10/30).
+    - [x] Verify test count is ~50+ (up from 14).
+    - [x] Verify all new test files under 500 lines, `playwright.config.ts` under 500 lines.
+    - [x] Verify `r2-mock.ts` remains unchanged (limitation documented).
 - [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
 </protect>
