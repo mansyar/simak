@@ -64,17 +64,17 @@ New keys must be added to both `locales/en.json` and `locales/id.json`. `pnpm ch
 
 ## Acceptance Criteria
 
-- [ ] **AC-1:** `emails.subjects.twoFactorEnabled` and `emails.subjects.twoFactorDisabled` keys exist in both `locales/en.json` and `locales/id.json` with correct translations.
-- [ ] **AC-2:** `pnpm generate:i18n` has been run; `src/i18n/types.ts` and `src/i18n/detect-locale.ts` are regenerated and committed.
-- [ ] **AC-3:** `src/server/two-factor.server.ts:99` uses `resolveEmailSubject('emails.subjects.twoFactorEnabled', undefined, session.user.locale as Locales)` instead of the hardcoded string.
-- [ ] **AC-4:** `src/server/two-factor.server.ts:201` uses `resolveEmailSubject('emails.subjects.twoFactorDisabled', undefined, session.user.locale as Locales)` instead of the hardcoded string.
-- [ ] **AC-5:** `resolveEmailSubject` is imported from `../lib/i18n-server` in `two-factor.server.ts`; `Locales` type is imported from `../i18n/types`.
-- [ ] **AC-6:** Unit tests in `tests/unit/server/two-factor.test.ts` mock `resolveEmailSubject` and assert it is called with the correct key (`emails.subjects.twoFactorEnabled` / `emails.subjects.twoFactorDisabled`) and `session.user.locale` for both enable and disable handlers. (Existing tests that assert the hardcoded subject string are updated.)
-- [ ] **AC-7:** Phase 2 grep audit confirms no other hardcoded `subject:` string literals exist in `src/server/**/*.ts` or `src/lib/**/*.ts` (or any newly found ones are fixed).
-- [ ] **AC-8:** `pnpm test:unit` — all tests pass.
-- [ ] **AC-9:** `pnpm check:i18n` — parity for new keys, no unused keys.
-- [ ] **AC-10:** `pnpm typecheck` — 0 errors.
-- [ ] **AC-11:** `pnpm lint` — 0 warnings, 0 errors.
+- [x] **AC-1:** `emails.subjects.twoFactorEnabled` and `emails.subjects.twoFactorDisabled` keys exist in both `locales/en.json` and `locales/id.json` with correct translations.
+- [x] **AC-2:** `pnpm generate:i18n` has been run; `src/i18n/types.ts` and `src/i18n/detect-locale.ts` are regenerated and committed.
+- [x] **AC-3:** `src/server/two-factor.server.ts:99` uses `resolveEmailSubject('emails.subjects.twoFactorEnabled', undefined, session.user.locale as Locales)` instead of the hardcoded string.
+- [x] **AC-4:** `src/server/two-factor.server.ts:201` uses `resolveEmailSubject('emails.subjects.twoFactorDisabled', undefined, session.user.locale as Locales)` instead of the hardcoded string.
+- [x] **AC-5:** `resolveEmailSubject` is imported from `../lib/i18n-server` in `two-factor.server.ts`; `Locales` type is imported from `../i18n/types`.
+- [x] **AC-6:** Unit tests in `tests/unit/server/two-factor.test.ts` mock `resolveEmailSubject` and assert it is called with the correct key (`emails.subjects.twoFactorEnabled` / `emails.subjects.twoFactorDisabled`) and `session.user.locale` for both enable and disable handlers. (Existing tests that assert the hardcoded subject string are updated.)
+- [x] **AC-7:** Phase 2 grep audit confirms no other hardcoded `subject:` string literals exist in `src/server/**/*.ts` or `src/lib/**/*.ts` (or any newly found ones are fixed).
+- [x] **AC-8:** `pnpm test:unit` — all tests pass.
+- [x] **AC-9:** `pnpm check:i18n` — parity for new keys, no unused keys.
+- [x] **AC-10:** `pnpm typecheck` — 0 errors.
+- [x] **AC-11:** `pnpm lint` — 0 warnings, 0 errors.
 
 ## Out of Scope
 
@@ -86,7 +86,7 @@ New keys must be added to both `locales/en.json` and `locales/id.json`. `pnpm ch
 
 ## Verification & Definition of Done (DoD)
 
-- [ ] **Manual Checkpoint:** Enable 2FA with an Indonesian-locale user (`locale: 'id'`) — verify the email subject is `"Autentikasi Dua Faktor Diaktifkan"`. Disable 2FA — verify the email subject is `"Autentikasi Dua Faktor Dinonaktifkan"`. Enable 2FA with an English-locale user — verify the subject is `"Two-Factor Authentication Enabled"`.
-- [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. Updated tests for `two-factor.server.ts` verifying `resolveEmailSubject` is called with correct key and locale. `pnpm check:i18n` — parity for new keys. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
-- [ ] **Conductor Review:** `src/server/two-factor.server.ts` imports `resolveEmailSubject` from `../lib/i18n-server` and `Locales` type from `../i18n/types`. Both hardcoded subject strings replaced with `resolveEmailSubject()` calls using `session.user.locale`. New keys in `emails.subjects.*` namespace in both locale files. `pnpm generate:i18n` run. Grep audit confirms no remaining hardcoded `subject:` string literals in `src/server/` or `src/lib/`. All files under 500 lines. Pre-push gate passes.
+- [x] **Manual Checkpoint:** Enable 2FA with an Indonesian-locale user (`locale: 'id'`) — verify the email subject is `"Autentikasi Dua Faktor Diaktifkan"`. Disable 2FA — verify the email subject is `"Autentikasi Dua Faktor Dinonaktifkan"`. Enable 2FA with an English-locale user — verify the subject is `"Two-Factor Authentication Enabled"`.
+- [x] **Automated Tests:** `pnpm test:unit` — all tests pass. Updated tests for `two-factor.server.ts` verifying `resolveEmailSubject` is called with correct key and locale. `pnpm check:i18n` — parity for new keys. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
+- [x] **Conductor Review:** `src/server/two-factor.server.ts` imports `resolveEmailSubject` from `../lib/i18n-server` and `Locales` type from `../i18n/types`. Both hardcoded subject strings replaced with `resolveEmailSubject()` calls using `session.user.locale`. New keys in `emails.subjects.*` namespace in both locale files. `pnpm generate:i18n` run. Grep audit confirms no remaining hardcoded `subject:` string literals in `src/server/` or `src/lib/`. All files under 500 lines. Pre-push gate passes.
 </protect>
