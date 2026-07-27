@@ -8,6 +8,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: NotificationCenter Infinite Query Migration (TRACK-030)**
-*Link: [./tracks/notification-center-infinite-query-migration_20260726/](./tracks/notification-center-infinite-query-migration_20260726/)*
 
