@@ -1,3 +1,4 @@
+<protect>
 # Track Specification: TRACK-035 — Test Infrastructure Consolidation
 
 ## Overview
@@ -98,3 +99,4 @@ Consolidate test infrastructure so that pool selection and test exclusion are **
 - E2E test config changes (Playwright config is separate; `test:e2e` / `test:e2e:ui` scripts unchanged).
 - Removing `test:unit` entirely (kept as alias per decision — only AGENTS.md/workflow.md descriptions updated, command name preserved).
 - Any changes to the 4 xlsx test files' source or test logic (only their pool assignment changes).
+</protect>

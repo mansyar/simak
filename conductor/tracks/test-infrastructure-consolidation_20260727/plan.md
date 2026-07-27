@@ -1,3 +1,4 @@
+<protect>
 # Implementation Plan: TRACK-035 — Test Infrastructure Consolidation
 
 > **Spec:** `./spec.md` (approved)  
@@ -5,6 +6,8 @@
 > **TDD note for config:** Deliverables are configuration files (`vitest.config.ts`, `vitest.config.integration.ts`, `package.json`) and documentation (`AGENTS.md`, `conductor/workflow.md`). Per the workflow's Phase Completion Protocol, non-code/config files are excluded from the unit-test requirement. `vitest.config.ts` is a configuration object with no application logic (analogous to `package.json`); verification is **behavioral** (run the vitest commands and observe outcomes), not unit-test-based. This is a deliberate simplicity decision — no artificial tests for config object literals, and these files are outside the coverage `include: ['src/**/*.{ts,tsx}']` scope anyway.
 
 ## Phase 1: Vitest Config & Script Consolidation
+
+- [ ] Task: Read `./spec.md` and `../../workflow.md` to re-establish context for this phase
 
 - [ ] Task: Restructure `vitest.config.ts` to use a `projects` array
     - [ ] Hoist shared config (resolve.alias `@`, extensions, globals, environment `happy-dom`, env loading, onConsoleLog, reporters, coverage block with ≥80% thresholds) so both projects inherit it
@@ -35,6 +38,8 @@
 
 ## Phase 2: Documentation Alignment & Final DoD
 
+- [ ] Task: Read `./spec.md` and `../../workflow.md` to re-establish context for this phase
+
 - [ ] Task: Update `AGENTS.md`
     - [ ] "Developer Commands" table: `pnpm test` → `vitest run` (unit tests; excludes integration; xlsx tests run via `projects`); `pnpm test:unit` → alias of `pnpm test`; `pnpm test:watch` → `vitest`; `pnpm test:coverage` → `vitest run --coverage` (vmThreads default for unit; excludes integration); `pnpm test:integration` → `vitest run --config vitest.config.integration.ts tests/integration`
     - [ ] "Testing Patterns" note: replace "A small set of xlsx-parsing tests run in a separate `--pool=threads` invocation (see the test script in package.json) — this is handled automatically" with: xlsx tests run via the `projects` array in `vitest.config.ts` (xlsx project uses `threads` pool) — still automatic, mechanism changed to config
@@ -52,3 +57,4 @@
     - [ ] Final review of `package.json` scripts against FR-4 (exact script strings) and confirm `lefthook.yml` unchanged (TRACK-036 territory)
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Documentation Alignment & Final DoD' (Protocol in workflow.md)
+</protect>
