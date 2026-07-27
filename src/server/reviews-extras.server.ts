@@ -14,20 +14,12 @@ import { getSessionFromHeaders } from './auth';
 import { verifyCheckpointAccess } from './ownership';
 import { serverError, ErrorCode } from '../lib/errors';
 import { translateKey } from '../lib/i18n-server';
-import type { NonNullableSession } from '../lib/types';
+import { isInstructor, isStudent } from '../lib/session-guards';
 import type { z } from 'zod';
 import type { OpenForReviewSchema, GetLatestReviewSchema } from './reviews';
 
 type OpenForReviewInput = z.infer<typeof OpenForReviewSchema>;
 type GetLatestReviewInput = z.infer<typeof GetLatestReviewSchema>;
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
-
-function isStudent(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'student';
-}
 
 export async function openForReviewHandler(args: { data: OpenForReviewInput }) {
   const session = await getSessionFromHeaders();

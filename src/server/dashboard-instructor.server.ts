@@ -7,17 +7,13 @@ import { consultations } from '../db/schema/consultations';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode, type ServerError } from '@/lib/errors';
-import type { NonNullableSession } from '../lib/types';
+import { isInstructor } from '@/lib/session-guards';
 import {
   computeStudentRisk,
   type RiskLevel,
   type RiskFactor,
   type CheckpointRiskData,
 } from '../lib/risk-scoring';
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
 
 type DashboardAssignmentOverview = {
   id: number;

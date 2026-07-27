@@ -9,7 +9,7 @@ import { reviewScores } from '@/db/schema/rubrics';
 import { finalGrades } from '@/db/schema/gradebook';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
-import type { NonNullableSession } from '@/lib/types';
+import { isAdmin } from '@/lib/session-guards';
 
 type AnalyticsDateRangeInput = {
   range?: '7d' | '30d' | '90d' | 'all';
@@ -30,10 +30,6 @@ export type AdminAnalyticsData = {
   gradeDistribution: { A: number; B: number; C: number; D: number; F: number };
   atRiskSummary: { high: number; medium: number; low: number };
 };
-
-function isAdmin(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && (session.user.role === 'superadmin' || session.user.role === 'admin');
-}
 
 function resolveDateRange(data: AnalyticsDateRangeInput): {
   startDate: Date | null;

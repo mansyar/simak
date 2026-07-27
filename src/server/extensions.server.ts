@@ -10,7 +10,7 @@ import { serverError, ErrorCode, isServerError } from '../lib/errors';
 import { getNotificationKeys } from './notifications.server';
 import { sendExtensionRequestedEmail } from '../lib/extension-email';
 import { shouldSendInAppNotification } from '../lib/notification-prefs';
-import type { NonNullableSession } from '../lib/types';
+import { isInstructor, isStudent } from '../lib/session-guards';
 import type { z } from 'zod';
 import type {
   RequestExtensionSchema,
@@ -21,14 +21,6 @@ import type {
 type RequestExtensionInput = z.infer<typeof RequestExtensionSchema>;
 type ListExtensionRequestsInput = z.infer<typeof ListExtensionRequestsSchema>;
 type ListMyExtensionsInput = z.infer<typeof ListMyExtensionsSchema>;
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
-
-function isStudent(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'student';
-}
 
 /**
  * Find the current active checkpoint for a student in an assignment.

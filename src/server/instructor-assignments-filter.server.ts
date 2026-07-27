@@ -3,12 +3,8 @@ import { and, eq, isNull, desc } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
-import type { NonNullableSession } from '../lib/types';
+import { isInstructor } from '../lib/session-guards';
 import { serverError, ErrorCode } from '../lib/errors';
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
 
 export async function listInstructorAssignmentsForFilterHandler() {
   const session = await getSessionFromHeaders();

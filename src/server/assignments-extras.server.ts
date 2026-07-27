@@ -10,7 +10,7 @@ import { serverError, ErrorCode } from '../lib/errors';
 import { consultations } from '../db/schema/consultations';
 import { assignmentGradeConfig } from '../db/schema/gradebook';
 import { computeEffectiveDeadline } from './due-dates.server';
-import type { NonNullableSession } from '../lib/types';
+import { isInstructor, isStudent } from '../lib/session-guards';
 import type { z } from 'zod';
 import type {
   ListStudentAssignmentsSchema,
@@ -23,14 +23,6 @@ type ListStudentAssignmentsInput = z.infer<typeof ListStudentAssignmentsSchema>;
 type StudentAssignmentIdParam = z.infer<typeof StudentAssignmentIdParamSchema>;
 type UnlockCheckpointInput = z.infer<typeof UnlockCheckpointSchema>;
 type ExtendDeadlineInput = z.infer<typeof ExtendDeadlineSchema>;
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
-
-function isStudent(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'student';
-}
 
 /**
  * Unlock a locked checkpoint.

@@ -14,7 +14,7 @@ import { serverError, ErrorCode } from '../lib/errors';
 import { getNotificationKeys } from './notifications.server';
 import { sendSubmissionReceivedEmail } from '../lib/submission-email';
 import { shouldSendInAppNotification } from '../lib/notification-prefs';
-import type { NonNullableSession } from '../lib/types';
+import { isStudent } from '../lib/session-guards';
 import type { z } from 'zod';
 import type {
   SubmitCheckpointSchema,
@@ -25,10 +25,6 @@ import type {
 type SubmitCheckpointInput = z.infer<typeof SubmitCheckpointSchema>;
 type ListSubmissionsInput = z.infer<typeof ListSubmissionsSchema>;
 type GetSubmissionDetailInput = z.infer<typeof GetSubmissionDetailSchema>;
-
-function isStudent(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'student';
-}
 
 const SUBMITTABLE_STATES = ['unlocked', 'revise'] as const;
 

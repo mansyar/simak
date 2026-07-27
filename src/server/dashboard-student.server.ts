@@ -8,11 +8,7 @@ import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
 import { computeEffectiveDeadline } from './due-dates.server';
 import { serverError, ErrorCode } from '@/lib/errors';
-import type { NonNullableSession } from '../lib/types';
-
-function isStudent(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'student';
-}
+import { isStudent } from '@/lib/session-guards';
 
 /**
  * Get all data for the student dashboard.

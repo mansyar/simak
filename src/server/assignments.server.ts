@@ -10,7 +10,7 @@ import { serverError, ErrorCode, type ServerError } from '../lib/errors';
 import { translateKey } from '../lib/i18n-server';
 import { calculateDueDates, validateDueDates } from './due-dates.server';
 import { createDefaultGradeConfig } from './assignments-extras.server';
-import type { NonNullableSession } from '../lib/types';
+import { isInstructor } from '../lib/session-guards';
 import type { z } from 'zod';
 import type {
   CreateAssignmentSchema,
@@ -72,10 +72,6 @@ export type AssignmentDetailSuccess = {
   templateType: string;
   students: AssignmentDetailStudent[];
 };
-
-function isInstructor(session: NonNullableSession | null): session is NonNullableSession {
-  return !!session && session.user.role === 'instructor';
-}
 
 export async function createAssignmentHandler(args: { data: CreateAssignmentInput }) {
   const session = await getSessionFromHeaders();
