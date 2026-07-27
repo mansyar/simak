@@ -7,7 +7,7 @@
 
 ---
 
-## Phase 1: Root-Cause Diagnosis & Type-Level Test
+## Phase 1: Root-Cause Diagnosis & Type-Level Test [checkpoint: 663747f]
 
 - [x] Task: Read spec.md and workflow.md to refresh context for this phase
     - [x] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
@@ -27,7 +27,7 @@
     - [x] Run `pnpm typecheck` — confirm the type-level test fails (the gap exists)
     - [x] Verify: type-level test fails as expected, confirming the gap — 2 type errors on return type assertions (Tests 1-2), Test 3 (input param) passes
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Root-Cause Diagnosis & Type-Level Test' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Root-Cause Diagnosis & Type-Level Test' (Protocol in workflow.md) [663747f]
 
 ---
 
