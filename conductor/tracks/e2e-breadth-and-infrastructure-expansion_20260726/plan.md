@@ -38,10 +38,10 @@
     - [x] Theme test: toggle from light to dark → verify `dark` class is applied to `<html>`.
     - [x] Notification preferences test: toggle off an event type email → verify the checkbox state persists after reload.
     - [x] Verify: `pnpm test:e2e settings.spec.ts` passes on Chromium.
-- [ ] Task: Expand `tests/e2e/admin-users.spec.ts` with edit and delete tests
-    - [ ] Edit user test: open edit sheet, change name, submit, verify change in table.
-    - [ ] Delete with reassignment test: delete an instructor with active assignments → verify `ReassignmentDialog` appears → select replacement instructor → confirm → verify assignment is reassigned (instructor changed in DB).
-    - [ ] Delete without assignments test: delete user without active assignments → verify direct deletion without dialog.
+- [x] Task: Expand `tests/e2e/admin-users.spec.ts` with edit and delete tests [14decf1]
+    - [x] Edit user test: open edit sheet, change name, submit, verify change in table.
+    - [x] Delete with reassignment test: delete an instructor with active assignments → verify `ReassignmentDialog` appears → select replacement instructor → confirm → verify assignment is reassigned (instructor changed in DB).
+    - [x] Delete without assignments test: delete user without active assignments → verify direct deletion without dialog.
     - [ ] Verify: `pnpm test:e2e admin-users.spec.ts` passes on Chromium.
 - [ ] Task: Write `tests/e2e/smoke-routes.spec.ts` — lightweight smoke tests for untested routes
     - [ ] Landing page (`/`): verify hero section and feature cards render.
