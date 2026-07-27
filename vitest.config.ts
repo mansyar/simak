@@ -1,6 +1,13 @@
 import { defineConfig } from 'vitest/config';
 import { loadEnv } from 'vite';
 
+const xlsxTestFiles = [
+  'tests/unit/lib/parse-templates-xlsx.test.ts',
+  'tests/unit/lib/parse-users-xlsx.test.ts',
+  'tests/unit/lib/sample-generators.test.ts',
+  'tests/unit/lib/excel-export.test.ts',
+];
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -12,8 +19,6 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
-    include: ['tests/**/*.test.{ts,tsx}'],
-    exclude: ['node_modules', 'dist'],
     testTimeout: 30000,
 
     // Load .env files
@@ -65,5 +70,27 @@ export default defineConfig({
         statements: 80,
       },
     },
+
+    // Projects: unit tests run on vmThreads (inherited), xlsx tests on threads.
+    // Bare `vitest run` executes both projects — no script-level flags needed.
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          include: ['tests/**/*.test.{ts,tsx}'],
+          exclude: ['node_modules', 'dist', 'tests/integration/**', ...xlsxTestFiles],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'xlsx',
+          pool: 'threads',
+          include: xlsxTestFiles,
+          exclude: ['node_modules', 'dist'],
+        },
+      },
+    ],
   },
 });
