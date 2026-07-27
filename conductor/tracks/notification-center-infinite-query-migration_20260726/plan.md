@@ -38,7 +38,7 @@
     - [x] Update `useNotificationsList` call: remove `page: currentPage` from options (no longer accepts `page`)
     - [x] Run `pnpm test` — confirm component tests pass (Green phase)
     - [x] Run `pnpm typecheck` — confirm no type errors
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3: Optimistic Mutation Rewrite + Full Test Suite
 
