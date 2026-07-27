@@ -58,7 +58,7 @@ export async function setupNumericRubric(
       VALUES (${templateCheckpointId}, ${c.title}, ${c.description ?? null}, ${c.weight}, ${i})
       RETURNING id, title, weight
     `;
-    created.push(row);
+    created.push(row as RubricCriterion);
   }
 
   await sql.end();
