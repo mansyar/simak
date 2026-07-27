@@ -145,7 +145,7 @@ test.describe('Cross-Role Lifecycle', () => {
     await clickConsultationsTab(instructorPage);
 
     // Verify the pending consultation appears in the verification queue
-    await expect(instructorPage.locator('text=Pending Verification')).toBeVisible({
+    await expect(instructorPage.locator('text=Pending Verification').first()).toBeVisible({
       timeout: 10_000,
     });
 
