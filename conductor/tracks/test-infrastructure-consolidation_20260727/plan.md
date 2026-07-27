@@ -38,17 +38,17 @@
 
 ## Phase 2: Documentation Alignment & Final DoD
 
-- [ ] Task: Read `./spec.md` and `../../workflow.md` to re-establish context for this phase
+- [x] Task: Read `./spec.md` and `../../workflow.md` to re-establish context for this phase
 
-- [ ] Task: Update `AGENTS.md`
-    - [ ] "Developer Commands" table: `pnpm test` → `vitest run` (unit tests; excludes integration; xlsx tests run via `projects`); `pnpm test:unit` → alias of `pnpm test`; `pnpm test:watch` → `vitest`; `pnpm test:coverage` → `vitest run --coverage` (vmThreads default for unit; excludes integration); `pnpm test:integration` → `vitest run --config vitest.config.integration.ts tests/integration`
-    - [ ] "Testing Patterns" note: replace "A small set of xlsx-parsing tests run in a separate `--pool=threads` invocation (see the test script in package.json) — this is handled automatically" with: xlsx tests run via the `projects` array in `vitest.config.ts` (xlsx project uses `threads` pool) — still automatic, mechanism changed to config
-    - [ ] Pre-push gate note: correct `pnpm vitest run --coverage` → `pnpm test:coverage` (matches `lefthook.yml` exactly); the "also excludes integration via `vitest.config.ts`" claim becomes TRUE after this change (currently it's via script flag)
+- [x] Task: Update `AGENTS.md` [d2fe77cb]
+    - [x] "Developer Commands" table: `pnpm test` → `vitest run` (unit tests; excludes integration; xlsx tests run via `projects`); `pnpm test:unit` → alias of `pnpm test`; `pnpm test:watch` → `vitest`; `pnpm test:coverage` → `vitest run --coverage` (vmThreads default for unit; excludes integration); `pnpm test:integration` → `vitest run --config vitest.config.integration.ts tests/integration`
+    - [x] "Testing Patterns" note: replace "A small set of xlsx-parsing tests run in a separate `--pool=threads` invocation (see the test script in package.json) — this is handled automatically" with: xlsx tests run via the `projects` array in `vitest.config.ts` (xlsx project uses `threads` pool) — still automatic, mechanism changed to config
+    - [x] Pre-push gate note: correct `pnpm vitest run --coverage` → `pnpm test:coverage` (matches `lefthook.yml` exactly); the "also excludes integration via `vitest.config.ts`" claim becomes TRUE after this change (currently it's via script flag)
 
-- [ ] Task: Update `conductor/workflow.md`
-    - [ ] "Daily Development" block: fix `pnpm test` comment — "excludes integration + xlsx-threaded tests" is now inaccurate (xlsx tests ARE included via `projects`); correct to "excludes integration; xlsx tests run via `projects` config"
-    - [ ] "Testing Requirements → Test Layout": update the xlsx note from "separate `--pool=threads` invocation (see the test script in package.json)" to "xlsx project in `vitest.config.ts` `projects` array (pool: `threads`)"
-    - [ ] Pre-push gate block: align `pnpm typecheck && pnpm vitest run --coverage` → `pnpm typecheck && pnpm test:coverage` (match `lefthook.yml`)
+- [x] Task: Update `conductor/workflow.md` [d2fe77cb]
+    - [x] "Daily Development" block: fix `pnpm test` comment — "excludes integration + xlsx-threaded tests" is now inaccurate (xlsx tests ARE included via `projects`); correct to "excludes integration; xlsx tests run via `projects` config"
+    - [x] "Testing Requirements → Test Layout": update the xlsx note from "separate `--pool=threads` invocation (see the test script in package.json)" to "xlsx project in `vitest.config.ts` `projects` array (pool: `threads`)"
+    - [x] Pre-push gate block: align `pnpm typecheck && pnpm vitest run --coverage` → `pnpm typecheck && pnpm test:coverage` (match `lefthook.yml`)
 
 - [ ] Task: Final Definition of Done verification
     - [ ] **AC-3:** Run `pnpm test:coverage` → passes ≥80% on all four thresholds, uses `vmThreads` for unit (no global `--pool=threads`), excludes integration; confirm xlsx tests counted in coverage
