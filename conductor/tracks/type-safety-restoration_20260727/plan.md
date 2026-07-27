@@ -31,7 +31,7 @@
 
 ---
 
-## Phase 2: Type Fix at Source
+## Phase 2: Type Fix at Source [checkpoint: 1791ee69]
 
 - [x] Task: Read spec.md and workflow.md to refresh context for this phase
     - [x] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
@@ -92,7 +92,7 @@
     - [x] Run `pnpm check:i18n` — parity maintained (781 keys used, 963 in both locales)
     - [x] Verify: all quality gates pass
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Type Fix at Source' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Type Fix at Source' (Protocol in workflow.md) [1791ee69]
 
 ---
 
