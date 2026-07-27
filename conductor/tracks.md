@@ -8,6 +8,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: E2E Breadth & Infrastructure Expansion (TRACK-028)**
-*Link: [./tracks/e2e-breadth-and-infrastructure-expansion_20260726/](./tracks/e2e-breadth-and-infrastructure-expansion_20260726/)*
-
