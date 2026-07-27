@@ -8,3 +8,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+---
+
+- [ ] **Track: Test Infrastructure Consolidation**
+*Link: [./tracks/test-infrastructure-consolidation_20260727/](./tracks/test-infrastructure-consolidation_20260727/)*
+
