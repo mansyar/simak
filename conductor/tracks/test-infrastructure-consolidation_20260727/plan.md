@@ -57,4 +57,7 @@
     - [x] Final review of `package.json` scripts against FR-4 (exact script strings) and confirm `lefthook.yml` unchanged (TRACK-036 territory)
 
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Documentation Alignment & Final DoD' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions [525b025]
 </protect>
