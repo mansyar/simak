@@ -58,14 +58,14 @@
     - [x] Run `pnpm typecheck` — confirm type-level test now passes
     - [x] Verify: type-level test passes, confirming the fix works — typecheck 0 errors (2 pre-existing type errors resolved), 3740 tests pass, lint 0 errors
 
-- [ ] Task: Migrate server-function stubs to `typedServerFn` (batch 1: core features)
-    - [ ] Migrate `src/server/assignments.ts` — replace `createServerFn` import with `typedServerFn` from `@/lib/server-fn`
-    - [ ] Migrate `src/server/submissions.ts`
-    - [ ] Migrate `src/server/notifications.ts`
-    - [ ] Migrate `src/server/reviews.ts`
-    - [ ] Migrate `src/server/settings.ts`
-    - [ ] Run `pnpm typecheck` after each file — catch any inference gaps immediately
-    - [ ] Verify: typecheck clean after batch 1
+- [x] Task: Migrate server-function stubs to `typedServerFn` (batch 1: core features) [5d2650a]
+    - [x] Migrate `src/server/assignments.ts` — replace `createServerFn` import with `typedServerFn` from `@/lib/server-fn`
+    - [x] Migrate `src/server/submissions.ts`
+    - [x] Migrate `src/server/notifications.ts`
+    - [x] Migrate `src/server/reviews.ts`
+    - [x] Migrate `src/server/settings.ts`
+    - [x] Run `pnpm typecheck` after each file — catch any inference gaps immediately
+    - [x] Verify: typecheck clean after batch 1 — typecheck 0 errors, 3780 tests pass, lint 0 errors
 
 - [ ] Task: Migrate server-function stubs to `typedServerFn` (batch 2: remaining stubs)
     - [ ] Migrate `src/server/consultations.ts`
