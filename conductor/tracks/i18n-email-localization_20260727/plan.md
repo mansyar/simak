@@ -34,7 +34,7 @@
     - [x] Stage all changes and commit: `fix(i18n): Replace hardcoded 2FA email subjects with resolveEmailSubject calls`
     - [x] Attach git note with task summary to the commit
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ---
 
@@ -58,5 +58,5 @@
     - [x] If no additional fixes: commit the audit documentation in the plan update
     - [x] Attach git note with audit summary to the commit
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 </protect>
