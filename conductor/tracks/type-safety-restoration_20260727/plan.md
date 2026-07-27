@@ -109,7 +109,7 @@
     - [x] Run `pnpm typecheck` after each file — confirm no type errors
     - [x] Verify: zero `as unknown as` in `src/hooks/`
 
-- [ ] Task: Remove `as unknown as` casts from settings components (13 casts, 5 files)
+- [x] Task: Remove `as unknown as` casts from settings components (13 casts, 5 files) [4b0c5e3]
     - [ ] Remove 4 casts from `src/components/settings/TwoFactorSettings.tsx`
     - [ ] Remove 3 casts from `src/components/settings/SessionManagement.tsx`
     - [ ] Remove 2 casts from `src/components/settings/ProfileSection.tsx`
