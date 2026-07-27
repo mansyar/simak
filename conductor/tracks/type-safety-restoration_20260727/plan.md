@@ -9,23 +9,23 @@
 
 ## Phase 1: Root-Cause Diagnosis & Type-Level Test
 
-- [ ] Task: Read spec.md and workflow.md to refresh context for this phase
-    - [ ] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
-    - [ ] Read `conductor/workflow.md` for TDD lifecycle and quality gates
-    - [ ] Verify: context is refreshed and understood
+- [x] Task: Read spec.md and workflow.md to refresh context for this phase
+    - [x] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
+    - [x] Read `conductor/workflow.md` for TDD lifecycle and quality gates
+    - [x] Verify: context is refreshed and understood
 
-- [ ] Task: Diagnose the `createServerFn` type-gap root cause
-    - [ ] Read `src/server/assignments.ts` (typed-builder pattern) and `src/server/submissions.ts` (inline-parse pattern) to understand both stub patterns
-    - [ ] Read `src/hooks/use-notifications.ts` to see the cast pattern at call sites
-    - [ ] Investigate why `createServerFn({ method }).inputValidator(Schema).handler(async ({ data }) => { const { handler } = await import('./feature.server'); return handler({ data }); })` doesn't propagate the handler's return type to client callers
-    - [ ] Document the root cause (likely: dynamic `await import()` breaks type inference, or `createServerFn`'s generic doesn't capture the handler return type through the builder chain)
-    - [ ] Verify: root cause is documented and understood
+- [x] Task: Diagnose the `createServerFn` type-gap root cause
+    - [x] Read `src/server/assignments.ts` (typed-builder pattern) and `src/server/submissions.ts` (inline-parse pattern) to understand both stub patterns
+    - [x] Read `src/hooks/use-notifications.ts` to see the cast pattern at call sites
+    - [x] Investigate why `createServerFn({ method }).inputValidator(Schema).handler(async ({ data }) => { const { handler } = await import('./feature.server'); return handler({ data }); })` doesn't propagate the handler's return type to client callers
+    - [x] Document the root cause: `createServerFn`'s `handler` method has generic `<TNewResponse>` but `ServerFnReturnType` applies `ValidateSerializableInput` (a recursive conditional type from `@tanstack/router-core`) that prevents TypeScript from inferring `TNewResponse` through the conditional. `TNewResponse` defaults to `unknown`, making the `Fetcher` return type `Promise<unknown>` at call sites. The dynamic `await import()` is NOT the cause — even direct handler returns suffer the same inference failure.
+    - [x] Verify: root cause is documented and understood
 
-- [ ] Task: Write type-level test (failing — confirms the gap exists)
-    - [ ] Create `tests/unit/types/server-fn-types.test-d.ts`
-    - [ ] Write `expectTypeOf` or `@ts-expect-error` assertions demonstrating that a `createServerFn` stub's return type is `unknown` at the call site (before the fix)
-    - [ ] Run `pnpm typecheck` — confirm the type-level test fails (the gap exists)
-    - [ ] Verify: type-level test fails as expected, confirming the gap
+- [x] Task: Write type-level test (failing — confirms the gap exists) [ca36ab8]
+    - [x] Create `tests/unit/types/server-fn-types.test-d.ts`
+    - [x] Write `expectTypeOf` or `@ts-expect-error` assertions demonstrating that a `createServerFn` stub's return type is `unknown` at the call site (before the fix)
+    - [x] Run `pnpm typecheck` — confirm the type-level test fails (the gap exists)
+    - [x] Verify: type-level test fails as expected, confirming the gap — 2 type errors on return type assertions (Tests 1-2), Test 3 (input param) passes
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Root-Cause Diagnosis & Type-Level Test' (Protocol in workflow.md)
 
