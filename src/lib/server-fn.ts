@@ -10,6 +10,12 @@ import type { z } from 'zod';
  */
 export type TypedFetcher<TInput, TResponse> = (args: { data: TInput }) => Promise<TResponse>;
 
+/**
+ * Fetcher for handler-only server fns (no `inputValidator`).
+ * Callable with 0 arguments — mirrors TanStack's `OptionalFetcher`.
+ */
+export type OptionalFetcher<TResponse> = (args?: { data?: unknown }) => Promise<TResponse>;
+
 interface TypedBuilderWithValidator<TInput, TOutput> {
   handler<TResponse>(
     fn: (ctx: { data: TOutput }) => Promise<TResponse> | TResponse,
@@ -22,7 +28,7 @@ interface TypedBuilder {
   ): TypedBuilderWithValidator<z.input<TSchema>, z.output<TSchema>>;
   handler<TResponse>(
     fn: (ctx: { data: unknown }) => Promise<TResponse> | TResponse,
-  ): TypedFetcher<unknown, TResponse>;
+  ): OptionalFetcher<TResponse>;
 }
 
 /**

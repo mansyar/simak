@@ -1,8 +1,8 @@
 // Client-safe server function wrapper for review-queue assignment filter
 // Handler implementation is in instructor-assignments-filter.server.ts
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 
-export const listInstructorAssignmentsForFilter = createServerFn({
+export const listInstructorAssignmentsForFilter = typedServerFn({
   method: 'GET',
 }).handler(async () => {
   const { listInstructorAssignmentsForFilterHandler } =

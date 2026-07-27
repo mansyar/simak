@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in discussions.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 // ---- Discussion Schemas ----
@@ -23,21 +23,21 @@ export const DeleteOwnMessageSchema = z.object({
 
 // ---- Discussion Server Function Stubs ----
 
-export const listDiscussionMessages = createServerFn({ method: 'GET' })
+export const listDiscussionMessages = typedServerFn({ method: 'GET' })
   .inputValidator(ListDiscussionMessagesSchema)
   .handler(async ({ data }) => {
     const { listDiscussionMessagesHandler } = await import('./discussions.server');
     return listDiscussionMessagesHandler({ data });
   });
 
-export const postDiscussionMessage = createServerFn({ method: 'POST' })
+export const postDiscussionMessage = typedServerFn({ method: 'POST' })
   .inputValidator(PostDiscussionMessageSchema)
   .handler(async ({ data }) => {
     const { postDiscussionMessageHandler } = await import('./discussions.server');
     return postDiscussionMessageHandler({ data });
   });
 
-export const deleteOwnMessage = createServerFn({ method: 'POST' })
+export const deleteOwnMessage = typedServerFn({ method: 'POST' })
   .inputValidator(DeleteOwnMessageSchema)
   .handler(async ({ data }) => {
     const { deleteOwnMessageHandler } = await import('./discussions.server');

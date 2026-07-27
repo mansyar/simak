@@ -1,4 +1,4 @@
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 // ---- Schemas ----
@@ -40,14 +40,14 @@ export type EmailQueueSummary = {
 
 // ---- Server Function Stubs ----
 
-export const listEmailQueue = createServerFn({ method: 'GET' })
+export const listEmailQueue = typedServerFn({ method: 'GET' })
   .inputValidator(ListEmailQueueSchema)
   .handler(async ({ data }) => {
     const { listEmailQueueHandler } = await import('./email-queue.server');
     return listEmailQueueHandler({ data });
   });
 
-export const retryEmail = createServerFn({ method: 'POST' })
+export const retryEmail = typedServerFn({ method: 'POST' })
   .inputValidator(RetryEmailSchema)
   .handler(async ({ data }) => {
     const { retryEmailHandler } = await import('./email-queue.server');

@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in dashboard.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const GetStudentDashboardDataSchema = z.object({});
@@ -9,17 +9,17 @@ export const GetInstructorDashboardDataSchema = z.object({});
 
 export const GetAdminDashboardDataSchema = z.object({});
 
-export const getStudentDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
+export const getStudentDashboardData = typedServerFn({ method: 'GET' }).handler(async () => {
   const { getStudentDashboardDataHandler } = await import('./dashboard.server');
   return getStudentDashboardDataHandler();
 });
 
-export const getInstructorDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
+export const getInstructorDashboardData = typedServerFn({ method: 'GET' }).handler(async () => {
   const { getInstructorDashboardDataHandler } = await import('./dashboard.server');
   return getInstructorDashboardDataHandler();
 });
 
-export const getAdminDashboardData = createServerFn({ method: 'GET' }).handler(async () => {
+export const getAdminDashboardData = typedServerFn({ method: 'GET' }).handler(async () => {
   const { getAdminDashboardDataHandler } = await import('./dashboard.server');
   return getAdminDashboardDataHandler();
 });

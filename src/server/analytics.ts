@@ -1,7 +1,7 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in analytics-admin.server.ts, analytics-instructor.server.ts,
 // and analytics-export.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const AnalyticsDateRangeSchema = z
@@ -31,28 +31,28 @@ export const AnalyticsDateRangeSchema = z
     { message: 'Start date must be before end date' },
   );
 
-export const getAdminAnalyticsData = createServerFn({ method: 'GET' })
+export const getAdminAnalyticsData = typedServerFn({ method: 'GET' })
   .inputValidator(AnalyticsDateRangeSchema)
   .handler(async ({ data }) => {
     const { getAdminAnalyticsDataHandler } = await import('./analytics-admin.server');
     return getAdminAnalyticsDataHandler({ data });
   });
 
-export const getInstructorAnalyticsData = createServerFn({ method: 'GET' })
+export const getInstructorAnalyticsData = typedServerFn({ method: 'GET' })
   .inputValidator(AnalyticsDateRangeSchema)
   .handler(async ({ data }) => {
     const { getInstructorAnalyticsDataHandler } = await import('./analytics-instructor.server');
     return getInstructorAnalyticsDataHandler({ data });
   });
 
-export const getInstructorRubricAnalytics = createServerFn({ method: 'GET' })
+export const getInstructorRubricAnalytics = typedServerFn({ method: 'GET' })
   .inputValidator(AnalyticsDateRangeSchema)
   .handler(async ({ data }) => {
     const { getInstructorRubricAnalyticsHandler } = await import('./analytics-instructor.server');
     return getInstructorRubricAnalyticsHandler({ data });
   });
 
-export const getAdminRubricAnalytics = createServerFn({ method: 'GET' })
+export const getAdminRubricAnalytics = typedServerFn({ method: 'GET' })
   .inputValidator(AnalyticsDateRangeSchema)
   .handler(async ({ data }) => {
     const { getAdminRubricAnalyticsHandler } = await import('./analytics-admin.server');
@@ -88,49 +88,49 @@ export const ExportGradebookCsvSchema = z.object({
 
 // ---- CSV Export Server Function Stubs ----
 
-export const exportUsersCsv = createServerFn({ method: 'GET' })
+export const exportUsersCsv = typedServerFn({ method: 'GET' })
   .inputValidator(ExportUsersCsvSchema)
   .handler(async ({ data }) => {
     const { exportUsersCsvHandler } = await import('./analytics-export.server');
     return exportUsersCsvHandler({ data });
   });
 
-export const exportAuditLogCsv = createServerFn({ method: 'GET' })
+export const exportAuditLogCsv = typedServerFn({ method: 'GET' })
   .inputValidator(ExportAuditLogCsvSchema)
   .handler(async ({ data }) => {
     const { exportAuditLogCsvHandler } = await import('./analytics-export.server');
     return exportAuditLogCsvHandler({ data });
   });
 
-export const exportAssignmentProgressCsv = createServerFn({ method: 'GET' })
+export const exportAssignmentProgressCsv = typedServerFn({ method: 'GET' })
   .inputValidator(ExportAssignmentProgressCsvSchema)
   .handler(async ({ data }) => {
     const { exportAssignmentProgressCsvHandler } = await import('./analytics-export.server');
     return exportAssignmentProgressCsvHandler({ data });
   });
 
-export const exportStudentProgressCsv = createServerFn({ method: 'GET' })
+export const exportStudentProgressCsv = typedServerFn({ method: 'GET' })
   .inputValidator(ExportStudentProgressCsvSchema)
   .handler(async ({ data }) => {
     const { exportStudentProgressCsvHandler } = await import('./analytics-export.server');
     return exportStudentProgressCsvHandler({ data });
   });
 
-export const exportReviewHistoryCsv = createServerFn({ method: 'GET' })
+export const exportReviewHistoryCsv = typedServerFn({ method: 'GET' })
   .inputValidator(ExportReviewHistoryCsvSchema)
   .handler(async ({ data }) => {
     const { exportReviewHistoryCsvHandler } = await import('./analytics-export.server');
     return exportReviewHistoryCsvHandler({ data });
   });
 
-export const exportRubricScoresCsv = createServerFn({ method: 'GET' })
+export const exportRubricScoresCsv = typedServerFn({ method: 'GET' })
   .inputValidator(ExportRubricScoresCsvSchema)
   .handler(async ({ data }) => {
     const { exportRubricScoresCsvHandler } = await import('./analytics-export.server');
     return exportRubricScoresCsvHandler({ data });
   });
 
-export const exportGradebookCsv = createServerFn({ method: 'GET' })
+export const exportGradebookCsv = typedServerFn({ method: 'GET' })
   .inputValidator(ExportGradebookCsvSchema)
   .handler(async ({ data }) => {
     const { exportGradebookCsvHandler } = await import('./analytics-export.server');

@@ -1,4 +1,4 @@
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { redirect } from '@tanstack/react-router';
 import { getRoleDashboard } from '../lib/route-utils';
 import { isAuthenticated } from '../lib/session-guards';
@@ -20,7 +20,7 @@ export type Session = {
   };
 } | null;
 
-const _getSession = createServerFn({ method: 'GET' }).handler(async () => {
+const _getSession = typedServerFn({ method: 'GET' }).handler(async () => {
   const { getSessionHandler } = await import('./auth.server');
   return getSessionHandler();
 });

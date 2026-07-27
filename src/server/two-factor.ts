@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in two-factor.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 // --- Schemas ---
@@ -31,7 +31,7 @@ export const GetTwoFactorStatusSchema = z.object({});
 
 // --- Server function stubs ---
 
-export const generateTwoFactorSetup = createServerFn({ method: 'POST' }).handler(
+export const generateTwoFactorSetup = typedServerFn({ method: 'POST' }).handler(
   async (args: { data: unknown }) => {
     const { generateTwoFactorSetupHandler } = await import('./two-factor.server');
     const data = EnableTwoFactorSchema.parse(args.data);
@@ -39,7 +39,7 @@ export const generateTwoFactorSetup = createServerFn({ method: 'POST' }).handler
   },
 );
 
-export const enableTwoFactor = createServerFn({ method: 'POST' }).handler(
+export const enableTwoFactor = typedServerFn({ method: 'POST' }).handler(
   async (args: { data: unknown }) => {
     const { enableTwoFactorHandler } = await import('./two-factor.server');
     const data = VerifyTwoFactorSchema.parse(args.data);
@@ -47,7 +47,7 @@ export const enableTwoFactor = createServerFn({ method: 'POST' }).handler(
   },
 );
 
-export const disableTwoFactor = createServerFn({ method: 'POST' }).handler(
+export const disableTwoFactor = typedServerFn({ method: 'POST' }).handler(
   async (args: { data: unknown }) => {
     const { disableTwoFactorHandler } = await import('./two-factor.server');
     const data = DisableTwoFactorSchema.parse(args.data);
@@ -55,7 +55,7 @@ export const disableTwoFactor = createServerFn({ method: 'POST' }).handler(
   },
 );
 
-export const regenerateBackupCodes = createServerFn({ method: 'POST' }).handler(
+export const regenerateBackupCodes = typedServerFn({ method: 'POST' }).handler(
   async (args: { data: unknown }) => {
     const { regenerateBackupCodesHandler } = await import('./two-factor.server');
     const data = RegenerateBackupCodesSchema.parse(args.data);
@@ -63,7 +63,7 @@ export const regenerateBackupCodes = createServerFn({ method: 'POST' }).handler(
   },
 );
 
-export const getTwoFactorStatus = createServerFn({ method: 'GET' }).handler(
+export const getTwoFactorStatus = typedServerFn({ method: 'GET' }).handler(
   async (args: { data: unknown }) => {
     const { getTwoFactorStatusHandler } = await import('./two-factor.server');
     const data = GetTwoFactorStatusSchema.parse(args.data);
