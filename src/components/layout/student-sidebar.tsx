@@ -68,7 +68,7 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
         {/* Navigation */}
         <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-4 pb-4">
           {/* MAIN section */}
-          <span className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">
+          <span className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/90">
             {t('studentSidebar.sectionMain')}
           </span>
           {mainLinks.map((link) => {
@@ -93,7 +93,7 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
           })}
 
           {/* PREFERENCES section */}
-          <span className="px-3 pb-1 pt-5 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/50">
+          <span className="px-3 pb-1 pt-5 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/90">
             {t('studentSidebar.sectionPreferences')}
           </span>
           {preferenceLinks.map((link) => {

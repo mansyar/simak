@@ -326,7 +326,12 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Textarea placeholder={t('discussions.placeholder')} rows={2} {...field} />
+                  <Textarea
+                    placeholder={t('discussions.placeholder')}
+                    aria-label={t('discussions.placeholder')}
+                    rows={2}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
