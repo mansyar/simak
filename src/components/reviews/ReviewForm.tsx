@@ -48,16 +48,12 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
 
       setIsUploadingFeedback(true);
       try {
-        const uploadData = await (
-          getPresignedReviewFeedbackUploadUrl as unknown as (args: {
-            data: { extension: string; contentType: string };
-          }) => Promise<{ uploadUrl: string; fileKey: string; error?: string }>
-        )({
+        const uploadData = await getPresignedReviewFeedbackUploadUrl({
           data: { extension, contentType },
         });
 
-        if (uploadData.error) {
-          onError(uploadData.error);
+        if (isServerError(uploadData)) {
+          onError(uploadData.error.message);
           return;
         }
 
@@ -94,18 +90,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
 
     setIsSubmitting(true);
     try {
-      const result = await (
-        submitReview as unknown as (args: {
-          data: {
-            submissionId: number;
-            decision: 'pass' | 'revise';
-            comment: string;
-            feedbackFileKey?: string;
-            revisionDeadline?: string;
-            scores?: ScoreInput[];
-          };
-        }) => Promise<{ error?: string }>
-      )({
+      const result = await submitReview({
         data: {
           submissionId,
           decision,

@@ -245,7 +245,9 @@ describe('ExtensionRequestForm', () => {
 
   it('should show error when requestExtension returns error', async () => {
     const requestExtension = (await import('@/server/extensions')).requestExtension;
-    (requestExtension as any).mockResolvedValue({ error: 'Failed to request extension' });
+    (requestExtension as any).mockResolvedValue({
+      error: { code: 'INTERNAL', message: 'Failed to request extension' },
+    });
 
     render(
       <ExtensionRequestForm

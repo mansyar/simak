@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { unlockCheckpoint, extendDeadline } from '@/server/assignments';
+import { isServerError } from '@/lib/errors';
 import { assignmentKeys } from '@/lib/query-keys';
 import {
   Dialog,
@@ -81,13 +82,9 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
   // Unlock mutation
   const unlockMutation = useMutation({
     mutationFn: async (checkpointId: number) => {
-      const result = await (
-        unlockCheckpoint as unknown as (args: {
-          data: { checkpointId: number };
-        }) => Promise<{ success: boolean; error: string | null }>
-      )({ data: { checkpointId } });
-      if (!result.success) {
-        throw new Error(result.error ?? 'Unlock failed');
+      const result = await unlockCheckpoint({ data: { checkpointId } });
+      if (isServerError(result)) {
+        throw new Error(result.error.message);
       }
       return result;
     },
@@ -134,13 +131,9 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       checkpointId: number;
       newDueDate: Date;
     }) => {
-      const result = await (
-        extendDeadline as unknown as (args: {
-          data: { checkpointId: number; newDueDate: Date };
-        }) => Promise<{ success: boolean; error: string | null }>
-      )({ data: { checkpointId, newDueDate } });
-      if (!result.success) {
-        throw new Error(result.error ?? 'Extend failed');
+      const result = await extendDeadline({ data: { checkpointId, newDueDate } });
+      if (isServerError(result)) {
+        throw new Error(result.error.message);
       }
       return result;
     },
