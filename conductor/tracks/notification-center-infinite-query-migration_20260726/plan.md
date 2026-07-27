@@ -62,4 +62,7 @@
     - [x] Verify all files under 500 lines: `use-notifications.ts`, `NotificationCenter.tsx`, `query-keys.ts`, all test files
     - [x] Grep verification: `allItems` and `existingIds` return zero matches in `NotificationCenter.tsx`; `'items' in old` returns zero matches in `use-notifications.ts`; `setCurrentPage` returns zero matches in `NotificationCenter.tsx`
 - [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 545e66b
 </protect>
