@@ -78,7 +78,7 @@
     - [ ] Set timeout to 120s, mark as serial, runs last.
     - [ ] Browser context management: single context, clear cookies + storageState between role switches, login as new role via Better Auth API (`loginAsRole` pattern).
     - [ ] Verify: `pnpm test:e2e cross-role-lifecycle.spec.ts` passes on Chromium.
-- [ ] Task: Add `mobile-chrome` project to `playwright.config.ts` and run mobile tests
+- [x] Task: Add `mobile-chrome` project to `playwright.config.ts` and run mobile tests [fa4067e]
     - [ ] Add `mobile-chrome` project using `devices['Pixel 7']` (or `devices['iPhone 14']`).
     - [ ] Run dashboard and assignment detail tests on mobile viewport to verify responsive layouts (card-based `ProgressTable`, stacked `CheckpointListEditor`, mobile step indicator in wizard).
     - [ ] Verify: mobile tests pass, `playwright.config.ts` stays under 500 lines.
