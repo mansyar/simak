@@ -882,7 +882,9 @@
       "extensionRequested": "Extension Requested",
       "deadlineReminder": "Deadline Reminder — {assignmentTitle}",
       "studentAtRisk": "Student At Risk — {assignmentTitle}",
-      "discussionReply": "New Discussion Reply — {assignmentTitle}"
+      "discussionReply": "New Discussion Reply — {assignmentTitle}",
+      "twoFactorEnabled": "Two-Factor Authentication Enabled",
+      "twoFactorDisabled": "Two-Factor Authentication Disabled"
     }
   },
   "errors": {

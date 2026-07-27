@@ -11,6 +11,7 @@ import * as authMod from '@/server/auth';
 import * as dbMod from '@/db/index';
 import * as auditMod from '@/lib/audit';
 import * as emailMod from '@/lib/email';
+import * as i18nServerMod from '@/lib/i18n-server';
 import * as authSessionMod from '@/lib/auth-session';
 import { auth } from '@/auth/config';
 
@@ -48,6 +49,10 @@ vi.mock('@/lib/email', async () => {
     enqueueEmail: vi.fn(),
   };
 });
+
+vi.mock('@/lib/i18n-server', () => ({
+  resolveEmailSubject: vi.fn(),
+}));
 
 vi.mock('@/lib/auth-session', () => ({
   revokeUserSessions: vi.fn().mockResolvedValue(undefined),
@@ -100,6 +105,7 @@ describe('Two-factor server functions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
+    vi.mocked(i18nServerMod.resolveEmailSubject).mockReturnValue('resolved-subject');
   });
 
   // ─── generateTwoFactorSetupHandler ───────────────────────────
@@ -204,9 +210,14 @@ describe('Two-factor server functions', () => {
       expect(emailMod.enqueueEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           recipientEmail: 'test@example.com',
-          subject: 'Two-Factor Authentication Enabled',
+          subject: 'resolved-subject',
           templateType: 'two_factor',
         }),
+      );
+      expect(i18nServerMod.resolveEmailSubject).toHaveBeenCalledWith(
+        'emails.subjects.twoFactorEnabled',
+        undefined,
+        'en',
       );
     });
 
@@ -293,9 +304,14 @@ describe('Two-factor server functions', () => {
       expect(emailMod.enqueueEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           recipientEmail: 'test@example.com',
-          subject: 'Two-Factor Authentication Disabled',
+          subject: 'resolved-subject',
           templateType: 'two_factor',
         }),
+      );
+      expect(i18nServerMod.resolveEmailSubject).toHaveBeenCalledWith(
+        'emails.subjects.twoFactorDisabled',
+        undefined,
+        'en',
       );
     });
 

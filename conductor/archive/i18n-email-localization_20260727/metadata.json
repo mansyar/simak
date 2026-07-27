@@ -1,0 +1,19 @@
+{
+  "track_id": "i18n-email-localization_20260727",
+  "type": "bugfix",
+  "state": "COMPLETE",
+  "spec": {
+    "approved": true,
+    "approved_at": "2026-07-27T18:59:00Z"
+  },
+  "plan": {
+    "approved": true,
+    "approved_at": "2026-07-27T18:59:00Z",
+    "items_total": 8,
+    "items_completed": 8
+  },
+  "revert_baseline": "61be862f",
+  "created_at": "2026-07-27T18:59:00Z",
+  "updated_at": "2026-07-27T18:59:00Z",
+  "description": "TRACK-034: i18n & Email Localization Completeness — Fix hardcoded 2FA email subjects with resolveEmailSubject calls and audit all enqueueEmail call sites"
+}

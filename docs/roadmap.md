@@ -529,40 +529,9 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-034: i18n & Email Localization Completeness
-
-*   **Status:** `Pending`
-*   **Dependencies:** None
-*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
-*   **Audit IDs:** INFRA-6 (hardcoded 2FA email subjects)
-
-#### Context Anchors (Traceability)
-*   **PRD Reference:** `docs/PRD.md` — Email Notification System (bilingual email support — EN/ID)
-*   **TDD Reference:** `src/lib/i18n-server.ts` (exports `resolveEmailSubject(key, params, locale)` — the canonical helper for localized email subjects); `src/lib/email.ts` (uses `resolveEmailSubject` correctly); `src/server/two-factor.server.ts:99` (`subject: 'Two-Factor Authentication Enabled'` — hardcoded, should use `resolveEmailSubject`); `src/server/two-factor.server.ts:201` (`subject: 'Two-Factor Authentication Disabled'` — hardcoded); `conductor/workflow.md` → "i18n Workflow" (all user-visible strings must use i18n keys)
-
-#### Track Tech Stack
-*   `src/lib/i18n-server.ts` (existing `resolveEmailSubject` helper — no new code needed)
-*   `src/server/two-factor.server.ts` (2 hardcoded email subjects to fix)
-*   `locales/en.json` + `locales/id.json` (new i18n keys for 2FA email subjects)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Fix hardcoded 2FA email subjects:** Replace `subject: 'Two-Factor Authentication Enabled'` and `subject: 'Two-Factor Authentication Disabled'` in `src/server/two-factor.server.ts` with `resolveEmailSubject('emails.twoFactorEnabled.subject', {}, locale)` and `resolveEmailSubject('emails.twoFactorDisabled.subject', {}, locale)` calls. The handler already has access to the user's locale via `session.user.locale`.
-    *   **Add i18n keys:** Add `emails.twoFactorEnabled.subject` and `emails.twoFactorDisabled.subject` to both `locales/en.json` and `locales/id.json`. Run `pnpm generate:i18n`.
-    *   **Audit all `enqueueEmail` call sites:** Grep for `subject:` in all `src/server/` and `src/lib/` files (enqueueEmail is called from both `*.server.ts` handlers and `src/lib/email.ts`/`src/lib/event-email.ts`). Verify every email subject uses `resolveEmailSubject()` or an i18n key — not a hardcoded English string. Fix any additional offenders found.
-*   **Out of Scope:**
-    *   Email body template localization (email HTML bodies are already in English-only by design — server-side templates are not user-facing i18n in the same way; deferred to a future track if needed)
-    *   Changes to the `resolveEmailSubject` helper (already works correctly)
-    *   Changes to the email queue infrastructure
-    *   Any new email templates (only fixing existing hardcoded subjects)
-
-#### High-Level Execution Vectors
-*   **Phase 1 (2FA email fix):** Add i18n keys for 2FA email subjects to both locale files. Run `pnpm generate:i18n`. Replace hardcoded subjects in `two-factor.server.ts` with `resolveEmailSubject()` calls using `session.user.locale`. Write/update tests verifying the subject is localized. Verify: `pnpm test:unit` passes, `pnpm check:i18n` parity.
-*   **Phase 2 (Full audit):** Grep all `src/server/` and `src/lib/` files for hardcoded `subject:` strings. Fix any found. Verify: `pnpm typecheck` clean, `pnpm check:i18n` parity, `pnpm lint` clean.
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** Enable 2FA with an Indonesian-locale user — verify the email subject is in Indonesian. Disable 2FA — verify the email subject is in Indonesian. Enable 2FA with an English-locale user — verify English subject.
-*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. Updated tests for `two-factor.server.ts` verifying `resolveEmailSubject` is called with correct key and locale. `pnpm check:i18n` — parity for new keys. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
-*   [ ] **Conductor Review:** Grep `subject: '` in `src/server/` and `src/lib/` returns zero matches (all subjects use `resolveEmailSubject`). `locales/en.json` and `locales/id.json` have `emails.twoFactorEnabled.subject` and `emails.twoFactorDisabled.subject`. All files under 500 lines. Pre-push gate passes.
+- **Status:** ✅ Complete · **Audit IDs:** INFRA-6 (hardcoded 2FA email subjects) · **Deps:** None
+- **Key decisions:** Replaced 2 hardcoded 2FA email subjects in `src/server/two-factor.server.ts` with `resolveEmailSubject('emails.subjects.twoFactorEnabled'|'twoFactorDisabled', undefined, session.user.locale as Locales)` calls; added `emails.subjects.twoFactorEnabled` / `twoFactorDisabled` i18n keys to both locale files; regenerated `src/i18n/types.ts` via `pnpm generate:i18n`; updated `tests/unit/server/two-factor.test.ts` to mock `@/lib/i18n-server` and assert `resolveEmailSubject` called with correct key + `session.user.locale`; Phase 2 audit confirmed zero hardcoded `subject:` string literals remain in `src/server/` or `src/lib/`; email body localization explicitly deferred (HTML bodies remain English-only by design)
+- **Detail:** `conductor/archive/i18n-email-localization_20260727/` (spec.md, plan.md)
 
 ---
 
@@ -704,7 +673,7 @@ Milestone 10: Infrastructure Consistency & Tech Debt Remediation
 ├── TRACK-031: Server-Side Guard Consolidation & Dead Code Removal [no deps]
 ├── TRACK-032: Type-Safety Restoration — Eliminate `as unknown as` Casts [recommended after 031]
 ├── TRACK-033: Server-Function Architecture Standardization [coordinate with 032]
-├── TRACK-034: i18n & Email Localization Completeness [no deps]
+├── TRACK-034: i18n & Email Localization Completeness [Complete — archived]
 ├── TRACK-035: Test Infrastructure Consolidation [no deps]
 └── TRACK-036: Developer Experience & Tooling Hygiene [no deps]
 ```
@@ -732,7 +701,7 @@ The following track groups can be worked on simultaneously:
 | **O** | TRACK-026 | Complete — new domain (discussions), extended notification infrastructure (TRACK-022) and email queue (TRACK-018). No file overlap with TRACK-025 (different domain: discussions vs grading). Archived |
 | **P** | TRACK-027 → TRACK-028 | Both complete (archived). TRACK-027 expanded seed data (student2, student3, consultation seed) + decoupled instructor-review tests + 3 new specs + notification/upload/negative test assertions. TRACK-028 built on this expanded seed data and decoupled patterns — expanded coverage to 73 tests across 14 spec files, added Firefox + mobile-chrome projects, axe-core a11y scanning, cross-role lifecycle test. No file overlap with feature tracks (TRACK-025/026) — only touches `tests/e2e/`, `scripts/seed-e2e.ts`, and `playwright.config.ts` |
 | **Q** | TRACK-029, TRACK-030 | Both complete — TRACK-029 touched `query-keys.ts` + settings + gradebook components (archived); TRACK-030 touched `use-notifications.ts` + `NotificationCenter.tsx` + `query-keys.ts` (archived). Both depended on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files (TRACK-029 only) |
-| **R** | TRACK-031, TRACK-034, TRACK-035, TRACK-036 | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touches `src/server/two-factor.server.ts` + locale files; TRACK-035 touches `vitest.config.ts` + `package.json`; TRACK-036 touches `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json`. Minor overlap: TRACK-035 and TRACK-036 both touch `package.json` scripts — coordinate to avoid merge conflicts |
+| **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035, TRACK-036 | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touches `vitest.config.ts` + `package.json`; TRACK-036 touches `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json`. Minor overlap: TRACK-035 and TRACK-036 both touch `package.json` scripts — coordinate to avoid merge conflicts |
 | **S** | TRACK-032 → TRACK-033 | Sequential — TRACK-032 (type-safety restoration) touches the same `createServerFn` stub files that TRACK-033 (architecture standardization) refactors. Complete TRACK-032's type fixes first, then TRACK-033's structural changes. Both touch `src/server/*.ts` and `src/server/*.server.ts` |
 
 ---
