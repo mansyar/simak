@@ -6,7 +6,7 @@
 
 ---
 
-## Phase 1: 2FA Email Subject Localization
+## Phase 1: 2FA Email Subject Localization [checkpoint: 117f6a2]
 
 - [x] Task: Read spec.md and workflow.md to orient before Phase 1 implementation
     - [x] Read `conductor/tracks/i18n-email-localization_20260727/spec.md` — review Functional Requirements, Acceptance Criteria, and Out of Scope
@@ -38,7 +38,7 @@
 
 ---
 
-## Phase 2: Full Audit of enqueueEmail Call Sites
+## Phase 2: Full Audit of enqueueEmail Call Sites [checkpoint: 117f6a2]
 
 - [x] Task: Read spec.md and workflow.md to orient before Phase 2 implementation
     - [x] Read `conductor/tracks/i18n-email-localization_20260727/spec.md` — review FR-3 (audit scope) and Acceptance Criteria
