@@ -59,11 +59,11 @@
     - [x] Create `tests/e2e/helpers/rubric-setup.ts`: dedicated helper that sets up rubric criteria + sets `gradingType: 'numeric'` on the Proposal template checkpoint via DB helper at test start.
     - [x] Rubric grading test: set up rubric criteria + `gradingType` via the helper → instructor reviews with rubric scoring → add numeric scores per criterion → verify weighted total auto-computes → submit → verify `review_scores` persisted in DB.
     - [x] Verify: `pnpm test:e2e rubric-grading.spec.ts` passes on Chromium.
-- [ ] Task: Write `tests/e2e/discussions.spec.ts` — checkpoint discussion Q&A tests
-    - [ ] Student posts a message on checkpoint page → verify it appears.
-    - [ ] Instructor sees it in Discussions tab → instructor replies → verify reply appears with indentation.
-    - [ ] Student deletes within 15-min window → verify soft-delete.
-    - [ ] Verify: `pnpm test:e2e discussions.spec.ts` passes on Chromium.
+- [x] Task: Write `tests/e2e/discussions.spec.ts` — checkpoint discussion Q&A tests [2725af9]
+    - [x] Student posts a message on checkpoint page → verify it appears.
+    - [x] Instructor sees it in Discussions tab → instructor replies → verify reply appears with indentation.
+    - [x] Student deletes within 15-min window → verify soft-delete.
+    - [x] Verify: `pnpm test:e2e discussions.spec.ts` passes on Chromium.
 - [ ] Task: Verify Phase 2 route coverage and full suite
     - [ ] Run `pnpm test:e2e` — full suite passes on Chromium.
     - [ ] Verify route coverage increased from 10/30 to 28+/30.
