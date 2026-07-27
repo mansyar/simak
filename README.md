@@ -16,7 +16,7 @@
 | File Storage | Cloudflare R2 (presigned URL uploads) |
 | Email | Resend (transactional, via background queue) |
 | i18n | typesafe-i18n (English + Indonesian) |
-| Testing | Vitest (unit + integration), Playwright (E2E) |
+| Testing | Vitest (unit + integration), Playwright (E2E: chromium + firefox + mobile), @axe-core/playwright (a11y) |
 | Deployment | Docker + Coolify |
 
 ## Prerequisites
@@ -135,7 +135,7 @@ simak/
 
 - **Unit tests** (`tests/unit/`) — Mirror `src/` structure. Default environment is `happy-dom`; server handler tests use `/** @vitest-environment node */`.
 - **Integration tests** (`tests/integration/`) — Excluded from the default test run. Run explicitly with `pnpm test:integration`.
-- **E2E tests** (`tests/e2e/`) — Playwright E2E tests (~28 tests across 8 spec files) covering critical user flows: auth route guards + invalid login, admin user management + superadmin role-creation rule, instructor assignment creation, student file submission + upload UI validation + cross-student access denial, instructor review workflow (decoupled tests) + notification assertions, consultation lifecycle (log → verify → gating UI), extension workflow (request → approve/reject → deadline adjustment), and password setup lifecycle (token → setup → login → token reuse/expiry). Uses a dedicated test database (`postgres-test` Docker service, port 5433). Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive). The global setup migrates, truncates, and seeds the test DB (6 users incl. Student2/Student3, pending consultation) before each run; each spec file resets the DB for isolation.
+- **E2E tests** (`tests/e2e/`) — Playwright E2E tests (~73 tests across 14 spec files) covering critical user flows: auth route guards + invalid login, admin user management + edit/delete with reassignment, admin template CRUD, instructor assignment creation, student file submission + upload UI validation + cross-student access denial, instructor review workflow (decoupled tests) + notification assertions, consultation lifecycle (log → verify → gating UI), extension workflow (request → approve/reject → deadline adjustment), password setup lifecycle (token → setup → login → token reuse/expiry), role dashboard smoke tests, settings hub, smoke tests for 13 routes, rubric grading, checkpoint discussions Q&A, cross-role lifecycle integration, mobile viewport, and axe accessibility scans on 6 key pages. Runs on 3 browser projects: chromium (desktop), firefox (desktop), and mobile-chrome (Pixel 7). Uses a dedicated test database (`postgres-test` Docker service, port 5433). Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive). The global setup migrates, truncates, and seeds the test DB (7 users incl. Instructor2/Student2/Student3, pending consultation) before each run; each spec file resets the DB for isolation.
 - **Coverage thresholds:** lines, functions, branches, and statements all >= 80%.
 
 ## Deployment

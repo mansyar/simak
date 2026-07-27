@@ -142,6 +142,11 @@ All tracks must adhere to the following project constraints:
 - **Key decisions:** Dedicated `postgres-test` DB (port 5433); `loginAsRole` via API submit (Base UI Button renders `type="button"`); R2 upload not E2E-tested (TanStack Start server-fn limitation — direct DB insertion workaround); `workers: 1` for DB isolation; `reuseExistingServer` CI-conditional
 - **Detail:** `conductor/archive/e2e-playwright-tests_20260721/` (spec.md, plan.md)
 
+### TRACK-028: E2E Breadth & Infrastructure Expansion
+- **Status:** ✅ Complete · **Audit IDs:** None (proactive testing gap remediation) · **Deps:** E2E-FEAT-001
+- **Key decisions:** Expanded E2E coverage from 14→73 tests (chromium) across 14 spec files; route coverage from 10/30→28/31; added Firefox + mobile-chrome (Pixel 7) Playwright projects; integrated `@axe-core/playwright` for automated WCAG 2.1 AA accessibility scanning on 6 key pages; fixed 8 critical/serious a11y violations (color contrast on muted-foreground/sidebar/warning/success/info colors, aria-progressbar-name, label on discussion textarea, button-name on select triggers); fixed Firefox `NS_BINDING_ABORTED` by adding `waitForLoadState('networkidle')` in `loginAsRole`; `retries: 1` (2 in CI); cross-role lifecycle integration test; settings hub tests; rubric grading test; discussion Q&A tests; added second instructor to seed data for reassignment tests
+- **Detail:** `conductor/archive/e2e-breadth-and-infrastructure-expansion_20260726/` (spec.md, plan.md)
+
 ---
 
 ## Milestone 5: Post-Audit Enhancements
