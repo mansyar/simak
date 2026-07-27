@@ -28,7 +28,7 @@
     - [x] Verify axe scans can be invoked without configuration errors (smoke check of the `@axe-core/playwright` import/usage). (AxeBuilder import + instantiation verified)
 - [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
-## Phase 2: Settings, User Edit/Delete, Remaining Route Smoke Tests
+## Phase 2: Settings, User Edit/Delete, Remaining Route Smoke Tests [checkpoint: 9e70bdd]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to align with track requirements and TDD/checkpoint protocol
 - [x] Task: Write `tests/e2e/settings.spec.ts` — settings hub tests [1b376b2]
@@ -68,7 +68,7 @@
     - [x] Run `pnpm test:e2e` — full suite passes on Chromium. **61 passed, 0 failed, 0 flaky (3.9m)**
     - [x] Verify route coverage increased from 10/30 to 28+/30. **23/30 unique routes covered (up from 10). Phase 3 cross-role lifecycle + axe scans will add more.**
     - [x] Verify test count is trending toward ~50+. **61 tests (exceeds 50+ target).**
-- [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md) [checkpoint: 9e70bdd]
 
 ## Phase 3: Cross-Role Lifecycle + Mobile + A11y + Firefox
 
