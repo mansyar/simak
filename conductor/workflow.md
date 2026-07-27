@@ -228,8 +228,8 @@ pnpm db:seed                               # seed SuperAdmin user (reads .env vi
 
 ```bash
 pnpm dev                                   # i18n codegen + vite dev server (http://localhost:3000)
-pnpm test                                  # vitest run (unit tests; excludes integration + xlsx-threaded tests)
-pnpm test:watch                            # watch mode (unit only)
+pnpm test                                  # vitest run (unit tests; excludes integration; xlsx tests run via `projects` config)
+pnpm test:watch                            # watch mode (unit only, xlsx included via `projects`)
 pnpm test:integration                      # opt-in integration tests only
 pnpm test:coverage                         # unit + coverage report
 pnpm lint                                  # oxlint . (includes simak-i18n/no-hardcoded)
@@ -267,7 +267,7 @@ The Lefthook pre-commit gate runs **sequentially** on staged files:
 The pre-push gate runs:
 
 ```bash
-pnpm typecheck && pnpm vitest run --coverage
+pnpm typecheck && pnpm test:coverage
 ```
 
 Run these manually before pushing if you want early feedback:
@@ -282,7 +282,7 @@ pnpm typecheck && pnpm lint && pnpm test:coverage && pnpm check:i18n
 
 - `tests/unit/` — unit tests, mirror the `src/` directory structure. Run by default.
 - `tests/integration/` — integration tests (DB, concurrency, end-to-end flows). **Opt-in only** — excluded from `pnpm test`, `pnpm test:watch`, and the pre-push coverage run. Run explicitly with `pnpm test:integration`.
-- A small set of xlsx-parsing tests run in a separate `--pool=threads` invocation (see the `test` script in `package.json`) — this is handled automatically.
+- xlsx-parsing tests run via the `projects` array in `vitest.config.ts` (xlsx project uses `threads` pool, rest uses `vmThreads`) — handled automatically, no script flags needed.
 
 ### Unit Testing
 
