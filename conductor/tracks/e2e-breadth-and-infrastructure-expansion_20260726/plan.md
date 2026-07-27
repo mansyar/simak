@@ -102,5 +102,5 @@
     - [x] Verify test count is ~50+ (up from 14).
     - [x] Verify all new test files under 500 lines, `playwright.config.ts` under 500 lines.
     - [x] Verify `r2-mock.ts` remains unchanged (limitation documented).
-- [ ] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3' (Protocol in workflow.md) [checkpoint: a3d87ba]
 </protect>
