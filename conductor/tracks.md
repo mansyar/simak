@@ -8,3 +8,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: TRACK-034: i18n & Email Localization Completeness**
+*Link: [./tracks/i18n-email-localization_20260727/](./tracks/i18n-email-localization_20260727/)*
+
+---
+
