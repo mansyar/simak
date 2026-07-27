@@ -36,7 +36,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Vitest Config & Script Consolidation' (Protocol in workflow.md)
 
-## Phase 2: Documentation Alignment & Final DoD
+## Phase 2: Documentation Alignment & Final DoD [checkpoint: a54546b]
 
 - [x] Task: Read `./spec.md` and `../../workflow.md` to re-establish context for this phase
 
