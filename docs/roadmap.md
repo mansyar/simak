@@ -471,6 +471,258 @@ All tracks must adhere to the following project constraints:
 
 ---
 
+## Milestone 10: Infrastructure Consistency & Tech Debt Remediation
+
+> This milestone addresses structural inconsistencies and tech debt identified in a comprehensive infrastructure audit conducted after Milestone 9. The audit examined server-function architecture, type safety, error handling, i18n completeness, test configuration, and developer tooling. Findings are prefixed `INFRA-` to distinguish them from prior audit IDs. Tracks are ordered by ROI: quick wins first, then structural standardization, then the larger type-safety restoration effort.
+
+---
+
+### TRACK-031: Server-Side Guard Consolidation & Env Type Consolidation
+
+*   **Status:** `Pending`
+*   **Dependencies:** None
+*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
+*   **Audit IDs:** INFRA-1 (role-check helper duplication), INFRA-7 (redundant Env type reconstruction in `env.ts`)
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** N/A (infrastructure refactor, no product impact)
+*   **TDD Reference:** `AGENTS.md` → "Server function split" (handlers in `*.server.ts`); `src/lib/types.ts` (already exports `NonNullableSession` type used by all guards); `src/lib/errors.ts` (centralized error infrastructure pattern — guards should follow the same single-source principle)
+
+#### Track Tech Stack
+*   TypeScript (shared module creation — no new dependencies)
+*   `src/lib/types.ts` (existing — `NonNullableSession` type already defined here)
+*   `src/server/*.server.ts` (20 files with duplicate guard definitions to refactor)
+*   `src/config/env.ts` (Env type consolidation — replace manual type reconstruction)
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   Create a shared `src/lib/session-guards.ts` module exporting `isAdmin`, `isInstructor`, `isStudent`, `isAuthenticated` type-guard functions (all accept `NonNullableSession | null` and return `session is NonNullableSession`)
+    *   Replace 28 duplicate inline definitions across 20 `*.server.ts` files with imports from the shared module
+    *   Consolidate `Env` type derivation in `src/config/env.ts` — replace the manual type reconstruction (`z.infer<typeof baseSchema> & Partial<z.infer<typeof r2Schema>> & { MIGRATE_DATABASE_URL?: string; EMAIL_FROM: string }`) with `z.infer<typeof envSchema>`, then remove the now-redundant `r2Schema` and `baseSchema` constants (their detailed validation messages were never surfaced — `envSchema` redefined those fields with plain `.optional()`)
+*   **Out of Scope:**
+    *   Refactoring the `createServerFn` type system (deferred to TRACK-032)
+    *   Changes to `NonNullableSession` type itself (already correct in `src/lib/types.ts`)
+    *   Any behavioral change to the guards (identical logic, just centralized)
+    *   Adding new guard functions not already duplicated in the codebase
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Shared module):** Create `src/lib/session-guards.ts` with the 4 guard functions extracted from any existing `*.server.ts` file (they're identical). Write unit tests verifying each guard accepts the correct role and rejects others. Verify: `pnpm test:unit` passes for new tests.
+*   **Phase 2 (Migration & Env consolidation):** Remove inline guard definitions from all 20 `*.server.ts` files, replace with `import { isAdmin, isInstructor, ... } from '../lib/session-guards'`. In `src/config/env.ts`, replace the manual `Env` type reconstruction with `export type Env = z.infer<typeof envSchema>`, then remove the now-redundant `r2Schema` and `baseSchema` constants. Verify: `pnpm typecheck` clean (the `Env` type shape must match — all R2 fields optional, `MIGRATE_DATABASE_URL` optional, `EMAIL_FROM` required with default), `pnpm test:unit` passes, `pnpm lint` clean, grep for `function isAdmin(` in `src/server/` returns zero matches.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Run `pnpm dev` — app starts, login works for all roles (superadmin, admin, instructor, student), role-guarded routes redirect correctly (e.g., student accessing `/admin` → redirect to student dashboard). Run `pnpm typecheck` — 0 errors. Verify `src/config/env.ts` no longer contains `r2Schema` or `baseSchema` constants, and `Env` type is `z.infer<typeof envSchema>`.
+*   [ ] **Automated Tests:** `pnpm test:unit` — all existing tests pass unchanged. New tests for `src/lib/session-guards.ts` (each guard: accepts correct role, rejects wrong role, handles null). Existing `tests/unit/config/env.test.ts` passes unchanged (validates the `Env` type shape is identical). `pnpm test:coverage` ≥80%. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
+*   [ ] **Conductor Review:** `src/lib/session-guards.ts` exists with 4 exported functions. Grep `function (isAdmin|isInstructor|isStudent|isAuthenticated)\(` in `src/server/` returns zero matches (all replaced with imports). `src/config/env.ts` has no `r2Schema` or `baseSchema` constants (grep returns zero matches). `Env` type is `z.infer<typeof envSchema>` (single source of truth). All files under 500 lines. Pre-push gate passes.
+
+---
+
+### TRACK-032: Type-Safety Restoration — Eliminate `as unknown as` Casts
+
+*   **Status:** `Pending`
+*   **Dependencies:** None (recommended AFTER TRACK-031 — guard consolidation reduces the surface area of server-function calls to audit)
+*   **Estimated Effort:** 5 Days / 2.5 Sprint Loops
+*   **Audit IDs:** INFRA-4 (systemic type-safety erosion — ~80 `as unknown as` casts across hooks, components, routes, and server files)
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** N/A (type-safety infrastructure, no product impact)
+*   **TDD Reference:** `conductor/archive/instructor-ui-consistency_20260619/spec.md` (Track that first identified the `createServerFn` type-gap — removed `@ts-expect-error` from route loaders but the underlying gap was patched with casts); `src/server/assignments.ts` (canonical typed-builder stub pattern: `createServerFn({ method }).inputValidator(Schema).handler(...)`); `src/server/submissions.ts` (canonical inline-parse pattern); `src/hooks/use-notifications.ts` (representative hook with 4 `as unknown as` casts on server fn calls)
+
+#### Track Tech Stack
+*   TypeScript 7 (type inference, generic constraints)
+*   `@tanstack/react-start` (`createServerFn` — the wrapper whose return type doesn't propagate to client callers)
+*   `@tanstack/react-router` (route loader typing — `Route.useLoaderData()` return types)
+*   Drizzle ORM (`as unknown as ScoreRow[]` query-result casts in server handlers)
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Diagnose the `createServerFn` type-gap root cause:** Determine why the return type of `.handler(async ({ data }) => { ... })` doesn't propagate to the client-callable stub. Investigate whether the gap is in the TanStack Start `createServerFn` generic, the `.inputValidator()` chain, or the dynamic `await import('./feature.server')` pattern.
+    *   **Fix the type propagation at the source:** Apply the minimal typing change (likely a generic constraint or wrapper utility in a shared `src/lib/server-fn.ts` helper) so that `createServerFn` stubs propagate their handler's return type to callers without casts.
+    *   **Remove `as unknown as` casts from hooks:** Eliminate casts in `src/hooks/use-notifications.ts` (4 casts), `src/hooks/use-assignment-tabs.ts` (3 casts), and any other hooks.
+    *   **Remove `as unknown as` casts from components:** Eliminate casts in `src/components/settings/TwoFactorSettings.tsx` (4 casts), `src/components/settings/SessionManagement.tsx` (3 casts), `src/components/settings/ProfileSection.tsx` (2 casts), `src/components/settings/NotificationPreferencesSection.tsx` (2 casts), `src/components/settings/AccessibilitySection.tsx` (2 casts), `src/components/reviews/ReviewForm.tsx` (2 casts), `src/components/reviews/DeadlineManager.tsx` (2 casts), `src/components/student/extensions/ExtensionRequestForm.tsx` (1 cast), `src/components/consultations/ConsultationForm.tsx` (1 cast), `src/components/consultations/VerificationDialog.tsx` (3 casts), `src/components/discussions/discussion-panel.tsx` (3 casts), `src/components/admin/templates/TemplateDetailPage.tsx` (3 casts), `src/components/instructor/assignments/AssignmentWizard.tsx` (3 casts), `src/components/instructor/assignments/StudentPicker.tsx` (1 cast), `src/components/instructor/assignments/TemplatePicker.tsx` (1 cast), and any others found via grep.
+    *   **Remove `as unknown as` casts from routes:** Eliminate loader-data casts and server-fn call casts in: `src/routes/_authenticated/student/dashboard.tsx` (1 cast), `src/routes/_authenticated/admin/dashboard.tsx` (1 cast), `src/routes/_authenticated/admin/analytics.tsx` (2 casts), `src/routes/_authenticated/instructor/analytics.tsx` (2 casts), `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx` (7 casts), `src/routes/_authenticated/student/assignments/$id.tsx` (6 casts). Redirect casts in `_authenticated.tsx` and `_unauthenticated.tsx` are Out of Scope (TanStack Router typed-routes limitation).
+    *   **Remove `as unknown as` casts from server files:** Eliminate Drizzle query-result casts (`as unknown as ScoreRow[]`) in `src/server/analytics-export.server.ts`, `src/server/gradebook.server.ts`, `src/server/reviews-extras.server.ts`, `src/lib/email-queue-retention.ts`, `src/lib/email-queue-processor.ts`.
+    *   **Remove `as unknown as` casts from 2FA and auth handlers:** Eliminate `result as unknown as { totpURI?: string; backupCodes?: string[] }` in `src/server/two-factor.server.ts` (Better Auth API response — type properly). Eliminate `result as unknown as NonNullable<Session>` in `src/server/auth.server.ts:56` (Better Auth `getSession` response — type properly).
+*   **Out of Scope:**
+    *   `src/routeTree.gen.ts` — generated file (`as any` is TanStack Router codegen, not fixable by hand)
+    *   Sidebar `to={link.to as unknown as '.'}` casts (`admin-sidebar.tsx`, `instructor-sidebar.tsx`, `student-sidebar.tsx` — 6 casts total) — TanStack Router typed-routes limitation (route paths are string literals; dynamic sidebar configs can't satisfy the literal type). Document as a known limitation, do not attempt to fix.
+    *   Auth redirect casts in `src/server/auth.ts` (`redirect({ to: '/auth/login' as unknown as '.' })` — 2 casts) — same TanStack Router typed-routes limitation. Document, do not fix.
+    *   Route redirect casts in `src/routes/_authenticated.tsx:30` and `src/routes/_unauthenticated.tsx:9` (2 casts) — same TanStack Router typed-routes limitation. Document, do not fix.
+    *   Any changes to server handler logic (type-only changes, no behavioral changes)
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Root-cause diagnosis):** Read `src/server/assignments.ts` (typed-builder pattern) and `src/server/submissions.ts` (inline-parse pattern). Write a minimal type-level test (`tests/unit/types/server-fn-types.test-d.ts`) demonstrating that a `createServerFn` stub's return type is `unknown` or `Promise<unknown>` at the call site. Identify the exact point in the chain where type inference breaks. Document the root cause. Verify: type-level test fails (confirming the gap exists).
+*   **Phase 2 (Type fix at source):** Apply the minimal typing change to restore type propagation. This may be: (a) a generic constraint on the `createServerFn` wrapper, (b) a shared helper utility in `src/lib/server-fn.ts` that wraps `createServerFn` with proper return-type inference, or (c) explicit return-type annotations on all stub handlers. Verify: type-level test passes, `pnpm typecheck` clean.
+*   **Phase 3 (Cast elimination):** Systematically remove `as unknown as` casts from hooks → components → routes → server files. After each file group, run `pnpm typecheck` to catch any inference gaps. For Drizzle query-result casts, use proper `.then()` typing or `z.infer` schema types instead of ad-hoc casts. For Better Auth API responses, use the documented response types from `better-auth`. Verify: `pnpm typecheck` clean after all casts removed, `pnpm test:unit` passes, grep `as unknown as` in `src/` returns only the documented TanStack Router limitations (sidebar, auth redirects).
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Run `pnpm dev` — all pages render without console errors. Navigate to `/settings` — profile, 2FA, sessions, notifications, accessibility sections all load and function. Open `/student/assignments/$id` — checkpoint view, file upload, consultation form all work. Open `/instructor/assignments/$id` — tabs, review form, deadline manager all work. Open `/admin/analytics` — gradebook and analytics export work. Run `pnpm typecheck` — 0 errors. Grep `as unknown as` in `src/hooks/`, `src/components/`, `src/routes/` — zero matches (excluding generated `routeTree.gen.ts` and documented TanStack Router sidebar/auth-redirect limitations).
+*   [ ] **Automated Tests:** `pnpm test:unit` — all existing tests pass unchanged (type-only changes, no behavioral changes). New type-level test (`server-fn-types.test-d.ts`) passes, confirming return-type propagation. `pnpm test:coverage` ≥80%. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
+*   [ ] **Conductor Review:** Type-level test exists and passes. Grep `as unknown as` in `src/` returns: zero matches in `src/hooks/`, `src/components/`, `src/lib/`; only documented TanStack Router limitations remain — sidebar casts in `src/components/layout/*-sidebar.tsx`, auth-redirect casts in `src/server/auth.ts`, and route-redirect casts in `src/routes/_authenticated.tsx` and `src/routes/_unauthenticated.tsx`. No `@ts-expect-error` directives added. No `as any` added. All type changes are inference-based (no manual type assertions unless documented with a reason). All files under 500 lines. Pre-push gate passes.
+
+---
+
+### TRACK-033: Server-Function Architecture Standardization
+
+*   **Status:** `Pending`
+*   **Dependencies:** None (coordinate with TRACK-032 if both are active — TRACK-032 touches the same stub files for type fixes)
+*   **Estimated Effort:** 3 Days / 1.5 Sprint Loops
+*   **Audit IDs:** INFRA-2 (inconsistent server-function split patterns), INFRA-3 (17 circular dependency chains), INFRA-5 (setup-password.ts error handling inconsistency), INFRA-9 (audit-log naming inconsistency)
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** N/A (architecture standardization, no product impact)
+*   **TDD Reference:** `AGENTS.md` → "Server function split" (documents two calling patterns but not the structural file layout); `conductor/workflow.md` → "Quality Gates" (enforces two-file split: `*.ts` + `*.server.ts`); `src/server/assignments.ts` + `assignments.server.ts` + `assignments-extras.server.ts` (canonical extras pattern); `src/server/dashboard.ts` + `dashboard-*.server.ts` (canonical multi-handler pattern); `src/server/setup-password.ts` (violates two-file split — schemas + handler + stub in one file); `src/lib/errors.ts` (canonical `serverError()` + `ErrorCode` pattern that setup-password.ts doesn't use)
+
+#### Track Tech Stack
+*   TypeScript (architecture refactor — no new dependencies)
+*   `src/server/*.ts` and `src/server/*.server.ts` (all server function files)
+*   `src/db/schema/audit-log.ts` → `src/server/audit-logs.ts` (naming inconsistency)
+*   `src/server/setup-password.ts` (refactor to two-file split)
+*   `AGENTS.md` (documentation update for split-pattern rules)
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Document the server-function split taxonomy:** Update `AGENTS.md` with explicit rules for when to use each structural pattern: (1) Standard pair (default — `*.ts` + `*.server.ts`), (2) Extras variant (`*-extras.server.ts` — when a feature has both student-facing and instructor-facing handlers that would exceed the 500-line limit), (3) Multi-handler (multiple `*.server.ts` files — when a feature serves multiple roles with distinct query logic, e.g., role-specific dashboards), (4) Handler-only (no `*.ts` stub — internal helper, never called from client).
+    *   **Refactor `setup-password.ts` to two-file split:** Split into `src/server/setup-password.ts` (Zod schema + `createServerFn` stub with dynamic import) and `src/server/setup-password.server.ts` (handler implementation). Migrate error handling from `{ error: string }` to `serverError(ErrorCode.X, message)` + `ServerError` type. Add `logError` calls.
+    *   **Address circular dependencies:** Audit the 17 circular dependency chains. For type-only `import type { Schema } from './feature'` cycles, verify they are erased at compile time (no runtime impact) and document them as acceptable. For any runtime value imports creating cycles, refactor to break the cycle (e.g., move shared schema to a third file, or pass types via a shared `types.ts`).
+    *   **Fix audit-log naming:** Rename `src/server/audit-logs.ts` → `src/server/audit-log.ts` and `src/server/audit-logs.server.ts` → `src/server/audit-log.server.ts` to match the schema file (`src/db/schema/audit-log.ts`) and DB table (`audit_log`). Update all import paths.
+*   **Out of Scope:**
+    *   Consolidating `*-extras.server.ts` files into main `.server.ts` files (the extras pattern is valid for file-size management — just needs documentation)
+    *   Merging multi-handler `.server.ts` files (the pattern is valid for role-separated logic — just needs documentation)
+    *   Changes to handler logic or API contracts (purely structural/naming)
+    *   Database schema changes (table name stays `audit_log`)
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Documentation):** Update `AGENTS.md` "Server function split" section with the 4-pattern taxonomy and decision criteria. Document the type-only circular dependency pattern as acceptable (with rationale). Verify: documentation is clear and matches existing code patterns.
+*   **Phase 2 (setup-password refactor):** Split `setup-password.ts` into stub + handler. Migrate error returns to `serverError()`. Update tests to mock the new two-file pattern. Verify: `pnpm typecheck` clean, `pnpm test:unit` passes, password setup flow works end-to-end.
+*   **Phase 3 (Naming + circular-deps audit):** Rename audit-log server files. Update all import paths. Run `pnpm codebase_graph_circular` (or equivalent) to verify circular chains are type-only (no runtime value imports). Verify: `pnpm typecheck` clean, `pnpm test:unit` passes, `pnpm lint` clean, import paths updated.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Run `pnpm dev` — navigate to password setup page (`/auth/setup-password?token=...`) — flow works, errors display correctly. Admin views audit logs — page loads. Run `pnpm typecheck` — 0 errors. Run code graph circular dependency check — all remaining cycles are `import type` only (no runtime value imports).
+*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. Updated tests for `setup-password` (mock two-file pattern, verify `serverError` return type). `pnpm test:coverage` ≥80%. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
+*   [ ] **Conductor Review:** `AGENTS.md` documents 4 split patterns with decision criteria. `src/server/setup-password.ts` contains only Zod schema + `createServerFn` stub. `src/server/setup-password.server.ts` contains handler using `serverError()`. `src/server/audit-log.ts` and `src/server/audit-log.server.ts` match schema file naming. All circular dependency chains verified as type-only. All files under 500 lines. Pre-push gate passes.
+
+---
+
+### TRACK-034: i18n & Email Localization Completeness
+
+*   **Status:** `Pending`
+*   **Dependencies:** None
+*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
+*   **Audit IDs:** INFRA-6 (hardcoded 2FA email subjects)
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** `docs/PRD.md` — Email Notification System (bilingual email support — EN/ID)
+*   **TDD Reference:** `src/lib/i18n-server.ts` (exports `resolveEmailSubject(key, params, locale)` — the canonical helper for localized email subjects); `src/lib/email.ts` (uses `resolveEmailSubject` correctly); `src/server/two-factor.server.ts:99` (`subject: 'Two-Factor Authentication Enabled'` — hardcoded, should use `resolveEmailSubject`); `src/server/two-factor.server.ts:201` (`subject: 'Two-Factor Authentication Disabled'` — hardcoded); `conductor/workflow.md` → "i18n Workflow" (all user-visible strings must use i18n keys)
+
+#### Track Tech Stack
+*   `src/lib/i18n-server.ts` (existing `resolveEmailSubject` helper — no new code needed)
+*   `src/server/two-factor.server.ts` (2 hardcoded email subjects to fix)
+*   `locales/en.json` + `locales/id.json` (new i18n keys for 2FA email subjects)
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Fix hardcoded 2FA email subjects:** Replace `subject: 'Two-Factor Authentication Enabled'` and `subject: 'Two-Factor Authentication Disabled'` in `src/server/two-factor.server.ts` with `resolveEmailSubject('emails.twoFactorEnabled.subject', {}, locale)` and `resolveEmailSubject('emails.twoFactorDisabled.subject', {}, locale)` calls. The handler already has access to the user's locale via `session.user.locale`.
+    *   **Add i18n keys:** Add `emails.twoFactorEnabled.subject` and `emails.twoFactorDisabled.subject` to both `locales/en.json` and `locales/id.json`. Run `pnpm generate:i18n`.
+    *   **Audit all `enqueueEmail` call sites:** Grep for `subject:` in all `src/server/` and `src/lib/` files (enqueueEmail is called from both `*.server.ts` handlers and `src/lib/email.ts`/`src/lib/event-email.ts`). Verify every email subject uses `resolveEmailSubject()` or an i18n key — not a hardcoded English string. Fix any additional offenders found.
+*   **Out of Scope:**
+    *   Email body template localization (email HTML bodies are already in English-only by design — server-side templates are not user-facing i18n in the same way; deferred to a future track if needed)
+    *   Changes to the `resolveEmailSubject` helper (already works correctly)
+    *   Changes to the email queue infrastructure
+    *   Any new email templates (only fixing existing hardcoded subjects)
+
+#### High-Level Execution Vectors
+*   **Phase 1 (2FA email fix):** Add i18n keys for 2FA email subjects to both locale files. Run `pnpm generate:i18n`. Replace hardcoded subjects in `two-factor.server.ts` with `resolveEmailSubject()` calls using `session.user.locale`. Write/update tests verifying the subject is localized. Verify: `pnpm test:unit` passes, `pnpm check:i18n` parity.
+*   **Phase 2 (Full audit):** Grep all `src/server/` and `src/lib/` files for hardcoded `subject:` strings. Fix any found. Verify: `pnpm typecheck` clean, `pnpm check:i18n` parity, `pnpm lint` clean.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Enable 2FA with an Indonesian-locale user — verify the email subject is in Indonesian. Disable 2FA — verify the email subject is in Indonesian. Enable 2FA with an English-locale user — verify English subject.
+*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. Updated tests for `two-factor.server.ts` verifying `resolveEmailSubject` is called with correct key and locale. `pnpm check:i18n` — parity for new keys. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
+*   [ ] **Conductor Review:** Grep `subject: '` in `src/server/` and `src/lib/` returns zero matches (all subjects use `resolveEmailSubject`). `locales/en.json` and `locales/id.json` have `emails.twoFactorEnabled.subject` and `emails.twoFactorDisabled.subject`. All files under 500 lines. Pre-push gate passes.
+
+---
+
+### TRACK-035: Test Infrastructure Consolidation
+
+*   **Status:** `Pending`
+*   **Dependencies:** None
+*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
+*   **Audit IDs:** INFRA-8 (fragile test script configuration)
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** N/A (test infrastructure, no product impact)
+*   **TDD Reference:** `vitest.config.ts` (current config — `pool: 'vmThreads'`, `include: ['tests/**/*.test.{ts,tsx}']`, `exclude: ['node_modules', 'dist']` — does NOT exclude integration tests); `package.json` (test scripts with complex `--exclude` flags and dual-run pattern); `AGENTS.md` → "Developer Commands" (documents `pnpm test` excludes `tests/integration/**`)
+
+#### Track Tech Stack
+*   `vitest.config.ts` (test runner config)
+*   `vitest.config.integration.ts` (new — integration test config that extends base but removes integration from `exclude`)
+*   `package.json` (script cleanup)
+*   `tests/unit/lib/parse-templates-xlsx.test.ts`, `parse-users-xlsx.test.ts`, `sample-generators.test.ts`, `excel-export.test.ts` (4 files incompatible with `vmThreads` pool)
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Move integration test exclusion into `vitest.config.ts`:** Add `'tests/integration/**'` to the `exclude` array in `vitest.config.ts` so bare `vitest` matches `pnpm test` behavior. Remove the `--exclude tests/integration/**` from `pnpm test`, `pnpm test:unit`, and `pnpm test:watch` scripts.
+    *   **Create `vitest.config.integration.ts`:** Since adding `'tests/integration/**'` to the config `exclude` array would break `pnpm test:integration` (Vitest applies config `exclude` even when filtering by path), create a minimal `vitest.config.integration.ts` that extends the base config but removes integration from `exclude`. Update `test:integration` script to `vitest run --config vitest.config.integration.ts tests/integration`.
+    *   **Address `vmThreads` incompatibility at config level:** The 4 xlsx/Excel test files fail under `vmThreads` pool and are currently run separately with `--pool=threads`. Investigate using Vitest's per-file or per-directory environment override (e.g., `test.environmentMatchGlobs` or a separate `vitest.config.excel.ts` project) instead of the dual-run script pattern. If a clean config-level solution isn't feasible, document why and keep the dual-run but extract the file list into a shared variable.
+    *   **Fix `test:watch` xlsx gap:** Currently `test:watch` excludes the 4 xlsx files but has no second `--pool=threads` run for them — xlsx tests are silently skipped in watch mode. The config-level xlsx pool fix (above) resolves this automatically.
+    *   **Fix `test:coverage` pool override:** Currently `test:coverage` uses `--pool=threads` for ALL tests (50% slower than `vmThreads`), not just the 4 xlsx files. After the config-level xlsx fix, remove `--pool=threads` from `test:coverage` so it uses the default `vmThreads` pool.
+    *   **Remove duplicate `test:unit` script:** `pnpm test:unit` is identical to `pnpm test`. Either remove `test:unit` and update `AGENTS.md` references, or make `test:unit` a thin alias (`"test:unit": "pnpm test"`).
+    *   **Simplify `test:coverage` script:** Ensure `test:coverage` also excludes integration tests via config, not command-line flag.
+*   **Out of Scope:**
+    *   Changing the default test pool from `vmThreads` to `threads` (vmThreads is 50% faster — the 4 files should be fixed, not the default changed)
+    *   Adding new tests or changing test coverage thresholds
+    *   Integration test improvements (only config/exclusion changes)
+    *   E2E test changes (Playwright config is separate)
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Config consolidation):** Add `'tests/integration/**'` to `vitest.config.ts` `exclude` array. Create `vitest.config.integration.ts` that extends the base config but overrides `exclude` to NOT exclude integration tests. Update `test:integration` script to use `--config vitest.config.integration.ts`. Remove `--exclude tests/integration/**` from all package.json test scripts. Verify: bare `vitest run` excludes integration tests (matches `pnpm test`), `pnpm test` still passes, `pnpm test:integration` still runs integration tests.
+*   **Phase 2 (xlsx pool fix + coverage):** Investigate Vitest 4's `projects` or `environmentMatchGlobs` config to assign `threads` pool to the 4 xlsx test files at config level. If feasible, remove the dual-run pattern from package.json and remove `--pool=threads` from `test:coverage` (let it use default `vmThreads`). If not feasible, document the limitation and extract the file list to a shared constant. Verify: `pnpm test` passes (both pools or config-level override), `pnpm test:coverage` passes with `vmThreads` default pool, `pnpm test:watch` runs xlsx tests.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Run bare `vitest run` (not via `pnpm test`) — integration tests are excluded. Run `pnpm test` — all unit tests pass (including xlsx tests). Run `pnpm test:coverage` — coverage passes with ≥80% thresholds, integration tests excluded, uses `vmThreads` pool. Run `pnpm test:watch` — watch mode excludes integration tests AND runs xlsx tests. Run `pnpm test:integration` — integration tests run via `vitest.config.integration.ts`. Review `package.json` — `test` and `test:unit` are either identical aliases or `test:unit` is removed.
+*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. `pnpm test:coverage` ≥80% on all thresholds. `pnpm typecheck` clean. `pnpm lint` clean.
+*   [ ] **Conductor Review:** `vitest.config.ts` `exclude` array contains `'tests/integration/**'`. `vitest.config.integration.ts` exists and overrides `exclude` for integration tests. `package.json` test scripts no longer have `--exclude tests/integration/**` flags. `test:coverage` no longer uses `--pool=threads` for all tests. The dual-run xlsx pattern is either resolved at config level or documented with rationale. `test:unit` is either an alias or removed (no duplicated long script). `AGENTS.md` "Developer Commands" table matches the actual scripts. All files under 500 lines. Pre-push gate passes.
+
+---
+
+### TRACK-036: Developer Experience & Tooling Hygiene
+
+*   **Status:** `Pending`
+*   **Dependencies:** None
+*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
+*   **Audit IDs:** INFRA-10 (lefthook vs package.json configuration mismatch)
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** N/A (developer tooling, no product impact)
+*   **TDD Reference:** `lefthook.yml` (pre-commit `lint` glob: `src/**/*.{js,jsx,ts,tsx}` — src only; pre-commit `format` glob: `*.{js,jsx,ts,tsx}` — all dirs, no `.css`; pre-push `typecheck`: `tsc --noEmit --incremental --checkers 4`); `package.json` (`lint` script: `oxlint .` — everything; `format` script: `oxfmt --write "src/**/*.{ts,tsx,css}"` — src only, includes `.css`; `typecheck` script: `tsc --noEmit --incremental` — no `--checkers`); `AGENTS.md` → "Formatting Quirks" (documents oxfmt on `src/**/*.{ts,tsx,css}`)
+
+#### Track Tech Stack
+*   `lefthook.yml` (git hook config)
+*   `package.json` (script alignment)
+*   `.socraticodecontextartifacts.json` (new file — SocratiCode context artifact config)
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Align lefthook format glob with package.json:** The pre-commit `format` hook formats files in `tests/` and `scripts/` (glob: `*.{js,jsx,ts,tsx}`), but `pnpm format` only targets `src/**/*.{ts,tsx,css}`. Two gaps: (1) lefthook glob doesn't include `.css` files — add `.css` to the lefthook format glob so pre-commit formats CSS files too; (2) scope mismatch (all dirs vs src only) — either expand `pnpm format` to include `tests/` and `scripts/` (recommended — ensures manual format matches pre-commit), or narrow the lefthook glob to match `pnpm format` scope. Document the decision in `AGENTS.md`.
+    *   **Align lefthook lint glob with pnpm lint:** The pre-commit `lint` hook only lints `src/` files (glob: `src/**/*.{js,jsx,ts,tsx}`), but `pnpm lint` runs `oxlint .` (everything). Expand the lefthook lint glob to `*.{js,jsx,ts,tsx}` (all dirs) to match the format and modularity globs, so lint errors in `tests/` and `scripts/` are caught at commit time.
+    *   **Align lefthook typecheck with package.json:** The pre-push `typecheck` uses `--checkers 4` but `pnpm typecheck` doesn't. Add `--checkers 4` to `pnpm typecheck` in `package.json` (or remove from lefthook — but the TS 7 track explicitly added it for parallelism, so adding to `pnpm typecheck` is preferred).
+    *   **Configure SocratiCode context artifacts:** Create `.socraticodecontextartifacts.json` with entries for: `conductor/product.md`, `conductor/tech-stack.md`, `conductor/workflow.md`, `conductor/product-guidelines.md`, `drizzle/migrations/` (DB schema history), `docs/PRD.md`, `docs/TDD.md`. Run `codebase_context_index` to index them.
+*   **Out of Scope:**
+    *   Changes to test coverage thresholds (handled in TRACK-035)
+    *   Structured logging migration (deferred — `console.error(JSON.stringify(...))` is functional; a pino/winston migration is a separate infrastructure track)
+    *   Pagination UI component consolidation (deferred — identified in the instructor-ui-consistency audit as a "should-have" but requires UI design work, not tooling)
+    *   Any code changes beyond config files
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Lefthook alignment):** Update `package.json` `format` script to include `tests/` and `scripts/` (or narrow lefthook glob — decide based on whether test/script formatting is desired). Add `.css` to lefthook format glob. Expand lefthook lint glob from `src/**/*.{js,jsx,ts,tsx}` to `*.{js,jsx,ts,tsx}` (all dirs). Add `--checkers 4` to `pnpm typecheck`. Update `AGENTS.md` "Formatting Quirks" and "Developer Commands" to match. Verify: `pnpm format`, `pnpm lint`, and `pnpm typecheck` match lefthook behavior.
+*   **Phase 2 (SocratiCode artifacts):** Create `.socraticodecontextartifacts.json`. Run `codebase_context_index`. Verify `codebase_context_search` returns results from conductor docs and PRD/TDD.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Run `pnpm format` — formats files in `src/`, `tests/`, and `scripts/` (if expanded), including `.css` files. Run `pnpm typecheck` — uses `--checkers 4` (TS 7 parallelism). Run `pnpm lint` — lints all directories (matches lefthook lint glob). Verify `.socraticodecontextartifacts.json` exists and `codebase_context_search` returns results from conductor docs and PRD/TDD.
+*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. `pnpm typecheck` clean. `pnpm lint` clean. `pnpm check:i18n` parity maintained.
+*   [ ] **Conductor Review:** `lefthook.yml` format glob matches `pnpm format` scope (including `.css`). `lefthook.yml` lint glob matches `pnpm lint` scope (all dirs). `package.json` `typecheck` script uses `--checkers 4`. `.socraticodecontextartifacts.json` exists with documented artifacts. `codebase_context_search` returns results from indexed artifacts. `AGENTS.md` reflects the updated scripts. All files under 500 lines. Pre-push gate passes.
+
+---
+
 ## Track Dependency Graph
 
 ```
@@ -522,6 +774,14 @@ Milestone 8: E2E Coverage Expansion
 Milestone 9: Client Architecture Consistency
 ├── TRACK-029: Query-Key Factory Completion & Client Data-Fetching Consistency [Complete — extends query-key factory]
 └── TRACK-030: NotificationCenter Infinite Query Migration [Complete — depends on 014 — notificationKeys factory]
+
+Milestone 10: Infrastructure Consistency & Tech Debt Remediation
+├── TRACK-031: Server-Side Guard Consolidation & Dead Code Removal [no deps]
+├── TRACK-032: Type-Safety Restoration — Eliminate `as unknown as` Casts [recommended after 031]
+├── TRACK-033: Server-Function Architecture Standardization [coordinate with 032]
+├── TRACK-034: i18n & Email Localization Completeness [no deps]
+├── TRACK-035: Test Infrastructure Consolidation [no deps]
+└── TRACK-036: Developer Experience & Tooling Hygiene [no deps]
 ```
 
 ### Parallelization Strategy
@@ -547,6 +807,8 @@ The following track groups can be worked on simultaneously:
 | **O** | TRACK-026 | Complete — new domain (discussions), extended notification infrastructure (TRACK-022) and email queue (TRACK-018). No file overlap with TRACK-025 (different domain: discussions vs grading). Archived |
 | **P** | TRACK-027 → TRACK-028 | Both complete (archived). TRACK-027 expanded seed data (student2, student3, consultation seed) + decoupled instructor-review tests + 3 new specs + notification/upload/negative test assertions. TRACK-028 built on this expanded seed data and decoupled patterns — expanded coverage to 73 tests across 14 spec files, added Firefox + mobile-chrome projects, axe-core a11y scanning, cross-role lifecycle test. No file overlap with feature tracks (TRACK-025/026) — only touches `tests/e2e/`, `scripts/seed-e2e.ts`, and `playwright.config.ts` |
 | **Q** | TRACK-029, TRACK-030 | Both complete — TRACK-029 touched `query-keys.ts` + settings + gradebook components (archived); TRACK-030 touched `use-notifications.ts` + `NotificationCenter.tsx` + `query-keys.ts` (archived). Both depended on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files (TRACK-029 only) |
+| **R** | TRACK-031, TRACK-034, TRACK-035, TRACK-036 | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touches `src/server/two-factor.server.ts` + locale files; TRACK-035 touches `vitest.config.ts` + `package.json`; TRACK-036 touches `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json`. Minor overlap: TRACK-035 and TRACK-036 both touch `package.json` scripts — coordinate to avoid merge conflicts |
+| **S** | TRACK-032 → TRACK-033 | Sequential — TRACK-032 (type-safety restoration) touches the same `createServerFn` stub files that TRACK-033 (architecture standardization) refactors. Complete TRACK-032's type fixes first, then TRACK-033's structural changes. Both touch `src/server/*.ts` and `src/server/*.server.ts` |
 
 ---
 
@@ -563,7 +825,8 @@ The following track groups can be worked on simultaneously:
 | 7: Infrastructure & Tooling | 1 | ~1 Day |
 | 8: E2E Coverage Expansion | 2 | ~9 Days |
 | 9: Client Architecture Consistency | 2 | ~3 Days |
-| **Total** | **31** | **~107 Days** |
+| 10: Infrastructure Consistency & Tech Debt | 6 | ~12 Days |
+| **Total** | **37** | **~119 Days** |
 
 > Effort estimates assume a single developer. Tracks within the same parallelization group can be distributed across developers to reduce wall-clock time.
 
