@@ -536,45 +536,9 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-035: Test Infrastructure Consolidation
-
-*   **Status:** `Pending`
-*   **Dependencies:** None
-*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
-*   **Audit IDs:** INFRA-8 (fragile test script configuration)
-
-#### Context Anchors (Traceability)
-*   **PRD Reference:** N/A (test infrastructure, no product impact)
-*   **TDD Reference:** `vitest.config.ts` (current config — `pool: 'vmThreads'`, `include: ['tests/**/*.test.{ts,tsx}']`, `exclude: ['node_modules', 'dist']` — does NOT exclude integration tests); `package.json` (test scripts with complex `--exclude` flags and dual-run pattern); `AGENTS.md` → "Developer Commands" (documents `pnpm test` excludes `tests/integration/**`)
-
-#### Track Tech Stack
-*   `vitest.config.ts` (test runner config)
-*   `vitest.config.integration.ts` (new — integration test config that extends base but removes integration from `exclude`)
-*   `package.json` (script cleanup)
-*   `tests/unit/lib/parse-templates-xlsx.test.ts`, `parse-users-xlsx.test.ts`, `sample-generators.test.ts`, `excel-export.test.ts` (4 files incompatible with `vmThreads` pool)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Move integration test exclusion into `vitest.config.ts`:** Add `'tests/integration/**'` to the `exclude` array in `vitest.config.ts` so bare `vitest` matches `pnpm test` behavior. Remove the `--exclude tests/integration/**` from `pnpm test`, `pnpm test:unit`, and `pnpm test:watch` scripts.
-    *   **Create `vitest.config.integration.ts`:** Since adding `'tests/integration/**'` to the config `exclude` array would break `pnpm test:integration` (Vitest applies config `exclude` even when filtering by path), create a minimal `vitest.config.integration.ts` that extends the base config but removes integration from `exclude`. Update `test:integration` script to `vitest run --config vitest.config.integration.ts tests/integration`.
-    *   **Address `vmThreads` incompatibility at config level:** The 4 xlsx/Excel test files fail under `vmThreads` pool and are currently run separately with `--pool=threads`. Investigate using Vitest's per-file or per-directory environment override (e.g., `test.environmentMatchGlobs` or a separate `vitest.config.excel.ts` project) instead of the dual-run script pattern. If a clean config-level solution isn't feasible, document why and keep the dual-run but extract the file list into a shared variable.
-    *   **Fix `test:watch` xlsx gap:** Currently `test:watch` excludes the 4 xlsx files but has no second `--pool=threads` run for them — xlsx tests are silently skipped in watch mode. The config-level xlsx pool fix (above) resolves this automatically.
-    *   **Fix `test:coverage` pool override:** Currently `test:coverage` uses `--pool=threads` for ALL tests (50% slower than `vmThreads`), not just the 4 xlsx files. After the config-level xlsx fix, remove `--pool=threads` from `test:coverage` so it uses the default `vmThreads` pool.
-    *   **Remove duplicate `test:unit` script:** `pnpm test:unit` is identical to `pnpm test`. Either remove `test:unit` and update `AGENTS.md` references, or make `test:unit` a thin alias (`"test:unit": "pnpm test"`).
-    *   **Simplify `test:coverage` script:** Ensure `test:coverage` also excludes integration tests via config, not command-line flag.
-*   **Out of Scope:**
-    *   Changing the default test pool from `vmThreads` to `threads` (vmThreads is 50% faster — the 4 files should be fixed, not the default changed)
-    *   Adding new tests or changing test coverage thresholds
-    *   Integration test improvements (only config/exclusion changes)
-    *   E2E test changes (Playwright config is separate)
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Config consolidation):** Add `'tests/integration/**'` to `vitest.config.ts` `exclude` array. Create `vitest.config.integration.ts` that extends the base config but overrides `exclude` to NOT exclude integration tests. Update `test:integration` script to use `--config vitest.config.integration.ts`. Remove `--exclude tests/integration/**` from all package.json test scripts. Verify: bare `vitest run` excludes integration tests (matches `pnpm test`), `pnpm test` still passes, `pnpm test:integration` still runs integration tests.
-*   **Phase 2 (xlsx pool fix + coverage):** Investigate Vitest 4's `projects` or `environmentMatchGlobs` config to assign `threads` pool to the 4 xlsx test files at config level. If feasible, remove the dual-run pattern from package.json and remove `--pool=threads` from `test:coverage` (let it use default `vmThreads`). If not feasible, document the limitation and extract the file list to a shared constant. Verify: `pnpm test` passes (both pools or config-level override), `pnpm test:coverage` passes with `vmThreads` default pool, `pnpm test:watch` runs xlsx tests.
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** Run bare `vitest run` (not via `pnpm test`) — integration tests are excluded. Run `pnpm test` — all unit tests pass (including xlsx tests). Run `pnpm test:coverage` — coverage passes with ≥80% thresholds, integration tests excluded, uses `vmThreads` pool. Run `pnpm test:watch` — watch mode excludes integration tests AND runs xlsx tests. Run `pnpm test:integration` — integration tests run via `vitest.config.integration.ts`. Review `package.json` — `test` and `test:unit` are either identical aliases or `test:unit` is removed.
-*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. `pnpm test:coverage` ≥80% on all thresholds. `pnpm typecheck` clean. `pnpm lint` clean.
-*   [ ] **Conductor Review:** `vitest.config.ts` `exclude` array contains `'tests/integration/**'`. `vitest.config.integration.ts` exists and overrides `exclude` for integration tests. `package.json` test scripts no longer have `--exclude tests/integration/**` flags. `test:coverage` no longer uses `--pool=threads` for all tests. The dual-run xlsx pattern is either resolved at config level or documented with rationale. `test:unit` is either an alias or removed (no duplicated long script). `AGENTS.md` "Developer Commands" table matches the actual scripts. All files under 500 lines. Pre-push gate passes.
+- **Status:** ✅ Complete · **Audit IDs:** INFRA-8 (fragile test script configuration) · **Deps:** None
+- **Key decisions:** `vitest.config.ts` restructured to use Vitest 4 `projects` array with `extends: true` — unit project (vmThreads pool, excludes integration + 4 xlsx files) and xlsx project (threads pool, includes 4 xlsx files) — eliminating all script-level `--exclude`/`--pool` flags; integration test exclusion moved from script flags to config `exclude` array; new `vitest.config.integration.ts` standalone config (alias, globals, happy-dom, env loading, vmThreads, `testTimeout: 30000`); `package.json` scripts simplified to flag-free one-liners (`test`=`vitest run`, `test:unit`=`pnpm test`, `test:watch`=`vitest`, `test:coverage`=`vitest run --coverage`, `test:integration`=`vitest run --config vitest.config.integration.ts tests/integration`); `test:watch` now runs xlsx tests (previously silently skipped); `test:coverage` uses vmThreads for unit tests (no global `--pool=threads`); AGENTS.md and workflow.md documentation updated to reflect projects-based pool isolation; review fix added `testTimeout: 30000` to integration config (standalone config defaulted to 5s, risking DB-dependent test timeouts)
+- **Detail:** `conductor/archive/test-infrastructure-consolidation_20260727/` (spec.md, plan.md)
 
 ---
 
@@ -701,7 +665,7 @@ The following track groups can be worked on simultaneously:
 | **O** | TRACK-026 | Complete — new domain (discussions), extended notification infrastructure (TRACK-022) and email queue (TRACK-018). No file overlap with TRACK-025 (different domain: discussions vs grading). Archived |
 | **P** | TRACK-027 → TRACK-028 | Both complete (archived). TRACK-027 expanded seed data (student2, student3, consultation seed) + decoupled instructor-review tests + 3 new specs + notification/upload/negative test assertions. TRACK-028 built on this expanded seed data and decoupled patterns — expanded coverage to 73 tests across 14 spec files, added Firefox + mobile-chrome projects, axe-core a11y scanning, cross-role lifecycle test. No file overlap with feature tracks (TRACK-025/026) — only touches `tests/e2e/`, `scripts/seed-e2e.ts`, and `playwright.config.ts` |
 | **Q** | TRACK-029, TRACK-030 | Both complete — TRACK-029 touched `query-keys.ts` + settings + gradebook components (archived); TRACK-030 touched `use-notifications.ts` + `NotificationCenter.tsx` + `query-keys.ts` (archived). Both depended on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files (TRACK-029 only) |
-| **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035, TRACK-036 | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touches `vitest.config.ts` + `package.json`; TRACK-036 touches `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json`. Minor overlap: TRACK-035 and TRACK-036 both touch `package.json` scripts — coordinate to avoid merge conflicts |
+| **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035 (complete — archived), TRACK-036 | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touched `vitest.config.ts` + `vitest.config.integration.ts` + `package.json` (complete — archived); TRACK-036 touches `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json`. Minor overlap: TRACK-035 and TRACK-036 both touch `package.json` scripts — coordinate to avoid merge conflicts |
 | **S** | TRACK-032 → TRACK-033 | Sequential — TRACK-032 (type-safety restoration) touches the same `createServerFn` stub files that TRACK-033 (architecture standardization) refactors. Complete TRACK-032's type fixes first, then TRACK-033's structural changes. Both touch `src/server/*.ts` and `src/server/*.server.ts` |
 
 ---
