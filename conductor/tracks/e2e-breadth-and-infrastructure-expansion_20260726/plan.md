@@ -42,19 +42,19 @@
     - [x] Edit user test: open edit sheet, change name, submit, verify change in table.
     - [x] Delete with reassignment test: delete an instructor with active assignments → verify `ReassignmentDialog` appears → select replacement instructor → confirm → verify assignment is reassigned (instructor changed in DB).
     - [x] Delete without assignments test: delete user without active assignments → verify direct deletion without dialog.
-    - [ ] Verify: `pnpm test:e2e admin-users.spec.ts` passes on Chromium.
-- [ ] Task: Write `tests/e2e/smoke-routes.spec.ts` — lightweight smoke tests for untested routes
-    - [ ] Landing page (`/`): verify hero section and feature cards render.
-    - [ ] Admin audit log (`/admin/audit-log`): verify table loads, filters render.
-    - [ ] Admin email queue (`/admin/email-queue`): verify table loads, status filter renders.
-    - [ ] Admin analytics (`/admin/analytics`): verify metric cards render, date range selector present.
-    - [ ] Instructor analytics (`/instructor/analytics`): verify metrics render.
-    - [ ] Forgot password (`/auth/forgot-password`): fill email, submit, verify success message.
-    - [ ] Reset password (`/auth/reset-password`): verify form renders with token.
-    - [ ] 2FA verify page (`/auth/verify-2fa`): verify TOTP input renders.
-    - [ ] Bulk user import (`/admin/users/import`): verify upload zone and template download button render.
-    - [ ] Bulk template import (`/admin/templates/import`): verify upload zone renders.
-    - [ ] Verify: `pnpm test:e2e smoke-routes.spec.ts` passes on Chromium.
+    - [x] Verify: `pnpm test:e2e admin-users.spec.ts` passes on Chromium.
+- [x] Task: Write `tests/e2e/smoke-routes.spec.ts` — lightweight smoke tests for untested routes [05f9586]
+    - [x] Landing page (`/`): verify hero section and feature cards render.
+    - [x] Admin audit log (`/admin/audit-log`): verify table loads, filters render.
+    - [x] Admin email queue (`/admin/email-queue`): verify table loads, status filter renders.
+    - [x] Admin analytics (`/admin/analytics`): verify metric cards render, date range selector present.
+    - [x] Instructor analytics (`/instructor/analytics`): verify metrics render.
+    - [x] Forgot password (`/auth/forgot-password`): fill email, submit, verify success message.
+    - [x] Reset password (`/auth/reset-password`): verify form renders with token.
+    - [x] 2FA verify page (`/auth/verify-2fa`): verify TOTP input renders.
+    - [x] Bulk user import (`/admin/users/import`): verify upload zone and template download button render.
+    - [x] Bulk template import (`/admin/templates/import`): verify upload zone renders.
+    - [x] Verify: `pnpm test:e2e smoke-routes.spec.ts` passes on Chromium.
 - [ ] Task: Create `tests/e2e/helpers/rubric-setup.ts` and write `tests/e2e/rubric-grading.spec.ts`
     - [ ] Create `tests/e2e/helpers/rubric-setup.ts`: dedicated helper that sets up rubric criteria + sets `gradingType: 'numeric'` on the Proposal template checkpoint via DB helper at test start.
     - [ ] Rubric grading test: set up rubric criteria + `gradingType` via the helper → instructor reviews with rubric scoring → add numeric scores per criterion → verify weighted total auto-computes → submit → verify `review_scores` persisted in DB.
