@@ -87,10 +87,10 @@
     - [x] Assert zero critical and serious violations.
     - [x] Document moderate/minor violations in `docs/a11y-violations.md`.
     - [x] Verify: axe scans pass (zero critical/serious), violations doc created.
-- [ ] Task: Run full suite on Firefox and fix any browser-specific failures
-    - [ ] Run `pnpm test:e2e` on Firefox project.
-    - [ ] Triage and fix any Firefox-specific failures within this track (do not skip or defer).
-    - [ ] Verify: full suite passes on Firefox.
+- [x] Task: Run full suite on Firefox and fix any browser-specific failures [0a299a5]
+    - [x] Run `pnpm test:e2e` on Firefox project.
+    - [x] Triage and fix any Firefox-specific failures within this track (do not skip or defer).
+    - [x] Verify: full suite passes on Firefox.
 - [ ] Task: Final verification and Definition of Done
     - [ ] Run `pnpm test:e2e` — all tests pass on both Chromium and Firefox.
     - [ ] Verify full suite runtime ≤ 5 minutes (with Firefox + mobile added).
