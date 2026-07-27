@@ -118,15 +118,15 @@
     - [ ] Run `pnpm typecheck` after each file
     - [ ] Verify: typecheck clean, zero casts in settings components
 
-- [ ] Task: Remove `as unknown as` casts from review/consultation/discussion components (12 casts, 6 files)
-    - [ ] Remove 2 casts from `src/components/reviews/ReviewForm.tsx`
-    - [ ] Remove 2 casts from `src/components/reviews/DeadlineManager.tsx`
-    - [ ] Remove 1 cast from `src/components/student/extensions/ExtensionRequestForm.tsx`
-    - [ ] Remove 1 cast from `src/components/consultations/ConsultationForm.tsx`
-    - [ ] Remove 3 casts from `src/components/consultations/VerificationDialog.tsx`
-    - [ ] Remove 3 casts from `src/components/discussions/discussion-panel.tsx`
-    - [ ] Run `pnpm typecheck` after each file
-    - [ ] Verify: typecheck clean, zero casts in these components
+- [x] Task: Remove `as unknown as` casts from review/consultation/discussion components (12 casts, 6 files) [14714a95]
+    - [x] Remove 2 casts from `src/components/reviews/ReviewForm.tsx`
+    - [x] Remove 2 casts from `src/components/reviews/DeadlineManager.tsx`
+    - [x] Remove 1 cast from `src/components/student/extensions/ExtensionRequestForm.tsx`
+    - [x] Remove 1 cast from `src/components/consultations/ConsultationForm.tsx`
+    - [x] Remove 3 casts from `src/components/consultations/VerificationDialog.tsx`
+    - [x] Remove 3 casts from `src/components/discussions/discussion-panel.tsx`
+    - [x] Run `pnpm typecheck` after each file
+    - [x] Verify: typecheck clean, zero casts in these components
 
 - [ ] Task: Remove `as unknown as` casts from admin/instructor components (8 casts, 4 files)
     - [ ] Remove 3 casts from `src/components/admin/templates/TemplateDetailPage.tsx`
