@@ -8,6 +8,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Type-Safety Restoration — Eliminate `as unknown as` Casts**
+- [~] **Track: Type-Safety Restoration — Eliminate `as unknown as` Casts**
 *Link: [./tracks/type-safety-restoration_20260727/](./tracks/type-safety-restoration_20260727/)*
 
