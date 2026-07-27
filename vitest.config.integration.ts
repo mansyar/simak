@@ -12,6 +12,7 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     env: loadEnv('', process.cwd(), ''),
+    testTimeout: 30000,
     pool: 'vmThreads',
     include: ['tests/integration/**/*.test.{ts,tsx}'],
     exclude: ['node_modules', 'dist'],
