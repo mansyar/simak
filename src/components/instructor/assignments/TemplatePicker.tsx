@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listTemplates } from '@/server/templates';
 import { templateKeys } from '@/lib/query-keys';
+import { isServerError } from '@/lib/errors';
 import { useI18n } from '../../../routes/__root';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
@@ -28,13 +29,12 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
   const { data, isLoading, isError, error } = useQuery({
     queryKey: templateKeys.list({ page: 1, limit: 100, search: '' }),
     queryFn: async () => {
-      const response = await (
-        listTemplates as unknown as (args: {
-          data: { page: number; limit: number; search: string; type?: string };
-        }) => Promise<{ templates: Template[] }>
-      )({
+      const response = await listTemplates({
         data: { page: 1, limit: 100, search: '' },
       });
+      if (isServerError(response)) {
+        throw new Error(response.error.message);
+      }
       return response;
     },
     retry: false,

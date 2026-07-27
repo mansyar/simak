@@ -2,18 +2,13 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listUsers } from '@/server/users';
 import { userKeys } from '@/lib/query-keys';
+import { isServerError } from '@/lib/errors';
 import { useI18n } from '../../../routes/__root';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Users, Check, CheckSquare, Square } from 'lucide-react';
-
-interface Student {
-  id: string;
-  name: string;
-  email: string;
-}
 
 interface StudentPickerProps {
   selectedStudentIds: string[];
@@ -36,13 +31,12 @@ export function StudentPicker({
   const { data, isLoading, isError, error } = useQuery({
     queryKey: userKeys.list({ page: 1, limit: 200, search: '', role: 'student' }),
     queryFn: async () => {
-      const response = await (
-        listUsers as unknown as (args: {
-          data: { page: number; limit: number; search: string; role?: string };
-        }) => Promise<{ users: Student[] }>
-      )({
+      const response = await listUsers({
         data: { page: 1, limit: 200, search: '', role: 'student' },
       });
+      if (isServerError(response)) {
+        throw new Error(response.error.message);
+      }
       return response;
     },
     retry: false,

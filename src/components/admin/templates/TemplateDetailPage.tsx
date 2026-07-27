@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { updateTemplate, deleteTemplate, listTemplateAssignments } from '@/server/templates';
 import { saveRubric } from '@/server/rubrics';
+import { isServerError } from '@/lib/errors';
 import { TemplateMetadata } from './TemplateMetadata';
 import { TemplateCheckpointSection } from './TemplateCheckpointSection';
 import { TemplateLinkedAssignments } from './TemplateLinkedAssignments';
@@ -181,15 +182,11 @@ export function TemplateDetailPage({
     setSaveError(null);
     setSaveSuccess(false);
     try {
-      const result = await (
-        updateTemplateFn as unknown as (args: {
-          data: { id: number; name: string; type: string; checkpoints: typeof checkpoints };
-        }) => Promise<{ error?: string }>
-      )({
+      const result = await updateTemplateFn({
         data: { id: template.id, name, type, checkpoints },
       });
-      if (result?.error) {
-        setSaveError(result.error);
+      if (isServerError(result)) {
+        setSaveError(result.error.message);
       } else {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 3000);
@@ -203,28 +200,20 @@ export function TemplateDetailPage({
 
   const handleDelete = async () => {
     if (!template) return;
-    const result = await (
-      deleteTemplateFn as unknown as (args: {
-        data: { id: number };
-      }) => Promise<{ success?: boolean; error?: string }>
-    )({ data: { id: template.id } });
-    if (result?.success) {
+    const result = await deleteTemplateFn({ data: { id: template.id } });
+    if (!isServerError(result)) {
       navigate({ to: '/admin/templates', search: { page: 1, limit: 20, search: '', type: '' } });
     }
   };
 
   const fetchAssignments = async (page: number) => {
     if (!template) return;
-    const result = await (
-      listTemplateAssignmentsFn as unknown as (args: {
-        data: { templateId: number; page: number; limit: number };
-      }) => Promise<{ assignments?: AssignmentData[]; total?: number; error?: string }>
-    )({
+    const result = await listTemplateAssignmentsFn({
       data: { templateId: template.id, page, limit: 20 },
     });
-    if (!result?.error) {
-      setAssignmentsList(result?.assignments ?? []);
-      setAssignmentsTotal(result?.total ?? 0);
+    if (!isServerError(result)) {
+      setAssignmentsList(result.assignments);
+      setAssignmentsTotal(result.total);
     }
   };
 

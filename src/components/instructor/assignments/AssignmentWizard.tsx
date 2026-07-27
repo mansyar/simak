@@ -7,6 +7,7 @@ import { createAssignment } from '@/server/assignments';
 import { getTemplate } from '@/server/templates';
 import { listUsers } from '@/server/users';
 import { userKeys } from '@/lib/query-keys';
+import { isServerError } from '@/lib/errors';
 import { TemplatePicker } from './TemplatePicker';
 import { AssignmentDetailsForm } from './AssignmentDetailsForm';
 import { StudentPicker } from './StudentPicker';
@@ -14,12 +15,6 @@ import { DueDatePreview } from './DueDatePreview';
 import { ReviewStep } from './ReviewStep';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-
-interface Student {
-  id: string;
-  name: string;
-  email: string;
-}
 
 interface Template {
   id: number;
@@ -66,13 +61,12 @@ export function AssignmentWizard() {
   } = useQuery({
     queryKey: userKeys.list({ page: 1, limit: 200, search: '', role: 'student' }),
     queryFn: async () => {
-      const response = await (
-        listUsers as unknown as (args: {
-          data: { page: number; limit: number; search: string; role?: string };
-        }) => Promise<{ users: Student[] }>
-      )({
+      const response = await listUsers({
         data: { page: 1, limit: 200, search: '', role: 'student' },
       });
+      if (isServerError(response)) {
+        throw new Error(response.error.message);
+      }
       return response;
     },
     retry: false,
@@ -95,12 +89,10 @@ export function AssignmentWizard() {
 
     // Fetch template details to get estimated_durations
     try {
-      const response = await (
-        getTemplate as unknown as (args: { data: { id: number } }) => Promise<{
-          id: number;
-          checkpoints: { name: string; order: number; estimatedDuration: number | null }[];
-        } | null>
-      )({ data: { id: tpl.id } });
+      const response = await getTemplate({ data: { id: tpl.id } });
+      if (isServerError(response)) {
+        throw new Error(response.error.message);
+      }
       if (response && response.checkpoints) {
         const details: CheckpointDetail[] = response.checkpoints.map((cp) => ({
           name: cp.name,
@@ -190,18 +182,7 @@ export function AssignmentWizard() {
     try {
       setIsSubmitting(true);
       const overrideDueDates = dueDateOverrides.length > 0 ? dueDateOverrides : undefined;
-      const res = await (
-        createAssignment as unknown as (args: {
-          data: {
-            templateId: number | undefined;
-            title: string;
-            description: string;
-            finalDeadline: string;
-            studentIds: string[];
-            overrideDueDates?: { checkpointOrder: number; dueDate: string }[];
-          };
-        }) => Promise<{ success: boolean; assignmentId: number; error?: string }>
-      )({
+      const res = await createAssignment({
         data: {
           templateId: selectedTemplate?.id,
           title,
@@ -212,10 +193,10 @@ export function AssignmentWizard() {
         },
       });
 
-      if (res && res.success) {
-        navigate({ to: ('/instructor/assignments/' + res.assignmentId) as never });
+      if (isServerError(res)) {
+        setErrors({ submit: res.error.message });
       } else {
-        setErrors({ submit: res?.error || t('instructorAssignments.wizard.errors.submitFailed') });
+        navigate({ to: ('/instructor/assignments/' + res.assignmentId) as never });
       }
     } catch (err) {
       console.error(err);
