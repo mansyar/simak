@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in assignments.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const OverrideDueDateSchema = z.object({
@@ -31,21 +31,21 @@ export const AssignmentIdParamSchema = z.object({
 
 export const CreateAssignmentInputSchema = CreateAssignmentSchema;
 
-export const createAssignment = createServerFn({ method: 'POST' })
+export const createAssignment = typedServerFn({ method: 'POST' })
   .inputValidator(CreateAssignmentSchema)
   .handler(async ({ data }) => {
     const { createAssignmentHandler } = await import('./assignments.server');
     return createAssignmentHandler({ data });
   });
 
-export const listInstructorAssignments = createServerFn({ method: 'GET' })
+export const listInstructorAssignments = typedServerFn({ method: 'GET' })
   .inputValidator(ListInstructorAssignmentsSchema)
   .handler(async ({ data }) => {
     const { listInstructorAssignmentsHandler } = await import('./assignments.server');
     return listInstructorAssignmentsHandler({ data });
   });
 
-export const getAssignmentDetail = createServerFn({ method: 'GET' })
+export const getAssignmentDetail = typedServerFn({ method: 'GET' })
   .inputValidator(AssignmentIdParamSchema)
   .handler(async ({ data }) => {
     const { getAssignmentDetailHandler } = await import('./assignments.server');
@@ -66,14 +66,14 @@ export const StudentAssignmentIdParamSchema = z.object({
 
 // ---- Student Assignment Server Function Stubs ----
 
-export const listStudentAssignments = createServerFn({ method: 'GET' })
+export const listStudentAssignments = typedServerFn({ method: 'GET' })
   .inputValidator(ListStudentAssignmentsSchema)
   .handler(async ({ data }) => {
     const { listStudentAssignmentsHandler } = await import('./assignments.server');
     return listStudentAssignmentsHandler({ data });
   });
 
-export const getStudentAssignmentDetail = createServerFn({ method: 'GET' })
+export const getStudentAssignmentDetail = typedServerFn({ method: 'GET' })
   .inputValidator(StudentAssignmentIdParamSchema)
   .handler(async ({ data }) => {
     const { getStudentAssignmentDetailHandler } = await import('./assignments.server');
@@ -86,7 +86,7 @@ export const UnlockCheckpointSchema = z.object({
   checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),
 });
 
-export const unlockCheckpoint = createServerFn({ method: 'POST' })
+export const unlockCheckpoint = typedServerFn({ method: 'POST' })
   .inputValidator(UnlockCheckpointSchema)
   .handler(async ({ data }) => {
     const { unlockCheckpointHandler } = await import('./assignments.server');
@@ -100,7 +100,7 @@ export const ExtendDeadlineSchema = z.object({
   }),
 });
 
-export const extendDeadline = createServerFn({ method: 'POST' })
+export const extendDeadline = typedServerFn({ method: 'POST' })
   .inputValidator(ExtendDeadlineSchema)
   .handler(async ({ data }) => {
     const { extendDeadlineHandler } = await import('./assignments.server');
@@ -114,7 +114,7 @@ export const ReassignAssignmentSchema = z.object({
   newInstructorId: z.string().min(1, 'Instructor ID is required'),
 });
 
-export const reassignAssignment = createServerFn({ method: 'POST' })
+export const reassignAssignment = typedServerFn({ method: 'POST' })
   .inputValidator(ReassignAssignmentSchema)
   .handler(async ({ data }) => {
     const { reassignAssignmentHandler } = await import('./assignments.server');

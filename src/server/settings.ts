@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in settings.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const UpdateProfileSchema = z.object({
@@ -20,28 +20,28 @@ export const GetPresignedAvatarUploadUrlSchema = z.object({
 
 export const GetCurrentUserSchema = z.object({});
 
-export const updateProfile = createServerFn({ method: 'POST' })
+export const updateProfile = typedServerFn({ method: 'POST' })
   .inputValidator(UpdateProfileSchema)
   .handler(async ({ data }) => {
     const { updateProfileHandler } = await import('./settings.server');
     return updateProfileHandler({ data });
   });
 
-export const updateUserSettings = createServerFn({ method: 'POST' })
+export const updateUserSettings = typedServerFn({ method: 'POST' })
   .inputValidator(UpdateUserSettingsSchema)
   .handler(async ({ data }) => {
     const { updateUserSettingsHandler } = await import('./settings.server');
     return updateUserSettingsHandler({ data });
   });
 
-export const getPresignedAvatarUploadUrl = createServerFn({ method: 'POST' })
+export const getPresignedAvatarUploadUrl = typedServerFn({ method: 'POST' })
   .inputValidator(GetPresignedAvatarUploadUrlSchema)
   .handler(async ({ data }) => {
     const { getPresignedAvatarUploadUrlHandler } = await import('./settings.server');
     return getPresignedAvatarUploadUrlHandler({ data });
   });
 
-export const getCurrentUser = createServerFn({ method: 'GET' }).handler(async () => {
+export const getCurrentUser = typedServerFn({ method: 'GET' }).handler(async () => {
   const { getCurrentUserHandler } = await import('./settings.server');
   return getCurrentUserHandler();
 });

@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in submissions.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const SubmitCheckpointSchema = z.object({
@@ -20,7 +20,7 @@ export const GetSubmissionDetailSchema = z.object({
   submissionId: z.coerce.number().int().positive('Submission ID must be a positive integer'),
 });
 
-export const submitCheckpoint = createServerFn({ method: 'POST' }).handler(
+export const submitCheckpoint = typedServerFn({ method: 'POST' }).handler(
   async (args: { data: unknown }) => {
     const { submitCheckpointHandler } = await import('./submissions.server');
     const data = SubmitCheckpointSchema.parse(args.data);
@@ -28,7 +28,7 @@ export const submitCheckpoint = createServerFn({ method: 'POST' }).handler(
   },
 );
 
-export const listSubmissions = createServerFn({ method: 'GET' }).handler(
+export const listSubmissions = typedServerFn({ method: 'GET' }).handler(
   async (args: { data: unknown }) => {
     const { listSubmissionsHandler } = await import('./submissions.server');
     const data = ListSubmissionsSchema.parse(args.data);
@@ -36,7 +36,7 @@ export const listSubmissions = createServerFn({ method: 'GET' }).handler(
   },
 );
 
-export const getSubmissionDetail = createServerFn({ method: 'GET' }).handler(
+export const getSubmissionDetail = typedServerFn({ method: 'GET' }).handler(
   async (args: { data: unknown }) => {
     const { getSubmissionDetailHandler } = await import('./submissions.server');
     const data = GetSubmissionDetailSchema.parse(args.data);
