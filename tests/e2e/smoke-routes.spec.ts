@@ -140,5 +140,31 @@ test.describe('Smoke Route Tests', () => {
       // Smoke test: verify the page heading renders
       await expect(page.getByRole('heading', { level: 1, name: 'Analytics' })).toBeVisible();
     });
+
+    test('instructor settings page loads', async ({ page }) => {
+      await page.goto('/instructor/settings');
+      await page.waitForLoadState('networkidle');
+      await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
+    });
+  });
+
+  test.describe('Student Routes', () => {
+    test.beforeAll(async ({ browser }) => {
+      await ensureAuthFile(browser, 'student');
+    });
+
+    test.use({ storageState: getAuthFilePath('student') });
+
+    test('student assignments list page loads', async ({ page }) => {
+      await page.goto('/student/assignments');
+      await page.waitForLoadState('networkidle');
+      await expect(page.getByRole('heading', { level: 1, name: 'My Assignments' })).toBeVisible();
+    });
+
+    test('student settings page loads', async ({ page }) => {
+      await page.goto('/student/settings');
+      await page.waitForLoadState('networkidle');
+      await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
+    });
   });
 });

@@ -53,7 +53,7 @@ async function createSubmissionForA11y(checkpointName: string): Promise<number> 
   return submission.id;
 }
 
-function filterCriticalAndSerious(violations: Array<{ impact?: string }>) {
+function filterCriticalAndSerious(violations: Array<{ impact?: string | null }>) {
   return violations.filter((v) => v.impact === 'critical' || v.impact === 'serious');
 }
 
