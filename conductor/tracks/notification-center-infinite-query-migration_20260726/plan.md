@@ -18,26 +18,26 @@
     - [x] Run `pnpm test` — confirm hook tests pass (Green phase)
     - [x] Run `pnpm typecheck` — confirm no type errors in hook file (component will still error — fixed in Phase 2)
     - [x] Split test file into `use-notifications.test.tsx` and `use-notifications-mutations.test.tsx` to stay under 500-line limit
-- [~] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: Component Refactor (NotificationCenter)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before implementation
-- [ ] Task: Write failing tests for `NotificationCenter` with infinite query data shape
-    - [ ] Update `tests/unit/components/notifications/notification-pagination.test.tsx` — mock `useInfiniteQuery` returning `{ pages: [{ items: [...], total: N }], pageParams: [1] }`, assert "Load More" button calls `fetchNextPage` (not `setCurrentPage`), assert accumulated items include all pages via `data.pages.flatMap`, assert `hasNextPage` controls button visibility, assert `isFetchingNextPage` shows spinner on Load More button only
-    - [ ] Update `tests/unit/components/notifications/notification-filter.test.tsx` — verify tab switch resets infinite query to page 1 (filter change creates new query entry)
-    - [ ] Run `pnpm test` — confirm new/updated component tests fail (Red phase)
-- [ ] Task: Refactor `NotificationCenter` component to use infinite query data
-    - [ ] Edit `src/components/notifications/NotificationCenter.tsx` — remove `useState<Notification[]>(allItems)` (line 47), remove `useEffect` accumulation/dedup (lines 56-67), remove `currentPage` state (line 46)
-    - [ ] Replace `items` computation: `const items = data?.pages.flatMap((p) => p.items) ?? []` (was `allItems`)
-    - [ ] Replace `total`: `const total = data?.pages[0]?.total ?? 0`
-    - [ ] Replace `hasMore` with `hasNextPage` from `useNotificationsList` return
-    - [ ] Replace Load More button `onClick`: `setCurrentPage((p) => p + 1)` → `fetchNextPage()`
-    - [ ] Replace Load More spinner: `isFetching` → `isFetchingNextPage`
-    - [ ] Replace Load More visibility: `hasMore` → `hasNextPage`
-    - [ ] Update `useNotificationsList` call: remove `page: currentPage` from options (no longer accepts `page`)
-    - [ ] Run `pnpm test` — confirm component tests pass (Green phase)
-    - [ ] Run `pnpm typecheck` — confirm no type errors
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to re-establish context before implementation
+- [x] Task: Write failing tests for `NotificationCenter` with infinite query data shape [SHA: 97377657]
+    - [x] Update `tests/unit/components/notifications/notification-pagination.test.tsx` — mock `useInfiniteQuery` returning `{ pages: [{ items: [...], total: N }], pageParams: [1] }`, assert "Load More" button calls `fetchNextPage` (not `setCurrentPage`), assert accumulated items include all pages via `data.pages.flatMap`, assert `hasNextPage` controls button visibility, assert `isFetchingNextPage` shows spinner on Load More button only
+    - [x] Update `tests/unit/components/notifications/notification-filter.test.tsx` — verify tab switch resets infinite query to page 1 (filter change creates new query entry)
+    - [x] Run `pnpm test` — confirm new/updated component tests fail (Red phase)
+- [x] Task: Refactor `NotificationCenter` component to use infinite query data [SHA: 97377657]
+    - [x] Edit `src/components/notifications/NotificationCenter.tsx` — remove `useState<Notification[]>(allItems)` (line 47), remove `useEffect` accumulation/dedup (lines 56-67), remove `currentPage` state (line 46)
+    - [x] Replace `items` computation: `const items = data?.pages.flatMap((p) => p.items) ?? []` (was `allItems`)
+    - [x] Replace `total`: `const total = data?.pages[0]?.total ?? 0`
+    - [x] Replace `hasMore` with `hasNextPage` from `useNotificationsList` return
+    - [x] Replace Load More button `onClick`: `setCurrentPage((p) => p + 1)` → `fetchNextPage()`
+    - [x] Replace Load More spinner: `isFetching` → `isFetchingNextPage`
+    - [x] Replace Load More visibility: `hasMore` → `hasNextPage`
+    - [x] Update `useNotificationsList` call: remove `page: currentPage` from options (no longer accepts `page`)
+    - [x] Run `pnpm test` — confirm component tests pass (Green phase)
+    - [x] Run `pnpm typecheck` — confirm no type errors
 - [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 
 ## Phase 3: Optimistic Mutation Rewrite + Full Test Suite
