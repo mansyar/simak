@@ -21,7 +21,7 @@
     - [x] Update `plan.md`: mark task `[x]` with commit SHA
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Shared Module & Unit Tests' (Protocol in workflow.md)
 
-## Phase 2: Guard Migration, requireRole Refactor & Env Consolidation
+## Phase 2: Guard Migration, requireRole Refactor & Env Consolidation [checkpoint: 28b53b6]
 
 **Objective:** Replace all 28 duplicate inline guard definitions across 20 `*.server.ts` files with imports from the shared module, refactor `requireRole` to use `isAuthenticated`, and consolidate the `Env` type derivation in `env.ts`.
 
