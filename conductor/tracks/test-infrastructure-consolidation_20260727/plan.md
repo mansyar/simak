@@ -5,7 +5,7 @@
 > **Workflow:** `../../workflow.md` — Standard Task Workflow + Phase Completion Verification & Checkpointing Protocol  
 > **TDD note for config:** Deliverables are configuration files (`vitest.config.ts`, `vitest.config.integration.ts`, `package.json`) and documentation (`AGENTS.md`, `conductor/workflow.md`). Per the workflow's Phase Completion Protocol, non-code/config files are excluded from the unit-test requirement. `vitest.config.ts` is a configuration object with no application logic (analogous to `package.json`); verification is **behavioral** (run the vitest commands and observe outcomes), not unit-test-based. This is a deliberate simplicity decision — no artificial tests for config object literals, and these files are outside the coverage `include: ['src/**/*.{ts,tsx}']` scope anyway.
 
-## Phase 1: Vitest Config & Script Consolidation
+## Phase 1: Vitest Config & Script Consolidation [checkpoint: 3a1e360]
 
 - [x] Task: Read `./spec.md` and `../../workflow.md` to re-establish context for this phase
 
