@@ -21,7 +21,7 @@ interface ExtensionRequestItem {
   reason: string;
   extensionDays: number;
   status: string;
-  createdAt: Date;
+  createdAt: Date | null;
 }
 
 interface ApproveExtensionDialogProps {

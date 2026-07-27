@@ -13,18 +13,6 @@ import { consultationKeys, extensionKeys } from '@/lib/query-keys';
 import type { PendingConsultation } from '@/components/instructor/assignments/AssignmentConsultationsTab';
 import type { ExtensionRequestItem } from '@/components/instructor/extensions/PendingExtensionsSection';
 
-const listExtensionsFn = listExtensionRequests as unknown as (args: {
-  data: { assignmentId: number; status: string; page: number; limit: number };
-}) => Promise<{ items: ExtensionRequestItem[]; error?: { code: string; message: string } }>;
-
-const approveFn = approveExtension as unknown as (args: {
-  data: { requestId: number; resolutionReason?: string };
-}) => Promise<{ error?: { code: string; message: string } }>;
-
-const rejectFn = rejectExtension as unknown as (args: {
-  data: { requestId: number; resolutionReason: string };
-}) => Promise<{ error?: { code: string; message: string } }>;
-
 export function useAssignmentTabs(assignmentId: number | null) {
   const { t } = useI18n();
   const queryClient = useQueryClient();
@@ -66,7 +54,7 @@ export function useAssignmentTabs(assignmentId: number | null) {
     queryKey: extensionKeys.pending(assignmentId ?? -1),
     queryFn: async () => {
       if (assignmentId == null) return { items: [] as ExtensionRequestItem[] };
-      const result = await listExtensionsFn({
+      const result = await listExtensionRequests({
         data: { assignmentId, status: 'pending', page: 1, limit: 50 },
       });
       if ('items' in result) return { items: result.items };
@@ -80,7 +68,7 @@ export function useAssignmentTabs(assignmentId: number | null) {
 
   const approveMutation = useMutation({
     mutationFn: async (vars: { requestId: number; comment?: string }) => {
-      const result = await approveFn({
+      const result = await approveExtension({
         data: { requestId: vars.requestId, resolutionReason: vars.comment },
       });
       if ('error' in result) throw result;
@@ -120,7 +108,7 @@ export function useAssignmentTabs(assignmentId: number | null) {
 
   const rejectMutation = useMutation({
     mutationFn: async (vars: { requestId: number; reason: string }) => {
-      const result = await rejectFn({
+      const result = await rejectExtension({
         data: { requestId: vars.requestId, resolutionReason: vars.reason },
       });
       if ('error' in result) throw result;

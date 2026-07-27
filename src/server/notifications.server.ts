@@ -140,7 +140,7 @@ export async function listNotificationsHandler(args: { data: ListNotificationsIn
     });
 
     return {
-      items: hydratedItems as never,
+      items: hydratedItems as never[],
       total: Number(count),
     };
   } catch (err) {
