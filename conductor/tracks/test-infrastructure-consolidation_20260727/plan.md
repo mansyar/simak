@@ -56,5 +56,5 @@
     - [x] **AC-8:** Run `pnpm typecheck` → clean; `pnpm lint` → clean; run `node scripts/check-modularity.js` on changed files → all under 500 lines; `pnpm check:i18n` sanity (no i18n changes expected)
     - [x] Final review of `package.json` scripts against FR-4 (exact script strings) and confirm `lefthook.yml` unchanged (TRACK-036 territory)
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Documentation Alignment & Final DoD' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Documentation Alignment & Final DoD' (Protocol in workflow.md)
 </protect>
