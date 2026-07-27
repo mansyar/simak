@@ -34,7 +34,7 @@
     - [x] **AC-4:** Run `pnpm test:watch` briefly → confirm the 4 xlsx tests run (no silent gap); exit watch
     - [x] Confirm no `--exclude tests/integration/**` or global `--pool=threads` flags remain in `test`/`test:unit`/`test:watch`/`test:coverage` scripts
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Vitest Config & Script Consolidation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Vitest Config & Script Consolidation' (Protocol in workflow.md)
 
 ## Phase 2: Documentation Alignment & Final DoD
 
