@@ -28,11 +28,11 @@
     - [x] Set `test:integration` to `vitest run --config vitest.config.integration.ts tests/integration`
     - [x] Leave `test:e2e`, `test:e2e:ui` unchanged (Playwright — out of scope)
 
-- [ ] Task: Behavioral verification of consolidated config + scripts
-    - [ ] **AC-1:** Run bare `pnpm exec vitest run` (not `pnpm test`) → confirm integration tests excluded (no `tests/integration/**` executes)
-    - [ ] **AC-2:** Run `pnpm test` → all unit tests pass including the 4 xlsx files (xlsx on `threads`, rest on `vmThreads`)
-    - [ ] **AC-4:** Run `pnpm test:watch` briefly → confirm the 4 xlsx tests run (no silent gap); exit watch
-    - [ ] Confirm no `--exclude tests/integration/**` or global `--pool=threads` flags remain in `test`/`test:unit`/`test:watch`/`test:coverage` scripts
+- [x] Task: Behavioral verification of consolidated config + scripts
+    - [x] **AC-1:** Run bare `pnpm exec vitest run` (not `pnpm test`) → confirm integration tests excluded (no `tests/integration/**` executes)
+    - [x] **AC-2:** Run `pnpm test` → all unit tests pass including the 4 xlsx files (xlsx on `threads`, rest on `vmThreads`)
+    - [x] **AC-4:** Run `pnpm test:watch` briefly → confirm the 4 xlsx tests run (no silent gap); exit watch
+    - [x] Confirm no `--exclude tests/integration/**` or global `--pool=threads` flags remain in `test`/`test:unit`/`test:watch`/`test:coverage` scripts
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Vitest Config & Script Consolidation' (Protocol in workflow.md)
 
