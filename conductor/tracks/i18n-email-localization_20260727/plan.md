@@ -8,31 +8,31 @@
 
 ## Phase 1: 2FA Email Subject Localization
 
-- [ ] Task: Read spec.md and workflow.md to orient before Phase 1 implementation
-    - [ ] Read `conductor/tracks/i18n-email-localization_20260727/spec.md` — review Functional Requirements, Acceptance Criteria, and Out of Scope
-    - [ ] Read `conductor/workflow.md` — review TDD lifecycle, Quality Gates, and Phase Completion Verification protocol
+- [x] Task: Read spec.md and workflow.md to orient before Phase 1 implementation
+    - [x] Read `conductor/tracks/i18n-email-localization_20260727/spec.md` — review Functional Requirements, Acceptance Criteria, and Out of Scope
+    - [x] Read `conductor/workflow.md` — review TDD lifecycle, Quality Gates, and Phase Completion Verification protocol
 
-- [ ] Task: Add i18n keys for 2FA email subjects to locale files
-    - [ ] Add `emails.subjects.twoFactorEnabled` (`"Two-Factor Authentication Enabled"`) and `emails.subjects.twoFactorDisabled` (`"Two-Factor Authentication Disabled"`) to `locales/en.json` under the existing `emails.subjects` namespace
-    - [ ] Add `emails.subjects.twoFactorEnabled` (`"Autentikasi Dua Faktor Diaktifkan"`) and `emails.subjects.twoFactorDisabled` (`"Autentikasi Dua Faktor Dinonaktifkan"`) to `locales/id.json`
-    - [ ] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
-    - [ ] Verify `pnpm check:i18n` passes (parity between EN and ID, no unused keys)
+- [x] Task: Add i18n keys for 2FA email subjects to locale files [af3f00b]
+    - [x] Add `emails.subjects.twoFactorEnabled` (`"Two-Factor Authentication Enabled"`) and `emails.subjects.twoFactorDisabled` (`"Two-Factor Authentication Disabled"`) to `locales/en.json` under the existing `emails.subjects` namespace
+    - [x] Add `emails.subjects.twoFactorEnabled` (`"Autentikasi Dua Faktor Diaktifkan"`) and `emails.subjects.twoFactorDisabled` (`"Autentikasi Dua Faktor Dinonaktifkan"`) to `locales/id.json`
+    - [x] Run `pnpm generate:i18n` to regenerate `src/i18n/types.ts` and `src/i18n/detect-locale.ts`
+    - [x] Verify `pnpm check:i18n` passes (parity between EN and ID, no unused keys)
 
-- [ ] Task: Write failing tests for localized 2FA email subjects (Red Phase)
-    - [ ] Add `vi.mock('@/lib/i18n-server', () => ({ resolveEmailSubject: vi.fn() }))` to `tests/unit/server/two-factor.test.ts`
-    - [ ] Update the `enableTwoFactorHandler` email test to assert `resolveEmailSubject` is called with `('emails.subjects.twoFactorEnabled', undefined, session.user.locale)` instead of asserting the hardcoded subject string on `enqueueEmail`
-    - [ ] Update the `disableTwoFactorHandler` email test to assert `resolveEmailSubject` is called with `('emails.subjects.twoFactorDisabled', undefined, session.user.locale)` instead of asserting the hardcoded subject string on `enqueueEmail`
-    - [ ] Run `pnpm test` — confirm the updated tests fail (handlers still use hardcoded strings, so `resolveEmailSubject` is never called)
+- [x] Task: Write failing tests for localized 2FA email subjects (Red Phase) [af3f00b]
+    - [x] Add `vi.mock('@/lib/i18n-server', () => ({ resolveEmailSubject: vi.fn() }))` to `tests/unit/server/two-factor.test.ts`
+    - [x] Update the `enableTwoFactorHandler` email test to assert `resolveEmailSubject` is called with `('emails.subjects.twoFactorEnabled', undefined, session.user.locale)` instead of asserting the hardcoded subject string on `enqueueEmail`
+    - [x] Update the `disableTwoFactorHandler` email test to assert `resolveEmailSubject` is called with `('emails.subjects.twoFactorDisabled', undefined, session.user.locale)` instead of asserting the hardcoded subject string on `enqueueEmail`
+    - [x] Run `pnpm test` — confirm the updated tests fail (handlers still use hardcoded strings, so `resolveEmailSubject` is never called)
 
-- [ ] Task: Replace hardcoded 2FA email subjects with resolveEmailSubject calls (Green Phase)
-    - [ ] Add `import { resolveEmailSubject } from '../lib/i18n-server'` to `src/server/two-factor.server.ts`
-    - [ ] Add `import type { Locales } from '../i18n/types'` to `src/server/two-factor.server.ts`
-    - [ ] Replace `subject: 'Two-Factor Authentication Enabled'` (line 99) with `subject: resolveEmailSubject('emails.subjects.twoFactorEnabled', undefined, session.user.locale as Locales)`
-    - [ ] Replace `subject: 'Two-Factor Authentication Disabled'` (line 201) with `subject: resolveEmailSubject('emails.subjects.twoFactorDisabled', undefined, session.user.locale as Locales)`
-    - [ ] Run `pnpm test` — confirm all tests now pass
-    - [ ] Run quality gates: `pnpm typecheck` (0 errors), `pnpm lint` (0 warnings/errors), `pnpm check:i18n` (parity), `pnpm test:coverage` (≥80% all thresholds)
-    - [ ] Stage all changes and commit: `fix(i18n): Replace hardcoded 2FA email subjects with resolveEmailSubject calls`
-    - [ ] Attach git note with task summary to the commit
+- [x] Task: Replace hardcoded 2FA email subjects with resolveEmailSubject calls (Green Phase) [af3f00b]
+    - [x] Add `import { resolveEmailSubject } from '../lib/i18n-server'` to `src/server/two-factor.server.ts`
+    - [x] Add `import type { Locales } from '../i18n/types'` to `src/server/two-factor.server.ts`
+    - [x] Replace `subject: 'Two-Factor Authentication Enabled'` (line 99) with `subject: resolveEmailSubject('emails.subjects.twoFactorEnabled', undefined, session.user.locale as Locales)`
+    - [x] Replace `subject: 'Two-Factor Authentication Disabled'` (line 201) with `subject: resolveEmailSubject('emails.subjects.twoFactorDisabled', undefined, session.user.locale as Locales)`
+    - [x] Run `pnpm test` — confirm all tests now pass
+    - [x] Run quality gates: `pnpm typecheck` (0 errors), `pnpm lint` (0 warnings/errors), `pnpm check:i18n` (parity), `pnpm test:coverage` (≥80% all thresholds)
+    - [x] Stage all changes and commit: `fix(i18n): Replace hardcoded 2FA email subjects with resolveEmailSubject calls`
+    - [x] Attach git note with task summary to the commit
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
