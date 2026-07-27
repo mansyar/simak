@@ -40,20 +40,14 @@ export function TwoFactorSettings() {
   const { data: statusData, isLoading: statusLoading } = useQuery({
     queryKey: settingsKeys.twoFactorStatus(),
     queryFn: async () => {
-      const result = await (
-        getTwoFactorStatus as unknown as (args: { data: Record<string, never> }) => Promise<unknown>
-      )({ data: {} });
+      const result = await getTwoFactorStatus({ data: {} });
       return result as { enabled: boolean };
     },
   });
 
   const generateSetupMutation = useMutation({
     mutationFn: async (pwd: string) => {
-      const result = await (
-        generateTwoFactorSetup as unknown as (args: {
-          data: { password: string };
-        }) => Promise<unknown>
-      )({ data: { password: pwd } });
+      const result = await generateTwoFactorSetup({ data: { password: pwd } });
       return result as { totpURI?: string; backupCodes?: string[]; error?: string };
     },
     onSuccess: (data) => {
@@ -73,11 +67,7 @@ export function TwoFactorSettings() {
 
   const enableMutation = useMutation({
     mutationFn: async (code: string) => {
-      const result = await (
-        enableTwoFactor as unknown as (args: {
-          data: { code: string; trustDevice: boolean };
-        }) => Promise<unknown>
-      )({ data: { code, trustDevice: false } });
+      const result = await enableTwoFactor({ data: { code, trustDevice: false } });
       return result as { success?: boolean; error?: string };
     },
     onSuccess: (data) => {
@@ -96,9 +86,7 @@ export function TwoFactorSettings() {
 
   const disableMutation = useMutation({
     mutationFn: async (pwd: string) => {
-      const result = await (
-        disableTwoFactor as unknown as (args: { data: { password: string } }) => Promise<unknown>
-      )({ data: { password: pwd } });
+      const result = await disableTwoFactor({ data: { password: pwd } });
       return result as { success?: boolean; error?: string };
     },
     onSuccess: (data) => {

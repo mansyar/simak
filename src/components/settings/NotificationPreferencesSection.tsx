@@ -112,7 +112,7 @@ export function NotificationPreferencesSection() {
   const { data, isLoading } = useQuery({
     queryKey: settingsKeys.currentUser(),
     queryFn: async () => {
-      const result = await (getCurrentUser as unknown as () => Promise<unknown>)();
+      const result = await getCurrentUser();
       return result as {
         user: { id: string; name: string; email: string; image: string | null } | null;
         settings: {
@@ -128,11 +128,9 @@ export function NotificationPreferencesSection() {
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (args: { notificationPrefs: NotificationPrefs }) => {
-      const result = await (
-        updateUserSettings as unknown as (args: {
-          data: { notificationPrefs: NotificationPrefs };
-        }) => Promise<unknown>
-      )({ data: { notificationPrefs: args.notificationPrefs } });
+      const result = await updateUserSettings({
+        data: { notificationPrefs: args.notificationPrefs },
+      });
       return result as { notificationPrefs?: NotificationPrefs; error?: string };
     },
     onSuccess: () => {
