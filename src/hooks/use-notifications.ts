@@ -91,13 +91,19 @@ export function useMarkRead() {
         if (typeof old === 'number') {
           return Math.max(0, old - 1);
         }
-        if (old && typeof old === 'object' && 'items' in old) {
-          const listData = old as { items: Array<{ id: number; read: boolean }>; total: number };
+        if (old && typeof old === 'object' && 'pages' in old) {
+          const infiniteData = old as {
+            pages: Array<{ items: Array<{ id: number; read: boolean }>; total: number }>;
+            pageParams: number[];
+          };
           return {
-            ...listData,
-            items: listData.items.map((item) =>
-              item.id === notificationId ? { ...item, read: true } : item,
-            ),
+            ...infiniteData,
+            pages: infiniteData.pages.map((page) => ({
+              ...page,
+              items: page.items.map((item) =>
+                item.id === notificationId ? { ...item, read: true } : item,
+              ),
+            })),
           };
         }
         return old;
@@ -149,11 +155,17 @@ export function useMarkAllRead() {
         if (typeof old === 'number') {
           return 0;
         }
-        if (old && typeof old === 'object' && 'items' in old) {
-          const listData = old as { items: Array<{ id: number; read: boolean }>; total: number };
+        if (old && typeof old === 'object' && 'pages' in old) {
+          const infiniteData = old as {
+            pages: Array<{ items: Array<{ id: number; read: boolean }>; total: number }>;
+            pageParams: number[];
+          };
           return {
-            ...listData,
-            items: listData.items.map((item) => ({ ...item, read: true })),
+            ...infiniteData,
+            pages: infiniteData.pages.map((page) => ({
+              ...page,
+              items: page.items.map((item) => ({ ...item, read: true })),
+            })),
           };
         }
         return old;

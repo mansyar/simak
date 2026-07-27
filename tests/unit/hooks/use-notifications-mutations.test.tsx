@@ -69,28 +69,33 @@ describe('Notification mutation hooks', () => {
 
   describe('useMarkRead - optimistic updates', () => {
     it('should optimistically flip read to true on the targeted notification in the list cache', async () => {
-      const mockList = {
-        items: [
-          { id: 42, read: false, title: 'Test' },
-          { id: 43, read: false, title: 'Test 2' },
+      const mockInfinite = {
+        pages: [
+          {
+            items: [
+              { id: 42, read: false, title: 'Test' },
+              { id: 43, read: false, title: 'Test 2' },
+            ],
+            total: 2,
+          },
         ],
-        total: 2,
+        pageParams: [1],
       };
       vi.mocked(markRead).mockResolvedValue({ success: true } as any);
 
       const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.list({ limit: 20 }), mockList);
+      queryClient.setQueryData(notificationKeys.list({ limit: 20 }), mockInfinite);
 
       const { result } = renderHook(() => useMarkRead(), { wrapper });
       result.current.mutate(42);
 
       await waitFor(() => {
         const listData = queryClient.getQueryData(notificationKeys.list({ limit: 20 })) as {
-          items: Array<{ id: number; read: boolean }>;
-          total: number;
+          pages: Array<{ items: Array<{ id: number; read: boolean }>; total: number }>;
+          pageParams: number[];
         };
-        expect(listData.items[0].read).toBe(true);
-        expect(listData.items[1].read).toBe(false);
+        expect(listData.pages[0].items[0].read).toBe(true);
+        expect(listData.pages[0].items[1].read).toBe(false);
       });
     });
 
@@ -109,16 +114,21 @@ describe('Notification mutation hooks', () => {
     });
 
     it('should restore the list cache on error', async () => {
-      const mockList = {
-        items: [{ id: 42, read: false, title: 'Test' }],
-        total: 1,
+      const mockInfinite = {
+        pages: [
+          {
+            items: [{ id: 42, read: false, title: 'Test' }],
+            total: 1,
+          },
+        ],
+        pageParams: [1],
       };
       vi.mocked(markRead).mockResolvedValue({
         error: { code: 'FORBIDDEN', message: 'Forbidden' },
       } as any);
 
       const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.list({ limit: 20 }), mockList);
+      queryClient.setQueryData(notificationKeys.list({ limit: 20 }), mockInfinite);
 
       const { result } = renderHook(() => useMarkRead(), { wrapper });
       result.current.mutate(42);
@@ -128,10 +138,10 @@ describe('Notification mutation hooks', () => {
       });
 
       const listData = queryClient.getQueryData(notificationKeys.list({ limit: 20 })) as {
-        items: Array<{ id: number; read: boolean }>;
-        total: number;
+        pages: Array<{ items: Array<{ id: number; read: boolean }>; total: number }>;
+        pageParams: number[];
       };
-      expect(listData.items[0].read).toBe(false);
+      expect(listData.pages[0].items[0].read).toBe(false);
     });
 
     it('should restore the unread count on error', async () => {
@@ -168,6 +178,38 @@ describe('Notification mutation hooks', () => {
       });
 
       expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
+    });
+
+    it('should optimistically update the correct item across multiple pages', async () => {
+      const mockInfinite = {
+        pages: [
+          {
+            items: [{ id: 42, read: false, title: 'Page 1 Item' }],
+            total: 2,
+          },
+          {
+            items: [{ id: 43, read: false, title: 'Page 2 Item' }],
+            total: 2,
+          },
+        ],
+        pageParams: [1, 2],
+      };
+      vi.mocked(markRead).mockResolvedValue({ success: true } as any);
+
+      const { queryClient, wrapper } = createOptimisticWrapper();
+      queryClient.setQueryData(notificationKeys.list({ limit: 20 }), mockInfinite);
+
+      const { result } = renderHook(() => useMarkRead(), { wrapper });
+      result.current.mutate(43);
+
+      await waitFor(() => {
+        const listData = queryClient.getQueryData(notificationKeys.list({ limit: 20 })) as {
+          pages: Array<{ items: Array<{ id: number; read: boolean }>; total: number }>;
+          pageParams: number[];
+        };
+        expect(listData.pages[0].items[0].read).toBe(false);
+        expect(listData.pages[1].items[0].read).toBe(true);
+      });
     });
   });
 
@@ -197,28 +239,33 @@ describe('Notification mutation hooks', () => {
 
   describe('useMarkAllRead - optimistic updates', () => {
     it('should optimistically flip read to true on all notifications in the list cache', async () => {
-      const mockList = {
-        items: [
-          { id: 42, read: false, title: 'Test' },
-          { id: 43, read: false, title: 'Test 2' },
+      const mockInfinite = {
+        pages: [
+          {
+            items: [
+              { id: 42, read: false, title: 'Test' },
+              { id: 43, read: false, title: 'Test 2' },
+            ],
+            total: 2,
+          },
         ],
-        total: 2,
+        pageParams: [1],
       };
       vi.mocked(markAllRead).mockResolvedValue({ success: true } as any);
 
       const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.list({ limit: 20 }), mockList);
+      queryClient.setQueryData(notificationKeys.list({ limit: 20 }), mockInfinite);
 
       const { result } = renderHook(() => useMarkAllRead(), { wrapper });
       result.current.mutate();
 
       await waitFor(() => {
         const listData = queryClient.getQueryData(notificationKeys.list({ limit: 20 })) as {
-          items: Array<{ id: number; read: boolean }>;
-          total: number;
+          pages: Array<{ items: Array<{ id: number; read: boolean }>; total: number }>;
+          pageParams: number[];
         };
-        expect(listData.items[0].read).toBe(true);
-        expect(listData.items[1].read).toBe(true);
+        expect(listData.pages[0].items[0].read).toBe(true);
+        expect(listData.pages[0].items[1].read).toBe(true);
       });
     });
 
@@ -237,19 +284,24 @@ describe('Notification mutation hooks', () => {
     });
 
     it('should restore the list cache on error', async () => {
-      const mockList = {
-        items: [
-          { id: 42, read: false, title: 'Test' },
-          { id: 43, read: true, title: 'Test 2' },
+      const mockInfinite = {
+        pages: [
+          {
+            items: [
+              { id: 42, read: false, title: 'Test' },
+              { id: 43, read: true, title: 'Test 2' },
+            ],
+            total: 2,
+          },
         ],
-        total: 2,
+        pageParams: [1],
       };
       vi.mocked(markAllRead).mockResolvedValue({
         error: { code: 'FORBIDDEN', message: 'Forbidden' },
       } as any);
 
       const { queryClient, wrapper } = createOptimisticWrapper();
-      queryClient.setQueryData(notificationKeys.list({ limit: 20 }), mockList);
+      queryClient.setQueryData(notificationKeys.list({ limit: 20 }), mockInfinite);
 
       const { result } = renderHook(() => useMarkAllRead(), { wrapper });
       result.current.mutate();
@@ -259,11 +311,11 @@ describe('Notification mutation hooks', () => {
       });
 
       const listData = queryClient.getQueryData(notificationKeys.list({ limit: 20 })) as {
-        items: Array<{ id: number; read: boolean }>;
-        total: number;
+        pages: Array<{ items: Array<{ id: number; read: boolean }>; total: number }>;
+        pageParams: number[];
       };
-      expect(listData.items[0].read).toBe(false);
-      expect(listData.items[1].read).toBe(true);
+      expect(listData.pages[0].items[0].read).toBe(false);
+      expect(listData.pages[0].items[1].read).toBe(true);
     });
 
     it('should restore the unread count on error', async () => {
@@ -300,6 +352,38 @@ describe('Notification mutation hooks', () => {
       });
 
       expect(mockShowErrorToast).toHaveBeenCalledWith('FORBIDDEN', expect.any(Function));
+    });
+
+    it('should optimistically set read to true in all loaded pages', async () => {
+      const mockInfinite = {
+        pages: [
+          {
+            items: [{ id: 42, read: false, title: 'Page 1 Item' }],
+            total: 2,
+          },
+          {
+            items: [{ id: 43, read: false, title: 'Page 2 Item' }],
+            total: 2,
+          },
+        ],
+        pageParams: [1, 2],
+      };
+      vi.mocked(markAllRead).mockResolvedValue({ success: true } as any);
+
+      const { queryClient, wrapper } = createOptimisticWrapper();
+      queryClient.setQueryData(notificationKeys.list({ limit: 20 }), mockInfinite);
+
+      const { result } = renderHook(() => useMarkAllRead(), { wrapper });
+      result.current.mutate();
+
+      await waitFor(() => {
+        const listData = queryClient.getQueryData(notificationKeys.list({ limit: 20 })) as {
+          pages: Array<{ items: Array<{ id: number; read: boolean }>; total: number }>;
+          pageParams: number[];
+        };
+        expect(listData.pages[0].items[0].read).toBe(true);
+        expect(listData.pages[1].items[0].read).toBe(true);
+      });
     });
   });
 
