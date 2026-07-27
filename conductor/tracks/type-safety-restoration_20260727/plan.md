@@ -53,10 +53,10 @@
     - [x] Run `pnpm typecheck` — confirm no new type errors
     - [x] Verify: wrapper tests pass, typecheck clean
 
-- [~] Task: Update type-level test to verify `typedServerFn` fixes the gap
-    - [ ] Update `tests/unit/types/server-fn-types.test-d.ts` to assert that `typedServerFn` stub's return type propagates correctly (no longer `unknown`)
-    - [ ] Run `pnpm typecheck` — confirm type-level test now passes
-    - [ ] Verify: type-level test passes, confirming the fix works
+- [x] Task: Update type-level test to verify `typedServerFn` fixes the gap [c331e6f]
+    - [x] Update `tests/unit/types/server-fn-types.test-d.ts` to assert that `typedServerFn` stub's return type propagates correctly (no longer `unknown`)
+    - [x] Run `pnpm typecheck` — confirm type-level test now passes
+    - [x] Verify: type-level test passes, confirming the fix works — typecheck 0 errors (2 pre-existing type errors resolved), 3740 tests pass, lint 0 errors
 
 - [ ] Task: Migrate server-function stubs to `typedServerFn` (batch 1: core features)
     - [ ] Migrate `src/server/assignments.ts` — replace `createServerFn` import with `typedServerFn` from `@/lib/server-fn`
