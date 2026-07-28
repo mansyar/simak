@@ -156,7 +156,7 @@ export async function getStudentFinalGradeHandler({ data }: { data: { assignment
       .where(
         and(eq(checkpoints.assignmentId, assignmentId), eq(checkpoints.studentId, session.user.id)),
       )
-      .orderBy(checkpoints.order)) as unknown as ScoreRow[];
+      .orderBy(checkpoints.order)) as ScoreRow[];
 
     return computeFinalGrade(groupRowsToCheckpoints(rows), config);
   } catch (err) {
@@ -215,7 +215,7 @@ export async function getAssignmentGradebookHandler({ data }: { data: { assignme
       .leftJoin(reviews, eq(reviews.submissionId, submissions.id))
       .leftJoin(reviewScores, eq(reviewScores.reviewId, reviews.id))
       .where(eq(checkpoints.assignmentId, assignmentId))
-      .orderBy(users.name, checkpoints.order)) as unknown as ScoreRow[];
+      .orderBy(users.name, checkpoints.order)) as ScoreRow[];
 
     const studentMap = groupRowsByStudent(rows);
     const students = Array.from(studentMap.entries()).map(
@@ -348,7 +348,7 @@ export async function recomputeAllGradesHandler({ data }: { data: { assignmentId
       .leftJoin(reviews, eq(reviews.submissionId, submissions.id))
       .leftJoin(reviewScores, eq(reviewScores.reviewId, reviews.id))
       .where(eq(checkpoints.assignmentId, assignmentId))
-      .orderBy(checkpoints.studentId, checkpoints.order)) as unknown as ScoreRow[];
+      .orderBy(checkpoints.studentId, checkpoints.order)) as ScoreRow[];
 
     const studentMap = groupRowsByStudent(rows);
     let count = 0;
