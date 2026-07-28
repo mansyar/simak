@@ -33,7 +33,7 @@
     - [ ] Run `pnpm typecheck`
     - [ ] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
     - [ ] Run `pnpm check:i18n`
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Landmark Structure & Skip Link' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Landmark Structure & Skip Link' (Protocol in workflow.md)
 
 ## Phase 2: Fix `region` (Content Outside Landmarks)
 
