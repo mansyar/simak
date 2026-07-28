@@ -91,5 +91,5 @@
     - [x] Run `pnpm typecheck`
     - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
     - [x] Run `pnpm check:i18n`
-- [~] Task: Conductor - User Manual Verification 'Phase 4: E2E Tests & Documentation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: E2E Tests & Documentation' (Protocol in workflow.md)
 </protect>
