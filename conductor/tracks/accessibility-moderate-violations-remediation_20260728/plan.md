@@ -53,7 +53,7 @@
     - [x] Run `pnpm check:i18n`
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Region Content Containment' (Protocol in workflow.md)
 
-## Phase 3: Fix `heading-order` (4 Pages)
+## Phase 3: Fix `heading-order` (4 Pages) [checkpoint: ef9f01f]
 
 - [x] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
 - [x] Task: Write failing unit tests for heading hierarchy (Red Phase)
@@ -70,7 +70,7 @@
     - [x] Run `pnpm typecheck`
     - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
     - [x] Run `pnpm check:i18n`
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Heading Order' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Heading Order' (Protocol in workflow.md)
 
 ## Phase 4: E2E Tests & Documentation Update
 
