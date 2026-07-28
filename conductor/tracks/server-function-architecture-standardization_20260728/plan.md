@@ -8,7 +8,7 @@
     - [ ] Document Multi-handler pattern (multiple `*.server.ts` for role-separated logic) with decision criteria, referencing `dashboard-instructor.server.ts`, `dashboard-student.server.ts`, `dashboard-admin.server.ts`
     - [ ] Document Handler-only pattern (no `*.ts` stub, internal helper) with decision criteria
     - [ ] Document acceptable type-only circular dependency pattern (`import type { Schema }`) with rationale (erased at compile time, no runtime impact)
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Documentation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Documentation' (Protocol in workflow.md)
 
 ## Phase 2: setup-password.ts Two-File Split Refactor
 
