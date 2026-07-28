@@ -22,8 +22,30 @@ export function clearSessionCacheForTests(): void {
   sessionCache.clear();
 }
 
+/**
+ * Shape returned by `auth.api.getSession()` from Better Auth.
+ * The `role` and `locale` fields come from `additionalFields` in the auth config
+ * and are typed as `string` by Better Auth (not the local union).
+ */
+interface BetterAuthSessionResult {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role?: string;
+    locale?: string;
+    emailVerified: boolean;
+    image?: string | null;
+  };
+  session: {
+    id: string;
+    token: string;
+    expiresAt: Date;
+  };
+}
+
 /** Build a Session return value from the Better Auth payload and role/locale fallback. */
-function buildSession(u: NonNullable<Session>, role: UserRole, locale: string): Session {
+function buildSession(u: BetterAuthSessionResult, role: UserRole, locale: string): Session {
   const payloadRole = u.user.role as UserRole | undefined;
   const payloadLocale = u.user.locale as string | undefined;
 
@@ -53,7 +75,7 @@ export async function getSessionHandler(): Promise<Session> {
     return null;
   }
 
-  const u = result as unknown as NonNullable<Session>;
+  const u = result;
   const userId = u.user.id;
 
   // Check session cache before querying the database.
