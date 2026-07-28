@@ -1,3 +1,4 @@
+<protect>
 # TRACK-039: Orphaned R2 Object Cleanup
 
 ## Overview
@@ -106,3 +107,4 @@ When students upload files to Cloudflare R2 via presigned URLs, an `upload_inten
 - R2 object listing/inventory (would require `ListObjectsV2Command` — rely on `uploadIntents` as source of truth).
 - Batch delete API (`DeleteObjects` multi-object delete) — use individual `DeleteObjectCommand` for simpler error tracking.
 - Structured logger migration (TRACK-040 scope — this track uses `console.*` with structured object payloads for forward compatibility).
+</protect>

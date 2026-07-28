@@ -1,6 +1,11 @@
+<protect>
 # TRACK-039: Orphaned R2 Object Cleanup — Implementation Plan
 
 ## Phase 1: Schema Migration & Cleanup Scanner Core
+
+- [ ] Task: Read `spec.md` and `workflow.md` before starting Phase 1
+    - [ ] Read `conductor/tracks/orphaned-r2-object-cleanup_20260728/spec.md`
+    - [ ] Read `conductor/workflow.md`
 
 - [ ] Task: Add `cleanedUpAt` column to `uploadIntents` schema
     - [ ] Add nullable `cleanedUpAt: timestamp('cleaned_up_at')` to `uploadIntents` in `src/db/schema/submissions.ts`
@@ -56,6 +61,10 @@
 
 ## Phase 2: Manual Admin Trigger & UI
 
+- [ ] Task: Read `spec.md` and `workflow.md` before starting Phase 2
+    - [ ] Read `conductor/tracks/orphaned-r2-object-cleanup_20260728/spec.md`
+    - [ ] Read `conductor/workflow.md`
+
 - [ ] Task: Write failing tests for `triggerR2Cleanup()` server function (Red Phase)
     - [ ] Create `tests/unit/server/r2-cleanup.test.ts` with `/** @vitest-environment node */` header
     - [ ] Mock `@tanstack/react-start` (builder chain), `@/server/auth`, `@/db/index`, `@/lib/storage`, `@/lib/audit`
@@ -105,3 +114,4 @@
     - [ ] Attach git note with task summary
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
+</protect>
