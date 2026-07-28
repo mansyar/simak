@@ -45,12 +45,12 @@
     - [x] Update test imports from `@/server/audit-logs` to `@/server/audit-log`
     - [x] Rename test file if needed (`audit-logs.test.ts` → `audit-log.test.ts`)
     - [x] Run `pnpm test` and confirm all audit-log tests pass
-- [ ] Task: Audit and address circular dependencies (INFRA-3)
-    - [ ] Run circular dependency analysis via `codebase_graph_circular` (or equivalent `pnpm` tooling)
-    - [ ] Classify each of the 17 chains as type-only (`import type`) or runtime value import
-    - [ ] For type-only cycles: verify erased at compile time, document as acceptable (already covered in Phase 1 AGENTS.md update)
-    - [ ] For runtime value cycles: extract shared schema/type to a `types.ts` (or `_shared.ts`) file that both modules import from
-    - [ ] Re-run circular dependency check to verify runtime cycles are resolved
+- [x] Task: Audit and address circular dependencies (INFRA-3)
+    - [x] Run circular dependency analysis via `codebase_graph_circular` (or equivalent `pnpm` tooling)
+    - [x] Classify each of the 34 chains as type-only (`import type`) or runtime value import
+    - [x] For type-only cycles: verify erased at compile time, document as acceptable (already covered in Phase 1 AGENTS.md update)
+    - [x] For runtime value cycles: extract shared schema/type to a `types.ts` (or `_shared.ts`) file that both modules import from — N/A: no runtime value cycles found in server-function layer
+    - [x] Re-run circular dependency check to verify runtime cycles are resolved — N/A: no runtime cycles to resolve
 - [ ] Task: Verify quality gates for Phase 3
     - [ ] Run `pnpm typecheck` — 0 errors
     - [ ] Run `pnpm test:coverage` — ≥80% on all thresholds
