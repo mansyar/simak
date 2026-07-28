@@ -444,6 +444,180 @@ All tracks must adhere to the following project constraints:
 
 ---
 
+## Milestone 11: Observability & Infrastructure Hardening
+
+> This milestone addresses observability, infrastructure hardening, and accessibility compliance gaps identified in a post-completion audit of the production-ready codebase. These tracks are proactive infrastructure improvements — no new product features. Tracks are ordered by priority: accessibility compliance first (legal/compliance risk), then quick infrastructure wins (health endpoint, R2 cleanup), and finally the larger structured logging effort.
+
+---
+
+### TRACK-037: Accessibility Moderate Violations Remediation
+- **Status:** Planned · **Audit IDs:** None (recurring a11y violations documented in `docs/a11y-violations.md`) · **Deps:** TRACK-010 (Accessibility & i18n Compliance — established the a11y baseline and fixed all critical/serious violations)
+- **Key decisions:** Fix 4 recurring MODERATE axe-core violations identified in `docs/a11y-violations.md` (last scanned 2026-07-27): (1) `region` — page content outside landmarks on all scanned pages (1 node each on authenticated pages, 4 nodes on login); (2) `landmark-one-main` — document should have one main landmark (login page only — `_unauthenticated.tsx` renders bare `<Outlet />` with no `<main>`); (3) `skip-link` — skip-to-content target `#main-content` does not exist in the DOM (skip link is in `__root.tsx` line 165, but no element has `id="main-content"`); (4) `heading-order` — heading levels skip on specific pages (Student dashboard, Student assignment detail, Instructor review detail, Admin templates). Note: role layouts (`student.tsx`, `instructor.tsx`, `admin.tsx`) already have `<main>` — the fix is adding `id` + `tabindex`, not wrapping in `<main>`. The `region` "1 node" on authenticated pages is NOT the sidebar/header (they already have `<aside>`, `<nav>`, `<header>` landmarks) — root cause requires investigation (likely `NotificationCenter`, `KeyboardCheatSheet`, `Toaster`, or `#skip-to-content` div in `__root.tsx`).
+- **Detail:** Planned — not yet scaffolded
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** N/A (infrastructure/compliance, no product impact)
+*   **TDD Reference:** `docs/TDD.md` — Route structure (`src/routes/` pathless layouts); `docs/a11y-violations.md` — documents the 4 recurring MODERATE violations with affected page lists
+*   **Codebase References:** `src/routes/__root.tsx` (skip-to-content link at line 163-170, targets `#main-content` which doesn't exist); `src/routes/_unauthenticated.tsx` (bare `<Outlet />` — no `<main>` landmark, causes `landmark-one-main` + `region` on login/auth pages); `src/routes/_authenticated.tsx` (pass-through layout — `<Outlet />` + `<KeyboardCheatSheet>`, does NOT need `<main>`); `src/routes/_authenticated/student.tsx` (already has `<main className="flex-1 overflow-y-auto p-6">` at line 27 — needs `id` + `tabindex`); `src/routes/_authenticated/instructor.tsx` (already has `<main>` at line 27 — needs `id` + `tabindex`); `src/routes/_authenticated/admin.tsx` (already has `<main>` at line 27 — needs `id` + `tabindex`); `src/routes/index.tsx` (landing page — no `<main>` landmark, uses `<section>` + `<footer>` with `<nav>`); `src/components/layout/student-sidebar.tsx` (has `<aside>` + `<nav>` — landmark OK); `src/components/layout/app-header.tsx` (has `<header>` — landmark OK); `src/components/notifications/NotificationCenter.tsx` (rendered as sibling to `<main>` — candidate for `region` violation); `src/components/keyboard-cheat-sheet.tsx` (rendered in `_authenticated.tsx` — candidate for `region` violation)
+
+#### Track Tech Stack
+*   No new dependencies — pure React/Tailwind fixes (adding `id`/`tabindex` attributes to existing `<main>` elements, adding `<main>` wrapper to `_unauthenticated.tsx` and `index.tsx`, fixing heading hierarchy, wrapping non-landmarked content)
+*   Existing `@axe-core/playwright` E2E scanning (from TRACK-028) — used to investigate root cause and verify fixes
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **`skip-link` violation fix (highest priority — affects all pages):** The skip-to-content link in `__root.tsx` (line 165) targets `#main-content`, but no element in the codebase has `id="main-content"`. Fix: add `id="main-content" tabindex="-1"` to the existing `<main>` elements in `student.tsx` (line 27), `instructor.tsx` (line 27), and `admin.tsx` (line 27). Add a new `<main id="main-content" tabindex="-1">` wrapper to `_unauthenticated.tsx` (wrapping `<Outlet />`). Add a `<main id="main-content" tabindex="-1">` wrapper to `index.tsx` (landing page — wrapping the `<section>` content, keeping `<footer>` outside as is conventional).
+    *   **`landmark-one-main` violation fix (login page):** `_unauthenticated.tsx` renders bare `<Outlet />` with no `<main>`. Fix: wrap `<Outlet />` in `<main id="main-content" tabindex="-1" className="...">`. This also fixes the 4 `region` nodes on the login page.
+    *   **`region` violation fix (authenticated pages — 1 node each):** The role layouts already have `<main>`, `<aside>` (sidebar), and `<header>` (app header) landmarks. The "1 node" outside landmarks must be identified via axe-core scan. Likely candidates: `NotificationCenter` (rendered as sibling to `<main>` in role layouts), `KeyboardCheatSheet` (rendered in `_authenticated.tsx`), `Toaster` (rendered in `__root.tsx`), or the `#skip-to-content` div (rendered in `__root.tsx`). Fix: wrap the identified node in an appropriate landmark (`role="dialog"` for modal components when closed, `<aside>` for complementary content, or `aria-hidden="true"` if the content is purely decorative when not active).
+    *   **`heading-order` violation fix (specific pages):** Fix heading hierarchy on the 4 affected pages identified in `docs/a11y-violations.md`: Student dashboard (`src/routes/_authenticated/student/dashboard.tsx`), Student assignment detail (`src/routes/_authenticated/student/assignments/$id.tsx`), Instructor review detail (`src/routes/_authenticated/instructor/reviews/$submissionId.tsx`), Admin templates (`src/routes/_authenticated/admin/templates/$templateId.tsx`). Ensure no heading level skips (h1 → h2 → h3, never h1 → h3 or h2 → h4). Fix by adjusting heading levels or inserting intermediate headings.
+    *   **Landing page landmarks:** Add `<main>` landmark to `src/routes/index.tsx` (currently has no `<main>` — uses `<section>` elements only). Wrap the hero + features + how-it-works sections in `<main>`, keep `<footer>` outside.
+    *   **E2E verification:** Update existing axe-core scans in `tests/e2e/` to assert zero `region`, `landmark-one-main`, `skip-link`, and `heading-order` violations on all scanned pages. Add axe-core scans for the landing page and auth pages (login, setup-password, reset-password, forgot-password) which are not currently scanned.
+*   **Out of Scope:**
+    *   New a11y features beyond fixing the 4 documented violations
+    *   Keyboard navigation enhancements (separate concern)
+    *   Screen reader testing (axe-core covers automated checks; manual SR testing is out of scope)
+    *   Color contrast adjustments (all critical/serious contrast issues already fixed in TRACK-028)
+
+#### High-Level Execution Vectors
+*   **Phase 0 (Root cause investigation):** Run axe-core scan on all 6 currently-scanned pages. For each `region` violation, identify the exact DOM node that's outside landmarks. Check `NotificationCenter`, `KeyboardCheatSheet`, `Toaster`, and `#skip-to-content` div. Document the root cause for each page. Verify: root cause is identified and documented before proceeding to Phase 1.
+*   **Phase 1 (Skip-link + landmark-one-main):** Add `id="main-content" tabindex="-1"` to existing `<main>` in `student.tsx`, `instructor.tsx`, `admin.tsx`. Wrap `<Outlet />` in `<main id="main-content" tabindex="-1">` in `_unauthenticated.tsx`. Add `<main id="main-content" tabindex="-1">` wrapper to `index.tsx` (landing page). Verify: axe-core `skip-link` and `landmark-one-main` violations are zero on all pages. `region` on login page is zero (was 4 nodes, all caused by missing `<main>`).
+*   **Phase 2 (Region root cause fix):** Based on Phase 0 findings, wrap or mark the identified non-landmarked node(s). For modal/dialog components (`NotificationCenter`, `KeyboardCheatSheet`): add `role="dialog"` or ensure they're `aria-hidden` when not active. For `Toaster`: wrap in `<aside role="status" aria-live="polite">` or add `role="status"`. For `#skip-to-content` div: this is typically exempt from `region` — if it's the culprit, add `role="navigation"` or restructure. Verify: axe-core `region` violations are zero on all authenticated pages.
+*   **Phase 3 (Heading order):** Fix heading hierarchy on the 4 affected pages: Student dashboard, Student assignment detail, Instructor review detail, Admin templates. Adjust heading levels to ensure no skips (h1 → h2 → h3). Verify: axe-core `heading-order` violations are zero on all pages.
+*   **Phase 4 (E2E assertion hardening):** Update existing E2E axe-core scans to assert zero `region`, `landmark-one-main`, `skip-link`, and `heading-order` violations. Add axe-core scans for landing page and auth pages (login, setup-password, reset-password, forgot-password). Verify: `pnpm test:e2e` passes with zero a11y violations of any severity.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Navigate to any page (authenticated, unauthenticated, landing) → axe-core browser extension shows zero `region`, `landmark-one-main`, `skip-link`, and `heading-order` violations. Tab through any page → focus moves to the main content after activating skip-link. Heading hierarchy is logical (no skips) on Student dashboard, Student assignment detail, Instructor review detail, and Admin templates pages.
+*   [ ] **Automated Tests:** `pnpm test:e2e` — all axe-core scans pass with zero violations (critical, serious, AND moderate). New scan coverage for landing page + auth pages. `pnpm test:unit` — all existing tests pass (layout changes don't break component tests).
+*   [ ] **Conductor Review:** Existing `<main>` elements in `student.tsx`, `instructor.tsx`, `admin.tsx` have `id="main-content" tabindex="-1"`. `_unauthenticated.tsx` wraps `<Outlet />` in `<main id="main-content" tabindex="-1">`. `index.tsx` (landing) has `<main>` landmark. `region` root cause identified and fixed (documented in Phase 0 findings). No heading level skips on the 4 affected pages. `docs/a11y-violations.md` updated to mark all 4 violations as fixed. All files under 500 lines. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — all clean.
+
+---
+
+### TRACK-038: Health Check Endpoint
+- **Status:** Planned · **Audit IDs:** None (new infrastructure — addresses missing production monitoring) · **Deps:** None
+- **Key decisions:** Add `GET /api/health` endpoint returning JSON with 3 checks: DB connectivity (`SELECT 1`), R2 reachability (`HeadBucketCommand` via existing `getR2Client()` from `src/lib/storage.ts` — returns `S3Client | null`; if null, R2 is `not_configured`; if non-null but HEAD bucket fails, R2 is `unreachable` → 503), email queue depth (`COUNT(*)` where `status IN ('pending', 'processing')` — informational, doesn't fail health). Return HTTP 200 with `{ status: 'healthy', checks: {...} }` if DB reachable AND (R2 not configured OR R2 reachable). Return HTTP 503 if DB unreachable OR R2 configured-but-unreachable. No auth required. Individual check timeouts (2s each) to prevent hanging. Used by Coolify/container orchestration for liveness/readiness probes.
+- **Detail:** Planned — not yet scaffolded
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** N/A (infrastructure, no product impact)
+*   **TDD Reference:** `docs/TDD.md` — Deployment section (Docker multi-stage, Coolify, PgBouncer); `src/config/env.ts` (DATABASE_URL required, R2_* optional env vars); `src/db/index.ts` (`getDb()` — throws if DATABASE_URL unset); `src/lib/storage.ts` (`getR2Client()` returns `S3Client | null` — null when R2 env vars absent; `getBucketName()` returns bucket name); `src/db/schema/email-queue.ts` (`emailQueue` table — `status` enum: `'pending', 'processing', 'sent', 'failed'`); `src/routes/api/auth/$.tsx` (existing API route pattern — `createFileRoute` with `server.handlers` object, NOT `createAPIFileRoute`); `docker/Dockerfile` (uses `node:22-alpine` — has `wget` in busybox, no `curl`)
+
+#### Track Tech Stack
+*   TanStack Start API route (`src/routes/api/health.ts`) — `createFileRoute` from `@tanstack/react-router` with `server: { handlers: { GET: async ({ request }) => ... } }` pattern (matching `src/routes/api/auth/$.tsx`)
+*   Drizzle ORM — `SELECT 1` for DB check, `COUNT(*)` query on `emailQueue` table for queue depth
+*   `@aws-sdk/client-s3` — `HeadBucketCommand` for R2 check (already a dependency; uses existing `getR2Client()` + `getBucketName()` from `src/lib/storage.ts`)
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Health endpoint:** New `GET /api/health` route using `createFileRoute` with `server.handlers.GET`. Returns JSON with 3 checks: (1) DB check: `SELECT 1` via `getDb()`; (2) R2 check: call `getR2Client()` — if null, return `{ status: 'not_configured' }` (healthy); if non-null, send `HeadBucketCommand` with `getBucketName()` — success returns `{ status: 'ok' }`, failure returns `{ status: 'error', error: '...' }` (unhealthy → 503); (3) Email queue check: `COUNT(*)` where `status IN ('pending', 'processing')` — informational, always returns depth number. Overall status: `healthy` (200) if DB reachable AND (R2 not configured OR R2 reachable); `unhealthy` (503) if DB unreachable OR R2 configured-but-unreachable.
+    *   **Timeout handling:** Each check wrapped in `Promise.race` with 2s timeout. Failed/timed-out checks return `{ status: 'error', error: '...' }` but don't crash the endpoint.
+    *   **No auth:** Endpoint is public (no session check) — must be accessible by load balancers/containers without credentials.
+    *   **Dockerfile HEALTHCHECK:** Add `HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:3000/api/health || exit 1` to `docker/Dockerfile` (uses `wget` from busybox — `curl` is not available on `node:22-alpine`).
+*   **Out of Scope:**
+    *   Authenticated health check variant (for deeper introspection)
+    *   Metrics endpoint (Prometheus format — separate future track)
+    *   Database migration check (pending migrations count — separate concern)
+    *   Rate limiting on the health endpoint (public endpoint, but simple enough to not need protection)
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Endpoint creation):** Create `src/routes/api/health.ts` using `createFileRoute('/api/health')` with `server.handlers.GET`. Implement 3 checks with `Promise.allSettled` + 2s per-check timeout. DB check: `await getDb().execute(sql\`SELECT 1\`)`. R2 check: `const client = getR2Client(); if (!client) → not_configured; else await client.send(new HeadBucketCommand({ Bucket: getBucketName()! }))`. Email queue check: `await getDb().select({ count: count() }).from(emailQueue).where(inArray(emailQueue.status, ['pending', 'processing']))`. Return 200/503 with JSON body. Verify: `wget -qO- http://localhost:3000/api/health` returns 200 with all checks passing when DB is up.
+*   **Phase 2 (Failure handling):** Test with DB down → returns 503 with database check error. Test with R2 not configured → returns 200 with R2 `not_configured`. Test with R2 configured but unreachable → returns 503 with R2 error. Verify: endpoint never hangs (all checks time out within 2s).
+*   **Phase 3 (Deployment integration):** Add `HEALTHCHECK` directive to `docker/Dockerfile` (using `wget --spider`). Document in `docs/TDD.md` that Coolify can use `/api/health` for liveness/readiness probes. Verify: endpoint works behind PgBouncer (uses simple `SELECT 1`, not session-specific queries).
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** `wget -qO- http://localhost:3000/api/health` returns `{"status":"healthy","checks":{"database":{"status":"ok"},"r2":{"status":"ok"},"emailQueue":{"status":"ok","depth":0}}}`. Stop PostgreSQL → returns 503 with database check error. Remove R2 env vars → returns 200 with R2 `not_configured`. Configure R2 with wrong endpoint → returns 503 with R2 error.
+*   [ ] **Automated Tests:** Unit test for the health handler (mock `getDb`/`getR2Client`/`emailQueue`, assert: 200 healthy when DB up + R2 up, 200 healthy when DB up + R2 not_configured, 503 unhealthy when DB down, 503 unhealthy when R2 configured but HEAD fails, 2s timeout behavior, email queue depth reported correctly). `pnpm test:unit` — all tests pass.
+*   [ ] **Conductor Review:** `src/routes/api/health.ts` exists using `createFileRoute` with `server.handlers` (not `createAPIFileRoute`). No auth required. 2s per-check timeout. 200/503 status codes. R2: `not_configured` → 200, `ok` → 200, `error` → 503. Email queue uses correct status values (`'pending', 'processing'` — no `'retry'`). Dockerfile has `HEALTHCHECK` using `wget`. No new dependencies (`HeadBucketCommand` already in `@aws-sdk/client-s3`). File under 500 lines. `pnpm typecheck`, `pnpm lint` — clean.
+
+---
+
+### TRACK-039: Orphaned R2 Object Cleanup
+- **Status:** Planned · **Audit IDs:** None (new infrastructure — addresses storage cost growth from orphaned R2 objects) · **Deps:** None
+- **Key decisions:** Periodic cleanup scanner integrated into the existing email-queue tick loop in `src/lib/email-queue-init.ts` (similar to `processDeadlineReminders` pattern from TRACK-021). The `upload_intents` table has NO `status` column — intent lifecycle is implicit via `consumedAt` (null = unconsumed, non-null = file was submitted). Orphaned intents = `consumedAt IS NULL AND expiresAt < now() AND cleanedUpAt IS NULL`. A new nullable `cleanedUpAt` timestamp column is added via migration to track cleanup without losing audit trail. Deletes R2 objects via `DeleteObjectCommand` from `@aws-sdk/client-s3` (needs to be imported — not currently in `storage.ts`). Marks intent with `cleanedUpAt = now()` after successful R2 delete. Chunked processing (50 per tick) with in-memory `lastR2CleanupAt` throttle (6h interval, resets on restart — same pattern as `lastReminderScanAt`). `Promise.allSettled` for parallel deletes with per-object error isolation. Scanner failure isolated via `try/catch` in `tick()`. Audit logging via `safeAuditLog` from `src/lib/audit.ts` with `actorId: 'system'`.
+- **Detail:** Planned — not yet scaffolded
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** `docs/PRD.md` — File upload pattern (presigned URLs to R2, server never sees file bytes)
+*   **TDD Reference:** `docs/TDD.md` — File management section (R2 presigned URLs, upload intents trust boundary)
+*   **Codebase References:** `src/lib/storage.ts` (`getR2Client()` returns `S3Client | null`, `getBucketName()` returns `string | null` — both used for cleanup; `DeleteObjectCommand` needs to be added to imports); `src/db/schema/submissions.ts` lines 63-85 (`uploadIntents` table — `fileKey`, `userId`, `purpose`, `checkpointId`, `fileName`, `fileSize`, `contentType`, `expiresAt`, `consumedAt`, `createdAt` — NO `status` column; new `cleanedUpAt` column to be added); `src/lib/email-queue-init.ts` (75 lines — tick loop with in-memory `lastPruneAt` and `lastReminderScanAt` throttle variables, `try/catch` isolation pattern); `src/lib/audit.ts` (`logAuditEvent` requires `actorId` — throws if empty; `safeAuditLog` wraps in try/catch for advisory use); `src/db/schema/audit-log.ts` (`auditLog` table for cleanup action logging)
+
+#### Track Tech Stack
+*   R2/S3 API — `DeleteObjectCommand` from `@aws-sdk/client-s3` (already a dependency; needs to be imported in `storage.ts` or in the cleanup module directly). Uses existing `getR2Client()` + `getBucketName()` from `src/lib/storage.ts`.
+*   Drizzle ORM — Migration to add `cleanedUpAt` timestamp column to `uploadIntents` table. Query: `SELECT id, fileKey FROM uploadIntents WHERE consumedAt IS NULL AND expiresAt < now() AND cleanedUpAt IS NULL LIMIT 50`. Update: `UPDATE uploadIntents SET cleanedUpAt = now() WHERE id = ...`.
+*   Existing email-queue tick loop (`src/lib/email-queue-init.ts`) — extended with `processOrphanedR2Objects()` function call, throttled by in-memory `lastR2CleanupAt` variable (same pattern as `lastReminderScanAt`).
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Migration:** Add nullable `cleanedUpAt` timestamp column to `uploadIntents` table in `src/db/schema/submissions.ts`. Generate migration via `pnpm db:generate`.
+    *   **Cleanup scanner:** New `processOrphanedR2Objects()` function (in `src/lib/email-queue-init.ts` — file is 75 lines, plenty of room; or a new `src/lib/r2-cleanup.ts` if preferred for separation). Queries orphaned intents: `SELECT id, fileKey FROM uploadIntents WHERE consumedAt IS NULL AND expiresAt < now() AND cleanedUpAt IS NULL LIMIT 50`. For each: call `DeleteObjectCommand` with `getR2Client()` and `getBucketName()`, on success set `cleanedUpAt = now()`. On R2 delete failure, leave `cleanedUpAt` null (will be retried next tick). Wrap in `Promise.allSettled` for parallel deletes.
+    *   **Throttle mechanism:** In-memory `let lastR2CleanupAt: Date | null = null` variable in `email-queue-init.ts` (same pattern as `lastPruneAt` and `lastReminderScanAt`). Runs at most every 6 hours. Resets on server restart (acceptable — same as existing throttle pattern). If R2 is not configured (`getR2Client()` returns null), scanner is a no-op.
+    *   **Error isolation:** `Promise.allSettled` for parallel R2 deletes. Per-object failures logged via `console.error` (or `logger.error` if TRACK-040 is complete) but don't abort the batch. Scanner wrapped in `try/catch` in `tick()` — email processing continues regardless.
+    *   **Audit logging:** Log cleanup runs via `safeAuditLog('r2-cleanup', { actorId: 'system', action: 'r2.cleanup', entityType: 'upload_intent', entityId: 'batch', details: { deleted, failed, batchSize } })` from `src/lib/audit.ts`. Uses `safeAuditLog` (not `logAuditEvent` directly) to prevent audit failures from crashing the scanner.
+    *   **Manual trigger:** Admin-only server function `triggerR2Cleanup()` with two-file split: `src/server/r2-cleanup.ts` (stub with `typedServerFn`) + `src/server/r2-cleanup.server.ts` (handler with `isAdmin` guard). Calls `processOrphanedR2Objects()` directly (bypasses throttle) and returns summary `{ deleted, failed, batchSize }`. Audit logs with admin's `userId` as `actorId`.
+*   **Out of Scope:**
+    *   R2 lifecycle policy configuration (bucket-level rules — separate infrastructure concern)
+    *   Cleanup of submitted files (files attached to `submissions` are not orphaned — they're actively referenced)
+    *   Cleanup of consumed-but-orphaned intents (race condition: file submitted → submission deleted → R2 object orphaned but `consumedAt` is set — edge case, not common)
+    *   R2 object listing/inventory (would require `ListObjectsV2Command` — rely on `uploadIntents` as source of truth)
+    *   Batch delete API (`DeleteObjects` multi-object delete) — use individual `DeleteObjectCommand` for simpler error tracking
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Migration & scanner):** Add `cleanedUpAt: timestamp('cleaned_up_at')` to `uploadIntents` in `src/db/schema/submissions.ts`. Generate migration via `pnpm db:generate`. Create `processOrphanedR2Objects()` function. Import `DeleteObjectCommand` from `@aws-sdk/client-s3`. Query orphaned intents (`consumedAt IS NULL AND expiresAt < now() AND cleanedUpAt IS NULL LIMIT 50`). For each: call `getR2Client().send(new DeleteObjectCommand({ Bucket: getBucketName(), Key: intent.fileKey }))`, on success `UPDATE uploadIntents SET cleanedUpAt = now() WHERE id = intent.id`. Add `lastR2CleanupAt` in-memory throttle (6h). Integrate into `tick()` with `try/catch`. Call `safeAuditLog` with `actorId: 'system'`. Verify: orphaned intents are cleaned up, R2 objects deleted, `cleanedUpAt` set, scanner doesn't affect email processing.
+*   **Phase 2 (Manual trigger):** Add `triggerR2Cleanup()` admin-only server function (two-file split: `src/server/r2-cleanup.ts` stub + `src/server/r2-cleanup.server.ts` handler with `isAdmin` guard). Calls `processOrphanedR2Objects()` directly (no throttle) and returns summary. Audit logs with admin's `userId`. Verify: admin can trigger cleanup, audit log records action with admin as actor.
+*   **Phase 3 (Testing & edge cases):** Test with R2 not configured → `getR2Client()` returns null, scanner is a no-op. Test with orphaned intents → R2 objects deleted, `cleanedUpAt` set. Test with R2 delete failure → `cleanedUpAt` remains null, failure logged, will retry next tick. Test with consumed intents → not queried (excluded by `consumedAt IS NULL`). Verify: scanner runs at most every 6h, doesn't hang on R2 timeouts.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Insert an upload intent with `consumedAt = NULL AND expiresAt < now()` in the DB → wait for next tick (or trigger manually) → R2 object is deleted, `cleanedUpAt` is set. Check audit log → cleanup action recorded with `actorId: 'system'`. R2 not configured → scanner is a no-op (no errors). Consumed intents (where `consumedAt IS NOT NULL`) are NOT queried.
+*   [ ] **Automated Tests:** Unit tests for `processOrphanedR2Objects()` (mock R2 client + DB, assert: orphaned intents queried with correct WHERE clause `consumedAt IS NULL AND expiresAt < now() AND cleanedUpAt IS NULL`, R2 objects deleted via `DeleteObjectCommand`, `cleanedUpAt` set on success, `cleanedUpAt` NOT set on R2 failure, throttle respected, R2-not-configured no-op, per-object failure isolation, `safeAuditLog` called with `actorId: 'system'`). Unit test for `triggerR2Cleanup()` (admin-only — rejects instructor/student, triggers cleanup bypassing throttle, returns summary, audit logs with admin userId). `pnpm test:unit` — all tests pass.
+*   [ ] **Conductor Review:** `cleanedUpAt` column added to `uploadIntents` in `src/db/schema/submissions.ts`. Migration generated via `pnpm db:generate`. Scanner integrated into `tick()` in `src/lib/email-queue-init.ts` with `try/catch` isolation. 6h in-memory throttle via `lastR2CleanupAt` (same pattern as `lastReminderScanAt`). `DeleteObjectCommand` imported from `@aws-sdk/client-s3`. Uses `getR2Client()` + `getBucketName()` from `storage.ts`. `safeAuditLog` used with `actorId: 'system'` for background cleanup. Admin trigger is two-file split with `isAdmin` guard. No `status` column references (table has no status — uses `consumedAt` + `cleanedUpAt`). All files under 500 lines. `pnpm typecheck`, `pnpm lint` — clean.
+
+---
+
+### TRACK-040: Structured Logging & Observability
+- **Status:** Planned · **Audit IDs:** None (new infrastructure — addresses ad-hoc `console.*` logging and missing request tracing) · **Deps:** None
+- **Key decisions:** Introduce `pino` as the structured logger (server-side only — TanStack Start runs on Node.js via vinxi/nitro). Full migration of all 58 `console.*` calls across `src/lib/` and `src/server/`. Two migration patterns: (1) structured calls `console.error({ event: '...' })` in background jobs → `logger.info`/`logger.error` preserving `{ event, ...payload }` shape; (2) unstructured calls `console.error('Failed to ...', err)` in server handler advisory blocks → `logger.error({ event: 'advisory_failed', error: err.message, ... })`. `logError()` in `src/lib/errors.ts` already has two modes (production: `JSON.stringify(entry)`, dev: pretty-printed multi-line) — migration preserves the existing `entry` object shape (`timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`) and routes through `logger.error(entry)` instead of `console.error`. Uses `import.meta.env.PROD` (not `process.env.NODE_ENV`) for env detection — consistent with existing `logError()`. JSON format in production, `pino-pretty` in dev. Request ID propagation via TanStack Start `createMiddleware`. No external log aggregation (logs to stdout for Docker/Coolify).
+- **Detail:** Planned — not yet scaffolded
+
+#### Context Anchors (Traceability)
+*   **PRD Reference:** N/A (infrastructure, no product impact)
+*   **TDD Reference:** `docs/TDD.md` — Error handling section (typed `ServerError`, `serverError()` factory, `logError()` structured logger, `sonner` toasts, error boundary)
+*   **Codebase References:** `src/lib/errors.ts` (`logError()` lines 82-143 — already builds structured `entry` object with `timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`; uses `import.meta.env.PROD` for env detection; production mode already outputs `JSON.stringify(entry)`; dev mode outputs pretty-printed multi-line; `sanitizeInput()` redacts sensitive keys); `src/lib/email-queue-init.ts` (3 `console.*` calls — structured `{ event: '...' }` pattern); `src/lib/email-queue-processor.ts` (4 calls — `console.info`, `console.warn` with structured payloads); `src/lib/deadline-reminder-scanner.ts` (1 call — structured `{ event: '...' }`); `src/lib/risk-alerts.ts` (1 call — unstructured `'Failed to fire risk alert:', err`); `src/lib/review-risk-alert.ts` (1 call — unstructured advisory); `src/lib/review-sla.ts` (1 call — unstructured); `src/lib/consultation-email.ts` (1 call); `src/lib/extension-email.ts` (3 calls); `src/lib/event-email.ts` (1 call); `src/lib/audit.ts` (1 call — `safeAuditLog` catch block); `src/server/assignments.server.ts` (1 call); `src/server/consultations.server.ts` (2 calls); `src/server/bulk-import.server.ts` (2 calls); `src/server/reviews-extras.server.ts` (1 call); `src/server/reviews.server.ts` (2 calls); `src/server/extensions-extras.server.ts` (4 calls); `src/server/gradebook.server.ts` (1 call); `src/server/discussions.server.ts` (1 call); `src/server/users.server.ts` (3 calls); `src/server/two-factor.server.ts` (3 calls); `src/server/submissions.server.ts` (1 call) — total ~58 calls across ~20 files
+
+#### Track Tech Stack
+*   `pino` — structured logger (npm package, server-side only — not bundled with client code)
+*   `pino-pretty` — dev-only pretty-printer (npm package, devDependency)
+*   TanStack Start `createMiddleware` — request ID injection (header → middleware context → logger child)
+*   Existing `src/lib/errors.ts` — `logError()` refactored to route through pino instead of `console.error`; preserves `entry` object shape and `sanitizeInput()` redaction
+*   `import.meta.env.PROD` — env detection (consistent with existing `logError()`, NOT `process.env.NODE_ENV`)
+
+#### Scope Boundaries
+*   **In Scope:**
+    *   **Logger setup:** New `src/lib/logger.ts` — creates and exports the `pino` logger instance. Config: JSON in production (`import.meta.env.PROD`), `pino-pretty` in dev. Log level configurable via `LOG_LEVEL` env var (optional, default `info`). Server-side only — must not be imported by client code.
+    *   **`logError()` migration:** Refactor `src/lib/errors.ts` `logError()` to use `logger.error(entry)` instead of `console.error(JSON.stringify(entry))` (production) / `console.error(lines.join('\n'))` (dev). Preserve existing `entry` object shape (`timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`). Preserve `sanitizeInput()` redaction. Remove the `import.meta.env.PROD` branching — pino handles JSON vs pretty automatically based on transport config.
+    *   **Full `console.*` migration (58 calls across ~20 files):** Replace ALL `console.info`/`console.error`/`console.warn` in `src/lib/` and `src/server/` with `logger.info`/`logger.error`/`logger.warn`. Two patterns: (1) structured calls `console.error({ event: '...', error: '...' })` → `logger.error({ event: '...', error: '...' })` (preserve payload shape); (2) unstructured calls `console.error('Failed to ...', err)` → `logger.error({ event: 'advisory_failed', handler: '...', error: err instanceof Error ? err.message : String(err) })` (add structure). Files: `email-queue-init.ts`, `email-queue-processor.ts`, `deadline-reminder-scanner.ts`, `risk-alerts.ts`, `review-risk-alert.ts`, `review-sla.ts`, `consultation-email.ts`, `extension-email.ts`, `event-email.ts`, `audit.ts`, `assignments.server.ts`, `consultations.server.ts`, `bulk-import.server.ts`, `reviews-extras.server.ts`, `reviews.server.ts`, `extensions-extras.server.ts`, `gradebook.server.ts`, `discussions.server.ts`, `users.server.ts`, `two-factor.server.ts`, `submissions.server.ts`.
+    *   **Request ID propagation:** TanStack Start `createMiddleware` that reads `x-request-id` header (or generates UUID via `crypto.randomUUID()`), stores in middleware context, and makes available to logger child instances. All server function logs include `requestId` for tracing.
+    *   **Log format:** JSON in production (`{ level, time, pid, requestId, event, ...payload }`). Pretty-printed in dev via `pino-pretty`. Logs go to `stdout` (Docker/Coolify captures).
+*   **Out of Scope:**
+    *   External log aggregation (Datadog, Loki, etc. — separate infrastructure concern)
+    *   Metrics collection / Prometheus endpoint (separate future track)
+    *   Distributed tracing (OpenTelemetry — separate future track)
+    *   Log-based alerting (Coolify/Docker-level concern)
+    *   `console.log`/`console.error` in `src/db/seed.ts` and `src/db/migrate.ts` (one-off deployment scripts — leave as-is)
+    *   `console.log`/`console.error` in `scripts/` (build tooling — leave as-is)
+    *   Client-side logging (browser console — out of scope; pino is server-side only)
+
+#### High-Level Execution Vectors
+*   **Phase 1 (Logger setup):** Install `pino` + `pino-pretty` (devDep). Create `src/lib/logger.ts` — pino instance with env-based config (`import.meta.env.PROD` → JSON transport; dev → `pino-pretty` transport). Add `LOG_LEVEL` to `src/config/env.ts` (optional, default `info`). Verify: `import { logger } from '@/lib/logger'; logger.info({ event: 'test' }, 'message')` works in dev (pretty) and production (JSON).
+*   **Phase 2 (`logError()` migration):** Refactor `logError()` in `src/lib/errors.ts` — replace `console.error(JSON.stringify(entry))` (prod) and `console.error(lines.join('\n'))` (dev) with `logger.error(entry)`. Remove the `import.meta.env.PROD` branching (pino handles format via transport config). Preserve `sanitizeInput()` redaction and `entry` object shape. Verify: `logError()` output is JSON in production with `timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input` fields.
+*   **Phase 3 (Full `console.*` migration — 58 calls):** Replace all `console.info`/`console.error`/`console.warn` in `src/lib/` and `src/server/` with `logger.info`/`logger.error`/`logger.warn`. For structured calls: preserve `{ event: '...', ...payload }` shape. For unstructured calls: add structure (`{ event: 'advisory_failed', handler: '...', error: err.message }`). Grep verification: zero `console.info`/`console.error`/`console.warn` in `src/lib/` and `src/server/` (excluding `src/db/seed.ts` and `src/db/migrate.ts`). Verify: all logs go through pino, JSON in production, pretty in dev.
+*   **Phase 4 (Request ID propagation):** Add TanStack Start `createMiddleware` that injects `x-request-id` header (read or generate UUID via `crypto.randomUUID()`). Store in middleware context. Create `logger.child({ requestId })` helper for server functions. Update tests to assert `requestId` is present in log output. Verify: logs from a single request share the same `requestId`.
+
+#### Verification & Definition of Done (DoD)
+*   [ ] **Manual Checkpoint:** Start dev server → logs are pretty-printed with colors. Start production build → logs are JSON. Trigger a background job (e.g., email queue tick) → log entry includes `event` field. Trigger a server error → `logError` output is JSON with `timestamp`, `code`, `message`, `cause`, `stack` fields. Make a request → all log entries for that request share the same `requestId`. Grep `src/lib/` and `src/server/` for `console.info`/`console.error`/`console.warn` → zero matches (excluding `src/db/seed.ts`, `src/db/migrate.ts`).
+*   [ ] **Automated Tests:** Unit test for `logger.ts` (JSON in production, pretty in dev, `LOG_LEVEL` respected). Unit test for `logError()` (routes through pino, preserves `entry` object shape, `sanitizeInput()` still redacts sensitive keys). Unit test for request ID middleware (generates UUID if header absent, passes through if present). Existing tests updated if they assert `console.error` calls (switch to pino mock). `pnpm test:unit` — all tests pass. `pnpm test:coverage` >= 80%.
+*   [ ] **Conductor Review:** `pino` + `pino-pretty` added to `package.json`. `src/lib/logger.ts` exists with env-based config using `import.meta.env.PROD` (not `process.env.NODE_ENV`). `logError()` in `src/lib/errors.ts` uses `logger.error(entry)` instead of `console.error` — preserves `entry` shape and `sanitizeInput()`. Zero `console.info`/`console.error`/`console.warn` in `src/lib/` and `src/server/` (grep verification — `src/db/seed.ts`, `src/db/migrate.ts`, `scripts/` excluded). `LOG_LEVEL` added to `src/config/env.ts` as optional. Request ID middleware via `createMiddleware` injects `x-request-id`. All files under 500 lines. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — clean.
+
+---
+
 ## Track Dependency Graph
 
 ```
@@ -503,6 +677,12 @@ Milestone 10: Infrastructure Consistency & Tech Debt Remediation
 ├── TRACK-034: i18n & Email Localization Completeness [Complete — archived]
 ├── TRACK-035: Test Infrastructure Consolidation [no deps]
 └── TRACK-036: Developer Experience & Tooling Hygiene [no deps]
+
+Milestone 11: Observability & Infrastructure Hardening
+├── TRACK-037: Accessibility Moderate Violations Remediation [Planned — depends on 010]
+├── TRACK-038: Health Check Endpoint [Planned — no deps]
+├── TRACK-039: Orphaned R2 Object Cleanup [Planned — no deps]
+└── TRACK-040: Structured Logging & Observability [Planned — no deps]
 ```
 
 ### Parallelization Strategy
@@ -530,6 +710,7 @@ The following track groups can be worked on simultaneously:
 | **Q** | TRACK-029, TRACK-030 | Both complete — TRACK-029 touched `query-keys.ts` + settings + gradebook components (archived); TRACK-030 touched `use-notifications.ts` + `NotificationCenter.tsx` + `query-keys.ts` (archived). Both depended on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files (TRACK-029 only) |
 | **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035 (complete — archived), TRACK-036 (complete — archived) | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touched `vitest.config.ts` + `vitest.config.integration.ts` + `package.json` (complete — archived); TRACK-036 touched `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json` (complete — archived). Minor overlap: TRACK-035 and TRACK-036 both touched `package.json` scripts — coordinated to avoid merge conflicts |
 | **S** | TRACK-032 → TRACK-033 | Both complete — TRACK-032 (type-safety restoration, archived) touched the same `createServerFn` stub files that TRACK-033 (architecture standardization, archived) refactored. TRACK-033 proceeded with structural changes on the typed stubs after TRACK-032's type fixes. Both touched `src/server/*.ts` and `src/server/*.server.ts` |
+| **T** | TRACK-037, TRACK-038, TRACK-039, TRACK-040 | Planned — fully independent. TRACK-037 touches layout files + E2E tests; TRACK-038 adds a new route; TRACK-039 extends email-queue tick loop; TRACK-040 touches logger/errors/background jobs. Minor overlap: TRACK-040 and TRACK-039 both touch `email-queue-init.ts` — coordinate if parallelized |
 
 ---
 
@@ -547,7 +728,8 @@ The following track groups can be worked on simultaneously:
 | 8: E2E Coverage Expansion | 2 | ~9 Days |
 | 9: Client Architecture Consistency | 2 | ~3 Days |
 | 10: Infrastructure Consistency & Tech Debt | 6 | ~12 Days |
-| **Total** | **37** | **~119 Days** |
+| 11: Observability & Infrastructure Hardening | 4 | ~10 Days |
+| **Total** | **41** | **~129 Days** |
 
 > Effort estimates assume a single developer. Tracks within the same parallelization group can be distributed across developers to reduce wall-clock time.
 
