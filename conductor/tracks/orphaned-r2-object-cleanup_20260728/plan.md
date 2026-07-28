@@ -61,57 +61,57 @@
 
 ## Phase 2: Manual Admin Trigger & UI
 
-- [ ] Task: Read `spec.md` and `workflow.md` before starting Phase 2
-    - [ ] Read `conductor/tracks/orphaned-r2-object-cleanup_20260728/spec.md`
-    - [ ] Read `conductor/workflow.md`
+- [x] Task: Read `spec.md` and `workflow.md` before starting Phase 2
+    - [x] Read `conductor/tracks/orphaned-r2-object-cleanup_20260728/spec.md`
+    - [x] Read `conductor/workflow.md`
 
-- [ ] Task: Write failing tests for `triggerR2Cleanup()` server function (Red Phase)
-    - [ ] Create `tests/unit/server/r2-cleanup.test.ts` with `/** @vitest-environment node */` header
-    - [ ] Mock `@tanstack/react-start` (builder chain), `@/server/auth`, `@/db/index`, `@/lib/storage`, `@/lib/audit`
-    - [ ] Test: admin user → triggers `processOrphanedR2Objects()` directly (no throttle), returns summary
-    - [ ] Test: instructor user → rejected by `isAdmin` guard
-    - [ ] Test: student user → rejected by `isAdmin` guard
-    - [ ] Test: `safeAuditLog` called with admin's `userId` as `actorId`
-    - [ ] Run `pnpm test` and confirm tests fail as expected
+- [x] Task: Write failing tests for `triggerR2Cleanup()` server function (Red Phase)
+    - [x] Create `tests/unit/server/r2-cleanup.test.ts` with `/** @vitest-environment node */` header
+    - [x] Mock `@tanstack/react-start` (builder chain), `@/server/auth`, `@/db/index`, `@/lib/r2-cleanup`, `@/lib/audit`
+    - [x] Test: admin user → triggers `processOrphanedR2Objects()` directly (no throttle), returns summary
+    - [x] Test: instructor user → rejected by `isAdmin` guard
+    - [x] Test: student user → rejected by `isAdmin` guard
+    - [x] Test: `safeAuditLog` called with admin's `userId` as `actorId`
+    - [x] Run `pnpm test` and confirm tests fail as expected
 
-- [ ] Task: Implement `triggerR2Cleanup()` server function (Green Phase)
-    - [ ] Create `src/server/r2-cleanup.ts` (stub with `typedServerFn` + Zod input schema)
-    - [ ] Create `src/server/r2-cleanup.server.ts` (handler with `isAdmin` guard via `getSessionFromHeaders`)
-    - [ ] Handler calls `processOrphanedR2Objects()` directly (bypasses throttle)
-    - [ ] Handler calls `safeAuditLog` with admin's `userId` as `actorId`
-    - [ ] Returns summary `{ deleted, failed, batchSize }`
-    - [ ] Run `pnpm test` and confirm all tests pass
+- [x] Task: Implement `triggerR2Cleanup()` server function (Green Phase)
+    - [x] Create `src/server/r2-cleanup.ts` (stub with `typedServerFn` + Zod input schema)
+    - [x] Create `src/server/r2-cleanup.server.ts` (handler with `isAdmin` guard via `getSessionFromHeaders`)
+    - [x] Handler calls `processOrphanedR2Objects()` directly (bypasses throttle)
+    - [x] Handler calls `safeAuditLog` with admin's `userId` as `actorId`
+    - [x] Returns summary `{ deleted, failed, batchSize }`
+    - [x] Run `pnpm test` and confirm all tests pass (9/9 passing)
 
-- [ ] Task: Add i18n keys for admin UI
-    - [ ] Add keys to `locales/en.json`: `adminEmailQueue.r2Cleanup.trigger`, `adminEmailQueue.r2Cleanup.success`, `adminEmailQueue.r2Cleanup.error`
-    - [ ] Add same keys to `locales/id.json` with Indonesian translations
-    - [ ] Run `pnpm generate:i18n` to regenerate types
-    - [ ] Run `pnpm check:i18n` to verify parity
+- [x] Task: Add i18n keys for admin UI
+    - [x] Add keys to `locales/en.json`: `adminEmailQueue.r2Cleanup.trigger`, `adminEmailQueue.r2Cleanup.success`, `adminEmailQueue.r2Cleanup.error`
+    - [x] Add same keys to `locales/id.json` with Indonesian translations
+    - [x] Run `pnpm generate:i18n` to regenerate types
+    - [x] Run `pnpm check:i18n` to verify parity (966=966; unused keys expected until UI implemented)
 
-- [ ] Task: Write failing test for admin UI trigger button (Red Phase)
-    - [ ] Create/update `tests/unit/routes/admin/email-queue.test.tsx` (or existing test file for that route)
-    - [ ] Test: "Trigger R2 Cleanup" button renders on `/admin/email-queue` page
-    - [ ] Test: button click calls `triggerR2Cleanup()` and shows success toast with summary
-    - [ ] Run `pnpm test` and confirm tests fail as expected
+- [x] Task: Write failing test for admin UI trigger button (Red Phase)
+    - [x] Create/update `tests/unit/routes/admin/email-queue.test.tsx` (or existing test file for that route)
+    - [x] Test: "Trigger R2 Cleanup" button renders on `/admin/email-queue` page
+    - [x] Test: button click calls `triggerR2Cleanup()` and shows success toast with summary
+    - [x] Run `pnpm test` and confirm tests fail as expected
 
-- [ ] Task: Implement admin UI trigger button (Green Phase)
-    - [ ] Add "Trigger R2 Cleanup" button to `/admin/email-queue` route component
-    - [ ] Wire to `triggerR2Cleanup()` via `useMutation` (or `useServerFn` pattern matching existing page style)
-    - [ ] Show success toast with i18n-interpolated summary on success
-    - [ ] Show error toast on failure
-    - [ ] Run `pnpm test` and confirm all tests pass
+- [x] Task: Implement admin UI trigger button (Green Phase)
+    - [x] Add "Trigger R2 Cleanup" button to `/admin/email-queue` route component
+    - [x] Wire to `triggerR2Cleanup()` via `useMutation` (or `useServerFn` pattern matching existing page style)
+    - [x] Show success toast with i18n-interpolated summary on success
+    - [x] Show error toast on failure
+    - [x] Run `pnpm test` and confirm all tests pass (20/20 passing)
 
-- [ ] Task: Verify quality gates for Phase 2
-    - [ ] Run `pnpm test:coverage` — confirm ≥80% on all thresholds
-    - [ ] Run `pnpm typecheck` — confirm clean
-    - [ ] Run `pnpm lint` — confirm clean (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n` — confirm parity, no unused keys
-    - [ ] Confirm all files under 500 lines (`node scripts/check-modularity.js`)
+- [x] Task: Verify quality gates for Phase 2
+    - [x] Run `pnpm test:coverage` — confirm ≥80% on all thresholds (87.93% stmts, 81.92% branches, 83.4% funcs, 88.56% lines)
+    - [x] Run `pnpm typecheck` — confirm clean
+    - [x] Run `pnpm lint` — confirm clean (0 errors, 4 pre-existing warnings)
+    - [x] Run `pnpm check:i18n` — confirm parity (966=966), no unused keys
+    - [x] Confirm all files under 500 lines (`node scripts/check-modularity.js`)
 
-- [ ] Task: Commit Phase 2 changes
-    - [ ] Stage all code + i18n files
-    - [ ] Commit with message `feat(r2-cleanup): Add manual admin trigger with UI button on email queue page`
-    - [ ] Attach git note with task summary
+- [x] Task: Commit Phase 2 changes [27dced4]
+    - [x] Stage all code + i18n files
+    - [x] Commit with message `feat(r2-cleanup): Add manual admin trigger with UI button on email queue page`
+    - [x] Attach git note with task summary
 
 - [ ] Task: Conductor - User Manual Verification 'Phase 2' (Protocol in workflow.md)
 </protect>
