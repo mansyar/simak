@@ -16,31 +16,31 @@
     - [x] Update Formatting Quirks section: `pnpm format` description from `src/**/*.{ts,tsx,css}` (not `tests/`) to `*.{js,jsx,ts,tsx,css}` (all dirs)
     - [x] Update Pre-commit gate description: reflect expanded lint and format glob scopes
 - [x] Task: Verify quality gates
-    - [ ] Run `pnpm format` — verify it covers all dirs (src, tests, scripts) with `.css`; fix any formatting issues surfaced by expanded scope
-    - [ ] Run `pnpm typecheck` — verify `--checkers 4` works, no type errors
-    - [ ] Run `pnpm lint` — verify expanded scope, fix any new lint issues in `tests/`/`scripts/`
-    - [ ] Run `pnpm test` — all existing tests pass
-    - [ ] Run `pnpm check:i18n` — i18n parity maintained
+    - [x] Run `pnpm format` — verify it covers all dirs (src, tests, scripts) with `.css`; fix any formatting issues surfaced by expanded scope
+    - [x] Run `pnpm typecheck` — verify `--checkers 4` works, no type errors
+    - [x] Run `pnpm lint` — verify expanded scope, fix any new lint issues in `tests/`/`scripts/`
+    - [x] Run `pnpm test` — all existing tests pass
+    - [x] Run `pnpm check:i18n` — i18n parity maintained
 - [x] Task: Commit configuration alignment changes [7b833c1]
-    - [ ] Stage `lefthook.yml`, `package.json`, `AGENTS.md` + any formatting fixes in `tests/`/`scripts/`
-    - [ ] Commit with message `chore(tooling): Align lefthook/package.json format, lint, typecheck configs`
-    - [ ] Attach git note with task summary
+    - [x] Stage `lefthook.yml`, `package.json`, `AGENTS.md` + any formatting fixes in `tests/`/`scripts/`
+    - [x] Commit with message `chore(tooling): Align lefthook/package.json format, lint, typecheck configs`
+    - [x] Attach git note with task summary
 - [x] Task: Conductor - User Manual Verification 'Configuration Alignment' (Protocol in workflow.md)
 
 ## Phase 2: SocratiCode Context Artifacts
 
-- [ ] Task: Read `spec.md` and `workflow.md` to establish context
-    - [ ] Read `./spec.md` for track requirements and acceptance criteria
-    - [ ] Read `../../workflow.md` for TDD lifecycle and phase completion protocol
-- [ ] Task: Create `.socraticodecontextartifacts.json`
-    - [ ] Create `.socraticodecontextartifacts.json` at project root with 7 artifact entries (`conductor/product.md`, `conductor/tech-stack.md`, `conductor/workflow.md`, `conductor/product-guidelines.md`, `drizzle/migrations/`, `docs/PRD.md`, `docs/TDD.md`)
-- [ ] Task: Index artifacts and verify semantic search
-    - [ ] Run `codebase_context_index` to index artifacts into the vector database
-    - [ ] Run `codebase_context_search` with test queries (e.g., "authentication setup", "database schema") and verify relevant results are returned from indexed artifacts
-- [ ] Task: Verify quality gates
-    - [ ] Run `pnpm test` — all existing tests pass
-    - [ ] Run `pnpm typecheck` — clean
-    - [ ] Run `pnpm lint` — clean
+- [x] Task: Read `spec.md` and `workflow.md` to establish context
+    - [x] Read `./spec.md` for track requirements and acceptance criteria
+    - [x] Read `../../workflow.md` for TDD lifecycle and phase completion protocol
+- [x] Task: Create `.socraticodecontextartifacts.json`
+    - [x] Create `.socraticodecontextartifacts.json` at project root with 7 artifact entries (`conductor/product.md`, `conductor/tech-stack.md`, `conductor/workflow.md`, `conductor/product-guidelines.md`, `drizzle/migrations/`, `docs/PRD.md`, `docs/TDD.md`)
+- [x] Task: Index artifacts and verify semantic search
+    - [x] Run `codebase_context_index` to index artifacts into the vector database
+    - [x] Run `codebase_context_search` with test queries (e.g., "authentication setup", "database schema") and verify relevant results are returned from indexed artifacts
+- [x] Task: Verify quality gates
+    - [x] Run `pnpm test` — all existing tests pass
+    - [x] Run `pnpm typecheck` — clean
+    - [x] Run `pnpm lint` — clean
 - [ ] Task: Commit SocratiCode artifacts configuration
     - [ ] Stage `.socraticodecontextartifacts.json`
     - [ ] Commit with message `chore(tooling): Configure SocratiCode context artifacts`

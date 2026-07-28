@@ -1,0 +1,39 @@
+{
+  "artifacts": [
+    {
+      "name": "product-definition",
+      "path": "./conductor/product.md",
+      "description": "SIMAK product definition — feature list by track, product vision, and scope boundaries."
+    },
+    {
+      "name": "tech-stack",
+      "path": "./conductor/tech-stack.md",
+      "description": "Approved technology stack — TanStack Start, PostgreSQL, Drizzle ORM, Better Auth, shadcn/ui, Tailwind v4."
+    },
+    {
+      "name": "development-workflow",
+      "path": "./conductor/workflow.md",
+      "description": "Conductor TDD workflow — task lifecycle, quality gates, commit format, git notes protocol, phase completion."
+    },
+    {
+      "name": "product-guidelines",
+      "path": "./conductor/product-guidelines.md",
+      "description": "Core product guidelines — branding, voice, tone, and user engagement philosophy."
+    },
+    {
+      "name": "database-migrations",
+      "path": "./drizzle/migrations/",
+      "description": "Drizzle ORM database migrations — all schema changes, snapshots, rollback scripts, and migration journal."
+    },
+    {
+      "name": "prd",
+      "path": "./docs/PRD.md",
+      "description": "Product Requirements Document — detailed functional requirements and feature specifications."
+    },
+    {
+      "name": "tdd-guide",
+      "path": "./docs/TDD.md",
+      "description": "Test-Driven Development guide — testing patterns, conventions, and best practices for the SIMAK codebase."
+    }
+  ]
+}
