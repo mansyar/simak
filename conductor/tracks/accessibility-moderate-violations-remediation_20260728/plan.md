@@ -20,19 +20,19 @@
     - [x] Add test that `login.tsx` does NOT have a duplicate `id="main-content"` on a `<div>` (must be removed)
     - [x] Run `pnpm test` — confirm new tests FAIL as expected
 - [x] Task: Implement landmark and skip link fixes (Green Phase) [d1e8993]
-    - [ ] `src/routes/_unauthenticated.tsx` — wrap `<Outlet />` in `<main id="main-content" tabindex="-1" className="...">`
-    - [ ] `src/routes/_authenticated/student.tsx` — add `id="main-content"` and `tabindex="-1"` to existing `<main>`
-    - [ ] `src/routes/_authenticated/instructor.tsx` — add `id="main-content"` and `tabindex="-1"` to existing `<main>`
-    - [ ] `src/routes/_authenticated/admin.tsx` — add `id="main-content"` and `tabindex="-1"` to existing `<main>`
-    - [ ] `src/routes/index.tsx` — wrap content in `<main id="main-content" tabindex="-1">`
-    - [ ] `src/routes/_unauthenticated/auth/login.tsx` — remove `id="main-content"` from the `<div>` (line 52) to avoid duplicate ID
-    - [ ] Check `setup-password.tsx` — remove `id="main-content"` if present (to avoid duplicate with new `<main>` in `_unauthenticated.tsx`)
-    - [ ] Run `pnpm test` — confirm all tests now PASS
-- [ ] Task: Verify quality gates
-    - [ ] Run `pnpm test:coverage` (≥80% thresholds)
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n`
+    - [x] `src/routes/_unauthenticated.tsx` — wrap `<Outlet />` in `<main id="main-content" tabindex="-1" className="...">`
+    - [x] `src/routes/_authenticated/student.tsx` — add `id="main-content"` and `tabindex="-1"` to existing `<main>`
+    - [x] `src/routes/_authenticated/instructor.tsx` — add `id="main-content"` and `tabindex="-1"` to existing `<main>`
+    - [x] `src/routes/_authenticated/admin.tsx` — add `id="main-content"` and `tabindex="-1"` to existing `<main>`
+    - [x] `src/routes/index.tsx` — wrap content in `<main id="main-content" tabindex="-1">`
+    - [x] `src/routes/_unauthenticated/auth/login.tsx` — remove `id="main-content"` from the `<div>` (line 52) to avoid duplicate ID
+    - [x] Check `setup-password.tsx` — remove `id="main-content"` if present (to avoid duplicate with new `<main>` in `_unauthenticated.tsx`)
+    - [x] Run `pnpm test` — confirm all tests now PASS
+- [x] Task: Verify quality gates
+    - [x] Run `pnpm test:coverage` (≥80% thresholds)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n`
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Landmark Structure & Skip Link' (Protocol in workflow.md)
 
 ## Phase 2: Fix `region` (Content Outside Landmarks) [checkpoint: 6ff3cb3]
@@ -60,11 +60,11 @@
     - [x] Add test to `tests/unit/routes/layout-a11y.test.tsx` — verify heading levels don't skip on each of the 4 pages (render component, query `h1`-`h6` in order, assert no skips)
     - [x] Run `pnpm test` — confirm new tests FAIL as expected
 - [x] Task: Implement heading-order fixes (Green Phase) [6d5922e]
-    - [ ] `src/routes/_authenticated/student/dashboard.tsx` — fix heading hierarchy (e.g., change `h3` to `h2` if no `h2` exists between `h1` and `h3`)
-    - [ ] `src/routes/_authenticated/student/assignments/$id.tsx` — fix heading hierarchy
-    - [ ] `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` — fix heading hierarchy
-    - [ ] `src/routes/_authenticated/admin/templates/$templateId.tsx` — fix heading hierarchy
-    - [ ] Run `pnpm test` — confirm all tests now PASS
+    - [x] `src/routes/_authenticated/student/dashboard.tsx` — fix heading hierarchy (e.g., change `h3` to `h2` if no `h2` exists between `h1` and `h3`)
+    - [x] `src/routes/_authenticated/student/assignments/$id.tsx` — fix heading hierarchy
+    - [x] `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` — fix heading hierarchy
+    - [x] `src/routes/_authenticated/admin/templates/$templateId.tsx` — fix heading hierarchy
+    - [x] Run `pnpm test` — confirm all tests now PASS
 - [x] Task: Verify quality gates
     - [x] Run `pnpm test:coverage` (≥80% thresholds)
     - [x] Run `pnpm typecheck`
@@ -92,4 +92,11 @@
     - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
     - [x] Run `pnpm check:i18n`
 - [x] Task: Conductor - User Manual Verification 'Phase 4: E2E Tests & Documentation' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [8779f9f]
+    - Restored 9 deleted behavioral tests in `tests/unit/components/app-header.test.tsx` (menu toggle, notification open, user avatar, logout, fallback letter)
+    - Restored 2 deleted DiscussionPanel integration tests in `tests/unit/routes/_authenticated/instructor/reviews/$submissionId.test.tsx` (props verification, DOM order)
+    - Fixed unchecked sub-task checkboxes in Phase 1 and Phase 3 of plan.md
 </protect>
