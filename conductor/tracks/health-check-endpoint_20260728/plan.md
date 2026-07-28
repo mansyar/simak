@@ -51,27 +51,27 @@
 
 ## Phase 2: Deployment Integration
 
-- [ ] Task: Read spec.md and workflow.md to load context for this phase
-    - [ ] Read `conductor/tracks/health-check-endpoint_20260728/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to load context for this phase
+    - [x] Read `conductor/tracks/health-check-endpoint_20260728/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Add HEALTHCHECK to `docker/Dockerfile`
-    - [ ] Add `HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:3000/api/health || exit 1`
-    - [ ] Confirm `wget` is the correct tool (`node:22-alpine` busybox has `wget`, not `curl`)
+- [x] Task: Add HEALTHCHECK to `docker/Dockerfile`
+    - [x] Add `HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:3000/api/health || exit 1`
+    - [x] Confirm `wget` is the correct tool (`node:22-alpine` busybox has `wget`, not `curl`)
 
-- [ ] Task: Update `docs/TDD.md` deployment section
-    - [ ] Document that Coolify can use `GET /api/health` for liveness/readiness probes
-    - [ ] Note the 200/503 contract and the three checks (DB, R2, email queue depth)
+- [x] Task: Update `docs/TDD.md` deployment section
+    - [x] Document that Coolify can use `GET /api/health` for liveness/readiness probes
+    - [x] Note the 200/503 contract and the three checks (DB, R2, email queue depth)
 
-- [ ] Task: Verify quality gates
-    - [ ] Run `pnpm typecheck` — clean
-    - [ ] Run `pnpm lint` — clean
-    - [ ] Confirm `docker/Dockerfile` HEALTHCHECK uses `wget` (not `curl`)
+- [x] Task: Verify quality gates
+    - [x] Run `pnpm typecheck` — clean
+    - [x] Run `pnpm lint` — clean
+    - [x] Confirm `docker/Dockerfile` HEALTHCHECK uses `wget` (not `curl`)
 
-- [ ] Task: Commit deployment integration changes & attach git note
-    - [ ] Stage `docker/Dockerfile`, `docs/TDD.md`
-    - [ ] Commit: `chore(deploy): Add Dockerfile HEALTHCHECK and document /api/health for Coolify probes`
-    - [ ] Attach git note with task summary to the commit hash
+- [x] Task: Commit deployment integration changes & attach git note [0d636f8]
+    - [x] Stage `docker/Dockerfile`, `docs/TDD.md`
+    - [x] Commit: `chore(deploy): Add Dockerfile HEALTHCHECK and document /api/health for Coolify probes`
+    - [x] Attach git note with task summary to the commit hash
 
 - [ ] Task: Conductor - User Manual Verification 'Deployment Integration' (Protocol in workflow.md)
 </protect>
