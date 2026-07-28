@@ -807,6 +807,7 @@ export type Translation = {
     filterAll: string
     filterUnread: string
     loadMore: string
+    toasterLabel: string
     groups: {
       newReviews: string
       consultations: string

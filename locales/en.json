@@ -802,6 +802,7 @@
     "filterAll": "All",
     "filterUnread": "Unread",
     "loadMore": "Load More",
+    "toasterLabel": "Notifications",
     "groups": {
       "newReviews": "New Reviews",
       "consultations": "Consultation Updates",

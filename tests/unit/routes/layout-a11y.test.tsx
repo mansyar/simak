@@ -16,6 +16,27 @@ vi.mock('@tanstack/react-router', () => ({
     navigate: vi.fn(),
     invalidate: vi.fn(),
   }),
+  useMatchRoute: vi.fn().mockReturnValue(() => false),
+}));
+
+// Mock @tanstack/react-query (needed by useKeyboardShortcuts)
+vi.mock('@tanstack/react-query', () => ({
+  useQueryClient: vi.fn().mockReturnValue({
+    invalidateQueries: vi.fn(),
+  }),
+}));
+
+// Mock useKeyboardShortcuts
+vi.mock('@/hooks/use-keyboard-shortcuts', () => ({
+  useKeyboardShortcuts: vi.fn().mockReturnValue({
+    cheatSheetOpen: false,
+    setCheatSheetOpen: vi.fn(),
+  }),
+}));
+
+// Mock KeyboardCheatSheet
+vi.mock('@/components/keyboard-cheat-sheet', () => ({
+  KeyboardCheatSheet: () => <div data-testid="cheat-sheet-trigger" />,
 }));
 
 // Mock @tanstack/react-start
@@ -100,6 +121,16 @@ vi.mock('@/components/layout/theme-toggle', () => ({
 describe('Layout Accessibility — Landmark Structure & Skip Link', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  describe('_authenticated layout', () => {
+    it('does NOT render KeyboardCheatSheet (moved to AppHeader)', async () => {
+      const mod = await import('@/routes/_authenticated');
+      const Component = (mod.Route as any).component;
+      const { container } = render(<Component />);
+      const cheatSheet = container.querySelector('[data-testid="cheat-sheet-trigger"]');
+      expect(cheatSheet).toBeNull();
+    });
   });
 
   describe('_unauthenticated layout', () => {
