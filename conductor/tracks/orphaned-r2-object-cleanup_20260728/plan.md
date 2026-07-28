@@ -1,7 +1,7 @@
 <protect>
 # TRACK-039: Orphaned R2 Object Cleanup — Implementation Plan
 
-## Phase 1: Schema Migration & Cleanup Scanner Core
+## Phase 1: Schema Migration & Cleanup Scanner Core [checkpoint: 65c9492]
 
 - [x] Task: Read `spec.md` and `workflow.md` before starting Phase 1
     - [x] Read `conductor/tracks/orphaned-r2-object-cleanup_20260728/spec.md`
@@ -57,7 +57,7 @@
     - [x] Commit with message `chore(r2-cleanup): Add orphaned R2 object cleanup scanner with tick loop integration`
     - [x] Attach git note with task summary
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
 ## Phase 2: Manual Admin Trigger & UI
 
