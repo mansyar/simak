@@ -3,42 +3,42 @@
 
 ## Phase 1: Logger Setup
 
-- [ ] Task: Read spec.md and workflow.md to load context for this phase
-    - [ ] Read `conductor/tracks/structured-logging-observability_20260729/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to load context for this phase
+    - [x] Read `conductor/tracks/structured-logging-observability_20260729/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Install pino + pino-pretty and add LOG_LEVEL to env.ts
-    - [ ] Run `pnpm add pino` (production dependency — server-side only)
-    - [ ] Run `pnpm add -D pino-pretty` (devDependency — dev-only pretty-printer)
-    - [ ] Add `LOG_LEVEL: z.string().default('info')` to `src/config/env.ts` envSchema
-    - [ ] Add `LOG_LEVEL=info` to `.env.example` with comment
+- [x] Task: Install pino + pino-pretty and add LOG_LEVEL to env.ts
+    - [x] Run `pnpm add pino` (production dependency — server-side only)
+    - [x] Run `pnpm add -D pino-pretty` (devDependency — dev-only pretty-printer)
+    - [x] Add `LOG_LEVEL: z.string().default('info')` to `src/config/env.ts` envSchema
+    - [x] Add `LOG_LEVEL=info` to `.env.example` with comment
 
-- [ ] Task: Write failing unit tests for logger.ts (Red Phase)
-    - [ ] Create `tests/unit/lib/logger.test.ts` with `/** @vitest-environment node */`
-    - [ ] Test: logger outputs JSON in production mode (`import.meta.env.PROD = true`) — assert `JSON.parse(output)` has `level`, `time`, `pid`, `msg` fields
-    - [ ] Test: logger uses pino-pretty in dev mode (`import.meta.env.PROD = false`) — assert output is human-readable (not raw JSON)
-    - [ ] Test: `LOG_LEVEL` env var respected — `LOG_LEVEL=debug` allows debug messages, `LOG_LEVEL=error` suppresses info messages
-    - [ ] Test: `logger.info`/`logger.error`/`logger.warn` methods exist and are callable
-    - [ ] Run `pnpm test` and confirm the new tests fail as expected
+- [x] Task: Write failing unit tests for logger.ts (Red Phase)
+    - [x] Create `tests/unit/lib/logger.test.ts` with `/** @vitest-environment node */`
+    - [x] Test: logger outputs JSON in production mode (`import.meta.env.PROD = true`) — assert `JSON.parse(output)` has `level`, `time`, `pid`, `msg` fields
+    - [x] Test: logger uses pino-pretty in dev mode (`import.meta.env.PROD = false`) — assert output is human-readable (not raw JSON)
+    - [x] Test: `LOG_LEVEL` env var respected — `LOG_LEVEL=debug` allows debug messages, `LOG_LEVEL=error` suppresses info messages
+    - [x] Test: `logger.info`/`logger.error`/`logger.warn` methods exist and are callable
+    - [x] Run `pnpm test` and confirm the new tests fail as expected
 
-- [ ] Task: Implement logger.ts (Green Phase)
-    - [ ] Create `src/lib/logger.ts` — singleton pino instance
-    - [ ] Configure: `import.meta.env.PROD` → JSON to stdout; dev → `pino-pretty` transport to stdout
-    - [ ] Use `getEnv().LOG_LEVEL` for log level (default `info`)
-    - [ ] Export `logger` instance and `Logger` type
-    - [ ] Run `pnpm test` and confirm all tests now pass
+- [x] Task: Implement logger.ts (Green Phase)
+    - [x] Create `src/lib/logger.ts` — singleton pino instance
+    - [x] Configure: `import.meta.env.PROD` → JSON to stdout; dev → `pino-pretty` transport to stdout
+    - [x] Use `getEnv().LOG_LEVEL` for log level (default `info`)
+    - [x] Export `logger` instance and `Logger` type
+    - [x] Run `pnpm test` and confirm all tests now pass
 
-- [ ] Task: Verify coverage & quality gates
-    - [ ] Run `pnpm test:coverage` — confirm ≥80% on lines, statements, branches, functions
-    - [ ] Run `pnpm typecheck` — clean
-    - [ ] Run `pnpm lint` — clean
-    - [ ] Confirm `src/lib/logger.ts` is under 500 lines
-    - [ ] Run `pnpm check:i18n` — clean (no i18n changes expected)
+- [x] Task: Verify coverage & quality gates
+    - [x] Run `pnpm test:coverage` — confirm ≥80% on lines, statements, branches, functions
+    - [x] Run `pnpm typecheck` — clean
+    - [x] Run `pnpm lint` — clean
+    - [x] Confirm `src/lib/logger.ts` is under 500 lines
+    - [x] Run `pnpm check:i18n` — clean (no i18n changes expected)
 
-- [ ] Task: Commit code changes & attach git note
-    - [ ] Stage `package.json`, `pnpm-lock.yaml`, `src/config/env.ts`, `src/lib/logger.ts`, `tests/unit/lib/logger.test.ts`, `.env.example`
-    - [ ] Commit: `feat(logging): Add pino structured logger with env-based config`
-    - [ ] Attach git note with task summary to the commit hash
+- [x] Task: Commit code changes & attach git note (e279d8e)
+    - [x] Stage `package.json`, `pnpm-lock.yaml`, `src/config/env.ts`, `src/lib/logger.ts`, `tests/unit/lib/logger.test.ts`, `.env.example`
+    - [x] Commit: `feat(logging): Add pino structured logger with env-based config`
+    - [x] Attach git note with task summary to the commit hash
 
 - [ ] Task: Conductor - User Manual Verification 'Logger Setup' (Protocol in workflow.md)
 
