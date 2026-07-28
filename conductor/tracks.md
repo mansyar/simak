@@ -8,6 +8,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: TRACK-036: Developer Experience & Tooling Hygiene**
-*Link: [./tracks/developer-experience-tooling-hygiene_20260728/](./tracks/developer-experience-tooling-hygiene_20260728/)*
-
