@@ -23,6 +23,7 @@ const mockSearch = vi.hoisted(() => ({
 }));
 
 const mockRetryEmail = vi.hoisted(() => vi.fn());
+const mockTriggerR2Cleanup = vi.hoisted(() => vi.fn());
 
 vi.mock('@tanstack/react-start/server', () => ({
   getRequestHeaders: vi.fn().mockReturnValue(new Headers()),
@@ -53,6 +54,10 @@ vi.mock('@/server/email-queue', () => ({
   retryEmail: mockRetryEmail,
 }));
 
+vi.mock('@/server/r2-cleanup', () => ({
+  triggerR2Cleanup: mockTriggerR2Cleanup,
+}));
+
 vi.mock('@/routes/__root', () => ({
   useI18n: vi.fn().mockReturnValue({
     t: vi.fn().mockImplementation((key: string) => key),
@@ -79,6 +84,7 @@ describe('Admin Email Queue page', () => {
   beforeEach(() => {
     mockRouter.invalidate.mockClear();
     mockRetryEmail.mockClear();
+    mockTriggerR2Cleanup.mockClear();
     mockData.entries = [];
     mockData.total = 0;
     mockData.page = 1;
@@ -350,6 +356,28 @@ describe('Admin Email Queue page', () => {
       expect(cardElements.length).toBeGreaterThan(0);
       const tableCard = cardElements.find((el) => el.querySelector('table'));
       expect(tableCard).toBeTruthy();
+    });
+
+    it('should render Trigger R2 Cleanup button', async () => {
+      const Component = await getComponent();
+      render(<Component />);
+      expect(
+        screen.getByRole('button', { name: 'adminEmailQueue.r2Cleanup.trigger' }),
+      ).toBeInTheDocument();
+    });
+
+    it('should call triggerR2Cleanup and show success toast on click', async () => {
+      mockTriggerR2Cleanup.mockResolvedValueOnce({ deleted: 3, failed: 1, batchSize: 4 });
+      const { toast } = await import('sonner');
+      const Component = await getComponent();
+      render(<Component />);
+      fireEvent.click(screen.getByRole('button', { name: 'adminEmailQueue.r2Cleanup.trigger' }));
+      await waitFor(() => {
+        expect(mockTriggerR2Cleanup).toHaveBeenCalledWith({ data: {} });
+      });
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('adminEmailQueue.r2Cleanup.success');
+      });
     });
   });
 });

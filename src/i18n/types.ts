@@ -189,6 +189,11 @@ export type Translation = {
     retrySuccess: string
     empty: string
     emptyFiltered: string
+    r2Cleanup: {
+      trigger: string
+      success: string
+      error: string
+    }
   }
   adminUsers: {
     title: string

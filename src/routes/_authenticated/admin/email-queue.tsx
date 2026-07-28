@@ -1,10 +1,12 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { listEmailQueue, retryEmail } from '@/server/email-queue';
+import { triggerR2Cleanup } from '@/server/r2-cleanup';
 import type { EmailQueueEntry } from '@/server/email-queue';
 import { useI18n } from '../../__root';
 import { PageHeader } from '@/components/ui/page-header';
 import { RefreshButton } from '@/components/ui/refresh-button';
+import { Button } from '@/components/ui/button';
 import { EmailQueueSummaryCards } from '@/components/admin/email-queue/EmailQueueSummaryCards';
 import { EmailQueueFilters } from '@/components/admin/email-queue/EmailQueueFilters';
 import { EmailQueueTable } from '@/components/admin/email-queue/EmailQueueTable';
@@ -54,6 +56,7 @@ function EmailQueuePage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [retryTarget, setRetryTarget] = useState<EmailQueueEntry | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [isCleaningR2, setIsCleaningR2] = useState(false);
 
   const totalPages = Math.ceil(listData.total / LIMIT);
 
@@ -63,6 +66,23 @@ function EmailQueuePage() {
     setIsRefreshing(true);
     await router.invalidate();
     setIsRefreshing(false);
+  };
+
+  const handleR2Cleanup = async () => {
+    setIsCleaningR2(true);
+    const result = await triggerR2Cleanup({ data: {} });
+    if (isServerError(result)) {
+      toast.error(t('adminEmailQueue.r2Cleanup.error'));
+    } else {
+      toast.success(
+        t('adminEmailQueue.r2Cleanup.success', {
+          deleted: String(result.deleted),
+          failed: String(result.failed),
+          batchSize: String(result.batchSize),
+        }),
+      );
+    }
+    setIsCleaningR2(false);
   };
 
   const handleSearchChange = (value: string) => {
@@ -106,7 +126,14 @@ function EmailQueuePage() {
       <PageHeader
         title={t('adminEmailQueue.title')}
         subtitle={t('adminEmailQueue.subtitle')}
-        action={<RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />}
+        action={
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleR2Cleanup} disabled={isCleaningR2}>
+              {t('adminEmailQueue.r2Cleanup.trigger')}
+            </Button>
+            <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />
+          </div>
+        }
       />
 
       <EmailQueueSummaryCards summary={listData.summary} />
