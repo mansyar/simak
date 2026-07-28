@@ -3,7 +3,7 @@
 
 ## Phase 0: Investigation & Test Baseline
 
-- [x] Task: Confirm exact `region` violating node and check for duplicate `id="main-content"`
+- [x] Task: Confirm exact `region` violating node and check for duplicate `id="main-content"` [f7a2d12]
     - [x] Check `src/routes/_unauthenticated/auth/setup-password.tsx` for `id="main-content"` (login.tsx already has it on a `<div>` — must avoid duplicate IDs when adding to `<main>`)
     - [x] Inspect `src/routes/_authenticated.tsx` KeyboardCheatSheet integration — understand `isOpen` state management and `isReviewPage` prop passing to determine best relocation strategy
     - [x] Verify landing page (`src/routes/index.tsx`) has no `<main>` landmark (confirmed — only `<section>`, `<footer>`, `<nav>`)
