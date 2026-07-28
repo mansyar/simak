@@ -58,4 +58,4 @@
     - [x] Run `pnpm check:i18n` — parity maintained
     - [x] Verify all files under 500 lines (audit-log.ts: 31 lines, audit-log.server.ts: 155 lines)
     - [x] Verify circular dependency chains are all type-only (no runtime value imports remaining)
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Naming + Circular Deps' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Naming + Circular Deps' (Protocol in workflow.md)
