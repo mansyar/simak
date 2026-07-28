@@ -1338,7 +1338,9 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 
 - Radix UI primitives provide built-in ARIA attributes for dialogs, selects, dropdowns, and other interactive components.
 - Keyboard navigation for all interactive elements — Tab order is logical across all pages.
-- Focus management: focus trapping in dialogs and sheets on open, focus return on close, skip-to-content link as first focusable element.
+- Focus management: focus trapping in dialogs and sheets on open, focus return on close, skip-to-content link as first focusable element. The skip-to-content link targets `#main-content` — every page has a `<main id="main-content" tabIndex={-1}>` element that receives focus when the skip link is activated (TRACK-037).
+- **Landmark structure (TRACK-037):** Every page has exactly one `<main>` landmark. Role layouts (`student.tsx`, `instructor.tsx`, `admin.tsx`) have `<main id="main-content" tabIndex={-1}>` wrapping page content. The `_unauthenticated.tsx` layout wraps `<Outlet />` in `<main id="main-content" tabIndex={-1}>`. The landing page (`index.tsx`) uses `<main id="main-content" tabIndex={-1}>` as its outer container.
+- **Region content containment (TRACK-037):** All interactive content is contained within HTML landmarks. The `KeyboardCheatSheet` trigger button is rendered inside the `AppHeader` `<header>` landmark (moved from `_authenticated.tsx` where it was rendered outside any landmark). The sonner `<Toaster>` exposes an `aria-label` (via i18n key `notifications.toasterLabel`) so screen readers can identify the notification region.
 - `focus-visible:` ring classes on all interactive elements (only visible on keyboard navigation, not mouse clicks).
 - Touch targets minimum 44×44px (`min-h-11 min-w-11`) on all buttons, links, and interactive elements for mobile accessibility.
 - `aria-hidden="true"` on all decorative icons (sidebar nav icons, notification bell icons) to hide them from screen readers. Also applied to purely-visual connector lines and dots in the `CheckpointTimeline` (Track: Accessibility & i18n Compliance).
@@ -1347,7 +1349,7 @@ All UI built on shadcn/ui primitives (Radix UI wrappers). Components used by cat
 - `role="progressbar"` with `aria-valuenow`/`aria-valuemin`/`aria-valuemax`/`aria-label` on all progress bars: `ProgressTable` (per-student completion), `ConsultationProgress` (summary + per-checkpoint verified/required bars) (Track: Accessibility & i18n Compliance).
 - `aria-expanded` + `aria-controls` on the `DeadlineManager` collapsible toggle buttons, with matching `id` on the expandable content div (Track: Accessibility & i18n Compliance).
 - `aria-describedby` on form inputs pointing to error message elements for screen reader association.
-- Heading hierarchy: every page has exactly one `h1`, heading levels don't skip (h1 → h2 → h3).
+- Heading hierarchy: every page has exactly one `h1`, heading levels don't skip (h1 → h2 → h3). Enforced across all pages — 9 components/pages had heading level skips remediated in TRACK-037 (StudentDashboard, CheckpointTimeline, CheckpointCard, ExtensionHistoryList, DiscussionPanel, TemplateDangerZone, TemplateDetailPage, student assignment detail, instructor review detail).
 - Color contrast meets WCAG 2.1 AA minimum (4.5:1 for normal text, 3:1 for large text).
 - Semantic color system: success (green), warning (amber), error (red), info (blue) for status badges and indicators.
 
