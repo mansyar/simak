@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
-import { listAuditLogs } from '@/server/audit-logs';
+import { listAuditLogs } from '@/server/audit-log';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';

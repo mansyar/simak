@@ -19,7 +19,7 @@ vi.mock('@tanstack/react-router', () => ({
   useRouter: () => ({ invalidate: vi.fn() }),
 }));
 
-vi.mock('@/server/audit-logs', () => ({
+vi.mock('@/server/audit-log', () => ({
   listAuditLogs: vi.fn(),
 }));
 

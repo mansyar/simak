@@ -71,7 +71,7 @@ Students and instructors lack a centralized system to:
 - **DB migration** — Generated with Drizzle Kit, applied to dev database
 - **logAuditEvent helper** (`src/lib/audit.ts`) — Single-import helper used across all handlers to write to audit_log
 - **Handler wiring** — All handlers log audit events: user.created/deleted, template.created/updated/deleted, assignment.created, review.passed/revised, consultation.verified/rejected
-- **Server functions** — `listAuditLogs` (paginated with filters) and `getAuditLogDetail` in `src/server/audit-logs.ts` and `audit-logs.server.ts`
+- **Server functions** — `listAuditLogs` (paginated with filters) and `getAuditLogDetail` in `src/server/audit-log.ts` and `audit-log.server.ts`
 - **Admin audit log viewer** (`/admin/audit-log`) — Paginated table with Timestamp, Action badge, Actor, Entity Type, Entity ID, expandable Details JSON; filters by action type dropdown, date range pickers, free-text search
 - **Sidebar link** — 'Audit Log' link with ScrollText icon in admin sidebar
 - **i18n translations** — Full English and Indonesian translations for audit log UI including action type labels

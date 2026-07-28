@@ -3,6 +3,7 @@ pre-commit:
   commands:
     lint:
       glob: "*.{js,jsx,ts,tsx}"
+      exclude: "{tests,scripts}/**"
       run: pnpm exec oxlint --fix {staged_files}
       stage_fixed: true
     format:

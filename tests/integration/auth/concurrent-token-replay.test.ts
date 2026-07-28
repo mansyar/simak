@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 import { verifyPassword } from 'better-auth/crypto';
 import { getDb } from '@/db/index';
 import { users, verification, account } from '@/db/schema/index';
-import { completePasswordSetupHandler } from '@/server/setup-password';
+import { completePasswordSetupHandler } from '@/server/setup-password.server';
 
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: vi.fn().mockReturnValue({
@@ -98,7 +98,7 @@ describe('completePasswordSetupHandler atomic token consumption', () => {
       data: { token, password: passwordA },
     });
 
-    expect(result).toEqual({ error: 'Invalid or expired token' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Invalid or expired token' } });
 
     const remainingTokens = await db
       .select({ id: verification.id })
@@ -119,7 +119,7 @@ describe('completePasswordSetupHandler atomic token consumption', () => {
       data: { token, password: passwordA },
     });
 
-    expect(result).toEqual({ error: 'Internal Server Error' });
+    expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
 
     const remainingTokens = await db
       .select({ id: verification.id })
@@ -144,7 +144,7 @@ describe('completePasswordSetupHandler atomic token consumption', () => {
     const second = await completePasswordSetupHandler({
       data: { token, password: passwordB },
     });
-    expect(second).toEqual({ error: 'Invalid or expired token' });
+    expect(second).toEqual({ error: { code: 'NOT_FOUND', message: 'Invalid or expired token' } });
 
     const remainingTokens = await db
       .select({ id: verification.id })
