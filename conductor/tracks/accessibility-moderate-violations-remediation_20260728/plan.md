@@ -12,14 +12,14 @@
 
 ## Phase 1: Fix `landmark-one-main` + `skip-link` (Landmark Structure & Skip Link Targets)
 
-- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
-- [ ] Task: Write failing unit tests for landmark structure and skip link targets (Red Phase)
-    - [ ] Create `tests/unit/routes/layout-a11y.test.tsx` — test that `_unauthenticated.tsx` renders a `<main id="main-content" tabindex="-1">` wrapping the Outlet
-    - [ ] Add test that role layouts (`student.tsx`, `instructor.tsx`, `admin.tsx`) render `<main id="main-content" tabindex="-1">`
-    - [ ] Add test that landing page (`index.tsx`) renders a `<main>` landmark
-    - [ ] Add test that `login.tsx` does NOT have a duplicate `id="main-content"` on a `<div>` (must be removed)
-    - [ ] Run `pnpm test` — confirm new tests FAIL as expected
-- [ ] Task: Implement landmark and skip link fixes (Green Phase)
+- [x] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
+- [x] Task: Write failing unit tests for landmark structure and skip link targets (Red Phase)
+    - [x] Create `tests/unit/routes/layout-a11y.test.tsx` — test that `_unauthenticated.tsx` renders a `<main id="main-content" tabindex="-1">` wrapping the Outlet
+    - [x] Add test that role layouts (`student.tsx`, `instructor.tsx`, `admin.tsx`) render `<main id="main-content" tabindex="-1">`
+    - [x] Add test that landing page (`index.tsx`) renders a `<main>` landmark
+    - [x] Add test that `login.tsx` does NOT have a duplicate `id="main-content"` on a `<div>` (must be removed)
+    - [x] Run `pnpm test` — confirm new tests FAIL as expected
+- [x] Task: Implement landmark and skip link fixes (Green Phase) [d1e8993]
     - [ ] `src/routes/_unauthenticated.tsx` — wrap `<Outlet />` in `<main id="main-content" tabindex="-1" className="...">`
     - [ ] `src/routes/_authenticated/student.tsx` — add `id="main-content"` and `tabindex="-1"` to existing `<main>`
     - [ ] `src/routes/_authenticated/instructor.tsx` — add `id="main-content"` and `tabindex="-1"` to existing `<main>`
@@ -86,10 +86,10 @@
     - [ ] Mark `region` as remediated
     - [ ] Mark `heading-order` as remediated
     - [ ] Add remediation date and track reference (TRACK-037)
-- [ ] Task: Verify quality gates
-    - [ ] Run `pnpm test:coverage` (≥80% thresholds)
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint`
-    - [ ] Run `pnpm check:i18n`
+- [x] Task: Verify quality gates
+    - [x] Run `pnpm test:coverage` (≥80% thresholds)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n`
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: E2E Tests & Documentation' (Protocol in workflow.md)
 </protect>
