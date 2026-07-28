@@ -1,6 +1,11 @@
+<protect>
 # Implementation Plan: TRACK-038 — Health Check Endpoint
 
 ## Phase 1: Health Check Module & Route (TDD)
+
+- [ ] Task: Read spec.md and workflow.md to load context for this phase
+    - [ ] Read `conductor/tracks/health-check-endpoint_20260728/spec.md`
+    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
 - [ ] Task: Write failing unit tests for the health check logic (Red Phase)
     - [ ] Create `tests/unit/server/health.server.test.ts` starting with `/** @vitest-environment node */`
@@ -46,6 +51,10 @@
 
 ## Phase 2: Deployment Integration
 
+- [ ] Task: Read spec.md and workflow.md to load context for this phase
+    - [ ] Read `conductor/tracks/health-check-endpoint_20260728/spec.md`
+    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+
 - [ ] Task: Add HEALTHCHECK to `docker/Dockerfile`
     - [ ] Add `HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:3000/api/health || exit 1`
     - [ ] Confirm `wget` is the correct tool (`node:22-alpine` busybox has `wget`, not `curl`)
@@ -65,3 +74,4 @@
     - [ ] Attach git note with task summary to the commit hash
 
 - [ ] Task: Conductor - User Manual Verification 'Deployment Integration' (Protocol in workflow.md)
+</protect>

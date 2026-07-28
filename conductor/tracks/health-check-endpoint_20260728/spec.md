@@ -1,3 +1,4 @@
+<protect>
 # TRACK-038: Health Check Endpoint
 
 ## Overview
@@ -101,3 +102,4 @@ The `runHealthChecks()` function in `src/server/health.server.ts` runs three che
 - Database migration check (pending migrations count) — separate concern.
 - Rate limiting on the health endpoint — public endpoint, simple enough not to need protection.
 - Uptime, commit hash, or build ID in the response — only `timestamp` + `version`.
+</protect>
