@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: Developer Experience & Tooling Hygiene
 
-## Phase 1: Configuration Alignment
+## Phase 1: Configuration Alignment [checkpoint: pending]
 
 - [x] Task: Read `spec.md` and `workflow.md` to establish context
     - [x] Read `./spec.md` for track requirements and acceptance criteria
@@ -25,7 +25,7 @@
     - [ ] Stage `lefthook.yml`, `package.json`, `AGENTS.md` + any formatting fixes in `tests/`/`scripts/`
     - [ ] Commit with message `chore(tooling): Align lefthook/package.json format, lint, typecheck configs`
     - [ ] Attach git note with task summary
-- [ ] Task: Conductor - User Manual Verification 'Configuration Alignment' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Configuration Alignment' (Protocol in workflow.md)
 
 ## Phase 2: SocratiCode Context Artifacts
 
