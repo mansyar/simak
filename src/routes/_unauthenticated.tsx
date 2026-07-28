@@ -9,5 +9,9 @@ export const Route = createFileRoute('/_unauthenticated')({
       throw redirect({ to: getRoleDashboard(session.user.role) as unknown as '.' });
     }
   },
-  component: () => <Outlet />,
+  component: () => (
+    <main id="main-content" tabIndex={-1}>
+      <Outlet />
+    </main>
+  ),
 });
