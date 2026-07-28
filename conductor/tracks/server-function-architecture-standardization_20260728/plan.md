@@ -12,7 +12,7 @@
 
 ## Phase 2: setup-password.ts Two-File Split Refactor
 
-- [ ] Task: Write failing tests for the new two-file split pattern (Red Phase)
+- [x] Task: Write failing tests for the new two-file split pattern (Red Phase)
     - [ ] Locate existing test file for setup-password (check `tests/unit/server/setup-password.test.ts` or equivalent)
     - [ ] Update/create test file with `/** @vitest-environment node */` header
     - [ ] Mock `@tanstack/react-start` with `typedServerFn` builder chain (matching canonical pattern from `tests/unit/server/submissions.test.ts`)
@@ -20,7 +20,7 @@
     - [ ] Write tests asserting `serverError()` return type on error cases (invalid token, expired token, user not found)
     - [ ] Write tests asserting success case returns correct shape
     - [ ] Run `pnpm test` and confirm new/updated tests fail as expected
-- [ ] Task: Implement the two-file split (Green Phase)
+- [x] Task: Implement the two-file split (Green Phase)
     - [ ] Create `src/server/setup-password.server.ts` with `completePasswordSetupHandler` using `serverError(ErrorCode.X, message)` from `src/lib/errors.ts`
     - [ ] Refactor `src/server/setup-password.ts` to stub-only: Zod schema + `typedServerFn` stub with dynamic import of handler
     - [ ] Add `logError` calls for structured error logging on failure paths

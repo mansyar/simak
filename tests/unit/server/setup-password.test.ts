@@ -1,6 +1,9 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { completePasswordSetupHandler, type PasswordSetupResult } from '@/server/setup-password';
+import {
+  completePasswordSetupHandler,
+  type PasswordSetupResult,
+} from '@/server/setup-password.server';
 
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: vi.fn().mockReturnValue({
@@ -9,23 +12,25 @@ vi.mock('@tanstack/react-start', () => ({
   }),
 }));
 
-const mockTx = {
-  select: vi.fn().mockReturnThis(),
-  from: vi.fn().mockReturnThis(),
-  where: vi.fn().mockReturnThis(),
-  limit: vi.fn().mockReturnThis(),
-  returning: vi.fn().mockReturnThis(),
-  then: vi.fn(),
-  insert: vi.fn().mockReturnThis(),
-  values: vi.fn().mockReturnThis(),
-  update: vi.fn().mockReturnThis(),
-  set: vi.fn().mockReturnThis(),
-  delete: vi.fn().mockReturnThis(),
-};
-
-const mockDb = {
-  transaction: vi.fn(async (callback) => callback(mockTx)),
-};
+const { mockTx, mockDb } = vi.hoisted(() => {
+  const mockTx = {
+    select: vi.fn().mockReturnThis(),
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    returning: vi.fn().mockReturnThis(),
+    then: vi.fn(),
+    insert: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+  };
+  const mockDb = {
+    transaction: vi.fn(async (callback: any) => callback(mockTx)),
+  };
+  return { mockTx, mockDb };
+});
 
 vi.mock('@/db/index', () => ({
   getDb: vi.fn().mockReturnValue(mockDb),
@@ -49,7 +54,7 @@ vi.mock('better-auth/crypto', () => ({
 }));
 
 vi.mock('node:crypto', () => ({
-  default: { randomUUID: vi.fn().mockReturnValue('random-uuid') },
+  randomUUID: vi.fn().mockReturnValue('random-uuid'),
 }));
 
 describe('completePasswordSetupHandler', () => {
@@ -60,7 +65,9 @@ describe('completePasswordSetupHandler', () => {
 
   it('should reject invalid token or password', async () => {
     const result = await completePasswordSetupHandler({ data: { token: '', password: 'short' } });
-    expect(result).toEqual({ error: 'Invalid token or password' });
+    expect(result).toEqual({
+      error: { code: 'BAD_REQUEST', message: 'Invalid token or password' },
+    });
   });
 
   it('should atomically consume the token and complete setup', async () => {
@@ -90,7 +97,7 @@ describe('completePasswordSetupHandler', () => {
       data: { token: 'used-token', password: 'securepassword' },
     });
 
-    expect(result).toEqual({ error: 'Invalid or expired token' });
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Invalid or expired token' } });
   });
 
   it('should return an internal error when the transaction fails', async () => {
@@ -100,7 +107,7 @@ describe('completePasswordSetupHandler', () => {
       data: { token: 'valid-token', password: 'securepassword' },
     });
 
-    expect(result).toEqual({ error: 'Internal Server Error' });
+    expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
   });
 
   it('should roll back and return an internal error when the user is not found', async () => {
@@ -112,6 +119,6 @@ describe('completePasswordSetupHandler', () => {
       data: { token: 'valid-token', password: 'securepassword' },
     });
 
-    expect(result).toEqual({ error: 'Internal Server Error' });
+    expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
   });
 });

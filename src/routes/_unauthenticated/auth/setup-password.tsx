@@ -50,7 +50,7 @@ function SetupPasswordPage() {
     try {
       const result = await completePasswordSetup({ data: { token, password } });
       if ('error' in result) {
-        setError(result.error);
+        setError(result.error.message);
       } else {
         setSuccess(true);
       }
