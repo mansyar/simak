@@ -463,7 +463,9 @@ describe('DeadlineManager', () => {
     });
 
     it('should rollback on server error ({ success: false }) for unlock', async () => {
-      mockUnlockCheckpoint.mockResolvedValue({ success: false, error: 'Server rejected' });
+      mockUnlockCheckpoint.mockResolvedValue({
+        error: { code: 'INTERNAL', message: 'Server rejected' },
+      });
       setup();
 
       clickUnlock();
@@ -475,7 +477,9 @@ describe('DeadlineManager', () => {
     });
 
     it('should rollback on server error ({ success: false }) for extend', async () => {
-      mockExtendDeadline.mockResolvedValue({ success: false, error: 'Server rejected' });
+      mockExtendDeadline.mockResolvedValue({
+        error: { code: 'INTERNAL', message: 'Server rejected' },
+      });
       setup();
 
       clickExtend();

@@ -134,7 +134,7 @@ describe('StudentDashboard - shared formatDate (UX-20)', () => {
 
   it('uses formatDate for consultation reminders with locale and short style', async () => {
     const { StudentDashboard } = await import('@/components/dashboard/StudentDashboard');
-    const consultationDate = '2026-07-01T10:00:00Z';
+    const consultationDate = new Date('2026-07-01T10:00:00Z');
     render(
       <StudentDashboard
         data={{

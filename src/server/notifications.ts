@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in notifications.server.ts
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const CreateNotificationSchema = z.object({
@@ -20,7 +20,7 @@ export const ListNotificationsSchema = z.object({
   unreadOnly: z.boolean().optional(),
 });
 
-export const createNotification = createServerFn({ method: 'POST' }).handler(
+export const createNotification = typedServerFn({ method: 'POST' }).handler(
   async (args: { data: unknown }) => {
     const { createNotificationHandler } = await import('./notifications.server');
     const data = CreateNotificationSchema.parse(args.data);
@@ -28,7 +28,7 @@ export const createNotification = createServerFn({ method: 'POST' }).handler(
   },
 );
 
-export const listNotifications = createServerFn({ method: 'GET' }).handler(
+export const listNotifications = typedServerFn({ method: 'GET' }).handler(
   async (args: { data: unknown }) => {
     const { listNotificationsHandler } = await import('./notifications.server');
     const data = ListNotificationsSchema.parse(args.data);
@@ -46,7 +46,7 @@ export const MarkAllReadSchema = z.object({});
 
 export const GetUnreadCountSchema = z.object({});
 
-export const markRead = createServerFn({ method: 'POST' }).handler(
+export const markRead = typedServerFn({ method: 'POST' }).handler(
   async (args: { data: unknown }) => {
     const { markReadHandler } = await import('./notifications.server');
     const data = MarkReadSchema.parse(args.data);
@@ -54,7 +54,7 @@ export const markRead = createServerFn({ method: 'POST' }).handler(
   },
 );
 
-export const markAllRead = createServerFn({ method: 'POST' }).handler(
+export const markAllRead = typedServerFn({ method: 'POST' }).handler(
   async (args: { data: unknown }) => {
     const { markAllReadHandler } = await import('./notifications.server');
     const data = MarkAllReadSchema.parse(args.data);
@@ -62,7 +62,7 @@ export const markAllRead = createServerFn({ method: 'POST' }).handler(
   },
 );
 
-export const getUnreadCount = createServerFn({ method: 'GET' }).handler(
+export const getUnreadCount = typedServerFn({ method: 'GET' }).handler(
   async (args: { data: unknown }) => {
     const { getUnreadCountHandler } = await import('./notifications.server');
     const data = GetUnreadCountSchema.parse(args.data);

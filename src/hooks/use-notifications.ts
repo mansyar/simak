@@ -4,28 +4,17 @@ import { useI18n } from '@/routes/__root';
 import { parseServerError, showErrorToast } from '@/lib/toast';
 import { notificationKeys } from '@/lib/query-keys';
 
-function handleServerError<T extends { error?: unknown }>(
-  res: T,
-  t: ReturnType<typeof useI18n>['t'],
-) {
-  if ('error' in res) {
-    const parsed = parseServerError(res);
-    showErrorToast(parsed.code, t);
-    throw new Error(parsed.message);
-  }
-}
-
 export function useUnreadCount() {
   const { t } = useI18n();
   return useQuery({
     queryKey: notificationKeys.unreadCount(),
     queryFn: async () => {
-      const res = await (
-        getUnreadCount as unknown as (args: {
-          data: Record<string, never>;
-        }) => Promise<{ count: number; error?: { code: string; message: string } }>
-      )({ data: {} });
-      handleServerError(res, t);
+      const res = await getUnreadCount({ data: {} });
+      if ('error' in res) {
+        const parsed = parseServerError(res);
+        showErrorToast(parsed.code, t);
+        throw new Error(parsed.message);
+      }
       return res.count;
     },
     refetchInterval: 30000,
@@ -41,16 +30,12 @@ export function useNotificationsList(
   return useInfiniteQuery({
     queryKey: notificationKeys.list({ limit, type, unreadOnly }),
     queryFn: async ({ pageParam }: { pageParam: number }) => {
-      const res = await (
-        listNotifications as unknown as (args: {
-          data: { page: number; limit: number; type?: string; unreadOnly?: boolean };
-        }) => Promise<{
-          items: unknown[];
-          total: number;
-          error?: { code: string; message: string };
-        }>
-      )({ data: { page: pageParam, limit, type, unreadOnly } });
-      handleServerError(res, t);
+      const res = await listNotifications({ data: { page: pageParam, limit, type, unreadOnly } });
+      if ('error' in res) {
+        const parsed = parseServerError(res);
+        showErrorToast(parsed.code, t);
+        throw new Error(parsed.message);
+      }
       return res;
     },
     initialPageParam: 1,
@@ -67,11 +52,7 @@ export function useMarkRead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (notificationId: number) => {
-      const res = await (
-        markRead as unknown as (args: {
-          data: { notificationId: number };
-        }) => Promise<{ error?: { code: string; message: string } }>
-      )({ data: { notificationId } });
+      const res = await markRead({ data: { notificationId } });
       if ('error' in res) {
         const parsed = parseServerError(res);
         const error = new Error(parsed.message) as Error & { code: string };
@@ -131,11 +112,7 @@ export function useMarkAllRead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      const res = await (
-        markAllRead as unknown as (args: {
-          data: Record<string, never>;
-        }) => Promise<{ error?: { code: string; message: string } }>
-      )({ data: {} });
+      const res = await markAllRead({ data: {} });
       if ('error' in res) {
         const parsed = parseServerError(res);
         const error = new Error(parsed.message) as Error & { code: string };

@@ -25,17 +25,15 @@ export async function pruneOldEmails(): Promise<{ deleted: number }> {
   // Drizzle's delete() return type doesn't expose rowCount; cast to access it
   const sentResult = (await db
     .delete(emailQueue)
-    .where(
-      and(eq(emailQueue.status, 'sent'), lt(emailQueue.createdAt, sentThreshold)),
-    )) as unknown as {
+    .where(and(eq(emailQueue.status, 'sent'), lt(emailQueue.createdAt, sentThreshold)))) as {
     rowCount?: number;
   };
 
   const failedResult = (await db
     .delete(emailQueue)
-    .where(
-      and(eq(emailQueue.status, 'failed'), lt(emailQueue.createdAt, failedThreshold)),
-    )) as unknown as { rowCount?: number };
+    .where(and(eq(emailQueue.status, 'failed'), lt(emailQueue.createdAt, failedThreshold)))) as {
+    rowCount?: number;
+  };
 
   const deleted = (sentResult?.rowCount ?? 0) + (failedResult?.rowCount ?? 0);
 

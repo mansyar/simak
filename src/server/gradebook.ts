@@ -1,6 +1,6 @@
-// Gradebook server function stubs — Zod schemas + createServerFn definitions.
+// Gradebook server function stubs — Zod schemas + typedServerFn definitions.
 // Handler implementations live in gradebook.server.ts (server-only, never client-bundled).
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 // ---- Schemas ----
@@ -52,28 +52,28 @@ export const RecomputeAllGradesSchema = z.object({
 
 // ---- Server Function Stubs ----
 
-export const getStudentFinalGrade = createServerFn({ method: 'GET' })
+export const getStudentFinalGrade = typedServerFn({ method: 'GET' })
   .inputValidator(GetStudentFinalGradeSchema)
   .handler(async ({ data }) => {
     const { getStudentFinalGradeHandler } = await import('./gradebook.server');
     return getStudentFinalGradeHandler({ data });
   });
 
-export const getAssignmentGradebook = createServerFn({ method: 'GET' })
+export const getAssignmentGradebook = typedServerFn({ method: 'GET' })
   .inputValidator(GetAssignmentGradebookSchema)
   .handler(async ({ data }) => {
     const { getAssignmentGradebookHandler } = await import('./gradebook.server');
     return getAssignmentGradebookHandler({ data });
   });
 
-export const saveGradeConfig = createServerFn({ method: 'POST' })
+export const saveGradeConfig = typedServerFn({ method: 'POST' })
   .inputValidator(SaveGradeConfigSchema)
   .handler(async ({ data }) => {
     const { saveGradeConfigHandler } = await import('./gradebook.server');
     return saveGradeConfigHandler({ data });
   });
 
-export const recomputeAllGrades = createServerFn({ method: 'POST' })
+export const recomputeAllGrades = typedServerFn({ method: 'POST' })
   .inputValidator(RecomputeAllGradesSchema)
   .handler(async ({ data }) => {
     const { recomputeAllGradesHandler } = await import('./gradebook.server');

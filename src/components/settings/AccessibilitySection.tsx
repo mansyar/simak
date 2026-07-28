@@ -12,7 +12,7 @@ export function AccessibilitySection() {
   const { data, isLoading } = useQuery({
     queryKey: settingsKeys.accessibility(),
     queryFn: async () => {
-      const result = await (getCurrentUser as unknown as () => Promise<unknown>)();
+      const result = await getCurrentUser();
       return result as {
         user: { id: string; name: string; email: string; image: string | null } | null;
         settings: { reducedMotion?: boolean } | null;
@@ -25,11 +25,7 @@ export function AccessibilitySection() {
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (args: { reducedMotion: boolean }) => {
-      const result = await (
-        updateUserSettings as unknown as (args: {
-          data: { reducedMotion: boolean };
-        }) => Promise<unknown>
-      )({ data: { reducedMotion: args.reducedMotion } });
+      const result = await updateUserSettings({ data: { reducedMotion: args.reducedMotion } });
       return result as { reducedMotion?: boolean; error?: string };
     },
     onSuccess: () => {

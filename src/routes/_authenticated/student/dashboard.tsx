@@ -1,11 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getStudentDashboardData } from '@/server/dashboard';
 import { useI18n } from '../../__root';
-import {
-  StudentDashboard,
-  type StudentDashboardData,
-} from '@/components/dashboard/StudentDashboard';
+import { StudentDashboard } from '@/components/dashboard/StudentDashboard';
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
+import { isServerError } from '@/lib/errors';
 
 export const Route = createFileRoute('/_authenticated/student/dashboard')({
   loader: async () => {
@@ -17,7 +15,21 @@ export const Route = createFileRoute('/_authenticated/student/dashboard')({
 
 function StudentDashboardPage() {
   const { t } = useI18n();
-  const data = Route.useLoaderData() as unknown as StudentDashboardData;
+  const data = Route.useLoaderData();
+
+  if (isServerError(data)) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            {t('studentDashboard.title')}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('studentDashboard.subtitle')}</p>
+        </div>
+        <p className="text-destructive">{data.error.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

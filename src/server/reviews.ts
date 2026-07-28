@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in reviews.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const ListPendingReviewsSchema = z.object({
@@ -39,35 +39,35 @@ export const GetLatestReviewSchema = z.object({
   checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),
 });
 
-export const listPendingReviews = createServerFn({ method: 'GET' })
+export const listPendingReviews = typedServerFn({ method: 'GET' })
   .inputValidator(ListPendingReviewsSchema)
   .handler(async ({ data }) => {
     const { listPendingReviewsHandler } = await import('./reviews.server');
     return listPendingReviewsHandler({ data });
   });
 
-export const getReviewDetail = createServerFn({ method: 'GET' })
+export const getReviewDetail = typedServerFn({ method: 'GET' })
   .inputValidator(GetReviewDetailSchema)
   .handler(async ({ data }) => {
     const { getReviewDetailHandler } = await import('./reviews.server');
     return getReviewDetailHandler({ data });
   });
 
-export const openForReview = createServerFn({ method: 'POST' })
+export const openForReview = typedServerFn({ method: 'POST' })
   .inputValidator(OpenForReviewSchema)
   .handler(async ({ data }) => {
     const { openForReviewHandler } = await import('./reviews.server');
     return openForReviewHandler({ data });
   });
 
-export const submitReview = createServerFn({ method: 'POST' })
+export const submitReview = typedServerFn({ method: 'POST' })
   .inputValidator(SubmitReviewSchema)
   .handler(async ({ data }) => {
     const { submitReviewHandler } = await import('./reviews.server');
     return submitReviewHandler({ data });
   });
 
-export const getLatestReview = createServerFn({ method: 'GET' })
+export const getLatestReview = typedServerFn({ method: 'GET' })
   .inputValidator(GetLatestReviewSchema)
   .handler(async ({ data }) => {
     const { getLatestReviewHandler } = await import('./reviews.server');

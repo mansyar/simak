@@ -175,7 +175,7 @@ export async function recomputeStudentGrade(
     .leftJoin(reviews, eq(reviews.submissionId, submissions.id))
     .leftJoin(reviewScores, eq(reviewScores.reviewId, reviews.id))
     .where(and(eq(checkpoints.assignmentId, assignmentId), eq(checkpoints.studentId, studentId)))
-    .orderBy(checkpoints.order)) as unknown as ScoreRow[];
+    .orderBy(checkpoints.order)) as ScoreRow[];
 
   const result = computeFinalGrade(groupRowsToCheckpoints(rows), config);
   const numericScore = result.numericScore !== null ? String(result.numericScore) : null;

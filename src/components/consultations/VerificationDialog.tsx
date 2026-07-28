@@ -6,6 +6,7 @@ import {
   verifyConsultation,
   rejectConsultation,
 } from '@/server/consultations';
+import { isServerError } from '@/lib/errors';
 import { consultationKeys } from '@/lib/query-keys';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,12 +29,12 @@ interface VerificationDialogProps {
 
 interface DetailData {
   id: number;
-  studentName: string;
-  checkpointName: string;
+  studentName: string | null;
+  checkpointName: string | null;
   sessionType: string | null;
   externalConsultantName: string | null;
   notes: string | null;
-  createdAt: string;
+  createdAt: Date | null;
   status: string;
 }
 
@@ -65,15 +66,11 @@ export function VerificationDialog({
   const loadDetail = async (id: number) => {
     setLoading(true);
     setError(null);
-    const result = await (
-      getConsultationDetail as unknown as (args: {
-        data: { consultationId: number };
-      }) => Promise<{ consultation: DetailData; error?: string }>
-    )({ data: { consultationId: id } });
-    if (result.consultation) {
-      setDetail(result.consultation);
+    const result = await getConsultationDetail({ data: { consultationId: id } });
+    if (isServerError(result)) {
+      setError(result.error.message);
     } else {
-      setError(result.error ?? 'Failed to load consultation');
+      setDetail(result.consultation);
     }
     setLoading(false);
   };
@@ -81,13 +78,9 @@ export function VerificationDialog({
   const verifyMutation = useMutation({
     mutationFn: async () => {
       if (!consultationId) throw new Error('No consultation selected');
-      const result = await (
-        verifyConsultation as unknown as (args: {
-          data: { consultationId: number };
-        }) => Promise<{ success: boolean; error: string | null }>
-      )({ data: { consultationId } });
-      if (!result.success) {
-        throw new Error(result.error ?? 'Verification failed');
+      const result = await verifyConsultation({ data: { consultationId } });
+      if (isServerError(result)) {
+        throw new Error(result.error.message);
       }
       return result;
     },
@@ -131,15 +124,11 @@ export function VerificationDialog({
   const rejectMutation = useMutation({
     mutationFn: async () => {
       if (!consultationId || !rejectReason.trim()) throw new Error('No reason provided');
-      const result = await (
-        rejectConsultation as unknown as (args: {
-          data: { consultationId: number; reason: string };
-        }) => Promise<{ success: boolean; error: string | null }>
-      )({
+      const result = await rejectConsultation({
         data: { consultationId, reason: rejectReason.trim() },
       });
-      if (!result.success) {
-        throw new Error(result.error ?? 'Rejection failed');
+      if (isServerError(result)) {
+        throw new Error(result.error.message);
       }
       return result;
     },
@@ -230,7 +219,9 @@ export function VerificationDialog({
                 <span className="text-xs text-muted-foreground font-medium">
                   {t('consultations.date')}
                 </span>
-                <p className="text-foreground">{new Date(detail.createdAt).toLocaleDateString()}</p>
+                <p className="text-foreground">
+                  {detail.createdAt ? new Date(detail.createdAt).toLocaleDateString() : '-'}
+                </p>
               </div>
             </div>
 

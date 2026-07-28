@@ -81,7 +81,7 @@ vi.mock('@/components/ui/input', () => ({
 describe('VerificationDialog', () => {
   const onOpenChange = vi.fn();
   const onActionComplete = vi.fn();
-
+  const serverErrorMock = (msg: string) => ({ error: { code: 'INTERNAL' as const, message: msg } });
   const mockDetail = {
     id: 42,
     studentName: 'Alice Johnson',
@@ -173,7 +173,7 @@ describe('VerificationDialog', () => {
 
   it('should show error when loading fails', async () => {
     const mod = await import('@/server/consultations');
-    (mod.getConsultationDetail as any).mockResolvedValue({ error: 'Failed to load' });
+    (mod.getConsultationDetail as any).mockResolvedValue(serverErrorMock('Failed to load'));
 
     renderDialog();
 
@@ -219,7 +219,7 @@ describe('VerificationDialog', () => {
   it('should show error on verify failure', async () => {
     await resolveDetail();
     const mod = await import('@/server/consultations');
-    (mod.verifyConsultation as any).mockResolvedValue({ error: 'Already verified' });
+    (mod.verifyConsultation as any).mockResolvedValue(serverErrorMock('Already verified'));
 
     renderDialog();
     await loadDetail();
@@ -279,7 +279,7 @@ describe('VerificationDialog', () => {
   it('should show error on reject failure', async () => {
     await resolveDetail();
     const mod = await import('@/server/consultations');
-    (mod.rejectConsultation as any).mockResolvedValue({ error: 'Already verified' });
+    (mod.rejectConsultation as any).mockResolvedValue(serverErrorMock('Already verified'));
 
     renderDialog();
     await loadDetail();
@@ -314,7 +314,7 @@ describe('VerificationDialog', () => {
 
   it('should show error text when present', async () => {
     const mod = await import('@/server/consultations');
-    (mod.getConsultationDetail as any).mockResolvedValue({ error: 'Consultation not found' });
+    (mod.getConsultationDetail as any).mockResolvedValue(serverErrorMock('Consultation not found'));
 
     renderDialog({ consultationId: 999 });
 
@@ -432,7 +432,7 @@ describe('VerificationDialog', () => {
     it('should restore consultation list on verify error', async () => {
       await resolveDetail();
       const mod = await import('@/server/consultations');
-      (mod.verifyConsultation as any).mockResolvedValue({ error: 'Already verified' });
+      (mod.verifyConsultation as any).mockResolvedValue(serverErrorMock('Already verified'));
       queryClient.setQueryData(consultationKeys.pending(1, 1), seedData);
       renderDialog();
       await loadDetail();
@@ -446,7 +446,7 @@ describe('VerificationDialog', () => {
     it('should show error toast on verify rollback', async () => {
       await resolveDetail();
       const mod = await import('@/server/consultations');
-      (mod.verifyConsultation as any).mockResolvedValue({ error: 'Already verified' });
+      (mod.verifyConsultation as any).mockResolvedValue(serverErrorMock('Already verified'));
       renderDialog();
       await loadDetail();
       clickVerify();
@@ -473,7 +473,7 @@ describe('VerificationDialog', () => {
     it('should restore consultation list on reject error', async () => {
       await resolveDetail();
       const mod = await import('@/server/consultations');
-      (mod.rejectConsultation as any).mockResolvedValue({ error: 'Already rejected' });
+      (mod.rejectConsultation as any).mockResolvedValue(serverErrorMock('Already rejected'));
       queryClient.setQueryData(consultationKeys.pending(1, 1), seedData);
       renderDialog();
       await loadDetail();
@@ -487,7 +487,7 @@ describe('VerificationDialog', () => {
     it('should show error toast on reject rollback', async () => {
       await resolveDetail();
       const mod = await import('@/server/consultations');
-      (mod.rejectConsultation as any).mockResolvedValue({ error: 'Already rejected' });
+      (mod.rejectConsultation as any).mockResolvedValue(serverErrorMock('Already rejected'));
       renderDialog();
       await loadDetail();
       rejectWithReason();

@@ -119,7 +119,7 @@ simak/
 │   │   ├── skeletons/        → Reusable loading skeletons (DashboardSkeleton, TableSkeleton, AssignmentDetailSkeleton)
 │   │   ├── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton, email queue inspector subcomponents (summary cards, filters, table, retry dialog)
 │   │   └── keyboard-cheat-sheet.tsx → Popover showing all keyboard shortcuts (greys out review-specific J/K when not on review page)
-│   ├── server/               → Server functions (split: .ts = client-safe stubs + Zod, .server.ts = handlers)
+│   ├── server/               → Server functions (split: .ts = client-safe stubs + Zod using `typedServerFn` from `@/lib/server-fn`, .server.ts = handlers)
 │   │   ├── auth.ts           → Client-safe stub: Session type, getSessionFromHeaders, requireRole, _getSession (dynamic import)
 │   │   ├── auth.server.ts    → Session handler: Better Auth validation, DB query, 5s-TTL in-memory cache
 │   │   ├── users.ts          → User CRUD, invitations
@@ -191,6 +191,7 @@ simak/
 │   │   ├── route-utils.ts    → Role-based dashboard routing utility
     │   │   ├── role-permissions.ts → Canonical CREATION_ALLOWED_ROLES (shared by user creation + bulk import)
     │   │   ├── session-guards.ts → Shared client-safe type-guard functions (isAdmin, isInstructor, isStudent, isAuthenticated) — accept `NonNullableSession | null`, return `session is NonNullableSession` (TRACK-031)
+    │   │   ├── server-fn.ts     → `typedServerFn` wrapper — wraps `createServerFn` with a single `as unknown as TypedBuilder` solution cast that restores return-type inference through the `.inputValidator(Schema).handler(fn)` builder chain. All 23 server stub files import `typedServerFn` instead of `createServerFn` (TRACK-032). Runtime: pure pass-through (type-only change).
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
     │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys, discussionKeys, settingsKeys, gradebookKeys)
     │   │   └── utils.ts          → Shared utilities
@@ -334,6 +335,26 @@ All 9 user-initiated mutation sites where the predicted state is deterministic u
 **DeadlineManager invalidation fix:** Prior to this track, `unlockMutation` and `extendMutation` in `DeadlineManager.tsx` had `onSuccess` that only showed a toast — they never called `queryClient.invalidateQueries`, leaving the deadline list stale until manual refresh. This was fixed as a prerequisite before optimistic logic could work.
 
 **NotificationCenter infinite query migration (TRACK-030):** `useNotificationsList` was migrated from `useQuery` + manual `useState`/`useEffect` page accumulation to TanStack Query's native `useInfiniteQuery` (`initialPageParam: 1`, `getNextPageParam` derives next page from accumulated items count vs `total`). The `useMarkRead`/`useMarkAllRead` optimistic `onMutate` callbacks were rewritten to handle the `{ pages, pageParams }` infinite query data shape — checking `'pages' in old` instead of `'items' in old` and mapping over `old.pages` to update items within each page. This fixed a latent bug where the optimistic `'items' in old` check silently fell through to `return old` (no-op) against the infinite query data shape, breaking the optimistic update entirely. The `useUnreadCount` hook still uses `useQuery` (returns a number); its `typeof old === 'number'` check is preserved unchanged.
+
+### Type-Safe Server Functions [v1] (Track: Type-Safety Restoration)
+
+The `createServerFn` wrapper from `@tanstack/react-start` has a known type-inference gap: its `handler` method declares a generic `<TNewResponse>` but `ServerFnReturnType` applies `ValidateSerializableInput` (a recursive conditional type from `@tanstack/router-core`) that prevents TypeScript from inferring `TNewResponse` through the conditional. `TNewResponse` defaults to `unknown`, making the `Fetcher` return type `Promise<unknown>` at call sites — even when the handler's return type is explicitly annotated. The dynamic `await import('./feature.server')` pattern is NOT the cause; even direct handler returns suffer the same inference failure.
+
+**Solution:** A `typedServerFn` wrapper in `src/lib/server-fn.ts` (58 lines) wraps `createServerFn` with a single `as unknown as TypedBuilder` solution cast that restores return-type inference. The wrapper:
+
+- Preserves both stub patterns: `.inputValidator(Schema).handler(fn)` (typed-builder) and `.handler(fn)` (inline-parse).
+- Defines `TypedFetcher<TInput, TResponse>`, `OptionalFetcher<TResponse>`, `TypedBuilderWithValidator`, and `TypedBuilder` interfaces to model the builder chain.
+- Is a type-only change at runtime — pure pass-through, delegates to `createServerFn`.
+
+All 23 server stub files (`src/server/*.ts`) import `typedServerFn` from `@/lib/server-fn` instead of `createServerFn` from `@tanstack/react-start`. This eliminated 66 `as unknown as` casts across hooks (7), components (38), routes (19), server files (5), lib (3), and Better Auth handlers (2) — replacing them with `isServerError()` type-guard checks and proper Drizzle/Better Auth typing.
+
+**Documented remaining casts (TanStack Router typed-routes limitation, not fixable):**
+- 6 sidebar casts (`to={link.to as unknown as '.'}`) in `admin-sidebar.tsx`, `instructor-sidebar.tsx`, `student-sidebar.tsx`.
+- 2 auth redirect casts in `src/server/auth.ts` (`redirect({ to: '/auth/login' as unknown as '.' })`).
+- 2 route redirect casts in `src/routes/_authenticated.tsx` and `src/routes/_unauthenticated.tsx`.
+- 1 solution cast in `src/lib/server-fn.ts` (the `as unknown as TypedBuilder` boundary).
+
+Zero `@ts-expect-error` directives. Zero `as any` casts (excluding generated `routeTree.gen.ts`). All type changes are inference-based — no behavioral changes, all 3,780 tests pass unchanged.
 
 ---
 

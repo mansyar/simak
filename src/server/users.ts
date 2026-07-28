@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in users.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 const VALID_CREATE_ROLES = ['admin', 'instructor', 'student'] as const;
@@ -28,42 +28,42 @@ export const UserIdParamSchema = z.object({
   id: z.string().min(1, 'User ID is required'),
 });
 
-export const listUsers = createServerFn({ method: 'GET' })
+export const listUsers = typedServerFn({ method: 'GET' })
   .inputValidator(ListUsersSchema)
   .handler(async ({ data }) => {
     const { listUsersHandler } = await import('./users.server');
     return listUsersHandler({ data });
   });
 
-export const getUser = createServerFn({ method: 'GET' })
+export const getUser = typedServerFn({ method: 'GET' })
   .inputValidator(UserIdParamSchema)
   .handler(async ({ data }) => {
     const { getUserHandler } = await import('./users.server');
     return getUserHandler({ data });
   });
 
-export const createUser = createServerFn({ method: 'POST' })
+export const createUser = typedServerFn({ method: 'POST' })
   .inputValidator(CreateUserSchema)
   .handler(async ({ data }) => {
     const { createUserHandler } = await import('./users.server');
     return createUserHandler({ data });
   });
 
-export const updateUser = createServerFn({ method: 'POST' })
+export const updateUser = typedServerFn({ method: 'POST' })
   .inputValidator(UpdateUserSchema.extend({ id: z.string() }))
   .handler(async ({ data }) => {
     const { updateUserHandler } = await import('./users.server');
     return updateUserHandler({ data });
   });
 
-export const deleteUser = createServerFn({ method: 'POST' })
+export const deleteUser = typedServerFn({ method: 'POST' })
   .inputValidator(UserIdParamSchema)
   .handler(async ({ data }) => {
     const { deleteUserHandler } = await import('./users.server');
     return deleteUserHandler({ data });
   });
 
-export const generateSetupLink = createServerFn({ method: 'POST' })
+export const generateSetupLink = typedServerFn({ method: 'POST' })
   .inputValidator(UserIdParamSchema)
   .handler(async ({ data }) => {
     const { generateSetupLinkHandler } = await import('./users.server');
@@ -74,7 +74,7 @@ export const ListInstructorActiveAssignmentsSchema = z.object({
   instructorId: z.string().min(1, 'Instructor ID is required'),
 });
 
-export const listInstructorActiveAssignments = createServerFn({ method: 'GET' })
+export const listInstructorActiveAssignments = typedServerFn({ method: 'GET' })
   .inputValidator(ListInstructorActiveAssignmentsSchema)
   .handler(async ({ data }) => {
     const { listInstructorActiveAssignmentsHandler } = await import('./users.server');

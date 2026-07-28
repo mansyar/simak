@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in extensions.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const RequestExtensionSchema = z.object({
@@ -49,42 +49,42 @@ export const BulkExtendSchema = z.object({
 
 // ---- Server Function Stubs ----
 
-export const requestExtension = createServerFn({ method: 'POST' })
+export const requestExtension = typedServerFn({ method: 'POST' })
   .inputValidator(RequestExtensionSchema)
   .handler(async ({ data }) => {
     const { requestExtensionHandler } = await import('./extensions.server');
     return requestExtensionHandler({ data });
   });
 
-export const listExtensionRequests = createServerFn({ method: 'GET' })
+export const listExtensionRequests = typedServerFn({ method: 'GET' })
   .inputValidator(ListExtensionRequestsSchema)
   .handler(async ({ data }) => {
     const { listExtensionRequestsHandler } = await import('./extensions.server');
     return listExtensionRequestsHandler({ data });
   });
 
-export const listMyExtensionRequests = createServerFn({ method: 'GET' })
+export const listMyExtensionRequests = typedServerFn({ method: 'GET' })
   .inputValidator(ListMyExtensionsSchema)
   .handler(async ({ data }) => {
     const { listMyExtensionRequestsHandler } = await import('./extensions.server');
     return listMyExtensionRequestsHandler({ data });
   });
 
-export const approveExtension = createServerFn({ method: 'POST' })
+export const approveExtension = typedServerFn({ method: 'POST' })
   .inputValidator(ApproveExtensionSchema)
   .handler(async ({ data }) => {
     const { approveExtensionHandler } = await import('./extensions.server');
     return approveExtensionHandler({ data });
   });
 
-export const rejectExtension = createServerFn({ method: 'POST' })
+export const rejectExtension = typedServerFn({ method: 'POST' })
   .inputValidator(RejectExtensionSchema)
   .handler(async ({ data }) => {
     const { rejectExtensionHandler } = await import('./extensions.server');
     return rejectExtensionHandler({ data });
   });
 
-export const bulkExtend = createServerFn({ method: 'POST' })
+export const bulkExtend = typedServerFn({ method: 'POST' })
   .inputValidator(BulkExtendSchema)
   .handler(async ({ data }) => {
     const { bulkExtendHandler } = await import('./extensions.server');

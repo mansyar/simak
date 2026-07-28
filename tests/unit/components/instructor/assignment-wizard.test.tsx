@@ -462,8 +462,7 @@ describe('AssignmentWizard', () => {
 
     it('should show submit error when creation fails', async () => {
       vi.mocked(assignmentsApi.createAssignment).mockResolvedValue({
-        success: false,
-        error: 'Template is no longer available',
+        error: { code: 'INTERNAL', message: 'Template is no longer available' },
       } as any);
       render(<AssignmentWizard />, { wrapper: createWrapper() });
       navigateToStep5();

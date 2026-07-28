@@ -1,4 +1,4 @@
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const SetupPasswordSchema = z.object({
@@ -94,7 +94,7 @@ export async function completePasswordSetupHandler(args: {
   }
 }
 
-export const completePasswordSetup = createServerFn({ method: 'POST' })
+export const completePasswordSetup = typedServerFn({ method: 'POST' })
   .inputValidator(SetupPasswordSchema)
   .handler(async ({ data }) => {
     return completePasswordSetupHandler({ data });

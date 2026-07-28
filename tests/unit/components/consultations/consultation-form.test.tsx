@@ -194,7 +194,9 @@ describe('ConsultationForm', () => {
 
   it('should show error when logConsultation returns error', async () => {
     const logConsultation = (await import('@/server/consultations')).logConsultation;
-    (logConsultation as any).mockResolvedValue({ error: 'Failed to log consultation' });
+    (logConsultation as any).mockResolvedValue({
+      error: { code: 'INTERNAL', message: 'Failed to log consultation' },
+    });
 
     render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
     const selects = screen.getAllByTestId('select');

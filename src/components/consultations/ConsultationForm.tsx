@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { logConsultation } from '@/server/consultations';
+import { isServerError } from '@/lib/errors';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
@@ -74,16 +75,7 @@ export function ConsultationForm({
   const sessionType = form.watch('sessionType');
 
   const handleFormSubmit = async (values: FormValues) => {
-    const result = await (
-      logConsultation as unknown as (args: {
-        data: {
-          checkpointId: number;
-          sessionType: string;
-          externalConsultantName?: string;
-          notes: string;
-        };
-      }) => Promise<{ error?: string }>
-    )({
+    const result = await logConsultation({
       data: {
         checkpointId: Number(values.checkpointId),
         sessionType: values.sessionType,
@@ -93,8 +85,8 @@ export function ConsultationForm({
       },
     });
 
-    if (result.error) {
-      form.setError('root', { message: result.error });
+    if (isServerError(result)) {
+      form.setError('root', { message: result.error.message });
       return;
     }
 

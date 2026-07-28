@@ -9,8 +9,8 @@ interface ExtensionHistoryItem {
   extensionDays: number;
   status: 'pending' | 'approved' | 'rejected';
   reason: string | null;
-  createdAt: string;
-  resolvedAt: string | null;
+  createdAt: Date | null;
+  resolvedAt: Date | null;
   resolutionReason: string | null;
   checkpointName: string | null;
 }

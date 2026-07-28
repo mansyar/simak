@@ -410,47 +410,9 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-032: Type-Safety Restoration — Eliminate `as unknown as` Casts
-
-*   **Status:** `Pending`
-*   **Dependencies:** None (recommended AFTER TRACK-031 — guard consolidation reduces the surface area of server-function calls to audit)
-*   **Estimated Effort:** 5 Days / 2.5 Sprint Loops
-*   **Audit IDs:** INFRA-4 (systemic type-safety erosion — ~80 `as unknown as` casts across hooks, components, routes, and server files)
-
-#### Context Anchors (Traceability)
-*   **PRD Reference:** N/A (type-safety infrastructure, no product impact)
-*   **TDD Reference:** `conductor/archive/instructor-ui-consistency_20260619/spec.md` (Track that first identified the `createServerFn` type-gap — removed `@ts-expect-error` from route loaders but the underlying gap was patched with casts); `src/server/assignments.ts` (canonical typed-builder stub pattern: `createServerFn({ method }).inputValidator(Schema).handler(...)`); `src/server/submissions.ts` (canonical inline-parse pattern); `src/hooks/use-notifications.ts` (representative hook with 4 `as unknown as` casts on server fn calls)
-
-#### Track Tech Stack
-*   TypeScript 7 (type inference, generic constraints)
-*   `@tanstack/react-start` (`createServerFn` — the wrapper whose return type doesn't propagate to client callers)
-*   `@tanstack/react-router` (route loader typing — `Route.useLoaderData()` return types)
-*   Drizzle ORM (`as unknown as ScoreRow[]` query-result casts in server handlers)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Diagnose the `createServerFn` type-gap root cause:** Determine why the return type of `.handler(async ({ data }) => { ... })` doesn't propagate to the client-callable stub. Investigate whether the gap is in the TanStack Start `createServerFn` generic, the `.inputValidator()` chain, or the dynamic `await import('./feature.server')` pattern.
-    *   **Fix the type propagation at the source:** Apply the minimal typing change (likely a generic constraint or wrapper utility in a shared `src/lib/server-fn.ts` helper) so that `createServerFn` stubs propagate their handler's return type to callers without casts.
-    *   **Remove `as unknown as` casts from hooks:** Eliminate casts in `src/hooks/use-notifications.ts` (4 casts), `src/hooks/use-assignment-tabs.ts` (3 casts), and any other hooks.
-    *   **Remove `as unknown as` casts from components:** Eliminate casts in `src/components/settings/TwoFactorSettings.tsx` (4 casts), `src/components/settings/SessionManagement.tsx` (3 casts), `src/components/settings/ProfileSection.tsx` (2 casts), `src/components/settings/NotificationPreferencesSection.tsx` (2 casts), `src/components/settings/AccessibilitySection.tsx` (2 casts), `src/components/reviews/ReviewForm.tsx` (2 casts), `src/components/reviews/DeadlineManager.tsx` (2 casts), `src/components/student/extensions/ExtensionRequestForm.tsx` (1 cast), `src/components/consultations/ConsultationForm.tsx` (1 cast), `src/components/consultations/VerificationDialog.tsx` (3 casts), `src/components/discussions/discussion-panel.tsx` (3 casts), `src/components/admin/templates/TemplateDetailPage.tsx` (3 casts), `src/components/instructor/assignments/AssignmentWizard.tsx` (3 casts), `src/components/instructor/assignments/StudentPicker.tsx` (1 cast), `src/components/instructor/assignments/TemplatePicker.tsx` (1 cast), and any others found via grep.
-    *   **Remove `as unknown as` casts from routes:** Eliminate loader-data casts and server-fn call casts in: `src/routes/_authenticated/student/dashboard.tsx` (1 cast), `src/routes/_authenticated/admin/dashboard.tsx` (1 cast), `src/routes/_authenticated/admin/analytics.tsx` (2 casts), `src/routes/_authenticated/instructor/analytics.tsx` (2 casts), `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx` (7 casts), `src/routes/_authenticated/student/assignments/$id.tsx` (6 casts). Redirect casts in `_authenticated.tsx` and `_unauthenticated.tsx` are Out of Scope (TanStack Router typed-routes limitation).
-    *   **Remove `as unknown as` casts from server files:** Eliminate Drizzle query-result casts (`as unknown as ScoreRow[]`) in `src/server/analytics-export.server.ts`, `src/server/gradebook.server.ts`, `src/server/reviews-extras.server.ts`, `src/lib/email-queue-retention.ts`, `src/lib/email-queue-processor.ts`.
-    *   **Remove `as unknown as` casts from 2FA and auth handlers:** Eliminate `result as unknown as { totpURI?: string; backupCodes?: string[] }` in `src/server/two-factor.server.ts` (Better Auth API response — type properly). Eliminate `result as unknown as NonNullable<Session>` in `src/server/auth.server.ts:56` (Better Auth `getSession` response — type properly).
-*   **Out of Scope:**
-    *   `src/routeTree.gen.ts` — generated file (`as any` is TanStack Router codegen, not fixable by hand)
-    *   Sidebar `to={link.to as unknown as '.'}` casts (`admin-sidebar.tsx`, `instructor-sidebar.tsx`, `student-sidebar.tsx` — 6 casts total) — TanStack Router typed-routes limitation (route paths are string literals; dynamic sidebar configs can't satisfy the literal type). Document as a known limitation, do not attempt to fix.
-    *   Auth redirect casts in `src/server/auth.ts` (`redirect({ to: '/auth/login' as unknown as '.' })` — 2 casts) — same TanStack Router typed-routes limitation. Document, do not fix.
-    *   Route redirect casts in `src/routes/_authenticated.tsx:30` and `src/routes/_unauthenticated.tsx:9` (2 casts) — same TanStack Router typed-routes limitation. Document, do not fix.
-    *   Any changes to server handler logic (type-only changes, no behavioral changes)
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Root-cause diagnosis):** Read `src/server/assignments.ts` (typed-builder pattern) and `src/server/submissions.ts` (inline-parse pattern). Write a minimal type-level test (`tests/unit/types/server-fn-types.test-d.ts`) demonstrating that a `createServerFn` stub's return type is `unknown` or `Promise<unknown>` at the call site. Identify the exact point in the chain where type inference breaks. Document the root cause. Verify: type-level test fails (confirming the gap exists).
-*   **Phase 2 (Type fix at source):** Apply the minimal typing change to restore type propagation. This may be: (a) a generic constraint on the `createServerFn` wrapper, (b) a shared helper utility in `src/lib/server-fn.ts` that wraps `createServerFn` with proper return-type inference, or (c) explicit return-type annotations on all stub handlers. Verify: type-level test passes, `pnpm typecheck` clean.
-*   **Phase 3 (Cast elimination):** Systematically remove `as unknown as` casts from hooks → components → routes → server files. After each file group, run `pnpm typecheck` to catch any inference gaps. For Drizzle query-result casts, use proper `.then()` typing or `z.infer` schema types instead of ad-hoc casts. For Better Auth API responses, use the documented response types from `better-auth`. Verify: `pnpm typecheck` clean after all casts removed, `pnpm test:unit` passes, grep `as unknown as` in `src/` returns only the documented TanStack Router limitations (sidebar, auth redirects).
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** Run `pnpm dev` — all pages render without console errors. Navigate to `/settings` — profile, 2FA, sessions, notifications, accessibility sections all load and function. Open `/student/assignments/$id` — checkpoint view, file upload, consultation form all work. Open `/instructor/assignments/$id` — tabs, review form, deadline manager all work. Open `/admin/analytics` — gradebook and analytics export work. Run `pnpm typecheck` — 0 errors. Grep `as unknown as` in `src/hooks/`, `src/components/`, `src/routes/` — zero matches (excluding generated `routeTree.gen.ts` and documented TanStack Router sidebar/auth-redirect limitations).
-*   [ ] **Automated Tests:** `pnpm test:unit` — all existing tests pass unchanged (type-only changes, no behavioral changes). New type-level test (`server-fn-types.test-d.ts`) passes, confirming return-type propagation. `pnpm test:coverage` ≥80%. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
-*   [ ] **Conductor Review:** Type-level test exists and passes. Grep `as unknown as` in `src/` returns: zero matches in `src/hooks/`, `src/components/`, `src/lib/`; only documented TanStack Router limitations remain — sidebar casts in `src/components/layout/*-sidebar.tsx`, auth-redirect casts in `src/server/auth.ts`, and route-redirect casts in `src/routes/_authenticated.tsx` and `src/routes/_unauthenticated.tsx`. No `@ts-expect-error` directives added. No `as any` added. All type changes are inference-based (no manual type assertions unless documented with a reason). All files under 500 lines. Pre-push gate passes.
+- **Status:** ✅ Complete · **Audit IDs:** INFRA-4 (systemic type-safety erosion — ~80 `as unknown as` casts across hooks, components, routes, and server files) · **Deps:** TRACK-031 (recommended after — guard consolidation reduced the surface area of server-function calls to audit)
+- **Key decisions:** Created `typedServerFn` wrapper in `src/lib/server-fn.ts` — wraps `createServerFn` with a single `as unknown as TypedBuilder` solution cast that restores return-type inference through the `.inputValidator(Schema).handler(fn)` builder chain (root cause: TanStack Start's `ServerFnReturnType` applies `ValidateSerializableInput` conditional type that prevents TS from inferring `TNewResponse` through the chain); migrated all 23 server stub files from `createServerFn` to `typedServerFn`; eliminated 66 in-scope `as unknown as` casts across hooks (7), components (38), routes (19), server files (5), lib (3), and Better Auth handlers (2) — replaced with `isServerError()` type-guard checks and proper Drizzle/Better Auth typing; 10 documented TanStack Router limitation casts remain (6 sidebar typed-routes, 2 auth redirect, 2 route redirect) + 1 solution cast in `server-fn.ts`; type-only changes — zero behavioral changes, all 3,780 tests pass unchanged; review fixes: removed `as DetailData` narrowing cast in `VerificationDialog.tsx` with proper nullable interface, updated `spec.md` FR-3 wording to acknowledge the documented solution cast
+- **Detail:** `conductor/archive/type-safety-restoration_20260727/` (spec.md, plan.md)
 
 ---
 
@@ -571,7 +533,7 @@ Milestone 9: Client Architecture Consistency
 
 Milestone 10: Infrastructure Consistency & Tech Debt Remediation
 ├── TRACK-031: Server-Side Guard Consolidation & Env Type Consolidation [Complete — archived]
-├── TRACK-032: Type-Safety Restoration — Eliminate `as unknown as` Casts [recommended after 031]
+├── TRACK-032: Type-Safety Restoration — Eliminate `as unknown as` Casts [Complete — archived — recommended after 031]
 ├── TRACK-033: Server-Function Architecture Standardization [coordinate with 032]
 ├── TRACK-034: i18n & Email Localization Completeness [Complete — archived]
 ├── TRACK-035: Test Infrastructure Consolidation [no deps]
@@ -602,7 +564,7 @@ The following track groups can be worked on simultaneously:
 | **P** | TRACK-027 → TRACK-028 | Both complete (archived). TRACK-027 expanded seed data (student2, student3, consultation seed) + decoupled instructor-review tests + 3 new specs + notification/upload/negative test assertions. TRACK-028 built on this expanded seed data and decoupled patterns — expanded coverage to 73 tests across 14 spec files, added Firefox + mobile-chrome projects, axe-core a11y scanning, cross-role lifecycle test. No file overlap with feature tracks (TRACK-025/026) — only touches `tests/e2e/`, `scripts/seed-e2e.ts`, and `playwright.config.ts` |
 | **Q** | TRACK-029, TRACK-030 | Both complete — TRACK-029 touched `query-keys.ts` + settings + gradebook components (archived); TRACK-030 touched `use-notifications.ts` + `NotificationCenter.tsx` + `query-keys.ts` (archived). Both depended on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files (TRACK-029 only) |
 | **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035 (complete — archived), TRACK-036 (complete — archived) | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touched `vitest.config.ts` + `vitest.config.integration.ts` + `package.json` (complete — archived); TRACK-036 touched `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json` (complete — archived). Minor overlap: TRACK-035 and TRACK-036 both touched `package.json` scripts — coordinated to avoid merge conflicts |
-| **S** | TRACK-032 → TRACK-033 | Sequential — TRACK-032 (type-safety restoration) touches the same `createServerFn` stub files that TRACK-033 (architecture standardization) refactors. Complete TRACK-032's type fixes first, then TRACK-033's structural changes. Both touch `src/server/*.ts` and `src/server/*.server.ts` |
+| **S** | TRACK-032 → TRACK-033 | Sequential — TRACK-032 (type-safety restoration, complete — archived) touched the same `createServerFn` stub files that TRACK-033 (architecture standardization) refactors. TRACK-032's type fixes are complete; TRACK-033 can now proceed with structural changes on the typed stubs. Both touch `src/server/*.ts` and `src/server/*.server.ts` |
 
 ---
 

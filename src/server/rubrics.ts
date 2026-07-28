@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in rubrics.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 import type { ServerError } from '@/lib/errors';
 
@@ -118,35 +118,35 @@ export const CountPendingReviewsSchema = z.object({
 
 // ── Server function stubs ─────────────────────────────────────────
 
-export const saveRubric = createServerFn({ method: 'POST' })
+export const saveRubric = typedServerFn({ method: 'POST' })
   .inputValidator(SaveRubricSchema)
   .handler(async ({ data }) => {
     const { saveRubricHandler } = await import('./rubrics.server');
     return saveRubricHandler({ data });
   });
 
-export const getRubric = createServerFn({ method: 'GET' })
+export const getRubric = typedServerFn({ method: 'GET' })
   .inputValidator(GetRubricSchema)
   .handler(async ({ data }) => {
     const { getRubricHandler } = await import('./rubrics.server');
     return getRubricHandler({ data });
   });
 
-export const softDeleteCriterion = createServerFn({ method: 'POST' })
+export const softDeleteCriterion = typedServerFn({ method: 'POST' })
   .inputValidator(DeleteCriterionSchema)
   .handler(async ({ data }) => {
     const { softDeleteCriterionHandler } = await import('./rubrics.server');
     return softDeleteCriterionHandler({ data });
   });
 
-export const softDeleteLevel = createServerFn({ method: 'POST' })
+export const softDeleteLevel = typedServerFn({ method: 'POST' })
   .inputValidator(DeleteLevelSchema)
   .handler(async ({ data }) => {
     const { softDeleteLevelHandler } = await import('./rubrics.server');
     return softDeleteLevelHandler({ data });
   });
 
-export const countPendingReviews = createServerFn({ method: 'GET' })
+export const countPendingReviews = typedServerFn({ method: 'GET' })
   .inputValidator(CountPendingReviewsSchema)
   .handler(async ({ data }) => {
     const { countPendingReviewsHandler } = await import('./rubrics.server');

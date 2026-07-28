@@ -17,7 +17,7 @@ export function ProfileSection() {
   const { data, isLoading } = useQuery({
     queryKey: settingsKeys.currentUser(),
     queryFn: async () => {
-      const result = await (getCurrentUser as unknown as () => Promise<unknown>)();
+      const result = await getCurrentUser();
       return result as {
         user: { id: string; name: string; email: string; image: string | null } | null;
         settings: { reducedMotion?: boolean } | null;
@@ -37,9 +37,7 @@ export function ProfileSection() {
 
   const updateNameMutation = useMutation({
     mutationFn: async (args: { name: string }) => {
-      const result = await (
-        updateProfile as unknown as (args: { data: { name: string } }) => Promise<unknown>
-      )({ data: { name: args.name } });
+      const result = await updateProfile({ data: { name: args.name } });
       return result as { name?: string; error?: string };
     },
     onSettled: () => {

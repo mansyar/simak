@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { requestExtension } from '@/server/extensions';
+import { isServerError } from '@/lib/errors';
 
 interface CheckpointOption {
   id: number;
@@ -87,28 +88,18 @@ export function ExtensionRequestForm({
     ) : null;
 
   const handleFormSubmit = async (values: FormValues) => {
-    const result = await (
-      requestExtension as unknown as (args: {
-        data: {
-          assignmentId: number;
-          category: string;
-          reason: string;
-          extensionDays: number;
-          checkpointId?: number;
-        };
-      }) => Promise<{ error?: string; extensionRequest?: { id: number } }>
-    )({
+    const result = await requestExtension({
       data: {
         assignmentId,
-        category: values.category,
+        category: values.category as 'personal' | 'research' | 'health' | 'other',
         reason: values.reason,
         extensionDays: Number(values.duration),
         ...(values.checkpointId ? { checkpointId: Number(values.checkpointId) } : {}),
       },
     });
 
-    if (result.error) {
-      form.setError('root', { message: result.error });
+    if (isServerError(result)) {
+      form.setError('root', { message: result.error.message });
       return;
     }
 

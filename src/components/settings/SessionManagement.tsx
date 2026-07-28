@@ -51,16 +51,14 @@ export function SessionManagement() {
   const { data: sessionsData, isLoading } = useQuery({
     queryKey: settingsKeys.activeSessions(),
     queryFn: async () => {
-      const result = await (listActiveSessions as unknown as () => Promise<unknown>)();
+      const result = await listActiveSessions();
       return result as { sessions: SessionItem[]; total: number };
     },
   });
 
   const revokeMutation = useMutation({
     mutationFn: async (sessionId: string) => {
-      const result = await (
-        revokeSession as unknown as (args: { data: { sessionId: string } }) => Promise<unknown>
-      )({ data: { sessionId } });
+      const result = await revokeSession({ data: { sessionId } });
       return result as { success?: boolean; error?: string };
     },
     onSuccess: (data) => {
@@ -72,11 +70,7 @@ export function SessionManagement() {
 
   const revokeAllMutation = useMutation({
     mutationFn: async () => {
-      const result = await (
-        revokeAllOtherSessions as unknown as (args: {
-          data: Record<string, never>;
-        }) => Promise<unknown>
-      )({ data: {} });
+      const result = await revokeAllOtherSessions({ data: {} });
       return result as { success?: boolean; revokedCount?: number; error?: string };
     },
     onSuccess: (data) => {

@@ -13,6 +13,7 @@ import {
   postDiscussionMessage,
   deleteOwnMessage,
 } from '@/server/discussions';
+import { isServerError } from '@/lib/errors';
 import { discussionKeys } from '@/lib/query-keys';
 import { formatRelativeTime } from '@/lib/format';
 import { Avatar } from '@/components/ui/avatar';
@@ -31,7 +32,7 @@ interface DiscussionMessage {
   authorName: string;
   authorRole: string;
   parentMessageId: number | null;
-  createdAt: Date;
+  createdAt: Date | null;
   deletedAt: Date | null;
 }
 
@@ -62,13 +63,12 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
   const { data, isLoading } = useQuery({
     queryKey: discussionKeys.list(checkpointId, 1),
     queryFn: async () => {
-      const res = await (
-        listDiscussionMessages as unknown as (args: {
-          data: { checkpointId: number; page: number; limit: number };
-        }) => Promise<{ messages: DiscussionMessage[]; total: number }>
-      )({
+      const res = await listDiscussionMessages({
         data: { checkpointId, page: 1, limit: 100 },
       });
+      if (isServerError(res)) {
+        throw new Error(res.error.message);
+      }
       return res;
     },
     refetchInterval: 30000,
@@ -83,23 +83,15 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
 
   const postMutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      const res = await (
-        postDiscussionMessage as unknown as (args: {
-          data: { checkpointId: number; message: string; parentMessageId?: number };
-        }) => Promise<{
-          success: boolean;
-          message?: DiscussionMessage;
-          error?: { code: string; message: string };
-        }>
-      )({
+      const res = await postDiscussionMessage({
         data: {
           checkpointId,
           message: values.message,
           parentMessageId: replyTo ?? undefined,
         },
       });
-      if (!res.success) {
-        throw new Error(res.error?.message ?? 'Failed to post message');
+      if (isServerError(res)) {
+        throw new Error(res.error.message);
       }
       return res;
     },
@@ -148,16 +140,11 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
 
   const deleteMutation = useMutation({
     mutationFn: async (messageId: number) => {
-      const res = await (
-        deleteOwnMessage as unknown as (args: { data: { messageId: number } }) => Promise<{
-          success: boolean;
-          error?: { code: string; message: string };
-        }>
-      )({
+      const res = await deleteOwnMessage({
         data: { messageId },
       });
-      if (!res.success) {
-        throw new Error(res.error?.message ?? 'Failed to delete message');
+      if (isServerError(res)) {
+        throw new Error(res.error.message);
       }
       return res;
     },
@@ -253,7 +240,7 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
             {msg.deletedAt ? t('discussions.deleted') : msg.message}
           </p>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>{formatRelativeTime(msg.createdAt, locale)}</span>
+            <span>{msg.createdAt ? formatRelativeTime(msg.createdAt, locale) : ''}</span>
             {canDelete(msg) && (
               <button
                 type="button"

@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in templates.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 import type { ServerError } from '@/lib/errors';
 
@@ -40,49 +40,49 @@ export const ListTemplateAssignmentsSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-export const listTemplates = createServerFn({ method: 'GET' })
+export const listTemplates = typedServerFn({ method: 'GET' })
   .inputValidator(ListTemplatesSchema)
   .handler(async ({ data }) => {
     const { listTemplatesHandler } = await import('./templates.server');
     return listTemplatesHandler({ data });
   });
 
-export const getTemplate = createServerFn({ method: 'GET' })
+export const getTemplate = typedServerFn({ method: 'GET' })
   .inputValidator(TemplateIdParamSchema)
   .handler(async ({ data }) => {
     const { getTemplateHandler } = await import('./templates.server');
     return getTemplateHandler({ data });
   });
 
-export const createTemplate = createServerFn({ method: 'POST' })
+export const createTemplate = typedServerFn({ method: 'POST' })
   .inputValidator(CreateTemplateSchema)
   .handler(async ({ data }) => {
     const { createTemplateHandler } = await import('./templates.server');
     return createTemplateHandler({ data });
   });
 
-export const updateTemplate = createServerFn({ method: 'POST' })
+export const updateTemplate = typedServerFn({ method: 'POST' })
   .inputValidator(UpdateTemplateSchema.extend({ id: z.coerce.number().int().positive() }))
   .handler(async ({ data }) => {
     const { updateTemplateHandler } = await import('./templates.server');
     return updateTemplateHandler({ data });
   });
 
-export const deleteTemplate = createServerFn({ method: 'POST' })
+export const deleteTemplate = typedServerFn({ method: 'POST' })
   .inputValidator(TemplateIdParamSchema)
   .handler(async ({ data }) => {
     const { deleteTemplateHandler } = await import('./templates.server');
     return deleteTemplateHandler({ data });
   });
 
-export const duplicateTemplate = createServerFn({ method: 'POST' })
+export const duplicateTemplate = typedServerFn({ method: 'POST' })
   .inputValidator(TemplateIdParamSchema)
   .handler(async ({ data }) => {
     const { duplicateTemplateHandler } = await import('./templates.server');
     return duplicateTemplateHandler({ data });
   });
 
-export const listTemplateAssignments = createServerFn({ method: 'GET' })
+export const listTemplateAssignments = typedServerFn({ method: 'GET' })
   .inputValidator(ListTemplateAssignmentsSchema)
   .handler(async ({ data }) => {
     const { listTemplateAssignmentsHandler } = await import('./templates.server');

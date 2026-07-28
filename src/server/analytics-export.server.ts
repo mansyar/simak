@@ -440,7 +440,7 @@ export async function exportGradebookCsvHandler({ data }: { data: ExportGradeboo
       .leftJoin(reviews, eq(reviews.submissionId, submissions.id))
       .leftJoin(reviewScores, eq(reviewScores.reviewId, reviews.id))
       .where(eq(checkpoints.assignmentId, assignmentId))
-      .orderBy(users.name, checkpoints.order)) as unknown as ScoreRow[];
+      .orderBy(users.name, checkpoints.order)) as ScoreRow[];
 
     const studentMap = groupRowsByStudent(rows);
 

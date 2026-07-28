@@ -49,28 +49,6 @@ export const Route = createFileRoute('/_authenticated/instructor/analytics')({
   pendingComponent: () => <DashboardSkeleton />,
 });
 
-type InstructorAnalyticsData = {
-  reviewsCompleted: number;
-  averageResponseTimeHours: number | null;
-  slaBreachCount: number;
-  studentsSupervised: number;
-  assignmentsActive: number;
-  dateRange: { start: string | null; end: string | null };
-};
-
-type RubricCriterionMetric = {
-  criterionId: number;
-  criterionTitle: string;
-  avgScore: number;
-  reviewCount: number;
-  passRate: number;
-};
-
-type InstructorRubricAnalytics = {
-  criteria: RubricCriterionMetric[];
-  dateRange: { start: string | null; end: string | null };
-};
-
 type AnalyticsSearchParams = {
   range?: '7d' | '30d' | '90d' | 'all';
   start?: string;
@@ -79,13 +57,10 @@ type AnalyticsSearchParams = {
 
 function InstructorAnalyticsPage() {
   const { t } = useI18n();
-  const loaderData = Route.useLoaderData() as unknown as {
-    analytics: InstructorAnalyticsData;
-    rubric: InstructorRubricAnalytics | { error: { code: string; message: string } };
-  };
+  const loaderData = Route.useLoaderData();
   const data = loaderData.analytics;
   const rubricData = loaderData.rubric;
-  const searchParams = Route.useSearch() as unknown as AnalyticsSearchParams;
+  const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
 
   if (isServerError(data)) {

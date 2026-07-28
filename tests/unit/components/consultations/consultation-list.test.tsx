@@ -37,7 +37,7 @@ describe('ConsultationList', () => {
     externalConsultantName: null,
     notes: 'Student discussed topic selection.',
     status: 'pending',
-    createdAt: '2026-05-20T10:00:00Z',
+    createdAt: new Date('2026-05-20T10:00:00Z'),
   };
 
   it('should render EmptyState component when no consultations', () => {
@@ -133,7 +133,7 @@ describe('ConsultationList - shared formatDate (UX-20)', () => {
     externalConsultantName: null,
     notes: 'Student discussed topic selection.',
     status: 'pending',
-    createdAt: '2026-05-20T10:00:00Z',
+    createdAt: new Date('2026-05-20T10:00:00Z'),
   };
 
   beforeEach(() => {

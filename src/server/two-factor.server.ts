@@ -45,7 +45,7 @@ export async function generateTwoFactorSetupHandler(args: { data: EnableTwoFacto
     });
 
     // auth.api.enableTwoFactor() returns { totpURI, backupCodes } directly
-    const data = result as unknown as { totpURI?: string; backupCodes?: string[] };
+    const data = result as { totpURI?: string; backupCodes?: string[] };
 
     // Log audit event
     await logAuditEvent({

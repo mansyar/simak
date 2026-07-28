@@ -1,6 +1,6 @@
-// Client-safe server function wrappers (Zod schemas + createServerFn stubs)
+// Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in consultations.server.ts (not bundled for client)
-import { createServerFn } from '@tanstack/react-start';
+import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const LogConsultationSchema = z.object({
@@ -42,49 +42,49 @@ export const ListVerifiedCountsSchema = z.object({
   assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
 });
 
-export const logConsultation = createServerFn({ method: 'POST' })
+export const logConsultation = typedServerFn({ method: 'POST' })
   .inputValidator(LogConsultationSchema)
   .handler(async ({ data }) => {
     const { logConsultationHandler } = await import('./consultations.server');
     return logConsultationHandler({ data });
   });
 
-export const listConsultations = createServerFn({ method: 'GET' })
+export const listConsultations = typedServerFn({ method: 'GET' })
   .inputValidator(ListConsultationsSchema)
   .handler(async ({ data }) => {
     const { listConsultationsHandler } = await import('./consultations.server');
     return listConsultationsHandler({ data });
   });
 
-export const listPendingConsultations = createServerFn({ method: 'GET' })
+export const listPendingConsultations = typedServerFn({ method: 'GET' })
   .inputValidator(ListPendingConsultationsSchema)
   .handler(async ({ data }) => {
     const { listPendingConsultationsHandler } = await import('./consultations.server');
     return listPendingConsultationsHandler({ data });
   });
 
-export const verifyConsultation = createServerFn({ method: 'POST' })
+export const verifyConsultation = typedServerFn({ method: 'POST' })
   .inputValidator(VerifyConsultationSchema)
   .handler(async ({ data }) => {
     const { verifyConsultationHandler } = await import('./consultations.server');
     return verifyConsultationHandler({ data });
   });
 
-export const rejectConsultation = createServerFn({ method: 'POST' })
+export const rejectConsultation = typedServerFn({ method: 'POST' })
   .inputValidator(RejectConsultationSchema)
   .handler(async ({ data }) => {
     const { rejectConsultationHandler } = await import('./consultations.server');
     return rejectConsultationHandler({ data });
   });
 
-export const getConsultationDetail = createServerFn({ method: 'GET' })
+export const getConsultationDetail = typedServerFn({ method: 'GET' })
   .inputValidator(GetConsultationDetailSchema)
   .handler(async ({ data }) => {
     const { getConsultationDetailHandler } = await import('./consultations.server');
     return getConsultationDetailHandler({ data });
   });
 
-export const listVerifiedCounts = createServerFn({ method: 'GET' })
+export const listVerifiedCounts = typedServerFn({ method: 'GET' })
   .inputValidator(ListVerifiedCountsSchema)
   .handler(async ({ data }) => {
     const { listVerifiedCountsHandler } = await import('./consultations.server');
