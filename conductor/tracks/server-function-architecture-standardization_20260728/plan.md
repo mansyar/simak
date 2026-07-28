@@ -25,11 +25,11 @@
     - [ ] Refactor `src/server/setup-password.ts` to stub-only: Zod schema + `typedServerFn` stub with dynamic import of handler
     - [ ] Add `logError` calls for structured error logging on failure paths
     - [ ] Run `pnpm test` and confirm all tests now pass
-- [ ] Task: Verify quality gates for Phase 2
-    - [ ] Run `pnpm typecheck` — 0 errors
-    - [ ] Run `pnpm test:coverage` — ≥80% on all thresholds (lines, statements, branches, functions)
-    - [ ] Run `pnpm lint` — 0 warnings, 0 errors
-    - [ ] Verify `src/server/setup-password.ts` and `src/server/setup-password.server.ts` are each under 500 lines
+- [x] Task: Verify quality gates for Phase 2
+    - [x] Run `pnpm typecheck` — 0 errors
+    - [x] Run `pnpm test:coverage` — ≥80% on all thresholds (lines, statements, branches, functions)
+    - [x] Run `pnpm lint` — 0 warnings, 0 errors
+    - [x] Verify `src/server/setup-password.ts` and `src/server/setup-password.server.ts` are each under 500 lines
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: setup-password Refactor' (Protocol in workflow.md)
 
 ## Phase 3: Audit-Log Naming + Circular Dependency Audit
