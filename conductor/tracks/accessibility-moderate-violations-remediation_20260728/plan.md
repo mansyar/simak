@@ -35,7 +35,7 @@
     - [ ] Run `pnpm check:i18n`
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Landmark Structure & Skip Link' (Protocol in workflow.md)
 
-## Phase 2: Fix `region` (Content Outside Landmarks)
+## Phase 2: Fix `region` (Content Outside Landmarks) [checkpoint: 6ff3cb3]
 
 - [x] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
 - [x] Task: Write failing unit tests for content containment in landmarks (Red Phase)
