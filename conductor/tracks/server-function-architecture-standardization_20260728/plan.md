@@ -2,7 +2,7 @@
 
 ## Phase 1: Documentation — Server-Function Split Taxonomy
 
-- [ ] Task: Update AGENTS.md with 4-pattern server-function split taxonomy
+- [x] Task: Update AGENTS.md with 4-pattern server-function split taxonomy (0e80240)
     - [ ] Document Standard pair pattern (default `*.ts` + `*.server.ts`) with decision criteria, referencing `src/server/assignments.ts` + `assignments.server.ts` as canonical example
     - [ ] Document Extras variant pattern (`*-extras.server.ts`) with decision criteria (when file would exceed 500-line limit), referencing `assignments-extras.server.ts` and `reviews-extras.server.ts`
     - [ ] Document Multi-handler pattern (multiple `*.server.ts` for role-separated logic) with decision criteria, referencing `dashboard-instructor.server.ts`, `dashboard-student.server.ts`, `dashboard-admin.server.ts`
