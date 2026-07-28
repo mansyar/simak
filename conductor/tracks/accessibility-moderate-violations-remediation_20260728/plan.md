@@ -74,22 +74,22 @@
 
 ## Phase 4: E2E Tests & Documentation Update
 
-- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
-- [ ] Task: Update E2E a11y tests to assert zero moderate violations
-    - [ ] Read `tests/e2e/a11y.spec.ts` — understand current critical/serious filter
-    - [ ] Extend to also assert zero moderate violations (or change filter to include moderate)
-    - [ ] If E2E login timeout blocks authenticated-page scans, document the workaround or skip authenticated scans with a note (the E2E login issue is pre-existing and out of scope)
-    - [ ] Run E2E a11y tests for login page — confirm zero moderate violations
-- [ ] Task: Update `docs/a11y-violations.md`
-    - [ ] Mark `landmark-one-main` as remediated
-    - [ ] Mark `skip-link` as remediated
-    - [ ] Mark `region` as remediated
-    - [ ] Mark `heading-order` as remediated
-    - [ ] Add remediation date and track reference (TRACK-037)
+- [x] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
+- [x] Task: Update E2E a11y tests to assert zero moderate violations [c9373eb]
+    - [x] Read `tests/e2e/a11y.spec.ts` — understand current critical/serious filter
+    - [x] Extend to also assert zero moderate violations (or change filter to include moderate)
+    - [x] If E2E login timeout blocks authenticated-page scans, document the workaround or skip authenticated scans with a note (the E2E login issue is pre-existing and out of scope)
+    - [x] Run E2E a11y tests for login page — confirm zero moderate violations
+- [x] Task: Update `docs/a11y-violations.md` [c9373eb]
+    - [x] Mark `landmark-one-main` as remediated
+    - [x] Mark `skip-link` as remediated
+    - [x] Mark `region` as remediated
+    - [x] Mark `heading-order` as remediated
+    - [x] Add remediation date and track reference (TRACK-037)
 - [x] Task: Verify quality gates
     - [x] Run `pnpm test:coverage` (≥80% thresholds)
     - [x] Run `pnpm typecheck`
     - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
     - [x] Run `pnpm check:i18n`
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: E2E Tests & Documentation' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 4: E2E Tests & Documentation' (Protocol in workflow.md)
 </protect>
