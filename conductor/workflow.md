@@ -68,7 +68,7 @@ All tasks follow a strict lifecycle:
 
    ```bash
    pnpm test:coverage   # vitest run --coverage; thresholds: lines/stmts/branches/funcs ≥80%
-   pnpm typecheck       # tsc --noEmit --incremental
+   pnpm typecheck       # tsc --noEmit --incremental --checkers 4
    pnpm lint            # oxlint . (includes simak-i18n/no-hardcoded rule)
    pnpm check:i18n      # i18n key parity EN↔ID
    ```
@@ -181,7 +181,7 @@ Before marking any task complete, verify ALL of the following. These mirror the 
 
 - [ ] `pnpm test` passes (unit tests; excludes `tests/integration/**`)
 - [ ] `pnpm test:coverage` meets thresholds — lines, statements, branches, **and** functions ≥80%
-- [ ] `pnpm typecheck` passes (`tsc --noEmit --incremental`)
+- [ ] `pnpm typecheck` passes (`tsc --noEmit --incremental --checkers 4`)
 - [ ] `pnpm lint` passes — `oxlint .`, including the custom `simak-i18n/no-hardcoded` rule (no hardcoded English UI strings)
 - [ ] `pnpm check:i18n` passes — i18n key parity between `locales/en.json` and `locales/id.json`
 - [ ] No file in `src/`, `tests/`, or `scripts/` exceeds **500 lines** (enforced by `scripts/check-modularity.js` on commit; exempt: `*.gen.ts`, `src/i18n/types.ts`, `src/i18n/detect-locale.ts`, `scripts/generate-i18n-types.ts`)
@@ -233,8 +233,8 @@ pnpm test:watch                            # watch mode (unit only, xlsx include
 pnpm test:integration                      # opt-in integration tests only
 pnpm test:coverage                         # unit + coverage report
 pnpm lint                                  # oxlint . (includes simak-i18n/no-hardcoded)
-pnpm format                                # oxfmt --write "src/**/*.{ts,tsx,css}"
-pnpm typecheck                             # tsc --noEmit --incremental
+pnpm format                                # oxfmt --write "*.{js,jsx,ts,tsx,css}"
+pnpm typecheck                             # tsc --noEmit --incremental --checkers 4
 pnpm check:i18n                            # i18n key parity EN↔ID
 pnpm check:i18n:unused                     # show unused i18n keys
 ```

@@ -511,41 +511,9 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-036: Developer Experience & Tooling Hygiene
-
-*   **Status:** `Pending`
-*   **Dependencies:** None
-*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
-*   **Audit IDs:** INFRA-10 (lefthook vs package.json configuration mismatch)
-
-#### Context Anchors (Traceability)
-*   **PRD Reference:** N/A (developer tooling, no product impact)
-*   **TDD Reference:** `lefthook.yml` (pre-commit `lint` glob: `src/**/*.{js,jsx,ts,tsx}` — src only; pre-commit `format` glob: `*.{js,jsx,ts,tsx}` — all dirs, no `.css`; pre-push `typecheck`: `tsc --noEmit --incremental --checkers 4`); `package.json` (`lint` script: `oxlint .` — everything; `format` script: `oxfmt --write "src/**/*.{ts,tsx,css}"` — src only, includes `.css`; `typecheck` script: `tsc --noEmit --incremental` — no `--checkers`); `AGENTS.md` → "Formatting Quirks" (documents oxfmt on `src/**/*.{ts,tsx,css}`)
-
-#### Track Tech Stack
-*   `lefthook.yml` (git hook config)
-*   `package.json` (script alignment)
-*   `.socraticodecontextartifacts.json` (new file — SocratiCode context artifact config)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Align lefthook format glob with package.json:** The pre-commit `format` hook formats files in `tests/` and `scripts/` (glob: `*.{js,jsx,ts,tsx}`), but `pnpm format` only targets `src/**/*.{ts,tsx,css}`. Two gaps: (1) lefthook glob doesn't include `.css` files — add `.css` to the lefthook format glob so pre-commit formats CSS files too; (2) scope mismatch (all dirs vs src only) — either expand `pnpm format` to include `tests/` and `scripts/` (recommended — ensures manual format matches pre-commit), or narrow the lefthook glob to match `pnpm format` scope. Document the decision in `AGENTS.md`.
-    *   **Align lefthook lint glob with pnpm lint:** The pre-commit `lint` hook only lints `src/` files (glob: `src/**/*.{js,jsx,ts,tsx}`), but `pnpm lint` runs `oxlint .` (everything). Expand the lefthook lint glob to `*.{js,jsx,ts,tsx}` (all dirs) to match the format and modularity globs, so lint errors in `tests/` and `scripts/` are caught at commit time.
-    *   **Align lefthook typecheck with package.json:** The pre-push `typecheck` uses `--checkers 4` but `pnpm typecheck` doesn't. Add `--checkers 4` to `pnpm typecheck` in `package.json` (or remove from lefthook — but the TS 7 track explicitly added it for parallelism, so adding to `pnpm typecheck` is preferred).
-    *   **Configure SocratiCode context artifacts:** Create `.socraticodecontextartifacts.json` with entries for: `conductor/product.md`, `conductor/tech-stack.md`, `conductor/workflow.md`, `conductor/product-guidelines.md`, `drizzle/migrations/` (DB schema history), `docs/PRD.md`, `docs/TDD.md`. Run `codebase_context_index` to index them.
-*   **Out of Scope:**
-    *   Changes to test coverage thresholds (handled in TRACK-035)
-    *   Structured logging migration (deferred — `console.error(JSON.stringify(...))` is functional; a pino/winston migration is a separate infrastructure track)
-    *   Pagination UI component consolidation (deferred — identified in the instructor-ui-consistency audit as a "should-have" but requires UI design work, not tooling)
-    *   Any code changes beyond config files
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Lefthook alignment):** Update `package.json` `format` script to include `tests/` and `scripts/` (or narrow lefthook glob — decide based on whether test/script formatting is desired). Add `.css` to lefthook format glob. Expand lefthook lint glob from `src/**/*.{js,jsx,ts,tsx}` to `*.{js,jsx,ts,tsx}` (all dirs). Add `--checkers 4` to `pnpm typecheck`. Update `AGENTS.md` "Formatting Quirks" and "Developer Commands" to match. Verify: `pnpm format`, `pnpm lint`, and `pnpm typecheck` match lefthook behavior.
-*   **Phase 2 (SocratiCode artifacts):** Create `.socraticodecontextartifacts.json`. Run `codebase_context_index`. Verify `codebase_context_search` returns results from conductor docs and PRD/TDD.
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** Run `pnpm format` — formats files in `src/`, `tests/`, and `scripts/` (if expanded), including `.css` files. Run `pnpm typecheck` — uses `--checkers 4` (TS 7 parallelism). Run `pnpm lint` — lints all directories (matches lefthook lint glob). Verify `.socraticodecontextartifacts.json` exists and `codebase_context_search` returns results from conductor docs and PRD/TDD.
-*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. `pnpm typecheck` clean. `pnpm lint` clean. `pnpm check:i18n` parity maintained.
-*   [ ] **Conductor Review:** `lefthook.yml` format glob matches `pnpm format` scope (including `.css`). `lefthook.yml` lint glob matches `pnpm lint` scope (all dirs). `package.json` `typecheck` script uses `--checkers 4`. `.socraticodecontextartifacts.json` exists with documented artifacts. `codebase_context_search` returns results from indexed artifacts. `AGENTS.md` reflects the updated scripts. All files under 500 lines. Pre-push gate passes.
+- **Status:** ✅ Complete · **Audit IDs:** INFRA-10 (lefthook vs package.json configuration mismatch) · **Deps:** None
+- **Key decisions:** Aligned `lefthook.yml` and `package.json` tooling gates — format glob expanded to include `.css` (`*.{js,jsx,ts,tsx,css}`) and cover all dirs (was `src/**/*.{ts,tsx,css}` in `pnpm format`); lint glob expanded from `src/**/*.{js,jsx,ts,tsx}` to `*.{js,jsx,ts,tsx}` (all dirs, matching `oxlint .`); `pnpm typecheck` script updated to include `--checkers 4` (TS 7 shared-memory multithreading, previously only in lefthook pre-push gate); created `.socraticodecontextartifacts.json` with 7 entries (`conductor/product.md`, `conductor/tech-stack.md`, `conductor/workflow.md`, `conductor/product-guidelines.md`, `drizzle/migrations/`, `docs/PRD.md`, `docs/TDD.md`) enabling SocratiCode semantic search across project documentation and DB migrations; updated `AGENTS.md` (Developer Commands table, Formatting Quirks, Pre-commit gate description); expanded format scope surfaced 2 formatting fixes (`src/app/global.css` oklch normalization, `tests/unit/lib/notification-resolver.test.ts` line folding); all 3,773 tests pass, typecheck clean, lint clean (0 errors), i18n parity confirmed (963 keys in both locales)
+- **Detail:** `conductor/archive/developer-experience-tooling-hygiene_20260728/` (spec.md, plan.md)
 
 ---
 
@@ -633,7 +601,7 @@ The following track groups can be worked on simultaneously:
 | **O** | TRACK-026 | Complete — new domain (discussions), extended notification infrastructure (TRACK-022) and email queue (TRACK-018). No file overlap with TRACK-025 (different domain: discussions vs grading). Archived |
 | **P** | TRACK-027 → TRACK-028 | Both complete (archived). TRACK-027 expanded seed data (student2, student3, consultation seed) + decoupled instructor-review tests + 3 new specs + notification/upload/negative test assertions. TRACK-028 built on this expanded seed data and decoupled patterns — expanded coverage to 73 tests across 14 spec files, added Firefox + mobile-chrome projects, axe-core a11y scanning, cross-role lifecycle test. No file overlap with feature tracks (TRACK-025/026) — only touches `tests/e2e/`, `scripts/seed-e2e.ts`, and `playwright.config.ts` |
 | **Q** | TRACK-029, TRACK-030 | Both complete — TRACK-029 touched `query-keys.ts` + settings + gradebook components (archived); TRACK-030 touched `use-notifications.ts` + `NotificationCenter.tsx` + `query-keys.ts` (archived). Both depended on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files (TRACK-029 only) |
-| **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035 (complete — archived), TRACK-036 | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touched `vitest.config.ts` + `vitest.config.integration.ts` + `package.json` (complete — archived); TRACK-036 touches `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json`. Minor overlap: TRACK-035 and TRACK-036 both touch `package.json` scripts — coordinate to avoid merge conflicts |
+| **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035 (complete — archived), TRACK-036 (complete — archived) | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touched `vitest.config.ts` + `vitest.config.integration.ts` + `package.json` (complete — archived); TRACK-036 touched `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json` (complete — archived). Minor overlap: TRACK-035 and TRACK-036 both touched `package.json` scripts — coordinated to avoid merge conflicts |
 | **S** | TRACK-032 → TRACK-033 | Sequential — TRACK-032 (type-safety restoration) touches the same `createServerFn` stub files that TRACK-033 (architecture standardization) refactors. Complete TRACK-032's type fixes first, then TRACK-033's structural changes. Both touch `src/server/*.ts` and `src/server/*.server.ts` |
 
 ---

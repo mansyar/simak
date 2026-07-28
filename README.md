@@ -68,9 +68,9 @@
 | `pnpm test:coverage` | Unit tests + coverage (excludes integration) |
 | `pnpm test:e2e` | Run Playwright E2E tests (requires Docker for test DB) |
 | `pnpm test:e2e:ui` | Run E2E tests in interactive UI mode |
-| `pnpm typecheck` | TypeScript type checking (`tsc --noEmit`) |
-| `pnpm lint` | Lint with oxlint |
-| `pnpm format` | Format with oxfmt |
+| `pnpm typecheck` | TypeScript type checking (`tsc --noEmit --incremental --checkers 4`) |
+| `pnpm lint` | Lint all dirs with oxlint (`oxlint .`) |
+| `pnpm format` | Format all dirs with oxfmt (`*.{js,jsx,ts,tsx,css}`) |
 | `pnpm db:generate` | Generate Drizzle migration from schema |
 | `pnpm db:migrate` | Run pending migrations |
 | `pnpm db:seed` | Seed SuperAdmin user |
