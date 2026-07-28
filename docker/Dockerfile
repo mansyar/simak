@@ -24,5 +24,8 @@ COPY --from=builder --chown=simak:nodejs /app/drizzle/migrations /app/drizzle/mi
 ENV NODE_ENV=production
 EXPOSE 3000
 
+# Health check via the public /api/health endpoint (wget available via busybox on alpine)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:3000/api/health || exit 1
+
 # Run migrations before starting the app
 CMD ["sh", "-c", "node .output/server/migrate.mjs && node .output/server/index.mjs"]

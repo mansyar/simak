@@ -161,7 +161,8 @@ simak/
     │   │   ├── bulk-import.ts      → Bulk import server fn stubs + Zod schemas (users, templates)
     │   │   └── bulk-import.server.ts → Server-only bulk import handlers (parse, validate, insert)
     │   │   ├── gradebook.ts         → Gradebook server fn stubs (getStudentFinalGrade, getAssignmentGradebook, saveGradeConfig, recomputeAllGrades) + Zod schemas
-    │   │   └── gradebook.server.ts  → Server-only gradebook handlers (student grade, gradebook view, config upsert, batch recompute)
+    │   │   ├── gradebook.server.ts  → Server-only gradebook handlers (student grade, gradebook view, config upsert, batch recompute)
+    │   │   └── health.server.ts    → Health check handler (runHealthChecks — DB, R2, email queue checks with 2s timeouts, generic error messages)
 │   ├── db/
 │   │   ├── schema/           → Drizzle schema (split by domain)
 │   │   ├── index.ts          → Database client
@@ -1293,6 +1294,30 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 - **Development**: Direct connections (Drizzle uses a single pool internally).
 - **Production**: PgBouncer deployed as a sidecar container in Coolify. The app connects to PgBouncer, which multiplexes connections to PostgreSQL. Prevents connection exhaustion under concurrent load.
 - Connection string format: `postgresql://user:pass@pgbouncer:6432/simak` (PgBouncer on port 6432).
+
+### Health Checks [v1]
+
+The public, unauthenticated `GET /api/health` endpoint provides container orchestration health probes. Coolify can configure liveness and readiness probes against this endpoint.
+
+- **HTTP 200 (healthy):** DB reachable AND (R2 not configured OR R2 reachable). Response body:
+  ```json
+  {
+    "status": "healthy",
+    "timestamp": "<ISO 8601>",
+    "version": "<package.json version>",
+    "checks": {
+      "database": { "status": "ok" },
+      "r2": { "status": "ok" | "not_configured" },
+      "emailQueue": { "status": "ok", "depth": <number> }
+    }
+  }
+  ```
+- **HTTP 503 (unhealthy):** DB unreachable OR R2 configured-but-unreachable. Same response shape but `status: "unhealthy"` with failing check(s) carrying `{ status: "error", error: "..." }`. Error messages are generic (`'database unreachable'`, `'r2 unreachable'`) — raw error details are never exposed on the public endpoint to prevent information leakage (internal IPs, DB usernames, R2 bucket names).
+- **Three checks** (each with a 2-second timeout, run in parallel via `Promise.allSettled`):
+  1. **Database** — `SELECT 1` via `getDb()` (PgBouncer-safe — no session-specific queries).
+  2. **R2** — `HeadBucketCommand` via `getR2Client()` (returns `null` if R2 env vars are absent → `not_configured`, which is healthy).
+  3. **Email queue** — `COUNT(*)` where `status IN ('pending', 'processing')` — informational depth only, never causes unhealthy status.
+- **Dockerfile HEALTHCHECK** — `HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:3000/api/health || exit 1` (uses `wget` from busybox; `curl` is not available on `node:22-alpine`).
 
 ---
 

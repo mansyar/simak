@@ -51,7 +51,7 @@ export function getR2Client(): S3Client | null {
 /**
  * Returns the configured R2 bucket name, or null if not configured.
  */
-function getBucketName(): string | null {
+export function getBucketName(): string | null {
   return process.env.R2_BUCKET_NAME ?? null;
 }
 
