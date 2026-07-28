@@ -178,12 +178,12 @@
     - [x] Update `conductor/tech-stack.md` changelog — add pino + pino-pretty entries with date
     - [x] Update `docs/roadmap.md` TRACK-040 status from `Planned` to `✅ Complete` with key decisions summary
 
-- [~] Task: Commit code changes & attach git note
-    - [ ] Stage all modified `src/lib/`, `src/server/`, `tests/unit/`, `conductor/tech-stack.md`, `docs/roadmap.md` files
-    - [ ] Commit: `refactor(logging): Migrate all console.* calls to pino structured logger`
-    - [ ] Attach git note with task summary to the commit hash
+- [x] Task: Commit code changes & attach git note (48b1945b)
+    - [x] Stage all modified `src/lib/`, `src/server/`, `tests/unit/`, `conductor/tech-stack.md`, `docs/roadmap.md` files
+    - [x] Commit: `refactor(logging): Migrate all console.* calls to pino structured logger`
+    - [x] Attach git note with task summary to the commit hash
 
-- [ ] Task: Conductor - User Manual Verification 'Full console.* Migration' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Full console.* Migration' (Protocol in workflow.md)
 
 ## Phase: Review Fixes
 - [ ] Task: Apply review suggestions
