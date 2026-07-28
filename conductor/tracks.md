@@ -8,3 +8,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: Health Check Endpoint**
+*Link: [./tracks/health-check-endpoint_20260728/](./tracks/health-check-endpoint_20260728/)*
+
