@@ -20,7 +20,7 @@
     - [ ] Write tests asserting `serverError()` return type on error cases (invalid token, expired token, user not found)
     - [ ] Write tests asserting success case returns correct shape
     - [ ] Run `pnpm test` and confirm new/updated tests fail as expected
-- [x] Task: Implement the two-file split (Green Phase)
+- [x] Task: Implement the two-file split (Green Phase) (5b8d757)
     - [ ] Create `src/server/setup-password.server.ts` with `completePasswordSetupHandler` using `serverError(ErrorCode.X, message)` from `src/lib/errors.ts`
     - [ ] Refactor `src/server/setup-password.ts` to stub-only: Zod schema + `typedServerFn` stub with dynamic import of handler
     - [ ] Add `logError` calls for structured error logging on failure paths
