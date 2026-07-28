@@ -37,14 +37,31 @@
 
 ### Server function split (critical)
 
-Every feature has **two files** — the client is **never** bundled with handler code:
+Server functions follow a two-file split: the client-safe stub file (`*.ts`) and the server-only handler file (`*.server.ts`). The client is **never** bundled with handler code. All stubs use `typedServerFn` from `src/lib/server-fn.ts` — never call `createServerFn` directly.
 
-- `src/server/<feature>.ts` — Exports Zod schemas + `createServerFn` stubs that dynamically import the handler
-- `src/server/<feature>.server.ts` — Exports handler functions only (server code, never client-bundled)
+#### Structural patterns (choose based on complexity)
 
-Two stub patterns coexist — match the surrounding file:
-- Typed builder: `createServerFn({ method }).inputValidator(Schema).handler(fn)` (preferred; see `assignments.ts`)
-- Inline parse: `createServerFn({ method }).handler(async (args) => { Schema.parse(args.data) })` (see `submissions.ts`)
+1. **Standard pair** (default) — `*.ts` (Zod schemas + `typedServerFn` stubs with dynamic import of handler) + `*.server.ts` (handler implementations). Use when a feature's handlers fit within the 500-line file limit in a single `.server.ts` file. Canonical example: `src/server/assignments.ts` + `assignments.server.ts`.
+
+2. **Extras variant** — Standard pair + `*-extras.server.ts`. Use when adding more handlers to a `.server.ts` file would exceed the 500-line limit. The extras file imports schemas via `import type` from the `*.ts` stub and is handler-only (no corresponding extras stub file). Canonical examples: `assignments-extras.server.ts`, `reviews-extras.server.ts`, `consultations-extras.server.ts`, `extensions-extras.server.ts`.
+
+3. **Multi-handler** — `*.ts` (shared schemas + stubs) + multiple role-specific `*.server.ts` files. Use when a feature serves multiple roles with distinct query logic, making file separation clearer than a single handler file. Canonical examples: `dashboard.ts` + `dashboard-instructor.server.ts` + `dashboard-student.server.ts` + `dashboard-admin.server.ts`; also `analytics.ts` + `analytics-admin.server.ts` + `analytics-instructor.server.ts` + `analytics-export.server.ts`.
+
+4. **Handler-only** — No `*.ts` stub file; the `.server.ts` file is an internal helper imported only by other server files, never called directly from client code. Canonical example: the `*-extras.server.ts` helper functions.
+
+#### Stub calling conventions
+
+Two `typedServerFn` stub patterns coexist — match the surrounding file:
+- Typed builder (preferred): `typedServerFn({ method }).inputValidator(Schema).handler(fn)` — Zod validation at the TanStack layer. See `assignments.ts`.
+- Inline parse: `typedServerFn({ method }).handler(async (args) => { Schema.parse(args.data); ... })` — manual Zod parse inside the handler. See `submissions.ts`.
+
+#### Acceptable type-only circular dependencies
+
+Static analyzers report cycles like `feature.ts → feature.server.ts → feature.ts`. These are **safe and expected**:
+- The `*.ts` stub uses `await import('./feature.server')` — a **dynamic import** resolved lazily at call time, not at module evaluation.
+- The `*.server.ts` handler uses `import type { Schema } from './feature'` — a **type-only import** erased at compile time.
+
+Neither edge exists at runtime, so there is no circular dependency at execution. This pattern is the standard two-file split and should not be "fixed" by extracting types to a separate file.
 
 ### File limits
 
