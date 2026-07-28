@@ -84,6 +84,8 @@
 
 - [x] Task: Conductor - User Manual Verification 'logError() Migration' (Protocol in workflow.md)
 
+[checkpoint: 643f1c7a]
+
 ## Phase 3: Request ID Middleware
 
 - [ ] Task: Read spec.md and workflow.md to load context for this phase
