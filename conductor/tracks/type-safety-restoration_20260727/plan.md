@@ -136,15 +136,16 @@
     - [x] Run `pnpm typecheck` after each file
     - [x] Verify: typecheck clean, zero casts in admin/instructor components
 
-- [ ] Task: Remove `as unknown as` casts from routes (11 casts, 6 files)
-    - [ ] Remove 1 cast from `src/routes/_authenticated/student/dashboard.tsx` (loader data cast)
-    - [ ] Remove 1 cast from `src/routes/_authenticated/admin/dashboard.tsx` (loader data cast)
-    - [ ] Remove 2 casts from `src/routes/_authenticated/admin/analytics.tsx` (loader data + server fn casts)
-    - [ ] Remove 2 casts from `src/routes/_authenticated/instructor/analytics.tsx` (loader data + server fn casts)
-    - [ ] Remove 7 casts from `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx` (loader data + server fn casts)
-    - [ ] Remove 6 casts from `src/routes/_authenticated/student/assignments/$id.tsx` (loader data + server fn casts)
-    - [ ] Run `pnpm typecheck` after each file
-    - [ ] Verify: typecheck clean, only `_authenticated.tsx` and `_unauthenticated.tsx` redirect casts remain in routes
+- [x] Task: Remove `as unknown as` casts from routes (19 casts, 6 files) [0393f6a1]
+    - [x] Remove 1 cast from `src/routes/_authenticated/student/dashboard.tsx` (loader data cast)
+    - [x] Remove 1 cast from `src/routes/_authenticated/admin/dashboard.tsx` (loader data cast)
+    - [x] Remove 2 casts from `src/routes/_authenticated/admin/analytics.tsx` (loader data + server fn casts)
+    - [x] Remove 2 casts from `src/routes/_authenticated/instructor/analytics.tsx` (loader data + server fn casts)
+    - [x] Remove 7 casts from `src/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.tsx` (loader data + server fn casts)
+    - [x] Remove 6 casts from `src/routes/_authenticated/student/assignments/$id.tsx` (loader data + server fn casts)
+    - [x] Run `pnpm typecheck` after each file
+    - [x] Verify: typecheck clean, only `_authenticated.tsx` and `_unauthenticated.tsx` redirect casts remain in routes
+    - Note: Also removed orphaned type aliases (InstructorAnalyticsData, RubricCriterionMetric, InstructorRubricAnalytics, AdminAnalyticsData) in commit 73ddad61. Updated ConsultationList, ExtensionHistoryList, file-list, AdminDashboard, StudentDashboard interfaces for Drizzle nullable timestamps.
 
 - [ ] Task: Remove Drizzle query-result casts from server files (5 casts, 3 files)
     - [ ] Remove 1 cast from `src/server/analytics-export.server.ts` — replace `as unknown as ScoreRow[]` with `$type<RowShape>()` or explicit interface annotation
