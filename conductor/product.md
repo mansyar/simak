@@ -575,4 +575,13 @@ Students and instructors lack a centralized system to:
 - **i18n** — 3 new keys in EN and ID (`adminEmailQueue.r2Cleanup.trigger`, `.success`, `.error`)
 - **Tests** — 3,819 tests pass across 369 test files; coverage ≥80% on all thresholds (stmts 87.93%, branches 81.92%, funcs 83.4%, lines 88.56%)
 
+### Track: Structured Logging & Observability (TRACK-040) (July 2026)
+
+- **pino structured logger** — New `src/lib/logger.ts` with singleton pino instance; production outputs JSON to stdout, dev uses `pino-pretty` (lazy-loaded via `createRequire` to avoid bundling in prod); `LOG_LEVEL` env var controls verbosity (default `info`)
+- **logError() migration** — Refactored `src/lib/errors.ts` `logError()` to route through `logger.error(entry)` instead of `console.error`; removed `import.meta.env.PROD` branching; preserved entry object shape and `sanitizeInput()` redaction
+- **Request ID middleware** — New `src/lib/request-context.ts` with TanStack Start `createMiddleware({ type: 'request' })` that reads `x-request-id` header or generates UUID via `crypto.randomUUID()`; `createRequestLogger(context)` helper creates `logger.child({ requestId })` for request-scoped logging
+- **logAdvisoryFailure helper** — Added to `src/lib/logger.ts` for unstructured error logging pattern: `logAdvisoryFailure(handler, error)` wraps `logger.error({ event: 'advisory_failed', handler, error })`
+- **Full console.* migration** — All 41 `console.*` calls across 22 files in `src/lib/` and `src/server/` replaced with pino structured logger calls (zero `console.*` remaining, excluding `src/db/seed.ts` and `src/db/migrate.ts`); background jobs use `logger.child({ requestId: crypto.randomUUID() })` for request tracing
+- **Tests** — 3,849 tests pass across 379 test files; coverage ≥80% on all thresholds (stmts 87.92%, branches 80.91%, funcs 83.32%, lines 88.54%)
+
 </protect>
