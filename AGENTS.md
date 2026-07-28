@@ -18,9 +18,9 @@
 | `pnpm test:watch`                                 | Watch mode (`vitest`; unit only, xlsx included via `projects`) |
 | `pnpm test:coverage`                              | Unit tests + coverage (`vitest run --coverage`; vmThreads for unit, excludes integration) |
 | `pnpm vitest run tests/unit/path/to/file.test.ts` | Single test file                                         |
-| `pnpm typecheck`                                  | `tsc --noEmit --incremental`                             |
+| `pnpm typecheck`                                  | `tsc --noEmit --incremental --checkers 4`                |
 | `pnpm lint`                                       | **oxlint** on everything (`oxlint .`)                    |
-| `pnpm format`                                     | **oxfmt** on `src/**/*.{ts,tsx,css}` (not `tests/`)       |
+| `pnpm format`                                     | **oxfmt** on all dirs (`*.{js,jsx,ts,tsx,css}`)         |
 | `pnpm db:generate`                                | Generate Drizzle migration from schema                   |
 | `pnpm db:push`                                    | Push schema to dev DB (`drizzle-kit push`)              |
 | `pnpm db:migrate`                                 | Run pending migrations                                   |
@@ -28,7 +28,7 @@
 | `pnpm generate:i18n`                              | Regenerate i18n TypeScript types                         |
 | `pnpm check:i18n` / `pnpm check:i18n:unused`      | Validate i18n key parity / show unused keys              |
 
-**Pre-commit gate** (Lefthook, sequential): `oxlint --fix {staged_files}` → `oxfmt --write {staged_files}` → `node scripts/check-modularity.js {staged_files}`  
+**Pre-commit gate** (Lefthook, sequential): `oxlint --fix {staged_files}` (all dirs, `*.{js,jsx,ts,tsx}`) → `oxfmt --write {staged_files}` (all dirs, `*.{js,jsx,ts,tsx,css}`) → `node scripts/check-modularity.js {staged_files}`  
 **Pre-push gate** (Lefthook): `pnpm typecheck` && `pnpm test:coverage` (coverage run **also excludes integration** via `vitest.config.ts`).
 
 > Integration tests never run unless you invoke `pnpm test:integration` explicitly.
@@ -108,7 +108,7 @@ Files go **directly to Cloudflare R2** via presigned URLs — the server never s
 
 ## Formatting Quirks
 
-- **Formatting via oxfmt** (`.oxfmtrc.json`): `semi: true`, `singleQuote: true`, `trailingComma: 'all'`, `printWidth: 100`, `tabWidth: 2`.
+- **Formatting via oxfmt** (`.oxfmtrc.json`): `semi: true`, `singleQuote: true`, `trailingComma: 'all'`, `printWidth: 100`, `tabWidth: 2`. `pnpm format` covers all dirs (`*.{js,jsx,ts,tsx,css}`).
 - **Linting via oxlint** (`.oxlintrc.json`): TypeScript + React plugins, `correctness: error`, plus the custom `simak-i18n/no-hardcoded` rule (see above).
 - `.gitattributes` enforces **LF line endings** for all source files (`.ts`, `.tsx`, `.js`, etc.) — Windows checkout is fine, commits are always LF.
 - `pnpm-lock.yaml` uses **pnpm** (not npm or yarn). Always use `pnpm` for dependency operations.
