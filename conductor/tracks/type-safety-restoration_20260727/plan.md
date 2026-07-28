@@ -166,12 +166,12 @@
     - [x] Run `pnpm typecheck` after each file — 0 errors
     - [x] Verify: typecheck clean, zero Better Auth casts
 
-- [ ] Task: Final cast elimination verification
-    - [ ] Run `rg "as unknown as" src/hooks/ src/components/ src/lib/` — confirm zero matches (excluding `src/components/layout/*-sidebar.tsx`)
-    - [ ] Run `rg "as unknown as" src/routes/` — confirm only `_authenticated.tsx` (1 cast) and `_unauthenticated.tsx` (1 cast) remain (documented TanStack Router limitation)
-    - [ ] Run `rg "as unknown as" src/server/` — confirm only `auth.ts` (2 casts) remains (documented TanStack Router redirect limitation)
-    - [ ] Run `rg "as unknown as" src/components/layout/` — confirm only 3 sidebar files (6 casts) remain (documented TanStack Router typed-routes limitation)
-    - [ ] Verify: only 10 documented TanStack Router limitation casts remain across the entire `src/` directory
+- [x] Task: Final cast elimination verification
+    - [x] Run `rg "as unknown as" src/hooks/ src/components/ src/lib/` — zero matches in hooks/components (excl. sidebar). `src/lib/server-fn.ts` has 1 solution cast (typedServerFn wrapper boundary, Decision 1) + 1 comment mention.
+    - [x] Run `rg "as unknown as" src/routes/` — only `_authenticated.tsx` (1 cast) and `_unauthenticated.tsx` (1 cast) remain (documented TanStack Router limitation)
+    - [x] Run `rg "as unknown as" src/server/` — only `auth.ts` (2 casts) remain (documented TanStack Router redirect limitation). `auth.server.ts` and `two-factor.server.ts` casts eliminated.
+    - [x] Run `rg "as unknown as" src/components/layout/` — only 3 sidebar files (6 casts) remain (documented TanStack Router typed-routes limitation)
+    - [x] Verify: 10 documented TanStack Router limitation casts + 1 solution cast (typedServerFn wrapper) = 11 total across `src/`. All 66 in-scope casts eliminated.
 
 - [ ] Task: Run full quality gate suite
     - [ ] Run `pnpm typecheck` — 0 errors
