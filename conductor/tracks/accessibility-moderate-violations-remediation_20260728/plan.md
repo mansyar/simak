@@ -1,7 +1,7 @@
 <protect>
 # TRACK-037: Accessibility Moderate Violations Remediation — Implementation Plan
 
-## Phase 0: Investigation & Test Baseline
+## Phase 0: Investigation & Test Baseline [checkpoint: 9f95797]
 
 - [x] Task: Confirm exact `region` violating node and check for duplicate `id="main-content"` [f7a2d12]
     - [x] Check `src/routes/_unauthenticated/auth/setup-password.tsx` for `id="main-content"` (login.tsx already has it on a `<div>` — must avoid duplicate IDs when adding to `<main>`)
