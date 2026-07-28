@@ -37,21 +37,21 @@
 
 ## Phase 2: Fix `region` (Content Outside Landmarks)
 
-- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
-- [ ] Task: Write failing unit tests for content containment in landmarks (Red Phase)
-    - [ ] Add test to `tests/unit/routes/layout-a11y.test.tsx` — verify `KeyboardCheatSheet` trigger button is rendered inside a landmark (`<main>` or `<header>`)
-    - [ ] Add test to `tests/unit/components/sonner.test.tsx` (or extend existing) — verify Toaster `<section>` has `aria-label` attribute
-    - [ ] Run `pnpm test` — confirm new tests FAIL as expected
-- [ ] Task: Implement `region` fixes (Green Phase)
-    - [ ] `src/routes/_authenticated.tsx` — relocate `<KeyboardCheatSheet />` so its trigger button is inside a landmark (options: move into role layout `<main>`, move into `AppHeader` `<header>`, or wrap in a landmark). Determine best approach from Phase 0 investigation.
-    - [ ] `src/components/ui/sonner.tsx` — add `aria-label` to Toaster `<section>` (use i18n key if lint rule requires — add key to `locales/en.json` and `locales/id.json`, run `pnpm generate:i18n`)
-    - [ ] Run `pnpm test` — confirm all tests now PASS
-- [ ] Task: Verify quality gates
-    - [ ] Run `pnpm test:coverage` (≥80% thresholds)
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n`
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Region Content Containment' (Protocol in workflow.md)
+- [x] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
+- [x] Task: Write failing unit tests for content containment in landmarks (Red Phase)
+    - [x] Add test to `tests/unit/routes/layout-a11y.test.tsx` — verify `KeyboardCheatSheet` trigger button is rendered inside a landmark (`<main>` or `<header>`)
+    - [x] Add test to `tests/unit/components/sonner.test.tsx` (or extend existing) — verify Toaster `<section>` has `aria-label` attribute
+    - [x] Run `pnpm test` — confirm new tests FAIL as expected
+- [x] Task: Implement `region` fixes (Green Phase) [1fd3035]
+    - [x] `src/routes/_authenticated.tsx` — relocate `<KeyboardCheatSheet />` so its trigger button is inside a landmark (options: move into role layout `<main>`, move into `AppHeader` `<header>`, or wrap in a landmark). Determine best approach from Phase 0 investigation.
+    - [x] `src/components/ui/sonner.tsx` — add `aria-label` to Toaster `<section>` (use i18n key if lint rule requires — add key to `locales/en.json` and `locales/id.json`, run `pnpm generate:i18n`)
+    - [x] Run `pnpm test` — confirm all tests now PASS
+- [x] Task: Verify quality gates
+    - [x] Run `pnpm test:coverage` (≥80% thresholds)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n`
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Region Content Containment' (Protocol in workflow.md)
 
 ## Phase 3: Fix `heading-order` (4 Pages)
 
