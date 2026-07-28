@@ -184,4 +184,10 @@
     - [x] Verify: all quality gates pass, no regressions
 
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Cast Elimination' (Protocol in workflow.md) [4b2504b9]
-</protect>
+
+---
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [71cc04c]
+
