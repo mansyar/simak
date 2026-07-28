@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: TRACK-038 — Health Check Endpoint
 
-## Phase 1: Health Check Module & Route (TDD)
+## Phase 1: Health Check Module & Route (TDD) [checkpoint: 1affcb9]
 
 - [x] Task: Read spec.md and workflow.md to load context for this phase
     - [x] Read `conductor/tracks/health-check-endpoint_20260728/spec.md`
