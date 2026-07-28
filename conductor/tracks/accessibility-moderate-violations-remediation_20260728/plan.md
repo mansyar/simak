@@ -65,11 +65,11 @@
     - [ ] `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` — fix heading hierarchy
     - [ ] `src/routes/_authenticated/admin/templates/$templateId.tsx` — fix heading hierarchy
     - [ ] Run `pnpm test` — confirm all tests now PASS
-- [ ] Task: Verify quality gates
-    - [ ] Run `pnpm test:coverage` (≥80% thresholds)
-    - [ ] Run `pnpm typecheck`
-    - [ ] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
-    - [ ] Run `pnpm check:i18n`
+- [x] Task: Verify quality gates
+    - [x] Run `pnpm test:coverage` (≥80% thresholds)
+    - [x] Run `pnpm typecheck`
+    - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
+    - [x] Run `pnpm check:i18n`
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Heading Order' (Protocol in workflow.md)
 
 ## Phase 4: E2E Tests & Documentation Update
