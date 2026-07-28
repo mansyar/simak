@@ -8,7 +8,7 @@
     - [x] Inspect `src/routes/_authenticated.tsx` KeyboardCheatSheet integration — understand `isOpen` state management and `isReviewPage` prop passing to determine best relocation strategy
     - [x] Verify landing page (`src/routes/index.tsx`) has no `<main>` landmark (confirmed — only `<section>`, `<footer>`, `<nav>`)
     - [x] Read the 4 heading-order pages to identify exact heading-level skips
-- [ ] Task: Conductor - User Manual Verification 'Phase 0: Investigation & Test Baseline' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 0: Investigation & Test Baseline' (Protocol in workflow.md)
 
 ## Phase 1: Fix `landmark-one-main` + `skip-link` (Landmark Structure & Skip Link Targets)
 
