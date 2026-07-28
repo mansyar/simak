@@ -57,7 +57,7 @@ export async function processEmailQueue(): Promise<{
     .set({ status: 'pending' })
     .where(
       and(eq(emailQueue.status, 'processing'), lt(emailQueue.lastAttemptAt, staleThreshold)),
-    )) as unknown as { rowCount?: number };
+    )) as { rowCount?: number };
   const reclaimed = reclaimResult?.rowCount ?? 0;
 
   if (reclaimed > 0) {
