@@ -3,8 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 
-const { mockReviewDetail } = vi.hoisted(() => ({
-  mockReviewDetail: {
+const mocks = vi.hoisted(() => ({
+  reviewDetail: {
     submission: {
       id: 1,
       studentName: 'John Doe',
@@ -22,12 +22,14 @@ const { mockReviewDetail } = vi.hoisted(() => ({
     reviewHistory: [],
     rubric: null,
   } as any,
+  discussionPanelProps: null as Record<string, unknown> | null,
+  shouldCompleteReview: false,
 }));
 
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: vi.fn().mockReturnValue((config: any) => ({
     ...config,
-    useLoaderData: () => mockReviewDetail,
+    useLoaderData: () => mocks.reviewDetail,
     useParams: () => ({ submissionId: '1' }),
   })),
   useNavigate: vi.fn().mockReturnValue(vi.fn()),
@@ -70,7 +72,7 @@ vi.mock('@/components/reviews/ReviewHistory', () => ({
 vi.mock('@/components/reviews/ReviewForm', () => ({
   ReviewForm: ({ onComplete }: any) => {
     React.useEffect(() => {
-      onComplete();
+      if (mocks.shouldCompleteReview) onComplete();
     }, []);
     return null;
   },
@@ -81,7 +83,10 @@ vi.mock('@/components/reviews/ReviewQueueSkeleton', () => ({
 }));
 
 vi.mock('@/components/discussions/discussion-panel', () => ({
-  DiscussionPanel: () => <div data-testid="discussion-panel" />,
+  DiscussionPanel: (props: any) => {
+    mocks.discussionPanelProps = props;
+    return <div data-testid="discussion-panel" />;
+  },
 }));
 
 vi.mock('@/components/ui/empty-state', () => ({
@@ -98,9 +103,50 @@ vi.mock('lucide-react', () => ({
   SearchX: () => <div />,
 }));
 
+describe('ReviewDetailPage - DiscussionPanel', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.discussionPanelProps = null;
+    mocks.shouldCompleteReview = false;
+  });
+
+  it('should render DiscussionPanel with checkpointId and assignmentId from submission', async () => {
+    const mod = await import('@/routes/_authenticated/instructor/reviews/$submissionId');
+    const Component = (mod.Route as any).component;
+    render(<Component />);
+
+    expect(mocks.discussionPanelProps).toEqual({
+      checkpointId: 1,
+      assignmentId: 1,
+      instructorView: true,
+    });
+  });
+
+  it('should render DiscussionPanel below the file preview section', async () => {
+    const mod = await import('@/routes/_authenticated/instructor/reviews/$submissionId');
+    const Component = (mod.Route as any).component;
+    const { container } = render(<Component />);
+
+    const filePreview = container.querySelector('[data-testid="file-preview"]');
+    const discussionPanelEl = container.querySelector('[data-testid="discussion-panel"]');
+
+    expect(filePreview).toBeTruthy();
+    expect(discussionPanelEl).toBeTruthy();
+
+    // DiscussionPanel should come AFTER file preview in DOM order
+    const allElements = Array.from(container.querySelectorAll('[data-testid]'));
+    const filePreviewIndex = allElements.indexOf(filePreview!);
+    const discussionPanelIndex = allElements.indexOf(discussionPanelEl!);
+
+    expect(discussionPanelIndex).toBeGreaterThan(filePreviewIndex);
+  });
+});
+
 describe('Instructor Review Detail heading order', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.discussionPanelProps = null;
+    mocks.shouldCompleteReview = true;
   });
 
   it('should render success message as h1 (not h2) for proper heading order', async () => {
