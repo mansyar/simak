@@ -3,25 +3,25 @@
 
 ## Phase 1: Configuration Alignment
 
-- [ ] Task: Read `spec.md` and `workflow.md` to establish context
-    - [ ] Read `./spec.md` for track requirements and acceptance criteria
-    - [ ] Read `../../workflow.md` for TDD lifecycle and phase completion protocol
-- [ ] Task: Align format, lint, and typecheck configuration in `lefthook.yml` and `package.json`
-    - [ ] Update `package.json` `format` script: `oxfmt --write "src/**/*.{ts,tsx,css}"` → `oxfmt --write "*.{js,jsx,ts,tsx,css}"`
-    - [ ] Update `lefthook.yml` `format` glob: `"*.{js,jsx,ts,tsx}"` → `"*.{js,jsx,ts,tsx,css}"`
-    - [ ] Update `lefthook.yml` `lint` glob: `"src/**/*.{js,jsx,ts,tsx}"` → `"*.{js,jsx,ts,tsx}"`
-    - [ ] Update `package.json` `typecheck` script: `tsc --noEmit --incremental` → `tsc --noEmit --incremental --checkers 4`
-- [ ] Task: Update `AGENTS.md` documentation
-    - [ ] Update Developer Commands table: `format` row to reflect all-dirs scope with `.css`; `typecheck` row to note `--checkers 4`
-    - [ ] Update Formatting Quirks section: `pnpm format` description from `src/**/*.{ts,tsx,css}` (not `tests/`) to `*.{js,jsx,ts,tsx,css}` (all dirs)
-    - [ ] Update Pre-commit gate description: reflect expanded lint and format glob scopes
-- [ ] Task: Verify quality gates
+- [x] Task: Read `spec.md` and `workflow.md` to establish context
+    - [x] Read `./spec.md` for track requirements and acceptance criteria
+    - [x] Read `../../workflow.md` for TDD lifecycle and phase completion protocol
+- [x] Task: Align format, lint, and typecheck configuration in `lefthook.yml` and `package.json`
+    - [x] Update `package.json` `format` script: `oxfmt --write "src/**/*.{ts,tsx,css}"` → `oxfmt --write "*.{js,jsx,ts,tsx,css}"`
+    - [x] Update `lefthook.yml` `format` glob: `"*.{js,jsx,ts,tsx}"` → `"*.{js,jsx,ts,tsx,css}"`
+    - [x] Update `lefthook.yml` `lint` glob: `"src/**/*.{js,jsx,ts,tsx}"` → `"*.{js,jsx,ts,tsx}"`
+    - [x] Update `package.json` `typecheck` script: `tsc --noEmit --incremental` → `tsc --noEmit --incremental --checkers 4`
+- [x] Task: Update `AGENTS.md` documentation
+    - [x] Update Developer Commands table: `format` row to reflect all-dirs scope with `.css`; `typecheck` row to note `--checkers 4`
+    - [x] Update Formatting Quirks section: `pnpm format` description from `src/**/*.{ts,tsx,css}` (not `tests/`) to `*.{js,jsx,ts,tsx,css}` (all dirs)
+    - [x] Update Pre-commit gate description: reflect expanded lint and format glob scopes
+- [x] Task: Verify quality gates
     - [ ] Run `pnpm format` — verify it covers all dirs (src, tests, scripts) with `.css`; fix any formatting issues surfaced by expanded scope
     - [ ] Run `pnpm typecheck` — verify `--checkers 4` works, no type errors
     - [ ] Run `pnpm lint` — verify expanded scope, fix any new lint issues in `tests/`/`scripts/`
     - [ ] Run `pnpm test` — all existing tests pass
     - [ ] Run `pnpm check:i18n` — i18n parity maintained
-- [ ] Task: Commit configuration alignment changes
+- [x] Task: Commit configuration alignment changes [7b833c1]
     - [ ] Stage `lefthook.yml`, `package.json`, `AGENTS.md` + any formatting fixes in `tests/`/`scripts/`
     - [ ] Commit with message `chore(tooling): Align lefthook/package.json format, lint, typecheck configs`
     - [ ] Attach git note with task summary
