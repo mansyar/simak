@@ -8,6 +8,7 @@ import { eq, and, gt, isNull, sql } from 'drizzle-orm';
 import { checkpoints } from '../db/schema/assignments';
 import { users } from '../db/schema/users';
 import { notifications } from '../db/schema/notifications';
+import { logger } from '@/lib/logger';
 import { sendSLAAlertEmail } from './email';
 import { getNotificationKeys } from './i18n-server';
 import { shouldSendInAppNotification } from './notification-prefs';
@@ -133,6 +134,10 @@ export async function dispatchSLABreachNotifications(
     );
   } catch (notifErr) {
     // Notifications are advisory — log but don't fail the review
-    console.error('Failed to send SLA notifications:', notifErr);
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'sendSlaNotifications',
+      error: notifErr instanceof Error ? notifErr.message : String(notifErr),
+    });
   }
 }

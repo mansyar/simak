@@ -9,6 +9,19 @@ vi.mock('@/lib/risk-alerts', () => ({
   checkAndFireRiskAlert: vi.fn().mockResolvedValue(undefined),
 }));
 
+const { mockChildLogger } = vi.hoisted(() => ({
+  mockChildLogger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    child: vi.fn().mockReturnValue(mockChildLogger),
+  },
+}));
+
 import { processDeadlineReminders } from '@/lib/deadline-reminder-scanner';
 import { getDb } from '@/db/index';
 import { sendDeadlineReminderEmail } from '@/lib/deadline-reminder-email';
@@ -319,8 +332,6 @@ describe('processDeadlineReminders', () => {
 
   describe('error isolation', () => {
     it('should catch errors per tier and continue processing other tiers', async () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
       // 7d tier SELECT fails, 3d tier succeeds, 1d tier empty
       mockDb.then
         .mockImplementationOnce((_onf: any, onr: any) => {
@@ -333,23 +344,17 @@ describe('processDeadlineReminders', () => {
 
       await processDeadlineReminders();
 
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(mockChildLogger.error).toHaveBeenCalled();
       // 3d tier still processed: dedup + notifications = 2 inserts
       expect(mockDb.insert).toHaveBeenCalledTimes(2);
-
-      consoleSpy.mockRestore();
     });
 
     it('should never throw — all errors are caught', async () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
       mockDb.then.mockImplementation(() => {
         throw new Error('Catastrophic failure');
       });
 
       await expect(processDeadlineReminders()).resolves.toBeUndefined();
-
-      consoleSpy.mockRestore();
     });
   });
 

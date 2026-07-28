@@ -23,6 +23,7 @@ import { fetchRubric } from './rubrics.server';
 import { validateReviewScores, insertReviewScores } from './review-scores.server';
 import { advisoryRecomputeGrade } from './reviews-extras.server';
 import { isInstructor } from '../lib/session-guards';
+import { logAdvisoryFailure } from '../lib/logger';
 import type { z } from 'zod';
 import type {
   ListPendingReviewsSchema,
@@ -456,7 +457,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
             : { checkpointName: submission.checkpointName, revisionDeadline },
       });
     } catch (advisoryErr) {
-      console.error('Post-commit advisory work failed in submitReviewHandler:', advisoryErr);
+      logAdvisoryFailure('submitReviewHandler', advisoryErr);
     }
 
     // 4. SLA breach notifications (after transaction — advisory, non-critical)
@@ -464,7 +465,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       try {
         await dispatchSLABreachNotifications(db, slaFields, breachDays);
       } catch (advisoryErr) {
-        console.error('Post-commit advisory work failed in submitReviewHandler:', advisoryErr);
+        logAdvisoryFailure('submitReviewHandler', advisoryErr);
       }
     }
     // 5. Email notification (post-commit advisory)

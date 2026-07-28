@@ -7,6 +7,7 @@ import {
   buildExtensionRejectedHtml,
   buildExtensionRequestedHtml,
 } from './email-templates';
+import { logger } from '@/lib/logger';
 
 export async function sendExtensionApprovedEmail(opts: {
   studentId: string;
@@ -52,7 +53,11 @@ export async function sendExtensionApprovedEmail(opts: {
         }),
     });
   } catch (err) {
-    console.error('Failed to enqueue extension_approved email:', err);
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'sendExtensionApprovedEmail',
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }
 
@@ -84,7 +89,11 @@ export async function sendExtensionRejectedEmail(opts: {
         }),
     });
   } catch (err) {
-    console.error('Failed to enqueue extension_rejected email:', err);
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'sendExtensionRejectedEmail',
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }
 
@@ -118,6 +127,10 @@ export async function sendExtensionRequestedEmail(opts: {
         }),
     });
   } catch (err) {
-    console.error('Failed to enqueue extension_requested email:', err);
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'sendExtensionRequestedEmail',
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }

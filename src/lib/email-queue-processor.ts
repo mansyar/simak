@@ -3,6 +3,7 @@ import { and, eq, lt } from 'drizzle-orm';
 import { getDb } from '@/db/index';
 import { getEnv } from '@/config/env';
 import { emailQueue } from '@/db/schema/index';
+import { logger } from '@/lib/logger';
 
 // --- Shared Resend client (lazy singleton) ---
 
@@ -49,6 +50,7 @@ export async function processEmailQueue(): Promise<{
 }> {
   const db = getDb();
   const resend = getResendClient();
+  const queueLogger = logger.child({ requestId: crypto.randomUUID() });
 
   const staleThreshold = new Date(Date.now() - STALE_PROCESSING_THRESHOLD_MS);
   // Drizzle's UPDATE result type doesn't expose rowCount; cast to read it
@@ -61,7 +63,7 @@ export async function processEmailQueue(): Promise<{
   const reclaimed = reclaimResult?.rowCount ?? 0;
 
   if (reclaimed > 0) {
-    console.info({ event: 'email_queue.reclaimed', count: reclaimed });
+    queueLogger.info({ event: 'email_queue.reclaimed', count: reclaimed });
   }
 
   const emails = await db.transaction(async (tx) => {
@@ -90,7 +92,7 @@ export async function processEmailQueue(): Promise<{
     return dueRows;
   });
 
-  console.info({ event: 'email_queue.cycle_start', dueCount: emails.length });
+  queueLogger.info({ event: 'email_queue.cycle_start', dueCount: emails.length });
 
   let processed = 0;
   let sent = 0;
@@ -139,7 +141,7 @@ export async function processEmailQueue(): Promise<{
             })
             .where(eq(emailQueue.id, email.id));
 
-          console.warn({
+          queueLogger.warn({
             event: 'email_queue.send_failed',
             emailId: email.id,
             error: error instanceof Error ? error.message : 'Unknown error',
@@ -162,7 +164,7 @@ export async function processEmailQueue(): Promise<{
     }
   }
 
-  console.info({
+  queueLogger.info({
     event: 'email_queue.cycle_end',
     processed,
     sent,

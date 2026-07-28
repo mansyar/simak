@@ -1,6 +1,7 @@
 import type { Db } from '../db/index';
 import type { SLASubmissionFields } from './review-sla';
 import { checkAndFireRiskAlert } from './risk-alerts';
+import { logger } from '@/lib/logger';
 
 /**
  * Post-commit advisory: fire risk alert when decision is 'revise' or SLA breach occurred.
@@ -23,6 +24,10 @@ export async function maybeFireReviewRiskAlert(
       instructorId,
     });
   } catch (advisoryErr) {
-    console.error('Post-commit advisory work failed in submitReviewHandler:', advisoryErr);
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'maybeFireReviewRiskAlert',
+      error: advisoryErr instanceof Error ? advisoryErr.message : String(advisoryErr),
+    });
   }
 }

@@ -11,6 +11,7 @@ import {
   buildConsultationVerifiedHtml,
   buildConsultationRejectedHtml,
 } from '@/lib/email-templates';
+import { logger } from '@/lib/logger';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -32,6 +33,10 @@ vi.mock('@/lib/email', () => ({
 vi.mock('@/lib/email-templates', () => ({
   buildConsultationVerifiedHtml: vi.fn().mockReturnValue('<html>verified body</html>'),
   buildConsultationRejectedHtml: vi.fn().mockReturnValue('<html>rejected body</html>'),
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn() },
 }));
 
 describe('Consultation email enqueue', () => {
@@ -188,16 +193,13 @@ describe('Consultation email enqueue', () => {
       locale: 'en',
     });
     vi.mocked(enqueueEmail).mockRejectedValueOnce(new Error('email service down'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const result = await verifyConsultationHandler({ data: { consultationId: 1 } });
 
     expect(result).toEqual({ success: true });
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to enqueue consultation_verified email:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'advisory_failed' }),
     );
-    consoleSpy.mockRestore();
   });
 
   it('should skip email when student is soft-deleted or has no verified email', async () => {

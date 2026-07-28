@@ -23,6 +23,7 @@ import { getNotificationKeys } from '@/lib/i18n-server';
 import { sendDeadlineReminderEmail } from '@/lib/deadline-reminder-email';
 import { checkAndFireRiskAlert } from '@/lib/risk-alerts';
 import { shouldSendInAppNotification } from '@/lib/notification-prefs';
+import { logger } from '@/lib/logger';
 
 const REMINDER_TIERS = [
   { tier: '7d', leadDays: 7 },
@@ -32,6 +33,7 @@ const REMINDER_TIERS = [
 
 export async function processDeadlineReminders(): Promise<void> {
   const db = getDb();
+  const scanLogger = logger.child({ requestId: crypto.randomUUID() });
 
   for (let i = 0; i < REMINDER_TIERS.length; i++) {
     const { tier, leadDays } = REMINDER_TIERS[i];
@@ -151,7 +153,7 @@ export async function processDeadlineReminders(): Promise<void> {
         ),
       );
     } catch (error) {
-      console.error({
+      scanLogger.error({
         event: 'deadline_reminder.scan_error',
         tier,
         error: error instanceof Error ? error.message : String(error),

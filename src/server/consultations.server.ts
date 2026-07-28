@@ -13,6 +13,7 @@ import { getNotificationKeys } from './notifications.server';
 import { sendConsultationEmail } from '../lib/consultation-email';
 import { maybeInsertNotification } from '../lib/notification-prefs';
 import { isStudent, isInstructor } from '../lib/session-guards';
+import { logger } from '../lib/logger';
 import type { z } from 'zod';
 import type {
   LogConsultationSchema,
@@ -392,7 +393,11 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
           details: { checkpoint: auditData.assignmentId, student: auditData.studentId },
         });
       } catch (err) {
-        console.error('Failed to log consultation verified audit event:', err);
+        logger.error({
+          event: 'advisory_failed',
+          handler: 'verifyConsultationHandler',
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
       await sendConsultationEmail(auditData, session.user.name, consultationId, true);
     }
@@ -469,7 +474,11 @@ export async function rejectConsultationHandler(args: { data: RejectConsultation
           details: { checkpoint: auditData.assignmentId, student: auditData.studentId, reason },
         });
       } catch (err) {
-        console.error('Failed to log consultation rejected audit event:', err);
+        logger.error({
+          event: 'advisory_failed',
+          handler: 'rejectConsultationHandler',
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
       await sendConsultationEmail(auditData, session.user.name, consultationId, false, reason);
     }

@@ -1,6 +1,11 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { adjustDeadlinesForBreach, dispatchSLABreachNotifications } from '@/lib/review-sla';
+import { logger } from '@/lib/logger';
+
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn() },
+}));
 
 vi.mock('@/lib/email', () => ({
   sendSLAAlertEmail: vi.fn().mockResolvedValue(undefined),
@@ -322,17 +327,13 @@ describe('dispatchSLABreachNotifications', () => {
       .mockResolvedValueOnce(undefined)
       .mockRejectedValueOnce(new Error('Email send failed'));
 
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     // Should not throw — allSettled handles rejections internally
     await dispatchSLABreachNotifications(mockDb, baseSubmission, 3);
 
     // Both emails attempted (allSettled doesn't short-circuit)
     expect(sendSLAAlertEmail).toHaveBeenCalledTimes(2);
     // No error logged — allSettled catches rejections internally
-    expect(consoleSpy).not.toHaveBeenCalled();
-
-    consoleSpy.mockRestore();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
   it('should catch and log errors without re-throwing', async () => {
@@ -344,15 +345,17 @@ describe('dispatchSLABreachNotifications', () => {
       values: vi.fn().mockRejectedValue(new Error('DB error')),
     }));
 
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     // Should not throw
     await expect(
       dispatchSLABreachNotifications(mockDb, baseSubmission, 3),
     ).resolves.toBeUndefined();
 
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to send SLA notifications:', expect.any(Error));
-    consoleSpy.mockRestore();
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'advisory_failed',
+        handler: 'sendSlaNotifications',
+      }),
+    );
   });
 
   it('should catch and log error when admin query fails', async () => {
@@ -362,14 +365,16 @@ describe('dispatchSLABreachNotifications', () => {
       onrejected(dbError);
     });
 
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     await expect(
       dispatchSLABreachNotifications(mockDb, baseSubmission, 3),
     ).resolves.toBeUndefined();
 
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to send SLA notifications:', dbError);
-    consoleSpy.mockRestore();
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'advisory_failed',
+        handler: 'sendSlaNotifications',
+      }),
+    );
   });
 
   it('should skip in-app notification for admins with inApp=false but still email all', async () => {

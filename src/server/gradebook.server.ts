@@ -13,6 +13,7 @@ import { logAuditEvent } from '@/lib/audit';
 import { computeFinalGrade } from '@/lib/grade-computation';
 import type { CheckpointGradeInput, AssignmentGradeConfig } from '@/lib/grade-computation';
 import { isAdmin, isInstructor } from '@/lib/session-guards';
+import { logger } from '@/lib/logger';
 
 // ---- Shared Helpers ----
 
@@ -294,7 +295,11 @@ export async function saveGradeConfigHandler({
         },
       });
     } catch (auditErr) {
-      console.error('Audit log failed after successful config save:', auditErr);
+      logger.error({
+        event: 'advisory_failed',
+        handler: 'saveGradeConfigHandler',
+        error: auditErr instanceof Error ? auditErr.message : String(auditErr),
+      });
     }
 
     return { success: true };

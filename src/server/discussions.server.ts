@@ -10,6 +10,7 @@ import { getNotificationKeys } from './notifications.server';
 import { maybeInsertNotification } from '../lib/notification-prefs';
 import { sendDiscussionReplyEmail } from '../lib/discussion-email';
 import { serverError, ErrorCode } from '../lib/errors';
+import { logger } from '../lib/logger';
 import type { NonNullableSession } from '../lib/types';
 import type { z } from 'zod';
 import type {
@@ -216,7 +217,11 @@ export async function postDiscussionMessageHandler({ data }: { data: PostDiscuss
           target: isStudentPoster ? 'instructor' : 'student',
         });
       } catch (emailErr) {
-        console.error('Discussion reply email failed after successful transaction:', emailErr);
+        logger.error({
+          event: 'advisory_failed',
+          handler: 'postDiscussionMessageHandler',
+          error: emailErr instanceof Error ? emailErr.message : String(emailErr),
+        });
       }
     }
 

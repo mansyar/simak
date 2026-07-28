@@ -1,5 +1,6 @@
 import { getDb } from '@/db/index';
 import { auditLog } from '@/db/schema/audit-log';
+import { logger } from '@/lib/logger';
 
 /**
  * Logs an audit event to the audit_log table.
@@ -34,6 +35,11 @@ export async function safeAuditLog(label: string, event: Parameters<typeof logAu
   try {
     await logAuditEvent(event);
   } catch (e) {
-    console.error(`Post-commit advisory work failed in ${label}:`, e);
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'safeAuditLog',
+      label,
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }

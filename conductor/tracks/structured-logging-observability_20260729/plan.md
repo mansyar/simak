@@ -126,59 +126,59 @@
 
 ## Phase 4: Full console.* Migration (remaining calls across 22 files — errors.ts handled in Phase 2)
 
-- [ ] Task: Read spec.md and workflow.md to load context for this phase
-    - [ ] Read `conductor/tracks/structured-logging-observability_20260729/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to load context for this phase
+    - [x] Read `conductor/tracks/structured-logging-observability_20260729/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Migrate console.* calls in src/lib/ background job files (structured pattern)
-    - [ ] `email-queue-init.ts` — replace `console.*({ event: '...' })` with `logger.*({ event: '...' })`; add `requestId: crypto.randomUUID()` at tick start
-    - [ ] `email-queue-processor.ts` — replace `console.*({ event: '...' })` with `logger.*({ event: '...' })`; propagate requestId from tick caller
-    - [ ] `deadline-reminder-scanner.ts` — replace `console.*({ event: '...' })` with `logger.*({ event: '...' })`; add `requestId: crypto.randomUUID()` at scanner start
+- [x] Task: Migrate console.* calls in src/lib/ background job files (structured pattern)
+    - [x] `email-queue-init.ts` — replace `console.*({ event: '...' })` with `logger.*({ event: '...' })`; add `requestId: crypto.randomUUID()` at tick start
+    - [x] `email-queue-processor.ts` — replace `console.*({ event: '...' })` with `logger.*({ event: '...' })`; propagate requestId from tick caller
+    - [x] `deadline-reminder-scanner.ts` — replace `console.*({ event: '...' })` with `logger.*({ event: '...' })`; add `requestId: crypto.randomUUID()` at scanner start
 
-- [ ] Task: Migrate console.* calls in src/lib/ advisory & email files (unstructured pattern)
-    - [ ] `risk-alerts.ts` — `console.error('Failed to ...', err)` → `logger.error({ event: 'advisory_failed', handler: 'checkAndFireRiskAlert', error: err instanceof Error ? err.message : String(err) })`
-    - [ ] `review-risk-alert.ts` — same unstructured pattern
-    - [ ] `review-sla.ts` — same unstructured pattern
-    - [ ] `consultation-email.ts` — same unstructured pattern
-    - [ ] `extension-email.ts` (3 calls) — same unstructured pattern
-    - [ ] `event-email.ts` — same unstructured pattern
-    - [ ] `audit.ts` — `safeAuditLog` catch block; same unstructured pattern
-    - [ ] `r2-cleanup.ts` — same unstructured pattern
+- [x] Task: Migrate console.* calls in src/lib/ advisory & email files (unstructured pattern)
+    - [x] `risk-alerts.ts` — `console.error('Failed to ...', err)` → `logger.error({ event: 'advisory_failed', handler: 'checkAndFireRiskAlert', error: err instanceof Error ? err.message : String(err) })`
+    - [x] `review-risk-alert.ts` — same unstructured pattern
+    - [x] `review-sla.ts` — same unstructured pattern
+    - [x] `consultation-email.ts` — same unstructured pattern
+    - [x] `extension-email.ts` (3 calls) — same unstructured pattern
+    - [x] `event-email.ts` — same unstructured pattern
+    - [x] `audit.ts` — `safeAuditLog` catch block; same unstructured pattern
+    - [x] `r2-cleanup.ts` — same unstructured pattern
 
-- [ ] Task: Migrate console.* calls in src/server/ handler files (unstructured advisory pattern)
-    - [ ] `consultations.server.ts` (2 calls)
-    - [ ] `assignments.server.ts` (1 call)
-    - [ ] `extensions-extras.server.ts` (4 calls)
-    - [ ] `bulk-import.server.ts` (2 calls)
-    - [ ] `discussions.server.ts` (1 call)
-    - [ ] `gradebook.server.ts` (1 call)
-    - [ ] `reviews-extras.server.ts` (1 call)
-    - [ ] `reviews.server.ts` (2 calls)
-    - [ ] `submissions.server.ts` (1 call)
-    - [ ] `two-factor.server.ts` (3 calls)
-    - [ ] `users.server.ts` (3 calls)
+- [x] Task: Migrate console.* calls in src/server/ handler files (unstructured advisory pattern)
+    - [x] `consultations.server.ts` (2 calls)
+    - [x] `assignments.server.ts` (1 call)
+    - [x] `extensions-extras.server.ts` (4 calls)
+    - [x] `bulk-import.server.ts` (2 calls)
+    - [x] `discussions.server.ts` (1 call)
+    - [x] `gradebook.server.ts` (1 call)
+    - [x] `reviews-extras.server.ts` (1 call)
+    - [x] `reviews.server.ts` (2 calls)
+    - [x] `submissions.server.ts` (1 call)
+    - [x] `two-factor.server.ts` (3 calls)
+    - [x] `users.server.ts` (3 calls)
 
-- [ ] Task: Update existing tests that assert console.error calls
-    - [ ] Grep `tests/unit/` for `console.error` assertions — `rg "console\.error" tests/unit/`
-    - [ ] For each test that asserts `console.error` was called: add `vi.mock('@/lib/logger', ...)` and assert `logger.error` instead
-    - [ ] Run `pnpm test` and confirm all tests pass with updated mocks
+- [x] Task: Update existing tests that assert console.error calls
+    - [x] Grep `tests/unit/` for `console.error` assertions — `rg "console\.error" tests/unit/`
+    - [x] For each test that asserts `console.error` was called: add `vi.mock('@/lib/logger', ...)` and assert `logger.error` instead
+    - [x] Run `pnpm test` and confirm all tests pass with updated mocks
 
-- [ ] Task: Grep verification — zero console.* in src/lib/ and src/server/
-    - [ ] Run `rg "console\.(log|error|warn|info)" src/lib/ src/server/ --glob "!src/db/seed.ts" --glob "!src/db/migrate.ts"` — expect ZERO matches
-    - [ ] Confirm `console.*` calls remain only in `src/db/seed.ts`, `src/db/migrate.ts`, and `scripts/` (excluded from scope)
+- [x] Task: Grep verification — zero console.* in src/lib/ and src/server/
+    - [x] Run `rg "console\.(log|error|warn|info)" src/lib/ src/server/ --glob "!src/db/seed.ts" --glob "!src/db/migrate.ts"` — expect ZERO matches
+    - [x] Confirm `console.*` calls remain only in `src/db/seed.ts`, `src/db/migrate.ts`, and `scripts/` (excluded from scope)
 
-- [ ] Task: Verify coverage & quality gates
-    - [ ] Run `pnpm test:coverage` — confirm ≥80% on all four metrics
-    - [ ] Run `pnpm typecheck` — clean
-    - [ ] Run `pnpm lint` — clean
-    - [ ] Run `pnpm check:i18n` — clean
-    - [ ] Confirm all modified files are under 500 lines
+- [x] Task: Verify coverage & quality gates
+    - [x] Run `pnpm test:coverage` — confirm ≥80% on all four metrics
+    - [x] Run `pnpm typecheck` — clean
+    - [x] Run `pnpm lint` — clean
+    - [x] Run `pnpm check:i18n` — clean
+    - [x] Confirm all modified files are under 500 lines
 
-- [ ] Task: Update documentation
-    - [ ] Update `conductor/tech-stack.md` changelog — add pino + pino-pretty entries with date
-    - [ ] Update `docs/roadmap.md` TRACK-040 status from `Planned` to `✅ Complete` with key decisions summary
+- [x] Task: Update documentation
+    - [x] Update `conductor/tech-stack.md` changelog — add pino + pino-pretty entries with date
+    - [x] Update `docs/roadmap.md` TRACK-040 status from `Planned` to `✅ Complete` with key decisions summary
 
-- [ ] Task: Commit code changes & attach git note
+- [~] Task: Commit code changes & attach git note
     - [ ] Stage all modified `src/lib/`, `src/server/`, `tests/unit/`, `conductor/tech-stack.md`, `docs/roadmap.md` files
     - [ ] Commit: `refactor(logging): Migrate all console.* calls to pino structured logger`
     - [ ] Attach git note with task summary to the commit hash

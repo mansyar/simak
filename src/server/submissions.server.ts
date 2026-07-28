@@ -15,6 +15,7 @@ import { getNotificationKeys } from './notifications.server';
 import { sendSubmissionReceivedEmail } from '../lib/submission-email';
 import { shouldSendInAppNotification } from '../lib/notification-prefs';
 import { isStudent } from '../lib/session-guards';
+import { logger } from '../lib/logger';
 import type { z } from 'zod';
 import type {
   SubmitCheckpointSchema,
@@ -241,7 +242,11 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
         });
       }
     } catch (err) {
-      console.error('Failed to log submission.created audit event:', err);
+      logger.error({
+        event: 'advisory_failed',
+        handler: 'submitCheckpointHandler',
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
 
     // Post-commit advisory: enqueue email notification to instructor.

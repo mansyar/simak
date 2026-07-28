@@ -2,6 +2,7 @@ import { processEmailQueue } from './email-queue-processor';
 import { pruneOldEmails } from './email-queue-retention';
 import { processDeadlineReminders } from './deadline-reminder-scanner';
 import { processOrphanedR2Objects } from './r2-cleanup';
+import { logger } from '@/lib/logger';
 
 const POLL_INTERVAL_MS = 30_000;
 const PRUNE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -17,6 +18,7 @@ async function tick(): Promise<void> {
   if (isRunning) return;
 
   isRunning = true;
+  const tickLogger = logger.child({ requestId: crypto.randomUUID() });
   try {
     await processEmailQueue();
 
@@ -31,7 +33,7 @@ async function tick(): Promise<void> {
         await processDeadlineReminders();
         lastReminderScanAt = new Date();
       } catch (error) {
-        console.error({
+        tickLogger.error({
           event: 'deadline_reminder.scan_error',
           error: error instanceof Error ? error.message : String(error),
         });
@@ -44,7 +46,7 @@ async function tick(): Promise<void> {
         await processOrphanedR2Objects();
         lastR2CleanupAt = new Date();
       } catch (error) {
-        console.error({
+        tickLogger.error({
           event: 'r2_cleanup_scanner_failed',
           error: error instanceof Error ? error.message : String(error),
         });
@@ -54,10 +56,10 @@ async function tick(): Promise<void> {
     if (lastPruneAt === null || now - lastPruneAt.getTime() > PRUNE_INTERVAL_MS) {
       const result = await pruneOldEmails();
       lastPruneAt = new Date();
-      console.info({ event: 'email_queue.retention_pruned', deleted: result.deleted });
+      tickLogger.info({ event: 'email_queue.retention_pruned', deleted: result.deleted });
     }
   } catch (error) {
-    console.error({
+    tickLogger.error({
       event: 'email_queue.tick_error',
       error: error instanceof Error ? error.message : String(error),
       willRetryNextInterval: true,

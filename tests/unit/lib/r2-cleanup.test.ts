@@ -3,6 +3,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
 vi.mock('@/lib/audit', () => ({ safeAuditLog: vi.fn().mockResolvedValue(undefined) }));
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn() },
+}));
 
 const { r2ClientMock } = vi.hoisted(() => ({
   r2ClientMock: { send: vi.fn() },
@@ -22,6 +25,7 @@ import { getDb } from '@/db/index';
 import { safeAuditLog } from '@/lib/audit';
 import { getR2Client, getBucketName } from '@/lib/storage';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { logger } from '@/lib/logger';
 
 describe('processOrphanedR2Objects', () => {
   let mockDb: any;
@@ -186,8 +190,6 @@ describe('processOrphanedR2Objects', () => {
   });
 
   it('logs structured error for failed deletes', async () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     mockSelectChain.then.mockImplementation((onf: any) =>
       Promise.resolve(orphanedIntents).then(onf),
     );
@@ -195,15 +197,13 @@ describe('processOrphanedR2Objects', () => {
 
     await processOrphanedR2Objects();
 
-    expect(consoleSpy).toHaveBeenCalledWith(
+    expect(logger.error).toHaveBeenCalledWith(
       expect.objectContaining({
         event: 'r2_cleanup_failed',
         fileKey: 'submissions/abc-123.pdf',
         error: 'R2 delete failed',
       }),
     );
-
-    consoleSpy.mockRestore();
   });
 
   it('calls safeAuditLog with correct parameters for background cleanup', async () => {

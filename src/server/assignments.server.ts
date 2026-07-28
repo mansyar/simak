@@ -11,6 +11,7 @@ import { translateKey } from '../lib/i18n-server';
 import { calculateDueDates, validateDueDates } from './due-dates.server';
 import { createDefaultGradeConfig } from './assignments-extras.server';
 import { isInstructor } from '../lib/session-guards';
+import { logAdvisoryFailure } from '../lib/logger';
 import type { z } from 'zod';
 import type {
   CreateAssignmentSchema,
@@ -475,7 +476,7 @@ export async function reassignAssignmentHandler(args: {
         details: { newInstructorId },
       });
     } catch (err) {
-      console.error('Failed to log assignment reassignment audit event:', err);
+      logAdvisoryFailure('reassignAssignmentHandler', err);
     }
 
     return result;

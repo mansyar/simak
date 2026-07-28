@@ -1,14 +1,24 @@
-import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
 vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({ RESEND_API_KEY: 'test-key' }),
 }));
 
-const { pruneMock, scannerMock, r2CleanupMock } = vi.hoisted(() => ({
+const { mockChildLogger, pruneMock, scannerMock, r2CleanupMock } = vi.hoisted(() => ({
+  mockChildLogger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
   pruneMock: vi.fn(),
   scannerMock: vi.fn(),
   r2CleanupMock: vi.fn(),
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    child: vi.fn().mockReturnValue(mockChildLogger),
+  },
 }));
 
 vi.mock('@/lib/email-queue-retention', () => ({
@@ -43,8 +53,6 @@ describe('email-queue-init', () => {
   function mockProcessor(returnFn: () => Promise<any>): ReturnType<typeof vi.fn> {
     const processMock = vi.fn(returnFn);
     vi.doMock('@/lib/email-queue-processor', () => ({ processEmailQueue: processMock }));
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.spyOn(console, 'info').mockImplementation(() => {});
     return processMock;
   }
 
@@ -88,7 +96,7 @@ describe('email-queue-init', () => {
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
 
-    const errorLog = (console.error as Mock).mock.calls.find(
+    const errorLog = mockChildLogger.error.mock.calls.find(
       (call: any[]) => call[0]?.event === 'email_queue.tick_error',
     );
     expect(errorLog).toBeTruthy();
@@ -156,7 +164,7 @@ describe('email-queue-init', () => {
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
 
-    const pruneLog = (console.info as Mock).mock.calls.find(
+    const pruneLog = mockChildLogger.info.mock.calls.find(
       (call: any[]) => call[0]?.event === 'email_queue.retention_pruned',
     );
     expect(pruneLog).toBeTruthy();
@@ -240,7 +248,7 @@ describe('email-queue-init', () => {
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
 
-    const errorLog = (console.error as Mock).mock.calls.find(
+    const errorLog = mockChildLogger.error.mock.calls.find(
       (call: any[]) => call[0]?.event === 'deadline_reminder.scan_error',
     );
     expect(errorLog).toBeTruthy();
@@ -321,7 +329,7 @@ describe('email-queue-init', () => {
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
 
-    const errorLog = (console.error as Mock).mock.calls.find(
+    const errorLog = mockChildLogger.error.mock.calls.find(
       (call: any[]) => call[0]?.event === 'r2_cleanup_scanner_failed',
     );
     expect(errorLog).toBeTruthy();

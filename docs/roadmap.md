@@ -507,9 +507,9 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-040: Structured Logging & Observability
-- **Status:** Planned · **Audit IDs:** None (new infrastructure — addresses ad-hoc `console.*` logging and missing request tracing) · **Deps:** None
-- **Key decisions:** Introduce `pino` as the structured logger (server-side only — TanStack Start runs on Node.js via vinxi/nitro). Full migration of all 58 `console.*` calls across `src/lib/` and `src/server/`. Two migration patterns: (1) structured calls `console.error({ event: '...' })` in background jobs → `logger.info`/`logger.error` preserving `{ event, ...payload }` shape; (2) unstructured calls `console.error('Failed to ...', err)` in server handler advisory blocks → `logger.error({ event: 'advisory_failed', error: err.message, ... })`. `logError()` in `src/lib/errors.ts` already has two modes (production: `JSON.stringify(entry)`, dev: pretty-printed multi-line) — migration preserves the existing `entry` object shape (`timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`) and routes through `logger.error(entry)` instead of `console.error`. Uses `import.meta.env.PROD` (not `process.env.NODE_ENV`) for env detection — consistent with existing `logError()`. JSON format in production, `pino-pretty` in dev. Request ID propagation via TanStack Start `createMiddleware`. No external log aggregation (logs to stdout for Docker/Coolify).
-- **Detail:** Planned — not yet scaffolded
+- **Status:** ✅ Complete · **Audit IDs:** None (new infrastructure — addresses ad-hoc `console.*` logging and missing request tracing) · **Deps:** None
+- **Key decisions:** Introduced `pino` as the structured logger (server-side only — TanStack Start runs on Node.js via vinxi/nitro). Full migration of all 41 `console.*` calls across `src/lib/` and `src/server/` (errors.ts `logError()` handled in Phase 2, remaining 41 calls in Phase 4). Two migration patterns: (1) structured calls `console.error({ event: '...' })` in background jobs → `logger.info`/`logger.error` preserving `{ event, ...payload }` shape with `requestId: crypto.randomUUID()` child logger; (2) unstructured calls `console.error('Failed to ...', err)` in server handler advisory blocks → `logger.error({ event: 'advisory_failed', handler: '<fn_name>', error: err instanceof Error ? err.message : String(err) })`. `logError()` in `src/lib/errors.ts` refactored to use `logger.error(entry)` — preserves existing `entry` object shape (`timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`) and `sanitizeInput()` redaction. Uses `import.meta.env.PROD` for env detection (dead code elimination in production). JSON format in production, `pino-pretty` in dev (lazy-loaded via `createRequire` to avoid bundling in prod). `LOG_LEVEL` env var (default `info`). Request ID propagation via TanStack Start `createMiddleware({ type: 'request' })` — reads `x-request-id` header or generates UUID via `crypto.randomUUID()`. `createRequestLogger(context)` helper creates `logger.child({ requestId })`. No external log aggregation (logs to stdout for Docker/Coolify).
+- **Detail:** `conductor/tracks/structured-logging-observability_20260729/` (spec.md, plan.md)
 
 #### Context Anchors (Traceability)
 *   **PRD Reference:** N/A (infrastructure, no product impact)
@@ -616,7 +616,7 @@ Milestone 11: Observability & Infrastructure Hardening
 ├── TRACK-037: Accessibility Moderate Violations Remediation [Planned — depends on 010]
 ├── TRACK-038: Health Check Endpoint [Complete — archived]
 ├── TRACK-039: Orphaned R2 Object Cleanup [Complete — archived]
-└── TRACK-040: Structured Logging & Observability [Planned — no deps]
+└── TRACK-040: Structured Logging & Observability [✅ Complete — no deps]
 ```
 
 ### Parallelization Strategy

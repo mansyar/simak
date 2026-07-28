@@ -13,6 +13,7 @@ import { getNotificationKeys } from './notifications.server';
 import { sendExtensionApprovedEmail, sendExtensionRejectedEmail } from '../lib/extension-email';
 import { shouldSendInAppNotification } from '../lib/notification-prefs';
 import { isInstructor } from '../lib/session-guards';
+import { logger } from '../lib/logger';
 import type { z } from 'zod';
 import type { ApproveExtensionSchema, RejectExtensionSchema, BulkExtendSchema } from './extensions';
 
@@ -193,7 +194,11 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
           },
         });
       } catch (err) {
-        console.error('Failed to log extension approved audit event:', err);
+        logger.error({
+          event: 'advisory_failed',
+          handler: 'approveExtensionHandler',
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
 
       await sendExtensionApprovedEmail({
@@ -319,7 +324,11 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
           },
         });
       } catch (err) {
-        console.error('Failed to log extension rejected audit event:', err);
+        logger.error({
+          event: 'advisory_failed',
+          handler: 'rejectExtensionHandler',
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
 
       await sendExtensionRejectedEmail({
@@ -424,7 +433,11 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
         })),
       );
     } catch (err) {
-      console.error('[bulkExtend] audit log insert failed:', err);
+      logger.error({
+        event: 'advisory_failed',
+        handler: 'bulkExtendHandler',
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
 
     // 6. Notify the student
@@ -458,7 +471,11 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
         });
       }
     } catch (err) {
-      console.error('[bulkExtend] notification insert failed:', err);
+      logger.error({
+        event: 'advisory_failed',
+        handler: 'bulkExtendHandler',
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
 
     // 7. Email notification (post-commit advisory)
