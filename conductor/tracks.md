@@ -8,8 +8,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Accessibility Moderate Violations Remediation**
-*Link: [./tracks/accessibility-moderate-violations-remediation_20260728/](./tracks/accessibility-moderate-violations-remediation_20260728/)*
-
----
-
