@@ -183,7 +183,9 @@
     - [x] Commit: `refactor(logging): Migrate all console.* calls to pino structured logger`
     - [x] Attach git note with task summary to the commit hash
 
-- [~] Task: Conductor - User Manual Verification 'Full console.* Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Full console.* Migration' (Protocol in workflow.md)
+
+[checkpoint: pending]
 
 ## Phase: Review Fixes
 - [ ] Task: Apply review suggestions
