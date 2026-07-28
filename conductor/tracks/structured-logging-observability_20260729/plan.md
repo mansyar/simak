@@ -88,34 +88,34 @@
 
 ## Phase 3: Request ID Middleware
 
-- [ ] Task: Read spec.md and workflow.md to load context for this phase
-    - [ ] Read `conductor/tracks/structured-logging-observability_20260729/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to load context for this phase
+    - [x] Read `conductor/tracks/structured-logging-observability_20260729/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Write failing unit tests for request ID middleware (Red Phase)
-    - [ ] Create `tests/unit/lib/request-context.test.ts` with `/** @vitest-environment node */`
-    - [ ] Mock `@tanstack/react-start` for `createMiddleware` if needed (or test helper functions directly)
-    - [ ] Test: middleware reads `x-request-id` header when present — returns existing UUID
-    - [ ] Test: middleware generates UUID via `crypto.randomUUID()` when header absent — returns valid UUID format
-    - [ ] Test: `createRequestLogger(context)` creates `logger.child({ requestId })` — assert child logger has `requestId` in bindings
-    - [ ] Run `pnpm test` and confirm the new tests fail as expected
+- [x] Task: Write failing unit tests for request ID middleware (Red Phase)
+    - [x] Create `tests/unit/lib/request-context.test.ts` with `/** @vitest-environment node */`
+    - [x] Mock `@tanstack/react-start` for `createMiddleware` if needed (or test helper functions directly)
+    - [x] Test: middleware reads `x-request-id` header when present — returns existing UUID
+    - [x] Test: middleware generates UUID via `crypto.randomUUID()` when header absent — returns valid UUID format
+    - [x] Test: `createRequestLogger(context)` creates `logger.child({ requestId })` — assert child logger has `requestId` in bindings
+    - [x] Run `pnpm test` and confirm the new tests fail as expected
 
-- [ ] Task: Implement request ID middleware (Green Phase)
-    - [ ] Create `src/lib/request-context.ts` with TanStack Start `createMiddleware`
-    - [ ] Implement: read `x-request-id` header from request; if absent, generate via `crypto.randomUUID()`
-    - [ ] Store `requestId` in middleware context
-    - [ ] Implement `createRequestLogger(context)` helper — returns `logger.child({ requestId })`
-    - [ ] Export `requestIdMiddleware` and `createRequestLogger`
-    - [ ] Run `pnpm test` and confirm all tests now pass
+- [x] Task: Implement request ID middleware (Green Phase)
+    - [x] Create `src/lib/request-context.ts` with TanStack Start `createMiddleware`
+    - [x] Implement: read `x-request-id` header from request; if absent, generate via `crypto.randomUUID()`
+    - [x] Store `requestId` in middleware context
+    - [x] Implement `createRequestLogger(context)` helper — returns `logger.child({ requestId })`
+    - [x] Export `requestIdMiddleware` and `createRequestLogger`
+    - [x] Run `pnpm test` and confirm all tests now pass
 
-- [ ] Task: Verify coverage & quality gates
-    - [ ] Run `pnpm test:coverage` — confirm ≥80% on all four metrics
-    - [ ] Run `pnpm typecheck` — clean
-    - [ ] Run `pnpm lint` — clean
-    - [ ] Confirm `src/lib/request-context.ts` is under 500 lines
-    - [ ] Run `pnpm check:i18n` — clean
+- [x] Task: Verify coverage & quality gates
+    - [x] Run `pnpm test:coverage` — confirm ≥80% on all four metrics
+    - [x] Run `pnpm typecheck` — clean
+    - [x] Run `pnpm lint` — clean
+    - [x] Confirm `src/lib/request-context.ts` is under 500 lines
+    - [x] Run `pnpm check:i18n` — clean
 
-- [ ] Task: Commit code changes & attach git note
+- [~] Task: Commit code changes & attach git note
     - [ ] Stage `src/lib/request-context.ts`, `tests/unit/lib/request-context.test.ts`
     - [ ] Commit: `feat(logging): Add request ID middleware for request tracing`
     - [ ] Attach git note with task summary to the commit hash
