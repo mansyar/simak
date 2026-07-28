@@ -55,11 +55,11 @@
 
 ## Phase 3: Fix `heading-order` (4 Pages)
 
-- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
-- [ ] Task: Write failing unit tests for heading hierarchy (Red Phase)
-    - [ ] Add test to `tests/unit/routes/layout-a11y.test.tsx` — verify heading levels don't skip on each of the 4 pages (render component, query `h1`-`h6` in order, assert no skips)
-    - [ ] Run `pnpm test` — confirm new tests FAIL as expected
-- [ ] Task: Implement heading-order fixes (Green Phase)
+- [x] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
+- [x] Task: Write failing unit tests for heading hierarchy (Red Phase)
+    - [x] Add test to `tests/unit/routes/layout-a11y.test.tsx` — verify heading levels don't skip on each of the 4 pages (render component, query `h1`-`h6` in order, assert no skips)
+    - [x] Run `pnpm test` — confirm new tests FAIL as expected
+- [x] Task: Implement heading-order fixes (Green Phase) [6d5922e]
     - [ ] `src/routes/_authenticated/student/dashboard.tsx` — fix heading hierarchy (e.g., change `h3` to `h2` if no `h2` exists between `h1` and `h3`)
     - [ ] `src/routes/_authenticated/student/assignments/$id.tsx` — fix heading hierarchy
     - [ ] `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` — fix heading hierarchy
