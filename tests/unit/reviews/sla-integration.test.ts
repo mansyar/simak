@@ -10,6 +10,7 @@ vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({
     RESEND_API_KEY: 'test-key',
     BETTER_AUTH_URL: 'http://localhost:3000',
+    LOG_LEVEL: 'info',
   }),
 }));
 
