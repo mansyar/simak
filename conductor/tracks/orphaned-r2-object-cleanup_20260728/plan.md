@@ -59,7 +59,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Phase 1' (Protocol in workflow.md)
 
-## Phase 2: Manual Admin Trigger & UI
+## Phase 2: Manual Admin Trigger & UI [checkpoint: 25d07a6]
 
 - [x] Task: Read `spec.md` and `workflow.md` before starting Phase 2
     - [x] Read `conductor/tracks/orphaned-r2-object-cleanup_20260728/spec.md`
