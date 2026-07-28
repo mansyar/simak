@@ -82,7 +82,7 @@
     - [x] Commit: `refactor(logging): Route logError() through pino instead of console.error`
     - [x] Attach git note with task summary to the commit hash
 
-- [~] Task: Conductor - User Manual Verification 'logError() Migration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'logError() Migration' (Protocol in workflow.md)
 
 ## Phase 3: Request ID Middleware
 
