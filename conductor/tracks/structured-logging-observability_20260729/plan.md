@@ -115,12 +115,12 @@
     - [x] Confirm `src/lib/request-context.ts` is under 500 lines
     - [x] Run `pnpm check:i18n` — clean
 
-- [~] Task: Commit code changes & attach git note
-    - [ ] Stage `src/lib/request-context.ts`, `tests/unit/lib/request-context.test.ts`
-    - [ ] Commit: `feat(logging): Add request ID middleware for request tracing`
-    - [ ] Attach git note with task summary to the commit hash
+- [x] Task: Commit code changes & attach git note (1c44f407)
+    - [x] Stage `src/lib/request-context.ts`, `tests/unit/lib/request-context.test.ts`
+    - [x] Commit: `feat(logging): Add request ID middleware for request tracing`
+    - [x] Attach git note with task summary to the commit hash
 
-- [ ] Task: Conductor - User Manual Verification 'Request ID Middleware' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Request ID Middleware' (Protocol in workflow.md)
 
 ## Phase 4: Full console.* Migration (remaining calls across 22 files — errors.ts handled in Phase 2)
 
