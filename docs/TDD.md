@@ -128,7 +128,7 @@ simak/
 │   │   ├── submissions.ts    → Upload, versioning
 │   │   ├── reviews.ts        → Review, pass/revise
 │   │   ├── consultations.ts  → Log, list, verify, reject, detail, counts (split: .ts stubs + .server.ts handlers)
-│   │   ├── discussions.ts    → Discussion Q&A stubs + Zod schemas (list, post, delete) + createServerFn (split: .ts stubs + .server.ts handlers)
+│   │   ├── discussions.ts    → Discussion Q&A stubs + Zod schemas (list, post, delete) + typedServerFn (split: .ts stubs + .server.ts handlers)
 │   │   ├── discussions.server.ts → Discussion handlers (list paginated, post with notification+email, delete with 15-min window) — ownership: student owns checkpoint OR instructor owns assignment
 │   │   ├── notifications.ts  → Create, fetch, mark read
 │   │   ├── notifications.server.ts → Server-only notification handlers
@@ -137,11 +137,11 @@ simak/
 │   │   ├── rubrics.ts         → Rubric CRUD stubs + Zod schemas (saveRubric, getRubric, soft-delete)
 │   │   ├── rubrics.server.ts  → Server-only rubric handlers (criteria/levels CRUD, admin-only)
 │   │   ├── review-scores.server.ts → Review score validation + insertion helpers (validateReviewScores, insertReviewScores)
-    │   │   ├── audit-logs.ts      → Audit log query stubs + Zod schemas
-    │   │   ├── audit-logs.server.ts → Server-only audit log handlers
+    │   │   ├── audit-log.ts       → Audit log query stubs + Zod schemas
+    │   │   ├── audit-log.server.ts  → Server-only audit log handlers
     │   │   ├── email-queue.ts      → Email queue inspector stubs (listEmailQueue, retryEmail) + Zod schemas + shared types
     │   │   ├── email-queue.server.ts → Server-only email queue handlers (list, retry with FOR UPDATE)
-    │   │   ├── setup-password.ts → Custom password setup handler
+    │   │   ├── setup-password.ts → Password setup stub (Zod schema + typedServerFn stub with dynamic import) + setup-password.server.ts → Handler (token validation, password hashing, serverError pattern)
 │   │   ├── files.ts          → Presigned URL generation
 │   │   ├── settings.ts       → Settings hub stubs (UpdateProfileSchema, UpdateUserSettingsSchema, GetPresignedAvatarUploadUrlSchema)
 │   │   ├── settings.server.ts → Settings hub handlers (updateProfile, getPresignedAvatarUploadUrl, updateUserSettings)
@@ -242,7 +242,7 @@ Role-based analytics dashboards complement (do not duplicate) the real-time oper
 
 - **Routes:** `/admin/analytics` (admin/superadmin via `requireRole(['admin'])`) and `/instructor/analytics` (instructor via `requireRole(['instructor'])`). Both are linked from their role-specific sidebars (BarChart3 icon).
 - **Date range:** URL search params drive the range (`?range=7d|30d|90d|all`) with optional custom start/end. Routes use `validateSearch` + `loaderDeps` so URLs are shareable and back/forward navigation works. A shared `resolveDateRange` helper converts the range token into `{ dateFrom, dateTo }`, and a `dateCondition` helper builds the `WHERE created_at >= ?` SQL fragment.
-- **Server function split:** `src/server/analytics.ts` exports Zod schemas + `createServerFn` stubs (with `.inputValidator(Schema).handler(...)` builder pattern + dynamic imports). Three handler files:
+- **Server function split:** `src/server/analytics.ts` exports Zod schemas + `typedServerFn` stubs (with `.inputValidator(Schema).handler(...)` builder pattern + dynamic imports). Three handler files:
   - `analytics-admin.server.ts` — 9 parallel aggregate queries via `Promise.all` (consultation verification rate, deadline breach rate, assignment status distribution by checkpoint state, submission/review volume trends via `date_trunc`, reviews completed, DAU/WAU, at-risk student summary with high/medium/low counts).
   - `analytics-instructor.server.ts` — instructor-scoped queries (reviews completed, avg response time via `EXTRACT(EPOCH FROM reviewedAt - uploadedAt)`, SLA breach count where `EXTRACT(EPOCH FROM reviewedAt - uploadedAt) > 259200` (3 days), students supervised, assignments active).
   - `analytics-export.server.ts` — 5 CSV export handlers (admin: users, audit log with date filtering, assignment progress; instructor: student progress, review history — both with ownership checks returning `NOT_FOUND` if the assignment is not owned).
@@ -355,6 +355,24 @@ All 23 server stub files (`src/server/*.ts`) import `typedServerFn` from `@/lib/
 - 1 solution cast in `src/lib/server-fn.ts` (the `as unknown as TypedBuilder` boundary).
 
 Zero `@ts-expect-error` directives. Zero `as any` casts (excluding generated `routeTree.gen.ts`). All type changes are inference-based — no behavioral changes, all 3,780 tests pass unchanged.
+
+### Server-Function Architecture Patterns [v1] (Track: Server-Function Architecture Standardization)
+
+Server functions follow a two-file split: `*.ts` (client-safe stub with Zod schemas + `typedServerFn` stubs) and `*.server.ts` (handler with DB code). The client is never bundled with handler code. Four structural patterns are used based on complexity:
+
+1. **Standard pair** (default) — `*.ts` (Zod schemas + `typedServerFn` stubs with dynamic import of handler) + `*.server.ts` (handler implementations). Used when a feature's handlers fit within the 500-line file limit in a single `.server.ts` file. Canonical example: `src/server/assignments.ts` + `assignments.server.ts`.
+
+2. **Extras variant** — Standard pair + `*-extras.server.ts`. Used when adding more handlers to a `.server.ts` file would exceed the 500-line limit. The extras file imports schemas via `import type` from the `*.ts` stub and is handler-only (no corresponding extras stub file). Canonical examples: `assignments-extras.server.ts`, `reviews-extras.server.ts`, `consultations-extras.server.ts`, `extensions-extras.server.ts`.
+
+3. **Multi-handler** — `*.ts` (shared schemas + stubs) + multiple role-specific `*.server.ts` files. Used when a feature serves multiple roles with distinct query logic, making file separation clearer than a single handler file. Canonical examples: `dashboard.ts` + `dashboard-instructor.server.ts` + `dashboard-student.server.ts` + `dashboard-admin.server.ts`; also `analytics.ts` + `analytics-admin.server.ts` + `analytics-instructor.server.ts` + `analytics-export.server.ts`.
+
+4. **Handler-only** — No `*.ts` stub file; the `.server.ts` file is an internal helper imported only by other server files, never called directly from client code. Canonical example: the `*-extras.server.ts` helper functions.
+
+**Stub calling conventions:** Two `typedServerFn` stub patterns coexist — match the surrounding file:
+- Typed builder (preferred): `typedServerFn({ method }).inputValidator(Schema).handler(fn)` — Zod validation at the TanStack layer.
+- Inline parse: `typedServerFn({ method }).handler(async (args) => { Schema.parse(args.data); ... })` — manual Zod parse inside the handler.
+
+**Acceptable type-only circular dependencies:** Static analyzers report cycles like `feature.ts → feature.server.ts → feature.ts`. These are safe and expected — the `*.ts` stub uses `await import('./feature.server')` (dynamic import, resolved lazily at call time) and the `*.server.ts` handler uses `import type { Schema } from './feature'` (type-only import, erased at compile time). Neither edge exists at runtime, so there is no circular dependency at execution. All 34 circular dependency chains in the codebase have been verified as type-only.
 
 ---
 
@@ -908,7 +926,7 @@ Admin       (creates Instructors and Students)
 
 - Server-side sessions stored in the `session` table (managed by Better-Auth via Drizzle adapter).
 - Session validation via `getSessionFromHeaders()` server function using `auth.api.getSession()` with SSR request headers.
-- **Two-file split (Track: Session Caching & Bundle Safety):** `src/server/auth.ts` is a client-safe stub (43 lines) exporting the `Session` type, `getSessionFromHeaders`, `requireRole`, and `_getSession` (a `createServerFn` that dynamically imports the handler). It contains no DB, schema, or Better-Auth config imports — ensuring `pg`/`drizzle-orm` do not leak into the client bundle. The actual handler logic lives in `src/server/auth.server.ts` (~100 lines): Better Auth session validation, DB query for user role/locale, and the session cache. All 6 route layout files import from `auth.ts` and receive only client-safe code.
+- **Two-file split (Track: Session Caching & Bundle Safety):** `src/server/auth.ts` is a client-safe stub (43 lines) exporting the `Session` type, `getSessionFromHeaders`, `requireRole`, and `_getSession` (a `typedServerFn` stub that dynamically imports the handler). It contains no DB, schema, or Better-Auth config imports — ensuring `pg`/`drizzle-orm` do not leak into the client bundle. The actual handler logic lives in `src/server/auth.server.ts` (~100 lines): Better Auth session validation, DB query for user role/locale, and the session cache. All 6 route layout files import from `auth.ts` and receive only client-safe code.
 - **Session cache (Track: Session Caching & Bundle Safety):** A 5s-TTL in-memory `Map<string, { role, locale, expiresAt }>` cache sits inside `getSessionHandler` in `auth.server.ts`. After `auth.api.getSession()` returns a valid user ID, the cache is checked. On a hit (not expired), the cached role/locale is returned and the DB query is skipped. On a miss, the DB query runs and the result is cached with a 5s TTL. Expired entries are evicted lazily on cache miss. **Tradeoff:** soft-deleted users and role changes take up to 5s to take effect — acceptable for a university system. The Better Auth `getSession()` call runs on every request (the cache only skips the DB query, not session validation). A `clearSessionCacheForTests` helper is exported for test isolation.
 - Route-level guard via TanStack Router `beforeLoad`:
   - `_unauthenticated` layout redirects authenticated users to their role-specific dashboard via `getRoleDashboard()`.

@@ -34,7 +34,7 @@ Before initializing individual tracks, the following foundational context files 
 
 All tracks must adhere to the following project constraints:
 
-- **Server function split:** Every feature has two files — `*.ts` (client-safe stub with `createServerFn` + dynamic import) and `*.server.ts` (handler with DB code). See `AGENTS.md` → "Server function split".
+- **Server function split:** Every feature has two files — `*.ts` (client-safe stub with `typedServerFn` + dynamic import) and `*.server.ts` (handler with DB code). Four structural patterns are documented in `AGENTS.md` → "Server function split" (Standard pair, Extras variant, Multi-handler, Handler-only). Type-only circular dependencies (`import type`) between stub and handler files are acceptable — neither edge exists at runtime.
 - **File limit:** Max 500 lines per file in `src/`, `tests/`, `scripts/`.
 - **i18n:** All new user-visible strings must be added to both `locales/en.json` and `locales/id.json`, then `pnpm generate:i18n`.
 - **Testing:** TDD per `conductor/workflow.md`. Coverage thresholds: lines/functions/branches/statements ≥ 80%. Integration tests excluded from default run.
@@ -417,44 +417,9 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-033: Server-Function Architecture Standardization
-
-*   **Status:** `Pending`
-*   **Dependencies:** None (coordinate with TRACK-032 if both are active — TRACK-032 touches the same stub files for type fixes)
-*   **Estimated Effort:** 3 Days / 1.5 Sprint Loops
-*   **Audit IDs:** INFRA-2 (inconsistent server-function split patterns), INFRA-3 (17 circular dependency chains), INFRA-5 (setup-password.ts error handling inconsistency), INFRA-9 (audit-log naming inconsistency)
-
-#### Context Anchors (Traceability)
-*   **PRD Reference:** N/A (architecture standardization, no product impact)
-*   **TDD Reference:** `AGENTS.md` → "Server function split" (documents two calling patterns but not the structural file layout); `conductor/workflow.md` → "Quality Gates" (enforces two-file split: `*.ts` + `*.server.ts`); `src/server/assignments.ts` + `assignments.server.ts` + `assignments-extras.server.ts` (canonical extras pattern); `src/server/dashboard.ts` + `dashboard-*.server.ts` (canonical multi-handler pattern); `src/server/setup-password.ts` (violates two-file split — schemas + handler + stub in one file); `src/lib/errors.ts` (canonical `serverError()` + `ErrorCode` pattern that setup-password.ts doesn't use)
-
-#### Track Tech Stack
-*   TypeScript (architecture refactor — no new dependencies)
-*   `src/server/*.ts` and `src/server/*.server.ts` (all server function files)
-*   `src/db/schema/audit-log.ts` → `src/server/audit-logs.ts` (naming inconsistency)
-*   `src/server/setup-password.ts` (refactor to two-file split)
-*   `AGENTS.md` (documentation update for split-pattern rules)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Document the server-function split taxonomy:** Update `AGENTS.md` with explicit rules for when to use each structural pattern: (1) Standard pair (default — `*.ts` + `*.server.ts`), (2) Extras variant (`*-extras.server.ts` — when a feature has both student-facing and instructor-facing handlers that would exceed the 500-line limit), (3) Multi-handler (multiple `*.server.ts` files — when a feature serves multiple roles with distinct query logic, e.g., role-specific dashboards), (4) Handler-only (no `*.ts` stub — internal helper, never called from client).
-    *   **Refactor `setup-password.ts` to two-file split:** Split into `src/server/setup-password.ts` (Zod schema + `createServerFn` stub with dynamic import) and `src/server/setup-password.server.ts` (handler implementation). Migrate error handling from `{ error: string }` to `serverError(ErrorCode.X, message)` + `ServerError` type. Add `logError` calls.
-    *   **Address circular dependencies:** Audit the 17 circular dependency chains. For type-only `import type { Schema } from './feature'` cycles, verify they are erased at compile time (no runtime impact) and document them as acceptable. For any runtime value imports creating cycles, refactor to break the cycle (e.g., move shared schema to a third file, or pass types via a shared `types.ts`).
-    *   **Fix audit-log naming:** Rename `src/server/audit-logs.ts` → `src/server/audit-log.ts` and `src/server/audit-logs.server.ts` → `src/server/audit-log.server.ts` to match the schema file (`src/db/schema/audit-log.ts`) and DB table (`audit_log`). Update all import paths.
-*   **Out of Scope:**
-    *   Consolidating `*-extras.server.ts` files into main `.server.ts` files (the extras pattern is valid for file-size management — just needs documentation)
-    *   Merging multi-handler `.server.ts` files (the pattern is valid for role-separated logic — just needs documentation)
-    *   Changes to handler logic or API contracts (purely structural/naming)
-    *   Database schema changes (table name stays `audit_log`)
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Documentation):** Update `AGENTS.md` "Server function split" section with the 4-pattern taxonomy and decision criteria. Document the type-only circular dependency pattern as acceptable (with rationale). Verify: documentation is clear and matches existing code patterns.
-*   **Phase 2 (setup-password refactor):** Split `setup-password.ts` into stub + handler. Migrate error returns to `serverError()`. Update tests to mock the new two-file pattern. Verify: `pnpm typecheck` clean, `pnpm test:unit` passes, password setup flow works end-to-end.
-*   **Phase 3 (Naming + circular-deps audit):** Rename audit-log server files. Update all import paths. Run `pnpm codebase_graph_circular` (or equivalent) to verify circular chains are type-only (no runtime value imports). Verify: `pnpm typecheck` clean, `pnpm test:unit` passes, `pnpm lint` clean, import paths updated.
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** Run `pnpm dev` — navigate to password setup page (`/auth/setup-password?token=...`) — flow works, errors display correctly. Admin views audit logs — page loads. Run `pnpm typecheck` — 0 errors. Run code graph circular dependency check — all remaining cycles are `import type` only (no runtime value imports).
-*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. Updated tests for `setup-password` (mock two-file pattern, verify `serverError` return type). `pnpm test:coverage` ≥80%. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors.
-*   [ ] **Conductor Review:** `AGENTS.md` documents 4 split patterns with decision criteria. `src/server/setup-password.ts` contains only Zod schema + `createServerFn` stub. `src/server/setup-password.server.ts` contains handler using `serverError()`. `src/server/audit-log.ts` and `src/server/audit-log.server.ts` match schema file naming. All circular dependency chains verified as type-only. All files under 500 lines. Pre-push gate passes.
+- **Status:** ✅ Complete · **Audit IDs:** INFRA-2 (inconsistent server-function split patterns), INFRA-3 (17 circular dependency chains), INFRA-5 (setup-password.ts error handling inconsistency), INFRA-9 (audit-log naming inconsistency) · **Deps:** TRACK-032 (recommended after — type fixes on stub files precede structural changes)
+- **Key decisions:** Documented 4-pattern server-function split taxonomy in AGENTS.md (Standard pair, Extras variant, Multi-handler, Handler-only) with decision criteria; documented acceptable type-only circular dependencies (stub uses dynamic import, handler uses `import type` — neither edge exists at runtime, all 34 chains verified); refactored `setup-password.ts` into two-file split (`setup-password.ts` stub + `setup-password.server.ts` handler) migrating error handling from `{ error: string }` to `serverError(ErrorCode.X, message)` + `ServerError` type with `logError` structured logging; renamed `audit-logs.ts` → `audit-log.ts` and `audit-logs.server.ts` → `audit-log.server.ts` to match schema file (`src/db/schema/audit-log.ts`) and DB table (`audit_log`); review fixes: replaced explicit `any` in test mock callbacks with typed callback signatures, fixed pre-existing lefthook/oxlint misconfiguration (added `exclude: "{tests,scripts}/**"` to lint step in `lefthook.yml`)
+- **Detail:** `conductor/archive/server-function-architecture-standardization_20260728/` (spec.md, plan.md)
 
 ---
 
@@ -534,7 +499,7 @@ Milestone 9: Client Architecture Consistency
 Milestone 10: Infrastructure Consistency & Tech Debt Remediation
 ├── TRACK-031: Server-Side Guard Consolidation & Env Type Consolidation [Complete — archived]
 ├── TRACK-032: Type-Safety Restoration — Eliminate `as unknown as` Casts [Complete — archived — recommended after 031]
-├── TRACK-033: Server-Function Architecture Standardization [coordinate with 032]
+├── TRACK-033: Server-Function Architecture Standardization [Complete — archived — recommended after 032]
 ├── TRACK-034: i18n & Email Localization Completeness [Complete — archived]
 ├── TRACK-035: Test Infrastructure Consolidation [no deps]
 └── TRACK-036: Developer Experience & Tooling Hygiene [no deps]
@@ -564,7 +529,7 @@ The following track groups can be worked on simultaneously:
 | **P** | TRACK-027 → TRACK-028 | Both complete (archived). TRACK-027 expanded seed data (student2, student3, consultation seed) + decoupled instructor-review tests + 3 new specs + notification/upload/negative test assertions. TRACK-028 built on this expanded seed data and decoupled patterns — expanded coverage to 73 tests across 14 spec files, added Firefox + mobile-chrome projects, axe-core a11y scanning, cross-role lifecycle test. No file overlap with feature tracks (TRACK-025/026) — only touches `tests/e2e/`, `scripts/seed-e2e.ts`, and `playwright.config.ts` |
 | **Q** | TRACK-029, TRACK-030 | Both complete — TRACK-029 touched `query-keys.ts` + settings + gradebook components (archived); TRACK-030 touched `use-notifications.ts` + `NotificationCenter.tsx` + `query-keys.ts` (archived). Both depended on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files (TRACK-029 only) |
 | **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035 (complete — archived), TRACK-036 (complete — archived) | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touched `vitest.config.ts` + `vitest.config.integration.ts` + `package.json` (complete — archived); TRACK-036 touched `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json` (complete — archived). Minor overlap: TRACK-035 and TRACK-036 both touched `package.json` scripts — coordinated to avoid merge conflicts |
-| **S** | TRACK-032 → TRACK-033 | Sequential — TRACK-032 (type-safety restoration, complete — archived) touched the same `createServerFn` stub files that TRACK-033 (architecture standardization) refactors. TRACK-032's type fixes are complete; TRACK-033 can now proceed with structural changes on the typed stubs. Both touch `src/server/*.ts` and `src/server/*.server.ts` |
+| **S** | TRACK-032 → TRACK-033 | Both complete — TRACK-032 (type-safety restoration, archived) touched the same `createServerFn` stub files that TRACK-033 (architecture standardization, archived) refactored. TRACK-033 proceeded with structural changes on the typed stubs after TRACK-032's type fixes. Both touched `src/server/*.ts` and `src/server/*.server.ts` |
 
 ---
 
