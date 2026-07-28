@@ -29,12 +29,12 @@ interface VerificationDialogProps {
 
 interface DetailData {
   id: number;
-  studentName: string;
-  checkpointName: string;
+  studentName: string | null;
+  checkpointName: string | null;
   sessionType: string | null;
   externalConsultantName: string | null;
   notes: string | null;
-  createdAt: Date;
+  createdAt: Date | null;
   status: string;
 }
 
@@ -70,7 +70,7 @@ export function VerificationDialog({
     if (isServerError(result)) {
       setError(result.error.message);
     } else {
-      setDetail(result.consultation as DetailData);
+      setDetail(result.consultation);
     }
     setLoading(false);
   };
@@ -219,7 +219,9 @@ export function VerificationDialog({
                 <span className="text-xs text-muted-foreground font-medium">
                   {t('consultations.date')}
                 </span>
-                <p className="text-foreground">{new Date(detail.createdAt).toLocaleDateString()}</p>
+                <p className="text-foreground">
+                  {detail.createdAt ? new Date(detail.createdAt).toLocaleDateString() : '-'}
+                </p>
               </div>
             </div>
 

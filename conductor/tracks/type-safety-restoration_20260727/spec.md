@@ -125,7 +125,7 @@ The codebase has accumulated ~78 `as unknown as` type casts across 36 files in `
 - The wrapper must not change runtime behavior (type-only change).
 
 ### FR-3: Cast Elimination
-- After migration, `rg "as unknown as" src/hooks/ src/components/ src/lib/` must return zero matches.
+- After migration, `rg "as unknown as" src/hooks/ src/components/ src/lib/` must return only the 1 documented solution cast in `src/lib/server-fn.ts` (Decision 1).
 - After migration, `rg "as unknown as" src/routes/` must return only the 2 documented TanStack Router redirect casts in `_authenticated.tsx` and `_unauthenticated.tsx`.
 - After migration, `rg "as unknown as" src/server/` must return only the 2 documented TanStack Router redirect casts in `auth.ts`.
 - After migration, `rg "as unknown as" src/components/layout/` must return only the 6 documented sidebar casts.
@@ -160,7 +160,7 @@ The codebase has accumulated ~78 `as unknown as` type casts across 36 files in `
 
 1. **Type-level test exists and passes** — `tests/unit/types/server-fn-types.test-d.ts` confirms return-type propagation via `typedServerFn`.
 2. **`typedServerFn` wrapper exists** — `src/lib/server-fn.ts` exports the wrapper, all server stubs migrated.
-3. **Zero `as unknown as` in hooks/components/lib** — `rg "as unknown as" src/hooks/ src/components/ src/lib/` returns zero matches (excluding `src/components/layout/*-sidebar.tsx`).
+3. **Only documented casts in hooks/components/lib** — `rg "as unknown as" src/hooks/ src/components/ src/lib/` returns only the 1 documented solution cast in `src/lib/server-fn.ts` (excluding `src/components/layout/*-sidebar.tsx`).
 4. **Only documented limitations remain in routes/server** — `rg "as unknown as" src/routes/ src/server/` returns only: sidebar casts (6), auth-redirect casts (2 in `auth.ts`), route-redirect casts (2 in `_authenticated.tsx` + `_unauthenticated.tsx`).
 5. **All existing tests pass** — `pnpm test:unit` passes with no test changes (type-only refactor).
 6. **Quality gates pass** — `pnpm typecheck`, `pnpm test:coverage`, `pnpm lint` all clean.
