@@ -5,9 +5,10 @@ vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({ RESEND_API_KEY: 'test-key' }),
 }));
 
-const { pruneMock, scannerMock } = vi.hoisted(() => ({
+const { pruneMock, scannerMock, r2CleanupMock } = vi.hoisted(() => ({
   pruneMock: vi.fn(),
   scannerMock: vi.fn(),
+  r2CleanupMock: vi.fn(),
 }));
 
 vi.mock('@/lib/email-queue-retention', () => ({
@@ -16,6 +17,10 @@ vi.mock('@/lib/email-queue-retention', () => ({
 
 vi.mock('@/lib/deadline-reminder-scanner', () => ({
   processDeadlineReminders: scannerMock,
+}));
+
+vi.mock('@/lib/r2-cleanup', () => ({
+  processOrphanedR2Objects: r2CleanupMock,
 }));
 
 describe('email-queue-init', () => {
@@ -27,6 +32,8 @@ describe('email-queue-init', () => {
     pruneMock.mockResolvedValue({ deleted: 0 });
     scannerMock.mockReset();
     scannerMock.mockResolvedValue(undefined);
+    r2CleanupMock.mockReset();
+    r2CleanupMock.mockResolvedValue({ deleted: 0, failed: 0, batchSize: 0 });
   });
 
   afterEach(() => {
@@ -243,6 +250,86 @@ describe('email-queue-init', () => {
     });
 
     expect(pruneMock).toHaveBeenCalledTimes(1);
+    stopEmailQueue();
+  });
+
+  it('calls processOrphanedR2Objects on first tick (lastR2CleanupAt is null)', async () => {
+    mockProcessor(() => Promise.resolve());
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(r2CleanupMock).toHaveBeenCalledTimes(1);
+    stopEmailQueue();
+  });
+
+  it('does not call processOrphanedR2Objects again within 6h of last cleanup', async () => {
+    mockProcessor(() => Promise.resolve());
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(r2CleanupMock).toHaveBeenCalledTimes(1);
+
+    for (let i = 0; i < 5; i++) {
+      vi.advanceTimersByTime(30_000);
+      await vi.advanceTimersByTimeAsync(0);
+    }
+    expect(r2CleanupMock).toHaveBeenCalledTimes(1);
+
+    stopEmailQueue();
+  });
+
+  it('calls processOrphanedR2Objects again after >6h since last cleanup', async () => {
+    mockProcessor(() => Promise.resolve());
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(r2CleanupMock).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(6 * 60 * 60 * 1000 + 1_000);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(r2CleanupMock).toHaveBeenCalledTimes(2);
+
+    stopEmailQueue();
+  });
+
+  it('R2 cleanup failure is isolated — email processing continues on next tick', async () => {
+    const processMock = mockProcessor(() => Promise.resolve());
+    r2CleanupMock.mockRejectedValueOnce(new Error('r2 cleanup failed'));
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(processMock).toHaveBeenCalledTimes(1);
+    expect(r2CleanupMock).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(30_000);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(processMock).toHaveBeenCalledTimes(2);
+
+    stopEmailQueue();
+  });
+
+  it('logs structured error when R2 cleanup throws', async () => {
+    mockProcessor(() => Promise.resolve());
+    r2CleanupMock.mockRejectedValueOnce(new Error('r2 cleanup failed'));
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+
+    const errorLog = (console.error as Mock).mock.calls.find(
+      (call: any[]) => call[0]?.event === 'r2_cleanup_scanner_failed',
+    );
+    expect(errorLog).toBeTruthy();
+    expect(errorLog![0]).toMatchObject({
+      event: 'r2_cleanup_scanner_failed',
+      error: 'r2 cleanup failed',
+    });
+
     stopEmailQueue();
   });
 });
