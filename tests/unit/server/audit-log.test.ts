@@ -5,7 +5,7 @@ import {
   GetAuditLogDetailSchema,
   listAuditLogs,
   getAuditLogDetail,
-} from '@/server/audit-logs';
+} from '@/server/audit-log';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 
@@ -172,7 +172,7 @@ describe('Audit log handlers', () => {
     it('should return paginated audit log entries for admin', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
 
-      const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
+      const { listAuditLogsHandler } = await import('@/server/audit-log.server');
       const result = (await listAuditLogsHandler({
         data: { page: 1, limit: 20, action: '', dateFrom: '', dateTo: '', search: '' },
       })) as { entries: unknown[]; total: number };
@@ -185,7 +185,7 @@ describe('Audit log handlers', () => {
     it('should throw for non-admin users', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(nonAdminSession);
 
-      const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
+      const { listAuditLogsHandler } = await import('@/server/audit-log.server');
       const result = await listAuditLogsHandler({
         data: { page: 1, limit: 20, action: '', dateFrom: '', dateTo: '', search: '' },
       });
@@ -203,7 +203,7 @@ describe('Audit log handlers', () => {
         );
       });
 
-      const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
+      const { listAuditLogsHandler } = await import('@/server/audit-log.server');
       const result = (await listAuditLogsHandler({
         data: { page: 1, limit: 20, action: 'user.created', dateFrom: '', dateTo: '', search: '' },
       })) as { entries: { action: string }[] };
@@ -217,7 +217,7 @@ describe('Audit log handlers', () => {
         return Promise.resolve([]).then(onfulfilled);
       });
 
-      const { listAuditLogsHandler } = await import('@/server/audit-logs.server');
+      const { listAuditLogsHandler } = await import('@/server/audit-log.server');
       const result = (await listAuditLogsHandler({
         data: { page: 1, limit: 20, action: '', dateFrom: '', dateTo: '', search: '' },
       })) as { entries: unknown[]; total: number };
@@ -231,7 +231,7 @@ describe('Audit log handlers', () => {
     it('should return a single audit entry for admin', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
 
-      const { getAuditLogDetailHandler } = await import('@/server/audit-logs.server');
+      const { getAuditLogDetailHandler } = await import('@/server/audit-log.server');
       const result = (await getAuditLogDetailHandler({ data: { id: 1 } })) as { id: unknown };
 
       expect(result).toBeDefined();
@@ -241,7 +241,7 @@ describe('Audit log handlers', () => {
     it('should throw for non-admin users', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(nonAdminSession);
 
-      const { getAuditLogDetailHandler } = await import('@/server/audit-logs.server');
+      const { getAuditLogDetailHandler } = await import('@/server/audit-log.server');
       const result = await getAuditLogDetailHandler({ data: { id: 1 } });
 
       expect(result).toEqual({

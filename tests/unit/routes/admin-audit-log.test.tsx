@@ -47,8 +47,8 @@ vi.mock('@tanstack/react-router', () => ({
   useRouter: vi.fn().mockReturnValue(mockRouter),
 }));
 
-// Mock server audit-logs
-vi.mock('@/server/audit-logs', () => ({
+// Mock server audit-log
+vi.mock('@/server/audit-log', () => ({
   listAuditLogs: vi.fn(),
   getAuditLogDetail: vi.fn(),
 }));
@@ -81,7 +81,7 @@ describe('Admin Audit Log page', () => {
   });
 
   it('should use listAuditLogs server function', async () => {
-    const { listAuditLogs } = await import('@/server/audit-logs');
+    const { listAuditLogs } = await import('@/server/audit-log');
     expect(typeof listAuditLogs).toBe('function');
   });
 

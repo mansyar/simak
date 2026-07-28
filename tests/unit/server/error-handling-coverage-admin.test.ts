@@ -32,7 +32,7 @@ import {
   getAssignmentDetailHandler,
 } from '@/server/assignments.server';
 import { unlockCheckpointHandler, extendDeadlineHandler } from '@/server/assignments-extras.server';
-import { listAuditLogsHandler, getAuditLogDetailHandler } from '@/server/audit-logs.server';
+import { listAuditLogsHandler, getAuditLogDetailHandler } from '@/server/audit-log.server';
 import { bulkCreateUsersHandler } from '@/server/bulk-import.server';
 import {
   listConsultationsHandler,
@@ -173,13 +173,13 @@ const cases: TestCase[] = [
   },
 
   {
-    label: 'audit-logs.listAuditLogsHandler',
+    label: 'audit-log.listAuditLogsHandler',
     handler: listAuditLogsHandler,
     role: 'admin',
     input: { page: 1, limit: 10 },
   },
   {
-    label: 'audit-logs.getAuditLogDetailHandler',
+    label: 'audit-log.getAuditLogDetailHandler',
     handler: getAuditLogDetailHandler,
     role: 'admin',
     input: { id: 1 },

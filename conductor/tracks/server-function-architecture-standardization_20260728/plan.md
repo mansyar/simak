@@ -34,17 +34,17 @@
 
 ## Phase 3: Audit-Log Naming + Circular Dependency Audit
 
-- [ ] Task: Rename audit-log server files and update imports
-    - [ ] Rename `src/server/audit-logs.ts` → `src/server/audit-log.ts` (git mv)
-    - [ ] Rename `src/server/audit-logs.server.ts` → `src/server/audit-log.server.ts` (git mv)
-    - [ ] Grep for all import references to `audit-logs` across `src/` and `tests/` (both `@/server/audit-logs` and relative paths)
-    - [ ] Update all import paths from `audit-logs` to `audit-log`
-    - [ ] Update test file imports (`tests/unit/server/audit-logs.test.ts` → `audit-log.test.ts` if file rename needed)
-    - [ ] Run `pnpm typecheck` to verify no broken imports remain
-- [ ] Task: Write/update tests for renamed audit-log module (Red Phase)
-    - [ ] Update test imports from `@/server/audit-logs` to `@/server/audit-log`
-    - [ ] Rename test file if needed (`audit-logs.test.ts` → `audit-log.test.ts`)
-    - [ ] Run `pnpm test` and confirm all audit-log tests pass
+- [x] Task: Rename audit-log server files and update imports
+    - [x] Rename `src/server/audit-logs.ts` → `src/server/audit-log.ts` (git mv)
+    - [x] Rename `src/server/audit-logs.server.ts` → `src/server/audit-log.server.ts` (git mv)
+    - [x] Grep for all import references to `audit-logs` across `src/` and `tests/` (both `@/server/audit-logs` and relative paths)
+    - [x] Update all import paths from `audit-logs` to `audit-log`
+    - [x] Update test file imports (`tests/unit/server/audit-logs.test.ts` → `audit-log.test.ts` if file rename needed)
+    - [x] Run `pnpm typecheck` to verify no broken imports remain
+- [x] Task: Write/update tests for renamed audit-log module (Red Phase)
+    - [x] Update test imports from `@/server/audit-logs` to `@/server/audit-log`
+    - [x] Rename test file if needed (`audit-logs.test.ts` → `audit-log.test.ts`)
+    - [x] Run `pnpm test` and confirm all audit-log tests pass
 - [ ] Task: Audit and address circular dependencies (INFRA-3)
     - [ ] Run circular dependency analysis via `codebase_graph_circular` (or equivalent `pnpm` tooling)
     - [ ] Classify each of the 17 chains as type-only (`import type`) or runtime value import

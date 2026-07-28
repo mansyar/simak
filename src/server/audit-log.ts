@@ -1,5 +1,5 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
-// Handler implementations are in audit-logs.server.ts (not bundled for client)
+// Handler implementations are in audit-log.server.ts (not bundled for client)
 import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
@@ -19,13 +19,13 @@ export const GetAuditLogDetailSchema = z.object({
 export const listAuditLogs = typedServerFn({ method: 'GET' })
   .inputValidator(ListAuditLogsSchema)
   .handler(async ({ data }) => {
-    const { listAuditLogsHandler } = await import('./audit-logs.server');
+    const { listAuditLogsHandler } = await import('./audit-log.server');
     return listAuditLogsHandler({ data });
   });
 
 export const getAuditLogDetail = typedServerFn({ method: 'GET' })
   .inputValidator(GetAuditLogDetailSchema)
   .handler(async ({ data }) => {
-    const { getAuditLogDetailHandler } = await import('./audit-logs.server');
+    const { getAuditLogDetailHandler } = await import('./audit-log.server');
     return getAuditLogDetailHandler({ data });
   });
