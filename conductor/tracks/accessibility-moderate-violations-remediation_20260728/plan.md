@@ -10,7 +10,7 @@
     - [x] Read the 4 heading-order pages to identify exact heading-level skips
 - [x] Task: Conductor - User Manual Verification 'Phase 0: Investigation & Test Baseline' (Protocol in workflow.md)
 
-## Phase 1: Fix `landmark-one-main` + `skip-link` (Landmark Structure & Skip Link Targets)
+## Phase 1: Fix `landmark-one-main` + `skip-link` (Landmark Structure & Skip Link Targets) [checkpoint: 7592772]
 
 - [x] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
 - [x] Task: Write failing unit tests for landmark structure and skip link targets (Red Phase)
