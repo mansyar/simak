@@ -183,7 +183,11 @@
     "retryConfirmDescription": "Ini akan mengatur ulang email ke status tertunda dengan batas percobaan baru. Email akan dikirim pada siklus prosesor berikutnya.",
     "retrySuccess": "Email antri untuk dikirim ulang",
     "empty": "Tidak ada email dalam antrian",
-    "emptyFiltered": "Tidak ada email yang cocok dengan filter"
+    "emptyFiltered": "Tidak ada email yang cocok dengan filter",
+    "r2Cleanup": {
+      "trigger": "Memicu Pembersihan R2",
+      "success": "Pembersihan R2 selesai: {{deleted}} dihapus, {{failed}} gagal, {{batchSize}} diproses"
+    }
   },
   "adminUsers": {
     "title": "Pengguna",

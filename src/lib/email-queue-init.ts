@@ -1,14 +1,17 @@
 import { processEmailQueue } from './email-queue-processor';
 import { pruneOldEmails } from './email-queue-retention';
 import { processDeadlineReminders } from './deadline-reminder-scanner';
+import { processOrphanedR2Objects } from './r2-cleanup';
 
 const POLL_INTERVAL_MS = 30_000;
 const PRUNE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const REMINDER_SCAN_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
+const R2_CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
 let intervalId: ReturnType<typeof setInterval> | null = null;
 let isRunning = false;
 let lastPruneAt: Date | null = null;
 let lastReminderScanAt: Date | null = null;
+let lastR2CleanupAt: Date | null = null;
 
 async function tick(): Promise<void> {
   if (isRunning) return;
@@ -30,6 +33,19 @@ async function tick(): Promise<void> {
       } catch (error) {
         console.error({
           event: 'deadline_reminder.scan_error',
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    // R2 orphaned object cleanup — 6h throttle, advisory (failure must not break email processing)
+    if (lastR2CleanupAt === null || now - lastR2CleanupAt.getTime() > R2_CLEANUP_INTERVAL_MS) {
+      try {
+        await processOrphanedR2Objects();
+        lastR2CleanupAt = new Date();
+      } catch (error) {
+        console.error({
+          event: 'r2_cleanup_scanner_failed',
           error: error instanceof Error ? error.message : String(error),
         });
       }

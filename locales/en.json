@@ -183,7 +183,11 @@
     "retryConfirmDescription": "This will reset the email to pending status with a fresh retry budget. The email will be sent on the next processor cycle.",
     "retrySuccess": "Email queued for retry",
     "empty": "No emails in the queue",
-    "emptyFiltered": "No emails match your filters"
+    "emptyFiltered": "No emails match your filters",
+    "r2Cleanup": {
+      "trigger": "Trigger R2 Cleanup",
+      "success": "R2 cleanup complete: {{deleted}} deleted, {{failed}} failed, {{batchSize}} processed"
+    }
   },
   "adminUsers": {
     "title": "Users",

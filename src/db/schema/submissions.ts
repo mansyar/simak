@@ -76,6 +76,7 @@ export const uploadIntents = pgTable(
     contentType: text('content_type').notNull(),
     expiresAt: timestamp('expires_at').notNull(),
     consumedAt: timestamp('consumed_at'),
+    cleanedUpAt: timestamp('cleaned_up_at'),
     createdAt: timestamp('created_at').defaultNow(),
   },
   (table) => [
