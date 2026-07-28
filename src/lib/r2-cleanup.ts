@@ -7,7 +7,7 @@ import { getBucketName, getR2Client } from '@/lib/storage';
 
 const BATCH_SIZE = 50;
 
-export async function processOrphanedR2Objects(): Promise<{
+export async function processOrphanedR2Objects(actorId: string = 'system'): Promise<{
   deleted: number;
   failed: number;
   batchSize: number;
@@ -64,7 +64,7 @@ export async function processOrphanedR2Objects(): Promise<{
   const failed = results.filter((r) => r.status === 'rejected').length;
 
   await safeAuditLog('r2-cleanup', {
-    actorId: 'system',
+    actorId,
     action: 'r2.cleanup',
     entityType: 'upload_intent',
     entityId: 'batch',

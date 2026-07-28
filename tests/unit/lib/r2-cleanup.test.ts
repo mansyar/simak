@@ -222,6 +222,22 @@ describe('processOrphanedR2Objects', () => {
     });
   });
 
+  it('calls safeAuditLog with custom actorId when provided', async () => {
+    mockSelectChain.then.mockImplementation((onf: any) =>
+      Promise.resolve(orphanedIntents).then(onf),
+    );
+
+    await processOrphanedR2Objects('admin-42');
+
+    expect(safeAuditLog).toHaveBeenCalledWith('r2-cleanup', {
+      actorId: 'admin-42',
+      action: 'r2.cleanup',
+      entityType: 'upload_intent',
+      entityId: 'batch',
+      details: { deleted: 2, failed: 0, batchSize: 2 },
+    });
+  });
+
   it('calls safeAuditLog with correct parameters when some deletes fail', async () => {
     mockSelectChain.then.mockImplementation((onf: any) =>
       Promise.resolve(orphanedIntents).then(onf),

@@ -4,7 +4,6 @@ import { triggerR2Cleanup } from '@/server/r2-cleanup';
 import type { ServerError } from '@/lib/errors';
 import * as auth from '@/server/auth';
 import * as r2CleanupMod from '@/lib/r2-cleanup';
-import * as auditMod from '@/lib/audit';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -16,10 +15,6 @@ vi.mock('@/db/index', () => ({
 
 vi.mock('@/lib/r2-cleanup', () => ({
   processOrphanedR2Objects: vi.fn(),
-}));
-
-vi.mock('@/lib/audit', () => ({
-  safeAuditLog: vi.fn(),
 }));
 
 vi.mock('@tanstack/react-start', () => ({
@@ -128,19 +123,13 @@ describe('triggerR2CleanupHandler', () => {
     expect(r2CleanupMod.processOrphanedR2Objects).not.toHaveBeenCalled();
   });
 
-  it('calls safeAuditLog with admin userId as actorId', async () => {
+  it('passes admin userId as actorId to processOrphanedR2Objects', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
 
     const { triggerR2CleanupHandler } = await import('@/server/r2-cleanup.server');
     await triggerR2CleanupHandler({ data: {} });
 
-    expect(auditMod.safeAuditLog).toHaveBeenCalledWith('r2-cleanup', {
-      actorId: 'admin-1',
-      action: 'r2.cleanup',
-      entityType: 'upload_intent',
-      entityId: 'batch',
-      details: { deleted: 3, failed: 1, batchSize: 4 },
-    });
+    expect(r2CleanupMod.processOrphanedR2Objects).toHaveBeenCalledWith('admin-1');
   });
 
   it('accepts admin role (not just superadmin)', async () => {
@@ -157,7 +146,7 @@ describe('triggerR2CleanupHandler', () => {
     expect(result).toEqual({ deleted: 3, failed: 1, batchSize: 4 });
   });
 
-  it('returns summary and audits even when no orphans found', async () => {
+  it('returns summary even when no orphans found', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
     vi.mocked(r2CleanupMod.processOrphanedR2Objects).mockResolvedValue({
       deleted: 0,
@@ -169,13 +158,7 @@ describe('triggerR2CleanupHandler', () => {
     const result = await triggerR2CleanupHandler({ data: {} });
 
     expect(result).toEqual({ deleted: 0, failed: 0, batchSize: 0 });
-    expect(auditMod.safeAuditLog).toHaveBeenCalledWith('r2-cleanup', {
-      actorId: 'admin-1',
-      action: 'r2.cleanup',
-      entityType: 'upload_intent',
-      entityId: 'batch',
-      details: { deleted: 0, failed: 0, batchSize: 0 },
-    });
+    expect(r2CleanupMod.processOrphanedR2Objects).toHaveBeenCalledWith('admin-1');
   });
 
   it('handles processOrphanedR2Objects failure with INTERNAL server error', async () => {

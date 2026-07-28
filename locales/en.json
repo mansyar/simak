@@ -186,8 +186,7 @@
     "emptyFiltered": "No emails match your filters",
     "r2Cleanup": {
       "trigger": "Trigger R2 Cleanup",
-      "success": "R2 cleanup complete: {{deleted}} deleted, {{failed}} failed, {{batchSize}} processed",
-      "error": "Failed to trigger R2 cleanup"
+      "success": "R2 cleanup complete: {{deleted}} deleted, {{failed}} failed, {{batchSize}} processed"
     }
   },
   "adminUsers": {

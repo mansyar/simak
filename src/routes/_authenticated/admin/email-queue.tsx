@@ -7,6 +7,7 @@ import { useI18n } from '../../__root';
 import { PageHeader } from '@/components/ui/page-header';
 import { RefreshButton } from '@/components/ui/refresh-button';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { EmailQueueSummaryCards } from '@/components/admin/email-queue/EmailQueueSummaryCards';
 import { EmailQueueFilters } from '@/components/admin/email-queue/EmailQueueFilters';
 import { EmailQueueTable } from '@/components/admin/email-queue/EmailQueueTable';
@@ -72,7 +73,7 @@ function EmailQueuePage() {
     setIsCleaningR2(true);
     const result = await triggerR2Cleanup({ data: {} });
     if (isServerError(result)) {
-      toast.error(t('adminEmailQueue.r2Cleanup.error'));
+      showErrorToast(parseServerError(result).code, t);
     } else {
       toast.success(
         t('adminEmailQueue.r2Cleanup.success', {
@@ -129,6 +130,7 @@ function EmailQueuePage() {
         action={
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleR2Cleanup} disabled={isCleaningR2}>
+              {isCleaningR2 && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t('adminEmailQueue.r2Cleanup.trigger')}
             </Button>
             <RefreshButton isRefreshing={isRefreshing} onClick={handleRefresh} />

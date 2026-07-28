@@ -2,7 +2,6 @@
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode, type ServerError } from '../lib/errors';
 import { processOrphanedR2Objects } from '@/lib/r2-cleanup';
-import { safeAuditLog } from '@/lib/audit';
 import type { TriggerR2CleanupInput, R2CleanupSummary } from './r2-cleanup';
 
 // Re-export shared types for callers that historically imported them from here
@@ -27,15 +26,7 @@ export async function triggerR2CleanupHandler(_args: {
   }
 
   try {
-    const summary = await processOrphanedR2Objects();
-
-    await safeAuditLog('r2-cleanup', {
-      actorId: session.user.id,
-      action: 'r2.cleanup',
-      entityType: 'upload_intent',
-      entityId: 'batch',
-      details: summary,
-    });
+    const summary = await processOrphanedR2Objects(session.user.id);
 
     return summary;
   } catch (err) {

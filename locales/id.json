@@ -186,8 +186,7 @@
     "emptyFiltered": "Tidak ada email yang cocok dengan filter",
     "r2Cleanup": {
       "trigger": "Memicu Pembersihan R2",
-      "success": "Pembersihan R2 selesai: {{deleted}} dihapus, {{failed}} gagal, {{batchSize}} diproses",
-      "error": "Gagal memicu pembersihan R2"
+      "success": "Pembersihan R2 selesai: {{deleted}} dihapus, {{failed}} gagal, {{batchSize}} diproses"
     }
   },
   "adminUsers": {

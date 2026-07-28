@@ -192,7 +192,6 @@ export type Translation = {
     r2Cleanup: {
       trigger: string
       success: string
-      error: string
     }
   }
   adminUsers: {
