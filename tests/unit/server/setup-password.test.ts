@@ -27,7 +27,7 @@ const { mockTx, mockDb } = vi.hoisted(() => {
     delete: vi.fn().mockReturnThis(),
   };
   const mockDb = {
-    transaction: vi.fn(async (callback: any) => callback(mockTx)),
+    transaction: vi.fn(async (callback: (tx: typeof mockTx) => unknown) => callback(mockTx)),
   };
   return { mockTx, mockDb };
 });
