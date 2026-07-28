@@ -96,7 +96,7 @@
 
 ---
 
-## Phase 3: Cast Elimination
+## Phase 3: Cast Elimination [checkpoint: 4b2504b9]
 
 - [x] Task: Read spec.md and workflow.md to refresh context for this phase
     - [x] Read `./spec.md` for requirements, scope boundaries, and acceptance criteria
@@ -183,5 +183,5 @@
     - [x] Run `rg "as any" src/` — zero matches (excluding routeTree.gen.ts)
     - [x] Verify: all quality gates pass, no regressions
 
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Cast Elimination' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Cast Elimination' (Protocol in workflow.md) [4b2504b9]
 </protect>
