@@ -232,6 +232,8 @@ export function TemplateDetailPage({
         search={{ page: 1, limit: 20, search: '', type: '' }}
       />
 
+      <h1 className="font-display text-3xl text-foreground">{template.name}</h1>
+
       {saveSuccess && (
         <AlertBanner variant="success" title={t('adminTemplates.detail.saveSuccess')} />
       )}

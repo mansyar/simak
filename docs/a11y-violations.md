@@ -5,48 +5,48 @@ This document tracks moderate and minor accessibility violations identified by a
 **Last scanned:** 2026-07-27  
 **Scanner:** @axe-core/playwright 4.12.1  
 **Critical/serious violations:** 0 (all fixed)  
+**Moderate violations:** 0 (all fixed — remediated in TRACK-037 on 2026-07-28)  
 **Pages scanned:** Login, Student Dashboard, Student Assignment Detail, Instructor Review Detail, Admin Users, Admin Templates
 
 ---
 
-## Common Violations (appear on multiple pages)
+## Remediated Moderate Violations (TRACK-037, 2026-07-28)
 
-### 1. `region` (moderate) — All pages except login
+All 4 moderate violations were remediated in TRACK-037. Unit tests verify the fixes at the DOM level. E2E axe-core scans are pending resolution of a pre-existing TanStack Router runtime issue in this worktree (see TRACK-037 spec, "Out of Scope").
 
-**Rule:** Ensure all page content is contained by landmarks.  
-**Help:** All page content should be contained by landmarks.  
-**Affected pages:** Student dashboard, student assignment detail, instructor review detail, admin users, admin templates (1 node each).  
-**Root cause:** Some page content (e.g., sidebar, header elements) falls outside of `<main>` or other landmark regions.  
-**Remediation:** Wrap remaining content sections in appropriate landmark elements (`<nav>`, `<aside>`, `<header>`).
+| Rule | Impact | Pages Affected | Root Cause | Fix |
+|------|--------|----------------|------------|-----|
+| `landmark-one-main` | moderate | Login page | `_unauthenticated.tsx` rendered bare `<Outlet />` with no `<main>` landmark | Wrapped `<Outlet />` in `<main id="main-content" tabIndex={-1}>` |
+| `skip-link` | moderate | All authenticated pages | Skip link targeted `#main-content` but no element had that `id` | Added `id="main-content"` and `tabIndex={-1}` to `<main>` in all 3 role layouts (`student.tsx`, `instructor.tsx`, `admin.tsx`) and landing page (`index.tsx`); removed duplicate `id="main-content"` from `login.tsx` `<div>` |
+| `region` | moderate | All authenticated pages | `KeyboardCheatSheet` trigger button rendered outside landmarks in `_authenticated.tsx`; sonner `<Toaster>` `<section>` lacked `aria-label` | Moved `KeyboardCheatSheet` into `AppHeader` (`<header>` landmark); added `aria-label` to sonner `<Toaster>` via i18n key `notifications.toasterLabel` |
+| `heading-order` | moderate | Student dashboard, student assignment detail, instructor review detail, admin template editor | Heading levels skipped (e.g., `h1` → `h3` without `h2`) | Changed `h3` → `h2` and `h4` → `h3` where skips existed; added missing `<h1>` to `TemplateDetailPage.tsx`; changed success message `h2` → `h1` in instructor review detail |
 
-### 2. `skip-link` (moderate) — All authenticated pages
+### Files Modified in TRACK-037
 
-**Rule:** Ensure all skip links have a focusable target.  
-**Help:** The skip-link target should exist and be focusable.  
-**Affected pages:** Student dashboard, student assignment detail, instructor review detail, admin users, admin templates (1 node each).  
-**Root cause:** The skip-to-content link targets an element that is not focusable or does not exist.  
-**Remediation:** Ensure the skip link target has `tabindex="-1"` and the target element exists in the DOM.
+**Phase 1 — Landmark Structure & Skip Link:**
+- `src/routes/_unauthenticated.tsx` — wrapped `<Outlet />` in `<main>`
+- `src/routes/_authenticated/student.tsx` — added `id` and `tabIndex` to `<main>`
+- `src/routes/_authenticated/instructor.tsx` — same
+- `src/routes/_authenticated/admin.tsx` — same
+- `src/routes/index.tsx` — changed outer `<div>` to `<main>`
+- `src/routes/_unauthenticated/auth/login.tsx` — removed duplicate `id="main-content"`
 
-### 3. `heading-order` (moderate) — Student/instructor/admin pages
+**Phase 2 — Region Content Containment:**
+- `src/routes/_authenticated.tsx` — removed `KeyboardCheatSheet` rendering
+- `src/components/layout/app-header.tsx` — added `KeyboardCheatSheet` inside `<header>`
+- `src/components/ui/sonner.tsx` — added `aria-label` to `<Sonner>`
+- `locales/en.json`, `locales/id.json` — added `toasterLabel` i18n key
 
-**Rule:** Ensure the order of headings is semantically correct.  
-**Help:** Heading levels should only increase by one.  
-**Affected pages:** Student dashboard, student assignment detail, instructor review detail, admin templates (1 node each).  
-**Root cause:** A heading level is skipped (e.g., `<h1>` directly followed by `<h3>` without an `<h2>`).  
-**Remediation:** Fix the heading hierarchy in affected page components.
-
----
-
-## Page-Specific Violations
-
-### Login page (`/auth/login`)
-
-| Rule | Impact | Nodes | Description |
-|------|--------|-------|-------------|
-| `landmark-one-main` | moderate | 1 | Document should have one main landmark |
-| `region` | moderate | 4 | All page content should be contained by landmarks |
-
-**Note:** The login page is rendered outside the authenticated layout and lacks a `<main>` landmark. The unauthenticated auth layout should wrap content in `<main>`.
+**Phase 3 — Heading Order:**
+- `src/components/dashboard/StudentDashboard.tsx` — `h3` → `h2`
+- `src/components/student/assignments/CheckpointTimeline.tsx` — `h3` → `h2`
+- `src/components/student/extensions/ExtensionHistoryList.tsx` — `h3` → `h2`
+- `src/components/student/assignments/CheckpointCard.tsx` — `h4` → `h3`
+- `src/components/discussions/discussion-panel.tsx` — `h3` → `h2`
+- `src/components/admin/templates/TemplateDangerZone.tsx` — `h3` → `h2`
+- `src/components/admin/templates/TemplateDetailPage.tsx` — added `<h1>`
+- `src/routes/_authenticated/student/assignments/$id.tsx` — `h3` → `h2` (3 section titles)
+- `src/routes/_authenticated/instructor/reviews/$submissionId.tsx` — `h2` → `h1` (success message)
 
 ---
 

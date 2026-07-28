@@ -7,8 +7,10 @@ import {
   OctagonXIcon,
   Loader2Icon,
 } from 'lucide-react';
+import { useI18n } from '@/routes/__root';
 
 const Toaster = ({ ...props }: ToasterProps) => {
+  const { t } = useI18n();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
@@ -32,6 +34,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme}
       closeButton={false}
       className="toaster group"
+      aria-label={t('notifications.toasterLabel')}
       icons={{
         success: <CircleCheckIcon className="size-4" />,
         info: <InfoIcon className="size-4" />,

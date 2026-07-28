@@ -1,4 +1,4 @@
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useMatchRoute } from '@tanstack/react-router';
 import { useI18n } from '@/routes/__root';
 import { Menu, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
@@ -6,6 +6,8 @@ import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
 import { NotificationBadge } from '../notifications/NotificationBadge';
 import { useTheme } from '@/hooks/use-theme';
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { KeyboardCheatSheet } from '@/components/keyboard-cheat-sheet';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -25,6 +27,12 @@ export function AppHeader({ onMenuToggle, onNotificationOpen }: AppHeaderProps) 
   const router = useRouter();
   const { data: sessionData } = authClient.useSession();
   const user = sessionData?.user;
+
+  const { cheatSheetOpen, setCheatSheetOpen } = useKeyboardShortcuts();
+  const matchRoute = useMatchRoute();
+  const reviewMatch = matchRoute({
+    to: '/instructor/reviews/$submissionId',
+  });
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -85,6 +93,12 @@ export function AppHeader({ onMenuToggle, onNotificationOpen }: AppHeaderProps) 
           </DropdownMenu>
         )}
       </div>
+
+      <KeyboardCheatSheet
+        isOpen={cheatSheetOpen}
+        onClose={() => setCheatSheetOpen(false)}
+        isReviewPage={!!reviewMatch}
+      />
     </header>
   );
 }

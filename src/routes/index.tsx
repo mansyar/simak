@@ -22,7 +22,7 @@ export function HomePage() {
   const { t } = useI18n();
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <main id="main-content" tabIndex={-1} className="flex min-h-screen flex-col">
       {/* Hero */}
       <section
         id="hero"
@@ -123,6 +123,6 @@ export function HomePage() {
           </nav>
         </div>
       </footer>
-    </div>
+    </main>
   );
 }

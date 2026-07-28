@@ -270,7 +270,7 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">{t('discussions.title')}</h3>
+      <h2 className="text-lg font-semibold">{t('discussions.title')}</h2>
 
       {messages.length === 0 ? (
         <EmptyState

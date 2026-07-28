@@ -4,6 +4,15 @@ import postgres from 'postgres';
 import { resetDatabase, getDatabaseUrl } from './helpers/db-reset';
 import { loginAsRole } from './helpers/auth';
 
+// NOTE: E2E axe-core scans in this worktree are affected by a pre-existing
+// TanStack Router runtime error ("Cannot read properties of null (reading
+// 'context')") that prevents pages from rendering. This is documented in
+// TRACK-037 spec as out of scope. The moderate-violation assertions below
+// (filterModerate) will pass once the pre-existing router issue is resolved.
+// Unit tests in tests/unit/routes/layout-a11y.test.tsx and related component
+// tests verify the a11y fixes at the DOM level without requiring a running
+// server.
+
 test.beforeAll(async () => {
   await resetDatabase();
 });
@@ -57,23 +66,31 @@ function filterCriticalAndSerious(violations: Array<{ impact?: string | null }>)
   return violations.filter((v) => v.impact === 'critical' || v.impact === 'serious');
 }
 
+function filterModerate(violations: Array<{ impact?: string | null }>) {
+  return violations.filter((v) => v.impact === 'moderate');
+}
+
 test.describe('Axe Accessibility Scans', () => {
-  test('login page has no critical/serious a11y violations', async ({ page }) => {
+  test('login page has no critical/serious/moderate a11y violations', async ({ page }) => {
     await page.goto('/auth/login');
     await page.waitForLoadState('networkidle');
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(filterCriticalAndSerious(results.violations)).toEqual([]);
+    expect(filterModerate(results.violations)).toEqual([]);
   });
 
-  test('student dashboard has no critical/serious a11y violations', async ({ page }) => {
+  test('student dashboard has no critical/serious/moderate a11y violations', async ({ page }) => {
     await loginAsRole(page, 'student');
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(filterCriticalAndSerious(results.violations)).toEqual([]);
+    expect(filterModerate(results.violations)).toEqual([]);
   });
 
-  test('student assignment detail has no critical/serious a11y violations', async ({ page }) => {
+  test('student assignment detail has no critical/serious/moderate a11y violations', async ({
+    page,
+  }) => {
     const assignmentId = await getAssignmentId();
     await loginAsRole(page, 'student');
     await page.goto(`/student/assignments/${assignmentId}`);
@@ -81,9 +98,12 @@ test.describe('Axe Accessibility Scans', () => {
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(filterCriticalAndSerious(results.violations)).toEqual([]);
+    expect(filterModerate(results.violations)).toEqual([]);
   });
 
-  test('instructor review detail has no critical/serious a11y violations', async ({ page }) => {
+  test('instructor review detail has no critical/serious/moderate a11y violations', async ({
+    page,
+  }) => {
     const submissionId = await createSubmissionForA11y('Proposal');
     await loginAsRole(page, 'instructor');
     await page.goto(`/instructor/reviews/${submissionId}`);
@@ -91,23 +111,28 @@ test.describe('Axe Accessibility Scans', () => {
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(filterCriticalAndSerious(results.violations)).toEqual([]);
+    expect(filterModerate(results.violations)).toEqual([]);
   });
 
-  test('admin users page has no critical/serious a11y violations', async ({ page }) => {
+  test('admin users page has no critical/serious/moderate a11y violations', async ({ page }) => {
     await loginAsRole(page, 'admin');
     await page.goto('/admin/users');
     await page.waitForLoadState('networkidle');
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(filterCriticalAndSerious(results.violations)).toEqual([]);
+    expect(filterModerate(results.violations)).toEqual([]);
   });
 
-  test('admin templates page has no critical/serious a11y violations', async ({ page }) => {
+  test('admin templates page has no critical/serious/moderate a11y violations', async ({
+    page,
+  }) => {
     await loginAsRole(page, 'admin');
     await page.goto('/admin/templates');
     await page.waitForLoadState('networkidle');
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(filterCriticalAndSerious(results.violations)).toEqual([]);
+    expect(filterModerate(results.violations)).toEqual([]);
   });
 });

@@ -55,7 +55,7 @@ export function ExtensionHistoryList({ items }: ExtensionHistoryListProps) {
 
   return (
     <div className="rounded-lg border bg-card p-5 shadow-sm">
-      <h3 className="text-lg font-semibold text-foreground mb-4">{t('extensions.historyTitle')}</h3>
+      <h2 className="text-lg font-semibold text-foreground mb-4">{t('extensions.historyTitle')}</h2>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>

@@ -49,7 +49,7 @@ function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div id="main-content" className="w-full max-w-sm rounded-xl border bg-card p-8 shadow-lg">
+      <div className="w-full max-w-sm rounded-xl border bg-card p-8 shadow-lg">
         <div className="mb-6 flex items-center justify-between">
           <LanguageSwitcher currentLocale={locale} onSwitch={setLocale} />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
