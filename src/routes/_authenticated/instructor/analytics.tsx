@@ -79,13 +79,10 @@ type AnalyticsSearchParams = {
 
 function InstructorAnalyticsPage() {
   const { t } = useI18n();
-  const loaderData = Route.useLoaderData() as unknown as {
-    analytics: InstructorAnalyticsData;
-    rubric: InstructorRubricAnalytics | { error: { code: string; message: string } };
-  };
+  const loaderData = Route.useLoaderData();
   const data = loaderData.analytics;
   const rubricData = loaderData.rubric;
-  const searchParams = Route.useSearch() as unknown as AnalyticsSearchParams;
+  const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
 
   if (isServerError(data)) {

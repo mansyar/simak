@@ -158,7 +158,7 @@ describe('AdminDashboard component', () => {
           type: 'submission_received',
           title: 'New submission',
           message: 'Student submitted checkpoint',
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(),
         },
       ],
     };

@@ -93,26 +93,12 @@ type AnalyticsSearchParams = {
 
 function AdminAnalyticsPage() {
   const { t } = useI18n();
-  const loaderData = Route.useLoaderData() as unknown as {
-    analytics: AdminAnalyticsData;
-    rubric: {
-      criteria: RubricCriterionMetric[];
-      dateRange: { start: string | null; end: string | null };
-    };
-  };
+  const loaderData = Route.useLoaderData();
   const data = loaderData.analytics;
   const rubricData = loaderData.rubric;
-  const searchParams = Route.useSearch() as unknown as AnalyticsSearchParams;
+  const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const { exportCsv, isExporting } = useCsvDownload();
-
-  const gradeTotal = data.gradeDistribution
-    ? data.gradeDistribution.A +
-      data.gradeDistribution.B +
-      data.gradeDistribution.C +
-      data.gradeDistribution.D +
-      data.gradeDistribution.F
-    : 0;
 
   if (isServerError(data)) {
     return (
@@ -124,6 +110,14 @@ function AdminAnalyticsPage() {
       </div>
     );
   }
+
+  const gradeTotal = data.gradeDistribution
+    ? data.gradeDistribution.A +
+      data.gradeDistribution.B +
+      data.gradeDistribution.C +
+      data.gradeDistribution.D +
+      data.gradeDistribution.F
+    : 0;
 
   const totalCheckpoints = data.statusDistribution.reduce((sum, s) => sum + s.count, 0);
 

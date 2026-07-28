@@ -70,7 +70,7 @@ function AssignmentDetailPage() {
       externalConsultantName: string | null;
       notes: string | null;
       status: string;
-      createdAt: string;
+      createdAt: Date | null;
     }[]
   >([]);
   const [verifiedCounts, setVerifiedCounts] = useState<
@@ -99,8 +99,8 @@ function AssignmentDetailPage() {
       extensionDays: number;
       status: 'pending' | 'approved' | 'rejected';
       reason: string | null;
-      createdAt: string;
-      resolvedAt: string | null;
+      createdAt: Date | null;
+      resolvedAt: Date | null;
       resolutionReason: string | null;
       checkpointName: string | null;
     }[]
@@ -114,52 +114,29 @@ function AssignmentDetailPage() {
         setLoadingExtensions(true);
         setSideDataError(false);
         try {
-          const listConsFn = listConsultations as unknown as (args: {
-            data: { assignmentId: number; page: number; limit: number };
-          }) => Promise<unknown>;
-          const listCountsFn = listVerifiedCounts as unknown as (args: {
-            data: { assignmentId: number };
-          }) => Promise<unknown>;
-          const consResult = await listConsFn({
+          const consResult = await listConsultations({
             data: { assignmentId: assignment.id, page: consultationPage, limit: 20 },
           });
-          if (
-            consResult &&
-            typeof consResult === 'object' &&
-            'consultations' in (consResult as Record<string, unknown>)
-          ) {
-            const consData = consResult as { consultations: typeof consultations; total: number };
-            setConsultations(consData.consultations);
-            setConsultationTotal(consData.total);
+          if (!isServerError(consResult)) {
+            setConsultations(consResult.consultations);
+            setConsultationTotal(consResult.total);
           }
 
-          const countsResult = await listCountsFn({
+          const countsResult = await listVerifiedCounts({
             data: { assignmentId: assignment.id },
           });
-          if (
-            countsResult &&
-            typeof countsResult === 'object' &&
-            'counts' in (countsResult as Record<string, unknown>)
-          ) {
-            setVerifiedCounts((countsResult as { counts: typeof verifiedCounts }).counts);
+          if (!isServerError(countsResult)) {
+            setVerifiedCounts(countsResult.counts);
           }
           setLoadingConsultations(false);
 
           // Load extension requests
-          const listExtFn = listMyExtensionRequests as unknown as (args: {
-            data: { assignmentId: number; page: number; limit: number };
-          }) => Promise<unknown>;
-          const extResult = await listExtFn({
+          const extResult = await listMyExtensionRequests({
             data: { assignmentId: assignment.id, page: extensionPage, limit: 20 },
           });
-          if (
-            extResult &&
-            typeof extResult === 'object' &&
-            'items' in (extResult as Record<string, unknown>)
-          ) {
-            const extData = extResult as { items: typeof extensionItems; total: number };
-            setExtensionItems(extData.items);
-            setExtensionTotal(extData.total);
+          if (!isServerError(extResult)) {
+            setExtensionItems(extResult.items);
+            setExtensionTotal(extResult.total);
           }
           setLoadingExtensions(false);
         } catch {
@@ -220,34 +197,19 @@ function AssignmentDetailPage() {
   const handleConsultationSuccess = async () => {
     setLoadingConsultations(true);
     // Refresh consultation data
-    const listConsFn = listConsultations as unknown as (args: {
-      data: { assignmentId: number; page: number; limit: number };
-    }) => Promise<unknown>;
-    const listCountsFn = listVerifiedCounts as unknown as (args: {
-      data: { assignmentId: number };
-    }) => Promise<unknown>;
-    const consResult = await listConsFn({
+    const consResult = await listConsultations({
       data: { assignmentId: assignment.id, page: consultationPage, limit: 20 },
     });
-    if (
-      consResult &&
-      typeof consResult === 'object' &&
-      'consultations' in (consResult as Record<string, unknown>)
-    ) {
-      const consData = consResult as { consultations: typeof consultations; total: number };
-      setConsultations(consData.consultations);
-      setConsultationTotal(consData.total);
+    if (!isServerError(consResult)) {
+      setConsultations(consResult.consultations);
+      setConsultationTotal(consResult.total);
     }
 
-    const countsResult = await listCountsFn({
+    const countsResult = await listVerifiedCounts({
       data: { assignmentId: assignment.id },
     });
-    if (
-      countsResult &&
-      typeof countsResult === 'object' &&
-      'counts' in (countsResult as Record<string, unknown>)
-    ) {
-      setVerifiedCounts((countsResult as { counts: typeof verifiedCounts }).counts);
+    if (!isServerError(countsResult)) {
+      setVerifiedCounts(countsResult.counts);
     }
     setLoadingConsultations(false);
   };
@@ -255,20 +217,12 @@ function AssignmentDetailPage() {
   const handleExtensionSuccess = async () => {
     setLoadingExtensions(true);
     // Refresh extension data
-    const listExtFn = listMyExtensionRequests as unknown as (args: {
-      data: { assignmentId: number; page: number; limit: number };
-    }) => Promise<unknown>;
-    const extResult = await listExtFn({
+    const extResult = await listMyExtensionRequests({
       data: { assignmentId: assignment.id, page: extensionPage, limit: 20 },
     });
-    if (
-      extResult &&
-      typeof extResult === 'object' &&
-      'items' in (extResult as Record<string, unknown>)
-    ) {
-      const extData = extResult as { items: typeof extensionItems; total: number };
-      setExtensionItems(extData.items);
-      setExtensionTotal(extData.total);
+    if (!isServerError(extResult)) {
+      setExtensionItems(extResult.items);
+      setExtensionTotal(extResult.total);
     }
     setLoadingExtensions(false);
   };

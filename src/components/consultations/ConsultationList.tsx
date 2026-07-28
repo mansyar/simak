@@ -12,7 +12,7 @@ interface ConsultationItem {
   externalConsultantName: string | null;
   notes: string | null;
   status: string;
-  createdAt: string;
+  createdAt: Date | null;
 }
 
 interface ConsultationListProps {

@@ -38,7 +38,7 @@ interface ActivityEvent {
   type: string;
   title: string;
   message: string | null;
-  createdAt: string;
+  createdAt: Date | null;
 }
 
 interface EmailQueueCounts {

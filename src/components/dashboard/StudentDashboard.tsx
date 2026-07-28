@@ -11,8 +11,8 @@ import { Progress } from '@/components/ui/progress';
 interface ActiveAssignment {
   id: number;
   title: string;
-  finalDeadline: string | null;
-  effectiveDeadline?: Date | string | null;
+  finalDeadline: Date;
+  effectiveDeadline?: Date | null;
   templateName: string;
   templateType: string;
   progressPercent: number;
@@ -33,7 +33,7 @@ interface PendingReview {
   submissionId: number;
   assignmentTitle: string;
   checkpointName: string;
-  submittedAt: string;
+  submittedAt: Date | null;
   waitTimeDays: number;
 }
 
@@ -41,7 +41,7 @@ interface ConsultationReminder {
   consultationId: number;
   assignmentTitle: string;
   checkpointName: string;
-  consultationDate: string;
+  consultationDate: Date | null;
 }
 
 export interface StudentDashboardData {

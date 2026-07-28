@@ -16,10 +16,10 @@ import { Badge } from '@/components/ui/badge';
 
 interface Submission {
   id: number;
-  version: number;
+  version: number | null;
   fileName: string;
   fileSize: number;
-  uploadedAt: Date;
+  uploadedAt: Date | null;
 }
 
 interface FileListProps {
@@ -40,7 +40,8 @@ function formatFileSize(
   return `${bytes} bytes`;
 }
 
-function formatDate(date: Date, locale: string): string {
+function formatDate(date: Date | null, locale: string): string {
+  if (!date) return '';
   return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',
@@ -72,7 +73,7 @@ export function FileList({ submissions, onDownload }: FileListProps) {
     );
   }
 
-  const maxVersion = Math.max(...submissions.map((s) => s.version));
+  const maxVersion = Math.max(...submissions.map((s) => s.version ?? 0));
 
   return (
     <div className="rounded-lg border">

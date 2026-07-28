@@ -39,65 +39,33 @@ export const Route = createFileRoute(
       if (!checkpoint) return null;
 
       // Fetch submissions for this checkpoint
-      const submissionsData = await (
-        listSubmissions as unknown as (args: {
-          data: { checkpointId: number; page: number; limit: number };
-        }) => Promise<{ submissions?: unknown; total?: number }>
-      )({
+      const submissionsData = await listSubmissions({
         data: { checkpointId: Number(checkpointId), page: 1, limit: 20 },
       });
 
       // Find the latest review (from the reviews table)
-      const reviewData = await (
-        getLatestReview as unknown as (args: { data: { checkpointId: number } }) => Promise<{
-          review?: {
-            decision: string;
-            comment: string | null;
-            instructorName: string;
-            revisionDeadline: string | null;
-            createdAt: string | null;
-          } | null;
-          scores?: Array<{
-            id: number;
-            criterionId: number;
-            criterionTitle: string;
-            score: number;
-            weight: number;
-            rubricLevelId: number | null;
-            levelLabel: string | null;
-            comment: string | null;
-          }>;
-        }>
-      )({ data: { checkpointId: Number(checkpointId) } });
-      const latestReview = reviewData?.review
-        ? ({
-            decision: reviewData.review.decision as 'pass' | 'revise',
-            comment: reviewData.review.comment ?? null,
-            reviewerName: reviewData.review.instructorName ?? null,
-            revisionDeadline: reviewData.review.revisionDeadline ?? null,
-            reviewedAt: reviewData.review.createdAt ?? null,
-          } as const)
-        : null;
+      const reviewData = await getLatestReview({
+        data: { checkpointId: Number(checkpointId) },
+      });
+      const latestReview =
+        !isServerError(reviewData) && reviewData?.review
+          ? ({
+              decision: reviewData.review.decision as 'pass' | 'revise',
+              comment: reviewData.review.comment ?? null,
+              reviewerName: reviewData.review.instructorName ?? null,
+              revisionDeadline: reviewData.review.revisionDeadline ?? null,
+              reviewedAt: reviewData.review.createdAt ?? null,
+            } as const)
+          : null;
 
       return {
         assignmentId: Number(id),
         assignmentTitle: (assignmentData as { title: string }).title,
         checkpoint,
-        submissions:
-          (
-            submissionsData as unknown as {
-              submissions: {
-                id: number;
-                version: number;
-                fileName: string;
-                fileSize: number;
-                uploadedAt: Date;
-              }[];
-            }
-          ).submissions ?? [],
-        submissionTotal: (submissionsData as { total?: number })?.total ?? 0,
+        submissions: !isServerError(submissionsData) ? submissionsData.submissions : [],
+        submissionTotal: !isServerError(submissionsData) ? submissionsData.total : 0,
         latestReview,
-        rubricScores: reviewData?.scores ?? [],
+        rubricScores: !isServerError(reviewData) ? (reviewData?.scores ?? []) : [],
       };
     } catch (err) {
       console.error('Failed to load submission page:', err);
@@ -146,30 +114,26 @@ function CheckpointSubmissionPage() {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | undefined>(undefined);
   const [submissions, setSubmissions] = useState<
-    { id: number; version: number; fileName: string; fileSize: number; uploadedAt: Date }[]
+    {
+      id: number;
+      version: number | null;
+      fileName: string;
+      fileSize: number;
+      uploadedAt: Date | null;
+    }[]
   >(data?.submissions ?? []);
   const [submissionPage, setSubmissionPage] = useState(1);
   const [submissionTotal, setSubmissionTotal] = useState(data?.submissionTotal ?? 0);
 
   const fetchSubmissions = useCallback(
     async (page: number) => {
-      const listSubFn = listSubmissions as unknown as (args: {
-        data: { checkpointId: number; page: number; limit: number };
-      }) => Promise<{
-        submissions: {
-          id: number;
-          version: number;
-          fileName: string;
-          fileSize: number;
-          uploadedAt: Date;
-        }[];
-        total: number;
-      }>;
-      const submissionsData = await listSubFn({
+      const submissionsData = await listSubmissions({
         data: { checkpointId: Number(params.checkpointId), page, limit: 20 },
       });
-      setSubmissions(submissionsData?.submissions ?? []);
-      setSubmissionTotal(submissionsData?.total ?? 0);
+      if (!isServerError(submissionsData)) {
+        setSubmissions(submissionsData.submissions);
+        setSubmissionTotal(submissionsData.total);
+      }
     },
     [params.checkpointId],
   );
@@ -189,10 +153,7 @@ function CheckpointSubmissionPage() {
             : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
         // Step 1: Get presigned upload URL
-        const getUploadUrlFn = getPresignedUploadUrl as unknown as (args: {
-          data: { checkpointId: number; contentType: string; extension: string };
-        }) => Promise<{ uploadUrl: string; fileKey: string }>;
-        const uploadData = await getUploadUrlFn({
+        const uploadData = await getPresignedUploadUrl({
           data: {
             checkpointId: Number(params.checkpointId),
             contentType,
@@ -232,10 +193,7 @@ function CheckpointSubmissionPage() {
         });
 
         // Step 3: Submit checkpoint
-        const submitFn = submitCheckpoint as unknown as (args: {
-          data: { checkpointId: number; fileKey: string; fileName: string; fileSize: number };
-        }) => Promise<{ error?: string }>;
-        const result = await submitFn({
+        const result = await submitCheckpoint({
           data: {
             checkpointId: Number(params.checkpointId),
             fileKey: uploadData.fileKey,
@@ -244,8 +202,8 @@ function CheckpointSubmissionPage() {
           },
         });
 
-        if (result.error) {
-          setUploadError(result.error);
+        if (isServerError(result)) {
+          setUploadError(result.error.message);
           return;
         }
 
@@ -269,13 +227,10 @@ function CheckpointSubmissionPage() {
 
   const handleDownload = useCallback(async (submissionId: number) => {
     const { getPresignedDownloadUrl } = await import('@/server/files');
-    const downloadFn = getPresignedDownloadUrl as unknown as (args: {
-      data: { submissionId: number };
-    }) => Promise<{ downloadUrl?: string }>;
-    const result = await downloadFn({
+    const result = await getPresignedDownloadUrl({
       data: { submissionId },
     });
-    if (result?.downloadUrl) {
+    if (!isServerError(result) && result?.downloadUrl) {
       window.open(result.downloadUrl, '_blank');
     }
   }, []);

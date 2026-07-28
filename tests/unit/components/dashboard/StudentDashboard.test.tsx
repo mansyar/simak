@@ -71,7 +71,7 @@ describe('StudentDashboard', () => {
         {
           id: 1,
           title: 'Thesis Assignment',
-          finalDeadline: '2026-06-01',
+          finalDeadline: new Date('2026-06-01'),
           effectiveDeadline: null,
           templateName: 'Thesis Template',
           templateType: 'thesis',
@@ -97,8 +97,8 @@ describe('StudentDashboard', () => {
         {
           id: 1,
           title: 'Thesis Assignment',
-          finalDeadline: '2026-06-01',
-          effectiveDeadline: '2026-07-15',
+          finalDeadline: new Date('2026-06-01'),
+          effectiveDeadline: new Date('2026-07-15'),
           templateName: 'Thesis Template',
           templateType: 'thesis',
           progressPercent: 50,
@@ -122,7 +122,7 @@ describe('StudentDashboard', () => {
         {
           id: 1,
           title: 'Thesis Assignment',
-          finalDeadline: '2026-06-01',
+          finalDeadline: new Date('2026-06-01'),
           effectiveDeadline: null,
           templateName: 'Thesis Template',
           templateType: 'thesis',
@@ -225,7 +225,7 @@ describe('StudentDashboard', () => {
           submissionId: 1,
           assignmentTitle: 'Thesis Assignment',
           checkpointName: 'Chapter 1',
-          submittedAt: '2026-05-20',
+          submittedAt: new Date('2026-05-20'),
           waitTimeDays: 3,
         },
       ],
@@ -249,7 +249,7 @@ describe('StudentDashboard', () => {
           consultationId: 1,
           assignmentTitle: 'Thesis Assignment',
           checkpointName: 'Chapter 1',
-          consultationDate: '2026-05-25',
+          consultationDate: new Date('2026-05-25'),
         },
       ],
     };
@@ -267,7 +267,7 @@ describe('StudentDashboard', () => {
         {
           id: 1,
           title: 'Thesis Assignment',
-          finalDeadline: '2026-06-01',
+          finalDeadline: new Date('2026-06-01'),
           templateName: 'Thesis Template',
           templateType: 'thesis',
           progressPercent: 50,
@@ -293,7 +293,7 @@ describe('StudentDashboard', () => {
         {
           id: 1,
           title: 'Thesis Assignment',
-          finalDeadline: '2026-06-01',
+          finalDeadline: new Date('2026-06-01'),
           templateName: 'Thesis Template',
           templateType: 'thesis',
           progressPercent: undefined as unknown as number,
@@ -316,7 +316,7 @@ describe('StudentDashboard', () => {
         {
           id: 1,
           title: 'Thesis Assignment',
-          finalDeadline: '2026-06-01',
+          finalDeadline: new Date('2026-06-01'),
           templateName: 'Thesis Template',
           templateType: 'thesis',
           progressPercent: 75,
