@@ -46,42 +46,43 @@
 
 ## Phase 2: logError() Migration
 
-- [ ] Task: Read spec.md and workflow.md to load context for this phase
-    - [ ] Read `conductor/tracks/structured-logging-observability_20260729/spec.md`
-    - [ ] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
+- [x] Task: Read spec.md and workflow.md to load context for this phase
+    - [x] Read `conductor/tracks/structured-logging-observability_20260729/spec.md`
+    - [x] Read `conductor/workflow.md` (TDD lifecycle, commit format, checkpoint protocol)
 
-- [ ] Task: Write failing unit tests for refactored logError() (Red Phase)
-    - [ ] Check if `tests/unit/lib/errors.test.ts` exists; create or update it with `/** @vitest-environment node */`
-    - [ ] Mock `@/lib/logger` — `vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }))`
-    - [ ] Test: `logError()` calls `logger.error` (not `console.error`) — assert `logger.error` was called
-    - [ ] Test: entry object shape preserved — assert `logger.error` called with object containing `timestamp`, `code`, `message` fields
-    - [ ] Test: optional fields included when provided — `cause`, `userId`, `handler`, `stack`, `input`
-    - [ ] Test: `sanitizeInput()` still redacts sensitive keys — pass `{ password: 'secret' }` as input, assert `logger.error` called with `input.password === '[REDACTED]'`
-    - [ ] Test: `serverError()` calls `logError()` and returns `{ error: { code, message } }` — no behavioral change
-    - [ ] Run `pnpm test` and confirm tests fail as expected (existing console.error assertions break)
+- [x] Task: Write failing unit tests for refactored logError() (Red Phase)
+    - [x] Check if `tests/unit/lib/errors.test.ts` exists; create or update it with `/** @vitest-environment node */`
+    - [x] Mock `@/lib/logger` — `vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() } }))`
+    - [x] Test: `logError()` calls `logger.error` (not `console.error`) — assert `logger.error` was called
+    - [x] Test: entry object shape preserved — assert `logger.error` called with object containing `timestamp`, `code`, `message` fields
+    - [x] Test: optional fields included when provided — `cause`, `userId`, `handler`, `stack`, `input`
+    - [x] Test: `sanitizeInput()` still redacts sensitive keys — pass `{ password: 'secret' }` as input, assert `logger.error` called with `input.password === '[REDACTED]'`
+    - [x] Test: `serverError()` calls `logError()` and returns `{ error: { code, message } }` — no behavioral change
+    - [x] Run `pnpm test` and confirm tests fail as expected (existing console.error assertions break)
 
-- [ ] Task: Refactor logError() to use pino (Green Phase)
-    - [ ] Import `logger` from `@/lib/logger` in `src/lib/errors.ts`
-    - [ ] Replace `console.error(JSON.stringify(entry))` (production, line 116) and `console.error(lines.join('\n'))` (dev, line 142) with `logger.error(entry)`
-    - [ ] Remove the `import.meta.env.PROD` branching (lines 115-142) — pino handles format via transport config
-    - [ ] Remove the `lines` array construction (dev-mode pretty printing) — no longer needed
-    - [ ] Preserve `entry` object construction (lines 89-113) — `timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`
-    - [ ] Preserve `sanitizeInput()` call for input redaction
-    - [ ] Run `pnpm test` and confirm all tests now pass
+- [x] Task: Refactor logError() to use pino (Green Phase)
+    - [x] Import `logger` from `@/lib/logger` in `src/lib/errors.ts`
+    - [x] Replace `console.error(JSON.stringify(entry))` (production, line 116) and `console.error(lines.join('\n'))` (dev, line 142) with `logger.error(entry)`
+    - [x] Remove the `import.meta.env.PROD` branching (lines 115-142) — pino handles format via transport config
+    - [x] Remove the `lines` array construction (dev-mode pretty printing) — no longer needed
+    - [x] Preserve `entry` object construction (lines 89-113) — `timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`
+    - [x] Preserve `sanitizeInput()` call for input redaction
+    - [x] Run `pnpm test` and confirm all tests now pass
+    - [x] Fix 3 downstream test files: `sla-integration.test.ts` (add LOG_LEVEL to env mock), `two-factor.test.ts` (add @/lib/logger mock), `error-boundary.test.tsx` (mock @/lib/logger, assert logger.error instead of console.error)
 
-- [ ] Task: Verify coverage & quality gates
-    - [ ] Run `pnpm test:coverage` — confirm ≥80% on all four metrics
-    - [ ] Run `pnpm typecheck` — clean
-    - [ ] Run `pnpm lint` — clean
-    - [ ] Confirm `src/lib/errors.ts` is under 500 lines (should decrease — removing dev-mode branching)
-    - [ ] Run `pnpm check:i18n` — clean
+- [x] Task: Verify coverage & quality gates
+    - [x] Run `pnpm test:coverage` — confirm ≥80% on all four metrics
+    - [x] Run `pnpm typecheck` — clean
+    - [x] Run `pnpm lint` — clean
+    - [x] Confirm `src/lib/errors.ts` is under 500 lines (should decrease — removing dev-mode branching)
+    - [x] Run `pnpm check:i18n` — clean
 
-- [ ] Task: Commit code changes & attach git note
-    - [ ] Stage `src/lib/errors.ts`, `tests/unit/lib/errors.test.ts`
-    - [ ] Commit: `refactor(logging): Route logError() through pino instead of console.error`
-    - [ ] Attach git note with task summary to the commit hash
+- [x] Task: Commit code changes & attach git note (3560064a)
+    - [x] Stage `src/lib/errors.ts`, `tests/unit/errors.test.ts`
+    - [x] Commit: `refactor(logging): Route logError() through pino instead of console.error`
+    - [x] Attach git note with task summary to the commit hash
 
-- [ ] Task: Conductor - User Manual Verification 'logError() Migration' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'logError() Migration' (Protocol in workflow.md)
 
 ## Phase 3: Request ID Middleware
 
