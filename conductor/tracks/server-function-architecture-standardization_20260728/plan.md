@@ -10,7 +10,7 @@
     - [ ] Document acceptable type-only circular dependency pattern (`import type { Schema }`) with rationale (erased at compile time, no runtime impact)
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Documentation' (Protocol in workflow.md)
 
-## Phase 2: setup-password.ts Two-File Split Refactor
+## Phase 2: setup-password.ts Two-File Split Refactor [checkpoint: bfa0c529]
 
 - [x] Task: Write failing tests for the new two-file split pattern (Red Phase)
     - [ ] Locate existing test file for setup-password (check `tests/unit/server/setup-password.test.ts` or equivalent)
@@ -30,7 +30,7 @@
     - [x] Run `pnpm test:coverage` — ≥80% on all thresholds (lines, statements, branches, functions)
     - [x] Run `pnpm lint` — 0 warnings, 0 errors
     - [x] Verify `src/server/setup-password.ts` and `src/server/setup-password.server.ts` are each under 500 lines
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: setup-password Refactor' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: setup-password Refactor' (Protocol in workflow.md)
 
 ## Phase 3: Audit-Log Naming + Circular Dependency Audit
 
