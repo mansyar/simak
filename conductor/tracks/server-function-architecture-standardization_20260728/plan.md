@@ -32,7 +32,7 @@
     - [x] Verify `src/server/setup-password.ts` and `src/server/setup-password.server.ts` are each under 500 lines
 - [x] Task: Conductor - User Manual Verification 'Phase 2: setup-password Refactor' (Protocol in workflow.md)
 
-## Phase 3: Audit-Log Naming + Circular Dependency Audit
+## Phase 3: Audit-Log Naming + Circular Dependency Audit [checkpoint: 3c19d8e6]
 
 - [x] Task: Rename audit-log server files and update imports
     - [x] Rename `src/server/audit-logs.ts` → `src/server/audit-log.ts` (git mv)
