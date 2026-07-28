@@ -6,8 +6,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 <!-- Archived tracks are in conductor/archive/ -->
 
----
-
-- [x] **Track: Health Check Endpoint**
-*Link: [./tracks/health-check-endpoint_20260728/](./tracks/health-check-endpoint_20260728/)*
-
