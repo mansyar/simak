@@ -51,7 +51,7 @@
     - [x] Run `pnpm typecheck`
     - [x] Run `pnpm lint` (including `simak-i18n/no-hardcoded`)
     - [x] Run `pnpm check:i18n`
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Region Content Containment' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Region Content Containment' (Protocol in workflow.md)
 
 ## Phase 3: Fix `heading-order` (4 Pages)
 
