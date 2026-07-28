@@ -333,9 +333,9 @@ function AssignmentDetailPage() {
               <ConsultationProgress counts={verifiedCounts} />
 
               <div className="rounded-lg border bg-card p-5 shadow-sm">
-                <h3 className="text-lg font-semibold text-foreground mb-4">
+                <h2 className="text-lg font-semibold text-foreground mb-4">
                   {t('consultations.logConsultation')}
-                </h3>
+                </h2>
                 <ConsultationForm
                   assignmentId={assignment.id}
                   checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
@@ -344,9 +344,9 @@ function AssignmentDetailPage() {
               </div>
 
               <div className="rounded-lg border bg-card p-5 shadow-sm">
-                <h3 className="text-lg font-semibold text-foreground mb-4">
+                <h2 className="text-lg font-semibold text-foreground mb-4">
                   {t('consultations.previousSessions')}
-                </h3>
+                </h2>
                 <ConsultationList consultations={consultations} />
                 <Pagination
                   currentPage={consultationPage}
@@ -389,9 +389,9 @@ function AssignmentDetailPage() {
           ) : (
             <>
               <div className="rounded-lg border bg-card p-5 shadow-sm">
-                <h3 className="text-lg font-semibold text-foreground mb-4">
+                <h2 className="text-lg font-semibold text-foreground mb-4">
                   {t('extensions.requestTitle')}
-                </h3>
+                </h2>
                 <ExtensionRequestForm
                   assignmentId={assignment.id}
                   maxExtensionDays={assignment.maxExtensionDays ?? 7}

@@ -20,9 +20,9 @@ export function TemplateDangerZone({ assignmentCount, onDelete }: TemplateDanger
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-medium text-foreground">
+              <h2 className="text-sm font-medium text-foreground">
                 {t('adminTemplates.actions.delete')}
-              </h3>
+              </h2>
               <p className="text-xs text-muted-foreground">{t('adminTemplates.deleteConfirm')}</p>
             </div>
             <Button

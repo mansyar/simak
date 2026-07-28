@@ -98,7 +98,7 @@ export function StudentDashboard({ data }: Props) {
                       {assignment.progressPercent ?? 0}%
                     </span>
                   </div>
-                  <h3 className="font-medium text-foreground truncate mb-2">{assignment.title}</h3>
+                  <h2 className="font-medium text-foreground truncate mb-2">{assignment.title}</h2>
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
                     <Calendar className="h-3.5 w-3.5" />
                     <span>

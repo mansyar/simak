@@ -357,4 +357,16 @@ describe('DiscussionPanel', () => {
     const msg = cache?.messages.find((m) => m.id === 1);
     expect(msg?.deletedAt).toBeNull();
   });
+
+  it('renders discussions title as h2 (not h3) for proper heading order', async () => {
+    await resolveList();
+    const { container } = renderPanel();
+    await waitForMessages();
+
+    const h2 = container.querySelector('h2');
+    expect(h2).not.toBeNull();
+    expect(h2?.textContent).toBe('discussions.title');
+    const h3 = container.querySelector('h3');
+    expect(h3).toBeNull();
+  });
 });

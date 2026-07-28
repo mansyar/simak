@@ -86,7 +86,7 @@ function ReviewDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
         <CheckCircle2 className="h-12 w-12 text-success" />
-        <h2 className="text-xl font-semibold">{t('instructorReviews.reviewSubmitted')}</h2>
+        <h1 className="text-xl font-semibold">{t('instructorReviews.reviewSubmitted')}</h1>
         {nextReviewSubmissionId !== null && (
           <button
             onClick={() =>

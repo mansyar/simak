@@ -12,7 +12,7 @@ export function CheckpointTimeline({ checkpoints, assignmentId }: CheckpointTime
 
   return (
     <div className="space-y-4">
-      <h3 className="font-display text-2xl text-foreground">{t('studentAssignments.timeline')}</h3>
+      <h2 className="font-display text-2xl text-foreground">{t('studentAssignments.timeline')}</h2>
       <div className="space-y-3">
         {checkpoints.map((checkpoint, index) => (
           <div key={checkpoint.id} className="relative pl-6">

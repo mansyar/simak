@@ -346,4 +346,30 @@ describe('StudentDashboard', () => {
     const emptyStates = container.querySelectorAll('[class*="p-4"]');
     expect(emptyStates.length).toBeGreaterThan(0);
   });
+
+  it('should render assignment titles as h2 (not h3) for proper heading order', () => {
+    const data = {
+      activeAssignments: [
+        {
+          id: 1,
+          title: 'Thesis Assignment',
+          finalDeadline: new Date('2026-06-01'),
+          templateName: 'Thesis Template',
+          templateType: 'thesis',
+          progressPercent: 50,
+          currentState: 'unlocked',
+        },
+      ],
+      upcomingDeadlines: [],
+      pendingReviews: [],
+      consultationReminders: [],
+    };
+
+    const { container } = render(<StudentDashboard data={data} />);
+
+    // Assignment title should be h2 (not h3) to avoid h1→h3 skip
+    const h2 = container.querySelector('h2');
+    expect(h2).not.toBeNull();
+    expect(h2?.textContent).toBe('Thesis Assignment');
+  });
 });

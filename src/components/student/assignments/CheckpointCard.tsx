@@ -94,7 +94,7 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="text-sm font-semibold text-foreground">{checkpoint.name}</h4>
+            <h3 className="text-sm font-semibold text-foreground">{checkpoint.name}</h3>
             <Badge variant={config.badgeVariant}>{t(config.label as TranslationKey)}</Badge>
             {isOverdue && (
               <Badge variant="destructive" className="gap-1">
