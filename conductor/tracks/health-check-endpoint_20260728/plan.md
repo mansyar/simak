@@ -73,5 +73,5 @@
     - [x] Commit: `chore(deploy): Add Dockerfile HEALTHCHECK and document /api/health for Coolify probes`
     - [x] Attach git note with task summary to the commit hash
 
-- [ ] Task: Conductor - User Manual Verification 'Deployment Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Deployment Integration' (Protocol in workflow.md)
 </protect>
