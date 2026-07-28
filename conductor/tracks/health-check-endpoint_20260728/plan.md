@@ -49,7 +49,7 @@
 
 - [x] Task: Conductor - User Manual Verification 'Health Check Module & Route' (Protocol in workflow.md)
 
-## Phase 2: Deployment Integration
+## Phase 2: Deployment Integration [checkpoint: efe9019]
 
 - [x] Task: Read spec.md and workflow.md to load context for this phase
     - [x] Read `conductor/tracks/health-check-endpoint_20260728/spec.md`
