@@ -1,3 +1,4 @@
+<protect>
 # TRACK-037: Accessibility Moderate Violations Remediation — Implementation Plan
 
 ## Phase 0: Investigation & Test Baseline
@@ -11,6 +12,7 @@
 
 ## Phase 1: Fix `landmark-one-main` + `skip-link` (Landmark Structure & Skip Link Targets)
 
+- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
 - [ ] Task: Write failing unit tests for landmark structure and skip link targets (Red Phase)
     - [ ] Create `tests/unit/routes/layout-a11y.test.tsx` — test that `_unauthenticated.tsx` renders a `<main id="main-content" tabindex="-1">` wrapping the Outlet
     - [ ] Add test that role layouts (`student.tsx`, `instructor.tsx`, `admin.tsx`) render `<main id="main-content" tabindex="-1">`
@@ -35,6 +37,7 @@
 
 ## Phase 2: Fix `region` (Content Outside Landmarks)
 
+- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
 - [ ] Task: Write failing unit tests for content containment in landmarks (Red Phase)
     - [ ] Add test to `tests/unit/routes/layout-a11y.test.tsx` — verify `KeyboardCheatSheet` trigger button is rendered inside a landmark (`<main>` or `<header>`)
     - [ ] Add test to `tests/unit/components/sonner.test.tsx` (or extend existing) — verify Toaster `<section>` has `aria-label` attribute
@@ -52,6 +55,7 @@
 
 ## Phase 3: Fix `heading-order` (4 Pages)
 
+- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
 - [ ] Task: Write failing unit tests for heading hierarchy (Red Phase)
     - [ ] Add test to `tests/unit/routes/layout-a11y.test.tsx` — verify heading levels don't skip on each of the 4 pages (render component, query `h1`-`h6` in order, assert no skips)
     - [ ] Run `pnpm test` — confirm new tests FAIL as expected
@@ -70,6 +74,7 @@
 
 ## Phase 4: E2E Tests & Documentation Update
 
+- [ ] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
 - [ ] Task: Update E2E a11y tests to assert zero moderate violations
     - [ ] Read `tests/e2e/a11y.spec.ts` — understand current critical/serious filter
     - [ ] Extend to also assert zero moderate violations (or change filter to include moderate)
@@ -87,3 +92,4 @@
     - [ ] Run `pnpm lint`
     - [ ] Run `pnpm check:i18n`
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: E2E Tests & Documentation' (Protocol in workflow.md)
+</protect>

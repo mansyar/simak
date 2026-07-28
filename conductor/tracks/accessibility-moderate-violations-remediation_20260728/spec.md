@@ -1,3 +1,4 @@
+<protect>
 # TRACK-037: Accessibility Moderate Violations Remediation
 
 ## Overview
@@ -65,3 +66,4 @@ Axe-core scan and code analysis identified the following root causes:
 - Critical and serious axe-core violations (already remediated in prior tracks).
 - New accessibility features beyond fixing the 4 documented moderate violations.
 - Screen reader testing beyond what axe-core covers.
+</protect>
