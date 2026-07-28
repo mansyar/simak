@@ -161,7 +161,8 @@ simak/
     │   │   ├── bulk-import.ts      → Bulk import server fn stubs + Zod schemas (users, templates)
     │   │   └── bulk-import.server.ts → Server-only bulk import handlers (parse, validate, insert)
     │   │   ├── gradebook.ts         → Gradebook server fn stubs (getStudentFinalGrade, getAssignmentGradebook, saveGradeConfig, recomputeAllGrades) + Zod schemas
-    │   │   └── gradebook.server.ts  → Server-only gradebook handlers (student grade, gradebook view, config upsert, batch recompute)
+    │   │   ├── gradebook.server.ts  → Server-only gradebook handlers (student grade, gradebook view, config upsert, batch recompute)
+    │   │   └── health.server.ts    → Health check handler (runHealthChecks — DB, R2, email queue checks with 2s timeouts, generic error messages)
 │   ├── db/
 │   │   ├── schema/           → Drizzle schema (split by domain)
 │   │   ├── index.ts          → Database client
@@ -1311,7 +1312,7 @@ The public, unauthenticated `GET /api/health` endpoint provides container orches
     }
   }
   ```
-- **HTTP 503 (unhealthy):** DB unreachable OR R2 configured-but-unreachable. Same response shape but `status: "unhealthy"` with failing check(s) carrying `{ status: "error", error: "..." }`.
+- **HTTP 503 (unhealthy):** DB unreachable OR R2 configured-but-unreachable. Same response shape but `status: "unhealthy"` with failing check(s) carrying `{ status: "error", error: "..." }`. Error messages are generic (`'database unreachable'`, `'r2 unreachable'`) — raw error details are never exposed on the public endpoint to prevent information leakage (internal IPs, DB usernames, R2 bucket names).
 - **Three checks** (each with a 2-second timeout, run in parallel via `Promise.allSettled`):
   1. **Database** — `SELECT 1` via `getDb()` (PgBouncer-safe — no session-specific queries).
   2. **R2** — `HeadBucketCommand` via `getR2Client()` (returns `null` if R2 env vars are absent → `not_configured`, which is healthy).

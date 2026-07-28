@@ -493,40 +493,9 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-038: Health Check Endpoint
-- **Status:** Planned · **Audit IDs:** None (new infrastructure — addresses missing production monitoring) · **Deps:** None
-- **Key decisions:** Add `GET /api/health` endpoint returning JSON with 3 checks: DB connectivity (`SELECT 1`), R2 reachability (`HeadBucketCommand` via existing `getR2Client()` from `src/lib/storage.ts` — returns `S3Client | null`; if null, R2 is `not_configured`; if non-null but HEAD bucket fails, R2 is `unreachable` → 503), email queue depth (`COUNT(*)` where `status IN ('pending', 'processing')` — informational, doesn't fail health). Return HTTP 200 with `{ status: 'healthy', checks: {...} }` if DB reachable AND (R2 not configured OR R2 reachable). Return HTTP 503 if DB unreachable OR R2 configured-but-unreachable. No auth required. Individual check timeouts (2s each) to prevent hanging. Used by Coolify/container orchestration for liveness/readiness probes.
-- **Detail:** Planned — not yet scaffolded
-
-#### Context Anchors (Traceability)
-*   **PRD Reference:** N/A (infrastructure, no product impact)
-*   **TDD Reference:** `docs/TDD.md` — Deployment section (Docker multi-stage, Coolify, PgBouncer); `src/config/env.ts` (DATABASE_URL required, R2_* optional env vars); `src/db/index.ts` (`getDb()` — throws if DATABASE_URL unset); `src/lib/storage.ts` (`getR2Client()` returns `S3Client | null` — null when R2 env vars absent; `getBucketName()` returns bucket name); `src/db/schema/email-queue.ts` (`emailQueue` table — `status` enum: `'pending', 'processing', 'sent', 'failed'`); `src/routes/api/auth/$.tsx` (existing API route pattern — `createFileRoute` with `server.handlers` object, NOT `createAPIFileRoute`); `docker/Dockerfile` (uses `node:22-alpine` — has `wget` in busybox, no `curl`)
-
-#### Track Tech Stack
-*   TanStack Start API route (`src/routes/api/health.ts`) — `createFileRoute` from `@tanstack/react-router` with `server: { handlers: { GET: async ({ request }) => ... } }` pattern (matching `src/routes/api/auth/$.tsx`)
-*   Drizzle ORM — `SELECT 1` for DB check, `COUNT(*)` query on `emailQueue` table for queue depth
-*   `@aws-sdk/client-s3` — `HeadBucketCommand` for R2 check (already a dependency; uses existing `getR2Client()` + `getBucketName()` from `src/lib/storage.ts`)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Health endpoint:** New `GET /api/health` route using `createFileRoute` with `server.handlers.GET`. Returns JSON with 3 checks: (1) DB check: `SELECT 1` via `getDb()`; (2) R2 check: call `getR2Client()` — if null, return `{ status: 'not_configured' }` (healthy); if non-null, send `HeadBucketCommand` with `getBucketName()` — success returns `{ status: 'ok' }`, failure returns `{ status: 'error', error: '...' }` (unhealthy → 503); (3) Email queue check: `COUNT(*)` where `status IN ('pending', 'processing')` — informational, always returns depth number. Overall status: `healthy` (200) if DB reachable AND (R2 not configured OR R2 reachable); `unhealthy` (503) if DB unreachable OR R2 configured-but-unreachable.
-    *   **Timeout handling:** Each check wrapped in `Promise.race` with 2s timeout. Failed/timed-out checks return `{ status: 'error', error: '...' }` but don't crash the endpoint.
-    *   **No auth:** Endpoint is public (no session check) — must be accessible by load balancers/containers without credentials.
-    *   **Dockerfile HEALTHCHECK:** Add `HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:3000/api/health || exit 1` to `docker/Dockerfile` (uses `wget` from busybox — `curl` is not available on `node:22-alpine`).
-*   **Out of Scope:**
-    *   Authenticated health check variant (for deeper introspection)
-    *   Metrics endpoint (Prometheus format — separate future track)
-    *   Database migration check (pending migrations count — separate concern)
-    *   Rate limiting on the health endpoint (public endpoint, but simple enough to not need protection)
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Endpoint creation):** Create `src/routes/api/health.ts` using `createFileRoute('/api/health')` with `server.handlers.GET`. Implement 3 checks with `Promise.allSettled` + 2s per-check timeout. DB check: `await getDb().execute(sql\`SELECT 1\`)`. R2 check: `const client = getR2Client(); if (!client) → not_configured; else await client.send(new HeadBucketCommand({ Bucket: getBucketName()! }))`. Email queue check: `await getDb().select({ count: count() }).from(emailQueue).where(inArray(emailQueue.status, ['pending', 'processing']))`. Return 200/503 with JSON body. Verify: `wget -qO- http://localhost:3000/api/health` returns 200 with all checks passing when DB is up.
-*   **Phase 2 (Failure handling):** Test with DB down → returns 503 with database check error. Test with R2 not configured → returns 200 with R2 `not_configured`. Test with R2 configured but unreachable → returns 503 with R2 error. Verify: endpoint never hangs (all checks time out within 2s).
-*   **Phase 3 (Deployment integration):** Add `HEALTHCHECK` directive to `docker/Dockerfile` (using `wget --spider`). Document in `docs/TDD.md` that Coolify can use `/api/health` for liveness/readiness probes. Verify: endpoint works behind PgBouncer (uses simple `SELECT 1`, not session-specific queries).
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** `wget -qO- http://localhost:3000/api/health` returns `{"status":"healthy","checks":{"database":{"status":"ok"},"r2":{"status":"ok"},"emailQueue":{"status":"ok","depth":0}}}`. Stop PostgreSQL → returns 503 with database check error. Remove R2 env vars → returns 200 with R2 `not_configured`. Configure R2 with wrong endpoint → returns 503 with R2 error.
-*   [ ] **Automated Tests:** Unit test for the health handler (mock `getDb`/`getR2Client`/`emailQueue`, assert: 200 healthy when DB up + R2 up, 200 healthy when DB up + R2 not_configured, 503 unhealthy when DB down, 503 unhealthy when R2 configured but HEAD fails, 2s timeout behavior, email queue depth reported correctly). `pnpm test:unit` — all tests pass.
-*   [ ] **Conductor Review:** `src/routes/api/health.ts` exists using `createFileRoute` with `server.handlers` (not `createAPIFileRoute`). No auth required. 2s per-check timeout. 200/503 status codes. R2: `not_configured` → 200, `ok` → 200, `error` → 503. Email queue uses correct status values (`'pending', 'processing'` — no `'retry'`). Dockerfile has `HEALTHCHECK` using `wget`. No new dependencies (`HeadBucketCommand` already in `@aws-sdk/client-s3`). File under 500 lines. `pnpm typecheck`, `pnpm lint` — clean.
+- **Status:** ✅ Complete · **Audit IDs:** None (new infrastructure — addresses missing production monitoring) · **Deps:** None
+- **Key decisions:** Public unauthenticated `GET /api/health` endpoint with 3 parallel checks (2s timeout each via `Promise.allSettled`): DB (`SELECT 1`), R2 (`HeadBucketCommand` — `not_configured` if env vars absent, healthy), email queue depth (`COUNT` pending/processing — informational only). Returns 200 (healthy) or 503 (unhealthy). Generic error messages (no internal detail leakage). Dockerfile `HEALTHCHECK` using `wget --spider`. Review fix: replaced raw `error.message`/`String(error)` with generic `'database unreachable'`/`'r2 unreachable'` to prevent information leakage on public endpoint.
+- **Detail:** `conductor/archive/health-check-endpoint_20260728/` (spec.md, plan.md)
 
 ---
 
@@ -680,7 +649,7 @@ Milestone 10: Infrastructure Consistency & Tech Debt Remediation
 
 Milestone 11: Observability & Infrastructure Hardening
 ├── TRACK-037: Accessibility Moderate Violations Remediation [Planned — depends on 010]
-├── TRACK-038: Health Check Endpoint [Planned — no deps]
+├── TRACK-038: Health Check Endpoint [Complete — archived]
 ├── TRACK-039: Orphaned R2 Object Cleanup [Planned — no deps]
 └── TRACK-040: Structured Logging & Observability [Planned — no deps]
 ```
@@ -710,7 +679,7 @@ The following track groups can be worked on simultaneously:
 | **Q** | TRACK-029, TRACK-030 | Both complete — TRACK-029 touched `query-keys.ts` + settings + gradebook components (archived); TRACK-030 touched `use-notifications.ts` + `NotificationCenter.tsx` + `query-keys.ts` (archived). Both depended on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files (TRACK-029 only) |
 | **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035 (complete — archived), TRACK-036 (complete — archived) | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touched `vitest.config.ts` + `vitest.config.integration.ts` + `package.json` (complete — archived); TRACK-036 touched `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json` (complete — archived). Minor overlap: TRACK-035 and TRACK-036 both touched `package.json` scripts — coordinated to avoid merge conflicts |
 | **S** | TRACK-032 → TRACK-033 | Both complete — TRACK-032 (type-safety restoration, archived) touched the same `createServerFn` stub files that TRACK-033 (architecture standardization, archived) refactored. TRACK-033 proceeded with structural changes on the typed stubs after TRACK-032's type fixes. Both touched `src/server/*.ts` and `src/server/*.server.ts` |
-| **T** | TRACK-037, TRACK-038, TRACK-039, TRACK-040 | Planned — fully independent. TRACK-037 touches layout files + E2E tests; TRACK-038 adds a new route; TRACK-039 extends email-queue tick loop; TRACK-040 touches logger/errors/background jobs. Minor overlap: TRACK-040 and TRACK-039 both touch `email-queue-init.ts` — coordinate if parallelized |
+| **T** | TRACK-037, TRACK-038 (complete — archived), TRACK-039, TRACK-040 | Planned — fully independent. TRACK-037 touches layout files + E2E tests; TRACK-038 added a new route (complete — archived); TRACK-039 extends email-queue tick loop; TRACK-040 touches logger/errors/background jobs. Minor overlap: TRACK-040 and TRACK-039 both touch `email-queue-init.ts` — coordinate if parallelized |
 
 ---
 
