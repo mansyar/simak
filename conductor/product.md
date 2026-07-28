@@ -563,4 +563,16 @@ Students and instructors lack a centralized system to:
 - **i18n** — `discussions.*` namespace (12 keys), `notifications.events.discussion_reply.title/.message` with params, `emails.subjects.discussionReply` — in both EN and ID locales
 - **Tests** — 3,607 tests pass across 351 test files; coverage ≥80% on all thresholds (stmts 88.27%, branches 82.41%, functions 83.66%, lines 88.92%)
 
+### Track: Orphaned R2 Object Cleanup (TRACK-039) (July 2026)
+
+- **Orphaned object cleanup scanner** — New `src/lib/r2-cleanup.ts` with `processOrphanedR2Objects()` that queries upload intents where `consumedAt IS NULL AND expiresAt < now() AND cleanedUpAt IS NULL` (batch LIMIT 50), deletes the corresponding R2 objects via `DeleteObjectCommand`, and marks intents as cleaned up (`cleanedUpAt = now()`)
+- **Schema migration** — Added nullable `cleanedUpAt` timestamp column to `uploadIntents` table in `src/db/schema/submissions.ts`; migration 0016 with rollback
+- **Throttled tick loop integration** — Scanner integrated into the existing email-queue `tick()` loop with a 6-hour throttle (`lastR2CleanupAt`), wrapped in try/catch for error isolation; no-op when R2 is not configured
+- **Parallel deletes with error isolation** — `Promise.allSettled` for per-object R2 deletes; failed deletes leave `cleanedUpAt` null for retry on next tick; structured error logging `{ event: 'r2_cleanup_failed', fileKey, error }`
+- **Audit logging** — Background cleanup logs `r2.cleanup` audit event with `actorId: 'system'`; manual admin trigger logs with admin's `userId` as `actorId`
+- **Manual admin trigger** — Admin-only server function `triggerR2Cleanup()` (two-file split: `src/server/r2-cleanup.ts` stub + `r2-cleanup.server.ts` handler with `isAdmin` guard); calls `processOrphanedR2Objects()` directly, bypassing throttle
+- **Admin UI** — "Trigger R2 Cleanup" button on `/admin/email-queue` page with success toast showing summary `{ deleted, failed, batchSize }`
+- **i18n** — 3 new keys in EN and ID (`adminEmailQueue.r2Cleanup.trigger`, `.success`, `.error`)
+- **Tests** — 3,819 tests pass across 369 test files; coverage ≥80% on all thresholds (stmts 87.93%, branches 81.92%, funcs 83.4%, lines 88.56%)
+
 </protect>
