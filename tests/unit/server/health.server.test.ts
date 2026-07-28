@@ -80,7 +80,7 @@ describe('runHealthChecks', () => {
       expect(result.status).toBe('unhealthy');
       expect(result.checks.database.status).toBe('error');
       expect(result.checks.database).toHaveProperty('error');
-      expect(result.checks.database.error).toBe('Connection refused');
+      expect(result.checks.database.error).toBe('database unreachable');
     });
 
     it('returns unhealthy status when R2 configured but HeadBucket fails', async () => {
@@ -92,7 +92,7 @@ describe('runHealthChecks', () => {
       expect(result.status).toBe('unhealthy');
       expect(result.checks.r2.status).toBe('error');
       expect(result.checks.r2).toHaveProperty('error');
-      expect(result.checks.r2.error).toBe('Access Denied');
+      expect(result.checks.r2.error).toBe('r2 unreachable');
     });
   });
 
@@ -109,7 +109,7 @@ describe('runHealthChecks', () => {
 
       expect(result.status).toBe('unhealthy');
       expect(result.checks.database.status).toBe('error');
-      expect(result.checks.database.error).toBe('timeout');
+      expect(result.checks.database.error).toBe('database unreachable');
     });
 
     it('hanging R2 dependency resolves to error within 2s timeout', async () => {
@@ -124,7 +124,7 @@ describe('runHealthChecks', () => {
 
       expect(result.status).toBe('unhealthy');
       expect(result.checks.r2.status).toBe('error');
-      expect(result.checks.r2.error).toBe('timeout');
+      expect(result.checks.r2.error).toBe('r2 unreachable');
     });
   });
 

@@ -43,8 +43,8 @@ async function checkDatabase(): Promise<HealthResult['checks']['database']> {
   try {
     await withTimeout(getDb().execute(sql`SELECT 1`), CHECK_TIMEOUT_MS);
     return { status: 'ok' };
-  } catch (error) {
-    return { status: 'error', error: error instanceof Error ? error.message : String(error) };
+  } catch {
+    return { status: 'error', error: 'database unreachable' };
   }
 }
 
@@ -62,8 +62,8 @@ async function checkR2(): Promise<HealthResult['checks']['r2']> {
   try {
     await withTimeout(client.send(new HeadBucketCommand({ Bucket: bucket })), CHECK_TIMEOUT_MS);
     return { status: 'ok' };
-  } catch (error) {
-    return { status: 'error', error: error instanceof Error ? error.message : String(error) };
+  } catch {
+    return { status: 'error', error: 'r2 unreachable' };
   }
 }
 
@@ -92,12 +92,12 @@ export async function runHealthChecks(): Promise<HealthResult> {
   const database =
     dbSettled.status === 'fulfilled'
       ? dbSettled.value
-      : { status: 'error' as const, error: dbSettled.reason?.message ?? 'Unknown error' };
+      : { status: 'error' as const, error: 'database unreachable' };
 
   const r2 =
     r2Settled.status === 'fulfilled'
       ? r2Settled.value
-      : { status: 'error' as const, error: r2Settled.reason?.message ?? 'Unknown error' };
+      : { status: 'error' as const, error: 'r2 unreachable' };
 
   const emailQueueCheck =
     emailQueueSettled.status === 'fulfilled'
