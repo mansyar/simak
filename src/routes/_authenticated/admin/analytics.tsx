@@ -63,20 +63,6 @@ export const Route = createFileRoute('/_authenticated/admin/analytics')({
   pendingComponent: () => <DashboardSkeleton />,
 });
 
-type AdminAnalyticsData = {
-  consultationVerificationRate: number;
-  deadlineBreachRate: number;
-  statusDistribution: { state: string; count: number }[];
-  submissionTrend: { date: string; count: number }[];
-  reviewTrend: { date: string; count: number }[];
-  reviewsCompleted: number;
-  dauTrend: { date: string; activeUsers: number }[];
-  wauTrend: { date: string; activeUsers: number }[];
-  dateRange: { start: string | null; end: string | null };
-  gradeDistribution: { A: number; B: number; C: number; D: number; F: number };
-  atRiskSummary: { high: number; medium: number; low: number };
-};
-
 type RubricCriterionMetric = {
   criterionId: number;
   criterionTitle: string;

@@ -49,28 +49,6 @@ export const Route = createFileRoute('/_authenticated/instructor/analytics')({
   pendingComponent: () => <DashboardSkeleton />,
 });
 
-type InstructorAnalyticsData = {
-  reviewsCompleted: number;
-  averageResponseTimeHours: number | null;
-  slaBreachCount: number;
-  studentsSupervised: number;
-  assignmentsActive: number;
-  dateRange: { start: string | null; end: string | null };
-};
-
-type RubricCriterionMetric = {
-  criterionId: number;
-  criterionTitle: string;
-  avgScore: number;
-  reviewCount: number;
-  passRate: number;
-};
-
-type InstructorRubricAnalytics = {
-  criteria: RubricCriterionMetric[];
-  dateRange: { start: string | null; end: string | null };
-};
-
 type AnalyticsSearchParams = {
   range?: '7d' | '30d' | '90d' | 'all';
   start?: string;
