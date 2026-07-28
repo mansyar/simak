@@ -72,7 +72,7 @@
     - [x] Run `pnpm check:i18n`
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Heading Order' (Protocol in workflow.md)
 
-## Phase 4: E2E Tests & Documentation Update
+## Phase 4: E2E Tests & Documentation Update [checkpoint: fb2136b]
 
 - [x] Task: Read `spec.md` and `workflow.md` to re-establish context and confirm TDD requirements
 - [x] Task: Update E2E a11y tests to assert zero moderate violations [c9373eb]
