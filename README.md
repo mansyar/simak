@@ -62,14 +62,15 @@
 | `pnpm dev` | Start dev server (auto-runs i18n codegen) |
 | `pnpm build` | Production build (codegen + vite build + migrate/seed bundles) |
 | `pnpm start` | Start production server |
-| `pnpm test` | Run unit tests (excludes integration) |
-| `pnpm test:integration` | Run integration tests only |
-| `pnpm test:coverage` | Unit tests + coverage report |
+| `pnpm test` | Run unit tests (excludes integration; xlsx tests run via `projects` config) |
+| `pnpm test:watch` | Watch mode (unit only, xlsx included via `projects`) |
+| `pnpm test:integration` | Run integration tests only (via standalone config) |
+| `pnpm test:coverage` | Unit tests + coverage (excludes integration) |
 | `pnpm test:e2e` | Run Playwright E2E tests (requires Docker for test DB) |
 | `pnpm test:e2e:ui` | Run E2E tests in interactive UI mode |
-| `pnpm typecheck` | TypeScript type checking (`tsc --noEmit`) |
-| `pnpm lint` | Lint with oxlint |
-| `pnpm format` | Format with oxfmt |
+| `pnpm typecheck` | TypeScript type checking (`tsc --noEmit --incremental --checkers 4`) |
+| `pnpm lint` | Lint all dirs with oxlint (`oxlint .`) |
+| `pnpm format` | Format all dirs with oxfmt (`*.{js,jsx,ts,tsx,css}`) |
 | `pnpm db:generate` | Generate Drizzle migration from schema |
 | `pnpm db:migrate` | Run pending migrations |
 | `pnpm db:seed` | Seed SuperAdmin user |
@@ -135,8 +136,8 @@ simak/
 
 ## Testing
 
-- **Unit tests** (`tests/unit/`) — Mirror `src/` structure. Default environment is `happy-dom`; server handler tests use `/** @vitest-environment node */`.
-- **Integration tests** (`tests/integration/`) — Excluded from the default test run. Run explicitly with `pnpm test:integration`.
+- **Unit tests** (`tests/unit/`) — Mirror `src/` structure. Default environment is `happy-dom`; server handler tests use `/** @vitest-environment node */`. The 4 xlsx/Excel test files (incompatible with the `vmThreads` pool) run in a separate `threads` pool via Vitest's `projects` array in `vitest.config.ts` — no script-level flags needed.
+- **Integration tests** (`tests/integration/`) — Excluded from the default test run via `vitest.config.ts` (not script flags). Run explicitly with `pnpm test:integration` (uses standalone `vitest.config.integration.ts`).
 - **E2E tests** (`tests/e2e/`) — Playwright E2E tests (~73 tests across 14 spec files) covering critical user flows: auth route guards + invalid login, admin user management + edit/delete with reassignment, admin template CRUD, instructor assignment creation, student file submission + upload UI validation + cross-student access denial, instructor review workflow (decoupled tests) + notification assertions, consultation lifecycle (log → verify → gating UI), extension workflow (request → approve/reject → deadline adjustment), password setup lifecycle (token → setup → login → token reuse/expiry), role dashboard smoke tests, settings hub, smoke tests for 13 routes, rubric grading, checkpoint discussions Q&A, cross-role lifecycle integration, mobile viewport, and axe accessibility scans on 6 key pages. Runs on 3 browser projects: chromium (desktop), firefox (desktop), and mobile-chrome (Pixel 7). Uses a dedicated test database (`postgres-test` Docker service, port 5433). Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive). The global setup migrates, truncates, and seeds the test DB (7 users incl. Instructor2/Student2/Student3, pending consultation) before each run; each spec file resets the DB for isolation.
 - **Coverage thresholds:** lines, functions, branches, and statements all >= 80%.
 

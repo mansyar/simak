@@ -12,9 +12,7 @@ describe('resolveNotificationContent', () => {
     );
 
     expect(result.title).toBe('Review Completed');
-    expect(result.message).toBe(
-      'The review for checkpoint "Draft" in "Essay" has been completed.',
-    );
+    expect(result.message).toBe('The review for checkpoint "Draft" in "Essay" has been completed.');
   });
 
   it('returns Indonesian strings for the id locale', () => {
@@ -26,9 +24,7 @@ describe('resolveNotificationContent', () => {
     );
 
     expect(result.title).toBe('Ulasan Selesai');
-    expect(result.message).toBe(
-      'Ulasan untuk checkpoint "Draft" di "Essay" telah selesai.',
-    );
+    expect(result.message).toBe('Ulasan untuk checkpoint "Draft" di "Essay" telah selesai.');
   });
 
   it('interpolates missing params with placeholders', () => {

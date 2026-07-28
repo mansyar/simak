@@ -1,0 +1,19 @@
+{
+  "track_id": "developer-experience-tooling-hygiene_20260728",
+  "type": "chore",
+  "state": "INIT",
+  "spec": {
+    "approved": true,
+    "approved_at": "2026-07-28T09:52:00Z"
+  },
+  "plan": {
+    "approved": true,
+    "approved_at": "2026-07-28T09:52:00Z",
+    "items_total": 12,
+    "items_completed": 0
+  },
+  "revert_baseline": "b4eaabaebd165f7b4544ffbacce6a769142720c0",
+  "created_at": "2026-07-28T09:52:00Z",
+  "updated_at": "2026-07-28T09:52:00Z",
+  "description": "TRACK-036: Developer Experience & Tooling Hygiene"
+}

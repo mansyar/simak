@@ -466,84 +466,16 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-035: Test Infrastructure Consolidation
-
-*   **Status:** `Pending`
-*   **Dependencies:** None
-*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
-*   **Audit IDs:** INFRA-8 (fragile test script configuration)
-
-#### Context Anchors (Traceability)
-*   **PRD Reference:** N/A (test infrastructure, no product impact)
-*   **TDD Reference:** `vitest.config.ts` (current config — `pool: 'vmThreads'`, `include: ['tests/**/*.test.{ts,tsx}']`, `exclude: ['node_modules', 'dist']` — does NOT exclude integration tests); `package.json` (test scripts with complex `--exclude` flags and dual-run pattern); `AGENTS.md` → "Developer Commands" (documents `pnpm test` excludes `tests/integration/**`)
-
-#### Track Tech Stack
-*   `vitest.config.ts` (test runner config)
-*   `vitest.config.integration.ts` (new — integration test config that extends base but removes integration from `exclude`)
-*   `package.json` (script cleanup)
-*   `tests/unit/lib/parse-templates-xlsx.test.ts`, `parse-users-xlsx.test.ts`, `sample-generators.test.ts`, `excel-export.test.ts` (4 files incompatible with `vmThreads` pool)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Move integration test exclusion into `vitest.config.ts`:** Add `'tests/integration/**'` to the `exclude` array in `vitest.config.ts` so bare `vitest` matches `pnpm test` behavior. Remove the `--exclude tests/integration/**` from `pnpm test`, `pnpm test:unit`, and `pnpm test:watch` scripts.
-    *   **Create `vitest.config.integration.ts`:** Since adding `'tests/integration/**'` to the config `exclude` array would break `pnpm test:integration` (Vitest applies config `exclude` even when filtering by path), create a minimal `vitest.config.integration.ts` that extends the base config but removes integration from `exclude`. Update `test:integration` script to `vitest run --config vitest.config.integration.ts tests/integration`.
-    *   **Address `vmThreads` incompatibility at config level:** The 4 xlsx/Excel test files fail under `vmThreads` pool and are currently run separately with `--pool=threads`. Investigate using Vitest's per-file or per-directory environment override (e.g., `test.environmentMatchGlobs` or a separate `vitest.config.excel.ts` project) instead of the dual-run script pattern. If a clean config-level solution isn't feasible, document why and keep the dual-run but extract the file list into a shared variable.
-    *   **Fix `test:watch` xlsx gap:** Currently `test:watch` excludes the 4 xlsx files but has no second `--pool=threads` run for them — xlsx tests are silently skipped in watch mode. The config-level xlsx pool fix (above) resolves this automatically.
-    *   **Fix `test:coverage` pool override:** Currently `test:coverage` uses `--pool=threads` for ALL tests (50% slower than `vmThreads`), not just the 4 xlsx files. After the config-level xlsx fix, remove `--pool=threads` from `test:coverage` so it uses the default `vmThreads` pool.
-    *   **Remove duplicate `test:unit` script:** `pnpm test:unit` is identical to `pnpm test`. Either remove `test:unit` and update `AGENTS.md` references, or make `test:unit` a thin alias (`"test:unit": "pnpm test"`).
-    *   **Simplify `test:coverage` script:** Ensure `test:coverage` also excludes integration tests via config, not command-line flag.
-*   **Out of Scope:**
-    *   Changing the default test pool from `vmThreads` to `threads` (vmThreads is 50% faster — the 4 files should be fixed, not the default changed)
-    *   Adding new tests or changing test coverage thresholds
-    *   Integration test improvements (only config/exclusion changes)
-    *   E2E test changes (Playwright config is separate)
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Config consolidation):** Add `'tests/integration/**'` to `vitest.config.ts` `exclude` array. Create `vitest.config.integration.ts` that extends the base config but overrides `exclude` to NOT exclude integration tests. Update `test:integration` script to use `--config vitest.config.integration.ts`. Remove `--exclude tests/integration/**` from all package.json test scripts. Verify: bare `vitest run` excludes integration tests (matches `pnpm test`), `pnpm test` still passes, `pnpm test:integration` still runs integration tests.
-*   **Phase 2 (xlsx pool fix + coverage):** Investigate Vitest 4's `projects` or `environmentMatchGlobs` config to assign `threads` pool to the 4 xlsx test files at config level. If feasible, remove the dual-run pattern from package.json and remove `--pool=threads` from `test:coverage` (let it use default `vmThreads`). If not feasible, document the limitation and extract the file list to a shared constant. Verify: `pnpm test` passes (both pools or config-level override), `pnpm test:coverage` passes with `vmThreads` default pool, `pnpm test:watch` runs xlsx tests.
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** Run bare `vitest run` (not via `pnpm test`) — integration tests are excluded. Run `pnpm test` — all unit tests pass (including xlsx tests). Run `pnpm test:coverage` — coverage passes with ≥80% thresholds, integration tests excluded, uses `vmThreads` pool. Run `pnpm test:watch` — watch mode excludes integration tests AND runs xlsx tests. Run `pnpm test:integration` — integration tests run via `vitest.config.integration.ts`. Review `package.json` — `test` and `test:unit` are either identical aliases or `test:unit` is removed.
-*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. `pnpm test:coverage` ≥80% on all thresholds. `pnpm typecheck` clean. `pnpm lint` clean.
-*   [ ] **Conductor Review:** `vitest.config.ts` `exclude` array contains `'tests/integration/**'`. `vitest.config.integration.ts` exists and overrides `exclude` for integration tests. `package.json` test scripts no longer have `--exclude tests/integration/**` flags. `test:coverage` no longer uses `--pool=threads` for all tests. The dual-run xlsx pattern is either resolved at config level or documented with rationale. `test:unit` is either an alias or removed (no duplicated long script). `AGENTS.md` "Developer Commands" table matches the actual scripts. All files under 500 lines. Pre-push gate passes.
+- **Status:** ✅ Complete · **Audit IDs:** INFRA-8 (fragile test script configuration) · **Deps:** None
+- **Key decisions:** `vitest.config.ts` restructured to use Vitest 4 `projects` array with `extends: true` — unit project (vmThreads pool, excludes integration + 4 xlsx files) and xlsx project (threads pool, includes 4 xlsx files) — eliminating all script-level `--exclude`/`--pool` flags; integration test exclusion moved from script flags to config `exclude` array; new `vitest.config.integration.ts` standalone config (alias, globals, happy-dom, env loading, vmThreads, `testTimeout: 30000`); `package.json` scripts simplified to flag-free one-liners (`test`=`vitest run`, `test:unit`=`pnpm test`, `test:watch`=`vitest`, `test:coverage`=`vitest run --coverage`, `test:integration`=`vitest run --config vitest.config.integration.ts tests/integration`); `test:watch` now runs xlsx tests (previously silently skipped); `test:coverage` uses vmThreads for unit tests (no global `--pool=threads`); AGENTS.md and workflow.md documentation updated to reflect projects-based pool isolation; review fix added `testTimeout: 30000` to integration config (standalone config defaulted to 5s, risking DB-dependent test timeouts)
+- **Detail:** `conductor/archive/test-infrastructure-consolidation_20260727/` (spec.md, plan.md)
 
 ---
 
 ### TRACK-036: Developer Experience & Tooling Hygiene
-
-*   **Status:** `Pending`
-*   **Dependencies:** None
-*   **Estimated Effort:** 1 Day / 0.5 Sprint Loops
-*   **Audit IDs:** INFRA-10 (lefthook vs package.json configuration mismatch)
-
-#### Context Anchors (Traceability)
-*   **PRD Reference:** N/A (developer tooling, no product impact)
-*   **TDD Reference:** `lefthook.yml` (pre-commit `lint` glob: `src/**/*.{js,jsx,ts,tsx}` — src only; pre-commit `format` glob: `*.{js,jsx,ts,tsx}` — all dirs, no `.css`; pre-push `typecheck`: `tsc --noEmit --incremental --checkers 4`); `package.json` (`lint` script: `oxlint .` — everything; `format` script: `oxfmt --write "src/**/*.{ts,tsx,css}"` — src only, includes `.css`; `typecheck` script: `tsc --noEmit --incremental` — no `--checkers`); `AGENTS.md` → "Formatting Quirks" (documents oxfmt on `src/**/*.{ts,tsx,css}`)
-
-#### Track Tech Stack
-*   `lefthook.yml` (git hook config)
-*   `package.json` (script alignment)
-*   `.socraticodecontextartifacts.json` (new file — SocratiCode context artifact config)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Align lefthook format glob with package.json:** The pre-commit `format` hook formats files in `tests/` and `scripts/` (glob: `*.{js,jsx,ts,tsx}`), but `pnpm format` only targets `src/**/*.{ts,tsx,css}`. Two gaps: (1) lefthook glob doesn't include `.css` files — add `.css` to the lefthook format glob so pre-commit formats CSS files too; (2) scope mismatch (all dirs vs src only) — either expand `pnpm format` to include `tests/` and `scripts/` (recommended — ensures manual format matches pre-commit), or narrow the lefthook glob to match `pnpm format` scope. Document the decision in `AGENTS.md`.
-    *   **Align lefthook lint glob with pnpm lint:** The pre-commit `lint` hook only lints `src/` files (glob: `src/**/*.{js,jsx,ts,tsx}`), but `pnpm lint` runs `oxlint .` (everything). Expand the lefthook lint glob to `*.{js,jsx,ts,tsx}` (all dirs) to match the format and modularity globs, so lint errors in `tests/` and `scripts/` are caught at commit time.
-    *   **Align lefthook typecheck with package.json:** The pre-push `typecheck` uses `--checkers 4` but `pnpm typecheck` doesn't. Add `--checkers 4` to `pnpm typecheck` in `package.json` (or remove from lefthook — but the TS 7 track explicitly added it for parallelism, so adding to `pnpm typecheck` is preferred).
-    *   **Configure SocratiCode context artifacts:** Create `.socraticodecontextartifacts.json` with entries for: `conductor/product.md`, `conductor/tech-stack.md`, `conductor/workflow.md`, `conductor/product-guidelines.md`, `drizzle/migrations/` (DB schema history), `docs/PRD.md`, `docs/TDD.md`. Run `codebase_context_index` to index them.
-*   **Out of Scope:**
-    *   Changes to test coverage thresholds (handled in TRACK-035)
-    *   Structured logging migration (deferred — `console.error(JSON.stringify(...))` is functional; a pino/winston migration is a separate infrastructure track)
-    *   Pagination UI component consolidation (deferred — identified in the instructor-ui-consistency audit as a "should-have" but requires UI design work, not tooling)
-    *   Any code changes beyond config files
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Lefthook alignment):** Update `package.json` `format` script to include `tests/` and `scripts/` (or narrow lefthook glob — decide based on whether test/script formatting is desired). Add `.css` to lefthook format glob. Expand lefthook lint glob from `src/**/*.{js,jsx,ts,tsx}` to `*.{js,jsx,ts,tsx}` (all dirs). Add `--checkers 4` to `pnpm typecheck`. Update `AGENTS.md` "Formatting Quirks" and "Developer Commands" to match. Verify: `pnpm format`, `pnpm lint`, and `pnpm typecheck` match lefthook behavior.
-*   **Phase 2 (SocratiCode artifacts):** Create `.socraticodecontextartifacts.json`. Run `codebase_context_index`. Verify `codebase_context_search` returns results from conductor docs and PRD/TDD.
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** Run `pnpm format` — formats files in `src/`, `tests/`, and `scripts/` (if expanded), including `.css` files. Run `pnpm typecheck` — uses `--checkers 4` (TS 7 parallelism). Run `pnpm lint` — lints all directories (matches lefthook lint glob). Verify `.socraticodecontextartifacts.json` exists and `codebase_context_search` returns results from conductor docs and PRD/TDD.
-*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. `pnpm typecheck` clean. `pnpm lint` clean. `pnpm check:i18n` parity maintained.
-*   [ ] **Conductor Review:** `lefthook.yml` format glob matches `pnpm format` scope (including `.css`). `lefthook.yml` lint glob matches `pnpm lint` scope (all dirs). `package.json` `typecheck` script uses `--checkers 4`. `.socraticodecontextartifacts.json` exists with documented artifacts. `codebase_context_search` returns results from indexed artifacts. `AGENTS.md` reflects the updated scripts. All files under 500 lines. Pre-push gate passes.
+- **Status:** ✅ Complete · **Audit IDs:** INFRA-10 (lefthook vs package.json configuration mismatch) · **Deps:** None
+- **Key decisions:** Aligned `lefthook.yml` and `package.json` tooling gates — format glob expanded to include `.css` (`*.{js,jsx,ts,tsx,css}`) and cover all dirs (was `src/**/*.{ts,tsx,css}` in `pnpm format`); lint glob expanded from `src/**/*.{js,jsx,ts,tsx}` to `*.{js,jsx,ts,tsx}` (all dirs, matching `oxlint .`); `pnpm typecheck` script updated to include `--checkers 4` (TS 7 shared-memory multithreading, previously only in lefthook pre-push gate); created `.socraticodecontextartifacts.json` with 7 entries (`conductor/product.md`, `conductor/tech-stack.md`, `conductor/workflow.md`, `conductor/product-guidelines.md`, `drizzle/migrations/`, `docs/PRD.md`, `docs/TDD.md`) enabling SocratiCode semantic search across project documentation and DB migrations; updated `AGENTS.md` (Developer Commands table, Formatting Quirks, Pre-commit gate description); expanded format scope surfaced 2 formatting fixes (`src/app/global.css` oklch normalization, `tests/unit/lib/notification-resolver.test.ts` line folding); all 3,773 tests pass, typecheck clean, lint clean (0 errors), i18n parity confirmed (963 keys in both locales)
+- **Detail:** `conductor/archive/developer-experience-tooling-hygiene_20260728/` (spec.md, plan.md)
 
 ---
 
@@ -631,7 +563,7 @@ The following track groups can be worked on simultaneously:
 | **O** | TRACK-026 | Complete — new domain (discussions), extended notification infrastructure (TRACK-022) and email queue (TRACK-018). No file overlap with TRACK-025 (different domain: discussions vs grading). Archived |
 | **P** | TRACK-027 → TRACK-028 | Both complete (archived). TRACK-027 expanded seed data (student2, student3, consultation seed) + decoupled instructor-review tests + 3 new specs + notification/upload/negative test assertions. TRACK-028 built on this expanded seed data and decoupled patterns — expanded coverage to 73 tests across 14 spec files, added Firefox + mobile-chrome projects, axe-core a11y scanning, cross-role lifecycle test. No file overlap with feature tracks (TRACK-025/026) — only touches `tests/e2e/`, `scripts/seed-e2e.ts`, and `playwright.config.ts` |
 | **Q** | TRACK-029, TRACK-030 | Both complete — TRACK-029 touched `query-keys.ts` + settings + gradebook components (archived); TRACK-030 touched `use-notifications.ts` + `NotificationCenter.tsx` + `query-keys.ts` (archived). Both depended on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files (TRACK-029 only) |
-| **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035, TRACK-036 | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touches `vitest.config.ts` + `package.json`; TRACK-036 touches `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json`. Minor overlap: TRACK-035 and TRACK-036 both touch `package.json` scripts — coordinate to avoid merge conflicts |
+| **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035 (complete — archived), TRACK-036 (complete — archived) | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touched `vitest.config.ts` + `vitest.config.integration.ts` + `package.json` (complete — archived); TRACK-036 touched `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json` (complete — archived). Minor overlap: TRACK-035 and TRACK-036 both touched `package.json` scripts — coordinated to avoid merge conflicts |
 | **S** | TRACK-032 → TRACK-033 | Sequential — TRACK-032 (type-safety restoration, complete — archived) touched the same `createServerFn` stub files that TRACK-033 (architecture standardization) refactors. TRACK-032's type fixes are complete; TRACK-033 can now proceed with structural changes on the typed stubs. Both touch `src/server/*.ts` and `src/server/*.server.ts` |
 
 ---

@@ -12,15 +12,15 @@
 | `pnpm dev`                                        | Start dev server (auto-runs i18n codegen first)          |
 | `pnpm build`                                      | Prod build (codegen + `vite build` + migrate/seed bundles) |
 | `pnpm start`                                      | Start prod server (`vinxi start`)                        |
-| `pnpm test`                                       | Run unit tests (**excludes `tests/integration/**`**)     |
-| `pnpm test:unit`                                  | Same as `pnpm test`                                      |
-| `pnpm test:integration`                            | Run **only** integration tests (opt-in, not in pre-push) |
-| `pnpm test:watch`                                 | Watch mode (excludes integration)                        |
-| `pnpm test:coverage`                              | Unit tests + coverage (excludes integration)             |
+| `pnpm test`                                       | Run unit tests (`vitest run`; excludes integration; xlsx tests run via `projects`) |
+| `pnpm test:unit`                                  | Alias of `pnpm test`                                     |
+| `pnpm test:integration`                            | Run **only** integration tests via `vitest.config.integration.ts` (opt-in, not in pre-push) |
+| `pnpm test:watch`                                 | Watch mode (`vitest`; unit only, xlsx included via `projects`) |
+| `pnpm test:coverage`                              | Unit tests + coverage (`vitest run --coverage`; vmThreads for unit, excludes integration) |
 | `pnpm vitest run tests/unit/path/to/file.test.ts` | Single test file                                         |
-| `pnpm typecheck`                                  | `tsc --noEmit --incremental`                             |
+| `pnpm typecheck`                                  | `tsc --noEmit --incremental --checkers 4`                |
 | `pnpm lint`                                       | **oxlint** on everything (`oxlint .`)                    |
-| `pnpm format`                                     | **oxfmt** on `src/**/*.{ts,tsx,css}` (not `tests/`)       |
+| `pnpm format`                                     | **oxfmt** on all dirs (`*.{js,jsx,ts,tsx,css}`)         |
 | `pnpm db:generate`                                | Generate Drizzle migration from schema                   |
 | `pnpm db:push`                                    | Push schema to dev DB (`drizzle-kit push`)              |
 | `pnpm db:migrate`                                 | Run pending migrations                                   |
@@ -28,8 +28,8 @@
 | `pnpm generate:i18n`                              | Regenerate i18n TypeScript types                         |
 | `pnpm check:i18n` / `pnpm check:i18n:unused`      | Validate i18n key parity / show unused keys              |
 
-**Pre-commit gate** (Lefthook, sequential): `oxlint --fix {staged_files}` → `oxfmt --write {staged_files}` → `node scripts/check-modularity.js {staged_files}`  
-**Pre-push gate** (Lefthook): `pnpm typecheck` && `pnpm vitest run --coverage` (coverage run **also excludes integration** via `vitest.config.ts`).
+**Pre-commit gate** (Lefthook, sequential): `oxlint --fix {staged_files}` (all dirs, `*.{js,jsx,ts,tsx}`) → `oxfmt --write {staged_files}` (all dirs, `*.{js,jsx,ts,tsx,css}`) → `node scripts/check-modularity.js {staged_files}`  
+**Pre-push gate** (Lefthook): `pnpm typecheck` && `pnpm test:coverage` (coverage run **also excludes integration** via `vitest.config.ts`).
 
 > Integration tests never run unless you invoke `pnpm test:integration` explicitly.
 
@@ -90,6 +90,7 @@ Files go **directly to Cloudflare R2** via presigned URLs — the server never s
 
 - Tests live in `tests/unit/` and `tests/integration/` — mirror `src/` structure.
 - Vitest config: `globals: true`, default environment **`happy-dom`**, discovery from `tests/**/*.test.{ts,tsx}`; `tests/integration/**` is **excluded** from the default run.
+- xlsx tests run via the `projects` array in `vitest.config.ts` (xlsx project uses `threads` pool, rest uses `vmThreads`) — handled automatically, no script flags needed.
 - Server-handler tests add `/** @vitest-environment node */` at the top of the file (overrides happy-dom).
 - Tests import handlers directly via `@/server/*.server` and mock `@/server/auth`, `@/db/index`, plus external clients (`@/lib/storage`, Resend).
 - When a server function uses `.inputValidator(Schema).handler(...)`, the test **must mock `@tanstack/react-start`** with the builder chain or import fails. Canonical pattern in `tests/unit/server/submissions.test.ts`:
@@ -107,7 +108,7 @@ Files go **directly to Cloudflare R2** via presigned URLs — the server never s
 
 ## Formatting Quirks
 
-- **Formatting via oxfmt** (`.oxfmtrc.json`): `semi: true`, `singleQuote: true`, `trailingComma: 'all'`, `printWidth: 100`, `tabWidth: 2`.
+- **Formatting via oxfmt** (`.oxfmtrc.json`): `semi: true`, `singleQuote: true`, `trailingComma: 'all'`, `printWidth: 100`, `tabWidth: 2`. `pnpm format` covers all dirs (`*.{js,jsx,ts,tsx,css}`).
 - **Linting via oxlint** (`.oxlintrc.json`): TypeScript + React plugins, `correctness: error`, plus the custom `simak-i18n/no-hardcoded` rule (see above).
 - `.gitattributes` enforces **LF line endings** for all source files (`.ts`, `.tsx`, `.js`, etc.) — Windows checkout is fine, commits are always LF.
 - `pnpm-lock.yaml` uses **pnpm** (not npm or yarn). Always use `pnpm` for dependency operations.
