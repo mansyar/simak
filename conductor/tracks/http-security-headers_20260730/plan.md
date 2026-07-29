@@ -3,15 +3,15 @@
 
 ## Phase 1: Research & API Verification
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
-- [ ] Task: Verify TanStack Start nonce/middleware API
-    - [ ] Load `tanstack-start-best-practices` skill and review nonce/middleware patterns
-    - [ ] Verify `createStart`, `createMiddleware`, `setResponseHeader` exports exist in installed `@tanstack/react-start` version (check `node_modules/@tanstack/react-start/dist/`)
-    - [ ] Review TanStack Start docs for nonce propagation from middleware to router context
-    - [ ] Check `src/lib/storage.ts` for R2 endpoint domain extraction logic (`getR2Client()`)
-    - [ ] Check `src/config/env.ts` for `R2_ENDPOINT` env var access pattern
-    - [ ] Locate E2E test directory and existing E2E test patterns (Playwright config)
-- [ ] Task: Conductor - User Manual Verification 'Research & API Verification' (Protocol in workflow.md)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
+- [x] Task: Verify TanStack Start nonce/middleware API
+    - [x] Load `tanstack-start-best-practices` skill and review nonce/middleware patterns
+    - [x] Verify `createStart`, `createMiddleware`, `setResponseHeader` exports exist in installed `@tanstack/react-start` version (check `node_modules/@tanstack/react-start/dist/`)
+    - [x] Review TanStack Start docs for nonce propagation from middleware to router context
+    - [x] Check `src/lib/storage.ts` for R2 endpoint domain extraction logic (`getR2Client()`)
+    - [x] Check `src/config/env.ts` for `R2_ENDPOINT` env var access pattern
+    - [x] Locate E2E test directory and existing E2E test patterns (Playwright config)
+- [~] Task: Conductor - User Manual Verification 'Research & API Verification' (Protocol in workflow.md)
 
 ## Phase 2: Security Headers Pure Logic (TDD)
 
