@@ -1,3 +1,4 @@
+<protect>
 # TRACK-041: HTTP Security Headers
 
 ## Track Information
@@ -94,3 +95,4 @@ CSP is the primary defense against stored XSS — the app has rich user-generate
 - WebSocket/SSE `connect-src` allowances (deferred to TRACK-046).
 - Expanding Permissions-Policy beyond geolocation, microphone, camera.
 - Changes to `__root.tsx` (TanStack Start's nonce mechanism auto-attaches).
+</protect>

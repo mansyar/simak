@@ -1,7 +1,9 @@
+<protect>
 # TRACK-041: Implementation Plan
 
 ## Phase 1: Research & API Verification
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
 - [ ] Task: Verify TanStack Start nonce/middleware API
     - [ ] Load `tanstack-start-best-practices` skill and review nonce/middleware patterns
     - [ ] Verify `createStart`, `createMiddleware`, `setResponseHeader` exports exist in installed `@tanstack/react-start` version (check `node_modules/@tanstack/react-start/dist/`)
@@ -13,6 +15,7 @@
 
 ## Phase 2: Security Headers Pure Logic (TDD)
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
 - [ ] Task: Write Tests (Red) — `tests/unit/lib/security-headers.test.ts`
     - [ ] Test `generateNonce()` returns base64 string of correct length (24 chars from 16 bytes)
     - [ ] Test `generateNonce()` returns unique values across multiple calls
@@ -39,6 +42,7 @@
 
 ## Phase 3: TanStack Start Integration
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
 - [ ] Task: Create `src/start.ts` with `createStart` instance + CSP middleware
     - [ ] Import `createStart`, `createMiddleware` from `@tanstack/react-start`
     - [ ] Import `setResponseHeader` from `@tanstack/react-start/server`
@@ -55,6 +59,7 @@
 
 ## Phase 4: E2E Test
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
 - [ ] Task: Write E2E test for security headers
     - [ ] Test header presence + values on unauthenticated route (e.g., `/auth/login`)
     - [ ] Test header presence + values on authenticated route (e.g., `/admin/dashboard` or `/instructor/dashboard`)
@@ -70,6 +75,7 @@
 
 ## Phase 5: Documentation & Final Verification
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
 - [ ] Task: Update `conductor/tech-stack.md`
     - [ ] Add "HTTP Security Headers" section documenting CSP allowlist rationale
     - [ ] Document nonce lifecycle (generation → middleware → router context → auto-attach to scripts/styles)
@@ -82,3 +88,4 @@
     - [ ] `pnpm test:coverage` (verify ≥80% thresholds for new code)
     - [ ] Verify `src/start.ts` + `src/lib/security-headers.ts` under 500 lines each (`node scripts/check-modularity.js`)
 - [ ] Task: Conductor - User Manual Verification 'Documentation & Final Verification' (Protocol in workflow.md)
+</protect>
