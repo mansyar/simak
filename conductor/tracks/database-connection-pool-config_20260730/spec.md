@@ -1,3 +1,4 @@
+<protect>
 # Specification: TRACK-042 — Database Connection Pool Configuration
 
 ## Overview
@@ -106,3 +107,4 @@ This track is configuration-only — no query logic, schema, or handler changes.
 - **Connection pool monitoring/observability UI:** No admin dashboard for pool stats. Pool sizing guidance documented in `conductor/tech-stack.md` only.
 - **Multi-instance pool coordination (Redis-backed):** In-memory singleton is sufficient for single-instance Coolify deployment.
 - **`closeDb()` / pool shutdown:** Tracked separately in TRACK-045 (Graceful Shutdown & Background Processor Drain).
+</protect>

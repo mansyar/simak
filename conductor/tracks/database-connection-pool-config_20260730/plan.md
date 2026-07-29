@@ -1,7 +1,9 @@
+<protect>
 # Implementation Plan: TRACK-042 — Database Connection Pool Configuration
 
 ## Phase 1: Environment Variable Configuration
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
 - [ ] Task: Write tests for new env vars (TDD Red Phase)
     - [ ] Add test in `tests/unit/config/env.test.ts`: `DB_POOL_MAX` defaults to `10` when unset
     - [ ] Add test: `DB_POOL_MAX='20'` coerces to number `20`
@@ -23,6 +25,7 @@
 
 ## Phase 2: Database Pool Configuration
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
 - [ ] Task: Write tests for `getDb()` pool configuration (TDD Red Phase)
     - [ ] Add tests in `tests/unit/db/client.test.ts` (or new `tests/unit/db/pool-config.test.ts`): mock `postgres` and `drizzle-orm/postgres-js` to capture constructor arguments
     - [ ] Test: `getDb()` calls `postgres()` with `max` equal to `env.DB_POOL_MAX` (default 10)
@@ -51,6 +54,7 @@
 
 ## Phase 3: Documentation & Final Verification
 
+- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
 - [ ] Task: Update `conductor/tech-stack.md` with DB pool configuration changelog entry
     - [ ] Add dated note (2026-07-30) documenting: explicit pool config on postgres.js (`max`, `idle_timeout`, `connect_timeout`, `max_lifetime`, `prepare`), matching `prepare` on Drizzle, `onnotice` routing through pino, new env vars `DB_POOL_MAX` + `DB_PREPARED_STATEMENTS_DISABLED`, pool sizing guidance (default 10 for single-instance Coolify), PgBouncer transaction pooling notes (`DB_PREPARED_STATEMENTS_DISABLED=true`)
 - [ ] Task: Run full quality gate suite
@@ -59,3 +63,4 @@
     - [ ] Run `pnpm lint` — verify clean (0 errors)
     - [ ] Run `pnpm check:i18n` — verify EN<->ID parity (no new i18n keys needed for this track, but verify no breakage)
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Documentation & Final Verification' (Protocol in workflow.md)
+</protect>
