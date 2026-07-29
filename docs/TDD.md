@@ -17,6 +17,7 @@
 | **ORM**            | Drizzle ORM                     | Type-safe SQL-first ORM. Lightweight, no code generation, runs natively in server functions.        |
 | **File Storage**   | Cloudflare R2                   | S3-compatible object storage with presigned URL uploads.                                            |
 | **Email**          | Resend                          | Transactional email API for invitations and password setup.                                         |
+| **Logging**        | pino                             | Structured JSON logger (server-side only). `pino-pretty` in dev. `LOG_LEVEL` env var (default `info`). |
 | **i18n**           | typesafe-i18n                   | Type-safe translations with compile-time checks. Works in both client and server functions.         |
 | **Testing**        | Vitest + Playwright + @axe-core/playwright | Vitest for unit and integration tests; Playwright for E2E (chromium + firefox + mobile-chrome projects); @axe-core/playwright for automated WCAG 2.1 AA accessibility scanning in E2E tests. |
 | **Deployment**     | Docker + Coolify                | Self-hosted on a VPS.                                                                               |
@@ -124,7 +125,8 @@ simak/
 │   │   ├── auth.server.ts    → Session handler: Better Auth validation, DB query, 5s-TTL in-memory cache
 │   │   ├── users.ts          → User CRUD, invitations
 │   │   ├── assignments.ts    → Assignment CRUD (instructor + student queries)
-│   │   ├── assignments.server.ts → Server-only assignment handlers
+│   │   ├── assignments.server.ts → Server-only assignment handlers (createAssignment, listInstructor, getDetail — re-exports handlers from extras + admin files)
+│   │   ├── assignments-admin.server.ts → Admin-only assignment handler (`reassignAssignmentHandler` — extracted to stay under 500-line limit, multi-handler pattern) (TRACK-040)
 │   │   ├── submissions.ts    → Upload, versioning
 │   │   ├── reviews.ts        → Review, pass/revise
 │   │   ├── consultations.ts  → Log, list, verify, reject, detail, counts (split: .ts stubs + .server.ts handlers)
@@ -198,6 +200,8 @@ simak/
     │   │   ├── server-fn.ts     → `typedServerFn` wrapper — wraps `createServerFn` with a single `as unknown as TypedBuilder` solution cast that restores return-type inference through the `.inputValidator(Schema).handler(fn)` builder chain. All 23 server stub files import `typedServerFn` instead of `createServerFn` (TRACK-032). Runtime: pure pass-through (type-only change).
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
     │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys, discussionKeys, settingsKeys, gradebookKeys)
+    │   │   ├── logger.ts         → Singleton `pino` logger instance — JSON to stdout in prod, `pino-pretty` in dev (lazy-loaded via `createRequire`). `LOG_LEVEL` env var (default `info`). `createLogger(options?)` factory. Server-side only. (TRACK-040)
+    │   │   ├── request-context.ts → `requestIdMiddleware` (TanStack Start `createMiddleware`) + `createRequestLogger(context)` — reads `x-request-id` header or generates UUID. Defined and tested but not yet wired to HTTP handlers (future work). (TRACK-040)
     │   │   └── utils.ts          → Shared utilities
 │   ├── hooks/               → Custom React hooks
 │   │   ├── use-debounced-callback.ts → Generic debounce hook (setTimeout/clearTimeout, 300ms for search inputs)
@@ -206,7 +210,7 @@ simak/
 │   │   ├── use-notifications.ts → Notification hooks (useMarkRead, useMarkAllRead with optimistic updates on useInfiniteQuery page shape, useUnreadCount, useNotificationsList via useInfiniteQuery)
 │   │   └── use-assignment-tabs.ts → Assignment tab hooks (approveExtension, rejectExtension with optimistic updates; consultations/extensions via useQuery)
 │   └── config/
-│       └── env.ts            → Validated environment variables (Zod `envSchema`; `Env` type = `z.infer<typeof envSchema>` — single source of truth, TRACK-031)
+│       └── env.ts            → Validated environment variables (Zod `envSchema`; `Env` type = `z.infer<typeof envSchema>` — single source of truth, TRACK-031). Includes `LOG_LEVEL` (optional, default `info` — TRACK-040).
 ├── locales/                  → typesafe-i18n translation files
 │   ├── en.json               → English translations
 │   └── id.json               → Indonesian translations
@@ -1128,12 +1132,25 @@ A checkpoint unlocks when:
 
 | Module | Responsibility |
 | --- | --- |
-| `src/lib/errors.ts` | `ErrorCode` union (`UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION`, `BAD_REQUEST`, `CONFLICT`, `INTERNAL`), `ServerError` shape `{ error: { code, message } }`, `serverError(code, message, context?)` factory, `logError()` structured logger (readable text in dev, single-line JSON in prod), `sanitizeInput()` (redacts `password`/`token`/`secret`/etc.), `isServerError()` guard. Responses expose only `code` + `message` — never stack traces, SQL, or raw errors. |
+| `src/lib/errors.ts` | `ErrorCode` union (`UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION`, `BAD_REQUEST`, `CONFLICT`, `INTERNAL`), `ServerError` shape `{ error: { code, message } }`, `serverError(code, message, context?)` factory, `logError()` structured logger (routes through `pino` `logger.error(entry)` — preserves `entry` object shape with `timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`; JSON in prod, pretty in dev via pino transport config), `sanitizeInput()` (redacts `password`/`token`/`secret`/etc.), `isServerError()` guard. Responses expose only `code` + `message` — never stack traces, SQL, or raw errors. (TRACK-040: migrated from `console.error` to `pino`) |
 | `src/lib/toast.ts` | `showErrorToast(code, t)` renders a sonner `toast.error` with the translated message (falls back to `error.default`); `parseServerError(res)` extracts `{ code, message }`, tolerant of both the typed shape and the legacy `{ error: string }` shape. |
 | `src/components/ui/sonner.tsx` | `<Toaster>` wrapper — theme-aware (light/dark via `MutationObserver`), design-token CSS vars, `position="top-right"`, `richColors`. Mounted once in `src/routes/__root.tsx`. |
 | `src/components/error-boundary.tsx` | `RootErrorComponent` — bilingual fallback (`error.somethingWentWrong`), Reload button + home link, `role="alert"` + `aria-live="assertive"`, logs via `logError('INTERNAL', ...)`. Wired as `errorComponent` in `src/routes/__root.tsx`. |
 | Server handlers (`src/server/*.server.ts`) | All migrated from `{ error: '<string>' }` to `serverError(code, message, context?)`. DB operations wrapped in `try/catch` → `serverError('INTERNAL', ..., { cause, handler })`. Client mutation hooks (`src/hooks/*.ts`) call `showErrorToast()` on error. |
 | i18n (`locales/{en,id}.json`) | `error` namespace (camelCase) holds user-facing messages per code; `simak-i18n/no-hardcoded` lint rule enforces `t('key')` usage. |
+
+### Structured Logging (Track: Structured Logging & Observability)
+
+All server-side logging uses `pino` (server-side only — not bundled with client code). The singleton `logger` instance (`src/lib/logger.ts`) outputs JSON to stdout in production and pretty-printed output in dev (via `pino-pretty`, lazy-loaded via `createRequire`). Log level is configurable via the optional `LOG_LEVEL` env var (default `info`).
+
+Two migration patterns were applied:
+
+1. **Background jobs** (email queue, deadline scanner, R2 cleanup) — `logger.child({ requestId: crypto.randomUUID() })` at the start of each tick/scan, with structured `{ event, ...payload }` log calls preserving the existing shape.
+2. **Server handler advisory blocks** — all post-commit advisory `try/catch` blocks that previously used `console.error('Failed to ...', err)` now use `logger.error({ event: 'advisory_failed', handler: '<fn_name>', error: err instanceof Error ? err.message : String(err) })` for consistent structured output.
+
+`logError()` in `src/lib/errors.ts` routes through `logger.error(entry)` — the existing `entry` object shape (`timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`) and `sanitizeInput()` redaction are preserved.
+
+Request ID propagation infrastructure is defined in `src/lib/request-context.ts` (`requestIdMiddleware` + `createRequestLogger`), but **not yet wired** to HTTP handlers — wiring requires extending `typedServerFn` to chain `.middleware([requestIdMiddleware])` and threading `requestId` through stub handlers. This is tracked as future work.
 
 ---
 
@@ -1284,6 +1301,7 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 | `BETTER_AUTH_URL`      | Public URL of the app                                                   |
 | `SUPERADMIN_EMAIL`     | Email for the seeded SuperAdmin                                         |
 | `SUPERADMIN_PASSWORD`  | Password for the seeded SuperAdmin                                      |
+| `LOG_LEVEL`             | Optional. Pino log level (default: `info`). `debug`/`info`/`warn`/`error`. (TRACK-040) |
 
 ### Database Migrations [v1]
 
