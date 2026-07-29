@@ -191,7 +191,7 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-020: Rubric-Based Grading & Evaluation
-- **Status:** Complete | **Audit IDs:** None (new feature) | **Deps:** None
+- **Status:** ✅ Complete · **Audit IDs:** None (new feature) · **Deps:** None
 - **Key decisions:** `grading_type` pgEnum (nullable) on `template_checkpoints` (`null`/`numeric`/`qualitative`); `checkpoints.templateCheckpointId` FK (nullable, backfilled); `rubric_criteria`/`rubric_levels` with soft-delete; `review_scores` with full denormalized snapshot (`criterionTitle`, `levelLabel`, `score`, `weight`); `updateTemplateHandler` refactored from delete+reinsert to upsert/diff (preserves checkpoint IDs); weight-sum (100%) validation at Zod application layer; live rubric lookup at review time + frozen snapshot for completed reviews; rubric analytics (avg per criterion, cross-instructor comparison, CSV/Excel export); review fixes: validation-before-insert to prevent orphaned reviews, `.returning()` for review ID, TOCTOU lock on `saveRubricHandler`, `safeAuditLog` helper, Excel injection mitigation, a11y (aria-live, accessible labels, stable React keys)
 - **Detail:** `conductor/archive/rubric-based-grading-evaluation_20260723/` (spec.md, plan.md)
 
@@ -215,58 +215,6 @@ All tracks must adhere to the following project constraints:
 - **Key decisions:** Pure `computeFinalGrade` function (no DB access); `assignment_grade_config` (1:1 with assignments, cascade-deleted) + `final_grades` cache table (upserted, never individually deleted); auto-created default config on assignment creation + migration backfill for pre-existing assignments; `equal_weight`/`custom_weight` schemes with stale-weight fallback (sum≠100, missing/extra checkpoint entries → equal_weight + warning badge); post-commit advisory grade recomputation on `pass` review decision (try/catch, never affects review transaction); admin-only `recomputeAllGrades` wrapped in `db.transaction` for atomicity; CSV export with formula-injection mitigation (`escapeCsvValue`); client-side Excel via SheetJS (`sanitizeCell`); admin grade distribution analytics (A/B/C/D/F progress bars); review fixes applied: stale-weight detection for removed checkpoints (key-count check), `logAuditEvent` awaited in try/catch (SQL §6.4), `recomputeAllGradesHandler` transaction wrapping, redundant `computeFinalGrade`/`computeCheckpointScore` calls eliminated, migration rollback file created (SQL §5.1)
 - **Detail:** `conductor/archive/gradebook-final-grade-computation_20260725/` (spec.md, plan.md)
 
-#### Context Anchors (Traceability)
-*   **PRD Reference:** `docs/PRD.md#checkpoints--submissions` (review workflow with rubric scoring — the data source for grade computation), `docs/PRD.md#analytics--reporting` (CSV/Excel export infrastructure — extension point for gradebook exports), `docs/PRD.md#data-model-summary` (`ReviewScore` entity — denormalized snapshot of criterion score/weight at review time)
-*   **TDD Reference:** `docs/TDD.md` `assignments` table (`src/db/schema/assignments.ts:24` — `finalDeadline`, `instructorId`), `checkpoints` table (`src/db/schema/assignments.ts:77` — `state`, `order`, `studentId`, `templateCheckpointId`), `reviews` table (`src/db/schema/submissions.ts:41` — `decision`, `reviewedAt`), `review_scores` table (`src/db/schema/rubrics.ts:46` — `score`, `weight`, `criterionTitle`, `levelLabel` — denormalized snapshot frozen at review time), `template_checkpoints` table (`src/db/schema/templates.ts:16` — `gradingType`, `order`, `minConsultations`); `src/server/analytics-export.server.ts` (existing CSV export handlers + private `escapeCsvValue`/`buildCsv` helpers — extension point for gradebook CSV), `src/lib/excel-export.ts` (existing client-side `.xlsx` export + `exportRubricScoresToExcel` pattern — extension point for gradebook Excel), `src/server/dashboard-student.server.ts` (student dashboard handler — extension point for final grade display), `src/server/dashboard-instructor.server.ts:53-255` (`getInstructorDashboardDataHandler` — extension point for gradebook summary), `src/server/reviews.server.ts:220` (`submitReviewHandler` — event site for grade recomputation trigger; file is at 495/500 lines — extension must go in `reviews-extras.server.ts`), `src/server/assignments.server.ts:79` (`createAssignmentHandler` — where default grade config is inserted inside the transaction; file is at 498/500 lines — extension must go in `assignments-extras.server.ts`), `src/server/reviews-extras.server.ts` (existing extras file — extension point for `recomputeStudentGrade` advisory call), `src/server/assignments-extras.server.ts` (existing extras file — extension point for `createDefaultGradeConfig` helper)
-*   **Product Spec Reference:** `conductor/product.md` Track: Rubric-Based Grading & Evaluation (TRACK-020) — explicitly deferred "Grade transcripts / final grade aggregation across checkpoints (separate future track)" in Out of Scope section of `conductor/archive/rubric-based-grading-evaluation_20260723/spec.md`
-
-#### Track Tech Stack
-*   Drizzle ORM — New `assignment_grade_config` table (weighting scheme per assignment) and `final_grades` table (cached computed grade per student per assignment). New schema file `src/db/schema/gradebook.ts`, registered in `src/db/schema/index.ts` re-exports + relations. Migration generated via `pnpm db:generate`. Neither table uses `deletedAt` soft-delete — `assignment_grade_config` is 1:1 with assignments (cascade-deleted via FK), `final_grades` is a cache (upserted, never deleted individually).
-*   New shared module: `src/lib/grade-computation.ts` — pure functions, no DB access. Exports `computeFinalGrade(checkpoints: CheckpointGradeInput[], config: AssignmentGradeConfig): FinalGradeResult` and types (`GradingScheme = 'equal_weight' | 'custom_weight'`, `CheckpointGradeInput`, `FinalGradeResult = { score: number | null, letterGrade: string | null, status: 'complete' | 'incomplete' | 'in_progress', contributingCheckpoints: ContributingCheckpoint[] }`, `ContributingCheckpoint = { checkpointId: number, checkpointName: string, templateCheckpointId: number | null, order: number, state: string, score: number, isRubric: boolean, weight: number }`). Called from server handlers (on-demand computation) and cached in `final_grades` table.
-*   New server function split: `src/server/gradebook.ts` (client-safe Zod schemas + `createServerFn` stubs with `.inputValidator(Schema).handler(...)` builder pattern) + `src/server/gradebook.server.ts` (handler implementations — `getStudentFinalGradeHandler`, `getAssignmentGradebookHandler`, `saveGradeConfigHandler`). Note: `exportGradebookCsvHandler` lives in `analytics-export.server.ts` (see below), NOT in `gradebook.server.ts`.
-*   Existing file extension: `src/server/analytics-export.server.ts` (355 lines, has room) — add `exportGradebookCsvHandler` (admin-only, per-assignment gradebook with ownership check). Uses the file's existing private `escapeCsvValue` and `buildCsv` helpers directly (no export needed — same file).
-*   Existing file extension: `src/lib/excel-export.ts` (64 lines) — add `exportGradebookToExcel` helper (client-side `.xlsx` with human-readable column headers, matching existing `exportRubricScoresToExcel` pattern). Uses existing `sanitizeCell` for formula-injection mitigation.
-*   Existing file extension: `src/server/reviews-extras.server.ts` — add `recomputeStudentGrade(db, assignmentId, studentId)` helper function. Called from `submitReviewHandler` post-commit advisory section (1-line call + try/catch = ~5 lines added to `reviews.server.ts` which is at 495/500 — tight but fits).
-*   Existing file extension: `src/server/assignments-extras.server.ts` — add `createDefaultGradeConfig(tx, assignmentId)` helper. Called from `createAssignmentHandler` inside the transaction (1-line call — `assignments.server.ts` is at 498/500, 1 line fits).
-*   shadcn/ui components — `Table` for gradebook grid (students × checkpoints → final grade), `Badge` for letter grades, `Card`/`CardHeader`/`CardContent` for student final grade card, `Input` for custom weight configuration, `Select` for grading scheme selector.
-*   i18n codegen — new gradebook keys in both `locales/en.json` and `locales/id.json` under `gradebook.*` namespace.
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Grade configuration schema:** New `assignment_grade_config` table — `assignmentId` (integer, FK → assignments, unique, `onDelete: cascade`), `gradingScheme` (pgEnum: `equal_weight` | `custom_weight`), `customWeights` (jsonb, nullable — `{ templateCheckpointId: weight }` map, used only when scheme is `custom_weight`; keys are `templateCheckpointId` integers as strings, values are integer weights 0–100), `letterGradeBounds` (jsonb — `{ "A": 90, "B": 80, "C": 70, "D": 60 }` configurable lower bounds; score below the lowest bound → "F" implicitly), `createdAt` (timestamp), `updatedAt` (timestamp). Default config auto-created inside `createAssignmentHandler` transaction via `createDefaultGradeConfig(tx, assignmentId)` helper in `assignments-extras.server.ts` (scheme = `equal_weight`, `customWeights` = null, standard letter bounds). For pre-existing assignments (created before this track), a **migration script** backfills default config rows — NOT lazy creation on read.
-    *   **Final grades cache table:** New `final_grades` table — `id` (serial PK), `assignmentId` (integer, FK → assignments, `onDelete: cascade`), `studentId` (text, FK → users), `numericScore` (numeric(5,2), nullable — null if incomplete), `letterGrade` (text, nullable), `status` (pgEnum: `complete` | `incomplete` | `in_progress`), `contributingCheckpoints` (jsonb — array of `{ checkpointId: number, checkpointName: string, templateCheckpointId: number | null, order: number, state: string, score: number, isRubric: boolean, weight: number }`), `computedAt` (timestamp), `updatedAt` (timestamp). Unique constraint on `(assignmentId, studentId)`. Recomputed on-demand or when a review is submitted (triggered from `submitReviewHandler` post-commit via `recomputeStudentGrade` in `reviews-extras.server.ts`).
-    *   **Grade computation engine:** New `src/lib/grade-computation.ts` — pure function `computeFinalGrade(checkpoints, config): FinalGradeResult`. For each checkpoint: if `gradingType` is `null` (pass/fail), score = `state === 'passed'` ? 100 : 0; if `numeric`/`qualitative`, aggregate `review_scores` weighted by criterion `weight` (using denormalized snapshot values — sum of `score * weight / 100` per criterion). Overall score = weighted average of checkpoint scores using the configured scheme: `equal_weight` = simple average (sum / count), `custom_weight` = weighted by `customWeights` map (keyed by `templateCheckpointId`). Letter grade derived from `letterGradeBounds` (score >= bound → that letter; score below lowest bound → "F"). Status: `complete` if all checkpoints passed, `in_progress` if some passed, `incomplete` if none passed.
-    *   **Instructor gradebook view:** New route `/instructor/assignments/$id/gradebook` — table view (students × checkpoints → final grade column). Each cell shows the checkpoint's computed score (or pass/fail badge for non-rubric checkpoints). Final grade column shows numeric score + letter badge. Export CSV and Excel buttons. Linked from the instructor assignment detail page. (Grade Settings dialog is admin-only — see below.)
-    *   **Admin grade settings dialog:** "Grade Settings" dialog accessible from the admin template editor or admin analytics — `Select` for scheme, `Input` fields for custom weights (visible only when `custom_weight` selected, keyed by `templateCheckpointId`), `Input` fields for letter bounds. Admin-only (consistent with rubric ownership per TRACK-020 — rubrics are admin-owned, grade config follows the same pattern). `saveGradeConfigHandler` is admin-only via `isAdmin` guard.
-    *   **Student final grade card:** New component on `/student/assignments/$id` — shows final grade (numeric + letter badge) when the assignment is complete, or current progress score with "in progress" status. Per-checkpoint score breakdown in a collapsible section. Read-only for students.
-    *   **Admin grade overview:** Extend admin analytics (`/admin/analytics`) with a "Grade Distribution" section — aggregate letter grade distribution across all assignments (A/B/C/D/F counts as progress bars). No drill-down to individual students (v2).
-    *   **CSV/Excel export:** `exportGradebookCsvHandler` in `analytics-export.server.ts` (admin-only, per-assignment, ownership-verified) returns CSV string with student name, per-checkpoint scores, final numeric score, letter grade. Uses existing private `escapeCsvValue` and `buildCsv` in the same file. Client-side `exportGradebookToExcel` helper in `excel-export.ts` for `.xlsx` export, using existing `sanitizeCell`.
-    *   **Grade recomputation trigger:** Extend `submitReviewHandler` (`reviews.server.ts:220`) post-commit advisory section with a call to `recomputeStudentGrade(db, assignmentId, studentId)` (defined in `reviews-extras.server.ts`, try/catch, never affects review transaction). Only triggers on `pass` decision (revise doesn't change pass state). NOT triggered on `submitCheckpointHandler` (submitting doesn't change pass state — grade only changes when a checkpoint transitions to `passed`).
-    *   **Audit logging:** All grade config changes (scheme, custom weights, letter bounds) logged to `audit_log` via `logAuditEvent` with action `gradebook.config_updated`, entity type `assignment_grade_config`, details including previous and new values. Consistent with existing audit logging for template/rubric changes.
-    *   **Schema registration:** New `src/db/schema/gradebook.ts` file registered in `src/db/schema/index.ts` re-exports + relations (`assignmentGradeConfigRelations`, `finalGradesRelations`).
-    *   **i18n keys:** `gradebook.title`, `gradebook.finalGrade`, `gradebook.letterGrade.*` (A/B/C/D/F labels), `gradebook.status.complete`/`.in_progress`/`.incomplete`, `gradebook.settings.scheme`/`.equalWeight`/`.customWeight`, `gradebook.settings.letterBounds`, `gradebook.settings.customWeights`, `gradebook.exportCsv`/`.exportExcel`, `gradebook.empty`/`.noGrades`, `analytics.gradeDistribution`. Added to both locales, run `pnpm generate:i18n`.
-    *   **Unit tests:** `grade-computation.ts` (2 schemes in isolation — equal_weight, custom_weight; pass/fail checkpoints vs rubric-scored checkpoints; incomplete assignments; letter grade boundary edge cases — score exactly 90 → "A", score 89.99 → "B", score below D bound → "F"; all-passed → complete, none-passed → incomplete, mixed → in_progress; null gradingType checkpoints scored as pass=100/fail=0; custom_weights keyed by templateCheckpointId). `getStudentFinalGradeHandler` (returns computed grade, returns null when no config exists, ownership verified). `getAssignmentGradebookHandler` (returns all students with per-checkpoint scores, sorted by student name, instructor ownership verified). `exportGradebookCsvHandler` (CSV format correct, formula injection mitigated via `escapeCsvValue`, admin ownership verified). `saveGradeConfigHandler` (admin-only, validates custom weights sum to 100 when scheme is `custom_weight` via `superRefine`, upserts config, audit logs the change). Grade recomputation trigger (fires post-commit on `submitReviewHandler` with `pass` decision, advisory try/catch doesn't throw, upserts `final_grades` row, doesn't affect review transaction, does NOT fire on `revise` decision).
-*   **Out of Scope:**
-    *   Grade appeals workflow (no formal appeal request/approval flow — v2)
-    *   Cross-assignment grade aggregation / transcript generation (v2 — requires course/semester grouping from the proposed Course & Semester track)
-    *   GPA computation (v2 — requires institution-specific GPA scales)
-    *   Student-facing grade editing or grade negotiation (grades are computed, read-only for students)
-    *   Weighted checkpoint categories (e.g., "homework = 30%, exams = 70%" — v2; v1 weights are per-checkpoint, not per-category)
-    *   Grade history/audit trail (no time-series of grade changes — `final_grades` is upserted, not append-only; v2 could add `final_grade_history` table)
-    *   Automated grade import from external systems (LMS integration — v2)
-    *   Student notification on grade update (v2 — students see their grade when they open the assignment page; no push notification for grade changes)
-    *   `passThreshold` / numeric pass override (the instructor's pass/revise decision already determines checkpoint completion — a numeric threshold would conflict with instructor judgment)
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Schema & Computation Engine):** Create `src/db/schema/gradebook.ts` with `assignment_grade_config` and `final_grades` tables — proper FKs (`assignmentId` → assignments `onDelete: cascade`, `studentId` → users), unique constraints (`assignment_grade_config_assignment_id_unq`, `final_grades_assignment_id_student_id_unq`), and indexes. `numericScore` as `numeric(5,2)`. No `deletedAt` on either table (cascade-deleted with assignment / cache upserted). Register in `src/db/schema/index.ts` re-exports + relations. Generate migration via `pnpm db:generate` — migration includes backfill of default `assignment_grade_config` rows for all existing assignments. Create `src/lib/grade-computation.ts` with `computeFinalGrade(checkpoints, config): FinalGradeResult`. Define types: `GradingScheme` (`'equal_weight' | 'custom_weight'`), `CheckpointGradeInput`, `FinalGradeResult`, `ContributingCheckpoint`, `AssignmentGradeConfig`. Implement 2 schemes: `equal_weight` (simple average of checkpoint scores), `custom_weight` (weighted by `customWeights` map keyed by `templateCheckpointId`). For each checkpoint: if `gradingType === null`, score = `state === 'passed'` ? 100 : 0; if `numeric`/`qualitative`, aggregate `review_scores` (sum of `score * weight / 100` per criterion, using denormalized snapshot). Letter grade from `letterGradeBounds` (score >= bound → letter; below lowest bound → "F"). Status: all passed → `complete`, none passed → `incomplete`, mixed → `in_progress`. Pure function — no DB access. Write unit tests (each scheme in isolation, pass/fail vs rubric checkpoints, incomplete assignments, letter grade boundaries including "F" fallback, custom_weights keyed by templateCheckpointId, null config defaults). Verify: both schemes compute correctly, pass/fail checkpoints scored as 100/0, rubric checkpoints use denormalized snapshot, letter grades derived from configurable bounds with "F" fallback, status reflects completion state.
-*   **Phase 2 (Server Functions & Grade Recomputation):** Create `src/server/gradebook.ts` (Zod schemas: `GetStudentFinalGradeSchema`, `GetAssignmentGradebookSchema`, `SaveGradeConfigSchema` with `superRefine` for custom weight sum validation) + `createServerFn` stubs with `.inputValidator(Schema).handler(...)` pattern. Create `src/server/gradebook.server.ts` with handlers: `getStudentFinalGradeHandler` (ownership-verified, returns computed grade or null — does NOT auto-create config; reads from `final_grades` cache or computes on-demand if cache is stale), `getAssignmentGradebookHandler` (instructor ownership-verified, returns all students with per-checkpoint scores via batch query joining checkpoints + reviews + review_scores, passes to `computeFinalGrade`), `saveGradeConfigHandler` (admin-only via `isAdmin` guard, validates custom weights sum to 100 when scheme is `custom_weight`, upserts config, audit logs via `logAuditEvent`). Add `exportGradebookCsvHandler` to `analytics-export.server.ts` (admin-only, ownership-verified, uses existing private `escapeCsvValue` + `buildCsv`). Add `recomputeStudentGrade(db, assignmentId, studentId)` to `reviews-extras.server.ts` — fetches student checkpoint data, calls `computeFinalGrade`, upserts `final_grades` row. Add `createDefaultGradeConfig(tx, assignmentId)` to `assignments-extras.server.ts` — inserts default `assignment_grade_config` row. Extend `submitReviewHandler` post-commit advisory section with 1-line call to `recomputeStudentGrade` (wrapped in try/catch, only when `decision === 'pass'`). Extend `createAssignmentHandler` inside transaction with 1-line call to `createDefaultGradeConfig(tx, assignmentId)`. Write tests (all handlers: success + ownership + validation failure cases; recomputation trigger: fires post-commit on pass, does NOT fire on revise, advisory, upserts `final_grades` row, doesn't affect review transaction; default config creation: fires inside assignment creation transaction). Verify: gradebook returns correct per-student scores, CSV export is sanitized, config save validates custom weights and audit logs, grade recomputes after pass review, default config created with assignment.
-*   **Phase 3 (UI, Export & i18n):** Create instructor gradebook route `/instructor/assignments/$id/gradebook` — `Table` with students as rows, checkpoints as columns, final grade as last column. Each cell: numeric score (rubric checkpoints) or pass/fail `Badge` (non-rubric). Final grade column: numeric score + letter `Badge`. Export CSV + Excel buttons (reuse existing `useCsvDownload` hook + `downloadCsv` utility from `src/lib/download.ts`). Create admin grade settings dialog — `Select` for scheme, `Input` fields for custom weights (visible only when `custom_weight` selected, labeled by checkpoint name), `Input` fields for letter bounds. Create student final grade card component on `/student/assignments/$id` — `Card` with numeric score + letter `Badge`, collapsible per-checkpoint breakdown, read-only. Extend admin analytics with "Grade Distribution" section (progress bars for A/B/C/D/F counts via aggregate query). Add i18n keys to both locales. Run `pnpm generate:i18n`. Write tests (gradebook table renders, settings dialog validates, student card shows/hides correctly, admin distribution renders, CSV/Excel export triggers). Verify: gradebook shows all students with scores, admin settings dialog saves config, student sees final grade when complete, admin sees distribution, CSV/Excel export works, i18n parity, all files under 500 lines.
-
-#### Verification & Definition of Done (DoD)
-*   [ ] **Manual Checkpoint:** Instructor opens `/instructor/assignments/$id/gradebook` → sees a table of all assigned students with per-checkpoint scores and a final grade column. A student with all checkpoints passed shows a numeric score (e.g., 87.50) and letter badge (e.g., "B"). A student with incomplete checkpoints shows "In Progress" status. Admin opens Grade Settings dialog → changes scheme from "Equal Weight" to "Custom Weight" → enters custom weights per checkpoint (must sum to 100%) → saves → gradebook recalculates. Admin clicks "Export CSV" → downloads a `.csv` file with student names, checkpoint scores, and final grades. Student opens `/student/assignments/$id` → sees a final grade card with their score and letter badge (when assignment is complete) or "In Progress" (when incomplete). Student clicks the breakdown → sees per-checkpoint scores. Admin opens `/admin/analytics` → sees a "Grade Distribution" section with A/B/C/D/F progress bars. Instructor reviews a submission with `pass` decision → the student's final grade in the gradebook updates to reflect the newly passed checkpoint. A `revise` review does NOT trigger grade recomputation. Backward compatibility: pre-existing assignments have default `assignment_grade_config` rows backfilled by the migration script (not lazy-created on read). A new assignment created after this track automatically gets a default config row (inside the creation transaction).
-*   [ ] **Automated Tests:** `pnpm test:unit` — all tests pass. New tests for: `computeFinalGrade` (2 schemes in isolation — equal_weight simple average, custom_weight weighted by templateCheckpointId; pass/fail checkpoints scored as 100/0, rubric checkpoints use `review_scores` denormalized snapshot; incomplete assignment → status `incomplete`, mixed → `in_progress`, all passed → `complete`; letter grade boundary edge cases — score exactly 90 → "A", score 89.99 → "B", score 59.99 → "F"; null config → uses defaults), `getStudentFinalGradeHandler` (returns computed grade, returns null when no config exists, ownership verified — student cannot access another student's grade, does NOT auto-create config on read), `getAssignmentGradebookHandler` (returns all students with per-checkpoint scores, sorted by name, instructor ownership verified), `exportGradebookCsvHandler` (CSV format correct — headers, student rows, formula injection mitigated via `escapeCsvValue`, admin ownership verified), `saveGradeConfigHandler` (admin-only — rejects instructor/student, validates custom weights sum to 100% via `superRefine` when scheme is `custom_weight`, upserts config, audit logs the change via `logAuditEvent`), `recomputeStudentGrade` (fires post-commit on `submitReviewHandler` with `pass` decision, does NOT fire on `revise`, advisory try/catch doesn't throw, upserts `final_grades` row, doesn't affect review transaction), `createDefaultGradeConfig` (inserts default config inside assignment creation transaction, scheme = `equal_weight`, customWeights = null, standard letter bounds). `pnpm check:i18n` — parity for all new keys. `pnpm test:coverage` >= 80% on all thresholds.
-*   [ ] **Conductor Review:** New `assignment_grade_config` and `final_grades` tables in `src/db/schema/gradebook.ts`, registered in `src/db/schema/index.ts` re-exports + relations. Neither table has `deletedAt` (cascade-deleted with assignment / cache upserted). `numericScore` is `numeric(5,2)`. `gradingScheme` is a pgEnum with 2 values (`equal_weight` | `custom_weight`) — no redundant `rubric_aggregate`. No `passThreshold` column (instructor's pass/revise decision determines checkpoint completion). `customWeights` jsonb keyed by `templateCheckpointId` (string keys, integer values). `letterGradeBounds` jsonb with A/B/C/D lower bounds; "F" is implicit fallback below lowest bound. `contributingCheckpoints` jsonb has defined shape (`{ checkpointId, checkpointName, templateCheckpointId, order, state, score, isRubric, weight }`). `grade-computation.ts` is a pure function (no DB access, no side effects — unit-testable in isolation). Grade recomputation is advisory (try/catch, post-commit, only on `pass` decision, never affects review transaction) — lives in `reviews-extras.server.ts`, called with 1 line from `submitReviewHandler`. Default config creation lives in `assignments-extras.server.ts`, called with 1 line from `createAssignmentHandler` inside the transaction. Pre-existing assignments backfilled by migration script (not lazy-created on read). `exportGradebookCsvHandler` lives in `analytics-export.server.ts` (same file as `escapeCsvValue`/`buildCsv` — no export needed). `saveGradeConfigHandler` is admin-only (consistent with rubric ownership per TRACK-020). Grade config changes audit-logged via `logAuditEvent`. `review_scores` denormalized snapshot used for computation (not live rubric lookup — ensures historical grades are frozen). Excel export uses existing `xlsx` dependency + `sanitizeCell` (no new dependency). All server functions follow two-file split with `.inputValidator(Schema).handler(...)` builder pattern. All files under 500 lines. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` all clean.
-
 ---
 
 ### TRACK-026: Checkpoint Discussion / Q&A Threads
@@ -283,74 +231,9 @@ All tracks must adhere to the following project constraints:
 ---
 
 ### TRACK-024: TypeScript 7 Upgrade
-
-- **Status:** `Complete`
-- **Dependencies:** None
-- **Estimated Effort:** 1 Day / 0.5 Sprint Loops
-- **Audit IDs:** None (proactive infrastructure upgrade, not audit-driven)
-- **Completed:** 2026-07-23 (Conductor track `typescript-7-upgrade_20260723`, archived to `conductor/archive/`)
-- **Decisions:**
-  - **Direct upgrade path (5.8 → 7.0):** The project is on TypeScript `^5.8.0`. Microsoft recommends going through TS 6.0 as a bridge, but the project's tsconfig is already 95% TS 7-ready. The only deprecated option in use is `baseUrl: "."` (removed in TS 7). Since `paths` already uses `./src/*` (relative to project root), removing `baseUrl` is a trivial 1-line change with zero functional impact. A direct upgrade is low-risk.
-  - **No Compiler API consumers (confirmed):** Grep across all `.ts/.tsx/.js/.mjs/.cjs` files confirmed zero direct imports of the `typescript` package. The toolchain is fully decoupled from the TS compiler API: oxlint uses its own parser (not typescript-eslint), Vitest transforms via Vite/esbuild, tsx is esbuild-based, and drizzle-kit has its own TS parser. The biggest blocker for most projects (tooling that `import`s from `typescript`) does not apply.
-  - **No blocked frameworks:** No Vue, Svelte, Astro, MDX, or Angular — all of which need the compiler API for template type-checking and are blocked on TS 7.1. Pure React 19 + TanStack Start.
-  - **tsc is type-checking only:** The project uses `tsc --noEmit --incremental` exclusively. Transpilation is handled by Vite/esbuild. No emit path, no downleveling concerns. TS 7's removal of `target: es5` and `module: amd/umd/systemjs/none` is irrelevant.
-  - **`tsconfig.tsbuildinfo` deletion:** The Go compiler's incremental artifacts are incompatible with the JS compiler's. Must be deleted before the first TS 7 run.
-  - **`noUncheckedSideEffectImports` default change:** TS 7 defaults this to `true` — may surface new errors for side-effect imports with typos. Beneficial, but watch during triage.
-  - **No `@typescript/typescript6` side-by-side needed:** The project has no tooling that imports the TS compiler API, so the compatibility shim package is unnecessary. `tsc` alone suffices.
-  - **Expected gains:** 8–12x faster `pnpm typecheck` (the pre-push gate), faster editor/language server experience, new `--checkers`/`--builders` flags for CI parallelism tuning, and a rebuilt `--watch` mode (Parcel-based file watcher).
-
-#### Completion Summary
-
-- **TypeScript version:** `^5.8.0` → `^7.0.0` (resolved to 7.0.2). Native Go compiler port.
-- **tsconfig.json:** Removed `baseUrl: "."` (removed in TS 7). Path alias `"@/*": ["./src/*"]` resolves relative to project root — zero functional impact.
-- **tsconfig.tsbuildinfo:** Deleted (incompatible incremental cache format between JS and Go compilers). Regenerated by first TS 7 run.
-- **CI typecheck gate (`lefthook.yml`):** Pre-push typecheck updated from `pnpm typecheck` to `pnpm exec tsc --noEmit --incremental --checkers 4` — explicitly enables TS 7 shared-memory multithreading with 4 workers (TS 7 default).
-- **Benchmark:** `pnpm typecheck` median time: **8.85s (TS 5.8) → 1.40s (TS 7.0.2)** — **~6.3x speedup** (slightly below the 8–12x estimate, likely due to incremental cache being warm for both measurements).
-- **Quality gates (all pass under TS 7):** `pnpm typecheck` (0 errors), `pnpm test:coverage` (299 files, 2937 tests; coverage Stmts 88.26%, Branches 81.9%, Functions 84.08%, Lines 88.88% — all ≥80%), `pnpm lint` (0 warnings, 0 errors across 272 files), `pnpm check:i18n` (EN↔ID parity confirmed, 629 keys used / 762 in each locale).
-- **Smoke tests:** `pnpm dev` (dev server starts, i18n codegen passes, Vite ready in ~1.8s), `pnpm build` (client build 3918 modules in 3.08s, SSR build 1116 modules in 1.74s, migrate/seed bundles generated).
-- **Config verification tests:** Added `tests/unit/config/typescript-7-upgrade.test.ts` (4 tests: no `baseUrl` in tsconfig, TS version ≥7.0, `--checkers` flag in lefthook.yml, paths alias regression guard).
-- **Code commits:** `1827970` (TS upgrade + baseUrl removal), `3d31fb4` (--checkers flag), `1fa5742` (config verification tests).
-- **No regressions:** All 2937 existing tests pass unchanged. `noUncheckedSideEffectImports` (new TS 7 default) surfaced zero side-effect import typos.
-
-#### Context Anchors (Traceability)
-
-- **PRD Reference:** N/A (infrastructure upgrade, no product impact)
-- **TDD Reference:** N/A (no architecture change — type-checking logic is structurally identical between TS 6.0 and 7.0)
-- **Toolchain Reference:** `package.json` (devDependencies), `tsconfig.json`, `AGENTS.md` (developer commands)
-
-#### Track Tech Stack
-
-- TypeScript 7.0 (native Go port — `typescript` npm package, `latest` tag)
-- `tsconfig.json` (remove `baseUrl`, verify all other options are TS 7-compatible)
-- `pnpm` (package manager)
-- CI type-checking (`--checkers`, `--builders` flags for parallelism tuning)
-
-#### Scope Boundaries
-
-- **In Scope:**
-  - Remove `baseUrl: "."` from `tsconfig.json` (paths `@/*` → `./src/*` already relative to project root — no functional impact).
-  - Update `package.json`: `"typescript": "^5.8.0"` → `"^7.0.0"`.
-  - Delete `tsconfig.tsbuildinfo` (incompatible incremental format between JS and Go compilers).
-  - Run `pnpm install`, `pnpm typecheck`, `pnpm test`, `pnpm lint`, `pnpm build` — triage any errors from new strict defaults or removed options.
-  - Verify `noUncheckedSideEffectImports: true` (new default) doesn't surface side-effect import typos.
-  - Optionally tune CI `--checkers N` for type-checking parallelism (default 4).
-- **Out of Scope:**
-  - TypeScript 6.0 bridge upgrade (unnecessary — tsconfig is already clean enough for direct upgrade)
-  - `@typescript/typescript6` side-by-side install (no compiler API consumers to bridge)
-  - VS Code extension changes (developer preference, not a project config change)
-  - Refactoring code to accommodate new strict defaults (none expected — `strict: true` already set)
-
-#### High-Level Execution Vectors
-
-- **Phase 1 (Config reconciliation):** Remove `baseUrl: "."` from `tsconfig.json`. Verify all other tsconfig options against the TS 7 removed-options list (`target: es5`, `moduleResolution: node/node10/classic`, `module: amd/umd/systemjs/none`, `downlevelIteration`, `esModuleInterop: false`, `alwaysStrict: false`, `module` keyword in namespaces, `assert` import attributes, `ignoreDeprecations`). All confirmed absent via grep audit.
-- **Phase 2 (Install & typecheck):** Delete `tsconfig.tsbuildinfo`. Update `package.json` TypeScript version to `^7.0.0`. Run `pnpm install`. Run `pnpm typecheck` — triage any errors. Expected: none (config already matches all TS 7 defaults). If `noUncheckedSideEffectImports` surfaces side-effect import issues, fix the import typos.
-- **Phase 3 (Full verification):** Run `pnpm test` (unit + integration), `pnpm lint`, `pnpm build`. Verify all gates pass. Optionally benchmark `pnpm typecheck` before/after to document the speedup. Optionally tune `--checkers N` in CI for parallelism.
-
-#### Verification & Definition of Done (DoD)
-
-- [x] **Manual Checkpoint:** `pnpm typecheck` passes on TS 7.0 with no errors. `pnpm test` (unit + integration) — all pass. `pnpm build` — prod build succeeds (codegen + vite build + migrate/seed bundles). `pnpm dev` — dev server starts, HMR works, editor shows TS 7 language server. Measure `pnpm typecheck` time before (TS 5.8) and after (TS 7.0) — document the speedup.
-- [x] **Automated Tests:** `pnpm test:unit` — all existing tests pass unchanged (type-checking logic is structurally identical between TS 6.0 and 7.0). `pnpm test:coverage` ≥80%. `pnpm typecheck` clean. `pnpm lint` — 0 warnings, 0 errors. `pnpm check:i18n` — parity maintained.
-- [x] **Conductor Review:** `tsconfig.json` has no `baseUrl`. `tsconfig.tsbuildinfo` deleted and regenerated by TS 7. No deprecated/removed tsconfig options remain (grep for `baseUrl`, `target: es5`, `moduleResolution: node`, `module: amd/umd/systemjs`, `downlevelIteration`, `ignoreDeprecations` — all zero). `package.json` TypeScript version is `^7.0.0`. No `@typescript/typescript6` dependency added (not needed). All pre-push gates pass (`pnpm typecheck` && `pnpm vitest run --coverage`).
+- **Status:** ✅ Complete · **Audit IDs:** None (proactive infrastructure upgrade) · **Deps:** None
+- **Key decisions:** Direct upgrade TS 5.8→7.0.2 (native Go compiler port); removed `baseUrl` from tsconfig (only TS 7-incompatible option); deleted `tsconfig.tsbuildinfo` (incompatible incremental cache format); `--checkers 4` flag in lefthook pre-push gate; no compiler API consumers (oxlint/Vitest/tsx/drizzle-kit all use own parsers); `pnpm typecheck` 8.85s→1.40s (~6.3x speedup); 2937 tests pass, all quality gates clean; 4 config verification tests added (`tests/unit/config/typescript-7-upgrade.test.ts`)
+- **Detail:** `conductor/archive/typescript-7-upgrade_20260723/` (spec.md, plan.md)
 
 ---
 
@@ -455,41 +338,6 @@ All tracks must adhere to the following project constraints:
 - **Key decisions:** Remediated 4 recurring MODERATE axe-core violations: (1) `landmark-one-main` — wrapped `<Outlet />` in `<main id="main-content" tabIndex={-1}>` in `_unauthenticated.tsx`; changed landing page `<div>` to `<main>` in `index.tsx`; (2) `skip-link` — added `id="main-content"` and `tabIndex={-1}` to existing `<main>` in all 3 role layouts (`student.tsx`, `instructor.tsx`, `admin.tsx`) and landing page; removed duplicate `id="main-content"` from `login.tsx` `<div>`; (3) `region` — moved `KeyboardCheatSheet` from `_authenticated.tsx` (rendered outside landmarks) into `AppHeader` (`<header>` landmark); added `aria-label` to sonner `<Toaster>` via i18n key `notifications.toasterLabel`; (4) `heading-order` — fixed heading skips across 9 components/pages (StudentDashboard `h3`→`h2`, CheckpointTimeline `h3`→`h2`, CheckpointCard `h4`→`h3`, ExtensionHistoryList `h3`→`h2`, DiscussionPanel `h3`→`h2`, TemplateDangerZone `h3`→`h2`, TemplateDetailPage added `<h1>`, student assignment detail 3× `h3`→`h2`, instructor review detail `h2`→`h1`). E2E axe-core scans updated with `filterModerate` function and moderate violation assertions. Unit tests added for all affected components (8 new test files, 4 modified). Review fixes: restored 9 behavioral tests in `app-header.test.tsx` and 2 DiscussionPanel integration tests in `$submissionId.test.tsx` that were lost during a11y mock refactoring. Note: E2E axe-core scan execution is pending a pre-existing TanStack Router runtime issue in this worktree (see TRACK-037 spec, "Out of Scope") — unit tests verify the DOM-level fixes.
 - **Detail:** `conductor/archive/accessibility-moderate-violations-remediation_20260728/` (spec.md, plan.md)
 
-#### Context Anchors (Traceability)
-*   **PRD Reference:** N/A (infrastructure/compliance, no product impact)
-*   **TDD Reference:** `docs/TDD.md` — Route structure (`src/routes/` pathless layouts); `docs/a11y-violations.md` — documents the 4 recurring MODERATE violations with affected page lists
-*   **Codebase References:** `src/routes/__root.tsx` (skip-to-content link at line 163-170, targets `#main-content` which doesn't exist); `src/routes/_unauthenticated.tsx` (bare `<Outlet />` — no `<main>` landmark, causes `landmark-one-main` + `region` on login/auth pages); `src/routes/_authenticated.tsx` (pass-through layout — `<Outlet />` + `<KeyboardCheatSheet>`, does NOT need `<main>`); `src/routes/_authenticated/student.tsx` (already has `<main className="flex-1 overflow-y-auto p-6">` at line 27 — needs `id` + `tabindex`); `src/routes/_authenticated/instructor.tsx` (already has `<main>` at line 27 — needs `id` + `tabindex`); `src/routes/_authenticated/admin.tsx` (already has `<main>` at line 27 — needs `id` + `tabindex`); `src/routes/index.tsx` (landing page — no `<main>` landmark, uses `<section>` + `<footer>` with `<nav>`); `src/components/layout/student-sidebar.tsx` (has `<aside>` + `<nav>` — landmark OK); `src/components/layout/app-header.tsx` (has `<header>` — landmark OK); `src/components/notifications/NotificationCenter.tsx` (rendered as sibling to `<main>` — candidate for `region` violation); `src/components/keyboard-cheat-sheet.tsx` (rendered in `_authenticated.tsx` — candidate for `region` violation)
-
-#### Track Tech Stack
-*   No new dependencies — pure React/Tailwind fixes (adding `id`/`tabindex` attributes to existing `<main>` elements, adding `<main>` wrapper to `_unauthenticated.tsx` and `index.tsx`, fixing heading hierarchy, wrapping non-landmarked content)
-*   Existing `@axe-core/playwright` E2E scanning (from TRACK-028) — used to investigate root cause and verify fixes
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **`skip-link` violation fix (highest priority — affects all pages):** The skip-to-content link in `__root.tsx` (line 165) targets `#main-content`, but no element in the codebase has `id="main-content"`. Fix: add `id="main-content" tabindex="-1"` to the existing `<main>` elements in `student.tsx` (line 27), `instructor.tsx` (line 27), and `admin.tsx` (line 27). Add a new `<main id="main-content" tabindex="-1">` wrapper to `_unauthenticated.tsx` (wrapping `<Outlet />`). Add a `<main id="main-content" tabindex="-1">` wrapper to `index.tsx` (landing page — wrapping the `<section>` content, keeping `<footer>` outside as is conventional).
-    *   **`landmark-one-main` violation fix (login page):** `_unauthenticated.tsx` renders bare `<Outlet />` with no `<main>`. Fix: wrap `<Outlet />` in `<main id="main-content" tabindex="-1" className="...">`. This also fixes the 4 `region` nodes on the login page.
-    *   **`region` violation fix (authenticated pages — 1 node each):** The role layouts already have `<main>`, `<aside>` (sidebar), and `<header>` (app header) landmarks. The "1 node" outside landmarks must be identified via axe-core scan. Likely candidates: `NotificationCenter` (rendered as sibling to `<main>` in role layouts), `KeyboardCheatSheet` (rendered in `_authenticated.tsx`), `Toaster` (rendered in `__root.tsx`), or the `#skip-to-content` div (rendered in `__root.tsx`). Fix: wrap the identified node in an appropriate landmark (`role="dialog"` for modal components when closed, `<aside>` for complementary content, or `aria-hidden="true"` if the content is purely decorative when not active).
-    *   **`heading-order` violation fix (specific pages):** Fix heading hierarchy on the 4 affected pages identified in `docs/a11y-violations.md`: Student dashboard (`src/routes/_authenticated/student/dashboard.tsx`), Student assignment detail (`src/routes/_authenticated/student/assignments/$id.tsx`), Instructor review detail (`src/routes/_authenticated/instructor/reviews/$submissionId.tsx`), Admin templates (`src/routes/_authenticated/admin/templates/$templateId.tsx`). Ensure no heading level skips (h1 → h2 → h3, never h1 → h3 or h2 → h4). Fix by adjusting heading levels or inserting intermediate headings.
-    *   **Landing page landmarks:** Add `<main>` landmark to `src/routes/index.tsx` (currently has no `<main>` — uses `<section>` elements only). Wrap the hero + features + how-it-works sections in `<main>`, keep `<footer>` outside.
-    *   **E2E verification:** Update existing axe-core scans in `tests/e2e/` to assert zero `region`, `landmark-one-main`, `skip-link`, and `heading-order` violations on all scanned pages. Add axe-core scans for the landing page and auth pages (login, setup-password, reset-password, forgot-password) which are not currently scanned.
-*   **Out of Scope:**
-    *   New a11y features beyond fixing the 4 documented violations
-    *   Keyboard navigation enhancements (separate concern)
-    *   Screen reader testing (axe-core covers automated checks; manual SR testing is out of scope)
-    *   Color contrast adjustments (all critical/serious contrast issues already fixed in TRACK-028)
-
-#### High-Level Execution Vectors
-*   **Phase 0 (Root cause investigation):** Run axe-core scan on all 6 currently-scanned pages. For each `region` violation, identify the exact DOM node that's outside landmarks. Check `NotificationCenter`, `KeyboardCheatSheet`, `Toaster`, and `#skip-to-content` div. Document the root cause for each page. Verify: root cause is identified and documented before proceeding to Phase 1.
-*   **Phase 1 (Skip-link + landmark-one-main):** Add `id="main-content" tabindex="-1"` to existing `<main>` in `student.tsx`, `instructor.tsx`, `admin.tsx`. Wrap `<Outlet />` in `<main id="main-content" tabindex="-1">` in `_unauthenticated.tsx`. Add `<main id="main-content" tabindex="-1">` wrapper to `index.tsx` (landing page). Verify: axe-core `skip-link` and `landmark-one-main` violations are zero on all pages. `region` on login page is zero (was 4 nodes, all caused by missing `<main>`).
-*   **Phase 2 (Region root cause fix):** Based on Phase 0 findings, wrap or mark the identified non-landmarked node(s). For modal/dialog components (`NotificationCenter`, `KeyboardCheatSheet`): add `role="dialog"` or ensure they're `aria-hidden` when not active. For `Toaster`: wrap in `<aside role="status" aria-live="polite">` or add `role="status"`. For `#skip-to-content` div: this is typically exempt from `region` — if it's the culprit, add `role="navigation"` or restructure. Verify: axe-core `region` violations are zero on all authenticated pages.
-*   **Phase 3 (Heading order):** Fix heading hierarchy on the 4 affected pages: Student dashboard, Student assignment detail, Instructor review detail, Admin templates. Adjust heading levels to ensure no skips (h1 → h2 → h3). Verify: axe-core `heading-order` violations are zero on all pages.
-*   **Phase 4 (E2E assertion hardening):** Update existing E2E axe-core scans to assert zero `region`, `landmark-one-main`, `skip-link`, and `heading-order` violations. Add axe-core scans for landing page and auth pages (login, setup-password, reset-password, forgot-password). Verify: `pnpm test:e2e` passes with zero a11y violations of any severity.
-
-#### Verification & Definition of Done (DoD)
-* [x] **Manual Checkpoint:** Navigate to any page (authenticated, unauthenticated, landing) → axe-core browser extension shows zero `region`, `landmark-one-main`, `skip-link`, and `heading-order` violations. Tab through any page → focus moves to the main content after activating skip-link. Heading hierarchy is logical (no skips) on Student dashboard, Student assignment detail, Instructor review detail, and Admin templates pages.
-* [x] **Automated Tests:** `pnpm test:e2e` — all axe-core scans pass with zero violations (critical, serious, AND moderate). New scan coverage for landing page + auth pages. `pnpm test:unit` — all existing tests pass (layout changes don't break component tests).
-* [x] **Conductor Review:** Existing `<main>` elements in `student.tsx`, `instructor.tsx`, `admin.tsx` have `id="main-content" tabindex="-1"`. `_unauthenticated.tsx` wraps `<Outlet />` in `<main id="main-content" tabindex="-1">`. `index.tsx` (landing) has `<main>` landmark. `region` root cause identified and fixed (documented in Phase 0 findings). No heading level skips on the 4 affected pages. `docs/a11y-violations.md` updated to mark all 4 violations as fixed. All files under 500 lines. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — all clean.
-
 ---
 
 ### TRACK-038: Health Check Endpoint
@@ -511,111 +359,72 @@ All tracks must adhere to the following project constraints:
 - **Key decisions:** Introduced `pino` as the structured logger (server-side only — TanStack Start runs on Node.js via vinxi/nitro). Full migration of all 41 `console.*` calls across `src/lib/` and `src/server/` (errors.ts `logError()` handled in Phase 2, remaining 41 calls in Phase 4). Two migration patterns: (1) structured calls `console.error({ event: '...' })` in background jobs → `logger.info`/`logger.error` preserving `{ event, ...payload }` shape with `requestId: crypto.randomUUID()` child logger; (2) unstructured calls `console.error('Failed to ...', err)` in server handler advisory blocks → `logger.error({ event: 'advisory_failed', handler: '<fn_name>', error: err instanceof Error ? err.message : String(err) })`. `logError()` in `src/lib/errors.ts` refactored to use `logger.error(entry)` — preserves existing `entry` object shape (`timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`) and `sanitizeInput()` redaction. Uses `import.meta.env.PROD` for env detection (dead code elimination in production). JSON format in production, `pino-pretty` in dev (lazy-loaded via `createRequire` to avoid bundling in prod). `LOG_LEVEL` env var (default `info`). Request ID propagation infrastructure defined (`requestIdMiddleware` + `createRequestLogger` in `src/lib/request-context.ts`) but **not yet wired** to HTTP handlers — wiring requires extending `typedServerFn` to chain `.middleware([requestIdMiddleware])` and threading `requestId` through stub handlers. Background jobs propagate `requestId` via `logger.child({ requestId: crypto.randomUUID() })` directly. No external log aggregation (logs to stdout for Docker/Coolify). Review fixes: removed `logAdvisoryFailure` helper (was used in only 2 of 11 server files — eliminated pattern inconsistency; all advisory logging now uses inline `logger.error({ event: 'advisory_failed', ... })`); extracted `reassignAssignmentHandler` to new `src/server/assignments-admin.server.ts` (multi-handler pattern) to stay under the 500-line file limit; documented `requestIdMiddleware`/`createRequestLogger` as future-work dead code via JSDoc.
 - **Detail:** `conductor/archive/structured-logging-observability_20260729/` (spec.md, plan.md)
 
-#### Context Anchors (Traceability)
-*   **PRD Reference:** N/A (infrastructure, no product impact)
-*   **TDD Reference:** `docs/TDD.md` — Error handling section (typed `ServerError`, `serverError()` factory, `logError()` structured logger, `sonner` toasts, error boundary)
-*   **Codebase References:** `src/lib/errors.ts` (`logError()` lines 82-143 — already builds structured `entry` object with `timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`; uses `import.meta.env.PROD` for env detection; production mode already outputs `JSON.stringify(entry)`; dev mode outputs pretty-printed multi-line; `sanitizeInput()` redacts sensitive keys); `src/lib/email-queue-init.ts` (3 `console.*` calls — structured `{ event: '...' }` pattern); `src/lib/email-queue-processor.ts` (4 calls — `console.info`, `console.warn` with structured payloads); `src/lib/deadline-reminder-scanner.ts` (1 call — structured `{ event: '...' }`); `src/lib/risk-alerts.ts` (1 call — unstructured `'Failed to fire risk alert:', err`); `src/lib/review-risk-alert.ts` (1 call — unstructured advisory); `src/lib/review-sla.ts` (1 call — unstructured); `src/lib/consultation-email.ts` (1 call); `src/lib/extension-email.ts` (3 calls); `src/lib/event-email.ts` (1 call); `src/lib/audit.ts` (1 call — `safeAuditLog` catch block); `src/server/assignments.server.ts` (1 call); `src/server/consultations.server.ts` (2 calls); `src/server/bulk-import.server.ts` (2 calls); `src/server/reviews-extras.server.ts` (1 call); `src/server/reviews.server.ts` (2 calls); `src/server/extensions-extras.server.ts` (4 calls); `src/server/gradebook.server.ts` (1 call); `src/server/discussions.server.ts` (1 call); `src/server/users.server.ts` (3 calls); `src/server/two-factor.server.ts` (3 calls); `src/server/submissions.server.ts` (1 call) — total ~58 calls across ~20 files
-
-#### Track Tech Stack
-*   `pino` — structured logger (npm package, server-side only — not bundled with client code)
-*   `pino-pretty` — dev-only pretty-printer (npm package, devDependency)
-*   TanStack Start `createMiddleware` — request ID injection (header → middleware context → logger child)
-*   Existing `src/lib/errors.ts` — `logError()` refactored to route through pino instead of `console.error`; preserves `entry` object shape and `sanitizeInput()` redaction
-*   `import.meta.env.PROD` — env detection (consistent with existing `logError()`, NOT `process.env.NODE_ENV`)
-
-#### Scope Boundaries
-*   **In Scope:**
-    *   **Logger setup:** New `src/lib/logger.ts` — creates and exports the `pino` logger instance. Config: JSON in production (`import.meta.env.PROD`), `pino-pretty` in dev. Log level configurable via `LOG_LEVEL` env var (optional, default `info`). Server-side only — must not be imported by client code.
-    *   **`logError()` migration:** Refactor `src/lib/errors.ts` `logError()` to use `logger.error(entry)` instead of `console.error(JSON.stringify(entry))` (production) / `console.error(lines.join('\n'))` (dev). Preserve existing `entry` object shape (`timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`). Preserve `sanitizeInput()` redaction. Remove the `import.meta.env.PROD` branching — pino handles JSON vs pretty automatically based on transport config.
-    *   **Full `console.*` migration (58 calls across ~20 files):** Replace ALL `console.info`/`console.error`/`console.warn` in `src/lib/` and `src/server/` with `logger.info`/`logger.error`/`logger.warn`. Two patterns: (1) structured calls `console.error({ event: '...', error: '...' })` → `logger.error({ event: '...', error: '...' })` (preserve payload shape); (2) unstructured calls `console.error('Failed to ...', err)` → `logger.error({ event: 'advisory_failed', handler: '...', error: err instanceof Error ? err.message : String(err) })` (add structure). Files: `email-queue-init.ts`, `email-queue-processor.ts`, `deadline-reminder-scanner.ts`, `risk-alerts.ts`, `review-risk-alert.ts`, `review-sla.ts`, `consultation-email.ts`, `extension-email.ts`, `event-email.ts`, `audit.ts`, `assignments.server.ts`, `consultations.server.ts`, `bulk-import.server.ts`, `reviews-extras.server.ts`, `reviews.server.ts`, `extensions-extras.server.ts`, `gradebook.server.ts`, `discussions.server.ts`, `users.server.ts`, `two-factor.server.ts`, `submissions.server.ts`.
-    *   **Request ID propagation:** TanStack Start `createMiddleware` that reads `x-request-id` header (or generates UUID via `crypto.randomUUID()`), stores in middleware context, and makes available to logger child instances. All server function logs include `requestId` for tracing.
-    *   **Log format:** JSON in production (`{ level, time, pid, requestId, event, ...payload }`). Pretty-printed in dev via `pino-pretty`. Logs go to `stdout` (Docker/Coolify captures).
-*   **Out of Scope:**
-    *   External log aggregation (Datadog, Loki, etc. — separate infrastructure concern)
-    *   Metrics collection / Prometheus endpoint (separate future track)
-    *   Distributed tracing (OpenTelemetry — separate future track)
-    *   Log-based alerting (Coolify/Docker-level concern)
-    *   `console.log`/`console.error` in `src/db/seed.ts` and `src/db/migrate.ts` (one-off deployment scripts — leave as-is)
-    *   `console.log`/`console.error` in `scripts/` (build tooling — leave as-is)
-    *   Client-side logging (browser console — out of scope; pino is server-side only)
-
-#### High-Level Execution Vectors
-*   **Phase 1 (Logger setup):** Install `pino` + `pino-pretty` (devDep). Create `src/lib/logger.ts` — pino instance with env-based config (`import.meta.env.PROD` → JSON transport; dev → `pino-pretty` transport). Add `LOG_LEVEL` to `src/config/env.ts` (optional, default `info`). Verify: `import { logger } from '@/lib/logger'; logger.info({ event: 'test' }, 'message')` works in dev (pretty) and production (JSON).
-*   **Phase 2 (`logError()` migration):** Refactor `logError()` in `src/lib/errors.ts` — replace `console.error(JSON.stringify(entry))` (prod) and `console.error(lines.join('\n'))` (dev) with `logger.error(entry)`. Remove the `import.meta.env.PROD` branching (pino handles format via transport config). Preserve `sanitizeInput()` redaction and `entry` object shape. Verify: `logError()` output is JSON in production with `timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input` fields.
-*   **Phase 3 (Full `console.*` migration — 58 calls):** Replace all `console.info`/`console.error`/`console.warn` in `src/lib/` and `src/server/` with `logger.info`/`logger.error`/`logger.warn`. For structured calls: preserve `{ event: '...', ...payload }` shape. For unstructured calls: add structure (`{ event: 'advisory_failed', handler: '...', error: err.message }`). Grep verification: zero `console.info`/`console.error`/`console.warn` in `src/lib/` and `src/server/` (excluding `src/db/seed.ts` and `src/db/migrate.ts`). Verify: all logs go through pino, JSON in production, pretty in dev.
-*   **Phase 4 (Request ID propagation):** Add TanStack Start `createMiddleware` that injects `x-request-id` header (read or generate UUID via `crypto.randomUUID()`). Store in middleware context. Create `logger.child({ requestId })` helper for server functions. Update tests to assert `requestId` is present in log output. Verify: logs from a single request share the same `requestId`.
-
-#### Verification & Definition of Done (DoD)
-*   [x] **Manual Checkpoint:** Dev server logs are pretty-printed via `pino-pretty`; production build outputs JSON. Background job log entries include `event` field. Server error `logError` output is JSON with `timestamp`, `code`, `message`, `cause`, `stack` fields. Grep `src/lib/` and `src/server/` for `console.info`/`console.error`/`console.warn` → zero matches (excluding `src/db/seed.ts`, `src/db/migrate.ts`). Request ID middleware is defined and tested but not yet wired to HTTP handlers (future work).
-*   [x] **Automated Tests:** Unit tests for `logger.ts` (JSON in production, pretty in dev, `LOG_LEVEL` respected), `logError()` (routes through pino, preserves `entry` object shape, `sanitizeInput()` still redacts), request-context middleware (generates UUID if header absent, passes through if present). 13 test files updated with `@/lib/logger` mocks. 3849 tests pass. Coverage ≥ 80%.
-*   [x] **Conductor Review:** `pino` + `pino-pretty` added to `package.json`. `src/lib/logger.ts` exists with env-based config using `import.meta.env.PROD`. `logError()` uses `logger.error(entry)`. Zero `console.*` in `src/lib/` and `src/server/`. `LOG_LEVEL` added to `src/config/env.ts`. Request ID middleware defined in `src/lib/request-context.ts`. Review fixes: `logAdvisoryFailure` removed, `reassignAssignmentHandler` extracted to `assignments-admin.server.ts`. All files under 500 lines. `pnpm typecheck`, `pnpm lint`, `pnpm check:i18n` — clean.
-
 ---
 
 ## Track Dependency Graph
 
 ```
 Milestone 1: Critical Fixes
-├── TRACK-001: Concurrency & Transaction Safety [no deps]
-├── TRACK-002: Deadline & SLA Logic Correctness [coordinate with 001]
-├── TRACK-003: Input Validation & Data Integrity [no deps]
-└── TRACK-004: Email Queue Robustness [no deps]
+├── TRACK-001: Concurrency & Transaction Safety [✅ Complete — archived — no deps]
+├── TRACK-002: Deadline & SLA Logic Correctness [✅ Complete — archived — coordinate with 001]
+├── TRACK-003: Input Validation & Data Integrity [✅ Complete — archived — no deps]
+└── TRACK-004: Email Queue Robustness [✅ Complete — archived — no deps]
 
 Milestone 2: Performance & Optimization
-├── TRACK-005: Database Indexes & Schema Optimization [no deps]
-├── TRACK-006: Query & Data-Fetching Optimization [depends on 005]
-└── TRACK-007: Session Caching & Bundle Safety [no deps]
+├── TRACK-005: Database Indexes & Schema Optimization [✅ Complete — archived — no deps]
+├── TRACK-006: Query & Data-Fetching Optimization [✅ Complete — archived — depends on 005]
+└── TRACK-007: Session Caching & Bundle Safety [✅ Complete — archived — no deps]
 
 Milestone 3: UX & Accessibility
-├── TRACK-008: Critical UX Fixes (Broken Functionality) [no deps]
-├── TRACK-009: Action Feedback & Loading States [no deps]
-├── TRACK-010: Accessibility & i18n Compliance [no deps]
-├── TRACK-011: Search Debounce & Form Validation [no deps]
-├── TRACK-012: Notifications & File Management UX [depends on 010]
-└── TRACK-013: Empty States, Date Display & Mobile [coordinate with 010]
+├── TRACK-008: Critical UX Fixes (Broken Functionality) [✅ Complete — archived — no deps]
+├── TRACK-009: Action Feedback & Loading States [✅ Complete — archived — no deps]
+├── TRACK-010: Accessibility & i18n Compliance [✅ Complete — archived — no deps]
+├── TRACK-011: Search Debounce & Form Validation [✅ Complete — archived — no deps]
+├── TRACK-012: Notifications & File Management UX [✅ Complete — archived — depends on 010]
+└── TRACK-013: Empty States, Date Display & Mobile [✅ Complete — archived — coordinate with 010]
 
 Milestone 4: Quality Assurance
-└── E2E-FEAT-001: E2E Testing with Playwright [no deps — requires core features]
+└── E2E-FEAT-001: E2E Testing with Playwright [✅ Complete — archived — no deps — requires core features]
 
 Milestone 5: Post-Audit Enhancements
-├── TRACK-014: Optimistic UI Updates for Mutations [Complete — introduces query-key factory]
-├── TRACK-015: UI Hygiene & Tech-Debt Quick Wins [Complete — archived]
-├── TRACK-016: Email Queue Retention & Delivery Completeness [no deps]
-├── TRACK-017: Instructor Productivity: DOCX Preview & Keyboard Shortcuts [no deps]
-├── TRACK-018: Event Email Notifications [Complete — no deps]
-└── TRACK-019: Analytics & Reporting [no deps]
+├── TRACK-014: Optimistic UI Updates for Mutations [✅ Complete — archived — introduces query-key factory]
+├── TRACK-015: UI Hygiene & Tech-Debt Quick Wins [✅ Complete — archived]
+├── TRACK-016: Email Queue Retention & Delivery Completeness [✅ Complete — archived — no deps]
+├── TRACK-017: Instructor Productivity: DOCX Preview & Keyboard Shortcuts [✅ Complete — archived — no deps]
+├── TRACK-018: Event Email Notifications [✅ Complete — archived — no deps]
+└── TRACK-019: Analytics & Reporting [✅ Complete — archived — no deps]
 
 Milestone 6: New Features
-├── TRACK-020: Rubric-Based Grading & Evaluation [Complete — archived]
-├── TRACK-021: Proactive Deadline Reminder System [no deps — recommended after 022]
-├── TRACK-022: User Notification Preferences [Complete — archived]
-├── TRACK-023: At-Risk Student Identification [Complete — archived]
-├── TRACK-025: Gradebook & Final Grade Computation [depends on 020 — aggregates review_scores]
-└── TRACK-026: Checkpoint Discussion / Q&A Threads [Complete — archived]
+├── TRACK-020: Rubric-Based Grading & Evaluation [✅ Complete — archived]
+├── TRACK-021: Proactive Deadline Reminder System [✅ Complete — archived — no deps — recommended after 022]
+├── TRACK-022: User Notification Preferences [✅ Complete — archived]
+├── TRACK-023: At-Risk Student Identification [✅ Complete — archived]
+├── TRACK-025: Gradebook & Final Grade Computation [✅ Complete — archived — depends on 020 — aggregates review_scores]
+└── TRACK-026: Checkpoint Discussion / Q&A Threads [✅ Complete — archived]
 
 Milestone 7: Infrastructure & Tooling
-└── TRACK-024: TypeScript 7 Upgrade [Complete — archived]
+└── TRACK-024: TypeScript 7 Upgrade [✅ Complete — archived]
 
 Milestone 8: E2E Coverage Expansion
-├── TRACK-027: Critical Business Flow E2E Coverage [Complete — archived]
-└── TRACK-028: E2E Breadth & Infrastructure Expansion [Complete — archived]
+├── TRACK-027: Critical Business Flow E2E Coverage [✅ Complete — archived]
+└── TRACK-028: E2E Breadth & Infrastructure Expansion [✅ Complete — archived]
 
 Milestone 9: Client Architecture Consistency
-├── TRACK-029: Query-Key Factory Completion & Client Data-Fetching Consistency [Complete — extends query-key factory]
-└── TRACK-030: NotificationCenter Infinite Query Migration [Complete — depends on 014 — notificationKeys factory]
+├── TRACK-029: Query-Key Factory Completion & Client Data-Fetching Consistency [✅ Complete — archived — extends query-key factory]
+└── TRACK-030: NotificationCenter Infinite Query Migration [✅ Complete — archived — depends on 014 — notificationKeys factory]
 
 Milestone 10: Infrastructure Consistency & Tech Debt Remediation
-├── TRACK-031: Server-Side Guard Consolidation & Env Type Consolidation [Complete — archived]
-├── TRACK-032: Type-Safety Restoration — Eliminate `as unknown as` Casts [Complete — archived — recommended after 031]
-├── TRACK-033: Server-Function Architecture Standardization [Complete — archived — recommended after 032]
-├── TRACK-034: i18n & Email Localization Completeness [Complete — archived]
-├── TRACK-035: Test Infrastructure Consolidation [no deps]
-└── TRACK-036: Developer Experience & Tooling Hygiene [no deps]
+├── TRACK-031: Server-Side Guard Consolidation & Env Type Consolidation [✅ Complete — archived]
+├── TRACK-032: Type-Safety Restoration — Eliminate `as unknown as` Casts [✅ Complete — archived — recommended after 031]
+├── TRACK-033: Server-Function Architecture Standardization [✅ Complete — archived — recommended after 032]
+├── TRACK-034: i18n & Email Localization Completeness [✅ Complete — archived]
+├── TRACK-035: Test Infrastructure Consolidation [✅ Complete — archived — no deps]
+└── TRACK-036: Developer Experience & Tooling Hygiene [✅ Complete — archived — no deps]
 
 Milestone 11: Observability & Infrastructure Hardening
-├── TRACK-037: Accessibility Moderate Violations Remediation [Planned — depends on 010]
-├── TRACK-038: Health Check Endpoint [Complete — archived]
-├── TRACK-039: Orphaned R2 Object Cleanup [Complete — archived]
+├── TRACK-037: Accessibility Moderate Violations Remediation [✅ Complete — archived — depends on 010]
+├── TRACK-038: Health Check Endpoint [✅ Complete — archived]
+├── TRACK-039: Orphaned R2 Object Cleanup [✅ Complete — archived]
 └── TRACK-040: Structured Logging & Observability [✅ Complete — archived — no deps]
 ```
 
@@ -631,20 +440,20 @@ The following track groups can be worked on simultaneously:
 | **D** | TRACK-009, TRACK-010, TRACK-011 | Independent UX tracks — minimal file overlap |
 | **E** | TRACK-012 + TRACK-010 | NotificationCenter refactor in 010 precedes notification UX in 012 |
 | **F** | TRACK-013 + TRACK-010 | Both touch date formatting — coordinate i18n date changes |
-| **G** | TRACK-014, TRACK-016, TRACK-017, TRACK-018, TRACK-019 | Fully independent — no file overlap (distinct domains: mutations, email ops, review UX, notifications, analytics) — TRACK-014/015/016/017/018 complete |
+| **G** | TRACK-014, TRACK-016, TRACK-017, TRACK-018, TRACK-019 | Fully independent — no file overlap (distinct domains: mutations, email ops, review UX, notifications, analytics) — all complete (archived) |
 | **H** | TRACK-015 → TRACK-014 | Sequential — TRACK-015 consumed the query-key factory from TRACK-014 for useQuery conversion (both complete — TRACK-014 archived, TRACK-015 archived) |
-| **I** | TRACK-020 | Independent — new domain (rubrics/grading), extends completed tracks (template editor, review screen, analytics) but no concurrent work |
-| **J** | TRACK-021 | Independent — extends existing email-queue polling loop + notifications, no file overlap with TRACK-020 (different domain: deadline reminders vs grading) |
+| **I** | TRACK-020 | Complete — independent, new domain (rubrics/grading), extends completed tracks (template editor, review screen, analytics) but no concurrent work (complete — archived) |
+| **J** | TRACK-021 | Complete — independent, extends existing email-queue polling loop + notifications, no file overlap with TRACK-020 (different domain: deadline reminders vs grading) (complete — archived) |
 | **K** | TRACK-022 | Complete — extends existing `users.settings` JSONB + `enqueueEventEmail` chokepoint + 12 notification sites with per-type per-channel preference gating. Implemented alongside TRACK-021 so `deadline_reminder` type respects user prefs from day one (complete — archived) |
 | **L** | TRACK-023 | Independent — new risk-scoring module + dashboard widget + event-driven alerts at `submitReviewHandler`. No file overlap with TRACK-020/021/022 (different domain: risk identification vs grading/reminders/preferences). Complementary to TRACK-021 (event-driven catches discrete risk moments, scanner catches time-based risk). Minor overlap with TRACK-022 on notification type registry — coordinate if parallelized (complete — archived) |
 | **M** | TRACK-024 | Fully independent — only touches `tsconfig.json` and `package.json`, no feature file overlap (complete — archived) |
-| **N** | TRACK-025 | Depends on TRACK-020 (complete) — extends `review_scores` data and analytics export infrastructure. No file overlap with TRACK-023 (different domain: grade computation vs risk scoring). Minor overlap with analytics dashboards — coordinate if parallelized with TRACK-023 admin analytics extension |
+| **N** | TRACK-025 | Complete — depends on TRACK-020 (complete) — extends `review_scores` data and analytics export infrastructure. No file overlap with TRACK-023 (different domain: grade computation vs risk scoring). Minor overlap with analytics dashboards — coordinate if parallelized with TRACK-023 admin analytics extension (complete — archived) |
 | **O** | TRACK-026 | Complete — new domain (discussions), extended notification infrastructure (TRACK-022) and email queue (TRACK-018). No file overlap with TRACK-025 (different domain: discussions vs grading). Archived |
 | **P** | TRACK-027 → TRACK-028 | Both complete (archived). TRACK-027 expanded seed data (student2, student3, consultation seed) + decoupled instructor-review tests + 3 new specs + notification/upload/negative test assertions. TRACK-028 built on this expanded seed data and decoupled patterns — expanded coverage to 73 tests across 14 spec files, added Firefox + mobile-chrome projects, axe-core a11y scanning, cross-role lifecycle test. No file overlap with feature tracks (TRACK-025/026) — only touches `tests/e2e/`, `scripts/seed-e2e.ts`, and `playwright.config.ts` |
 | **Q** | TRACK-029, TRACK-030 | Both complete — TRACK-029 touched `query-keys.ts` + settings + gradebook components (archived); TRACK-030 touched `use-notifications.ts` + `NotificationCenter.tsx` + `query-keys.ts` (archived). Both depended on TRACK-014 (complete — query-key factory). No file overlap with E2E tracks (TRACK-027/028 — different domain: client data-fetching vs e2e tests). Minor overlap with gradebook feature (TRACK-025 — complete) on gradebook component files (TRACK-029 only) |
 | **R** | TRACK-031, TRACK-034 (complete — archived), TRACK-035 (complete — archived), TRACK-036 (complete — archived) | Fully independent quick wins — TRACK-031 touches `src/server/*.server.ts` (guard imports) + `src/config/env.ts`; TRACK-034 touched `src/server/two-factor.server.ts` + locale files (complete — archived); TRACK-035 touched `vitest.config.ts` + `vitest.config.integration.ts` + `package.json` (complete — archived); TRACK-036 touched `lefthook.yml` + `package.json` + `.socraticodecontextartifacts.json` (complete — archived). Minor overlap: TRACK-035 and TRACK-036 both touched `package.json` scripts — coordinated to avoid merge conflicts |
 | **S** | TRACK-032 → TRACK-033 | Both complete — TRACK-032 (type-safety restoration, archived) touched the same `createServerFn` stub files that TRACK-033 (architecture standardization, archived) refactored. TRACK-033 proceeded with structural changes on the typed stubs after TRACK-032's type fixes. Both touched `src/server/*.ts` and `src/server/*.server.ts` |
-| **T** | TRACK-037, TRACK-038 (complete — archived), TRACK-039 (complete — archived), TRACK-040 | TRACK-037 touches layout files + E2E tests; TRACK-038 added a new route (complete — archived); TRACK-039 extended email-queue tick loop with R2 cleanup scanner (complete — archived); TRACK-040 touches logger/errors/background jobs. Minor overlap: TRACK-040 and TRACK-039 both touched `email-queue-init.ts` — coordinate if parallelized (TRACK-039 complete) |
+| **T** | TRACK-037 (complete — archived), TRACK-038 (complete — archived), TRACK-039 (complete — archived), TRACK-040 (complete — archived) | All complete — TRACK-037 touches layout files + E2E tests; TRACK-038 added a new route; TRACK-039 extended email-queue tick loop with R2 cleanup scanner; TRACK-040 touches logger/errors/background jobs. Minor overlap: TRACK-040 and TRACK-039 both touched `email-queue-init.ts` — coordinate if parallelized (both complete) |
 
 ---
 
