@@ -13,7 +13,7 @@
     - [x] Locate E2E test directory and existing E2E test patterns (Playwright config)
 - [x] Task: Conductor - User Manual Verification 'Research & API Verification' (Protocol in workflow.md)
 
-## Phase 2: Security Headers Pure Logic (TDD)
+## Phase 2: Security Headers Pure Logic (TDD) [checkpoint: 2631d851]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
 - [x] Task: Write Tests (Red) — `tests/unit/lib/security-headers.test.ts`
