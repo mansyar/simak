@@ -22,7 +22,7 @@
 - [x] Task: Update `.env.example` with new env vars `0a6879b`
     - [x] Add `DB_POOL_MAX=10` with comment explaining pool sizing + PgBouncer notes
     - [x] Add `DB_PREPARED_STATEMENTS_DISABLED=false` with comment explaining PgBouncer transaction pooling compatibility
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Environment Variable Configuration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Environment Variable Configuration' (Protocol in workflow.md) — Checkpoint: `4cc1ca1`
 
 ## Phase 2: Database Pool Configuration
 
