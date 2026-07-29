@@ -3,24 +3,25 @@
 
 ## Phase 1: Environment Variable Configuration
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Write tests for new env vars (TDD Red Phase)
-    - [ ] Add test in `tests/unit/config/env.test.ts`: `DB_POOL_MAX` defaults to `10` when unset
-    - [ ] Add test: `DB_POOL_MAX='20'` coerces to number `20`
-    - [ ] Add test: `DB_POOL_MAX='0'` is rejected (must be positive)
-    - [ ] Add test: `DB_POOL_MAX='-5'` is rejected (must be positive)
-    - [ ] Add test: `DB_POOL_MAX='abc'` is rejected (must be a number)
-    - [ ] Add test: `DB_PREPARED_STATEMENTS_DISABLED` defaults to `false` when unset
-    - [ ] Add test: `DB_PREPARED_STATEMENTS_DISABLED='true'` parses to boolean `true`
-    - [ ] Add test: `DB_PREPARED_STATEMENTS_DISABLED='false'` parses to boolean `false` (CRITICAL — `z.coerce.boolean()` would incorrectly return `true` for the string `'false'`; must use a custom transform/preprocess that checks `val === 'true'`)
-    - [ ] Run `pnpm test` and confirm all new tests fail (env vars not yet in schema)
-- [ ] Task: Implement new env vars in `src/config/env.ts` (TDD Green Phase)
-    - [ ] Add `DB_POOL_MAX: z.coerce.number().int().positive().default(10)` to `envSchema`
-    - [ ] Add `DB_PREPARED_STATEMENTS_DISABLED` with custom string-to-boolean transform (NOT `z.coerce.boolean()` — use `z.preprocess` or `.transform` that maps `'true'`->`true`, everything else->`false`, default `false`)
-    - [ ] Run `pnpm test` and confirm all new env tests pass
-- [ ] Task: Update `.env.example` with new env vars
-    - [ ] Add `DB_POOL_MAX=10` with comment explaining pool sizing + PgBouncer notes
-    - [ ] Add `DB_PREPARED_STATEMENTS_DISABLED=false` with comment explaining PgBouncer transaction pooling compatibility
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
+- [x] Task: Write tests for new env vars (TDD Red Phase) `0a6879b`
+    - [x] Add test in `tests/unit/config/env.test.ts`: `DB_POOL_MAX` defaults to `10` when unset
+    - [x] Add test: `DB_POOL_MAX='20'` coerces to number `20`
+    - [x] Add test: `DB_POOL_MAX='0'` is rejected (must be positive)
+    - [x] Add test: `DB_POOL_MAX='-5'` is rejected (must be positive)
+    - [x] Add test: `DB_POOL_MAX='abc'` is rejected (must be a number)
+    - [x] Add test: `DB_PREPARED_STATEMENTS_DISABLED` defaults to `false` when unset
+    - [x] Add test: `DB_PREPARED_STATEMENTS_DISABLED='true'` parses to boolean `true`
+    - [x] Add test: `DB_PREPARED_STATEMENTS_DISABLED='false'` parses to boolean `false` (CRITICAL — `z.coerce.boolean()` would incorrectly return `true` for the string `'false'`; must use a custom transform/preprocess that checks `val === 'true'`)
+    - [x] Run `pnpm test` and confirm all new tests fail (env vars not yet in schema)
+    - [x] Also updated `tests/unit/lib/logger.test.ts` mockEnv to include new Env properties (DB_POOL_MAX, DB_PREPARED_STATEMENTS_DISABLED) — required by TypeScript after schema change
+- [x] Task: Implement new env vars in `src/config/env.ts` (TDD Green Phase) `0a6879b`
+    - [x] Add `DB_POOL_MAX: z.coerce.number().int().positive().default(10)` to `envSchema`
+    - [x] Add `DB_PREPARED_STATEMENTS_DISABLED` with custom string-to-boolean transform (NOT `z.coerce.boolean()` — use `z.preprocess` or `.transform` that maps `'true'`->`true`, everything else->`false`, default `false`)
+    - [x] Run `pnpm test` and confirm all new env tests pass
+- [x] Task: Update `.env.example` with new env vars `0a6879b`
+    - [x] Add `DB_POOL_MAX=10` with comment explaining pool sizing + PgBouncer notes
+    - [x] Add `DB_PREPARED_STATEMENTS_DISABLED=false` with comment explaining PgBouncer transaction pooling compatibility
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Environment Variable Configuration' (Protocol in workflow.md)
 
 ## Phase 2: Database Pool Configuration
