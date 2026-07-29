@@ -30,15 +30,3 @@ export function createLogger(options?: CreateLoggerOptions): Logger {
 }
 
 export const logger: Logger = createLogger();
-
-/**
- * Logs an advisory failure (non-critical error in post-commit catch blocks).
- * Used by server handlers to replace ad-hoc `console.error('Failed to...', err)` calls.
- */
-export function logAdvisoryFailure(handler: string, error: unknown): void {
-  logger.error({
-    event: 'advisory_failed',
-    handler,
-    error: error instanceof Error ? error.message : String(error),
-  });
-}
