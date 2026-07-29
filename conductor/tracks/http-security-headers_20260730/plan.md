@@ -15,29 +15,29 @@
 
 ## Phase 2: Security Headers Pure Logic (TDD)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
-- [ ] Task: Write Tests (Red) — `tests/unit/lib/security-headers.test.ts`
-    - [ ] Test `generateNonce()` returns base64 string of correct length (24 chars from 16 bytes)
-    - [ ] Test `generateNonce()` returns unique values across multiple calls
-    - [ ] Test `buildSecurityHeaders(nonce, true, r2Domain)` returns prod headers with `Content-Security-Policy` key
-    - [ ] Test `buildSecurityHeaders(nonce, false, r2Domain)` returns dev headers with `Content-Security-Policy-Report-Only` key
-    - [ ] Test CSP value contains all directives: `default-src`, `script-src` with nonce + `'strict-dynamic'`, `style-src` with nonce, `img-src`, `connect-src`, `frame-src`, `frame-ancestors`, `base-uri`, `form-action`, `object-src`, `upgrade-insecure-requests`
-    - [ ] Test `connect-src` includes R2 domain when provided
-    - [ ] Test `connect-src` omits R2 domain gracefully when not provided (undefined/null)
-    - [ ] Test `X-Frame-Options: DENY` present
-    - [ ] Test `X-Content-Type-Options: nosniff` present
-    - [ ] Test `Strict-Transport-Security` present only when `isProd=true`, absent when `isProd=false`
-    - [ ] Test `Referrer-Policy: strict-origin-when-cross-origin` present
-    - [ ] Test `Permissions-Policy: geolocation=(), microphone=(), camera=()` present
-- [ ] Task: Implement (Green) — `src/lib/security-headers.ts`
-    - [ ] Implement `generateNonce()`: `crypto.randomBytes(16).toString('base64')`
-    - [ ] Implement `buildSecurityHeaders(nonce: string, isProd: boolean, r2Domain?: string): Record<string, string>`
-    - [ ] Build CSP directive string with all directives, nonce substitution, and conditional R2 domain
-    - [ ] Return header name/value map with `Content-Security-Policy` (prod) or `Content-Security-Policy-Report-Only` (dev)
-    - [ ] Include HSTS only when `isProd=true`
-- [ ] Task: Refactor
-    - [ ] Review `src/lib/security-headers.ts` for clarity and file size
-    - [ ] Ensure no duplication in CSP directive building
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
+- [x] Task: Write Tests (Red) — `tests/unit/lib/security-headers.test.ts`
+    - [x] Test `generateNonce()` returns base64 string of correct length (24 chars from 16 bytes)
+    - [x] Test `generateNonce()` returns unique values across multiple calls
+    - [x] Test `buildSecurityHeaders(nonce, true, r2Domain)` returns prod headers with `Content-Security-Policy` key
+    - [x] Test `buildSecurityHeaders(nonce, false, r2Domain)` returns dev headers with `Content-Security-Policy-Report-Only` key
+    - [x] Test CSP value contains all directives: `default-src`, `script-src` with nonce + `'strict-dynamic'`, `style-src` with nonce, `img-src`, `connect-src`, `frame-src`, `frame-ancestors`, `base-uri`, `form-action`, `object-src`, `upgrade-insecure-requests`
+    - [x] Test `connect-src` includes R2 domain when provided
+    - [x] Test `connect-src` omits R2 domain gracefully when not provided (undefined/null)
+    - [x] Test `X-Frame-Options: DENY` present
+    - [x] Test `X-Content-Type-Options: nosniff` present
+    - [x] Test `Strict-Transport-Security` present only when `isProd=true`, absent when `isProd=false`
+    - [x] Test `Referrer-Policy: strict-origin-when-cross-origin` present
+    - [x] Test `Permissions-Policy: geolocation=(), microphone=(), camera=()` present
+- [x] Task: Implement (Green) — `src/lib/security-headers.ts` [6fefa98d]
+    - [x] Implement `generateNonce()`: `crypto.randomBytes(16).toString('base64')`
+    - [x] Implement `buildSecurityHeaders(nonce: string, isProd: boolean, r2Domain?: string): Record<string, string>`
+    - [x] Build CSP directive string with all directives, nonce substitution, and conditional R2 domain
+    - [x] Return header name/value map with `Content-Security-Policy` (prod) or `Content-Security-Policy-Report-Only` (dev)
+    - [x] Include HSTS only when `isProd=true`
+- [x] Task: Refactor [6fefa98d]
+    - [x] Review `src/lib/security-headers.ts` for clarity and file size
+    - [x] Ensure no duplication in CSP directive building
 - [ ] Task: Conductor - User Manual Verification 'Security Headers Pure Logic' (Protocol in workflow.md)
 
 ## Phase 3: TanStack Start Integration
