@@ -1,7 +1,7 @@
 <protect>
 # TRACK-041: Implementation Plan
 
-## Phase 1: Research & API Verification
+## Phase 1: Research & API Verification [checkpoint: c95a5709]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
 - [x] Task: Verify TanStack Start nonce/middleware API
@@ -11,7 +11,7 @@
     - [x] Check `src/lib/storage.ts` for R2 endpoint domain extraction logic (`getR2Client()`)
     - [x] Check `src/config/env.ts` for `R2_ENDPOINT` env var access pattern
     - [x] Locate E2E test directory and existing E2E test patterns (Playwright config)
-- [~] Task: Conductor - User Manual Verification 'Research & API Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Research & API Verification' (Protocol in workflow.md)
 
 ## Phase 2: Security Headers Pure Logic (TDD)
 
