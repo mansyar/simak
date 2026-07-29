@@ -15,6 +15,12 @@ const envSchema = z.object({
   MIGRATE_DATABASE_URL: z.string().url().optional(),
   EMAIL_FROM: z.string().min(1, 'EMAIL_FROM cannot be empty').default('SIMAK <noreply@simak.app>'),
   LOG_LEVEL: z.string().default('info'),
+  DB_POOL_MAX: z.coerce.number().int().positive().default(10),
+  DB_PREPARED_STATEMENTS_DISABLED: z
+    .string()
+    .optional()
+    .transform((val) => val === 'true')
+    .default(false),
 });
 
 export type Env = z.infer<typeof envSchema>;

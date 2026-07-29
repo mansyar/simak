@@ -266,4 +266,113 @@ describe('Environment validation', () => {
     const env = getEnv();
     expect(env.EMAIL_FROM).toBe('SIMAK <noreply@simak.app>');
   });
+
+  it('should default DB_POOL_MAX to 10 when unset', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    delete process.env.DB_POOL_MAX;
+
+    const { getEnv } = await import('@/config/env');
+    const env = getEnv();
+    expect(env.DB_POOL_MAX).toBe(10);
+  });
+
+  it('should coerce DB_POOL_MAX string to number', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    process.env.DB_POOL_MAX = '20';
+
+    const { getEnv } = await import('@/config/env');
+    const env = getEnv();
+    expect(env.DB_POOL_MAX).toBe(20);
+  });
+
+  it('should reject DB_POOL_MAX of 0 (must be positive)', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    process.env.DB_POOL_MAX = '0';
+
+    const { getEnv } = await import('@/config/env');
+    expect(() => getEnv()).toThrow();
+  });
+
+  it('should reject negative DB_POOL_MAX', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    process.env.DB_POOL_MAX = '-5';
+
+    const { getEnv } = await import('@/config/env');
+    expect(() => getEnv()).toThrow();
+  });
+
+  it('should reject non-numeric DB_POOL_MAX', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    process.env.DB_POOL_MAX = 'abc';
+
+    const { getEnv } = await import('@/config/env');
+    expect(() => getEnv()).toThrow();
+  });
+
+  it('should default DB_PREPARED_STATEMENTS_DISABLED to false when unset', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    delete process.env.DB_PREPARED_STATEMENTS_DISABLED;
+
+    const { getEnv } = await import('@/config/env');
+    const env = getEnv();
+    expect(env.DB_PREPARED_STATEMENTS_DISABLED).toBe(false);
+  });
+
+  it('should parse DB_PREPARED_STATEMENTS_DISABLED=true to boolean true', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    process.env.DB_PREPARED_STATEMENTS_DISABLED = 'true';
+
+    const { getEnv } = await import('@/config/env');
+    const env = getEnv();
+    expect(env.DB_PREPARED_STATEMENTS_DISABLED).toBe(true);
+  });
+
+  it('should parse DB_PREPARED_STATEMENTS_DISABLED=false to boolean false (not z.coerce.boolean)', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    process.env.DB_PREPARED_STATEMENTS_DISABLED = 'false';
+
+    const { getEnv } = await import('@/config/env');
+    const env = getEnv();
+    expect(env.DB_PREPARED_STATEMENTS_DISABLED).toBe(false);
+  });
 });
