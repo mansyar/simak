@@ -15,6 +15,7 @@ import { logAuditEvent } from '../lib/audit';
 import { revokeUserSessions } from '../lib/auth-session';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '../lib/errors';
+import { logger } from '../lib/logger';
 import type { z } from 'zod';
 import type {
   CreateUserSchema,
@@ -241,7 +242,12 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
         details: { role, email: userEmail, status },
       });
     } catch (err) {
-      console.error(`Failed to log ${auditAction} audit event:`, err);
+      logger.error({
+        event: 'advisory_failed',
+        handler: 'auditLog',
+        action: auditAction,
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
 
     // Post-commit advisory work: invitation email is non-fatal
@@ -254,7 +260,11 @@ export async function createUserHandler(args: { data: CreateUserInput }) {
       });
       emailSent = true;
     } catch (err) {
-      console.error('Failed to send invitation email:', err);
+      logger.error({
+        event: 'advisory_failed',
+        handler: 'createUserHandler',
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
 
     return { user: { id: userId }, emailSent };
@@ -389,7 +399,11 @@ export async function deleteUserHandler(args: { data: UserIdParam }) {
     try {
       await revokeUserSessions(args.data.id, session.user.id);
     } catch (err) {
-      console.error('Failed to revoke sessions post-commit (user already soft-deleted):', err);
+      logger.error({
+        event: 'advisory_failed',
+        handler: 'deleteUserHandler',
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
 
     await logAuditEvent({

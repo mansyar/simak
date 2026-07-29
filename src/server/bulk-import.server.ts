@@ -15,6 +15,7 @@ import { translateKey, resolveEmailSubject } from '../lib/i18n-server';
 import { getSessionFromHeaders } from './auth';
 import { CREATION_ALLOWED_ROLES } from '../lib/role-permissions';
 import { serverError, ErrorCode } from '../lib/errors';
+import { logger } from '../lib/logger';
 import type { z } from 'zod';
 import type { BulkCreateUsersSchema, BulkCreateTemplatesSchema } from './bulk-import';
 
@@ -225,7 +226,11 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
           })),
         );
       } catch (advisoryErr) {
-        console.error('Per-row advisory audit log failed:', advisoryErr);
+        logger.error({
+          event: 'advisory_failed',
+          handler: 'bulkCreateUsersHandler',
+          error: advisoryErr instanceof Error ? advisoryErr.message : String(advisoryErr),
+        });
       }
     }
 
@@ -243,7 +248,11 @@ export async function bulkCreateUsersHandler(args: { data: BulkCreateUsersInput 
           },
         });
       } catch (advisoryErr) {
-        console.error('Post-commit advisory work failed in bulkCreateUsersHandler:', advisoryErr);
+        logger.error({
+          event: 'advisory_failed',
+          handler: 'bulkCreateUsersHandler',
+          error: advisoryErr instanceof Error ? advisoryErr.message : String(advisoryErr),
+        });
       }
     }
 

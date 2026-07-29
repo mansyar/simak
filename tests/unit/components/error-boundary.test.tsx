@@ -3,6 +3,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { RootErrorComponent } from '@/components/error-boundary';
 
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
+}));
+
+import { logger } from '@/lib/logger';
+
 const t = vi.fn((key: string) => `i18n:${key}`);
 
 vi.mock('@/routes/__root', () => ({
@@ -12,7 +18,6 @@ vi.mock('@/routes/__root', () => ({
 describe('RootErrorComponent', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -44,13 +49,12 @@ describe('RootErrorComponent', () => {
     reloadSpy.mockRestore();
   });
 
-  it('logs the error via console.error', () => {
+  it('logs the error via logger.error', () => {
     render(<RootErrorComponent error={new Error('render failure')} />);
 
-    expect(console.error).toHaveBeenCalled();
-    const calls = vi.mocked(console.error).mock.calls;
-    const merged = calls.map((call) => call.join(' ')).join('\n');
-    expect(merged).toContain('INTERNAL');
-    expect(merged).toContain('render failure');
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(entry.code).toBe('INTERNAL');
+    expect(entry.message).toBe('render failure');
   });
 });

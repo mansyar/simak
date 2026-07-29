@@ -15,6 +15,7 @@ import { verifyCheckpointAccess } from './ownership';
 import { serverError, ErrorCode } from '../lib/errors';
 import { translateKey } from '../lib/i18n-server';
 import { isInstructor, isStudent } from '../lib/session-guards';
+import { logger } from '../lib/logger';
 import type { z } from 'zod';
 import type { OpenForReviewSchema, GetLatestReviewSchema } from './reviews';
 
@@ -218,6 +219,10 @@ export async function advisoryRecomputeGrade(
   try {
     await recomputeStudentGrade(db, submission.assignmentId, submission.studentId);
   } catch (e) {
-    console.error('Post-commit advisory work failed in submitReviewHandler:', e);
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'submitReviewHandler',
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 }

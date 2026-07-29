@@ -4,6 +4,7 @@ import { consultations } from '../db/schema/consultations';
 import { checkpoints } from '../db/schema/assignments';
 import { enqueueEventEmail } from './event-email';
 import { buildConsultationVerifiedHtml, buildConsultationRejectedHtml } from './email-templates';
+import { logger } from '@/lib/logger';
 
 export async function sendConsultationEmail(
   data: { studentId: string; assignmentId: number },
@@ -44,6 +45,10 @@ export async function sendConsultationEmail(
             }),
     });
   } catch (err) {
-    console.error('Failed to enqueue consultation email:', err);
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'sendConsultationEmail',
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }

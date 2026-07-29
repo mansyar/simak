@@ -6,6 +6,7 @@ import * as dbMod from '@/db/index';
 import { logAuditEvent } from '@/lib/audit';
 import { dispatchSLABreachNotifications } from '@/lib/review-sla';
 import { checkAndFireRiskAlert } from '@/lib/risk-alerts';
+import { logger } from '@/lib/logger';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -21,6 +22,10 @@ vi.mock('@/lib/audit', () => ({
 
 vi.mock('@/lib/risk-alerts', () => ({
   checkAndFireRiskAlert: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn() },
 }));
 
 vi.mock('@/lib/review-sla', async (importOriginal) => {
@@ -133,8 +138,6 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
     vi.mocked(logAuditEvent).mockRejectedValueOnce(new Error('audit logging failed'));
     setupPassSubmission();
 
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     const result = await submitReviewHandler({
       data: { submissionId: 1, decision: 'pass', comment: 'Well done!' },
     });
@@ -142,12 +145,9 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
     expect(result).toEqual({ success: true });
     expect(mockDb.transaction).toHaveBeenCalledTimes(1);
     expect(logAuditEvent).toHaveBeenCalled();
-    expect(errorSpy).toHaveBeenCalledWith(
-      'Post-commit advisory work failed in submitReviewHandler:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'advisory_failed', handler: 'submitReviewHandler' }),
     );
-
-    errorSpy.mockRestore();
   });
 
   it('should return success true when dispatchSLABreachNotifications throws', async () => {
@@ -157,8 +157,6 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
     );
     setupPassSubmission();
 
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     const result = await submitReviewHandler({
       data: { submissionId: 1, decision: 'pass', comment: 'Well done!' },
     });
@@ -166,33 +164,29 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
     expect(result).toEqual({ success: true });
     expect(mockDb.transaction).toHaveBeenCalledTimes(1);
     expect(dispatchSLABreachNotifications).toHaveBeenCalled();
-    expect(errorSpy).toHaveBeenCalledWith(
-      'Post-commit advisory work failed in submitReviewHandler:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'advisory_failed', handler: 'submitReviewHandler' }),
     );
-
-    errorSpy.mockRestore();
   });
 
-  it('should log advisory failures to console.error', async () => {
+  it('should log advisory failures to logger.error', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     const advisoryError = new Error('audit logging failed');
     vi.mocked(logAuditEvent).mockRejectedValueOnce(advisoryError);
     setupPassSubmission();
 
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     await submitReviewHandler({
       data: { submissionId: 1, decision: 'pass', comment: 'Well done!' },
     });
 
-    expect(errorSpy).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      'Post-commit advisory work failed in submitReviewHandler:',
-      advisoryError,
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'advisory_failed',
+        handler: 'submitReviewHandler',
+        error: advisoryError.message,
+      }),
     );
-
-    errorSpy.mockRestore();
   });
 
   it('should still commit the transaction when advisory work throws', async () => {
@@ -200,15 +194,11 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
     vi.mocked(logAuditEvent).mockRejectedValueOnce(new Error('audit logging failed'));
     setupPassSubmission();
 
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     await submitReviewHandler({
       data: { submissionId: 1, decision: 'pass', comment: 'Well done!' },
     });
 
     expect(mockDb.transaction).toHaveBeenCalledTimes(1);
-
-    errorSpy.mockRestore();
   });
 
   it('should still fire audit log and SLA notifications in the normal case', async () => {
@@ -276,8 +266,6 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
     vi.mocked(checkAndFireRiskAlert).mockRejectedValueOnce(new Error('risk alert failed'));
     setupNoBreachSubmission();
 
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     const result = await submitReviewHandler({
       data: {
         submissionId: 1,
@@ -289,11 +277,8 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
 
     expect(result).toEqual({ success: true });
     expect(checkAndFireRiskAlert).toHaveBeenCalled();
-    expect(errorSpy).toHaveBeenCalledWith(
-      'Post-commit advisory work failed in submitReviewHandler:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'advisory_failed', handler: 'maybeFireReviewRiskAlert' }),
     );
-
-    errorSpy.mockRestore();
   });
 });

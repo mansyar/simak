@@ -9,6 +9,7 @@ import { logAuditEvent } from '../lib/audit';
 import { enqueueEmail, escapeHtml } from '../lib/email';
 import { resolveEmailSubject } from '../lib/i18n-server';
 import { revokeUserSessions } from '../lib/auth-session';
+import { logger } from '../lib/logger';
 import { serverError, ErrorCode } from '@/lib/errors';
 import type { z } from 'zod';
 import type { Locales } from '../i18n/types';
@@ -175,17 +176,22 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
         headers,
       });
     } catch (authErr) {
-      console.error(
-        'auth.api.disableTwoFactor failed post-commit (DB already committed):',
-        authErr,
-      );
+      logger.error({
+        event: 'advisory_failed',
+        handler: 'disableTwoFactorHandler',
+        error: authErr instanceof Error ? authErr.message : String(authErr),
+      });
     }
 
     // 3. Revoke all sessions so the security change takes effect immediately
     try {
       await revokeUserSessions(session.user.id, session.user.id);
     } catch (err) {
-      console.error('Failed to revoke sessions post-commit (DB already committed):', err);
+      logger.error({
+        event: 'advisory_failed',
+        handler: 'disableTwoFactorHandler',
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
 
     // 4. Log audit event
@@ -197,7 +203,11 @@ export async function disableTwoFactorHandler(args: { data: DisableTwoFactorInpu
         entityId: session.user.id,
       });
     } catch (err) {
-      console.error('Failed to log 2FA disable audit event:', err);
+      logger.error({
+        event: 'advisory_failed',
+        handler: 'disableTwoFactorHandler',
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
 
     // 5. Send email notification

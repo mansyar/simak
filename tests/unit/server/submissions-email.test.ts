@@ -5,6 +5,7 @@ import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import { enqueueEmail, resolveEmailRecipient } from '@/lib/email';
 import { buildSubmissionReceivedHtml } from '@/lib/email-templates';
+import { logger } from '@/lib/logger';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -25,6 +26,10 @@ vi.mock('@/lib/email', () => ({
 
 vi.mock('@/lib/email-templates', () => ({
   buildSubmissionReceivedHtml: vi.fn().mockReturnValue('<html>body</html>'),
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn() },
 }));
 
 vi.mock('@tanstack/react-start', () => ({
@@ -179,16 +184,13 @@ describe('Submission email enqueue', () => {
       locale: 'en',
     });
     vi.mocked(enqueueEmail).mockRejectedValueOnce(new Error('email service down'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const result = await submitCheckpointHandler({ data: submitData });
 
     expect(result).toEqual({ success: true });
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to enqueue submission_received email:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'advisory_failed' }),
     );
-    consoleSpy.mockRestore();
   });
 
   it('should skip email when instructor is soft-deleted or has no verified email', async () => {

@@ -4,6 +4,7 @@ import { getDb } from '@/db/index';
 import { uploadIntents } from '@/db/schema/submissions';
 import { safeAuditLog } from '@/lib/audit';
 import { getBucketName, getR2Client } from '@/lib/storage';
+import { logger } from '@/lib/logger';
 
 const BATCH_SIZE = 50;
 
@@ -50,7 +51,7 @@ export async function processOrphanedR2Objects(actorId: string = 'system'): Prom
           .set({ cleanedUpAt: new Date() })
           .where(eq(uploadIntents.fileKey, intent.fileKey));
       } catch (err) {
-        console.error({
+        logger.error({
           event: 'r2_cleanup_failed',
           fileKey: intent.fileKey,
           error: err instanceof Error ? err.message : String(err),

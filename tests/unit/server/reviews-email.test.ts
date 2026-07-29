@@ -6,6 +6,7 @@ import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import { enqueueEmail, resolveEmailRecipient } from '@/lib/email';
 import { buildReviewCompletedHtml, buildRevisionRequestedHtml } from '@/lib/email-templates';
+import { logger } from '@/lib/logger';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -41,6 +42,10 @@ vi.mock('@/lib/email', () => ({
 vi.mock('@/lib/email-templates', () => ({
   buildReviewCompletedHtml: vi.fn().mockReturnValue('<html>review completed body</html>'),
   buildRevisionRequestedHtml: vi.fn().mockReturnValue('<html>revision requested body</html>'),
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn() },
 }));
 
 describe('Review email enqueue', () => {
@@ -210,18 +215,15 @@ describe('Review email enqueue', () => {
       locale: 'en',
     });
     vi.mocked(enqueueEmail).mockRejectedValueOnce(new Error('email service down'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const result = await submitReviewHandler({
       data: { submissionId: 1, decision: 'pass', comment: 'Good' },
     });
 
     expect(result).toEqual({ success: true });
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to enqueue review_completed email:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'advisory_failed' }),
     );
-    consoleSpy.mockRestore();
   });
 
   it('should skip email when student is soft-deleted or has no verified email', async () => {

@@ -8,7 +8,6 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 // --- Module-level mocks ---
-
 vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
 vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({
@@ -17,13 +16,17 @@ vi.mock('@/config/env', () => ({
   }),
 }));
 
-const { mockResendSend, ResendMock } = vi.hoisted(() => {
+const { mockChildLogger, mockResendSend, ResendMock } = vi.hoisted(() => {
+  const childLogger = { error: vi.fn(), info: vi.fn(), warn: vi.fn() };
   const send = vi.fn();
   const mock = vi.fn(function () {
     return { emails: { send } };
   });
-  return { mockResendSend: send, ResendMock: mock };
+  return { mockChildLogger: childLogger, mockResendSend: send, ResendMock: mock };
 });
+vi.mock('@/lib/logger', () => ({
+  logger: { child: vi.fn().mockReturnValue(mockChildLogger) },
+}));
 
 vi.mock('resend', () => ({ Resend: ResendMock }));
 
@@ -43,8 +46,6 @@ describe('email-queue-processor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockResendSend.mockReset();
-    vi.spyOn(console, 'info').mockImplementation(() => {});
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   describe('processEmailQueue', () => {
@@ -309,7 +310,7 @@ describe('email-queue-processor', () => {
 
       await processEmailQueue();
 
-      const cycleStartLog = (console.info as Mock).mock.calls.find(
+      const cycleStartLog = mockChildLogger.info.mock.calls.find(
         ([arg]: any[]) => arg?.event === 'email_queue.cycle_start',
       );
       expect(cycleStartLog).toBeTruthy();
@@ -324,7 +325,7 @@ describe('email-queue-processor', () => {
 
       await processEmailQueue();
 
-      const cycleEndLog = (console.info as Mock).mock.calls.find(
+      const cycleEndLog = mockChildLogger.info.mock.calls.find(
         ([arg]: any[]) => arg?.event === 'email_queue.cycle_end',
       );
       expect(cycleEndLog).toBeTruthy();
@@ -348,7 +349,7 @@ describe('email-queue-processor', () => {
 
       await processEmailQueue();
 
-      const reclaimLog = (console.info as Mock).mock.calls.find(
+      const reclaimLog = mockChildLogger.info.mock.calls.find(
         ([arg]: any[]) => arg?.event === 'email_queue.reclaimed',
       );
       expect(reclaimLog).toBeTruthy();
@@ -373,7 +374,7 @@ describe('email-queue-processor', () => {
 
       await processEmailQueue();
 
-      const failLog = (console.warn as Mock).mock.calls.find(
+      const failLog = mockChildLogger.warn.mock.calls.find(
         ([arg]: any[]) => arg?.event === 'email_queue.send_failed',
       );
       expect(failLog).toBeTruthy();

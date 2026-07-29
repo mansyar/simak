@@ -3,6 +3,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { checkAndFireRiskAlert } from '@/lib/risk-alerts';
 import { computeStudentRisk } from '@/lib/risk-scoring';
 import { sendStudentAtRiskEmail } from '@/lib/at-risk-email';
+import { logger } from '@/lib/logger';
+
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn() },
+}));
 
 vi.mock('@/lib/risk-scoring', () => ({
   computeStudentRisk: vi.fn(),
@@ -195,12 +200,14 @@ describe('checkAndFireRiskAlert', () => {
       onrejected(dbError);
     });
 
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     await expect(checkAndFireRiskAlert(mockDb, baseOpts)).resolves.toBeUndefined();
 
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to fire risk alert:', dbError);
-    consoleSpy.mockRestore();
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'advisory_failed',
+        handler: 'checkAndFireRiskAlert',
+      }),
+    );
   });
 
   it('should use Promise.allSettled so email failure does not block notification insert', async () => {
@@ -210,8 +217,6 @@ describe('checkAndFireRiskAlert', () => {
     // Make email reject
     vi.mocked(sendStudentAtRiskEmail).mockRejectedValueOnce(new Error('Email failed'));
 
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     // Should not throw — allSettled handles rejections
     await expect(checkAndFireRiskAlert(mockDb, baseOpts)).resolves.toBeUndefined();
 
@@ -219,8 +224,6 @@ describe('checkAndFireRiskAlert', () => {
     expect(mockDb.insert).toHaveBeenCalledTimes(1);
     // Email should have been attempted
     expect(sendStudentAtRiskEmail).toHaveBeenCalledTimes(1);
-
-    consoleSpy.mockRestore();
   });
 
   it('should target instructor with notification (userId = instructorId)', async () => {

@@ -6,6 +6,7 @@ import { checkpoints } from '@/db/schema/assignments';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 import { logAuditEvent } from '@/lib/audit';
+import { logger } from '@/lib/logger';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -17,6 +18,10 @@ vi.mock('@/lib/audit', () => ({
 
 vi.mock('@/db/index', () => ({
   getDb: vi.fn(),
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn() },
 }));
 
 vi.mock('@tanstack/react-start', () => ({
@@ -434,8 +439,6 @@ describe('Submission server functions - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
       vi.mocked(logAuditEvent).mockRejectedValueOnce(new Error('audit service down'));
 
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
       mockDb.returning.mockReturnValueOnce({
         then: (onfulfilled: any) => Promise.resolve([{ id: 42 }]).then(onfulfilled),
       });
@@ -461,12 +464,9 @@ describe('Submission server functions - Logic & Security', () => {
         entityId: '42',
         details: { checkpointId: 1, fileName: 'chapter1.pdf' },
       });
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Failed to log submission.created audit event:',
-        expect.any(Error),
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.objectContaining({ event: 'advisory_failed' }),
       );
-
-      consoleSpy.mockRestore();
     });
   });
 

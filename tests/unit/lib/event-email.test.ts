@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { enqueueEventEmail } from '@/lib/event-email';
 import { enqueueEmail, resolveEmailRecipient } from '@/lib/email';
+import { logger } from '@/lib/logger';
 
 vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
 
@@ -10,6 +11,10 @@ vi.mock('@/config/env', () => ({
     RESEND_API_KEY: 'test-key',
     BETTER_AUTH_URL: 'http://localhost:3000',
   }),
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn() },
 }));
 
 vi.mock('@/lib/email', () => ({
@@ -101,7 +106,6 @@ describe('enqueueEventEmail', () => {
       locale: 'en',
     });
     vi.mocked(enqueueEmail).mockRejectedValue(new Error('service down'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await expect(
       enqueueEventEmail({
@@ -112,16 +116,16 @@ describe('enqueueEventEmail', () => {
       }),
     ).resolves.toBeUndefined();
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to enqueue review_completed email:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'advisory_failed',
+        handler: 'enqueueEventEmail',
+      }),
     );
-    consoleSpy.mockRestore();
   });
 
   it('should not throw when resolveEmailRecipient throws', async () => {
     vi.mocked(resolveEmailRecipient).mockRejectedValue(new Error('DB error'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await expect(
       enqueueEventEmail({
@@ -132,11 +136,12 @@ describe('enqueueEventEmail', () => {
       }),
     ).resolves.toBeUndefined();
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to enqueue review_completed email:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'advisory_failed',
+        handler: 'enqueueEventEmail',
+      }),
     );
-    consoleSpy.mockRestore();
   });
 });
 

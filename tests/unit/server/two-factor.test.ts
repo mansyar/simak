@@ -34,6 +34,10 @@ vi.mock('@/db/index', () => ({
   getDb: vi.fn(),
 }));
 
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
+}));
+
 vi.mock('@tanstack/react-start/server', () => ({
   getRequestHeaders: vi.fn().mockReturnValue(new Headers()),
 }));

@@ -14,6 +14,7 @@ import {
   buildExtensionRejectedHtml,
   buildExtensionRequestedHtml,
 } from '@/lib/email-templates';
+import { logger } from '@/lib/logger';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -36,6 +37,10 @@ vi.mock('@/lib/email-templates', () => ({
   buildExtensionApprovedHtml: vi.fn().mockReturnValue('<html>approved body</html>'),
   buildExtensionRejectedHtml: vi.fn().mockReturnValue('<html>rejected body</html>'),
   buildExtensionRequestedHtml: vi.fn().mockReturnValue('<html>requested body</html>'),
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn() },
 }));
 
 vi.mock('@tanstack/react-start', () => ({
@@ -152,16 +157,13 @@ describe('Extension email enqueue — approveExtensionHandler', () => {
       locale: 'en',
     });
     vi.mocked(enqueueEmail).mockRejectedValueOnce(new Error('email service down'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const result = await approveExtensionHandler({ data: { requestId: 1 } });
 
     expect(result).toEqual({ success: true });
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to enqueue extension_approved email:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'advisory_failed' }),
     );
-    consoleSpy.mockRestore();
   });
 });
 
@@ -351,7 +353,6 @@ describe('Extension email enqueue — requestExtensionHandler', () => {
       locale: 'en',
     });
     vi.mocked(enqueueEmail).mockRejectedValueOnce(new Error('email service down'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const result = await requestExtensionHandler({
       data: {
@@ -364,11 +365,9 @@ describe('Extension email enqueue — requestExtensionHandler', () => {
     });
 
     expect(result).toHaveProperty('extensionRequest');
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to enqueue extension_requested email:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'advisory_failed' }),
     );
-    consoleSpy.mockRestore();
   });
 });
 
@@ -460,18 +459,15 @@ describe('Extension email enqueue — bulkExtendHandler', () => {
       locale: 'en',
     });
     vi.mocked(enqueueEmail).mockRejectedValueOnce(new Error('email service down'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const result = await bulkExtendHandler({
       data: { assignmentId: 1, studentId: 'student-1', extraDays: 3, reason: 'Medical leave' },
     });
 
     expect(result).toEqual({ success: true, extendedCount: 2 });
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to enqueue extension_approved email:',
-      expect.any(Error),
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'advisory_failed' }),
     );
-    consoleSpy.mockRestore();
   });
 
   it('should skip email when student is soft-deleted or has no verified email', async () => {

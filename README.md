@@ -15,6 +15,7 @@
 | ORM | Drizzle ORM |
 | File Storage | Cloudflare R2 (presigned URL uploads) |
 | Email | Resend (transactional, via background queue) |
+| Logging | pino (structured JSON logging, server-side only; `pino-pretty` in dev) |
 | i18n | typesafe-i18n (English + Indonesian) |
 | Testing | Vitest (unit + integration), Playwright (E2E: chromium + firefox + mobile), @axe-core/playwright (a11y) |
 | Deployment | Docker + Coolify |
@@ -87,7 +88,7 @@ simak/
 │   ├── db/schema/        → Drizzle schema (split by domain)
 │   ├── auth/             → Better-Auth configuration
 │   ├── i18n/             → Translation init + locale detection
-│   ├── lib/              → Shared utilities (email, storage, errors, etc.)
+│   ├── lib/              → Shared utilities (email, storage, errors, logging, etc.)
 │   └── config/           → Validated environment variables
 ├── locales/              → Translation JSON (en.json, id.json)
 ├── tests/                → Unit, integration, and E2E tests
@@ -135,6 +136,7 @@ simak/
 - **Checkpoint discussions (Q&A):** Students and instructors can exchange lightweight async Q&A messages on a per-checkpoint basis via a `DiscussionPanel` component. Messages are threaded via `parentMessageId` (self-referencing FK). Users can delete their own messages within a 15-minute window (soft-delete — deleted messages render as "[deleted]" placeholders with replies preserved). A `discussion_reply` notification and localized email are dispatched to the other party as post-commit advisory work. The panel uses optimistic mutations (TanStack Query `onMutate`/`onError`/`onSettled`) and 30-second polling (`refetchInterval`) for near-real-time updates. Mounted on the student checkpoint detail page, instructor assignment detail (Discussions tab), and instructor review detail page. Ownership-gated: students can only view/post in their own checkpoints; instructors can view/post in any checkpoint within their assignments.
 - **Orphaned R2 object cleanup:** A periodic cleanup scanner (`processOrphanedR2Objects()` in `src/lib/r2-cleanup.ts`) runs every 6 hours as part of the email queue tick loop, deleting R2 objects whose upload intents have expired without being consumed (`consumedAt IS NULL AND expiresAt < now()`). Deletes are parallelized via `Promise.allSettled` with per-object error isolation, and a `cleanedUpAt` timestamp marks intents after successful deletion (preserving the audit trail). Audit logs use `safeAuditLog` with `actorId: 'system'` for background runs. If R2 is not configured, the scanner is a no-op. Admins can manually trigger cleanup (bypassing the throttle) via a "Trigger R2 Cleanup" button on the `/admin/email-queue` page, which logs the action with the admin's userId as actor.
 - **Health check endpoint:** A public, unauthenticated `GET /api/health` endpoint provides container orchestration health probes. It runs 3 parallel checks (each with a 2-second timeout): DB connectivity (`SELECT 1`), R2 reachability (`HeadBucketCommand` — returns `not_configured` if R2 env vars are absent, which is healthy), and email queue depth (`COUNT` of pending/processing rows — informational only). Returns HTTP 200 (healthy) or 503 (unhealthy). Error messages are generic to prevent information leakage on the public endpoint. The Dockerfile includes a `HEALTHCHECK` directive (`wget --spider` against `/api/health`) for Docker/Coolify liveness probes.
+- **Structured logging:** All server-side logging uses `pino` (server-side only — not bundled with client code). JSON output to stdout in production (Docker/Coolify captures), pretty-printed in dev via `pino-pretty`. The `logError()` helper in `src/lib/errors.ts` routes through `logger.error(entry)` with structured fields (`timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`) and `sanitizeInput()` redaction. Background jobs (email queue, deadline scanner, R2 cleanup) use `logger.child({ requestId: crypto.randomUUID() })` for trace correlation. Server handler advisory blocks use `logger.error({ event: 'advisory_failed', handler: '<fn>', error: '...' })`. Log level configurable via optional `LOG_LEVEL` env var (default `info`). Zero `console.*` calls remain in `src/lib/` and `src/server/` (excluding deployment scripts).
 
 ## Testing
 

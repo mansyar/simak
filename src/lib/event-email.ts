@@ -2,6 +2,7 @@ import type { Locales } from '../i18n/types';
 import type { TemplateType } from './email';
 import { enqueueEmail, resolveEmailRecipient } from './email';
 import { resolveEmailSubject } from './i18n-server';
+import { logger } from '@/lib/logger';
 
 /** Security-type emails are never gated by user preferences (FR-8). */
 const EMAIL_GATE_EXEMPT: ReadonlySet<TemplateType> = new Set([
@@ -16,7 +17,7 @@ const EMAIL_GATE_EXEMPT: ReadonlySet<TemplateType> = new Set([
  * Resolves the recipient, builds the subject, and enqueues the email.
  * Skips silently if the recipient is soft-deleted or has no verified email.
  * Respects email notification preferences unless the templateType is exempt (FR-8).
- * Never throws — logs errors to console.error (advisory-only guarantee).
+ * Never throws — logs errors via logger.error (advisory-only guarantee).
  */
 export async function enqueueEventEmail(opts: {
   recipientId: string;
@@ -44,6 +45,11 @@ export async function enqueueEventEmail(opts: {
       templateType: opts.templateType,
     });
   } catch (err) {
-    console.error(`Failed to enqueue ${opts.templateType} email:`, err);
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'enqueueEventEmail',
+      templateType: opts.templateType,
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }

@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger';
+
 export const ErrorCode = {
   UNAUTHORIZED: 'UNAUTHORIZED',
   FORBIDDEN: 'FORBIDDEN',
@@ -112,34 +114,7 @@ export function logError(code: ErrorCode, message: string, context: ErrorContext
     entry.input = sanitizedInput;
   }
 
-  if (import.meta.env.PROD) {
-    console.error(JSON.stringify(entry));
-    return;
-  }
-
-  const lines: string[] = [`[${code}] ${message}`, `Timestamp: ${timestamp}`];
-
-  if (causeDetail !== undefined && causeDetail !== '') {
-    lines.push(`Cause: ${causeDetail}`);
-  }
-
-  if (userId !== undefined && userId !== null) {
-    lines.push(`User: ${userId}`);
-  }
-
-  if (handler !== undefined && handler !== '') {
-    lines.push(`Handler: ${handler}`);
-  }
-
-  if (stack !== undefined) {
-    lines.push(`Stack:\n${stack}`);
-  }
-
-  if (sanitizedInput !== undefined) {
-    lines.push(`Input:\n${JSON.stringify(sanitizedInput, null, 2)}`);
-  }
-
-  console.error(lines.join('\n'));
+  logger.error(entry);
 }
 
 export function serverError(

@@ -8,6 +8,7 @@
 import { eq, and, inArray, gt, sql } from 'drizzle-orm';
 import { checkpoints } from '../db/schema/assignments';
 import { consultations } from '../db/schema/consultations';
+import { logger } from '@/lib/logger';
 import { submissions, reviews } from '../db/schema/submissions';
 import { notifications } from '../db/schema/notifications';
 import { computeStudentRisk } from './risk-scoring';
@@ -181,6 +182,10 @@ export async function checkAndFireRiskAlert(db: Db, opts: RiskAlertOpts): Promis
       }),
     ]);
   } catch (err) {
-    console.error('Failed to fire risk alert:', err);
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'checkAndFireRiskAlert',
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }

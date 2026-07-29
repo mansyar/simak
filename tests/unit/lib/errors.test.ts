@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   ErrorCode,
   serverError,
@@ -7,6 +7,16 @@ import {
   type ServerError,
   type ErrorContext,
 } from '@/lib/errors';
+
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+  },
+}));
+
+import { logger } from '@/lib/logger';
 
 describe('ErrorCode', () => {
   it('includes the required error codes', () => {
@@ -24,6 +34,10 @@ describe('ErrorCode', () => {
 });
 
 describe('serverError', () => {
+  beforeEach(() => {
+    vi.mocked(logger.error).mockClear();
+  });
+
   it('returns a typed ServerError shape with code and message', () => {
     const result: ServerError = serverError('NOT_FOUND', 'User not found');
 
@@ -47,7 +61,6 @@ describe('serverError', () => {
   });
 
   it('calls logError with the supplied context', () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const context: ErrorContext = {
       userId: 'user-123',
       handler: 'createUser',
@@ -56,83 +69,57 @@ describe('serverError', () => {
 
     serverError('VALIDATION', 'Invalid input', context);
 
-    expect(consoleSpy).toHaveBeenCalledTimes(1);
-    const output = consoleSpy.mock.calls[0]?.[0] as string;
-    expect(output).toContain('VALIDATION');
-    expect(output).toContain('Invalid input');
-    expect(output).toContain('user-123');
-    expect(output).toContain('createUser');
-
-    consoleSpy.mockRestore();
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(entry.code).toBe('VALIDATION');
+    expect(entry.message).toBe('Invalid input');
+    expect(entry.userId).toBe('user-123');
+    expect(entry.handler).toBe('createUser');
   });
 });
 
 describe('logError', () => {
-  let consoleSpy: ReturnType<typeof vi.spyOn>;
-  const originalProd = import.meta.env.PROD;
-
   beforeEach(() => {
-    consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.mocked(logger.error).mockClear();
   });
 
-  afterEach(() => {
-    consoleSpy.mockRestore();
-    import.meta.env.PROD = originalProd;
+  it('calls logger.error with an entry object containing timestamp, code, and message', () => {
+    logError('NOT_FOUND', 'Resource missing');
+
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(entry.code).toBe('NOT_FOUND');
+    expect(entry.message).toBe('Resource missing');
+    expect(typeof entry.timestamp).toBe('string');
   });
 
-  it('writes a readable multi-line log entry in development', () => {
-    import.meta.env.PROD = false;
-
-    logError('NOT_FOUND', 'Resource missing', {
-      userId: 'user-1',
-      handler: 'getResource',
-      input: { id: 1 },
-    });
-
-    expect(consoleSpy).toHaveBeenCalledTimes(1);
-    const output = consoleSpy.mock.calls[0]?.[0] as string;
-    expect(output).toContain('[NOT_FOUND]');
-    expect(output).toContain('Resource missing');
-    expect(output).toContain('user-1');
-    expect(output).toContain('getResource');
-    expect(output).toContain('id');
-  });
-
-  it('writes a single-line JSON log entry in production', () => {
-    import.meta.env.PROD = true;
-
-    logError('INTERNAL', 'Database failure', {
+  it('includes optional fields cause, userId, handler, stack, and input when provided', () => {
+    const cause = new Error('Connection reset');
+    logError('INTERNAL', 'Unexpected error', {
+      cause,
       userId: 'user-2',
       handler: 'saveThing',
       input: { name: 'x' },
     });
 
-    expect(consoleSpy).toHaveBeenCalledTimes(1);
-    const output = consoleSpy.mock.calls[0]?.[0] as string;
-    const parsed = JSON.parse(output);
-
-    expect(parsed.code).toBe('INTERNAL');
-    expect(parsed.message).toBe('Database failure');
-    expect(parsed.userId).toBe('user-2');
-    expect(parsed.handler).toBe('saveThing');
-    expect(parsed.input).toEqual({ name: 'x' });
-    expect(typeof parsed.timestamp).toBe('string');
+    const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(entry.cause).toBe('Connection reset');
+    expect(entry.userId).toBe('user-2');
+    expect(entry.handler).toBe('saveThing');
+    expect(entry.input).toEqual({ name: 'x' });
+    expect(entry.stack).toBeDefined();
+    expect(typeof entry.stack).toBe('string');
   });
 
   it('includes the stack trace when an Error is provided as cause', () => {
-    import.meta.env.PROD = true;
     const cause = new Error('Connection reset');
-
     logError('INTERNAL', 'Unexpected error', { cause, handler: 'testHandler' });
 
-    const output = consoleSpy.mock.calls[0]?.[0] as string;
-    const parsed = JSON.parse(output);
-    expect(parsed.stack).toContain('Connection reset');
+    const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(entry.stack).toContain('Connection reset');
   });
 
   it('redacts sensitive fields from the input summary', () => {
-    import.meta.env.PROD = true;
-
     logError('VALIDATION', 'Bad input', {
       input: {
         email: 'a@example.com',
@@ -142,11 +129,22 @@ describe('logError', () => {
       },
     });
 
-    const output = consoleSpy.mock.calls[0]?.[0] as string;
-    const parsed = JSON.parse(output);
-    expect(parsed.input.password).toBe('[REDACTED]');
-    expect(parsed.input.token).toBe('[REDACTED]');
-    expect(parsed.input.secret).toBe('[REDACTED]');
-    expect(parsed.input.email).toBe('a@example.com');
+    const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
+    const input = entry.input as Record<string, string>;
+    expect(input.password).toBe('[REDACTED]');
+    expect(input.token).toBe('[REDACTED]');
+    expect(input.secret).toBe('[REDACTED]');
+    expect(input.email).toBe('a@example.com');
+  });
+
+  it('omits optional fields when not provided', () => {
+    logError('NOT_FOUND', 'Resource missing');
+
+    const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(entry).not.toHaveProperty('cause');
+    expect(entry).not.toHaveProperty('userId');
+    expect(entry).not.toHaveProperty('handler');
+    expect(entry).not.toHaveProperty('stack');
+    expect(entry).not.toHaveProperty('input');
   });
 });
