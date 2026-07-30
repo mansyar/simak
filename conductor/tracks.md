@@ -10,6 +10,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active Tracks
 
-- [~] **TRACK-043: Application-Level Rate Limiting on Server Functions** *Link: [tracks/application-level-rate-limiting_20260730/index.md](./tracks/application-level-rate-limiting_20260730/index.md)*
+- [x] **TRACK-043: Application-Level Rate Limiting on Server Functions** *Link: [tracks/application-level-rate-limiting_20260730/index.md](./tracks/application-level-rate-limiting_20260730/index.md)*
 
 
