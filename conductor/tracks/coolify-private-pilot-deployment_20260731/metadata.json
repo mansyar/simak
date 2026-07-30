@@ -1,0 +1,9 @@
+{
+  "track_id": "coolify-private-pilot-deployment_20260731",
+  "track_number": "TRACK-047",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-07-30T22:38:06Z",
+  "updated_at": "2026-07-30T22:38:06Z",
+  "description": "Deploy SIMAK for a private pilot through Coolify with a Coolify-managed PostgreSQL service, custom HTTPS domain, production operational runbooks, backups, rollback procedures, and pilot smoke-test verification."
+}

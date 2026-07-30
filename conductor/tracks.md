@@ -9,3 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 ---
 
 ## Active Tracks
+
+- [ ] **Track: TRACK-047 — Coolify Private-Pilot Deployment** *Link: [coolify-private-pilot-deployment_20260731](./tracks/coolify-private-pilot-deployment_20260731/index.md)*
