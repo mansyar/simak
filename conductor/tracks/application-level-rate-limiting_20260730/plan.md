@@ -35,7 +35,7 @@
     - [x] Run `pnpm test` and confirm all rate-limiter tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Rate Limit Infrastructure' (Protocol in workflow.md)
 
-## Phase 2: Extend typedServerFn with .middleware() + rateLimit config
+## Phase 2: Extend typedServerFn with .middleware() + rateLimit config [checkpoint: 67ca70a]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
 - [x] Task: Update `tests/unit/lib/server-fn.test.ts` mock + write new tests (TDD Red Phase)
