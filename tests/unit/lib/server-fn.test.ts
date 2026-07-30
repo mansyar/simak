@@ -4,9 +4,21 @@ import { z } from 'zod';
 
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: vi.fn().mockReturnValue({
+    middleware: vi.fn().mockReturnThis(),
     inputValidator: vi.fn().mockReturnThis(),
     handler: vi.fn().mockImplementation((fn) => fn),
   }),
+  createMiddleware: vi.fn().mockReturnValue({
+    server: vi.fn().mockImplementation((fn) => fn),
+  }),
+}));
+
+vi.mock('@/server/auth', () => ({
+  getSessionFromHeaders: vi.fn(),
+}));
+
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
 
 import { createServerFn } from '@tanstack/react-start';
@@ -82,5 +94,59 @@ describe('typedServerFn — type-level behavior', () => {
       .handler(async ({ data }) => ({ result: data.name }));
 
     expectTypeOf(stub).parameter(0).toEqualTypeOf<{ data: { name: string } }>();
+  });
+});
+
+describe('typedServerFn — rateLimit config', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('calls .middleware([...]) when rateLimit is provided', () => {
+    typedServerFn({ method: 'GET', rateLimit: { window: 60, max: 5 } });
+
+    const builder = createServerFn();
+    expect(builder.middleware).toHaveBeenCalled();
+  });
+
+  it('does NOT call .middleware() when rateLimit is omitted (pass-through)', () => {
+    typedServerFn({ method: 'GET' });
+
+    const builder = createServerFn();
+    expect(builder.middleware).not.toHaveBeenCalled();
+  });
+
+  it('preserves the .inputValidator(Schema).handler(fn) chain when rateLimit is provided', () => {
+    const schema = z.object({ name: z.string() });
+    const handler = async ({ data }: { data: { name: string } }) => ({ result: data.name });
+
+    const stub = typedServerFn({ method: 'POST', rateLimit: { window: 60, max: 10 } })
+      .inputValidator(schema)
+      .handler(handler);
+
+    expect(stub).toBeDefined();
+    expect(typeof stub).toBe('function');
+  });
+
+  it('existing typed-builder pattern still works without rateLimit (regression)', () => {
+    const schema = z.object({ name: z.string() });
+    const handler = async ({ data }: { data: { name: string } }) => ({ result: data.name });
+
+    const stub = typedServerFn({ method: 'POST' }).inputValidator(schema).handler(handler);
+
+    expect(stub).toBeDefined();
+    expect(typeof stub).toBe('function');
+  });
+
+  it('existing inline-parse pattern still works without rateLimit (regression)', () => {
+    const handler = async (args: { data: unknown }) => {
+      const data = z.object({ name: z.string() }).parse(args.data);
+      return { result: data.name };
+    };
+
+    const stub = typedServerFn({ method: 'GET' }).handler(handler);
+
+    expect(stub).toBeDefined();
+    expect(typeof stub).toBe('function');
   });
 });

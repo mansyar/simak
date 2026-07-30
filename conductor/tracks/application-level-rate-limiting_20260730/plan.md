@@ -37,21 +37,21 @@
 
 ## Phase 2: Extend typedServerFn with .middleware() + rateLimit config
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Update `tests/unit/lib/server-fn.test.ts` mock + write new tests (TDD Red Phase)
-    - [ ] Update the `@tanstack/react-start` mock to include `createMiddleware: vi.fn().mockReturnValue({ server: vi.fn().mockImplementation((fn) => fn) })` and `middleware: vi.fn().mockReturnThis()` on the `createServerFn` return value
-    - [ ] Test: `typedServerFn({ method: 'GET', rateLimit: { window: 60, max: 5 } })` calls `.middleware([...])` on the builder (verify `middleware` mock was called)
-    - [ ] Test: `typedServerFn({ method: 'GET' })` without `rateLimit` does NOT call `.middleware()` (pass-through — existing behavior preserved)
-    - [ ] Test: `typedServerFn({ method: 'POST', rateLimit: { window: 60, max: 10 } }).inputValidator(schema).handler(fn)` — builder chain still works with `rateLimit` (returns a callable function)
-    - [ ] Test: existing typed-builder and inline-parse patterns still work without `rateLimit` (regression check)
-    - [ ] Run `pnpm test` and confirm new tests fail (`.middleware()` not yet on `TypedBuilder`, `rateLimit` not yet accepted)
-- [ ] Task: Implement `.middleware()` + `rateLimit` config in `src/lib/server-fn.ts` (TDD Green Phase)
-    - [ ] Add `.middleware(middlewares: unknown[]): TypedBuilder` method to the `TypedBuilder` interface
-    - [ ] Update `typedServerFn` function signature to accept `rateLimit?: RateLimitConfig` in the options
-    - [ ] Import `RateLimitConfig` type and `createRateLimitMiddleware` from `@/lib/rate-limiter`
-    - [ ] When `opts.rateLimit` is provided: call `fn.middleware([createRateLimitMiddleware(opts.rateLimit)])` and cast back to `TypedBuilder`
-    - [ ] When `opts.rateLimit` is omitted: return `fn` directly (existing pass-through behavior)
-    - [ ] Run `pnpm test` and confirm all `server-fn.test.ts` tests pass
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
+- [x] Task: Update `tests/unit/lib/server-fn.test.ts` mock + write new tests (TDD Red Phase)
+    - [x] Update the `@tanstack/react-start` mock to include `createMiddleware: vi.fn().mockReturnValue({ server: vi.fn().mockImplementation((fn) => fn) })` and `middleware: vi.fn().mockReturnThis()` on the `createServerFn` return value
+    - [x] Test: `typedServerFn({ method: 'GET', rateLimit: { window: 60, max: 5 } })` calls `.middleware([...])` on the builder (verify `middleware` mock was called)
+    - [x] Test: `typedServerFn({ method: 'GET' })` without `rateLimit` does NOT call `.middleware()` (pass-through — existing behavior preserved)
+    - [x] Test: `typedServerFn({ method: 'POST', rateLimit: { window: 60, max: 10 } }).inputValidator(schema).handler(fn)` — builder chain still works with `rateLimit` (returns a callable function)
+    - [x] Test: existing typed-builder and inline-parse patterns still work without `rateLimit` (regression check)
+    - [x] Run `pnpm test` and confirm new tests fail (`.middleware()` not yet on `TypedBuilder`, `rateLimit` not yet accepted)
+- [x] Task: Implement `.middleware()` + `rateLimit` config in `src/lib/server-fn.ts` (TDD Green Phase)
+    - [x] Add `.middleware(middlewares: unknown[]): TypedBuilder` method to the `TypedBuilder` interface
+    - [x] Update `typedServerFn` function signature to accept `rateLimit?: RateLimitConfig` in the options
+    - [x] Import `RateLimitConfig` type and `createRateLimitMiddleware` from `@/lib/rate-limiter`
+    - [x] When `opts.rateLimit` is provided: call `fn.middleware([createRateLimitMiddleware(opts.rateLimit)])` and cast back to `TypedBuilder`
+    - [x] When `opts.rateLimit` is omitted: return `fn` directly (existing pass-through behavior)
+    - [x] Run `pnpm test` and confirm all `server-fn.test.ts` tests pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Extend typedServerFn' (Protocol in workflow.md)
 
 ## Phase 3: Update Existing Test Mocks for Middleware Chain
