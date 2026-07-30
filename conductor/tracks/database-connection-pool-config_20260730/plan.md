@@ -65,5 +65,5 @@
     - [x] Run `pnpm typecheck` — verify clean — PASS
     - [x] Run `pnpm lint` — verify clean (0 errors) — PASS (0 errors, 4 pre-existing warnings)
     - [x] Run `pnpm check:i18n` — verify EN<->ID parity (no new i18n keys needed for this track, but verify no breakage) — PASS (783 used, 966 EN/966 ID)
-- [~] Task: Conductor - User Manual Verification 'Phase 3: Documentation & Final Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Documentation & Final Verification' (Protocol in workflow.md) — Checkpoint: `62e2696e`
 </protect>
