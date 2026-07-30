@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: TRACK-044 — Request ID Middleware Wiring
 
-## Phase 1: AsyncLocalStorage Store + Request Context Middleware (FR-1, FR-2)
+## Phase 1: AsyncLocalStorage Store + Request Context Middleware (FR-1, FR-2) [checkpoint: f354406]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation (f354406)
 - [x] Task: Write tests for `src/lib/request-context-store.ts` (TDD Red Phase) (f354406)
@@ -31,7 +31,7 @@
     - [x] Wrap `next({ context: { requestId } })` in `requestContextStorage.run({ requestId }, () => next({ context: { requestId } }))`
     - [x] Update the NOTE comment to reflect that the middleware is now wired (remove the "not yet wired" language, note it's wired via `typedServerFn` in TRACK-044)
     - [x] Run `pnpm test` and confirm all `request-context.test.ts` tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: AsyncLocalStorage Store + Request Context Middleware' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: AsyncLocalStorage Store + Request Context Middleware' (Protocol in workflow.md) (f354406)
 
 ## Phase 2: Pino Mixin in Logger (FR-3)
 
