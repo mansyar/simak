@@ -10,4 +10,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active Tracks
 
-_None — all tracks are archived._
+- [ ] **Track: Request ID Middleware Wiring (TRACK-044)** *Link: [request-id-middleware-wiring_20260730](./tracks/request-id-middleware-wiring_20260730/index.md)*

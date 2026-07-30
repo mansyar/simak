@@ -1,0 +1,13 @@
+{
+  "trackId": "request-id-middleware-wiring_20260730",
+  "roadmapId": "TRACK-044",
+  "type": "chore",
+  "status": "new",
+  "title": "Request ID Middleware Wiring",
+  "milestone": "12 — Security, Reliability & Real-Time Infrastructure",
+  "branch": "track-044/request-id-middleware-wiring",
+  "dependencies": ["TRACK-040", "TRACK-043"],
+  "coordinateWith": [],
+  "createdAt": "2026-07-30T00:00:00.000Z",
+  "updatedAt": "2026-07-30T00:00:00.000Z"
+}
