@@ -16,16 +16,16 @@ import * as dbMod from '@/db/index';
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
 }));
-
 vi.mock('@/db/index', () => ({
   getDb: vi.fn(),
 }));
-
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: vi.fn().mockReturnValue({
+    middleware: vi.fn().mockReturnThis(),
     inputValidator: vi.fn().mockReturnThis(),
     handler: vi.fn().mockImplementation((fn) => fn),
   }),
+  createMiddleware: vi.fn().mockReturnValue({ server: vi.fn().mockImplementation((fn) => fn) }),
 }));
 
 describe('Template server functions - Logic & Security', () => {

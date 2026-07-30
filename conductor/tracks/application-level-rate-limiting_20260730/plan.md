@@ -56,15 +56,15 @@
 
 ## Phase 3: Update Existing Test Mocks for Middleware Chain
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Batch-update all test files that mock `@tanstack/react-start` to include `createMiddleware` + `middleware`
-    - [ ] Find all test files with `createServerFn: vi.fn().mockReturnValue({` that lack `middleware:` in the return value (90 files identified via `rg "createServerFn: vi.fn" tests/`)
-    - [ ] Add `middleware: vi.fn().mockReturnThis(),` as the first property in the `createServerFn` mock return value (before `inputValidator`)
-    - [ ] Add `createMiddleware: vi.fn().mockReturnValue({ server: vi.fn().mockImplementation((fn) => fn) }),` to the `@tanstack/react-start` mock object (alongside `createServerFn`)
-    - [ ] Some test files may already mock `createMiddleware` (e.g., `request-context.test.ts`) — skip those
-    - [ ] Some test files may have a different mock shape — update those manually
-- [ ] Task: Run `pnpm test` to verify all existing tests still pass with updated mocks
-    - [ ] If any tests fail, investigate and fix (the mock update is additive — it should not break existing behavior)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
+- [x] Task: Batch-update all test files that mock `@tanstack/react-start` to include `createMiddleware` + `middleware`
+    - [x] Find all test files with `createServerFn: vi.fn().mockReturnValue({` that lack `middleware:` in the return value (90 files identified via `rg "createServerFn: vi.fn" tests/`)
+    - [x] Add `middleware: vi.fn().mockReturnThis(),` as the first property in the `createServerFn` mock return value (before `inputValidator`)
+    - [x] Add `createMiddleware: vi.fn().mockReturnValue({ server: vi.fn().mockImplementation((fn) => fn) }),` to the `@tanstack/react-start` mock object (alongside `createServerFn`)
+    - [x] Some test files may already mock `createMiddleware` (e.g., `request-context.test.ts`, `server-fn.test.ts`) — skip those
+    - [x] Some test files may have a different mock shape — update those manually (instructor-routes.test.tsx and instructor-page-headers.test.tsx had `useServerFn` after `createServerFn` — handled manually)
+- [x] Task: Run `pnpm test` to verify all existing tests still pass with updated mocks
+    - [x] If any tests fail, investigate and fix (the mock update is additive — it should not break existing behavior) — all 3,919 tests pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Update Existing Test Mocks' (Protocol in workflow.md)
 
 ## Phase 4: Annotate Server Functions with Rate Limit Config
