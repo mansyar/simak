@@ -170,7 +170,7 @@ simak/
     │   │   └── health.server.ts    → Health check handler (runHealthChecks — DB, R2, email queue checks with 2s timeouts, generic error messages)
 │   ├── db/
 │   │   ├── schema/           → Drizzle schema (split by domain)
-│   │   ├── index.ts          → Database client
+│   │   ├── index.ts          → Database client — postgres.js + Drizzle with explicit pool config (`max`/`idle_timeout`/`connect_timeout`/`max_lifetime`/`prepare`), `onnotice` routed through pino, `getDb()` uses `getEnv()`. (TRACK-042)
 │   │   └── migrate.ts        → Migration runner
 │   ├── auth/
 │   │   └── config.ts         → Better-Auth setup
@@ -212,7 +212,7 @@ simak/
 │   │   ├── use-notifications.ts → Notification hooks (useMarkRead, useMarkAllRead with optimistic updates on useInfiniteQuery page shape, useUnreadCount, useNotificationsList via useInfiniteQuery)
 │   │   └── use-assignment-tabs.ts → Assignment tab hooks (approveExtension, rejectExtension with optimistic updates; consultations/extensions via useQuery)
 │   └── config/
-│       └── env.ts            → Validated environment variables (Zod `envSchema`; `Env` type = `z.infer<typeof envSchema>` — single source of truth, TRACK-031). Includes `LOG_LEVEL` (optional, default `info` — TRACK-040).
+│       └── env.ts            → Validated environment variables (Zod `envSchema`; `Env` type = `z.infer<typeof envSchema>` — single source of truth, TRACK-031). Includes `LOG_LEVEL` (optional, default `info` — TRACK-040), `DB_POOL_MAX` (optional, default `10`), and `DB_PREPARED_STATEMENTS_DISABLED` (optional, default `false` — string → `val === 'true'` transform, deliberately avoids `z.coerce.boolean()` — TRACK-042).
 ├── locales/                  → typesafe-i18n translation files
 │   ├── en.json               → English translations
 │   └── id.json               → Indonesian translations
@@ -1161,7 +1161,7 @@ A checkpoint unlocks when:
 
 ### Structured Logging (Track: Structured Logging & Observability)
 
-All server-side logging uses `pino` (server-side only — not bundled with client code). The singleton `logger` instance (`src/lib/logger.ts`) outputs JSON to stdout in production and pretty-printed output in dev (via `pino-pretty`, lazy-loaded via `createRequire`). Log level is configurable via the optional `LOG_LEVEL` env var (default `info`).
+All server-side logging uses `pino` (server-side only — not bundled with client code). The singleton `logger` instance (`src/lib/logger.ts`) outputs JSON to stdout in production and pretty-printed output in dev (via `pino-pretty`, lazy-loaded via `createRequire`). Log level is configurable via the optional `LOG_LEVEL` env var (default `info`). PostgreSQL notices are also routed into pino via the postgres.js `onnotice` callback on the database client (`logger.debug({ event: 'pg_notice', ...notice })` — TRACK-042).
 
 Two migration patterns were applied:
 
@@ -1322,6 +1322,8 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 | `SUPERADMIN_EMAIL`     | Email for the seeded SuperAdmin                                         |
 | `SUPERADMIN_PASSWORD`  | Password for the seeded SuperAdmin                                      |
 | `LOG_LEVEL`             | Optional. Pino log level (default: `info`). `debug`/`info`/`warn`/`error`. (TRACK-040) |
+| `DB_POOL_MAX`           | Optional. Max postgres.js pool connections (default: `10`). Positive integer. (TRACK-042) |
+| `DB_PREPARED_STATEMENTS_DISABLED` | Optional. Disable prepared statements for PgBouncer transaction-pooling compat (default: `false`; set `true` behind PgBouncer). String parsed via `val === 'true'`. (TRACK-042) |
 
 ### Database Migrations [v1]
 
@@ -1335,8 +1337,9 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 
 ### Connection Pooling
 
-- **Development**: Direct connections (Drizzle uses a single pool internally).
-- **Production**: PgBouncer deployed as a sidecar container in Coolify. The app connects to PgBouncer, which multiplexes connections to PostgreSQL. Prevents connection exhaustion under concurrent load.
+- **Application pool**: `getDb()` (`src/db/index.ts`) configures the postgres.js client with explicit pool options: `max` (`DB_POOL_MAX`, default 10), `idle_timeout: 30s`, `connect_timeout: 10s`, `max_lifetime: 1800s`, and `prepare: !DB_PREPARED_STATEMENTS_DISABLED`. PostgreSQL notices are routed through pino via an `onnotice` callback (`logger.debug({ event: 'pg_notice', ...notice })`). `DATABASE_URL` is read via `getEnv()` (Zod-validated), not `process.env` directly. (TRACK-042)
+- **Development**: Direct connections (no PgBouncer); `DB_PREPARED_STATEMENTS_DISABLED` left at default `false` (prepared statements enabled).
+- **Production**: PgBouncer deployed as a sidecar container in Coolify. The app connects to PgBouncer, which multiplexes connections to PostgreSQL. Prevents connection exhaustion under concurrent load. Set `DB_PREPARED_STATEMENTS_DISABLED=true` so the postgres.js client uses `prepare: false` — PgBouncer's transaction-mode pooling is incompatible with prepared statements.
 - Connection string format: `postgresql://user:pass@pgbouncer:6432/simak` (PgBouncer on port 6432).
 
 ### Health Checks [v1]

@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Set DATABASE_URL before any imports
+// Set required env vars before any imports (getDb() uses getEnv() which validates the full schema)
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
+process.env.RESEND_API_KEY = 'test-key';
+process.env.BETTER_AUTH_SECRET = 'test-secret-that-is-at-least-32-characters-long';
+process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+process.env.SUPERADMIN_EMAIL = 'admin@test.com';
+process.env.SUPERADMIN_PASSWORD = 'test-password';
 
 describe('Database client', () => {
   it('should export db and getDb from the module', async () => {

@@ -594,4 +594,13 @@ Students and instructors lack a centralized system to:
 - **E2E test** — `tests/e2e/security-headers.spec.ts` verifies header presence + values on landing page and nonce uniqueness across requests
 - **Tests** — 3,881 tests pass across 382 test files; coverage ≥80% on all thresholds (stmts 87.84%, branches 80.96%, funcs 83.24%, lines 88.47%); `security-headers.ts` at 100% coverage
 
+### Track: Database Connection Pool Configuration (TRACK-042) (July 2026)
+
+- **Explicit pool configuration** — `postgres()` client in `src/db/index.ts` now receives explicit pool settings: `max` (DB_POOL_MAX, default 10), `idle_timeout` (30s), `connect_timeout` (10s), `max_lifetime` (30min), `prepare` (toggleable via DB_PREPARED_STATEMENTS_DISABLED for PgBouncer compatibility)
+- **getEnv() migration** — `getDb()` now reads `DATABASE_URL` via Zod-validated `getEnv()` instead of `process.env` directly; manual guard removed
+- **PostgreSQL notice routing** — `onnotice` callback routes PG NOTICE messages through the pino structured logger at `debug` level, consistent with TRACK-040
+- **New env vars** — `DB_POOL_MAX` (coerced integer, default 10) and `DB_PREPARED_STATEMENTS_DISABLED` (custom string-to-boolean transform, default false) added to Zod schema and documented in `.env.example`
+- **FR-3 deviation** — `prepare` was NOT added to the `drizzle()` call because drizzle-orm 0.45.2's DrizzleConfig type doesn't support `prepare`; the postgres.js client setting is sufficient
+- **Tests** — 3,867 tests pass across 380 test files; coverage ≥80% on all thresholds (stmts 87.94%, branches 80.93%, funcs 83.4%, lines 88.56%)
+
 </protect>
