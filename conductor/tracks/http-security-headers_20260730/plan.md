@@ -57,7 +57,7 @@
 - [x] Task: Run `pnpm test` to verify unit tests still pass
 - [x] Task: Conductor - User Manual Verification 'TanStack Start Integration' (Protocol in workflow.md)
 
-## Phase 4: E2E Test
+## Phase 4: E2E Test [checkpoint: 3566922]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
 - [x] Task: Write E2E test for security headers
