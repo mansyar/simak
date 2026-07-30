@@ -375,4 +375,32 @@ describe('Environment validation', () => {
     const env = getEnv();
     expect(env.DB_PREPARED_STATEMENTS_DISABLED).toBe(false);
   });
+
+  it('should default SHUTDOWN_TIMEOUT_MS to 10000 when unset', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    delete process.env.SHUTDOWN_TIMEOUT_MS;
+
+    const { getEnv } = await import('@/config/env');
+    const env = getEnv();
+    expect(env.SHUTDOWN_TIMEOUT_MS).toBe(10000);
+  });
+
+  it('should coerce SHUTDOWN_TIMEOUT_MS string to number', async () => {
+    process.env.DATABASE_URL = 'postgresql://localhost:5432/simak';
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.BETTER_AUTH_SECRET = 'test-secret-32-chars-minimum!!!!!';
+    process.env.BETTER_AUTH_URL = 'http://localhost:3000';
+    process.env.SUPERADMIN_EMAIL = 'superadmin@simak.local';
+    process.env.SUPERADMIN_PASSWORD = 'super-secret-password';
+    process.env.SHUTDOWN_TIMEOUT_MS = '5000';
+
+    const { getEnv } = await import('@/config/env');
+    const env = getEnv();
+    expect(env.SHUTDOWN_TIMEOUT_MS).toBe(5000);
+  });
 });
