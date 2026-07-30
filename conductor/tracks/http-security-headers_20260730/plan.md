@@ -81,11 +81,11 @@
     - [x] Document nonce lifecycle (generation → middleware → router context → auto-attach to scripts/styles)
     - [x] Document environment differences (Report-Only in dev, enforce in prod, HSTS prod-only)
     - [x] Add changelog entry
-- [ ] Task: Run full verification suite
-    - [ ] `pnpm typecheck`
-    - [ ] `pnpm lint`
-    - [ ] `pnpm test`
-    - [ ] `pnpm test:coverage` (verify ≥80% thresholds for new code)
-    - [ ] Verify `src/start.ts` + `src/lib/security-headers.ts` under 500 lines each (`node scripts/check-modularity.js`)
+- [x] Task: Run full verification suite
+    - [x] `pnpm typecheck`
+    - [x] `pnpm lint`
+    - [x] `pnpm test`
+    - [x] `pnpm test:coverage` (verify ≥80% thresholds for new code)
+    - [x] Verify `src/start.ts` + `src/lib/security-headers.ts` under 500 lines each (`node scripts/check-modularity.js`)
 - [ ] Task: Conductor - User Manual Verification 'Documentation & Final Verification' (Protocol in workflow.md)
 </protect>
