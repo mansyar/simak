@@ -54,7 +54,7 @@
     - [x] Run `pnpm test` and confirm all `server-fn.test.ts` tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Extend typedServerFn' (Protocol in workflow.md)
 
-## Phase 3: Update Existing Test Mocks for Middleware Chain
+## Phase 3: Update Existing Test Mocks for Middleware Chain [checkpoint: 9c1e119]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
 - [x] Task: Batch-update all test files that mock `@tanstack/react-start` to include `createMiddleware` + `middleware`
