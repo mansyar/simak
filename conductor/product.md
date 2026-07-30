@@ -583,4 +583,15 @@ Students and instructors lack a centralized system to:
 - **Full console.* migration** — All 41 `console.*` calls across 22 files in `src/lib/` and `src/server/` replaced with pino structured logger calls (zero `console.*` remaining, excluding `src/db/seed.ts` and `src/db/migrate.ts`); background jobs use `logger.child({ requestId: crypto.randomUUID() })` for request tracing; advisory failures use inline `logger.error({ event: 'advisory_failed', handler, error })` pattern uniformly
 - **Tests** — 3,849 tests pass across 379 test files; coverage ≥80% on all thresholds (stmts 87.92%, branches 80.91%, funcs 83.32%, lines 88.54%)
 
+### Track: HTTP Security Headers (TRACK-041) (July 2026)
+
+- **HTTP security headers middleware** — New `src/start.ts` with `createStart` instance; `securityHeadersMiddleware` (request middleware via `createMiddleware().server()`) generates a cryptographic nonce per request, builds CSP + security headers, sets them via `setResponseHeader()`, and passes the nonce to router context
+- **Nonce-based CSP** — `src/lib/security-headers.ts` pure functions: `generateNonce()` (16 random bytes → base64) and `buildSecurityHeaders(nonce, isProd, r2Domain?)` returning 6 headers (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, HSTS prod-only). 11 CSP directives including `default-src 'self'`, `script-src 'nonce-{nonce}' 'strict-dynamic'`, `object-src 'none'`, `frame-ancestors 'none'`
+- **Router nonce propagation** — `src/router.tsx` reads nonce from `getGlobalStartContext()` and passes it via `ssr: { nonce }` to `createRouter()`, auto-attaching nonces to all inline `<script>` and `<style>` tags during SSR
+- **CSRF middleware** — `createCsrfMiddleware({ filter: (ctx) => ctx.handlerType === 'serverFn' })` explicitly added to `requestMiddleware` array (not auto-installed when custom `src/start.ts` exists), matching TanStack Start's default behavior
+- **Environment differences** — Dev: `Content-Security-Policy-Report-Only` (violations logged, not blocked), no HSTS, no `upgrade-insecure-requests`. Prod: `Content-Security-Policy` (enforced), HSTS `max-age=31536000; includeSubDomains`, `upgrade-insecure-requests`
+- **R2 domain extraction** — `getR2Domain()` helper reads `R2_ENDPOINT` env var, extracts hostname via `new URL()`, and includes it in `connect-src`. Omitted gracefully if unset
+- **E2E test** — `tests/e2e/security-headers.spec.ts` verifies header presence + values on landing page and nonce uniqueness across requests
+- **Tests** — 3,881 tests pass across 382 test files; coverage ≥80% on all thresholds (stmts 87.84%, branches 80.96%, funcs 83.24%, lines 88.47%); `security-headers.ts` at 100% coverage
+
 </protect>
