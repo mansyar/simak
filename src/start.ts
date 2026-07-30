@@ -3,7 +3,7 @@ import { setResponseHeader } from '@tanstack/react-start/server';
 
 import { generateNonce, buildSecurityHeaders } from '@/lib/security-headers';
 
-function getR2Domain(): string | undefined {
+export function getR2Domain(): string | undefined {
   const endpoint = process.env.R2_ENDPOINT;
   if (!endpoint) return undefined;
   try {
