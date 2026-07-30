@@ -1,7 +1,7 @@
 <protect>
 # Implementation Plan: TRACK-043 — Application-Level Rate Limiting on Server Functions
 
-## Phase 1: Rate Limit Infrastructure (ErrorCode + rate-limiter module)
+## Phase 1: Rate Limit Infrastructure (ErrorCode + rate-limiter module) [checkpoint: 11debcf]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
 - [x] Task: Write tests for `RATE_LIMITED` error code (TDD Red Phase)
