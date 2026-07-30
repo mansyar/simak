@@ -57,13 +57,13 @@
 
 ## Phase 3: Documentation & Final Verification
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Update `conductor/tech-stack.md` with DB pool configuration changelog entry
-    - [ ] Add dated note (2026-07-30) documenting: explicit pool config on postgres.js (`max`, `idle_timeout`, `connect_timeout`, `max_lifetime`, `prepare`), matching `prepare` on Drizzle, `onnotice` routing through pino, new env vars `DB_POOL_MAX` + `DB_PREPARED_STATEMENTS_DISABLED`, pool sizing guidance (default 10 for single-instance Coolify), PgBouncer transaction pooling notes (`DB_PREPARED_STATEMENTS_DISABLED=true`)
-- [ ] Task: Run full quality gate suite
-    - [ ] Run `pnpm test:coverage` — verify >=80% on lines, statements, branches, functions
-    - [ ] Run `pnpm typecheck` — verify clean
-    - [ ] Run `pnpm lint` — verify clean (0 errors)
-    - [ ] Run `pnpm check:i18n` — verify EN<->ID parity (no new i18n keys needed for this track, but verify no breakage)
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Documentation & Final Verification' (Protocol in workflow.md)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
+- [x] Task: Update `conductor/tech-stack.md` with DB pool configuration changelog entry `b49f6609`
+    - [x] Add dated note (2026-07-30) documenting: explicit pool config on postgres.js (`max`, `idle_timeout`, `connect_timeout`, `max_lifetime`, `prepare`), matching `prepare` on Drizzle, `onnotice` routing through pino, new env vars `DB_POOL_MAX` + `DB_PREPARED_STATEMENTS_DISABLED`, pool sizing guidance (default 10 for single-instance Coolify), PgBouncer transaction pooling notes (`DB_PREPARED_STATEMENTS_DISABLED=true`)
+- [x] Task: Run full quality gate suite
+    - [x] Run `pnpm test:coverage` — verify >=80% on lines, statements, branches, functions — PASS (380 files, 3867 tests, stmts 87.94%, branches 80.93%, funcs 83.4%, lines 88.56%)
+    - [x] Run `pnpm typecheck` — verify clean — PASS
+    - [x] Run `pnpm lint` — verify clean (0 errors) — PASS (0 errors, 4 pre-existing warnings)
+    - [x] Run `pnpm check:i18n` — verify EN<->ID parity (no new i18n keys needed for this track, but verify no breakage) — PASS (783 used, 966 EN/966 ID)
+- [~] Task: Conductor - User Manual Verification 'Phase 3: Documentation & Final Verification' (Protocol in workflow.md)
 </protect>
