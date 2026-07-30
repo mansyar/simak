@@ -73,7 +73,7 @@
     - [x] Verify hydration scripts load (no `script-src` violations) — Nonce-based script-src with strict-dynamic, verified nonce in HTML
 - [x] Task: Conductor - User Manual Verification 'E2E Test' (Protocol in workflow.md)
 
-## Phase 5: Documentation & Final Verification
+## Phase 5: Documentation & Final Verification [checkpoint: e9a805f]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
 - [x] Task: Update `conductor/tech-stack.md` [147b75cc]
