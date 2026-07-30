@@ -11,7 +11,12 @@
   - [x] Run `pnpm test:coverage`, `pnpm typecheck`, and `pnpm lint`.
   - [x] Build the production image using `docker/Dockerfile`.
   - [x] Verify the image contains the app, migration runner, seed runner, migrations, and `/api/health` health check.
-- [ ] Task: Document the release baseline and pre-deployment prerequisites.
+- [~] Task: Document the release baseline and pre-deployment prerequisites.
+  - Release candidate: `5adf406d` (`fix(build): restore production Docker build`), built locally as `simak:pilot-baseline`.
+  - Quality evidence: coverage (3,948 tests; statements 89.35%, branches 81.05%, functions 83.44%, lines 90.09%), typecheck, lint (0 errors), `pnpm build`, and Docker artifact checks pass.
+  - Before Coolify configuration, the operator needs: Coolify project access, repository access to this branch, control of the pilot-domain DNS zone, and a Coolify-managed PostgreSQL 16 service with persistent storage.
+  - Coolify-only configuration inventory: `DATABASE_URL`, `MIGRATE_DATABASE_URL`, `RESEND_API_KEY`, `EMAIL_FROM`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`, and all five R2 values (`R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`). Optional runtime settings are `LOG_LEVEL`, `DB_POOL_MAX`, and `SHUTDOWN_TIMEOUT_MS`; set `DB_PREPARED_STATEMENTS_DISABLED=true` only when PgBouncer is used.
+  - Keep all secret values in Coolify, prepare a backup before the first migration, and run `node .output/server/seed.mjs` once only after the initial deployment is healthy.
 - [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 
 ## Phase 1: Provision Coolify Pilot Infrastructure
