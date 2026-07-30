@@ -13,6 +13,8 @@ const { mockEnv } = vi.hoisted(() => ({
     SUPERADMIN_EMAIL: 'test@test.com',
     SUPERADMIN_PASSWORD: 'password123',
     EMAIL_FROM: 'test@test.com',
+    DB_POOL_MAX: 10,
+    DB_PREPARED_STATEMENTS_DISABLED: false,
   },
 }));
 

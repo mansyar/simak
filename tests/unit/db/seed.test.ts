@@ -1,5 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// Mock logger to prevent getEnv() call at module load (seed.ts imports @/db/index which imports @/lib/logger)
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
 describe('Seed script', () => {
   beforeEach(() => {
     vi.resetModules();

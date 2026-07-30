@@ -147,7 +147,7 @@ simak/
 
 ## Deployment
 
-The app is deployed via Docker on a VPS using Coolify. The multi-stage Dockerfile builds the app and bundles migration + seed runners. In production, PgBouncer handles connection pooling, and `MIGRATE_DATABASE_URL` bypasses it for migrations.
+The app is deployed via Docker on a VPS using Coolify. The multi-stage Dockerfile builds the app and bundles migration + seed runners. In production, PgBouncer handles connection pooling — set `DB_PREPARED_STATEMENTS_DISABLED=true` so the postgres.js client uses `prepare: false` (PgBouncer's transaction-mode pooling is incompatible with prepared statements) — and `MIGRATE_DATABASE_URL` bypasses PgBouncer for migrations. The application pool (`src/db/index.ts`) is configured with explicit lifecycle options (`DB_POOL_MAX` default 10, 30s idle timeout, 10s connect timeout, 30-min max lifetime), reads `DATABASE_URL` via Zod-validated `getEnv()`, and routes PostgreSQL notices through the structured `pino` logger.
 
 ```bash
 docker build -f docker/Dockerfile -t simak .

@@ -583,4 +583,13 @@ Students and instructors lack a centralized system to:
 - **Full console.* migration** — All 41 `console.*` calls across 22 files in `src/lib/` and `src/server/` replaced with pino structured logger calls (zero `console.*` remaining, excluding `src/db/seed.ts` and `src/db/migrate.ts`); background jobs use `logger.child({ requestId: crypto.randomUUID() })` for request tracing; advisory failures use inline `logger.error({ event: 'advisory_failed', handler, error })` pattern uniformly
 - **Tests** — 3,849 tests pass across 379 test files; coverage ≥80% on all thresholds (stmts 87.92%, branches 80.91%, funcs 83.32%, lines 88.54%)
 
+### Track: Database Connection Pool Configuration (TRACK-042) (July 2026)
+
+- **Explicit pool configuration** — `postgres()` client in `src/db/index.ts` now receives explicit pool settings: `max` (DB_POOL_MAX, default 10), `idle_timeout` (30s), `connect_timeout` (10s), `max_lifetime` (30min), `prepare` (toggleable via DB_PREPARED_STATEMENTS_DISABLED for PgBouncer compatibility)
+- **getEnv() migration** — `getDb()` now reads `DATABASE_URL` via Zod-validated `getEnv()` instead of `process.env` directly; manual guard removed
+- **PostgreSQL notice routing** — `onnotice` callback routes PG NOTICE messages through the pino structured logger at `debug` level, consistent with TRACK-040
+- **New env vars** — `DB_POOL_MAX` (coerced integer, default 10) and `DB_PREPARED_STATEMENTS_DISABLED` (custom string-to-boolean transform, default false) added to Zod schema and documented in `.env.example`
+- **FR-3 deviation** — `prepare` was NOT added to the `drizzle()` call because drizzle-orm 0.45.2's DrizzleConfig type doesn't support `prepare`; the postgres.js client setting is sufficient
+- **Tests** — 3,867 tests pass across 380 test files; coverage ≥80% on all thresholds (stmts 87.94%, branches 80.93%, funcs 83.4%, lines 88.56%)
+
 </protect>
