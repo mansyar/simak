@@ -13,6 +13,7 @@ let isRunning = false;
 let lastPruneAt: Date | null = null;
 let lastReminderScanAt: Date | null = null;
 let lastR2CleanupAt: Date | null = null;
+let currentTickPromise: Promise<void> | null = null;
 
 async function tick(): Promise<void> {
   if (isRunning) return;
@@ -78,17 +79,22 @@ export function startEmailQueue(): void {
   if (intervalId !== null) return;
 
   reclaimAllProcessingRows().then(() => {
-    tick();
-    intervalId = setInterval(tick, POLL_INTERVAL_MS);
+    currentTickPromise = tick();
+    intervalId = setInterval(() => {
+      if (!isRunning) currentTickPromise = tick();
+    }, POLL_INTERVAL_MS);
   });
 }
 
 /**
- * Stop the background email queue processor.
+ * Stop the background email queue processor and drain any in-flight tick.
  */
-export function stopEmailQueue(): void {
+export async function stopGracefully(): Promise<void> {
   if (intervalId !== null) {
     clearInterval(intervalId);
     intervalId = null;
+  }
+  if (currentTickPromise) {
+    await currentTickPromise;
   }
 }

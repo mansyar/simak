@@ -63,8 +63,14 @@ describe('email-queue-init', () => {
   }
 
   it('skips overlapping ticks while a previous tick is in flight', async () => {
-    const processMock = mockProcessor(() => new Promise(() => {}));
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    let resolveTick!: () => void;
+    const processMock = mockProcessor(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveTick = resolve;
+        }),
+    );
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -74,7 +80,8 @@ describe('email-queue-init', () => {
     await vi.advanceTimersByTimeAsync(0);
 
     expect(processMock).toHaveBeenCalledTimes(1);
-    stopEmailQueue();
+    resolveTick();
+    await stopGracefully();
   });
 
   it('resets isRunning guard after a tick errors so the next tick runs', async () => {
@@ -83,7 +90,7 @@ describe('email-queue-init', () => {
       call += 1;
       return call === 1 ? Promise.reject(new Error('tick failed')) : Promise.resolve();
     });
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -93,12 +100,12 @@ describe('email-queue-init', () => {
     await vi.advanceTimersByTimeAsync(0);
 
     expect(processMock).toHaveBeenCalledTimes(2);
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('logs structured error when tick throws', async () => {
     mockProcessor(() => Promise.reject(new Error('tick failed')));
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -112,25 +119,25 @@ describe('email-queue-init', () => {
       error: 'tick failed',
       willRetryNextInterval: true,
     });
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('calls pruneOldEmails on first tick (lastPruneAt is null)', async () => {
     mockProcessor(() => Promise.resolve());
     pruneMock.mockResolvedValue({ deleted: 3 });
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
 
     expect(pruneMock).toHaveBeenCalledTimes(1);
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('does not call pruneOldEmails again within 24h of last prune', async () => {
     mockProcessor(() => Promise.resolve());
     pruneMock.mockResolvedValue({ deleted: 0 });
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -143,13 +150,13 @@ describe('email-queue-init', () => {
     }
     expect(pruneMock).toHaveBeenCalledTimes(1);
 
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('calls pruneOldEmails again after >24h since last prune', async () => {
     mockProcessor(() => Promise.resolve());
     pruneMock.mockResolvedValue({ deleted: 2 });
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -160,13 +167,13 @@ describe('email-queue-init', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(pruneMock).toHaveBeenCalledTimes(2);
 
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('logs email_queue.retention_pruned with deleted count and no PII', async () => {
     mockProcessor(() => Promise.resolve());
     pruneMock.mockResolvedValue({ deleted: 5 });
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -183,23 +190,23 @@ describe('email-queue-init', () => {
     expect(logJson).not.toContain('@');
     expect(logJson).not.toContain('recipient');
     expect(logJson).not.toContain('subject');
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('calls processDeadlineReminders on first tick (lastReminderScanAt is null)', async () => {
     mockProcessor(() => Promise.resolve());
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
 
     expect(scannerMock).toHaveBeenCalledTimes(1);
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('does not call processDeadlineReminders again within 1h of last scan', async () => {
     mockProcessor(() => Promise.resolve());
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -211,12 +218,12 @@ describe('email-queue-init', () => {
     }
     expect(scannerMock).toHaveBeenCalledTimes(1);
 
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('calls processDeadlineReminders again after >1h since last scan', async () => {
     mockProcessor(() => Promise.resolve());
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -226,13 +233,13 @@ describe('email-queue-init', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(scannerMock).toHaveBeenCalledTimes(2);
 
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('scanner failure is isolated — email processing continues on next tick', async () => {
     const processMock = mockProcessor(() => Promise.resolve());
     scannerMock.mockRejectedValueOnce(new Error('scanner failed'));
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -243,14 +250,14 @@ describe('email-queue-init', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(processMock).toHaveBeenCalledTimes(2);
 
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('logs structured error when scanner throws but tick continues to prune', async () => {
     mockProcessor(() => Promise.resolve());
     scannerMock.mockRejectedValueOnce(new Error('scanner failed'));
     pruneMock.mockResolvedValue({ deleted: 7 });
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -265,23 +272,23 @@ describe('email-queue-init', () => {
     });
 
     expect(pruneMock).toHaveBeenCalledTimes(1);
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('calls processOrphanedR2Objects on first tick (lastR2CleanupAt is null)', async () => {
     mockProcessor(() => Promise.resolve());
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
 
     expect(r2CleanupMock).toHaveBeenCalledTimes(1);
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('does not call processOrphanedR2Objects again within 6h of last cleanup', async () => {
     mockProcessor(() => Promise.resolve());
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -293,12 +300,12 @@ describe('email-queue-init', () => {
     }
     expect(r2CleanupMock).toHaveBeenCalledTimes(1);
 
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('calls processOrphanedR2Objects again after >6h since last cleanup', async () => {
     mockProcessor(() => Promise.resolve());
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -308,13 +315,13 @@ describe('email-queue-init', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(r2CleanupMock).toHaveBeenCalledTimes(2);
 
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('R2 cleanup failure is isolated — email processing continues on next tick', async () => {
     const processMock = mockProcessor(() => Promise.resolve());
     r2CleanupMock.mockRejectedValueOnce(new Error('r2 cleanup failed'));
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -325,13 +332,13 @@ describe('email-queue-init', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(processMock).toHaveBeenCalledTimes(2);
 
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('logs structured error when R2 cleanup throws', async () => {
     mockProcessor(() => Promise.resolve());
     r2CleanupMock.mockRejectedValueOnce(new Error('r2 cleanup failed'));
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
@@ -345,18 +352,53 @@ describe('email-queue-init', () => {
       error: 'r2 cleanup failed',
     });
 
-    stopEmailQueue();
+    await stopGracefully();
   });
 
   it('calls reclaimAllProcessingRows before first tick on startEmailQueue', async () => {
     const processMock = mockProcessor(() => Promise.resolve());
-    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
     await vi.advanceTimersByTimeAsync(0);
 
     expect(reclaimMock).toHaveBeenCalledTimes(1);
     expect(processMock).toHaveBeenCalledTimes(1);
-    stopEmailQueue();
+    await stopGracefully();
+  });
+
+  it('stopGracefully is a no-op when startEmailQueue was never called', async () => {
+    mockProcessor(() => Promise.resolve());
+    const { stopGracefully } = await import('@/lib/email-queue-init');
+    await expect(stopGracefully()).resolves.not.toThrow();
+  });
+
+  it('stopGracefully awaits in-flight tick before resolving', async () => {
+    let resolveTick!: () => void;
+    const processMock = mockProcessor(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveTick = resolve;
+        }),
+    );
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(processMock).toHaveBeenCalledTimes(1);
+
+    let stopResolved = false;
+    stopGracefully().then(() => {
+      stopResolved = true;
+    });
+
+    await vi.advanceTimersByTimeAsync(0);
+    expect(stopResolved).toBe(false);
+
+    resolveTick();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(stopResolved).toBe(true);
   });
 });
