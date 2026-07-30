@@ -1,6 +1,8 @@
 import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import { getEnv } from '@/config/env';
+import { logger } from '@/lib/logger';
 import * as schema from './schema/index';
 
 export type Db = PostgresJsDatabase<typeof schema>;
@@ -10,12 +12,15 @@ let _db: Db | null = null;
 export function getDb(): Db {
   if (_db) return _db;
 
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    throw new Error('DATABASE_URL environment variable is required.');
-  }
-
-  const client = postgres(databaseUrl);
+  const env = getEnv();
+  const client = postgres(env.DATABASE_URL, {
+    max: env.DB_POOL_MAX,
+    idle_timeout: 30,
+    connect_timeout: 10,
+    max_lifetime: 60 * 30,
+    prepare: !env.DB_PREPARED_STATEMENTS_DISABLED,
+    onnotice: (notice) => logger.debug({ event: 'pg_notice', ...notice }),
+  });
   _db = drizzle(client, { schema });
   return _db;
 }
