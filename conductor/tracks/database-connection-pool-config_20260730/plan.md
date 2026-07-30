@@ -26,32 +26,34 @@
 
 ## Phase 2: Database Pool Configuration
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Write tests for `getDb()` pool configuration (TDD Red Phase)
-    - [ ] Add tests in `tests/unit/db/client.test.ts` (or new `tests/unit/db/pool-config.test.ts`): mock `postgres` and `drizzle-orm/postgres-js` to capture constructor arguments
-    - [ ] Test: `getDb()` calls `postgres()` with `max` equal to `env.DB_POOL_MAX` (default 10)
-    - [ ] Test: `postgres()` called with `idle_timeout: 30`
-    - [ ] Test: `postgres()` called with `connect_timeout: 10`
-    - [ ] Test: `postgres()` called with `max_lifetime: 1800` (60 * 30)
-    - [ ] Test: `postgres()` called with `prepare: true` when `DB_PREPARED_STATEMENTS_DISABLED` is unset/false
-    - [ ] Test: `postgres()` called with `prepare: false` when `DB_PREPARED_STATEMENTS_DISABLED='true'` (PgBouncer compatibility)
-    - [ ] Test: `drizzle()` called with matching `prepare` option (same value as postgres.js client)
-    - [ ] Test: `postgres()` called with `onnotice` callback function
-    - [ ] Test: `getDb()` singleton invariant preserved (returns cached instance on repeated calls)
-    - [ ] Run `pnpm test` and confirm new tests fail (pool config not yet implemented)
-- [ ] Task: Implement pool configuration in `src/db/index.ts` (TDD Green Phase)
-    - [ ] Import `getEnv` from `@/config/env` and `logger` from `@/lib/logger`
-    - [ ] Replace `process.env.DATABASE_URL` with `getEnv().DATABASE_URL` in `getDb()`
-    - [ ] Remove manual `if (!databaseUrl) throw new Error(...)` guard (getEnv handles validation)
-    - [ ] Add pool config options to `postgres()` call: `max`, `idle_timeout`, `connect_timeout`, `max_lifetime`, `prepare`, `onnotice`
-    - [ ] Add `onnotice: (notice) => logger.debug({ event: 'pg_notice', ...notice })` callback
-    - [ ] Add `prepare: !env.DB_PREPARED_STATEMENTS_DISABLED` to `drizzle()` call
-    - [ ] Run `pnpm test` and confirm all pool config tests pass
-- [ ] Task: Update existing `tests/unit/db/client.test.ts` for `getEnv()` migration
-    - [ ] The test currently sets only `process.env.DATABASE_URL` (line 4) — after migration to `getEnv()`, ALL required env vars must be set (getEnv validates the full schema)
-    - [ ] Add all required env vars (`RESEND_API_KEY`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`) to the test setup
-    - [ ] Verify singleton and CRUD method tests still pass with the new env setup
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Database Pool Configuration' (Protocol in workflow.md)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
+- [x] Task: Write tests for `getDb()` pool configuration (TDD Red Phase) `f21e0756`
+    - [x] Add tests in new `tests/unit/db/pool-config.test.ts`: mock `postgres` and `drizzle-orm/postgres-js` to capture constructor arguments
+    - [x] Test: `getDb()` calls `postgres()` with `max` equal to `env.DB_POOL_MAX` (default 10)
+    - [x] Test: `postgres()` called with `idle_timeout: 30`
+    - [x] Test: `postgres()` called with `connect_timeout: 10`
+    - [x] Test: `postgres()` called with `max_lifetime: 1800` (60 * 30)
+    - [x] Test: `postgres()` called with `prepare: true` when `DB_PREPARED_STATEMENTS_DISABLED` is unset/false
+    - [x] Test: `postgres()` called with `prepare: false` when `DB_PREPARED_STATEMENTS_DISABLED='true'` (PgBouncer compatibility)
+    - [x] ~~Test: `drizzle()` called with matching `prepare` option~~ — REMOVED: drizzle-orm 0.45.2 DrizzleConfig type does not support `prepare`
+    - [x] Test: `postgres()` called with `onnotice` callback function
+    - [x] Test: `getDb()` singleton invariant preserved (returns cached instance on repeated calls)
+    - [x] Run `pnpm test` and confirm new tests fail (pool config not yet implemented) — 11 failed, 1 passed (singleton)
+- [x] Task: Implement pool configuration in `src/db/index.ts` (TDD Green Phase) `f21e0756`
+    - [x] Import `getEnv` from `@/config/env` and `logger` from `@/lib/logger`
+    - [x] Replace `process.env.DATABASE_URL` with `getEnv().DATABASE_URL` in `getDb()`
+    - [x] Remove manual `if (!databaseUrl) throw new Error(...)` guard (getEnv handles validation)
+    - [x] Add pool config options to `postgres()` call: `max`, `idle_timeout`, `connect_timeout`, `max_lifetime`, `prepare`, `onnotice`
+    - [x] Add `onnotice: (notice) => logger.debug({ event: 'pg_notice', ...notice })` callback
+    - [x] ~~Add `prepare: !env.DB_PREPARED_STATEMENTS_DISABLED` to `drizzle()` call~~ — DEVIATION from FR-3: drizzle-orm 0.45.2 DrizzleConfig type does not include `prepare`. The `prepare` on postgres.js client (FR-2) is sufficient.
+    - [x] Run `pnpm test` and confirm all pool config tests pass (10 tests pass)
+- [x] Task: Update existing `tests/unit/db/client.test.ts` for `getEnv()` migration `f21e0756`
+    - [x] The test currently sets only `process.env.DATABASE_URL` (line 4) — after migration to `getEnv()`, ALL required env vars must be set (getEnv validates the full schema)
+    - [x] Add all required env vars (`RESEND_API_KEY`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`) to the test setup
+    - [x] Verify singleton and CRUD method tests still pass with the new env setup
+    - [x] Also fixed `tests/unit/db/seed.test.ts` — added `vi.mock('@/lib/logger', ...)` to prevent getEnv() call at module load
+    - [x] Also fixed 3 email template test files (`email-templates.test.ts`, `email-templates-at-risk.test.ts`, `email-templates-discussion-reply.test.ts`) — added `LOG_LEVEL: 'info'` to mock getEnv()
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Database Pool Configuration' (Protocol in workflow.md)
 
 ## Phase 3: Documentation & Final Verification
 
