@@ -122,14 +122,14 @@
 
 ## Phase 5: Documentation & Final Verification
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Document rate limit catalog in `conductor/tech-stack.md`
-    - [ ] Add dated note (2026-07-30) documenting: application-level rate limiting via `typedServerFn` `rateLimit` config; in-memory sliding window (`src/lib/rate-limiter.ts`); 4-tier presets (`RATE_LIMITS.presignedUrl` 20/min, `heavyMutation` 10/min, `destructive` 5/min, `standardRead` 60/min); per-user + per-function isolation (`userId + ':' + fnId`); unauthenticated pass-through; `RATE_LIMITED` error code; single-instance (in-memory) — Redis deferred for multi-instance; `.middleware()` method added to `TypedBuilder` (shared with TRACK-044)
-- [ ] Task: Run full quality gate suite
-    - [ ] Run `pnpm test:coverage` — verify >=80% on lines, statements, branches, functions
-    - [ ] Run `pnpm typecheck` — verify clean
-    - [ ] Run `pnpm lint` — verify clean (0 errors)
-    - [ ] Run `pnpm check:i18n` — verify EN<->ID parity (no new i18n keys needed for this track, but verify no breakage)
-    - [ ] Verify no file in `src/`, `tests/`, `scripts/` exceeds 500 lines (`scripts/check-modularity.js`)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
+- [x] Task: Document rate limit catalog in `conductor/tech-stack.md`
+    - [x] Add dated note (2026-07-30) documenting: application-level rate limiting via `typedServerFn` `rateLimit` config; in-memory sliding window (`src/lib/rate-limiter.ts`); 4-tier presets (`RATE_LIMITS.presignedUrl` 20/min, `heavyMutation` 10/min, `destructive` 5/min, `standardRead` 60/min); per-user + per-function isolation (`userId + ':' + fnId`); unauthenticated pass-through; `RATE_LIMITED` error code; single-instance (in-memory) — Redis deferred for multi-instance; `.middleware()` method added to `TypedBuilder` (shared with TRACK-044)
+- [x] Task: Run full quality gate suite
+    - [x] Run `pnpm test:coverage` — verify >=80% on lines, statements, branches, functions
+    - [x] Run `pnpm typecheck` — verify clean
+    - [x] Run `pnpm lint` — verify clean (0 errors)
+    - [x] Run `pnpm check:i18n` — verify EN<->ID parity (no new i18n keys needed for this track, but verify no breakage)
+    - [x] Verify no file in `src/`, `tests/`, `scripts/` exceeds 500 lines (`scripts/check-modularity.js`)
 - [ ] Task: Conductor - User Manual Verification 'Phase 5: Documentation & Final Verification' (Protocol in workflow.md)
 </protect>

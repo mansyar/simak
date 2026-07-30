@@ -88,6 +88,48 @@ Comprehensive HTTP security headers are set per-request via TanStack Start middl
 **CSRF middleware:**
 When a custom `src/start.ts` exists, TanStack Start does NOT auto-install CSRF middleware. `createCsrfMiddleware({ filter: (ctx) => ctx.handlerType === 'serverFn' })` is explicitly added to the `requestMiddleware` array, matching TanStack Start's default behavior (CSRF validation only on server function POST requests, not GET page navigations).
 
+### Application-Level Rate Limiting (TRACK-043)
+
+Rate limiting is enforced at the `typedServerFn` layer — the single entry point for all authenticated server functions. Better Auth's built-in rate limiting only covers `/api/auth/*` endpoints; this track extends protection to all application server functions (assignments, submissions, reviews, file uploads, etc.).
+
+**Implementation files:**
+- `src/lib/rate-limiter.ts` — `RATE_LIMITS` presets, `checkRateLimit()` sliding window logic, `createRateLimitMiddleware()` middleware factory, module-level `rateLimitStore` Map
+- `src/lib/server-fn.ts` — `typedServerFn()` accepts optional `rateLimit?: RateLimitConfig`; chains `createRateLimitMiddleware()` via `.middleware()` when provided; pass-through when omitted
+- `src/lib/errors.ts` — `RATE_LIMITED` error code added to `ErrorCode` enum
+- `src/lib/toast.ts` — `RATE_LIMITED` mapped to `error.rateLimited` i18n key
+
+**Rate limit tiers:**
+
+| Tier | Preset | Limit | Use Case | Example Functions |
+|------|--------|-------|----------|-------------------|
+| 1 | `RATE_LIMITS.presignedUrl` | 20/min | R2 presigned URL generation (cost abuse prevention) | `getPresignedUploadUrl`, `getPresignedDownloadUrl`, `getPresignedAvatarUploadUrl` |
+| 2 | `RATE_LIMITS.heavyMutation` | 10/min | High-impact mutations (submissions, reviews) | `submitCheckpoint`, `submitReview`, `openForReview` |
+| 3 | `RATE_LIMITS.destructive` | 5/min | Destructive or admin-level operations | `createAssignment`, `deleteTemplate`, `createUser`, `extendDeadline`, `approveExtension`, `enableTwoFactor` |
+| 4 | `RATE_LIMITS.standardRead` | 60/min | Standard read queries (dashboards, lists, detail views) | `listUsers`, `getAssignmentDetail`, `getStudentDashboardData`, `listAuditLogs` |
+
+**Sliding window algorithm:**
+Each `(userId, fnId)` pair has an independent entry in the in-memory `Map`. The window resets when the configured `window` time (in ms) elapses since first request. Requests under `max` increment the counter and are allowed. Requests at or above `max` are denied without incrementing (preventing permanent lockout after window expiry).
+
+**Exempt functions (no rateLimit):**
+- `auth.ts`: `_getSession` — internal helper, cascading/infinite-loop concern
+- `notifications.ts`: `getUnreadCount`, `markRead`, `markAllRead` — high-frequency UX (30s polling)
+- `setup-password.ts`: `completePasswordSetup` — token-based, no session required
+
+**Per-user + per-function isolation:**
+The rate limit key is `userId + ':' + fnId`, where `fnId` is an auto-incrementing counter assigned per middleware instance. This means a user hitting `listUsers` 60 times in a minute does NOT affect their ability to call `getAssignmentDetail` — each function has its own independent counter.
+
+**Unauthenticated pass-through:**
+`createRateLimitMiddleware()` calls `getSessionFromHeaders()`. If no session is found, the middleware passes through to `next()` without rate limiting. Unauthenticated requests are rejected by route guards before reaching protected server functions.
+
+**Error handling:**
+When a rate limit is exceeded, the middleware short-circuits with `serverError(RATE_LIMITED, 'Rate limit exceeded')`. The client-side toast system maps this to the `error.rateLimited` i18n key: "Too many requests. Please wait a moment and try again." (EN) / "Terlalu banyak permintaan. Mohon tunggu sebentar dan coba lagi." (ID).
+
+**Single-instance scope:**
+The in-memory `Map` store is sufficient for the current single-instance Coolify deployment. Multi-instance support (Redis-backed store) is deferred to a future track.
+
+**`.middleware()` method on `TypedBuilder`:**
+The `.middleware(middlewares: unknown[]): TypedBuilder` method was added to the `TypedBuilder` interface in `src/lib/server-fn.ts`. This is shared infrastructure — TRACK-044 (request-scoped context) also uses `.middleware()` to inject request context into server functions.
+
 ## Testing & Quality
 
 | Component                  | Technology                           | Purpose                                                 |
@@ -114,5 +156,6 @@ When a custom `src/start.ts` exists, TanStack Start does NOT auto-install CSRF m
 - **2026-07-29:** Added `pino` (production dependency) and `pino-pretty` (devDependency) for structured logging (TRACK-040). New `src/lib/logger.ts` — singleton pino instance with env-based config (`LOG_LEVEL` env var, default `info`). Production: JSON to stdout. Dev: `pino-pretty` (lazy-loaded via `createRequire` to avoid bundling in prod). New `src/lib/request-context.ts` — TanStack Start `createMiddleware({ type: 'request' })` for request ID propagation (`x-request-id` header → UUID → `logger.child({ requestId })`). `logError()` in `src/lib/errors.ts` refactored to route through `logger.error(entry)` instead of `console.error`. All 41 `console.*` calls in `src/lib/` and `src/server/` migrated to pino (zero `console.*` remaining, excluding `src/db/seed.ts` and `src/db/migrate.ts`).
 - **2026-07-30:** Added HTTP security headers with nonce-based CSP (TRACK-041). New `src/lib/security-headers.ts` (`generateNonce()` + `buildSecurityHeaders()`), `src/start.ts` (`createStart` instance with `securityHeadersMiddleware` + `createCsrfMiddleware`). Updated `src/router.tsx` with `getGlobalStartContext()` nonce extraction + `ssr: { nonce }`. CSP directives enforce strict defaults (`default-src 'self'`, `script-src 'nonce-{nonce}' 'strict-dynamic'`, `object-src 'none'`, etc.). Report-Only in dev, enforced in prod. HSTS and `upgrade-insecure-requests` prod-only. R2 domain auto-extracted from `R2_ENDPOINT` for `connect-src`.
 - **2026-07-30:** Configured explicit connection pool settings on postgres.js client in `src/db/index.ts` (TRACK-042). Migrated `getDb()` to use `getEnv()` instead of `process.env.DATABASE_URL` (removes manual guard — Zod validation handles it). Pool config: `max`=`DB_POOL_MAX` (default 10, suitable for single-instance Coolify), `idle_timeout`=30s, `connect_timeout`=10s, `max_lifetime`=1800s (30 min). `prepare` flag controlled by `DB_PREPARED_STATEMENTS_DISABLED` env var (set to `true` for PgBouncer transaction pooling compatibility). `onnotice` callback routes PostgreSQL notices through pino at debug level. New env vars: `DB_POOL_MAX` (`z.coerce.number().int().positive().default(10)`), `DB_PREPARED_STATEMENTS_DISABLED` (custom string-to-boolean transform — `val === 'true'`, default `false`; NOT `z.coerce.boolean()` which returns `true` for the string `'false'`). **Deviation from spec (FR-3):** `prepare` was NOT added to the `drizzle()` call because drizzle-orm 0.45.2's `DrizzleConfig` type does not include a `prepare` property. The `prepare` option on the postgres.js client (FR-2) is sufficient — Drizzle uses the underlying client's settings.
+- **2026-07-30:** Added application-level rate limiting on all authenticated TanStack Start server functions via `typedServerFn` `rateLimit` config (TRACK-043). New `src/lib/rate-limiter.ts` — in-memory sliding window with 4-tier `RATE_LIMITS` presets (`presignedUrl` 20/min, `heavyMutation` 10/min, `destructive` 5/min, `standardRead` 60/min). Per-user + per-function isolation (`userId:fnId` key). Unauthenticated pass-through. `RATE_LIMITED` error code added to `src/lib/errors.ts`; mapped to `error.rateLimited` i18n key in `src/lib/toast.ts` (EN/ID). `.middleware()` method added to `TypedBuilder` interface in `src/lib/server-fn.ts` (shared with TRACK-044). 85 server functions annotated across 22 stub files. Exempt: `_getSession`, `getUnreadCount`/`markRead`/`markAllRead` (high-freq UX), `completePasswordSetup` (token-based). Single-instance in-memory `Map` — Redis deferred for multi-instance.
 
 </protect>
