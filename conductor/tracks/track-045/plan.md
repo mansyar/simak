@@ -23,7 +23,7 @@ These are the building blocks that the shutdown handler depends on.
 
 Eliminate the up-to-5-minute delay before stuck `processing` rows are reclaimed on restart.
 
-- [ ] **Task 2.1: Add `reclaimAllProcessingRows()` to `src/lib/email-queue-processor.ts`**
+- [x] **Task 2.1: Add `reclaimAllProcessingRows()` to `src/lib/email-queue-processor.ts`** (commit `4c667df7`)
   - [ ] Write tests for `reclaimAllProcessingRows()`: updates ALL `status='processing'` rows to `pending` (no time threshold); logs reclaimed count via `email_queue.startup_reclaimed` event; returns `{ reclaimed: number }`
   - [ ] Implement: `UPDATE emailQueue SET status = 'pending' WHERE status = 'processing'` — no `lt(lastAttemptAt, threshold)` condition (unlike the existing in-tick reclaim which uses 5-min threshold)
   - [ ] Verify tests pass
