@@ -99,12 +99,7 @@ describe('shutdown', () => {
   });
 
   it('second signal during drain immediately calls exit(1)', async () => {
-    let _resolve!: () => void;
-    mockStopGracefully.mockReturnValue(
-      new Promise<void>((resolve) => {
-        _resolve = resolve;
-      }),
-    );
+    mockStopGracefully.mockReturnValue(new Promise<void>(() => {}));
 
     const { registerShutdownHandlers } = await import('@/lib/shutdown');
     registerShutdownHandlers();
@@ -119,8 +114,6 @@ describe('shutdown', () => {
     expect(mockLogger.warn).toHaveBeenCalledWith(
       expect.objectContaining({ event: 'shutdown.force_exit' }),
     );
-
-    _resolve();
   });
 
   it('timeout forces exit(1) when drain does not complete in time', async () => {
