@@ -170,7 +170,7 @@ simak/
     │   │   └── health.server.ts    → Health check handler (runHealthChecks — DB, R2, email queue checks with 2s timeouts, generic error messages)
 │   ├── db/
 │   │   ├── schema/           → Drizzle schema (split by domain)
-│   │   ├── index.ts          → Database client — postgres.js + Drizzle with explicit pool config (`max`/`idle_timeout`/`connect_timeout`/`max_lifetime`/`prepare`), `onnotice` routed through pino, `getDb()` uses `getEnv()`. (TRACK-042)
+│   │   ├── index.ts          → Database client — postgres.js + Drizzle with explicit pool config (`max`/`idle_timeout`/`connect_timeout`/`max_lifetime`/`prepare`), `onnotice` routed through pino, `getDb()` uses `getEnv()`. `closeDb()` closes the pool via `client.end()` for graceful shutdown. (TRACK-042, TRACK-045)
 │   │   └── migrate.ts        → Migration runner
 │   ├── auth/
 │   │   └── config.ts         → Better-Auth setup
@@ -204,6 +204,7 @@ simak/
     │   │   ├── logger.ts         → Singleton `pino` logger instance — JSON to stdout in prod, `pino-pretty` in dev (lazy-loaded via `createRequire`). `LOG_LEVEL` env var (default `info`). `createLogger(options?)` factory. Server-side only. (TRACK-040)
     │   │   ├── request-context.ts → `requestIdMiddleware` (TanStack Start `createMiddleware`) + `createRequestLogger(context)` — reads `x-request-id` header or generates UUID. Defined and tested but not yet wired to HTTP handlers (future work). (TRACK-040)
     │   │   ├── security-headers.ts → Pure functions `generateNonce()` (`crypto.randomBytes(16).toString('base64')`) + `buildSecurityHeaders(nonce, isProd, r2Domain?)` (returns header name→value map). CSP directive assembly + Report-Only/enforce switching. (TRACK-041)
+    │   │   ├── shutdown.ts       → `registerShutdownHandlers()` — SIGTERM/SIGINT handler (guarded by `import.meta.env.SSR`): clears `setInterval`, awaits in-flight `tick()` via `stopGracefully()` (drain), closes DB pool via `closeDb()`, then `process.exit(0)`. Second signal forces `process.exit(1)`. Configurable timeout via `SHUTDOWN_TIMEOUT_MS` (default 10000ms). (TRACK-045)
     │   │   └── utils.ts          → Shared utilities
 │   ├── hooks/               → Custom React hooks
 │   │   ├── use-debounced-callback.ts → Generic debounce hook (setTimeout/clearTimeout, 300ms for search inputs)
@@ -212,7 +213,7 @@ simak/
 │   │   ├── use-notifications.ts → Notification hooks (useMarkRead, useMarkAllRead with optimistic updates on useInfiniteQuery page shape, useUnreadCount, useNotificationsList via useInfiniteQuery)
 │   │   └── use-assignment-tabs.ts → Assignment tab hooks (approveExtension, rejectExtension with optimistic updates; consultations/extensions via useQuery)
 │   └── config/
-│       └── env.ts            → Validated environment variables (Zod `envSchema`; `Env` type = `z.infer<typeof envSchema>` — single source of truth, TRACK-031). Includes `LOG_LEVEL` (optional, default `info` — TRACK-040), `DB_POOL_MAX` (optional, default `10`), and `DB_PREPARED_STATEMENTS_DISABLED` (optional, default `false` — string → `val === 'true'` transform, deliberately avoids `z.coerce.boolean()` — TRACK-042).
+│       └── env.ts            → Validated environment variables (Zod `envSchema`; `Env` type = `z.infer<typeof envSchema>` — single source of truth, TRACK-031). Includes `LOG_LEVEL` (optional, default `info` — TRACK-040), `DB_POOL_MAX` (optional, default `10`), `DB_PREPARED_STATEMENTS_DISABLED` (optional, default `false` — string → `val === 'true'` transform, deliberately avoids `z.coerce.boolean()` — TRACK-042), and `SHUTDOWN_TIMEOUT_MS` (optional, default `10000` — graceful shutdown drain timeout in ms, TRACK-045).
 ├── locales/                  → typesafe-i18n translation files
 │   ├── en.json               → English translations
 │   └── id.json               → Indonesian translations
@@ -1108,6 +1109,8 @@ A checkpoint unlocks when:
 - **Retention cleanup:** `sent` rows older than 90 days and `failed` rows older than 180 days are automatically pruned on a tick-embedded 24-hour cycle (`lastPruneAt` timestamp in `email-queue-init.ts`). `pending`/`processing` rows are never deleted. Logged as `email_queue.retention_pruned` with deleted count (no PII) (TRACK-016, ENH-OPS-1/BUG-20).
 - **Delivery tracking:** A `resendMessageId` column (populated from the Resend API `result.data.id` on successful send) enables correlation with Resend's delivery dashboard. Exposed in the admin email queue inspector as a monospace truncated cell with tooltip (TRACK-016, BUG-4).
 - **Concurrency hardening:** rows are claimed inside a transaction using `FOR UPDATE SKIP LOCKED` and marked `processing`; the Resend send occurs **outside** the transaction so no long-lived lock is held. An in-process `isRunning` guard prevents overlapping ticks. Rows stuck in `processing` for > 5 minutes are reclaimed to `pending` at the start of each tick, preventing lockup on worker crash.
+- **Startup stale-row reclaim (TRACK-045):** `reclaimAllProcessingRows()` runs in `startEmailQueue()` before the first `tick()`, resetting ALL `status='processing'` rows to `pending` with no time threshold. Since a fresh process start means no instance could be processing them, all stuck rows from a crashed previous instance are reclaimed immediately — eliminating the up-to-5-minute delay from the in-tick threshold-based reclaim.
+- **Graceful shutdown (TRACK-045):** `registerShutdownHandlers()` in `src/lib/shutdown.ts` registers `SIGTERM`/`SIGINT` handlers (guarded by `import.meta.env.SSR`) that: (1) clear the `setInterval`, (2) await the in-flight `tick()` via async `stopGracefully()` (drain), (3) close the DB pool via `closeDb()`, (4) `process.exit(0)`. A second signal during drain forces `process.exit(1)` (standard container force-kill pattern). A configurable timeout (`SHUTDOWN_TIMEOUT_MS`, default 10000ms) forces `process.exit(1)` if the drain doesn't complete. The former sync `stopEmailQueue()` (dead code — only called in tests) is replaced by async `stopGracefully()`. Wired in `src/router.tsx` alongside `startEmailQueue()`.
 - **XSS hardening:** all user-derived interpolations in email bodies are passed through an `escapeHtml` helper before rendering, preventing stored-XSS via user-controlled fields (name, email, subject context).
 
 ### Preferences [v1] (Track: User Notification Preferences)
@@ -1132,7 +1135,7 @@ A checkpoint unlocks when:
 | --------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | **Server functions**  | Validate inputs with Zod before processing. Return typed error responses. Never expose stack traces to the client. |
 | **File upload**       | Server-side MIME validation. R2 failures surface as upload errors with retry guidance to the user.                 |
-| **Email delivery**    | Queue-based with retry. Transient failures are retried; permanent failures are logged. Rows claimed transactionally (`FOR UPDATE SKIP LOCKED`); stale `processing` rows (> 5 min) are reclaimed to prevent lockup. |
+| **Email delivery**    | Queue-based with retry. Transient failures are retried; permanent failures are logged. Rows claimed transactionally (`FOR UPDATE SKIP LOCKED`); stale `processing` rows (> 5 min) are reclaimed to prevent lockup. On startup, ALL `processing` rows are immediately reclaimed (no threshold). Graceful shutdown on `SIGTERM`/`SIGINT` drains in-flight ticks and closes the DB pool (TRACK-045). |
 | **Database**          | Drizzle query errors caught and mapped to user-friendly messages (e.g. "Failed to load assignments").              |
 | **Client**            | TanStack Query `onError` callbacks show toast notifications. Form errors displayed inline per field.               |
 | **Unexpected errors** | A global error boundary catches render crashes and shows a fallback UI with a reload option.                       |
