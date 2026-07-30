@@ -22,6 +22,7 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 import { createServerFn } from '@tanstack/react-start';
+import { requestIdMiddleware } from '@/lib/request-context';
 import { typedServerFn } from '@/lib/server-fn';
 
 describe('typedServerFn — runtime behavior', () => {
@@ -106,14 +107,16 @@ describe('typedServerFn — rateLimit config', () => {
     typedServerFn({ method: 'GET', rateLimit: { window: 60, max: 5 } });
 
     const builder = createServerFn();
-    expect(builder.middleware).toHaveBeenCalled();
+    expect(builder.middleware).toHaveBeenCalledWith(
+      expect.arrayContaining([requestIdMiddleware, expect.any(Function)]),
+    );
   });
 
-  it('does NOT call .middleware() when rateLimit is omitted (pass-through)', () => {
+  it('calls .middleware([requestIdMiddleware]) when rateLimit is omitted', () => {
     typedServerFn({ method: 'GET' });
 
     const builder = createServerFn();
-    expect(builder.middleware).not.toHaveBeenCalled();
+    expect(builder.middleware).toHaveBeenCalledWith([requestIdMiddleware]);
   });
 
   it('preserves the .inputValidator(Schema).handler(fn) chain when rateLimit is provided', () => {

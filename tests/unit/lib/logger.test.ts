@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Writable } from 'node:stream';
 import { getEnv } from '@/config/env';
+import { requestContextStorage } from '@/lib/request-context-store';
 
 const { mockEnv } = vi.hoisted(() => ({
   mockEnv: {
@@ -44,6 +45,10 @@ describe('createLogger', () => {
     return { stream, getOutput: () => chunks.join('') };
   }
 
+  function parseOutput(getOutput: () => string) {
+    return JSON.parse(getOutput().trim()) as Record<string, unknown>;
+  }
+
   describe('production mode (JSON output)', () => {
     beforeEach(() => {
       import.meta.env.PROD = true;
@@ -74,6 +79,46 @@ describe('createLogger', () => {
       const parsed = JSON.parse(output);
       expect(parsed.level).toBe(50);
       expect(parsed.msg).toBe('error occurred');
+    });
+
+    it('includes the request ID from AsyncLocalStorage', () => {
+      const { stream, getOutput } = createCaptureStream();
+      const logger = createLogger({ stream });
+
+      requestContextStorage.run({ requestId: 'request-id' }, () => {
+        logger.info('request message');
+      });
+
+      expect(parseOutput(getOutput).requestId).toBe('request-id');
+    });
+
+    it('omits request ID outside an AsyncLocalStorage context', () => {
+      const { stream, getOutput } = createCaptureStream();
+      const logger = createLogger({ stream });
+
+      logger.info('background message');
+
+      expect(parseOutput(getOutput)).not.toHaveProperty('requestId');
+    });
+
+    it('retains child logger request IDs outside an AsyncLocalStorage context', () => {
+      const { stream, getOutput } = createCaptureStream();
+      const logger = createLogger({ stream });
+
+      logger.child({ requestId: 'background-job-id' }).info('background message');
+
+      expect(parseOutput(getOutput).requestId).toBe('background-job-id');
+    });
+
+    it('uses the request-context ID when both the child and context provide one', () => {
+      const { stream, getOutput } = createCaptureStream();
+      const logger = createLogger({ stream });
+
+      requestContextStorage.run({ requestId: 'request-id' }, () => {
+        logger.child({ requestId: 'background-job-id' }).info('request message');
+      });
+
+      expect(parseOutput(getOutput).requestId).toBe('request-id');
     });
   });
 

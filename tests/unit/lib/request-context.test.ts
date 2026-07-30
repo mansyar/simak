@@ -16,6 +16,7 @@ vi.mock('@tanstack/react-start', () => ({
 // Import after mocks are set up
 import { logger } from '@/lib/logger';
 import { requestIdMiddleware, createRequestLogger } from '@/lib/request-context';
+import { requestContextStorage } from '@/lib/request-context-store';
 
 // The mock makes createMiddleware().server(fn) return fn directly,
 // but TypeScript sees the real RequestMiddlewareAfterServer type.
@@ -75,6 +76,40 @@ describe('request-context', () => {
       expect(callArg.context.requestId).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
       );
+    });
+
+    it('stores the request ID while next executes', async () => {
+      const mockNext = vi.fn().mockImplementation(async () => {
+        expect(requestContextStorage.getStore()?.requestId).toBe('existing-id-123');
+      });
+      const request = new Request('https://example.com/api', {
+        headers: { 'x-request-id': 'existing-id-123' },
+      });
+
+      await middleware({
+        next: mockNext,
+        request,
+        context: {},
+        pathname: '/api',
+        handlerType: 'rpc',
+      });
+    });
+
+    it('clears the request ID after next returns', async () => {
+      const mockNext = vi.fn().mockResolvedValue({});
+      const request = new Request('https://example.com/api', {
+        headers: { 'x-request-id': 'existing-id-123' },
+      });
+
+      await middleware({
+        next: mockNext,
+        request,
+        context: {},
+        pathname: '/api',
+        handlerType: 'rpc',
+      });
+
+      expect(requestContextStorage.getStore()).toBeUndefined();
     });
   });
 
