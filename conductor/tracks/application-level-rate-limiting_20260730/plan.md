@@ -118,7 +118,7 @@
     - [x] `src/server/setup-password.ts`: `completePasswordSetup` — no `rateLimit` (token-based, exempt) — verified
 - [x] Task: Run `pnpm typecheck` — verify all annotations are type-correct (`rateLimit` must be `RateLimitConfig`) — clean (0 errors)
 - [x] Task: Run `pnpm test` — verify all tests pass with annotated stubs — 3,919 tests pass (0 failures)
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Annotate Server Functions' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Annotate Server Functions' (Protocol in workflow.md)
 
 ## Phase 5: Documentation & Final Verification
 
