@@ -23,12 +23,12 @@
 
 - [x] Task: Create the isolated Coolify project and environment for the private pilot [a005a21]
   - Coolify project `simak-private-pilot` and environment `production` created by the operator; no application or database has been added yet.
-- [~] Task: Provision a Coolify-managed PostgreSQL 16 service
+- [x] Task: Provision a Coolify-managed PostgreSQL 16 service [b6eec00]
   - [x] Enable persistent database storage.
   - [x] Generate and store unique database credentials exclusively in Coolify.
   - [x] Restrict database networking to the application service.
   - Operator confirmed `simak-postgres` (PostgreSQL 16, database `simak`) is running and healthy with generated credentials and no public exposure.
-- [ ] Task: Create the SIMAK application service from the repository Dockerfile
+- [~] Task: Create the SIMAK application service from the repository Dockerfile
   - [ ] Configure the production build context and `docker/Dockerfile`.
   - [ ] Configure the container port and `/api/health` health probe.
   - [ ] Configure restart and deployment behavior appropriate for a single-instance pilot.
