@@ -40,7 +40,7 @@
     - [x] Ensure no duplication in CSP directive building
 - [x] Task: Conductor - User Manual Verification 'Security Headers Pure Logic' (Protocol in workflow.md)
 
-## Phase 3: TanStack Start Integration
+## Phase 3: TanStack Start Integration [checkpoint: 3ca61ca1]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
 - [x] Task: Create `src/start.ts` with `createStart` instance + CSP middleware [aeddf46a]
