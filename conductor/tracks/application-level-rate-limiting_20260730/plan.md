@@ -33,7 +33,7 @@
     - [x] Implement `createRateLimitMiddleware(config: RateLimitConfig)` — auto-incrementing `fnIdCounter`, returns `createMiddleware({ type: 'request' }).server(async ({ next }) => { ... })` that calls `getSessionFromHeaders()`, checks rate limit, short-circuits with `serverError(ErrorCode.RATE_LIMITED, ...)` or calls `next()`
     - [x] Export `resetRateLimitStoreForTests()` for test cleanup
     - [x] Run `pnpm test` and confirm all rate-limiter tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Rate Limit Infrastructure' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Rate Limit Infrastructure' (Protocol in workflow.md)
 
 ## Phase 2: Extend typedServerFn with .middleware() + rateLimit config
 
