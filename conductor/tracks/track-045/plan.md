@@ -1,6 +1,6 @@
 # Implementation Plan: TRACK-045 — Graceful Shutdown & Background Processor Drain
 
-## Phase 1: Foundation — `closeDb()` & `SHUTDOWN_TIMEOUT_MS` env var
+## Phase 1: Foundation — `closeDb()` & `SHUTDOWN_TIMEOUT_MS` env var [checkpoint: dfd33aa]
 
 These are the building blocks that the shutdown handler depends on.
 
