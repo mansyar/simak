@@ -11,7 +11,7 @@
   - [x] Run `pnpm test:coverage`, `pnpm typecheck`, and `pnpm lint`.
   - [x] Build the production image using `docker/Dockerfile`.
   - [x] Verify the image contains the app, migration runner, seed runner, migrations, and `/api/health` health check.
-- [~] Task: Document the release baseline and pre-deployment prerequisites.
+- [x] Task: Document the release baseline and pre-deployment prerequisites [01bedac]
   - Release candidate: `5adf406d` (`fix(build): restore production Docker build`), built locally as `simak:pilot-baseline`.
   - Quality evidence: coverage (3,948 tests; statements 89.35%, branches 81.05%, functions 83.44%, lines 90.09%), typecheck, lint (0 errors), `pnpm build`, and Docker artifact checks pass.
   - Before Coolify configuration, the operator needs: Coolify project access, repository access to this branch, control of the pilot-domain DNS zone, and a Coolify-managed PostgreSQL 16 service with persistent storage.
