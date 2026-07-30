@@ -1,5 +1,6 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in extensions.server.ts (not bundled for client)
+import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
@@ -49,42 +50,54 @@ export const BulkExtendSchema = z.object({
 
 // ---- Server Function Stubs ----
 
-export const requestExtension = typedServerFn({ method: 'POST' })
+export const requestExtension = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+})
   .inputValidator(RequestExtensionSchema)
   .handler(async ({ data }) => {
     const { requestExtensionHandler } = await import('./extensions.server');
     return requestExtensionHandler({ data });
   });
 
-export const listExtensionRequests = typedServerFn({ method: 'GET' })
+export const listExtensionRequests = typedServerFn({
+  method: 'GET',
+  rateLimit: RATE_LIMITS.standardRead,
+})
   .inputValidator(ListExtensionRequestsSchema)
   .handler(async ({ data }) => {
     const { listExtensionRequestsHandler } = await import('./extensions.server');
     return listExtensionRequestsHandler({ data });
   });
 
-export const listMyExtensionRequests = typedServerFn({ method: 'GET' })
+export const listMyExtensionRequests = typedServerFn({
+  method: 'GET',
+  rateLimit: RATE_LIMITS.standardRead,
+})
   .inputValidator(ListMyExtensionsSchema)
   .handler(async ({ data }) => {
     const { listMyExtensionRequestsHandler } = await import('./extensions.server');
     return listMyExtensionRequestsHandler({ data });
   });
 
-export const approveExtension = typedServerFn({ method: 'POST' })
+export const approveExtension = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+})
   .inputValidator(ApproveExtensionSchema)
   .handler(async ({ data }) => {
     const { approveExtensionHandler } = await import('./extensions.server');
     return approveExtensionHandler({ data });
   });
 
-export const rejectExtension = typedServerFn({ method: 'POST' })
+export const rejectExtension = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.destructive })
   .inputValidator(RejectExtensionSchema)
   .handler(async ({ data }) => {
     const { rejectExtensionHandler } = await import('./extensions.server');
     return rejectExtensionHandler({ data });
   });
 
-export const bulkExtend = typedServerFn({ method: 'POST' })
+export const bulkExtend = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.destructive })
   .inputValidator(BulkExtendSchema)
   .handler(async ({ data }) => {
     const { bulkExtendHandler } = await import('./extensions.server');

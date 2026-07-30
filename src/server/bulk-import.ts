@@ -1,5 +1,6 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in bulk-import.server.ts (not bundled for client)
+import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
@@ -27,14 +28,17 @@ export const BulkCreateTemplatesSchema = z.object({
   rows: z.array(BulkTemplateRowSchema).min(1, 'At least one row required'),
 });
 
-export const bulkCreateUsers = typedServerFn({ method: 'POST' })
+export const bulkCreateUsers = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.destructive })
   .inputValidator(BulkCreateUsersSchema)
   .handler(async ({ data }) => {
     const { bulkCreateUsersHandler } = await import('./bulk-import.server');
     return bulkCreateUsersHandler({ data });
   });
 
-export const bulkCreateTemplates = typedServerFn({ method: 'POST' })
+export const bulkCreateTemplates = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+})
   .inputValidator(BulkCreateTemplatesSchema)
   .handler(async ({ data }) => {
     const { bulkCreateTemplatesHandler } = await import('./bulk-import.server');

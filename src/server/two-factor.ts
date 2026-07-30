@@ -1,5 +1,6 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in two-factor.server.ts (not bundled for client)
+import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
@@ -31,42 +32,47 @@ export const GetTwoFactorStatusSchema = z.object({});
 
 // --- Server function stubs ---
 
-export const generateTwoFactorSetup = typedServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
-    const { generateTwoFactorSetupHandler } = await import('./two-factor.server');
-    const data = EnableTwoFactorSchema.parse(args.data);
-    return generateTwoFactorSetupHandler({ data });
-  },
-);
+export const generateTwoFactorSetup = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+}).handler(async (args: { data: unknown }) => {
+  const { generateTwoFactorSetupHandler } = await import('./two-factor.server');
+  const data = EnableTwoFactorSchema.parse(args.data);
+  return generateTwoFactorSetupHandler({ data });
+});
 
-export const enableTwoFactor = typedServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
-    const { enableTwoFactorHandler } = await import('./two-factor.server');
-    const data = VerifyTwoFactorSchema.parse(args.data);
-    return enableTwoFactorHandler({ data });
-  },
-);
+export const enableTwoFactor = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+}).handler(async (args: { data: unknown }) => {
+  const { enableTwoFactorHandler } = await import('./two-factor.server');
+  const data = VerifyTwoFactorSchema.parse(args.data);
+  return enableTwoFactorHandler({ data });
+});
 
-export const disableTwoFactor = typedServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
-    const { disableTwoFactorHandler } = await import('./two-factor.server');
-    const data = DisableTwoFactorSchema.parse(args.data);
-    return disableTwoFactorHandler({ data });
-  },
-);
+export const disableTwoFactor = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+}).handler(async (args: { data: unknown }) => {
+  const { disableTwoFactorHandler } = await import('./two-factor.server');
+  const data = DisableTwoFactorSchema.parse(args.data);
+  return disableTwoFactorHandler({ data });
+});
 
-export const regenerateBackupCodes = typedServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
-    const { regenerateBackupCodesHandler } = await import('./two-factor.server');
-    const data = RegenerateBackupCodesSchema.parse(args.data);
-    return regenerateBackupCodesHandler({ data });
-  },
-);
+export const regenerateBackupCodes = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+}).handler(async (args: { data: unknown }) => {
+  const { regenerateBackupCodesHandler } = await import('./two-factor.server');
+  const data = RegenerateBackupCodesSchema.parse(args.data);
+  return regenerateBackupCodesHandler({ data });
+});
 
-export const getTwoFactorStatus = typedServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
-    const { getTwoFactorStatusHandler } = await import('./two-factor.server');
-    const data = GetTwoFactorStatusSchema.parse(args.data);
-    return getTwoFactorStatusHandler({ data });
-  },
-);
+export const getTwoFactorStatus = typedServerFn({
+  method: 'GET',
+  rateLimit: RATE_LIMITS.standardRead,
+}).handler(async (args: { data: unknown }) => {
+  const { getTwoFactorStatusHandler } = await import('./two-factor.server');
+  const data = GetTwoFactorStatusSchema.parse(args.data);
+  return getTwoFactorStatusHandler({ data });
+});

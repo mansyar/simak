@@ -1,5 +1,6 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in assignments.server.ts (not bundled for client)
+import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
@@ -31,21 +32,30 @@ export const AssignmentIdParamSchema = z.object({
 
 export const CreateAssignmentInputSchema = CreateAssignmentSchema;
 
-export const createAssignment = typedServerFn({ method: 'POST' })
+export const createAssignment = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+})
   .inputValidator(CreateAssignmentSchema)
   .handler(async ({ data }) => {
     const { createAssignmentHandler } = await import('./assignments.server');
     return createAssignmentHandler({ data });
   });
 
-export const listInstructorAssignments = typedServerFn({ method: 'GET' })
+export const listInstructorAssignments = typedServerFn({
+  method: 'GET',
+  rateLimit: RATE_LIMITS.standardRead,
+})
   .inputValidator(ListInstructorAssignmentsSchema)
   .handler(async ({ data }) => {
     const { listInstructorAssignmentsHandler } = await import('./assignments.server');
     return listInstructorAssignmentsHandler({ data });
   });
 
-export const getAssignmentDetail = typedServerFn({ method: 'GET' })
+export const getAssignmentDetail = typedServerFn({
+  method: 'GET',
+  rateLimit: RATE_LIMITS.standardRead,
+})
   .inputValidator(AssignmentIdParamSchema)
   .handler(async ({ data }) => {
     const { getAssignmentDetailHandler } = await import('./assignments.server');
@@ -66,14 +76,20 @@ export const StudentAssignmentIdParamSchema = z.object({
 
 // ---- Student Assignment Server Function Stubs ----
 
-export const listStudentAssignments = typedServerFn({ method: 'GET' })
+export const listStudentAssignments = typedServerFn({
+  method: 'GET',
+  rateLimit: RATE_LIMITS.standardRead,
+})
   .inputValidator(ListStudentAssignmentsSchema)
   .handler(async ({ data }) => {
     const { listStudentAssignmentsHandler } = await import('./assignments.server');
     return listStudentAssignmentsHandler({ data });
   });
 
-export const getStudentAssignmentDetail = typedServerFn({ method: 'GET' })
+export const getStudentAssignmentDetail = typedServerFn({
+  method: 'GET',
+  rateLimit: RATE_LIMITS.standardRead,
+})
   .inputValidator(StudentAssignmentIdParamSchema)
   .handler(async ({ data }) => {
     const { getStudentAssignmentDetailHandler } = await import('./assignments.server');
@@ -86,7 +102,10 @@ export const UnlockCheckpointSchema = z.object({
   checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),
 });
 
-export const unlockCheckpoint = typedServerFn({ method: 'POST' })
+export const unlockCheckpoint = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+})
   .inputValidator(UnlockCheckpointSchema)
   .handler(async ({ data }) => {
     const { unlockCheckpointHandler } = await import('./assignments.server');
@@ -100,7 +119,7 @@ export const ExtendDeadlineSchema = z.object({
   }),
 });
 
-export const extendDeadline = typedServerFn({ method: 'POST' })
+export const extendDeadline = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.destructive })
   .inputValidator(ExtendDeadlineSchema)
   .handler(async ({ data }) => {
     const { extendDeadlineHandler } = await import('./assignments.server');
@@ -114,7 +133,10 @@ export const ReassignAssignmentSchema = z.object({
   newInstructorId: z.string().min(1, 'Instructor ID is required'),
 });
 
-export const reassignAssignment = typedServerFn({ method: 'POST' })
+export const reassignAssignment = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+})
   .inputValidator(ReassignAssignmentSchema)
   .handler(async ({ data }) => {
     const { reassignAssignmentHandler } = await import('./assignments.server');
