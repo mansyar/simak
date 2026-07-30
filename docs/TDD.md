@@ -198,12 +198,13 @@ simak/
 │   │   ├── route-utils.ts    → Role-based dashboard routing utility
     │   │   ├── role-permissions.ts → Canonical CREATION_ALLOWED_ROLES (shared by user creation + bulk import)
     │   │   ├── session-guards.ts → Shared client-safe type-guard functions (isAdmin, isInstructor, isStudent, isAuthenticated) — accept `NonNullableSession | null`, return `session is NonNullableSession` (TRACK-031)
-    │   │   ├── server-fn.ts     → `typedServerFn` wrapper — wraps `createServerFn` with a single `as unknown as TypedBuilder` solution cast that restores return-type inference through the `.inputValidator(Schema).handler(fn)` builder chain. All 23 server stub files import `typedServerFn` instead of `createServerFn` (TRACK-032). Runtime: pure pass-through (type-only change).
+    │   │   ├── server-fn.ts     → `typedServerFn` wrapper — wraps `createServerFn` with a single `as unknown as TypedBuilder` solution cast that restores return-type inference through the `.inputValidator(Schema).handler(fn)` builder chain. All 23 server stub files import `typedServerFn` instead of `createServerFn` (TRACK-032). Accepts optional `rateLimit?: RateLimitConfig` config — when provided, chains `createRateLimitMiddleware()` via `.middleware()` before the handler (TRACK-043). Runtime: pure pass-through when no rateLimit (type-only change); rate limit enforced at middleware layer when provided.
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
     │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys, discussionKeys, settingsKeys, gradebookKeys)
     │   │   ├── logger.ts         → Singleton `pino` logger instance — JSON to stdout in prod, `pino-pretty` in dev (lazy-loaded via `createRequire`). `LOG_LEVEL` env var (default `info`). `createLogger(options?)` factory. Server-side only. (TRACK-040)
     │   │   ├── request-context.ts → `requestIdMiddleware` (TanStack Start `createMiddleware`) + `createRequestLogger(context)` — reads `x-request-id` header or generates UUID. Defined and tested but not yet wired to HTTP handlers (future work). (TRACK-040)
     │   │   ├── security-headers.ts → Pure functions `generateNonce()` (`crypto.randomBytes(16).toString('base64')`) + `buildSecurityHeaders(nonce, isProd, r2Domain?)` (returns header name→value map). CSP directive assembly + Report-Only/enforce switching. (TRACK-041)
+    │   │   ├── rate-limiter.ts   → In-memory sliding window rate limiter. Exports `RateLimitConfig` type, `RATE_LIMITS` presets (4 tiers: presignedUrl 20/min, heavyMutation 10/min, destructive 5/min, standardRead 60/min), `checkRateLimit(store, key, config)` (sliding window: resets if expired, increments if under max, denies without incrementing at max), `createRateLimitMiddleware(config)` (TanStack Start `createMiddleware({type:'request'}).server()` — calls `getSessionFromHeaders()`, unauthenticated pass-through, short-circuits with `serverError(RATE_LIMITED)` when exceeded), `resetRateLimitStoreForTests()`. Module-level `Map<string, {count, windowStart}>` keyed by `userId:fnId`. (TRACK-043)
     │   │   ├── shutdown.ts       → `registerShutdownHandlers()` — SIGTERM/SIGINT handler (guarded by `import.meta.env.SSR`): clears `setInterval`, awaits in-flight `tick()` via `stopGracefully()` (drain), closes DB pool via `closeDb()`, then `process.exit(0)`. Second signal forces `process.exit(1)`. Configurable timeout via `SHUTDOWN_TIMEOUT_MS` (default 10000ms). (TRACK-045)
     │   │   └── utils.ts          → Shared utilities
 │   ├── hooks/               → Custom React hooks
@@ -351,11 +352,12 @@ All 9 user-initiated mutation sites where the predicted state is deterministic u
 
 The `createServerFn` wrapper from `@tanstack/react-start` has a known type-inference gap: its `handler` method declares a generic `<TNewResponse>` but `ServerFnReturnType` applies `ValidateSerializableInput` (a recursive conditional type from `@tanstack/router-core`) that prevents TypeScript from inferring `TNewResponse` through the conditional. `TNewResponse` defaults to `unknown`, making the `Fetcher` return type `Promise<unknown>` at call sites — even when the handler's return type is explicitly annotated. The dynamic `await import('./feature.server')` pattern is NOT the cause; even direct handler returns suffer the same inference failure.
 
-**Solution:** A `typedServerFn` wrapper in `src/lib/server-fn.ts` (58 lines) wraps `createServerFn` with a single `as unknown as TypedBuilder` solution cast that restores return-type inference. The wrapper:
+**Solution:** A `typedServerFn` wrapper in `src/lib/server-fn.ts` (74 lines) wraps `createServerFn` with a single `as unknown as TypedBuilder` solution cast that restores return-type inference. The wrapper:
 
 - Preserves both stub patterns: `.inputValidator(Schema).handler(fn)` (typed-builder) and `.handler(fn)` (inline-parse).
-- Defines `TypedFetcher<TInput, TResponse>`, `OptionalFetcher<TResponse>`, `TypedBuilderWithValidator`, and `TypedBuilder` interfaces to model the builder chain.
-- Is a type-only change at runtime — pure pass-through, delegates to `createServerFn`.
+- Defines `TypedFetcher<TInput, TResponse>`, `OptionalFetcher<TResponse>`, `TypedBuilderWithValidator`, and `TypedBuilder` interfaces to model the builder chain. The `TypedBuilder` interface includes a `.middleware(middlewares: unknown[]): TypedBuilder` method (added in TRACK-043 for rate limit middleware chaining).
+- Accepts an optional `rateLimit?: RateLimitConfig` config (added in TRACK-043). When provided, the wrapper chains `createRateLimitMiddleware(opts.rateLimit)` via `.middleware([...])` before returning the builder — the middleware runs before `.inputValidator()` / `.handler()` and short-circuits with `serverError(ErrorCode.RATE_LIMITED, ...)` when the per-user per-function sliding window is exceeded. When omitted, the wrapper is a pure pass-through (delegates directly to `createServerFn`).
+- Is a type-only change at runtime when no `rateLimit` is provided — pure pass-through, delegates to `createServerFn`.
 
 All 23 server stub files (`src/server/*.ts`) import `typedServerFn` from `@/lib/server-fn` instead of `createServerFn` from `@tanstack/react-start`. This eliminated 66 `as unknown as` casts across hooks (7), components (38), routes (19), server files (5), lib (3), and Better Auth handlers (2) — replacing them with `isServerError()` type-guard checks and proper Drizzle/Better Auth typing.
 
@@ -402,6 +404,32 @@ A nonce-based Content-Security-Policy defends against XSS — the primary browse
 **Additional headers** on all responses: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: geolocation=(), microphone=(), camera=()`. `Strict-Transport-Security: max-age=31536000; includeSubDomains` (HSTS) is production-only (defense-in-depth behind Traefik TLS termination).
 
 **Testing:** Unit tests (32 assertions) cover nonce generation (uniqueness, length, base64 format), header values (exact string match), Report-Only vs enforce switching, `getR2Domain` edge cases, and router nonce propagation. An E2E test asserts all headers are present, nonce uniqueness across requests, and that nonces are auto-attached to `<script>` tags in the rendered HTML.
+
+### Application-Level Rate Limiting [v1] (Track: Application-Level Rate Limiting on Server Functions)
+
+All 85 authenticated TanStack Start server functions are rate-limited via `typedServerFn`'s optional `rateLimit` config. Better Auth's built-in rate limiting only covers `/api/auth/*` endpoints — application server functions were previously unprotected against abuse (R2 cost exploitation, email queue flooding, data pollution, DB connection exhaustion).
+
+- **`src/lib/rate-limiter.ts`** — In-memory sliding window rate limiter:
+  - `RateLimitConfig` type: `{ window: number; max: number }` (window in seconds).
+  - `RATE_LIMITS` presets (4 tiers): `presignedUrl` (60s/20 — R2 cost abuse), `heavyMutation` (60s/10 — submissions/reviews), `destructive` (60s/5 — admin CRUD, 2FA, session revocation), `standardRead` (60s/60 — dashboards, lists, detail views).
+  - `checkRateLimit(store, key, config): boolean` — sliding window logic: if entry exists and window hasn't expired, increment count if under max (return `true`), deny without incrementing if at max (return `false` — prevents permanent lockout); if no entry or window expired, reset to count=1 (return `true`).
+  - `createRateLimitMiddleware(config)` — factory using `createMiddleware({ type: 'request' }).server(async ({ next }) => {...})`. Auto-incrementing `fnIdCounter` assigns a unique `fnId` per middleware instance (per-function isolation). Calls `getSessionFromHeaders()` — unauthenticated requests pass through to `next()` without rate limiting. Authenticated requests are checked against the sliding window keyed by `${session.user.id}:${fnId}`. When exceeded, short-circuits with `serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded')`.
+  - Module-level `Map<string, { count: number; windowStart: number }>` store — sufficient for single-instance deployment (Redis deferred to multi-instance work).
+  - `resetRateLimitStoreForTests()` — test-only utility to clear the store between tests.
+
+- **`src/lib/server-fn.ts`** — Extended with `.middleware()` method on `TypedBuilder` interface and optional `rateLimit?: RateLimitConfig` config on `typedServerFn()`. When `rateLimit` is provided, the wrapper calls `fn.middleware([createRateLimitMiddleware(opts.rateLimit)])` before returning the builder. When omitted, pure pass-through (backward-compatible).
+
+- **`src/lib/errors.ts`** — `RATE_LIMITED` added to the `ErrorCode` enum.
+
+- **`src/lib/toast.ts`** — `RATE_LIMITED` added to `VALID_ERROR_CODES` and mapped to `error.rateLimited` i18n key ("Too many requests. Please wait a moment and try again." / "Terlalu banyak permintaan. Mohon tunggu sebentar dan coba lagi.").
+
+- **Server function annotations:** 85 functions across 22 stub files annotated with `rateLimit: RATE_LIMITS.<tier>` per the rate limit catalog. Tier 1 (presignedUrl): 4 functions (file presigned URLs, avatar upload). Tier 2 (heavyMutation): 3 functions (submitCheckpoint, submitReview, openForReview). Tier 3 (destructive): 36 functions (assignment/template/user CRUD, 2FA, sessions, consultations, extensions, discussions, email retry, R2 cleanup, grade config). Tier 4 (standardRead): 42 functions (dashboards, analytics, list/detail views, audit log, gradebook, rubrics).
+
+- **Exempt functions** (no rateLimit): `_getSession` (internal session fetch — cascading/infinite-loop concern), `getUnreadCount` / `markRead` / `markAllRead` (high-frequency UX — 30s polling, instant interactions), `completePasswordSetup` (token-based, no session).
+
+- **No handler changes** — Rate limiting is enforced at the middleware layer before the handler runs. Zero `.server.ts` handler files were modified. All annotations are in stub files (`.ts`).
+
+- **Testing:** 14 unit tests in `tests/unit/lib/rate-limiter.test.ts` (presets, sliding window, per-key isolation, fake-timer window expiry, middleware pass-through/deny/fnId isolation) + 5 new tests in `tests/unit/lib/server-fn.test.ts` (rateLimit calls `.middleware()`, no rateLimit is pass-through, builder chain preservation, regression tests). `rate-limiter.ts` and `server-fn.ts` at 100% coverage.
 
 ---
 
@@ -1155,7 +1183,7 @@ A checkpoint unlocks when:
 
 | Module | Responsibility |
 | --- | --- |
-| `src/lib/errors.ts` | `ErrorCode` union (`UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION`, `BAD_REQUEST`, `CONFLICT`, `INTERNAL`), `ServerError` shape `{ error: { code, message } }`, `serverError(code, message, context?)` factory, `logError()` structured logger (routes through `pino` `logger.error(entry)` — preserves `entry` object shape with `timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`; JSON in prod, pretty in dev via pino transport config), `sanitizeInput()` (redacts `password`/`token`/`secret`/etc.), `isServerError()` guard. Responses expose only `code` + `message` — never stack traces, SQL, or raw errors. (TRACK-040: migrated from `console.error` to `pino`) |
+| `src/lib/errors.ts` | `ErrorCode` union (`UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION`, `BAD_REQUEST`, `CONFLICT`, `INTERNAL`, `RATE_LIMITED`), `ServerError` shape `{ error: { code, message } }`, `serverError(code, message, context?)` factory, `logError()` structured logger (routes through `pino` `logger.error(entry)` — preserves `entry` object shape with `timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`; JSON in prod, pretty in dev via pino transport config), `sanitizeInput()` (redacts `password`/`token`/`secret`/etc.), `isServerError()` guard. Responses expose only `code` + `message` — never stack traces, SQL, or raw errors. `RATE_LIMITED` added in TRACK-043 for application-level rate limiting. (TRACK-040: migrated from `console.error` to `pino`) |
 | `src/lib/toast.ts` | `showErrorToast(code, t)` renders a sonner `toast.error` with the translated message (falls back to `error.default`); `parseServerError(res)` extracts `{ code, message }`, tolerant of both the typed shape and the legacy `{ error: string }` shape. |
 | `src/components/ui/sonner.tsx` | `<Toaster>` wrapper — theme-aware (light/dark via `MutationObserver`), design-token CSS vars, `position="top-right"`, `richColors`. Mounted once in `src/routes/__root.tsx`. |
 | `src/components/error-boundary.tsx` | `RootErrorComponent` — bilingual fallback (`error.somethingWentWrong`), Reload button + home link, `role="alert"` + `aria-live="assertive"`, logs via `logError('INTERNAL', ...)`. Wired as `errorComponent` in `src/routes/__root.tsx`. |
@@ -1173,7 +1201,7 @@ Two migration patterns were applied:
 
 `logError()` in `src/lib/errors.ts` routes through `logger.error(entry)` — the existing `entry` object shape (`timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`) and `sanitizeInput()` redaction are preserved.
 
-Request ID propagation infrastructure is defined in `src/lib/request-context.ts` (`requestIdMiddleware` + `createRequestLogger`), but **not yet wired** to HTTP handlers — wiring requires extending `typedServerFn` to chain `.middleware([requestIdMiddleware])` and threading `requestId` through stub handlers. This is tracked as future work.
+Request ID propagation infrastructure is defined in `src/lib/request-context.ts` (`requestIdMiddleware` + `createRequestLogger`), but **not yet wired** to HTTP handlers — wiring requires chaining `requestIdMiddleware` via `typedServerFn`'s `.middleware()` method (established in TRACK-043 for rate limiting) and threading `requestId` through stub handlers. This is tracked as future work (TRACK-044).
 
 ---
 
@@ -1269,7 +1297,7 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 - **Redis** as a shared cache layer for:
   - Better-Auth session storage (reduces PostgreSQL session lookups).
   - Dashboard aggregated query results (30s TTL — avoids re-joining 5 tables on every visit).
-  - Rate limiting counters for server functions.
+  - Rate limiting counters for server functions (v1 uses in-memory `Map` per instance — sufficient for single-instance Coolify deployment; Redis needed only when scaling to multiple instances for shared rate limit state).
 - Redis runs as a dedicated Coolify service alongside PostgreSQL. No changes to application logic — only a cache adapter swap in Better-Auth and a query result wrapper in the dashboard server function.
 
 ### Rendering Strategy

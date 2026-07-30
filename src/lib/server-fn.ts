@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import type { z } from 'zod';
+import { createRateLimitMiddleware, type RateLimitConfig } from '@/lib/rate-limiter';
 
 /**
  * A callable server function stub with proper return-type inference.
@@ -23,6 +24,7 @@ interface TypedBuilderWithValidator<TInput, TOutput> {
 }
 
 interface TypedBuilder {
+  middleware(middlewares: unknown[]): TypedBuilder;
   inputValidator<TSchema extends z.ZodType>(
     schema: TSchema,
   ): TypedBuilderWithValidator<z.input<TSchema>, z.output<TSchema>>;
@@ -52,7 +54,22 @@ interface TypedBuilder {
  * export const myFn = typedServerFn({ method: 'GET' })
  *   .handler(async (args) => { const data = Schema.parse(args.data); ... });
  * ```
+ * Usage (rate-limit pattern):
+ * ```ts
+ * export const myFn = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.heavyMutation })
+ *   .inputValidator(Schema)
+ *   .handler(async ({ data }) => ({ result: data.field }));
+ * ```
  */
-export function typedServerFn(opts: { method: 'GET' | 'POST' }): TypedBuilder {
-  return createServerFn(opts) as unknown as TypedBuilder;
+export function typedServerFn(opts: {
+  method: 'GET' | 'POST';
+  rateLimit?: RateLimitConfig;
+}): TypedBuilder {
+  const fn = createServerFn({ method: opts.method }) as unknown as TypedBuilder;
+
+  if (opts.rateLimit) {
+    return fn.middleware([createRateLimitMiddleware(opts.rateLimit)]);
+  }
+
+  return fn;
 }

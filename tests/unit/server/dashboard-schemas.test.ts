@@ -4,8 +4,12 @@ import { describe, it, expect, vi } from 'vitest';
 // Mock createServerFn before importing
 vi.mock('@tanstack/react-start', () => ({
   createServerFn: vi.fn().mockReturnValue({
+    middleware: vi.fn().mockReturnThis(),
     inputValidator: vi.fn().mockReturnThis(),
     handler: vi.fn().mockImplementation((fn) => fn),
+  }),
+  createMiddleware: vi.fn().mockReturnValue({
+    server: vi.fn().mockImplementation((fn) => fn),
   }),
 }));
 

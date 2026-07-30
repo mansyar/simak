@@ -1,0 +1,13 @@
+{
+  "trackId": "application-level-rate-limiting_20260730",
+  "roadmapId": "TRACK-043",
+  "type": "chore",
+  "status": "new",
+  "title": "Application-Level Rate Limiting on Server Functions",
+  "milestone": "12 — Security, Reliability & Real-Time Infrastructure",
+  "branch": "track-043/application-level-rate-limiting",
+  "dependencies": ["TRACK-032"],
+  "coordinateWith": ["TRACK-044"],
+  "createdAt": "2026-07-30T00:00:00.000Z",
+  "updatedAt": "2026-07-30T00:00:00.000Z"
+}

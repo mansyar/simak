@@ -1,5 +1,6 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in notifications.server.ts
+import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
@@ -20,21 +21,23 @@ export const ListNotificationsSchema = z.object({
   unreadOnly: z.boolean().optional(),
 });
 
-export const createNotification = typedServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
-    const { createNotificationHandler } = await import('./notifications.server');
-    const data = CreateNotificationSchema.parse(args.data);
-    return createNotificationHandler({ data });
-  },
-);
+export const createNotification = typedServerFn({
+  method: 'POST',
+  rateLimit: RATE_LIMITS.destructive,
+}).handler(async (args: { data: unknown }) => {
+  const { createNotificationHandler } = await import('./notifications.server');
+  const data = CreateNotificationSchema.parse(args.data);
+  return createNotificationHandler({ data });
+});
 
-export const listNotifications = typedServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
-    const { listNotificationsHandler } = await import('./notifications.server');
-    const data = ListNotificationsSchema.parse(args.data);
-    return listNotificationsHandler({ data });
-  },
-);
+export const listNotifications = typedServerFn({
+  method: 'GET',
+  rateLimit: RATE_LIMITS.standardRead,
+}).handler(async (args: { data: unknown }) => {
+  const { listNotificationsHandler } = await import('./notifications.server');
+  const data = ListNotificationsSchema.parse(args.data);
+  return listNotificationsHandler({ data });
+});
 
 // --- Phase 1: New schemas and stubs ---
 

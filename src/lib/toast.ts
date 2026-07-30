@@ -12,6 +12,7 @@ const VALID_ERROR_CODES: readonly ErrorCode[] = [
   'BAD_REQUEST',
   'CONFLICT',
   'INTERNAL',
+  'RATE_LIMITED',
 ];
 
 const ERROR_CODE_TO_KEY: Record<ErrorCode | 'NETWORK', TranslationKey> = {
@@ -22,6 +23,7 @@ const ERROR_CODE_TO_KEY: Record<ErrorCode | 'NETWORK', TranslationKey> = {
   BAD_REQUEST: 'error.badRequest',
   CONFLICT: 'error.conflict',
   INTERNAL: 'error.internal',
+  RATE_LIMITED: 'error.rateLimited',
   NETWORK: 'error.network',
 };
 

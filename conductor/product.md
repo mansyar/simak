@@ -603,4 +603,18 @@ Students and instructors lack a centralized system to:
 - **FR-3 deviation** — `prepare` was NOT added to the `drizzle()` call because drizzle-orm 0.45.2's DrizzleConfig type doesn't support `prepare`; the postgres.js client setting is sufficient
 - **Tests** — 3,867 tests pass across 380 test files; coverage ≥80% on all thresholds (stmts 87.94%, branches 80.93%, funcs 83.4%, lines 88.56%)
 
+### Track: Application-Level Rate Limiting on Server Functions (TRACK-043) (July 2026)
+
+- **Application-level rate limiting** — All 85 authenticated TanStack Start server functions are now rate-limited via `typedServerFn`'s optional `rateLimit` config; Better Auth's built-in rate limiting only covers `/api/auth/*` endpoints
+- **4-tier rate limit presets** — `RATE_LIMITS` in `src/lib/rate-limiter.ts`: `presignedUrl` (20/min, R2 cost abuse prevention), `heavyMutation` (10/min, submissions/reviews), `destructive` (5/min, admin-level operations), `standardRead` (60/min, dashboards/lists/detail views)
+- **In-memory sliding window** — Module-level `Map` store keyed by `userId:fnId`; per-user + per-function isolation; window resets after configured time elapses; denies without incrementing when at max (prevents permanent lockout)
+- **`typedServerFn` extension** — `.middleware()` method added to `TypedBuilder` interface; `rateLimit?: RateLimitConfig` optional config chains `createRateLimitMiddleware()` via `.middleware()`; pass-through when omitted
+- **Unauthenticated pass-through** — Middleware calls `getSessionFromHeaders()`; if no session, passes through to `next()` without rate limiting (route guards handle unauthenticated access)
+- **`RATE_LIMITED` error code** — Added to `ErrorCode` enum in `src/lib/errors.ts`; mapped to `error.rateLimited` i18n key in `src/lib/toast.ts` ("Too many requests. Please wait a moment and try again." / "Terlalu banyak permintaan. Mohon tunggu sebentar dan coba lagi.")
+- **Exempt functions** — `_getSession` (internal, cascading concern), `getUnreadCount`/`markRead`/`markAllRead` (high-frequency UX, 30s polling), `completePasswordSetup` (token-based, no session)
+- **Single-instance scope** — In-memory `Map` sufficient for current single-instance Coolify deployment; Redis-backed store deferred for multi-instance
+- **`.middleware()` shared infrastructure** — The `.middleware()` method on `TypedBuilder` is shared with TRACK-044 (request-scoped context)
+- **i18n** — 1 new key in both EN and ID locales (`error.rateLimited`)
+- **Tests** — 3,919 tests pass across 384 test files; coverage ≥80% on all thresholds (stmts 87.91%, branches 81.04%, funcs 83.31%, lines 88.54%); `rate-limiter.ts` and `server-fn.ts` at 100% coverage
+
 </protect>

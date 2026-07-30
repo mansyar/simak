@@ -1,3 +1,4 @@
+import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
@@ -40,14 +41,14 @@ export type EmailQueueSummary = {
 
 // ---- Server Function Stubs ----
 
-export const listEmailQueue = typedServerFn({ method: 'GET' })
+export const listEmailQueue = typedServerFn({ method: 'GET', rateLimit: RATE_LIMITS.standardRead })
   .inputValidator(ListEmailQueueSchema)
   .handler(async ({ data }) => {
     const { listEmailQueueHandler } = await import('./email-queue.server');
     return listEmailQueueHandler({ data });
   });
 
-export const retryEmail = typedServerFn({ method: 'POST' })
+export const retryEmail = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.destructive })
   .inputValidator(RetryEmailSchema)
   .handler(async ({ data }) => {
     const { retryEmailHandler } = await import('./email-queue.server');

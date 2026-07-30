@@ -8,6 +8,7 @@ export const ErrorCode = {
   BAD_REQUEST: 'BAD_REQUEST',
   CONFLICT: 'CONFLICT',
   INTERNAL: 'INTERNAL',
+  RATE_LIMITED: 'RATE_LIMITED',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

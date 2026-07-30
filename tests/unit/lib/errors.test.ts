@@ -4,6 +4,7 @@ import {
   ErrorCode,
   serverError,
   logError,
+  isServerError,
   type ServerError,
   type ErrorContext,
 } from '@/lib/errors';
@@ -30,6 +31,10 @@ describe('ErrorCode', () => {
     ];
     expect(codes).toHaveLength(6);
     codes.forEach((code) => expect(typeof code).toBe('string'));
+  });
+
+  it('includes RATE_LIMITED', () => {
+    expect(ErrorCode.RATE_LIMITED).toBe('RATE_LIMITED');
   });
 });
 
@@ -75,6 +80,22 @@ describe('serverError', () => {
     expect(entry.message).toBe('Invalid input');
     expect(entry.userId).toBe('user-123');
     expect(entry.handler).toBe('createUser');
+  });
+
+  it('returns a RATE_LIMITED ServerError', () => {
+    const result = serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded');
+
+    expect(result).toEqual({
+      error: { code: 'RATE_LIMITED', message: 'Rate limit exceeded' },
+    });
+  });
+});
+
+describe('isServerError', () => {
+  it('returns true for a RATE_LIMITED server error', () => {
+    const result = serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded');
+
+    expect(isServerError(result)).toBe(true);
   });
 });
 

@@ -7,8 +7,12 @@ const mockAssignmentsFn = vi.hoisted(() => vi.fn().mockResolvedValue({ assignmen
 vi.mock('@tanstack/react-start', () => ({
   useServerFn: vi.fn(() => mockAssignmentsFn),
   createServerFn: vi.fn().mockReturnValue({
+    middleware: vi.fn().mockReturnThis(),
     inputValidator: vi.fn().mockReturnThis(),
     handler: vi.fn().mockImplementation((fn) => fn),
+  }),
+  createMiddleware: vi.fn().mockReturnValue({
+    server: vi.fn().mockImplementation((fn) => fn),
   }),
 }));
 
