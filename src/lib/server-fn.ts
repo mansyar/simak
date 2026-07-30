@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import type { z } from 'zod';
 import { createRateLimitMiddleware, type RateLimitConfig } from '@/lib/rate-limiter';
+import { requestIdMiddleware } from '@/lib/request-context';
 
 /**
  * A callable server function stub with proper return-type inference.
@@ -67,9 +68,10 @@ export function typedServerFn(opts: {
 }): TypedBuilder {
   const fn = createServerFn({ method: opts.method }) as unknown as TypedBuilder;
 
+  const middlewares: unknown[] = [requestIdMiddleware];
   if (opts.rateLimit) {
-    return fn.middleware([createRateLimitMiddleware(opts.rateLimit)]);
+    middlewares.push(createRateLimitMiddleware(opts.rateLimit));
   }
 
-  return fn;
+  return fn.middleware(middlewares);
 }
