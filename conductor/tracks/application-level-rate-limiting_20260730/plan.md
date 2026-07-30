@@ -3,36 +3,36 @@
 
 ## Phase 1: Rate Limit Infrastructure (ErrorCode + rate-limiter module)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Write tests for `RATE_LIMITED` error code (TDD Red Phase)
-    - [ ] Add test in `tests/unit/lib/errors.test.ts` (or existing error test file): `ErrorCode.RATE_LIMITED` equals `'RATE_LIMITED'`
-    - [ ] Add test: `serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded')` returns `{ error: { code: 'RATE_LIMITED', message: 'Rate limit exceeded' } }`
-    - [ ] Add test: `isServerError` returns `true` for a `RATE_LIMITED` server error
-    - [ ] Run `pnpm test` and confirm new tests fail (`RATE_LIMITED` not yet in enum)
-- [ ] Task: Add `RATE_LIMITED` to `ErrorCode` enum in `src/lib/errors.ts` (TDD Green Phase)
-    - [ ] Add `RATE_LIMITED: 'RATE_LIMITED'` to the `ErrorCode` const object
-    - [ ] Run `pnpm test` and confirm all error code tests pass
-- [ ] Task: Write tests for `src/lib/rate-limiter.ts` (TDD Red Phase)
-    - [ ] Create `tests/unit/lib/rate-limiter.test.ts` with `/** @vitest-environment node */` header
-    - [ ] Mock `@tanstack/react-start` (for `createMiddleware`), `@/server/auth` (for `getSessionFromHeaders`), `@/lib/logger` (for logger used by errors.ts)
-    - [ ] Test `checkRateLimit`: allows requests up to `max` within the window (returns `true` for each)
-    - [ ] Test `checkRateLimit`: denies when `count >= max` (returns `false`, does NOT increment)
-    - [ ] Test `checkRateLimit`: resets after window expiry (`Date.now() - windowStart > window * 1000` → new window, count resets to 1, returns `true`)
-    - [ ] Test `checkRateLimit`: per-key isolation (different keys have independent counters)
-    - [ ] Test `RATE_LIMITS` presets: `presignedUrl` = `{ window: 60, max: 20 }`, `heavyMutation` = `{ window: 60, max: 10 }`, `destructive` = `{ window: 60, max: 5 }`, `standardRead` = `{ window: 60, max: 60 }`
-    - [ ] Test `createRateLimitMiddleware`: passes through (calls `next()`) when `getSessionFromHeaders()` returns null (unauthenticated)
-    - [ ] Test `createRateLimitMiddleware`: allows (calls `next()`) when under the limit
-    - [ ] Test `createRateLimitMiddleware`: short-circuits with `serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded')` when limit exceeded (does NOT call `next()`)
-    - [ ] Test `createRateLimitMiddleware`: each call generates a unique `fnId` (per-function isolation — two middlewares with the same config have independent counters for the same userId)
-    - [ ] Export a `resetRateLimitStoreForTests()` function and call it in `beforeEach` to reset the module-level `Map` between tests
-    - [ ] Run `pnpm test` and confirm new tests fail (`rate-limiter.ts` not yet created)
-- [ ] Task: Implement `src/lib/rate-limiter.ts` (TDD Green Phase)
-    - [ ] Define `RateLimitConfig` type: `{ window: number; max: number }`
-    - [ ] Define `RATE_LIMITS` presets constant (4 presets: `presignedUrl`, `heavyMutation`, `destructive`, `standardRead`)
-    - [ ] Implement `checkRateLimit(store: Map<string, { count: number; windowStart: number }>, key: string, config: RateLimitConfig): boolean` — sliding window logic (window expiry → reset; under max → increment + allow; at/over max → deny without increment)
-    - [ ] Implement `createRateLimitMiddleware(config: RateLimitConfig)` — auto-incrementing `fnIdCounter`, returns `createMiddleware({ type: 'request' }).server(async ({ next }) => { ... })` that calls `getSessionFromHeaders()`, checks rate limit, short-circuits with `serverError(ErrorCode.RATE_LIMITED, ...)` or calls `next()`
-    - [ ] Export `resetRateLimitStoreForTests()` for test cleanup
-    - [ ] Run `pnpm test` and confirm all rate-limiter tests pass
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
+- [x] Task: Write tests for `RATE_LIMITED` error code (TDD Red Phase)
+    - [x] Add test in `tests/unit/lib/errors.test.ts` (or existing error test file): `ErrorCode.RATE_LIMITED` equals `'RATE_LIMITED'`
+    - [x] Add test: `serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded')` returns `{ error: { code: 'RATE_LIMITED', message: 'Rate limit exceeded' } }`
+    - [x] Add test: `isServerError` returns `true` for a `RATE_LIMITED` server error
+    - [x] Run `pnpm test` and confirm new tests fail (`RATE_LIMITED` not yet in enum)
+- [x] Task: Add `RATE_LIMITED` to `ErrorCode` enum in `src/lib/errors.ts` (TDD Green Phase)
+    - [x] Add `RATE_LIMITED: 'RATE_LIMITED'` to the `ErrorCode` const object
+    - [x] Run `pnpm test` and confirm all error code tests pass
+- [x] Task: Write tests for `src/lib/rate-limiter.ts` (TDD Red Phase)
+    - [x] Create `tests/unit/lib/rate-limiter.test.ts` with `/** @vitest-environment node */` header
+    - [x] Mock `@tanstack/react-start` (for `createMiddleware`), `@/server/auth` (for `getSessionFromHeaders`), `@/lib/logger` (for logger used by errors.ts)
+    - [x] Test `checkRateLimit`: allows requests up to `max` within the window (returns `true` for each)
+    - [x] Test `checkRateLimit`: denies when `count >= max` (returns `false`, does NOT increment)
+    - [x] Test `checkRateLimit`: resets after window expiry (`Date.now() - windowStart > window * 1000` → new window, count resets to 1, returns `true`)
+    - [x] Test `checkRateLimit`: per-key isolation (different keys have independent counters)
+    - [x] Test `RATE_LIMITS` presets: `presignedUrl` = `{ window: 60, max: 20 }`, `heavyMutation` = `{ window: 60, max: 10 }`, `destructive` = `{ window: 60, max: 5 }`, `standardRead` = `{ window: 60, max: 60 }`
+    - [x] Test `createRateLimitMiddleware`: passes through (calls `next()`) when `getSessionFromHeaders()` returns null (unauthenticated)
+    - [x] Test `createRateLimitMiddleware`: allows (calls `next()`) when under the limit
+    - [x] Test `createRateLimitMiddleware`: short-circuits with `serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded')` when limit exceeded (does NOT call `next()`)
+    - [x] Test `createRateLimitMiddleware`: each call generates a unique `fnId` (per-function isolation — two middlewares with the same config have independent counters for the same userId)
+    - [x] Export a `resetRateLimitStoreForTests()` function and call it in `beforeEach` to reset the module-level `Map` between tests
+    - [x] Run `pnpm test` and confirm new tests fail (`rate-limiter.ts` not yet created)
+- [x] Task: Implement `src/lib/rate-limiter.ts` (TDD Green Phase) `8a20ce6`
+    - [x] Define `RateLimitConfig` type: `{ window: number; max: number }`
+    - [x] Define `RATE_LIMITS` presets constant (4 presets: `presignedUrl`, `heavyMutation`, `destructive`, `standardRead`)
+    - [x] Implement `checkRateLimit(store: Map<string, { count: number; windowStart: number }>, key: string, config: RateLimitConfig): boolean` — sliding window logic (window expiry → reset; under max → increment + allow; at/over max → deny without increment)
+    - [x] Implement `createRateLimitMiddleware(config: RateLimitConfig)` — auto-incrementing `fnIdCounter`, returns `createMiddleware({ type: 'request' }).server(async ({ next }) => { ... })` that calls `getSessionFromHeaders()`, checks rate limit, short-circuits with `serverError(ErrorCode.RATE_LIMITED, ...)` or calls `next()`
+    - [x] Export `resetRateLimitStoreForTests()` for test cleanup
+    - [x] Run `pnpm test` and confirm all rate-limiter tests pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Rate Limit Infrastructure' (Protocol in workflow.md)
 
 ## Phase 2: Extend typedServerFn with .middleware() + rateLimit config
