@@ -35,20 +35,20 @@
 
 ## Phase 2: Pino Mixin in Logger (FR-3)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Update `tests/unit/lib/logger.test.ts` for mixin behavior (TDD Red Phase)
-    - [ ] Import `requestContextStorage` from `@/lib/request-context-store` in the test file
-    - [ ] New test (production mode): mixin returns `{ requestId: 'test-id' }` when `requestContextStorage.run({ requestId: 'test-id' }, () => logger.info('msg'))` is called — verify parsed JSON log output contains `requestId: 'test-id'`
-    - [ ] New test (production mode): mixin returns `{}` when `requestId` is NOT in AsyncLocalStorage — verify parsed JSON log output does NOT contain a `requestId` field
-    - [ ] New test (production mode): child logger bindings persist alongside mixin — `logger.child({ requestId: 'bg-job-id' }).info('msg')` outside AsyncLocalStorage context produces log output with `requestId: 'bg-job-id'` (from child binding, not mixin)
-    - [ ] New test (production mode): when both AsyncLocalStorage and child logger have `requestId`, the mixin value does NOT override the child logger binding (or verify pino's merge behavior — document the actual behavior)
-    - [ ] Existing tests (JSON output, pretty output, LOG_LEVEL, logger methods) still pass — regression check
-    - [ ] Run `pnpm test` and confirm new tests fail (mixin not yet added to `createLogger()`)
-- [ ] Task: Add pino `mixin` to `createLogger()` in `src/lib/logger.ts` (TDD Green Phase)
-    - [ ] Import `requestContextStorage` from `@/lib/request-context-store`
-    - [ ] Define `mixin` function: `() => { const store = requestContextStorage.getStore(); return store ? { requestId: store.requestId } : {}; }`
-    - [ ] Add `mixin` to pino config in both production (`pino({ level, mixin }, stream)`) and development (`pino({ level, mixin }, prettyStream)`) code paths
-    - [ ] Run `pnpm test` and confirm all `logger.test.ts` tests pass
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation (d15de12)
+- [x] Task: Update `tests/unit/lib/logger.test.ts` for mixin behavior (TDD Red Phase) (d15de12)
+    - [x] Import `requestContextStorage` from `@/lib/request-context-store` in the test file
+    - [x] New test (production mode): mixin returns `{ requestId: 'test-id' }` when `requestContextStorage.run({ requestId: 'test-id' }, () => logger.info('msg'))` is called — verify parsed JSON log output contains `requestId: 'test-id'`
+    - [x] New test (production mode): mixin returns `{}` when `requestId` is NOT in AsyncLocalStorage — verify parsed JSON log output does NOT contain a `requestId` field
+    - [x] New test (production mode): child logger bindings persist alongside mixin — `logger.child({ requestId: 'bg-job-id' }).info('msg')` outside AsyncLocalStorage context produces log output with `requestId: 'bg-job-id'` (from child binding, not mixin)
+    - [x] New test (production mode): when both AsyncLocalStorage and child logger have `requestId`, the mixin value does NOT override the child logger binding (or verify pino's merge behavior — document the actual behavior; pino uses the mixin value)
+    - [x] Existing tests (JSON output, pretty output, LOG_LEVEL, logger methods) still pass — regression check
+    - [x] Run `pnpm test` and confirm new tests fail (mixin not yet added to `createLogger()`)
+- [x] Task: Add pino `mixin` to `createLogger()` in `src/lib/logger.ts` (TDD Green Phase) (d15de12)
+    - [x] Import `requestContextStorage` from `@/lib/request-context-store`
+    - [x] Define `mixin` function: `() => { const store = requestContextStorage.getStore(); return store ? { requestId: store.requestId } : {}; }`
+    - [x] Add `mixin` to pino config in both production (`pino({ level, mixin }, stream)`) and development (`pino({ level, mixin }, prettyStream)`) code paths
+    - [x] Run `pnpm test` and confirm all `logger.test.ts` tests pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Pino Mixin in Logger' (Protocol in workflow.md)
 
 ## Phase 3: Wire requestIdMiddleware to typedServerFn (FR-4)
