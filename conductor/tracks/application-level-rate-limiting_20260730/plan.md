@@ -67,7 +67,7 @@
     - [x] If any tests fail, investigate and fix (the mock update is additive — it should not break existing behavior) — all 3,919 tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Update Existing Test Mocks' (Protocol in workflow.md)
 
-## Phase 4: Annotate Server Functions with Rate Limit Config
+## Phase 4: Annotate Server Functions with Rate Limit Config [checkpoint: 39a51db]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
 - [x] Task: Annotate Tier 1 functions — presigned URLs (`RATE_LIMITS.presignedUrl`, 20/min)
