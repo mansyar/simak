@@ -53,19 +53,19 @@
 
 ## Phase 3: Wire requestIdMiddleware to typedServerFn (FR-4)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Update `tests/unit/lib/server-fn.test.ts` for always-chained middleware (TDD Red Phase)
-    - [ ] Update test "does NOT call .middleware() when rateLimit is omitted (pass-through)" → rename to "calls .middleware([requestIdMiddleware]) when rateLimit is omitted" — assert `builder.middleware` WAS called (not `not.toHaveBeenCalled()`)
-    - [ ] New test: `.middleware()` is called with an array containing `requestIdMiddleware` (or at least one function) when `rateLimit` is omitted — verify the middleware array includes the request ID middleware
-    - [ ] Update test "calls .middleware([...]) when rateLimit is provided" → verify `.middleware()` is called with an array containing BOTH `requestIdMiddleware` and the rate limit middleware (array length >= 2)
-    - [ ] Existing builder chain tests (typed-builder pattern, inline-parse pattern, rateLimit + builder chain, regression tests) still pass
-    - [ ] Run `pnpm test` and confirm new/updated tests fail (middleware not yet always-chained in `typedServerFn`)
-- [ ] Task: Wire `requestIdMiddleware` in `typedServerFn` (TDD Green Phase)
-    - [ ] Import `requestIdMiddleware` from `@/lib/request-context` in `src/lib/server-fn.ts`
-    - [ ] Replace the `if (opts.rateLimit) { return fn.middleware([...]); } return fn;` logic with always-chain: construct `middlewares = [requestIdMiddleware]`, push `createRateLimitMiddleware(opts.rateLimit)` when `rateLimit` is provided, call `fn.middleware(middlewares)`
-    - [ ] Run `pnpm test` and confirm all `server-fn.test.ts` tests pass
-- [ ] Task: Run `pnpm test` to verify all existing tests still pass (no other test files should break — the `middleware: vi.fn().mockReturnThis()` mock from TRACK-043 handles the always-chained `.middleware()` call)
-    - [ ] If any tests fail, investigate — the mock update from TRACK-043 should be sufficient, but verify no test asserts `.middleware()` was NOT called outside of `server-fn.test.ts`
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation (d63bf09)
+- [x] Task: Update `tests/unit/lib/server-fn.test.ts` for always-chained middleware (TDD Red Phase) (d63bf09)
+    - [x] Update test "does NOT call .middleware() when rateLimit is omitted (pass-through)" → rename to "calls .middleware([requestIdMiddleware]) when rateLimit is omitted" — assert `builder.middleware` WAS called (not `not.toHaveBeenCalled()`)
+    - [x] New test: `.middleware()` is called with an array containing `requestIdMiddleware` (or at least one function) when `rateLimit` is omitted — verify the middleware array includes the request ID middleware
+    - [x] Update test "calls .middleware([...]) when rateLimit is provided" → verify `.middleware()` is called with an array containing BOTH `requestIdMiddleware` and the rate limit middleware (array length >= 2)
+    - [x] Existing builder chain tests (typed-builder pattern, inline-parse pattern, rateLimit + builder chain, regression tests) still pass
+    - [x] Run `pnpm test` and confirm new/updated tests fail (middleware not yet always-chained in `typedServerFn`)
+- [x] Task: Wire `requestIdMiddleware` in `typedServerFn` (TDD Green Phase) (d63bf09)
+    - [x] Import `requestIdMiddleware` from `@/lib/request-context` in `src/lib/server-fn.ts`
+    - [x] Replace the `if (opts.rateLimit) { return fn.middleware([...]); } return fn;` logic with always-chain: construct `middlewares = [requestIdMiddleware]`, push `createRateLimitMiddleware(opts.rateLimit)` when `rateLimit` is provided, call `fn.middleware(middlewares)`
+    - [x] Run `pnpm test` and confirm all `server-fn.test.ts` tests pass
+- [x] Task: Run `pnpm test` to verify all existing tests still pass (no other test files should break — the `middleware: vi.fn().mockReturnThis()` mock from TRACK-043 handles the always-chained `.middleware()` call) (d63bf09)
+    - [x] Investigated intermittent Vitest/Zod unhandled rejection: full suite passes serially with `--maxWorkers=1`; individual reported tests pass, implicating the default parallel vmThreads runner rather than track changes.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Wire requestIdMiddleware to typedServerFn' (Protocol in workflow.md)
 
 ## Phase 4: Documentation & Final Verification
