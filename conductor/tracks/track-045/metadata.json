@@ -1,0 +1,10 @@
+{
+  "trackId": "track-045",
+  "title": "Graceful Shutdown & Background Processor Drain",
+  "type": "bug",
+  "status": "new",
+  "milestone": "12 — Security, Reliability & Real-Time Infrastructure",
+  "dependencies": [],
+  "createdAt": "2026-07-30T19:21:00.000Z",
+  "updatedAt": "2026-07-30T19:21:00.000Z"
+}

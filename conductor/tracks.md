@@ -8,4 +8,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
+- [ ] **Track: TRACK-045 — Graceful Shutdown & Background Processor Drain** *Link: [./tracks/track-045/index.md](./tracks/track-045/index.md)*
 
