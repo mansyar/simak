@@ -4,7 +4,7 @@
 
 These are the building blocks that the shutdown handler depends on.
 
-- [ ] **Task 1.1: Add `SHUTDOWN_TIMEOUT_MS` env var**
+- [x] **Task 1.1: Add `SHUTDOWN_TIMEOUT_MS` env var** `28d70a6`
   - [ ] Write test verifying `SHUTDOWN_TIMEOUT_MS` defaults to 10000 and coerces from string
   - [ ] Add `SHUTDOWN_TIMEOUT_MS: z.coerce.number().int().positive().default(10000)` to Zod schema in `src/config/env.ts`
   - [ ] Add `SHUTDOWN_TIMEOUT_MS=10000` to `.env.example`
