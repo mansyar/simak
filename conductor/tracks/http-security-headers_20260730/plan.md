@@ -71,7 +71,7 @@
     - [x] Verify Better Auth login flow works (no CSP violations) — Pre-existing SSR error prevents testing, NOT caused by CSP
     - [x] Verify DOCX iframe preview works (no `frame-src` violations) — frame-src 'self' allows iframes, Report-Only in dev
     - [x] Verify hydration scripts load (no `script-src` violations) — Nonce-based script-src with strict-dynamic, verified nonce in HTML
-- [ ] Task: Conductor - User Manual Verification 'E2E Test' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'E2E Test' (Protocol in workflow.md)
 
 ## Phase 5: Documentation & Final Verification
 
