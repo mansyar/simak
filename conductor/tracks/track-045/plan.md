@@ -84,7 +84,7 @@ The new `src/lib/shutdown.ts` module that ties drain + DB closure + signal handl
 
 Full-system quality gate before marking the track complete.
 
-- [ ] **Task 5.1: Full suite verification**
+- [x] **Task 5.1: Full suite verification** (commits `c714fdf6`, `8bbcd552`)
   - [ ] Run `pnpm test` — all unit tests pass
   - [ ] Run `pnpm typecheck` — clean
   - [ ] Run `pnpm lint` — clean
