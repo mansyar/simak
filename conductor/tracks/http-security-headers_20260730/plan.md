@@ -88,4 +88,7 @@
     - [x] `pnpm test:coverage` (verify ≥80% thresholds for new code)
     - [x] Verify `src/start.ts` + `src/lib/security-headers.ts` under 500 lines each (`node scripts/check-modularity.js`)
 - [x] Task: Conductor - User Manual Verification 'Documentation & Final Verification' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions c6bda86d
 </protect>
