@@ -21,6 +21,7 @@ const envSchema = z.object({
     .optional()
     .transform((val) => val === 'true')
     .default(false),
+  SHUTDOWN_TIMEOUT_MS: z.coerce.number().int().positive().default(10000),
 });
 
 export type Env = z.infer<typeof envSchema>;

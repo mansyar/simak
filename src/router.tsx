@@ -2,10 +2,13 @@ import { createRouter } from '@tanstack/react-router';
 import { getGlobalStartContext } from '@tanstack/react-start';
 import { routeTree } from './routeTree.gen';
 
-// Start background email queue processor on the server only
+// Start background email queue processor and register shutdown handlers on the server only
 if (import.meta.env.SSR) {
   import('./lib/email-queue-init').then(({ startEmailQueue }) => {
     startEmailQueue();
+  });
+  import('./lib/shutdown').then(({ registerShutdownHandlers }) => {
+    registerShutdownHandlers();
   });
 }
 

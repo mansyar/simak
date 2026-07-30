@@ -174,3 +174,21 @@ export async function processEmailQueue(): Promise<{
 
   return { processed, sent, failed, reclaimed };
 }
+
+export async function reclaimAllProcessingRows(): Promise<{ reclaimed: number }> {
+  const db = getDb();
+  const startupLogger = logger.child({ requestId: crypto.randomUUID() });
+
+  const result = (await db
+    .update(emailQueue)
+    .set({ status: 'pending' })
+    .where(eq(emailQueue.status, 'processing'))) as { rowCount?: number };
+
+  const reclaimed = result?.rowCount ?? 0;
+
+  if (reclaimed > 0) {
+    startupLogger.info({ event: 'email_queue.startup_reclaimed', count: reclaimed });
+  }
+
+  return { reclaimed };
+}

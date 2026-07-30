@@ -1,4 +1,4 @@
-import { processEmailQueue } from './email-queue-processor';
+import { processEmailQueue, reclaimAllProcessingRows } from './email-queue-processor';
 import { pruneOldEmails } from './email-queue-retention';
 import { processDeadlineReminders } from './deadline-reminder-scanner';
 import { processOrphanedR2Objects } from './r2-cleanup';
@@ -13,6 +13,7 @@ let isRunning = false;
 let lastPruneAt: Date | null = null;
 let lastReminderScanAt: Date | null = null;
 let lastR2CleanupAt: Date | null = null;
+let currentTickPromise: Promise<void> | null = null;
 
 async function tick(): Promise<void> {
   if (isRunning) return;
@@ -77,17 +78,23 @@ async function tick(): Promise<void> {
 export function startEmailQueue(): void {
   if (intervalId !== null) return;
 
-  tick();
-
-  intervalId = setInterval(tick, POLL_INTERVAL_MS);
+  reclaimAllProcessingRows().then(() => {
+    currentTickPromise = tick();
+    intervalId = setInterval(() => {
+      if (!isRunning) currentTickPromise = tick();
+    }, POLL_INTERVAL_MS);
+  });
 }
 
 /**
- * Stop the background email queue processor.
+ * Stop the background email queue processor and drain any in-flight tick.
  */
-export function stopEmailQueue(): void {
+export async function stopGracefully(): Promise<void> {
   if (intervalId !== null) {
     clearInterval(intervalId);
     intervalId = null;
+  }
+  if (currentTickPromise) {
+    await currentTickPromise;
   }
 }
