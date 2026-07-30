@@ -7,10 +7,10 @@
   - [x] Confirm deployment scope, quality gates, and evidence requirements.
   - [x] Record the target source branch and revision for the pilot release.
     - Pilot release baseline: `track-047/coolify-private-pilot-deployment` at `a95e2c5272c40f25e06ff15711f9c12d01b2cf68`.
-- [ ] Task: Validate the production artifact before Coolify configuration
-  - [ ] Run `pnpm test:coverage`, `pnpm typecheck`, and `pnpm lint`.
-  - [ ] Build the production image using `docker/Dockerfile`.
-  - [ ] Verify the image contains the app, migration runner, seed runner, migrations, and `/api/health` health check.
+- [x] Task: Validate the production artifact before Coolify configuration [5adf406]
+  - [x] Run `pnpm test:coverage`, `pnpm typecheck`, and `pnpm lint`.
+  - [x] Build the production image using `docker/Dockerfile`.
+  - [x] Verify the image contains the app, migration runner, seed runner, migrations, and `/api/health` health check.
 - [ ] Task: Document the release baseline and pre-deployment prerequisites.
 - [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 
