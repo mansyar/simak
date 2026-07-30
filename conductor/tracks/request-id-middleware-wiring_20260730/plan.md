@@ -33,7 +33,7 @@
     - [x] Run `pnpm test` and confirm all `request-context.test.ts` tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 1: AsyncLocalStorage Store + Request Context Middleware' (Protocol in workflow.md) (f354406)
 
-## Phase 2: Pino Mixin in Logger (FR-3)
+## Phase 2: Pino Mixin in Logger (FR-3) [checkpoint: d15de12]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation (d15de12)
 - [x] Task: Update `tests/unit/lib/logger.test.ts` for mixin behavior (TDD Red Phase) (d15de12)
@@ -49,7 +49,7 @@
     - [x] Define `mixin` function: `() => { const store = requestContextStorage.getStore(); return store ? { requestId: store.requestId } : {}; }`
     - [x] Add `mixin` to pino config in both production (`pino({ level, mixin }, stream)`) and development (`pino({ level, mixin }, prettyStream)`) code paths
     - [x] Run `pnpm test` and confirm all `logger.test.ts` tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Pino Mixin in Logger' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Pino Mixin in Logger' (Protocol in workflow.md) (d15de12)
 
 ## Phase 3: Wire requestIdMiddleware to typedServerFn (FR-4)
 
