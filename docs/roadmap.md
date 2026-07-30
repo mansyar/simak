@@ -419,6 +419,65 @@ All tracks must adhere to the following project constraints:
 
 ---
 
+### TRACK-047: Coolify Private-Pilot Deployment
+
+- **Status:** 📋 Planned · **Audit IDs:** None (production-readiness track) · **Deps:** TRACK-038 (health endpoint), TRACK-041 (security headers), TRACK-042 (DB pool configuration), TRACK-045 (graceful shutdown)
+- **Problem:** SIMAK has a Docker image and production migration runner, but has not been deployed. The first private pilot needs a repeatable Coolify deployment topology, isolated production data services, safe automated migrations, configured external integrations, and an operational runbook. Running migrations in the application container command couples migration failure to every application restart.
+- **Decisions:** Deploy one SIMAK application instance for an invite-only private pilot. Create a new production database in the existing Coolify PostgreSQL service; do not reuse development data. Use a dedicated production Cloudflare R2 bucket. Add a production Docker Compose file that orchestrates the SIMAK application while connecting to the separately Coolify-managed PostgreSQL service. Run the advisory-locked `migrate.mjs` automatically as a Coolify pre-deploy step using `MIGRATE_DATABASE_URL` when a direct migration connection is required; the application container starts only `index.mjs`. Run the idempotent SuperAdmin seed as a separate one-off command during the initial deployment only. The environment may be provisioned by this track, but onboarding real pilot data is blocked until TRACK-048 verifies backup and restore readiness.
+- **Scope:** Add `docker-compose.prod.yml` for the production application topology; adjust Docker startup so it does not run migrations; document/configure the Coolify pre-deploy migration command, health check, production environment variables, domain/TLS, R2 CORS, Resend sender verification, and first-deployment seed command; create deployment, smoke-test, migration rollback, and incident runbooks. The Compose file must not define a second PostgreSQL service or automatically start a migration sidecar.
+- **Execution vectors:** Verify the existing Docker image builds and contains `migrate.mjs`, `seed.mjs`, and migrations; define an app-only Compose service with production restart/health-check configuration and external database environment variables; define a one-off pre-deploy migration command using the same image and its direct migration connection where needed; configure Coolify to execute the migration before releasing the new application version; provision the new database and R2 bucket; configure all required secrets in Coolify; deploy to the production domain; run smoke checks for health, login, role guards, direct R2 upload/download, email enqueue, and background-job logs; document deploy failure and migration rollback procedures.
+- **Definition of Done:** A new isolated production database and dedicated R2 bucket are configured; Coolify deploys the Compose topology over HTTPS to the configured domain; migrations execute automatically before application release and a failed migration prevents release without replacing the healthy version; application startup no longer runs migrations; initial SuperAdmin seeding is documented and idempotent; `/api/health` passes the platform health check; required env vars, R2 CORS, Resend sender, Better Auth URL/origins, structured logs, and graceful shutdown are verified in production; deployment, smoke-test, migration rollback, and incident runbooks are complete; real pilot-data onboarding remains blocked until TRACK-048 is complete.
+
+---
+
+### TRACK-048: Backup & Restore Readiness
+
+- **Status:** 📋 Planned · **Audit IDs:** None (proactive data-protection and operational-resilience enhancement) · **Deps:** TRACK-047 (private-pilot deployment establishes the production database, dedicated R2 bucket, and deployment environment)
+- **Problem:** SIMAK stores academic records that cannot be recreated easily: users, assignments, checkpoint states, submissions, reviews, rubric scores, final grades, consultations, extensions, and audit logs. Graceful shutdown and transactional integrity protect normal operations, but not accidental destructive actions, failed migrations, database corruption, VPS loss, or a failed volume. The planned private-pilot deployment requires an independently stored PostgreSQL backup policy and verified recovery procedure before it handles real academic data. A generated backup alone is insufficient until restoration is proven.
+- **Decisions:** Run a daily, compressed PostgreSQL logical backup (`pg_dump`) and retain artifacts for 30 days in a dedicated Cloudflare R2 backup bucket, independent of the application VPS and application-upload bucket. A separately scoped backup job—not the web-app process—holds the database read credential and backup-bucket write credential. Capture timestamp, result, artifact size, checksum, and sanitized error in structured logs; the external scheduler or Coolify job must surface a failed run to operators because an in-app email alert cannot be relied upon when the database or application is unavailable. Restoration remains an operator-only runbook procedure, never an in-app admin action. The recovery point objective is up to 24 hours; the recovery-time target will be measured and documented through the restore drill. Review the production R2 configuration for uploaded-file durability, object versioning, and any needed replication, without presuming files must be duplicated.
+- **Scope:** Backup script/container job, external deployment scheduler configuration, dedicated backup-bucket configuration/documentation, job-level failure visibility, restore runbook, isolated restore drill, and R2 uploaded-file durability/versioning review. The restore drill includes schema/migration integrity and a sampled verification that restored submission metadata still resolves to the expected R2 object keys. Application schema and feature behavior are unchanged.
+- **Out of Scope:** Point-in-time recovery, high-availability replicas, a user-facing restore UI, cross-region active-active deployment, backup encryption beyond Cloudflare R2's managed encryption at rest, and mandatory R2 object replication unless the R2 review identifies a gap.
+- **Execution vectors:** Establish a dedicated backup bucket and least-privilege database/R2 credentials; implement and schedule a non-web backup job; validate the upload checksum and capture structured success/failure metadata; force a controlled job failure to verify external operational visibility; restore a recent artifact into an isolated database, run schema/data integrity checks, and sample restored submission-to-object-key references; document the measured restore procedure and R2 review outcome.
+- **Definition of Done:** A daily PostgreSQL backup runs outside the web-app process; the latest 30 days of artifacts are retained in a dedicated bucket outside the application VPS; the backup job records checksum and sanitized outcome metadata; a failed run is visible through the scheduler/platform's external operational signal; a restore has succeeded into an isolated database using the documented runbook, including schema/data checks and sampled submission-object reference verification; R2 uploaded-file durability/versioning has been reviewed and its outcome documented; backup credentials are unavailable to the normal application runtime.
+
+---
+
+### TRACK-049: Instructor Feedback Snippets
+
+- **Status:** 📋 Planned · **Audit IDs:** None (proactive instructor-productivity enhancement) · **Deps:** None
+- **Problem:** SIMAK's review queue already provides FIFO prioritization, SLA indicators, inline PDF/DOCX previews, keyboard navigation, rubric scoring, and next-review navigation. However, instructors still repeatedly compose common feedback in free-text comments, slowing the review bottleneck that gates student checkpoint progress and can lead to SLA breaches. The system has no reusable, instructor-owned feedback library.
+- **Decisions:** Snippets are private to their owning instructor; there is no shared or admin-managed library in this version. Snippets are plain text with a required title, optional free-text category, and bounded body length validated by Zod; dynamic placeholders and HTML/rich-text rendering are deliberately excluded. Inserting a snippet appends its plain text to the editable review comment through an explicit action—it never selects Pass/Revise, completes rubric scores, or submits a review. Snippet updates and archival never alter comments on existing reviews.
+- **Scope:** A small instructor-owned feedback-snippet data model; CRUD server functions with session ownership checks; a dedicated instructor-only `/instructor/feedback-snippets` management route; and review-form insertion that appends text while preserving manual editing. Archived snippets are excluded from the default picker/list but retained for historical management. Include i18n, unit tests, and E2E coverage for snippet ownership and review-form insertion.
+- **Out of Scope:** Shared or department-wide snippet libraries, admin approval workflows, AI-generated feedback, automatic decision recommendations, custom placeholders, and feedback-quality analytics.
+- **Execution vectors:** Add a migration with an instructor-user foreign key, bounded columns, and archival support; implement client-safe stubs and server-only handlers following the established two-file pattern; add the dedicated instructor route and sidebar navigation; integrate a searchable active-snippet picker into the review form while preserving manual editing; verify inserts do not alter review state or rubric behavior; test validation boundaries, cross-instructor access denial, archival behavior, and historical-review immutability.
+- **Definition of Done:** Instructors can create, edit, archive, search, and append only their own validated plain-text snippets; archived snippets are not offered for insertion; insertion leaves comments editable and cannot auto-submit or select a decision; existing review comments remain unchanged after snippet edits; cross-instructor access is rejected; all new UI is bilingual and accessible; unit/E2E tests, typecheck, lint, and coverage gates pass.
+
+---
+
+### TRACK-050: At-Risk Intervention Workflow
+
+- **Status:** 📋 Planned · **Audit IDs:** None (proactive student-support workflow enhancement) · **Deps:** TRACK-023 (at-risk student identification provides risk signals and dashboard context)
+- **Problem:** SIMAK identifies at-risk students from overdue work, approaching deadlines without submissions, insufficient consultations, repeated revisions, and stalled reviews. It surfaces the risk to instructors through dashboard widgets and alerts, but provides no structured record of whether an instructor responded, what support action was chosen, or when follow-up is due. Detection without a human-response workflow risks alert fatigue and makes support activity impossible to track.
+- **Decisions:** Intervention records are private operational records: they are visible only to the current instructor who owns the assignment, never to students or admins; the original actor is retained in the audit history. If an assignment is reassigned, the replacement instructor receives access as the new assignment owner and the former instructor loses access. Each record is scoped to one student and assignment, with at most one open intervention per pair. Creation is available only when the live assessment contains at least one `student_inaction` factor; a `pending_review`-only risk is an instructor-workload issue and cannot create a student intervention. The instructor explicitly manages status (`open`, `monitoring`, `resolved`, `dismissed`) and provides a reason when resolving or dismissing. Follow-up dates are displayed, including overdue state, in instructor views only; they do not create new in-app or email notifications. Risk scoring remains live and separate—an intervention never automatically resolves because risk factors disappear.
+- **Scope:** An intervention data model with immutable audit events; instructor-only server functions and UI launched from at-risk dashboard/assignment context; live student-inaction risk-factor context; action type, private note, status, optional follow-up date, and resolution/dismissal reason; filters and dashboard visibility for open and overdue follow-ups; reassignment-aware authorization. Existing consultation, extension, and discussion workflows remain the mechanisms for carrying out the chosen action.
+- **Out of Scope:** Student-visible risk labels or intervention plans, admin case-management access, automated follow-up notifications, cross-assignment student case files, escalation chains, institutional counseling integrations, and automatic intervention resolution.
+- **Execution vectors:** Add the schema and migration with unique protection for an open student-assignment intervention; implement session/assignment ownership guards in the established server-function split; add dashboard and assignment-context intervention UI; link existing extension/consultation/discussion actions without duplicating them; add immutable audit events; extend assignment reassignment behavior to preserve authorized handover; test privacy boundaries, student-inaction eligibility, pending-review-only rejection, duplicate-open prevention, reassignment access, status transitions, and overdue display behavior.
+- **Definition of Done:** The current owning instructor can create and manage interventions only for students in their assignments and only with a live student-inaction risk factor; a pending-review-only risk cannot create an intervention; only one open intervention exists per student-assignment pair; risk factors are visible as context; resolution/dismissal requires a reason and creates an immutable audit event; assignment reassignment transfers record access to the replacement instructor; open and overdue follow-ups are visible in instructor views without sending notifications; students and admins cannot access individual records; unit/E2E tests, typecheck, lint, i18n, accessibility, and coverage gates pass.
+
+---
+
+### TRACK-051: Grade Release Workflow
+
+- **Status:** 📋 Planned · **Audit IDs:** None (proactive academic-governance enhancement) · **Deps:** TRACK-025 (gradebook and final-grade computation)
+- **Problem:** SIMAK computes final grades from checkpoint outcomes and rubric scores, but computed values can be provisional while late submissions, reviews, or corrections remain in progress. Students currently have no explicit distinction between a working grade and an officially released result. Formal coursework requires the instructor to control when results become visible and to leave an accountable record if a published result must be withdrawn for correction.
+- **Decisions:** Grade release is controlled by the assignment instructor, not an admin approval queue; existing authorized staff retain their current read-only gradebook access. Each assignment has a `draft` or `published` release state, stored with its existing one-to-one grade configuration. Publishing creates an immutable release snapshot for every currently complete enrolled student from the authoritative computed grade; later grade recomputation cannot silently change the student-visible released value. An instructor can return the release to draft only with an audit reason, then publish a new snapshot after corrections or after additional students become complete. Incomplete students continue to see a clear unavailable/not-yet-released state. Staff exports remain working-data exports and do not claim to be a released transcript.
+- **Scope:** Grade-configuration release state plus immutable per-student published-grade snapshot data and migrations; ownership-guarded publish/unpublish server functions; instructor gradebook preflight summary for incomplete/missing-grade students; student final-grade visibility gating; audit-log events for publication and withdrawal; bilingual, accessible UI and tests. Existing grade computation and rubric scoring remain unchanged.
+- **Out of Scope:** Admin moderation/approval queues, grade appeals, student acknowledgments, formal transcripts, GPA calculation, scheduled release dates, automatic email/in-app publication announcements, and a student-facing history of withdrawn or superseded releases.
+- **Execution vectors:** Add the release-state and immutable snapshot schema; update gradebook and student-grade handlers to enforce role-appropriate visibility and select the active published snapshot for students; build a preflight confirmation showing eligible, incomplete, and missing-grade students; implement publish/unpublish with instructor ownership verification and a required unpublish reason; add audit events; test that unpublished computed results remain inaccessible to students, published values do not change after recomputation, newly completed students require a later publication, incomplete students remain unavailable, and unauthorized users cannot change release state.
+- **Definition of Done:** Only the owning instructor can publish or unpublish an assignment's grades; draft computed grades are inaccessible to students; publishing creates immutable snapshots visible only to completed enrolled students; later recomputation cannot alter an active published value; incomplete or newly completed students remain unavailable until a later publication; withdrawal requires a reason and publication/withdrawal are audited; existing authorized staff exports remain working-data exports; unit/E2E tests, typecheck, lint, i18n, accessibility, and coverage gates pass.
+
+---
+
 ## Track Dependency Graph
 
 ```
@@ -492,6 +551,21 @@ Milestone 12: Security, Reliability & Real-Time Infrastructure
 ├── TRACK-044: Request ID Middleware Wiring [✅ Complete — archived — depends on 040, 043]
 ├── TRACK-045: Graceful Shutdown & Background Processor Drain [✅ Complete — archived — no deps]
 └── TRACK-046: Real-Time Notifications via SSE [📋 Planned — depends on 022, 030]
+
+Milestone 13: Production Readiness
+└── TRACK-047: Coolify Private-Pilot Deployment [📋 Planned — depends on 038, 041, 042, 045]
+
+Milestone 14: Data Protection & Recovery
+└── TRACK-048: Backup & Restore Readiness [📋 Planned — depends on 047]
+
+Milestone 15: Instructor Productivity
+└── TRACK-049: Instructor Feedback Snippets [📋 Planned — no deps]
+
+Milestone 16: Student Support Workflows
+└── TRACK-050: At-Risk Intervention Workflow [📋 Planned — depends on 023]
+
+Milestone 17: Academic Governance
+└── TRACK-051: Grade Release Workflow [📋 Planned — depends on 025]
 ```
 
 ### Parallelization Strategy
@@ -524,6 +598,8 @@ The following track groups can be worked on simultaneously:
 | **V** | TRACK-043 → TRACK-032 (complete — archived) | Sequential dependency — TRACK-043 extends the `typedServerFn` wrapper introduced in TRACK-032. Established the `.middleware()` method on `TypedBuilder`, now used by TRACK-044. |
 | **W** | TRACK-044 → TRACK-040, TRACK-043 (complete — archived) | TRACK-044 wires TRACK-040's `requestIdMiddleware` through the middleware chaining established by TRACK-043. It runs request-ID middleware before optional rate limiting so all server-function logs receive request context. |
 | **X** | TRACK-046 → TRACK-022 (complete), TRACK-030 (complete) | Sequential dependency — TRACK-046 builds on notification infrastructure from TRACK-022 and the client-side data layer from TRACK-030. New domain (SSE route + connection manager) — no file overlap with other planned tracks |
+| **Y** | TRACK-047 → TRACK-048 | Sequential — deploy the production environment first, then verify its independent backup/restore procedure before onboarding real pilot data. |
+| **Z** | TRACK-049, TRACK-050, TRACK-051 | Independently implementable after their completed dependencies. TRACK-049 touches review UI and a new snippet domain; TRACK-050 touches risk/dashboard/assignment-reassignment paths; TRACK-051 touches gradebook and student-grade visibility. Coordinate only if work overlaps shared instructor dashboard or gradebook files. |
 
 ---
 
@@ -543,7 +619,12 @@ The following track groups can be worked on simultaneously:
 | 10: Infrastructure Consistency & Tech Debt | 6 | ~12 Days |
 | 11: Observability & Infrastructure Hardening | 4 | ~10 Days |
 | 12: Security, Reliability & Real-Time Infrastructure | 6 | ~20 Days |
-| **Total** | **47** | **~149 Days** |
+| 13: Production Readiness | 1 | ~4–6 Days |
+| 14: Data Protection & Recovery | 1 | ~3–6 Days |
+| 15: Instructor Productivity | 1 | ~4–7 Days |
+| 16: Student Support Workflows | 1 | ~5–8 Days |
+| 17: Academic Governance | 1 | ~8–12 Days |
+| **Total** | **52** | **~173–188 Days** |
 
 > Effort estimates assume a single developer. Tracks within the same parallelization group can be distributed across developers to reduce wall-clock time.
 
