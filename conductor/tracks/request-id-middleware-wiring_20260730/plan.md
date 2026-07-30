@@ -68,7 +68,7 @@
     - [x] Investigated intermittent Vitest/Zod unhandled rejection: full suite passes serially with `--maxWorkers=1`; individual reported tests pass, implicating the default parallel vmThreads runner rather than track changes.
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Wire requestIdMiddleware to typedServerFn' (Protocol in workflow.md) (d63bf09)
 
-## Phase 4: Documentation & Final Verification
+## Phase 4: Documentation & Final Verification [checkpoint: 689395c]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation (689395c)
 - [x] Task: Document request ID middleware wiring in `conductor/tech-stack.md` (689395c)
@@ -80,5 +80,5 @@
     - [x] Run `pnpm check:i18n` — EN<->ID parity verified
     - [x] Verify no file in `src/`, `tests/`, `scripts/` exceeds 500 lines (`scripts/check-modularity.js`)
     - [x] Verify no circular dependencies: `request-context-store.ts` has zero project deps; `logger.ts` imports from `request-context-store.ts` (not `request-context.ts`); `request-context.ts` imports from both `logger.ts` and `request-context-store.ts` (no cycle)
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Documentation & Final Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Documentation & Final Verification' (Protocol in workflow.md) (689395c)
 </protect>
