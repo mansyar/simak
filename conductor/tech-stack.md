@@ -41,6 +41,53 @@
 | **Containerization** | Docker         | Multi-stage build for production deployment                |
 | **Hosting**          | Coolify on VPS | Self-hosted deployment with auto-proxied SSL via Traefik   |
 
+## Security
+
+### HTTP Security Headers (TRACK-041)
+
+Comprehensive HTTP security headers are set per-request via TanStack Start middleware in `src/start.ts`. The nonce-based Content Security Policy (CSP) is the primary defense against stored XSS — the app has rich user-generated content (assignment descriptions, review feedback, discussion Q&A).
+
+**Implementation files:**
+- `src/lib/security-headers.ts` — `generateNonce()` + `buildSecurityHeaders(nonce, isProd, r2Domain?)` pure functions
+- `src/start.ts` — `createStart` instance with `securityHeadersMiddleware` (request middleware) + `createCsrfMiddleware`
+- `src/router.tsx` — `getGlobalStartContext()` nonce extraction + `ssr: { nonce }` router option
+
+**Nonce lifecycle:**
+1. `securityHeadersMiddleware` runs on every request via `createMiddleware().server()`
+2. `generateNonce()` generates 16 random bytes → base64 (24-char string)
+3. Nonce is embedded in CSP directives (`script-src 'nonce-{nonce}'`, `style-src 'nonce-{nonce}'`)
+4. Nonce is passed to router context via `next({ context: { nonce } })`
+5. `getGlobalStartContext()` in `src/router.tsx` reads the nonce from context
+6. `ssr: { nonce }` on `createRouter()` — TanStack Start auto-attaches the nonce to all inline `<script>` and `<style>` tags during SSR
+
+**CSP directive rationale:**
+
+| Directive | Value | Rationale |
+|-----------|-------|-----------|
+| `default-src` | `'self'` | Deny everything by default; each resource type must be explicitly allowed |
+| `script-src` | `'nonce-{nonce}' 'strict-dynamic'` | Allow only nonce-tagged inline scripts (hydration, theme script). `'strict-dynamic'` trusts scripts loaded by other trusted scripts, avoiding the need to allowlist every dynamic import |
+| `style-src` | `'nonce-{nonce}'` | Allow only nonce-tagged inline styles (Tailwind v4 injects styles at runtime) |
+| `img-src` | `'self' data: https:` | Allow self-hosted images, `data:` URIs (inline images), and any HTTPS image source |
+| `connect-src` | `'self' <R2_ENDPOINT domain>` | Allow same-origin fetch/XHR + R2 presigned URL requests. R2 domain extracted from `R2_ENDPOINT` env var; omitted gracefully if unset. WebSocket/SSE allowances deferred to TRACK-046 |
+| `frame-src` | `'self'` | Allow only same-origin iframes (DOCX preview uses iframe) |
+| `frame-ancestors` | `'none'` | Prevent the page from being embedded in any iframe (clickjacking defense; supersedes `X-Frame-Options`) |
+| `base-uri` | `'self'` | Prevent `<base>` tag injection attacks |
+| `form-action` | `'self'` | Restrict form submissions to same-origin only |
+| `object-src` | `'none'` | Block all `<object>`, `<embed>`, `<applet>` (legacy plugin vectors) |
+| `upgrade-insecure-requests` | _(prod only)_ | Force browser to upgrade HTTP to HTTPS. Omitted in dev (Report-Only mode has no effect and Chrome logs a console error) |
+
+**Environment differences:**
+
+| Aspect | Development | Production |
+|--------|-------------|------------|
+| CSP header name | `Content-Security-Policy-Report-Only` | `Content-Security-Policy` |
+| CSP behavior | Violations logged to console, not blocked | Violations blocked |
+| `Strict-Transport-Security` (HSTS) | Absent (avoids browser lockout on HTTP localhost) | `max-age=31536000; includeSubDomains` |
+| `upgrade-insecure-requests` | Omitted (no effect in Report-Only mode) | Included |
+
+**CSRF middleware:**
+When a custom `src/start.ts` exists, TanStack Start does NOT auto-install CSRF middleware. `createCsrfMiddleware({ filter: (ctx) => ctx.handlerType === 'serverFn' })` is explicitly added to the `requestMiddleware` array, matching TanStack Start's default behavior (CSRF validation only on server function POST requests, not GET page navigations).
+
 ## Testing & Quality
 
 | Component                  | Technology                           | Purpose                                                 |
@@ -65,6 +112,7 @@
 - **2026-07-27:** Added `@axe-core/playwright` for automated accessibility scanning in E2E tests. Added Firefox and mobile-chrome (Pixel 7) projects to Playwright config. Fixed 8 critical/serious WCAG violations (color contrast, aria-labels, button names) across 10 source files (TRACK-028).
 - **2026-07-28:** Aligned `lefthook.yml` and `package.json` tooling gates (TRACK-036, INFRA-10). `pnpm format` expanded from `src/**/*.{ts,tsx,css}` to `*.{js,jsx,ts,tsx,css}` (all dirs); lefthook format glob added `.css`; lefthook lint glob expanded from `src/**/*.{js,jsx,ts,tsx}` to `*.{js,jsx,ts,tsx}` (all dirs); `pnpm typecheck` added `--checkers 4` (was only in lefthook pre-push gate). Created `.socraticodecontextartifacts.json` with 7 entries for SocratiCode semantic search across project docs and DB migrations.
 - **2026-07-29:** Added `pino` (production dependency) and `pino-pretty` (devDependency) for structured logging (TRACK-040). New `src/lib/logger.ts` — singleton pino instance with env-based config (`LOG_LEVEL` env var, default `info`). Production: JSON to stdout. Dev: `pino-pretty` (lazy-loaded via `createRequire` to avoid bundling in prod). New `src/lib/request-context.ts` — TanStack Start `createMiddleware({ type: 'request' })` for request ID propagation (`x-request-id` header → UUID → `logger.child({ requestId })`). `logError()` in `src/lib/errors.ts` refactored to route through `logger.error(entry)` instead of `console.error`. All 41 `console.*` calls in `src/lib/` and `src/server/` migrated to pino (zero `console.*` remaining, excluding `src/db/seed.ts` and `src/db/migrate.ts`).
+- **2026-07-30:** Added HTTP security headers with nonce-based CSP (TRACK-041). New `src/lib/security-headers.ts` (`generateNonce()` + `buildSecurityHeaders()`), `src/start.ts` (`createStart` instance with `securityHeadersMiddleware` + `createCsrfMiddleware`). Updated `src/router.tsx` with `getGlobalStartContext()` nonce extraction + `ssr: { nonce }`. CSP directives enforce strict defaults (`default-src 'self'`, `script-src 'nonce-{nonce}' 'strict-dynamic'`, `object-src 'none'`, etc.). Report-Only in dev, enforced in prod. HSTS and `upgrade-insecure-requests` prod-only. R2 domain auto-extracted from `R2_ENDPOINT` for `connect-src`.
 - **2026-07-30:** Configured explicit connection pool settings on postgres.js client in `src/db/index.ts` (TRACK-042). Migrated `getDb()` to use `getEnv()` instead of `process.env.DATABASE_URL` (removes manual guard — Zod validation handles it). Pool config: `max`=`DB_POOL_MAX` (default 10, suitable for single-instance Coolify), `idle_timeout`=30s, `connect_timeout`=10s, `max_lifetime`=1800s (30 min). `prepare` flag controlled by `DB_PREPARED_STATEMENTS_DISABLED` env var (set to `true` for PgBouncer transaction pooling compatibility). `onnotice` callback routes PostgreSQL notices through pino at debug level. New env vars: `DB_POOL_MAX` (`z.coerce.number().int().positive().default(10)`), `DB_PREPARED_STATEMENTS_DISABLED` (custom string-to-boolean transform — `val === 'true'`, default `false`; NOT `z.coerce.boolean()` which returns `true` for the string `'false'`). **Deviation from spec (FR-3):** `prepare` was NOT added to the `drizzle()` call because drizzle-orm 0.45.2's `DrizzleConfig` type does not include a `prepare` property. The `prepare` option on the postgres.js client (FR-2) is sufficient — Drizzle uses the underlying client's settings.
 
 </protect>

@@ -99,6 +99,7 @@ The role-specific layout guard means a student accessing `/instructor/reviews` i
 ```
 simak/
 ├── src/
+│   ├── start.ts              → TanStack Start `createStart` instance — `securityHeadersMiddleware` (nonce-based CSP) + `createCsrfMiddleware` (TRACK-041)
 │   ├── routes/               → TanStack Router route files (file-based routing in `src/routes/`)
 │   ├── app/                  → Application root files (global.css, legacy __root.tsx location)
 │   ├── components/           → React components
@@ -202,6 +203,7 @@ simak/
     │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys, discussionKeys, settingsKeys, gradebookKeys)
     │   │   ├── logger.ts         → Singleton `pino` logger instance — JSON to stdout in prod, `pino-pretty` in dev (lazy-loaded via `createRequire`). `LOG_LEVEL` env var (default `info`). `createLogger(options?)` factory. Server-side only. (TRACK-040)
     │   │   ├── request-context.ts → `requestIdMiddleware` (TanStack Start `createMiddleware`) + `createRequestLogger(context)` — reads `x-request-id` header or generates UUID. Defined and tested but not yet wired to HTTP handlers (future work). (TRACK-040)
+    │   │   ├── security-headers.ts → Pure functions `generateNonce()` (`crypto.randomBytes(16).toString('base64')`) + `buildSecurityHeaders(nonce, isProd, r2Domain?)` (returns header name→value map). CSP directive assembly + Report-Only/enforce switching. (TRACK-041)
     │   │   └── utils.ts          → Shared utilities
 │   ├── hooks/               → Custom React hooks
 │   │   ├── use-debounced-callback.ts → Generic debounce hook (setTimeout/clearTimeout, 300ms for search inputs)
@@ -381,6 +383,24 @@ Server functions follow a two-file split: `*.ts` (client-safe stub with Zod sche
 - Inline parse: `typedServerFn({ method }).handler(async (args) => { Schema.parse(args.data); ... })` — manual Zod parse inside the handler.
 
 **Acceptable type-only circular dependencies:** Static analyzers report cycles like `feature.ts → feature.server.ts → feature.ts`. These are safe and expected — the `*.ts` stub uses `await import('./feature.server')` (dynamic import, resolved lazily at call time) and the `*.server.ts` handler uses `import type { Schema } from './feature'` (type-only import, erased at compile time). Neither edge exists at runtime, so there is no circular dependency at execution. All 34 circular dependency chains in the codebase have been verified as type-only.
+
+### HTTP Security Headers & Nonce-Based CSP [v1] (Track: HTTP Security Headers)
+
+A nonce-based Content-Security-Policy defends against XSS — the primary browser-level defense given the app's rich user-generated content (assignment descriptions, review feedback, discussion Q&A). The implementation spans three files:
+
+- **`src/lib/security-headers.ts`** — Two pure functions:
+  - `generateNonce()` — `crypto.randomBytes(16).toString('base64')` → a 24-character base64 nonce, unique per request.
+  - `buildSecurityHeaders(nonce, isProd, r2Domain?)` — Assembles the CSP directive string and returns a `Record<string, string>` of header name → value pairs. The CSP header name switches: `Content-Security-Policy` (prod, enforced) vs `Content-Security-Policy-Report-Only` (dev, violations logged only). The `upgrade-insecure-requests` directive and HSTS header are conditionally included only in production.
+- **`src/start.ts`** — The TanStack Start entry point (`createStart` instance) with two request middlewares wired via `requestMiddleware: [csrfMiddleware, securityHeadersMiddleware]`:
+  - `securityHeadersMiddleware` (via `createMiddleware().server()`) — generates the nonce, extracts the R2 domain from `process.env.R2_ENDPOINT` via `new URL(endpoint).hostname` (try/catch — omitted gracefully when unset/invalid), builds all headers via `buildSecurityHeaders()`, sets them via `setResponseHeader()` from `@tanstack/react-start/server`, and propagates the nonce to the router context via `next({ context: { nonce } })`.
+  - `createCsrfMiddleware({ filter: (ctx) => ctx.handlerType === 'serverFn' })` — explicitly added because a custom `createStart` entry point disables TanStack Start's auto-installed CSRF middleware. Scoped to server-function requests only.
+- **`src/router.tsx`** — Reads the nonce from `getGlobalStartContext()` (justified type assertion — middleware context is not inferred through TanStack Start's `Register` type) and passes it to `ssr: { nonce }` on the router config. TanStack Start then auto-attaches the nonce to all inline `<script>` and `<style>` tags during SSR — including the theme-init script (`__root.tsx` `dangerouslySetInnerHTML`) and TanStack Router's hydration scripts. No manual nonce injection in `__root.tsx` is needed.
+
+**CSP directives:** `default-src 'self'; script-src 'nonce-{nonce}' 'strict-dynamic'; style-src 'nonce-{nonce}'; img-src 'self' data: https:; connect-src 'self' <R2 domain>; frame-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests` (prod only). The `connect-src` directive dynamically includes the Cloudflare R2 domain so presigned upload/download URLs work.
+
+**Additional headers** on all responses: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: geolocation=(), microphone=(), camera=()`. `Strict-Transport-Security: max-age=31536000; includeSubDomains` (HSTS) is production-only (defense-in-depth behind Traefik TLS termination).
+
+**Testing:** Unit tests (32 assertions) cover nonce generation (uniqueness, length, base64 format), header values (exact string match), Report-Only vs enforce switching, `getR2Domain` edge cases, and router nonce propagation. An E2E test asserts all headers are present, nonce uniqueness across requests, and that nonces are auto-attached to `<script>` tags in the rendered HTML.
 
 ---
 

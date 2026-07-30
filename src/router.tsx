@@ -1,4 +1,5 @@
 import { createRouter } from '@tanstack/react-router';
+import { getGlobalStartContext } from '@tanstack/react-start';
 import { routeTree } from './routeTree.gen';
 
 // Start background email queue processor on the server only
@@ -9,10 +10,15 @@ if (import.meta.env.SSR) {
 }
 
 export function getRouter() {
+  // nonce is set by securityHeadersMiddleware in src/start.ts at runtime;
+  // type assertion needed because getGlobalStartContext() doesn't infer
+  // custom middleware context types through the Register interface
+  const nonce = (getGlobalStartContext() as { nonce?: string } | undefined)?.nonce;
   const router = createRouter({
     routeTree,
     scrollRestoration: true,
     defaultPreload: false,
+    ssr: { nonce },
   });
 
   return router;
