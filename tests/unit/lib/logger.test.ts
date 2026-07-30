@@ -15,6 +15,7 @@ const { mockEnv } = vi.hoisted(() => ({
     EMAIL_FROM: 'test@test.com',
     DB_POOL_MAX: 10,
     DB_PREPARED_STATEMENTS_DISABLED: false,
+    SHUTDOWN_TIMEOUT_MS: 10000,
   },
 }));
 
