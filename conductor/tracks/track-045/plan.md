@@ -10,7 +10,7 @@ These are the building blocks that the shutdown handler depends on.
   - [ ] Add `SHUTDOWN_TIMEOUT_MS=10000` to `.env.example`
   - [ ] Verify tests pass
 
-- [ ] **Task 1.2: Add `closeDb()` to `src/db/index.ts`**
+- [x] **Task 1.2: Add `closeDb()` to `src/db/index.ts`** `dfd33aa`
   - [ ] Write tests for `closeDb()`: calls `client.end()` when client exists; no-op when `getDb()` was never called; resets `_db` and client singleton so subsequent `getDb()` creates a fresh connection
   - [ ] Implement: store raw `postgres()` client in module-level `_client` variable alongside `_db`; export `closeDb()` that calls `_client.end()`, sets `_db = null` and `_client = null`
   - [ ] Verify tests pass
