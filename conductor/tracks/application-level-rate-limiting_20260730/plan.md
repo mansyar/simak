@@ -65,7 +65,7 @@
     - [x] Some test files may have a different mock shape — update those manually (instructor-routes.test.tsx and instructor-page-headers.test.tsx had `useServerFn` after `createServerFn` — handled manually)
 - [x] Task: Run `pnpm test` to verify all existing tests still pass with updated mocks
     - [x] If any tests fail, investigate and fix (the mock update is additive — it should not break existing behavior) — all 3,919 tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Update Existing Test Mocks' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Update Existing Test Mocks' (Protocol in workflow.md)
 
 ## Phase 4: Annotate Server Functions with Rate Limit Config
 
