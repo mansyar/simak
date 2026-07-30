@@ -41,7 +41,7 @@ Eliminate the up-to-5-minute delay before stuck `processing` rows are reclaimed 
 
 Replace the sync dead-code `stopEmailQueue()` with async `stopGracefully()` that drains in-flight work.
 
-- [ ] **Task 3.1: Convert `stopEmailQueue()` to async `stopGracefully()`**
+- [x] **Task 3.1: Convert `stopEmailQueue()` to async `stopGracefully()`** (commit `71fa2af8`)
   - [ ] Write tests for `stopGracefully()`: clears the `setInterval`; awaits the in-flight `tick()` promise if one is running; is a no-op if `startEmailQueue()` was never called; the tick promise is tracked so `stopGracefully` awaits the correct in-flight tick (not a resolved promise from a skipped overlap)
   - [ ] Implement: add module-level `currentTickPromise: Promise<void> | null`; set it in `startEmailQueue()` (first tick) and in the `setInterval` callback (only when `!isRunning`); `stopGracefully()` clears interval then `await currentTickPromise` if non-null
   - [ ] Update all references in `email-queue-init.test.ts` from `stopEmailQueue` to `stopGracefully` (the existing tests call it as cleanup — update to `await stopGracefully()`)
