@@ -21,9 +21,9 @@
 
 ## Phase 1: Provision Coolify Pilot Infrastructure
 
-- [~] Task: Create the isolated Coolify project and environment for the private pilot.
+- [x] Task: Create the isolated Coolify project and environment for the private pilot [a005a21]
   - Coolify project `simak-private-pilot` and environment `production` created by the operator; no application or database has been added yet.
-- [ ] Task: Provision a Coolify-managed PostgreSQL 16 service
+- [~] Task: Provision a Coolify-managed PostgreSQL 16 service
   - [ ] Enable persistent database storage.
   - [ ] Generate and store unique database credentials exclusively in Coolify.
   - [ ] Restrict database networking to the application service.
