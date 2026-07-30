@@ -17,7 +17,7 @@
   - Before Coolify configuration, the operator needs: Coolify project access, repository access to this branch, control of the pilot-domain DNS zone, and a Coolify-managed PostgreSQL 16 service with persistent storage.
   - Coolify-only configuration inventory: `DATABASE_URL`, `MIGRATE_DATABASE_URL`, `RESEND_API_KEY`, `EMAIL_FROM`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD`, and all five R2 values (`R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`). Optional runtime settings are `LOG_LEVEL`, `DB_POOL_MAX`, and `SHUTDOWN_TIMEOUT_MS`; set `DB_PREPARED_STATEMENTS_DISABLED=true` only when PgBouncer is used.
   - Keep all secret values in Coolify, prepare a backup before the first migration, and run `node .output/server/seed.mjs` once only after the initial deployment is healthy.
-- [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`) [01bedac]
 
 ## Phase 1: Provision Coolify Pilot Infrastructure
 
