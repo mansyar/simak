@@ -3,7 +3,7 @@
 
 ## Phase 0: Deployment Baseline & Release Evidence
 
-- [~] Task: Re-read the approved specification and `conductor/workflow.md`
+- [x] Task: Re-read the approved specification and `conductor/workflow.md` [18bb033]
   - [x] Confirm deployment scope, quality gates, and evidence requirements.
   - [x] Record the target source branch and revision for the pilot release.
     - Pilot release baseline: `track-047/coolify-private-pilot-deployment` at `a95e2c5272c40f25e06ff15711f9c12d01b2cf68`.
