@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const { mockClient } = vi.hoisted(() => ({
-  mockClient: { end: vi.fn() },
+  mockClient: { end: vi.fn().mockResolvedValue(undefined) },
 }));
 
 vi.mock('postgres', () => ({
@@ -41,7 +41,7 @@ describe('db/index', () => {
   it('closeDb calls client.end() after getDb was called', async () => {
     const { getDb, closeDb } = await import('@/db/index');
     getDb();
-    closeDb();
+    await closeDb();
     expect(mockClient.end).toHaveBeenCalledTimes(1);
   });
 
@@ -50,7 +50,7 @@ describe('db/index', () => {
     const { getDb, closeDb } = await import('@/db/index');
 
     getDb();
-    closeDb();
+    await closeDb();
     getDb();
 
     expect(postgres).toHaveBeenCalledTimes(2);

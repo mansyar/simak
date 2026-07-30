@@ -30,9 +30,9 @@ export function getDb(): Db {
  * Close the database connection pool and reset the singleton.
  * Called during graceful shutdown.
  */
-export function closeDb(): void {
+export async function closeDb(): Promise<void> {
   if (_client) {
-    _client.end();
+    await _client.end();
   }
   _db = null;
   _client = null;
