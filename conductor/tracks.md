@@ -8,6 +8,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: TRACK-041: HTTP Security Headers**
-*Link: [./tracks/http-security-headers_20260730/](./tracks/http-security-headers_20260730/)*
 
