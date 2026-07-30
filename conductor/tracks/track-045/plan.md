@@ -28,7 +28,7 @@ Eliminate the up-to-5-minute delay before stuck `processing` rows are reclaimed 
   - [ ] Implement: `UPDATE emailQueue SET status = 'pending' WHERE status = 'processing'` — no `lt(lastAttemptAt, threshold)` condition (unlike the existing in-tick reclaim which uses 5-min threshold)
   - [ ] Verify tests pass
 
-- [ ] **Task 2.2: Wire reclaim into `startEmailQueue()`**
+- [x] **Task 2.2: Wire reclaim into `startEmailQueue()`** (commit `a61b46b2`)
   - [ ] Write test verifying `reclaimAllProcessingRows()` is called before the first `tick()` when `startEmailQueue()` is called
   - [ ] Add `await reclaimAllProcessingRows()` call in `startEmailQueue()` before `tick()` (make `startEmailQueue` async, or fire-and-forget the reclaim before tick)
   - [ ] Verify tests pass (update existing `email-queue-init.test.ts` to mock `reclaimAllProcessingRows`)
