@@ -789,6 +789,7 @@
     "conflict": "The resource you requested already exists or conflicts with another",
     "internal": "An unexpected server error occurred. Please try again later.",
     "network": "Could not connect to the server. Please check your internet connection.",
+    "rateLimited": "Too many requests. Please wait a moment and try again.",
     "default": "An error occurred",
     "assignmentNotFound": "This assignment could not be found or you do not have permission to view it.",
     "templateNotFound": "This template could not be found or you do not have permission to view it.",

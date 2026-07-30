@@ -794,6 +794,7 @@ export type Translation = {
     conflict: string
     internal: string
     network: string
+    rateLimited: string
     default: string
     assignmentNotFound: string
     templateNotFound: string

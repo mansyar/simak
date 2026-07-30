@@ -789,6 +789,7 @@
     "conflict": "Sumber daya yang Anda minta sudah ada atau bertabrakan",
     "internal": "Terjadi kesalahan pada server. Silakan coba lagi.",
     "network": "Tidak dapat terhubung ke server. Silakan periksa koneksi internet Anda.",
+    "rateLimited": "Terlalu banyak permintaan. Mohon tunggu sebentar dan coba lagi.",
     "default": "Terjadi kesalahan",
     "assignmentNotFound": "Tugas ini tidak ditemukan atau Anda tidak memiliki izin untuk melihatnya.",
     "templateNotFound": "Templat ini tidak ditemukan atau Anda tidak memiliki izin untuk melihatnya.",

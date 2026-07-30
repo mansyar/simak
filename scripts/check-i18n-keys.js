@@ -27,7 +27,7 @@ const DYNAMIC_KEY_PATTERNS = [
   /^notifications\.events\./,
   // Notification preference type labels/descriptions are resolved via config maps
   /^settings\.notificationPreferences\.types\./,
-  /^error\.(unauthorized|forbidden|validation|badRequest|conflict|internal|network|default)$/,
+  /^error\.(unauthorized|forbidden|validation|badRequest|conflict|internal|network|rateLimited|default)$/,
   /^studentAssignments\.status\.(locked|unlocked)$/,
   // Sidebar labels are passed dynamically to t(link.label)
   /^adminSidebar\.(dashboard|users|templates|auditLog|emailQueue)$/,
