@@ -42,19 +42,19 @@
 
 ## Phase 3: TanStack Start Integration
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
-- [ ] Task: Create `src/start.ts` with `createStart` instance + CSP middleware
-    - [ ] Import `createStart`, `createMiddleware` from `@tanstack/react-start`
-    - [ ] Import `setResponseHeader` from `@tanstack/react-start/server`
-    - [ ] Import `generateNonce`, `buildSecurityHeaders` from `@/lib/security-headers`
-    - [ ] Import `env` from `@/config/env` for `R2_ENDPOINT` access
-    - [ ] Implement `createMiddleware().server()` that: generates nonce, extracts R2 domain from `R2_ENDPOINT`, calls `buildSecurityHeaders()`, sets all headers via `setResponseHeader()`, passes nonce to router context
-    - [ ] Export `createStart` instance with the middleware
-- [ ] Task: Update `src/router.tsx` with nonce configuration
-    - [ ] Add `ssr: { nonce }` to `createRouter()` options
-    - [ ] Receive nonce from middleware context (per TanStack Start API verified in Phase 1)
-- [ ] Task: Run `pnpm typecheck` to verify integration compiles
-- [ ] Task: Run `pnpm test` to verify unit tests still pass
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
+- [x] Task: Create `src/start.ts` with `createStart` instance + CSP middleware [aeddf46a]
+    - [x] Import `createStart`, `createMiddleware` from `@tanstack/react-start`
+    - [x] Import `setResponseHeader` from `@tanstack/react-start/server`
+    - [x] Import `generateNonce`, `buildSecurityHeaders` from `@/lib/security-headers`
+    - [x] Import `env` from `@/config/env` for `R2_ENDPOINT` access
+    - [x] Implement `createMiddleware().server()` that: generates nonce, extracts R2 domain from `R2_ENDPOINT`, calls `buildSecurityHeaders()`, sets all headers via `setResponseHeader()`, passes nonce to router context
+    - [x] Export `createStart` instance with the middleware
+- [x] Task: Update `src/router.tsx` with nonce configuration [aeddf46a]
+    - [x] Add `ssr: { nonce }` to `createRouter()` options
+    - [x] Receive nonce from middleware context (per TanStack Start API verified in Phase 1)
+- [x] Task: Run `pnpm typecheck` to verify integration compiles
+- [x] Task: Run `pnpm test` to verify unit tests still pass
 - [ ] Task: Conductor - User Manual Verification 'TanStack Start Integration' (Protocol in workflow.md)
 
 ## Phase 4: E2E Test
