@@ -52,7 +52,7 @@
     - [x] When `opts.rateLimit` is provided: call `fn.middleware([createRateLimitMiddleware(opts.rateLimit)])` and cast back to `TypedBuilder`
     - [x] When `opts.rateLimit` is omitted: return `fn` directly (existing pass-through behavior)
     - [x] Run `pnpm test` and confirm all `server-fn.test.ts` tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Extend typedServerFn' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Extend typedServerFn' (Protocol in workflow.md)
 
 ## Phase 3: Update Existing Test Mocks for Middleware Chain
 
