@@ -203,6 +203,18 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - **CSRF middleware** is explicitly wired (a custom `createStart` entry point disables TanStack Start's auto-installed CSRF middleware), scoped to server-function requests via a `handlerType === 'serverFn'` filter.
 - Implemented via a `createStart` instance with a global request middleware (`src/start.ts`) that generates the nonce, sets all headers, and propagates the nonce to the router context; the router reads the nonce via `ssr: { nonce }` so TanStack Start handles auto-attachment.
 
+### Application-Level Rate Limiting on Server Functions
+
+- All 85 authenticated TanStack Start server functions are rate-limited via `typedServerFn`'s optional `rateLimit` config. Better Auth's built-in rate limiting only covers `/api/auth/*` endpoints — application server functions were previously unprotected against abuse (R2 cost exploitation, email queue flooding, data pollution, DB connection exhaustion).
+- **4-tier rate limit presets** (`RATE_LIMITS` in `src/lib/rate-limiter.ts`): `presignedUrl` (20/min — R2 cost abuse prevention), `heavyMutation` (10/min — submissions/reviews), `destructive` (5/min — admin-level operations: user CRUD, template CRUD, 2FA, session revocation), `standardRead` (60/min — dashboards, list views, detail views).
+- **In-memory sliding window** — Module-level `Map` store keyed by `userId:fnId`; per-user + per-function isolation. The window resets after the configured time elapses. When at max, requests are denied without incrementing the counter (prevents permanent lockout — the user can retry after the window expires).
+- **`typedServerFn` extension** — `.middleware()` method added to the `TypedBuilder` interface; `rateLimit?: RateLimitConfig` optional config on `typedServerFn()`. When provided, the wrapper chains `createRateLimitMiddleware()` via `.middleware()`. When omitted, the function passes through unchanged (backward-compatible).
+- **Unauthenticated pass-through** — The middleware calls `getSessionFromHeaders()`; if no session exists, the request passes through to `next()` without rate limiting (route guards handle unauthenticated access). This avoids rate-limiting token-based flows like password setup.
+- **`RATE_LIMITED` error code** — Added to the `ErrorCode` enum in `src/lib/errors.ts`; mapped to `error.rateLimited` i18n key in `src/lib/toast.ts` ("Too many requests. Please wait a moment and try again." / "Terlalu banyak permintaan. Mohon tunggu sebentar dan coba lagi."). The client renders this as a toast notification via the standard `showErrorToast` pattern.
+- **Exempt functions** (no rate limit): `_getSession` (internal session fetch — cascading/infinite-loop concern), `getUnreadCount` / `markRead` / `markAllRead` (high-frequency UX — 30s polling, instant interactions), `completePasswordSetup` (token-based, no session).
+- **Single-instance scope** — The in-memory `Map` is sufficient for the current single-instance Coolify deployment. A Redis-backed store is deferred to multi-instance work (TRACK-044+ coordination).
+- **No handler changes** — Rate limiting is enforced at the middleware layer before the handler runs. Zero `.server.ts` handler files were modified — all changes are in stub files (`.ts`) and library code.
+
 ### Analytics & Reporting
 
 - **Role-based analytics dashboards** (admin + instructor) showing historical trends and metrics that are NOT duplicated on the real-time operational dashboards. URL search params drive the date range (`?range=7d|30d|90d|all`) with optional custom start/end support. Shareable, back/forward-navigable URLs.
