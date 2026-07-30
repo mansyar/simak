@@ -72,7 +72,7 @@ The new `src/lib/shutdown.ts` module that ties drain + DB closure + signal handl
     - Timeout handler: log `shutdown.timeout`, `process.exit(1)`
   - [ ] Verify tests pass
 
-- [ ] **Task 4.2: Wire `registerShutdownHandlers()` in `src/router.tsx`**
+- [x] **Task 4.2: Wire `registerShutdownHandlers()` in `src/router.tsx`** (commit `d2ef0b81`)
   - [ ] Add `registerShutdownHandlers()` import and call alongside `startEmailQueue()` in the `import.meta.env.SSR` block
   - [ ] Run `pnpm typecheck` to verify no type errors
 
