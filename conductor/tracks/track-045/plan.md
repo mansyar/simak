@@ -55,7 +55,7 @@ Replace the sync dead-code `stopEmailQueue()` with async `stopGracefully()` that
 
 The new `src/lib/shutdown.ts` module that ties drain + DB closure + signal handling together.
 
-- [ ] **Task 4.1: Create `src/lib/shutdown.ts`**
+- [x] **Task 4.1: Create `src/lib/shutdown.ts`** (commit `7cb01487`)
   - [ ] Write tests for `registerShutdownHandlers()`:
     - First `SIGTERM` triggers: `stopGracefully()` -> `closeDb()` -> `process.exit(0)`
     - First `SIGINT` triggers same drain as `SIGTERM`
