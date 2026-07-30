@@ -3,34 +3,34 @@
 
 ## Phase 1: AsyncLocalStorage Store + Request Context Middleware (FR-1, FR-2)
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Write tests for `src/lib/request-context-store.ts` (TDD Red Phase)
-    - [ ] Create `tests/unit/lib/request-context-store.test.ts` with `/** @vitest-environment node */` header
-    - [ ] Test: `requestContextStorage` is an `AsyncLocalStorage` instance
-    - [ ] Test: `getRequestId()` returns `undefined` when called outside a store context (no `requestContextStorage.run()`)
-    - [ ] Test: `getRequestId()` returns the `requestId` string when called inside `requestContextStorage.run({ requestId: 'test-id' }, () => ...)`
-    - [ ] Test: `getRequestId()` returns `undefined` after `requestContextStorage.run()` callback completes (context is scoped)
-    - [ ] Test: nested `requestContextStorage.run()` calls correctly restore the parent store after the inner run completes
-    - [ ] Run `pnpm test` and confirm new tests fail (`request-context-store.ts` not yet created)
-- [ ] Task: Implement `src/lib/request-context-store.ts` (TDD Green Phase)
-    - [ ] Import `AsyncLocalStorage` from `node:async_hooks`
-    - [ ] Define `RequestContext` interface: `{ requestId: string }`
-    - [ ] Create `requestContextStorage = new AsyncLocalStorage<RequestContext>()`
-    - [ ] Implement `getRequestId(): string | undefined` — returns `requestContextStorage.getStore()?.requestId`
-    - [ ] Run `pnpm test` and confirm all `request-context-store.test.ts` tests pass
-- [ ] Task: Update `tests/unit/lib/request-context.test.ts` for AsyncLocalStorage wrapping (TDD Red Phase)
-    - [ ] Import `requestContextStorage` from `@/lib/request-context-store` in the test file (real instance, no mock needed — `AsyncLocalStorage` works in Node.js test environment)
-    - [ ] Update existing test "reads x-request-id header when present and passes it to next": verify `next()` is called with `{ context: { requestId: 'existing-id-123' } }` (unchanged — regression check)
-    - [ ] Update existing test "generates a UUID when x-request-id header is absent": verify `next()` is called with `{ context: { requestId: <UUID> } }` (unchanged — regression check)
-    - [ ] New test: `requestIdMiddleware` stores `requestId` in `requestContextStorage` — within the `next()` callback, `requestContextStorage.getStore()?.requestId` equals the header value (or generated UUID)
-    - [ ] New test: `requestId` is NOT available in `requestContextStorage` after `next()` returns (async context is scoped to the request)
-    - [ ] New test: TanStack context passing preserved — `next()` is called with `{ context: { requestId } }` (both AsyncLocalStorage and context propagation work)
-    - [ ] Run `pnpm test` and confirm new tests fail (middleware not yet wrapping `next()` in `storage.run()`)
-- [ ] Task: Update `requestIdMiddleware` in `src/lib/request-context.ts` (TDD Green Phase)
-    - [ ] Import `requestContextStorage` from `@/lib/request-context-store`
-    - [ ] Wrap `next({ context: { requestId } })` in `requestContextStorage.run({ requestId }, () => next({ context: { requestId } }))`
-    - [ ] Update the NOTE comment to reflect that the middleware is now wired (remove the "not yet wired" language, note it's wired via `typedServerFn` in TRACK-044)
-    - [ ] Run `pnpm test` and confirm all `request-context.test.ts` tests pass
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation (f354406)
+- [x] Task: Write tests for `src/lib/request-context-store.ts` (TDD Red Phase) (f354406)
+    - [x] Create `tests/unit/lib/request-context-store.test.ts` with `/** @vitest-environment node */` header
+    - [x] Test: `requestContextStorage` is an `AsyncLocalStorage` instance
+    - [x] Test: `getRequestId()` returns `undefined` when called outside a store context (no `requestContextStorage.run()`)
+    - [x] Test: `getRequestId()` returns the `requestId` string when called inside `requestContextStorage.run({ requestId: 'test-id' }, () => ...)`
+    - [x] Test: `getRequestId()` returns `undefined` after `requestContextStorage.run()` callback completes (context is scoped)
+    - [x] Test: nested `requestContextStorage.run()` calls correctly restore the parent store after the inner run completes
+    - [x] Run `pnpm test` and confirm new tests fail (`request-context-store.ts` not yet created)
+- [x] Task: Implement `src/lib/request-context-store.ts` (TDD Green Phase) (f354406)
+    - [x] Import `AsyncLocalStorage` from `node:async_hooks`
+    - [x] Define `RequestContext` interface: `{ requestId: string }`
+    - [x] Create `requestContextStorage = new AsyncLocalStorage<RequestContext>()`
+    - [x] Implement `getRequestId(): string | undefined` — returns `requestContextStorage.getStore()?.requestId`
+    - [x] Run `pnpm test` and confirm all `request-context-store.test.ts` tests pass
+- [x] Task: Update `tests/unit/lib/request-context.test.ts` for AsyncLocalStorage wrapping (TDD Red Phase) (f354406)
+    - [x] Import `requestContextStorage` from `@/lib/request-context-store` in the test file (real instance, no mock needed — `AsyncLocalStorage` works in Node.js test environment)
+    - [x] Update existing test "reads x-request-id header when present and passes it to next": verify `next()` is called with `{ context: { requestId: 'existing-id-123' } }` (unchanged — regression check)
+    - [x] Update existing test "generates a UUID when x-request-id header is absent": verify `next()` is called with `{ context: { requestId: <UUID> } }` (unchanged — regression check)
+    - [x] New test: `requestIdMiddleware` stores `requestId` in `requestContextStorage` — within the `next()` callback, `requestContextStorage.getStore()?.requestId` equals the header value (or generated UUID)
+    - [x] New test: `requestId` is NOT available in `requestContextStorage` after `next()` returns (async context is scoped to the request)
+    - [x] New test: TanStack context passing preserved — `next()` is called with `{ context: { requestId } }` (both AsyncLocalStorage and context propagation work)
+    - [x] Run `pnpm test` and confirm new tests fail (middleware not yet wrapping `next()` in `storage.run()`)
+- [x] Task: Update `requestIdMiddleware` in `src/lib/request-context.ts` (TDD Green Phase) (f354406)
+    - [x] Import `requestContextStorage` from `@/lib/request-context-store`
+    - [x] Wrap `next({ context: { requestId } })` in `requestContextStorage.run({ requestId }, () => next({ context: { requestId } }))`
+    - [x] Update the NOTE comment to reflect that the middleware is now wired (remove the "not yet wired" language, note it's wired via `typedServerFn` in TRACK-044)
+    - [x] Run `pnpm test` and confirm all `request-context.test.ts` tests pass
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: AsyncLocalStorage Store + Request Context Middleware' (Protocol in workflow.md)
 
 ## Phase 2: Pino Mixin in Logger (FR-3)
