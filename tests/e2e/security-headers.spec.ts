@@ -50,6 +50,10 @@ test.describe('Security Headers', () => {
 
     // HSTS should NOT be present in dev
     expect(headers['strict-transport-security']).toBeUndefined();
+
+    // AC #2: nonce is auto-attached to inline scripts by TanStack Start SSR
+    const nonceScripts = await page.locator('script[nonce]').count();
+    expect(nonceScripts).toBeGreaterThan(0);
   });
 
   test('each request gets a unique nonce', async ({ request }) => {
