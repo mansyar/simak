@@ -132,4 +132,19 @@ describe('shutdown', () => {
       expect.objectContaining({ event: 'shutdown.timeout' }),
     );
   });
+
+  it('catches errors during drain and calls exit(1)', async () => {
+    mockStopGracefully.mockRejectedValue(new Error('drain failed'));
+
+    const { registerShutdownHandlers } = await import('@/lib/shutdown');
+    registerShutdownHandlers();
+
+    onHandlers['SIGTERM']();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(exitMock).toHaveBeenCalledWith(1);
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'shutdown.error' }),
+    );
+  });
 });
