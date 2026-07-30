@@ -34,7 +34,9 @@ export function buildSecurityHeaders(
     "base-uri 'self'",
     "form-action 'self'",
     "object-src 'none'",
-    'upgrade-insecure-requests',
+    // upgrade-insecure-requests only in enforced CSP (prod).
+    // In Report-Only mode (dev), it has no effect and Chrome logs a console error.
+    ...(isProd ? ['upgrade-insecure-requests'] : []),
   ].join('; ');
 
   const cspHeaderName = isProd ? 'Content-Security-Policy' : 'Content-Security-Policy-Report-Only';

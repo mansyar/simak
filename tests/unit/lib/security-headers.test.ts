@@ -90,9 +90,14 @@ describe('buildSecurityHeaders', () => {
       expect(csp).toContain("object-src 'none'");
     });
 
-    it('includes upgrade-insecure-requests', () => {
+    it('includes upgrade-insecure-requests in prod', () => {
       const csp = getCsp(true, testR2Domain);
       expect(csp).toContain('upgrade-insecure-requests');
+    });
+
+    it('omits upgrade-insecure-requests in dev (Report-Only mode)', () => {
+      const csp = getCsp(false, testR2Domain);
+      expect(csp).not.toContain('upgrade-insecure-requests');
     });
 
     it('includes connect-src with self and R2 domain when provided', () => {

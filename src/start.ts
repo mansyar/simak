@@ -25,6 +25,10 @@ const securityHeadersMiddleware = createMiddleware().server(({ next }) => {
   return next({ context: { nonce } });
 });
 
+const csrfMiddleware = createCsrfMiddleware({
+  filter: (ctx) => ctx.handlerType === 'serverFn',
+});
+
 export const startInstance = createStart(() => ({
-  requestMiddleware: [createCsrfMiddleware(), securityHeadersMiddleware],
+  requestMiddleware: [csrfMiddleware, securityHeadersMiddleware],
 }));
