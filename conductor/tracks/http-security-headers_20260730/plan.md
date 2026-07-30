@@ -75,12 +75,12 @@
 
 ## Phase 5: Documentation & Final Verification
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
-- [ ] Task: Update `conductor/tech-stack.md`
-    - [ ] Add "HTTP Security Headers" section documenting CSP allowlist rationale
-    - [ ] Document nonce lifecycle (generation → middleware → router context → auto-attach to scripts/styles)
-    - [ ] Document environment differences (Report-Only in dev, enforce in prod, HSTS prod-only)
-    - [ ] Add changelog entry
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context
+- [x] Task: Update `conductor/tech-stack.md` [147b75cc]
+    - [x] Add "HTTP Security Headers" section documenting CSP allowlist rationale
+    - [x] Document nonce lifecycle (generation → middleware → router context → auto-attach to scripts/styles)
+    - [x] Document environment differences (Report-Only in dev, enforce in prod, HSTS prod-only)
+    - [x] Add changelog entry
 - [ ] Task: Run full verification suite
     - [ ] `pnpm typecheck`
     - [ ] `pnpm lint`
