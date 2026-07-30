@@ -5,11 +5,12 @@ vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({ RESEND_API_KEY: 'test-key' }),
 }));
 
-const { mockChildLogger, pruneMock, scannerMock, r2CleanupMock } = vi.hoisted(() => ({
+const { mockChildLogger, pruneMock, scannerMock, r2CleanupMock, reclaimMock } = vi.hoisted(() => ({
   mockChildLogger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
   pruneMock: vi.fn(),
   scannerMock: vi.fn(),
   r2CleanupMock: vi.fn(),
+  reclaimMock: vi.fn(),
 }));
 
 vi.mock('@/lib/logger', () => ({
@@ -44,6 +45,8 @@ describe('email-queue-init', () => {
     scannerMock.mockResolvedValue(undefined);
     r2CleanupMock.mockReset();
     r2CleanupMock.mockResolvedValue({ deleted: 0, failed: 0, batchSize: 0 });
+    reclaimMock.mockReset();
+    reclaimMock.mockResolvedValue({ reclaimed: 0 });
   });
 
   afterEach(() => {
@@ -52,7 +55,10 @@ describe('email-queue-init', () => {
 
   function mockProcessor(returnFn: () => Promise<any>): ReturnType<typeof vi.fn> {
     const processMock = vi.fn(returnFn);
-    vi.doMock('@/lib/email-queue-processor', () => ({ processEmailQueue: processMock }));
+    vi.doMock('@/lib/email-queue-processor', () => ({
+      processEmailQueue: processMock,
+      reclaimAllProcessingRows: reclaimMock,
+    }));
     return processMock;
   }
 
@@ -61,6 +67,7 @@ describe('email-queue-init', () => {
     const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
 
     startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
     expect(processMock).toHaveBeenCalledTimes(1);
 
     vi.advanceTimersByTime(30_000);
@@ -338,6 +345,18 @@ describe('email-queue-init', () => {
       error: 'r2 cleanup failed',
     });
 
+    stopEmailQueue();
+  });
+
+  it('calls reclaimAllProcessingRows before first tick on startEmailQueue', async () => {
+    const processMock = mockProcessor(() => Promise.resolve());
+    const { startEmailQueue, stopEmailQueue } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(reclaimMock).toHaveBeenCalledTimes(1);
+    expect(processMock).toHaveBeenCalledTimes(1);
     stopEmailQueue();
   });
 });

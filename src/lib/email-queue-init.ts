@@ -1,4 +1,4 @@
-import { processEmailQueue } from './email-queue-processor';
+import { processEmailQueue, reclaimAllProcessingRows } from './email-queue-processor';
 import { pruneOldEmails } from './email-queue-retention';
 import { processDeadlineReminders } from './deadline-reminder-scanner';
 import { processOrphanedR2Objects } from './r2-cleanup';
@@ -77,9 +77,10 @@ async function tick(): Promise<void> {
 export function startEmailQueue(): void {
   if (intervalId !== null) return;
 
-  tick();
-
-  intervalId = setInterval(tick, POLL_INTERVAL_MS);
+  reclaimAllProcessingRows().then(() => {
+    tick();
+    intervalId = setInterval(tick, POLL_INTERVAL_MS);
+  });
 }
 
 /**
