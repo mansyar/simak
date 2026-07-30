@@ -53,7 +53,7 @@
     - [x] Verify singleton and CRUD method tests still pass with the new env setup
     - [x] Also fixed `tests/unit/db/seed.test.ts` — added `vi.mock('@/lib/logger', ...)` to prevent getEnv() call at module load
     - [x] Also fixed 3 email template test files (`email-templates.test.ts`, `email-templates-at-risk.test.ts`, `email-templates-discussion-reply.test.ts`) — added `LOG_LEVEL: 'info'` to mock getEnv()
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Database Pool Configuration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Database Pool Configuration' (Protocol in workflow.md) — Checkpoint: `40458ba3`
 
 ## Phase 3: Documentation & Final Verification
 
