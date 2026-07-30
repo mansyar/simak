@@ -8,12 +8,13 @@ import * as schema from './schema/index';
 export type Db = PostgresJsDatabase<typeof schema>;
 
 let _db: Db | null = null;
+let _client: ReturnType<typeof postgres> | null = null;
 
 export function getDb(): Db {
   if (_db) return _db;
 
   const env = getEnv();
-  const client = postgres(env.DATABASE_URL, {
+  _client = postgres(env.DATABASE_URL, {
     max: env.DB_POOL_MAX,
     idle_timeout: 30,
     connect_timeout: 10,
@@ -21,8 +22,20 @@ export function getDb(): Db {
     prepare: !env.DB_PREPARED_STATEMENTS_DISABLED,
     onnotice: (notice) => logger.debug({ event: 'pg_notice', ...notice }),
   });
-  _db = drizzle(client, { schema });
+  _db = drizzle(_client, { schema });
   return _db;
+}
+
+/**
+ * Close the database connection pool and reset the singleton.
+ * Called during graceful shutdown.
+ */
+export function closeDb(): void {
+  if (_client) {
+    _client.end();
+  }
+  _db = null;
+  _client = null;
 }
 
 /**
