@@ -70,15 +70,15 @@
 
 ## Phase 4: Documentation & Final Verification
 
-- [ ] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation
-- [ ] Task: Document request ID middleware wiring in `conductor/tech-stack.md`
-    - [ ] Add dated note (2026-07-30) documenting: `requestIdMiddleware` wired to all server functions via `typedServerFn`; `AsyncLocalStorage<{ requestId: string }>` in `src/lib/request-context-store.ts` (standalone module to avoid circular dependency between `logger.ts` and `request-context.ts`); pino `mixin` in `createLogger()` reads from AsyncLocalStorage — automatic `requestId` in all log entries within a request context (zero handler changes); `x-request-id` header propagated when provided, UUID generated when absent; background job `logger.child({ requestId })` and `createRequestLogger()` continue working (mixin returns `{}` when AsyncLocalStorage is empty); `requestIdMiddleware` runs before `createRateLimitMiddleware` (rate limit decisions logged with requestId); `createRequestLogger` retained for background jobs
-- [ ] Task: Run full quality gate suite
-    - [ ] Run `pnpm test:coverage` — verify >=80% on lines, statements, branches, functions
-    - [ ] Run `pnpm typecheck` — verify clean (0 errors)
-    - [ ] Run `pnpm lint` — verify clean (0 errors)
-    - [ ] Run `pnpm check:i18n` — verify EN<->ID parity (no new i18n keys needed for this track, but verify no breakage)
-    - [ ] Verify no file in `src/`, `tests/`, `scripts/` exceeds 500 lines (`scripts/check-modularity.js`)
-    - [ ] Verify no circular dependencies: `request-context-store.ts` has zero project deps; `logger.ts` imports from `request-context-store.ts` (not `request-context.ts`); `request-context.ts` imports from both `logger.ts` and `request-context-store.ts` (no cycle)
+- [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation (689395c)
+- [x] Task: Document request ID middleware wiring in `conductor/tech-stack.md` (689395c)
+    - [x] Add dated note (2026-07-30) documenting: `requestIdMiddleware` wired to all server functions via `typedServerFn`; `AsyncLocalStorage<{ requestId: string }>` in `src/lib/request-context-store.ts` (standalone module to avoid circular dependency between `logger.ts` and `request-context.ts`); pino `mixin` in `createLogger()` reads from AsyncLocalStorage — automatic `requestId` in all log entries within a request context (zero handler changes); `x-request-id` header propagated when provided, UUID generated when absent; background job `logger.child({ requestId })` and `createRequestLogger()` continue working (mixin returns `{}` when AsyncLocalStorage is empty); `requestIdMiddleware` runs before `createRateLimitMiddleware` (rate limit decisions logged with requestId); `createRequestLogger` retained for background jobs
+- [x] Task: Run full quality gate suite (689395c)
+    - [x] Run `pnpm test:coverage` — 87.97% statements, 81.02% branches, 83.37% functions, 88.63% lines
+    - [x] Run `pnpm typecheck` — clean (0 errors)
+    - [x] Run `pnpm lint` — clean (0 errors; 4 pre-existing warnings)
+    - [x] Run `pnpm check:i18n` — EN<->ID parity verified
+    - [x] Verify no file in `src/`, `tests/`, `scripts/` exceeds 500 lines (`scripts/check-modularity.js`)
+    - [x] Verify no circular dependencies: `request-context-store.ts` has zero project deps; `logger.ts` imports from `request-context-store.ts` (not `request-context.ts`); `request-context.ts` imports from both `logger.ts` and `request-context-store.ts` (no cycle)
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Documentation & Final Verification' (Protocol in workflow.md)
 </protect>
