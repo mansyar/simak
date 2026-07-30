@@ -51,7 +51,7 @@
     - [x] Run `pnpm test` and confirm all `logger.test.ts` tests pass
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Pino Mixin in Logger' (Protocol in workflow.md) (d15de12)
 
-## Phase 3: Wire requestIdMiddleware to typedServerFn (FR-4)
+## Phase 3: Wire requestIdMiddleware to typedServerFn (FR-4) [checkpoint: d63bf09]
 
 - [x] Task: Read `spec.md` and `conductor/workflow.md` to refresh context before implementation (d63bf09)
 - [x] Task: Update `tests/unit/lib/server-fn.test.ts` for always-chained middleware (TDD Red Phase) (d63bf09)
@@ -66,7 +66,7 @@
     - [x] Run `pnpm test` and confirm all `server-fn.test.ts` tests pass
 - [x] Task: Run `pnpm test` to verify all existing tests still pass (no other test files should break — the `middleware: vi.fn().mockReturnThis()` mock from TRACK-043 handles the always-chained `.middleware()` call) (d63bf09)
     - [x] Investigated intermittent Vitest/Zod unhandled rejection: full suite passes serially with `--maxWorkers=1`; individual reported tests pass, implicating the default parallel vmThreads runner rather than track changes.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Wire requestIdMiddleware to typedServerFn' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Wire requestIdMiddleware to typedServerFn' (Protocol in workflow.md) (d63bf09)
 
 ## Phase 4: Documentation & Final Verification
 
