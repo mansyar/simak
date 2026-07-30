@@ -18,6 +18,14 @@ vi.mock('@/routeTree.gen', () => ({
   routeTree: {},
 }));
 
+// Prevent the dynamic import('./lib/email-queue-init') in router.tsx from loading
+// the real email queue module chain (which imports postal-mime and throws an
+// unhandled rejection in the test environment). The router test verifies nonce
+// propagation, not email queue functionality.
+vi.mock('@/lib/email-queue-init', () => ({
+  startEmailQueue: vi.fn(),
+}));
+
 import { getRouter } from '@/router';
 
 describe('getRouter', () => {
