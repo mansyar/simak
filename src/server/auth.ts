@@ -1,7 +1,8 @@
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { redirect } from '@tanstack/react-router';
 import { getRoleDashboard } from '../lib/route-utils';
 import { isAuthenticated } from '../lib/session-guards';
+import { getSessionHandler } from './auth.server';
 
 export type Session = {
   user: {
@@ -20,10 +21,11 @@ export type Session = {
   };
 } | null;
 
-const _getSession = typedServerFn({ method: 'GET' }).handler(async () => {
-  const { getSessionHandler } = await import('./auth.server');
-  return getSessionHandler();
-});
+const _getSession = typedServerFn({ method: 'GET' })
+  .middleware(serverFnMiddlewares())
+  .handler(async () => {
+    return getSessionHandler();
+  });
 
 export async function getSessionFromHeaders(): Promise<Session> {
   return _getSession();

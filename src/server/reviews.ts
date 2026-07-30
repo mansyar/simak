@@ -1,8 +1,15 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in reviews.server.ts (not bundled for client)
 import { RATE_LIMITS } from '@/lib/rate-limiter';
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
+import {
+  getLatestReviewHandler,
+  getReviewDetailHandler,
+  listPendingReviewsHandler,
+  openForReviewHandler,
+  submitReviewHandler,
+} from './reviews.server';
 
 export const ListPendingReviewsSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -42,50 +49,45 @@ export const GetLatestReviewSchema = z.object({
 
 export const listPendingReviews = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListPendingReviewsSchema)
   .handler(async ({ data }) => {
-    const { listPendingReviewsHandler } = await import('./reviews.server');
     return listPendingReviewsHandler({ data });
   });
 
 export const getReviewDetail = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(GetReviewDetailSchema)
   .handler(async ({ data }) => {
-    const { getReviewDetailHandler } = await import('./reviews.server');
     return getReviewDetailHandler({ data });
   });
 
 export const openForReview = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.heavyMutation,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.heavyMutation))
   .inputValidator(OpenForReviewSchema)
   .handler(async ({ data }) => {
-    const { openForReviewHandler } = await import('./reviews.server');
     return openForReviewHandler({ data });
   });
 
 export const submitReview = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.heavyMutation,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.heavyMutation))
   .inputValidator(SubmitReviewSchema)
   .handler(async ({ data }) => {
-    const { submitReviewHandler } = await import('./reviews.server');
     return submitReviewHandler({ data });
   });
 
 export const getLatestReview = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(GetLatestReviewSchema)
   .handler(async ({ data }) => {
-    const { getLatestReviewHandler } = await import('./reviews.server');
     return getLatestReviewHandler({ data });
   });

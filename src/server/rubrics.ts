@@ -1,9 +1,16 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in rubrics.server.ts (not bundled for client)
 import { RATE_LIMITS } from '@/lib/rate-limiter';
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 import type { ServerError } from '@/lib/errors';
+import {
+  countPendingReviewsHandler,
+  getRubricHandler,
+  saveRubricHandler,
+  softDeleteCriterionHandler,
+  softDeleteLevelHandler,
+} from './rubrics.server';
 
 // ── Shared base schemas ───────────────────────────────────────────
 
@@ -119,44 +126,42 @@ export const CountPendingReviewsSchema = z.object({
 
 // ── Server function stubs ─────────────────────────────────────────
 
-export const saveRubric = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.destructive })
+export const saveRubric = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(SaveRubricSchema)
   .handler(async ({ data }) => {
-    const { saveRubricHandler } = await import('./rubrics.server');
     return saveRubricHandler({ data });
   });
 
-export const getRubric = typedServerFn({ method: 'GET', rateLimit: RATE_LIMITS.standardRead })
+export const getRubric = typedServerFn({ method: 'GET' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(GetRubricSchema)
   .handler(async ({ data }) => {
-    const { getRubricHandler } = await import('./rubrics.server');
     return getRubricHandler({ data });
   });
 
 export const softDeleteCriterion = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.destructive,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(DeleteCriterionSchema)
   .handler(async ({ data }) => {
-    const { softDeleteCriterionHandler } = await import('./rubrics.server');
     return softDeleteCriterionHandler({ data });
   });
 
-export const softDeleteLevel = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.destructive })
+export const softDeleteLevel = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(DeleteLevelSchema)
   .handler(async ({ data }) => {
-    const { softDeleteLevelHandler } = await import('./rubrics.server');
     return softDeleteLevelHandler({ data });
   });
 
 export const countPendingReviews = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(CountPendingReviewsSchema)
   .handler(async ({ data }) => {
-    const { countPendingReviewsHandler } = await import('./rubrics.server');
     return countPendingReviewsHandler({ data });
   });
 
