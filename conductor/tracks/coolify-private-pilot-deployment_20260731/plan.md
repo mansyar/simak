@@ -29,9 +29,10 @@
   - [x] Restrict database networking to the application service.
   - Operator confirmed `simak-postgres` (PostgreSQL 16, database `simak`) is running and healthy with generated credentials and no public exposure.
 - [~] Task: Create the SIMAK application service from the repository Dockerfile
-  - [ ] Configure the production build context and `docker/Dockerfile`.
-  - [ ] Configure the container port and `/api/health` health probe.
-  - [ ] Configure restart and deployment behavior appropriate for a single-instance pilot.
+  - [x] Configure the production build context and `docker/Dockerfile`.
+  - [x] Configure the container port and `/api/health` health probe.
+  - [x] Configure restart and deployment behavior appropriate for a single-instance pilot.
+  - Operator configured `mansyar/simak` at `track-047/coolify-private-pilot-deployment` with base directory `/`, `docker/Dockerfile`, port `3000`, and `/api/health`; deployment is manual with one instance and normal restart-on-failure behavior. The application remains undeployed pending Phase 2 runtime secrets.
 - [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 
 ## Phase 2: Configure Production Runtime & First Release
