@@ -108,4 +108,13 @@
   - Automated verification: latest pre-push gate passed 388 test files and 3,953 tests, typecheck, and coverage (89.39% statements, 81.08% branches, 83.55% functions, 90.13% lines). Public `/api/health` returned HTTP 200 with healthy database, R2, and email queue checks; live HTTPS security headers and R2 CSP sources were present.
   - Manual verification: Operator confirmed on 2026-08-01 that role authentication/authorization, invitation/password setup, R2 upload/CORS, PDF preview, authorized download, non-owner denial, assignment lifecycle, and secret-free structured logs all passed.
   - Handover confirmation: Operator confirmed the Phase 4 production smoke tests and runbook handover were complete.
+## Phase: Review Fixes
+
+- [~] Task: Apply review suggestions from the TRACK-047 principal-engineer review
+  - [~] Fix the failing Sonner regression test and unhandled test errors.
+  - [ ] Align production stylesheet delivery with the CSP policy and add regression coverage.
+  - [ ] Restore the client-safe/server-only server-function boundary or document and test the supported compiler boundary.
+  - [ ] Make SuperAdmin bootstrap atomic.
+  - [ ] Harden the Docker runner user, signal handling, image pinning, and health-check contract.
+  - [ ] Clarify rollback migration-journal reconciliation and correct redirect/environment documentation.
 </protect>
