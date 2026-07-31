@@ -86,14 +86,19 @@
   - [x] Configure the production R2 bucket CORS policy for browser presigned uploads [0a3762d]
     - Operator configured the production origin-specific R2 CORS policy; the browser preflight and disposable upload then passed.
   - [x] Fix production CSP `object-src` to allow the R2 PDF preview while retaining source restrictions [32215a3]
-    - `object-src` now allows only the configured HTTPS R2 endpoint and bucket subdomains; it remains `object-src 'none'` when R2 is not configured. Targeted red/green coverage passed with 26 tests. Redeploy and retry the review-page PDF preview before closing the smoke-test task.
+    - `object-src` now allows only the configured HTTPS R2 endpoint and bucket subdomains; it remains `object-src 'none'` when R2 is not configured. Targeted red/green coverage passed with 26 tests; the deployed PDF preview subsequently rendered successfully.
   - [x] Fix production CSP `frame-src` to allow the R2 PDF preview while retaining source restrictions [78dc3c4]
-    - `frame-src` now allows only the configured HTTPS R2 endpoint and bucket subdomains alongside `'self'`. Targeted red/green coverage passed with 26 tests. Redeploy and retry the review-page PDF preview before closing the smoke-test task.
-  - [ ] Verify HTTPS, `/api/health`, and expected security headers.
-  - [ ] Verify SuperAdmin, Admin, Instructor, and Student authentication and authorization paths.
-  - [ ] Verify invitation/password setup email delivery through Resend.
-  - [ ] Verify an R2 upload, download, and permission-restricted access path.
-  - [ ] Verify a minimal assignment lifecycle: assignment creation, submission, and review.
+    - `frame-src` now allows only the configured HTTPS R2 endpoint and bucket subdomains alongside `'self'`. Targeted red/green coverage passed with 26 tests; the deployed PDF preview subsequently rendered successfully.
+  - [x] Verify HTTPS, `/api/health`, and expected security headers.
+    - Public verification returned HTTP 200 with healthy database, R2, and email queue checks. The deployed response included the R2 `connect-src`, `frame-src`, and `object-src` sources, HSTS, frame protection, `nosniff`, strict referrer policy, and restrictive permissions policy.
+  - [x] Verify SuperAdmin, Admin, Instructor, and Student authentication and authorization paths.
+    - Operator confirmed all four role login and role-bound route checks passed, including denied-route behavior.
+  - [x] Verify invitation/password setup email delivery through Resend.
+    - Operator confirmed invitation delivery, first-time password setup, login, and setup-token non-reuse passed.
+  - [x] Verify an R2 upload, download, and permission-restricted access path.
+    - Operator confirmed the disposable browser upload, PDF preview, authorized download, and non-owner access denial passed after the production R2 CORS/CSP fixes.
+  - [x] Verify a minimal assignment lifecycle: assignment creation, submission, and review.
+    - Operator confirmed assignment creation, Student submission, Instructor review/decision, resulting status, and notification passed.
 - [ ] Task: Verify Coolify logs contain structured operational output and no secrets.
 - [ ] Task: Record pilot deployment details, known operational limits, and rollback readiness in the runbook.
 - [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
