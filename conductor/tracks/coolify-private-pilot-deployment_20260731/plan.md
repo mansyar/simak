@@ -73,7 +73,7 @@
   - Runbook: `docs/deployment-runbook.md`.
   - Quality gates: typecheck passed; lint passed with 4 pre-existing warnings and 0 errors; coverage passed with 388 files and 3,953 tests, exceeding all 80% thresholds.
 - [x] Task: Link the runbook from the project README. [1430db2]
-- [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
+- [~] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 
 ## Phase 4: Private-Pilot Verification & Handover
 
