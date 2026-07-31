@@ -44,9 +44,10 @@
   - Operator configured the approved pilot origin `https://simak.ansyar-world.top` without disclosing any secret value.
 - [~] Task: Configure the custom pilot domain and TLS
   - [x] Point DNS to the VPS/Coolify ingress.
-  - [ ] Attach the domain in Coolify and verify a valid certificate.
+  - [x] Attach the domain in Coolify; verify a valid certificate after the first application deployment.
   - [ ] Confirm HTTP redirects to HTTPS.
   - Operator confirmed `simak.ansyar-world.top` points directly to the Coolify ingress with Cloudflare proxying disabled for certificate issuance.
+  - Operator attached `https://simak.ansyar-world.top` to the Coolify application on port `3000`; deployment is required before Traefik can serve and verify TLS.
 - [ ] Task: Perform the initial application deployment
   - [ ] Verify migrations complete through the bundled, advisory-locked migration runner.
   - [ ] Verify the container becomes healthy through `/api/health`.
