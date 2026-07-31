@@ -75,9 +75,9 @@ describe('buildSecurityHeaders', () => {
       expect(csp).toContain("img-src 'self' data: https:");
     });
 
-    it('includes frame-src self', () => {
+    it('allows the R2 endpoint and bucket subdomains in frame-src', () => {
       const csp = getCsp(true, testR2Domain);
-      expect(csp).toContain("frame-src 'self'");
+      expect(csp).toContain(`frame-src 'self' https://${testR2Domain} https://*.${testR2Domain}`);
     });
 
     it('includes frame-ancestors none', () => {

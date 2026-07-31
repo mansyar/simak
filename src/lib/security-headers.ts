@@ -24,6 +24,7 @@ export function buildSecurityHeaders(
 ): Record<string, string> {
   const r2Sources = r2Domain ? `https://${r2Domain} https://*.${r2Domain}` : '';
   const connectSrc = `connect-src 'self'${r2Sources ? ` ${r2Sources}` : ''}`;
+  const frameSrc = `frame-src 'self'${r2Sources ? ` ${r2Sources}` : ''}`;
   const objectSrc = r2Sources ? `object-src ${r2Sources}` : "object-src 'none'";
 
   const cspDirectives = [
@@ -33,7 +34,7 @@ export function buildSecurityHeaders(
     "style-src-attr 'unsafe-inline'",
     "img-src 'self' data: https:",
     connectSrc,
-    "frame-src 'self'",
+    frameSrc,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
