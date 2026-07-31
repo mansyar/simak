@@ -67,6 +67,33 @@ Configure these names in Coolify without recording their values here.
 After saving variables, confirm that Coolify displays them as masked runtime
 values and that no value appears in repository files, build output, or logs.
 
+## R2 browser CORS policy
+
+Uploads use browser-direct presigned `PUT` requests. R2 must therefore allow the
+production origin and the request headers used by the uploader; setting the R2
+environment variables alone is not sufficient. Configure the application-upload
+bucket in Cloudflare R2 **Settings → CORS policy** with an origin-specific policy
+like this:
+
+```json
+[
+  {
+    "AllowedOrigins": ["https://simak.ansyar-world.top"],
+    "AllowedMethods": ["GET", "PUT", "HEAD"],
+    "AllowedHeaders": ["Content-Type"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]
+```
+
+Do not use `*` for the production origin. Add a localhost origin only to a
+deliberately shared development bucket/policy. After saving the policy, verify
+that the browser's preflight `OPTIONS` response includes
+`Access-Control-Allow-Origin` and allows `PUT`/`Content-Type`; the subsequent
+presigned `PUT` should return a successful response. Never paste a signed URL
+or its query string into an issue, commit, or operator log.
+
 ## Pre-deployment checklist
 
 1. Confirm the intended repository branch and commit in Coolify. Record the
