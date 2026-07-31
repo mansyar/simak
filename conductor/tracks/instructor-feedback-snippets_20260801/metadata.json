@@ -1,0 +1,9 @@
+{
+  "track_id": "instructor-feedback-snippets_20260801",
+  "track_number": "TRACK-049",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-08-01T00:00:00Z",
+  "updated_at": "2026-08-01T00:00:00Z",
+  "description": "Provide instructors with a private, searchable library of validated plain-text feedback snippets that can be appended to editable review comments without changing review decisions or submission state."
+}
