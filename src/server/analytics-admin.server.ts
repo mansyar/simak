@@ -205,12 +205,12 @@ export async function getAdminAnalyticsDataHandler({ data }: { data: AnalyticsDa
         high: sql<number>`count(DISTINCT CASE WHEN ${riskCheckpoints.state} IN ('unlocked','revise') AND ${riskCheckpoints.dueDate} < now() THEN ${riskCheckpoints.studentId} END)::int`,
         medium: sql<number>`count(DISTINCT CASE WHEN (
           (${riskCheckpoints.state} = 'unlocked' AND ${riskCheckpoints.dueDate} > now() AND ${riskCheckpoints.dueDate} <= now() + interval '3 days'
-           AND NOT EXISTS (SELECT 1 FROM ${riskSubmissions} WHERE ${riskSubmissions.checkpointId} = ${riskCheckpoints.id}))
+           AND NOT EXISTS (SELECT 1 FROM ${submissions} AS ${riskSubmissions} WHERE ${riskSubmissions.checkpointId} = ${riskCheckpoints.id}))
           OR (${riskCheckpoints.dueDate} <= now() + interval '7 days'
-              AND COALESCE((SELECT count(*) FROM ${riskConsultations} WHERE ${riskConsultations.checkpointId} = ${riskCheckpoints.id} AND ${riskConsultations.status} = 'verified'), 0) < COALESCE(${riskCheckpoints.minConsultations}, 0))
-          OR (SELECT count(*) FROM ${riskReviews} JOIN ${riskSubmissions} ON ${riskSubmissions.id} = ${riskReviews.submissionId} WHERE ${riskSubmissions.checkpointId} = ${riskCheckpoints.id} AND ${riskReviews.decision} = 'revise') >= 2
+               AND COALESCE((SELECT count(*) FROM ${consultations} AS ${riskConsultations} WHERE ${riskConsultations.checkpointId} = ${riskCheckpoints.id} AND ${riskConsultations.status} = 'verified'), 0) < COALESCE(${riskCheckpoints.minConsultations}, 0))
+          OR (SELECT count(*) FROM ${reviews} AS ${riskReviews} JOIN ${submissions} AS ${riskSubmissions} ON ${riskSubmissions.id} = ${riskReviews.submissionId} WHERE ${riskSubmissions.checkpointId} = ${riskCheckpoints.id} AND ${riskReviews.decision} = 'revise') >= 2
         ) THEN ${riskCheckpoints.studentId} END)::int`,
-        low: sql<number>`count(DISTINCT CASE WHEN ${riskCheckpoints.state} = 'under_review' AND EXISTS (SELECT 1 FROM ${riskSubmissions} WHERE ${riskSubmissions.checkpointId} = ${riskCheckpoints.id} AND ${riskSubmissions.uploadedAt} < now() - interval '3 days') THEN ${riskCheckpoints.studentId} END)::int`,
+        low: sql<number>`count(DISTINCT CASE WHEN ${riskCheckpoints.state} = 'under_review' AND EXISTS (SELECT 1 FROM ${submissions} AS ${riskSubmissions} WHERE ${riskSubmissions.checkpointId} = ${riskCheckpoints.id} AND ${riskSubmissions.uploadedAt} < now() - interval '3 days') THEN ${riskCheckpoints.studentId} END)::int`,
       })
       .from(riskCheckpoints)
       .where(inArray(riskCheckpoints.state, ['unlocked', 'revise', 'under_review', 'submitted']));

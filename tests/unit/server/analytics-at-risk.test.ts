@@ -78,6 +78,11 @@ describe('getAdminAnalyticsDataHandler - at-risk summary', () => {
     const atRiskSelection = mockDb.select.mock.calls.at(-1)?.[0];
     const mediumSql = new PgDialect().sqlToQuery(atRiskSelection.medium).sql;
 
+    expect(mediumSql).toContain('FROM "submissions" AS "risk_submissions"');
+    expect(mediumSql).toContain('FROM "consultations" AS "risk_consultations"');
+    expect(mediumSql).toContain(
+      'FROM "reviews" AS "risk_reviews" JOIN "submissions" AS "risk_submissions"',
+    );
     expect(mediumSql).toContain('"risk_submissions"."checkpoint_id" = "risk_checkpoints"."id"');
     expect(mediumSql).toContain('"risk_reviews"."decision"');
   });
