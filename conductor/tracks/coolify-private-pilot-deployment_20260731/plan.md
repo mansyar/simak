@@ -104,7 +104,7 @@
 - [x] Task: Record pilot deployment details, known operational limits, and rollback readiness in the runbook [2dd34e6]
   - `docs/deployment-runbook.md` records the `simak-private-pilot`/`production` Coolify topology, `track-047/coolify-private-pilot-deployment` deployment branch, port 3000 health contract, direct PostgreSQL/no-PgBouncer operation, R2/Resend dependencies, daily seven-copy local and remote backups, restore evidence, rollback procedures, and single-instance pilot limits.
   - The runbook also records the final smoke-test handover: health/security checks, role access, invitation setup, R2 upload/download/authorization, assignment lifecycle, and secret-free structured-log verification.
-- [x] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`) [c3412f2]
   - Automated verification: latest pre-push gate passed 388 test files and 3,953 tests, typecheck, and coverage (89.39% statements, 81.08% branches, 83.55% functions, 90.13% lines). Public `/api/health` returned HTTP 200 with healthy database, R2, and email queue checks; live HTTPS security headers and R2 CSP sources were present.
   - Manual verification: Operator confirmed on 2026-08-01 that role authentication/authorization, invitation/password setup, R2 upload/CORS, PDF preview, authorized download, non-owner denial, assignment lifecycle, and secret-free structured logs all passed.
   - Handover confirmation: Operator confirmed the Phase 4 production smoke tests and runbook handover were complete.
