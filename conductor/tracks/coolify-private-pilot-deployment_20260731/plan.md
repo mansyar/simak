@@ -37,7 +37,7 @@
 
 ## Phase 2: Configure Production Runtime & First Release
 
-- [ ] Task: Configure the complete production environment in Coolify
+- [~] Task: Configure the complete production environment in Coolify
   - [ ] Set `DATABASE_URL`, `MIGRATE_DATABASE_URL`, `BETTER_AUTH_URL`, authentication secrets, Resend, R2, SuperAdmin, logging, and pool settings.
   - [ ] Ensure `MIGRATE_DATABASE_URL` reaches PostgreSQL directly and set `DB_PREPARED_STATEMENTS_DISABLED` only if PgBouncer is enabled.
   - [ ] Verify no secrets appear in Git, application logs, or documentation.
