@@ -3,3 +3,5 @@ allowBuilds:
   esbuild: true
   lefthook: true
   msw: true
+patchedDependencies:
+  sonner@2.0.7: patches/sonner@2.0.7.patch

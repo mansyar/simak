@@ -1,0 +1,28 @@
+diff --git a/dist/index.js b/dist/index.js
+index bd21e898f431298b70e941833c78819a1eb53a36..d428f8882284eeb6436166fc64419164900ce496 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -4,8 +4,8 @@ function __insertCSS(code) {
+   let head = document.head || document.getElementsByTagName('head')[0]
+   let style = document.createElement('style')
+   style.type = 'text/css'
+-  head.appendChild(style)
+   ;style.styleSheet ? (style.styleSheet.cssText = code) : style.appendChild(document.createTextNode(code))
++  head.appendChild(style)
+ }
+ 
+ Object.defineProperty(exports, '__esModule', { value: true });
+diff --git a/dist/index.mjs b/dist/index.mjs
+index d0c7a5a1fa1ed8b19c27bea968bb404f2437a07e..ff1ebc477348c5769806e37ea662def9198984b6 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -4,8 +4,8 @@ function __insertCSS(code) {
+   let head = document.head || document.getElementsByTagName('head')[0]
+   let style = document.createElement('style')
+   style.type = 'text/css'
+-  head.appendChild(style)
+   ;style.styleSheet ? (style.styleSheet.cssText = code) : style.appendChild(document.createTextNode(code))
++  head.appendChild(style)
+ }
+ 
+ import React from 'react';
