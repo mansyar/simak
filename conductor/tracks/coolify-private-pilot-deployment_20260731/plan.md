@@ -61,7 +61,7 @@
 - [x] Task: Configure PostgreSQL backup retention in Coolify [dc47411]
   - Operator configured daily PostgreSQL backups with 7 retained copies for `simak-postgres`.
   - Backups are stored on both Coolify server storage and remote S3-compatible storage; database persistence and private networking remain enabled.
-- [ ] Task: Test and record the database restore procedure in a non-production target.
+- [~] Task: Test and record the database restore procedure in a non-production target.
 - [ ] Task: Write the deployment operations runbook
   - [ ] Document environment-variable inventory without secret values.
   - [ ] Document deployment, health/log inspection, migration failure handling, backup/restore, and rollback procedures.
