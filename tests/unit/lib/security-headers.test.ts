@@ -60,6 +60,11 @@ describe('buildSecurityHeaders', () => {
       expect(csp).toContain(`style-src 'nonce-${testNonce}'`);
     });
 
+    it('allows Sonner’s static runtime stylesheet by hash', () => {
+      const csp = getCsp(true, testR2Domain);
+      expect(csp).toContain("'sha256-CIxDM5jnsGiKqXs2v7NKCY5MzdR9gu6TtiMJrDw29AY='");
+    });
+
     it('allows inline style attributes without weakening nonce-protected style elements', () => {
       const csp = getCsp(true, testR2Domain);
       expect(csp).toContain("style-src-attr 'unsafe-inline'");

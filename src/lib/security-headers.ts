@@ -26,7 +26,7 @@ export function buildSecurityHeaders(
   const cspDirectives = [
     "default-src 'self'",
     `script-src 'nonce-${nonce}' 'strict-dynamic'`,
-    `style-src 'nonce-${nonce}'`,
+    `style-src 'nonce-${nonce}' 'sha256-CIxDM5jnsGiKqXs2v7NKCY5MzdR9gu6TtiMJrDw29AY='`,
     "style-src-attr 'unsafe-inline'",
     "img-src 'self' data: https:",
     connectSrc,
