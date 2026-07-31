@@ -83,7 +83,8 @@
 - [~] Task: Execute production smoke tests
   - [x] Fix production CSP `connect-src` to allow the R2 bucket subdomain used by presigned upload URLs [381f1ac]
     - `buildSecurityHeaders` now allows the HTTPS R2 endpoint and HTTPS bucket subdomains; targeted red/green test coverage passed (26 tests).
-  - [~] Configure the production R2 bucket CORS policy for browser presigned uploads.
+  - [x] Configure the production R2 bucket CORS policy for browser presigned uploads [0a3762d]
+    - Operator configured the production origin-specific R2 CORS policy; the browser preflight and disposable upload then passed.
   - [ ] Verify HTTPS, `/api/health`, and expected security headers.
   - [ ] Verify SuperAdmin, Admin, Instructor, and Student authentication and authorization paths.
   - [ ] Verify invitation/password setup email delivery through Resend.
