@@ -58,7 +58,9 @@
 
 ## Phase 3: Recovery, Operations & Runbooks
 
-- [~] Task: Configure PostgreSQL backup retention in Coolify.
+- [x] Task: Configure PostgreSQL backup retention in Coolify
+  - Operator configured daily PostgreSQL backups with 7 retained copies for `simak-postgres`.
+  - Backups are stored on both Coolify server storage and remote S3-compatible storage; database persistence and private networking remain enabled.
 - [ ] Task: Test and record the database restore procedure in a non-production target.
 - [ ] Task: Write the deployment operations runbook
   - [ ] Document environment-variable inventory without secret values.
