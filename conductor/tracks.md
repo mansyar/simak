@@ -10,4 +10,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active Tracks
 
-_No active tracks._
+- [ ] **Track: TRACK-048 — Backup & Restore Readiness** *Link: [Track workspace](./tracks/backup-restore-readiness_20260801/index.md)*
