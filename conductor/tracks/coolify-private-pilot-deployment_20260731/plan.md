@@ -124,4 +124,8 @@
   - [x] Clarify rollback migration-journal reconciliation and correct redirect/environment documentation.
     - README, PRD, TDD, AGENTS, and the deployment runbook now describe required environment variables, current CSP/rate-limit/test-pool behavior, explicit HTTP redirect verification, and safe `__drizzle_migrations` reconciliation.
   - Automated verification: `pnpm test:coverage` passed 388 test files and 3,953 tests with 88.04% statements, 81.08% branches, 83.56% functions, and 88.68% lines; `pnpm typecheck` passed; `pnpm lint` passed with four pre-existing warnings; production build and Docker image build passed; pre-commit format, lint, and modularity checks passed.
+## Phase: Post-review Operational Follow-up
+
+- [~] Task: Force the Docker healthcheck to use the IPv4 loopback address.
+  - The application is listening, but the `localhost` healthcheck is reporting connection refused; use `127.0.0.1` to avoid Alpine hostname/IPv6 resolution ambiguity while retaining the lightweight `wget` probe.
 </protect>
