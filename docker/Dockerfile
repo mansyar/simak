@@ -31,7 +31,7 @@ RUN test -f /app/.output/server/index.mjs \
 
 ENV NODE_ENV=production
 EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:3000/api/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://127.0.0.1:3000/api/health || exit 1
 USER simak
 
 # Run migrations before starting the app; the wrapper forwards stop signals
