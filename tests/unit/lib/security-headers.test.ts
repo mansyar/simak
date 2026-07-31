@@ -95,9 +95,9 @@ describe('buildSecurityHeaders', () => {
       expect(csp).toContain("form-action 'self'");
     });
 
-    it('includes object-src none', () => {
+    it('allows only the R2 endpoint and bucket subdomains for object-src', () => {
       const csp = getCsp(true, testR2Domain);
-      expect(csp).toContain("object-src 'none'");
+      expect(csp).toContain(`object-src https://${testR2Domain} https://*.${testR2Domain}`);
     });
 
     it('includes upgrade-insecure-requests in prod', () => {
@@ -119,6 +119,7 @@ describe('buildSecurityHeaders', () => {
       const csp = getCsp(true);
       expect(csp).toContain("connect-src 'self'");
       expect(csp).not.toContain(testR2Domain);
+      expect(csp).toContain("object-src 'none'");
     });
 
     it('includes connect-src with only self when R2 domain is undefined', () => {
