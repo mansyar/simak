@@ -104,5 +104,5 @@
 - [x] Task: Record pilot deployment details, known operational limits, and rollback readiness in the runbook [2dd34e6]
   - `docs/deployment-runbook.md` records the `simak-private-pilot`/`production` Coolify topology, `track-047/coolify-private-pilot-deployment` deployment branch, port 3000 health contract, direct PostgreSQL/no-PgBouncer operation, R2/Resend dependencies, daily seven-copy local and remote backups, restore evidence, rollback procedures, and single-instance pilot limits.
   - The runbook also records the final smoke-test handover: health/security checks, role access, invitation setup, R2 upload/download/authorization, assignment lifecycle, and secret-free structured-log verification.
-- [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
+- [~] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 </protect>
