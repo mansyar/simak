@@ -129,4 +129,5 @@
 - [x] Task: Force the Docker healthcheck to use the IPv4 loopback address [f17bae9]
   - The application is listening, but the `localhost` healthcheck is reporting connection refused; use `127.0.0.1` to avoid Alpine hostname/IPv6 resolution ambiguity while retaining the lightweight `wget` probe.
   - Verification: Docker build passed and image inspection confirmed `wget --spider -q http://127.0.0.1:3000/api/health`; pre-commit checks passed.
+  - Post-deployment verification: Coolify deployed the fix; public `/api/health` returned healthy with database, R2, and email queue checks passing, and the live CSP now includes `style-src 'self'` alongside the nonce and Sonner hash.
 </protect>
