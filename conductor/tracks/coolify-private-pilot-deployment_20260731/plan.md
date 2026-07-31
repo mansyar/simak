@@ -99,7 +99,7 @@
     - Operator confirmed the disposable browser upload, PDF preview, authorized download, and non-owner access denial passed after the production R2 CORS/CSP fixes.
   - [x] Verify a minimal assignment lifecycle: assignment creation, submission, and review.
     - Operator confirmed assignment creation, Student submission, Instructor review/decision, resulting status, and notification passed.
-- [ ] Task: Verify Coolify logs contain structured operational output and no secrets.
+- [~] Task: Verify Coolify logs contain structured operational output and no secrets.
 - [ ] Task: Record pilot deployment details, known operational limits, and rollback readiness in the runbook.
 - [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 </protect>
