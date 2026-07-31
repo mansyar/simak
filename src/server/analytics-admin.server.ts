@@ -1,5 +1,6 @@
 // Server-only handler for admin analytics data
 import { and, sql, gte, lte, asc, eq, inArray } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import { getDb } from '@/db/index';
 import { checkpoints } from '@/db/schema/assignments';
 import { submissions, reviews } from '@/db/schema/submissions';
@@ -192,21 +193,27 @@ export async function getAdminAnalyticsDataHandler({ data }: { data: AnalyticsDa
         ? Math.round((deadlineStats.breached / deadlineStats.total) * 100)
         : 0;
 
+    // Use aliases so correlated subqueries keep their columns unambiguous.
+    const riskCheckpoints = alias(checkpoints, 'risk_checkpoints');
+    const riskSubmissions = alias(submissions, 'risk_submissions');
+    const riskConsultations = alias(consultations, 'risk_consultations');
+    const riskReviews = alias(reviews, 'risk_reviews');
+
     // At-risk student summary (simplified SQL counting distinct students per signal)
     const [atRiskRow] = await db
       .select({
-        high: sql<number>`count(DISTINCT CASE WHEN ${checkpoints.state} IN ('unlocked','revise') AND ${checkpoints.dueDate} < now() THEN ${checkpoints.studentId} END)::int`,
+        high: sql<number>`count(DISTINCT CASE WHEN ${riskCheckpoints.state} IN ('unlocked','revise') AND ${riskCheckpoints.dueDate} < now() THEN ${riskCheckpoints.studentId} END)::int`,
         medium: sql<number>`count(DISTINCT CASE WHEN (
-          (${checkpoints.state} = 'unlocked' AND ${checkpoints.dueDate} > now() AND ${checkpoints.dueDate} <= now() + interval '3 days'
-           AND NOT EXISTS (SELECT 1 FROM ${submissions} WHERE ${submissions.checkpointId} = ${checkpoints.id}))
-          OR (${checkpoints.dueDate} <= now() + interval '7 days'
-              AND COALESCE((SELECT count(*) FROM ${consultations} WHERE ${consultations.checkpointId} = ${checkpoints.id} AND ${consultations.status} = 'verified'), 0) < COALESCE(${checkpoints.minConsultations}, 0))
-          OR (SELECT count(*) FROM ${reviews} JOIN ${submissions} ON ${submissions.id} = ${reviews.submissionId} WHERE ${submissions.checkpointId} = ${checkpoints.id} AND ${reviews.decision} = 'revise') >= 2
-        ) THEN ${checkpoints.studentId} END)::int`,
-        low: sql<number>`count(DISTINCT CASE WHEN ${checkpoints.state} = 'under_review' AND EXISTS (SELECT 1 FROM ${submissions} WHERE ${submissions.checkpointId} = ${checkpoints.id} AND ${submissions.uploadedAt} < now() - interval '3 days') THEN ${checkpoints.studentId} END)::int`,
+          (${riskCheckpoints.state} = 'unlocked' AND ${riskCheckpoints.dueDate} > now() AND ${riskCheckpoints.dueDate} <= now() + interval '3 days'
+           AND NOT EXISTS (SELECT 1 FROM ${riskSubmissions} WHERE ${riskSubmissions.checkpointId} = ${riskCheckpoints.id}))
+          OR (${riskCheckpoints.dueDate} <= now() + interval '7 days'
+              AND COALESCE((SELECT count(*) FROM ${riskConsultations} WHERE ${riskConsultations.checkpointId} = ${riskCheckpoints.id} AND ${riskConsultations.status} = 'verified'), 0) < COALESCE(${riskCheckpoints.minConsultations}, 0))
+          OR (SELECT count(*) FROM ${riskReviews} JOIN ${riskSubmissions} ON ${riskSubmissions.id} = ${riskReviews.submissionId} WHERE ${riskSubmissions.checkpointId} = ${riskCheckpoints.id} AND ${riskReviews.decision} = 'revise') >= 2
+        ) THEN ${riskCheckpoints.studentId} END)::int`,
+        low: sql<number>`count(DISTINCT CASE WHEN ${riskCheckpoints.state} = 'under_review' AND EXISTS (SELECT 1 FROM ${riskSubmissions} WHERE ${riskSubmissions.checkpointId} = ${riskCheckpoints.id} AND ${riskSubmissions.uploadedAt} < now() - interval '3 days') THEN ${riskCheckpoints.studentId} END)::int`,
       })
-      .from(checkpoints)
-      .where(inArray(checkpoints.state, ['unlocked', 'revise', 'under_review', 'submitted']));
+      .from(riskCheckpoints)
+      .where(inArray(riskCheckpoints.state, ['unlocked', 'revise', 'under_review', 'submitted']));
 
     return {
       consultationVerificationRate,
