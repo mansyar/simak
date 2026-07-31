@@ -84,6 +84,7 @@ describe('getAdminAnalyticsDataHandler - at-risk summary', () => {
       'FROM "reviews" AS "risk_reviews" JOIN "submissions" AS "risk_submissions"',
     );
     expect(mediumSql).toContain('"risk_submissions"."checkpoint_id" = "risk_checkpoints"."id"');
+    expect(mediumSql).toContain('"risk_submissions"."id" = "risk_reviews"."submission_id"');
     expect(mediumSql).toContain('"risk_reviews"."decision"');
   });
 
