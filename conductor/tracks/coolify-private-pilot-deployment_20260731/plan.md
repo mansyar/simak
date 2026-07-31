@@ -80,7 +80,7 @@
 
 ## Phase 4: Private-Pilot Verification & Handover
 
-- [ ] Task: Execute production smoke tests
+- [~] Task: Execute production smoke tests
   - [ ] Verify HTTPS, `/api/health`, and expected security headers.
   - [ ] Verify SuperAdmin, Admin, Instructor, and Student authentication and authorization paths.
   - [ ] Verify invitation/password setup email delivery through Resend.
