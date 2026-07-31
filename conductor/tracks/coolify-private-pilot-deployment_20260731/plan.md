@@ -65,6 +65,7 @@
   - Operator restored the latest local Coolify backup into an isolated non-production target and verified connectivity, SIMAK schema/migration state, and representative data.
   - The temporary target was removed after verification; the backup timestamp and target name were intentionally kept out of repository documentation.
 - [~] Task: Write the deployment operations runbook
+  - [~] Harden the production seed entry point so direct execution seeds only the SuperAdmin.
   - [ ] Document environment-variable inventory without secret values.
   - [ ] Document deployment, health/log inspection, migration failure handling, backup/restore, and rollback procedures.
   - [ ] Document the one-time SuperAdmin bootstrap command and expected outcome.
