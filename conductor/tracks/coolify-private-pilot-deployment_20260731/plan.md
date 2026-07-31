@@ -54,7 +54,7 @@
   - [x] Run the idempotent seed runner once through Coolify to create the initial SuperAdmin.
   - Initial deployment from `afb3d53d` reached and completed migrations but failed because the build lacked a Nitro Node-server output. Although the Vite build also emitted `dist/server/server.js`, that artifact is not the standalone Docker listener. The official TanStack Vite/Docker configuration now applies the `nitro()` plugin; validated remediation `66797bbc` emits `.output/server/index.mjs`, preserves the migration/seed runners, and has been pushed for redeployment.
   - Operator confirmed a healthy `/api/health` response with database, R2, and email-queue checks passing; the one-time seed completed, SuperAdmin login succeeded, and Analytics loaded successfully after the deployed query repair.
-- [~] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`) [210f924]
 
 ## Phase 3: Recovery, Operations & Runbooks
 
