@@ -85,6 +85,7 @@
     - `buildSecurityHeaders` now allows the HTTPS R2 endpoint and HTTPS bucket subdomains; targeted red/green test coverage passed (26 tests).
   - [x] Configure the production R2 bucket CORS policy for browser presigned uploads [0a3762d]
     - Operator configured the production origin-specific R2 CORS policy; the browser preflight and disposable upload then passed.
+  - [~] Fix production CSP `object-src` to allow the R2 PDF preview while retaining source restrictions.
   - [ ] Verify HTTPS, `/api/health`, and expected security headers.
   - [ ] Verify SuperAdmin, Admin, Instructor, and Student authentication and authorization paths.
   - [ ] Verify invitation/password setup email delivery through Resend.
