@@ -128,10 +128,11 @@ or its query string into an issue, commit, or operator log.
 4. Watch the deployment logs. The image contains
    `.output/server/index.mjs`, `.output/server/migrate.mjs`,
    `.output/server/seed.mjs`, and `drizzle/migrations/`.
-5. The current image command runs the migration runner before the application:
+5. The current image starts `/app/start.sh`. The wrapper runs the migration runner
+   before the application and uses `exec` for correct signal delivery:
 
    ```text
-   node .output/server/migrate.mjs && node .output/server/index.mjs
+   /app/start.sh
    ```
 
    The migration runner acquires PostgreSQL advisory lock `789123`, applies
@@ -180,6 +181,11 @@ be run against the pilot database.
 The public endpoint is unauthenticated and intentionally returns generic error
 messages. It performs database connectivity, R2 reachability, and informational
 email-queue depth checks, each with a two-second timeout.
+
+The image-level Docker healthcheck uses BusyBox `wget` against the IPv4 loopback
+address (`http://127.0.0.1:3000/api/health`) to avoid Alpine `localhost` resolution
+ambiguity. The public check below validates the same application endpoint through
+Coolify's HTTPS ingress.
 
 From an operator workstation:
 

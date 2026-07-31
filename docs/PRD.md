@@ -5,7 +5,14 @@
 **Project Name:** SIMAK (Sistem Informasi dan Manajemen Akademik)
 **Purpose:** Help students and instructors track assignment progress through defined checkpoints with structured feedback cycles.
 **Audience:** University or school instructors and students.
-**Platform:** Web application, deployed via Docker on a VPS.
+**Platform:** Web application, containerized with Docker and deployed through Coolify on a VPS.
+
+**Private-pilot deployment decision (TRACK-047):** The completed pilot runs one SIMAK
+instance in Coolify with a Coolify-managed PostgreSQL 16 service on a private network,
+direct PostgreSQL connections without PgBouncer, private Cloudflare R2 storage, and
+Resend transactional email. The custom domain is HTTPS-only, with daily PostgreSQL
+backups retaining seven copies in both Coolify server storage and remote S3-compatible
+storage. Multi-instance scaling, Redis, and CI/CD outside Coolify remain out of scope.
 
 ---
 

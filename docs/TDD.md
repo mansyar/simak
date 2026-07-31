@@ -20,7 +20,7 @@
 | **Logging**        | pino                             | Structured JSON logger (server-side only). `pino-pretty` in dev. `LOG_LEVEL` env var (default `info`). |
 | **i18n**           | typesafe-i18n                   | Type-safe translations with compile-time checks. Works in both client and server functions.         |
 | **Testing**        | Vitest + Playwright + @axe-core/playwright | Vitest for unit and integration tests; Playwright for E2E (chromium + firefox + mobile-chrome projects); @axe-core/playwright for automated WCAG 2.1 AA accessibility scanning in E2E tests. |
-| **Deployment**     | Docker + Coolify                | Self-hosted on a VPS.                                                                               |
+| **Deployment**     | Docker + Coolify                | Completed private-pilot deployment on Coolify with a single application instance and managed PostgreSQL. |
 
 ### MVP Scope Legend
 
@@ -1202,7 +1202,7 @@ Two migration patterns were applied:
 
 `logError()` in `src/lib/errors.ts` routes through `logger.error(entry)` — the existing `entry` object shape (`timestamp`, `code`, `message`, `cause`, `userId`, `handler`, `stack`, `input`) and `sanitizeInput()` redaction are preserved.
 
-Request ID propagation infrastructure is defined in `src/lib/request-context.ts` (`requestIdMiddleware` + `createRequestLogger`), but **not yet wired** to HTTP handlers — wiring requires chaining `requestIdMiddleware` via `typedServerFn`'s `.middleware()` method (established in TRACK-043 for rate limiting) and threading `requestId` through stub handlers. This is tracked as future work (TRACK-044).
+Request ID propagation infrastructure is defined in `src/lib/request-context.ts` (`requestIdMiddleware` + `createRequestLogger`) and is wired to server functions through `serverFnMiddlewares(rateLimit?)`. The middleware chain attaches request IDs first and optional rate limiting second; client-safe stubs dynamically load server-only handlers. The application logger and shutdown flow preserve the request context for structured operational diagnostics.
 
 ---
 
@@ -1299,7 +1299,7 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
   - Better-Auth session storage (reduces PostgreSQL session lookups).
   - Dashboard aggregated query results (30s TTL — avoids re-joining 5 tables on every visit).
   - Rate limiting counters for server functions (v1 uses in-memory `Map` per instance — sufficient for single-instance Coolify deployment; Redis needed only when scaling to multiple instances for shared rate limit state).
-- Redis runs as a dedicated Coolify service alongside PostgreSQL. No changes to application logic — only a cache adapter swap in Better-Auth and a query result wrapper in the dashboard server function.
+- Redis is not provisioned in the completed TRACK-047 pilot. It remains a future requirement only for multi-instance scaling, when shared sessions, cache state, and rate-limit counters need an external store.
 
 ### Rendering Strategy
 
@@ -1341,12 +1341,12 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 | Variable               | Purpose                                                                 |
 | ---------------------- | ----------------------------------------------------------------------- |
 | `DATABASE_URL`         | PostgreSQL connection string                                            |
-| `MIGRATE_DATABASE_URL` | Direct PostgreSQL connection string for migrations (bypasses PgBouncer) |
+| `MIGRATE_DATABASE_URL` | Optional direct PostgreSQL connection string for migrations; the pilot connects directly to PostgreSQL without PgBouncer |
 | `R2_ENDPOINT`          | Cloudflare R2 endpoint URL                                              |
 | `R2_ACCESS_KEY_ID`     | R2 API access key                                                       |
 | `R2_SECRET_ACCESS_KEY` | R2 API secret key                                                       |
 | `R2_BUCKET_NAME`       | R2 bucket for uploads                                                   |
-| `R2_PUBLIC_URL`        | R2 public base URL for file access                                      |
+| `R2_PUBLIC_URL`        | Optional public base URL for file access; leave unset for private pilot storage |
 | `RESEND_API_KEY`       | Resend API key for email delivery                                       |
 | `EMAIL_FROM`           | From-address for outgoing emails (default: `SIMAK <noreply@simak.app>`)  |
 | `BETTER_AUTH_SECRET`   | Signing secret for auth tokens                                          |
@@ -1355,24 +1355,24 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 | `SUPERADMIN_PASSWORD`  | Password for the seeded SuperAdmin                                      |
 | `LOG_LEVEL`             | Optional. Pino log level (default: `info`). `debug`/`info`/`warn`/`error`. (TRACK-040) |
 | `DB_POOL_MAX`           | Optional. Max postgres.js pool connections (default: `10`). Positive integer. (TRACK-042) |
-| `DB_PREPARED_STATEMENTS_DISABLED` | Optional. Disable prepared statements for PgBouncer transaction-pooling compat (default: `false`; set `true` behind PgBouncer). String parsed via `val === 'true'`. (TRACK-042) |
+| `DB_PREPARED_STATEMENTS_DISABLED` | Optional future PgBouncer compatibility switch (default: `false`; not used in the direct-PostgreSQL pilot). String parsed via `val === 'true'`. (TRACK-042) |
 
 ### Database Migrations [v1]
 
 - Drizzle Kit for migration generation and execution.
 - `drizzle-kit push` for development; `drizzle-kit migrate` for local CLI use.
-- **Production migration runner**: Bundled `migrate.mjs` executed via Dockerfile CMD before app start.
-- **PgBouncer bypass**: Use `MIGRATE_DATABASE_URL` to connect directly to PostgreSQL (port 5432) during migrations, bypassing PgBouncer's transaction-mode pooling which breaks Drizzle's prepared statements.
+- **Production migration runner**: Bundled `migrate.mjs` runs from `/app/start.sh` before the application is started; the wrapper then uses `exec` for correct signal delivery.
+- **Connection target**: The pilot uses direct PostgreSQL networking. Set `MIGRATE_DATABASE_URL` only when migrations need a separate direct connection from the application URL.
 - **Concurrency guard**: `pg_advisory_lock` (ID: 789123) serializes concurrent migration runs to prevent corruption.
-- **Seed runner**: `seed.mjs` chained after migrations; idempotent (skips existing SuperAdmin).
+- **Seed runner**: Bundled `seed.mjs` is a separate one-time/operator bootstrap command after migrations; it calls the production-safe SuperAdmin-only runner and is idempotent.
 - **Rollback convention**: Companion rollback SQL files at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql` for emergency manual execution.
 
 ### Connection Pooling
 
 - **Application pool**: `getDb()` (`src/db/index.ts`) configures the postgres.js client with explicit pool options: `max` (`DB_POOL_MAX`, default 10), `idle_timeout: 30s`, `connect_timeout: 10s`, `max_lifetime: 1800s`, and `prepare: !DB_PREPARED_STATEMENTS_DISABLED`. PostgreSQL notices are routed through pino via an `onnotice` callback (`logger.debug({ event: 'pg_notice', ...notice })`). `DATABASE_URL` is read via `getEnv()` (Zod-validated), not `process.env` directly. (TRACK-042)
 - **Development**: Direct connections (no PgBouncer); `DB_PREPARED_STATEMENTS_DISABLED` left at default `false` (prepared statements enabled).
-- **Production**: PgBouncer deployed as a sidecar container in Coolify. The app connects to PgBouncer, which multiplexes connections to PostgreSQL. Prevents connection exhaustion under concurrent load. Set `DB_PREPARED_STATEMENTS_DISABLED=true` so the postgres.js client uses `prepare: false` — PgBouncer's transaction-mode pooling is incompatible with prepared statements.
-- Connection string format: `postgresql://user:pass@pgbouncer:6432/simak` (PgBouncer on port 6432).
+- **Production pilot**: Direct connections to the Coolify-managed PostgreSQL service; no PgBouncer sidecar is provisioned. The application pool is bounded by `DB_POOL_MAX` (default 10), and shared connection pooling remains a future scaling concern.
+- Future PgBouncer deployments must set `DB_PREPARED_STATEMENTS_DISABLED=true` and use a separate direct migration URL; that topology is outside TRACK-047.
 
 ### Health Checks [v1]
 
@@ -1396,7 +1396,7 @@ The public, unauthenticated `GET /api/health` endpoint provides container orches
   1. **Database** — `SELECT 1` via `getDb()` (PgBouncer-safe — no session-specific queries).
   2. **R2** — `HeadBucketCommand` via `getR2Client()` (returns `null` if R2 env vars are absent → `not_configured`, which is healthy).
   3. **Email queue** — `COUNT(*)` where `status IN ('pending', 'processing')` — informational depth only, never causes unhealthy status.
-- **Dockerfile HEALTHCHECK** — `HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://localhost:3000/api/health || exit 1` (uses `wget` from busybox; `curl` is not available on `node:22-alpine`).
+- **Dockerfile HEALTHCHECK** — `HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD wget --spider -q http://127.0.0.1:3000/api/health || exit 1` (uses `wget` from busybox; `curl` is not available on `node:22-alpine`). The IPv4 loopback avoids Alpine `localhost` resolution ambiguity.
 
 ---
 
