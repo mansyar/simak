@@ -58,7 +58,7 @@
 
 ## Phase 3: Recovery, Operations & Runbooks
 
-- [ ] Task: Configure PostgreSQL backup retention in Coolify.
+- [~] Task: Configure PostgreSQL backup retention in Coolify.
 - [ ] Task: Test and record the database restore procedure in a non-production target.
 - [ ] Task: Write the deployment operations runbook
   - [ ] Document environment-variable inventory without secret values.
