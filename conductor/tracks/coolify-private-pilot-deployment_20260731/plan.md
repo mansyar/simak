@@ -52,7 +52,7 @@
   - [ ] Verify migrations complete through the bundled, advisory-locked migration runner.
   - [ ] Verify the container becomes healthy through `/api/health`.
   - [ ] Run the idempotent seed runner once through Coolify to create the initial SuperAdmin.
-  - Initial deployment from `afb3d53d` reached and completed migrations but failed because the runner expected the obsolete `.output/server/index.mjs` path. Coolify build logs confirmed the TanStack server is emitted as `dist/server/server.js`; the runner-artifact fix is `ff7fe679` and has been pushed for the next deployment.
+  - Initial deployment from `afb3d53d` reached and completed migrations but failed because the build lacked a Nitro Node-server output. Although the Vite build also emitted `dist/server/server.js`, that artifact is not the standalone Docker listener. The official TanStack Vite/Docker configuration now applies the `nitro()` plugin; validated remediation `66797bbc` emits `.output/server/index.mjs`, preserves the migration/seed runners, and has been pushed for redeployment.
 - [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 
 ## Phase 3: Recovery, Operations & Runbooks
