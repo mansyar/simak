@@ -3,11 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  deleteOwnMessageHandler,
-  listDiscussionMessagesHandler,
-  postDiscussionMessageHandler,
-} from './discussions.server';
 
 // ---- Discussion Schemas ----
 
@@ -35,6 +30,7 @@ export const listDiscussionMessages = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListDiscussionMessagesSchema)
   .handler(async ({ data }) => {
+    const { listDiscussionMessagesHandler } = await import('./discussions.server');
     return listDiscussionMessagesHandler({ data });
   });
 
@@ -44,6 +40,7 @@ export const postDiscussionMessage = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(PostDiscussionMessageSchema)
   .handler(async ({ data }) => {
+    const { postDiscussionMessageHandler } = await import('./discussions.server');
     return postDiscussionMessageHandler({ data });
   });
 
@@ -53,5 +50,6 @@ export const deleteOwnMessage = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(DeleteOwnMessageSchema)
   .handler(async ({ data }) => {
+    const { deleteOwnMessageHandler } = await import('./discussions.server');
     return deleteOwnMessageHandler({ data });
   });

@@ -3,11 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  getAdminDashboardDataHandler,
-  getInstructorDashboardDataHandler,
-  getStudentDashboardDataHandler,
-} from './dashboard.server';
 
 export const GetStudentDashboardDataSchema = z.object({});
 
@@ -20,6 +15,7 @@ export const getStudentDashboardData = typedServerFn({
 })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .handler(async () => {
+    const { getStudentDashboardDataHandler } = await import('./dashboard.server');
     return getStudentDashboardDataHandler();
   });
 
@@ -28,6 +24,7 @@ export const getInstructorDashboardData = typedServerFn({
 })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .handler(async () => {
+    const { getInstructorDashboardDataHandler } = await import('./dashboard.server');
     return getInstructorDashboardDataHandler();
   });
 
@@ -36,5 +33,6 @@ export const getAdminDashboardData = typedServerFn({
 })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .handler(async () => {
+    const { getAdminDashboardDataHandler } = await import('./dashboard.server');
     return getAdminDashboardDataHandler();
   });

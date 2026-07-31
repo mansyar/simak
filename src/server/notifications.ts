@@ -3,13 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  createNotificationHandler,
-  getUnreadCountHandler,
-  listNotificationsHandler,
-  markAllReadHandler,
-  markReadHandler,
-} from './notifications.server';
 
 export const CreateNotificationSchema = z.object({
   userId: z.string().min(1, 'User ID is required'),
@@ -34,6 +27,7 @@ export const createNotification = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .handler(async (args: { data: unknown }) => {
     const data = CreateNotificationSchema.parse(args.data);
+    const { createNotificationHandler } = await import('./notifications.server');
     return createNotificationHandler({ data });
   });
 
@@ -43,6 +37,7 @@ export const listNotifications = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .handler(async (args: { data: unknown }) => {
     const data = ListNotificationsSchema.parse(args.data);
+    const { listNotificationsHandler } = await import('./notifications.server');
     return listNotificationsHandler({ data });
   });
 
@@ -60,6 +55,7 @@ export const markRead = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares())
   .handler(async (args: { data: unknown }) => {
     const data = MarkReadSchema.parse(args.data);
+    const { markReadHandler } = await import('./notifications.server');
     return markReadHandler({ data });
   });
 
@@ -67,6 +63,7 @@ export const markAllRead = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares())
   .handler(async (args: { data: unknown }) => {
     const data = MarkAllReadSchema.parse(args.data);
+    const { markAllReadHandler } = await import('./notifications.server');
     return markAllReadHandler({ data });
   });
 
@@ -74,5 +71,6 @@ export const getUnreadCount = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares())
   .handler(async (args: { data: unknown }) => {
     const data = GetUnreadCountSchema.parse(args.data);
+    const { getUnreadCountHandler } = await import('./notifications.server');
     return getUnreadCountHandler({ data });
   });

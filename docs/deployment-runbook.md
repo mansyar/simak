@@ -210,10 +210,13 @@ HTTP `503`; do not bypass that failure by disabling the health probe.
 Check the response headers as well:
 
 ```bash
+curl --silent --show-error --max-time 10 --output /dev/null --dump-header - http://simak.ansyar-world.top/
 curl --silent --show-error --head https://simak.ansyar-world.top/
 ```
 
-Confirm HTTPS, the HTTP-to-HTTPS redirect, `X-Frame-Options: DENY`,
+Confirm the first command returns a `301` or `308` with a `Location` pointing to
+the HTTPS origin. Confirm the second command returns HTTP `200` over HTTPS with
+`X-Frame-Options: DENY`,
 `X-Content-Type-Options: nosniff`, the expected referrer and permissions
 policies, and production HSTS.
 
@@ -320,8 +323,16 @@ Never validate a restore by overwriting the only live copy.
 4. Review data-loss notes and dependency order in the rollback SQL. Obtain
    explicit operator approval before production execution.
 5. Execute the approved SQL against the private production database, then
-   verify migration state, `/api/health`, and critical flows.
-6. Record the action, operator, backup, migration, outcome, and follow-up fix
+   verify migration state, `/api/health`, and critical flows. Reconcile
+   `__drizzle_migrations` before restarting the application: after a successful
+   manual rollback, remove only the exact rolled-back migration row when it is
+   the latest applied migration and the companion SQL fully reverses it; never
+   edit hashes or delete an earlier row. If the migration is not the latest, or
+   the rollback is partial/data-destructive, restore the isolated backup instead
+   of editing the journal. Run the migration bundle once after reconciliation
+   and confirm the journal matches the deployed migration files.
+6. Record the action, operator, backup, migration, journal reconciliation,
+   outcome, and follow-up fix
    without recording credentials or raw personal data.
 
 ## Incident handover checklist

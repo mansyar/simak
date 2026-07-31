@@ -56,7 +56,7 @@ export function createRateLimitMiddleware(config: RateLimitConfig) {
 
     if (!checkRateLimit(rateLimitStore, key, config)) {
       const { serverError, ErrorCode } = await import('@/lib/errors');
-      return serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded') as never;
+      throw serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded');
     }
 
     return next();

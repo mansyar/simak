@@ -1,7 +1,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import { triggerR2CleanupHandler } from './r2-cleanup.server';
 
 // ---- Schemas ----
 
@@ -25,5 +24,6 @@ export const triggerR2Cleanup = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(TriggerR2CleanupSchema)
   .handler(async ({ data }) => {
+    const { triggerR2CleanupHandler } = await import('./r2-cleanup.server');
     return triggerR2CleanupHandler({ data });
   });

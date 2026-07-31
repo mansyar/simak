@@ -5,11 +5,16 @@ const mockInsert = vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue(u
 const mockSelect = vi
   .fn()
   .mockReturnValue({ from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) });
+const mockTransaction = vi.fn(
+  async (callback: (tx: { insert: typeof mockInsert }) => Promise<void>) =>
+    callback({ insert: mockInsert }),
+);
 
 vi.mock('@/db/index', () => ({
   getDb: vi.fn(() => ({
     insert: mockInsert,
     select: mockSelect,
+    transaction: mockTransaction,
   })),
 }));
 
@@ -30,6 +35,7 @@ describe('Seed script - success path', () => {
 
     // Should check for existing user
     expect(mockSelect).toHaveBeenCalled();
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
     expect(mockInsert).toHaveBeenCalledTimes(2);
 
     // First insert should be the user

@@ -2,7 +2,6 @@ import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { redirect } from '@tanstack/react-router';
 import { getRoleDashboard } from '../lib/route-utils';
 import { isAuthenticated } from '../lib/session-guards';
-import { getSessionHandler } from './auth.server';
 
 export type Session = {
   user: {
@@ -24,6 +23,7 @@ export type Session = {
 const _getSession = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares())
   .handler(async () => {
+    const { getSessionHandler } = await import('./auth.server');
     return getSessionHandler();
   });
 

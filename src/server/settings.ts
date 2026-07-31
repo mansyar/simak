@@ -3,12 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  getCurrentUserHandler,
-  getPresignedAvatarUploadUrlHandler,
-  updateProfileHandler,
-  updateUserSettingsHandler,
-} from './settings.server';
 
 export const UpdateProfileSchema = z.object({
   name: z.string().min(1).max(100),
@@ -31,6 +25,7 @@ export const updateProfile = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(UpdateProfileSchema)
   .handler(async ({ data }) => {
+    const { updateProfileHandler } = await import('./settings.server');
     return updateProfileHandler({ data });
   });
 
@@ -40,6 +35,7 @@ export const updateUserSettings = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(UpdateUserSettingsSchema)
   .handler(async ({ data }) => {
+    const { updateUserSettingsHandler } = await import('./settings.server');
     return updateUserSettingsHandler({ data });
   });
 
@@ -49,6 +45,7 @@ export const getPresignedAvatarUploadUrl = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.presignedUrl))
   .inputValidator(GetPresignedAvatarUploadUrlSchema)
   .handler(async ({ data }) => {
+    const { getPresignedAvatarUploadUrlHandler } = await import('./settings.server');
     return getPresignedAvatarUploadUrlHandler({ data });
   });
 
@@ -57,5 +54,6 @@ export const getCurrentUser = typedServerFn({
 })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .handler(async () => {
+    const { getCurrentUserHandler } = await import('./settings.server');
     return getCurrentUserHandler();
   });

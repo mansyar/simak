@@ -1,5 +1,6 @@
 allowBuilds:
   "@parcel/watcher": true
+  better-auth: true
   esbuild: true
   lefthook: true
   msw: true

@@ -3,15 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  createUserHandler,
-  deleteUserHandler,
-  generateSetupLinkHandler,
-  getUserHandler,
-  listInstructorActiveAssignmentsHandler,
-  listUsersHandler,
-  updateUserHandler,
-} from './users.server';
 
 const VALID_CREATE_ROLES = ['admin', 'instructor', 'student'] as const;
 const VALID_ROLES = ['superadmin', 'admin', 'instructor', 'student'] as const;
@@ -42,6 +33,7 @@ export const listUsers = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListUsersSchema)
   .handler(async ({ data }) => {
+    const { listUsersHandler } = await import('./users.server');
     return listUsersHandler({ data });
   });
 
@@ -49,6 +41,7 @@ export const getUser = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(UserIdParamSchema)
   .handler(async ({ data }) => {
+    const { getUserHandler } = await import('./users.server');
     return getUserHandler({ data });
   });
 
@@ -56,6 +49,7 @@ export const createUser = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(CreateUserSchema)
   .handler(async ({ data }) => {
+    const { createUserHandler } = await import('./users.server');
     return createUserHandler({ data });
   });
 
@@ -63,6 +57,7 @@ export const updateUser = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(UpdateUserSchema.extend({ id: z.string() }))
   .handler(async ({ data }) => {
+    const { updateUserHandler } = await import('./users.server');
     return updateUserHandler({ data });
   });
 
@@ -70,6 +65,7 @@ export const deleteUser = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(UserIdParamSchema)
   .handler(async ({ data }) => {
+    const { deleteUserHandler } = await import('./users.server');
     return deleteUserHandler({ data });
   });
 
@@ -79,6 +75,7 @@ export const generateSetupLink = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(UserIdParamSchema)
   .handler(async ({ data }) => {
+    const { generateSetupLinkHandler } = await import('./users.server');
     return generateSetupLinkHandler({ data });
   });
 
@@ -92,5 +89,6 @@ export const listInstructorActiveAssignments = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListInstructorActiveAssignmentsSchema)
   .handler(async ({ data }) => {
+    const { listInstructorActiveAssignmentsHandler } = await import('./users.server');
     return listInstructorActiveAssignmentsHandler({ data });
   });

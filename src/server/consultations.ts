@@ -3,15 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  getConsultationDetailHandler,
-  listConsultationsHandler,
-  listPendingConsultationsHandler,
-  listVerifiedCountsHandler,
-  logConsultationHandler,
-  rejectConsultationHandler,
-  verifyConsultationHandler,
-} from './consultations.server';
 
 export const LogConsultationSchema = z.object({
   checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),
@@ -56,6 +47,7 @@ export const logConsultation = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(LogConsultationSchema)
   .handler(async ({ data }) => {
+    const { logConsultationHandler } = await import('./consultations.server');
     return logConsultationHandler({ data });
   });
 
@@ -65,6 +57,7 @@ export const listConsultations = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListConsultationsSchema)
   .handler(async ({ data }) => {
+    const { listConsultationsHandler } = await import('./consultations.server');
     return listConsultationsHandler({ data });
   });
 
@@ -74,6 +67,7 @@ export const listPendingConsultations = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListPendingConsultationsSchema)
   .handler(async ({ data }) => {
+    const { listPendingConsultationsHandler } = await import('./consultations.server');
     return listPendingConsultationsHandler({ data });
   });
 
@@ -83,6 +77,7 @@ export const verifyConsultation = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(VerifyConsultationSchema)
   .handler(async ({ data }) => {
+    const { verifyConsultationHandler } = await import('./consultations.server');
     return verifyConsultationHandler({ data });
   });
 
@@ -92,6 +87,7 @@ export const rejectConsultation = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(RejectConsultationSchema)
   .handler(async ({ data }) => {
+    const { rejectConsultationHandler } = await import('./consultations.server');
     return rejectConsultationHandler({ data });
   });
 
@@ -101,6 +97,7 @@ export const getConsultationDetail = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(GetConsultationDetailSchema)
   .handler(async ({ data }) => {
+    const { getConsultationDetailHandler } = await import('./consultations.server');
     return getConsultationDetailHandler({ data });
   });
 
@@ -110,5 +107,6 @@ export const listVerifiedCounts = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListVerifiedCountsSchema)
   .handler(async ({ data }) => {
+    const { listVerifiedCountsHandler } = await import('./consultations.server');
     return listVerifiedCountsHandler({ data });
   });

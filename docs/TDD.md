@@ -198,14 +198,14 @@ simak/
 │   │   ├── route-utils.ts    → Role-based dashboard routing utility
     │   │   ├── role-permissions.ts → Canonical CREATION_ALLOWED_ROLES (shared by user creation + bulk import)
     │   │   ├── session-guards.ts → Shared client-safe type-guard functions (isAdmin, isInstructor, isStudent, isAuthenticated) — accept `NonNullableSession | null`, return `session is NonNullableSession` (TRACK-031)
-    │   │   ├── server-fn.ts     → `typedServerFn` wrapper — wraps `createServerFn` with a single `as unknown as TypedBuilder` solution cast that restores return-type inference through the `.inputValidator(Schema).handler(fn)` builder chain. All 23 server stub files import `typedServerFn` instead of `createServerFn` (TRACK-032). It always wires `requestIdMiddleware` first, then optionally chains `createRateLimitMiddleware()` via `.middleware()` (TRACK-043, TRACK-044); rate limiting applies only when `rateLimit?: RateLimitConfig` is provided.
+     │   │   ├── server-fn.ts     → Type-preserving `typedServerFn` alias for `createServerFn`, plus explicit `serverFnMiddlewares()` composition for request IDs and optional rate limiting. Client-safe stubs dynamically import server-only handlers inside callbacks.
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
     │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys, discussionKeys, settingsKeys, gradebookKeys)
     │   │   ├── logger.ts         → Singleton `pino` logger instance — JSON to stdout in prod, `pino-pretty` in dev (lazy-loaded via `createRequire`). `LOG_LEVEL` env var (default `info`). A pino `mixin` adds the current AsyncLocalStorage request ID to every log entry. `createLogger(options?)` factory. Server-side only. (TRACK-040, TRACK-044)
     │   │   ├── request-context.ts → `requestIdMiddleware` (TanStack Start `createMiddleware`) + `createRequestLogger(context)` — reads `x-request-id` header or generates UUID, then scopes it through AsyncLocalStorage for automatic logger propagation. Wired globally by `typedServerFn`. (TRACK-040, TRACK-044)
     │   │   ├── request-context-store.ts → `AsyncLocalStorage<RequestContext>` and `getRequestId()` helper for request-scoped logging context. (TRACK-044)
     │   │   ├── security-headers.ts → Pure functions `generateNonce()` (`crypto.randomBytes(16).toString('base64')`) + `buildSecurityHeaders(nonce, isProd, r2Domain?)` (returns header name→value map). CSP directive assembly + Report-Only/enforce switching. (TRACK-041)
-    │   │   ├── rate-limiter.ts   → In-memory sliding window rate limiter. Exports `RateLimitConfig` type, `RATE_LIMITS` presets (4 tiers: presignedUrl 20/min, heavyMutation 10/min, destructive 5/min, standardRead 60/min), `checkRateLimit(store, key, config)` (sliding window: resets if expired, increments if under max, denies without incrementing at max), `createRateLimitMiddleware(config)` (TanStack Start `createMiddleware({type:'request'}).server()` — calls `getSessionFromHeaders()`, unauthenticated pass-through, short-circuits with `serverError(RATE_LIMITED)` when exceeded), `resetRateLimitStoreForTests()`. Module-level `Map<string, {count, windowStart}>` keyed by `userId:fnId`. (TRACK-043)
+     │   │   ├── rate-limiter.ts   → In-memory sliding window rate limiter. Exports `RateLimitConfig` type, `RATE_LIMITS` presets (4 tiers: presignedUrl 20/min, heavyMutation 10/min, destructive 5/min, standardRead 60/min), `checkRateLimit(store, key, config)` (sliding window: resets if expired, increments if under max, denies without incrementing at max), `createRateLimitMiddleware(config)` (TanStack Start function middleware — calls `getSessionFromHeaders()`, unauthenticated pass-through, throws a `RATE_LIMITED` server error when exceeded), `resetRateLimitStoreForTests()`. Module-level `Map<string, {count, windowStart}>` keyed by `userId:fnId`. (TRACK-043)
     │   │   ├── shutdown.ts       → `registerShutdownHandlers()` — SIGTERM/SIGINT handler (guarded by `import.meta.env.SSR`): clears `setInterval`, awaits in-flight `tick()` via `stopGracefully()` (drain), closes DB pool via `closeDb()`, then `process.exit(0)`. Second signal forces `process.exit(1)`. Configurable timeout via `SHUTDOWN_TIMEOUT_MS` (default 10000ms). (TRACK-045)
     │   │   └── utils.ts          → Shared utilities
 │   ├── hooks/               → Custom React hooks
@@ -353,12 +353,12 @@ All 9 user-initiated mutation sites where the predicted state is deterministic u
 
 The `createServerFn` wrapper from `@tanstack/react-start` has a known type-inference gap: its `handler` method declares a generic `<TNewResponse>` but `ServerFnReturnType` applies `ValidateSerializableInput` (a recursive conditional type from `@tanstack/router-core`) that prevents TypeScript from inferring `TNewResponse` through the conditional. `TNewResponse` defaults to `unknown`, making the `Fetcher` return type `Promise<unknown>` at call sites — even when the handler's return type is explicitly annotated. The dynamic `await import('./feature.server')` pattern is NOT the cause; even direct handler returns suffer the same inference failure.
 
-**Solution:** A `typedServerFn` wrapper in `src/lib/server-fn.ts` (74 lines) wraps `createServerFn` with a single `as unknown as TypedBuilder` solution cast that restores return-type inference. The wrapper:
+**Solution:** `src/lib/server-fn.ts` exports a type-preserving `typedServerFn` alias for `createServerFn` and typed builder interfaces that restore return-type inference. The module also exports `serverFnMiddlewares()` for explicit middleware composition. The implementation:
 
 - Preserves both stub patterns: `.inputValidator(Schema).handler(fn)` (typed-builder) and `.handler(fn)` (inline-parse).
 - Defines `TypedFetcher<TInput, TResponse>`, `OptionalFetcher<TResponse>`, `TypedBuilderWithValidator`, and `TypedBuilder` interfaces to model the builder chain. The `TypedBuilder` interface includes a `.middleware(middlewares: unknown[]): TypedBuilder` method (added in TRACK-043 for rate limit middleware chaining).
-- Always chains `requestIdMiddleware` first (TRACK-044). The middleware reads an incoming `x-request-id` or creates a UUID, then scopes it with `AsyncLocalStorage` so the pino logger's `mixin` includes `{ requestId }` in every server-function log without handler changes.
-- Accepts an optional `rateLimit?: RateLimitConfig` config (added in TRACK-043). When provided, it chains `createRateLimitMiddleware(opts.rateLimit)` after request-ID middleware and before `.inputValidator()` / `.handler()`, short-circuiting with `serverError(ErrorCode.RATE_LIMITED, ...)` when the per-user per-function sliding window is exceeded.
+- Composes `requestIdMiddleware` first (TRACK-044). The middleware reads an incoming `x-request-id` or creates a UUID, then scopes it with `AsyncLocalStorage` so the pino logger's `mixin` includes `{ requestId }` in every server-function log without handler changes.
+- Adds an optional `RateLimitConfig` middleware after request-ID middleware. When the per-user per-function sliding window is exceeded, the function middleware throws a `RATE_LIMITED` server error so TanStack Start terminates the invocation through its normal error path.
 
 All 23 server stub files (`src/server/*.ts`) import `typedServerFn` from `@/lib/server-fn` instead of `createServerFn` from `@tanstack/react-start`. This eliminated 66 `as unknown as` casts across hooks (7), components (38), routes (19), server files (5), lib (3), and Better Auth handlers (2) — replacing them with `isServerError()` type-guard checks and proper Drizzle/Better Auth typing.
 
@@ -366,7 +366,7 @@ All 23 server stub files (`src/server/*.ts`) import `typedServerFn` from `@/lib/
 - 6 sidebar casts (`to={link.to as unknown as '.'}`) in `admin-sidebar.tsx`, `instructor-sidebar.tsx`, `student-sidebar.tsx`.
 - 2 auth redirect casts in `src/server/auth.ts` (`redirect({ to: '/auth/login' as unknown as '.' })`).
 - 2 route redirect casts in `src/routes/_authenticated.tsx` and `src/routes/_unauthenticated.tsx`.
-- 1 solution cast in `src/lib/server-fn.ts` (the `as unknown as TypedBuilder` boundary).
+- 1 type boundary cast in `src/lib/server-fn.ts` (the `createServerFn` alias).
 
 Zero `@ts-expect-error` directives. Zero `as any` casts (excluding generated `routeTree.gen.ts`). All type changes are inference-based — no behavioral changes, all 3,780 tests pass unchanged.
 
@@ -400,7 +400,7 @@ A nonce-based Content-Security-Policy defends against XSS — the primary browse
   - `createCsrfMiddleware({ filter: (ctx) => ctx.handlerType === 'serverFn' })` — explicitly added because a custom `createStart` entry point disables TanStack Start's auto-installed CSRF middleware. Scoped to server-function requests only.
 - **`src/router.tsx`** — Reads the nonce from `getGlobalStartContext()` (justified type assertion — middleware context is not inferred through TanStack Start's `Register` type) and passes it to `ssr: { nonce }` on the router config. TanStack Start then auto-attaches the nonce to all inline `<script>` and `<style>` tags during SSR — including the theme-init script (`__root.tsx` `dangerouslySetInnerHTML`) and TanStack Router's hydration scripts. No manual nonce injection in `__root.tsx` is needed.
 
-**CSP directives:** `default-src 'self'; script-src 'nonce-{nonce}' 'strict-dynamic'; style-src 'nonce-{nonce}'; img-src 'self' data: https:; connect-src 'self' <R2 domain>; frame-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests` (prod only). The `connect-src` directive dynamically includes the Cloudflare R2 domain so presigned upload/download URLs work.
+**CSP directives:** `default-src 'self'; script-src 'nonce-{nonce}' 'strict-dynamic'; style-src 'self' 'nonce-{nonce}' <Sonner hash>; img-src 'self' data: https:; connect-src 'self' <R2 endpoint> <R2 bucket subdomains>; frame-src 'self' <R2 endpoint> <R2 bucket subdomains>; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src <R2 endpoint> <R2 bucket subdomains>` (or `object-src 'none'` without R2); `upgrade-insecure-requests` (prod only). The R2 sources are restricted to the configured endpoint and bucket subdomains so presigned uploads/downloads and PDF previews work without wildcard origins.
 
 **Additional headers** on all responses: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: geolocation=(), microphone=(), camera=()`. `Strict-Transport-Security: max-age=31536000; includeSubDomains` (HSTS) is production-only (defense-in-depth behind Traefik TLS termination).
 
@@ -408,7 +408,7 @@ A nonce-based Content-Security-Policy defends against XSS — the primary browse
 
 ### Application-Level Rate Limiting [v1] (Track: Application-Level Rate Limiting on Server Functions)
 
-All 85 authenticated TanStack Start server functions are rate-limited via `typedServerFn`'s optional `rateLimit` config. Better Auth's built-in rate limiting only covers `/api/auth/*` endpoints — application server functions were previously unprotected against abuse (R2 cost exploitation, email queue flooding, data pollution, DB connection exhaustion).
+All 85 authenticated TanStack Start server functions are rate-limited through explicit `serverFnMiddlewares` composition. Better Auth's built-in rate limiting only covers `/api/auth/*` endpoints — application server functions were previously unprotected against abuse (R2 cost exploitation, email queue flooding, data pollution, DB connection exhaustion).
 
 - **`src/lib/rate-limiter.ts`** — In-memory sliding window rate limiter:
   - `RateLimitConfig` type: `{ window: number; max: number }` (window in seconds).
@@ -418,13 +418,13 @@ All 85 authenticated TanStack Start server functions are rate-limited via `typed
   - Module-level `Map<string, { count: number; windowStart: number }>` store — sufficient for single-instance deployment (Redis deferred to multi-instance work).
   - `resetRateLimitStoreForTests()` — test-only utility to clear the store between tests.
 
-- **`src/lib/server-fn.ts`** — Extended with `.middleware()` method on `TypedBuilder` interface and optional `rateLimit?: RateLimitConfig` config on `typedServerFn()`. When `rateLimit` is provided, the wrapper calls `fn.middleware([createRateLimitMiddleware(opts.rateLimit)])` before returning the builder. When omitted, pure pass-through (backward-compatible).
+- **`src/lib/server-fn.ts`** — Exports the type-preserving `typedServerFn` alias and `serverFnMiddlewares(rateLimit?)`, which returns request-ID middleware followed by optional rate limiting. Stubs attach this array explicitly with `.middleware(...)`.
 
 - **`src/lib/errors.ts`** — `RATE_LIMITED` added to the `ErrorCode` enum.
 
 - **`src/lib/toast.ts`** — `RATE_LIMITED` added to `VALID_ERROR_CODES` and mapped to `error.rateLimited` i18n key ("Too many requests. Please wait a moment and try again." / "Terlalu banyak permintaan. Mohon tunggu sebentar dan coba lagi.").
 
-- **Server function annotations:** 85 functions across 22 stub files annotated with `rateLimit: RATE_LIMITS.<tier>` per the rate limit catalog. Tier 1 (presignedUrl): 4 functions (file presigned URLs, avatar upload). Tier 2 (heavyMutation): 3 functions (submitCheckpoint, submitReview, openForReview). Tier 3 (destructive): 36 functions (assignment/template/user CRUD, 2FA, sessions, consultations, extensions, discussions, email retry, R2 cleanup, grade config). Tier 4 (standardRead): 42 functions (dashboards, analytics, list/detail views, audit log, gradebook, rubrics).
+- **Server function annotations:** 85 functions across 22 stub files compose `serverFnMiddlewares(RATE_LIMITS.<tier>)` per the rate limit catalog. Tier 1 (presignedUrl): 4 functions (file presigned URLs, avatar upload). Tier 2 (heavyMutation): 3 functions (submitCheckpoint, submitReview, openForReview). Tier 3 (destructive): 36 functions (assignment/template/user CRUD, 2FA, sessions, consultations, extensions, discussions, email retry, R2 cleanup, grade config). Tier 4 (standardRead): 42 functions (dashboards, analytics, list/detail views, audit log, gradebook, rubrics).
 
 - **Exempt functions** (no rateLimit): `_getSession` (internal session fetch — cascading/infinite-loop concern), `getUnreadCount` / `markRead` / `markAllRead` (high-frequency UX — 30s polling, instant interactions), `completePasswordSetup` (token-based, no session).
 

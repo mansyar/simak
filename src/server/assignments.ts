@@ -3,16 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  createAssignmentHandler,
-  extendDeadlineHandler,
-  getAssignmentDetailHandler,
-  getStudentAssignmentDetailHandler,
-  listInstructorAssignmentsHandler,
-  listStudentAssignmentsHandler,
-  reassignAssignmentHandler,
-  unlockCheckpointHandler,
-} from './assignments.server';
 
 export const OverrideDueDateSchema = z.object({
   checkpointOrder: z.coerce.number().int().positive('Checkpoint order must be positive'),
@@ -48,6 +38,7 @@ export const createAssignment = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(CreateAssignmentSchema)
   .handler(async ({ data }) => {
+    const { createAssignmentHandler } = await import('./assignments.server');
     return createAssignmentHandler({ data });
   });
 
@@ -57,6 +48,7 @@ export const listInstructorAssignments = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListInstructorAssignmentsSchema)
   .handler(async ({ data }) => {
+    const { listInstructorAssignmentsHandler } = await import('./assignments.server');
     return listInstructorAssignmentsHandler({ data });
   });
 
@@ -66,6 +58,7 @@ export const getAssignmentDetail = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(AssignmentIdParamSchema)
   .handler(async ({ data }) => {
+    const { getAssignmentDetailHandler } = await import('./assignments.server');
     return getAssignmentDetailHandler({ data });
   });
 
@@ -89,6 +82,7 @@ export const listStudentAssignments = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListStudentAssignmentsSchema)
   .handler(async ({ data }) => {
+    const { listStudentAssignmentsHandler } = await import('./assignments.server');
     return listStudentAssignmentsHandler({ data });
   });
 
@@ -98,6 +92,7 @@ export const getStudentAssignmentDetail = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(StudentAssignmentIdParamSchema)
   .handler(async ({ data }) => {
+    const { getStudentAssignmentDetailHandler } = await import('./assignments.server');
     return getStudentAssignmentDetailHandler({ data });
   });
 
@@ -113,6 +108,7 @@ export const unlockCheckpoint = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(UnlockCheckpointSchema)
   .handler(async ({ data }) => {
+    const { unlockCheckpointHandler } = await import('./assignments.server');
     return unlockCheckpointHandler({ data });
   });
 
@@ -127,6 +123,7 @@ export const extendDeadline = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(ExtendDeadlineSchema)
   .handler(async ({ data }) => {
+    const { extendDeadlineHandler } = await import('./assignments.server');
     return extendDeadlineHandler({ data });
   });
 
@@ -143,5 +140,6 @@ export const reassignAssignment = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(ReassignAssignmentSchema)
   .handler(async ({ data }) => {
+    const { reassignAssignmentHandler } = await import('./assignments.server');
     return reassignAssignmentHandler({ data });
   });

@@ -53,24 +53,25 @@ export async function seedSuperAdmin(): Promise<void> {
   }
 
   const userId = crypto.randomUUID();
-
-  // Create the user record
-  await db.insert(users).values({
-    id: userId,
-    name: 'SuperAdmin',
-    email,
-    role: 'superadmin',
-    locale: 'en',
-  });
-
-  // Create the account record with hashed password (Better-Auth credential provider)
   const hashedPassword = await hashPassword(password);
-  await db.insert(account).values({
-    id: crypto.randomUUID(),
-    userId,
-    accountId: userId,
-    providerId: 'credential',
-    password: hashedPassword,
+
+  await db.transaction(async (tx) => {
+    await tx.insert(users).values({
+      id: userId,
+      name: 'SuperAdmin',
+      email,
+      role: 'superadmin',
+      locale: 'en',
+    });
+
+    // Create the account record with hashed password (Better-Auth credential provider)
+    await tx.insert(account).values({
+      id: crypto.randomUUID(),
+      userId,
+      accountId: userId,
+      providerId: 'credential',
+      password: hashedPassword,
+    });
   });
 
   console.log(`SuperAdmin user created (${email}).`);

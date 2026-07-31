@@ -57,7 +57,8 @@ describe('buildSecurityHeaders', () => {
 
     it('includes style-src with nonce', () => {
       const csp = getCsp(true, testR2Domain);
-      expect(csp).toContain(`style-src 'nonce-${testNonce}'`);
+      expect(csp).toContain("style-src 'self'");
+      expect(csp).toContain(`'nonce-${testNonce}'`);
     });
 
     it('allows Sonner’s static runtime stylesheet by hash', () => {

@@ -3,11 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  listActiveSessionsHandler,
-  revokeAllOtherSessionsHandler,
-  revokeSessionHandler,
-} from './sessions.server';
 
 export const RevokeSessionSchema = z.object({
   sessionId: z.string().min(1, 'Session ID is required'),
@@ -18,6 +13,7 @@ export const listActiveSessions = typedServerFn({
 })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .handler(async () => {
+    const { listActiveSessionsHandler } = await import('./sessions.server');
     return listActiveSessionsHandler();
   });
 
@@ -27,6 +23,7 @@ export const revokeSession = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .handler(async (args: { data: unknown }) => {
     const data = RevokeSessionSchema.parse(args.data);
+    const { revokeSessionHandler } = await import('./sessions.server');
     return revokeSessionHandler({ data });
   });
 
@@ -35,5 +32,6 @@ export const revokeAllOtherSessions = typedServerFn({
 })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .handler(async () => {
+    const { revokeAllOtherSessionsHandler } = await import('./sessions.server');
     return revokeAllOtherSessionsHandler();
   });

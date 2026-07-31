@@ -3,11 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  getSubmissionDetailHandler,
-  listSubmissionsHandler,
-  submitCheckpointHandler,
-} from './submissions.server';
 
 export const SubmitCheckpointSchema = z.object({
   checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),
@@ -32,6 +27,7 @@ export const submitCheckpoint = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.heavyMutation))
   .handler(async (args: { data: unknown }) => {
     const data = SubmitCheckpointSchema.parse(args.data);
+    const { submitCheckpointHandler } = await import('./submissions.server');
     return submitCheckpointHandler({ data });
   });
 
@@ -41,6 +37,7 @@ export const listSubmissions = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .handler(async (args: { data: unknown }) => {
     const data = ListSubmissionsSchema.parse(args.data);
+    const { listSubmissionsHandler } = await import('./submissions.server');
     return listSubmissionsHandler({ data });
   });
 
@@ -50,5 +47,6 @@ export const getSubmissionDetail = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .handler(async (args: { data: unknown }) => {
     const data = GetSubmissionDetailSchema.parse(args.data);
+    const { getSubmissionDetailHandler } = await import('./submissions.server');
     return getSubmissionDetailHandler({ data });
   });

@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 
 // Mock __root useI18n
@@ -11,21 +11,12 @@ vi.mock('@/routes/__root', () => ({
   }),
 }));
 
-// Mock sonner to capture props passed to the underlying Toaster
-vi.mock('sonner', () => ({
-  Toaster: (props: any) => <section data-testid="sonner-toaster" {...props} />,
-}));
-
 describe('Sonner Toaster — Region Containment', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('passes aria-label to the Toaster section', async () => {
+  it('passes the translated label to the Toaster region', async () => {
     const { Toaster } = await import('@/components/ui/sonner');
     const { container } = render(<Toaster />);
-    const section = container.querySelector('[data-testid="sonner-toaster"]');
+    const section = container.querySelector('section[aria-label]');
     expect(section).not.toBeNull();
-    expect(section?.getAttribute('aria-label')).not.toBeNull();
+    expect(section?.getAttribute('aria-label')).toContain('notifications.toasterLabel');
   });
 });

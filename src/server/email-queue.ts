@@ -1,7 +1,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import { listEmailQueueHandler, retryEmailHandler } from './email-queue.server';
 
 // ---- Schemas ----
 
@@ -46,6 +45,7 @@ export const listEmailQueue = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListEmailQueueSchema)
   .handler(async ({ data }) => {
+    const { listEmailQueueHandler } = await import('./email-queue.server');
     return listEmailQueueHandler({ data });
   });
 
@@ -53,5 +53,6 @@ export const retryEmail = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(RetryEmailSchema)
   .handler(async ({ data }) => {
+    const { retryEmailHandler } = await import('./email-queue.server');
     return retryEmailHandler({ data });
   });

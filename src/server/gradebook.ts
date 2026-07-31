@@ -3,12 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  getAssignmentGradebookHandler,
-  getStudentFinalGradeHandler,
-  recomputeAllGradesHandler,
-  saveGradeConfigHandler,
-} from './gradebook.server';
 
 // ---- Schemas ----
 
@@ -65,6 +59,7 @@ export const getStudentFinalGrade = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(GetStudentFinalGradeSchema)
   .handler(async ({ data }) => {
+    const { getStudentFinalGradeHandler } = await import('./gradebook.server');
     return getStudentFinalGradeHandler({ data });
   });
 
@@ -74,6 +69,7 @@ export const getAssignmentGradebook = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(GetAssignmentGradebookSchema)
   .handler(async ({ data }) => {
+    const { getAssignmentGradebookHandler } = await import('./gradebook.server');
     return getAssignmentGradebookHandler({ data });
   });
 
@@ -81,6 +77,7 @@ export const saveGradeConfig = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(SaveGradeConfigSchema)
   .handler(async ({ data }) => {
+    const { saveGradeConfigHandler } = await import('./gradebook.server');
     return saveGradeConfigHandler({ data });
   });
 
@@ -90,5 +87,6 @@ export const recomputeAllGrades = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(RecomputeAllGradesSchema)
   .handler(async ({ data }) => {
+    const { recomputeAllGradesHandler } = await import('./gradebook.server');
     return recomputeAllGradesHandler({ data });
   });

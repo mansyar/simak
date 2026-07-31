@@ -34,7 +34,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme}
       closeButton={false}
       className="toaster group"
-      aria-label={t('notifications.toasterLabel')}
+      containerAriaLabel={t('notifications.toasterLabel')}
       icons={{
         success: <CircleCheckIcon className="size-4" />,
         info: <InfoIcon className="size-4" />,

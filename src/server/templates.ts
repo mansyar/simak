@@ -4,15 +4,6 @@ import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 import type { ServerError } from '@/lib/errors';
-import {
-  createTemplateHandler,
-  deleteTemplateHandler,
-  duplicateTemplateHandler,
-  getTemplateHandler,
-  listTemplateAssignmentsHandler,
-  listTemplatesHandler,
-  updateTemplateHandler,
-} from './templates.server';
 
 export const CheckpointInputSchema = z.object({
   id: z.coerce.number().int().positive().optional(),
@@ -54,6 +45,7 @@ export const listTemplates = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListTemplatesSchema)
   .handler(async ({ data }) => {
+    const { listTemplatesHandler } = await import('./templates.server');
     return listTemplatesHandler({ data });
   });
 
@@ -61,6 +53,7 @@ export const getTemplate = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(TemplateIdParamSchema)
   .handler(async ({ data }) => {
+    const { getTemplateHandler } = await import('./templates.server');
     return getTemplateHandler({ data });
   });
 
@@ -68,6 +61,7 @@ export const createTemplate = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(CreateTemplateSchema)
   .handler(async ({ data }) => {
+    const { createTemplateHandler } = await import('./templates.server');
     return createTemplateHandler({ data });
   });
 
@@ -75,6 +69,7 @@ export const updateTemplate = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(UpdateTemplateSchema.extend({ id: z.coerce.number().int().positive() }))
   .handler(async ({ data }) => {
+    const { updateTemplateHandler } = await import('./templates.server');
     return updateTemplateHandler({ data });
   });
 
@@ -82,6 +77,7 @@ export const deleteTemplate = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(TemplateIdParamSchema)
   .handler(async ({ data }) => {
+    const { deleteTemplateHandler } = await import('./templates.server');
     return deleteTemplateHandler({ data });
   });
 
@@ -91,6 +87,7 @@ export const duplicateTemplate = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(TemplateIdParamSchema)
   .handler(async ({ data }) => {
+    const { duplicateTemplateHandler } = await import('./templates.server');
     return duplicateTemplateHandler({ data });
   });
 
@@ -100,6 +97,7 @@ export const listTemplateAssignments = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListTemplateAssignmentsSchema)
   .handler(async ({ data }) => {
+    const { listTemplateAssignmentsHandler } = await import('./templates.server');
     return listTemplateAssignmentsHandler({ data });
   });
 

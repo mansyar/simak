@@ -3,14 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  approveExtensionHandler,
-  bulkExtendHandler,
-  listExtensionRequestsHandler,
-  listMyExtensionRequestsHandler,
-  rejectExtensionHandler,
-  requestExtensionHandler,
-} from './extensions.server';
 
 export const RequestExtensionSchema = z.object({
   assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
@@ -64,6 +56,7 @@ export const requestExtension = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(RequestExtensionSchema)
   .handler(async ({ data }) => {
+    const { requestExtensionHandler } = await import('./extensions.server');
     return requestExtensionHandler({ data });
   });
 
@@ -73,6 +66,7 @@ export const listExtensionRequests = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListExtensionRequestsSchema)
   .handler(async ({ data }) => {
+    const { listExtensionRequestsHandler } = await import('./extensions.server');
     return listExtensionRequestsHandler({ data });
   });
 
@@ -82,6 +76,7 @@ export const listMyExtensionRequests = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListMyExtensionsSchema)
   .handler(async ({ data }) => {
+    const { listMyExtensionRequestsHandler } = await import('./extensions.server');
     return listMyExtensionRequestsHandler({ data });
   });
 
@@ -91,6 +86,7 @@ export const approveExtension = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(ApproveExtensionSchema)
   .handler(async ({ data }) => {
+    const { approveExtensionHandler } = await import('./extensions.server');
     return approveExtensionHandler({ data });
   });
 
@@ -98,6 +94,7 @@ export const rejectExtension = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(RejectExtensionSchema)
   .handler(async ({ data }) => {
+    const { rejectExtensionHandler } = await import('./extensions.server');
     return rejectExtensionHandler({ data });
   });
 
@@ -105,5 +102,6 @@ export const bulkExtend = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(BulkExtendSchema)
   .handler(async ({ data }) => {
+    const { bulkExtendHandler } = await import('./extensions.server');
     return bulkExtendHandler({ data });
   });

@@ -3,13 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import {
-  disableTwoFactorHandler,
-  enableTwoFactorHandler,
-  generateTwoFactorSetupHandler,
-  getTwoFactorStatusHandler,
-  regenerateBackupCodesHandler,
-} from './two-factor.server';
 
 // --- Schemas ---
 
@@ -45,6 +38,7 @@ export const generateTwoFactorSetup = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .handler(async (args: { data: unknown }) => {
     const data = EnableTwoFactorSchema.parse(args.data);
+    const { generateTwoFactorSetupHandler } = await import('./two-factor.server');
     return generateTwoFactorSetupHandler({ data });
   });
 
@@ -54,6 +48,7 @@ export const enableTwoFactor = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .handler(async (args: { data: unknown }) => {
     const data = VerifyTwoFactorSchema.parse(args.data);
+    const { enableTwoFactorHandler } = await import('./two-factor.server');
     return enableTwoFactorHandler({ data });
   });
 
@@ -63,6 +58,7 @@ export const disableTwoFactor = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .handler(async (args: { data: unknown }) => {
     const data = DisableTwoFactorSchema.parse(args.data);
+    const { disableTwoFactorHandler } = await import('./two-factor.server');
     return disableTwoFactorHandler({ data });
   });
 
@@ -72,6 +68,7 @@ export const regenerateBackupCodes = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .handler(async (args: { data: unknown }) => {
     const data = RegenerateBackupCodesSchema.parse(args.data);
+    const { regenerateBackupCodesHandler } = await import('./two-factor.server');
     return regenerateBackupCodesHandler({ data });
   });
 
@@ -81,5 +78,6 @@ export const getTwoFactorStatus = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .handler(async (args: { data: unknown }) => {
     const data = GetTwoFactorStatusSchema.parse(args.data);
+    const { getTwoFactorStatusHandler } = await import('./two-factor.server');
     return getTwoFactorStatusHandler({ data });
   });

@@ -3,7 +3,6 @@
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
-import { bulkCreateTemplatesHandler, bulkCreateUsersHandler } from './bulk-import.server';
 
 const VALID_CREATE_ROLES = ['admin', 'instructor', 'student'] as const;
 
@@ -33,6 +32,7 @@ export const bulkCreateUsers = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(BulkCreateUsersSchema)
   .handler(async ({ data }) => {
+    const { bulkCreateUsersHandler } = await import('./bulk-import.server');
     return bulkCreateUsersHandler({ data });
   });
 
@@ -42,5 +42,6 @@ export const bulkCreateTemplates = typedServerFn({
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(BulkCreateTemplatesSchema)
   .handler(async ({ data }) => {
+    const { bulkCreateTemplatesHandler } = await import('./bulk-import.server');
     return bulkCreateTemplatesHandler({ data });
   });
