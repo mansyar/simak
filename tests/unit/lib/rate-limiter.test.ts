@@ -139,7 +139,7 @@ describe('createRateLimitMiddleware', () => {
     expect(mockNext).toHaveBeenCalledOnce();
   });
 
-  it('short-circuits with serverError(RATE_LIMITED) when limit exceeded (does NOT call next)', async () => {
+  it('short-circuits by throwing serverError(RATE_LIMITED) when limit exceeded', async () => {
     vi.mocked(getSessionFromHeaders).mockResolvedValue({
       user: { id: 'user-1' },
       session: {},
@@ -152,10 +152,8 @@ describe('createRateLimitMiddleware', () => {
     await middleware({ next: mockNext });
 
     // Third call should short-circuit
-    const result = await middleware({ next: mockNext });
-
     expect(mockNext).toHaveBeenCalledTimes(2); // NOT called on 3rd
-    expect(result).toEqual({
+    await expect(middleware({ next: mockNext })).rejects.toEqual({
       error: { code: 'RATE_LIMITED', message: 'Rate limit exceeded' },
     });
   });
@@ -174,8 +172,7 @@ describe('createRateLimitMiddleware', () => {
     // Exhaust middlewareA's limit (max: 2)
     await middlewareA({ next: mockNextA });
     await middlewareA({ next: mockNextA });
-    const resultA = await middlewareA({ next: mockNextA });
-    expect(resultA).toEqual({
+    await expect(middlewareA({ next: mockNextA })).rejects.toEqual({
       error: { code: 'RATE_LIMITED', message: 'Rate limit exceeded' },
     });
 

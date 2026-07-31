@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SIMAK">
+  <rect width="64" height="64" rx="14" fill="#0f3557" />
+  <path d="m9 26 23-12 23 12-23 12L9 26Z" fill="#55d6be" />
+  <path d="M18 31v12c0 4.6 6.3 8 14 8s14-3.4 14-8V31l-14 7-14-7Z" fill="#f7fbff" />
+  <path d="M52 27v14" stroke="#55d6be" stroke-width="3" stroke-linecap="round" />
+  <circle cx="52" cy="44" r="3" fill="#55d6be" />
+</svg>

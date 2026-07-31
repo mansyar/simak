@@ -57,7 +57,18 @@ describe('buildSecurityHeaders', () => {
 
     it('includes style-src with nonce', () => {
       const csp = getCsp(true, testR2Domain);
-      expect(csp).toContain(`style-src 'nonce-${testNonce}'`);
+      expect(csp).toContain("style-src 'self'");
+      expect(csp).toContain(`'nonce-${testNonce}'`);
+    });
+
+    it('allows Sonner’s static runtime stylesheet by hash', () => {
+      const csp = getCsp(true, testR2Domain);
+      expect(csp).toContain("'sha256-CIxDM5jnsGiKqXs2v7NKCY5MzdR9gu6TtiMJrDw29AY='");
+    });
+
+    it('allows inline style attributes without weakening nonce-protected style elements', () => {
+      const csp = getCsp(true, testR2Domain);
+      expect(csp).toContain("style-src-attr 'unsafe-inline'");
     });
 
     it('includes img-src self data https', () => {
@@ -65,9 +76,9 @@ describe('buildSecurityHeaders', () => {
       expect(csp).toContain("img-src 'self' data: https:");
     });
 
-    it('includes frame-src self', () => {
+    it('allows the R2 endpoint and bucket subdomains in frame-src', () => {
       const csp = getCsp(true, testR2Domain);
-      expect(csp).toContain("frame-src 'self'");
+      expect(csp).toContain(`frame-src 'self' https://${testR2Domain} https://*.${testR2Domain}`);
     });
 
     it('includes frame-ancestors none', () => {
@@ -85,9 +96,9 @@ describe('buildSecurityHeaders', () => {
       expect(csp).toContain("form-action 'self'");
     });
 
-    it('includes object-src none', () => {
+    it('allows only the R2 endpoint and bucket subdomains for object-src', () => {
       const csp = getCsp(true, testR2Domain);
-      expect(csp).toContain("object-src 'none'");
+      expect(csp).toContain(`object-src https://${testR2Domain} https://*.${testR2Domain}`);
     });
 
     it('includes upgrade-insecure-requests in prod', () => {
@@ -100,15 +111,16 @@ describe('buildSecurityHeaders', () => {
       expect(csp).not.toContain('upgrade-insecure-requests');
     });
 
-    it('includes connect-src with self and R2 domain when provided', () => {
+    it('includes the R2 endpoint and bucket subdomains in connect-src', () => {
       const csp = getCsp(true, testR2Domain);
-      expect(csp).toContain(`connect-src 'self' ${testR2Domain}`);
+      expect(csp).toContain(`connect-src 'self' https://${testR2Domain} https://*.${testR2Domain}`);
     });
 
     it('includes connect-src with only self when R2 domain is omitted', () => {
       const csp = getCsp(true);
       expect(csp).toContain("connect-src 'self'");
       expect(csp).not.toContain(testR2Domain);
+      expect(csp).toContain("object-src 'none'");
     });
 
     it('includes connect-src with only self when R2 domain is undefined', () => {

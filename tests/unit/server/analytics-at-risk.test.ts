@@ -1,5 +1,6 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { PgDialect } from 'drizzle-orm/pg-core';
 import { getAdminAnalyticsDataHandler } from '@/server/analytics-admin.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
@@ -67,6 +68,24 @@ describe('getAdminAnalyticsDataHandler - at-risk summary', () => {
     mockResults([...emptyStandard, [{ high: 5, medium: 3, low: 7 }]]);
     const result = (await getAdminAnalyticsDataHandler({ data: { range: '30d' } })) as any;
     expect(result.atRiskSummary).toEqual({ high: 5, medium: 3, low: 7 });
+  });
+
+  it('qualifies correlated at-risk subqueries with table aliases', async () => {
+    mockResults([...emptyStandard, [{ high: 0, medium: 0, low: 0 }]]);
+
+    await getAdminAnalyticsDataHandler({ data: {} });
+
+    const atRiskSelection = mockDb.select.mock.calls.at(-1)?.[0];
+    const mediumSql = new PgDialect().sqlToQuery(atRiskSelection.medium).sql;
+
+    expect(mediumSql).toContain('FROM "submissions" AS "risk_submissions"');
+    expect(mediumSql).toContain('FROM "consultations" AS "risk_consultations"');
+    expect(mediumSql).toContain(
+      'FROM "reviews" AS "risk_reviews" JOIN "submissions" AS "risk_submissions"',
+    );
+    expect(mediumSql).toContain('"risk_submissions"."checkpoint_id" = "risk_checkpoints"."id"');
+    expect(mediumSql).toContain('"risk_submissions"."id" = "risk_reviews"."submission_id"');
+    expect(mediumSql).toContain('"risk_reviews"."decision"');
   });
 
   it('should return zero counts when no at-risk students', async () => {

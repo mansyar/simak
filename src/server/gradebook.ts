@@ -1,7 +1,7 @@
 // Gradebook server function stubs — Zod schemas + typedServerFn definitions.
 // Handler implementations live in gradebook.server.ts (server-only, never client-bundled).
 import { RATE_LIMITS } from '@/lib/rate-limiter';
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 // ---- Schemas ----
@@ -55,8 +55,8 @@ export const RecomputeAllGradesSchema = z.object({
 
 export const getStudentFinalGrade = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(GetStudentFinalGradeSchema)
   .handler(async ({ data }) => {
     const { getStudentFinalGradeHandler } = await import('./gradebook.server');
@@ -65,15 +65,16 @@ export const getStudentFinalGrade = typedServerFn({
 
 export const getAssignmentGradebook = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(GetAssignmentGradebookSchema)
   .handler(async ({ data }) => {
     const { getAssignmentGradebookHandler } = await import('./gradebook.server');
     return getAssignmentGradebookHandler({ data });
   });
 
-export const saveGradeConfig = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.destructive })
+export const saveGradeConfig = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(SaveGradeConfigSchema)
   .handler(async ({ data }) => {
     const { saveGradeConfigHandler } = await import('./gradebook.server');
@@ -82,8 +83,8 @@ export const saveGradeConfig = typedServerFn({ method: 'POST', rateLimit: RATE_L
 
 export const recomputeAllGrades = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.destructive,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(RecomputeAllGradesSchema)
   .handler(async ({ data }) => {
     const { recomputeAllGradesHandler } = await import('./gradebook.server');

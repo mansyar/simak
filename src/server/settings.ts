@@ -1,7 +1,7 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in settings.server.ts (not bundled for client)
 import { RATE_LIMITS } from '@/lib/rate-limiter';
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const UpdateProfileSchema = z.object({
@@ -21,7 +21,8 @@ export const GetPresignedAvatarUploadUrlSchema = z.object({
 
 export const GetCurrentUserSchema = z.object({});
 
-export const updateProfile = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.destructive })
+export const updateProfile = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(UpdateProfileSchema)
   .handler(async ({ data }) => {
     const { updateProfileHandler } = await import('./settings.server');
@@ -30,8 +31,8 @@ export const updateProfile = typedServerFn({ method: 'POST', rateLimit: RATE_LIM
 
 export const updateUserSettings = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.destructive,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(UpdateUserSettingsSchema)
   .handler(async ({ data }) => {
     const { updateUserSettingsHandler } = await import('./settings.server');
@@ -40,8 +41,8 @@ export const updateUserSettings = typedServerFn({
 
 export const getPresignedAvatarUploadUrl = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.presignedUrl,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.presignedUrl))
   .inputValidator(GetPresignedAvatarUploadUrlSchema)
   .handler(async ({ data }) => {
     const { getPresignedAvatarUploadUrlHandler } = await import('./settings.server');
@@ -50,8 +51,9 @@ export const getPresignedAvatarUploadUrl = typedServerFn({
 
 export const getCurrentUser = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
-}).handler(async () => {
-  const { getCurrentUserHandler } = await import('./settings.server');
-  return getCurrentUserHandler();
-});
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
+  .handler(async () => {
+    const { getCurrentUserHandler } = await import('./settings.server');
+    return getCurrentUserHandler();
+  });

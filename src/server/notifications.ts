@@ -1,7 +1,7 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in notifications.server.ts
 import { RATE_LIMITS } from '@/lib/rate-limiter';
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const CreateNotificationSchema = z.object({
@@ -23,21 +23,23 @@ export const ListNotificationsSchema = z.object({
 
 export const createNotification = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.destructive,
-}).handler(async (args: { data: unknown }) => {
-  const { createNotificationHandler } = await import('./notifications.server');
-  const data = CreateNotificationSchema.parse(args.data);
-  return createNotificationHandler({ data });
-});
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .handler(async (args: { data: unknown }) => {
+    const data = CreateNotificationSchema.parse(args.data);
+    const { createNotificationHandler } = await import('./notifications.server');
+    return createNotificationHandler({ data });
+  });
 
 export const listNotifications = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
-}).handler(async (args: { data: unknown }) => {
-  const { listNotificationsHandler } = await import('./notifications.server');
-  const data = ListNotificationsSchema.parse(args.data);
-  return listNotificationsHandler({ data });
-});
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
+  .handler(async (args: { data: unknown }) => {
+    const data = ListNotificationsSchema.parse(args.data);
+    const { listNotificationsHandler } = await import('./notifications.server');
+    return listNotificationsHandler({ data });
+  });
 
 // --- Phase 1: New schemas and stubs ---
 
@@ -49,26 +51,26 @@ export const MarkAllReadSchema = z.object({});
 
 export const GetUnreadCountSchema = z.object({});
 
-export const markRead = typedServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
-    const { markReadHandler } = await import('./notifications.server');
+export const markRead = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares())
+  .handler(async (args: { data: unknown }) => {
     const data = MarkReadSchema.parse(args.data);
+    const { markReadHandler } = await import('./notifications.server');
     return markReadHandler({ data });
-  },
-);
+  });
 
-export const markAllRead = typedServerFn({ method: 'POST' }).handler(
-  async (args: { data: unknown }) => {
-    const { markAllReadHandler } = await import('./notifications.server');
+export const markAllRead = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares())
+  .handler(async (args: { data: unknown }) => {
     const data = MarkAllReadSchema.parse(args.data);
+    const { markAllReadHandler } = await import('./notifications.server');
     return markAllReadHandler({ data });
-  },
-);
+  });
 
-export const getUnreadCount = typedServerFn({ method: 'GET' }).handler(
-  async (args: { data: unknown }) => {
-    const { getUnreadCountHandler } = await import('./notifications.server');
+export const getUnreadCount = typedServerFn({ method: 'GET' })
+  .middleware(serverFnMiddlewares())
+  .handler(async (args: { data: unknown }) => {
     const data = GetUnreadCountSchema.parse(args.data);
+    const { getUnreadCountHandler } = await import('./notifications.server');
     return getUnreadCountHandler({ data });
-  },
-);
+  });

@@ -1,7 +1,7 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in discussions.server.ts (not bundled for client)
 import { RATE_LIMITS } from '@/lib/rate-limiter';
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 // ---- Discussion Schemas ----
@@ -26,8 +26,8 @@ export const DeleteOwnMessageSchema = z.object({
 
 export const listDiscussionMessages = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListDiscussionMessagesSchema)
   .handler(async ({ data }) => {
     const { listDiscussionMessagesHandler } = await import('./discussions.server');
@@ -36,8 +36,8 @@ export const listDiscussionMessages = typedServerFn({
 
 export const postDiscussionMessage = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.destructive,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(PostDiscussionMessageSchema)
   .handler(async ({ data }) => {
     const { postDiscussionMessageHandler } = await import('./discussions.server');
@@ -46,8 +46,8 @@ export const postDiscussionMessage = typedServerFn({
 
 export const deleteOwnMessage = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.destructive,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(DeleteOwnMessageSchema)
   .handler(async ({ data }) => {
     const { deleteOwnMessageHandler } = await import('./discussions.server');

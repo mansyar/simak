@@ -54,9 +54,9 @@ export const auth = betterAuth({
     max: 10,
   },
   plugins: [
-    tanstackStartCookies(),
     twoFactor({
       issuer: 'SIMAK',
     }),
+    tanstackStartCookies(),
   ],
 });

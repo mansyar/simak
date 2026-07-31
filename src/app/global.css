@@ -160,6 +160,13 @@
   .bg-sidebar {
     --muted-foreground: var(--sidebar-foreground);
   }
+
+  .toaster {
+    --normal-bg: var(--popover);
+    --normal-text: var(--popover-foreground);
+    --normal-border: var(--border);
+    --border-radius: var(--radius);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

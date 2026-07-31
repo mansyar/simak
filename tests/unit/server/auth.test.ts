@@ -101,8 +101,8 @@ describe('auth.ts client-safe stub', () => {
       expect(authTsContent).not.toMatch(/getRequestHeaders/);
     });
 
-    it('should use dynamic import for auth.server', () => {
-      expect(authTsContent).toMatch(/import\(['"]\.\/auth\.server['"]\)/);
+    it('should dynamically import getSessionHandler from auth.server', () => {
+      expect(authTsContent).toMatch(/await\s+import\(['"]\.\/auth\.server['"]\)/);
     });
   });
 

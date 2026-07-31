@@ -1,6 +1,6 @@
 // Client-safe server function wrappers for file operations
 import { RATE_LIMITS } from '@/lib/rate-limiter';
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const GetPresignedUploadUrlSchema = z.object({
@@ -15,21 +15,23 @@ export const GetPresignedDownloadUrlSchema = z.object({
 
 export const getPresignedUploadUrl = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.presignedUrl,
-}).handler(async (args: { data: unknown }) => {
-  const { getPresignedUploadUrlHandler } = await import('./files.server');
-  const data = GetPresignedUploadUrlSchema.parse(args.data);
-  return getPresignedUploadUrlHandler({ data });
-});
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.presignedUrl))
+  .handler(async (args: { data: unknown }) => {
+    const data = GetPresignedUploadUrlSchema.parse(args.data);
+    const { getPresignedUploadUrlHandler } = await import('./files.server');
+    return getPresignedUploadUrlHandler({ data });
+  });
 
 export const getPresignedDownloadUrl = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.presignedUrl,
-}).handler(async (args: { data: unknown }) => {
-  const { getPresignedDownloadUrlHandler } = await import('./files.server');
-  const data = GetPresignedDownloadUrlSchema.parse(args.data);
-  return getPresignedDownloadUrlHandler({ data });
-});
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.presignedUrl))
+  .handler(async (args: { data: unknown }) => {
+    const data = GetPresignedDownloadUrlSchema.parse(args.data);
+    const { getPresignedDownloadUrlHandler } = await import('./files.server');
+    return getPresignedDownloadUrlHandler({ data });
+  });
 
 export const GetPresignedReviewFeedbackUploadUrlSchema = z.object({
   extension: z.string().min(1, 'File extension is required'),
@@ -38,9 +40,10 @@ export const GetPresignedReviewFeedbackUploadUrlSchema = z.object({
 
 export const getPresignedReviewFeedbackUploadUrl = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.presignedUrl,
-}).handler(async (args: { data: unknown }) => {
-  const { getPresignedReviewFeedbackUploadUrlHandler } = await import('./files.server');
-  const data = GetPresignedReviewFeedbackUploadUrlSchema.parse(args.data);
-  return getPresignedReviewFeedbackUploadUrlHandler({ data });
-});
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.presignedUrl))
+  .handler(async (args: { data: unknown }) => {
+    const data = GetPresignedReviewFeedbackUploadUrlSchema.parse(args.data);
+    const { getPresignedReviewFeedbackUploadUrlHandler } = await import('./files.server');
+    return getPresignedReviewFeedbackUploadUrlHandler({ data });
+  });

@@ -23,7 +23,7 @@ vi.mock('@/lib/logger', () => ({
 
 import { createServerFn } from '@tanstack/react-start';
 import { requestIdMiddleware } from '@/lib/request-context';
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 
 describe('typedServerFn — runtime behavior', () => {
   beforeEach(() => {
@@ -40,7 +40,10 @@ describe('typedServerFn — runtime behavior', () => {
     const schema = z.object({ name: z.string() });
     const handler = async ({ data }: { data: { name: string } }) => ({ result: data.name });
 
-    const stub = typedServerFn({ method: 'POST' }).inputValidator(schema).handler(handler);
+    const stub = typedServerFn({ method: 'POST' })
+      .middleware(serverFnMiddlewares())
+      .inputValidator(schema)
+      .handler(handler);
 
     expect(stub).toBeDefined();
     expect(typeof stub).toBe('function');
@@ -52,7 +55,9 @@ describe('typedServerFn — runtime behavior', () => {
       return { result: data.name };
     };
 
-    const stub = typedServerFn({ method: 'GET' }).handler(handler);
+    const stub = typedServerFn({ method: 'GET' })
+      .middleware(serverFnMiddlewares())
+      .handler(handler);
 
     expect(stub).toBeDefined();
     expect(typeof stub).toBe('function');
@@ -62,7 +67,10 @@ describe('typedServerFn — runtime behavior', () => {
     const schema = z.object({ name: z.string() });
     const handler = async ({ data }: { data: { name: string } }) => ({ result: data.name });
 
-    const stub = typedServerFn({ method: 'POST' }).inputValidator(schema).handler(handler);
+    const stub = typedServerFn({ method: 'POST' })
+      .middleware(serverFnMiddlewares())
+      .inputValidator(schema)
+      .handler(handler);
 
     // The mock's handler implementation returns the fn itself
     expect(stub).toBe(handler);
@@ -73,6 +81,7 @@ describe('typedServerFn — type-level behavior', () => {
   it('propagates the handler return type to the callable stub (typed-builder pattern)', () => {
     const schema = z.object({ name: z.string() });
     const stub = typedServerFn({ method: 'GET' })
+      .middleware(serverFnMiddlewares())
       .inputValidator(schema)
       .handler(async ({ data }) => ({ count: 1, name: data.name }));
 
@@ -80,10 +89,12 @@ describe('typedServerFn — type-level behavior', () => {
   });
 
   it('propagates the handler return type to the callable stub (inline-parse pattern)', () => {
-    const stub = typedServerFn({ method: 'GET' }).handler(async (args: { data: unknown }) => {
-      const data = z.object({ name: z.string() }).parse(args.data);
-      return { count: 1, name: data.name };
-    });
+    const stub = typedServerFn({ method: 'GET' })
+      .middleware(serverFnMiddlewares())
+      .handler(async (args: { data: unknown }) => {
+        const data = z.object({ name: z.string() }).parse(args.data);
+        return { count: 1, name: data.name };
+      });
 
     expectTypeOf(stub).returns.resolves.toEqualTypeOf<{ count: number; name: string }>();
   });
@@ -91,6 +102,7 @@ describe('typedServerFn — type-level behavior', () => {
   it('infers the input type from the Zod schema (typed-builder pattern)', () => {
     const schema = z.object({ name: z.string() });
     const stub = typedServerFn({ method: 'POST' })
+      .middleware(serverFnMiddlewares())
       .inputValidator(schema)
       .handler(async ({ data }) => ({ result: data.name }));
 
@@ -103,27 +115,22 @@ describe('typedServerFn — rateLimit config', () => {
     vi.clearAllMocks();
   });
 
-  it('calls .middleware([...]) when rateLimit is provided', () => {
-    typedServerFn({ method: 'GET', rateLimit: { window: 60, max: 5 } });
-
-    const builder = createServerFn();
-    expect(builder.middleware).toHaveBeenCalledWith(
+  it('returns request-ID and rate-limit middleware when rateLimit is provided', () => {
+    expect(serverFnMiddlewares({ window: 60, max: 5 })).toEqual(
       expect.arrayContaining([requestIdMiddleware, expect.any(Function)]),
     );
   });
 
-  it('calls .middleware([requestIdMiddleware]) when rateLimit is omitted', () => {
-    typedServerFn({ method: 'GET' });
-
-    const builder = createServerFn();
-    expect(builder.middleware).toHaveBeenCalledWith([requestIdMiddleware]);
+  it('returns only request-ID middleware when rateLimit is omitted', () => {
+    expect(serverFnMiddlewares()).toEqual([requestIdMiddleware]);
   });
 
   it('preserves the .inputValidator(Schema).handler(fn) chain when rateLimit is provided', () => {
     const schema = z.object({ name: z.string() });
     const handler = async ({ data }: { data: { name: string } }) => ({ result: data.name });
 
-    const stub = typedServerFn({ method: 'POST', rateLimit: { window: 60, max: 10 } })
+    const stub = typedServerFn({ method: 'POST' })
+      .middleware(serverFnMiddlewares({ window: 60, max: 10 }))
       .inputValidator(schema)
       .handler(handler);
 
@@ -135,7 +142,10 @@ describe('typedServerFn — rateLimit config', () => {
     const schema = z.object({ name: z.string() });
     const handler = async ({ data }: { data: { name: string } }) => ({ result: data.name });
 
-    const stub = typedServerFn({ method: 'POST' }).inputValidator(schema).handler(handler);
+    const stub = typedServerFn({ method: 'POST' })
+      .middleware(serverFnMiddlewares())
+      .inputValidator(schema)
+      .handler(handler);
 
     expect(stub).toBeDefined();
     expect(typeof stub).toBe('function');
@@ -147,7 +157,9 @@ describe('typedServerFn — rateLimit config', () => {
       return { result: data.name };
     };
 
-    const stub = typedServerFn({ method: 'GET' }).handler(handler);
+    const stub = typedServerFn({ method: 'GET' })
+      .middleware(serverFnMiddlewares())
+      .handler(handler);
 
     expect(stub).toBeDefined();
     expect(typeof stub).toBe('function');

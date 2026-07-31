@@ -24,9 +24,9 @@ export default defineConfig({
     // Load .env files
     env: loadEnv('', process.cwd(), ''),
 
-    // Performance: parallel execution (Vitest 4 syntax)
-    // vmThreads isolates via VM contexts (cheaper than re-importing modules per file) — ~50% faster than 'threads'.
-    pool: 'vmThreads',
+    // Use process isolation because Zod 4's lazy JIT schemas can access stale
+    // Vitest VM globals in VM worker pools, producing unhandled defineProperty errors.
+    pool: 'forks',
     maxWorkers: 14,
     fileParallelism: true,
 
@@ -71,7 +71,7 @@ export default defineConfig({
       },
     },
 
-    // Projects: unit tests run on vmThreads (inherited), xlsx tests on threads.
+    // Projects: unit tests run in forked processes (inherited), xlsx tests on threads.
     // Bare `vitest run` executes both projects — no script-level flags needed.
     projects: [
       {

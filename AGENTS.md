@@ -16,7 +16,7 @@
 | `pnpm test:unit`                                  | Alias of `pnpm test`                                     |
 | `pnpm test:integration`                            | Run **only** integration tests via `vitest.config.integration.ts` (opt-in, not in pre-push) |
 | `pnpm test:watch`                                 | Watch mode (`vitest`; unit only, xlsx included via `projects`) |
-| `pnpm test:coverage`                              | Unit tests + coverage (`vitest run --coverage`; vmThreads for unit, excludes integration) |
+| `pnpm test:coverage`                              | Unit tests + coverage (`vitest run --coverage`; forked unit workers, excludes integration) |
 | `pnpm vitest run tests/unit/path/to/file.test.ts` | Single test file                                         |
 | `pnpm typecheck`                                  | `tsc --noEmit --incremental --checkers 4`                |
 | `pnpm lint`                                       | **oxlint** on everything (`oxlint .`)                    |
@@ -107,7 +107,7 @@ Files go **directly to Cloudflare R2** via presigned URLs — the server never s
 
 - Tests live in `tests/unit/` and `tests/integration/` — mirror `src/` structure.
 - Vitest config: `globals: true`, default environment **`happy-dom`**, discovery from `tests/**/*.test.{ts,tsx}`; `tests/integration/**` is **excluded** from the default run.
-- xlsx tests run via the `projects` array in `vitest.config.ts` (xlsx project uses `threads` pool, rest uses `vmThreads`) — handled automatically, no script flags needed.
+- xlsx tests run via the `projects` array in `vitest.config.ts` (xlsx project uses `threads` pool, unit tests use forked workers) — handled automatically, no script flags needed.
 - Server-handler tests add `/** @vitest-environment node */` at the top of the file (overrides happy-dom).
 - Tests import handlers directly via `@/server/*.server` and mock `@/server/auth`, `@/db/index`, plus external clients (`@/lib/storage`, Resend).
 - When a server function uses `.inputValidator(Schema).handler(...)`, the test **must mock `@tanstack/react-start`** with the builder chain or import fails. Canonical pattern in `tests/unit/server/submissions.test.ts`:

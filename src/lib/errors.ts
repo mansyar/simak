@@ -1,5 +1,3 @@
-import { logger } from '@/lib/logger';
-
 export const ErrorCode = {
   UNAUTHORIZED: 'UNAUTHORIZED',
   FORBIDDEN: 'FORBIDDEN',
@@ -115,7 +113,11 @@ export function logError(code: ErrorCode, message: string, context: ErrorContext
     entry.input = sanitizedInput;
   }
 
-  logger.error(entry);
+  if (import.meta.env.SSR) {
+    void import('@/lib/logger').then(({ logger }) => logger.error(entry));
+  } else {
+    console.error(entry);
+  }
 }
 
 export function serverError(

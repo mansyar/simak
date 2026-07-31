@@ -34,7 +34,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme}
       closeButton={false}
       className="toaster group"
-      aria-label={t('notifications.toasterLabel')}
+      containerAriaLabel={t('notifications.toasterLabel')}
       icons={{
         success: <CircleCheckIcon className="size-4" />,
         info: <InfoIcon className="size-4" />,
@@ -42,14 +42,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
         error: <OctagonXIcon className="size-4" />,
         loading: <Loader2Icon className="size-4 animate-spin" />,
       }}
-      style={
-        {
-          '--normal-bg': 'var(--popover)',
-          '--normal-text': 'var(--popover-foreground)',
-          '--normal-border': 'var(--border)',
-          '--border-radius': 'var(--radius)',
-        } as React.CSSProperties
-      }
       {...props}
     />
   );

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
-import { useState, createContext, useContext, useCallback } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { Outlet, createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
+import { Outlet, createRootRoute, HeadContent, Scripts, useRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '../components/ui/sonner';
 import { RootErrorComponent } from '../components/error-boundary';
@@ -41,8 +41,11 @@ function interpolate(text: string, params?: Record<string, string>): string {
 
 // Placeholder ThemeProvider — replaces the hook-based approach for SSR compatibility
 function ThemeScript() {
+  const nonce = useRouter().options.ssr?.nonce;
+
   return (
     <script
+      nonce={nonce}
       dangerouslySetInnerHTML={{
         __html: `
           (function() {
@@ -80,10 +83,11 @@ export function useI18n() {
 }
 
 function useI18nProvider() {
-  const [locale, setLocaleState] = useState<Locales>(() => {
-    if (typeof window === 'undefined') return 'en';
-    return detectLocale();
-  });
+  const [locale, setLocaleState] = useState<Locales>('en');
+
+  useEffect(() => {
+    setLocaleState(detectLocale());
+  }, []);
 
   const setLocale = useCallback((newLocale: Locales) => {
     setLocaleState(newLocale);
@@ -133,6 +137,11 @@ export const Route = createRootRoute({
       },
     ],
     links: [
+      {
+        rel: 'icon',
+        type: 'image/svg+xml',
+        href: '/favicon.svg',
+      },
       {
         rel: 'stylesheet',
         href: globalCss,

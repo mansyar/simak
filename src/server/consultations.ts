@@ -1,7 +1,7 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in consultations.server.ts (not bundled for client)
 import { RATE_LIMITS } from '@/lib/rate-limiter';
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const LogConsultationSchema = z.object({
@@ -43,7 +43,8 @@ export const ListVerifiedCountsSchema = z.object({
   assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
 });
 
-export const logConsultation = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.destructive })
+export const logConsultation = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(LogConsultationSchema)
   .handler(async ({ data }) => {
     const { logConsultationHandler } = await import('./consultations.server');
@@ -52,8 +53,8 @@ export const logConsultation = typedServerFn({ method: 'POST', rateLimit: RATE_L
 
 export const listConsultations = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListConsultationsSchema)
   .handler(async ({ data }) => {
     const { listConsultationsHandler } = await import('./consultations.server');
@@ -62,8 +63,8 @@ export const listConsultations = typedServerFn({
 
 export const listPendingConsultations = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListPendingConsultationsSchema)
   .handler(async ({ data }) => {
     const { listPendingConsultationsHandler } = await import('./consultations.server');
@@ -72,8 +73,8 @@ export const listPendingConsultations = typedServerFn({
 
 export const verifyConsultation = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.destructive,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(VerifyConsultationSchema)
   .handler(async ({ data }) => {
     const { verifyConsultationHandler } = await import('./consultations.server');
@@ -82,8 +83,8 @@ export const verifyConsultation = typedServerFn({
 
 export const rejectConsultation = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.destructive,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(RejectConsultationSchema)
   .handler(async ({ data }) => {
     const { rejectConsultationHandler } = await import('./consultations.server');
@@ -92,8 +93,8 @@ export const rejectConsultation = typedServerFn({
 
 export const getConsultationDetail = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(GetConsultationDetailSchema)
   .handler(async ({ data }) => {
     const { getConsultationDetailHandler } = await import('./consultations.server');
@@ -102,8 +103,8 @@ export const getConsultationDetail = typedServerFn({
 
 export const listVerifiedCounts = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
 })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListVerifiedCountsSchema)
   .handler(async ({ data }) => {
     const { listVerifiedCountsHandler } = await import('./consultations.server');

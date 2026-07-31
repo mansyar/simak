@@ -53,24 +53,25 @@ export async function seedSuperAdmin(): Promise<void> {
   }
 
   const userId = crypto.randomUUID();
-
-  // Create the user record
-  await db.insert(users).values({
-    id: userId,
-    name: 'SuperAdmin',
-    email,
-    role: 'superadmin',
-    locale: 'en',
-  });
-
-  // Create the account record with hashed password (Better-Auth credential provider)
   const hashedPassword = await hashPassword(password);
-  await db.insert(account).values({
-    id: crypto.randomUUID(),
-    userId,
-    accountId: userId,
-    providerId: 'credential',
-    password: hashedPassword,
+
+  await db.transaction(async (tx) => {
+    await tx.insert(users).values({
+      id: userId,
+      name: 'SuperAdmin',
+      email,
+      role: 'superadmin',
+      locale: 'en',
+    });
+
+    // Create the account record with hashed password (Better-Auth credential provider)
+    await tx.insert(account).values({
+      id: crypto.randomUUID(),
+      userId,
+      accountId: userId,
+      providerId: 'credential',
+      password: hashedPassword,
+    });
   });
 
   console.log(`SuperAdmin user created (${email}).`);
@@ -226,6 +227,14 @@ export async function seedTestTemplatesAndAssignments(): Promise<void> {
   console.log(`Created ${templateCheckpointData.length} per-student checkpoints.`);
 }
 
+/**
+ * Run the production-safe bootstrap. Test fixtures remain available to the
+ * dedicated test seed helpers, but are never created by the production entry point.
+ */
+export async function runProductionSeed(): Promise<void> {
+  await seedSuperAdmin();
+}
+
 // Allow running directly: `tsx src/db/seed.ts` or `node .output/server/seed.mjs`
 // Cross-platform: compare resolved paths (handles Windows backslashes)
 const isDirectExecution =
@@ -235,9 +244,7 @@ const isDirectExecution =
     import.meta.url === `file://${process.argv[1]}` ||
     import.meta.url === `file:///${process.argv[1].replace(/\\/g, '/')}`);
 if (isDirectExecution) {
-  seedSuperAdmin()
-    .then(() => seedTestUsers())
-    .then(() => seedTestTemplatesAndAssignments())
+  runProductionSeed()
     .then(() => process.exit(0))
     .catch((err) => {
       console.error('Seed failed:', err);

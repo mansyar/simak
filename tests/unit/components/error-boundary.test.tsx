@@ -3,12 +3,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { RootErrorComponent } from '@/components/error-boundary';
 
-vi.mock('@/lib/logger', () => ({
-  logger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
-}));
-
-import { logger } from '@/lib/logger';
-
 const t = vi.fn((key: string) => `i18n:${key}`);
 
 vi.mock('@/routes/__root', () => ({
@@ -49,11 +43,12 @@ describe('RootErrorComponent', () => {
     reloadSpy.mockRestore();
   });
 
-  it('logs the error via logger.error', () => {
+  it('logs the error to the browser console', () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     render(<RootErrorComponent error={new Error('render failure')} />);
 
-    expect(logger.error).toHaveBeenCalledTimes(1);
-    const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(consoleError).toHaveBeenCalledTimes(1);
+    const entry = consoleError.mock.calls[0]?.[0] as Record<string, unknown>;
     expect(entry.code).toBe('INTERNAL');
     expect(entry.message).toBe('render failure');
   });

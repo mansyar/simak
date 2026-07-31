@@ -1,6 +1,5 @@
 import { createMiddleware } from '@tanstack/react-start';
 import { getSessionFromHeaders } from '@/server/auth';
-import { serverError, ErrorCode } from '@/lib/errors';
 
 export type RateLimitConfig = {
   window: number;
@@ -46,7 +45,7 @@ let fnIdCounter = 0;
 export function createRateLimitMiddleware(config: RateLimitConfig) {
   const fnId = ++fnIdCounter;
 
-  return createMiddleware({ type: 'request' }).server(async ({ next }) => {
+  return createMiddleware({ type: 'function' }).server(async ({ next }) => {
     const session = await getSessionFromHeaders();
 
     if (!session) {
@@ -56,7 +55,8 @@ export function createRateLimitMiddleware(config: RateLimitConfig) {
     const key = `${session.user.id}:${fnId}`;
 
     if (!checkRateLimit(rateLimitStore, key, config)) {
-      return serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded') as never;
+      const { serverError, ErrorCode } = await import('@/lib/errors');
+      throw serverError(ErrorCode.RATE_LIMITED, 'Rate limit exceeded');
     }
 
     return next();

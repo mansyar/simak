@@ -5,7 +5,14 @@
 **Project Name:** SIMAK (Sistem Informasi dan Manajemen Akademik)
 **Purpose:** Help students and instructors track assignment progress through defined checkpoints with structured feedback cycles.
 **Audience:** University or school instructors and students.
-**Platform:** Web application, deployed via Docker on a VPS.
+**Platform:** Web application, containerized with Docker and deployed through Coolify on a VPS.
+
+**Private-pilot deployment decision (TRACK-047):** The completed pilot runs one SIMAK
+instance in Coolify with a Coolify-managed PostgreSQL 16 service on a private network,
+direct PostgreSQL connections without PgBouncer, private Cloudflare R2 storage, and
+Resend transactional email. The custom domain is HTTPS-only, with daily PostgreSQL
+backups retaining seven copies in both Coolify server storage and remote S3-compatible
+storage. Multi-instance scaling, Redis, and CI/CD outside Coolify remain out of scope.
 
 ---
 
@@ -198,17 +205,17 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 
 - A **nonce-based Content-Security-Policy (CSP)** defends against XSS — the primary browser-level defense given the app's rich user-generated content (assignment descriptions, review feedback, discussion Q&A). A cryptographic nonce (`crypto.randomBytes(16)` → base64) is generated per request and auto-attached to all inline `<script>` and `<style>` tags during SSR (including the theme-init script for FOUC prevention and TanStack Router's hydration scripts) — no manual nonce injection needed.
 - **Report-Only in dev, enforced in prod:** CSP violations are logged (not blocked) in development via `Content-Security-Policy-Report-Only`, then enforced via `Content-Security-Policy` in production. This allows safe rollout without breaking dev workflows.
-- **CSP directives:** `default-src 'self'; script-src 'nonce-{nonce}' 'strict-dynamic'; style-src 'nonce-{nonce}'; img-src 'self' data: https:; connect-src 'self' <R2 domain>; frame-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests` (prod only). The `connect-src` directive dynamically includes the Cloudflare R2 domain (extracted from the `R2_ENDPOINT` env var) so presigned upload/download URLs work; it is omitted gracefully when R2 is unconfigured.
+- **CSP directives:** `default-src 'self'; script-src 'nonce-{nonce}' 'strict-dynamic'; style-src 'self' 'nonce-{nonce}' <Sonner hash>; img-src 'self' data: https:; connect-src 'self' <R2 endpoint> <R2 bucket subdomains>; frame-src 'self' <R2 endpoint> <R2 bucket subdomains>; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src <R2 endpoint> <R2 bucket subdomains>` (or `object-src 'none'` without R2); `upgrade-insecure-requests` (prod only). R2 sources are restricted to the configured endpoint and bucket subdomains for presigned uploads/downloads and PDF previews, and are omitted when R2 is unconfigured.
 - **Additional security headers** on all responses: `X-Frame-Options: DENY` (clickjacking), `X-Content-Type-Options: nosniff` (MIME sniffing), `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: geolocation=(), microphone=(), camera=()`. `Strict-Transport-Security: max-age=31536000; includeSubDomains` (HSTS) is set in production only (defense-in-depth behind Traefik TLS termination).
 - **CSRF middleware** is explicitly wired (a custom `createStart` entry point disables TanStack Start's auto-installed CSRF middleware), scoped to server-function requests via a `handlerType === 'serverFn'` filter.
 - Implemented via a `createStart` instance with a global request middleware (`src/start.ts`) that generates the nonce, sets all headers, and propagates the nonce to the router context; the router reads the nonce via `ssr: { nonce }` so TanStack Start handles auto-attachment.
 
 ### Application-Level Rate Limiting on Server Functions
 
-- All 85 authenticated TanStack Start server functions are rate-limited via `typedServerFn`'s optional `rateLimit` config. Better Auth's built-in rate limiting only covers `/api/auth/*` endpoints — application server functions were previously unprotected against abuse (R2 cost exploitation, email queue flooding, data pollution, DB connection exhaustion).
+- All 85 authenticated TanStack Start server functions are rate-limited through explicit `serverFnMiddlewares` composition. Better Auth's built-in rate limiting only covers `/api/auth/*` endpoints — application server functions were previously unprotected against abuse (R2 cost exploitation, email queue flooding, data pollution, DB connection exhaustion).
 - **4-tier rate limit presets** (`RATE_LIMITS` in `src/lib/rate-limiter.ts`): `presignedUrl` (20/min — R2 cost abuse prevention), `heavyMutation` (10/min — submissions/reviews), `destructive` (5/min — admin-level operations: user CRUD, template CRUD, 2FA, session revocation), `standardRead` (60/min — dashboards, list views, detail views).
 - **In-memory sliding window** — Module-level `Map` store keyed by `userId:fnId`; per-user + per-function isolation. The window resets after the configured time elapses. When at max, requests are denied without incrementing the counter (prevents permanent lockout — the user can retry after the window expires).
-- **`typedServerFn` extension** — `.middleware()` method added to the `TypedBuilder` interface; `rateLimit?: RateLimitConfig` optional config on `typedServerFn()`. When provided, the wrapper chains `createRateLimitMiddleware()` via `.middleware()`. When omitted, the function passes through unchanged (backward-compatible).
+- **`typedServerFn` extension** — `src/lib/server-fn.ts` exports a type-preserving alias for `createServerFn` and `serverFnMiddlewares(rateLimit?)`, which returns request-ID middleware followed by optional rate limiting. Stubs attach this array explicitly via `.middleware(...)`.
 - **Unauthenticated pass-through** — The middleware calls `getSessionFromHeaders()`; if no session exists, the request passes through to `next()` without rate limiting (route guards handle unauthenticated access). This avoids rate-limiting token-based flows like password setup.
 - **`RATE_LIMITED` error code** — Added to the `ErrorCode` enum in `src/lib/errors.ts`; mapped to `error.rateLimited` i18n key in `src/lib/toast.ts` ("Too many requests. Please wait a moment and try again." / "Terlalu banyak permintaan. Mohon tunggu sebentar dan coba lagi."). The client renders this as a toast notification via the standard `showErrorToast` pattern.
 - **Exempt functions** (no rate limit): `_getSession` (internal session fetch — cascading/infinite-loop concern), `getUnreadCount` / `markRead` / `markAllRead` (high-frequency UX — 30s polling, instant interactions), `completePasswordSetup` (token-based, no session).

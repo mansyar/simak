@@ -34,44 +34,29 @@ interface TypedBuilder {
   ): OptionalFetcher<TResponse>;
 }
 
-/**
- * Wraps `createServerFn` with proper generic return-type inference.
- *
- * At runtime this is a pure pass-through — the single `as unknown as` cast is
- * type-only and has no behavioural effect. The wrapper exists because
- * `createServerFn`'s `handler` method loses the return type through the
- * `ServerFnReturnType` conditional type (which applies `ValidateSerializableInput`),
- * causing `TNewResponse` to default to `unknown`.
- *
- * Usage (typed-builder pattern):
- * ```ts
- * export const myFn = typedServerFn({ method: 'GET' })
- *   .inputValidator(Schema)
- *   .handler(async ({ data }) => ({ result: data.field }));
- * ```
- *
- * Usage (inline-parse pattern):
- * ```ts
- * export const myFn = typedServerFn({ method: 'GET' })
- *   .handler(async (args) => { const data = Schema.parse(args.data); ... });
- * ```
- * Usage (rate-limit pattern):
- * ```ts
- * export const myFn = typedServerFn({ method: 'POST', rateLimit: RATE_LIMITS.heavyMutation })
- *   .inputValidator(Schema)
- *   .handler(async ({ data }) => ({ result: data.field }));
- * ```
- */
-export function typedServerFn(opts: {
-  method: 'GET' | 'POST';
-  rateLimit?: RateLimitConfig;
-}): TypedBuilder {
-  const fn = createServerFn({ method: opts.method }) as unknown as TypedBuilder;
+type TypedServerFn = (opts?: { method?: 'GET' | 'POST' }) => TypedBuilder;
 
+/**
+ * A type-preserving alias for `createServerFn`.
+ *
+ * The cast is type-only and has no behavioural effect. A value alias lets the
+ * Start compiler resolve this to `createServerFn`, while retaining the return
+ * type inference lost by the upstream builder.
+ */
+export const typedServerFn = createServerFn as unknown as TypedServerFn;
+
+/**
+ * Builds the standard middleware chain for every server function.
+ *
+ * The custom builder previously applied this chain internally. Keeping it
+ * explicit at call sites preserves the same request-ID and rate-limit order.
+ */
+export function serverFnMiddlewares(rateLimit?: RateLimitConfig): unknown[] {
   const middlewares: unknown[] = [requestIdMiddleware];
-  if (opts.rateLimit) {
-    middlewares.push(createRateLimitMiddleware(opts.rateLimit));
+
+  if (rateLimit) {
+    middlewares.push(createRateLimitMiddleware(rateLimit));
   }
 
-  return fn.middleware(middlewares);
+  return middlewares;
 }

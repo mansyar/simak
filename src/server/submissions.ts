@@ -1,7 +1,7 @@
 // Client-safe server function wrappers (Zod schemas + typedServerFn stubs)
 // Handler implementations are in submissions.server.ts (not bundled for client)
 import { RATE_LIMITS } from '@/lib/rate-limiter';
-import { typedServerFn } from '@/lib/server-fn';
+import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
 export const SubmitCheckpointSchema = z.object({
@@ -23,27 +23,30 @@ export const GetSubmissionDetailSchema = z.object({
 
 export const submitCheckpoint = typedServerFn({
   method: 'POST',
-  rateLimit: RATE_LIMITS.heavyMutation,
-}).handler(async (args: { data: unknown }) => {
-  const { submitCheckpointHandler } = await import('./submissions.server');
-  const data = SubmitCheckpointSchema.parse(args.data);
-  return submitCheckpointHandler({ data });
-});
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.heavyMutation))
+  .handler(async (args: { data: unknown }) => {
+    const data = SubmitCheckpointSchema.parse(args.data);
+    const { submitCheckpointHandler } = await import('./submissions.server');
+    return submitCheckpointHandler({ data });
+  });
 
 export const listSubmissions = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
-}).handler(async (args: { data: unknown }) => {
-  const { listSubmissionsHandler } = await import('./submissions.server');
-  const data = ListSubmissionsSchema.parse(args.data);
-  return listSubmissionsHandler({ data });
-});
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
+  .handler(async (args: { data: unknown }) => {
+    const data = ListSubmissionsSchema.parse(args.data);
+    const { listSubmissionsHandler } = await import('./submissions.server');
+    return listSubmissionsHandler({ data });
+  });
 
 export const getSubmissionDetail = typedServerFn({
   method: 'GET',
-  rateLimit: RATE_LIMITS.standardRead,
-}).handler(async (args: { data: unknown }) => {
-  const { getSubmissionDetailHandler } = await import('./submissions.server');
-  const data = GetSubmissionDetailSchema.parse(args.data);
-  return getSubmissionDetailHandler({ data });
-});
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
+  .handler(async (args: { data: unknown }) => {
+    const data = GetSubmissionDetailSchema.parse(args.data);
+    const { getSubmissionDetailHandler } = await import('./submissions.server');
+    return getSubmissionDetailHandler({ data });
+  });
