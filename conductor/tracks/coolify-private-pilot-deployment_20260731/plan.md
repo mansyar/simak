@@ -42,17 +42,18 @@
   - [x] Ensure `MIGRATE_DATABASE_URL` reaches PostgreSQL directly and leave `DB_PREPARED_STATEMENTS_DISABLED` unset because PgBouncer is not used.
   - [x] Confirm configured values remain masked and Coolify-only; repository and documentation record names only. Application-log secret review is deferred until Phase 4 after a deployment.
   - Operator configured the approved pilot origin `https://simak.ansyar-world.top` without disclosing any secret value.
-- [~] Task: Configure the custom pilot domain and TLS
+- [x] Task: Configure the custom pilot domain and TLS [9cbc551]
   - [x] Point DNS to the VPS/Coolify ingress.
   - [x] Attach the domain in Coolify; verify a valid certificate after the first application deployment.
-  - [ ] Confirm HTTP redirects to HTTPS.
+  - [x] Confirm HTTP redirects to HTTPS.
   - Operator confirmed `simak.ansyar-world.top` points directly to the Coolify ingress with Cloudflare proxying disabled for certificate issuance.
-  - Operator attached `https://simak.ansyar-world.top` to the Coolify application on port `3000`; deployment is required before Traefik can serve and verify TLS.
-- [~] Task: Perform the initial application deployment
-  - [ ] Verify migrations complete through the bundled, advisory-locked migration runner.
-  - [ ] Verify the container becomes healthy through `/api/health`.
-  - [ ] Run the idempotent seed runner once through Coolify to create the initial SuperAdmin.
+  - Operator attached `https://simak.ansyar-world.top` to the Coolify application on port `3000`, verified the certificate after deployment, and confirmed HTTP redirects to HTTPS.
+- [x] Task: Perform the initial application deployment [7b0f76f]
+  - [x] Verify migrations complete through the bundled, advisory-locked migration runner.
+  - [x] Verify the container becomes healthy through `/api/health`.
+  - [x] Run the idempotent seed runner once through Coolify to create the initial SuperAdmin.
   - Initial deployment from `afb3d53d` reached and completed migrations but failed because the build lacked a Nitro Node-server output. Although the Vite build also emitted `dist/server/server.js`, that artifact is not the standalone Docker listener. The official TanStack Vite/Docker configuration now applies the `nitro()` plugin; validated remediation `66797bbc` emits `.output/server/index.mjs`, preserves the migration/seed runners, and has been pushed for redeployment.
+  - Operator confirmed a healthy `/api/health` response with database, R2, and email-queue checks passing; the one-time seed completed, SuperAdmin login succeeded, and Analytics loaded successfully after the deployed query repair.
 - [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 
 ## Phase 3: Recovery, Operations & Runbooks
