@@ -48,10 +48,11 @@
   - [ ] Confirm HTTP redirects to HTTPS.
   - Operator confirmed `simak.ansyar-world.top` points directly to the Coolify ingress with Cloudflare proxying disabled for certificate issuance.
   - Operator attached `https://simak.ansyar-world.top` to the Coolify application on port `3000`; deployment is required before Traefik can serve and verify TLS.
-- [ ] Task: Perform the initial application deployment
+- [~] Task: Perform the initial application deployment
   - [ ] Verify migrations complete through the bundled, advisory-locked migration runner.
   - [ ] Verify the container becomes healthy through `/api/health`.
   - [ ] Run the idempotent seed runner once through Coolify to create the initial SuperAdmin.
+  - Initial deployment from `afb3d53d` reached and completed migrations but failed because the runner expected the obsolete `.output/server/index.mjs` path. Coolify build logs confirmed the TanStack server is emitted as `dist/server/server.js`; the runner-artifact fix is `ff7fe679` and has been pushed for the next deployment.
 - [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 
 ## Phase 3: Recovery, Operations & Runbooks
