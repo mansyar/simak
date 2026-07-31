@@ -37,12 +37,12 @@
 
 ## Phase 2: Configure Production Runtime & First Release
 
-- [~] Task: Configure the complete production environment in Coolify
+- [x] Task: Configure the complete production environment in Coolify [e1db409]
   - [x] Set `DATABASE_URL`, `MIGRATE_DATABASE_URL`, `BETTER_AUTH_URL`, authentication secrets, Resend, private R2, and SuperAdmin settings as Coolify runtime-only values. Use the application defaults for logging and pool settings; leave `R2_PUBLIC_URL` unset to keep the bucket private.
   - [x] Ensure `MIGRATE_DATABASE_URL` reaches PostgreSQL directly and leave `DB_PREPARED_STATEMENTS_DISABLED` unset because PgBouncer is not used.
   - [x] Confirm configured values remain masked and Coolify-only; repository and documentation record names only. Application-log secret review is deferred until Phase 4 after a deployment.
   - Operator configured the approved pilot origin `https://simak.ansyar-world.top` without disclosing any secret value.
-- [ ] Task: Configure the custom pilot domain and TLS
+- [~] Task: Configure the custom pilot domain and TLS
   - [ ] Point DNS to the VPS/Coolify ingress.
   - [ ] Attach the domain in Coolify and verify a valid certificate.
   - [ ] Confirm HTTP redirects to HTTPS.
