@@ -32,8 +32,8 @@
   - [x] Configure the production build context and `docker/Dockerfile`.
   - [x] Configure the container port and `/api/health` health probe.
   - [x] Configure restart and deployment behavior appropriate for a single-instance pilot.
-  - Operator configured `mansyar/simak` at `track-047/coolify-private-pilot-deployment` with base directory `/`, `docker/Dockerfile`, port `3000`, and `/api/health`; deployment is manual with one instance and normal restart-on-failure behavior. The application remains undeployed pending Phase 2 runtime secrets.
-- [~] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
+  - Operator configured `mansyar/simak` at `track-047/coolify-private-pilot-deployment` with base directory `/`, `docker/Dockerfile`, port `3000`, and `/api/health`; deployment is manual and uses Coolify's default single-container behavior (no scaling control is exposed), with normal restart-on-failure behavior. The application remains undeployed pending Phase 2 runtime secrets.
+- [x] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`) [3032252]
 
 ## Phase 2: Configure Production Runtime & First Release
 
