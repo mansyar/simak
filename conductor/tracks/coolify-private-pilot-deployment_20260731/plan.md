@@ -73,7 +73,7 @@
   - Runbook: `docs/deployment-runbook.md`.
   - Quality gates: typecheck passed; lint passed with 4 pre-existing warnings and 0 errors; coverage passed with 388 files and 3,953 tests, exceeding all 80% thresholds.
 - [x] Task: Link the runbook from the project README. [1430db2]
-- [x] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`) [efcc719]
   - Automated verification passed: `pnpm typecheck`; `pnpm lint` (0 errors, 4 pre-existing warnings); `CI=true pnpm test:coverage` (3,953 tests, all coverage thresholds passed); `git diff --check`.
   - Manual verification: Operator confirmed on 2026-08-01 that the README link and runbook match the confirmed Coolify setup, including direct PostgreSQL/no PgBouncer, daily seven-copy local and remote backups, the completed isolated restore drill and cleanup, and the SuperAdmin-only seed command.
   - Phase 3 outcome: Operations runbook, README link, production seed hardening, backup retention, and restore evidence are complete. Production smoke tests remain in Phase 4.
