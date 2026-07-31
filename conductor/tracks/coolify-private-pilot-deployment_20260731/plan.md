@@ -81,6 +81,7 @@
 ## Phase 4: Private-Pilot Verification & Handover
 
 - [~] Task: Execute production smoke tests
+  - [~] Fix production CSP `connect-src` to allow the R2 bucket subdomain used by presigned upload URLs.
   - [ ] Verify HTTPS, `/api/health`, and expected security headers.
   - [ ] Verify SuperAdmin, Admin, Instructor, and Student authentication and authorization paths.
   - [ ] Verify invitation/password setup email delivery through Resend.
