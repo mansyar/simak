@@ -7,7 +7,7 @@
     "dev": "pnpm generate:i18n && vite dev",
     "build": "pnpm generate:i18n && vite build && pnpm build:migrate && pnpm build:seed",
     "build:migrate": "esbuild src/db/migrate.ts --bundle --format=esm --platform=node --outfile=.output/server/migrate.mjs --external:child_process",
-    "build:seed": "esbuild src/db/seed.ts --bundle --format=esm --platform=node --outfile=.output/server/seed.mjs",
+    "build:seed": "esbuild src/db/seed.ts --bundle --format=esm --platform=node --define:import.meta.env.PROD=true --banner:js=\"import { createRequire as createNodeRequire } from 'node:module'; const require = createNodeRequire(import.meta.url);\" --outfile=.output/server/seed.mjs",
     "start": "vinxi start",
     "test": "vitest run",
     "test:unit": "pnpm test",
