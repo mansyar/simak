@@ -43,9 +43,10 @@
   - [x] Confirm configured values remain masked and Coolify-only; repository and documentation record names only. Application-log secret review is deferred until Phase 4 after a deployment.
   - Operator configured the approved pilot origin `https://simak.ansyar-world.top` without disclosing any secret value.
 - [~] Task: Configure the custom pilot domain and TLS
-  - [ ] Point DNS to the VPS/Coolify ingress.
+  - [x] Point DNS to the VPS/Coolify ingress.
   - [ ] Attach the domain in Coolify and verify a valid certificate.
   - [ ] Confirm HTTP redirects to HTTPS.
+  - Operator confirmed `simak.ansyar-world.top` points directly to the Coolify ingress with Cloudflare proxying disabled for certificate issuance.
 - [ ] Task: Perform the initial application deployment
   - [ ] Verify migrations complete through the bundled, advisory-locked migration runner.
   - [ ] Verify the container becomes healthy through `/api/health`.
