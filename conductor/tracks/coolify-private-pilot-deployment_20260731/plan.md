@@ -64,12 +64,14 @@
 - [x] Task: Test and record the database restore procedure in a non-production target. [8969d70]
   - Operator restored the latest local Coolify backup into an isolated non-production target and verified connectivity, SIMAK schema/migration state, and representative data.
   - The temporary target was removed after verification; the backup timestamp and target name were intentionally kept out of repository documentation.
-- [~] Task: Write the deployment operations runbook
+- [x] Task: Write the deployment operations runbook [2dd34e6]
   - [x] Harden the production seed entry point so direct execution seeds only the SuperAdmin [0b53ec7]
     - Direct `node .output/server/seed.mjs` execution now runs only `runProductionSeed()`; test fixture helpers remain available to dedicated test setup.
-  - [ ] Document environment-variable inventory without secret values.
-  - [ ] Document deployment, health/log inspection, migration failure handling, backup/restore, and rollback procedures.
-  - [ ] Document the one-time SuperAdmin bootstrap command and expected outcome.
+  - [x] Document environment-variable inventory without secret values.
+  - [x] Document deployment, health/log inspection, migration failure handling, backup/restore, and rollback procedures.
+  - [x] Document the one-time SuperAdmin bootstrap command and expected outcome.
+  - Runbook: `docs/deployment-runbook.md`.
+  - Quality gates: typecheck passed; lint passed with 4 pre-existing warnings and 0 errors; coverage passed with 388 files and 3,953 tests, exceeding all 80% thresholds.
 - [ ] Task: Link the runbook from the project README.
 - [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 
