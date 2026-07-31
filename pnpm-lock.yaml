@@ -5,7 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  sonner@2.0.7: 05b3900f859d001cc1049ec064f989753d175f8cb243245355fd0c07c6bc49ff
+  sonner@2.0.7:
+    hash: 05b3900f859d001cc1049ec064f989753d175f8cb243245355fd0c07c6bc49ff
+    path: patches/sonner@2.0.7.patch
 
 importers:
 
