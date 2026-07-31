@@ -27,6 +27,7 @@ export function buildSecurityHeaders(
     "default-src 'self'",
     `script-src 'nonce-${nonce}' 'strict-dynamic'`,
     `style-src 'nonce-${nonce}'`,
+    "style-src-attr 'unsafe-inline'",
     "img-src 'self' data: https:",
     connectSrc,
     "frame-src 'self'",

@@ -60,6 +60,11 @@ describe('buildSecurityHeaders', () => {
       expect(csp).toContain(`style-src 'nonce-${testNonce}'`);
     });
 
+    it('allows inline style attributes without weakening nonce-protected style elements', () => {
+      const csp = getCsp(true, testR2Domain);
+      expect(csp).toContain("style-src-attr 'unsafe-inline'");
+    });
+
     it('includes img-src self data https', () => {
       const csp = getCsp(true, testR2Domain);
       expect(csp).toContain("img-src 'self' data: https:");

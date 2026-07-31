@@ -65,7 +65,7 @@ describe('serverError', () => {
     expect(result.error).not.toHaveProperty('cause');
   });
 
-  it('calls logError with the supplied context', () => {
+  it('calls logError with the supplied context', async () => {
     const context: ErrorContext = {
       userId: 'user-123',
       handler: 'createUser',
@@ -74,7 +74,7 @@ describe('serverError', () => {
 
     serverError('VALIDATION', 'Invalid input', context);
 
-    expect(logger.error).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(logger.error).toHaveBeenCalledTimes(1));
     const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
     expect(entry.code).toBe('VALIDATION');
     expect(entry.message).toBe('Invalid input');
@@ -104,17 +104,17 @@ describe('logError', () => {
     vi.mocked(logger.error).mockClear();
   });
 
-  it('calls logger.error with an entry object containing timestamp, code, and message', () => {
+  it('calls logger.error with an entry object containing timestamp, code, and message', async () => {
     logError('NOT_FOUND', 'Resource missing');
 
-    expect(logger.error).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(logger.error).toHaveBeenCalledTimes(1));
     const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
     expect(entry.code).toBe('NOT_FOUND');
     expect(entry.message).toBe('Resource missing');
     expect(typeof entry.timestamp).toBe('string');
   });
 
-  it('includes optional fields cause, userId, handler, stack, and input when provided', () => {
+  it('includes optional fields cause, userId, handler, stack, and input when provided', async () => {
     const cause = new Error('Connection reset');
     logError('INTERNAL', 'Unexpected error', {
       cause,
@@ -123,6 +123,7 @@ describe('logError', () => {
       input: { name: 'x' },
     });
 
+    await vi.waitFor(() => expect(logger.error).toHaveBeenCalledTimes(1));
     const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
     expect(entry.cause).toBe('Connection reset');
     expect(entry.userId).toBe('user-2');
@@ -132,15 +133,16 @@ describe('logError', () => {
     expect(typeof entry.stack).toBe('string');
   });
 
-  it('includes the stack trace when an Error is provided as cause', () => {
+  it('includes the stack trace when an Error is provided as cause', async () => {
     const cause = new Error('Connection reset');
     logError('INTERNAL', 'Unexpected error', { cause, handler: 'testHandler' });
 
+    await vi.waitFor(() => expect(logger.error).toHaveBeenCalledTimes(1));
     const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
     expect(entry.stack).toContain('Connection reset');
   });
 
-  it('redacts sensitive fields from the input summary', () => {
+  it('redacts sensitive fields from the input summary', async () => {
     logError('VALIDATION', 'Bad input', {
       input: {
         email: 'a@example.com',
@@ -150,6 +152,7 @@ describe('logError', () => {
       },
     });
 
+    await vi.waitFor(() => expect(logger.error).toHaveBeenCalledTimes(1));
     const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
     const input = entry.input as Record<string, string>;
     expect(input.password).toBe('[REDACTED]');
@@ -158,9 +161,10 @@ describe('logError', () => {
     expect(input.email).toBe('a@example.com');
   });
 
-  it('omits optional fields when not provided', () => {
+  it('omits optional fields when not provided', async () => {
     logError('NOT_FOUND', 'Resource missing');
 
+    await vi.waitFor(() => expect(logger.error).toHaveBeenCalledTimes(1));
     const entry = vi.mocked(logger.error).mock.calls[0]?.[0] as Record<string, unknown>;
     expect(entry).not.toHaveProperty('cause');
     expect(entry).not.toHaveProperty('userId');

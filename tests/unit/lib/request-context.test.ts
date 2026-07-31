@@ -1,9 +1,8 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock @/lib/logger — we only need logger.child for createRequestLogger
-vi.mock('@/lib/logger', () => ({
-  logger: { child: vi.fn().mockReturnValue({}) },
+const { mockGetRequestHeaders } = vi.hoisted(() => ({
+  mockGetRequestHeaders: vi.fn(),
 }));
 
 // Mock @tanstack/react-start — capture the .server() callback as requestIdMiddleware
@@ -13,9 +12,12 @@ vi.mock('@tanstack/react-start', () => ({
   }),
 }));
 
+vi.mock('@tanstack/react-start/server', () => ({
+  getRequestHeaders: mockGetRequestHeaders,
+}));
+
 // Import after mocks are set up
-import { logger } from '@/lib/logger';
-import { requestIdMiddleware, createRequestLogger } from '@/lib/request-context';
+import { requestIdMiddleware } from '@/lib/request-context';
 import { requestContextStorage } from '@/lib/request-context-store';
 
 // The mock makes createMiddleware().server(fn) return fn directly,
@@ -34,6 +36,7 @@ const middleware = requestIdMiddleware as unknown as MiddlewareFn;
 describe('request-context', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetRequestHeaders.mockReturnValue(new Headers());
   });
 
   describe('requestIdMiddleware', () => {
@@ -42,6 +45,7 @@ describe('request-context', () => {
       const request = new Request('https://example.com/api', {
         headers: { 'x-request-id': 'existing-id-123' },
       });
+      mockGetRequestHeaders.mockReturnValue(request.headers);
 
       await middleware({
         next: mockNext,
@@ -60,6 +64,7 @@ describe('request-context', () => {
     it('generates a UUID when x-request-id header is absent', async () => {
       const mockNext = vi.fn().mockResolvedValue({});
       const request = new Request('https://example.com/api');
+      mockGetRequestHeaders.mockReturnValue(request.headers);
 
       await middleware({
         next: mockNext,
@@ -85,6 +90,7 @@ describe('request-context', () => {
       const request = new Request('https://example.com/api', {
         headers: { 'x-request-id': 'existing-id-123' },
       });
+      mockGetRequestHeaders.mockReturnValue(request.headers);
 
       await middleware({
         next: mockNext,
@@ -100,6 +106,7 @@ describe('request-context', () => {
       const request = new Request('https://example.com/api', {
         headers: { 'x-request-id': 'existing-id-123' },
       });
+      mockGetRequestHeaders.mockReturnValue(request.headers);
 
       await middleware({
         next: mockNext,
@@ -110,19 +117,6 @@ describe('request-context', () => {
       });
 
       expect(requestContextStorage.getStore()).toBeUndefined();
-    });
-  });
-
-  describe('createRequestLogger', () => {
-    it('creates a child logger with requestId from context', () => {
-      const mockChildLogger = { info: vi.fn(), error: vi.fn() };
-      vi.mocked(logger.child).mockReturnValue(mockChildLogger as any);
-
-      const result = createRequestLogger({ requestId: 'test-request-id' });
-
-      expect(logger.child).toHaveBeenCalledOnce();
-      expect(logger.child).toHaveBeenCalledWith({ requestId: 'test-request-id' });
-      expect(result).toBe(mockChildLogger);
     });
   });
 });

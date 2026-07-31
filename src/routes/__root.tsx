@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 import { useState, createContext, useContext, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { Outlet, createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
+import { Outlet, createRootRoute, HeadContent, Scripts, useRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '../components/ui/sonner';
 import { RootErrorComponent } from '../components/error-boundary';
@@ -41,8 +41,11 @@ function interpolate(text: string, params?: Record<string, string>): string {
 
 // Placeholder ThemeProvider — replaces the hook-based approach for SSR compatibility
 function ThemeScript() {
+  const nonce = useRouter().options.ssr?.nonce;
+
   return (
     <script
+      nonce={nonce}
       dangerouslySetInnerHTML={{
         __html: `
           (function() {

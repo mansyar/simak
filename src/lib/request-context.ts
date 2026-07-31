@@ -1,6 +1,5 @@
 import { createMiddleware } from '@tanstack/react-start';
-import { logger, type Logger } from '@/lib/logger';
-import { requestContextStorage } from '@/lib/request-context-store';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 
 /**
  * Request ID middleware — reads `x-request-id` header or generates a UUID.
@@ -9,13 +8,10 @@ import { requestContextStorage } from '@/lib/request-context-store';
  * is available through both TanStack context and AsyncLocalStorage, allowing
  * the logger to enrich entries without handler changes.
  */
-export const requestIdMiddleware = createMiddleware({ type: 'request' }).server(
-  async ({ next, request }) => {
-    const requestId = request.headers.get('x-request-id') ?? crypto.randomUUID();
+export const requestIdMiddleware = createMiddleware({ type: 'function' }).server(
+  async ({ next }) => {
+    const { requestContextStorage } = await import('@/lib/request-context-store');
+    const requestId = getRequestHeaders().get('x-request-id') ?? crypto.randomUUID();
     return requestContextStorage.run({ requestId }, () => next({ context: { requestId } }));
   },
 );
-
-export function createRequestLogger(context: { requestId: string }): Logger {
-  return logger.child({ requestId: context.requestId });
-}
