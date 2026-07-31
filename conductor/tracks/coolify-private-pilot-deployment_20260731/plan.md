@@ -101,6 +101,6 @@
     - Operator confirmed assignment creation, Student submission, Instructor review/decision, resulting status, and notification passed.
 - [x] Task: Verify Coolify logs contain structured operational output and no secrets.
   - Operator reviewed recent Coolify application logs after the final deployment and confirmed structured operational entries with no database/auth/R2/email secrets or signed URLs.
-- [ ] Task: Record pilot deployment details, known operational limits, and rollback readiness in the runbook.
+- [~] Task: Record pilot deployment details, known operational limits, and rollback readiness in the runbook.
 - [ ] Task: Phase Verification & Checkpoint (refer to `conductor/workflow.md`)
 </protect>
