@@ -110,11 +110,18 @@
   - Handover confirmation: Operator confirmed the Phase 4 production smoke tests and runbook handover were complete.
 ## Phase: Review Fixes
 
-- [~] Task: Apply review suggestions from the TRACK-047 principal-engineer review
-  - [~] Fix the failing Sonner regression test and unhandled test errors.
-  - [ ] Align production stylesheet delivery with the CSP policy and add regression coverage.
-  - [ ] Restore the client-safe/server-only server-function boundary or document and test the supported compiler boundary.
-  - [ ] Make SuperAdmin bootstrap atomic.
-  - [ ] Harden the Docker runner user, signal handling, image pinning, and health-check contract.
-  - [ ] Clarify rollback migration-journal reconciliation and correct redirect/environment documentation.
+- [x] Task: Apply review suggestions from the TRACK-047 principal-engineer review [b0e2420]
+  - [x] Fix the failing Sonner regression test and unhandled test errors.
+    - The real Sonner `containerAriaLabel` API is now used; the regression test renders the real component, and unit workers use forked processes to avoid Zod VM-global errors.
+  - [x] Align production stylesheet delivery with the CSP policy and add regression coverage.
+    - `style-src` now allows the same-origin stylesheet alongside the nonce and Sonner hash, with regression coverage.
+  - [x] Restore the client-safe/server-only server-function boundary or document and test the supported compiler boundary.
+    - Client-safe stubs dynamically import `*.server` handlers; remaining static imports are server-to-server only, and the auth boundary test asserts the dynamic form.
+  - [x] Make SuperAdmin bootstrap atomic.
+    - Password hashing occurs before one database transaction that inserts the user and Better Auth account; the success test verifies the transaction path.
+  - [x] Harden the Docker runner user, signal handling, image pinning, and health-check contract.
+    - The runner uses the pinned Node image, exact pnpm toolchain, non-root `simak` user, `/api/health` healthcheck, and a signal-forwarding migration/app startup wrapper.
+  - [x] Clarify rollback migration-journal reconciliation and correct redirect/environment documentation.
+    - README, PRD, TDD, AGENTS, and the deployment runbook now describe required environment variables, current CSP/rate-limit/test-pool behavior, explicit HTTP redirect verification, and safe `__drizzle_migrations` reconciliation.
+  - Automated verification: `pnpm test:coverage` passed 388 test files and 3,953 tests with 88.04% statements, 81.08% branches, 83.56% functions, and 88.68% lines; `pnpm typecheck` passed; `pnpm lint` passed with four pre-existing warnings; production build and Docker image build passed; pre-commit format, lint, and modularity checks passed.
 </protect>
