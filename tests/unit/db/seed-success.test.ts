@@ -52,6 +52,20 @@ describe('Seed script - success path', () => {
     expect(mockInsert).not.toHaveBeenCalled();
   });
 
+  it('production seed runner only executes the SuperAdmin bootstrap', async () => {
+    mockSelect.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ id: 'existing-id', email: 'admin@test.com' }]),
+      }),
+    });
+
+    const { runProductionSeed } = await import('@/db/seed');
+    await runProductionSeed();
+
+    expect(mockSelect).toHaveBeenCalledTimes(1);
+    expect(mockInsert).not.toHaveBeenCalled();
+  });
+
   it('should validate email format', async () => {
     vi.stubEnv('SUPERADMIN_EMAIL', 'not-an-email');
     vi.stubEnv('SUPERADMIN_PASSWORD', 'strong-password-123');
