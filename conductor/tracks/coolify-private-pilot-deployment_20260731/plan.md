@@ -126,6 +126,7 @@
   - Automated verification: `pnpm test:coverage` passed 388 test files and 3,953 tests with 88.04% statements, 81.08% branches, 83.56% functions, and 88.68% lines; `pnpm typecheck` passed; `pnpm lint` passed with four pre-existing warnings; production build and Docker image build passed; pre-commit format, lint, and modularity checks passed.
 ## Phase: Post-review Operational Follow-up
 
-- [~] Task: Force the Docker healthcheck to use the IPv4 loopback address.
+- [x] Task: Force the Docker healthcheck to use the IPv4 loopback address [f17bae9]
   - The application is listening, but the `localhost` healthcheck is reporting connection refused; use `127.0.0.1` to avoid Alpine hostname/IPv6 resolution ambiguity while retaining the lightweight `wget` probe.
+  - Verification: Docker build passed and image inspection confirmed `wget --spider -q http://127.0.0.1:3000/api/health`; pre-commit checks passed.
 </protect>
