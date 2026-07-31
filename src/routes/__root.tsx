@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { useState, createContext, useContext, useCallback } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { Outlet, createRootRoute, HeadContent, Scripts, useRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -83,10 +83,11 @@ export function useI18n() {
 }
 
 function useI18nProvider() {
-  const [locale, setLocaleState] = useState<Locales>(() => {
-    if (typeof window === 'undefined') return 'en';
-    return detectLocale();
-  });
+  const [locale, setLocaleState] = useState<Locales>('en');
+
+  useEffect(() => {
+    setLocaleState(detectLocale());
+  }, []);
 
   const setLocale = useCallback((newLocale: Locales) => {
     setLocaleState(newLocale);

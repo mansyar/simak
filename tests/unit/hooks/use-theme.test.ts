@@ -1,4 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
+import { createElement } from 'react';
+import { renderToString } from 'react-dom/server';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const localStorageMock = {
@@ -54,6 +56,15 @@ describe('useTheme - internal functions', () => {
     const { result } = renderHook(() => mod.useTheme());
 
     expect(result.current.theme).toBe('dark');
+  });
+
+  it('should render light before browser preferences are applied', async () => {
+    localStorageMock.getItem.mockReturnValue('dark');
+
+    const mod = await import('@/hooks/use-theme');
+    const Theme = () => createElement('span', null, mod.useTheme().theme);
+
+    expect(renderToString(createElement(Theme))).toContain('light');
   });
 
   it('should set theme via setTheme and apply dark class', async () => {

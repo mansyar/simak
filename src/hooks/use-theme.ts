@@ -25,9 +25,7 @@ function applyTheme(theme: Theme) {
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    return getStoredTheme() ?? getSystemPreference();
-  });
+  const [theme, setThemeState] = useState<Theme>('light');
 
   const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
@@ -40,7 +38,9 @@ export function useTheme() {
   }, [theme, setTheme]);
 
   useEffect(() => {
-    applyTheme(theme);
+    const initialTheme = getStoredTheme() ?? getSystemPreference();
+    setThemeState(initialTheme);
+    applyTheme(initialTheme);
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => {
@@ -53,7 +53,7 @@ export function useTheme() {
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
+  }, []);
 
   return { theme, setTheme, toggleTheme };
 }
