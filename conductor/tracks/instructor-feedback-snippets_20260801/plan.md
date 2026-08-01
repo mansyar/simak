@@ -58,7 +58,7 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Confirm all handlers stay within the client-safe/server-only split; code graph/source inspection confirmed dynamic handler imports and server-only ownership predicates.
   - [x] Confirm `pnpm db:push`, typecheck, lint, formatting, modularity, and `git diff --check` pass; attach the verification note to the functional commit.
 
-## Phase 3: Instructor Management Route & Navigation
+## Phase 3: Instructor Management Route & Navigation [checkpoint: 967fed9]
 
 - [x] Task: Write failing management UI tests
   - [x] Extend `tests/unit/components/instructor-sidebar.test.tsx` for the new navigation link and active state.
