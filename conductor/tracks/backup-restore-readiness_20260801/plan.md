@@ -31,7 +31,7 @@
   - [x] Document the existing isolated restore evidence and operator-only restore boundary.
   - [x] Document the current private R2 posture without asserting unapproved durability features.
 
-- [x] Task: Add the readiness gap analysis
+- [x] Task: Add the readiness gap analysis [c3f207d]
   - [x] Assess retention duration and policy ownership.
   - [x] Assess scheduler independence from the application.
   - [x] Assess job-level success/failure visibility and alerting.
