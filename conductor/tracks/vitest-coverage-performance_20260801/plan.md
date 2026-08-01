@@ -60,11 +60,11 @@
   - [x] Confirm the existing include/exclude scope and 80% thresholds are unchanged [a8d5ca2]
   - [x] Confirm integration tests remain opt-in through `pnpm test:integration` [a8d5ca2]
 
-- [~] Task: Run repository quality gates
-  - [ ] Run `pnpm typecheck`
-  - [ ] Run `pnpm lint`
-  - [ ] Run `pnpm test:integration` when the required integration environment is available
-  - [ ] Confirm changed files comply with the repository's modularity and formatting rules
+- [x] Task: Run repository quality gates [c869f27b] — typecheck passed; lint had 0 errors and 4 pre-existing warnings; integration had 5/7 files pass and 1/12 tests fail in unrelated existing setup/data paths
+  - [x] Run `pnpm typecheck` [c869f27b]
+  - [x] Run `pnpm lint` [c869f27b]
+  - [x] Run `pnpm test:integration` when the required integration environment is available [c869f27b] — 2 suites failed due logger configuration and assignment deadline/data behavior
+  - [x] Confirm changed files comply with the repository's modularity and formatting rules [c869f27b]
 
 - [ ] Task: Document the final result
   - [ ] Record the benchmark procedure, baseline, optimized measurements, and percentage improvement
