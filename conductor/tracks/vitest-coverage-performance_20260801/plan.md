@@ -50,7 +50,7 @@
 
 ## Phase 3: Benchmark Confirmation, Documentation, and Final Quality Gates
 
-- [ ] Task: Repeat the controlled performance benchmark
+- [~] Task: Repeat the controlled performance benchmark
   - [ ] Run the same repeated measurement procedure used for the baseline
   - [ ] Compare median or otherwise consistently selected wall-clock measurements
   - [ ] Confirm at least a 20% reduction; if not met, return to Phase 2 for another evidence-based candidate
