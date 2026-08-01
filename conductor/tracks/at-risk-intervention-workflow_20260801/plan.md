@@ -83,7 +83,7 @@
   - [x] Run the component and route tests and confirm the Green phase.
   - [x] Commit with `feat(ui): add instructor intervention management page` and attach the required task git note.
 
-- [ ] Task: Add assignment-context intervention management
+- [~] Task: Add assignment-context intervention management
   - [ ] Write failing route/component tests for the assignment interventions tab, per-student context, eligible create entry point, existing-record management, and links to consultation/extension/discussion workflows.
   - [ ] Run the assignment-context tests and confirm the Red phase.
   - [ ] Add the interventions tab/panel to the instructor assignment detail route without exposing it in student assignment views.
