@@ -1,6 +1,6 @@
 # TRACK-051: Grade Release Workflow — Implementation Plan
 
-**Status:** In progress
+**Status:** Complete
 **Specification:** [spec.md](./spec.md)
 
 ## Phase 1: Release Schema and Migration
@@ -181,10 +181,12 @@
 
 ## Phase: Review Fixes
 
-- [~] Task: Apply review suggestions
-  - [ ] Preserve a monotonic release version across withdrawal and republish.
-  - [ ] Add and manually verify the required migration rollback file.
-  - [ ] Strengthen E2E coverage for student mutation protection and withdrawal reason validation.
-  - [ ] Enforce the student role and lock assignment ownership during release mutations.
-  - [ ] Replace avoidable type and non-null assertions in the reviewed release paths.
-  - [ ] Run focused and full verification, record commit SHAs, and attach git notes.
+- [x] Task: Apply review suggestions [4e7d1428]
+  - [x] Preserve a monotonic release version across withdrawal and republish by retaining the latest version on the draft configuration.
+  - [x] Add and manually verify `drizzle/migrations/rollback/0019_daffy_bulldozer.rollback.sql`, including rollback and forward reapplication against the E2E database.
+  - [x] Strengthen E2E coverage for student mutation protection and withdrawal reason validation; isolated Chromium grade-release coverage passes both tests.
+  - [x] Enforce the student role for student-facing grade reads and lock assignment ownership during release mutations.
+  - [x] Replace avoidable release-path assertions with narrowed types and runtime parsing for persisted checkpoint breakdowns.
+  - [x] Run focused and full verification, record commit SHA `4e7d1428`, and attach the required git note.
+  - [x] Full verification: `pnpm test` passed with 406 files and 4,072 tests; `pnpm test:coverage` passed with 87.84% statements, 80.88% branches, 83.63% functions, and 88.48% lines; typecheck and i18n checks passed.
+  - [x] Review hooks passed with no warnings/errors for changed files; the repository's four pre-existing lint warnings remain unchanged.
