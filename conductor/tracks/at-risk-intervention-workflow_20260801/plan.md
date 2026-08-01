@@ -133,7 +133,7 @@
   - [x] Added regression coverage for nullable edit-form values, create-to-edit form state reset, and aggregate SQL timestamp normalization required by the browser workflow; unit tests, typecheck, i18n, formatting, lint, and modularity checks passed.
   - [x] Committed with `test(interventions): cover workflow acceptance paths` as `b2b6c3a` and attached the required task git note.
 
-- [ ] Task: Complete quality gates and documentation
+- [~] Task: Complete quality gates and documentation
   - [ ] Confirm all new user-visible strings exist in both locale files and generated i18n types are current.
   - [ ] Run `pnpm typecheck`.
   - [ ] Run `pnpm lint` and `pnpm format`.
