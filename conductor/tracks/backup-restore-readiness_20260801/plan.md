@@ -68,12 +68,12 @@
   - [x] Inspect the diff for secrets, signed URLs, credentials, exact sensitive target identifiers, and conflicting baseline claims.
   - [x] Record that application unit, integration, E2E, typecheck, and coverage tests are not applicable because no code or runtime behavior changes.
 
-- [ ] Task: Perform final acceptance review
-  - [ ] Check every TRACK-048 acceptance criterion against the completed documents.
-  - [ ] Confirm restore remains operator-only.
-  - [ ] Confirm current evidence and recommendations are clearly separated.
-  - [ ] Confirm no application schema, feature, deployment, or retention configuration was changed.
-  - [ ] Confirm the review is actionable for a future implementation track.
+- [x] [7796f39] Task: Perform final acceptance review
+  - [x] Check every TRACK-048 acceptance criterion against the completed documents.
+  - [x] Confirm restore remains operator-only.
+  - [x] Confirm current evidence and recommendations are clearly separated.
+  - [x] Confirm no application schema, feature, deployment, or retention configuration was changed.
+  - [x] Confirm the review is actionable for a future implementation track.
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
 </protect>
