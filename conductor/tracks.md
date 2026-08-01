@@ -10,4 +10,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active Tracks
 
-_No active tracks._
+- [ ] **Track: Improve Vitest Coverage Performance** *Link: [Track Context](./tracks/vitest-coverage-performance_20260801/index.md)*
