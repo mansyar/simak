@@ -13,6 +13,11 @@ direct PostgreSQL connections without PgBouncer, private Cloudflare R2 storage, 
 Resend transactional email. The custom domain is HTTPS-only, with daily PostgreSQL
 backups retaining seven copies in both Coolify server storage and remote S3-compatible
 storage. Multi-instance scaling, Redis, and CI/CD outside Coolify remain out of scope.
+The completed TRACK-048 readiness review confirms that the seven-copy setting is a
+pilot baseline rather than an approved broader retention policy. Restore remains an
+operator-only, isolated-first procedure; independent scheduling, job-level failure
+visibility, separate backup credentials, and expanded R2 durability are follow-up
+recommendations, not current product or deployment behavior.
 
 ---
 

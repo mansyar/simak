@@ -9,5 +9,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 ---
 
 ## Active Tracks
-
-_No active tracks._

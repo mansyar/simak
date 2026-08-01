@@ -441,13 +441,14 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-048: Backup & Restore Readiness
 
-- **Status:** 📋 Planned · **Audit IDs:** None (broader data-protection and operational-resilience enhancement) · **Deps:** TRACK-047 (complete; establishes the production database, R2 bucket, and deployment environment)
+- **Status:** ✅ Complete and archived in `conductor/archive/backup-restore-readiness_20260801/` · **Audit IDs:** None (broader data-protection and operational-resilience review) · **Deps:** TRACK-047 (complete; establishes the production database, R2 bucket, and deployment environment)
 - **Problem:** SIMAK stores academic records that cannot be recreated easily. TRACK-047 established and validated the private-pilot backup baseline, but broader retention, independent scheduling, failure alerting, and object-durability decisions may still be needed before wider production use.
 - **Decisions:** The current pilot uses daily PostgreSQL backups with seven retained copies in Coolify server storage and remote S3-compatible storage, plus an isolated restore drill. Any future 30-day logical-backup bucket, independent scheduler, or expanded R2 durability policy must be approved as a follow-up and must not be represented as the current pilot configuration. Restoration remains an operator-only runbook procedure.
-- **Scope:** If activated, a follow-up may add an independently scheduled backup job, approved retention policy, job-level failure visibility, and expanded R2 uploaded-file durability/versioning review. The existing TRACK-047 restore runbook and isolated drill are the baseline; application schema and feature behavior remain unchanged.
+- **Readiness review:** [Backup & restore readiness review](backup-restore-readiness.md) records the current pilot evidence, gaps, and non-implemented recommendations.
+- **Scope:** TRACK-048 completed a documentation-only readiness review using TRACK-047 evidence. A future follow-up may add an independently scheduled backup job, approved retention policy, job-level failure visibility, and expanded R2 uploaded-file durability/versioning review. The existing TRACK-047 restore runbook and isolated drill remain the baseline; application schema and feature behavior remain unchanged.
 - **Out of Scope:** Point-in-time recovery, high-availability replicas, a user-facing restore UI, cross-region active-active deployment, backup encryption beyond Cloudflare R2's managed encryption at rest, and mandatory R2 object replication unless the R2 review identifies a gap.
 - **Execution vectors:** If approved, establish least-privilege backup credentials, implement and schedule the follow-up job, capture sanitized success/failure metadata, verify external failure visibility, and extend the existing isolated restore and R2 review procedures.
-- **Definition of Done:** Any approved follow-up retention and scheduling policy is operationally visible, independently restorable, documented without conflicting with the seven-copy pilot baseline, and unavailable to the normal application runtime except through least-privilege backup credentials.
+- **Definition of Done:** The seven-copy local/remote baseline and isolated restore evidence are documented; six readiness gaps have prioritized, non-implemented recommendations; operator-only restore and secret-handling boundaries are explicit; and no application, schema, runtime, deployment, retention, scheduler, credential, or R2 configuration changes were introduced.
 
 ---
 
