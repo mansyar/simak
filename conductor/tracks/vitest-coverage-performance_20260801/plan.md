@@ -12,12 +12,12 @@
   - [x] Confirm the 20% wall-clock target and preserved coverage contract
   - [x] Confirm the allowed file scope: Vitest configuration, package scripts, and related documentation
 
-- [~] Task: Capture the current coverage baseline before implementation
-  - [ ] Record Node.js, pnpm, Vitest, repository revision, and relevant environment details
-  - [ ] Run `pnpm test:coverage` repeatedly using the same environment
-  - [ ] Record wall-clock measurements, pass/fail status, coverage percentages, and generated report types
+- [x] Task: Capture the current coverage baseline before implementation [45cbeb1]
+  - [x] Record Node.js, pnpm, Vitest, repository revision, and relevant environment details
+  - [x] Run `pnpm test:coverage` repeatedly using the same environment
+  - [x] Record wall-clock measurements, pass/fail status, coverage percentages, and generated report types
 
-- [ ] Task: Establish behavioral guardrails for the existing workflow
+- [~] Task: Establish behavioral guardrails for the existing workflow
   - [ ] Confirm the default command executes unit tests and the XLSX project
   - [ ] Confirm integration tests remain excluded from the default coverage run
   - [ ] Confirm V8 coverage, text/JSON/HTML reports, include/exclude scope, and all four 80% thresholds
