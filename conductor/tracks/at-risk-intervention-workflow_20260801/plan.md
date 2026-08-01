@@ -63,7 +63,7 @@
   - [x] Extend reassignment regression coverage to prove the replacement instructor can access the record and the former instructor cannot.
   - [x] Commit with `feat(interventions): add locked lifecycle updates` and attach the required task git note (`cebd15e`).
 
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — Dedicated intervention UI
 
