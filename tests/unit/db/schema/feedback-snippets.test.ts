@@ -45,11 +45,11 @@ describe('Feedback snippets schema', () => {
       );
     });
     const ownerArchiveIndex = config.indexes.find(
-      (index) => index.name === 'feedback_snippets_instructor_archived_idx',
+      (index) => index.config.name === 'feedback_snippets_instructor_archived_idx',
     );
 
     expect(foreignKey).toBeDefined();
-    expect(ownerArchiveIndex?.columns.map((column) => column.name)).toEqual([
+    expect(ownerArchiveIndex?.config.columns.map((column) => column.name)).toEqual([
       'instructor_id',
       'archived_at',
     ]);

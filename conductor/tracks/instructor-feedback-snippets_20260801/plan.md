@@ -13,11 +13,11 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Verify bounded title, category, and body columns.
   - [x] Verify the instructor foreign key and archive/timestamp columns.
   - [x] Verify the table and relations are re-exported from `src/db/schema/index.ts`.
-- [ ] Task: Implement the feedback-snippet schema
-  - [ ] Create `src/db/schema/feedback-snippets.ts`.
-  - [ ] Add the instructor ownership relation to `usersRelations`.
-  - [ ] Add an owner/archive index supporting active and archived list queries.
-  - [ ] Re-export the schema and relations from `src/db/schema/index.ts`.
+- [x] Task: Implement the feedback-snippet schema
+  - [x] Create `src/db/schema/feedback-snippets.ts`.
+  - [x] Add the instructor ownership relation to `usersRelations`.
+  - [x] Add an owner/archive index supporting active and archived list queries.
+  - [x] Re-export the schema and relations from `src/db/schema/index.ts`.
 - [ ] Task: Generate and apply the database migration
   - [ ] Run `pnpm db:generate`.
   - [ ] Inspect the generated SQL for bounded columns, the foreign key, and indexes.
