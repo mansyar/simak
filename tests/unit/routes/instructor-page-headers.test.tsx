@@ -18,6 +18,7 @@ import '@testing-library/jest-dom/vitest';
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, ...props }: any) => <a {...props}>{children}</a>,
   useNavigate: vi.fn().mockReturnValue(vi.fn()),
+  useMatchRoute: vi.fn().mockReturnValue(() => false),
   createFileRoute: vi.fn().mockImplementation((_path: string) => (config: any) => {
     // Provide default mock data for assignment detail page
     const defaultMockData: Record<string, any> = {

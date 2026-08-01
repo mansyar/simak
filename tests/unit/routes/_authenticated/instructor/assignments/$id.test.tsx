@@ -77,6 +77,7 @@ vi.mock('@tanstack/react-router', () => ({
     useParams: () => ({ id: '1' }),
   }),
   Link: ({ children }: any) => children,
+  useMatchRoute: () => () => false,
 }));
 
 vi.mock('@/server/assignments', () => ({
