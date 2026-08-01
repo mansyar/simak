@@ -56,8 +56,8 @@
   - [x] Test that students who become complete after publication remain unavailable until a later release.
   - [x] Run the focused server tests and confirm the new tests fail before implementation.
 
-- [ ] Task: Add validated release server-function contracts (Green Phase)
-  - [ ] Extend `src/server/gradebook.ts` with Zod schemas and typed stubs for preflight, publish, and withdraw operations.
+- [~] Task: Add validated release server-function contracts (Green Phase)
+  - [~] Extend `src/server/gradebook.ts` with Zod schemas and typed stubs for preflight, publish, and withdraw operations.
   - [ ] Apply the appropriate read and mutation rate-limit presets.
   - [ ] Add handler implementations in `src/server/gradebook-extras.server.ts` to preserve the server file-size limit.
   - [ ] Keep handlers server-only and follow the existing client-safe/server-only dynamic-import split.
