@@ -56,33 +56,33 @@
   - [x] Test that students who become complete after publication remain unavailable until a later release.
   - [x] Run the focused server tests and confirm the new tests fail before implementation.
 
-- [~] Task: Add validated release server-function contracts (Green Phase)
-  - [~] Extend `src/server/gradebook.ts` with Zod schemas and typed stubs for preflight, publish, and withdraw operations.
-  - [ ] Apply the appropriate read and mutation rate-limit presets.
-  - [ ] Add handler implementations in `src/server/gradebook-extras.server.ts` to preserve the server file-size limit.
-  - [ ] Keep handlers server-only and follow the existing client-safe/server-only dynamic-import split.
+- [x] Task: Add validated release server-function contracts (Green Phase) [ee6aaf7]
+  - [x] Extend `src/server/gradebook.ts` with Zod schemas and typed stubs for preflight, publish, and withdraw operations.
+  - [x] Apply the appropriate read and mutation rate-limit presets.
+  - [x] Add handler implementations in `src/server/gradebook-extras.server.ts` to preserve the server file-size limit.
+  - [x] Keep handlers server-only and follow the existing client-safe/server-only dynamic-import split.
 
-- [ ] Task: Implement transactional preflight and publication
-  - [ ] Add ownership-scoped preflight queries against enrolled students and authoritative `final_grades`.
-  - [ ] Use a transaction/row-lock strategy that keeps eligibility evaluation, snapshot inserts, release-version assignment, and state transition consistent.
-  - [ ] Insert immutable snapshots containing the numeric score, letter grade, status, and checkpoint breakdown.
-  - [ ] Prevent publication while another release is already active unless the current release has first been withdrawn.
-  - [ ] Preserve existing working-grade computation and admin/instructor gradebook responses.
+- [x] Task: Implement transactional preflight and publication [ee6aaf7]
+  - [x] Add ownership-scoped preflight queries against enrolled students and authoritative `final_grades`.
+  - [x] Use a transaction/row-lock strategy that keeps eligibility evaluation, snapshot inserts, release-version assignment, and state transition consistent.
+  - [x] Insert immutable snapshots containing the numeric score, letter grade, status, and checkpoint breakdown.
+  - [x] Prevent publication while another release is already active unless the current release has first been withdrawn.
+  - [x] Preserve existing working-grade computation and admin/instructor gradebook responses.
 
-- [ ] Task: Implement withdrawal and student visibility gating
-  - [ ] Add the required-reason withdrawal handler and retain all prior snapshots.
-  - [ ] Update `getStudentFinalGradeHandler` in `src/server/gradebook.server.ts` to select only the active published snapshot.
-  - [ ] Return a typed unavailable/not-yet-released result for draft assignments and students without an active snapshot.
-  - [ ] Extend the instructor gradebook response with release state and current release metadata without removing working-data rows.
-  - [ ] Ensure all release mutations enforce current assignment ownership server-side.
+- [x] Task: Implement withdrawal and student visibility gating [ee6aaf7]
+  - [x] Add the required-reason withdrawal handler and retain all prior snapshots.
+  - [x] Update `getStudentFinalGradeHandler` in `src/server/gradebook.server.ts` to select only the active published snapshot.
+  - [x] Return a typed unavailable/not-yet-released result for draft assignments and students without an active snapshot.
+  - [x] Extend the instructor gradebook response with release state and current release metadata without removing working-data rows.
+  - [x] Ensure all release mutations enforce current assignment ownership server-side.
 
-- [ ] Task: Implement audit integration and server hardening
-  - [ ] Add publication and withdrawal audit action types and details.
-  - [ ] Follow the existing advisory audit logging pattern so audit persistence errors are logged without corrupting the completed grade transaction.
-  - [ ] Validate malformed assignment IDs, reasons, invalid release transitions, missing assignments, and database failures with existing error conventions.
-  - [ ] Run focused server tests, then the related existing gradebook tests, and confirm all pass.
-  - [ ] Run coverage for the new server/schema modules and refactor only without changing behavior.
-  - [ ] Commit with a `feat(gradebook): ...` message and attach the required git note.
+- [x] Task: Implement audit integration and server hardening [ee6aaf7]
+  - [x] Add publication and withdrawal audit action types and details.
+  - [x] Follow the existing advisory audit logging pattern so audit persistence errors are logged without corrupting the completed grade transaction.
+  - [x] Validate malformed assignment IDs, reasons, invalid release transitions, missing assignments, and database failures with existing error conventions.
+  - [x] Run focused server tests, then the related existing gradebook tests, and confirm all pass.
+  - [x] Run coverage for the new server/schema modules and refactor only without changing behavior.
+  - [x] Commit with a `feat(gradebook): ...` message and attach the required git note.
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
