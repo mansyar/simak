@@ -154,7 +154,7 @@
   - [x] Run typecheck after the compatibility fix.
   - [x] Attach a git note to the compatibility fix commit.
 
-- [ ] Task: Run repository quality gates
+- [~] Task: Run repository quality gates
   - [ ] Run `pnpm test`.
   - [ ] Run `pnpm test:coverage` and verify the project thresholds, including at least 80% coverage for new code.
   - [ ] Run `pnpm typecheck`.
