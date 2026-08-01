@@ -125,10 +125,11 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Insert a snippet into a review comment.
   - [x] Verify the appended text remains editable.
   - [x] Verify the review still requires an explicit decision and submit action.
-- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
-  - [ ] Run the focused Playwright spec against the test database.
-  - [ ] Confirm tests are independently runnable and remain under the file limit.
-  - [ ] Commit the phase and attach the verification git note.
+- [x] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+  - [x] Run the focused Playwright spec against the test database: `CI=true pnpm exec playwright test tests/e2e/feedback-snippets.spec.ts --project=chromium --retries=0` passed 4/4 tests.
+  - [x] Confirm tests are independently runnable and remain under the file limit; the 152-line spec passed its standalone Chromium run and all changed governed files stayed below 500 lines.
+  - [x] Manually verify seeded management, ownership, route-access, and review-insertion flows; the user confirmed CRUD, archive exclusion, explicit insertion/editability, unchanged review controls, role redirects, and responsive light/dark behavior.
+  - [x] Commit the phase and attach the verification git note to the functional commit.
 
 ## Phase 6: Final Quality Gates & Completion
 
