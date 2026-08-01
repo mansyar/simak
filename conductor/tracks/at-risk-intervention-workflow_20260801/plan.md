@@ -91,7 +91,7 @@
   - [x] Run route and component tests and confirm the Green phase.
   - [x] Commit with `feat(ui): add assignment intervention context` and attach the required task git note.
 
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4 — Dashboard and reassignment integration
 
