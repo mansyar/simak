@@ -63,7 +63,11 @@
   - [x] Extend reassignment regression coverage to prove the replacement instructor can access the record and the former instructor cannot.
   - [x] Commit with `feat(interventions): add locked lifecycle updates` and attach the required task git note (`cebd15e`).
 
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+  - [x] Confirm changed server files have corresponding handler and lifecycle tests.
+  - [x] Run `pnpm vitest run tests/unit/server/interventions-schemas.test.ts tests/unit/db/interventions-schema.test.ts tests/unit/db/schema-index.test.ts tests/unit/server/interventions-handlers.test.ts tests/unit/server/interventions-lifecycle.test.ts tests/unit/server/student-risk-context.test.ts tests/unit/server/dashboard-instructor.test.ts tests/unit/lib/risk-scoring.test.ts` — 8 files and 79 tests passed.
+  - [x] Manual request-harness verification was unavailable because local authenticated instructor data is still unavailable; automated-only verification was explicitly approved.
+  - [x] Attach the verification report and record the phase checkpoint at `cebd15e`.
 
 ## Phase 3 — Dedicated intervention UI
 
