@@ -30,7 +30,7 @@ This plan follows the approved specification and the repository’s TDD workflow
 
 ## Phase 2: Server Functions, Validation & Ownership
 
-- [x] Task: Write failing server-function and handler tests
+- [x] Task: Write failing server-function and handler tests [184ffdc7]
   - [x] Create `tests/unit/server/feedback-snippets.test.ts`.
   - [x] Test title/category/body validation, including exact boundary values and over-limit values.
   - [x] Test client-safe stub exports and input schemas.
