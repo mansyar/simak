@@ -126,7 +126,7 @@
 
 ## Phase 5 — Integration, quality, and completion
 
-- [ ] Task: Add database-backed and browser acceptance coverage
+- [~] Task: Add database-backed and browser acceptance coverage
   - [ ] Write integration tests for the partial unique active-pair constraint, transactional status transitions, closure audit data, and reassignment visibility.
   - [ ] Add Playwright coverage for instructor creation, pending-review rejection, status changes, overdue display, contextual entry points, and student/admin privacy.
   - [ ] Run the new integration/browser tests and record any environment prerequisites.
