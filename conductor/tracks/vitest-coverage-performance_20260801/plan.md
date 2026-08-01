@@ -24,7 +24,7 @@
 
 - [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [dc9ff13]
 
-## Phase 2: Diagnose and Implement the Minimal Optimization
+## Phase 2: Diagnose and Implement the Minimal Optimization [checkpoint: a8d5ca2]
 
 - [x] Task: Analyze the current coverage-run bottleneck [5962fe9]
   - [x] Compare test-only and coverage-run timings to separate test execution from instrumentation/reporting overhead
@@ -46,7 +46,7 @@
   - [x] Run `pnpm test:coverage` and confirm all coverage thresholds and reports remain valid [b00240a]
   - [x] Confirm no worker crashes, unhandled errors, or missing XLSX tests occur [b00240a]
 
-- [~] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [a8d5ca2]
 
 ## Phase 3: Benchmark Confirmation, Documentation, and Final Quality Gates
 
