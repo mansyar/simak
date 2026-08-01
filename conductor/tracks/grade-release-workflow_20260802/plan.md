@@ -5,7 +5,7 @@
 
 ## Phase 1: Release Schema and Migration
 
-- [ ] Task: Re-establish implementation context
+- [~] Task: Re-establish implementation context
   - [ ] Read the approved `spec.md` once created.
   - [ ] Re-read `conductor/workflow.md` and confirm TDD, coverage, commit, git-note, and phase-checkpoint requirements.
   - [ ] Inspect the existing `assignment_grade_config`, `final_grades`, and assignment-enrollment schema before changing it.
