@@ -9,6 +9,7 @@ import {
   X,
   GraduationCap,
   BarChart3,
+  LifeBuoy,
 } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 
@@ -28,6 +29,11 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
     { to: '/instructor/dashboard', label: 'instructorSidebar.dashboard', icon: LayoutDashboard },
     { to: '/instructor/assignments', label: 'instructorSidebar.assignments', icon: ClipboardList },
     { to: '/instructor/reviews', label: 'instructorSidebar.reviews', icon: ClipboardCheck },
+    {
+      to: '/instructor/interventions',
+      label: t('instructorSidebar.interventions'),
+      icon: LifeBuoy,
+    },
     { to: '/instructor/analytics', label: 'instructorSidebar.analytics', icon: BarChart3 },
   ] as const;
 
@@ -98,7 +104,7 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
                 }`}
               >
                 <Icon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                {t(link.label)}
+                {link.to === '/instructor/interventions' ? link.label : t(link.label)}
               </Link>
             );
           })}
