@@ -117,7 +117,12 @@
   - [x] Run the reassignment and authorization tests and confirm the Green phase: 4 files and 23 tests passed.
   - [x] Commit with `test(interventions): verify reassignment privacy boundaries` and attach the required task git note.
 
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+  - [x] Confirmed dashboard and reassignment code/test changes have matching unit coverage.
+  - [x] Ran the exact combined Phase 4 command: 18 test files and 127 tests passed.
+  - [x] Ran typecheck, i18n validation, changed-file lint, formatting, and modularity checks successfully.
+  - [x] Manual browser verification was unavailable because authenticated local instructor data remained unavailable; automated-only verification was explicitly approved.
+  - [x] Attached the verification report to `2225d39` and recorded the phase checkpoint at `2225d39`.
 
 ## Phase 5 — Integration, quality, and completion
 
