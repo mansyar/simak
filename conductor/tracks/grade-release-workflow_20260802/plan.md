@@ -103,35 +103,35 @@
   - [x] Cover instructor publication with eligible and incomplete students, student visibility before/after publication, recomputation immutability, withdrawal, republish, and unauthorized mutation attempts.
   - [x] Run the focused component/route tests and confirm they fail before implementation.
 
-- [~] Task: Add bilingual translation keys
-  - [~] Add release-state, preflight, publish, withdrawal, unavailable-state, validation, success, and error keys to `locales/en.json`.
-  - [ ] Add matching Indonesian keys to `locales/id.json`.
-  - [ ] Add publication/withdrawal action labels to the shared audit-action translation source if required.
-  - [ ] Run `pnpm generate:i18n`.
-  - [ ] Run `pnpm check:i18n` and verify English/Indonesian key parity.
-  - [ ] Do not edit generated i18n files manually.
+- [x] Task: Add bilingual translation keys [0174d61]
+  - [x] Add release-state, preflight, publish, withdrawal, unavailable-state, validation, success, and error keys to `locales/en.json`.
+  - [x] Add matching Indonesian keys to `locales/id.json`.
+  - [x] Add publication/withdrawal action labels to the shared audit-action translation source if required.
+  - [x] Run `pnpm generate:i18n`.
+  - [x] Run `pnpm check:i18n` and verify English/Indonesian key parity.
+  - [x] Do not edit generated i18n files manually.
 
-- [ ] Task: Implement instructor release controls
-  - [ ] Create a focused gradebook release control component using existing accessible UI primitives.
-  - [ ] Show the current draft/published state and active release metadata.
-  - [ ] Add a preflight dialog with eligible, incomplete, and missing-grade summaries.
-  - [ ] Require explicit confirmation before publishing.
-  - [ ] Add a withdrawal dialog with a required reason and preserved form input on validation failure.
-  - [ ] Use TanStack Query mutation/invalidation patterns consistent with the project.
-  - [ ] Wire the controls into `src/routes/_authenticated/instructor/assignments/$id.gradebook.tsx`.
-  - [ ] Keep controls hidden from admin/superadmin views and preserve existing staff gradebook/export controls.
+- [x] Task: Implement instructor release controls [0174d61]
+  - [x] Create a focused gradebook release control component using existing accessible UI primitives.
+  - [x] Show the current draft/published state and active release metadata.
+  - [x] Add a preflight dialog with eligible, incomplete, and missing-grade summaries.
+  - [x] Require explicit confirmation before publishing.
+  - [x] Add a withdrawal dialog with a required reason and preserved form input on validation failure.
+  - [x] Use TanStack Query mutation/invalidation patterns consistent with the project.
+  - [x] Wire the controls into `src/routes/_authenticated/instructor/assignments/$id.gradebook.tsx`.
+  - [x] Keep controls hidden from admin/superadmin views and preserve existing staff gradebook/export controls.
 
-- [ ] Task: Implement student unavailable and published snapshot presentation
-  - [ ] Update `src/components/gradebook/StudentFinalGradeCard.tsx` for the typed unavailable state.
-  - [ ] Ensure draft, withdrawn, incomplete-at-release, and not-yet-released cases never render provisional numeric or letter grades.
-  - [ ] Preserve the current published grade and checkpoint breakdown presentation from snapshot data.
-  - [ ] Provide responsive layout, keyboard access, visible focus, accessible labels, and live mutation feedback.
+- [x] Task: Implement student unavailable and published snapshot presentation [0174d61]
+  - [x] Update `src/components/gradebook/StudentFinalGradeCard.tsx` for the typed unavailable state.
+  - [x] Ensure draft, withdrawn, incomplete-at-release, and not-yet-released cases never render provisional numeric or letter grades.
+  - [x] Preserve the current published grade and checkpoint breakdown presentation from snapshot data.
+  - [x] Provide responsive layout, keyboard access, visible focus, accessible labels, and live mutation feedback.
 
-- [ ] Task: Complete UI verification
-  - [ ] Run focused route/component tests and confirm they pass.
-  - [ ] Run the focused grade-release Playwright spec across the configured browser projects as practical.
+- [~] Task: Complete UI verification
+  - [x] Run focused route/component tests and confirm they pass (3 files, 32 tests).
+  - [x] Run the focused grade-release Playwright spec in Chromium (2 tests).
   - [ ] Run the relevant accessibility coverage for the new dialogs and gradebook/student surfaces.
-  - [ ] Commit with a `feat(ui): ...` message and attach the required git note.
+  - [x] Commit with a `feat(ui): ...` message and attach the required git note (`0174d61d`).
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
