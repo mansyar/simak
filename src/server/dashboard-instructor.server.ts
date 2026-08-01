@@ -2,6 +2,7 @@
 import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
+import { interventions } from '../db/schema/interventions';
 import { submissions } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
@@ -45,6 +46,12 @@ type AtRiskStudentEntry = {
   assignmentId: number;
   riskLevel: RiskLevel;
   factors: RiskFactor[];
+  activeIntervention?: {
+    id: number;
+    status: 'open' | 'monitoring';
+    followUpDate: string | null;
+    isOverdue: boolean;
+  };
 };
 
 export type InstructorDashboardSuccess = {
@@ -53,6 +60,8 @@ export type InstructorDashboardSuccess = {
   recentSubmissions: DashboardRecentSubmission[];
   assignments: DashboardAssignmentOverview[];
   atRiskStudents: AtRiskStudentEntry[];
+  openInterventionCount: number;
+  overdueInterventionCount: number;
 };
 
 /**
@@ -225,9 +234,46 @@ export async function getInstructorDashboardDataHandler(): Promise<
 
     // At-risk students (depends on assignmentIds)
     let atRiskStudents: AtRiskStudentEntry[] = [];
+    let openInterventionCount = 0;
+    let overdueInterventionCount = 0;
 
     if (assignmentIds.length > 0) {
       const riskContexts = await getLiveStudentRiskContexts(db, { assignmentIds });
+      const activeInterventionRows = await db
+        .select({
+          id: interventions.id,
+          studentId: interventions.studentId,
+          assignmentId: interventions.assignmentId,
+          status: interventions.status,
+          followUpDate: interventions.followUpDate,
+        })
+        .from(interventions)
+        .where(
+          and(
+            inArray(interventions.assignmentId, assignmentIds),
+            inArray(interventions.status, ['open', 'monitoring']),
+          ),
+        );
+      const activeInterventions = activeInterventionRows.map((intervention) => ({
+        id: intervention.id,
+        studentId: intervention.studentId,
+        assignmentId: intervention.assignmentId,
+        status: intervention.status as 'open' | 'monitoring',
+        followUpDate: intervention.followUpDate?.toISOString() ?? null,
+        isOverdue: Boolean(
+          intervention.followUpDate && intervention.followUpDate.getTime() < Date.now(),
+        ),
+      }));
+      const activeInterventionsByStudentAssignment = new Map(
+        activeInterventions.map((intervention) => [
+          `${intervention.studentId}-${intervention.assignmentId}`,
+          intervention,
+        ]),
+      );
+      openInterventionCount = activeInterventions.length;
+      overdueInterventionCount = activeInterventions.filter(
+        (intervention) => intervention.isOverdue,
+      ).length;
       const severityOrder: Record<RiskLevel, number> = { high: 0, medium: 1, low: 2 };
       atRiskStudents = riskContexts
         .filter((context) => context.assessment.factors.length > 0)
@@ -238,6 +284,9 @@ export async function getInstructorDashboardDataHandler(): Promise<
           assignmentId: context.assignmentId,
           riskLevel: context.assessment.level,
           factors: context.assessment.factors,
+          activeIntervention: activeInterventionsByStudentAssignment.get(
+            `${context.studentId}-${context.assignmentId}`,
+          ),
         }))
         .sort((a, b) => severityOrder[a.riskLevel] - severityOrder[b.riskLevel]);
     }
@@ -273,6 +322,8 @@ export async function getInstructorDashboardDataHandler(): Promise<
       })),
       assignments: assignmentsWithDetails,
       atRiskStudents,
+      openInterventionCount,
+      overdueInterventionCount,
     };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {

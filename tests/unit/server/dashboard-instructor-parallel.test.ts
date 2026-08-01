@@ -201,6 +201,8 @@ describe('getInstructorDashboardDataHandler — parallel query execution', () =>
       recentSubmissions: [],
       assignments: [],
       atRiskStudents: [],
+      openInterventionCount: 0,
+      overdueInterventionCount: 0,
     });
   });
 });
