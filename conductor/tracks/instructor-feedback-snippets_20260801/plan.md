@@ -13,7 +13,7 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Verify bounded title, category, and body columns.
   - [x] Verify the instructor foreign key and archive/timestamp columns.
   - [x] Verify the table and relations are re-exported from `src/db/schema/index.ts`.
-- [x] Task: Implement the feedback-snippet schema
+- [x] Task: Implement the feedback-snippet schema [a338d1d1]
   - [x] Create `src/db/schema/feedback-snippets.ts`.
   - [x] Add the instructor ownership relation to `usersRelations`.
   - [x] Add an owner/archive index supporting active and archived list queries.
