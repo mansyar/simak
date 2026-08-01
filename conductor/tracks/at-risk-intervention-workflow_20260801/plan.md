@@ -83,13 +83,13 @@
   - [x] Run the component and route tests and confirm the Green phase.
   - [x] Commit with `feat(ui): add instructor intervention management page` and attach the required task git note.
 
-- [~] Task: Add assignment-context intervention management
-  - [ ] Write failing route/component tests for the assignment interventions tab, per-student context, eligible create entry point, existing-record management, and links to consultation/extension/discussion workflows.
-  - [ ] Run the assignment-context tests and confirm the Red phase.
-  - [ ] Add the interventions tab/panel to the instructor assignment detail route without exposing it in student assignment views.
-  - [ ] Reuse the intervention server functions and preserve existing assignment tabs and loaders.
-  - [ ] Run route and component tests and confirm the Green phase.
-  - [ ] Commit with `feat(ui): add assignment intervention context` and attach the required task git note.
+- [x] Task: Add assignment-context intervention management (commit `7c29134`)
+  - [x] Write failing route/component tests for the assignment interventions tab, per-student context, eligible create entry point, existing-record management, and links to consultation/extension/discussion workflows.
+  - [x] Run the assignment-context tests and confirm the Red phase.
+  - [x] Add the interventions tab/panel to the instructor assignment detail route without exposing it in student assignment views.
+  - [x] Reuse the intervention server functions and preserve existing assignment tabs and loaders.
+  - [x] Run route and component tests and confirm the Green phase.
+  - [x] Commit with `feat(ui): add assignment intervention context` and attach the required task git note.
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
