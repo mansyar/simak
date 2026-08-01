@@ -15,16 +15,16 @@
 
 ## Phase 1 — Data model and live-risk context
 
-- [~] Task: Define intervention contracts and database model
-  - [ ] Write failing schema tests for action types, statuses, closure-reason validation, filters, and pagination inputs.
-  - [ ] Run the schema tests and confirm the Red phase.
-  - [ ] Implement Zod schemas and `typedServerFn` stubs in `src/server/interventions.ts`.
-  - [ ] Implement intervention enums, columns, foreign keys, indexes, timestamps, and the active-pair partial unique index in `src/db/schema/interventions.ts`.
-  - [ ] Export the schema and add Drizzle relations in `src/db/schema/index.ts`.
-  - [ ] Generate the migration with `pnpm db:generate` and verify the SQL contains the required constraints and partial unique index.
-  - [ ] Run the schema tests and confirm the Green phase.
-  - [ ] Verify the changed files remain within the modularity limit.
-  - [ ] Commit with `feat(interventions): add intervention data model and contracts` and attach the required task git note.
+- [x] Task: Define intervention contracts and database model
+  - [x] Write failing schema tests for action types, statuses, closure-reason validation, filters, and pagination inputs.
+  - [x] Run the schema tests and confirm the Red phase.
+  - [x] Implement Zod schemas and `typedServerFn` stubs in `src/server/interventions.ts`.
+  - [x] Implement intervention enums, columns, foreign keys, indexes, timestamps, and the active-pair partial unique index in `src/db/schema/interventions.ts`.
+  - [x] Export the schema and add Drizzle relations in `src/db/schema/index.ts`.
+  - [x] Generate the migration with `pnpm db:generate` and verify the SQL contains the required constraints and partial unique index.
+  - [x] Run the schema tests and confirm the Green phase.
+  - [x] Verify the changed files remain within the modularity limit.
+  - [x] Commit with `feat(interventions): add intervention data model and contracts` and attach the required task git note (`fbc423e`).
 
 - [ ] Task: Share live student-risk context without changing risk semantics
   - [ ] Write failing unit tests for assembling checkpoint context, preserving all five existing risk signals, and distinguishing `student_inaction` from `pending_review`.
