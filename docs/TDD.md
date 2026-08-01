@@ -1230,6 +1230,22 @@ Request ID propagation infrastructure is defined in `src/lib/request-context.ts`
 | **Permission checks** | Role-based access logic unit tests.                                                   |
 | **Bulk import**       | Xlsx parsing, role-permission validation, email uniqueness (excluding soft-deleted), transaction rollback, audit logging. |                                                   |
 
+### Vitest Execution and Coverage Contract
+
+The default unit workflow remains the canonical `vitest.config.ts` project
+configuration: unit tests use isolated fork workers, the four XLSX test files
+run in their dedicated `threads` project, and `tests/integration/**` remains
+opt-in through `pnpm test:integration`. Coverage uses the V8 provider with
+text, JSON, and HTML reports, the existing `src` include/exclude scope, and
+80% lines/functions/branches/statements thresholds.
+
+An August 2026 controlled benchmark recorded a 113.35-second median for
+`pnpm test:coverage`. Worker, pool, reporter, isolation, environment, and
+coverage-processing experiments did not produce a safe 20% reduction, so no
+configuration or package-script optimization was retained. The evidence and
+operational trade-offs are documented in
+[`docs/vitest-coverage-performance.md`](vitest-coverage-performance.md).
+
 ### Integration Tests (Vitest) [v2]
 
 | Focus                | Examples                                                                   |

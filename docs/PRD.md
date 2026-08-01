@@ -7,6 +7,14 @@
 **Audience:** University or school instructors and students.
 **Platform:** Web application, containerized with Docker and deployed through Coolify on a VPS.
 
+**Testing performance decision (August 2026):** A controlled Vitest coverage
+benchmark established a 113.35-second median for `pnpm test:coverage`. No safe
+configuration or package-script change met the 20% improvement target while
+preserving the existing test projects, V8 coverage reports, source scope, and
+80% thresholds, so the current test configuration remains unchanged. Detailed
+measurements and rejected candidates are recorded in
+[`docs/vitest-coverage-performance.md`](vitest-coverage-performance.md).
+
 **Private-pilot deployment decision (TRACK-047):** The completed pilot runs one SIMAK
 instance in Coolify with a Coolify-managed PostgreSQL 16 service on a private network,
 direct PostgreSQL connections without PgBouncer, private Cloudflare R2 storage, and

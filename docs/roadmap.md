@@ -327,6 +327,13 @@ All tracks must adhere to the following project constraints:
 
 ---
 
+### Vitest Coverage Performance Investigation (August 2026)
+- **Status:** ✅ Complete — evidence-only; no retained configuration or package-script changes
+- **Key decisions:** Recorded a repeatable 113.35-second median for `pnpm test:coverage`; evaluated worker counts, pools, reporters, isolation, environment/project layouts, and coverage-processing concurrency; rejected candidates that failed the 20% target, broke isolation, or changed the preserved coverage/project contract. The existing V8 provider, text/JSON/HTML reports, source scope, thresholds, unit/XLSX projects, and opt-in integration workflow remain authoritative.
+- **Detail:** [`docs/vitest-coverage-performance.md`](vitest-coverage-performance.md)
+
+---
+
 ## Milestone 11: Observability & Infrastructure Hardening
 
 > This milestone addresses observability, infrastructure hardening, and accessibility compliance gaps identified in a post-completion audit of the production-ready codebase. These tracks are proactive infrastructure improvements — no new product features. Tracks are ordered by priority: accessibility compliance first (legal/compliance risk), then quick infrastructure wins (health endpoint, R2 cleanup), and finally the larger structured logging effort.
