@@ -133,23 +133,23 @@ This plan follows the approved specification and the repository’s TDD workflow
 
 ## Phase 6: Final Quality Gates & Completion
 
-- [ ] Task: Run the complete automated verification suite
-  - [ ] Run `pnpm test`.
-  - [ ] Run `pnpm test:coverage` and confirm all thresholds remain at or above 80%.
-  - [ ] Run `pnpm typecheck`.
-  - [ ] Run `pnpm lint`.
-  - [ ] Run `pnpm check:i18n`.
-  - [ ] Run `pnpm exec playwright test`.
-- [ ] Task: Perform final implementation review
-  - [ ] Confirm no hardcoded user-visible strings were introduced.
-  - [ ] Confirm all queries enforce instructor ownership server-side.
-  - [ ] Confirm no student/admin access path exposes snippets.
-  - [ ] Confirm historical review comments are never re-read from or rewritten by snippets.
-  - [ ] Confirm migration and rollback files are present and consistent.
-  - [ ] Confirm no generated files were edited manually except through their generators.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
-  - [ ] Complete the manual verification plan for management and review insertion.
-  - [ ] Record the final checkpoint SHA in `plan.md`.
-  - [ ] Attach the final verification report as a git note.
-  - [ ] Mark all completed tasks and phases in `plan.md`.
+- [x] Task: Run the complete automated verification suite
+  - [x] Run `pnpm test`: 392 files and 3,985 tests passed.
+  - [x] Run `pnpm test:coverage`: statements 87.87%, branches 80.79%, functions 83.40%, and lines 88.47%.
+  - [x] Run `pnpm typecheck`.
+  - [x] Run `pnpm lint`: zero errors; four pre-existing warnings remain.
+  - [x] Run `pnpm check:i18n`: 831 used keys are present in both locales.
+  - [x] Run `pnpm exec playwright test`: the full 237-test, three-project run exceeded the 20-minute execution window without an aggregate result; the focused Track-049 spec passed 12/12 across Chromium, Firefox, and mobile Chromium, with the timeout documented by user decision.
+- [x] Task: Perform final implementation review
+  - [x] Confirm no hardcoded user-visible strings were introduced.
+  - [x] Confirm all queries enforce instructor ownership server-side.
+  - [x] Confirm no student/admin access path exposes snippets.
+  - [x] Confirm historical review comments are never re-read from or rewritten by snippets.
+  - [x] Confirm migration and rollback files are present and consistent.
+  - [x] Confirm no generated files were edited manually except through their generators.
+- [x] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+  - [x] Complete the manual verification plan for management and review insertion; the user confirmed management, insertion, ownership, role-access, responsive, and light/dark behavior.
+  - [x] Record the final checkpoint SHA in `plan.md` after the checkpoint commit.
+  - [x] Attach the final verification report as a git note to the functional commit.
+  - [x] Mark all completed tasks and phases in `plan.md`.
 </protect>
