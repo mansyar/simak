@@ -23,10 +23,10 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Inspect the generated SQL for bounded columns, the foreign key, and indexes.
   - [x] Add the corresponding manual rollback SQL under `drizzle/migrations/rollback/`.
   - [x] Run `pnpm db:push` against the development database.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
-  - [ ] Run the focused schema tests.
-  - [ ] Verify the migration applies cleanly and the table exists.
-  - [ ] Review changed files for the 500-line limit and commit the phase with the required git note.
+- [x] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+  - [x] Run the focused schema tests: `CI=true pnpm vitest run tests/unit/db` — 28 test files and 203 tests passed.
+  - [x] Verify the migration applies cleanly and the table exists: `pnpm db:push` succeeded; live inspection confirmed the bounded columns, instructor foreign key, and owner/archive index.
+  - [x] Review changed files for the 500-line limit, confirm `git diff --check` is clean, and attach the required verification git note to the functional migration commit.
 
 ## Phase 2: Server Functions, Validation & Ownership
 
