@@ -173,8 +173,8 @@
   - [x] Record implementation notes and completed task commit SHAs in `plan.md`; key implementation commits are `88d2985c`, `ee6aaf76`, `0174d61d`, `0f4d54d1`, `8330ad54`, `124c1714`, and `43d6acb4`, with required git notes attached.
   - [x] Commit final plan updates using the project’s `conductor(plan): ...` format and attach required git notes where applicable.
 
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [584ecf9d]
   - [x] Automated verification: full unit suite, coverage, typecheck, lint, i18n, build, grade-release E2E, and scoped accessibility checks pass.
   - [x] Manual verification: approved scope, security/ownership boundaries, snapshot invariants, bilingual UX, accessibility, mobile targets, migration readiness, and out-of-scope exclusions reviewed.
-  - [ ] Obtain user confirmation to complete TRACK-051.
-  - [ ] Checkpoint note: Record final approval and any accepted pre-existing accessibility-suite limitation.
+  - [x] Obtain user confirmation to complete TRACK-051.
+  - [x] Checkpoint note: User approved completion. The unrelated pre-existing admin-template heading-order violation remains documented; scoped grade-release accessibility checks pass.
