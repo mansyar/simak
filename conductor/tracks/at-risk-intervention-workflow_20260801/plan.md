@@ -42,7 +42,7 @@
 
 ## Phase 2 — Instructor-only server workflow
 
-- [ ] Task: Implement creation, listing, and live-context handlers
+- [~] Task: Implement creation, listing, and live-context handlers
   - [ ] Write failing server-handler tests for instructor authorization, assignment/student ownership, eligible `student_inaction` risk, pending-review-only rejection, active duplicate rejection, list status filters, overdue follow-up filtering, and privacy against students/admins/other instructors.
   - [ ] Run the handler tests and confirm the Red phase.
   - [ ] Implement `createInterventionHandler`, `listInterventionsHandler`, and the live context/detail handler in `src/server/interventions.server.ts`.
