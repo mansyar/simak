@@ -38,5 +38,10 @@ The baseline produced the text report in the command output, JSON at
 tests remained excluded from the default command, while the unit and XLSX
 projects both executed.
 
+The baseline guardrail checks also confirmed that the unit project excludes
+`tests/integration/**`, the XLSX project contains the four existing XLSX test
+files and uses threads, and the configuration still declares the V8 provider,
+all three report formats, the existing source scope, and all four 80% thresholds.
+
 The optimized measurements will be added below after the configuration change
 and the same procedure has been repeated.
