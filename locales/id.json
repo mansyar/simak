@@ -107,8 +107,9 @@
     "dashboard": "Dasbor",
     "assignments": "Tugas",
     "reviews": "Review",
+    "interventions": "Intervensi",
+    "feedbackSnippets": "Cuplikan umpan balik",
     "analytics": "Analitik",
-    "feedbackSnippets": "Cuplikan Umpan Balik",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
@@ -328,6 +329,66 @@
       "weightedTotal": "Total Terbobot",
       "allCriteriaRequired": "Semua kriteria harus dinilai sebelum mengirim",
       "selectLevel": "Pilih tingkat"
+    }
+  },
+  "instructorInterventions": {
+    "title": "Intervensi Siswa Berisiko",
+    "subtitle": "Tindak lanjut privat untuk mahasiswa yang membutuhkan dukungan tepat waktu.",
+    "listLabel": "Intervensi instruktur",
+    "empty": "Belum ada intervensi",
+    "emptyDescription": "Intervensi yang dibuat untuk mahasiswa berisiko akan muncul di sini.",
+    "loadError": "Intervensi tidak dapat dimuat",
+    "saveError": "Intervensi tidak dapat disimpan. Silakan coba lagi.",
+    "saveSuccess": "Intervensi tersimpan",
+    "create": "Buat intervensi",
+    "edit": "Simpan perubahan",
+    "createTitle": "Buat intervensi",
+    "editTitle": "Kelola intervensi",
+    "manage": "Kelola",
+    "closeForm": "Tutup formulir",
+    "action": "Tindakan",
+    "followUp": "Tindak lanjut",
+    "overdue": "Tindak lanjut terlambat",
+    "liveRisk": "Konteks risiko langsung",
+    "riskLevel": "Risiko saat ini",
+    "riskFactors": "Faktor risiko saat ini",
+    "risk": {
+      "high": "Tinggi",
+      "medium": "Sedang",
+      "low": "Rendah"
+    },
+    "actions": {
+      "consultation": "Konsultasi",
+      "extension": "Perpanjangan",
+      "discussion": "Diskusi",
+      "other": "Lainnya"
+    },
+    "status": {
+      "open": "Terbuka",
+      "monitoring": "Dipantau",
+      "resolved": "Selesai",
+      "dismissed": "Ditutup"
+    },
+    "factors": {
+      "overdue_checkpoint": "Checkpoint sudah melewati tenggat",
+      "approaching_deadline_no_submission": "Tenggat mendekat tanpa pengumpulan",
+      "insufficient_consultations": "Konsultasi belum memenuhi kebutuhan checkpoint",
+      "repeated_revise": "Checkpoint telah direvisi beberapa kali",
+      "stalled_review": "Pengumpulan menunggu review melewati SLA"
+    },
+    "filters": {
+      "status": "Status",
+      "allStatuses": "Semua status",
+      "overdue": "Hanya tindak lanjut terlambat"
+    },
+    "fields": {
+      "actionType": "Jenis tindakan",
+      "privateNote": "Catatan privat",
+      "privateNotePlaceholder": "Catat langkah bantuan berikutnya untuk mahasiswa ini...",
+      "followUpDate": "Tanggal tindak lanjut",
+      "followUpHelp": "Tanggal ini hanya terlihat oleh instruktur dan tidak mengirim notifikasi.",
+      "status": "Status",
+      "resolutionReason": "Alasan penyelesaian atau penutupan"
     }
   },
   "feedbackSnippets": {

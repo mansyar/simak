@@ -250,7 +250,11 @@ async function seedTemplateAndAssignment(): Promise<void> {
 
     for (const cp of E2E_TEMPLATE_CHECKPOINTS) {
       const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + cp.estimatedDuration);
+      if (cp.order === 1) {
+        dueDate.setDate(dueDate.getDate() - 1);
+      } else {
+        dueDate.setDate(dueDate.getDate() + cp.estimatedDuration);
+      }
       const state = cp.order === 1 ? 'unlocked' : 'locked';
 
       await db.insert(checkpoints).values({

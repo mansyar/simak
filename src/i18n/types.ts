@@ -112,8 +112,9 @@ export type Translation = {
     dashboard: string
     assignments: string
     reviews: string
-    analytics: string
+    interventions: string
     feedbackSnippets: string
+    analytics: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -333,6 +334,66 @@ export type Translation = {
       weightedTotal: string
       allCriteriaRequired: string
       selectLevel: string
+    }
+  }
+  instructorInterventions: {
+    title: string
+    subtitle: string
+    listLabel: string
+    empty: string
+    emptyDescription: string
+    loadError: string
+    saveError: string
+    saveSuccess: string
+    create: string
+    edit: string
+    createTitle: string
+    editTitle: string
+    manage: string
+    closeForm: string
+    action: string
+    followUp: string
+    overdue: string
+    liveRisk: string
+    riskLevel: string
+    riskFactors: string
+    risk: {
+      high: string
+      medium: string
+      low: string
+    }
+    actions: {
+      consultation: string
+      extension: string
+      discussion: string
+      other: string
+    }
+    status: {
+      open: string
+      monitoring: string
+      resolved: string
+      dismissed: string
+    }
+    factors: {
+      overdue_checkpoint: string
+      approaching_deadline_no_submission: string
+      insufficient_consultations: string
+      repeated_revise: string
+      stalled_review: string
+    }
+    filters: {
+      status: string
+      allStatuses: string
+      overdue: string
+    }
+    fields: {
+      actionType: string
+      privateNote: string
+      privateNotePlaceholder: string
+      followUpDate: string
+      followUpHelp: string
+      status: string
+      resolutionReason: string
     }
   }
   feedbackSnippets: {

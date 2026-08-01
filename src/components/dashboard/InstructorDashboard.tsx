@@ -9,6 +9,7 @@ import {
   Users,
   BookOpen,
   AlertTriangle,
+  LifeBuoy,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -24,6 +25,12 @@ export interface AtRiskStudentEntry {
   assignmentId: number;
   riskLevel: RiskLevel;
   factors: RiskFactor[];
+  activeIntervention?: {
+    id: number;
+    status: 'open' | 'monitoring';
+    followUpDate: string | null;
+    isOverdue: boolean;
+  };
 }
 
 interface PendingReviewItem {
@@ -58,6 +65,8 @@ export interface InstructorDashboardData {
   recentSubmissions: RecentSubmission[];
   assignments: AssignmentOverview[];
   atRiskStudents: AtRiskStudentEntry[];
+  openInterventionCount: number;
+  overdueInterventionCount: number;
   error?: string;
 }
 
@@ -166,6 +175,36 @@ export function InstructorDashboard({ data }: Props) {
         />
       </div>
 
+      {/* Intervention Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('instructorInterventions.title')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <MetricCard
+              label={t('instructorInterventions.status.open')}
+              value={d.openInterventionCount}
+              icon={LifeBuoy}
+              color="primary"
+            />
+            <MetricCard
+              label={t('instructorInterventions.overdue')}
+              value={d.overdueInterventionCount}
+              icon={AlertTriangle}
+              color="warning"
+            />
+          </div>
+          <Link
+            to={'/instructor/interventions' as never}
+            className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline"
+          >
+            {t('common.viewAll')}
+            <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+          </Link>
+        </CardContent>
+      </Card>
+
       {/* Pending Review Queue */}
       <Card>
         <CardHeader>
@@ -248,6 +287,20 @@ export function InstructorDashboard({ data }: Props) {
                   <p className="text-xs text-muted-foreground truncate">
                     {student.assignmentTitle}
                   </p>
+                  {student.activeIntervention && (
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <Badge variant="secondary">
+                        {student.activeIntervention.status === 'open'
+                          ? t('instructorInterventions.status.open')
+                          : t('instructorInterventions.status.monitoring')}
+                      </Badge>
+                      {student.activeIntervention.isOverdue && (
+                        <span className="text-xs font-medium text-warning">
+                          {t('instructorInterventions.overdue')}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   {student.factors.length > 0 && (
                     <ul className="mt-2 space-y-1">
                       {student.factors.map((factor, idx) => (

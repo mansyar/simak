@@ -72,6 +72,8 @@ describe('getInstructorDashboardDataHandler', () => {
       recentSubmissions: [],
       assignments: [],
       atRiskStudents: [],
+      openInterventionCount: 0,
+      overdueInterventionCount: 0,
     });
   });
 

@@ -107,8 +107,9 @@
     "dashboard": "Dashboard",
     "assignments": "Assignments",
     "reviews": "Reviews",
+    "interventions": "Interventions",
+    "feedbackSnippets": "Feedback snippets",
     "analytics": "Analytics",
-    "feedbackSnippets": "Feedback Snippets",
     "branding": "SIMAK",
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
@@ -328,6 +329,66 @@
       "weightedTotal": "Weighted Total",
       "allCriteriaRequired": "All criteria must be scored before submitting",
       "selectLevel": "Select a level"
+    }
+  },
+  "instructorInterventions": {
+    "title": "At-Risk Interventions",
+    "subtitle": "Private follow-up for students who need timely support.",
+    "listLabel": "Instructor interventions",
+    "empty": "No interventions found",
+    "emptyDescription": "Interventions you create for at-risk students will appear here.",
+    "loadError": "Unable to load interventions",
+    "saveError": "Unable to save the intervention. Please try again.",
+    "saveSuccess": "Intervention saved",
+    "create": "Create intervention",
+    "edit": "Save changes",
+    "createTitle": "Create intervention",
+    "editTitle": "Manage intervention",
+    "manage": "Manage",
+    "closeForm": "Close form",
+    "action": "Action",
+    "followUp": "Follow-up",
+    "overdue": "Overdue follow-up",
+    "liveRisk": "Live risk context",
+    "riskLevel": "Current risk",
+    "riskFactors": "Current risk factors",
+    "risk": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "actions": {
+      "consultation": "Consultation",
+      "extension": "Extension",
+      "discussion": "Discussion",
+      "other": "Other"
+    },
+    "status": {
+      "open": "Open",
+      "monitoring": "Monitoring",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed"
+    },
+    "factors": {
+      "overdue_checkpoint": "A checkpoint is overdue",
+      "approaching_deadline_no_submission": "A deadline is approaching without a submission",
+      "insufficient_consultations": "Consultations are below the checkpoint requirement",
+      "repeated_revise": "The checkpoint has been revised multiple times",
+      "stalled_review": "A submission is waiting for review beyond the SLA"
+    },
+    "filters": {
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "overdue": "Only overdue follow-ups"
+    },
+    "fields": {
+      "actionType": "Action type",
+      "privateNote": "Private note",
+      "privateNotePlaceholder": "Record the next helpful step for this student...",
+      "followUpDate": "Follow-up date",
+      "followUpHelp": "This date is visible only to instructors and does not send a notification.",
+      "status": "Status",
+      "resolutionReason": "Resolution or dismissal reason"
     }
   },
   "feedbackSnippets": {

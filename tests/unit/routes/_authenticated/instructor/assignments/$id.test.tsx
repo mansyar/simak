@@ -139,6 +139,10 @@ vi.mock('@/components/instructor/assignments/AssignmentExtensionsTab', () => ({
   AssignmentExtensionsTab: () => <div data-testid="extensions-tab" />,
 }));
 
+vi.mock('@/components/instructor/assignments/AssignmentInterventionsTab', () => ({
+  AssignmentInterventionsTab: () => <div data-testid="interventions-tab" />,
+}));
+
 vi.mock('@/components/instructor/assignments/AssignmentDetailTabs', () => ({
   AssignmentDetailTabs: ({ tabs, activeTab, onTabChange }: any) => (
     <div data-testid="assignment-detail-tabs">
@@ -198,6 +202,14 @@ describe('AssignmentDetailPage - Discussions tab', () => {
     const discussionsTab = getByTestId('tab-discussions');
     expect(discussionsTab).toBeTruthy();
     expect(discussionsTab.textContent).toBe('discussions.title');
+  });
+
+  it('should render the Interventions tab and panel for instructors', () => {
+    const { getByTestId } = render(<AssignmentDetailPage />);
+
+    expect(getByTestId('tab-interventions')).toBeTruthy();
+    fireEvent.click(getByTestId('tab-interventions'));
+    expect(getByTestId('interventions-tab')).toBeTruthy();
   });
 
   it('should render DiscussionPanel for each checkpoint when Discussions tab is active', () => {

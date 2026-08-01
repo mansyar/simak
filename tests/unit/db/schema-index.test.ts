@@ -42,4 +42,12 @@ describe('Schema barrel exports', () => {
   it('should export finalGradesRelations', () => {
     expect(schema.finalGradesRelations).toBeDefined();
   });
+
+  it('should export interventions table', () => {
+    expect(schema.interventions).toBeDefined();
+  });
+
+  it('should export interventions relations', () => {
+    expect(schema.interventionsRelations).toBeDefined();
+  });
 });

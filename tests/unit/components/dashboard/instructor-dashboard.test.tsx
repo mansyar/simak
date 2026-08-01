@@ -28,6 +28,8 @@ const emptyData = {
   recentSubmissions: [],
   assignments: [],
   atRiskStudents: [],
+  openInterventionCount: 0,
+  overdueInterventionCount: 0,
 };
 
 describe('InstructorDashboard component', () => {
@@ -321,5 +323,35 @@ describe('InstructorDashboard component', () => {
     expect(
       screen.getByText('instructorDashboard.atRisk.factors.insufficient_consultations'),
     ).toBeDefined();
+  });
+
+  it('should render intervention counts and active status on at-risk students', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const dataWithIntervention = {
+      ...emptyData,
+      openInterventionCount: 2,
+      overdueInterventionCount: 1,
+      atRiskStudents: [
+        {
+          studentName: 'Alice',
+          studentId: 'student-1',
+          assignmentTitle: 'Thesis 2026',
+          assignmentId: 1,
+          riskLevel: 'high' as const,
+          factors: [],
+          activeIntervention: {
+            id: 55,
+            status: 'monitoring' as const,
+            followUpDate: new Date().toISOString(),
+            isOverdue: true,
+          },
+        },
+      ],
+    };
+
+    render(<InstructorDashboard data={dataWithIntervention} />);
+    expect(screen.getByText('instructorInterventions.status.open')).toBeDefined();
+    expect(screen.getAllByText('instructorInterventions.overdue').length).toBeGreaterThan(0);
+    expect(screen.getByText('instructorInterventions.status.monitoring')).toBeDefined();
   });
 });

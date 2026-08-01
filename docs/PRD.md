@@ -59,7 +59,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | **SuperAdmin** | Seeds the system. Can create Admin users only. Not involved in day-to-day operations.                                                    |
 | **Admin**      | Manages users (Instructor, Student) and assignment templates. Sends invitation emails. No involvement in review or submission workflows. |
-| **Instructor** | Creates assignments, reviews submissions, manages deadlines, and maintains private feedback snippets. Can assign multiple assignments per student. |
+| **Instructor** | Creates assignments, reviews submissions, manages deadlines, maintains private feedback snippets, and manages private at-risk interventions for assigned students. Can assign multiple assignments per student. |
 | **Student**    | Views assignments, uploads checkpoint submissions, tracks progress. Can collaborate on group assignments `[v2]`.                         |
 
 ---
@@ -105,6 +105,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 5. Monitors student progress across assignments.
 6. Views and validates student consultation logs.
 7. Replies to student questions in checkpoint discussion threads (Discussions tab on assignment detail, or quick access from review detail page).
+8. Records and manages private at-risk interventions from the dashboard, assignment context, or `/instructor/interventions`. Intervention records are scoped to the current assignment owner and are not visible to students or admins.
 
 ### Admin
 
@@ -272,8 +273,17 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - **Event-driven alerts:** When an instructor submits a `revise` decision or an SLA breach occurs, the system checks the student's risk level post-commit (advisory — try/catch, never affects the review transaction). If the risk is medium or high, an in-app notification (`student_at_risk` type) and a localized email are dispatched to the instructor via `Promise.allSettled`. A 7-day dedup window via the `notifications` table prevents duplicate alerts for the same student+assignment pair. The deadline reminder scanner also calls the risk alert function for each approaching-deadline reminder.
 - **Admin analytics summary:** The admin analytics page displays aggregate at-risk counts (high/medium/low) across all active assignments, with colored Badges and an EmptyState when all counts are zero.
 - **Notification routing:** `student_at_risk` notifications are clickable and navigate the instructor to `/instructor/assignments/${assignmentId}`. Added to the `system` group in `GROUP_CONFIGS`.
-- **No new database tables or migrations** — all risk computation is derived from existing data. The `student_at_risk` value was added to the `email_queue.templateType` Drizzle text enum (code-only, no `ALTER TYPE`).
-- **Limitations:** Risk history/trend tracking, student-facing risk view, automated interventions, and inline at-risk widget actions are deferred to `[v2]`. Factor descriptions in notification params and emails use the risk-scoring module's internal descriptions; full i18n of notification params would require resolving recipient locale server-side.
+- **Risk computation remains ephemeral:** Risk scoring itself adds no persisted risk-history table. Intervention records are stored separately and do not change the risk-scoring semantics.
+- **Limitations:** Risk history/trend tracking, student-facing risk view, and automated intervention plans remain deferred to `[v2]`. Factor descriptions in notification params and emails use the risk-scoring module's internal descriptions; full i18n of notification params would require resolving recipient locale server-side.
+
+### At-Risk Intervention Workflow
+
+- **Instructor response records:** The instructor-only `/instructor/interventions` page manages one intervention per student-assignment pair while it is `open` or `monitoring`. Resolved and dismissed records remain available as history, and a later active intervention may be created.
+- **Eligibility:** Creation requires a live `student_inaction` factor (`overdue_checkpoint`, `approaching_deadline_no_submission`, `insufficient_consultations`, or `repeated_revise`). A `pending_review`-only `stalled_review` factor cannot create an intervention because it represents instructor workload rather than student inaction.
+- **Actions and lifecycle:** Action types are `consultation`, `extension`, `discussion`, and `other`. Instructors may move records between `open` and `monitoring`, or close them as `resolved`/`dismissed` with a reason. Closed records are terminal and never auto-resolve when live risk changes.
+- **Privacy and reassignment:** Records contain private notes and are authorized through the current assignment owner. Reassignment transfers access to the replacement instructor and removes former-owner access; students and admins cannot view individual records.
+- **Follow-up and audit:** Optional follow-up dates show overdue state in instructor views but do not create notifications. Creation, updates, resolution, dismissal, and ownership-sensitive lifecycle actions are recorded through immutable audit events.
+- **Contextual entry points:** The dashboard shows active and overdue intervention summaries, assignment detail provides per-student risk context and links to existing consultation/extension/discussion workflows, and all new UI is bilingual and accessible.
 
 ### File Management
 

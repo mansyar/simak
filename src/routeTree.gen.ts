@@ -36,6 +36,7 @@ import { Route as AuthenticatedAdminAuditLogRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedStudentAssignmentsIndexRouteImport } from './routes/_authenticated/student/assignments/index'
 import { Route as AuthenticatedInstructorReviewsIndexRouteImport } from './routes/_authenticated/instructor/reviews/index'
+import { Route as AuthenticatedInstructorInterventionsIndexRouteImport } from './routes/_authenticated/instructor/interventions/index'
 import { Route as AuthenticatedInstructorAssignmentsIndexRouteImport } from './routes/_authenticated/instructor/assignments/index'
 import { Route as AuthenticatedAdminUsersIndexRouteImport } from './routes/_authenticated/admin/users/index'
 import { Route as AuthenticatedAdminTemplatesIndexRouteImport } from './routes/_authenticated/admin/templates/index'
@@ -201,6 +202,12 @@ const AuthenticatedInstructorReviewsIndexRoute =
     path: '/reviews/',
     getParentRoute: () => AuthenticatedInstructorRoute,
   } as any)
+const AuthenticatedInstructorInterventionsIndexRoute =
+  AuthenticatedInstructorInterventionsIndexRouteImport.update({
+    id: '/interventions/',
+    path: '/interventions/',
+    getParentRoute: () => AuthenticatedInstructorRoute,
+  } as any)
 const AuthenticatedInstructorAssignmentsIndexRoute =
   AuthenticatedInstructorAssignmentsIndexRouteImport.update({
     id: '/assignments/',
@@ -308,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates/': typeof AuthenticatedAdminTemplatesIndexRoute
   '/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/instructor/assignments/': typeof AuthenticatedInstructorAssignmentsIndexRoute
+  '/instructor/interventions/': typeof AuthenticatedInstructorInterventionsIndexRoute
   '/instructor/reviews/': typeof AuthenticatedInstructorReviewsIndexRoute
   '/student/assignments/': typeof AuthenticatedStudentAssignmentsIndexRoute
   '/instructor/assignments/$id/gradebook': typeof AuthenticatedInstructorAssignmentsIdGradebookRoute
@@ -347,6 +355,7 @@ export interface FileRoutesByTo {
   '/admin/templates': typeof AuthenticatedAdminTemplatesIndexRoute
   '/admin/users': typeof AuthenticatedAdminUsersIndexRoute
   '/instructor/assignments': typeof AuthenticatedInstructorAssignmentsIndexRoute
+  '/instructor/interventions': typeof AuthenticatedInstructorInterventionsIndexRoute
   '/instructor/reviews': typeof AuthenticatedInstructorReviewsIndexRoute
   '/student/assignments': typeof AuthenticatedStudentAssignmentsIndexRoute
   '/instructor/assignments/$id/gradebook': typeof AuthenticatedInstructorAssignmentsIdGradebookRoute
@@ -389,6 +398,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/templates/': typeof AuthenticatedAdminTemplatesIndexRoute
   '/_authenticated/admin/users/': typeof AuthenticatedAdminUsersIndexRoute
   '/_authenticated/instructor/assignments/': typeof AuthenticatedInstructorAssignmentsIndexRoute
+  '/_authenticated/instructor/interventions/': typeof AuthenticatedInstructorInterventionsIndexRoute
   '/_authenticated/instructor/reviews/': typeof AuthenticatedInstructorReviewsIndexRoute
   '/_authenticated/student/assignments/': typeof AuthenticatedStudentAssignmentsIndexRoute
   '/_authenticated/instructor/assignments/$id/gradebook': typeof AuthenticatedInstructorAssignmentsIdGradebookRoute
@@ -430,6 +440,7 @@ export interface FileRouteTypes {
     | '/admin/templates/'
     | '/admin/users/'
     | '/instructor/assignments/'
+    | '/instructor/interventions/'
     | '/instructor/reviews/'
     | '/student/assignments/'
     | '/instructor/assignments/$id/gradebook'
@@ -469,6 +480,7 @@ export interface FileRouteTypes {
     | '/admin/templates'
     | '/admin/users'
     | '/instructor/assignments'
+    | '/instructor/interventions'
     | '/instructor/reviews'
     | '/student/assignments'
     | '/instructor/assignments/$id/gradebook'
@@ -510,6 +522,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/templates/'
     | '/_authenticated/admin/users/'
     | '/_authenticated/instructor/assignments/'
+    | '/_authenticated/instructor/interventions/'
     | '/_authenticated/instructor/reviews/'
     | '/_authenticated/student/assignments/'
     | '/_authenticated/instructor/assignments/$id/gradebook'
@@ -715,6 +728,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInstructorReviewsIndexRouteImport
       parentRoute: typeof AuthenticatedInstructorRoute
     }
+    '/_authenticated/instructor/interventions/': {
+      id: '/_authenticated/instructor/interventions/'
+      path: '/interventions'
+      fullPath: '/instructor/interventions/'
+      preLoaderRoute: typeof AuthenticatedInstructorInterventionsIndexRouteImport
+      parentRoute: typeof AuthenticatedInstructorRoute
+    }
     '/_authenticated/instructor/assignments/': {
       id: '/_authenticated/instructor/assignments/'
       path: '/assignments'
@@ -857,6 +877,7 @@ interface AuthenticatedInstructorRouteChildren {
   AuthenticatedInstructorAssignmentsNewRoute: typeof AuthenticatedInstructorAssignmentsNewRoute
   AuthenticatedInstructorReviewsSubmissionIdRoute: typeof AuthenticatedInstructorReviewsSubmissionIdRoute
   AuthenticatedInstructorAssignmentsIndexRoute: typeof AuthenticatedInstructorAssignmentsIndexRoute
+  AuthenticatedInstructorInterventionsIndexRoute: typeof AuthenticatedInstructorInterventionsIndexRoute
   AuthenticatedInstructorReviewsIndexRoute: typeof AuthenticatedInstructorReviewsIndexRoute
 }
 
@@ -877,6 +898,8 @@ const AuthenticatedInstructorRouteChildren: AuthenticatedInstructorRouteChildren
       AuthenticatedInstructorReviewsSubmissionIdRoute,
     AuthenticatedInstructorAssignmentsIndexRoute:
       AuthenticatedInstructorAssignmentsIndexRoute,
+    AuthenticatedInstructorInterventionsIndexRoute:
+      AuthenticatedInstructorInterventionsIndexRoute,
     AuthenticatedInstructorReviewsIndexRoute:
       AuthenticatedInstructorReviewsIndexRoute,
   }
