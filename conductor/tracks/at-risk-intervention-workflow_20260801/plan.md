@@ -144,7 +144,12 @@
   - [x] Update documentation only where the implementation changes an existing project contract. No project contract documentation required changes; acceptance results and quality-gate outcomes are recorded here.
   - [x] Commit with `chore(interventions): complete quality gates` as `5e454b3` and attach the required task git note.
 
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+  - [x] Reviewed files changed since the Phase 4 checkpoint: E2E seed/reset helpers, intervention form, logger compatibility, live-risk date normalization, unit tests, the real-DB integration suite, and the instructor intervention Playwright suite all have corresponding coverage.
+  - [x] Ran the final changed-code unit command: `pnpm vitest run tests/unit/components/instructor/interventions.test.tsx tests/unit/lib/logger.test.ts tests/unit/server/student-risk-context.test.ts` passed 3 files and 20 tests.
+  - [x] Confirmed the Phase 5 quality gates, targeted integration workflow, full integration result, and Chromium/mobile-chrome acceptance results recorded above.
+  - [x] Manual verification was recorded as automated-only with explicit user approval; seeded browser acceptance covered the instructor workflow, pending-review rejection, responsive flow, and student/admin privacy.
+  - [x] Attached the verification report to `b2b6c3a` and recorded the Phase 5 checkpoint at `b2b6c3a`.
 
 ## Expected primary files
 
