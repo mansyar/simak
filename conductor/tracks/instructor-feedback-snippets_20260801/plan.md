@@ -37,11 +37,11 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Test instructor-only authorization and cross-instructor access denial.
   - [x] Test active-by-default listing, archived filtering, title/category search, create, update, archive, and restore behavior.
   - [x] Test that no hard-delete operation is exposed.
-- [x] Task: Implement client-safe schemas and stubs in `src/server/feedback-snippets.ts`
+- [x] Task: Implement client-safe schemas and stubs in `src/server/feedback-snippets.ts` [ba8c9430]
   - [x] Add Zod schemas for list/search, create, update, archive, and restore inputs.
   - [x] Use `typedServerFn` with dynamic imports of the server handlers.
   - [x] Apply the established read and mutation rate-limit presets.
-- [x] Task: Implement server-only handlers in `src/server/feedback-snippets.server.ts`
+- [x] Task: Implement server-only handlers in `src/server/feedback-snippets.server.ts` [ba8c9430]
   - [x] Require an authenticated instructor session for every handler.
   - [x] Scope every query and mutation to `session.user.id`.
   - [x] Return active snippets by default and support archived filtering plus title/category search.
@@ -49,14 +49,14 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Archive and restore by updating `archivedAt`; do not delete rows.
   - [x] Preserve archive state when updating content.
   - [x] Use the project’s `serverError` and structured logging conventions.
-- [x] Task: Add server-handler regression coverage
+- [x] Task: Add server-handler regression coverage [ba8c9430]
   - [x] Verify malformed and unauthorized inputs do not reach mutation queries.
   - [x] Verify an instructor cannot infer or mutate another instructor’s snippet by ID.
   - [x] Verify archived snippets are excluded from active results.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
-  - [ ] Run the focused server/schema tests.
-  - [ ] Confirm all handlers stay within the client-safe/server-only split.
-  - [ ] Commit the phase and attach the task summary git note.
+- [x] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+  - [x] Run `CI=true pnpm vitest run tests/unit/server/feedback-snippets.test.ts tests/unit/db` — 29 test files and 216 tests passed.
+  - [x] Confirm all handlers stay within the client-safe/server-only split; code graph/source inspection confirmed dynamic handler imports and server-only ownership predicates.
+  - [x] Confirm `pnpm db:push`, typecheck, lint, formatting, modularity, and `git diff --check` pass; attach the verification note to the functional commit.
 
 ## Phase 3: Instructor Management Route & Navigation
 
