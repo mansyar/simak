@@ -6,7 +6,7 @@
 
 > **TDD/verification note:** This track changes test tooling configuration and scripts, not application logic. The red/green safety boundary will be established through baseline behavioral checks, coverage-contract checks, and benchmark comparisons rather than artificial unit tests for configuration object literals.
 
-## Phase 1: Baseline and Performance Guardrails
+## Phase 1: Baseline and Performance Guardrails [checkpoint: dc9ff13]
 
 - [x] Task: Re-read `./spec.md` and `../../workflow.md` to re-establish track context [997b791]
   - [x] Confirm the 20% wall-clock target and preserved coverage contract
@@ -17,12 +17,12 @@
   - [x] Run `pnpm test:coverage` repeatedly using the same environment
   - [x] Record wall-clock measurements, pass/fail status, coverage percentages, and generated report types
 
-- [~] Task: Establish behavioral guardrails for the existing workflow
-  - [ ] Confirm the default command executes unit tests and the XLSX project
-  - [ ] Confirm integration tests remain excluded from the default coverage run
-  - [ ] Confirm V8 coverage, text/JSON/HTML reports, include/exclude scope, and all four 80% thresholds
+- [x] Task: Establish behavioral guardrails for the existing workflow [dc9ff13]
+  - [x] Confirm the default command executes unit tests and the XLSX project
+  - [x] Confirm integration tests remain excluded from the default coverage run
+  - [x] Confirm V8 coverage, text/JSON/HTML reports, include/exclude scope, and all four 80% thresholds
 
-- [ ] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [dc9ff13]
 
 ## Phase 2: Diagnose and Implement the Minimal Optimization
 
