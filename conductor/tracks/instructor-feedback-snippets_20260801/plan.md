@@ -109,7 +109,7 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Manually verify insertion, continued editing, keyboard operation, and light/dark rendering; the user confirmed active-only filtering, search, explicit insertion, exact separators, multiple insertions, refocus, unchanged review controls, and responsive rendering.
   - [x] Commit the phase and attach the verification git note to the functional commit.
 
-## Phase 5: End-to-End Coverage & Test Fixtures
+## Phase 5: End-to-End Coverage & Test Fixtures [checkpoint: 349174e]
 
 - [x] Task: Prepare deterministic E2E data isolation [0545d16e]
   - [x] Add `feedback_snippets` to `tests/e2e/helpers/db-reset.ts`.
