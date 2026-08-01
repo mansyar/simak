@@ -9,3 +9,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 ---
 
 ## Active Tracks
+
+- [TRACK-050: At-Risk Intervention Workflow](./tracks/at-risk-intervention-workflow_20260801/index.md) — Feature — Planned

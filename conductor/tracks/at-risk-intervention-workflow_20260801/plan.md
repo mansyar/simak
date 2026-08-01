@@ -1,0 +1,146 @@
+<protect>
+# Implementation Plan: TRACK-050 — At-Risk Intervention Workflow
+
+## Architecture decisions
+
+- Add a dedicated `interventions` table with `assignmentId` and `studentId`; authorization derives from the assignment's current `instructorId`, so reassignment automatically transfers access without stale owner data.
+- Enforce one active (`open`/`monitoring`) intervention per student-assignment pair with a PostgreSQL partial unique index.
+- Add the standard client-safe/server-only pair:
+  - `src/server/interventions.ts`
+  - `src/server/interventions.server.ts`
+- Reuse the existing `computeStudentRisk` engine through a server-only live-risk context helper shared by intervention handlers and the instructor dashboard.
+- Add `/instructor/interventions`, an assignment-detail interventions tab, and dashboard summary/context links.
+- Use existing audit logging; do not create notification records for follow-up dates.
+- Keep all source, test, and script files under the 500-line limit. Split handler extras only if the implementation requires it.
+
+## Phase 1 — Data model and live-risk context
+
+- [ ] Task: Define intervention contracts and database model
+  - [ ] Write failing schema tests for action types, statuses, closure-reason validation, filters, and pagination inputs.
+  - [ ] Run the schema tests and confirm the Red phase.
+  - [ ] Implement Zod schemas and `typedServerFn` stubs in `src/server/interventions.ts`.
+  - [ ] Implement intervention enums, columns, foreign keys, indexes, timestamps, and the active-pair partial unique index in `src/db/schema/interventions.ts`.
+  - [ ] Export the schema and add Drizzle relations in `src/db/schema/index.ts`.
+  - [ ] Generate the migration with `pnpm db:generate` and verify the SQL contains the required constraints and partial unique index.
+  - [ ] Run the schema tests and confirm the Green phase.
+  - [ ] Verify the changed files remain within the modularity limit.
+  - [ ] Commit with `feat(interventions): add intervention data model and contracts` and attach the required task git note.
+
+- [ ] Task: Share live student-risk context without changing risk semantics
+  - [ ] Write failing unit tests for assembling checkpoint context, preserving all five existing risk signals, and distinguishing `student_inaction` from `pending_review`.
+  - [ ] Run the new risk-context tests and the existing risk-scoring tests to confirm the Red phase.
+  - [ ] Implement a server-only risk-context helper that accepts the current database connection, fetches checkpoint/consultation/submission/revision data, and delegates scoring to `computeStudentRisk`.
+  - [ ] Refactor `dashboard-instructor.server.ts` to use the helper while preserving its current dashboard response.
+  - [ ] Run risk-scoring and instructor-dashboard tests and confirm the Green phase.
+  - [ ] Commit with `refactor(risk): share live student risk context` and attach the required task git note.
+
+- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+
+## Phase 2 — Instructor-only server workflow
+
+- [ ] Task: Implement creation, listing, and live-context handlers
+  - [ ] Write failing server-handler tests for instructor authorization, assignment/student ownership, eligible `student_inaction` risk, pending-review-only rejection, active duplicate rejection, list status filters, overdue follow-up filtering, and privacy against students/admins/other instructors.
+  - [ ] Run the handler tests and confirm the Red phase.
+  - [ ] Implement `createInterventionHandler`, `listInterventionsHandler`, and the live context/detail handler in `src/server/interventions.server.ts`.
+  - [ ] Validate ownership and student membership on the server; never expose intervention data through student/admin handlers.
+  - [ ] Use the shared live-risk helper at creation and detail/context time; do not persist risk assessments or auto-resolve records.
+  - [ ] Use transactions and row locks for creation; rely on the database unique index as the final duplicate-prevention guard.
+  - [ ] Record creation events with the existing safe audit helper and do not enqueue notifications.
+  - [ ] Run the handler tests and confirm the Green phase.
+  - [ ] Commit with `feat(interventions): add instructor intervention handlers` and attach the required task git note.
+
+- [ ] Task: Implement locked status and record updates
+  - [ ] Write failing tests for allowed transitions, terminal resolved/dismissed states, required resolution/dismissal reasons, note/action/follow-up updates, row locking, and immutable audit-event details.
+  - [ ] Run the update tests and confirm the Red phase.
+  - [ ] Implement `updateInterventionHandler` with a transaction that locks the intervention row and verifies the current assignment owner before changing state.
+  - [ ] Reject unauthorized access, invalid transitions, empty closure reasons, and updates to terminal records.
+  - [ ] Record status changes and closure/dismissal reasons without altering historical audit actors.
+  - [ ] Run the lifecycle and transaction tests and confirm the Green phase.
+  - [ ] Extend reassignment regression coverage to prove the replacement instructor can access the record and the former instructor cannot.
+  - [ ] Commit with `feat(interventions): enforce intervention lifecycle and ownership` and attach the required task git note.
+
+- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+
+## Phase 3 — Dedicated intervention UI
+
+- [ ] Task: Build the intervention list, filters, and form
+  - [ ] Write failing component and route tests for loading, empty, error, status/overdue filters, action types, conditional closure reason, validation errors, status actions, and bilingual labels.
+  - [ ] Run the UI tests and confirm the Red phase.
+  - [ ] Add `src/routes/_authenticated/instructor/interventions/index.tsx` with validated search parameters for status, overdue, assignment, student, page, and limit.
+  - [ ] Add focused components under `src/components/instructor/interventions/` for the list, form, detail/context, loading, and empty states.
+  - [ ] Use React Hook Form/Zod and existing shadcn/Base UI primitives; provide keyboard access, visible focus, ARIA labels, live feedback, and 44px touch targets.
+  - [ ] Show current live risk factors as read-only context and make overdue follow-up state explicit.
+  - [ ] Add the instructor sidebar link and all new English/Indonesian keys in `locales/en.json` and `locales/id.json`.
+  - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`; do not edit generated i18n files manually.
+  - [ ] Run the component and route tests and confirm the Green phase.
+  - [ ] Commit with `feat(ui): add instructor intervention management page` and attach the required task git note.
+
+- [ ] Task: Add assignment-context intervention management
+  - [ ] Write failing route/component tests for the assignment interventions tab, per-student context, eligible create entry point, existing-record management, and links to consultation/extension/discussion workflows.
+  - [ ] Run the assignment-context tests and confirm the Red phase.
+  - [ ] Add the interventions tab/panel to the instructor assignment detail route without exposing it in student assignment views.
+  - [ ] Reuse the intervention server functions and preserve existing assignment tabs and loaders.
+  - [ ] Run route and component tests and confirm the Green phase.
+  - [ ] Commit with `feat(ui): add assignment intervention context` and attach the required task git note.
+
+- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+
+## Phase 4 — Dashboard and reassignment integration
+
+- [ ] Task: Surface intervention state in the instructor dashboard
+  - [ ] Write failing server and component tests for open/overdue counts, active intervention status on at-risk entries, empty states, and links to create/manage interventions.
+  - [ ] Run the dashboard tests and confirm the Red phase.
+  - [ ] Extend the instructor dashboard response with current-owner open and overdue intervention summaries.
+  - [ ] Add dashboard cards/context actions without changing live risk scoring or adding notifications.
+  - [ ] Update `InstructorDashboard.tsx` and its existing tests with bilingual, accessible UI behavior.
+  - [ ] Run dashboard server/component tests and confirm the Green phase.
+  - [ ] Commit with `feat(dashboard): surface instructor intervention status` and attach the required task git note.
+
+- [ ] Task: Verify reassignment-aware privacy end to end
+  - [ ] Write failing tests covering access before reassignment, access by the replacement instructor after reassignment, and denial for the former instructor, student, admin, and unrelated instructor.
+  - [ ] Run the authorization tests and confirm the Red phase.
+  - [ ] Verify the existing row-locked assignment reassignment transaction remains the single source of current ownership; modify it only if the new tests identify a required integration change.
+  - [ ] Confirm reassignment preserves immutable intervention audit actors and does not copy stale ownership into intervention records.
+  - [ ] Run the reassignment and authorization tests and confirm the Green phase.
+  - [ ] Commit with `test(interventions): verify reassignment privacy boundaries` and attach the required task git note.
+
+- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+
+## Phase 5 — Integration, quality, and completion
+
+- [ ] Task: Add database-backed and browser acceptance coverage
+  - [ ] Write integration tests for the partial unique active-pair constraint, transactional status transitions, closure audit data, and reassignment visibility.
+  - [ ] Add Playwright coverage for instructor creation, pending-review rejection, status changes, overdue display, contextual entry points, and student/admin privacy.
+  - [ ] Run the new integration/browser tests and record any environment prerequisites.
+  - [ ] Commit with `test(interventions): cover workflow acceptance paths` and attach the required task git note.
+
+- [ ] Task: Complete quality gates and documentation
+  - [ ] Confirm all new user-visible strings exist in both locale files and generated i18n types are current.
+  - [ ] Run `pnpm typecheck`.
+  - [ ] Run `pnpm lint` and `pnpm format`.
+  - [ ] Run `pnpm test:coverage` and confirm new code meets the project's 80% coverage threshold.
+  - [ ] Run `pnpm test:integration` with the configured database and the relevant Playwright command.
+  - [ ] Run `pnpm build`.
+  - [ ] Review responsive behavior, dark-mode tokens, keyboard/focus behavior, privacy boundaries, and server-side validation.
+  - [ ] Update documentation only where the implementation changes an existing project contract.
+  - [ ] Commit with `chore(interventions): complete quality gates` and attach the required task git note.
+
+- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+
+## Expected primary files
+
+- `src/db/schema/interventions.ts`
+- `src/db/schema/index.ts`
+- `src/server/interventions.ts`
+- `src/server/interventions.server.ts`
+- shared server-only risk-context helper
+- `src/server/dashboard-instructor.server.ts`
+- `src/components/instructor/interventions/*`
+- `src/routes/_authenticated/instructor/interventions/index.tsx`
+- `src/routes/_authenticated/instructor/assignments/$id.tsx`
+- `src/components/dashboard/InstructorDashboard.tsx`
+- `src/components/layout/instructor-sidebar.tsx`
+- matching unit/integration/Playwright tests
+- both locale source files and generated i18n output
+- generated Drizzle migration
+</protect>
