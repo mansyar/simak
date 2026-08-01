@@ -71,17 +71,17 @@
 
 ## Phase 3 — Dedicated intervention UI
 
-- [~] Task: Build the intervention list, filters, and form
-  - [ ] Write failing component and route tests for loading, empty, error, status/overdue filters, action types, conditional closure reason, validation errors, status actions, and bilingual labels.
-  - [ ] Run the UI tests and confirm the Red phase.
-  - [ ] Add `src/routes/_authenticated/instructor/interventions/index.tsx` with validated search parameters for status, overdue, assignment, student, page, and limit.
-  - [ ] Add focused components under `src/components/instructor/interventions/` for the list, form, detail/context, loading, and empty states.
-  - [ ] Use React Hook Form/Zod and existing shadcn/Base UI primitives; provide keyboard access, visible focus, ARIA labels, live feedback, and 44px touch targets.
-  - [ ] Show current live risk factors as read-only context and make overdue follow-up state explicit.
-  - [ ] Add the instructor sidebar link and all new English/Indonesian keys in `locales/en.json` and `locales/id.json`.
-  - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`; do not edit generated i18n files manually.
-  - [ ] Run the component and route tests and confirm the Green phase.
-  - [ ] Commit with `feat(ui): add instructor intervention management page` and attach the required task git note.
+- [x] Task: Build the intervention list, filters, and form (commit `d2bb3dd`)
+  - [x] Write failing component and route tests for loading, empty, error, status/overdue filters, action types, conditional closure reason, validation errors, status actions, and bilingual labels.
+  - [x] Run the UI tests and confirm the Red phase.
+  - [x] Add `src/routes/_authenticated/instructor/interventions/index.tsx` with validated search parameters for status, overdue, assignment, student, page, and limit.
+  - [x] Add focused components under `src/components/instructor/interventions/` for the list, form, detail/context, loading, and empty states.
+  - [x] Use React Hook Form/Zod and existing shadcn/Base UI primitives; provide keyboard access, visible focus, ARIA labels, live feedback, and 44px touch targets.
+  - [x] Show current live risk factors as read-only context and make overdue follow-up state explicit.
+  - [x] Add the instructor sidebar link and all new English/Indonesian keys in `locales/en.json` and `locales/id.json`.
+  - [x] Run `pnpm generate:i18n` and `pnpm check:i18n`; do not edit generated i18n files manually.
+  - [x] Run the component and route tests and confirm the Green phase.
+  - [x] Commit with `feat(ui): add instructor intervention management page` and attach the required task git note.
 
 - [ ] Task: Add assignment-context intervention management
   - [ ] Write failing route/component tests for the assignment interventions tab, per-student context, eligible create entry point, existing-record management, and links to consultation/extension/discussion workflows.
