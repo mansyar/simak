@@ -58,3 +58,9 @@ export const gradebookKeys = {
   studentFinalGrade: (assignmentId: number) =>
     ['gradebook', 'studentFinalGrade', assignmentId] as const,
 };
+
+export const feedbackSnippetKeys = {
+  all: () => ['feedbackSnippets'] as const,
+  list: (filters: { archived: boolean; search: string }) =>
+    ['feedbackSnippets', 'list', filters] as const,
+};

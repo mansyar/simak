@@ -60,28 +60,28 @@ This plan follows the approved specification and the repository’s TDD workflow
 
 ## Phase 3: Instructor Management Route & Navigation
 
-- [ ] Task: Write failing management UI tests
-  - [ ] Extend `tests/unit/components/instructor-sidebar.test.tsx` for the new navigation link and active state.
-  - [ ] Add route/component tests covering active and archived filters, title/category search, empty/loading/error states, create/edit forms, archive, and restore.
-  - [ ] Test inline validation for required fields and length boundaries.
-  - [ ] Test that mutation success refreshes the list and shows translated feedback.
-- [ ] Task: Implement the instructor feedback-snippet UI
-  - [ ] Add `src/routes/_authenticated/instructor/feedback-snippets.tsx`.
-  - [ ] Add focused components under `src/components/instructor/feedback-snippets/` for the page, list, form, and item actions while keeping each file under 500 lines.
-  - [ ] Use TanStack Query queries and mutations with a `feedbackSnippetKeys` entry in `src/lib/query-keys.ts`.
-  - [ ] Show active snippets by default and provide an Archived filter with Restore actions.
-  - [ ] Search title and category.
-  - [ ] Preserve form values on validation errors and require confirmation for archive actions.
-  - [ ] Add skeleton, empty, error, success, and mutation-pending states.
-- [ ] Task: Add instructor navigation
-  - [ ] Add a Feedback Snippets link to `src/components/layout/instructor-sidebar.tsx`.
-  - [ ] Use an appropriate existing icon and translated label.
-  - [ ] Verify the link is role-protected by the existing instructor layout.
-- [ ] Task: Add bilingual translations and regenerate types
-  - [ ] Add management, validation, archive/restore, picker, and accessibility strings to `locales/en.json` and `locales/id.json`.
-  - [ ] Run `pnpm generate:i18n`.
-  - [ ] Run `pnpm check:i18n`.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Write failing management UI tests
+  - [x] Extend `tests/unit/components/instructor-sidebar.test.tsx` for the new navigation link and active state.
+  - [x] Add route/component tests covering active and archived filters, title/category search, empty/loading/error states, create/edit forms, archive, and restore.
+  - [x] Test inline validation for required fields and length boundaries.
+  - [x] Test that mutation success refreshes the list and shows translated feedback.
+- [x] Task: Implement the instructor feedback-snippet UI
+  - [x] Add `src/routes/_authenticated/instructor/feedback-snippets.tsx`.
+  - [x] Add focused components under `src/components/instructor/feedback-snippets/` for the page, list, form, and item actions while keeping each file under 500 lines.
+  - [x] Use TanStack Query queries and mutations with a `feedbackSnippetKeys` entry in `src/lib/query-keys.ts`.
+  - [x] Show active snippets by default and provide an Archived filter with Restore actions.
+  - [x] Search title and category.
+  - [x] Preserve form values on validation errors and require confirmation for archive actions.
+  - [x] Add skeleton, empty, error, success, and mutation-pending states.
+- [x] Task: Add instructor navigation
+  - [x] Add a Feedback Snippets link to `src/components/layout/instructor-sidebar.tsx`.
+  - [x] Use an appropriate existing icon and translated label.
+  - [x] Verify the link is role-protected by the existing instructor layout.
+- [x] Task: Add bilingual translations and regenerate types
+  - [x] Add management, validation, archive/restore, picker, and accessibility strings to `locales/en.json` and `locales/id.json`.
+  - [x] Run `pnpm generate:i18n`.
+  - [x] Run `pnpm check:i18n`.
+- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
   - [ ] Run focused route/component tests and i18n checks.
   - [ ] Manually verify the active/archived management flows at desktop and mobile widths.
   - [ ] Commit the phase and attach the verification git note.
