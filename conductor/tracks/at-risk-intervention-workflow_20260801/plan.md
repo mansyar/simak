@@ -53,7 +53,7 @@
   - [x] Run the handler tests and confirm the Green phase.
   - [x] Commit with `feat(interventions): add instructor intervention handlers` and attach the required task git note (`e3704a6`).
 
-- [ ] Task: Implement locked status and record updates
+- [~] Task: Implement locked status and record updates
   - [ ] Write failing tests for allowed transitions, terminal resolved/dismissed states, required resolution/dismissal reasons, note/action/follow-up updates, row locking, and immutable audit-event details.
   - [ ] Run the update tests and confirm the Red phase.
   - [ ] Implement `updateInterventionHandler` with a transaction that locks the intervention row and verifies the current assignment owner before changing state.
