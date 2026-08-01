@@ -34,7 +34,7 @@
   - [x] Run risk-scoring and instructor-dashboard tests and confirm the Green phase.
   - [x] Commit with `refactor(risk): share live student risk context` and attach the required task git note (`2607976`).
 
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Instructor-only server workflow
 
