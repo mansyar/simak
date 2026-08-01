@@ -28,7 +28,7 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Verify the migration applies cleanly and the table exists: `pnpm db:push` succeeded; live inspection confirmed the bounded columns, instructor foreign key, and owner/archive index.
   - [x] Review changed files for the 500-line limit, confirm `git diff --check` is clean, and attach the required verification git note to the functional migration commit.
 
-## Phase 2: Server Functions, Validation & Ownership
+## Phase 2: Server Functions, Validation & Ownership [checkpoint: 4e8656e]
 
 - [x] Task: Write failing server-function and handler tests [184ffdc7]
   - [x] Create `tests/unit/server/feedback-snippets.test.ts`.
