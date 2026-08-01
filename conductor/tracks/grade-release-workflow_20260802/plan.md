@@ -40,21 +40,21 @@
 
 ## Phase 2: Server Release Lifecycle and Student Gating
 
-- [~] Task: Write failing server tests (Red Phase)
-  - [~] Create `tests/unit/server/gradebook-release.test.ts` using the established server-handler mocking pattern.
-  - [ ] Test preflight classification for complete, incomplete/in-progress, and missing persisted grades.
-  - [ ] Test that only the current assignment instructor can publish.
-  - [ ] Test that students, admins, superadmins, and non-owning instructors cannot publish or withdraw.
-  - [ ] Test publication creates one snapshot per eligible student and no snapshot for ineligible students.
-  - [ ] Test publication increments the release version and updates release state atomically.
-  - [ ] Test failed publication does not leave partial snapshots or a published state.
-  - [ ] Test withdrawal requires a non-empty reason, returns the assignment to draft, and retains prior snapshots.
-  - [ ] Test republishing creates a new release version while retaining prior snapshots.
-  - [ ] Test publication and withdrawal audit events contain the required actor, assignment, version, counts, and reason data.
-  - [ ] Extend student grade handler tests to prove draft grades and live provisional grades are hidden.
-  - [ ] Test that published student responses come from the active snapshot and remain unchanged after `final_grades` recomputation.
-  - [ ] Test that students who become complete after publication remain unavailable until a later release.
-  - [ ] Run the focused server tests and confirm the new tests fail before implementation.
+- [x] Task: Write failing server tests (Red Phase) [33c2c78]
+  - [x] Create `tests/unit/server/gradebook-release.test.ts` using the established server-handler mocking pattern.
+  - [x] Test preflight classification for complete, incomplete/in-progress, and missing persisted grades.
+  - [x] Test that only the current assignment instructor can publish.
+  - [x] Test that students, admins, superadmins, and non-owning instructors cannot publish or withdraw.
+  - [x] Test publication creates one snapshot per eligible student and no snapshot for ineligible students.
+  - [x] Test publication increments the release version and updates release state atomically.
+  - [x] Test failed publication does not leave partial snapshots or a published state.
+  - [x] Test withdrawal requires a non-empty reason, returns the assignment to draft, and retains prior snapshots.
+  - [x] Test republishing creates a new release version while retaining prior snapshots.
+  - [x] Test publication and withdrawal audit events contain the required actor, assignment, version, counts, and reason data.
+  - [x] Extend student grade handler tests to prove draft grades and live provisional grades are hidden.
+  - [x] Test that published student responses come from the active snapshot and remain unchanged after `final_grades` recomputation.
+  - [x] Test that students who become complete after publication remain unavailable until a later release.
+  - [x] Run the focused server tests and confirm the new tests fail before implementation.
 
 - [ ] Task: Add validated release server-function contracts (Green Phase)
   - [ ] Extend `src/server/gradebook.ts` with Zod schemas and typed stubs for preflight, publish, and withdraw operations.
