@@ -8,7 +8,7 @@ This plan follows the approved specification and the repository’s TDD workflow
 - [x] Task: Re-read the approved `spec.md` and `conductor/workflow.md` [a1919f9]
   - [x] Confirm the 100/50/2,000 character limits, ownership model, archive/restore lifecycle, and no-hard-delete rule.
   - [x] Confirm the migration, test, commit, and git-note requirements.
-- [x] Task: Write failing schema tests in `tests/unit/db/schema/feedback-snippets.test.ts`
+- [x] Task: Write failing schema tests in `tests/unit/db/schema/feedback-snippets.test.ts` [ac96fd17]
   - [x] Verify the `feedbackSnippets` table export and required columns.
   - [x] Verify bounded title, category, and body columns.
   - [x] Verify the instructor foreign key and archive/timestamp columns.
