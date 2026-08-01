@@ -28,7 +28,7 @@ export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }
 
   if (isPending) {
     return (
-      <Card data-testid="student-final-grade-card">
+      <Card>
         <CardHeader>
           <Skeleton data-testid="grade-card-skeleton" className="h-6 w-40" />
         </CardHeader>
@@ -55,7 +55,7 @@ export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }
 
   if ('available' in grade && !grade.available) {
     return (
-      <Card>
+      <Card data-testid="student-final-grade-card">
         <CardHeader>
           <CardTitle>{t('gradebook.student.unavailable')}</CardTitle>
         </CardHeader>

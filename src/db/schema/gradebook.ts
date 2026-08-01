@@ -37,6 +37,7 @@ export const assignmentGradeConfig = pgTable('assignment_grade_config', {
   customWeights: jsonb('custom_weights'), // { [templateCheckpointId]: number } map, values 0–100
   letterGradeBounds: jsonb('letter_grade_bounds').notNull().default({ A: 90, B: 80, C: 70, D: 60 }),
   releaseStatus: gradeReleaseStatus('release_status').notNull().default('draft'),
+  // Retains the latest version while draft; releaseStatus controls visibility.
   activeReleaseVersion: integer('active_release_version'),
   publishedAt: timestamp('published_at'),
   createdAt: timestamp('created_at').defaultNow(),

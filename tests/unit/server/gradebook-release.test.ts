@@ -210,6 +210,16 @@ describe('grade release server contracts', () => {
     expect(mock.db.transaction).not.toHaveBeenCalled();
   });
 
+  it('rejects non-students from the student-facing grade endpoint', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+
+    const result = await getStudentFinalGradeHandler({ data: { assignmentId: 1 } });
+
+    expect(isServerError(result)).toBe(true);
+    if (isServerError(result)) expect(result.error.code).toBe('UNAUTHORIZED');
+    expect(mock.db.select).not.toHaveBeenCalled();
+  });
+
   it('rejects a non-owning instructor from publishing or withdrawing', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(otherInstructorSession as any);
     mock.enqueue([]);
@@ -317,13 +327,9 @@ describe('grade release server contracts', () => {
 
     expect(result).toEqual({ success: true });
     expect(mock.tx.update).toHaveBeenCalledTimes(1);
-    expect(mock.tx.set).toHaveBeenCalledWith(
-      expect.objectContaining({
-        releaseStatus: 'draft',
-        activeReleaseVersion: null,
-        publishedAt: null,
-      }),
-    );
+    const update = mock.tx.set.mock.calls[0][0];
+    expect(update).toEqual(expect.objectContaining({ releaseStatus: 'draft', publishedAt: null }));
+    expect(update).not.toHaveProperty('activeReleaseVersion');
     expect(mock.tx.delete).not.toHaveBeenCalled();
     expect(audit.logAuditEvent).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -352,12 +358,18 @@ describe('grade release server contracts', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(ownerSession as any);
     mock.enqueue(
       [assignment],
+      [{ releaseStatus: 'published', activeReleaseVersion: 3, publishedAt: new Date() }],
+      [],
+      [assignment],
       [{ ...draftConfig, activeReleaseVersion: 3 }],
       [eligibleGrade],
       [],
       [],
     );
 
+    await withdrawGradeReleaseHandler({
+      data: { assignmentId: 1, reason: 'Corrected final grade calculation' },
+    });
     const result = (await publishGradeReleaseHandler({
       data: { assignmentId: 1, confirmed: true },
     })) as any;
@@ -407,7 +419,18 @@ describe('student grade release visibility', () => {
           numericScore: '92.50',
           letterGrade: 'A',
           status: 'complete',
-          contributingCheckpoints: [{ checkpointId: 10, score: 92.5 }],
+          contributingCheckpoints: [
+            {
+              checkpointId: 10,
+              checkpointName: 'Checkpoint 10',
+              templateCheckpointId: 100,
+              order: 1,
+              state: 'passed',
+              score: 92.5,
+              isRubric: false,
+              weight: 100,
+            },
+          ],
           publishedAt,
         },
       ],
@@ -421,7 +444,18 @@ describe('student grade release visibility', () => {
       numericScore: 92.5,
       letterGrade: 'A',
       status: 'complete',
-      contributingCheckpoints: [{ checkpointId: 10, score: 92.5 }],
+      contributingCheckpoints: [
+        {
+          checkpointId: 10,
+          checkpointName: 'Checkpoint 10',
+          templateCheckpointId: 100,
+          order: 1,
+          state: 'passed',
+          score: 92.5,
+          isRubric: false,
+          weight: 100,
+        },
+      ],
       publishedAt,
     });
   });

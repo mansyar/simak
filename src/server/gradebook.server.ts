@@ -1,5 +1,6 @@
 // Gradebook handler implementations (server-only, never client-bundled).
 import { and, eq } from 'drizzle-orm';
+import { z } from 'zod';
 import { getDb } from '@/db/index';
 import { assignments, assignmentStudents, checkpoints } from '@/db/schema/assignments';
 import { submissions, reviews } from '@/db/schema/submissions';
@@ -16,7 +17,7 @@ import type {
   AssignmentGradeConfig,
   ContributingCheckpoint,
 } from '@/lib/grade-computation';
-import { isAdmin, isInstructor } from '@/lib/session-guards';
+import { isAdmin, isInstructor, isStudent } from '@/lib/session-guards';
 import { logger } from '@/lib/logger';
 
 // ---- Shared Helpers ----
@@ -44,6 +45,24 @@ export interface GradebookConfig extends AssignmentGradeConfig {
   releaseStatus: 'draft' | 'published' | null;
   activeReleaseVersion: number | null;
   publishedAt: Date | null;
+}
+
+const contributingCheckpointSchema = z.object({
+  checkpointId: z.number(),
+  checkpointName: z.string(),
+  templateCheckpointId: z.number().nullable(),
+  order: z.number(),
+  state: z.enum(['locked', 'unlocked', 'submitted', 'under_review', 'passed', 'revise']),
+  score: z.number(),
+  isRubric: z.boolean(),
+  weight: z.number(),
+});
+
+const contributingCheckpointsSchema = z.array(contributingCheckpointSchema);
+
+function parseContributingCheckpoints(value: unknown): ContributingCheckpoint[] {
+  const result = contributingCheckpointsSchema.safeParse(value);
+  return result.success ? result.data : [];
 }
 
 export async function fetchGradeConfig(
@@ -128,7 +147,7 @@ export function groupRowsByStudent(
 /** Get a student's final grade. Ownership-verified, does NOT auto-create config on read. */
 export async function getStudentFinalGradeHandler({ data }: { data: { assignmentId: number } }) {
   const session = await getSessionFromHeaders();
-  if (!session) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  if (!isStudent(session)) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { assignmentId } = data;
   const db = getDb();
@@ -187,7 +206,7 @@ export async function getStudentFinalGradeHandler({ data }: { data: { assignment
         numericScore: Number(snapshot.numericScore),
         letterGrade: snapshot.letterGrade,
         status: snapshot.status,
-        contributingCheckpoints: snapshot.contributingCheckpoints as ContributingCheckpoint[],
+        contributingCheckpoints: parseContributingCheckpoints(snapshot.contributingCheckpoints),
         publishedAt: snapshot.publishedAt,
       };
     }

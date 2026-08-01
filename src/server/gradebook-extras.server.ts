@@ -24,6 +24,12 @@ interface ReleaseGradeRow {
   contributingCheckpoints: unknown;
 }
 
+interface EligibleReleaseGradeRow extends ReleaseGradeRow {
+  numericScore: string | number;
+  letterGrade: string;
+  status: 'complete';
+}
+
 interface ReleaseConfigRow {
   releaseStatus: ReleaseStatus;
   activeReleaseVersion: number | null;
@@ -34,12 +40,20 @@ function validateAssignmentId(assignmentId: number) {
   return Number.isInteger(assignmentId) && assignmentId > 0;
 }
 
-async function getOwnedAssignment(db: ReleaseDb, assignmentId: number, instructorId: string) {
-  const rows = await db
+async function getOwnedAssignment(
+  db: ReleaseDb,
+  assignmentId: number,
+  instructorId: string,
+  lock = false,
+) {
+  const query = db
     .select({ id: assignments.id, instructorId: assignments.instructorId })
     .from(assignments)
-    .where(and(eq(assignments.id, assignmentId), eq(assignments.instructorId, instructorId)))
-    .limit(1);
+    .where(and(eq(assignments.id, assignmentId), eq(assignments.instructorId, instructorId)));
+
+  const rows = lock
+    ? await query.for('update', { of: assignments }).limit(1)
+    : await query.limit(1);
 
   return rows[0] ?? null;
 }
@@ -91,13 +105,18 @@ async function getEnrolledGrades(db: ReleaseDb, assignmentId: number) {
 }
 
 function classifyGrades(rows: ReleaseGradeRow[]) {
-  const eligible: ReleaseGradeRow[] = [];
+  const eligible: EligibleReleaseGradeRow[] = [];
   const incomplete: ReleaseGradeRow[] = [];
   const missing: ReleaseGradeRow[] = [];
 
   for (const row of rows) {
     if (row.status === 'complete' && row.numericScore !== null && row.letterGrade !== null) {
-      eligible.push(row);
+      eligible.push({
+        ...row,
+        numericScore: row.numericScore,
+        letterGrade: row.letterGrade,
+        status: 'complete',
+      });
     } else if (row.status === 'incomplete' || row.status === 'in_progress') {
       incomplete.push(row);
     } else {
@@ -133,6 +152,7 @@ async function writeReleaseAudit(
   }
 }
 
+/** Return the owning instructor's current release state and grade eligibility summary. */
 export async function getGradeReleasePreflightHandler({
   data,
 }: {
@@ -175,6 +195,7 @@ export async function getGradeReleasePreflightHandler({
   }
 }
 
+/** Publish complete enrolled grades as an immutable, versioned snapshot set. */
 export async function publishGradeReleaseHandler({
   data,
 }: {
@@ -189,7 +210,7 @@ export async function publishGradeReleaseHandler({
   const db = getDb();
   try {
     const result = await db.transaction(async (tx) => {
-      const assignment = await getOwnedAssignment(tx, data.assignmentId, session.user.id);
+      const assignment = await getOwnedAssignment(tx, data.assignmentId, session.user.id, true);
       if (!assignment) return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
 
       const config = await getReleaseConfig(tx, data.assignmentId, true);
@@ -209,7 +230,7 @@ export async function publishGradeReleaseHandler({
             studentId: grade.studentId,
             releaseVersion,
             numericScore: String(grade.numericScore),
-            letterGrade: grade.letterGrade!,
+            letterGrade: grade.letterGrade,
             status: 'complete' as const,
             contributingCheckpoints: grade.contributingCheckpoints ?? [],
             publishedAt,
@@ -260,6 +281,7 @@ export async function publishGradeReleaseHandler({
   }
 }
 
+/** Withdraw the active release while retaining its immutable snapshot history. */
 export async function withdrawGradeReleaseHandler({
   data,
 }: {
@@ -274,7 +296,7 @@ export async function withdrawGradeReleaseHandler({
   const db = getDb();
   try {
     const result = await db.transaction(async (tx) => {
-      const assignment = await getOwnedAssignment(tx, data.assignmentId, session.user.id);
+      const assignment = await getOwnedAssignment(tx, data.assignmentId, session.user.id, true);
       if (!assignment) return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
 
       const config = await getReleaseConfig(tx, data.assignmentId, true);
@@ -287,7 +309,6 @@ export async function withdrawGradeReleaseHandler({
         .update(assignmentGradeConfig)
         .set({
           releaseStatus: 'draft',
-          activeReleaseVersion: null,
           publishedAt: null,
           updatedAt: new Date(),
         })

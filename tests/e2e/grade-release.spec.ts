@@ -74,7 +74,7 @@ function moderateOrHigherViolations(violations: Array<{ impact?: string | null }
 }
 
 test.describe('Grade release workflow', () => {
-  test.beforeAll(async ({ browser }) => {
+  test.beforeEach(async ({ browser }) => {
     await resetDatabase();
     await seedCompleteWorkingGrades();
     await ensureAuthFile(browser, 'instructor');
@@ -92,8 +92,8 @@ test.describe('Grade release workflow', () => {
     await instructorPage.getByRole('link', { name: /view all/i }).click();
     const gradebookLink = instructorPage.getByRole('link', { name: /gradebook/i });
     const gradebookHref = await gradebookLink.getAttribute('href');
-    expect(gradebookHref).toBeTruthy();
-    await instructorPage.goto(gradebookHref!);
+    if (!gradebookHref) throw new Error('Gradebook link did not include an href');
+    await instructorPage.goto(gradebookHref);
     await instructorPage.waitForLoadState('networkidle');
 
     const gradebookA11y = await new AxeBuilder({ page: instructorPage })
@@ -132,8 +132,57 @@ test.describe('Grade release workflow', () => {
     await studentContext.close();
   });
 
-  test('student cannot mutate a release and withdrawal requires a reason', async ({ page }) => {
-    await page.goto('/student/assignments');
-    await expect(page.getByText(/not yet released|unavailable/i)).toHaveCount(0);
+  test('student cannot mutate a release and withdrawal requires a reason', async ({ browser }) => {
+    const studentContext = await browser.newContext({ storageState: getAuthFilePath('student') });
+    const studentPage = await studentContext.newPage();
+    await studentPage.goto('/student/assignments');
+    await studentPage.getByRole('link', { name: /view all/i }).click();
+    await studentPage.waitForLoadState('networkidle');
+    await expect(studentPage.getByTestId('student-final-grade-card')).toContainText(
+      /not yet released|unavailable/i,
+    );
+    await expect(studentPage.getByRole('button', { name: /publish|withdraw/i })).toHaveCount(0);
+
+    const instructorContext = await browser.newContext({
+      storageState: getAuthFilePath('instructor'),
+    });
+    const instructorPage = await instructorContext.newPage();
+    await instructorPage.goto('/instructor/assignments');
+    await instructorPage.getByRole('link', { name: /view all/i }).click();
+    const gradebookLink = instructorPage.getByRole('link', { name: /gradebook/i });
+    const gradebookHref = await gradebookLink.getAttribute('href');
+    if (!gradebookHref) throw new Error('Gradebook link did not include an href');
+    await instructorPage.goto(gradebookHref);
+    await instructorPage.waitForLoadState('networkidle');
+    await instructorPage.getByRole('button', { name: /publish/i }).click();
+    await expect(instructorPage.getByText(/eligible/i)).toBeVisible();
+    await instructorPage.getByRole('checkbox').check();
+    await instructorPage
+      .getByRole('button', { name: /publish/i })
+      .last()
+      .click();
+    await expect(instructorPage.getByRole('button', { name: /withdraw release/i })).toBeVisible();
+
+    await instructorPage.getByRole('button', { name: /withdraw release/i }).click();
+    await instructorPage
+      .getByRole('button', { name: /withdraw release/i })
+      .last()
+      .click();
+    await expect(instructorPage.getByRole('alert')).toContainText(/reason/i);
+    await instructorPage.getByRole('textbox').fill('Corrected final grade calculation');
+    await instructorPage
+      .getByRole('button', { name: /withdraw release/i })
+      .last()
+      .click();
+    await expect(instructorPage.getByLabel(/release status/i).getByText(/draft/i)).toBeVisible();
+
+    await studentPage.reload();
+    await studentPage.waitForLoadState('networkidle');
+    await expect(studentPage.getByTestId('student-final-grade-card')).toContainText(
+      /not yet released|unavailable/i,
+    );
+
+    await instructorContext.close();
+    await studentContext.close();
   });
 });
