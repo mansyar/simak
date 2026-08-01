@@ -24,6 +24,27 @@ vi.mock('@/server/files', () => ({
   getPresignedReviewFeedbackUploadUrl: vi.fn(),
 }));
 
+vi.mock('@/components/reviews/FeedbackSnippetPicker', () => ({
+  FeedbackSnippetPicker: ({ onInsert }: { onInsert: (body: string) => void }) => (
+    <div>
+      <button
+        type="button"
+        data-testid="insert-first-snippet"
+        onClick={() => onInsert('Use evidence.')}
+      >
+        insert first snippet
+      </button>
+      <button
+        type="button"
+        data-testid="insert-second-snippet"
+        onClick={() => onInsert('Add detail.')}
+      >
+        insert second snippet
+      </button>
+    </div>
+  ),
+}));
+
 // Mock __root
 vi.mock('@/routes/__root', () => ({
   useI18n: vi.fn().mockReturnValue({
@@ -175,5 +196,43 @@ describe('ReviewForm', () => {
     await waitFor(() => {
       expect(mockOnError).toHaveBeenCalledWith('instructorReviews.submitError');
     });
+  });
+
+  it('inserts a snippet into an empty comment without submitting or changing the decision', () => {
+    render(<ReviewForm submissionId={1} onComplete={mockOnComplete} onError={mockOnError} />);
+
+    const comment = screen.getByLabelText('instructorReviews.comment') as HTMLTextAreaElement;
+    fireEvent.click(screen.getByTestId('insert-first-snippet'));
+
+    expect(comment.value).toBe('Use evidence.');
+    expect(document.activeElement).toBe(comment);
+    expect(screen.getByDisplayValue('pass')).toHaveProperty('checked', false);
+    expect(screen.getByDisplayValue('revise')).toHaveProperty('checked', false);
+    expect(submitReview).not.toHaveBeenCalled();
+  });
+
+  it('adds exactly one blank line for non-empty comments and preserves continued editing', () => {
+    render(<ReviewForm submissionId={1} onComplete={mockOnComplete} onError={mockOnError} />);
+
+    const comment = screen.getByLabelText('instructorReviews.comment') as HTMLTextAreaElement;
+    fireEvent.change(comment, { target: { value: 'Manual comment' } });
+    fireEvent.click(screen.getByTestId('insert-first-snippet'));
+    fireEvent.change(comment, { target: { value: `${comment.value} More manual text` } });
+    fireEvent.click(screen.getByTestId('insert-second-snippet'));
+
+    expect(comment.value).toBe('Manual comment\n\nUse evidence. More manual text\n\nAdd detail.');
+    fireEvent.change(comment, { target: { value: `${comment.value} Edited` } });
+    expect(comment.value.endsWith(' Edited')).toBe(true);
+    expect(submitReview).not.toHaveBeenCalled();
+  });
+
+  it('does not add a separator when the existing comment is whitespace only', () => {
+    render(<ReviewForm submissionId={1} onComplete={mockOnComplete} onError={mockOnError} />);
+
+    const comment = screen.getByLabelText('instructorReviews.comment') as HTMLTextAreaElement;
+    fireEvent.change(comment, { target: { value: '   ' } });
+    fireEvent.click(screen.getByTestId('insert-first-snippet'));
+
+    expect(comment.value).toBe('Use evidence.');
   });
 });

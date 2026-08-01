@@ -94,6 +94,23 @@ describe('InstructorSidebar', () => {
     expect(reviewsLink.textContent).toBe('instructorSidebar.reviews');
   });
 
+  it('should render feedback snippets link', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
+
+    const snippetsLink = screen.getByTestId('sidebar-link-/instructor/feedback-snippets');
+    expect(snippetsLink).toBeDefined();
+    expect(snippetsLink.textContent).toBe('instructorSidebar.feedbackSnippets');
+  });
+
+  it('should highlight the feedback snippets route', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/feedback-snippets' });
+    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
+
+    const snippetsLink = screen.getByTestId('sidebar-link-/instructor/feedback-snippets');
+    expect(snippetsLink.className).toContain('bg-sidebar-accent');
+  });
+
   it('should highlight the currently active route', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
     render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);

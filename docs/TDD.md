@@ -75,6 +75,7 @@ Throughout this document, features are tagged as:
 │   ├── /instructor/reviews               → Review queue [v1]
 │   ├── /instructor/interventions         → Private at-risk intervention management [v1]
 │   ├── /instructor/analytics             → Instructor performance analytics [v1]
+│   ├── /instructor/feedback-snippets     → Private instructor feedback snippet library [v1]
 │   └── /instructor/reports               → Report builder & history [v2]
 
 / (authenticated — admin)
@@ -122,7 +123,8 @@ simak/
 │   │   ├── student/
 │   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton
 │   │   ├── instructor/
-│   │   │   └── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
+│   │   │   ├── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
+│   │   │   └── feedback-snippets/ → Private snippet management page, form, and cards (TRACK-049)
 │   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js), RubricScoringSection (instructor scoring UI), RubricResultView (student view)
 │   │   ├── gradebook/        → GradebookTable, GradeConfigSummary, GradeSettingsDialog, StudentFinalGradeCard, GradebookExportButtons, RecomputeGradesButton
 │   │   ├── consultations/    → Log form, consultation list, progress bar, verification queue item, verification dialog
@@ -144,6 +146,8 @@ simak/
 │   │   ├── assignments-admin.server.ts → Admin-only assignment handler (`reassignAssignmentHandler` — extracted to stay under 500-line limit, multi-handler pattern) (TRACK-040)
 │   │   ├── submissions.ts    → Upload, versioning
 │   │   ├── reviews.ts        → Review, pass/revise
+│   │   ├── feedback-snippets.ts → Private snippet schemas/stubs (TRACK-049)
+│   │   ├── feedback-snippets.server.ts → Instructor-owned snippet handlers (TRACK-049)
 │   │   ├── consultations.ts  → Log, list, verify, reject, detail, counts (split: .ts stubs + .server.ts handlers)
 │   │   ├── interventions.ts  → Intervention Zod schemas and typed server-function stubs
 │   │   ├── interventions.server.ts → Instructor-only intervention creation, listing, context, and locked lifecycle handlers
@@ -217,7 +221,7 @@ simak/
     │   │   ├── session-guards.ts → Shared client-safe type-guard functions (isAdmin, isInstructor, isStudent, isAuthenticated) — accept `NonNullableSession | null`, return `session is NonNullableSession` (TRACK-031)
      │   │   ├── server-fn.ts     → Type-preserving `typedServerFn` alias for `createServerFn`, plus explicit `serverFnMiddlewares()` composition for request IDs and optional rate limiting. Client-safe stubs dynamically import server-only handlers inside callbacks.
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
-    │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys, discussionKeys, settingsKeys, gradebookKeys)
+     │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys, discussionKeys, settingsKeys, gradebookKeys, feedbackSnippetKeys)
     │   │   ├── logger.ts         → Singleton `pino` logger instance — JSON to stdout in prod, `pino-pretty` in dev (lazy-loaded via `createRequire`). `LOG_LEVEL` env var (default `info`). A pino `mixin` adds the current AsyncLocalStorage request ID to every log entry. `createLogger(options?)` factory. Server-side only. (TRACK-040, TRACK-044)
     │   │   ├── request-context.ts → `requestIdMiddleware` (TanStack Start `createMiddleware`) + `createRequestLogger(context)` — reads `x-request-id` header or generates UUID, then scopes it through AsyncLocalStorage for automatic logger propagation. Wired globally by `typedServerFn`. (TRACK-040, TRACK-044)
     │   │   ├── request-context-store.ts → `AsyncLocalStorage<RequestContext>` and `getRequestId()` helper for request-scoped logging context. (TRACK-044)
@@ -239,7 +243,7 @@ simak/
 ├── tests/
 │   ├── unit/                 → Vitest unit tests
 │   ├── integration/          → Vitest integration tests
-│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 20 spec files including intervention workflow coverage, includes @axe-core/playwright a11y scans)
+│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 20 spec files including feedback-snippet and intervention workflow coverage, includes @axe-core/playwright a11y scans)
 ├── docker/
 │   └── Dockerfile
 ├── drizzle.config.ts
@@ -358,7 +362,7 @@ All 9 user-initiated mutation sites where the predicted state is deterministic u
 
 **Pattern:** `onMutate` captures the previous cache snapshot via `queryClient.getQueryData()`, mutates the cache optimistically, and returns `{ previousData }` as the mutation context. `onError` restores the snapshot via `queryClient.setQueryData()`. `onSettled` calls `queryClient.invalidateQueries()` to reconcile with the authoritative server state. All mutation functions that return `{ success: boolean; error: string | null }` must throw on `!result.success` — this ensures `onError` (rollback) fires on server-side errors, not just network exceptions.
 
-**Query-key factory:** `src/lib/query-keys.ts` provides typed key factories for 9 domains (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`, `templateKeys`, `discussionKeys`, `settingsKeys`, `gradebookKeys`). All migrated queries reference factory keys instead of inline arrays — ensuring reliable cache invalidation across features. `templateKeys` was added in TRACK-015 when the template/student pickers were migrated from `useEffect`+`useState` to `useQuery`. `discussionKeys` was added in TRACK-026 for the checkpoint discussions feature. `settingsKeys` (4 sub-keys: `currentUser`, `activeSessions`, `twoFactorStatus`, `accessibility`) and `gradebookKeys` (`studentFinalGrade`) were added in TRACK-029, completing the factory pattern across all client-side data domains — zero inline string-array query keys remain in `src/**/*.tsx`. TRACK-029 also migrated `StudentFinalGradeCard` from `useState`/`useEffect` to `useQuery` and `RecomputeGradesButton` from `useState`/`async` to `useMutation` with dual invalidation (`queryClient.invalidateQueries` + `router.invalidate()` for SSR loader data). TRACK-030 subsequently removed `page` from `notificationKeys.list`'s type signature — with `useInfiniteQuery`, page tracking is managed by `pageParam` and all pages of the same filter share one cache entry (the `page` parameter was no longer part of the cache key).
+**Query-key factory:** `src/lib/query-keys.ts` provides typed key factories for 10 domains (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`, `templateKeys`, `discussionKeys`, `settingsKeys`, `gradebookKeys`, `feedbackSnippetKeys`). All migrated queries reference factory keys instead of inline arrays — ensuring reliable cache invalidation across features. `templateKeys` was added in TRACK-015 when the template/student pickers were migrated from `useEffect`+`useState` to `useQuery`. `discussionKeys` was added in TRACK-026 for the checkpoint discussions feature. `settingsKeys` (4 sub-keys: `currentUser`, `activeSessions`, `twoFactorStatus`, `accessibility`) and `gradebookKeys` (`studentFinalGrade`) were added in TRACK-029. `feedbackSnippetKeys` was added in TRACK-049 for active/archived/search-filtered snippet lists, completing the factory pattern across all client-side data domains — zero inline string-array query keys remain in `src/**/*.tsx`. TRACK-029 also migrated `StudentFinalGradeCard` from `useState`/`useEffect` to `useQuery` and `RecomputeGradesButton` from `useState`/`async` to `useMutation` with dual invalidation (`queryClient.invalidateQueries` + `router.invalidate()` for SSR loader data). TRACK-030 subsequently removed `page` from `notificationKeys.list`'s type signature — with `useInfiniteQuery`, page tracking is managed by `pageParam` and all pages of the same filter share one cache entry (the `page` parameter was no longer part of the cache key).
 
 **Scope guard:** Optimistic updates are applied ONLY where the predicted state is deterministic. Mutations whose server response carries computed/derived data the client can't predict (e.g., `submitReview` which unlocks the next checkpoint and adjusts deadlines server-side) keep the standard refetch-on-success flow.
 
@@ -377,7 +381,7 @@ The `createServerFn` wrapper from `@tanstack/react-start` has a known type-infer
 - Composes `requestIdMiddleware` first (TRACK-044). The middleware reads an incoming `x-request-id` or creates a UUID, then scopes it with `AsyncLocalStorage` so the pino logger's `mixin` includes `{ requestId }` in every server-function log without handler changes.
 - Adds an optional `RateLimitConfig` middleware after request-ID middleware. When the per-user per-function sliding window is exceeded, the function middleware throws a `RATE_LIMITED` server error so TanStack Start terminates the invocation through its normal error path.
 
-All 23 server stub files (`src/server/*.ts`) import `typedServerFn` from `@/lib/server-fn` instead of `createServerFn` from `@tanstack/react-start`. This eliminated 66 `as unknown as` casts across hooks (7), components (38), routes (19), server files (5), lib (3), and Better Auth handlers (2) — replacing them with `isServerError()` type-guard checks and proper Drizzle/Better Auth typing.
+All server stub files (`src/server/*.ts`) import `typedServerFn` from `@/lib/server-fn` instead of `createServerFn` from `@tanstack/react-start`. This eliminated 66 `as unknown as` casts across hooks (7), components (38), routes (19), server files (5), lib (3), and Better Auth handlers (2) — replacing them with `isServerError()` type-guard checks and proper Drizzle/Better Auth typing.
 
 **Documented remaining casts (TanStack Router typed-routes limitation, not fixable):**
 - 6 sidebar casts (`to={link.to as unknown as '.'}`) in `admin-sidebar.tsx`, `instructor-sidebar.tsx`, `student-sidebar.tsx`.
@@ -1259,6 +1263,22 @@ Request ID propagation infrastructure is defined in `src/lib/request-context.ts`
 | **Intervention workflow** | Instructor-only privacy, live `student_inaction` eligibility, pending-review rejection, active-pair uniqueness, reassignment access, lifecycle transitions, audit details, and overdue follow-up display. |
 | **Bulk import**       | Xlsx parsing, role-permission validation, email uniqueness (excluding soft-deleted), transaction rollback, audit logging. |                                                   |
 
+### Vitest Execution and Coverage Contract
+
+The default unit workflow remains the canonical `vitest.config.ts` project
+configuration: unit tests use isolated fork workers, the four XLSX test files
+run in their dedicated `threads` project, and `tests/integration/**` remains
+opt-in through `pnpm test:integration`. Coverage uses the V8 provider with
+text, JSON, and HTML reports, the existing `src` include/exclude scope, and
+80% lines/functions/branches/statements thresholds.
+
+An August 2026 controlled benchmark recorded a 113.35-second median for
+`pnpm test:coverage`. Worker, pool, reporter, isolation, environment, and
+coverage-processing experiments did not produce a safe 20% reduction, so no
+configuration or package-script optimization was retained. The evidence and
+operational trade-offs are documented in
+[`docs/vitest-coverage-performance.md`](vitest-coverage-performance.md).
+
 ### Integration Tests (Vitest) [v2]
 
 | Focus                | Examples                                                                   |
@@ -1270,7 +1290,7 @@ Request ID propagation infrastructure is defined in `src/lib/request-context.ts`
 
 ### E2E Tests (Playwright) [v1]
 
-E2E tests run against a dedicated test database (`simak_test` on a separate `postgres-test` Docker service, port 5433) to avoid polluting the dev database. The global setup (`tests/e2e/global-setup.ts`) migrates the test DB, truncates all tables, and seeds test users (SuperAdmin, Admin, Instructor, Student, Student2, Student3 — all with `emailVerified: true`) plus an assignment template (3 checkpoints, Thesis, `minConsultations: 1`), an assignment with the first checkpoint unlocked (Student + Student2 enrolled; Student3 not enrolled — for cross-student access denial tests), and a pending consultation on the Proposal checkpoint. Each spec file resets the database (truncate + re-seed) via `resetDatabase()` before execution to ensure isolation.
+E2E tests run against a dedicated test database (`simak_test` on a separate `postgres-test` Docker service, port 5433) to avoid polluting the dev database. The global setup (`tests/e2e/global-setup.ts`) migrates the test DB, truncates all tables, and seeds test users (SuperAdmin, Admin, Instructor, Instructor2, Student, Student2, Student3 — all with `emailVerified: true`) plus an assignment template (3 checkpoints, Thesis, `minConsultations: 1`), an assignment with the first checkpoint unlocked (Student + Student2 enrolled; Student3 not enrolled — for cross-student access denial tests), a pending consultation on the Proposal checkpoint, and TRACK-049 active, archived, and second-instructor-private feedback snippets. Each spec file resets the database (truncate + re-seed) via `resetDatabase()` before execution to ensure isolation.
 
 **Configuration** (`playwright.config.ts`):
 
@@ -1332,7 +1352,7 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 - **Over-fetch prevention:** `listNotificationsHandler` selects only needed columns (`id, type, titleKey, messageKey, params, read, createdAt` — no `metadata`) and constructs response objects explicitly (no `...item` spread leaking raw columns). The redundant `SELECT locale FROM users` query was removed — `session.user.locale` (enriched in `auth.ts` via `_getSession`) is used directly.
 - **R2 HEAD check before transaction:** `getObjectContentLength` (R2 `HeadObjectCommand`) is called **before** `db.transaction()` in both `submitCheckpointHandler` and `submitReviewHandler`, so row locks are not held during slow I/O. The discriminated return type `{ ok: true, size } | { ok: false, reason }` is handled before entering the transaction.
 - **Post-commit advisory work:** All advisory work after a transaction commit (audit logging, notification inserts, email dispatch) is wrapped in try/catch per SQL styleguide §6.4, so a failure in advisory work does not surface a 500 error to the user after the primary mutation has already succeeded.
-- **Typed query-key factory (Track: Optimistic UI Updates for Mutations):** `src/lib/query-keys.ts` centralizes all query cache keys into typed factory functions for 9 domains (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`, `templateKeys`, `discussionKeys`, `settingsKeys`, `gradebookKeys`). This replaces scattered inline key arrays (`['notifications', 'unreadCount']`, `['currentUser']`, etc.) and ensures reliable cache invalidation across features — especially for optimistic mutations that need to read and write the correct cache entry by key. `templateKeys` was added in TRACK-015, `discussionKeys` in TRACK-026, and `settingsKeys` + `gradebookKeys` in TRACK-029 — completing the factory pattern across all client-side data domains with zero remaining inline keys.
+- **Typed query-key factory (Tracks: Optimistic UI Updates and Instructor Feedback Snippets):** `src/lib/query-keys.ts` centralizes all query cache keys into typed factory functions for 10 domains (`notificationKeys`, `consultationKeys`, `extensionKeys`, `assignmentKeys`, `userKeys`, `templateKeys`, `discussionKeys`, `settingsKeys`, `gradebookKeys`, `feedbackSnippetKeys`). This replaces scattered inline key arrays (`['notifications', 'unreadCount']`, `['currentUser']`, etc.) and ensures reliable cache invalidation across features — especially for optimistic mutations and active/archived snippet searches that need to read and write the correct cache entry by key. `templateKeys` was added in TRACK-015, `discussionKeys` in TRACK-026, `settingsKeys` + `gradebookKeys` in TRACK-029, and `feedbackSnippetKeys` in TRACK-049 — completing the factory pattern across all client-side data domains with zero remaining inline keys.
 - **Optimistic UI updates (Track: Optimistic UI Updates for Mutations):** 9 mutation sites use the `onMutate`/`onError`/`onSettled` pattern to reflect predicted state changes before the server responds, eliminating perceived latency on deterministic operations (mark-as-read, verify/reject consultation, approve/reject extension, unlock/extend deadline, delete user). Rollback is guaranteed via snapshot capture/restore. Mutations with unpredictable server responses (e.g., `submitReview`) keep the standard refetch-on-success flow (scope guard).
 
 ### Server-Side Caching [v2]

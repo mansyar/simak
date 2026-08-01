@@ -10,6 +10,7 @@ import {
   GraduationCap,
   BarChart3,
   LifeBuoy,
+  MessageSquare,
 } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 
@@ -33,6 +34,11 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
       to: '/instructor/interventions',
       label: t('instructorSidebar.interventions'),
       icon: LifeBuoy,
+    },
+    {
+      to: '/instructor/feedback-snippets',
+      label: 'instructorSidebar.feedbackSnippets',
+      icon: MessageSquare,
     },
     { to: '/instructor/analytics', label: 'instructorSidebar.analytics', icon: BarChart3 },
   ] as const;

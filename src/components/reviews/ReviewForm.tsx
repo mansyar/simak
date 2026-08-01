@@ -8,6 +8,7 @@ import { submitReview } from '@/server/reviews';
 import { isServerError } from '@/lib/errors';
 import { getPresignedReviewFeedbackUploadUrl } from '@/server/files';
 import { RubricScoringSection, type ScoreInput } from '@/components/reviews/RubricScoringSection';
+import { FeedbackSnippetPicker } from '@/components/reviews/FeedbackSnippetPicker';
 import type { RubricData } from '@/server/rubrics';
 import { Loader2, Upload } from 'lucide-react';
 
@@ -34,6 +35,13 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
     rubric && rubric.gradingType !== null
       ? rubric.criteria.every((c) => scores.some((s) => s.criterionId === c.id))
       : true;
+
+  const handleInsertSnippet = useCallback((snippetBody: string) => {
+    setComment((currentComment) =>
+      currentComment.trim().length > 0 ? `${currentComment}\n\n${snippetBody}` : snippetBody,
+    );
+    document.getElementById('comment')?.focus();
+  }, []);
 
   const handleFeedbackFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,6 +178,8 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
             rows={3}
           />
         </div>
+
+        <FeedbackSnippetPicker onInsert={handleInsertSnippet} />
 
         {/* Feedback file upload */}
         <div className="space-y-1.5">

@@ -26,6 +26,7 @@ import { Route as UnauthenticatedAuthForgotPasswordRouteImport } from './routes/
 import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated/student/settings'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated/student/dashboard'
 import { Route as AuthenticatedInstructorSettingsRouteImport } from './routes/_authenticated/instructor/settings'
+import { Route as AuthenticatedInstructorFeedbackSnippetsRouteImport } from './routes/_authenticated/instructor/feedback-snippets'
 import { Route as AuthenticatedInstructorDashboardRouteImport } from './routes/_authenticated/instructor/dashboard'
 import { Route as AuthenticatedInstructorAnalyticsRouteImport } from './routes/_authenticated/instructor/analytics'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
@@ -139,6 +140,12 @@ const AuthenticatedInstructorSettingsRoute =
   AuthenticatedInstructorSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => AuthenticatedInstructorRoute,
+  } as any)
+const AuthenticatedInstructorFeedbackSnippetsRoute =
+  AuthenticatedInstructorFeedbackSnippetsRouteImport.update({
+    id: '/feedback-snippets',
+    path: '/feedback-snippets',
     getParentRoute: () => AuthenticatedInstructorRoute,
   } as any)
 const AuthenticatedInstructorDashboardRoute =
@@ -287,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/instructor/analytics': typeof AuthenticatedInstructorAnalyticsRoute
   '/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
+  '/instructor/feedback-snippets': typeof AuthenticatedInstructorFeedbackSnippetsRoute
   '/instructor/settings': typeof AuthenticatedInstructorSettingsRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
@@ -326,6 +334,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/instructor/analytics': typeof AuthenticatedInstructorAnalyticsRoute
   '/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
+  '/instructor/feedback-snippets': typeof AuthenticatedInstructorFeedbackSnippetsRoute
   '/instructor/settings': typeof AuthenticatedInstructorSettingsRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
@@ -368,6 +377,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/instructor/analytics': typeof AuthenticatedInstructorAnalyticsRoute
   '/_authenticated/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
+  '/_authenticated/instructor/feedback-snippets': typeof AuthenticatedInstructorFeedbackSnippetsRoute
   '/_authenticated/instructor/settings': typeof AuthenticatedInstructorSettingsRoute
   '/_authenticated/student/dashboard': typeof AuthenticatedStudentDashboardRoute
   '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
@@ -409,6 +419,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/instructor/analytics'
     | '/instructor/dashboard'
+    | '/instructor/feedback-snippets'
     | '/instructor/settings'
     | '/student/dashboard'
     | '/student/settings'
@@ -448,6 +459,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/instructor/analytics'
     | '/instructor/dashboard'
+    | '/instructor/feedback-snippets'
     | '/instructor/settings'
     | '/student/dashboard'
     | '/student/settings'
@@ -489,6 +501,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/instructor/analytics'
     | '/_authenticated/instructor/dashboard'
+    | '/_authenticated/instructor/feedback-snippets'
     | '/_authenticated/instructor/settings'
     | '/_authenticated/student/dashboard'
     | '/_authenticated/student/settings'
@@ -643,6 +656,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/instructor/settings'
       preLoaderRoute: typeof AuthenticatedInstructorSettingsRouteImport
+      parentRoute: typeof AuthenticatedInstructorRoute
+    }
+    '/_authenticated/instructor/feedback-snippets': {
+      id: '/_authenticated/instructor/feedback-snippets'
+      path: '/feedback-snippets'
+      fullPath: '/instructor/feedback-snippets'
+      preLoaderRoute: typeof AuthenticatedInstructorFeedbackSnippetsRouteImport
       parentRoute: typeof AuthenticatedInstructorRoute
     }
     '/_authenticated/instructor/dashboard': {
@@ -851,6 +871,7 @@ const AuthenticatedInstructorAssignmentsIdRouteWithChildren =
 interface AuthenticatedInstructorRouteChildren {
   AuthenticatedInstructorAnalyticsRoute: typeof AuthenticatedInstructorAnalyticsRoute
   AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
+  AuthenticatedInstructorFeedbackSnippetsRoute: typeof AuthenticatedInstructorFeedbackSnippetsRoute
   AuthenticatedInstructorSettingsRoute: typeof AuthenticatedInstructorSettingsRoute
   AuthenticatedInstructorAssignmentsIdRoute: typeof AuthenticatedInstructorAssignmentsIdRouteWithChildren
   AuthenticatedInstructorAssignmentsNewRoute: typeof AuthenticatedInstructorAssignmentsNewRoute
@@ -866,6 +887,8 @@ const AuthenticatedInstructorRouteChildren: AuthenticatedInstructorRouteChildren
       AuthenticatedInstructorAnalyticsRoute,
     AuthenticatedInstructorDashboardRoute:
       AuthenticatedInstructorDashboardRoute,
+    AuthenticatedInstructorFeedbackSnippetsRoute:
+      AuthenticatedInstructorFeedbackSnippetsRoute,
     AuthenticatedInstructorSettingsRoute: AuthenticatedInstructorSettingsRoute,
     AuthenticatedInstructorAssignmentsIdRoute:
       AuthenticatedInstructorAssignmentsIdRouteWithChildren,

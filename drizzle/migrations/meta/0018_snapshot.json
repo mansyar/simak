@@ -1,6 +1,6 @@
 {
-  "id": "19233168-4e84-40e0-b91e-ae90fcd68417",
-  "prevId": "afd91b39-d77a-4bb7-b433-38d8d060f0de",
+  "id": "cbf39596-3b40-46f0-b08f-f7ccd8f55bc6",
+  "prevId": "19233168-4e84-40e0-b91e-ae90fcd68417",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -3016,6 +3016,191 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.interventions": {
+      "name": "interventions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "assignment_id": {
+          "name": "assignment_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "student_id": {
+          "name": "student_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action_type": {
+          "name": "action_type",
+          "type": "intervention_action_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "private_note": {
+          "name": "private_note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "intervention_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'open'"
+        },
+        "follow_up_date": {
+          "name": "follow_up_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resolution_reason": {
+          "name": "resolution_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "interventions_assignment_id_status_idx": {
+          "name": "interventions_assignment_id_status_idx",
+          "columns": [
+            {
+              "expression": "assignment_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "interventions_assignment_id_student_id_idx": {
+          "name": "interventions_assignment_id_student_id_idx",
+          "columns": [
+            {
+              "expression": "assignment_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "student_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "interventions_follow_up_date_idx": {
+          "name": "interventions_follow_up_date_idx",
+          "columns": [
+            {
+              "expression": "follow_up_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "interventions_active_assignment_student_idx": {
+          "name": "interventions_active_assignment_student_idx",
+          "columns": [
+            {
+              "expression": "assignment_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "student_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"interventions\".\"status\" IN ('open', 'monitoring')",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "interventions_assignment_id_assignments_id_fk": {
+          "name": "interventions_assignment_id_assignments_id_fk",
+          "tableFrom": "interventions",
+          "tableTo": "assignments",
+          "columnsFrom": [
+            "assignment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "interventions_student_id_users_id_fk": {
+          "name": "interventions_student_id_users_id_fk",
+          "tableFrom": "interventions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "student_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.feedback_snippets": {
       "name": "feedback_snippets",
       "schema": "",
@@ -3195,6 +3380,26 @@
       "values": [
         "equal_weight",
         "custom_weight"
+      ]
+    },
+    "public.intervention_action_type": {
+      "name": "intervention_action_type",
+      "schema": "public",
+      "values": [
+        "consultation",
+        "extension",
+        "discussion",
+        "other"
+      ]
+    },
+    "public.intervention_status": {
+      "name": "intervention_status",
+      "schema": "public",
+      "values": [
+        "open",
+        "monitoring",
+        "resolved",
+        "dismissed"
       ]
     }
   },
