@@ -81,10 +81,10 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Add management, validation, archive/restore, picker, and accessibility strings to `locales/en.json` and `locales/id.json`.
   - [x] Run `pnpm generate:i18n`.
   - [x] Run `pnpm check:i18n`.
-- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
-  - [ ] Run focused route/component tests and i18n checks.
-  - [ ] Manually verify the active/archived management flows at desktop and mobile widths.
-  - [ ] Commit the phase and attach the verification git note.
+- [x] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+  - [x] Run focused route/component tests and i18n checks: `CI=true pnpm vitest run tests/unit/components/instructor/feedback-snippets.test.tsx tests/unit/components/instructor-sidebar.test.tsx tests/unit/server/feedback-snippets.test.ts tests/unit/db` passed 31 files and 235 tests; `pnpm check:i18n` passed.
+  - [x] Manually verify the active/archived management flows at desktop and mobile widths; the user confirmed navigation, search, CRUD, validation, archive/restore, translated feedback, loading/empty/error/pending, and light/dark states.
+  - [x] Commit the phase and attach the verification git note to the functional commit.
 
 ## Phase 4: Review-Form Snippet Picker & Comment Insertion
 
