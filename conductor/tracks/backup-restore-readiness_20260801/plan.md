@@ -14,11 +14,11 @@
   - [x] Review `docs/deployment-runbook.md` for the operator procedure and current pilot topology.
   - [x] Capture only non-sensitive evidence references and baseline facts.
 
-- [ ] Task: Define the documentation validation checklist
-  - [ ] List required review-document sections.
-  - [ ] List all facts that must be explicitly separated into current, deferred, or recommended status.
-  - [ ] List repository links that must resolve.
-  - [ ] Define the secret and sensitive-identifier exclusion check.
+- [x] Task: Define the documentation validation checklist
+  - [x] List required review-document sections.
+  - [x] List all facts that must be explicitly separated into current, deferred, or recommended status.
+  - [x] List repository links that must resolve.
+  - [x] Define the secret and sensitive-identifier exclusion check.
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
 
