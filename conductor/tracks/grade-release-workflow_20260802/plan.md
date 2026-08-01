@@ -164,13 +164,13 @@
   - [x] Run the relevant Playwright E2E and accessibility suites — grade-release Chromium passed 2 tests; scoped release-surface axe checks passed; broader Chromium accessibility passed 5 of 6, with the pre-existing admin-template heading-order violation.
   - [x] Resolve failures with focused fixes and rerun only the checks invalidated by each change; route mocks were corrected and the full unit/coverage suites were rerun.
 
-- [~] Task: Perform final self-review
-  - [ ] Review the diff against the approved specification and this plan.
-  - [ ] Confirm all server functions validate session, role, ownership, and input.
-  - [ ] Confirm snapshot immutability, release atomicity, and student visibility invariants.
-  - [ ] Confirm mobile touch targets, bilingual strings, accessible dialogs, and empty/error/loading states.
-  - [ ] Confirm migration and rollback safety.
-  - [ ] Record implementation notes and completed task commit SHAs in `plan.md`.
-  - [ ] Commit final plan updates using the project’s `conductor(plan): ...` format and attach required git notes where applicable.
+- [x] Task: Perform final self-review [43d6acb4]
+  - [x] Review the diff against the approved specification and this plan; `git diff --check` is clean and the change set is limited to release schema, server lifecycle, UI, i18n, audit registration, route support, tests, and Conductor artifacts.
+  - [x] Confirm all server functions validate session, role, ownership, and input; release mutations are instructor-owner only, student reads enforce enrollment and active-release state, and typed contracts validate IDs, confirmation, and withdrawal reasons.
+  - [x] Confirm snapshot immutability, release atomicity, and student visibility invariants; publication uses locked transactional state transitions and complete-only versioned inserts, withdrawal retains history, and recomputation cannot replace active snapshots.
+  - [x] Confirm mobile touch targets, bilingual strings, accessible dialogs, and empty/error/loading states; release actions and dialog buttons have 44px minimum targets, both locales/codegen are current, scoped axe checks pass, and translated feedback covers loading/error/unavailable states.
+  - [x] Confirm migration and rollback safety; the forward-only generated migration is ready, existing assignments default to draft without fabricated snapshots, `db:push` was verified, and the pre-existing empty migration-ledger limitation is documented.
+  - [x] Record implementation notes and completed task commit SHAs in `plan.md`; key implementation commits are `88d2985c`, `ee6aaf76`, `0174d61d`, `0f4d54d1`, `8330ad54`, `124c1714`, and `43d6acb4`, with required git notes attached.
+  - [x] Commit final plan updates using the project’s `conductor(plan): ...` format and attach required git notes where applicable.
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
