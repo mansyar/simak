@@ -8,11 +8,11 @@
 
 ## Phase 1: Baseline and Performance Guardrails
 
-- [ ] Task: Re-read `./spec.md` and `../../workflow.md` to re-establish track context
-  - [ ] Confirm the 20% wall-clock target and preserved coverage contract
-  - [ ] Confirm the allowed file scope: Vitest configuration, package scripts, and related documentation
+- [x] Task: Re-read `./spec.md` and `../../workflow.md` to re-establish track context [997b791]
+  - [x] Confirm the 20% wall-clock target and preserved coverage contract
+  - [x] Confirm the allowed file scope: Vitest configuration, package scripts, and related documentation
 
-- [ ] Task: Capture the current coverage baseline before implementation
+- [~] Task: Capture the current coverage baseline before implementation
   - [ ] Record Node.js, pnpm, Vitest, repository revision, and relevant environment details
   - [ ] Run `pnpm test:coverage` repeatedly using the same environment
   - [ ] Record wall-clock measurements, pass/fail status, coverage percentages, and generated report types
