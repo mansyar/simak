@@ -100,7 +100,7 @@
 
 ## Phase 4 — Dashboard and reassignment integration
 
-- [ ] Task: Surface intervention state in the instructor dashboard
+- [~] Task: Surface intervention state in the instructor dashboard
   - [ ] Write failing server and component tests for open/overdue counts, active intervention status on at-risk entries, empty states, and links to create/manage interventions.
   - [ ] Run the dashboard tests and confirm the Red phase.
   - [ ] Extend the instructor dashboard response with current-owner open and overdue intervention summaries.
