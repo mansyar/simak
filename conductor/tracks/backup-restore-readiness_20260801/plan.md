@@ -24,12 +24,12 @@
 
 ## Phase 1: Current-State Backup & Restore Review
 
-- [ ] Task: Create `docs/backup-restore-readiness.md`
-  - [ ] Add the review purpose, scope, authority, and relationship to TRACK-047.
-  - [ ] Document the daily PostgreSQL backup schedule and seven-copy retention baseline.
-  - [ ] Document local Coolify and remote S3-compatible storage locations at a non-sensitive level.
-  - [ ] Document the existing isolated restore evidence and operator-only restore boundary.
-  - [ ] Document the current private R2 posture without asserting unapproved durability features.
+- [~] Task: Create `docs/backup-restore-readiness.md`
+  - [x] Add the review purpose, scope, authority, and relationship to TRACK-047.
+  - [x] Document the daily PostgreSQL backup schedule and seven-copy retention baseline.
+  - [x] Document local Coolify and remote S3-compatible storage locations at a non-sensitive level.
+  - [x] Document the existing isolated restore evidence and operator-only restore boundary.
+  - [x] Document the current private R2 posture without asserting unapproved durability features.
 
 - [ ] Task: Add the readiness gap analysis
   - [ ] Assess retention duration and policy ownership.
