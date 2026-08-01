@@ -30,7 +30,7 @@ import { notifications } from './notifications';
 import { extensionRequests } from './extensions';
 import { emailQueue } from './email-queue';
 import { deadlineReminders } from './deadline-reminders';
-import { assignmentGradeConfig, finalGrades } from './gradebook';
+import { assignmentGradeConfig, finalGrades, gradeReleaseSnapshots } from './gradebook';
 import { checkpointDiscussions } from './discussions';
 import { interventions } from './interventions';
 import { feedbackSnippets } from './feedback-snippets';
@@ -69,6 +69,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   consultationsAsVerifier: many(consultations),
   twoFactor: many(twoFactor),
   finalGrades: many(finalGrades),
+  gradeReleaseSnapshots: many(gradeReleaseSnapshots),
   interventions: many(interventions),
   feedbackSnippets: many(feedbackSnippets),
 }));
@@ -112,6 +113,7 @@ export const assignmentsRelations = relations(assignments, ({ many, one }) => ({
   consultations: many(consultations),
   assignmentGradeConfig: one(assignmentGradeConfig),
   finalGrades: many(finalGrades),
+  gradeReleaseSnapshots: many(gradeReleaseSnapshots),
   interventions: many(interventions),
 }));
 
@@ -265,6 +267,17 @@ export const finalGradesRelations = relations(finalGrades, ({ one }) => ({
   }),
   student: one(users, {
     fields: [finalGrades.studentId],
+    references: [users.id],
+  }),
+}));
+
+export const gradeReleaseSnapshotsRelations = relations(gradeReleaseSnapshots, ({ one }) => ({
+  assignment: one(assignments, {
+    fields: [gradeReleaseSnapshots.assignmentId],
+    references: [assignments.id],
+  }),
+  student: one(users, {
+    fields: [gradeReleaseSnapshots.studentId],
     references: [users.id],
   }),
 }));
