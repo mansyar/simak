@@ -6,6 +6,7 @@ import { AssignmentDetailHeader } from '@/components/instructor/assignments/Assi
 import { AssignmentOverviewTab } from '@/components/instructor/assignments/AssignmentOverviewTab';
 import { AssignmentConsultationsTab } from '@/components/instructor/assignments/AssignmentConsultationsTab';
 import { AssignmentExtensionsTab } from '@/components/instructor/assignments/AssignmentExtensionsTab';
+import { AssignmentInterventionsTab } from '@/components/instructor/assignments/AssignmentInterventionsTab';
 import { AssignmentDetailTabs } from '@/components/instructor/assignments/AssignmentDetailTabs';
 import { DiscussionPanel } from '@/components/discussions/discussion-panel';
 import { useAssignmentTabs } from '@/hooks/use-assignment-tabs';
@@ -63,6 +64,7 @@ function AssignmentDetailPage() {
     },
     { id: 'extensions', label: t('extensions.queueTitle'), count: tabs.extensionRequests.length },
     { id: 'discussions', label: t('discussions.title') },
+    { id: 'interventions', label: t('instructorInterventions.title') },
   ];
 
   return (
@@ -151,6 +153,9 @@ function AssignmentDetailPage() {
             )),
           )}
         </div>
+      )}
+      {activeTab === 'interventions' && (
+        <AssignmentInterventionsTab assignmentId={assignment.id} students={assignment.students} />
       )}
     </div>
   );
