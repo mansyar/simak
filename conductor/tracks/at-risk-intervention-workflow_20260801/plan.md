@@ -26,7 +26,7 @@
   - [x] Verify the changed files remain within the modularity limit.
   - [x] Commit with `feat(interventions): add intervention data model and contracts` and attach the required task git note (`fbc423e`).
 
-- [ ] Task: Share live student-risk context without changing risk semantics
+- [~] Task: Share live student-risk context without changing risk semantics
   - [ ] Write failing unit tests for assembling checkpoint context, preserving all five existing risk signals, and distinguishing `student_inaction` from `pending_review`.
   - [ ] Run the new risk-context tests and the existing risk-scoring tests to confirm the Red phase.
   - [ ] Implement a server-only risk-context helper that accepts the current database connection, fetches checkpoint/consultation/submission/revision data, and delegates scoring to `computeStudentRisk`.
