@@ -74,6 +74,18 @@ const incompleteGrade: FinalGradeResult = {
 
 const mockServerError = { error: { code: 'INTERNAL', message: 'Failed' } };
 
+const unavailableGrade = { available: false as const, reason: 'not_yet_released' as const };
+
+const snapshotGrade = {
+  available: true as const,
+  releaseVersion: 2,
+  numericScore: 91.25,
+  letterGrade: 'A',
+  status: 'complete' as const,
+  contributingCheckpoints: [cp1, cp2],
+  publishedAt: new Date('2026-08-02T00:00:00.000Z'),
+};
+
 // ---- Tests ----
 
 describe('StudentFinalGradeCard', () => {
@@ -180,5 +192,28 @@ describe('StudentFinalGradeCard', () => {
       expect(screen.getByText('gradebook.student.finalGrade')).toBeDefined();
     });
     expect(queryClient.getQueryData(['gradebook', 'studentFinalGrade', 42])).toEqual(completeGrade);
+  });
+
+  it('shows an unavailable state without exposing a provisional grade', async () => {
+    (getStudentFinalGrade as any).mockResolvedValue(unavailableGrade);
+    renderWithQuery(<StudentFinalGradeCard assignmentId={1} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('gradebook.student.unavailable')).toBeDefined();
+    });
+    expect(screen.getByText('gradebook.student.notYetReleased')).toBeDefined();
+    expect(screen.queryByText('93.75')).toBeNull();
+  });
+
+  it('renders the active published snapshot and release version', async () => {
+    (getStudentFinalGrade as any).mockResolvedValue(snapshotGrade);
+    renderWithQuery(<StudentFinalGradeCard assignmentId={1} />);
+
+    await waitFor(() => {
+      expect(screen.getByText('91.25')).toBeDefined();
+      expect(screen.getByText('A')).toBeDefined();
+      expect(screen.getByText('gradebook.student.releaseVersion')).toBeDefined();
+      expect(screen.getByText('2')).toBeDefined();
+    });
   });
 });

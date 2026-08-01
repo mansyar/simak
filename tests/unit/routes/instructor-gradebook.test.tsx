@@ -14,6 +14,9 @@ vi.mock('@/routes/__root', () => ({
 
 vi.mock('@/server/gradebook', () => ({
   recomputeAllGrades: vi.fn(),
+  getGradeReleasePreflight: vi.fn(),
+  publishGradeRelease: vi.fn(),
+  withdrawGradeRelease: vi.fn(),
 }));
 
 vi.mock('@/server/analytics', () => ({
@@ -32,6 +35,7 @@ import { GradebookTable } from '@/components/gradebook/GradebookTable';
 import { GradeConfigSummary } from '@/components/gradebook/GradeConfigSummary';
 import { RecomputeGradesButton } from '@/components/gradebook/RecomputeGradesButton';
 import { GradebookExportButtons } from '@/components/gradebook/GradebookExportButtons';
+import { GradeReleaseControls } from '@/components/gradebook/GradeReleaseControls';
 import type {
   AssignmentGradeConfig,
   ContributingCheckpoint,
@@ -210,5 +214,36 @@ describe('GradebookExportButtons', () => {
   it('renders Excel export button', () => {
     renderWithQuery(<GradebookExportButtons assignmentId={1} />);
     expect(screen.getByText('gradebook.exportExcel')).toBeDefined();
+  });
+});
+
+describe('GradeReleaseControls on the instructor gradebook', () => {
+  it('shows draft release state and instructor publication controls', () => {
+    renderWithQuery(
+      <GradeReleaseControls
+        assignmentId={1}
+        releaseStatus="draft"
+        activeReleaseVersion={null}
+        publishedAt={null}
+        canManage
+      />,
+    );
+
+    expect(screen.getByText('gradebook.release.draft')).toBeDefined();
+    expect(screen.getByText('gradebook.release.startPublish')).toBeDefined();
+  });
+
+  it('does not expose publication controls to staff without release ownership', () => {
+    const { container } = renderWithQuery(
+      <GradeReleaseControls
+        assignmentId={1}
+        releaseStatus="published"
+        activeReleaseVersion={3}
+        publishedAt={new Date('2026-08-02T00:00:00.000Z')}
+        canManage={false}
+      />,
+    );
+
+    expect(container.querySelector('button')).toBeNull();
   });
 });
