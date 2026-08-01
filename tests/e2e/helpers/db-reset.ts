@@ -17,6 +17,7 @@ import { execSync } from 'node:child_process';
 export const TABLES_TO_TRUNCATE = [
   'email_queue',
   'audit_log',
+  'interventions',
   'notifications',
   'extension_requests',
   'consultations',

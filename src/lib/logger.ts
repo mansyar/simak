@@ -23,7 +23,7 @@ export function createLogger(options?: CreateLoggerOptions): Logger {
     return store ? { requestId: store.requestId } : {};
   };
 
-  if (import.meta.env.PROD) {
+  if (import.meta.env?.PROD) {
     return pino({ level, mixin }, stream);
   }
 

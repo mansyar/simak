@@ -70,24 +70,42 @@ export function InterventionForm({
     () => (mode === 'create' ? CreateInterventionSchema : UpdateInterventionSchema),
     [mode],
   );
-  const form = useForm<FormValues>({
-    resolver: zodResolver(schema as never) as never,
-    defaultValues: {
+  const defaultValues = useMemo<FormValues>(
+    () => ({
       ...(mode === 'create'
         ? { assignmentId, studentId }
         : { interventionId: intervention?.id, status: intervention?.status }),
       actionType: intervention?.actionType ?? 'consultation',
       privateNote: intervention?.privateNote ?? '',
       followUpDate: inputDate(intervention?.followUpDate),
-      resolutionReason: intervention?.resolutionReason ?? '',
-    },
+      resolutionReason: intervention?.resolutionReason ?? null,
+    }),
+    [
+      assignmentId,
+      intervention?.actionType,
+      intervention?.followUpDate,
+      intervention?.id,
+      intervention?.privateNote,
+      intervention?.resolutionReason,
+      intervention?.status,
+      mode,
+      studentId,
+    ],
+  );
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema as never) as never,
+    defaultValues,
   });
   const selectedStatus = form.watch('status');
   const isClosing = selectedStatus === 'resolved' || selectedStatus === 'dismissed';
   const errors = form.formState.errors as Record<string, { message?: string } | undefined>;
 
   useEffect(() => {
-    if (!isClosing) form.setValue('resolutionReason', '');
+    form.reset(defaultValues);
+  }, [defaultValues, form]);
+
+  useEffect(() => {
+    if (!isClosing) form.setValue('resolutionReason', null);
   }, [form, isClosing]);
 
   const handleSubmit = async (values: FormValues) => {
@@ -207,7 +225,9 @@ export function InterventionForm({
               </Label>
               <Textarea
                 id="intervention-resolution-reason"
-                {...form.register('resolutionReason')}
+                {...form.register('resolutionReason', {
+                  setValueAs: (value) => (value ? value : null),
+                })}
                 className="min-h-24"
                 aria-label={t('instructorInterventions.fields.resolutionReason')}
               />

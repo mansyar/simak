@@ -117,7 +117,7 @@ describe('getLiveStudentRiskContexts', () => {
         },
       ],
       [],
-      [{ checkpointId: 6, count: 1, latestDate: new Date(now.getTime() - 5 * day) }],
+      [{ checkpointId: 6, count: 1, latestDate: new Date(now.getTime() - 5 * day).toISOString() }],
       [],
     ]);
 

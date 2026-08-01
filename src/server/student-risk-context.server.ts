@@ -12,6 +12,14 @@ import {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+function normalizeDate(value: unknown): Date | null {
+  if (value == null) return null;
+  if (value instanceof Date) return value;
+
+  const date = new Date(String(value));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 export type LiveStudentRiskContext = {
   studentId: string;
   studentName: string;
@@ -103,7 +111,7 @@ export async function getLiveStudentRiskContexts(
   const submissionMap = new Map(
     submissionData.map((item) => [
       item.checkpointId,
-      { count: item.count, latestDate: item.latestDate },
+      { count: item.count, latestDate: normalizeDate(item.latestDate) },
     ]),
   );
   const reviseMap = new Map(reviseCounts.map((item) => [item.checkpointId, item.count]));

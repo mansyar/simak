@@ -122,4 +122,77 @@ describe('InterventionForm', () => {
     });
     expect(screen.getByLabelText('instructorInterventions.fields.resolutionReason')).toBeTruthy();
   });
+
+  it('submits a non-terminal status update without an empty closure reason', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(
+      <InterventionForm
+        mode="edit"
+        intervention={item}
+        assignmentId={3}
+        studentId="student-1"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText('instructorInterventions.fields.status'), {
+      target: { value: 'monitoring' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'instructorInterventions.edit' }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        interventionId: item.id,
+        status: 'monitoring',
+        resolutionReason: null,
+      }),
+    );
+  });
+
+  it('allows editing an intervention that has no follow-up date', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    render(
+      <InterventionForm
+        mode="edit"
+        intervention={{ ...item, followUpDate: null }}
+        assignmentId={3}
+        studentId="student-1"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText('instructorInterventions.fields.status'), {
+      target: { value: 'monitoring' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'instructorInterventions.edit' }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+  });
+
+  it('resets the edit identifier when a loaded intervention replaces the create form', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { rerender } = render(
+      <InterventionForm mode="create" assignmentId={3} studentId="student-1" onSubmit={onSubmit} />,
+    );
+
+    rerender(
+      <InterventionForm
+        mode="edit"
+        intervention={item}
+        assignmentId={3}
+        studentId="student-1"
+        onSubmit={onSubmit}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText('instructorInterventions.fields.status'), {
+      target: { value: 'monitoring' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'instructorInterventions.edit' }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ interventionId: item.id, status: 'monitoring' }),
+    );
+  });
 });
