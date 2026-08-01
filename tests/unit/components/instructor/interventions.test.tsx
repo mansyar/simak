@@ -1,5 +1,6 @@
 /** @vitest-environment happy-dom */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { InterventionFilters } from '@/components/instructor/interventions/InterventionFilters';
 import { InterventionForm } from '@/components/instructor/interventions/InterventionForm';
@@ -40,7 +41,7 @@ describe('InterventionList', () => {
     expect(screen.getByText('Research Methods')).toBeTruthy();
     expect(screen.getByText('instructorInterventions.status.open')).toBeTruthy();
     expect(screen.getByText('instructorInterventions.overdue')).toBeTruthy();
-    expect(screen.queryByText('Offer a consultation slot')).toBeNull();
+    expect(screen.getByText(/Offer a consultation slot/)).toBeTruthy();
   });
 
   it('calls onManage for the selected intervention', () => {
@@ -53,9 +54,10 @@ describe('InterventionList', () => {
 });
 
 describe('InterventionFilters', () => {
-  it('emits status and overdue filter changes', () => {
+  it('emits status and overdue filter changes', async () => {
     const onStatusChange = vi.fn();
     const onOverdueChange = vi.fn();
+    const user = userEvent.setup();
     render(
       <InterventionFilters
         status={null}
@@ -65,10 +67,15 @@ describe('InterventionFilters', () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText('instructorInterventions.filters.status'), {
-      target: { value: 'monitoring' },
-    });
-    fireEvent.click(screen.getByLabelText('instructorInterventions.filters.overdue'));
+    await user.click(
+      screen.getByRole('combobox', { name: 'instructorInterventions.filters.status' }),
+    );
+    await user.click(
+      screen.getByRole('option', { name: 'instructorInterventions.status.monitoring' }),
+    );
+    await user.click(
+      screen.getByRole('checkbox', { name: 'instructorInterventions.filters.overdue' }),
+    );
 
     expect(onStatusChange).toHaveBeenCalledWith('monitoring');
     expect(onOverdueChange).toHaveBeenCalledWith(true);
@@ -78,6 +85,7 @@ describe('InterventionFilters', () => {
 describe('InterventionForm', () => {
   it('renders creation fields and submits the validated action type and note', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
     render(
       <InterventionForm mode="create" assignmentId={3} studentId="student-1" onSubmit={onSubmit} />,
     );
@@ -86,9 +94,12 @@ describe('InterventionForm', () => {
     expect(screen.getByLabelText('instructorInterventions.fields.privateNote')).toBeTruthy();
     expect(screen.getByLabelText('instructorInterventions.fields.followUpDate')).toBeTruthy();
 
-    fireEvent.change(screen.getByLabelText('instructorInterventions.fields.actionType'), {
-      target: { value: 'extension' },
-    });
+    await user.click(
+      screen.getByRole('combobox', { name: 'instructorInterventions.fields.actionType' }),
+    );
+    await user.click(
+      screen.getByRole('option', { name: 'instructorInterventions.actions.extension' }),
+    );
     fireEvent.change(screen.getByLabelText('instructorInterventions.fields.privateNote'), {
       target: { value: 'Discuss an extension' },
     });
@@ -105,7 +116,8 @@ describe('InterventionForm', () => {
     );
   });
 
-  it('shows a closure reason field only when resolving or dismissing', () => {
+  it('shows a closure reason field only when resolving or dismissing', async () => {
+    const user = userEvent.setup();
     render(
       <InterventionForm
         mode="edit"
@@ -116,15 +128,23 @@ describe('InterventionForm', () => {
       />,
     );
 
-    expect(screen.queryByLabelText('instructorInterventions.fields.resolutionReason')).toBeNull();
-    fireEvent.change(screen.getByLabelText('instructorInterventions.fields.status'), {
-      target: { value: 'resolved' },
-    });
-    expect(screen.getByLabelText('instructorInterventions.fields.resolutionReason')).toBeTruthy();
+    expect(
+      screen.queryByRole('textbox', { name: 'instructorInterventions.fields.resolutionReason' }),
+    ).toBeNull();
+    await user.click(
+      screen.getByRole('combobox', { name: 'instructorInterventions.fields.status' }),
+    );
+    await user.click(
+      screen.getByRole('option', { name: 'instructorInterventions.status.resolved' }),
+    );
+    expect(
+      screen.getByRole('textbox', { name: 'instructorInterventions.fields.resolutionReason' }),
+    ).toBeTruthy();
   });
 
   it('submits a non-terminal status update without an empty closure reason', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
     render(
       <InterventionForm
         mode="edit"
@@ -135,9 +155,12 @@ describe('InterventionForm', () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText('instructorInterventions.fields.status'), {
-      target: { value: 'monitoring' },
-    });
+    await user.click(
+      screen.getByRole('combobox', { name: 'instructorInterventions.fields.status' }),
+    );
+    await user.click(
+      screen.getByRole('option', { name: 'instructorInterventions.status.monitoring' }),
+    );
     fireEvent.click(screen.getByRole('button', { name: 'instructorInterventions.edit' }));
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());
@@ -152,6 +175,7 @@ describe('InterventionForm', () => {
 
   it('allows editing an intervention that has no follow-up date', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
     render(
       <InterventionForm
         mode="edit"
@@ -162,9 +186,12 @@ describe('InterventionForm', () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText('instructorInterventions.fields.status'), {
-      target: { value: 'monitoring' },
-    });
+    await user.click(
+      screen.getByRole('combobox', { name: 'instructorInterventions.fields.status' }),
+    );
+    await user.click(
+      screen.getByRole('option', { name: 'instructorInterventions.status.monitoring' }),
+    );
     fireEvent.click(screen.getByRole('button', { name: 'instructorInterventions.edit' }));
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());
@@ -172,6 +199,7 @@ describe('InterventionForm', () => {
 
   it('resets the edit identifier when a loaded intervention replaces the create form', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
     const { rerender } = render(
       <InterventionForm mode="create" assignmentId={3} studentId="student-1" onSubmit={onSubmit} />,
     );
@@ -185,9 +213,12 @@ describe('InterventionForm', () => {
         onSubmit={onSubmit}
       />,
     );
-    fireEvent.change(screen.getByLabelText('instructorInterventions.fields.status'), {
-      target: { value: 'monitoring' },
-    });
+    await user.click(
+      screen.getByRole('combobox', { name: 'instructorInterventions.fields.status' }),
+    );
+    await user.click(
+      screen.getByRole('option', { name: 'instructorInterventions.status.monitoring' }),
+    );
     fireEvent.click(screen.getByRole('button', { name: 'instructorInterventions.edit' }));
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());

@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { cleanup, render, waitFor } from '@testing-library/react';
+import { cleanup, render, waitFor, within } from '@testing-library/react';
 
 const mockListInterventions = vi.fn();
 const mockGetInterventionContext = vi.fn();
@@ -41,8 +41,22 @@ describe('AssignmentInterventionsTab', () => {
           createdAt: new Date('2026-08-01T00:00:00.000Z'),
           updatedAt: new Date('2026-08-01T00:00:00.000Z'),
         },
+        {
+          id: 11,
+          assignmentId: 7,
+          studentId: 'student-2',
+          studentName: 'Bob',
+          assignmentTitle: 'Research paper',
+          actionType: 'discussion',
+          status: 'resolved',
+          privateNote: 'Past intervention',
+          followUpDate: null,
+          resolutionReason: 'Student re-engaged',
+          createdAt: new Date('2026-07-01T00:00:00.000Z'),
+          updatedAt: new Date('2026-07-10T00:00:00.000Z'),
+        },
       ],
-      total: 1,
+      total: 2,
       page: 1,
       limit: 100,
     });
@@ -80,7 +94,7 @@ describe('AssignmentInterventionsTab', () => {
     );
 
     await waitFor(() => expect(getByText('Alice', { selector: 'h3' })).toBeTruthy());
-    expect(getByText('Bob')).toBeTruthy();
+    expect(getByText('Bob', { selector: 'h3' })).toBeTruthy();
     expect(mockListInterventions).toHaveBeenCalledWith({
       data: { assignmentId: 7, page: 1, limit: 100 },
     });
@@ -91,17 +105,23 @@ describe('AssignmentInterventionsTab', () => {
     const { AssignmentInterventionsTab } =
       await import('@/components/instructor/assignments/AssignmentInterventionsTab');
 
-    const { getByTestId } = render(
+    const { getAllByRole, getByRole, getByTestId, queryByTestId } = render(
       <AssignmentInterventionsTab assignmentId={7} students={students} />,
     );
 
     await waitFor(() => expect(getByTestId('manage-intervention-student-1')).toBeTruthy());
     expect(getByTestId('create-intervention-student-2')).toBeTruthy();
+    expect(queryByTestId('manage-intervention-student-2')).toBeNull();
     expect(getByTestId('manage-intervention-student-1').getAttribute('href')).toContain(
       'studentId=student-1',
     );
     expect(getByTestId('create-intervention-student-2').getAttribute('href')).toContain(
       'studentId=student-2',
     );
+    expect(
+      within(getAllByRole('list', { name: 'instructorInterventions.listLabel' })[0])
+        .getByRole('link', { name: 'instructorInterventions.manage' })
+        .getAttribute('href'),
+    ).toContain('studentId=student-1');
   });
 });

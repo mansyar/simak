@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { InterventionContextCard } from './InterventionContextCard';
 import {
@@ -59,6 +66,12 @@ export function InterventionForm({
     discussion: t('instructorInterventions.actions.discussion'),
     other: t('instructorInterventions.actions.other'),
   };
+  const statusLabels = {
+    open: t('instructorInterventions.status.open'),
+    monitoring: t('instructorInterventions.status.monitoring'),
+    resolved: t('instructorInterventions.status.resolved'),
+    dismissed: t('instructorInterventions.status.dismissed'),
+  };
   const formTitle =
     mode === 'create'
       ? t('instructorInterventions.createTitle')
@@ -96,7 +109,9 @@ export function InterventionForm({
     resolver: zodResolver(schema as never) as never,
     defaultValues,
   });
-  const selectedStatus = form.watch('status');
+  const selectedActionType = (form.watch('actionType') ??
+    'consultation') as keyof typeof actionLabels;
+  const selectedStatus = (form.watch('status') ?? 'open') as keyof typeof statusLabels;
   const isClosing = selectedStatus === 'resolved' || selectedStatus === 'dismissed';
   const errors = form.formState.errors as Record<string, { message?: string } | undefined>;
 
@@ -150,18 +165,30 @@ export function InterventionForm({
             <Label htmlFor="intervention-action-type">
               {t('instructorInterventions.fields.actionType')}
             </Label>
-            <select
-              id="intervention-action-type"
-              {...form.register('actionType')}
-              className="flex h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-              aria-label={t('instructorInterventions.fields.actionType')}
+            <Select
+              value={selectedActionType}
+              onValueChange={(value) =>
+                form.setValue('actionType', value, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                  shouldValidate: true,
+                })
+              }
             >
-              {InterventionActionTypeSchema.options.map((actionType) => (
-                <option key={actionType} value={actionType}>
-                  {actionLabels[actionType]}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger
+                id="intervention-action-type"
+                aria-label={t('instructorInterventions.fields.actionType')}
+              >
+                <SelectValue>{actionLabels[selectedActionType]}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {InterventionActionTypeSchema.options.map((actionType) => (
+                  <SelectItem key={actionType} value={actionType}>
+                    {actionLabels[actionType]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <FieldError message={errors.actionType?.message} />
           </div>
 
@@ -202,18 +229,30 @@ export function InterventionForm({
               <Label htmlFor="intervention-status">
                 {t('instructorInterventions.fields.status')}
               </Label>
-              <select
-                id="intervention-status"
-                {...form.register('status')}
-                className="flex h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-                aria-label={t('instructorInterventions.fields.status')}
+              <Select
+                value={selectedStatus}
+                onValueChange={(value) =>
+                  form.setValue('status', value, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  })
+                }
               >
-                {InterventionStatusSchema.options.map((status) => (
-                  <option key={status} value={status}>
-                    {t(`instructorInterventions.status.${status}`)}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  id="intervention-status"
+                  aria-label={t('instructorInterventions.fields.status')}
+                >
+                  <SelectValue>{statusLabels[selectedStatus]}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {InterventionStatusSchema.options.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {t(`instructorInterventions.status.${status}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FieldError message={errors.status?.message} />
             </div>
           )}

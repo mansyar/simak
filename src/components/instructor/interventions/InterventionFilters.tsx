@@ -1,6 +1,15 @@
 import type { InterventionStatusSchema } from '@/server/interventions';
 import { useI18n } from '@/routes/__root';
 import type { z } from 'zod';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type InterventionStatus = z.infer<typeof InterventionStatusSchema>;
 
@@ -22,35 +31,45 @@ export function InterventionFilters({
   return (
     <div className="grid gap-4 rounded-xl border border-border bg-card p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
       <div className="space-y-2">
-        <label htmlFor="intervention-status-filter" className="text-sm font-medium text-foreground">
+        <Label htmlFor="intervention-status-filter">
           {t('instructorInterventions.filters.status')}
-        </label>
-        <select
-          id="intervention-status-filter"
-          value={status ?? ''}
-          onChange={(event) =>
-            onStatusChange((event.target.value || null) as InterventionStatus | null)
+        </Label>
+        <Select
+          value={status ?? 'all'}
+          onValueChange={(value) =>
+            onStatusChange(value === 'all' ? null : (value as InterventionStatus))
           }
-          className="flex h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          aria-label={t('instructorInterventions.filters.status')}
         >
-          <option value="">{t('instructorInterventions.filters.allStatuses')}</option>
-          <option value="open">{t('instructorInterventions.status.open')}</option>
-          <option value="monitoring">{t('instructorInterventions.status.monitoring')}</option>
-          <option value="resolved">{t('instructorInterventions.status.resolved')}</option>
-          <option value="dismissed">{t('instructorInterventions.status.dismissed')}</option>
-        </select>
+          <SelectTrigger
+            id="intervention-status-filter"
+            aria-label={t('instructorInterventions.filters.status')}
+          >
+            <SelectValue>
+              {status
+                ? t(`instructorInterventions.status.${status}`)
+                : t('instructorInterventions.filters.allStatuses')}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('instructorInterventions.filters.allStatuses')}</SelectItem>
+            <SelectItem value="open">{t('instructorInterventions.status.open')}</SelectItem>
+            <SelectItem value="monitoring">
+              {t('instructorInterventions.status.monitoring')}
+            </SelectItem>
+            <SelectItem value="resolved">{t('instructorInterventions.status.resolved')}</SelectItem>
+            <SelectItem value="dismissed">
+              {t('instructorInterventions.status.dismissed')}
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      <label className="flex min-h-11 items-center gap-3 text-sm font-medium text-foreground">
-        <input
-          type="checkbox"
+      <Label className="flex min-h-11 items-center gap-3 text-sm font-medium text-foreground">
+        <Checkbox
           checked={overdue}
-          onChange={(event) => onOverdueChange(event.target.checked)}
-          className="size-4 rounded border-input accent-primary focus-visible:ring-3 focus-visible:ring-ring/50"
-          aria-label={t('instructorInterventions.filters.overdue')}
+          onCheckedChange={(checked) => onOverdueChange(checked === true)}
         />
         {t('instructorInterventions.filters.overdue')}
-      </label>
+      </Label>
     </div>
   );
 }

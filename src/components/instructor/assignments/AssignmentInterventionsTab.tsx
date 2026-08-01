@@ -102,8 +102,12 @@ export function AssignmentInterventionsTab({
     <div className="space-y-5" data-testid="assignment-interventions-tab">
       {students.map((student) => {
         const studentInterventions = interventions.filter((item) => item.studentId === student.id);
+        const activeInterventions = studentInterventions.filter(
+          (item) => item.status === 'open' || item.status === 'monitoring',
+        );
         const context = contexts[student.id];
-        const canCreate = hasStudentInactionRisk(context) && studentInterventions.length === 0;
+        const hasActiveIntervention = activeInterventions.length > 0;
+        const canCreate = hasStudentInactionRisk(context) && !hasActiveIntervention;
         const manageHref = `/instructor/interventions?assignmentId=${assignmentId}&studentId=${student.id}`;
 
         return (
@@ -116,13 +120,13 @@ export function AssignmentInterventionsTab({
                 <h3 className="font-semibold text-foreground">{student.name}</h3>
                 {student.email && <p className="text-sm text-muted-foreground">{student.email}</p>}
               </div>
-              {(canCreate || studentInterventions.length > 0) && (
+              {(canCreate || hasActiveIntervention) && (
                 <a
                   href={manageHref}
-                  data-testid={`${studentInterventions.length > 0 ? 'manage' : 'create'}-intervention-${student.id}`}
+                  data-testid={`${hasActiveIntervention ? 'manage' : 'create'}-intervention-${student.id}`}
                   className="inline-flex min-h-11 items-center rounded-md border border-primary px-4 text-sm font-medium text-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  {studentInterventions.length > 0
+                  {hasActiveIntervention
                     ? t('instructorInterventions.manage')
                     : t('instructorInterventions.create')}
                 </a>
@@ -134,7 +138,14 @@ export function AssignmentInterventionsTab({
             )}
 
             {studentInterventions.length > 0 ? (
-              <InterventionList interventions={studentInterventions} onManage={() => undefined} />
+              <InterventionList
+                interventions={studentInterventions}
+                manageHref={(intervention) =>
+                  intervention.status === 'open' || intervention.status === 'monitoring'
+                    ? manageHref
+                    : undefined
+                }
+              />
             ) : (
               <p className="text-sm text-muted-foreground">
                 {t('instructorInterventions.emptyDescription')}

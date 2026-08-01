@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { getAssignmentDetail } from '@/server/assignments';
 import { exportStudentProgressCsv, exportReviewHistoryCsv } from '@/server/analytics';
@@ -26,6 +26,19 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/$id
   pendingComponent: () => <AssignmentDetailSkeleton />,
 });
 
+const assignmentTabIds = new Set([
+  'overview',
+  'consultations',
+  'extensions',
+  'discussions',
+  'interventions',
+]);
+
+export function getAssignmentTabFromHash(hash: string) {
+  const tab = hash.replace(/^#/, '');
+  return assignmentTabIds.has(tab) ? tab : null;
+}
+
 function AssignmentDetailPage() {
   const { t } = useI18n();
   const loaderData = Route.useLoaderData();
@@ -36,6 +49,17 @@ function AssignmentDetailPage() {
   const [selectedConsultationId, setSelectedConsultationId] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const tabs = useAssignmentTabs(assignment?.id ?? null);
+
+  useEffect(() => {
+    const applyHash = () => {
+      const tab = getAssignmentTabFromHash(window.location.hash);
+      if (tab) setActiveTab(tab);
+    };
+
+    applyHash();
+    window.addEventListener('hashchange', applyHash);
+    return () => window.removeEventListener('hashchange', applyHash);
+  }, []);
 
   if (!assignment) {
     return (

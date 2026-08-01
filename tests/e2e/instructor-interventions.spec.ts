@@ -117,7 +117,8 @@ test.describe('Instructor Intervention Workflow', () => {
     await expect(page).toHaveURL(/\/instructor\/interventions\?assignmentId=\d+&studentId=/);
     await page.waitForLoadState('networkidle');
     await expect(page.getByText('Create intervention', { exact: true }).first()).toBeVisible();
-    await page.selectOption('#intervention-action-type', 'discussion');
+    await page.getByRole('combobox', { name: 'Action type' }).click();
+    await page.getByRole('option', { name: 'Discussion', exact: true }).click();
     await page.fill('#intervention-private-note', 'Discuss the overdue proposal and next step.');
     const overdueDate = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
     await page.fill('#intervention-follow-up-date', overdueDate);
@@ -138,8 +139,10 @@ test.describe('Instructor Intervention Workflow', () => {
     await page.getByRole('button', { name: 'Manage' }).click();
     await page.waitForLoadState('networkidle');
     await expect(page.getByText('Manage intervention', { exact: true }).first()).toBeVisible();
-    await page.selectOption('#intervention-status', 'monitoring');
-    await expect(page.locator('#intervention-status')).toHaveValue('monitoring');
+    const statusSelect = page.locator('#intervention-status');
+    await statusSelect.click();
+    await page.getByRole('option', { name: 'Monitoring', exact: true }).click();
+    await expect(statusSelect).toContainText('Monitoring');
     await page.getByRole('button', { name: 'Save changes' }).click();
     await expect(page.locator('#intervention-status')).toHaveCount(0, { timeout: 15_000 });
     await expect(

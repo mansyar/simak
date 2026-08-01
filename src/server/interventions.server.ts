@@ -64,28 +64,32 @@ async function lockAssignmentStudent(db: QueryDb, assignmentId: number, studentI
 }
 
 async function lockOwnedIntervention(db: QueryDb, interventionId: number, instructorId: string) {
-  return db
-    .select({
-      id: interventions.id,
-      assignmentId: interventions.assignmentId,
-      studentId: interventions.studentId,
-      actionType: interventions.actionType,
-      privateNote: interventions.privateNote,
-      status: interventions.status,
-      followUpDate: interventions.followUpDate,
-      resolutionReason: interventions.resolutionReason,
-    })
-    .from(interventions)
-    .innerJoin(assignments, eq(interventions.assignmentId, assignments.id))
-    .where(
-      and(
-        eq(interventions.id, interventionId),
-        eq(assignments.instructorId, instructorId),
-        isNull(assignments.deletedAt),
-      ),
-    )
-    .limit(1)
-    .for('update', { of: interventions });
+  return (
+    db
+      .select({
+        id: interventions.id,
+        assignmentId: interventions.assignmentId,
+        studentId: interventions.studentId,
+        actionType: interventions.actionType,
+        privateNote: interventions.privateNote,
+        status: interventions.status,
+        followUpDate: interventions.followUpDate,
+        resolutionReason: interventions.resolutionReason,
+      })
+      .from(interventions)
+      .innerJoin(assignments, eq(interventions.assignmentId, assignments.id))
+      .where(
+        and(
+          eq(interventions.id, interventionId),
+          eq(assignments.instructorId, instructorId),
+          isNull(assignments.deletedAt),
+        ),
+      )
+      .limit(1)
+      // Lock the joined assignment together with the intervention so an
+      // assignment reassignment cannot commit between the ownership check and update.
+      .for('update')
+  );
 }
 
 function hasStudentInactionRisk(

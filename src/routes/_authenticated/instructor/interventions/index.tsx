@@ -83,7 +83,9 @@ function InstructorInterventionsPage() {
   const activeIntervention = interventions.find(
     (intervention) => intervention.status === 'open' || intervention.status === 'monitoring',
   );
-  const hasContextSelection = Boolean(search.assignmentId && search.studentId && data.context);
+  const hasContextSelection = Boolean(
+    search.assignmentId && search.studentId && (data.context || activeIntervention),
+  );
 
   const updateSearch = (changes: Record<string, unknown>) =>
     navigate({
@@ -141,7 +143,7 @@ function InstructorInterventionsPage() {
         />
       ) : (
         <>
-          {hasContextSelection && data.context && (
+          {hasContextSelection && (
             <InterventionForm
               mode={activeIntervention ? 'edit' : 'create'}
               assignmentId={search.assignmentId!}

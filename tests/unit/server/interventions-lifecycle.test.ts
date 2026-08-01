@@ -79,7 +79,7 @@ describe('updateInterventionHandler', () => {
 
     expect(result).toEqual({ intervention: { id: 42, status: 'monitoring' } });
     expect(mockDb.transaction).toHaveBeenCalled();
-    expect(mockDb.for).toHaveBeenCalledWith('update', expect.any(Object));
+    expect(mockDb.for).toHaveBeenCalledWith('update');
     expect(mockDb.update).toHaveBeenCalled();
   });
 

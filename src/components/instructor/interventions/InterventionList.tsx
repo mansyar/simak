@@ -1,6 +1,6 @@
 import { ClipboardCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useI18n } from '@/routes/__root';
 import type {
@@ -26,7 +26,8 @@ export type InterventionListItem = {
 
 interface InterventionListProps {
   interventions: InterventionListItem[];
-  onManage: (intervention: InterventionListItem) => void;
+  onManage?: (intervention: InterventionListItem) => void;
+  manageHref?: (intervention: InterventionListItem) => string | undefined;
   now?: Date;
 }
 
@@ -55,6 +56,7 @@ function formatDate(value: Date | string) {
 export function InterventionList({
   interventions,
   onManage,
+  manageHref,
   now = new Date(),
 }: InterventionListProps) {
   const { t } = useI18n();
@@ -79,6 +81,7 @@ export function InterventionList({
     <div className="space-y-3" role="list" aria-label={t('instructorInterventions.listLabel')}>
       {interventions.map((intervention) => {
         const overdue = isOverdue(intervention, now);
+        const manageUrl = manageHref?.(intervention);
         return (
           <article
             key={intervention.id}
@@ -110,16 +113,39 @@ export function InterventionList({
                     {t('instructorInterventions.followUp')}: {formatDate(intervention.followUpDate)}
                   </p>
                 )}
+                {intervention.privateNote && (
+                  <p className="text-sm text-foreground">
+                    {t('instructorInterventions.fields.privateNote')}: {intervention.privateNote}
+                  </p>
+                )}
+                {intervention.resolutionReason && (
+                  <p className="text-sm text-foreground">
+                    {t('instructorInterventions.fields.resolutionReason')}:{' '}
+                    {intervention.resolutionReason}
+                  </p>
+                )}
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                className="min-h-11 shrink-0"
-                aria-label={t('instructorInterventions.manage')}
-                onClick={() => onManage(intervention)}
-              >
-                {t('instructorInterventions.manage')}
-              </Button>
+              {manageUrl ? (
+                <a
+                  href={manageUrl}
+                  className={`${buttonVariants({ variant: 'outline' })} min-h-11 shrink-0`}
+                  aria-label={t('instructorInterventions.manage')}
+                >
+                  {t('instructorInterventions.manage')}
+                </a>
+              ) : (
+                onManage && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-11 shrink-0"
+                    aria-label={t('instructorInterventions.manage')}
+                    onClick={() => onManage(intervention)}
+                  >
+                    {t('instructorInterventions.manage')}
+                  </Button>
+                )
+              )}
             </div>
           </article>
         );
