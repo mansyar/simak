@@ -26,17 +26,17 @@
 
 ## Phase 2: Diagnose and Implement the Minimal Optimization
 
-- [ ] Task: Analyze the current coverage-run bottleneck
-  - [ ] Compare test-only and coverage-run timings to separate test execution from instrumentation/reporting overhead
-  - [ ] Measure relevant worker/project configuration candidates one variable at a time
-  - [ ] Select the simplest candidate that can plausibly meet the target without weakening coverage guarantees
+- [x] Task: Analyze the current coverage-run bottleneck [5962fe9]
+  - [x] Compare test-only and coverage-run timings to separate test execution from instrumentation/reporting overhead
+  - [x] Measure relevant worker/project configuration candidates one variable at a time
+  - [x] Select the simplest candidate that can plausibly meet the target without weakening coverage guarantees
 
-- [ ] Task: Write and execute pre-change regression checks
-  - [ ] Define the exact commands and observable outcomes that must remain valid
-  - [ ] Confirm the baseline checks pass before modifying configuration or scripts
-  - [ ] Preserve a before-change reference for project discovery, report generation, and threshold enforcement
+- [x] Task: Write and execute pre-change regression checks [f9d1157]
+  - [x] Define the exact commands and observable outcomes that must remain valid
+  - [x] Confirm the baseline checks pass before modifying configuration or scripts
+  - [x] Preserve a before-change reference for project discovery, report generation, and threshold enforcement
 
-- [ ] Task: Implement the selected Vitest configuration or package-script optimization
+- [~] Task: Implement the selected Vitest configuration or package-script optimization
   - [ ] Limit changes to the approved configuration/script scope
   - [ ] Preserve all existing tests, projects, coverage reporters, scope, and thresholds
   - [ ] Remove temporary diagnostic settings and keep comments aligned with the final behavior
