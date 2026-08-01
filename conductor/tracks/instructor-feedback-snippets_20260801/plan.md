@@ -86,7 +86,7 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Manually verify the active/archived management flows at desktop and mobile widths; the user confirmed navigation, search, CRUD, validation, archive/restore, translated feedback, loading/empty/error/pending, and light/dark states.
   - [x] Commit the phase and attach the verification git note to the functional commit.
 
-## Phase 4: Review-Form Snippet Picker & Comment Insertion
+## Phase 4: Review-Form Snippet Picker & Comment Insertion [checkpoint: d08f73e]
 
 - [x] Task: Write failing review-picker tests [ff0f3847]
   - [x] Add tests for the picker’s active-snippet query, search behavior, empty state, and keyboard-accessible controls.
