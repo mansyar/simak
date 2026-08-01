@@ -30,13 +30,13 @@ This plan follows the approved specification and the repository’s TDD workflow
 
 ## Phase 2: Server Functions, Validation & Ownership
 
-- [ ] Task: Write failing server-function and handler tests
-  - [ ] Create `tests/unit/server/feedback-snippets.test.ts`.
-  - [ ] Test title/category/body validation, including exact boundary values and over-limit values.
-  - [ ] Test client-safe stub exports and input schemas.
-  - [ ] Test instructor-only authorization and cross-instructor access denial.
-  - [ ] Test active-by-default listing, archived filtering, title/category search, create, update, archive, and restore behavior.
-  - [ ] Test that no hard-delete operation is exposed.
+- [x] Task: Write failing server-function and handler tests
+  - [x] Create `tests/unit/server/feedback-snippets.test.ts`.
+  - [x] Test title/category/body validation, including exact boundary values and over-limit values.
+  - [x] Test client-safe stub exports and input schemas.
+  - [x] Test instructor-only authorization and cross-instructor access denial.
+  - [x] Test active-by-default listing, archived filtering, title/category search, create, update, archive, and restore behavior.
+  - [x] Test that no hard-delete operation is exposed.
 - [ ] Task: Implement client-safe schemas and stubs in `src/server/feedback-snippets.ts`
   - [ ] Add Zod schemas for list/search, create, update, archive, and restore inputs.
   - [ ] Use `typedServerFn` with dynamic imports of the server handlers.
