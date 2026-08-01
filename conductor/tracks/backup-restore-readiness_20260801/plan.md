@@ -14,7 +14,7 @@
   - [x] Review `docs/deployment-runbook.md` for the operator procedure and current pilot topology.
   - [x] Capture only non-sensitive evidence references and baseline facts.
 
-- [x] Task: Define the documentation validation checklist
+- [x] Task: Define the documentation validation checklist [2a35569]
   - [x] List required review-document sections.
   - [x] List all facts that must be explicitly separated into current, deferred, or recommended status.
   - [x] List repository links that must resolve.
