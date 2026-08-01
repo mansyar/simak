@@ -43,8 +43,8 @@ The baseline guardrail checks also confirmed that the unit project excludes
 files and uses threads, and the configuration still declares the V8 provider,
 all three report formats, the existing source scope, and all four 80% thresholds.
 
-The optimized measurements will be added below after the configuration change
-and the same procedure has been repeated.
+No optimized measurement is recorded because no configuration or script change
+met the target while preserving the coverage contract.
 
 ## Bottleneck Analysis
 
@@ -69,9 +69,44 @@ eight existing tests to fail or time out. The XLSX project completed in 7.75 s
 when run alone, so it is not the dominant wall-clock bottleneck. Replacing the
 configured reporters with JSON only also remained slower and would violate the
 preserved report contract. These results rule out worker-pool and reporter
-flags as the minimal optimization candidate; the next candidate targets
-unnecessary `happy-dom` setup for non-DOM unit tests while retaining it for
-component, hook, route, and XLSX tests.
+flags as the minimal optimization candidate. Additional coverage
+processing-concurrency runs also failed to reach the target: one run at `1`
+took 102.59 s, while three runs at `4` took 101.07 s, 114.45 s, and 112.57 s
+(112.57 s median). Combining `--no-isolate` with processing concurrency `4`
+and four or eight workers took 115.97 s and 108.79 s respectively, and did not
+provide a qualifying result.
+
+## Rejected Environment Specialization
+
+The next candidate changed the default environment to `node`, moved the
+component, hook, i18n, and route tests into a dedicated `happy-dom` project, and
+explicitly retained `happy-dom` for the XLSX project. The complete non-coverage
+suite passed after the project split, but the controlled full-suite result was
+135.47 s for 388 files and 3,953 tests. That is slower than the 113.35 s baseline
+median, so the uncommitted configuration change was reverted. The existing
+global `happy-dom` configuration remains the verified behavior.
+
+No tested worker, pool, reporter, isolation, or environment configuration has
+achieved the required 20% reduction. The 98.70 s test-only reference is also
+above the 90.68 s maximum implied by the target, even before preserving coverage
+processing and reports.
+
+## Rejected Combined DOM/XLSX Project
+
+An additional configuration experiment changed the root environment to `node`
+and combined the DOM and XLSX files into one `threads` project. Representative
+DOM/XLSX discovery passed, and the complete non-coverage suite took 93.56 s.
+The full coverage run took 101.996 s; processing-concurrency and all-threads
+variants remained between 99.94 s and 103.34 s. The candidate improved on the
+baseline median but did not reach the 90.68 s target and changed the existing
+unit/XLSX project contract, so it was reverted.
+
+Disabling isolation for the unit project was also rejected: the suite produced
+20 failed files and 94 failed tests from shared mock/state contamination. Native
+module-runner mode was rejected after a representative unit test could not
+resolve the existing `@/server` alias. The final working tree therefore retains
+the original configuration and package scripts; no dependency or test-suite
+changes were made.
 
 ## Pre-change Regression Reference
 
@@ -89,3 +124,11 @@ process-local placeholder environment:
 - A configuration assertion confirmed the V8 provider, all three reporters,
   the existing include/exclude scope, all four thresholds, and the project
   pool assignments.
+
+## Final Green Verification
+
+After reverting every non-qualifying experiment, the unchanged configuration
+passed `pnpm test` and `pnpm test:coverage` with the controlled process-local
+environment. The coverage command exited 0 after 111.943 s, with 388 files and
+3,953 tests passing and coverage at 88.04% statements, 81.08% branches, 83.56%
+functions, and 88.68% lines. Text, JSON, and HTML reports were generated again.
