@@ -178,3 +178,13 @@
   - [x] Manual verification: approved scope, security/ownership boundaries, snapshot invariants, bilingual UX, accessibility, mobile targets, migration readiness, and out-of-scope exclusions reviewed.
   - [x] Obtain user confirmation to complete TRACK-051.
   - [x] Checkpoint note: User approved completion. The unrelated pre-existing admin-template heading-order violation remains documented; scoped grade-release accessibility checks pass.
+
+## Phase: Review Fixes
+
+- [~] Task: Apply review suggestions
+  - [ ] Preserve a monotonic release version across withdrawal and republish.
+  - [ ] Add and manually verify the required migration rollback file.
+  - [ ] Strengthen E2E coverage for student mutation protection and withdrawal reason validation.
+  - [ ] Enforce the student role and lock assignment ownership during release mutations.
+  - [ ] Replace avoidable type and non-null assertions in the reviewed release paths.
+  - [ ] Run focused and full verification, record commit SHAs, and attach git notes.
