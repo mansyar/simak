@@ -21,15 +21,15 @@ describe('Feedback snippets schema', () => {
     expect(feedbackSnippets).toHaveProperty('updatedAt');
 
     expect(feedbackSnippets.title.columnType).toBe('PgVarchar');
-    expect(feedbackSnippets.title.length).toBe(100);
+    expect((feedbackSnippets.title as any).length).toBe(100);
     expect(feedbackSnippets.title.notNull).toBe(true);
 
     expect(feedbackSnippets.category.columnType).toBe('PgVarchar');
-    expect(feedbackSnippets.category.length).toBe(50);
+    expect((feedbackSnippets.category as any).length).toBe(50);
     expect(feedbackSnippets.category.notNull).toBe(false);
 
     expect(feedbackSnippets.body.columnType).toBe('PgVarchar');
-    expect(feedbackSnippets.body.length).toBe(2000);
+    expect((feedbackSnippets.body as any).length).toBe(2000);
     expect(feedbackSnippets.body.notNull).toBe(true);
   });
 
@@ -39,7 +39,7 @@ describe('Feedback snippets schema', () => {
     const foreignKey = config.foreignKeys.find((key) => {
       const reference = key.reference();
       return (
-        reference.foreignTable[Symbol.for('drizzle:Name')] === 'users' &&
+        (reference.foreignTable as any)[Symbol.for('drizzle:Name')] === 'users' &&
         reference.columns[0]?.name === 'instructor_id' &&
         reference.foreignColumns[0]?.name === 'id'
       );
@@ -49,7 +49,7 @@ describe('Feedback snippets schema', () => {
     );
 
     expect(foreignKey).toBeDefined();
-    expect(ownerArchiveIndex?.config.columns.map((column) => column.name)).toEqual([
+    expect(ownerArchiveIndex?.config.columns.map((column) => (column as any).name)).toEqual([
       'instructor_id',
       'archived_at',
     ]);

@@ -37,22 +37,22 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Test instructor-only authorization and cross-instructor access denial.
   - [x] Test active-by-default listing, archived filtering, title/category search, create, update, archive, and restore behavior.
   - [x] Test that no hard-delete operation is exposed.
-- [ ] Task: Implement client-safe schemas and stubs in `src/server/feedback-snippets.ts`
-  - [ ] Add Zod schemas for list/search, create, update, archive, and restore inputs.
-  - [ ] Use `typedServerFn` with dynamic imports of the server handlers.
-  - [ ] Apply the established read and mutation rate-limit presets.
-- [ ] Task: Implement server-only handlers in `src/server/feedback-snippets.server.ts`
-  - [ ] Require an authenticated instructor session for every handler.
-  - [ ] Scope every query and mutation to `session.user.id`.
-  - [ ] Return active snippets by default and support archived filtering plus title/category search.
-  - [ ] Trim and persist validated values with correct nullable category handling.
-  - [ ] Archive and restore by updating `archivedAt`; do not delete rows.
-  - [ ] Preserve archive state when updating content.
-  - [ ] Use the project’s `serverError` and structured logging conventions.
-- [ ] Task: Add server-handler regression coverage
-  - [ ] Verify malformed and unauthorized inputs do not reach mutation queries.
-  - [ ] Verify an instructor cannot infer or mutate another instructor’s snippet by ID.
-  - [ ] Verify archived snippets are excluded from active results.
+- [x] Task: Implement client-safe schemas and stubs in `src/server/feedback-snippets.ts`
+  - [x] Add Zod schemas for list/search, create, update, archive, and restore inputs.
+  - [x] Use `typedServerFn` with dynamic imports of the server handlers.
+  - [x] Apply the established read and mutation rate-limit presets.
+- [x] Task: Implement server-only handlers in `src/server/feedback-snippets.server.ts`
+  - [x] Require an authenticated instructor session for every handler.
+  - [x] Scope every query and mutation to `session.user.id`.
+  - [x] Return active snippets by default and support archived filtering plus title/category search.
+  - [x] Trim and persist validated values with correct nullable category handling.
+  - [x] Archive and restore by updating `archivedAt`; do not delete rows.
+  - [x] Preserve archive state when updating content.
+  - [x] Use the project’s `serverError` and structured logging conventions.
+- [x] Task: Add server-handler regression coverage
+  - [x] Verify malformed and unauthorized inputs do not reach mutation queries.
+  - [x] Verify an instructor cannot infer or mutate another instructor’s snippet by ID.
+  - [x] Verify archived snippets are excluded from active results.
 - [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
   - [ ] Run the focused server/schema tests.
   - [ ] Confirm all handlers stay within the client-safe/server-only split.

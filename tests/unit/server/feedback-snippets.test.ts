@@ -217,6 +217,19 @@ describe('Feedback snippet server functions', () => {
       expect(mockDb.where).toHaveBeenCalledOnce();
     });
 
+    it('uses the archived filter to exclude archived rows from the active list', async () => {
+      mockDb.then.mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+
+      const result = await listFeedbackSnippetsHandler({
+        data: { archived: false, search: '' },
+      });
+
+      expect(result).toEqual({ snippets: [] });
+      expect(mockDb.where).toHaveBeenCalledOnce();
+    });
+
     it('does not reveal or mutate another instructor snippet by id', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(otherInstructorSession as any);
       const result = await updateFeedbackSnippetHandler({
@@ -234,6 +247,18 @@ describe('Feedback snippet server functions', () => {
       });
       expect(mockDb.update).toHaveBeenCalledOnce();
       expect(mockDb.where).toHaveBeenCalledOnce();
+    });
+
+    it('rejects malformed mutation input before a mutation query is invoked', () => {
+      const invalidInput = {
+        title: ' '.repeat(101),
+        category: 'c'.repeat(51),
+        body: 'b'.repeat(2001),
+      };
+
+      expect(CreateFeedbackSnippetSchema.safeParse(invalidInput).success).toBe(false);
+      expect(mockDb.insert).not.toHaveBeenCalled();
+      expect(mockDb.update).not.toHaveBeenCalled();
     });
   });
 
