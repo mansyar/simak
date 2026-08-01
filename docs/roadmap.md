@@ -261,7 +261,7 @@ All tracks must adhere to the following project constraints:
 
 ## Milestone 9: Client Architecture Consistency
 
-> This milestone addresses client-side data-fetching architectural inconsistencies identified after the completion of the gradebook feature (TRACK-025). The TanStack Query architecture established in TRACK-014 (query-key factory + `useQuery`/`useMutation` with optimistic updates) is followed by most domains, but two gaps were identified: (1) ~~the query-key factory covers only 7 of ~13 data domains, with 5 settings components and the entire gradebook feature using inline string-array keys or pre-React-Query `useState`/`useEffect` patterns~~ **[CLOSED — TRACK-029 complete: factory now covers 9 domains, all inline keys migrated]**, and (2) ~~the NotificationCenter reimplements infinite-scroll pagination by hand instead of using TanStack Query's native `useInfiniteQuery`~~ **[CLOSED — TRACK-030 complete: migrated to `useInfiniteQuery`, fixed latent optimistic-mutation no-op bug]**. These tracks are consistency/tech-debt work — no new product features, no backend changes, no schema migrations.
+> This milestone addresses client-side data-fetching architectural inconsistencies identified after the completion of the gradebook feature (TRACK-025). The TanStack Query architecture established in TRACK-014 (query-key factory + `useQuery`/`useMutation` with optimistic updates) is followed by most domains, but two gaps were identified: (1) ~~the query-key factory covers only 7 of ~13 data domains, with 5 settings components and the entire gradebook feature using inline string-array keys or pre-React-Query `useState`/`useEffect` patterns~~ **[CLOSED — TRACK-029 complete: factory covered 9 domains at that milestone; TRACK-049 added `feedbackSnippetKeys`, bringing the current total to 10]**, and (2) ~~the NotificationCenter reimplements infinite-scroll pagination by hand instead of using TanStack Query's native `useInfiniteQuery`~~ **[CLOSED — TRACK-030 complete: migrated to `useInfiniteQuery`, fixed latent optimistic-mutation no-op bug]**. These tracks are consistency/tech-debt work — no new product features, no backend changes, no schema migrations.
 
 ---
 
@@ -453,12 +453,13 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-049: Instructor Feedback Snippets
 
-- **Status:** 📋 Planned · **Audit IDs:** None (proactive instructor-productivity enhancement) · **Deps:** None
+- **Status:** ✅ Complete and archived in `conductor/archive/instructor-feedback-snippets_20260801/` · **Audit IDs:** None (proactive instructor-productivity enhancement) · **Deps:** None
 - **Problem:** SIMAK's review queue already provides FIFO prioritization, SLA indicators, inline PDF/DOCX previews, keyboard navigation, rubric scoring, and next-review navigation. However, instructors still repeatedly compose common feedback in free-text comments, slowing the review bottleneck that gates student checkpoint progress and can lead to SLA breaches. The system has no reusable, instructor-owned feedback library.
 - **Decisions:** Snippets are private to their owning instructor; there is no shared or admin-managed library in this version. Snippets are plain text with a required title, optional free-text category, and bounded body length validated by Zod; dynamic placeholders and HTML/rich-text rendering are deliberately excluded. Inserting a snippet appends its plain text to the editable review comment through an explicit action—it never selects Pass/Revise, completes rubric scores, or submits a review. Snippet updates and archival never alter comments on existing reviews.
 - **Scope:** A small instructor-owned feedback-snippet data model; CRUD server functions with session ownership checks; a dedicated instructor-only `/instructor/feedback-snippets` management route; and review-form insertion that appends text while preserving manual editing. Archived snippets are excluded from the default picker/list but retained for historical management. Include i18n, unit tests, and E2E coverage for snippet ownership and review-form insertion.
 - **Out of Scope:** Shared or department-wide snippet libraries, admin approval workflows, AI-generated feedback, automatic decision recommendations, custom placeholders, and feedback-quality analytics.
 - **Execution vectors:** Add a migration with an instructor-user foreign key, bounded columns, and archival support; implement client-safe stubs and server-only handlers following the established two-file pattern; add the dedicated instructor route and sidebar navigation; integrate a searchable active-snippet picker into the review form while preserving manual editing; verify inserts do not alter review state or rubric behavior; test validation boundaries, cross-instructor access denial, archival behavior, and historical-review immutability.
+- **Execution result:** Added the `feedback_snippets` schema and migration with rollback, ownership-scoped client-safe/server-only functions, bilingual instructor management UI, active-only searchable review picker, instructor-only route guard, deterministic E2E fixtures, and cross-role/ownership/review-insertion coverage. Review insertion is explicit, preserves editability and focus, and leaves decisions, rubric scores, checkpoint state, submission status, and historical comments unchanged. The focused TRACK-049 Playwright spec passed 12/12 across Chromium, Firefox, and mobile Chromium; the full repository Playwright run exceeded the environment execution window without an aggregate result and is documented as a limitation.
 - **Definition of Done:** Instructors can create, edit, archive, search, and append only their own validated plain-text snippets; archived snippets are not offered for insertion; insertion leaves comments editable and cannot auto-submit or select a decision; existing review comments remain unchanged after snippet edits; cross-instructor access is rejected; all new UI is bilingual and accessible; unit/E2E tests, typecheck, lint, and coverage gates pass.
 
 ---
@@ -568,7 +569,7 @@ Milestone 14: Data Protection & Recovery
 └── TRACK-048: Backup & Restore Readiness [📋 Planned — depends on 047]
 
 Milestone 15: Instructor Productivity
-└── TRACK-049: Instructor Feedback Snippets [📋 Planned — no deps]
+└── TRACK-049: Instructor Feedback Snippets [✅ Complete — archived — no deps]
 
 Milestone 16: Student Support Workflows
 └── TRACK-050: At-Risk Intervention Workflow [📋 Planned — depends on 023]
@@ -608,7 +609,7 @@ The following track groups can be worked on simultaneously:
 | **W** | TRACK-044 → TRACK-040, TRACK-043 (complete — archived) | TRACK-044 wires TRACK-040's `requestIdMiddleware` through the middleware chaining established by TRACK-043. It runs request-ID middleware before optional rate limiting so all server-function logs receive request context. |
 | **X** | TRACK-046 → TRACK-022 (complete), TRACK-030 (complete) | Sequential dependency — TRACK-046 builds on notification infrastructure from TRACK-022 and the client-side data layer from TRACK-030. New domain (SSE route + connection manager) — no file overlap with other planned tracks |
 | **Y** | TRACK-047 → TRACK-048 | TRACK-047 is complete and archived; any broader backup/restore follow-up can now build on the verified seven-copy pilot baseline before wider onboarding. |
-| **Z** | TRACK-049, TRACK-050, TRACK-051 | Independently implementable after their completed dependencies. TRACK-049 touches review UI and a new snippet domain; TRACK-050 touches risk/dashboard/assignment-reassignment paths; TRACK-051 touches gradebook and student-grade visibility. Coordinate only if work overlaps shared instructor dashboard or gradebook files. |
+| **Z** | TRACK-049 (complete — archived), TRACK-050, TRACK-051 | Independently implementable after their completed dependencies. TRACK-049 touches review UI and a new snippet domain; TRACK-050 touches risk/dashboard/assignment-reassignment paths; TRACK-051 touches gradebook and student-grade visibility. Coordinate only if work overlaps shared instructor dashboard or gradebook files. |
 
 ---
 
