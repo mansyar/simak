@@ -14,12 +14,14 @@ import type {
   CreateInterventionSchema,
   GetInterventionContextSchema,
   ListInterventionsSchema,
+  UpdateInterventionSchema,
 } from './interventions';
 import type { z } from 'zod';
 
 type CreateInterventionInput = z.infer<typeof CreateInterventionSchema>;
 type ListInterventionsInput = z.infer<typeof ListInterventionsSchema>;
 type GetInterventionContextInput = z.infer<typeof GetInterventionContextSchema>;
+type UpdateInterventionInput = z.infer<typeof UpdateInterventionSchema>;
 type Transaction = Parameters<Parameters<Db['transaction']>[0]>[0];
 type QueryDb = Db | Transaction;
 
@@ -59,6 +61,31 @@ async function lockAssignmentStudent(db: QueryDb, assignmentId: number, studentI
     )
     .limit(1)
     .for('update', { of: assignmentStudents });
+}
+
+async function lockOwnedIntervention(db: QueryDb, interventionId: number, instructorId: string) {
+  return db
+    .select({
+      id: interventions.id,
+      assignmentId: interventions.assignmentId,
+      studentId: interventions.studentId,
+      actionType: interventions.actionType,
+      privateNote: interventions.privateNote,
+      status: interventions.status,
+      followUpDate: interventions.followUpDate,
+      resolutionReason: interventions.resolutionReason,
+    })
+    .from(interventions)
+    .innerJoin(assignments, eq(interventions.assignmentId, assignments.id))
+    .where(
+      and(
+        eq(interventions.id, interventionId),
+        eq(assignments.instructorId, instructorId),
+        isNull(assignments.deletedAt),
+      ),
+    )
+    .limit(1)
+    .for('update', { of: interventions });
 }
 
 function hasStudentInactionRisk(
@@ -248,8 +275,117 @@ export async function getInterventionContextHandler(args: { data: GetInterventio
   }
 }
 
-// Lifecycle updates are implemented in the next Phase 2 task. Keep the
-// client-safe stub type-complete while creation and listing land first.
-export async function updateInterventionHandler(_args: { data: unknown }) {
-  return serverError(ErrorCode.BAD_REQUEST, 'Intervention updates are not yet available');
+function isAllowedStatusTransition(
+  currentStatus: (typeof interventions.$inferSelect)['status'],
+  nextStatus: NonNullable<UpdateInterventionInput['status']>,
+) {
+  if (currentStatus === 'resolved' || currentStatus === 'dismissed') return false;
+  if (currentStatus === nextStatus) return false;
+
+  if (currentStatus === 'open') {
+    return nextStatus === 'monitoring' || nextStatus === 'resolved' || nextStatus === 'dismissed';
+  }
+
+  return nextStatus === 'open' || nextStatus === 'resolved' || nextStatus === 'dismissed';
+}
+
+export async function updateInterventionHandler(args: { data: UpdateInterventionInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isInstructor(session)) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const { interventionId, actionType, privateNote, followUpDate, status, resolutionReason } =
+    args.data;
+  const db = getDb();
+
+  try {
+    const result = await db.transaction(async (tx) => {
+      const [existing] = await lockOwnedIntervention(tx, interventionId, session.user.id);
+      if (!existing) {
+        return serverError(ErrorCode.NOT_FOUND, 'Intervention not found');
+      }
+
+      if (existing.status === 'resolved' || existing.status === 'dismissed') {
+        return serverError(
+          ErrorCode.BAD_REQUEST,
+          'Resolved and dismissed interventions are immutable',
+        );
+      }
+
+      if (status !== undefined) {
+        if (!isAllowedStatusTransition(existing.status, status)) {
+          return serverError(ErrorCode.BAD_REQUEST, 'Invalid intervention status transition');
+        }
+
+        if ((status === 'resolved' || status === 'dismissed') && !resolutionReason?.trim()) {
+          return serverError(ErrorCode.BAD_REQUEST, 'A resolution or dismissal reason is required');
+        }
+      }
+
+      const changedFields: string[] = [];
+      const values: Partial<typeof interventions.$inferInsert> = { updatedAt: new Date() };
+
+      if (actionType !== undefined) {
+        values.actionType = actionType;
+        changedFields.push('actionType');
+      }
+      if (privateNote !== undefined) {
+        values.privateNote = privateNote;
+        changedFields.push('privateNote');
+      }
+      if (followUpDate !== undefined) {
+        values.followUpDate = followUpDate;
+        changedFields.push('followUpDate');
+      }
+      if (status !== undefined) {
+        values.status = status;
+        changedFields.push('status');
+      }
+      if (resolutionReason !== undefined) {
+        values.resolutionReason = resolutionReason;
+        changedFields.push('resolutionReason');
+      }
+
+      const [intervention] = await tx
+        .update(interventions)
+        .set(values)
+        .where(eq(interventions.id, interventionId))
+        .returning();
+
+      if (!intervention) {
+        return serverError(ErrorCode.NOT_FOUND, 'Intervention not found');
+      }
+
+      return { intervention, previousStatus: existing.status, changedFields };
+    });
+
+    if (isServerError(result)) return result;
+
+    const auditAction =
+      result.intervention.status === 'resolved' || result.intervention.status === 'dismissed'
+        ? `intervention.${result.intervention.status}`
+        : 'intervention.updated';
+    await safeAuditLog(auditAction, {
+      actorId: session.user.id,
+      action: auditAction,
+      entityType: 'intervention',
+      entityId: String(result.intervention.id),
+      details: {
+        previousStatus: result.previousStatus,
+        status: result.intervention.status,
+        changedFields: result.changedFields,
+        ...(result.intervention.status === 'resolved' || result.intervention.status === 'dismissed'
+          ? { reason: resolutionReason ?? result.intervention.resolutionReason }
+          : {}),
+      },
+    });
+
+    return { intervention: result.intervention };
+  } catch (error) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: error instanceof Error ? error.message : String(error),
+      handler: 'updateInterventionHandler',
+    });
+  }
 }
