@@ -28,6 +28,7 @@ import {
   assignmentStudents,
   checkpoints,
   consultations,
+  feedbackSnippets,
 } from '../src/db/schema/index';
 import { hashPassword } from 'better-auth/crypto';
 import crypto from 'node:crypto';
@@ -129,6 +130,10 @@ async function seedTemplateAndAssignment(): Promise<void> {
     .select()
     .from(users)
     .where(eq(users.email, 'instructor@e2e.test'));
+  const [instructorTwoUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, 'instructor2@e2e.test'));
 
   const [studentUser] = await db.select().from(users).where(eq(users.email, 'student@e2e.test'));
   const [student2User] = await db.select().from(users).where(eq(users.email, 'student2@e2e.test'));
@@ -136,6 +141,34 @@ async function seedTemplateAndAssignment(): Promise<void> {
   if (!instructorUser || !studentUser) {
     throw new Error('E2E instructor or student not found. Run seedE2EUsers() first.');
   }
+
+  await db.insert(feedbackSnippets).values([
+    {
+      instructorId: instructorUser.id,
+      title: 'E2E Evidence Reminder',
+      category: 'Evidence',
+      body: 'Support each claim with specific evidence.',
+    },
+    {
+      instructorId: instructorUser.id,
+      title: 'E2E Archived Snippet',
+      category: 'Archived',
+      body: 'This archived snippet must stay private and unavailable for insertion.',
+      archivedAt: new Date('2026-01-01T00:00:00.000Z'),
+    },
+    ...(instructorTwoUser
+      ? [
+          {
+            instructorId: instructorTwoUser.id,
+            title: 'Instructor Two Private Snippet',
+            category: 'Private',
+            body: 'This snippet belongs only to instructor two.',
+          },
+        ]
+      : []),
+  ]);
+
+  console.log('[E2E Seed] Feedback snippet fixtures created.');
 
   // --- Create template with checkpoints ---
   const [template] = await db

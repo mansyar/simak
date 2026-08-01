@@ -111,21 +111,21 @@ This plan follows the approved specification and the repository’s TDD workflow
 
 ## Phase 5: End-to-End Coverage & Test Fixtures
 
-- [ ] Task: Prepare deterministic E2E data isolation
-  - [ ] Add `feedback_snippets` to `tests/e2e/helpers/db-reset.ts`.
-  - [ ] Confirm the existing seeded instructor accounts are sufficient for cross-instructor ownership tests.
-  - [ ] Add only the minimum additional fixture data required for review-form insertion.
-- [ ] Task: Add Playwright coverage in `tests/e2e/feedback-snippets.spec.ts`
-  - [ ] Verify an instructor can create, search, edit, archive, and restore a snippet.
-  - [ ] Verify archived snippets are absent from the active management view and review picker.
-  - [ ] Verify a second instructor cannot see or access the first instructor’s snippets.
-  - [ ] Verify students and admins cannot use the instructor-only route.
-- [ ] Task: Add review-form insertion E2E coverage
-  - [ ] Extend the existing instructor review flow or add a focused spec.
-  - [ ] Insert a snippet into a review comment.
-  - [ ] Verify the appended text remains editable.
-  - [ ] Verify the review still requires an explicit decision and submit action.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Prepare deterministic E2E data isolation
+  - [x] Add `feedback_snippets` to `tests/e2e/helpers/db-reset.ts`.
+  - [x] Seed separate `instructor@e2e.test` and `instructor2@e2e.test` accounts for cross-instructor ownership tests.
+  - [x] Add only the minimum additional fixture data required for review-form insertion: active/archived snippets and a seeded submission helper.
+- [x] Task: Add Playwright coverage in `tests/e2e/feedback-snippets.spec.ts`
+  - [x] Verify an instructor can create, search, edit, archive, and restore a snippet.
+  - [x] Verify archived snippets are absent from the active management view and review picker.
+  - [x] Verify a second instructor cannot see or access the first instructor’s snippets.
+  - [x] Verify students and admins cannot use the instructor-only route.
+- [x] Task: Add review-form insertion E2E coverage
+  - [x] Add a focused spec for the seeded instructor review flow.
+  - [x] Insert a snippet into a review comment.
+  - [x] Verify the appended text remains editable.
+  - [x] Verify the review still requires an explicit decision and submit action.
+- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
   - [ ] Run the focused Playwright spec against the test database.
   - [ ] Confirm tests are independently runnable and remain under the file limit.
   - [ ] Commit the phase and attach the verification git note.
