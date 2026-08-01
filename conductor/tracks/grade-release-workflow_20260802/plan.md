@@ -84,7 +84,14 @@
   - [x] Run coverage for the new server/schema modules and refactor only without changing behavior.
   - [x] Commit with a `feat(gradebook): ...` message and attach the required git note.
 
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+  - [x] Automated verification: release lifecycle tests pass (17 tests).
+  - [x] Automated verification: related gradebook/server/UI regression tests pass (42 tests).
+  - [x] Automated verification: `pnpm test:coverage` passes (405 files, 4,062 tests; overall thresholds met).
+  - [x] Automated verification: `pnpm typecheck` passes; implementation lint and modularity checks pass.
+  - [x] Manual verification: publication is instructor-owner scoped, snapshots are complete-only and versioned, withdrawal retains snapshots, and student reads use only the active published snapshot.
+  - [ ] Obtain user confirmation to proceed to Phase 3.
+  - [ ] Record the checkpoint note and mark the phase complete.
 
 ## Phase 3: Instructor and Student UI, i18n, and Accessibility
 
