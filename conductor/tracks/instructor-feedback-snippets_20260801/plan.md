@@ -104,10 +104,10 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Add a blank line only when the existing comment contains non-whitespace text.
   - [x] Return focus to the comment textarea after insertion.
   - [x] Leave Pass/Revise, revision deadline, feedback-file upload, rubric scoring, and submit behavior unchanged.
-- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
-  - [ ] Run the focused picker and review-form tests.
-  - [ ] Manually verify insertion, continued editing, keyboard operation, and light/dark rendering.
-  - [ ] Commit the phase and attach the verification git note.
+- [x] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+  - [x] Run the focused picker and review-form tests: `CI=true pnpm vitest run tests/unit/components/reviews/FeedbackSnippetPicker.test.tsx tests/unit/components/reviews/ReviewForm.test.tsx tests/unit/components/reviews/review-form.test.tsx` passed 3 files and 30 tests; typecheck, i18n parity, and `git diff --check` also passed.
+  - [x] Manually verify insertion, continued editing, keyboard operation, and light/dark rendering; the user confirmed active-only filtering, search, explicit insertion, exact separators, multiple insertions, refocus, unchanged review controls, and responsive rendering.
+  - [x] Commit the phase and attach the verification git note to the functional commit.
 
 ## Phase 5: End-to-End Coverage & Test Fixtures
 
