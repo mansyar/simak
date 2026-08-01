@@ -131,7 +131,7 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Manually verify seeded management, ownership, route-access, and review-insertion flows; the user confirmed CRUD, archive exclusion, explicit insertion/editability, unchanged review controls, role redirects, and responsive light/dark behavior.
   - [x] Commit the phase and attach the verification git note to the functional commit.
 
-## Phase 6: Final Quality Gates & Completion
+## Phase 6: Final Quality Gates & Completion [checkpoint: 4bcb363]
 
 - [x] Task: Run the complete automated verification suite
   - [x] Run `pnpm test`: 392 files and 3,985 tests passed.
