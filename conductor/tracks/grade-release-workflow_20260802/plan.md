@@ -40,8 +40,8 @@
 
 ## Phase 2: Server Release Lifecycle and Student Gating
 
-- [ ] Task: Write failing server tests (Red Phase)
-  - [ ] Create `tests/unit/server/gradebook-release.test.ts` using the established server-handler mocking pattern.
+- [~] Task: Write failing server tests (Red Phase)
+  - [~] Create `tests/unit/server/gradebook-release.test.ts` using the established server-handler mocking pattern.
   - [ ] Test preflight classification for complete, incomplete/in-progress, and missing persisted grades.
   - [ ] Test that only the current assignment instructor can publish.
   - [ ] Test that students, admins, superadmins, and non-owning instructors cannot publish or withdraw.
