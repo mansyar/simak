@@ -142,6 +142,125 @@ durability feature.
 No R2 versioning, retention, replication, or recovery configuration is changed
 by TRACK-048.
 
+## Prioritized future recommendations
+
+These recommendations are the output of the gap analysis. They are options for
+future approval, not implemented configuration. A future implementation track
+must confirm its scope, owner, and verification evidence before changing the
+seven-copy pilot baseline.
+
+### 1. Approve recovery objectives and a retention policy
+
+- **Priority:** P0 — decision required before wider production use.
+- **Recommendation:** Assign an owner for recovery objectives and approve a
+  retention policy that explains how many recovery points are needed and for
+  how long. Keep the existing seven daily copies unchanged until that decision
+  is approved.
+- **Options:** Continue the seven-copy pilot setting; adopt a time-based window
+  such as a 30-day logical-backup policy; or adopt a tiered daily/weekly/monthly
+  policy. The latter options are examples for decision-making, not current
+  SIMAK configuration.
+- **Operational owner:** Infrastructure/data owner with product or compliance
+  input where required.
+- **Prerequisites:** Documented recovery-point and recovery-time objectives,
+  data classification, storage-cost estimate, and an approved retention owner.
+- **Risk:** A longer window increases storage and governance cost; an
+  unreviewed shorter window may leave insufficient recovery history.
+- **Implementation status:** Proposed; no retention policy change is included
+  in TRACK-048.
+
+### 2. Decide whether the Coolify scheduler is independent enough
+
+- **Priority:** P1 — evaluate with the recovery-objectives decision.
+- **Recommendation:** Treat the current Coolify-managed schedule as the pilot
+  mechanism and decide whether a separate managed scheduler or control plane is
+  justified. Do not move scheduling into the application process by default;
+  that would couple backup execution to application runtime health.
+- **Options:** Keep Coolify scheduling; use an external managed scheduler with
+  an authenticated backup operation; or use a second control plane only when a
+  defined failure model shows that it is necessary. A second scheduler must not
+  create duplicate or conflicting jobs.
+- **Operational owner:** Infrastructure operations.
+- **Prerequisites:** Failure-model review, recovery objectives, provider
+  capability review, ownership of the schedule, and an idempotency/duplicate-job
+  plan.
+- **Risk:** Additional schedulers increase cost and operational complexity;
+  duplicated jobs can increase load or create misleading success signals.
+- **Implementation status:** Proposed; no independent scheduler is added by
+  TRACK-048.
+
+### 3. Add job-level backup success and failure visibility
+
+- **Priority:** P0 — establish before relying on backups for a wider rollout.
+- **Recommendation:** For any future backup-job implementation, capture and
+  review sanitized evidence for the schedule, start and finish, success or
+  failure, each configured destination, retention result, failure reason, and
+  operator acknowledgement. Alert on a failed job, a missed expected job, or a
+  stale last-success signal, with a documented escalation owner.
+- **Operational owner:** Infrastructure operations, with the incident owner
+  responsible for escalation routing.
+- **Prerequisites:** An approved alert channel, job identifiers that do not
+  expose secrets, a freshness threshold, escalation ownership, and a test
+  failure or notification path.
+- **Risk:** Noisy alerts can be ignored; poorly redacted diagnostics can expose
+  connection strings, access keys, or signed URLs.
+- **Implementation status:** Deferred; TRACK-048 adds no monitoring or alerting.
+
+### 4. Maintain reproducible, sanitized restore evidence
+
+- **Priority:** P1 — maintain alongside database-version or procedure changes.
+- **Recommendation:** Keep the existing isolated-restore-first procedure as the
+  operator boundary. When the destination, database version, or procedure
+  changes, record a sanitized drill result covering connectivity,
+  migration/schema state, representative data, cleanup, and follow-up actions.
+  Do not record temporary target names, exact backup timestamps, or credentials.
+- **Operational owner:** Database/infrastructure operator.
+- **Prerequisites:** An isolated non-production destination, a representative
+  validation dataset, a version-aware checklist, an evidence owner, and a safe
+  cleanup procedure.
+- **Risk:** A stale or overly narrow drill can create false confidence; an
+  unsafe destination can affect production data.
+- **Implementation status:** Partially addressed by TRACK-047 evidence;
+  maintenance of future evidence is recommended but no new drill is performed
+  by TRACK-048.
+
+### 5. Verify least-privilege backup credential isolation
+
+- **Priority:** P0 — verify before expanding operational access.
+- **Recommendation:** Audit the identities used by Coolify and each backup
+  destination. Scope them to the required backup, list, retention, and restore
+  operations; keep them separate from application runtime credentials; define
+  rotation ownership; and test that the normal application runtime cannot read
+  or use backup-storage credentials.
+- **Operational owner:** Infrastructure and security operations.
+- **Prerequisites:** Provider IAM capability, an inventory of backup and R2
+  identities, an approved rotation procedure, break-glass access rules, and
+  redacted access-test evidence.
+- **Risk:** Overly broad access increases data-exfiltration impact; overly
+  narrow access can make backup or restore fail during an incident.
+- **Implementation status:** Proposed; TRACK-048 changes no credentials or
+  access policies.
+
+### 6. Review R2 durability and recovery only against a defined need
+
+- **Priority:** P1 — follow up when object-recovery objectives or risk review
+  justify it.
+- **Recommendation:** Validate the current private R2 bucket posture against
+  uploaded-file recovery objectives. Compare leaving the current policy as-is
+  with provider-supported versioning, retention, or replication controls. Add
+  a control only after its deletion/recovery behavior, cost, access impact, and
+  operational owner are approved.
+- **Operational owner:** Infrastructure/storage owner with security and product
+  risk input.
+- **Prerequisites:** Uploaded-file data classification, object recovery
+  objectives, provider/account configuration review, cost assessment, and a
+  recovery test plan that does not expose signed URLs.
+- **Risk:** Retention or replication can increase cost and complicate deletion
+  obligations; assuming a durability feature exists can create false recovery
+  confidence.
+- **Implementation status:** Deferred follow-up decision; TRACK-048 makes no
+  R2 versioning, retention, replication, or recovery configuration change.
+
 ## Review guardrails
 
 The following distinctions are mandatory for the remainder of this track:

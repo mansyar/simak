@@ -45,12 +45,12 @@
 
 ## Phase 2: Prioritized Recommendations & Documentation Integration
 
-- [ ] Task: Produce the future-state recommendation section
-  - [ ] Compare viable retention and scheduling options without approving implementation implicitly.
-  - [ ] Identify prerequisites, operational owner, risks, and priority for each recommendation.
-  - [ ] Define the required failure-visibility evidence for any future backup job.
-  - [ ] Define least-privilege expectations for future backup credentials.
-  - [ ] Identify when an R2 versioning, retention, or replication follow-up would be justified.
+- [~] Task: Produce the future-state recommendation section
+  - [x] Compare viable retention and scheduling options without approving implementation implicitly.
+  - [x] Identify prerequisites, operational owner, risks, and priority for each recommendation.
+  - [x] Define the required failure-visibility evidence for any future backup job.
+  - [x] Define least-privilege expectations for future backup credentials.
+  - [x] Identify when an R2 versioning, retention, or replication follow-up would be justified.
 
 - [ ] Task: Integrate the review into project documentation
   - [ ] Add a link from `docs/deployment-runbook.md` or the README where appropriate.
