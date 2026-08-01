@@ -145,7 +145,7 @@
 
 ## Phase 4: Regression, Quality Gates, and Final Documentation
 
-- [ ] Task: Verify cross-feature compatibility
+- [~] Task: Verify cross-feature compatibility
   - [ ] Confirm existing grade computation and recomputation tests remain green.
   - [ ] Confirm existing instructor gradebook, export, admin analytics, and student assignment tests remain green.
   - [ ] Confirm audit-log rendering handles the new publication and withdrawal actions in both locales.
