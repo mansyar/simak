@@ -55,9 +55,12 @@
   - [x] Compare median or otherwise consistently selected wall-clock measurements [5962fe9]
   - [x] Confirm at least a 20% reduction; if not met, return to Phase 2 for another evidence-based candidate [a8d5ca2] — no qualifying candidate remained
 
-- [~] Task: Verify coverage and test-scope invariants
+- [x] Task: Verify coverage and test-scope invariants [a8d5ca2]
+  - [x] Confirm text, JSON, and HTML reports are generated [a8d5ca2]
+  - [x] Confirm the existing include/exclude scope and 80% thresholds are unchanged [a8d5ca2]
+  - [x] Confirm integration tests remain opt-in through `pnpm test:integration` [a8d5ca2]
 
-- [ ] Task: Run repository quality gates
+- [~] Task: Run repository quality gates
   - [ ] Run `pnpm typecheck`
   - [ ] Run `pnpm lint`
   - [ ] Run `pnpm test:integration` when the required integration environment is available
