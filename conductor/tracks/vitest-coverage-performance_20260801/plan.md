@@ -41,12 +41,12 @@
   - [x] Preserve all existing tests, projects, coverage reporters, scope, and thresholds [318293a]
   - [x] Remove temporary diagnostic settings and keep comments aligned with the final behavior [318293a]
 
-- [~] Task: Run the green-phase verification
-  - [ ] Run `pnpm test` and confirm all default tests pass
-  - [ ] Run `pnpm test:coverage` and confirm all coverage thresholds and reports remain valid
-  - [ ] Confirm no worker crashes, unhandled errors, or missing XLSX tests occur
+- [x] Task: Run the green-phase verification [b00240a]
+  - [x] Run `pnpm test` and confirm all default tests pass [b00240a]
+  - [x] Run `pnpm test:coverage` and confirm all coverage thresholds and reports remain valid [b00240a]
+  - [x] Confirm no worker crashes, unhandled errors, or missing XLSX tests occur [b00240a]
 
-- [ ] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [~] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
 
 ## Phase 3: Benchmark Confirmation, Documentation, and Final Quality Gates
 
