@@ -69,7 +69,7 @@ describe('FeedbackSnippetPicker', () => {
     const onInsert = vi.fn();
     render(<FeedbackSnippetPicker onInsert={onInsert} />);
 
-    const queryOptions = mockUseQuery.mock.calls[0][0] as {
+    const queryOptions = mockUseQuery.mock.calls[0][0] as unknown as {
       queryFn: () => Promise<unknown>;
     };
     await queryOptions.queryFn();
@@ -109,7 +109,7 @@ describe('FeedbackSnippetPicker', () => {
     const onInsert = vi.fn();
     render(<FeedbackSnippetPicker onInsert={onInsert} />);
 
-    const option = screen.getByRole('button', { name: activeSnippet.title });
+    const option = screen.getByRole('button', { name: /Evidence reminder/ });
     expect(option.getAttribute('type')).toBe('button');
     expect(option.getAttribute('aria-pressed')).toBe('false');
 

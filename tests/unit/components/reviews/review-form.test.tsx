@@ -17,6 +17,10 @@ vi.mock('@/server/files', () => ({
   getPresignedReviewFeedbackUploadUrl: vi.fn(),
 }));
 
+vi.mock('@/components/reviews/FeedbackSnippetPicker', () => ({
+  FeedbackSnippetPicker: () => null,
+}));
+
 vi.mock('@/lib/errors', () => ({
   isServerError: vi.fn(() => false),
 }));

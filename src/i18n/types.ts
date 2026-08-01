@@ -344,6 +344,14 @@ export type Translation = {
     archived: string
     filterLabel: string
     searchPlaceholder: string
+    pickerTitle: string
+    pickerDescription: string
+    pickerSearchPlaceholder: string
+    pickerLoading: string
+    pickerLoadError: string
+    pickerEmpty: string
+    pickerSelected: string
+    pickerInsert: string
     loading: string
     empty: string
     emptyPrompt: string
