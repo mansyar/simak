@@ -98,8 +98,9 @@ and combined the DOM and XLSX files into one `threads` project. Representative
 DOM/XLSX discovery passed, and the complete non-coverage suite took 93.56 s.
 The full coverage run took 101.996 s; processing-concurrency and all-threads
 variants remained between 99.94 s and 103.34 s. The candidate improved on the
-baseline median but did not reach the 90.68 s target and changed the existing
-unit/XLSX project contract, so it was reverted.
+baseline median by at most 11.8% but did not reach the 90.68 s target and
+changed the existing unit/XLSX project contract, so it was reverted. The best
+candidate that preserved the project contract was still above the target.
 
 Disabling isolation for the unit project was also rejected: the suite produced
 20 failed files and 94 failed tests from shared mock/state contamination. Native
@@ -132,3 +133,6 @@ passed `pnpm test` and `pnpm test:coverage` with the controlled process-local
 environment. The coverage command exited 0 after 111.943 s, with 388 files and
 3,953 tests passing and coverage at 88.04% statements, 81.08% branches, 83.56%
 functions, and 88.68% lines. Text, JSON, and HTML reports were generated again.
+This single final run was 1.2% faster than the baseline median, but is normal
+run-to-run variation rather than an attributable optimization; no configuration
+or package-script change was retained.
