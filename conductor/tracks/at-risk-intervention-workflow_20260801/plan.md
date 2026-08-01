@@ -71,7 +71,7 @@
 
 ## Phase 3 — Dedicated intervention UI
 
-- [ ] Task: Build the intervention list, filters, and form
+- [~] Task: Build the intervention list, filters, and form
   - [ ] Write failing component and route tests for loading, empty, error, status/overdue filters, action types, conditional closure reason, validation errors, status actions, and bilingual labels.
   - [ ] Run the UI tests and confirm the Red phase.
   - [ ] Add `src/routes/_authenticated/instructor/interventions/index.tsx` with validated search parameters for status, overdue, assignment, student, page, and limit.
