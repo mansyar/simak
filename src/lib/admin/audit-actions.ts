@@ -21,6 +21,14 @@ export const ACTION_TYPES = [
   { value: 'consultation.rejected', label: 'adminAuditLog.actionLabels.consultationRejected' },
   { value: 'extension.approved', label: 'adminAuditLog.actionLabels.extensionApproved' },
   { value: 'extension.rejected', label: 'adminAuditLog.actionLabels.extensionRejected' },
+  {
+    value: 'gradebook.release_published',
+    label: 'adminAuditLog.actionLabels.gradeReleasePublished',
+  },
+  {
+    value: 'gradebook.release_withdrawn',
+    label: 'adminAuditLog.actionLabels.gradeReleaseWithdrawn',
+  },
 ] as const;
 
 export function getActionVisualProps(type: string): ActionVisualProps {

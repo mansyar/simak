@@ -3,14 +3,20 @@ import { describe, it, expect } from 'vitest';
 import { getActionVisualProps, ACTION_TYPES } from '@/lib/admin/audit-actions';
 
 describe('ACTION_TYPES', () => {
-  it('should have 14 entries matching locale keys', () => {
-    expect(ACTION_TYPES).toHaveLength(14);
+  it('should have 16 entries matching locale keys', () => {
+    expect(ACTION_TYPES).toHaveLength(16);
   });
 
   it('should include extensionApproved and extensionRejected', () => {
     const values = ACTION_TYPES.map((a) => a.value);
     expect(values).toContain('extension.approved');
     expect(values).toContain('extension.rejected');
+  });
+
+  it('should include grade release publication and withdrawal', () => {
+    const values = ACTION_TYPES.map((a) => a.value);
+    expect(values).toContain('gradebook.release_published');
+    expect(values).toContain('gradebook.release_withdrawn');
   });
 
   it('should have all labels reachable as i18n keys', () => {
