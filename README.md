@@ -103,6 +103,7 @@ simak/
 - **[docs/PRD.md](docs/PRD.md)** — Product Requirements Document (features, user flows, roles)
 - **[docs/TDD.md](docs/TDD.md)** — Technical Design Document (architecture, data model, schemas)
 - **[docs/roadmap.md](docs/roadmap.md)** — Remediation roadmap (audit findings, tracks, milestones)
+- **[docs/vitest-coverage-performance.md](docs/vitest-coverage-performance.md)** — Vitest coverage benchmark and optimization decision record
 - **[AGENTS.md](AGENTS.md)** — Developer guide (commands, architecture, testing patterns, formatting)
 
 ## Architecture Highlights
@@ -147,6 +148,7 @@ simak/
 - **Integration tests** (`tests/integration/`) — Excluded from the default test run via `vitest.config.ts` (not script flags). Run explicitly with `pnpm test:integration` (uses standalone `vitest.config.integration.ts`).
 - **E2E tests** (`tests/e2e/`) — Playwright E2E tests (~73 tests across 14 spec files) covering critical user flows: auth route guards + invalid login, admin user management + edit/delete with reassignment, admin template CRUD, instructor assignment creation, student file submission + upload UI validation + cross-student access denial, instructor review workflow (decoupled tests) + notification assertions, consultation lifecycle (log → verify → gating UI), extension workflow (request → approve/reject → deadline adjustment), password setup lifecycle (token → setup → login → token reuse/expiry), role dashboard smoke tests, settings hub, smoke tests for 13 routes, rubric grading, checkpoint discussions Q&A, cross-role lifecycle integration, mobile viewport, and axe accessibility scans on 6 key pages. Runs on 3 browser projects: chromium (desktop), firefox (desktop), and mobile-chrome (Pixel 7). Uses a dedicated test database (`postgres-test` Docker service, port 5433). Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive). The global setup migrates, truncates, and seeds the test DB (7 users incl. Instructor2/Student2/Student3, pending consultation) before each run; each spec file resets the DB for isolation.
 - **Coverage thresholds:** lines, functions, branches, and statements all >= 80%.
+- **Coverage performance decision (August 2026):** A controlled benchmark recorded a 113.35-second median for `pnpm test:coverage`. No safe in-scope optimization met the 20% target, so `vitest.config.ts` and the package scripts remain unchanged. See [`docs/vitest-coverage-performance.md`](docs/vitest-coverage-performance.md) for measurements and rejected candidates.
 
 ## Deployment
 
