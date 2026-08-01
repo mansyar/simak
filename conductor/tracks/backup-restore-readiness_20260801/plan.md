@@ -24,7 +24,7 @@
 
 ## Phase 1: Current-State Backup & Restore Review
 
-- [~] Task: Create `docs/backup-restore-readiness.md`
+- [x] Task: Create `docs/backup-restore-readiness.md` [16f06d7]
   - [x] Add the review purpose, scope, authority, and relationship to TRACK-047.
   - [x] Document the daily PostgreSQL backup schedule and seven-copy retention baseline.
   - [x] Document local Coolify and remote S3-compatible storage locations at a non-sensitive level.
