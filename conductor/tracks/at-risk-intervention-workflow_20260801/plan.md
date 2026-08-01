@@ -109,13 +109,13 @@
   - [x] Run dashboard server/component tests and confirm the Green phase: 5 files and 40 tests passed.
   - [x] Commit with `feat(dashboard): surface intervention status` and attach the required task git note.
 
-- [~] Task: Verify reassignment-aware privacy end to end
-  - [ ] Write failing tests covering access before reassignment, access by the replacement instructor after reassignment, and denial for the former instructor, student, admin, and unrelated instructor.
-  - [ ] Run the authorization tests and confirm the Red phase.
-  - [ ] Verify the existing row-locked assignment reassignment transaction remains the single source of current ownership; modify it only if the new tests identify a required integration change.
-  - [ ] Confirm reassignment preserves immutable intervention audit actors and does not copy stale ownership into intervention records.
-  - [ ] Run the reassignment and authorization tests and confirm the Green phase.
-  - [ ] Commit with `test(interventions): verify reassignment privacy boundaries` and attach the required task git note.
+- [x] Task: Verify reassignment-aware privacy end to end (commit `2225d39`)
+  - [x] Write regression tests covering access before reassignment, access by the replacement instructor after reassignment, and denial for the former instructor, student, admin, and unrelated instructor.
+  - [x] Run the authorization tests; the ownership checks introduced in earlier handler tasks already satisfied the new regression suite, so no additional Red-phase source fix was required.
+  - [x] Verify the existing row-locked assignment reassignment transaction remains the single source of current ownership; no integration change was required.
+  - [x] Confirm reassignment preserves immutable intervention audit actors and does not copy stale ownership into intervention records.
+  - [x] Run the reassignment and authorization tests and confirm the Green phase: 4 files and 23 tests passed.
+  - [x] Commit with `test(interventions): verify reassignment privacy boundaries` and attach the required task git note.
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
