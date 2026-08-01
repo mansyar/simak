@@ -18,7 +18,7 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Add the instructor ownership relation to `usersRelations`.
   - [x] Add an owner/archive index supporting active and archived list queries.
   - [x] Re-export the schema and relations from `src/db/schema/index.ts`.
-- [x] Task: Generate and apply the database migration
+- [x] Task: Generate and apply the database migration [cde32c6f]
   - [x] Run `pnpm db:generate`.
   - [x] Inspect the generated SQL for bounded columns, the foreign key, and indexes.
   - [x] Add the corresponding manual rollback SQL under `drizzle/migrations/rollback/`.
