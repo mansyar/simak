@@ -51,6 +51,20 @@ export const RecomputeAllGradesSchema = z.object({
   assignmentId: z.number().int().positive(),
 });
 
+export const PreflightGradeReleaseSchema = z.object({
+  assignmentId: z.number().int().positive(),
+});
+
+export const PublishGradeReleaseSchema = z.object({
+  assignmentId: z.number().int().positive(),
+  confirmed: z.literal(true),
+});
+
+export const WithdrawGradeReleaseSchema = z.object({
+  assignmentId: z.number().int().positive(),
+  reason: z.string().trim().min(1).max(1000),
+});
+
 // ---- Server Function Stubs ----
 
 export const getStudentFinalGrade = typedServerFn({
@@ -89,4 +103,30 @@ export const recomputeAllGrades = typedServerFn({
   .handler(async ({ data }) => {
     const { recomputeAllGradesHandler } = await import('./gradebook.server');
     return recomputeAllGradesHandler({ data });
+  });
+
+export const getGradeReleasePreflight = typedServerFn({
+  method: 'GET',
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
+  .inputValidator(PreflightGradeReleaseSchema)
+  .handler(async ({ data }) => {
+    const { getGradeReleasePreflightHandler } = await import('./gradebook-extras.server');
+    return getGradeReleasePreflightHandler({ data });
+  });
+
+export const publishGradeRelease = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .inputValidator(PublishGradeReleaseSchema)
+  .handler(async ({ data }) => {
+    const { publishGradeReleaseHandler } = await import('./gradebook-extras.server');
+    return publishGradeReleaseHandler({ data });
+  });
+
+export const withdrawGradeRelease = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .inputValidator(WithdrawGradeReleaseSchema)
+  .handler(async ({ data }) => {
+    const { withdrawGradeReleaseHandler } = await import('./gradebook-extras.server');
+    return withdrawGradeReleaseHandler({ data });
   });

@@ -53,6 +53,14 @@ export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }
     return null;
   }
 
+  if ('available' in grade && !grade.available) {
+    return null;
+  }
+
+  if (grade.status === undefined || grade.contributingCheckpoints === undefined) {
+    return null;
+  }
+
   const statusBadge: Record<
     string,
     { variant: 'success' | 'warning' | 'secondary'; label: string }
