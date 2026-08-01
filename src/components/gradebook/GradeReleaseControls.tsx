@@ -195,11 +195,11 @@ export function GradeReleaseControls({
 
       <div className="flex flex-wrap gap-2">
         {releaseStatus === 'draft' ? (
-          <Button type="button" onClick={openPublish}>
+          <Button type="button" className="min-h-11" onClick={openPublish}>
             {t('gradebook.release.startPublish')}
           </Button>
         ) : (
-          <Button type="button" variant="outline" onClick={openWithdraw}>
+          <Button type="button" variant="outline" className="min-h-11" onClick={openWithdraw}>
             {t('gradebook.release.withdraw')}
           </Button>
         )}
@@ -248,11 +248,17 @@ export function GradeReleaseControls({
             </div>
           )}
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setDialog(null)}>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              onClick={() => setDialog(null)}
+            >
               {t('common.cancel')}
             </Button>
             <Button
               type="button"
+              className="min-h-11"
               disabled={!confirmed || preflightQuery.isFetching || publishMutation.isPending}
               onClick={() => publishMutation.mutate()}
             >
@@ -280,10 +286,20 @@ export function GradeReleaseControls({
           </label>
           {validationError && <p role="alert">{t(validationError)}</p>}
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setDialog(null)}>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              onClick={() => setDialog(null)}
+            >
               {t('common.cancel')}
             </Button>
-            <Button type="button" disabled={withdrawMutation.isPending} onClick={submitWithdraw}>
+            <Button
+              type="button"
+              className="min-h-11"
+              disabled={withdrawMutation.isPending}
+              onClick={submitWithdraw}
+            >
               {withdrawMutation.isPending
                 ? t('gradebook.release.withdrawLoading')
                 : t('gradebook.release.confirmWithdraw')}
