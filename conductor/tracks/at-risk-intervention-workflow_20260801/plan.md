@@ -133,15 +133,15 @@
   - [x] Added regression coverage for nullable edit-form values, create-to-edit form state reset, and aggregate SQL timestamp normalization required by the browser workflow; unit tests, typecheck, i18n, formatting, lint, and modularity checks passed.
   - [x] Committed with `test(interventions): cover workflow acceptance paths` as `b2b6c3a` and attached the required task git note.
 
-- [~] Task: Complete quality gates and documentation
-  - [ ] Confirm all new user-visible strings exist in both locale files and generated i18n types are current.
-  - [ ] Run `pnpm typecheck`.
-  - [ ] Run `pnpm lint` and `pnpm format`.
-  - [ ] Run `pnpm test:coverage` and confirm new code meets the project's 80% coverage threshold.
-  - [ ] Run `pnpm test:integration` with the configured database and the relevant Playwright command.
-  - [ ] Run `pnpm build`.
-  - [ ] Review responsive behavior, dark-mode tokens, keyboard/focus behavior, privacy boundaries, and server-side validation.
-  - [ ] Update documentation only where the implementation changes an existing project contract.
+- [x] Task: Complete quality gates and documentation
+  - [x] Confirm all new user-visible strings exist in both locale files and generated i18n types are current. `pnpm check:i18n` passed with 830 used keys and parity across both 1,014-key locale files.
+  - [x] Run `pnpm typecheck`. Passed.
+  - [x] Run `pnpm lint` and `pnpm format`. Format passed; lint passed with no errors and four pre-existing warnings in NotificationCenter.tsx and analytics-export.server.ts.
+  - [x] Run `pnpm test:coverage` and confirm new code meets the project's 80% coverage threshold. Passed 398 files/4,002 tests with 88.03% statements, 81.08% branches, 83.84% functions, and 88.66% lines.
+  - [x] Run `pnpm test:integration` with the configured database and the relevant Playwright command. The full integration run passed 6 of 8 suites (14 of 15 tests); the intervention workflow passed all 3 tests, while the pre-existing email-queue environment mock and assignment-creation database setup failed. Targeted intervention integration passed 3 tests. Chromium and mobile-chrome Playwright runs each passed both intervention tests.
+  - [x] Run `pnpm build`. Passed, including i18n generation, production build, migrate bundle, and seed bundle.
+  - [x] Review responsive behavior, dark-mode tokens, keyboard/focus behavior, privacy boundaries, and server-side validation. Native labeled controls, accessible list/status output, responsive card layout, theme tokens, instructor-only server guards, ownership/enrollment checks, Zod validation, row locks, and student/admin privacy were reviewed; Chromium and mobile-chrome acceptance flows passed.
+  - [x] Update documentation only where the implementation changes an existing project contract. No project contract documentation required changes; acceptance results and quality-gate outcomes are recorded here.
   - [ ] Commit with `chore(interventions): complete quality gates` and attach the required task git note.
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
