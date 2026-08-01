@@ -8,7 +8,7 @@
   - [x] Confirm required acceptance criteria and phase-checkpoint procedure.
   - [x] Record that no fresh production backup or restore drill is required.
 
-- [x] Task: Inventory the authoritative TRACK-047 evidence
+- [x] Task: Inventory the authoritative TRACK-047 evidence [bddf3fd]
   - [x] Review `conductor/archive/coolify-private-pilot-deployment_20260731/spec.md`.
   - [x] Review the TRACK-047 plan entries for backup retention and isolated restore.
   - [x] Review `docs/deployment-runbook.md` for the operator procedure and current pilot topology.
