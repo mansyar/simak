@@ -40,6 +40,7 @@ Students and instructors lack a centralized system to:
 - **Sequential checkpoints** — Students complete checkpoints in order; each unlocks only after the previous is passed
 - **File submissions** — Upload .docx/.pdf files (max 25MB) to Cloudflare R2 via presigned URLs
 - **Review workflow** — Instructors review submissions with Pass/Revise decisions, comments, and optional feedback files
+- **Instructor feedback snippets** — Instructors maintain a private, searchable plain-text snippet library with soft archive/restore and explicitly append snippets to editable review comments without changing review decisions or historical comments
 - **Consultation tracking** — Students log sessions; instructors verify; minimum consultation thresholds gate checkpoint unlocks
 - **Notifications** — Real-time in-app alerts and email notifications for submissions, reviews, revisions, consultations, extensions, deadline reminders, and discussion replies
 - **Deadline management** — Auto-locking overdue checkpoints, instructor override, SLA breach escalation (3-day review SLA), proactive deadline reminders (7-day/3-day/1-day lead times via hourly background scanner)
@@ -616,5 +617,13 @@ Students and instructors lack a centralized system to:
 - **`.middleware()` shared infrastructure** — The `.middleware()` method on `TypedBuilder` is shared with TRACK-044 (request-scoped context)
 - **i18n** — 1 new key in both EN and ID locales (`error.rateLimited`)
 - **Tests** — 3,919 tests pass across 384 test files; coverage ≥80% on all thresholds (stmts 87.91%, branches 81.04%, funcs 83.31%, lines 88.54%); `rate-limiter.ts` and `server-fn.ts` at 100% coverage
+
+### Track: Instructor Feedback Snippets (TRACK-049) (August 2026)
+
+- **Private snippet library** — New `feedback_snippets` table stores instructor-owned plain-text snippets with bounded title/category/body fields, soft archive/restore timestamps, ownership FK, and instructor/archive indexes; migration 0017 includes a rollback
+- **Server functions** — Client-safe Zod schemas and typed TanStack Start stubs plus server-only instructor-authenticated handlers for list/search, create, update, archive, and restore; all mutations are ownership-scoped and no hard-delete operation is exposed
+- **Instructor management UI** — Protected `/instructor/feedback-snippets` route with active-by-default and archived filtering, title/category search, CRUD lifecycle, validation, loading/empty/error/success states, responsive light/dark UI, and English/Indonesian translations
+- **Review picker** — Active snippets are searchable in the instructor review form and require explicit insertion; insertion preserves editability/focus, adds exactly one blank-line separator when needed, and leaves decisions, rubric scores, uploads, submissions, and historical comments unchanged
+- **Access and test coverage** — Instructor-only route guard, cross-instructor isolation, deterministic E2E fixtures, Playwright management/ownership/role-access/review-insertion coverage, 3,985 unit tests, 12/12 focused E2E tests across Chromium/Firefox/mobile Chromium, and coverage thresholds above 80%; the repository-wide Playwright run exceeded the environment timeout without an aggregate result
 
 </protect>

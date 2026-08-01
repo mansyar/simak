@@ -15,6 +15,7 @@ export * from './email-queue';
 export * from './deadline-reminders';
 export * from './gradebook';
 export * from './discussions';
+export * from './feedback-snippets';
 
 // Import tables for relations
 import { users } from './users';
@@ -30,6 +31,7 @@ import { emailQueue } from './email-queue';
 import { deadlineReminders } from './deadline-reminders';
 import { assignmentGradeConfig, finalGrades } from './gradebook';
 import { checkpointDiscussions } from './discussions';
+import { feedbackSnippets } from './feedback-snippets';
 
 // ---- Relations ----
 
@@ -65,6 +67,14 @@ export const usersRelations = relations(users, ({ many }) => ({
   consultationsAsVerifier: many(consultations),
   twoFactor: many(twoFactor),
   finalGrades: many(finalGrades),
+  feedbackSnippets: many(feedbackSnippets),
+}));
+
+export const feedbackSnippetsRelations = relations(feedbackSnippets, ({ one }) => ({
+  instructor: one(users, {
+    fields: [feedbackSnippets.instructorId],
+    references: [users.id],
+  }),
 }));
 
 export const assignmentTemplatesRelations = relations(assignmentTemplates, ({ many, one }) => ({

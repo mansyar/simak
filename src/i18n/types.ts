@@ -113,6 +113,7 @@ export type Translation = {
     assignments: string
     reviews: string
     analytics: string
+    feedbackSnippets: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -332,6 +333,60 @@ export type Translation = {
       weightedTotal: string
       allCriteriaRequired: string
       selectLevel: string
+    }
+  }
+  feedbackSnippets: {
+    title: string
+    subtitle: string
+    newSnippet: string
+    editSnippet: string
+    active: string
+    archived: string
+    filterLabel: string
+    searchPlaceholder: string
+    pickerTitle: string
+    pickerDescription: string
+    pickerSearchPlaceholder: string
+    pickerLoading: string
+    pickerLoadError: string
+    pickerEmpty: string
+    pickerSelected: string
+    pickerInsert: string
+    loading: string
+    empty: string
+    emptyPrompt: string
+    loadError: string
+    retry: string
+    titleLabel: string
+    categoryLabel: string
+    bodyLabel: string
+    titlePlaceholder: string
+    categoryPlaceholder: string
+    bodyPlaceholder: string
+    plainTextOnly: string
+    create: string
+    save: string
+    cancel: string
+    edit: string
+    archive: string
+    restore: string
+    archiveConfirm: string
+    created: string
+    updated: string
+    archivedSuccess: string
+    restoredSuccess: string
+    validation: {
+      titleRequired: string
+      bodyRequired: string
+      titleTooLong: string
+      categoryTooLong: string
+      bodyTooLong: string
+      plainText: string
+    }
+    actions: {
+      edit: string
+      archive: string
+      restore: string
     }
   }
   instructorAssignments: {

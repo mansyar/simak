@@ -9,6 +9,7 @@ import {
   X,
   GraduationCap,
   BarChart3,
+  MessageSquare,
 } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 
@@ -28,6 +29,11 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
     { to: '/instructor/dashboard', label: 'instructorSidebar.dashboard', icon: LayoutDashboard },
     { to: '/instructor/assignments', label: 'instructorSidebar.assignments', icon: ClipboardList },
     { to: '/instructor/reviews', label: 'instructorSidebar.reviews', icon: ClipboardCheck },
+    {
+      to: '/instructor/feedback-snippets',
+      label: 'instructorSidebar.feedbackSnippets',
+      icon: MessageSquare,
+    },
     { to: '/instructor/analytics', label: 'instructorSidebar.analytics', icon: BarChart3 },
   ] as const;
 
