@@ -190,3 +190,12 @@
   - [x] Run focused and full verification, record commit SHA `4e7d1428`, and attach the required git note.
   - [x] Full verification: `pnpm test` passed with 406 files and 4,072 tests; `pnpm test:coverage` passed with 87.84% statements, 80.88% branches, 83.63% functions, and 88.48% lines; typecheck and i18n checks passed.
   - [x] Review hooks passed with no warnings/errors for changed files; the repository's four pre-existing lint warnings remain unchanged.
+
+## Phase: Review Follow-up
+
+- [x] Task: Close the remaining fail-closed student visibility finding [d7f0097, b6f7bdd]
+  - [x] Return unavailable for any non-published release state, including malformed/null persisted values.
+  - [x] Add regression coverage for the fail-closed behavior and update the legacy student-handler fixture.
+  - [x] Run focused tests (2 files, 30 tests), full `pnpm test` (406 files, 4,073 tests), and `pnpm typecheck`.
+  - [x] Run `pnpm test:coverage` (87.81% statements, 80.86% branches, 83.63% functions, 88.45% lines) and review hooks.
+  - [x] Attach git notes to the review-fix commits.
