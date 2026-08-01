@@ -30,13 +30,13 @@
   - [x] Run modularity checks and keep every changed source/test file under 500 lines.
   - [x] Commit with a `feat(db): ...` message and attach the required git note.
 
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [08a675a]
   - [x] Automated verification: focused schema/relation tests pass (8 tests).
   - [x] Automated verification: `pnpm test` passes (404 test files, 4,045 tests).
   - [x] Automated verification: `pnpm typecheck` passes; staged schema changes pass lint and modularity checks.
   - [x] Manual verification: generated migration `0019_daffy_bulldozer.sql` matches the schema, development DB exposes the release enum/table/columns, and no snapshots were fabricated.
-  - [ ] Obtain user confirmation to proceed to Phase 2.
-  - [ ] Record the checkpoint note and mark the phase complete.
+  - [x] Obtain user confirmation to proceed to Phase 2.
+  - [x] Checkpoint note: User confirmed the schema/migration results and authorized Phase 2 server lifecycle work.
 
 ## Phase 2: Server Release Lifecycle and Student Gating
 
