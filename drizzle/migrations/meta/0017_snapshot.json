@@ -1,6 +1,6 @@
 {
-  "id": "afd91b39-d77a-4bb7-b433-38d8d060f0de",
-  "prevId": "678634dd-ac64-4193-b544-633b66bd110c",
+  "id": "a7d2681e-dae6-4795-9c58-95733790e367",
+  "prevId": "afd91b39-d77a-4bb7-b433-38d8d060f0de",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1390,6 +1390,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "cleaned_up_at": {
+          "name": "cleaned_up_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -2693,6 +2699,143 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.final_grades": {
+      "name": "final_grades",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "assignment_id": {
+          "name": "assignment_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "student_id": {
+          "name": "student_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numeric_score": {
+          "name": "numeric_score",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "letter_grade": {
+          "name": "letter_grade",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "final_grade_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contributing_checkpoints": {
+          "name": "contributing_checkpoints",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "computed_at": {
+          "name": "computed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "final_grades_assignment_id_idx": {
+          "name": "final_grades_assignment_id_idx",
+          "columns": [
+            {
+              "expression": "assignment_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "final_grades_student_id_idx": {
+          "name": "final_grades_student_id_idx",
+          "columns": [
+            {
+              "expression": "student_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "final_grades_assignment_id_assignments_id_fk": {
+          "name": "final_grades_assignment_id_assignments_id_fk",
+          "tableFrom": "final_grades",
+          "tableTo": "assignments",
+          "columnsFrom": [
+            "assignment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "final_grades_student_id_users_id_fk": {
+          "name": "final_grades_student_id_users_id_fk",
+          "tableFrom": "final_grades",
+          "tableTo": "users",
+          "columnsFrom": [
+            "student_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "final_grades_assignment_id_student_id_unq": {
+          "name": "final_grades_assignment_id_student_id_unq",
+          "nullsNotDistinct": false,
+          "columns": [
+            "assignment_id",
+            "student_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.checkpoint_discussions": {
       "name": "checkpoint_discussions",
       "schema": "",
@@ -2873,8 +3016,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.final_grades": {
-      "name": "final_grades",
+    "public.interventions": {
+      "name": "interventions",
       "schema": "",
       "columns": {
         "id": {
@@ -2895,52 +3038,66 @@
           "primaryKey": false,
           "notNull": true
         },
-        "numeric_score": {
-          "name": "numeric_score",
-          "type": "numeric(5, 2)",
+        "action_type": {
+          "name": "action_type",
+          "type": "intervention_action_type",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "letter_grade": {
-          "name": "letter_grade",
+        "private_note": {
+          "name": "private_note",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
         "status": {
           "name": "status",
-          "type": "final_grade_status",
+          "type": "intervention_status",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'open'"
         },
-        "contributing_checkpoints": {
-          "name": "contributing_checkpoints",
-          "type": "jsonb",
+        "follow_up_date": {
+          "name": "follow_up_date",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },
-        "computed_at": {
-          "name": "computed_at",
+        "resolution_reason": {
+          "name": "resolution_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
       "indexes": {
-        "final_grades_assignment_id_idx": {
-          "name": "final_grades_assignment_id_idx",
+        "interventions_assignment_id_status_idx": {
+          "name": "interventions_assignment_id_status_idx",
           "columns": [
             {
               "expression": "assignment_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -2951,9 +3108,15 @@
           "method": "btree",
           "with": {}
         },
-        "final_grades_student_id_idx": {
-          "name": "final_grades_student_id_idx",
+        "interventions_assignment_id_student_id_idx": {
+          "name": "interventions_assignment_id_student_id_idx",
           "columns": [
+            {
+              "expression": "assignment_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
             {
               "expression": "student_id",
               "isExpression": false,
@@ -2965,12 +3128,49 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "interventions_follow_up_date_idx": {
+          "name": "interventions_follow_up_date_idx",
+          "columns": [
+            {
+              "expression": "follow_up_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "interventions_active_assignment_student_idx": {
+          "name": "interventions_active_assignment_student_idx",
+          "columns": [
+            {
+              "expression": "assignment_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "student_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"interventions\".\"status\" IN ('open', 'monitoring')",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
-        "final_grades_assignment_id_assignments_id_fk": {
-          "name": "final_grades_assignment_id_assignments_id_fk",
-          "tableFrom": "final_grades",
+        "interventions_assignment_id_assignments_id_fk": {
+          "name": "interventions_assignment_id_assignments_id_fk",
+          "tableFrom": "interventions",
           "tableTo": "assignments",
           "columnsFrom": [
             "assignment_id"
@@ -2981,9 +3181,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "final_grades_student_id_users_id_fk": {
-          "name": "final_grades_student_id_users_id_fk",
-          "tableFrom": "final_grades",
+        "interventions_student_id_users_id_fk": {
+          "name": "interventions_student_id_users_id_fk",
+          "tableFrom": "interventions",
           "tableTo": "users",
           "columnsFrom": [
             "student_id"
@@ -2996,16 +3196,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "final_grades_assignment_id_student_id_unq": {
-          "name": "final_grades_assignment_id_student_id_unq",
-          "nullsNotDistinct": false,
-          "columns": [
-            "assignment_id",
-            "student_id"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -3090,6 +3281,26 @@
       "values": [
         "equal_weight",
         "custom_weight"
+      ]
+    },
+    "public.intervention_action_type": {
+      "name": "intervention_action_type",
+      "schema": "public",
+      "values": [
+        "consultation",
+        "extension",
+        "discussion",
+        "other"
+      ]
+    },
+    "public.intervention_status": {
+      "name": "intervention_status",
+      "schema": "public",
+      "values": [
+        "open",
+        "monitoring",
+        "resolved",
+        "dismissed"
       ]
     }
   },

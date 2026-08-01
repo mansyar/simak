@@ -15,7 +15,7 @@
 
 ## Phase 1 — Data model and live-risk context
 
-- [ ] Task: Define intervention contracts and database model
+- [~] Task: Define intervention contracts and database model
   - [ ] Write failing schema tests for action types, statuses, closure-reason validation, filters, and pagination inputs.
   - [ ] Run the schema tests and confirm the Red phase.
   - [ ] Implement Zod schemas and `typedServerFn` stubs in `src/server/interventions.ts`.
