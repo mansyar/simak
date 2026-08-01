@@ -45,3 +45,30 @@ all three report formats, the existing source scope, and all four 80% thresholds
 
 The optimized measurements will be added below after the configuration change
 and the same procedure has been repeated.
+
+## Bottleneck Analysis
+
+The pre-change comparison separated test execution from coverage processing and
+tested one configuration variable at a time. The machine exposed 20 logical
+processors; all successful coverage candidates passed 388 files and 3,953 tests
+with unchanged coverage percentages.
+
+| Candidate | Wall-clock | Result |
+| --- | ---: | --- |
+| `pnpm test` (no coverage) | 98.70 s | Passed; establishes the test-only reference |
+| Coverage, `maxWorkers=8` | 119.66 s | Passed; slower than baseline median |
+| Coverage, `maxWorkers=10` | 132.16 s | Passed; slower than baseline median |
+| Coverage, `maxWorkers=16` | 127.42 s | Passed; slower than baseline median |
+| Coverage, `maxWorkers=20` | 122.57 s | Passed; slower than baseline median |
+| Coverage, `pool=threads` | 122.65 s | Passed; slower than baseline median |
+| Coverage, `pool=vmThreads` | 123.82 s | Passed; slower than baseline median |
+| Coverage, `--no-isolate` | 116.57 s | Passed; slower than baseline median |
+
+The `--no-isolate --maxWorkers=20` combination was rejected because it caused
+eight existing tests to fail or time out. The XLSX project completed in 7.75 s
+when run alone, so it is not the dominant wall-clock bottleneck. Replacing the
+configured reporters with JSON only also remained slower and would violate the
+preserved report contract. These results rule out worker-pool and reporter
+flags as the minimal optimization candidate; the next candidate targets
+unnecessary `happy-dom` setup for non-DOM unit tests while retaining it for
+component, hook, route, and XLSX tests.
