@@ -100,14 +100,14 @@
 
 ## Phase 4 — Dashboard and reassignment integration
 
-- [~] Task: Surface intervention state in the instructor dashboard
-  - [ ] Write failing server and component tests for open/overdue counts, active intervention status on at-risk entries, empty states, and links to create/manage interventions.
-  - [ ] Run the dashboard tests and confirm the Red phase.
-  - [ ] Extend the instructor dashboard response with current-owner open and overdue intervention summaries.
-  - [ ] Add dashboard cards/context actions without changing live risk scoring or adding notifications.
-  - [ ] Update `InstructorDashboard.tsx` and its existing tests with bilingual, accessible UI behavior.
-  - [ ] Run dashboard server/component tests and confirm the Green phase.
-  - [ ] Commit with `feat(dashboard): surface instructor intervention status` and attach the required task git note.
+- [x] Task: Surface intervention state in the instructor dashboard (commit `62c36f9`)
+  - [x] Write failing server and component tests for open/overdue counts, active intervention status on at-risk entries, empty states, and links to create/manage interventions.
+  - [x] Run the dashboard tests and confirm the Red phase with three expected failures.
+  - [x] Extend the instructor dashboard response with current-owner open and overdue intervention summaries.
+  - [x] Add dashboard cards/context actions without changing live risk scoring or adding notifications.
+  - [x] Update `InstructorDashboard.tsx` and its existing tests with bilingual, accessible UI behavior.
+  - [x] Run dashboard server/component tests and confirm the Green phase: 5 files and 40 tests passed.
+  - [x] Commit with `feat(dashboard): surface intervention status` and attach the required task git note.
 
 - [ ] Task: Verify reassignment-aware privacy end to end
   - [ ] Write failing tests covering access before reassignment, access by the replacement instructor after reassignment, and denial for the former instructor, student, admin, and unrelated instructor.
