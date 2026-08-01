@@ -42,16 +42,16 @@
 
 ## Phase 2 — Instructor-only server workflow
 
-- [~] Task: Implement creation, listing, and live-context handlers
-  - [ ] Write failing server-handler tests for instructor authorization, assignment/student ownership, eligible `student_inaction` risk, pending-review-only rejection, active duplicate rejection, list status filters, overdue follow-up filtering, and privacy against students/admins/other instructors.
-  - [ ] Run the handler tests and confirm the Red phase.
-  - [ ] Implement `createInterventionHandler`, `listInterventionsHandler`, and the live context/detail handler in `src/server/interventions.server.ts`.
-  - [ ] Validate ownership and student membership on the server; never expose intervention data through student/admin handlers.
-  - [ ] Use the shared live-risk helper at creation and detail/context time; do not persist risk assessments or auto-resolve records.
-  - [ ] Use transactions and row locks for creation; rely on the database unique index as the final duplicate-prevention guard.
-  - [ ] Record creation events with the existing safe audit helper and do not enqueue notifications.
-  - [ ] Run the handler tests and confirm the Green phase.
-  - [ ] Commit with `feat(interventions): add instructor intervention handlers` and attach the required task git note.
+- [x] Task: Implement creation, listing, and live-context handlers
+  - [x] Write failing server-handler tests for instructor authorization, assignment/student ownership, eligible `student_inaction` risk, pending-review-only rejection, active duplicate rejection, list status filters, overdue follow-up filtering, and privacy against students/admins/other instructors.
+  - [x] Run the handler tests and confirm the Red phase.
+  - [x] Implement `createInterventionHandler`, `listInterventionsHandler`, and the live context/detail handler in `src/server/interventions.server.ts`.
+  - [x] Validate ownership and student membership on the server; never expose intervention data through student/admin handlers.
+  - [x] Use the shared live-risk helper at creation and detail/context time; do not persist risk assessments or auto-resolve records.
+  - [x] Use transactions and row locks for creation; rely on the database unique index as the final duplicate-prevention guard.
+  - [x] Record creation events with the existing safe audit helper and do not enqueue notifications.
+  - [x] Run the handler tests and confirm the Green phase.
+  - [x] Commit with `feat(interventions): add instructor intervention handlers` and attach the required task git note (`e3704a6`).
 
 - [ ] Task: Implement locked status and record updates
   - [ ] Write failing tests for allowed transitions, terminal resolved/dismissed states, required resolution/dismissal reasons, note/action/follow-up updates, row locking, and immutable audit-event details.
