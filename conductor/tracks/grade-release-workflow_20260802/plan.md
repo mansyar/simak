@@ -127,13 +127,21 @@
   - [x] Preserve the current published grade and checkpoint breakdown presentation from snapshot data.
   - [x] Provide responsive layout, keyboard access, visible focus, accessible labels, and live mutation feedback.
 
-- [~] Task: Complete UI verification
+- [x] Task: Complete UI verification
   - [x] Run focused route/component tests and confirm they pass (3 files, 32 tests).
   - [x] Run the focused grade-release Playwright spec in Chromium (2 tests).
-  - [ ] Run the relevant accessibility coverage for the new dialogs and gradebook/student surfaces.
-  - [x] Commit with a `feat(ui): ...` message and attach the required git note (`0174d61d`).
+  - [x] Run scoped axe-core coverage for the release controls, preflight dialog, and published student snapshot card.
+  - [x] Run the broader Chromium accessibility suite; 5 of 6 checks passed, with the unrelated pre-existing admin-template heading-order violation recorded.
+  - [x] Commit with `feat(ui): ...` and `test(ui): ...` messages and attach the required git notes (`0174d61d`, `0f4d54d1`).
 
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+  - [x] Automated verification: focused route/component tests pass (3 files, 32 tests).
+  - [x] Automated verification: grade-release Chromium E2E passes (2 tests), including publication and active student snapshot visibility.
+  - [x] Automated verification: scoped axe-core checks pass for release controls, preflight dialog, and published student snapshot card.
+  - [x] Automated verification: `pnpm typecheck` and `pnpm check:i18n` pass; implementation lint and modularity hooks pass.
+  - [x] Manual verification: owner-only controls, explicit confirmation, withdrawal reason validation, staff-control preservation, unavailable student state, and active snapshot presentation were reviewed.
+  - [ ] Obtain user confirmation to proceed to Phase 4 regression and quality gates.
+  - [ ] Checkpoint note: Record user confirmation and any known unrelated accessibility-suite limitation.
 
 ## Phase 4: Regression, Quality Gates, and Final Documentation
 
