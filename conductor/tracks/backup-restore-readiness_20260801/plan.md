@@ -62,11 +62,11 @@
 
 ## Phase 3: Verification, Review & Handover
 
-- [ ] Task: Validate the documentation changes
-  - [ ] Verify every referenced repository link resolves.
-  - [ ] Run `git diff --check`.
-  - [ ] Inspect the diff for secrets, signed URLs, credentials, exact sensitive target identifiers, and conflicting baseline claims.
-  - [ ] Record that application unit, integration, E2E, typecheck, and coverage tests are not applicable because no code or runtime behavior changes.
+- [x] [1741593] Task: Validate the documentation changes
+  - [x] Verify every referenced repository link resolves.
+  - [x] Run `git diff --check`.
+  - [x] Inspect the diff for secrets, signed URLs, credentials, exact sensitive target identifiers, and conflicting baseline claims.
+  - [x] Record that application unit, integration, E2E, typecheck, and coverage tests are not applicable because no code or runtime behavior changes.
 
 - [ ] Task: Perform final acceptance review
   - [ ] Check every TRACK-048 acceptance criterion against the completed documents.
