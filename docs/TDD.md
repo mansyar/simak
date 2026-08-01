@@ -73,6 +73,7 @@ Throughout this document, features are tagged as:
 │   ├── /instructor/assignments/$id       → Assignment detail (instructor view) [v1]
 │   │   └── /instructor/assignments/$id/gradebook → Gradebook view (students × checkpoints → final grade) [v1]
 │   ├── /instructor/reviews               → Review queue [v1]
+│   ├── /instructor/interventions         → Private at-risk intervention management [v1]
 │   ├── /instructor/analytics             → Instructor performance analytics [v1]
 │   └── /instructor/reports               → Report builder & history [v2]
 
@@ -125,6 +126,7 @@ simak/
 │   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js), RubricScoringSection (instructor scoring UI), RubricResultView (student view)
 │   │   ├── gradebook/        → GradebookTable, GradeConfigSummary, GradeSettingsDialog, StudentFinalGradeCard, GradebookExportButtons, RecomputeGradesButton
 │   │   ├── consultations/    → Log form, consultation list, progress bar, verification queue item, verification dialog
+│   │   ├── interventions/    → Intervention list, filters, live-risk context, form, and loading skeleton
 │   │   ├── discussions/      → DiscussionPanel (ScrollArea, Avatar, message bubbles, optimistic mutations, 30s refetchInterval)
 │   │   ├── files/            → File upload, preview, file list
 │   │   ├── notifications/    → Notification center, badge, notification-routes (type→route map)
@@ -143,6 +145,9 @@ simak/
 │   │   ├── submissions.ts    → Upload, versioning
 │   │   ├── reviews.ts        → Review, pass/revise
 │   │   ├── consultations.ts  → Log, list, verify, reject, detail, counts (split: .ts stubs + .server.ts handlers)
+│   │   ├── interventions.ts  → Intervention Zod schemas and typed server-function stubs
+│   │   ├── interventions.server.ts → Instructor-only intervention creation, listing, context, and locked lifecycle handlers
+│   │   ├── student-risk-context.server.ts → Shared live student-assignment risk aggregation for dashboard and interventions
 │   │   ├── discussions.ts    → Discussion Q&A stubs + Zod schemas (list, post, delete) + typedServerFn (split: .ts stubs + .server.ts handlers)
 │   │   ├── discussions.server.ts → Discussion handlers (list paginated, post with notification+email, delete with 15-min window) — ownership: student owns checkpoint OR instructor owns assignment
 │   │   ├── notifications.ts  → Create, fetch, mark read
@@ -234,7 +239,7 @@ simak/
 ├── tests/
 │   ├── unit/                 → Vitest unit tests
 │   ├── integration/          → Vitest integration tests
-│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, ~73 tests across 14 spec files, includes @axe-core/playwright a11y scans)
+│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 20 spec files including intervention workflow coverage, includes @axe-core/playwright a11y scans)
 ├── docker/
 │   └── Dockerfile
 ├── drizzle.config.ts
@@ -719,6 +724,25 @@ _Note: Each row represents one student's individual participation. Group assignm
 
 > **Consultation verify/reject transaction safety (Track: Concurrency & Transaction Safety):** The `verifyConsultationHandler` and `rejectConsultationHandler` in `src/server/consultations.server.ts` read the `consultations` row **inside** a `db.transaction` with `FOR UPDATE` on the consultation row, then re-validate `status === 'pending'` after acquiring the lock. If the locked re-read shows the status has changed (e.g. another instructor already verified/rejected it), the operation is rejected with a stale-state error. This eliminates the check-then-act TOCTOU race where two concurrent verify/reject requests could both read `pending` and both proceed. Audit logging runs post-commit in a try/catch.
 
+#### interventions
+
+| Column           | Type                               | Notes                                                                                 |
+| ---------------- | ---------------------------------- | ------------------------------------------------------------------------------------- |
+| id               | serial (PK)                        |                                                                                       |
+| assignmentId     | integer (FK → assignments)         | Assignment ownership determines the current instructor authorized to access records |
+| studentId        | text (FK → users)                  | Student-assignment pair for the intervention                                          |
+| actionType       | pgEnum (intervention_action_type)  | `consultation` \| `extension` \| `discussion` \| `other`                             |
+| privateNote      | text                               | Instructor-only operational note                                                      |
+| status           | pgEnum (intervention_status)       | `open` \| `monitoring` \| `resolved` \| `dismissed`; defaults to `open`             |
+| followUpDate     | timestamp                          | Optional instructor-only follow-up date                                               |
+| resolutionReason | text                               | Required when transitioning to `resolved` or `dismissed`                              |
+| createdAt        | timestamp                          |                                                                                       |
+| updatedAt        | timestamp                          |                                                                                       |
+
+Indexes support assignment/status, assignment/student, and follow-up-date queries. A partial unique index on `(assignmentId, studentId)` where `status IN ('open', 'monitoring')` guarantees at most one active intervention per student-assignment pair while retaining resolved/dismissed history. The schema and rollback are versioned in migration `0017_faulty_anita_blake.sql` and `drizzle/migrations/rollback/0017_faulty_anita_blake.rollback.sql`.
+
+> **Intervention privacy and transaction safety (TRACK-050):** Instructor server functions authorize through the current assignment owner, so reassignment transfers access to the replacement instructor and removes former-owner access. Creation locks the owned assignment and enrollment with `FOR UPDATE`; lifecycle updates lock the joined assignment and intervention together before validating ownership and status. Valid transitions are `open ↔ monitoring` and either active status → `resolved`/`dismissed`; terminal rows cannot be modified. Audit events are written after commit as advisory work, and follow-up dates do not create notifications.
+
 #### checkpoint_discussions
 
 | Column          | Type                                  | Notes                                                                   |
@@ -803,7 +827,7 @@ Index on `(assignmentId, status)` for instructor queue queries. Index on `(assig
 | id         | serial (PK)       |                                                                                                    |
 | actorId    | text (FK → users) | NOT NULL — who performed the action                                                                |
 | action     | text, not null    | `user.created`, `template.deleted`, `assignment.created`, `review.passed`, etc.                    |
-| entityType | text, not null    | `user` \| `template` \| `assignment` \| `checkpoint` \| `submission` \| `review` \| `consultation` |
+| entityType | text, not null    | `user` \| `template` \| `assignment` \| `checkpoint` \| `submission` \| `review` \| `consultation` \| `intervention` |
 | entityId   | text, not null    | Stringified ID of affected entity                                                                  |
 | details    | jsonb             | NULLABLE — previous value, new value, reason, etc.                                                 |
 | createdAt  | timestamp         | DEFAULT NOW()                                                                                      |
@@ -905,6 +929,10 @@ Unique constraint on `(assignmentId, studentId)`. Indexes on `assignmentId` and 
 | `reviews`            | `submissionId`, `createdAt` | composite b-tree | Fetch review for a submission + ORDER BY createdAt DESC (TRACK-005 replaced single-column `submissionId`; leftmost prefix satisfies FK enforcement) |
 | `consultations`      | `checkpointId`           | b-tree           | Count consultations for gating logic         |
 | `consultations`      | `assignmentId`, `status` | composite b-tree | Filter pending verifications per assignment (TRACK-005 replaced low-cardinality single-column `status`) |
+| `interventions`      | `assignmentId`, `status` | composite b-tree | Current-owner active intervention queries (TRACK-050) |
+| `interventions`      | `assignmentId`, `studentId` | composite b-tree | Student-assignment history and context lookup (TRACK-050) |
+| `interventions`      | `followUpDate`            | b-tree           | Overdue follow-up filtering (TRACK-050)       |
+| `interventions`      | `assignmentId`, `studentId` (active only) | partial unique b-tree | One open/monitoring intervention per pair (TRACK-050) |
 | `notifications`      | `userId`, `read`         | composite b-tree | Notification center filtering                |
 | `notifications`      | `createdAt`              | b-tree           | Admin dashboard recentActivity query (TRACK-005) |
 | `template_checkpoints`| `templateId`, `order`   | composite b-tree | Template checkpoint ordering (TRACK-005)     |
@@ -1228,6 +1256,7 @@ Request ID propagation infrastructure is defined in `src/lib/request-context.ts`
 | **State transitions** | Valid and invalid checkpoint state transitions (e.g. can't go from LOCKED to PASSED). Stale-state rejection: handler returns error when locked re-read shows state changed (FOR UPDATE re-validation). |
 | **Validation**        | Zod schema tests for all input types (assignment creation, submission upload, etc.).  |
 | **Permission checks** | Role-based access logic unit tests.                                                   |
+| **Intervention workflow** | Instructor-only privacy, live `student_inaction` eligibility, pending-review rejection, active-pair uniqueness, reassignment access, lifecycle transitions, audit details, and overdue follow-up display. |
 | **Bulk import**       | Xlsx parsing, role-permission validation, email uniqueness (excluding soft-deleted), transaction rollback, audit logging. |                                                   |
 
 ### Integration Tests (Vitest) [v2]
@@ -1245,7 +1274,7 @@ E2E tests run against a dedicated test database (`simak_test` on a separate `pos
 
 **Configuration** (`playwright.config.ts`):
 
-- Chromium-only, `workers: 1` (serial execution for DB isolation).
+- Chromium, Firefox, and mobile-chrome projects, `workers: 1` (serial execution for DB isolation).
 - `reuseExistingServer: !process.env.CI` — reuses `pnpm dev` server in local dev, starts a fresh server in CI.
 - `globalSetup` runs migrations + truncate + seed + creates placeholder `storageState` files.
 - `webServer` starts `pnpm dev` on port 3000.
@@ -1268,7 +1297,7 @@ E2E tests run against a dedicated test database (`simak_test` on a separate `pos
 
 - Shared `createNotification()` and `cleanupNotifications()` helpers for notification assertion setup (extracted from duplicated code in consultation and instructor-review specs). Used by `student-submission.spec.ts` to insert `submission_received` notifications and by `consultation.spec.ts` to insert `consultation_verified` notifications for post-action assertion.
 
-**Spec files** (~28 tests across 8 files):
+**Spec files** (including the instructor intervention workflow):
 
 | Spec File                    | Tests | What it validates                                                                               |
 | ---------------------------- | ----- | ----------------------------------------------------------------------------------------------- |
@@ -1278,6 +1307,7 @@ E2E tests run against a dedicated test database (`simak_test` on a separate `pos
 | `student-submission.spec.ts` | 5     | Upload form visible + version history, resubmit with "Latest" badge, notification assertion (`submission_received`), upload UI validation (file type + size), locked checkpoint + cross-student access denial |
 | `instructor-review.spec.ts`  | 5     | Review queue, Pass unlocks next checkpoint, Revise sets deadline, review history (4 tests decoupled — each sets up own state via `createSubmissionForCheckpoint`) + notification assertion (`review_completed`) |
 | `consultation.spec.ts`       | 3     | Consultation lifecycle (log → verify → gating UI: "insufficient verified consultations (0/1)" → (1/1)), consultation rejection, notification assertion (`consultation_verified`) |
+| `instructor-interventions.spec.ts` | 2 | Pending-review-only students cannot create interventions; eligible instructors create an overdue discussion intervention, manage it to monitoring, see dashboard status, and student/admin access remains private |
 | `extension.spec.ts`          | 3     | Extension request → approve (checkpoint `dueDate` extended in DB), reject (deadline NOT extended), instructor bulk extension (all unfinished checkpoints extended) |
 | `password-setup.spec.ts`     | 2     | Password setup lifecycle (admin creates user → extract token from DB → setup password → login → redirect to dashboard), token reuse + expired token rejection |
 
