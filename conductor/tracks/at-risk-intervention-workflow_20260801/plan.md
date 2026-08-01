@@ -109,7 +109,7 @@
   - [x] Run dashboard server/component tests and confirm the Green phase: 5 files and 40 tests passed.
   - [x] Commit with `feat(dashboard): surface intervention status` and attach the required task git note.
 
-- [ ] Task: Verify reassignment-aware privacy end to end
+- [~] Task: Verify reassignment-aware privacy end to end
   - [ ] Write failing tests covering access before reassignment, access by the replacement instructor after reassignment, and denial for the former instructor, student, admin, and unrelated instructor.
   - [ ] Run the authorization tests and confirm the Red phase.
   - [ ] Verify the existing row-locked assignment reassignment transaction remains the single source of current ownership; modify it only if the new tests identify a required integration change.
