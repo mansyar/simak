@@ -10,4 +10,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active Tracks
 
-- [~] **Track: TRACK-049 — Instructor Feedback Snippets** *Link: [Track workspace](./tracks/instructor-feedback-snippets_20260801/index.md)*
+- [x] **Track: TRACK-049 — Instructor Feedback Snippets** *Link: [Track workspace](./tracks/instructor-feedback-snippets_20260801/index.md)*
