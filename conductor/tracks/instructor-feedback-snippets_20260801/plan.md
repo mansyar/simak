@@ -88,13 +88,13 @@ This plan follows the approved specification and the repository’s TDD workflow
 
 ## Phase 4: Review-Form Snippet Picker & Comment Insertion
 
-- [ ] Task: Write failing review-picker tests
-  - [ ] Add tests for the picker’s active-snippet query, search behavior, empty state, and keyboard-accessible controls.
-  - [ ] Extend `tests/unit/components/reviews/ReviewForm.test.tsx` to cover insertion into an empty comment.
-  - [ ] Test insertion after an existing comment adds exactly one blank-line separator.
-  - [ ] Test multiple insertions preserve prior manual text and keep the comment editable.
-  - [ ] Test insertion does not call `submitReview`, select a decision, modify rubric scores, or change submission state.
-  - [ ] Test archived snippets are not offered by the picker.
+- [x] Task: Write failing review-picker tests
+  - [x] Add tests for the picker’s active-snippet query, search behavior, empty state, and keyboard-accessible controls.
+  - [x] Extend `tests/unit/components/reviews/ReviewForm.test.tsx` to cover insertion into an empty comment.
+  - [x] Test insertion after an existing comment adds exactly one blank-line separator.
+  - [x] Test multiple insertions preserve prior manual text and keep the comment editable.
+  - [x] Test insertion does not call `submitReview`, select a decision, modify rubric scores, or change submission state.
+  - [x] Test archived snippets are not offered by the picker.
 - [ ] Task: Implement the searchable picker
   - [ ] Add a review-form picker component under `src/components/reviews/`.
   - [ ] Load only the current instructor’s active snippets through the server function and query-key factory.
