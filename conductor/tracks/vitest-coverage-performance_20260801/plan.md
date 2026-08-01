@@ -66,10 +66,10 @@
   - [x] Run `pnpm test:integration` when the required integration environment is available [c869f27b] — 2 suites failed due logger configuration and assignment deadline/data behavior
   - [x] Confirm changed files comply with the repository's modularity and formatting rules [c869f27b]
 
-- [ ] Task: Document the final result
-  - [ ] Record the benchmark procedure, baseline, optimized measurements, and percentage improvement
-  - [ ] Document the final configuration rationale and any operational trade-offs
-  - [ ] Update repository testing documentation only if command or configuration behavior changed
+- [x] Task: Document the final result [1c6e767]
+  - [x] Record the benchmark procedure, baseline, candidate measurements, and percentage improvement [1c6e767]
+  - [x] Document the final configuration rationale and operational trade-offs [1c6e767]
+  - [x] Update repository testing documentation only if command or configuration behavior changed [1c6e767] — documented the evidence-only result; no command/configuration behavior changed
 
-- [ ] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [~] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
 </protect>
