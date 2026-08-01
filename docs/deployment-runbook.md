@@ -260,6 +260,11 @@ they are not needed for diagnosis.
 
 The configured private-pilot policy is daily backups with seven retained
 copies, stored both on Coolify server storage and remote S3-compatible storage.
+The completed [TRACK-048 backup and restore readiness review](backup-restore-readiness.md)
+confirms this pilot baseline and records follow-up gaps without changing the
+configuration. Retention expansion, an independent scheduler, job-level failure
+alerting, separate backup credentials, and expanded R2 durability remain
+recommendations rather than implemented controls.
 Confirm that the remote destination remains accessible and that local disk
 capacity is sufficient. The retention count is an operational pilot setting;
 change it only with an approved backup-policy update.

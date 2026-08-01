@@ -22,6 +22,18 @@
 | **Testing**        | Vitest + Playwright + @axe-core/playwright | Vitest for unit and integration tests; Playwright for E2E (chromium + firefox + mobile-chrome projects); @axe-core/playwright for automated WCAG 2.1 AA accessibility scanning in E2E tests. |
 | **Deployment**     | Docker + Coolify                | Completed private-pilot deployment on Coolify with a single application instance and managed PostgreSQL. |
 
+### Operational backup boundary
+
+The completed TRACK-048 review documents the current private-pilot backup boundary
+without adding application backup code: Coolify manages daily PostgreSQL backups with
+seven retained copies in Coolify server storage and remote S3-compatible storage.
+Restore is an operator-only, isolated-first procedure. Broader retention policy,
+independent scheduling, job-level failure visibility, backup credential separation,
+and R2 durability/versioning changes remain follow-up recommendations and are not
+implemented by the application runtime. See [backup-restore-readiness.md](backup-restore-readiness.md)
+and [deployment-runbook.md](deployment-runbook.md) for the operational evidence and
+procedure.
+
 ### MVP Scope Legend
 
 Throughout this document, features are tagged as:
