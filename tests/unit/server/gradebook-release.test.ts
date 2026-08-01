@@ -408,6 +408,23 @@ describe('student grade release visibility', () => {
     expect(result).toEqual({ available: false, reason: 'not_yet_released' });
   });
 
+  it('fails closed when the persisted release state is not published', async () => {
+    mock.enqueue(
+      [{ assignmentId: 1 }],
+      [
+        {
+          releaseStatus: null,
+          activeReleaseVersion: null,
+          publishedAt: null,
+        },
+      ],
+    );
+
+    const result = await getStudentFinalGradeHandler({ data: { assignmentId: 1 } });
+
+    expect(result).toEqual({ available: false, reason: 'not_yet_released' });
+  });
+
   it('returns the active immutable snapshot rather than live final-grade data', async () => {
     const publishedAt = new Date('2026-08-02T12:00:00Z');
     mock.enqueue(

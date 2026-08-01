@@ -169,7 +169,7 @@ export async function getStudentFinalGradeHandler({ data }: { data: { assignment
     const config = await fetchGradeConfig(db, assignmentId);
     if (!config) return null;
 
-    if (config.releaseStatus === 'draft') {
+    if (config.releaseStatus !== 'published') {
       return { available: false, reason: 'not_yet_released' as const };
     }
 
