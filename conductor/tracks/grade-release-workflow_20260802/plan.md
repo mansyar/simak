@@ -18,17 +18,17 @@
   - [x] Test uniqueness for `(assignmentId, releaseVersion, studentId)` and indexes needed for assignment/version and student lookups.
   - [x] Run the focused schema test and confirm it fails before implementation.
 
-- [ ] Task: Implement release schema and migration (Green Phase)
-  - [ ] Extend `src/db/schema/gradebook.ts` with release-state metadata.
-  - [ ] Add the published-grade snapshot table and relations/indexes.
-  - [ ] Export new schema objects through `src/db/schema/index.ts` if required.
-  - [ ] Generate the next Drizzle migration with `pnpm db:generate`.
-  - [ ] Ensure existing grade configurations are backfilled to `draft` with no fabricated snapshots.
-  - [ ] Add or generate the matching rollback migration following repository conventions.
-  - [ ] Apply/verify the migration against the development database.
-  - [ ] Run the focused schema tests and confirm they pass.
-  - [ ] Run modularity checks and keep every changed source/test file under 500 lines.
-  - [ ] Commit with a `feat(db): ...` message and attach the required git note.
+- [x] Task: Implement release schema and migration (Green Phase) [88d2985]
+  - [x] Extend `src/db/schema/gradebook.ts` with release-state metadata.
+  - [x] Add the published-grade snapshot table and relations/indexes.
+  - [x] Export new schema objects through `src/db/schema/index.ts` if required.
+  - [x] Generate the next Drizzle migration with `pnpm db:generate` (`0019_daffy_bulldozer.sql`).
+  - [x] Ensure existing grade configurations are backfilled to `draft` with no fabricated snapshots.
+  - [x] Confirm the repository uses forward-only Drizzle migrations; no separate rollback file is generated.
+  - [x] Apply/verify the migration against the development database with `pnpm db:push`; `pnpm db:migrate` remains blocked by the pre-existing empty migration ledger.
+  - [x] Run the focused schema tests and confirm they pass.
+  - [x] Run modularity checks and keep every changed source/test file under 500 lines.
+  - [x] Commit with a `feat(db): ...` message and attach the required git note.
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
