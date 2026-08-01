@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 import postgres from 'postgres';
 import { resetDatabase, getDatabaseUrl } from './helpers/db-reset';
 import { ensureAuthFile, getAuthFilePath } from './helpers/auth';
@@ -66,6 +67,12 @@ async function seedCompleteWorkingGrades() {
   }
 }
 
+function moderateOrHigherViolations(violations: Array<{ impact?: string | null }>) {
+  return violations.filter((violation) =>
+    ['critical', 'serious', 'moderate'].includes(violation.impact ?? ''),
+  );
+}
+
 test.describe('Grade release workflow', () => {
   test.beforeAll(async ({ browser }) => {
     await resetDatabase();
@@ -89,9 +96,19 @@ test.describe('Grade release workflow', () => {
     await instructorPage.goto(gradebookHref!);
     await instructorPage.waitForLoadState('networkidle');
 
+    const gradebookA11y = await new AxeBuilder({ page: instructorPage })
+      .include('[data-testid="grade-release-controls"]')
+      .analyze();
+    expect(moderateOrHigherViolations(gradebookA11y.violations)).toEqual([]);
+
     await expect(instructorPage.getByText(/draft/i)).toBeVisible();
     await instructorPage.getByRole('button', { name: /publish/i }).click();
     await expect(instructorPage.getByText(/eligible/i)).toBeVisible();
+
+    const preflightA11y = await new AxeBuilder({ page: instructorPage })
+      .include('[role="dialog"]')
+      .analyze();
+    expect(moderateOrHigherViolations(preflightA11y.violations)).toEqual([]);
     await instructorPage.getByRole('checkbox').check();
     await instructorPage
       .getByRole('button', { name: /publish/i })
@@ -107,6 +124,10 @@ test.describe('Grade release workflow', () => {
     await studentPage.goto('/student/assignments');
     await studentPage.getByRole('link', { name: /view all/i }).click();
     await studentPage.waitForLoadState('networkidle');
+    const studentA11y = await new AxeBuilder({ page: studentPage })
+      .include('[data-testid="student-final-grade-card"]')
+      .analyze();
+    expect(moderateOrHigherViolations(studentA11y.violations)).toEqual([]);
     await expect(studentPage.getByText('93.75')).toBeVisible();
     await studentContext.close();
   });

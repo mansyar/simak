@@ -170,6 +170,7 @@ export function GradeReleaseControls({
 
   return (
     <div
+      data-testid="grade-release-controls"
       className="space-y-3 rounded-lg border bg-card p-4"
       aria-label={t('gradebook.release.status')}
     >
