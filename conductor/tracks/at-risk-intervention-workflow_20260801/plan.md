@@ -34,7 +34,11 @@
   - [x] Run risk-scoring and instructor-dashboard tests and confirm the Green phase.
   - [x] Commit with `refactor(risk): share live student risk context` and attach the required task git note (`2607976`).
 
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+  - [x] Confirm changed implementation files have corresponding unit-test coverage.
+  - [x] Run `pnpm vitest run tests/unit/server/student-risk-context.test.ts tests/unit/server/dashboard-instructor.test.ts tests/unit/lib/risk-scoring.test.ts` — 3 files and 40 tests passed.
+  - [x] Attempt manual instructor-dashboard verification; local login/data seeding was unavailable because configured and test credentials were rejected and the existing seed entrypoint fails on `import.meta.env.PROD` under direct Node execution.
+  - [x] Record the automated-only verification report and phase checkpoint at `2607976`.
 
 ## Phase 2 — Instructor-only server workflow
 
