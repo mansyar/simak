@@ -95,8 +95,8 @@
 
 ## Phase 3: Instructor and Student UI, i18n, and Accessibility
 
-- [ ] Task: Write failing UI and E2E tests (Red Phase)
-  - [ ] Extend `tests/unit/routes/instructor-gradebook.test.tsx` for draft/published state display and role-appropriate release controls.
+- [~] Task: Write failing UI and E2E tests (Red Phase)
+  - [~] Extend `tests/unit/routes/instructor-gradebook.test.tsx` for draft/published state display and role-appropriate release controls.
   - [ ] Create `tests/unit/components/gradebook-release-controls.test.tsx` for preflight rendering, explicit publish confirmation, loading/success/error states, and required withdrawal reason validation.
   - [ ] Extend `tests/unit/components/student-final-grade-card.test.tsx` for unavailable draft/no-snapshot states and active snapshot rendering.
   - [ ] Add `tests/e2e/grade-release.spec.ts` using existing deterministic fixture conventions.
