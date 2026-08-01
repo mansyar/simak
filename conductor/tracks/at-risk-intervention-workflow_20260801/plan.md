@@ -149,7 +149,20 @@
   - [x] Ran the final changed-code unit command: `pnpm vitest run tests/unit/components/instructor/interventions.test.tsx tests/unit/lib/logger.test.ts tests/unit/server/student-risk-context.test.ts` passed 3 files and 20 tests.
   - [x] Confirmed the Phase 5 quality gates, targeted integration workflow, full integration result, and Chromium/mobile-chrome acceptance results recorded above.
   - [x] Manual verification was recorded as automated-only with explicit user approval; seeded browser acceptance covered the instructor workflow, pending-review rejection, responsive flow, and student/admin privacy.
-  - [x] Attached the verification report to `b2b6c3a` and recorded the Phase 5 checkpoint at `b2b6c3a`.
+   - [x] Attached the verification report to `b2b6c3a` and recorded the Phase 5 checkpoint at `b2b6c3a`.
+
+## Review fixes
+
+- [x] Task: Apply formal review suggestions
+  - [x] Add the mandatory rollback migration for the intervention schema.
+  - [x] Lock the joined assignment during intervention lifecycle updates to close the reassignment race.
+  - [x] Keep active intervention management available when live risk context is unavailable.
+  - [x] Distinguish active interventions from resolved/dismissed history in assignment context and preserve manage links.
+  - [x] Implement assignment-detail hash navigation for consultation, extension, discussion, and intervention links.
+  - [x] Replace native intervention selects/checkboxes with shared accessible UI primitives.
+  - [x] Display private notes and resolution reasons in the instructor-only intervention list.
+  - [x] Run targeted regression tests, 19-file/135-test TRACK-050 regression tests, coverage, typecheck, i18n, lint, formatting, Playwright, and build checks.
+  - [x] Commit the fixes with `fix(conductor): Apply review suggestions for track 'At-Risk Intervention Workflow'` (`364665c`). A detailed git note was added to the functional review-fix commit.
 
 ## Expected primary files
 
