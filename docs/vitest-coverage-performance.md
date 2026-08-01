@@ -72,3 +72,20 @@ preserved report contract. These results rule out worker-pool and reporter
 flags as the minimal optimization candidate; the next candidate targets
 unnecessary `happy-dom` setup for non-DOM unit tests while retaining it for
 component, hook, route, and XLSX tests.
+
+## Pre-change Regression Reference
+
+Before changing the configuration, the following checks were run with the same
+process-local placeholder environment:
+
+- `pnpm test` exited 0 with 388 files and 3,953 tests passing; Stopwatch elapsed
+  98.70 s.
+- `pnpm test:coverage` exited 0 with 388 files and 3,953 tests passing; V8
+  coverage remained above every 80% threshold and text/JSON/HTML reports were
+  generated.
+- Vitest project discovery reported the normal unit project plus exactly the
+  four existing XLSX files in the XLSX project; integration files were absent
+  from the default unit project.
+- A configuration assertion confirmed the V8 provider, all three reporters,
+  the existing include/exclude scope, all four thresholds, and the project
+  pool assignments.
