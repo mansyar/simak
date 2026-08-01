@@ -152,4 +152,13 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Record the final checkpoint SHA in `plan.md` after the checkpoint commit.
   - [x] Attach the final verification report as a git note to the functional commit.
   - [x] Mark all completed tasks and phases in `plan.md`.
+
+## Phase: Review Fixes
+
+- [x] Task: Apply review suggestions [98ce1319]
+  - [x] Align the picker container role with its native button/`aria-pressed` interaction.
+  - [x] Assert the server ownership predicate includes the authenticated instructor ID.
+  - [x] Exercise exported-stub runtime validation before mutation queries in the server test.
+  - [x] Focused review suites passed 43 tests; typecheck, lint, formatting, modularity, and diff checks passed.
+
 </protect>
