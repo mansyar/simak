@@ -103,8 +103,8 @@
   - [x] Cover instructor publication with eligible and incomplete students, student visibility before/after publication, recomputation immutability, withdrawal, republish, and unauthorized mutation attempts.
   - [x] Run the focused component/route tests and confirm they fail before implementation.
 
-- [ ] Task: Add bilingual translation keys
-  - [ ] Add release-state, preflight, publish, withdrawal, unavailable-state, validation, success, and error keys to `locales/en.json`.
+- [~] Task: Add bilingual translation keys
+  - [~] Add release-state, preflight, publish, withdrawal, unavailable-state, validation, success, and error keys to `locales/en.json`.
   - [ ] Add matching Indonesian keys to `locales/id.json`.
   - [ ] Add publication/withdrawal action labels to the shared audit-action translation source if required.
   - [ ] Run `pnpm generate:i18n`.
