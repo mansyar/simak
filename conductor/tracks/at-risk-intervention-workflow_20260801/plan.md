@@ -53,15 +53,15 @@
   - [x] Run the handler tests and confirm the Green phase.
   - [x] Commit with `feat(interventions): add instructor intervention handlers` and attach the required task git note (`e3704a6`).
 
-- [~] Task: Implement locked status and record updates
-  - [ ] Write failing tests for allowed transitions, terminal resolved/dismissed states, required resolution/dismissal reasons, note/action/follow-up updates, row locking, and immutable audit-event details.
-  - [ ] Run the update tests and confirm the Red phase.
-  - [ ] Implement `updateInterventionHandler` with a transaction that locks the intervention row and verifies the current assignment owner before changing state.
-  - [ ] Reject unauthorized access, invalid transitions, empty closure reasons, and updates to terminal records.
-  - [ ] Record status changes and closure/dismissal reasons without altering historical audit actors.
-  - [ ] Run the lifecycle and transaction tests and confirm the Green phase.
-  - [ ] Extend reassignment regression coverage to prove the replacement instructor can access the record and the former instructor cannot.
-  - [ ] Commit with `feat(interventions): enforce intervention lifecycle and ownership` and attach the required task git note.
+- [x] Task: Implement locked status and record updates
+  - [x] Write failing tests for allowed transitions, terminal resolved/dismissed states, required resolution/dismissal reasons, note/action/follow-up updates, row locking, and immutable audit-event details.
+  - [x] Run the update tests and confirm the Red phase.
+  - [x] Implement `updateInterventionHandler` with a transaction that locks the intervention row and verifies the current assignment owner before changing state.
+  - [x] Reject unauthorized access, invalid transitions, empty closure reasons, and updates to terminal records.
+  - [x] Record status changes and closure/dismissal reasons without altering historical audit actors.
+  - [x] Run the lifecycle and transaction tests and confirm the Green phase.
+  - [x] Extend reassignment regression coverage to prove the replacement instructor can access the record and the former instructor cannot.
+  - [x] Commit with `feat(interventions): add locked lifecycle updates` and attach the required task git note (`cebd15e`).
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
