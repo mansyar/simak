@@ -10,8 +10,8 @@
   - [x] Re-read `conductor/workflow.md` and confirm TDD, coverage, commit, git-note, and phase-checkpoint requirements.
   - [x] Inspect the existing `assignment_grade_config`, `final_grades`, and assignment-enrollment schema before changing it.
 
-- [ ] Task: Write failing release-schema tests (Red Phase)
-  - [ ] Create `tests/unit/db/schema/gradebook-release.test.ts`.
+- [~] Task: Write failing release-schema tests (Red Phase)
+  - [~] Create `tests/unit/db/schema/gradebook-release.test.ts`.
   - [ ] Test the `draft`/`published` release-state enum and default state.
   - [ ] Test the active release version fields on the grade configuration.
   - [ ] Test the immutable snapshot table shape, foreign keys, required grade fields, release version, and publication timestamp.
