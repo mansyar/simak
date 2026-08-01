@@ -52,10 +52,10 @@
   - [x] Define least-privilege expectations for future backup credentials.
   - [x] Identify when an R2 versioning, retention, or replication follow-up would be justified.
 
-- [ ] Task: Integrate the review into project documentation
-  - [ ] Add a link from `docs/deployment-runbook.md` or the README where appropriate.
-  - [ ] Ensure existing runbook language still reflects the seven-copy pilot configuration.
-  - [ ] Ensure no document claims that a 30-day logical-backup bucket, independent scheduler, expanded R2 policy, or failure alerting is already implemented.
+- [~] Task: Integrate the review into project documentation
+  - [x] Add a link from `docs/deployment-runbook.md` or the README where appropriate.
+  - [x] Ensure existing runbook language still reflects the seven-copy pilot configuration.
+  - [x] Ensure no document claims that a 30-day logical-backup bucket, independent scheduler, expanded R2 policy, or failure alerting is already implemented.
   - [ ] Update the TRACK-048 roadmap entry with the completed review link only after the review is finalized.
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
