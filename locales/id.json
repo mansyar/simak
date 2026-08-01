@@ -145,7 +145,9 @@
       "consultationVerified": "Konsultasi Terverifikasi",
       "consultationRejected": "Konsultasi Ditolak",
       "extensionApproved": "Perpanjangan Disetujui",
-      "extensionRejected": "Perpanjangan Ditolak"
+      "extensionRejected": "Perpanjangan Ditolak",
+      "gradeReleasePublished": "Rilis Nilai Diterbitkan",
+      "gradeReleaseWithdrawn": "Rilis Nilai Ditarik"
     }
   },
   "adminEmailQueue": {
@@ -1351,12 +1353,44 @@
       "saveSuccess": "Pengaturan nilai berhasil disimpan",
       "saveError": "Gagal menyimpan pengaturan nilai"
     },
+    "release": {
+      "draft": "Draf",
+      "published": "Diterbitkan",
+      "status": "Status rilis",
+      "version": "Versi rilis {version}",
+      "startPublish": "Terbitkan nilai",
+      "publish": "Terbitkan rilis",
+      "preflightTitle": "Pemeriksaan rilis",
+      "preflightDescription": "Tinjau mahasiswa yang memenuhi syarat sebelum menerbitkan. Nilai yang belum lengkap atau hilang tetap tidak tersedia.",
+      "eligibleCount": "Mahasiswa memenuhi syarat: {count}",
+      "incompleteCount": "Mahasiswa belum lengkap: {count}",
+      "missingCount": "Mahasiswa tanpa nilai tersimpan: {count}",
+      "confirmPublish": "Saya mengonfirmasi bahwa nilai yang memenuhi syarat siap diterbitkan",
+      "publishSuccess": "Rilis nilai berhasil diterbitkan",
+      "publishError": "Gagal menerbitkan rilis nilai",
+      "publishLoading": "Menerbitkan nilai...",
+      "withdraw": "Tarik rilis",
+      "withdrawTitle": "Tarik nilai yang diterbitkan",
+      "withdrawDescription": "Penarikan menyembunyikan rilis saat ini dari mahasiswa. Snapshot sebelumnya tetap disimpan untuk audit.",
+      "withdrawReason": "Alasan penarikan",
+      "withdrawReasonPlaceholder": "Jelaskan alasan rilis ini ditarik",
+      "confirmWithdraw": "Tarik rilis",
+      "reasonRequired": "Alasan penarikan wajib diisi",
+      "withdrawSuccess": "Rilis nilai berhasil ditarik",
+      "withdrawError": "Gagal menarik rilis nilai",
+      "withdrawLoading": "Menarik rilis...",
+      "preflightError": "Gagal memuat pemeriksaan rilis"
+    },
     "student": {
       "finalGrade": "Nilai Akhir",
       "currentProgress": "Progres Saat Ini",
       "breakdown": "Tampilkan Rincian",
       "checkpoint": "Checkpoint",
-      "score": "Skor"
+      "score": "Skor",
+      "unavailable": "Nilai akhir belum tersedia",
+      "notYetReleased": "Nilai akhir Anda belum diterbitkan.",
+      "releaseVersion": "Versi rilis",
+      "publishedAt": "Diterbitkan"
     },
     "analytics": {
       "gradeDistribution": "Distribusi Nilai"

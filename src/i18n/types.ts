@@ -151,6 +151,8 @@ export type Translation = {
       consultationRejected: string
       extensionApproved: string
       extensionRejected: string
+      gradeReleasePublished: string
+      gradeReleaseWithdrawn: string
     }
   }
   adminEmailQueue: {
@@ -1356,12 +1358,44 @@ export type Translation = {
       saveSuccess: string
       saveError: string
     }
+    release: {
+      draft: string
+      published: string
+      status: string
+      version: string
+      startPublish: string
+      publish: string
+      preflightTitle: string
+      preflightDescription: string
+      eligibleCount: string
+      incompleteCount: string
+      missingCount: string
+      confirmPublish: string
+      publishSuccess: string
+      publishError: string
+      publishLoading: string
+      withdraw: string
+      withdrawTitle: string
+      withdrawDescription: string
+      withdrawReason: string
+      withdrawReasonPlaceholder: string
+      confirmWithdraw: string
+      reasonRequired: string
+      withdrawSuccess: string
+      withdrawError: string
+      withdrawLoading: string
+      preflightError: string
+    }
     student: {
       finalGrade: string
       currentProgress: string
       breakdown: string
       checkpoint: string
       score: string
+      unavailable: string
+      notYetReleased: string
+      releaseVersion: string
+      publishedAt: string
     }
     analytics: {
       gradeDistribution: string

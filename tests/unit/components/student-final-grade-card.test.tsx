@@ -212,8 +212,7 @@ describe('StudentFinalGradeCard', () => {
     await waitFor(() => {
       expect(screen.getByText('91.25')).toBeDefined();
       expect(screen.getByText('A')).toBeDefined();
-      expect(screen.getByText('gradebook.student.releaseVersion')).toBeDefined();
-      expect(screen.getByText('2')).toBeDefined();
+      expect(screen.getByText(/gradebook\.student\.releaseVersion.*2/)).toBeDefined();
     });
   });
 });

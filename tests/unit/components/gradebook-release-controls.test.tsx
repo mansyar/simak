@@ -29,14 +29,37 @@ function renderWithQuery(ui: React.ReactElement) {
 }
 
 const preflight = {
+  assignmentId: 42,
   releaseStatus: 'draft' as const,
   activeReleaseVersion: null,
   publishedAt: null,
-  eligibleStudents: [{ studentId: 'student-1', studentName: 'Alice', status: 'complete' as const }],
-  incompleteStudents: [
-    { studentId: 'student-2', studentName: 'Bob', status: 'in_progress' as const },
+  eligible: [
+    {
+      studentId: 'student-1',
+      studentName: 'Alice',
+      status: 'complete' as const,
+      numericScore: '95',
+      letterGrade: 'A',
+    },
   ],
-  missingStudents: [{ studentId: 'student-3', studentName: 'Cara', status: null }],
+  incomplete: [
+    {
+      studentId: 'student-2',
+      studentName: 'Bob',
+      status: 'in_progress' as const,
+      numericScore: null,
+      letterGrade: null,
+    },
+  ],
+  missing: [
+    {
+      studentId: 'student-3',
+      studentName: 'Cara',
+      status: null,
+      numericScore: null,
+      letterGrade: null,
+    },
+  ],
   counts: { eligible: 1, incomplete: 1, missing: 1 },
 };
 
@@ -110,7 +133,12 @@ describe('GradeReleaseControls', () => {
 
     const publishButton = screen.getByRole('button', { name: 'gradebook.release.publish' });
     expect(publishButton).toHaveProperty('disabled', true);
-    fireEvent.click(screen.getByRole('checkbox', { name: 'gradebook.release.confirmPublish' }));
+    const confirmation = screen.getByRole('checkbox', {
+      name: 'gradebook.release.confirmPublish',
+    });
+    fireEvent.pointerDown(confirmation);
+    fireEvent.pointerUp(confirmation);
+    fireEvent.click(confirmation);
     fireEvent.click(publishButton);
 
     await waitFor(() => {
@@ -122,7 +150,7 @@ describe('GradeReleaseControls', () => {
   });
 
   it('requires a withdrawal reason and submits the trimmed reason', async () => {
-    vi.mocked(withdrawGradeRelease).mockResolvedValue({ success: true, releaseVersion: 2 });
+    vi.mocked(withdrawGradeRelease).mockResolvedValue({ success: true });
 
     renderWithQuery(
       <GradeReleaseControls

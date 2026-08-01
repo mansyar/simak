@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, Outlet, useMatchRoute } from '@tanstack/react-router';
 import { getAssignmentDetail } from '@/server/assignments';
 import { exportStudentProgressCsv, exportReviewHistoryCsv } from '@/server/analytics';
 import { AssignmentDetailHeader } from '@/components/instructor/assignments/AssignmentDetailHeader';
@@ -49,6 +49,7 @@ function AssignmentDetailPage() {
   const [selectedConsultationId, setSelectedConsultationId] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const tabs = useAssignmentTabs(assignment?.id ?? null);
+  const matchRoute = useMatchRoute();
 
   useEffect(() => {
     const applyHash = () => {
@@ -77,6 +78,13 @@ function AssignmentDetailPage() {
         </Link>
       </EmptyState>
     );
+  }
+
+  const isOnGradebookChild = matchRoute({
+    to: '/instructor/assignments/$id/gradebook',
+  } as never);
+  if (isOnGradebookChild) {
+    return <Outlet />;
   }
 
   const tabList = [

@@ -7,14 +7,32 @@ async function seedCompleteWorkingGrades() {
   const sql = postgres(getDatabaseUrl());
   try {
     const [assignment] = await sql`SELECT id FROM assignments WHERE title = 'E2E Test Assignment'`;
+    await sql`
+      INSERT INTO assignment_grade_config (
+        assignment_id,
+        grading_scheme,
+        letter_grade_bounds,
+        release_status
+      ) VALUES (
+        ${assignment.id},
+        'equal_weight',
+        '{"A": 90, "B": 80, "C": 70, "D": 60}'::jsonb,
+        'draft'
+      )
+      ON CONFLICT (assignment_id) DO UPDATE SET
+        release_status = 'draft',
+        active_release_version = NULL,
+        published_at = NULL
+    `;
     const students = await sql`
-      SELECT student_id
+      SELECT assignment_students.student_id, users.email
       FROM assignment_students
-      WHERE assignment_id = ${assignment.id}
-      ORDER BY student_id
+      INNER JOIN users ON users.id = assignment_students.student_id
+      WHERE assignment_students.assignment_id = ${assignment.id}
+      ORDER BY users.email
     `;
 
-    for (const [index, student] of students.entries()) {
+    for (const student of students) {
       await sql`
         INSERT INTO final_grades (
           assignment_id,
@@ -28,8 +46,8 @@ async function seedCompleteWorkingGrades() {
         ) VALUES (
           ${assignment.id},
           ${student.student_id},
-          ${index === 0 ? '93.75' : '88.00'},
-          ${index === 0 ? 'A' : 'B'},
+          ${student.email === 'student@e2e.test' ? '93.75' : '88.00'},
+          ${student.email === 'student@e2e.test' ? 'A' : 'B'},
           'complete',
           '[]'::jsonb,
           NOW(),
@@ -64,8 +82,12 @@ test.describe('Grade release workflow', () => {
     });
     const instructorPage = await instructorContext.newPage();
     await instructorPage.goto('/instructor/assignments');
-    await instructorPage.getByText('E2E Test Assignment').click();
-    await instructorPage.getByRole('link', { name: /gradebook/i }).click();
+    await instructorPage.getByRole('link', { name: /view all/i }).click();
+    const gradebookLink = instructorPage.getByRole('link', { name: /gradebook/i });
+    const gradebookHref = await gradebookLink.getAttribute('href');
+    expect(gradebookHref).toBeTruthy();
+    await instructorPage.goto(gradebookHref!);
+    await instructorPage.waitForLoadState('networkidle');
 
     await expect(instructorPage.getByText(/draft/i)).toBeVisible();
     await instructorPage.getByRole('button', { name: /publish/i }).click();
@@ -75,13 +97,16 @@ test.describe('Grade release workflow', () => {
       .getByRole('button', { name: /publish/i })
       .last()
       .click();
-    await expect(instructorPage.getByText(/published/i)).toBeVisible();
+    await expect(
+      instructorPage.getByLabel(/release status/i).getByText(/published/i),
+    ).toBeVisible();
     await instructorContext.close();
 
     const studentContext = await browser.newContext({ storageState: getAuthFilePath('student') });
     const studentPage = await studentContext.newPage();
     await studentPage.goto('/student/assignments');
-    await studentPage.getByText('E2E Test Assignment').click();
+    await studentPage.getByRole('link', { name: /view all/i }).click();
+    await studentPage.waitForLoadState('networkidle');
     await expect(studentPage.getByText('93.75')).toBeVisible();
     await studentContext.close();
   });
