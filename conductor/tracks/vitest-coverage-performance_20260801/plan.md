@@ -50,15 +50,12 @@
 
 ## Phase 3: Benchmark Confirmation, Documentation, and Final Quality Gates
 
-- [~] Task: Repeat the controlled performance benchmark
-  - [ ] Run the same repeated measurement procedure used for the baseline
-  - [ ] Compare median or otherwise consistently selected wall-clock measurements
-  - [ ] Confirm at least a 20% reduction; if not met, return to Phase 2 for another evidence-based candidate
+- [x] Task: Repeat the controlled performance benchmark [a8d5ca2] — target unmet; evidence-only outcome approved
+  - [x] Run the same repeated measurement procedure used for the baseline [5962fe9]
+  - [x] Compare median or otherwise consistently selected wall-clock measurements [5962fe9]
+  - [x] Confirm at least a 20% reduction; if not met, return to Phase 2 for another evidence-based candidate [a8d5ca2] — no qualifying candidate remained
 
-- [ ] Task: Verify coverage and test-scope invariants
-  - [ ] Confirm text, JSON, and HTML reports are generated
-  - [ ] Confirm the existing include/exclude scope and 80% thresholds are unchanged
-  - [ ] Confirm integration tests remain opt-in through `pnpm test:integration`
+- [~] Task: Verify coverage and test-scope invariants
 
 - [ ] Task: Run repository quality gates
   - [ ] Run `pnpm typecheck`
