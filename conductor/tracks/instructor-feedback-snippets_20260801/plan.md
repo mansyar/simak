@@ -95,16 +95,16 @@ This plan follows the approved specification and the repository’s TDD workflow
   - [x] Test multiple insertions preserve prior manual text and keep the comment editable.
   - [x] Test insertion does not call `submitReview`, select a decision, modify rubric scores, or change submission state.
   - [x] Test archived snippets are not offered by the picker.
-- [x] Task: Implement the searchable picker
+- [x] Task: Implement the searchable picker [23ae7d9b]
   - [x] Add a review-form picker component under `src/components/reviews/`.
   - [x] Load only the current instructor’s active snippets through the server function and query-key factory.
   - [x] Provide title/category search, selected-snippet state, explicit Insert action, and accessible labels/focus behavior.
-- [x] Task: Integrate insertion into `ReviewForm.tsx`
+- [x] Task: Integrate insertion into `ReviewForm.tsx` [23ae7d9b]
   - [x] Append the selected plain-text body at the end of the controlled comment value.
   - [x] Add a blank line only when the existing comment contains non-whitespace text.
   - [x] Return focus to the comment textarea after insertion.
   - [x] Leave Pass/Revise, revision deadline, feedback-file upload, rubric scoring, and submit behavior unchanged.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
   - [ ] Run the focused picker and review-form tests.
   - [ ] Manually verify insertion, continued editing, keyboard operation, and light/dark rendering.
   - [ ] Commit the phase and attach the verification git note.
