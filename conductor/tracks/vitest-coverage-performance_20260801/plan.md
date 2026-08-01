@@ -36,12 +36,12 @@
   - [x] Confirm the baseline checks pass before modifying configuration or scripts
   - [x] Preserve a before-change reference for project discovery, report generation, and threshold enforcement
 
-- [~] Task: Implement the selected Vitest configuration or package-script optimization
-  - [ ] Limit changes to the approved configuration/script scope
-  - [ ] Preserve all existing tests, projects, coverage reporters, scope, and thresholds
-  - [ ] Remove temporary diagnostic settings and keep comments aligned with the final behavior
+- [x] Task: Implement the selected Vitest configuration or package-script optimization [318293a]
+  - [x] Limit changes to the approved configuration/script scope [318293a]
+  - [x] Preserve all existing tests, projects, coverage reporters, scope, and thresholds [318293a]
+  - [x] Remove temporary diagnostic settings and keep comments aligned with the final behavior [318293a]
 
-- [ ] Task: Run the green-phase verification
+- [~] Task: Run the green-phase verification
   - [ ] Run `pnpm test` and confirm all default tests pass
   - [ ] Run `pnpm test:coverage` and confirm all coverage thresholds and reports remain valid
   - [ ] Confirm no worker crashes, unhandled errors, or missing XLSX tests occur
