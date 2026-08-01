@@ -85,7 +85,7 @@ function FeedbackSnippetPicker({ onInsert }: FeedbackSnippetPickerProps) {
         <div
           aria-label={t('feedbackSnippets.pickerTitle')}
           className="grid gap-2 sm:grid-cols-2"
-          role="listbox"
+          role="group"
         >
           {snippets.map((snippet) => {
             const isSelected = selectedId === snippet.id;

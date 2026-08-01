@@ -1,5 +1,6 @@
 /** @vitest-environment node */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as drizzle from 'drizzle-orm';
 import {
   CreateFeedbackSnippetSchema,
   FeedbackSnippetIdSchema,
@@ -16,6 +17,7 @@ import {
 } from '@/server/feedback-snippets.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
+import { feedbackSnippets } from '@/db/schema/feedback-snippets';
 import { isServerError } from '@/lib/errors';
 
 vi.mock('@/server/auth', () => ({
@@ -30,11 +32,26 @@ vi.mock('@/lib/logger', () => ({
   logger: { error: vi.fn() },
 }));
 
+vi.mock('drizzle-orm', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('drizzle-orm')>();
+  return { ...actual, eq: vi.fn(actual.eq) };
+});
+
 vi.mock('@tanstack/react-start', () => ({
-  createServerFn: vi.fn().mockReturnValue({
-    middleware: vi.fn().mockReturnThis(),
-    inputValidator: vi.fn().mockReturnThis(),
-    handler: vi.fn().mockImplementation((fn) => fn),
+  createServerFn: vi.fn().mockImplementation(() => {
+    let validator: { parse: (value: unknown) => unknown } | undefined;
+    const builder = {
+      middleware: vi.fn().mockReturnThis(),
+      inputValidator: vi.fn((schema: { parse: (value: unknown) => unknown }) => {
+        validator = schema;
+        return builder;
+      }),
+      handler: vi.fn(
+        (fn: (args: { data: unknown }) => unknown) => async (args: { data: unknown }) =>
+          fn({ data: validator ? validator.parse(args.data) : args.data }),
+      ),
+    };
+    return builder;
   }),
   createMiddleware: vi.fn().mockReturnValue({
     server: vi.fn().mockImplementation((fn) => fn),
@@ -247,15 +264,17 @@ describe('Feedback snippet server functions', () => {
       });
       expect(mockDb.update).toHaveBeenCalledOnce();
       expect(mockDb.where).toHaveBeenCalledOnce();
+      expect(drizzle.eq).toHaveBeenCalledWith(feedbackSnippets.instructorId, 'instructor-2');
     });
 
-    it('rejects malformed mutation input before a mutation query is invoked', () => {
+    it('rejects malformed mutation input before a mutation query is invoked', async () => {
       const invalidInput = {
         title: ' '.repeat(101),
         category: 'c'.repeat(51),
         body: 'b'.repeat(2001),
       };
 
+      await expect(serverFunctions.createFeedbackSnippet({ data: invalidInput })).rejects.toThrow();
       expect(CreateFeedbackSnippetSchema.safeParse(invalidInput).success).toBe(false);
       expect(mockDb.insert).not.toHaveBeenCalled();
       expect(mockDb.update).not.toHaveBeenCalled();
