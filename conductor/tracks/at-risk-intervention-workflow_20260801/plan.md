@@ -126,11 +126,12 @@
 
 ## Phase 5 — Integration, quality, and completion
 
-- [~] Task: Add database-backed and browser acceptance coverage
-  - [ ] Write integration tests for the partial unique active-pair constraint, transactional status transitions, closure audit data, and reassignment visibility.
-  - [ ] Add Playwright coverage for instructor creation, pending-review rejection, status changes, overdue display, contextual entry points, and student/admin privacy.
-  - [ ] Run the new integration/browser tests and record any environment prerequisites.
-  - [ ] Commit with `test(interventions): cover workflow acceptance paths` and attach the required task git note.
+- [x] Task: Add database-backed and browser acceptance coverage
+  - [x] Write integration tests for the partial unique active-pair constraint, transactional status transitions, closure audit data, and reassignment visibility.
+  - [x] Add Playwright coverage for instructor creation, pending-review rejection, status changes, overdue display, contextual entry points, and student/admin privacy.
+  - [x] Run the new integration/browser tests and record any environment prerequisites. The integration command `pnpm vitest run --config vitest.config.integration.ts tests/integration/server/interventions-workflow.test.ts` passed 3 tests. The Chromium command `pnpm exec playwright test tests/e2e/instructor-interventions.spec.ts --project=chromium --retries=0` passed 2 tests. Existing local migration metadata required manual application of migration 0017 before the database-backed setup could run; reset/seed then completed successfully. Browser output contained only pre-existing route code-splitting and CSP nonce hydration warnings.
+  - [x] Added regression coverage for nullable edit-form values, create-to-edit form state reset, and aggregate SQL timestamp normalization required by the browser workflow; unit tests, typecheck, i18n, formatting, lint, and modularity checks passed.
+  - [x] Committed with `test(interventions): cover workflow acceptance paths` as `b2b6c3a` and attached the required task git note.
 
 - [ ] Task: Complete quality gates and documentation
   - [ ] Confirm all new user-visible strings exist in both locale files and generated i18n types are current.
