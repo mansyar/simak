@@ -31,15 +31,15 @@
   - [x] Document the existing isolated restore evidence and operator-only restore boundary.
   - [x] Document the current private R2 posture without asserting unapproved durability features.
 
-- [ ] Task: Add the readiness gap analysis
-  - [ ] Assess retention duration and policy ownership.
-  - [ ] Assess scheduler independence from the application.
-  - [ ] Assess job-level success/failure visibility and alerting.
-  - [ ] Assess restore reproducibility and evidence maintenance.
-  - [ ] Assess least-privilege backup credential isolation.
-  - [ ] Assess R2 uploaded-file durability, versioning, and recovery considerations.
-  - [ ] Label each item as current, partially addressed, deferred, or requiring a future decision.
-  - [ ] Preserve the distinction between the seven-copy pilot baseline and possible future policies.
+- [x] Task: Add the readiness gap analysis
+  - [x] Assess retention duration and policy ownership.
+  - [x] Assess scheduler independence from the application.
+  - [x] Assess job-level success/failure visibility and alerting.
+  - [x] Assess restore reproducibility and evidence maintenance.
+  - [x] Assess least-privilege backup credential isolation.
+  - [x] Assess R2 uploaded-file durability, versioning, and recovery considerations.
+  - [x] Label each item as current, partially addressed, deferred, or requiring a future decision.
+  - [x] Preserve the distinction between the seven-copy pilot baseline and possible future policies.
 
 - [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
 
