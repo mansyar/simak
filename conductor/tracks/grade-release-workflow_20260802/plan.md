@@ -1,6 +1,6 @@
 # TRACK-051: Grade Release Workflow — Implementation Plan
 
-**Status:** Not started
+**Status:** In progress
 **Specification:** [spec.md](./spec.md)
 
 ## Phase 1: Release Schema and Migration
@@ -10,13 +10,13 @@
   - [x] Re-read `conductor/workflow.md` and confirm TDD, coverage, commit, git-note, and phase-checkpoint requirements.
   - [x] Inspect the existing `assignment_grade_config`, `final_grades`, and assignment-enrollment schema before changing it.
 
-- [~] Task: Write failing release-schema tests (Red Phase)
-  - [~] Create `tests/unit/db/schema/gradebook-release.test.ts`.
-  - [ ] Test the `draft`/`published` release-state enum and default state.
-  - [ ] Test the active release version fields on the grade configuration.
-  - [ ] Test the immutable snapshot table shape, foreign keys, required grade fields, release version, and publication timestamp.
-  - [ ] Test uniqueness for `(assignmentId, releaseVersion, studentId)` and indexes needed for assignment/version and student lookups.
-  - [ ] Run the focused schema test and confirm it fails before implementation.
+- [x] Task: Write failing release-schema tests (Red Phase) [605bd1, 83906b]
+  - [x] Create `tests/unit/db/schema/gradebook-release.test.ts`.
+  - [x] Test the `draft`/`published` release-state enum and default state.
+  - [x] Test the active release version fields on the grade configuration.
+  - [x] Test the immutable snapshot table shape, foreign keys, required grade fields, release version, and publication timestamp.
+  - [x] Test uniqueness for `(assignmentId, releaseVersion, studentId)` and indexes needed for assignment/version and student lookups.
+  - [x] Run the focused schema test and confirm it fails before implementation.
 
 - [ ] Task: Implement release schema and migration (Green Phase)
   - [ ] Extend `src/db/schema/gradebook.ts` with release-state metadata.
