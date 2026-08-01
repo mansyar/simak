@@ -3,7 +3,7 @@
 
 This plan follows the approved specification and the repository’s TDD workflow. Every implementation task is preceded by failing tests, and every phase ends with a verification/checkpoint task.
 
-## Phase 1: Database Schema & Migration
+## Phase 1: Database Schema & Migration [checkpoint: 00b2f8b]
 
 - [x] Task: Re-read the approved `spec.md` and `conductor/workflow.md` [a1919f9]
   - [x] Confirm the 100/50/2,000 character limits, ownership model, archive/restore lifecycle, and no-hard-delete rule.
