@@ -48,7 +48,7 @@
 
 - [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [a8d5ca2]
 
-## Phase 3: Benchmark Confirmation, Documentation, and Final Quality Gates
+## Phase 3: Benchmark Confirmation, Documentation, and Final Quality Gates [checkpoint: f852ae7]
 
 - [x] Task: Repeat the controlled performance benchmark [a8d5ca2] — target unmet; evidence-only outcome approved
   - [x] Run the same repeated measurement procedure used for the baseline [5962fe9]
@@ -71,5 +71,5 @@
   - [x] Document the final configuration rationale and operational trade-offs [1c6e767]
   - [x] Update repository testing documentation only if command or configuration behavior changed [1c6e767] — documented the evidence-only result; no command/configuration behavior changed
 
-- [~] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [f852ae7]
 </protect>
