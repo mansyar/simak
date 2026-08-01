@@ -117,7 +117,7 @@
   - [x] Run the reassignment and authorization tests and confirm the Green phase: 4 files and 23 tests passed.
   - [x] Commit with `test(interventions): verify reassignment privacy boundaries` and attach the required task git note.
 
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 5 — Integration, quality, and completion
 
