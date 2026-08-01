@@ -154,15 +154,15 @@
   - [x] Run typecheck after the compatibility fix.
   - [x] Attach a git note to the compatibility fix commit.
 
-- [~] Task: Run repository quality gates
-  - [ ] Run `pnpm test`.
-  - [ ] Run `pnpm test:coverage` and verify the project thresholds, including at least 80% coverage for new code.
-  - [ ] Run `pnpm typecheck`.
-  - [ ] Run `pnpm lint`.
-  - [ ] Run `pnpm check:i18n`.
-  - [ ] Run `pnpm build`.
-  - [ ] Run the relevant Playwright E2E and accessibility suites.
-  - [ ] Resolve failures with focused fixes and rerun only the checks invalidated by each change.
+- [x] Task: Run repository quality gates [124c171]
+  - [x] Run `pnpm test` — 406 files and 4,071 tests passed after adding `useMatchRoute` mocks to the affected route tests.
+  - [x] Run `pnpm test:coverage` — 406 files and 4,071 tests passed; statements 87.81%, branches 80.88%, functions 83.62%, and lines 88.47%.
+  - [x] Run `pnpm typecheck`.
+  - [x] Run `pnpm lint` — passed with four pre-existing warnings in analytics export/notification files.
+  - [x] Run `pnpm check:i18n` — passed with English/Indonesian parity.
+  - [x] Run `pnpm build` — production Vite/TanStack/Nitro and migration/seed bundles completed successfully.
+  - [x] Run the relevant Playwright E2E and accessibility suites — grade-release Chromium passed 2 tests; scoped release-surface axe checks passed; broader Chromium accessibility passed 5 of 6, with the pre-existing admin-template heading-order violation.
+  - [x] Resolve failures with focused fixes and rerun only the checks invalidated by each change; route mocks were corrected and the full unit/coverage suites were rerun.
 
 - [ ] Task: Perform final self-review
   - [ ] Review the diff against the approved specification and this plan.
