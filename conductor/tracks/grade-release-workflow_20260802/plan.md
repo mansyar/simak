@@ -164,7 +164,7 @@
   - [x] Run the relevant Playwright E2E and accessibility suites — grade-release Chromium passed 2 tests; scoped release-surface axe checks passed; broader Chromium accessibility passed 5 of 6, with the pre-existing admin-template heading-order violation.
   - [x] Resolve failures with focused fixes and rerun only the checks invalidated by each change; route mocks were corrected and the full unit/coverage suites were rerun.
 
-- [ ] Task: Perform final self-review
+- [~] Task: Perform final self-review
   - [ ] Review the diff against the approved specification and this plan.
   - [ ] Confirm all server functions validate session, role, ownership, and input.
   - [ ] Confirm snapshot immutability, release atomicity, and student visibility invariants.
