@@ -91,7 +91,12 @@
   - [x] Run route and component tests and confirm the Green phase.
   - [x] Commit with `feat(ui): add assignment intervention context` and attach the required task git note.
 
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+  - [x] Confirmed changed UI code has matching component and route tests.
+  - [x] Ran the exact combined Phase 3 command: 12 test files and 91 tests passed.
+  - [x] Ran `pnpm typecheck`, `pnpm check:i18n`, `oxlint`, and `oxfmt --check` successfully.
+  - [x] Manual browser verification was unavailable because authenticated instructor data was not available locally; automated-only verification was explicitly approved.
+  - [x] Attached the verification report and recorded the phase checkpoint at `7c29134`.
 
 ## Phase 4 — Dashboard and reassignment integration
 
