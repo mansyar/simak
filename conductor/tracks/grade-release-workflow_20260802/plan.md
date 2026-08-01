@@ -145,12 +145,14 @@
 
 ## Phase 4: Regression, Quality Gates, and Final Documentation
 
-- [~] Task: Verify cross-feature compatibility
-  - [ ] Confirm existing grade computation and recomputation tests remain green.
-  - [ ] Confirm existing instructor gradebook, export, admin analytics, and student assignment tests remain green.
-  - [ ] Confirm audit-log rendering handles the new publication and withdrawal actions in both locales.
-  - [ ] Confirm generated route/type artifacts are current if route changes require regeneration.
-  - [ ] Confirm no notification, transcript, GPA, approval-queue, scheduled-release, or student-release-history behavior was introduced.
+- [x] Task: Verify cross-feature compatibility [8330ad5]
+  - [x] Confirm existing grade computation and recomputation tests remain green (60 related tests passed).
+  - [x] Confirm existing instructor gradebook, export, admin analytics, and student assignment tests remain green through the related gradebook/UI regression suite.
+  - [x] Confirm audit-log rendering handles the new publication and withdrawal actions in both locales; registered both actions in the admin filter/label map.
+  - [x] Confirm generated route/type artifacts are current; the instructor parent-route change does not require route-tree regeneration and generated i18n types are current.
+  - [x] Confirm no notification, transcript, GPA, approval-queue, scheduled-release, or student-release-history behavior was introduced.
+  - [x] Run typecheck after the compatibility fix.
+  - [x] Attach a git note to the compatibility fix commit.
 
 - [ ] Task: Run repository quality gates
   - [ ] Run `pnpm test`.
