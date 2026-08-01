@@ -3,7 +3,7 @@
 
 ## Phase 0: Scope, Context & Evidence Inventory
 
-- [x] Task: Re-read the approved specification and `conductor/workflow.md`
+- [x] Task: Re-read the approved specification and `conductor/workflow.md` [a9bfb83]
   - [x] Confirm the review-only scope and prohibited implementation work.
   - [x] Confirm required acceptance criteria and phase-checkpoint procedure.
   - [x] Record that no fresh production backup or restore drill is required.
