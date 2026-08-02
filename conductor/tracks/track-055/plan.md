@@ -58,10 +58,11 @@
 
 ### Tasks
 
-- [ ] **2.1 Add settings-handler tests (RED)**
-  - [ ] Extend `tests/unit/server/settings.test.ts` for timezone validation, authenticated updates, UTC fallback, and read-modify-write preservation of reduced-motion and notification settings.
-  - [ ] Test unauthorized access and malformed timezone input at the server-function boundary.
-  - [ ] Test that stored settings do not alter deadline values or reminder preferences.
+- [x] **2.1 Add settings-handler tests (RED)**
+  - [x] Add a companion `tests/unit/server/settings-timezone.test.ts` because `settings.test.ts` is already at the 500-line limit; cover timezone validation, authenticated updates, UTC fallback, and read-modify-write preservation of reduced-motion and notification settings.
+  - [x] Test unauthorized access and malformed timezone input at the server-function boundary.
+  - [x] Test that stored settings do not alter deadline values or reminder preferences.
+  - **RED evidence:** The invalid persisted-timezone normalization assertion failed before the settings handler implementation changed.
 
 - [ ] **2.2 Implement timezone settings persistence (GREEN)**
   - [ ] Update `src/server/settings.ts` and `src/server/settings.server.ts` using the existing typed server-function pair.
