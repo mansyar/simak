@@ -172,6 +172,7 @@
   - [x] Keep event identity stable and update event timestamps when source deadlines change.
   - [x] Ensure no token or internal-sensitive data is serialized.
   - **Evidence:** 3 serializer tests passed; UTC timestamps, stable UIDs, CRLF output, RFC 5545 escaping, UTF-8-safe line folding, Unicode, empty feeds, and overdue/locked events are covered. `pnpm typecheck` and targeted oxlint passed.
+  - **Commit:** `78230e25`
 
 ### Phase Verification
 
