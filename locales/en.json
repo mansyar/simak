@@ -1155,6 +1155,18 @@
       "reducedMotionLabel": "Reduced Motion",
       "reducedMotionHint": "Reduce animations and transitions throughout the app"
     },
+    "timezone": {
+      "title": "Student deadline timezone",
+      "description": "Choose the timezone used to display your student deadlines. Stored deadlines and reminders remain unchanged.",
+      "label": "IANA timezone",
+      "placeholder": "e.g. America/New_York",
+      "hint": "Use a valid IANA timezone such as Asia/Jakarta or America/New_York.",
+      "detecting": "Detecting timezone…",
+      "save": "Save timezone",
+      "saved": "Timezone saved successfully.",
+      "invalid": "Enter a valid IANA timezone.",
+      "saveError": "Unable to save timezone. Please try again."
+    },
     "notificationPreferences": {
       "title": "Notification Preferences",
       "description": "Choose how you want to be notified for each event type.",

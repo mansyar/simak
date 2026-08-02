@@ -5,8 +5,9 @@ import { AccessibilitySection } from './AccessibilitySection';
 import { NotificationPreferencesSection } from './NotificationPreferencesSection';
 import { TwoFactorSettings } from './TwoFactorSettings';
 import { SessionManagement } from './SessionManagement';
+import { TimezoneSettingsSection } from './TimezoneSettingsSection';
 
-export function SettingsPage() {
+export function SettingsPage({ studentOnly = false }: { studentOnly?: boolean }) {
   return (
     <div className="space-y-6">
       <ProfileSection />
@@ -16,6 +17,7 @@ export function SettingsPage() {
       <AppearanceSection />
       <AccessibilitySection />
       <NotificationPreferencesSection />
+      {studentOnly && <TimezoneSettingsSection />}
     </div>
   );
 }

@@ -1155,6 +1155,18 @@
       "reducedMotionLabel": "Gerakan Dikurangi",
       "reducedMotionHint": "Kurangi animasi dan transisi di seluruh aplikasi"
     },
+    "timezone": {
+      "title": "Zona waktu tenggat mahasiswa",
+      "description": "Pilih zona waktu untuk menampilkan tenggat mahasiswa Anda. Tenggat tersimpan dan pengingat tidak berubah.",
+      "label": "Zona waktu IANA",
+      "placeholder": "contoh: America/New_York",
+      "hint": "Gunakan zona waktu IANA yang valid seperti Asia/Jakarta atau America/New_York.",
+      "detecting": "Mendeteksi zona waktu…",
+      "save": "Simpan zona waktu",
+      "saved": "Zona waktu berhasil disimpan.",
+      "invalid": "Masukkan zona waktu IANA yang valid.",
+      "saveError": "Zona waktu tidak dapat disimpan. Silakan coba lagi."
+    },
     "notificationPreferences": {
       "title": "Preferensi Notifikasi",
       "description": "Pilih bagaimana Anda ingin diberi tahu untuk setiap jenis peristiwa.",

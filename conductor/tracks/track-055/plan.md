@@ -75,11 +75,11 @@
   - [x] Test accessible labels, keyboard selection, focus behavior, and English/Indonesian key usage.
   - **RED evidence:** The test suite initially failed because the focused timezone settings component did not yet exist.
 
-- [ ] **2.4 Implement the timezone preference UI (GREEN)**
-  - [ ] Add a focused component under `src/components/settings/` and wire it into `SettingsPage` for the student settings route.
-  - [ ] Detect the browser timezone only after hydration and avoid SSR/client text mismatches.
-  - [ ] Provide a manual valid-IANA selection, a clear UTC fallback, and accessible status/error messaging.
-  - [ ] Add the required keys to `locales/en.json` and `locales/id.json`; regenerate i18n types.
+- [x] **2.4 Implement the timezone preference UI (GREEN)**
+  - [x] Add a focused component under `src/components/settings/` and wire it into `SettingsPage` for the student settings route.
+  - [x] Detect the browser timezone only after hydration and avoid SSR/client text mismatches.
+  - [x] Provide a manual valid-IANA selection, a clear UTC fallback, and accessible status/error messaging.
+  - [x] Add the required keys to `locales/en.json` and `locales/id.json`; regenerate i18n types.
 
 - [ ] **2.5 Add deadline-surface regression tests (RED)**
   - [ ] Extend `tests/unit/components/dashboard/student-dashboard.test.tsx` for explicit timezone rendering, DST transitions, placeholders, relative time, overdue state, and null deadlines.

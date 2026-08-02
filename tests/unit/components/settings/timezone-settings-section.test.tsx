@@ -83,6 +83,7 @@ describe('TimezoneSettingsSection', () => {
     render(<TimezoneSettingsSection />);
 
     const input = screen.getByLabelText('settings.timezone.label');
+    await waitFor(() => expect((input as HTMLInputElement).disabled).toBe(false));
     fireEvent.change(input, { target: { value: 'America/New_York' } });
     fireEvent.click(screen.getByRole('button', { name: 'settings.timezone.save' }));
 
@@ -98,12 +99,14 @@ describe('TimezoneSettingsSection', () => {
     });
     render(<TimezoneSettingsSection />);
 
-    fireEvent.change(screen.getByLabelText('settings.timezone.label'), {
+    const input = screen.getByLabelText('settings.timezone.label');
+    await waitFor(() => expect((input as HTMLInputElement).disabled).toBe(false));
+    fireEvent.change(input, {
       target: { value: 'Mars/Phobos' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'settings.timezone.save' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('settings.timezone.invalid');
+    expect((await screen.findByRole('alert')).textContent).toContain('settings.timezone.invalid');
     expect(mockMutateAsync).not.toHaveBeenCalled();
   });
 
@@ -126,30 +129,33 @@ describe('TimezoneSettingsSection', () => {
 
   it('renders loading, save success, and save failure states', async () => {
     mockUseQuery.mockReturnValue({ data: null, isLoading: true });
-    render(<TimezoneSettingsSection />);
+    const loadingView = render(<TimezoneSettingsSection />);
     expect(screen.getByText('common.loading')).toBeDefined();
+    loadingView.unmount();
 
     mockUseQuery.mockReturnValue({ data: { settings: { timezone: 'UTC' } }, isLoading: false });
     mockMutateAsync.mockResolvedValueOnce({ timezone: 'America/New_York' });
     render(<TimezoneSettingsSection />);
-    fireEvent.change(screen.getAllByLabelText('settings.timezone.label')[1], {
+    const input = screen.getByLabelText('settings.timezone.label');
+    await waitFor(() => expect((input as HTMLInputElement).disabled).toBe(false));
+    fireEvent.change(input, {
       target: { value: 'America/New_York' },
     });
-    fireEvent.click(screen.getAllByRole('button', { name: 'settings.timezone.save' })[1]);
-    expect(await screen.findByRole('status')).toHaveTextContent('settings.timezone.saved');
+    fireEvent.click(screen.getByRole('button', { name: 'settings.timezone.save' }));
+    expect((await screen.findByRole('status')).textContent).toContain('settings.timezone.saved');
 
     mockMutateAsync.mockRejectedValueOnce(new Error('save failed'));
-    fireEvent.change(screen.getAllByLabelText('settings.timezone.label')[1], {
+    fireEvent.change(input, {
       target: { value: 'Europe/London' },
     });
-    fireEvent.click(screen.getAllByRole('button', { name: 'settings.timezone.save' })[1]);
-    expect(await screen.findByRole('alert')).toHaveTextContent('settings.timezone.saveError');
+    fireEvent.click(screen.getByRole('button', { name: 'settings.timezone.save' }));
+    expect((await screen.findByRole('alert')).textContent).toContain('settings.timezone.saveError');
   });
 
   it('uses translated labels and accessible form controls', () => {
     render(<TimezoneSettingsSection />);
 
-    expect(screen.getByRole('textbox', { name: 'settings.timezone.label' })).toBeDefined();
+    expect(screen.getByRole('combobox', { name: 'settings.timezone.label' })).toBeDefined();
     expect(screen.getByRole('button', { name: 'settings.timezone.save' })).toBeDefined();
     expect(mockT).toHaveBeenCalledWith('settings.timezone.title');
     expect(mockT).toHaveBeenCalledWith('settings.timezone.description');
