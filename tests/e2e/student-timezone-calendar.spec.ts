@@ -55,7 +55,12 @@ test.describe('Student timezone and calendar feed', () => {
       await expect(page.getByText('Private calendar feed', { exact: true })).toBeVisible();
 
       await timezoneInput.fill('America/New_York');
-      await page.getByRole('button', { name: 'Save timezone', exact: true }).click();
+      const saveTimezoneButton = page.getByRole('button', { name: 'Save timezone', exact: true });
+      await saveTimezoneButton.focus();
+      await expect(saveTimezoneButton).toBeFocused();
+      await page.setViewportSize({ width: 390, height: 844 });
+      await expect(saveTimezoneButton).toBeVisible();
+      await saveTimezoneButton.click();
       await expect(page.getByText('Timezone saved successfully.')).toBeVisible();
 
       await page.goto('/student/dashboard');

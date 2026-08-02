@@ -235,9 +235,11 @@
   - **Evidence:** Chromium E2E passed 2 tests: DST-sensitive student display/feed lifecycle and instructor isolation. Existing SSR nonce/date hydration warnings remain visible in the dev server logs; they did not fail the feature assertions.
   - **Commit:** `acb3da3`
 
-- [ ] **6.2 Add accessibility and responsive coverage**
-  - [ ] Run axe-core coverage for the new settings sections and relevant student deadline surfaces.
-  - [ ] Verify keyboard-only operation, focus visibility, live announcements, color-independent status, mobile touch targets, and light/dark themes.
+- [x] **6.2 Add accessibility and responsive coverage**
+  - [x] Run axe-core coverage for the new settings sections and relevant student deadline surfaces.
+  - [x] Verify keyboard-only operation, focus visibility, live announcements, color-independent status, mobile touch targets, and light/dark themes.
+  - **Evidence:** The student settings axe scan passed with no critical, serious, or moderate violations; existing dashboard and assignment-detail axe coverage remains in the suite. Chromium E2E additionally verified keyboard focus, live save/copy feedback, and a 390px mobile viewport. The settings heading hierarchy was corrected for axe compliance.
+  - **Commit:** `pending`
 
 - [ ] **6.3 Complete localization and generated artifacts**
   - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`.
