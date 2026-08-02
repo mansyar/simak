@@ -604,7 +604,37 @@
     "noDeadline": "No deadline",
     "underReview": "Under Review",
     "pending": "Pending",
-    "submittedAgo": "{days} day(s) ago"
+    "submittedAgo": "{days} day(s) ago",
+    "nextActions": {
+      "title": "Next Actions",
+      "description": "Start with the work that needs your attention most.",
+      "empty": "You're all caught up",
+      "emptyDescription": "No checkpoints need action right now.",
+      "actions": {
+        "submit": "Submit checkpoint",
+        "revise": "Revise and resubmit",
+        "consultation": "Complete required consultation"
+      },
+      "priority": {
+        "overdue": "Overdue",
+        "revise": "Revision requested",
+        "consultation": "Consultation required",
+        "within_168_hours": "Due soon",
+        "dated": "Upcoming",
+        "undated": "No deadline"
+      },
+      "due": "Due {date}",
+      "noDueDate": "No deadline",
+      "openCheckpoint": "Open {checkpoint}",
+      "openAssignment": "Open {assignment}",
+      "waiting": {
+        "title": "Waiting work",
+        "description": "Submitted work remains visible while it is being processed.",
+        "submitted": "Submitted",
+        "underReview": "Under Review",
+        "count": "{count} checkpoint(s)"
+      }
+    }
   },
   "instructorDashboard": {
     "title": "Dashboard",

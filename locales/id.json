@@ -604,7 +604,37 @@
     "noDeadline": "Tidak ada tenggat",
     "underReview": "Sedang Ditinjau",
     "pending": "Tertunda",
-    "submittedAgo": "{days} hari yang lalu"
+    "submittedAgo": "{days} hari yang lalu",
+    "nextActions": {
+      "title": "Aksi Berikutnya",
+      "description": "Mulai dari pekerjaan yang paling membutuhkan perhatian Anda.",
+      "empty": "Semua sudah tertangani",
+      "emptyDescription": "Saat ini tidak ada checkpoint yang memerlukan tindakan.",
+      "actions": {
+        "submit": "Kumpulkan checkpoint",
+        "revise": "Perbaiki dan kumpulkan ulang",
+        "consultation": "Selesaikan konsultasi yang diperlukan"
+      },
+      "priority": {
+        "overdue": "Terlambat",
+        "revise": "Diminta perbaikan",
+        "consultation": "Konsultasi diperlukan",
+        "within_168_hours": "Segera jatuh tempo",
+        "dated": "Mendatang",
+        "undated": "Tanpa tenggat"
+      },
+      "due": "Jatuh tempo {date}",
+      "noDueDate": "Tanpa tenggat",
+      "openCheckpoint": "Buka {checkpoint}",
+      "openAssignment": "Buka {assignment}",
+      "waiting": {
+        "title": "Pekerjaan yang Menunggu",
+        "description": "Pekerjaan yang dikumpulkan tetap terlihat selama diproses.",
+        "submitted": "Sudah Dikumpulkan",
+        "underReview": "Sedang Ditinjau",
+        "count": "{count} checkpoint"
+      }
+    }
   },
   "instructorDashboard": {
     "title": "Dasbor",
