@@ -7,7 +7,15 @@ const state = vi.hoisted(() => ({
 }));
 
 const checkCalendarFeedRateLimit = vi.hoisted(() => vi.fn(() => state.rateAllowed));
-const getCalendarFeedEvents = vi.hoisted(() => vi.fn(async () => []));
+type TestCalendarEvent = {
+  uid: string;
+  kind: string;
+  summary: string;
+  startsAt: Date;
+};
+const getCalendarFeedEvents = vi.hoisted(() =>
+  vi.fn<() => Promise<TestCalendarEvent[]>>().mockResolvedValue([]),
+);
 const serializeCalendarFeed = vi.hoisted(() => vi.fn(() => 'BEGIN:VCALENDAR\r\nEND:VCALENDAR\r\n'));
 
 vi.mock('@/lib/rate-limiter', () => ({ checkCalendarFeedRateLimit }));
