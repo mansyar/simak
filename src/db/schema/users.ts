@@ -2,6 +2,12 @@ import { pgTable, text, timestamp, boolean, jsonb, pgEnum, index } from 'drizzle
 
 export const userRole = pgEnum('user_role', ['superadmin', 'admin', 'instructor', 'student']);
 
+export type UserSettings = {
+  reducedMotion: boolean;
+  timezone?: string;
+  notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }>;
+};
+
 export const users = pgTable(
   'users',
   {
@@ -18,11 +24,7 @@ export const users = pgTable(
     updatedAt: timestamp('updated_at').defaultNow(),
     deletedAt: timestamp('deleted_at'),
     twoFactorEnabled: boolean('two_factor_enabled').default(false),
-    settings: jsonb('settings').$type<{
-      reducedMotion: boolean;
-      timezone?: string;
-      notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }>;
-    }>(),
+    settings: jsonb('settings').$type<UserSettings>(),
   },
   (table) => [index('users_role_deleted_at_idx').on(table.role, table.deletedAt)],
 );
