@@ -200,6 +200,7 @@
   - [x] Add a credential-authenticated rate-limit key that does not require a browser session.
   - [x] Set safe response headers and ensure credentials are never included in logs or error bodies.
   - **Evidence:** 5 route tests passed; the TanStack endpoint resolves to `/api/calendar/ics`, uses hashed opaque credentials, filters active student ownership in the database query, applies session-independent client rate limiting, and returns generic unauthorized/rate-limit responses with private/no-store, no-referrer, and `nosniff` headers. Typecheck and targeted oxlint passed.
+  - **Commit:** `8dce0eb`
 
 - [ ] **5.3 Define feed-management UI tests (RED)**
   - [ ] Create component tests for disabled, enabled, loading, success, empty, failure, regeneration-confirmation, and revoked states.
