@@ -20,6 +20,7 @@ export const users = pgTable(
     twoFactorEnabled: boolean('two_factor_enabled').default(false),
     settings: jsonb('settings').$type<{
       reducedMotion: boolean;
+      timezone?: string;
       notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }>;
     }>(),
   },

@@ -2,6 +2,7 @@
 // Handler implementations are in settings.server.ts (not bundled for client)
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
+import { isValidTimeZone } from '@/lib/timezone';
 import { z } from 'zod';
 
 export const UpdateProfileSchema = z.object({
@@ -10,6 +11,7 @@ export const UpdateProfileSchema = z.object({
 
 export const UpdateUserSettingsSchema = z.object({
   reducedMotion: z.boolean().optional(),
+  timezone: z.string().min(1).refine(isValidTimeZone, 'Invalid timezone').optional(),
   notificationPrefs: z
     .record(z.string(), z.object({ email: z.boolean().optional(), inApp: z.boolean().optional() }))
     .optional(),

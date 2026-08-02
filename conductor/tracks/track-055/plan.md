@@ -32,10 +32,10 @@
   - [x] Test deterministic UTC fallback and preservation of a valid saved preference over browser detection.
   - **RED evidence:** The targeted test initially failed because `@/lib/timezone` did not exist; it now passes after the separate GREEN implementation task.
 
-- [ ] **1.3 Implement shared timezone contracts (GREEN)**
-  - [ ] Add a small typed timezone validator/resolver in `src/lib/` with no browser-only code in server-rendered paths.
-  - [ ] Extend the typed `users.settings` shape and `UpdateUserSettingsSchema` with an optional validated timezone.
-  - [ ] Keep invalid persisted values from affecting rendering or server-side deadline comparisons.
+- [x] **1.3 Implement shared timezone contracts (GREEN)**
+  - [x] Add a small typed timezone validator/resolver in `src/lib/` with no browser-only code in server-rendered paths.
+  - [x] Extend the typed `users.settings` shape and `UpdateUserSettingsSchema` with an optional validated timezone.
+  - [x] Keep invalid persisted values from affecting rendering or server-side deadline comparisons.
 
 - [ ] **1.4 Define explicit timezone formatter behavior (RED)**
   - [ ] Extend `tests/unit/lib/format-date.test.ts` and `tests/unit/lib/format.test.ts` with explicit-timezone cases.
