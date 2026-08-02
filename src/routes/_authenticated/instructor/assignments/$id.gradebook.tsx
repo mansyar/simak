@@ -8,6 +8,7 @@ import { GradeConfigSummary } from '@/components/gradebook/GradeConfigSummary';
 import { RecomputeGradesButton } from '@/components/gradebook/RecomputeGradesButton';
 import { GradebookExportButtons } from '@/components/gradebook/GradebookExportButtons';
 import { GradeSettingsDialog } from '@/components/gradebook/GradeSettingsDialog';
+import { GradeReleaseControls } from '@/components/gradebook/GradeReleaseControls';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '../../../__root';
 import { isServerError } from '@/lib/errors';
@@ -85,6 +86,16 @@ function GradebookPage() {
       </Link>
       <h1 className="text-2xl font-bold">{t('gradebook.title')}</h1>
       <GradeConfigSummary config={data.config} />
+      {data.config && (
+        <GradeReleaseControls
+          assignmentId={Number(id)}
+          releaseStatus={data.config.releaseStatus ?? 'draft'}
+          activeReleaseVersion={data.config.activeReleaseVersion ?? null}
+          publishedAt={data.config.publishedAt ?? null}
+          canManage={!data.isAdmin}
+          onChanged={() => router.invalidate()}
+        />
+      )}
       <div className="flex gap-2">
         <GradebookExportButtons assignmentId={Number(id)} />
         <RecomputeGradesButton assignmentId={Number(id)} isAdmin={data.isAdmin} />

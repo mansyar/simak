@@ -21,6 +21,7 @@ describe('Drizzle ORM relations', () => {
       'extensionRequestsRelations',
       'assignmentGradeConfigRelations',
       'finalGradesRelations',
+      'gradeReleaseSnapshotsRelations',
     ];
 
     for (const rel of expectedRelations) {
@@ -48,6 +49,7 @@ describe('Drizzle ORM relations', () => {
       'extensionRequests',
       'assignmentGradeConfig',
       'finalGrades',
+      'gradeReleaseSnapshots',
     ];
 
     for (const table of expectedTables) {

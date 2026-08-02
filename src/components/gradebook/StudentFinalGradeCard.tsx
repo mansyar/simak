@@ -53,6 +53,23 @@ export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }
     return null;
   }
 
+  if ('available' in grade && !grade.available) {
+    return (
+      <Card data-testid="student-final-grade-card">
+        <CardHeader>
+          <CardTitle>{t('gradebook.student.unavailable')}</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          {t('gradebook.student.notYetReleased')}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (grade.status === undefined || grade.contributingCheckpoints === undefined) {
+    return null;
+  }
+
   const statusBadge: Record<
     string,
     { variant: 'success' | 'warning' | 'secondary'; label: string }
@@ -62,11 +79,17 @@ export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }
     incomplete: { variant: 'secondary', label: t('gradebook.status.incomplete') },
   };
   const status = statusBadge[grade.status] ?? statusBadge.incomplete;
+  const releaseVersion = 'available' in grade ? grade.releaseVersion : null;
 
   return (
-    <Card>
+    <Card data-testid="student-final-grade-card">
       <CardHeader>
         <CardTitle>{t('gradebook.student.finalGrade')}</CardTitle>
+        {releaseVersion !== null && (
+          <p className="text-sm text-muted-foreground">
+            {t('gradebook.student.releaseVersion')}: {releaseVersion}
+          </p>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center gap-3">

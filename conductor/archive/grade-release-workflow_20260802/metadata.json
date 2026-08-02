@@ -1,0 +1,11 @@
+{
+  "track_id": "grade-release-workflow_20260802",
+  "roadmap_id": "TRACK-051",
+  "type": "feature",
+  "status": "complete",
+  "title": "Grade Release Workflow",
+  "created_at": "2026-08-02",
+  "updated_at": "2026-08-02",
+  "dependencies": ["TRACK-025"],
+  "description": "Add instructor-controlled draft and published grade releases with immutable per-student snapshots, preflight checks, student visibility gating, and audit events."
+}

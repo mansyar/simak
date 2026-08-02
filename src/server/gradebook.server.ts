@@ -1,18 +1,23 @@
 // Gradebook handler implementations (server-only, never client-bundled).
 import { and, eq } from 'drizzle-orm';
+import { z } from 'zod';
 import { getDb } from '@/db/index';
 import { assignments, assignmentStudents, checkpoints } from '@/db/schema/assignments';
 import { submissions, reviews } from '@/db/schema/submissions';
 import { reviewScores } from '@/db/schema/rubrics';
 import { templateCheckpoints } from '@/db/schema/templates';
-import { assignmentGradeConfig, finalGrades } from '@/db/schema/gradebook';
+import { assignmentGradeConfig, finalGrades, gradeReleaseSnapshots } from '@/db/schema/gradebook';
 import { users } from '@/db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { serverError, ErrorCode } from '@/lib/errors';
 import { logAuditEvent } from '@/lib/audit';
 import { computeFinalGrade } from '@/lib/grade-computation';
-import type { CheckpointGradeInput, AssignmentGradeConfig } from '@/lib/grade-computation';
-import { isAdmin, isInstructor } from '@/lib/session-guards';
+import type {
+  CheckpointGradeInput,
+  AssignmentGradeConfig,
+  ContributingCheckpoint,
+} from '@/lib/grade-computation';
+import { isAdmin, isInstructor, isStudent } from '@/lib/session-guards';
 import { logger } from '@/lib/logger';
 
 // ---- Shared Helpers ----
@@ -36,15 +41,42 @@ export interface ScoreRow {
 }
 
 /** Fetch and cast grade config for an assignment. Returns null if no config exists. */
+export interface GradebookConfig extends AssignmentGradeConfig {
+  releaseStatus: 'draft' | 'published' | null;
+  activeReleaseVersion: number | null;
+  publishedAt: Date | null;
+}
+
+const contributingCheckpointSchema = z.object({
+  checkpointId: z.number(),
+  checkpointName: z.string(),
+  templateCheckpointId: z.number().nullable(),
+  order: z.number(),
+  state: z.enum(['locked', 'unlocked', 'submitted', 'under_review', 'passed', 'revise']),
+  score: z.number(),
+  isRubric: z.boolean(),
+  weight: z.number(),
+});
+
+const contributingCheckpointsSchema = z.array(contributingCheckpointSchema);
+
+function parseContributingCheckpoints(value: unknown): ContributingCheckpoint[] {
+  const result = contributingCheckpointsSchema.safeParse(value);
+  return result.success ? result.data : [];
+}
+
 export async function fetchGradeConfig(
   db: ReturnType<typeof getDb>,
   assignmentId: number,
-): Promise<AssignmentGradeConfig | null> {
+): Promise<GradebookConfig | null> {
   const rows = await db
     .select({
       gradingScheme: assignmentGradeConfig.gradingScheme,
       customWeights: assignmentGradeConfig.customWeights,
       letterGradeBounds: assignmentGradeConfig.letterGradeBounds,
+      releaseStatus: assignmentGradeConfig.releaseStatus,
+      activeReleaseVersion: assignmentGradeConfig.activeReleaseVersion,
+      publishedAt: assignmentGradeConfig.publishedAt,
     })
     .from(assignmentGradeConfig)
     .where(eq(assignmentGradeConfig.assignmentId, assignmentId))
@@ -55,6 +87,9 @@ export async function fetchGradeConfig(
     gradingScheme: rows[0].gradingScheme as AssignmentGradeConfig['gradingScheme'],
     customWeights: rows[0].customWeights as Record<string, number> | null,
     letterGradeBounds: rows[0].letterGradeBounds as Record<string, number>,
+    releaseStatus: (rows[0].releaseStatus as 'draft' | 'published' | null | undefined) ?? null,
+    activeReleaseVersion: rows[0].activeReleaseVersion ?? null,
+    publishedAt: rows[0].publishedAt ?? null,
   };
 }
 
@@ -112,7 +147,7 @@ export function groupRowsByStudent(
 /** Get a student's final grade. Ownership-verified, does NOT auto-create config on read. */
 export async function getStudentFinalGradeHandler({ data }: { data: { assignmentId: number } }) {
   const session = await getSessionFromHeaders();
-  if (!session) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  if (!isStudent(session)) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
 
   const { assignmentId } = data;
   const db = getDb();
@@ -133,6 +168,48 @@ export async function getStudentFinalGradeHandler({ data }: { data: { assignment
 
     const config = await fetchGradeConfig(db, assignmentId);
     if (!config) return null;
+
+    if (config.releaseStatus !== 'published') {
+      return { available: false, reason: 'not_yet_released' as const };
+    }
+
+    if (config.releaseStatus === 'published') {
+      if (config.activeReleaseVersion === null) {
+        return { available: false, reason: 'not_yet_released' as const };
+      }
+
+      const snapshots = await db
+        .select({
+          releaseVersion: gradeReleaseSnapshots.releaseVersion,
+          numericScore: gradeReleaseSnapshots.numericScore,
+          letterGrade: gradeReleaseSnapshots.letterGrade,
+          status: gradeReleaseSnapshots.status,
+          contributingCheckpoints: gradeReleaseSnapshots.contributingCheckpoints,
+          publishedAt: gradeReleaseSnapshots.publishedAt,
+        })
+        .from(gradeReleaseSnapshots)
+        .where(
+          and(
+            eq(gradeReleaseSnapshots.assignmentId, assignmentId),
+            eq(gradeReleaseSnapshots.studentId, session.user.id),
+            eq(gradeReleaseSnapshots.releaseVersion, config.activeReleaseVersion),
+          ),
+        )
+        .limit(1);
+
+      const snapshot = snapshots[0];
+      if (!snapshot) return { available: false, reason: 'not_yet_released' as const };
+
+      return {
+        available: true as const,
+        releaseVersion: snapshot.releaseVersion,
+        numericScore: Number(snapshot.numericScore),
+        letterGrade: snapshot.letterGrade,
+        status: snapshot.status,
+        contributingCheckpoints: parseContributingCheckpoints(snapshot.contributingCheckpoints),
+        publishedAt: snapshot.publishedAt,
+      };
+    }
 
     const rows = (await db
       .select({

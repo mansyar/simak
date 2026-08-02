@@ -103,7 +103,7 @@ describe('Gradebook Server Handlers', () => {
       expect(mockDb.insert).not.toHaveBeenCalled();
     });
 
-    it('should return computed grade with checkpoints and config', async () => {
+    it('should fail closed when release metadata is absent', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
       mockDb.then
         .mockImplementationOnce((onfulfilled: any) =>
@@ -115,63 +115,15 @@ describe('Gradebook Server Handlers', () => {
               gradingScheme: 'equal_weight',
               customWeights: null,
               letterGradeBounds: { A: 90, B: 80, C: 70, D: 60 },
-            },
-          ]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([
-            {
-              checkpointId: 1,
-              checkpointName: 'Chapter 1',
-              templateCheckpointId: 10,
-              order: 1,
-              state: 'passed',
-              gradingType: null,
-              criterionId: null,
-              criterionTitle: null,
-              score: null,
-              weight: null,
-              rubricLevelId: null,
-              levelLabel: null,
-            },
-            {
-              checkpointId: 2,
-              checkpointName: 'Chapter 2',
-              templateCheckpointId: 20,
-              order: 2,
-              state: 'passed',
-              gradingType: 'numeric',
-              criterionId: 5,
-              criterionTitle: 'Content Quality',
-              score: 85,
-              weight: 50,
-              rubricLevelId: 3,
-              levelLabel: 'Good',
-            },
-            {
-              checkpointId: 2,
-              checkpointName: 'Chapter 2',
-              templateCheckpointId: 20,
-              order: 2,
-              state: 'passed',
-              gradingType: 'numeric',
-              criterionId: 6,
-              criterionTitle: 'Structure',
-              score: 90,
-              weight: 50,
-              rubricLevelId: null,
-              levelLabel: null,
+              releaseStatus: null,
+              activeReleaseVersion: null,
+              publishedAt: null,
             },
           ]).then(onfulfilled),
         );
 
-      const result = (await getStudentFinalGradeHandler({ data: { assignmentId: 1 } })) as any;
-      expect(result).not.toBeNull();
-      expect(result.status).toBe('complete');
-      expect(result.numericScore).toBe(93.75);
-      expect(result.letterGrade).toBe('A');
-      expect(result.contributingCheckpoints).toHaveLength(2);
-      expect(result.staleWeights).toBe(false);
+      const result = await getStudentFinalGradeHandler({ data: { assignmentId: 1 } });
+      expect(result).toEqual({ available: false, reason: 'not_yet_released' });
     });
   });
 
