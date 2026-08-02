@@ -105,11 +105,12 @@
 
 ### Tasks
 
-- [ ] **3.1 Define token lifecycle behavior tests (RED)**
-  - [ ] Create `tests/unit/server/calendar-feed.test.ts` covering enable, status, regenerate, and revoke operations.
-  - [ ] Test high-entropy opaque token generation, one-way hash persistence, and absence of plaintext in return-side logs/audit details.
-  - [ ] Test ownership, student-role authorization, inactive/deleted users, regeneration invalidation, revocation, and one-active-token behavior.
-  - [ ] Add database-backed integration cases for concurrent lifecycle requests and the database uniqueness invariant.
+- [x] **3.1 Define token lifecycle behavior tests (RED)**
+  - [x] Create `tests/unit/server/calendar-feed.test.ts` covering enable, status, regenerate, and revoke operations.
+  - [x] Test high-entropy opaque token generation, one-way hash persistence, and absence of plaintext in return-side logs/audit details.
+  - [x] Test ownership, student-role authorization, inactive/deleted users, regeneration invalidation, revocation, and one-active-token behavior.
+  - [x] Add database-backed integration cases for concurrent lifecycle requests and the database uniqueness invariant.
+  - **RED evidence:** The unit suite initially failed because `src/server/calendar-feed.server.ts` did not yet exist; the integration case also references the not-yet-defined token table.
 
 - [ ] **3.2 Add the token schema and migration (GREEN)**
   - [ ] Add a dedicated token table to `src/db/schema/` with student ownership, token hash, lifecycle timestamps, and appropriate foreign-key/index constraints.
