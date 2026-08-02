@@ -20,7 +20,7 @@
 
 ### Tasks
 
-- [x] **1.1 Establish the integration boundary**
+- [x] **1.1 Establish the integration boundary** [commit: 155aded]
   - [x] Review the current TRACK-013/053 date-display and student deadline surfaces on this branch.
   - [x] Record the explicit student deadline call sites that will change and the instructor/admin call sites that must remain unchanged.
   - [x] Confirm the canonical UTC-instant convention for `assignments.finalDeadline` and `checkpoints.dueDate` without changing stored data.
