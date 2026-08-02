@@ -81,10 +81,11 @@
   - [x] Provide a manual valid-IANA selection, a clear UTC fallback, and accessible status/error messaging.
   - [x] Add the required keys to `locales/en.json` and `locales/id.json`; regenerate i18n types.
 
-- [ ] **2.5 Add deadline-surface regression tests (RED)**
-  - [ ] Extend `tests/unit/components/dashboard/student-dashboard.test.tsx` for explicit timezone rendering, DST transitions, placeholders, relative time, overdue state, and null deadlines.
-  - [ ] Add or extend a checkpoint-card test for student assignment/checkpoint deadline formatting and overdue behavior.
-  - [ ] Assert that pending-review, consultation, instructor, and admin date surfaces are not unintentionally changed.
+- [x] **2.5 Add deadline-surface regression tests (RED)**
+  - [x] Extend `tests/unit/components/dashboard/student-dashboard.test.tsx` for explicit timezone rendering, DST transitions, placeholders, relative time, overdue state, and null deadlines.
+  - [x] Add or extend a checkpoint-card test for student assignment/checkpoint deadline formatting and overdue behavior.
+  - [x] Assert that pending-review, consultation, instructor, and admin date surfaces are not unintentionally changed.
+  - **RED evidence:** The focused suite showed dashboard/checkpoint formatters still received no timezone and assignment deadline headers/cards still used date-fns directly.
 
 - [ ] **2.6 Apply timezone formatting to target surfaces (GREEN)**
   - [ ] Update `src/components/dashboard/StudentDashboard.tsx` and student assignment/checkpoint deadline components to consume the resolved student timezone.
