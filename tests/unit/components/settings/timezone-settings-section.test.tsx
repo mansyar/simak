@@ -70,9 +70,11 @@ describe('TimezoneSettingsSection', () => {
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalledWith({ timezone: 'Asia/Jakarta' });
     });
-    expect((screen.getByLabelText('settings.timezone.label') as HTMLInputElement).value).toBe(
-      'Asia/Jakarta',
-    );
+    await waitFor(() => {
+      expect((screen.getByLabelText('settings.timezone.label') as HTMLInputElement).value).toBe(
+        'Asia/Jakarta',
+      );
+    });
   });
 
   it('supports a manually selected valid IANA timezone', async () => {
