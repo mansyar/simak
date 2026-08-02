@@ -160,10 +160,11 @@
   - **Evidence:** 4 focused selection tests passed; `pnpm typecheck` and targeted oxlint passed. The query restricts by student-owned checkpoints, active assignments, non-passed state, and non-null due date; final events are derived only from qualifying rows.
   - **Commit:** `18d11dec`
 
-- [ ] **4.3 Define iCalendar serialization tests (RED)**
-  - [ ] Create `tests/unit/lib/calendar-ics.test.ts` for VCALENDAR/VEVENT structure and `text/calendar` output.
-  - [ ] Test UTC timed timestamps, stable UIDs, DTSTAMP, escaped assignment/checkpoint text, CRLF line endings, safe line folding, Unicode, quotes, commas, semicolons, and backslashes.
-  - [ ] Test empty feeds and feeds containing overdue or locked events.
+- [x] **4.3 Define iCalendar serialization tests (RED)**
+  - [x] Create `tests/unit/lib/calendar-ics.test.ts` for VCALENDAR/VEVENT structure and `text/calendar` output.
+  - [x] Test UTC timed timestamps, stable UIDs, DTSTAMP, escaped assignment/checkpoint text, CRLF line endings, safe line folding, Unicode, quotes, commas, semicolons, and backslashes.
+  - [x] Test empty feeds and feeds containing overdue or locked events.
+  - **RED evidence:** The focused suite failed before execution because `src/lib/calendar-ics.ts` did not yet exist.
 
 - [ ] **4.4 Implement the RFC 5545 serializer (GREEN)**
   - [ ] Add a small pure serializer module under `src/lib/` or a handler-only server helper with a typed event model.
