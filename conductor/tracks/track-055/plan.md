@@ -32,7 +32,7 @@
   - [x] Test deterministic UTC fallback and preservation of a valid saved preference over browser detection.
   - **RED evidence:** The targeted test initially failed because `@/lib/timezone` did not exist; it now passes after the separate GREEN implementation task.
 
-- [x] **1.3 Implement shared timezone contracts (GREEN)**
+- [x] **1.3 Implement shared timezone contracts (GREEN)** [commit: b5c9318]
   - [x] Add a small typed timezone validator/resolver in `src/lib/` with no browser-only code in server-rendered paths.
   - [x] Extend the typed `users.settings` shape and `UpdateUserSettingsSchema` with an optional validated timezone.
   - [x] Keep invalid persisted values from affecting rendering or server-side deadline comparisons.
