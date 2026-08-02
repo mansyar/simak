@@ -166,11 +166,12 @@
   - [x] Test empty feeds and feeds containing overdue or locked events.
   - **RED evidence:** The focused suite failed before execution because `src/lib/calendar-ics.ts` did not yet exist.
 
-- [ ] **4.4 Implement the RFC 5545 serializer (GREEN)**
-  - [ ] Add a small pure serializer module under `src/lib/` or a handler-only server helper with a typed event model.
-  - [ ] Emit valid UTC timed events independent of the student display timezone.
-  - [ ] Keep event identity stable and update event timestamps when source deadlines change.
-  - [ ] Ensure no token or internal-sensitive data is serialized.
+- [x] **4.4 Implement the RFC 5545 serializer (GREEN)**
+  - [x] Add a small pure serializer module under `src/lib/` or a handler-only server helper with a typed event model.
+  - [x] Emit valid UTC timed events independent of the student display timezone.
+  - [x] Keep event identity stable and update event timestamps when source deadlines change.
+  - [x] Ensure no token or internal-sensitive data is serialized.
+  - **Evidence:** 3 serializer tests passed; UTC timestamps, stable UIDs, CRLF output, RFC 5545 escaping, UTF-8-safe line folding, Unicode, empty feeds, and overdue/locked events are covered. `pnpm typecheck` and targeted oxlint passed.
 
 ### Phase Verification
 
