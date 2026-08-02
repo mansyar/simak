@@ -119,7 +119,7 @@
   - [x] Add the required companion rollback SQL under `drizzle/migrations/rollback/` and verify it follows the SQL style guide.
   - **Evidence:** `pnpm db:generate` produced migration `0020_white_spacker_dave.sql`; the schema and rollback passed targeted oxlint and `git diff --check`.
 
-- [x] **3.3 Implement authenticated token handlers (GREEN)**
+- [x] **3.3 Implement authenticated token handlers (GREEN)** [commit: a6e0b65]
   - [x] Add a client-safe `src/server/calendar-feed.ts` stub/schema file and a server-only handler file, splitting helpers if the 500-line limit requires it.
   - [x] Implement explicit enablement, status retrieval, regeneration, and revocation with transaction-safe writes.
   - [x] Hash tokens before persistence and return plaintext only on the enable/regenerate response needed to construct the URL.
