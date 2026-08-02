@@ -58,7 +58,7 @@
 
 ### Tasks
 
-- [x] **2.1 Add settings-handler tests (RED)**
+- [x] **2.1 Add settings-handler tests (RED)** [commit: eae8641]
   - [x] Add a companion `tests/unit/server/settings-timezone.test.ts` because `settings.test.ts` is already at the 500-line limit; cover timezone validation, authenticated updates, UTC fallback, and read-modify-write preservation of reduced-motion and notification settings.
   - [x] Test unauthorized access and malformed timezone input at the server-function boundary.
   - [x] Test that stored settings do not alter deadline values or reminder preferences.
