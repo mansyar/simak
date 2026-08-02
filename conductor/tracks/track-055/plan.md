@@ -218,9 +218,11 @@
 
 ### Phase Verification
 
-- [ ] Run route and component tests with `pnpm test:integration` plus the targeted Vitest files for the route and settings components.
-- [ ] Manually subscribe a test calendar client or inspect a downloaded feed, then regenerate and revoke the token and confirm the old URL fails generically.
-- [ ] Confirm response headers and logs do not disclose the bearer credential.
+- [x] Run route and component tests with `pnpm test:integration` plus the targeted Vitest files for the route and settings components.
+  - **Evidence:** Targeted settings/route verification passed 11 files and 100 tests. Calendar lifecycle and uniqueness integration tests passed in the full integration run. The full integration command also reported two unrelated pre-existing failures: the email queue processor logger configuration and the assignment-creation fixture flow.
+- [x] Manually subscribe a test calendar client or inspect a downloaded feed, then regenerate and revoke the token and confirm the old URL fails generically.
+- [x] Confirm response headers and logs do not disclose the bearer credential.
+  - **Checkpoint:** Functional commits `8dce0eb` and `49df7df`; user confirmed the Phase 5 frontend/backend manual verification checklist, including lifecycle behavior, generic old-token failures, UTC output, safe headers, hash-only storage, and no credential disclosure.
 
 ## Phase 6: End-to-End Accessibility and Quality Gates
 
