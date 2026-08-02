@@ -78,12 +78,12 @@ describe('StudentNextActions', () => {
     expect(screen.getAllByText('studentDashboard.nextActions.waiting.count')).toHaveLength(2);
     expect(
       screen
-        .getByRole('link', { name: 'studentDashboard.nextActions.openCheckpoint' })
+        .getByRole('link', { name: 'studentDashboard.nextActions.openWaitingCheckpoint' })
         .getAttribute('href'),
     ).toBe('/student/assignments/1/checkpoints/10');
     expect(
       screen
-        .getByRole('link', { name: 'studentDashboard.nextActions.openCheckpoint' })
+        .getByRole('link', { name: 'studentDashboard.nextActions.openWaitingCheckpoint' })
         .getAttribute('class'),
     ).toContain('focus-visible:ring-2');
   });
@@ -123,6 +123,15 @@ describe('StudentNextActions', () => {
     expect(screen.getByText('studentDashboard.nextActions.actions.submit')).toBeDefined();
     expect(screen.getByText('studentDashboard.nextActions.actions.revise')).toBeDefined();
     expect(screen.getByText('studentDashboard.nextActions.actions.consultation')).toBeDefined();
+    expect(
+      screen.getByRole('link', { name: 'studentDashboard.nextActions.submitCheckpoint' }),
+    ).toBeDefined();
+    expect(
+      screen.getByRole('link', { name: 'studentDashboard.nextActions.reviseCheckpoint' }),
+    ).toBeDefined();
+    expect(
+      screen.getByRole('link', { name: 'studentDashboard.nextActions.requiredConsultation' }),
+    ).toBeDefined();
     expect(screen.getByText('studentDashboard.nextActions.priority.revise')).toBeDefined();
     expect(screen.getByText('studentDashboard.nextActions.priority.consultation')).toBeDefined();
     expect(screen.getAllByText('studentDashboard.nextActions.due')).toHaveLength(3);

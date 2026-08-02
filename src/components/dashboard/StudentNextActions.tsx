@@ -58,19 +58,26 @@ function ActionCard({ action }: { action: StudentNextAction }) {
             : action.priority === 'dated'
               ? t('studentDashboard.nextActions.priority.dated')
               : t('studentDashboard.nextActions.priority.undated');
+  const accessibleLabel =
+    action.kind === 'consultation'
+      ? t('studentDashboard.nextActions.requiredConsultation', {
+          assignment: action.assignmentTitle,
+          checkpoint: action.checkpointName,
+        })
+      : action.kind === 'revise'
+        ? t('studentDashboard.nextActions.reviseCheckpoint', {
+            assignment: action.assignmentTitle,
+            checkpoint: action.checkpointName,
+          })
+        : t('studentDashboard.nextActions.submitCheckpoint', {
+            assignment: action.assignmentTitle,
+            checkpoint: action.checkpointName,
+          });
 
   return (
     <Link
       to={action.href as never}
-      aria-label={
-        action.kind === 'consultation'
-          ? t('studentDashboard.nextActions.openAssignment', {
-              assignment: action.assignmentTitle,
-            })
-          : t('studentDashboard.nextActions.openCheckpoint', {
-              checkpoint: action.checkpointName,
-            })
-      }
+      aria-label={accessibleLabel}
       className="group flex min-w-0 items-start gap-3 rounded-lg border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     >
       <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -202,7 +209,8 @@ export function StudentNextActions({ data }: Props) {
                       <li key={`${representative.assignmentId}-${representative.checkpointId}`}>
                         <Link
                           to={representative.href as never}
-                          aria-label={t('studentDashboard.nextActions.openCheckpoint', {
+                          aria-label={t('studentDashboard.nextActions.openWaitingCheckpoint', {
+                            assignment: representative.assignmentTitle,
                             checkpoint: representative.checkpointName,
                           })}
                           className="inline-flex max-w-full items-center gap-1 text-sm text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"

@@ -80,21 +80,30 @@ test.describe('Student Next Actions', () => {
     const primaryActions = page.getByLabel('Next Actions', { exact: true });
     await expect(primaryActions.getByRole('link')).toHaveCount(1);
     await expect(
-      page.getByRole('link', { name: 'Open E2E Test Assignment', exact: true }),
+      page.getByRole('link', {
+        name: 'Complete required consultation for Proposal in E2E Test Assignment',
+        exact: true,
+      }),
     ).toHaveAttribute('href', /\/student\/assignments\/\d+$/);
-    await expect(page.getByRole('link', { name: 'Open Proposal', exact: true })).toHaveCount(0);
+    await expect(
+      page.getByRole('link', { name: 'Open Proposal in E2E Test Assignment', exact: true }),
+    ).toHaveCount(0);
 
     await expect(page.getByText('Submitted', { exact: true })).toBeVisible();
     await expect(page.getByText('Under Review', { exact: true })).toBeVisible();
     await expect(page.getByText('1 checkpoint(s)', { exact: true })).toHaveCount(2);
-    await expect(page.getByRole('link', { name: 'Open Chapter 1', exact: true })).toHaveAttribute(
-      'href',
-      /\/student\/assignments\/\d+\/checkpoints\/\d+$/,
-    );
-    await expect(page.getByRole('link', { name: 'Open Chapter 2', exact: true })).toHaveAttribute(
-      'href',
-      /\/student\/assignments\/\d+\/checkpoints\/\d+$/,
-    );
+    await expect(
+      page.getByRole('link', {
+        name: 'Open Chapter 1 in E2E Test Assignment',
+        exact: true,
+      }),
+    ).toHaveAttribute('href', /\/student\/assignments\/\d+\/checkpoints\/\d+$/);
+    await expect(
+      page.getByRole('link', {
+        name: 'Open Chapter 2 in E2E Test Assignment',
+        exact: true,
+      }),
+    ).toHaveAttribute('href', /\/student\/assignments\/\d+\/checkpoints\/\d+$/);
 
     // These records are older than the existing 30-day pending-review widget window,
     // but remain visible in the all-age waiting summary.

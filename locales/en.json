@@ -625,8 +625,10 @@
       },
       "due": "Due {date}",
       "noDueDate": "No deadline",
-      "openCheckpoint": "Open {checkpoint}",
-      "openAssignment": "Open {assignment}",
+      "submitCheckpoint": "Submit {checkpoint} in {assignment}",
+      "reviseCheckpoint": "Revise and resubmit {checkpoint} in {assignment}",
+      "requiredConsultation": "Complete required consultation for {checkpoint} in {assignment}",
+      "openWaitingCheckpoint": "Open {checkpoint} in {assignment}",
       "waiting": {
         "title": "Waiting work",
         "description": "Submitted work remains visible while it is being processed.",

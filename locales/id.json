@@ -625,8 +625,10 @@
       },
       "due": "Jatuh tempo {date}",
       "noDueDate": "Tanpa tenggat",
-      "openCheckpoint": "Buka {checkpoint}",
-      "openAssignment": "Buka {assignment}",
+      "submitCheckpoint": "Kumpulkan {checkpoint} pada {assignment}",
+      "reviseCheckpoint": "Perbaiki dan kumpulkan ulang {checkpoint} pada {assignment}",
+      "requiredConsultation": "Selesaikan konsultasi yang diperlukan untuk {checkpoint} pada {assignment}",
+      "openWaitingCheckpoint": "Buka {checkpoint} pada {assignment}",
       "waiting": {
         "title": "Pekerjaan yang Menunggu",
         "description": "Pekerjaan yang dikumpulkan tetap terlihat selama diproses.",

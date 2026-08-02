@@ -630,8 +630,10 @@ export type Translation = {
       }
       due: string
       noDueDate: string
-      openCheckpoint: string
-      openAssignment: string
+      submitCheckpoint: string
+      reviseCheckpoint: string
+      requiredConsultation: string
+      openWaitingCheckpoint: string
       waiting: {
         title: string
         description: string
