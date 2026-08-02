@@ -105,7 +105,7 @@
 
 ### Tasks
 
-- [x] **3.1 Define token lifecycle behavior tests (RED)**
+- [x] **3.1 Define token lifecycle behavior tests (RED)** [commit: 5424dea]
   - [x] Create `tests/unit/server/calendar-feed.test.ts` covering enable, status, regenerate, and revoke operations.
   - [x] Test high-entropy opaque token generation, one-way hash persistence, and absence of plaintext in return-side logs/audit details.
   - [x] Test ownership, student-role authorization, inactive/deleted users, regeneration invalidation, revocation, and one-active-token behavior.
