@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router';
 import { Calendar, Clipboard } from 'lucide-react';
-import { format } from 'date-fns/format';
 import { useI18n } from '../../../routes/__root';
 import { Progress } from '../../ui/progress';
 import { Badge } from '../../ui/badge';
+import { formatDate } from '@/lib/format-date';
+import { useStudentTimezone } from '@/hooks/use-student-timezone';
 
 export interface StudentAssignmentRow {
   id: number;
@@ -20,7 +21,8 @@ interface StudentAssignmentCardProps {
 }
 
 export function StudentAssignmentCard({ assignment }: StudentAssignmentCardProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const { timezone, hydrated } = useStudentTimezone();
 
   return (
     <div className="group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-primary/30">
@@ -57,10 +59,14 @@ export function StudentAssignmentCard({ assignment }: StudentAssignmentCardProps
           <span>
             {assignment.effectiveDeadline
               ? t('studentAssignments.effectiveDeadline', {
-                  date: format(new Date(assignment.effectiveDeadline), 'MMM d, yyyy'),
+                  date: hydrated
+                    ? formatDate(new Date(assignment.effectiveDeadline), locale, 'short', timezone)
+                    : '—',
                 })
               : t('studentAssignments.finalDeadline', {
-                  date: format(new Date(assignment.finalDeadline), 'MMM d, yyyy'),
+                  date: hydrated
+                    ? formatDate(new Date(assignment.finalDeadline), locale, 'short', timezone)
+                    : '—',
                 })}
           </span>
         </div>

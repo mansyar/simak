@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Progress } from '@/components/ui/progress';
+import { useStudentTimezone } from '@/hooks/use-student-timezone';
 
 interface ActiveAssignment {
   id: number;
@@ -58,6 +59,7 @@ interface Props {
 
 export function StudentDashboard({ data }: Props) {
   const { t, locale } = useI18n();
+  const { timezone, hydrated } = useStudentTimezone();
 
   if (data?.error) {
     return (
@@ -105,7 +107,10 @@ export function StudentDashboard({ data }: Props) {
                       {(() => {
                         const deadline = assignment.effectiveDeadline ?? assignment.finalDeadline;
                         return t('studentDashboard.deadline', {
-                          date: deadline ? formatDateShort(deadline, locale) : '—',
+                          date:
+                            deadline && hydrated
+                              ? formatDateShort(deadline, locale, timezone)
+                              : '—',
                         });
                       })()}
                     </span>
@@ -156,7 +161,7 @@ export function StudentDashboard({ data }: Props) {
                     >
                       {deadline.dueDate === null
                         ? t('studentDashboard.noDeadline')
-                        : `${formatDate(deadline.dueDate, locale, 'short')} (${formatRelativeTime(deadline.dueDate, locale)})`}
+                        : `${hydrated ? formatDate(deadline.dueDate, locale, 'short', timezone) : '—'} (${formatRelativeTime(deadline.dueDate, locale)})`}
                       {deadline.isOverdue && (
                         <Badge variant="destructive" className="ml-1">
                           {t('studentDashboard.overdue')}

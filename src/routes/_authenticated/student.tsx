@@ -4,6 +4,7 @@ import { StudentSidebar } from '../../components/layout/student-sidebar';
 import { AppHeader } from '../../components/layout/app-header';
 import { useState } from 'react';
 import { NotificationCenter } from '../../components/notifications/NotificationCenter';
+import { StudentTimezoneProvider } from '../../hooks/use-student-timezone';
 
 export const Route = createFileRoute('/_authenticated/student')({
   beforeLoad: async () => {
@@ -25,9 +26,11 @@ function StudentLayout() {
           onNotificationOpen={() => setIsNotificationOpen(true)}
         />
         <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto p-6">
-          <div className="flex flex-col gap-6">
-            <Outlet />
-          </div>
+          <StudentTimezoneProvider>
+            <div className="flex flex-col gap-6">
+              <Outlet />
+            </div>
+          </StudentTimezoneProvider>
         </main>
       </div>
       <NotificationCenter

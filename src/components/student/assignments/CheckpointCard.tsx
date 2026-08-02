@@ -6,6 +6,7 @@ import { formatRelativeTime, formatDateShort } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, AlertCircle, Users, ExternalLink } from 'lucide-react';
+import { useStudentTimezone } from '@/hooks/use-student-timezone';
 
 export interface CheckpointData {
   id: number;
@@ -82,6 +83,7 @@ function getTranslatedBlockingReason(
 
 export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps) {
   const { t, locale } = useI18n();
+  const { timezone, hydrated } = useStudentTimezone();
   const navigate = useNavigate();
   const config = stateConfig[checkpoint.state] ?? stateConfig.locked;
   const isOverdue =
@@ -111,7 +113,7 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
             >
               <Clock className="h-3 w-3" />
               <span>
-                {formatDateShort(checkpoint.dueDate, locale)} (
+                {hydrated ? formatDateShort(checkpoint.dueDate, locale, timezone) : '—'} (
                 {formatRelativeTime(checkpoint.dueDate, locale)})
               </span>
             </div>

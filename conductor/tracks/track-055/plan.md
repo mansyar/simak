@@ -87,10 +87,10 @@
   - [x] Assert that pending-review, consultation, instructor, and admin date surfaces are not unintentionally changed.
   - **RED evidence:** The focused suite showed dashboard/checkpoint formatters still received no timezone and assignment deadline headers/cards still used date-fns directly.
 
-- [ ] **2.6 Apply timezone formatting to target surfaces (GREEN)**
-  - [ ] Update `src/components/dashboard/StudentDashboard.tsx` and student assignment/checkpoint deadline components to consume the resolved student timezone.
-  - [ ] Keep existing effective-deadline, relative-time, badge, and authorization behavior unchanged.
-  - [ ] Do not change the reminder scanner or server-side deadline calculations.
+- [~] **2.6 Apply timezone formatting to target surfaces (GREEN)**
+  - [~] Update `src/components/dashboard/StudentDashboard.tsx` and student assignment/checkpoint deadline components to consume the resolved student timezone.
+  - [~] Keep existing effective-deadline, relative-time, badge, and authorization behavior unchanged.
+  - [~] Do not change the reminder scanner or server-side deadline calculations.
 
 ### Phase Verification
 

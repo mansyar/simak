@@ -6,7 +6,7 @@ const { mockFormatDate, mockFormatDateShort, mockFormatRelativeTime, mockUseStud
     mockFormatDate: vi.fn(() => 'formatted date'),
     mockFormatDateShort: vi.fn(() => 'formatted short date'),
     mockFormatRelativeTime: vi.fn(() => 'relative time'),
-    mockUseStudentTimezone: vi.fn(() => 'America/Los_Angeles'),
+    mockUseStudentTimezone: vi.fn(() => ({ timezone: 'America/Los_Angeles', hydrated: true })),
   }));
 
 vi.mock('@/lib/format-date', () => ({ formatDate: mockFormatDate }));
@@ -39,7 +39,7 @@ import { StudentAssignmentCard } from '@/components/student/assignments/StudentA
 describe('student deadline timezone surfaces', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseStudentTimezone.mockReturnValue('America/Los_Angeles');
+    mockUseStudentTimezone.mockReturnValue({ timezone: 'America/Los_Angeles', hydrated: true });
   });
 
   it('passes the resolved timezone to dashboard assignment and checkpoint deadlines', () => {
@@ -186,7 +186,7 @@ describe('student deadline timezone surfaces', () => {
   });
 
   it('uses the UTC fallback returned by the timezone resolver', () => {
-    mockUseStudentTimezone.mockReturnValue('UTC');
+    mockUseStudentTimezone.mockReturnValue({ timezone: 'UTC', hydrated: true });
     const dueDate = new Date('2026-06-01T00:00:00.000Z');
 
     render(
@@ -205,5 +205,33 @@ describe('student deadline timezone surfaces', () => {
     );
 
     expect(mockFormatDateShort).toHaveBeenCalledWith(dueDate, 'en', 'UTC');
+  });
+
+  it('uses a neutral placeholder until timezone detection has hydrated', () => {
+    mockUseStudentTimezone.mockReturnValue({ timezone: 'UTC', hydrated: false });
+
+    render(
+      <StudentDashboard
+        data={{
+          activeAssignments: [
+            {
+              id: 1,
+              title: 'Thesis',
+              finalDeadline: new Date('2026-06-01T00:00:00.000Z'),
+              templateName: 'Template',
+              templateType: 'Thesis',
+              progressPercent: 20,
+              currentState: 'in_progress',
+            },
+          ],
+          upcomingDeadlines: [],
+          pendingReviews: [],
+          consultationReminders: [],
+        }}
+      />,
+    );
+
+    expect(mockFormatDateShort).not.toHaveBeenCalled();
+    expect(screen.getByText(/studentDashboard\.deadline.*—/)).toBeDefined();
   });
 });
