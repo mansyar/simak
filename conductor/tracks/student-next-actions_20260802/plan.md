@@ -18,7 +18,6 @@
   - [x] Keep the resolver free of database and client-incompatible imports.
   - [x] Normalize candidates, select one action per checkpoint, rank deterministically, and produce waiting groups.
 - [x] Task: Run the focused resolver tests and confirm the Red-to-Green transition. [19d82127]
-- [~] Task: Write failing handler tests in `tests/unit/server/dashboard-student-next-actions.test.ts`.
 - [ ] Task: Phase Verification & Checkpoint — manually verify the resolver against the approved priority and deduplication rules, record the workflow checkpoint, and attach the required git note.
 
 ## Phase 2: Student Dashboard Handler
