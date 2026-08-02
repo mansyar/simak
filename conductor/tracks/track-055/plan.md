@@ -146,11 +146,12 @@
 
 ### Tasks
 
-- [ ] **4.1 Define feed-selection tests (RED)**
-  - [ ] Create focused tests for student ownership and active-assignment filtering.
-  - [ ] Cover non-passed checkpoints with due dates, locked future checkpoints, overdue checkpoints, passed checkpoints, null due dates, and inactive assignments.
-  - [ ] Cover assignment final-deadline inclusion only when the assignment is active and has at least one non-passed checkpoint.
-  - [ ] Test stable UIDs across refreshes and changed due dates, including removal after a checkpoint passes.
+- [x] **4.1 Define feed-selection tests (RED)**
+  - [x] Create focused tests for student ownership and active-assignment filtering.
+  - [x] Cover non-passed checkpoints with due dates, locked future checkpoints, overdue checkpoints, passed checkpoints, null due dates, and inactive assignments.
+  - [x] Cover assignment final-deadline inclusion only when the assignment is active and has at least one non-passed checkpoint.
+  - [x] Test stable UIDs across refreshes and changed due dates, including removal after a checkpoint passes.
+  - **RED evidence:** The focused suite failed before execution because `src/server/calendar-feed-selection.server.ts` did not yet exist.
 
 - [ ] **4.2 Implement authoritative feed selection (GREEN)**
   - [ ] Add a server-only query/helper that joins assignment ownership and checkpoint data without exposing other students’ records.
