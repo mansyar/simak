@@ -190,8 +190,9 @@
   - [x] Add route/integration tests for missing, malformed, unknown, revoked, and valid bearer credentials.
   - [x] Assert generic unauthorized responses, no account/assignment enumeration, student ownership isolation, and inactive-user handling.
   - [x] Assert `text/calendar`, private/no-store cache behavior, safe referrer policy, and rate-limit responses.
+  - [x] Assert valid requests return only the selected events and reflect later state/deadline changes.
   - **RED evidence:** The focused suite failed before execution because `src/server/calendar-feed-route.server.ts` did not yet exist.
-  - [ ] Assert valid requests return only the selected events and reflect later state/deadline changes.
+  - **Evidence:** 5 focused route-security tests passed after adding the route contract coverage.
 
 - [ ] **5.2 Implement the calendar route (GREEN)**
   - [ ] Add a stable route-level GET endpoint under `src/routes/api/` using the project’s TanStack route-handler pattern.

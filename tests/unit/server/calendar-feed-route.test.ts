@@ -101,4 +101,31 @@ describe('handleCalendarFeedRequest', () => {
     expect(await response.text()).toBe('Calendar feed temporarily unavailable');
     expect(getCalendarFeedEvents).not.toHaveBeenCalled();
   });
+
+  it('serializes only the current selected events on each refresh', async () => {
+    state.tokenRows = [{ tokenId: 'token-row-1', studentId: 'student-1' }];
+    const firstEvents = [
+      {
+        uid: 'checkpoint-11@simak',
+        kind: 'checkpoint',
+        summary: 'Research Project — Proposal',
+        startsAt: new Date('2026-08-05T12:00:00.000Z'),
+      },
+    ];
+    const changedEvents = [
+      {
+        uid: 'checkpoint-11@simak',
+        kind: 'checkpoint',
+        summary: 'Research Project — Proposal',
+        startsAt: new Date('2026-08-06T12:00:00.000Z'),
+      },
+    ];
+    getCalendarFeedEvents.mockResolvedValueOnce(firstEvents).mockResolvedValueOnce(changedEvents);
+
+    await handleCalendarFeedRequest(request({ token: validToken }));
+    await handleCalendarFeedRequest(request({ token: validToken }));
+
+    expect(serializeCalendarFeed).toHaveBeenNthCalledWith(1, firstEvents, expect.any(Date));
+    expect(serializeCalendarFeed).toHaveBeenNthCalledWith(2, changedEvents, expect.any(Date));
+  });
 });
