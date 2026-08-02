@@ -112,7 +112,7 @@
   - [x] Add database-backed integration cases for concurrent lifecycle requests and the database uniqueness invariant.
   - **RED evidence:** The unit suite initially failed because `src/server/calendar-feed.server.ts` did not yet exist; the integration case also references the not-yet-defined token table.
 
-- [x] **3.2 Add the token schema and migration (GREEN)**
+- [x] **3.2 Add the token schema and migration (GREEN)** [commit: 6ce7efb]
   - [x] Add a dedicated token table to `src/db/schema/` with student ownership, token hash, lifecycle timestamps, and appropriate foreign-key/index constraints.
   - [x] Enforce at most one active token per student at the database level.
   - [x] Register the schema in `src/db/schema/index.ts` and generate the next Drizzle migration.
