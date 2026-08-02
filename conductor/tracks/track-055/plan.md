@@ -37,10 +37,11 @@
   - [x] Extend the typed `users.settings` shape and `UpdateUserSettingsSchema` with an optional validated timezone.
   - [x] Keep invalid persisted values from affecting rendering or server-side deadline comparisons.
 
-- [ ] **1.4 Define explicit timezone formatter behavior (RED)**
-  - [ ] Extend `tests/unit/lib/format-date.test.ts` and `tests/unit/lib/format.test.ts` with explicit-timezone cases.
-  - [ ] Cover locale-aware short/long/time output, DST boundary instants, UTC fallback, null values, invalid dates, and relative-time behavior.
-  - [ ] Add regression assertions that omitted timezone behavior remains unchanged for non-target callers.
+- [x] **1.4 Define explicit timezone formatter behavior (RED)**
+  - [x] Extend `tests/unit/lib/format-date.test.ts` and `tests/unit/lib/format.test.ts` with explicit-timezone cases.
+  - [x] Cover locale-aware short/long/time output, DST boundary instants, UTC fallback, null values, invalid dates, and relative-time behavior.
+  - [x] Add regression assertions that omitted timezone behavior remains unchanged for non-target callers.
+  - **RED evidence:** The new explicit-timezone assertions failed against the existing local-time-only formatter before the GREEN implementation.
 
 - [ ] **1.5 Implement timezone-aware formatting (GREEN)**
   - [ ] Extend the shared date formatting boundary with an optional explicit IANA timezone.

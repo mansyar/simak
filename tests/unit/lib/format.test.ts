@@ -30,6 +30,11 @@ describe('formatDate helpers', () => {
       const result = formatDateShort('invalid-date', 'en');
       expect(result).toBe('Invalid Date');
     });
+
+    it('formats an ISO instant in an explicit timezone', () => {
+      const result = formatDateShort('2026-03-05T00:30:00Z', 'en', 'America/Los_Angeles');
+      expect(result).toBe('Mar 4, 2026');
+    });
   });
 
   describe('formatDateLong', () => {
@@ -47,6 +52,11 @@ describe('formatDate helpers', () => {
       const result = formatDateLong(testISOString, 'en');
       expect(result).toBe('March 5, 2026');
     });
+
+    it('formats Indonesian output in an explicit timezone', () => {
+      const result = formatDateLong('2026-03-05T18:30:00Z', 'id', 'Asia/Jakarta');
+      expect(result).toBe('6 Maret 2026');
+    });
   });
 
   describe('formatDateTimeShort', () => {
@@ -63,6 +73,12 @@ describe('formatDate helpers', () => {
     it('accepts ISO string input', () => {
       const result = formatDateTimeShort(testISOString, 'en');
       expect(result).toBe('Mar 5, 2026 2:30 PM');
+    });
+
+    it('formats date and time in an explicit timezone', () => {
+      const result = formatDateTimeShort('2026-03-05T14:30:00Z', 'en', 'America/New_York');
+      expect(result).toContain('Mar 5, 2026');
+      expect(result).toContain('9:30 AM');
     });
   });
 
@@ -113,6 +129,12 @@ describe('formatDate helpers', () => {
     it('defaults to English locale', () => {
       const futureDate = new Date('2026-03-08T14:30:00');
       const result = formatRelativeTime(futureDate);
+      expect(result).toBe('in 3 days');
+    });
+
+    it('keeps relative time based on the instant, regardless of display timezone', () => {
+      const futureDate = new Date('2026-03-08T14:30:00');
+      const result = formatRelativeTime(futureDate, 'en');
       expect(result).toBe('in 3 days');
     });
   });

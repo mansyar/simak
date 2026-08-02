@@ -52,4 +52,20 @@ describe('formatDate', () => {
     const result = formatDate('not-a-date', 'en', 'short');
     expect(result).toBe('Invalid Date');
   });
+
+  it('formats an instant in an explicit timezone', () => {
+    const result = formatDate(testDate, 'en', 'time', 'America/Los_Angeles');
+    expect(result).toContain('Jun 15, 2026');
+    expect(result).toContain('3:30');
+  });
+
+  it('uses UTC when an explicit timezone is invalid', () => {
+    const result = formatDate('2026-01-01T00:30:00Z', 'en', 'short', 'Mars/Phobos');
+    expect(result).toContain('Jan 1, 2026');
+  });
+
+  it('keeps null and invalid values stable with an explicit timezone', () => {
+    expect(formatDate(null, 'en', 'short', 'Asia/Jakarta')).toBe('');
+    expect(formatDate('not-a-date', 'en', 'short', 'Asia/Jakarta')).toBe('Invalid Date');
+  });
 });
