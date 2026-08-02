@@ -33,7 +33,7 @@ export function TimezoneSettingsSection() {
     ? data?.settings?.timezone
     : undefined;
 
-  const saveTimezoneMutation = useMutation({
+  const { mutateAsync: saveTimezone, isPending: isSaving } = useMutation({
     mutationFn: async (args: { timezone: string }) => {
       return updateUserSettings({ data: { timezone: args.timezone } });
     },
@@ -54,9 +54,9 @@ export function TimezoneSettingsSection() {
     setHydrated(true);
 
     if (!savedTimezone) {
-      saveTimezoneMutation.mutateAsync({ timezone: resolvedTimezone }).catch(() => {});
+      saveTimezone({ timezone: resolvedTimezone }).catch(() => {});
     }
-  }, [data, isLoading, savedTimezone, saveTimezoneMutation.mutateAsync]);
+  }, [data, isLoading, savedTimezone, saveTimezone]);
 
   useEffect(() => {
     if (savedTimezone) {
@@ -77,7 +77,7 @@ export function TimezoneSettingsSection() {
 
     setStatus('idle');
     try {
-      await saveTimezoneMutation.mutateAsync({ timezone });
+      await saveTimezone({ timezone });
       setStatus('saved');
     } catch {
       setStatus('error');
@@ -124,7 +124,7 @@ export function TimezoneSettingsSection() {
               placeholder={
                 isReady ? t('settings.timezone.placeholder') : t('settings.timezone.detecting')
               }
-              disabled={!isReady || saveTimezoneMutation.isPending}
+              disabled={!isReady || isSaving}
               aria-describedby="student-timezone-hint"
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             />
@@ -143,7 +143,7 @@ export function TimezoneSettingsSection() {
           </div>
           <button
             type="submit"
-            disabled={!isReady || saveTimezoneMutation.isPending}
+            disabled={!isReady || isSaving}
             className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {t('settings.timezone.save')}
