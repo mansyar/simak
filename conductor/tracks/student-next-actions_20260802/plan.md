@@ -68,20 +68,20 @@
 
 **Objective:** Verify the complete student workflow and satisfy project quality gates.
 
-- [ ] Task: Write failing Playwright coverage for student Next Actions using the existing dashboard auth and database-reset helpers.
-  - [ ] Verify the section, primary action links, priority ordering, five-item cap, and waiting summary.
-  - [ ] Verify old unresolved waiting work is visible and no duplicate checkpoint action is rendered.
-  - [ ] Add only the minimal deterministic fixture data needed for states absent from the existing E2E seed.
-  - [ ] Verify the mobile dashboard has no horizontal overflow.
-- [ ] Task: Add or extend student dashboard axe-core coverage for critical and serious accessibility violations.
-- [ ] Task: Run focused unit, component, and E2E tests, then run the full required gates.
-  - [ ] Run `pnpm test`.
-  - [ ] Run `pnpm test:coverage`.
-  - [ ] Run `pnpm typecheck`.
-  - [ ] Run `pnpm lint`.
-  - [ ] Run `pnpm check:i18n`.
-  - [ ] Run `pnpm test:e2e`.
-  - [ ] Run `pnpm build`.
-- [ ] Task: Review the final diff for authorization, file-size, i18n, accessibility, and backward-compatibility compliance.
+- [x] Task: Write failing Playwright coverage for student Next Actions using the existing dashboard auth and database-reset helpers. [94c4b848]
+  - [x] Verify the section, primary action links, priority ordering, five-item cap, and waiting summary.
+  - [x] Verify old unresolved waiting work is visible and no duplicate checkpoint action is rendered.
+  - [x] Add only the minimal deterministic fixture data needed for states absent from the existing E2E seed.
+  - [x] Verify the mobile dashboard has no horizontal overflow.
+- [x] Task: Add or extend student dashboard axe-core coverage for critical and serious accessibility violations. [94c4b848]
+- [~] Task: Run focused unit, component, and E2E tests, then run the full required gates. [ae39e947, 94c4b848]
+  - [x] Run `pnpm test` — 409 files and 4,089 tests passed.
+  - [x] Run `pnpm test:coverage` — global thresholds passed: 87.92% statements, 80.96% branches, 83.91% functions, and 88.60% lines.
+  - [x] Run `pnpm typecheck`.
+  - [x] Run `pnpm lint` — 0 errors; four pre-existing warnings remain.
+  - [x] Run `pnpm check:i18n` — locale parity passed.
+  - [~] Run `pnpm test:e2e` — the full 600-second run reached test 111 without a final summary; focused Next Actions coverage passed across Chromium, Firefox, and mobile-chrome, while existing hydration and Firefox admin-template axe failures were observed.
+  - [x] Run `pnpm build`.
+- [x] Task: Review the final diff for authorization, file-size, i18n, accessibility, and backward-compatibility compliance. [94c4b848, ae39e947]
 - [ ] Task: Phase Verification & Checkpoint — complete the workflow manual verification, update plan checkpoint data, attach the verification git note, and confirm all acceptance criteria.
-- [ ] Task: Prepare conventional commits following `conductor/workflow.md`.
+- [x] Task: Prepare conventional commits following `conductor/workflow.md`.
