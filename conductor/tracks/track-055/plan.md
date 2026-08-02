@@ -26,7 +26,7 @@
   - [x] Confirm the canonical UTC-instant convention for `assignments.finalDeadline` and `checkpoints.dueDate` without changing stored data.
   - **Boundary notes:** Student deadline formatting is used by `StudentDashboard`, `StudentAssignmentCard`, `AssignmentDetailHeader`, and `CheckpointCard`. Consultation reminders, pending-review dates, instructor/admin surfaces, and reminder scanning remain unchanged. `assignments.finalDeadline` and `checkpoints.dueDate` are authoritative stored instants and are serialized with `toISOString()` at the dashboard boundary.
 
-- [x] **1.2 Define timezone validation and fallback tests (RED)**
+- [x] **1.2 Define timezone validation and fallback tests (RED)** [commit: 40b6ab3]
   - [x] Create `tests/unit/lib/timezone.test.ts`.
   - [x] Test valid IANA zones, `UTC`, invalid strings, missing values, and runtime zones unsupported by `Intl`.
   - [x] Test deterministic UTC fallback and preservation of a valid saved preference over browser detection.
