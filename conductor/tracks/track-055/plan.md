@@ -241,10 +241,12 @@
   - **Evidence:** The student settings axe scan passed with no critical, serious, or moderate violations; existing dashboard and assignment-detail axe coverage remains in the suite. Chromium E2E additionally verified keyboard focus, live save/copy feedback, and a 390px mobile viewport. The settings heading hierarchy was corrected for axe compliance.
   - **Commit:** `b941ad3`
 
-- [ ] **6.3 Complete localization and generated artifacts**
-  - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`.
-  - [ ] Run the unused-key check and remove or correct any new unused/mismatched keys.
-  - [ ] Confirm no generated i18n file was edited manually.
+- [x] **6.3 Complete localization and generated artifacts**
+  - [x] Run `pnpm generate:i18n` and `pnpm check:i18n`.
+  - [x] Run the unused-key check and remove or correct any new unused/mismatched keys.
+  - [x] Confirm no generated i18n file was edited manually.
+  - **Evidence:** `pnpm generate:i18n`, `pnpm check:i18n`, and `pnpm check:i18n:unused` passed. Both locales contain all 934 code-used keys; generated types were regenerated from `locales/en.json` without manual edits.
+  - **Commit:** `pending`
 
 - [ ] **6.4 Run final quality gates**
   - [ ] Run `pnpm format` and review the resulting diff for unrelated changes.
