@@ -24,21 +24,21 @@
 
 **Objective:** Return complete, authorized Next Actions and waiting-summary data through the existing dashboard request without regressing the current widgets.
 
-- [~] Task: Write failing handler tests in `tests/unit/server/dashboard-student-next-actions.test.ts`.
-  - [ ] Verify unauthenticated and non-student requests remain unauthorized.
-  - [ ] Verify assignment, checkpoint, submission, review, consultation, state, due-date, and destination identifiers are returned.
-  - [ ] Verify all eligible candidates reach the resolver before the five-item display limit.
-  - [ ] Verify unresolved submitted/under-review items older than 30 days are included in the waiting summary.
-  - [ ] Verify existing authorization, assignment ownership, gating, and four existing dashboard datasets remain intact.
-  - [ ] Verify empty results return stable empty action and waiting structures.
-- [ ] Task: Extend query assembly in `src/server/dashboard-student.server.ts`.
-  - [ ] Add the identifiers and authoritative state needed for precise action resolution.
-  - [ ] Load consultation requirements and verified consultation state using existing schema relationships.
-  - [ ] Preserve existing limits for current widgets while avoiding a five-row limit on Next Actions candidates.
-  - [ ] Avoid per-candidate N+1 queries and scope all data to the authenticated student.
-- [ ] Task: Integrate the resolver into `getStudentDashboardDataHandler` and return the new DTO fields while preserving existing response fields.
-- [ ] Task: Keep `src/server/dashboard.ts` client-safe and retain the dynamic import into the server-only handler.
-- [ ] Task: Run focused server/dashboard tests and confirm the Green transition.
+- [x] Task: Write failing handler tests in `tests/unit/server/dashboard-student-next-actions.test.ts`. [127ca612]
+  - [x] Verify unauthenticated and non-student requests remain unauthorized.
+  - [x] Verify assignment, checkpoint, submission, review, consultation, state, due-date, and destination identifiers are returned.
+  - [x] Verify all eligible candidates reach the resolver before the five-item display limit.
+  - [x] Verify unresolved submitted/under-review items older than 30 days are included in the waiting summary.
+  - [x] Verify existing authorization, assignment ownership, gating, and four existing dashboard datasets remain intact.
+  - [x] Verify empty results return stable empty action and waiting structures.
+- [x] Task: Extend query assembly in `src/server/dashboard-student.server.ts`. [127ca612]
+  - [x] Add the identifiers and authoritative state needed for precise action resolution.
+  - [x] Load consultation requirements and verified consultation state using existing schema relationships.
+  - [x] Preserve existing limits for current widgets while avoiding a five-row limit on Next Actions candidates.
+  - [x] Avoid per-candidate N+1 queries and scope all data to the authenticated student.
+- [x] Task: Integrate the resolver into `getStudentDashboardDataHandler` and return the new DTO fields while preserving existing response fields. [127ca612]
+- [x] Task: Keep `src/server/dashboard.ts` client-safe and retain the dynamic import into the server-only handler. [127ca612]
+- [x] Task: Run focused server/dashboard tests and confirm the Green transition. [127ca612]
 - [ ] Task: Phase Verification & Checkpoint — manually verify authorization, candidate completeness, stale waiting records, and backward compatibility, record the workflow checkpoint, and attach the required git note.
 
 ## Phase 3: Dashboard UI and Bilingual UX
