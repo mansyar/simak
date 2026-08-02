@@ -200,7 +200,6 @@ describe('calendar feed token lifecycle', () => {
   });
 
   it('rejects an inactive or deleted student even with a valid session', async () => {
-    queueAuthorizedStudent();
     mockTx.select.mockReturnValueOnce(queryResult([]));
 
     await expect(getCalendarFeedStatusHandler()).resolves.toEqual({

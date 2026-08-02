@@ -119,12 +119,13 @@
   - [x] Add the required companion rollback SQL under `drizzle/migrations/rollback/` and verify it follows the SQL style guide.
   - **Evidence:** `pnpm db:generate` produced migration `0020_white_spacker_dave.sql`; the schema and rollback passed targeted oxlint and `git diff --check`.
 
-- [ ] **3.3 Implement authenticated token handlers (GREEN)**
-  - [ ] Add a client-safe `src/server/calendar-feed.ts` stub/schema file and a server-only handler file, splitting helpers if the 500-line limit requires it.
-  - [ ] Implement explicit enablement, status retrieval, regeneration, and revocation with transaction-safe writes.
-  - [ ] Hash tokens before persistence and return plaintext only on the enable/regenerate response needed to construct the URL.
-  - [ ] Use the existing audit helper after successful commits, recording lifecycle actions without sensitive token data.
-  - [ ] Apply an appropriate authenticated mutation/read rate limit to the handlers.
+- [x] **3.3 Implement authenticated token handlers (GREEN)**
+  - [x] Add a client-safe `src/server/calendar-feed.ts` stub/schema file and a server-only handler file, splitting helpers if the 500-line limit requires it.
+  - [x] Implement explicit enablement, status retrieval, regeneration, and revocation with transaction-safe writes.
+  - [x] Hash tokens before persistence and return plaintext only on the enable/regenerate response needed to construct the URL.
+  - [x] Use the existing audit helper after successful commits, recording lifecycle actions without sensitive token data.
+  - [x] Apply an appropriate authenticated mutation/read rate limit to the handlers.
+  - **Evidence:** 7 lifecycle unit tests passed; `pnpm typecheck` and targeted oxlint passed with zero errors. Bearer plaintext is generated only in the response URL, while persisted values and audit details contain only the SHA-256 hash/metadata.
 
 - [ ] **3.4 Add lifecycle integration tests (RED/GREEN)**
   - [ ] Verify the full handler-to-database flow for enable, regenerate, revoke, and old-token invalidation.
