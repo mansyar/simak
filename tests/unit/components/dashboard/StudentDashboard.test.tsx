@@ -367,9 +367,7 @@ describe('StudentDashboard', () => {
 
     const { container } = render(<StudentDashboard data={data} />);
 
-    // Assignment title should be h2 (not h3) to avoid h1→h3 skip
-    const h2 = container.querySelector('h2');
-    expect(h2).not.toBeNull();
-    expect(h2?.textContent).toBe('Thesis Assignment');
+    // Assignment title should be h2 (not h3) to avoid h1→h3 skip.
+    expect(screen.getByRole('heading', { level: 2, name: 'Thesis Assignment' })).toBeDefined();
   });
 });
