@@ -202,10 +202,11 @@
   - **Evidence:** 5 route tests passed; the TanStack endpoint resolves to `/api/calendar/ics`, uses hashed opaque credentials, filters active student ownership in the database query, applies session-independent client rate limiting, and returns generic unauthorized/rate-limit responses with private/no-store, no-referrer, and `nosniff` headers. Typecheck and targeted oxlint passed.
   - **Commit:** `8dce0eb`
 
-- [ ] **5.3 Define feed-management UI tests (RED)**
-  - [ ] Create component tests for disabled, enabled, loading, success, empty, failure, regeneration-confirmation, and revoked states.
-  - [ ] Test copyable subscription URL behavior without exposing the token beyond the URL response and without hardcoded UI strings.
-  - [ ] Test keyboard operation, focus/confirmation behavior, live status messaging, responsive layout, and both locales.
+- [x] **5.3 Define feed-management UI tests (RED)**
+  - [x] Create component tests for disabled, enabled, loading, success, empty, failure, regeneration-confirmation, and revoked states.
+  - [x] Test copyable subscription URL behavior without exposing the token beyond the URL response and without hardcoded UI strings.
+  - [x] Test keyboard operation, focus/confirmation behavior, live status messaging, responsive layout, and both locales.
+  - **RED evidence:** The focused suite failed before execution because `src/components/settings/CalendarFeedSettingsSection.tsx` did not yet exist.
 
 - [ ] **5.4 Implement feed-management UI (GREEN)**
   - [ ] Add a focused calendar-feed settings component and wire it into the student settings page only.
