@@ -239,7 +239,7 @@
   - [x] Run axe-core coverage for the new settings sections and relevant student deadline surfaces.
   - [x] Verify keyboard-only operation, focus visibility, live announcements, color-independent status, mobile touch targets, and light/dark themes.
   - **Evidence:** The student settings axe scan passed with no critical, serious, or moderate violations; existing dashboard and assignment-detail axe coverage remains in the suite. Chromium E2E additionally verified keyboard focus, live save/copy feedback, and a 390px mobile viewport. The settings heading hierarchy was corrected for axe compliance.
-  - **Commit:** `pending`
+  - **Commit:** `b941ad3`
 
 - [ ] **6.3 Complete localization and generated artifacts**
   - [ ] Run `pnpm generate:i18n` and `pnpm check:i18n`.
