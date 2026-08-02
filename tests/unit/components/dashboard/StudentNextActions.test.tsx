@@ -75,11 +75,17 @@ describe('StudentNextActions', () => {
     expect(screen.getByText('studentDashboard.nextActions.waiting.title')).toBeDefined();
     expect(screen.getByText('studentDashboard.nextActions.waiting.submitted')).toBeDefined();
     expect(screen.getByText('studentDashboard.nextActions.waiting.underReview')).toBeDefined();
+    expect(screen.getAllByText('studentDashboard.nextActions.waiting.count')).toHaveLength(2);
     expect(
       screen
         .getByRole('link', { name: 'studentDashboard.nextActions.openCheckpoint' })
         .getAttribute('href'),
     ).toBe('/student/assignments/1/checkpoints/10');
+    expect(
+      screen
+        .getByRole('link', { name: 'studentDashboard.nextActions.openCheckpoint' })
+        .getAttribute('class'),
+    ).toContain('focus-visible:ring-2');
   });
 
   it('renders one accessible link per primary action with precise destinations', async () => {
@@ -117,6 +123,9 @@ describe('StudentNextActions', () => {
     expect(screen.getByText('studentDashboard.nextActions.actions.submit')).toBeDefined();
     expect(screen.getByText('studentDashboard.nextActions.actions.revise')).toBeDefined();
     expect(screen.getByText('studentDashboard.nextActions.actions.consultation')).toBeDefined();
+    expect(screen.getByText('studentDashboard.nextActions.priority.revise')).toBeDefined();
+    expect(screen.getByText('studentDashboard.nextActions.priority.consultation')).toBeDefined();
+    expect(screen.getAllByText('studentDashboard.nextActions.due')).toHaveLength(3);
   });
 
   it('renders no more than three waiting representatives across both groups', async () => {
@@ -141,5 +150,23 @@ describe('StudentNextActions', () => {
     render(<StudentNextActions data={data} />);
 
     expect(screen.getAllByRole('link')).toHaveLength(3);
+  });
+
+  it('renders no more than five primary action cards', async () => {
+    const { StudentNextActions } = await import('@/components/dashboard/StudentNextActions');
+    const data: StudentNextActionsResult = {
+      primaryActions: Array.from({ length: 6 }, (_, index) =>
+        action({
+          checkpointId: index + 1,
+          checkpointName: `Checkpoint ${index + 1}`,
+          href: `/student/assignments/1/checkpoints/${index + 1}`,
+        }),
+      ),
+      waitingSummary: emptyWaiting,
+    };
+
+    render(<StudentNextActions data={data} />);
+
+    expect(screen.getAllByRole('link')).toHaveLength(5);
   });
 });

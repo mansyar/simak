@@ -106,6 +106,7 @@ function ActionCard({ action }: { action: StudentNextAction }) {
 
 export function StudentNextActions({ data }: Props) {
   const { t } = useI18n();
+  const visiblePrimaryActions = data.primaryActions.slice(0, 5);
   const waitingGroups: WaitingGroup[] = [
     {
       key: 'submitted' as const,
@@ -154,7 +155,7 @@ export function StudentNextActions({ data }: Props) {
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
-        {data.primaryActions.length === 0 ? (
+        {visiblePrimaryActions.length === 0 ? (
           <EmptyState
             icon={ClipboardList}
             title={t('studentDashboard.nextActions.empty')}
@@ -166,7 +167,7 @@ export function StudentNextActions({ data }: Props) {
             className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
             aria-label={t('studentDashboard.nextActions.title')}
           >
-            {data.primaryActions.map((action) => (
+            {visiblePrimaryActions.map((action) => (
               <ActionCard key={`${action.assignmentId}-${action.checkpointId}`} action={action} />
             ))}
           </div>
