@@ -153,10 +153,11 @@
   - [x] Test stable UIDs across refreshes and changed due dates, including removal after a checkpoint passes.
   - **RED evidence:** The focused suite failed before execution because `src/server/calendar-feed-selection.server.ts` did not yet exist.
 
-- [ ] **4.2 Implement authoritative feed selection (GREEN)**
-  - [ ] Add a server-only query/helper that joins assignment ownership and checkpoint data without exposing other students’ records.
-  - [ ] Compare checkpoint state and assignment activity using authoritative database values.
-  - [ ] Return event data with canonical UTC instants and deterministic event identity inputs.
+- [x] **4.2 Implement authoritative feed selection (GREEN)**
+  - [x] Add a server-only query/helper that joins assignment ownership and checkpoint data without exposing other students’ records.
+  - [x] Compare checkpoint state and assignment activity using authoritative database values.
+  - [x] Return event data with canonical UTC instants and deterministic event identity inputs.
+  - **Evidence:** 4 focused selection tests passed; `pnpm typecheck` and targeted oxlint passed. The query restricts by student-owned checkpoints, active assignments, non-passed state, and non-null due date; final events are derived only from qualifying rows.
 
 - [ ] **4.3 Define iCalendar serialization tests (RED)**
   - [ ] Create `tests/unit/lib/calendar-ics.test.ts` for VCALENDAR/VEVENT structure and `text/calendar` output.
