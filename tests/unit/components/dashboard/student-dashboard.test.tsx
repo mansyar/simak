@@ -48,6 +48,31 @@ describe('StudentDashboard component', () => {
     expect(screen.getByText('studentDashboard.activeAssignments')).toBeDefined();
   });
 
+  it('should render Next Actions above the existing widgets', async () => {
+    const { StudentDashboard } = await import('@/components/dashboard/StudentDashboard');
+    render(
+      <StudentDashboard
+        data={{
+          activeAssignments: [],
+          upcomingDeadlines: [],
+          pendingReviews: [],
+          consultationReminders: [],
+          nextActions: {
+            primaryActions: [],
+            waitingSummary: {
+              submitted: { count: 0, representatives: [] },
+              underReview: { count: 0, representatives: [] },
+            },
+          },
+        }}
+      />,
+    );
+
+    const nextActionsTitle = screen.getByText('studentDashboard.nextActions.title');
+    const activeAssignmentsTitle = screen.getByText('studentDashboard.activeAssignments');
+    expect(nextActionsTitle.compareDocumentPosition(activeAssignmentsTitle) & 4).toBe(4);
+  });
+
   it('should render upcoming deadlines section', async () => {
     const { StudentDashboard } = await import('@/components/dashboard/StudentDashboard');
     render(

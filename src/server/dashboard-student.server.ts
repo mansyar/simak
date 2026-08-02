@@ -1,5 +1,5 @@
 // Server-only handler for student dashboard data
-import { eq, and, desc, sql, inArray, isNull, gte } from 'drizzle-orm';
+import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
 import { assignmentTemplates } from '../db/schema/templates';
@@ -9,6 +9,7 @@ import { getSessionFromHeaders } from './auth';
 import { computeEffectiveDeadline } from './due-dates.server';
 import { serverError, ErrorCode } from '@/lib/errors';
 import { isStudent } from '@/lib/session-guards';
+import { resolveStudentNextActions, type StudentActionCandidate } from '@/lib/student-next-actions';
 
 /**
  * Get all data for the student dashboard.
@@ -46,8 +47,10 @@ export async function getStudentDashboardDataHandler() {
           .select({
             assignmentId: assignments.id,
             assignmentTitle: assignments.title,
+            checkpointId: checkpoints.id,
             checkpointName: checkpoints.name,
             dueDate: checkpoints.dueDate,
+            minConsultations: checkpoints.minConsultations,
             state: checkpoints.state,
           })
           .from(checkpoints)
@@ -59,45 +62,36 @@ export async function getStudentDashboardDataHandler() {
               sql`${checkpoints.state} != 'passed'`,
             ),
           )
-          .orderBy(checkpoints.dueDate)
-          .limit(5),
+          .orderBy(checkpoints.dueDate),
         db
           .select({
             submissionId: submissions.id,
+            assignmentId: assignments.id,
+            checkpointId: checkpoints.id,
             assignmentTitle: assignments.title,
             checkpointName: checkpoints.name,
             submittedAt: submissions.uploadedAt,
+            state: checkpoints.state,
           })
           .from(submissions)
           .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
           .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-          .where(
-            and(
-              eq(checkpoints.studentId, studentId),
-              isNull(assignments.deletedAt),
-              gte(submissions.uploadedAt, thirtyDaysAgo),
-              sql`${checkpoints.state} = 'under_review'`,
-            ),
-          )
+          .where(and(eq(checkpoints.studentId, studentId), isNull(assignments.deletedAt)))
           .orderBy(desc(submissions.uploadedAt)),
         db
           .select({
             assignmentId: consultations.assignmentId,
+            checkpointId: consultations.checkpointId,
             assignmentTitle: assignments.title,
             checkpointName: checkpoints.name,
             consultationDate: consultations.createdAt,
             consultationId: consultations.id,
+            status: consultations.status,
           })
           .from(consultations)
           .innerJoin(assignments, eq(consultations.assignmentId, assignments.id))
           .innerJoin(checkpoints, eq(consultations.checkpointId, checkpoints.id))
-          .where(
-            and(
-              eq(consultations.studentId, studentId),
-              eq(consultations.status, 'pending'),
-              isNull(assignments.deletedAt),
-            ),
-          )
+          .where(and(eq(consultations.studentId, studentId), isNull(assignments.deletedAt)))
           .orderBy(desc(consultations.createdAt)),
       ]);
 
@@ -167,6 +161,23 @@ export async function getStudentDashboardDataHandler() {
       return a.progressPercent - b.progressPercent;
     });
 
+    const latestSubmissionByCheckpoint = new Map<number, number>();
+    for (const submission of pendingReviews) {
+      if (!latestSubmissionByCheckpoint.has(submission.checkpointId)) {
+        latestSubmissionByCheckpoint.set(submission.checkpointId, submission.submissionId);
+      }
+    }
+
+    const verifiedConsultationCounts = new Map<number, number>();
+    for (const consultation of consultationReminders) {
+      if (consultation.status === 'verified') {
+        verifiedConsultationCounts.set(
+          consultation.checkpointId,
+          (verifiedConsultationCounts.get(consultation.checkpointId) ?? 0) + 1,
+        );
+      }
+    }
+
     const now = new Date();
     const deadlines = upcomingDeadlines
       .filter((d) => d.state !== 'passed')
@@ -182,10 +193,31 @@ export async function getStudentDashboardDataHandler() {
           : null,
       }));
 
+    const actionCandidates: StudentActionCandidate[] = upcomingDeadlines.map((candidate) => ({
+      assignmentId: candidate.assignmentId,
+      assignmentTitle: candidate.assignmentTitle,
+      checkpointId: candidate.checkpointId,
+      checkpointName: candidate.checkpointName,
+      state: candidate.state,
+      dueDate: candidate.dueDate,
+      minConsultations: candidate.minConsultations,
+      verifiedConsultationCount: verifiedConsultationCounts.get(candidate.checkpointId) ?? 0,
+      submissionId: latestSubmissionByCheckpoint.get(candidate.checkpointId) ?? null,
+    }));
+
+    const nextActions = resolveStudentNextActions(actionCandidates, { now });
+
+    const pendingReviewRows = pendingReviews.filter(
+      (review) =>
+        (review.state === 'under_review' || review.state === undefined) &&
+        review.submittedAt !== null &&
+        review.submittedAt >= thirtyDaysAgo,
+    );
+
     return {
       activeAssignments: activeAssignmentsWithProgress,
-      upcomingDeadlines: deadlines,
-      pendingReviews: pendingReviews.map((pr) => ({
+      upcomingDeadlines: deadlines.slice(0, 5),
+      pendingReviews: pendingReviewRows.map((pr) => ({
         submissionId: pr.submissionId,
         assignmentTitle: pr.assignmentTitle,
         checkpointName: pr.checkpointName,
@@ -194,12 +226,15 @@ export async function getStudentDashboardDataHandler() {
           (Date.now() - (pr.submittedAt?.getTime() ?? Date.now())) / (1000 * 60 * 60 * 24),
         ),
       })),
-      consultationReminders: consultationReminders.map((cr) => ({
-        consultationId: cr.consultationId,
-        assignmentTitle: cr.assignmentTitle,
-        checkpointName: cr.checkpointName,
-        consultationDate: cr.consultationDate,
-      })),
+      consultationReminders: consultationReminders
+        .filter((cr) => cr.status === 'pending' || cr.status === undefined)
+        .map((cr) => ({
+          consultationId: cr.consultationId,
+          assignmentTitle: cr.assignmentTitle,
+          checkpointName: cr.checkpointName,
+          consultationDate: cr.consultationDate,
+        })),
+      nextActions,
     };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {

@@ -167,6 +167,13 @@ describe('getStudentDashboardDataHandler — parallel query execution', () => {
       upcomingDeadlines: [],
       pendingReviews: [],
       consultationReminders: [],
+      nextActions: {
+        primaryActions: [],
+        waitingSummary: {
+          submitted: { count: 0, representatives: [] },
+          underReview: { count: 0, representatives: [] },
+        },
+      },
     });
   });
 
@@ -220,7 +227,7 @@ describe('getStudentDashboardDataHandler — parallel query execution', () => {
   it('maps pending review and consultation data to the expected shape', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as any);
 
-    const submittedAt = new Date('2025-06-25T10:00:00Z');
+    const submittedAt = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const consultationDate = new Date('2025-06-24T10:00:00Z');
     const now = new Date();
 
