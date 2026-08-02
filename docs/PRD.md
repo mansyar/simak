@@ -38,6 +38,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Instructors can assign assignments with structured checkpoints to students.
 - Students can submit work for each checkpoint.
 - Instructors can review, approve, or request revisions on submissions.
+- Instructors can explicitly publish complete final grades and withdraw a release with an accountable reason when corrections are needed.
 - Instructors can maintain private reusable plain-text feedback snippets and explicitly append them to editable review comments without changing review decisions or submission state.
 - In-app notifications keep both parties informed of submissions, reviews, revision requests, and missed deadlines. Email notifications are now sent for 11 event types (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, deadline reminder, student at risk, discussion reply) alongside in-app notifications. Auth-related emails (invitations, password reset, 2FA enable/disable) continue as before. Proactive deadline reminders (7-day, 3-day, 1-day lead times) are dispatched by a background scanner that runs hourly alongside the email queue processor. Notification **preferences** (per-user, per-type, per-channel opt-out) are configurable in the Settings Hub — 13 notification types across 4 groups (Reviews, Consultations, Submissions, System) with independent Email and In-app toggles. All preferences default to enabled (opt-out). Security-critical emails (password reset, invitations, 2FA) are exempt from preference gating.
 - Checkpoints must be completed in sequential order.
@@ -58,9 +59,9 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 | Role           | Description                                                                                                                              |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | **SuperAdmin** | Seeds the system. Can create Admin users only. Not involved in day-to-day operations.                                                    |
-| **Admin**      | Manages users (Instructor, Student) and assignment templates. Sends invitation emails. No involvement in review or submission workflows. |
-| **Instructor** | Creates assignments, reviews submissions, manages deadlines, maintains private feedback snippets, and manages private at-risk interventions for assigned students. Can assign multiple assignments per student. |
-| **Student**    | Views assignments, uploads checkpoint submissions, tracks progress. Can collaborate on group assignments `[v2]`.                         |
+| **Admin**      | Manages users (Instructor, Student) and assignment templates. Sends invitation emails. Retains authorized read-only gradebook/export access and can review release audit events, but does not publish or withdraw grades. |
+| **Instructor** | Creates assignments, reviews submissions, manages deadlines, publishes or withdraws grades for owned assignments, maintains private feedback snippets, and manages private at-risk interventions for assigned students. Can assign multiple assignments per student. |
+| **Student**    | Views assignments, uploads checkpoint submissions, tracks progress, and sees final grades only from active published snapshots. Can collaborate on group assignments `[v2]`. |
 
 ---
 
@@ -94,7 +95,8 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 7. Logs consultation sessions with supervisor as needed (via assignment detail page).
 8. Asks questions about a checkpoint via the discussion panel (async Q&A with the instructor).
 9. Downloads previously submitted files from any checkpoint.
-10. Manages profile, preferences, and notification settings.
+10. Sees a final grade only when the instructor has published an eligible snapshot; draft, incomplete, missing, and post-withdrawal states show an unavailable/not-yet-released message.
+11. Manages profile, preferences, and notification settings.
 
 ### Instructor
 
@@ -106,6 +108,8 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 6. Views and validates student consultation logs.
 7. Replies to student questions in checkpoint discussion threads (Discussions tab on assignment detail, or quick access from review detail page).
 8. Records and manages private at-risk interventions from the dashboard, assignment context, or `/instructor/interventions`. Intervention records are scoped to the current assignment owner and are not visible to students or admins.
+9. Opens the assignment gradebook to review working grades and exports, then runs a preflight to see complete, incomplete, and missing-grade students before publishing.
+10. Withdraws a published release with a required reason when corrections are needed; republishing creates a new immutable release version.
 
 ### Admin
 
@@ -255,7 +259,8 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - **Grade configuration:** Each assignment has an `assignment_grade_config` row (auto-created on assignment creation, backfilled for pre-existing assignments via migration). Admins configure the grading scheme (`equal_weight`/`custom_weight`), custom per-checkpoint weights (must sum to 100), and letter grade bounds via a "Grade Settings" dialog on the gradebook page. All config changes are audit-logged.
 - **Stale weights detection:** If custom weights are stale (don't sum to 100, missing checkpoint entries, or have extra entries for removed checkpoints), computation falls back to `equal_weight` averaging and a warning badge is shown on the grade config summary.
 - **Instructor gradebook view:** New route `/instructor/assignments/$id/gradebook` — table view (students × checkpoints → final grade column). Each cell shows numeric score (rubric checkpoints) or pass/fail Badge (non-rubric). Final grade column shows numeric score + letter Badge. Instructors see a read-only config summary at the top. CSV and Excel export buttons. Admins see additional "Grade Settings" and "Recompute All Grades" buttons.
-- **Student final grade card:** New component on `/student/assignments/$id` showing the student's final grade (numeric + letter badge) when complete, or current progress score with "in progress" status. Per-checkpoint score breakdown in a collapsible section. Read-only.
+- **Grade release lifecycle (TRACK-051):** Each assignment grade configuration stores `draft`/`published` state, active release version, and publication time. Only the owning instructor can request preflight, publish with explicit confirmation, or withdraw with a non-empty reason. Preflight categorizes eligible complete non-null final grades, incomplete/in-progress grades, and missing persisted grades. Publication atomically captures immutable versioned snapshots for complete enrolled students only; later recomputation cannot change the active student-visible values. Withdrawal retains prior snapshots and the latest version for a later republish, while students see no release history and no provisional values.
+- **Student final grade card:** The component on `/student/assignments/$id` shows the numeric score, letter badge, checkpoint breakdown, active release version, and publication time only from the student's active immutable snapshot. Draft, withdrawn, incomplete, missing, or newly completed states show an unavailable/not-yet-released state. It is read-only.
 - **Cached final grades:** A `final_grades` table caches computed grades per student per assignment. Grades are recomputed automatically when a review is submitted with `pass` decision (post-commit advisory, never affects the review transaction) or manually via the admin "Recompute All Grades" button (wraps all student upserts in a single `db.transaction` for atomicity).
 - **CSV/Excel export:** Admin-only gradebook CSV export (student names, per-checkpoint scores, final score, letter grade, status) with CSV formula-injection mitigation. Client-side Excel export via SheetJS with `sanitizeCell`.
 - **Grade recomputation trigger:** `submitReviewHandler` post-commit advisory section calls `recomputeStudentGrade` when `decision === 'pass'` (revise doesn't change pass state). Wrapped in try/catch — grade computation failure never surfaces an error for a successful review.
@@ -361,8 +366,9 @@ Core entities:
 - **Consultation** — log entry for a student-instructor session tied to a specific checkpoint.
 - **CheckpointDiscussion** — lightweight async Q&A message tied to a specific checkpoint. Threaded via `parentMessageId` (self-referencing). Soft-deleted via `deletedAt` (deleted messages render as "[deleted]" placeholder, replies preserved). Denormalized `assignmentId` for efficient instructor queries.
 - **Notification** — in-app and/or email event logs.
-- **AuditLog** — immutable record of all meaningful system actions (user created/deleted, template CRUD, assignment creation, review decisions, deadline changes, unlock actions, consultation verifications/rejections). Includes actor, action type, entity reference, and JSON details. Implemented with an admin viewer at `/admin/audit-log`.
+- **AuditLog** — immutable record of all meaningful system actions (user created/deleted, template CRUD, assignment creation, review decisions, deadline changes, unlock actions, consultation verifications/rejections, and grade release publication/withdrawal). Includes actor, action type, entity reference, and JSON details. Implemented with an admin viewer at `/admin/audit-log`.
 - **ExtensionRequest** — student-initiated deadline extension request with reason category, proposed duration, and approval/rejection by instructor. Subject to admin-configurable caps (`maxExtensionDays`, `maxTotalExtensions`).
 - **DeadlineReminder** — dedup tracking table for proactive deadline reminders. Records `checkpointId`, `studentId`, `tier` (`'7d'`/`'3d'`/`'1d'`), and `sentAt`. Unique constraint on `(checkpointId, tier)` ensures at-most-once delivery per tier per checkpoint across multiple server instances.
-- **AssignmentGradeConfig** — per-assignment grade configuration (1:1 with assignments, cascade-deleted). Stores grading scheme (`equal_weight`/`custom_weight`), custom per-checkpoint weights (jsonb, nullable), and letter grade bounds (jsonb, default A≥90/B≥80/C≥70/D≥60). Auto-created on assignment creation; pre-existing assignments backfilled by migration.
+- **AssignmentGradeConfig** — per-assignment grade configuration (1:1 with assignments, cascade-deleted). Stores grading scheme (`equal_weight`/`custom_weight`), custom per-checkpoint weights (jsonb, nullable), letter grade bounds (jsonb, default A≥90/B≥80/C≥70/D≥60), release status (`draft`/`published`), active release version, and publication timestamp. Auto-created on assignment creation; pre-existing assignments backfilled by migration with `draft` state and no fabricated snapshots.
 - **FinalGrade** — cached computed grade per student per assignment (upserted on recomputation). Stores numeric score (numeric(5,2), nullable), letter grade (text, nullable), status (`complete`/`incomplete`/`in_progress`), and contributing checkpoints breakdown (jsonb). Unique constraint on `(assignmentId, studentId)`. Neither gradebook table uses soft-delete — config is cascade-deleted via FK, final_grades is a cache (upserted, never individually deleted).
+- **GradeReleaseSnapshot** — immutable per-student release value captured at publication time. Stores assignment/student, release version, numeric score, letter grade, status, checkpoint breakdown, and publication timestamp. Unique per `(assignmentId, releaseVersion, studentId)` with assignment/version and student lookup indexes; prior versions remain retained for auditability but are not shown in student-facing history.

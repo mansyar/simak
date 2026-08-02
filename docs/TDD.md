@@ -71,7 +71,7 @@ Throughout this document, features are tagged as:
 │   ├── /instructor/assignments           → All assignments [v1]
 │   ├── /instructor/assignments/new       → Assignment creation wizard [v1]
 │   ├── /instructor/assignments/$id       → Assignment detail (instructor view) [v1]
-│   │   └── /instructor/assignments/$id/gradebook → Gradebook view (students × checkpoints → final grade) [v1]
+│   │   └── /instructor/assignments/$id/gradebook → Gradebook view and owner-controlled grade release (students × checkpoints → final grade) [v1]
 │   ├── /instructor/reviews               → Review queue [v1]
 │   ├── /instructor/interventions         → Private at-risk intervention management [v1]
 │   ├── /instructor/analytics             → Instructor performance analytics [v1]
@@ -126,7 +126,7 @@ simak/
 │   │   │   ├── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
 │   │   │   └── feedback-snippets/ → Private snippet management page, form, and cards (TRACK-049)
 │   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js), RubricScoringSection (instructor scoring UI), RubricResultView (student view)
-│   │   ├── gradebook/        → GradebookTable, GradeConfigSummary, GradeSettingsDialog, StudentFinalGradeCard, GradebookExportButtons, RecomputeGradesButton
+│   │   ├── gradebook/        → GradebookTable, GradeConfigSummary, GradeSettingsDialog, GradeReleaseControls, StudentFinalGradeCard, GradebookExportButtons, RecomputeGradesButton
 │   │   ├── consultations/    → Log form, consultation list, progress bar, verification queue item, verification dialog
 │   │   ├── interventions/    → Intervention list, filters, live-risk context, form, and loading skeleton
 │   │   ├── discussions/      → DiscussionPanel (ScrollArea, Avatar, message bubbles, optimistic mutations, 30s refetchInterval)
@@ -186,8 +186,9 @@ simak/
     │   │   ├── analytics-export.server.ts → CSV export handlers (users, audit log, progress, review history)
     │   │   ├── bulk-import.ts      → Bulk import server fn stubs + Zod schemas (users, templates)
     │   │   └── bulk-import.server.ts → Server-only bulk import handlers (parse, validate, insert)
-    │   │   ├── gradebook.ts         → Gradebook server fn stubs (getStudentFinalGrade, getAssignmentGradebook, saveGradeConfig, recomputeAllGrades) + Zod schemas
-    │   │   ├── gradebook.server.ts  → Server-only gradebook handlers (student grade, gradebook view, config upsert, batch recompute)
+│   │   ├── gradebook.ts         → Gradebook and release server-fn stubs (student grade, gradebook, config, recompute, preflight, publish, withdraw) + Zod schemas
+│   │   ├── gradebook.server.ts  → Server-only gradebook handlers (student active-snapshot gating, gradebook view, config upsert, batch recompute)
+│   │   ├── gradebook-extras.server.ts → Owner-locked release preflight, publication, withdrawal, versioning, and audit handlers
     │   │   └── health.server.ts    → Health check handler (runHealthChecks — DB, R2, email queue checks with 2s timeouts, generic error messages)
 │   ├── db/
 │   │   ├── schema/           → Drizzle schema (split by domain)
@@ -243,7 +244,7 @@ simak/
 ├── tests/
 │   ├── unit/                 → Vitest unit tests
 │   ├── integration/          → Vitest integration tests
-│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 20 spec files including feedback-snippet and intervention workflow coverage, includes @axe-core/playwright a11y scans)
+│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 21 spec files including grade-release, feedback-snippet, and intervention workflow coverage, includes @axe-core/playwright a11y scans)
 ├── docker/
 │   └── Dockerfile
 ├── drizzle.config.ts
@@ -900,6 +901,9 @@ Composite index `checkpoints_state_due_date_idx` on `checkpoints (state, dueDate
 | letterGradeBounds| jsonb, not null                    | `{ "A": 90, "B": 80, "C": 70, "D": 60 }` configurable lower bounds |
 | createdAt        | timestamp                          | DEFAULT NOW()                                                      |
 | updatedAt        | timestamp                          | DEFAULT NOW()                                                      |
+| releaseStatus    | grade_release_status enum, not null | `draft` \| `published`. Default `draft`                              |
+| activeReleaseVersion | integer, nullable              | Current student-visible snapshot version; retained when withdrawn |
+| publishedAt      | timestamp, nullable                | Timestamp of the active publication                                 |
 
 Auto-created inside `createAssignmentHandler` transaction via `createDefaultGradeConfig(tx, assignmentId)` helper. Pre-existing assignments backfilled by migration `0014_youthful_morg.sql`. Admin-only config changes audit-logged via `logAuditEvent` (action: `gradebook.config_updated`). The `logAuditEvent` call is awaited and wrapped in try/catch per SQL styleguide §6.4 (post-commit advisory pattern).
 
@@ -919,7 +923,23 @@ Auto-created inside `createAssignmentHandler` transaction via `createDefaultGrad
 | computedAt            | timestamp                  | DEFAULT NOW() — when the grade was last computed                                        |
 | updatedAt             | timestamp                  | DEFAULT NOW()                                                                              |
 
-Unique constraint on `(assignmentId, studentId)`. Indexes on `assignmentId` and `studentId`. Upserted (never individually deleted) — cache table for computed grades. Recomputed on `pass` review decision via `recomputeStudentGrade` (post-commit advisory in `reviews-extras.server.ts`, try/catch, never affects review transaction). Admin "Recompute All Grades" wraps all student upserts in a single `db.transaction` for atomicity (SQL styleguide §6 — if one student's grade computation fails, all updates roll back).
+Unique constraint on `(assignmentId, studentId)`. Indexes on `assignmentId` and `studentId`. Upserted (never individually deleted) — cache table for computed working grades. Recomputed on `pass` review decision via `recomputeStudentGrade` (post-commit advisory in `reviews-extras.server.ts`, try/catch, never affects review transaction). Admin "Recompute All Grades" wraps all student upserts in a single `db.transaction` for atomicity (SQL styleguide §6 — if one student's grade computation fails, all updates roll back). Student-facing release reads never use this table directly after publication; they use the active immutable snapshot.
+
+#### grade_release_snapshots (TRACK-051: Grade Release Workflow)
+
+| Column                | Type                                | Notes                                                                            |
+| --------------------- | ----------------------------------- | -------------------------------------------------------------------------------- |
+| id                    | serial (PK)                         |                                                                                    |
+| assignmentId          | integer (FK → assignments)         | `onDelete: cascade`                                                              |
+| studentId             | text (FK → users)                   | Enrolled student captured at publication                                         |
+| releaseVersion        | integer, not null                   | Monotonically retained assignment release version                               |
+| numericScore          | numeric(5,2), not null              | Authoritative complete score captured at publication                            |
+| letterGrade           | text, not null                      | Letter grade captured at publication                                             |
+| status                | final_grade_status enum, not null   | Complete release status                                                         |
+| contributingCheckpoints | jsonb, not null                   | Immutable checkpoint breakdown shown with the released grade                    |
+| publishedAt           | timestamp, not null                 | Publication timestamp for this snapshot                                          |
+
+Unique constraint on `(assignmentId, releaseVersion, studentId)`. Indexes support assignment/version and student lookups. Publication inserts snapshots only for enrolled students with complete, non-null `final_grades`; recomputation cannot mutate existing rows. Withdrawal retains all snapshots, keeps the latest version for the next release, and clears only active publication visibility.
 
 ### Database Indexes
 
@@ -944,6 +964,8 @@ Unique constraint on `(assignmentId, studentId)`. Indexes on `assignmentId` and 
 | `verification`       | `value`                  | b-tree           | Token lookup on password setup/reset         |
 | `final_grades`       | `assignmentId`            | b-tree           | Gradebook query per assignment (TRACK-025)   |
 | `final_grades`       | `studentId`              | b-tree           | Student grade lookup (TRACK-025)             |
+| `grade_release_snapshots` | `assignmentId`, `releaseVersion` | composite b-tree | Active release snapshot lookup (TRACK-051) |
+| `grade_release_snapshots` | `studentId`            | b-tree           | Student snapshot lookup (TRACK-051)         |
 | `audit_log`          | `createdAt`              | b-tree           | Time-ordered queries                         |
 | `audit_log`          | `action`                 | b-tree           | Type filtering                               |
 | `audit_log`          | `entityType`, `entityId` | composite b-tree | Entity-specific history                      |
@@ -959,7 +981,7 @@ Unique constraint on `(assignmentId, studentId)`. Indexes on `assignmentId` and 
 | `checkpoint_discussions` | `assignmentId`, `createdAt` | composite b-tree | Instructor overview across all checkpoints (TRACK-026) |
 | `checkpoint_discussions` | `parentMessageId`       | b-tree           | Reply threading lookup (TRACK-026)            |
 
-All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Migrations `0010`–`0012` (TRACK-020) added rubric tables (`rubric_criteria`, `rubric_levels`, `review_scores`), `grading_type` pgEnum, `checkpoints.templateCheckpointId` FK + backfill, `template_checkpoints.deletedAt`, and the two rubric-related indexes. Migration `0014_sour_nightshade.sql` (TRACK-026) added the `checkpoint_discussions` table with 3 indexes. Migration `0016` (TRACK-039) added the `cleanedUpAt` timestamp column to `upload_intents`. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
+All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Migrations `0010`–`0012` (TRACK-020) added rubric tables (`rubric_criteria`, `rubric_levels`, `review_scores`), `grading_type` pgEnum, `checkpoints.templateCheckpointId` FK + backfill, `template_checkpoints.deletedAt`, and the two rubric-related indexes. Migration `0014_sour_nightshade.sql` (TRACK-026) added the `checkpoint_discussions` table with 3 indexes. Migration `0016` (TRACK-039) added the `cleanedUpAt` timestamp column to `upload_intents`. Migration `0019_daffy_bulldozer.sql` (TRACK-051) added release state, immutable snapshots, indexes, and foreign keys; its companion rollback is `drizzle/migrations/rollback/0019_daffy_bulldozer.rollback.sql`. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
 
 ---
 
@@ -1306,7 +1328,7 @@ E2E tests run against a dedicated test database (`simak_test` on a separate `pos
 
 **DB reset** (`tests/e2e/helpers/db-reset.ts`):
 
-- `resetDatabase()` truncates 18 tables (CASCADE) and re-seeds before each spec file.
+- `resetDatabase()` truncates 28 application tables (CASCADE), including `assignment_grade_config`, `final_grades`, and `grade_release_snapshots`, and re-seeds before each spec file.
 - `getDatabaseUrl()` is exported as a shared helper (no non-null assertions on `process.env`).
 
 **R2 mock** (`tests/e2e/helpers/r2-mock.ts`):
@@ -1317,7 +1339,7 @@ E2E tests run against a dedicated test database (`simak_test` on a separate `pos
 
 - Shared `createNotification()` and `cleanupNotifications()` helpers for notification assertion setup (extracted from duplicated code in consultation and instructor-review specs). Used by `student-submission.spec.ts` to insert `submission_received` notifications and by `consultation.spec.ts` to insert `consultation_verified` notifications for post-action assertion.
 
-**Spec files** (including the instructor intervention workflow):
+**Spec files** (including grade release and the instructor intervention workflow):
 
 | Spec File                    | Tests | What it validates                                                                               |
 | ---------------------------- | ----- | ----------------------------------------------------------------------------------------------- |
@@ -1330,6 +1352,7 @@ E2E tests run against a dedicated test database (`simak_test` on a separate `pos
 | `instructor-interventions.spec.ts` | 2 | Pending-review-only students cannot create interventions; eligible instructors create an overdue discussion intervention, manage it to monitoring, see dashboard status, and student/admin access remains private |
 | `extension.spec.ts`          | 3     | Extension request → approve (checkpoint `dueDate` extended in DB), reject (deadline NOT extended), instructor bulk extension (all unfinished checkpoints extended) |
 | `password-setup.spec.ts`     | 2     | Password setup lifecycle (admin creates user → extract token from DB → setup password → login → redirect to dashboard), token reuse + expired token rejection |
+| `grade-release.spec.ts`      | 2     | Instructor preflight/publication, complete-only student snapshot visibility, student control absence, withdrawal reason validation, retained draft state, and post-withdrawal unavailability |
 
 Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode). All tests pass in ~2 minutes.
 

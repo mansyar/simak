@@ -486,12 +486,13 @@ All tracks must adhere to the following project constraints:
 
 ### TRACK-051: Grade Release Workflow
 
-- **Status:** 📋 Planned · **Audit IDs:** None (proactive academic-governance enhancement) · **Deps:** TRACK-025 (gradebook and final-grade computation)
+- **Status:** ✅ Complete and archived in `conductor/archive/grade-release-workflow_20260802/` · **Audit IDs:** `gradebook.release_published`, `gradebook.release_withdrawn` · **Deps:** TRACK-025 (gradebook and final-grade computation)
 - **Problem:** SIMAK computes final grades from checkpoint outcomes and rubric scores, but computed values can be provisional while late submissions, reviews, or corrections remain in progress. Students currently have no explicit distinction between a working grade and an officially released result. Formal coursework requires the instructor to control when results become visible and to leave an accountable record if a published result must be withdrawn for correction.
 - **Decisions:** Grade release is controlled by the assignment instructor, not an admin approval queue; existing authorized staff retain their current read-only gradebook access. Each assignment has a `draft` or `published` release state, stored with its existing one-to-one grade configuration. Publishing creates an immutable release snapshot for every currently complete enrolled student from the authoritative computed grade; later grade recomputation cannot silently change the student-visible released value. An instructor can return the release to draft only with an audit reason, then publish a new snapshot after corrections or after additional students become complete. Incomplete students continue to see a clear unavailable/not-yet-released state. Staff exports remain working-data exports and do not claim to be a released transcript.
 - **Scope:** Grade-configuration release state plus immutable per-student published-grade snapshot data and migrations; ownership-guarded publish/unpublish server functions; instructor gradebook preflight summary for incomplete/missing-grade students; student final-grade visibility gating; audit-log events for publication and withdrawal; bilingual, accessible UI and tests. Existing grade computation and rubric scoring remain unchanged.
 - **Out of Scope:** Admin moderation/approval queues, grade appeals, student acknowledgments, formal transcripts, GPA calculation, scheduled release dates, automatic email/in-app publication announcements, and a student-facing history of withdrawn or superseded releases.
 - **Execution vectors:** Add the release-state and immutable snapshot schema; update gradebook and student-grade handlers to enforce role-appropriate visibility and select the active published snapshot for students; build a preflight confirmation showing eligible, incomplete, and missing-grade students; implement publish/unpublish with instructor ownership verification and a required unpublish reason; add audit events; test that unpublished computed results remain inaccessible to students, published values do not change after recomputation, newly completed students require a later publication, incomplete students remain unavailable, and unauthorized users cannot change release state.
+- **Execution result:** Added migration `0019_daffy_bulldozer.sql` plus a manually verified rollback; introduced draft/published release metadata and immutable `grade_release_snapshots`; added rate-limited, ownership-locked preflight/publish/withdraw handlers with complete-only atomic snapshots, retained version history, audit events, and fail-closed student gating; added bilingual instructor controls, unavailable/snapshot presentation, admin audit-action registration, and deterministic unit/E2E/accessibility coverage. Full verification passed with 4,073 unit tests and coverage above all 80% thresholds.
 - **Definition of Done:** Only the owning instructor can publish or unpublish an assignment's grades; draft computed grades are inaccessible to students; publishing creates immutable snapshots visible only to completed enrolled students; later recomputation cannot alter an active published value; incomplete or newly completed students remain unavailable until a later publication; withdrawal requires a reason and publication/withdrawal are audited; existing authorized staff exports remain working-data exports; unit/E2E tests, typecheck, lint, i18n, accessibility, and coverage gates pass.
 
 ---
@@ -583,7 +584,7 @@ Milestone 16: Student Support Workflows
 └── TRACK-050: At-Risk Intervention Workflow [✅ Complete — archived — depends on 023]
 
 Milestone 17: Academic Governance
-└── TRACK-051: Grade Release Workflow [📋 Planned — depends on 025]
+└── TRACK-051: Grade Release Workflow [✅ Complete — archived — depends on 025]
 ```
 
 ### Parallelization Strategy
@@ -617,7 +618,7 @@ The following track groups can be worked on simultaneously:
 | **W** | TRACK-044 → TRACK-040, TRACK-043 (complete — archived) | TRACK-044 wires TRACK-040's `requestIdMiddleware` through the middleware chaining established by TRACK-043. It runs request-ID middleware before optional rate limiting so all server-function logs receive request context. |
 | **X** | TRACK-046 → TRACK-022 (complete), TRACK-030 (complete) | Sequential dependency — TRACK-046 builds on notification infrastructure from TRACK-022 and the client-side data layer from TRACK-030. New domain (SSE route + connection manager) — no file overlap with other planned tracks |
 | **Y** | TRACK-047 → TRACK-048 | TRACK-047 is complete and archived; any broader backup/restore follow-up can now build on the verified seven-copy pilot baseline before wider onboarding. |
-| **Z** | TRACK-049 (complete — archived), TRACK-050 (complete — archived), TRACK-051 | Independently implementable after their dependencies. TRACK-049 touches review UI and a new snippet domain; TRACK-050 touched risk, dashboard, assignment-reassignment, and instructor intervention paths; TRACK-051 touches gradebook and student-grade visibility. Coordinate only if future work overlaps shared instructor dashboard or gradebook files. |
+| **Z** | TRACK-049 (complete — archived), TRACK-050 (complete — archived), TRACK-051 (complete — archived) | Independently implemented after their dependencies. TRACK-049 touches review UI and a new snippet domain; TRACK-050 touched risk, dashboard, assignment-reassignment, and instructor intervention paths; TRACK-051 touches gradebook and student-grade visibility. Future work should coordinate if it overlaps shared instructor dashboard or gradebook files. |
 
 ---
 
