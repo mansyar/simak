@@ -43,10 +43,10 @@
   - [x] Add regression assertions that omitted timezone behavior remains unchanged for non-target callers.
   - **RED evidence:** The new explicit-timezone assertions failed against the existing local-time-only formatter before the GREEN implementation.
 
-- [ ] **1.5 Implement timezone-aware formatting (GREEN)**
-  - [ ] Extend the shared date formatting boundary with an optional explicit IANA timezone.
-  - [ ] Ensure the formatter passes `timeZone` to `Intl`/date-fns-compatible formatting without mutating the `Date` or ISO instant.
-  - [ ] Keep the implementation locale-aware for English and Indonesian.
+- [x] **1.5 Implement timezone-aware formatting (GREEN)**
+  - [x] Extend the shared date formatting boundary with an optional explicit IANA timezone.
+  - [x] Ensure the formatter passes `timeZone` to `Intl`/date-fns-compatible formatting without mutating the `Date` or ISO instant.
+  - [x] Keep the implementation locale-aware for English and Indonesian.
 
 ### Phase Verification
 
