@@ -176,8 +176,11 @@
 
 ### Phase Verification
 
-- [ ] Run selection and serializer tests with `pnpm vitest run tests/unit/lib/calendar-ics.test.ts tests/unit/server/calendar-feed-selection.test.ts`.
-- [ ] Validate generated feeds with an RFC 5545-aware parser or calendar-client fixture and inspect line endings and escaped values.
+- [x] Run selection and serializer tests with `pnpm vitest run tests/unit/lib/calendar-ics.test.ts tests/unit/server/calendar-feed-selection.test.ts`.
+  - **Evidence:** 2 files and 7 tests passed.
+- [x] Validate generated feeds with an RFC 5545-aware parser or calendar-client fixture and inspect line endings and escaped values.
+  - **Evidence:** The focused serializer fixture validated UTC timestamps, stable UIDs, CRLF, escaping, UTF-8-safe folding, Unicode, empty feeds, overdue events, and locked events. User confirmed the manual output review; no external parser package is installed.
+  - **Checkpoint:** functional commits `18d11de` and `78230e2`; user confirmed Phase 4 manual verification and approved proceeding to Phase 5.
 
 ## Phase 5: Bearer-Protected Route and Feed Management UI
 
