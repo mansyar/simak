@@ -258,10 +258,10 @@
   - **Evidence:** `pnpm format`, `pnpm typecheck`, and `pnpm build` passed. `pnpm lint` passed with four pre-existing warnings and no errors. `pnpm test:coverage` passed 416 files and 4,139 tests with global coverage of 87.65% statements, 80.65% branches, 83.33% functions, and 88.44% lines. The final review found no credential disclosure, hardcoded new UI strings, unsafe feed headers, or over-limit changed files; the route-layout test mock and timezone assertion were stabilized after coverage exposed them.
   - **Commit:** `bf14e78`
 
-- [ ] **6.5 Complete manual verification and documentation**
-  - [ ] Document the stable feed URL, token lifecycle behavior, UTC storage invariant, and operational/security considerations in implementation notes if required.
-  - [ ] Execute the workflow’s frontend and backend manual verification steps against the development server.
-  - [ ] Record user confirmation for the final phase checkpoint before attaching the verification git note.
+- [~] **6.5 Complete manual verification and documentation**
+  - [~] Document the stable feed URL, token lifecycle behavior, UTC storage invariant, and operational/security considerations in implementation notes if required.
+  - [~] Execute the workflow’s frontend and backend manual verification steps against the development server.
+  - [~] Record user confirmation for the final phase checkpoint before attaching the verification git note.
 
 ### Phase Verification
 
