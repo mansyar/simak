@@ -81,7 +81,7 @@
   - [x] Provide a manual valid-IANA selection, a clear UTC fallback, and accessible status/error messaging.
   - [x] Add the required keys to `locales/en.json` and `locales/id.json`; regenerate i18n types.
 
-- [x] **2.5 Add deadline-surface regression tests (RED)**
+- [x] **2.5 Add deadline-surface regression tests (RED)** [commit: d3ce94b]
   - [x] Extend `tests/unit/components/dashboard/student-dashboard.test.tsx` for explicit timezone rendering, DST transitions, placeholders, relative time, overdue state, and null deadlines.
   - [x] Add or extend a checkpoint-card test for student assignment/checkpoint deadline formatting and overdue behavior.
   - [x] Assert that pending-review, consultation, instructor, and admin date surfaces are not unintentionally changed.
