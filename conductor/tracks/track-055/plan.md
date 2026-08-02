@@ -94,9 +94,12 @@
 
 ### Phase Verification
 
-- [ ] Run settings and student-surface tests with `pnpm vitest run tests/unit/server/settings.test.ts tests/unit/components/settings tests/unit/components/dashboard/student-dashboard.test.tsx`.
-- [ ] Run `pnpm check:i18n` and verify both locale files have matching new keys.
-- [ ] Perform a manual SSR/hydration check in a browser with a DST-observing timezone and with browser timezone access unavailable.
+- [x] Run settings and student-surface tests with `pnpm vitest run tests/unit/server/settings.test.ts tests/unit/components/settings tests/unit/components/dashboard/student-dashboard.test.tsx`.
+  - **Evidence:** 11 files and 143 tests passed.
+- [x] Run `pnpm check:i18n` and verify both locale files have matching new keys.
+  - **Evidence:** 917 used keys are present in both locale files.
+- [x] Perform a manual SSR/hydration check in a browser with a DST-observing timezone and with browser timezone access unavailable.
+  - **Checkpoint:** functional commit `90ed3ae`; automated verification passed with 143 tests and i18n parity; user confirmed the browser checks for hydration, DST-aware rendering, manual override/validation, UTC fallback, and unchanged non-student surfaces.
 
 ## Phase 3: Calendar Token Schema and Authenticated Lifecycle
 
