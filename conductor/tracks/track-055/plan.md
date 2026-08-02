@@ -69,10 +69,11 @@
   - [x] Preserve all existing settings fields when saving timezone changes.
   - [x] Return the normalized settings shape needed by the student settings UI.
 
-- [ ] **2.3 Add timezone settings component tests (RED)**
-  - [ ] Create a settings component test for hydration-safe placeholder rendering before browser detection.
-  - [ ] Test detected timezone persistence, manual IANA override, invalid selection feedback, UTC fallback, loading, save success, and save failure states.
-  - [ ] Test accessible labels, keyboard selection, focus behavior, and English/Indonesian key usage.
+- [x] **2.3 Add timezone settings component tests (RED)**
+  - [x] Create a settings component test for hydration-safe placeholder rendering before browser detection.
+  - [x] Test detected timezone persistence, manual IANA override, invalid selection feedback, UTC fallback, loading, save success, and save failure states.
+  - [x] Test accessible labels, keyboard selection, focus behavior, and English/Indonesian key usage.
+  - **RED evidence:** The test suite initially failed because the focused timezone settings component did not yet exist.
 
 - [ ] **2.4 Implement the timezone preference UI (GREEN)**
   - [ ] Add a focused component under `src/components/settings/` and wire it into `SettingsPage` for the student settings route.
