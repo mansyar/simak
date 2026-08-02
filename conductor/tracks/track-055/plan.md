@@ -233,7 +233,7 @@
   - [x] Cover a DST-sensitive deadline fixture and verify the feed remains UTC while the UI uses the selected display timezone.
   - [x] Verify non-student routes and existing reminder behavior remain unaffected.
   - **Evidence:** Chromium E2E passed 2 tests: DST-sensitive student display/feed lifecycle and instructor isolation. Existing SSR nonce/date hydration warnings remain visible in the dev server logs; they did not fail the feature assertions.
-  - **Commit:** `pending`
+  - **Commit:** `acb3da3`
 
 - [ ] **6.2 Add accessibility and responsive coverage**
   - [ ] Run axe-core coverage for the new settings sections and relevant student deadline surfaces.
