@@ -119,7 +119,7 @@ simak/
 │   ├── components/           → React components
 │   │   ├── ui/               → shadcn/ui primitives
 │   │   ├── layout/           → Sidebar (student, instructor, admin — dark navy variants), header (sticky, backdrop blur), language switcher, theme toggle
-│   │   ├── dashboard/        → Role-specific dashboard components (StudentDashboard, InstructorDashboard, AdminDashboard with metric cards)
+│   │   ├── dashboard/        → Role-specific dashboard components (StudentDashboard, StudentNextActions, InstructorDashboard, AdminDashboard with metric cards)
 │   │   ├── student/
 │   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton
 │   │   ├── instructor/
@@ -210,6 +210,7 @@ simak/
 │   │   ├── deadline-reminder-scanner.ts → `processDeadlineReminders()` — hourly background scanner for tiered deadline reminders (7d/3d/1d), dedup via `deadline_reminders` table
 │   │   ├── deadline-reminder-email.ts → `sendDeadlineReminderEmail()` helper (wraps `enqueueEventEmail` with `buildDeadlineReminderHtml`)
 │   │   ├── risk-scoring.ts   → Pure function `computeStudentRisk(data): RiskAssessment` — 5 risk signals (overdue, approaching deadline, insufficient consultations, repeated revise, stalled review); ephemeral, never persisted
+│   │   ├── student-next-actions.ts → Pure deterministic resolver for checkpoint action eligibility, priority/deduplication, precise destinations, and submitted/under-review waiting summaries (TRACK-053)
 │   │   ├── risk-alerts.ts    → `checkAndFireRiskAlert(db, opts)` — advisory post-commit alert with 7-day dedup via notifications table; fires in-app notification + email via `Promise.allSettled`
 │   │   ├── review-risk-alert.ts → `maybeFireReviewRiskAlert(db, decision, breachDays, slaFields, instructorId)` — wrapper called from `submitReviewHandler` when revise or SLA breach
 │   │   ├── at-risk-email.ts  → `sendStudentAtRiskEmail(opts)` helper (wraps `enqueueEventEmail` with `buildStudentAtRiskHtml`)
@@ -244,7 +245,7 @@ simak/
 ├── tests/
 │   ├── unit/                 → Vitest unit tests
 │   ├── integration/          → Vitest integration tests
-│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 21 spec files including grade-release, feedback-snippet, and intervention workflow coverage, includes @axe-core/playwright a11y scans)
+│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 22 spec files including Student Next Actions, grade-release, feedback-snippet, and intervention workflow coverage, includes @axe-core/playwright a11y scans)
 ├── docker/
 │   └── Dockerfile
 ├── drizzle.config.ts
@@ -263,11 +264,11 @@ Each role gets a dedicated dashboard page rendered within its role layout (`_stu
 
 | Role           | Dashboard Route         | Widgets                                                                                                                                                                                                                                                                                    |
 | -------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Student**    | `/student/dashboard`    | Active Assignments (card grid with progress bars), Upcoming Deadlines (next 5, color-coded urgency, overdue badges), Pending Reviews (submissions under review, wait times), Consultation Reminders (pending verifications)                                                                |
+| **Student**    | `/student/dashboard`    | Next Actions (prioritized submit/revise/required-consultation actions, maximum 5, plus submitted/under-review waiting summaries with maximum 3 representative links), Active Assignments (card grid with progress bars), Upcoming Deadlines (next 5, color-coded urgency, overdue badges), Pending Reviews (submissions under review, wait times), Consultation Reminders (pending verifications) |
 | **Instructor** | `/instructor/dashboard` | Pending Review Queue (count + FIFO list with SLA badges: On Time/Approaching/Breached), Recent Submissions (last 5 with status badges), Assignment Overview (cards with student count, pending count, progress), At-Risk Students (sorted by severity: high/medium/low with colored Badges, factor descriptions via i18n, link to assignment detail, EmptyState when none), Quick Actions (Go to Review Queue, Manage Assignments)                    |
 | **Admin**      | `/admin/dashboard`      | System Metrics (6 cards: Total Users, Instructors, Students, Active Assignments, Pending Reviews, Active Consultations), Recent Activity Feed (last 10 events, 7 days), Deadline Escalation Alerts (SLA breaches >3 days with red styling), Quick Actions (Manage Users, Manage Templates) |
 
-Widget data is fetched via a single **aggregated server function** per role. Each handler verifies session + role, executes multiple Drizzle queries, and returns a pre-shaped payload. All widgets show appropriate empty states when no data is available.
+Widget data is fetched via a single **aggregated server function** per role. Each handler verifies session + role, executes multiple Drizzle queries, and returns a pre-shaped payload. The student handler resolves Next Actions from authoritative checkpoint, submission, review, and consultation state in the same response; it loads candidates completely before applying display caps and does not persist a second task system. All widgets show appropriate empty states when no data is available.
 
 Query key: `['dashboard']` with role differentiation handled server-side.
 
@@ -303,7 +304,7 @@ All list views (assignments, reviews, users, notifications, consultations, submi
 - **20 items per page** as default page size (max 100 via Zod `max(100)` cap).
 - **Server-side pattern:** Each list handler accepts `page` (Zod `z.coerce.number().int().min(1).default(1)`) and `limit` (Zod `z.coerce.number().int().min(1).max(100).default(20)`) params. The data query and a `SELECT count(*)::int` query run in parallel via `Promise.all`. The response includes a `total` field for client-side page count calculation.
 - **Client-side pattern:** Page state is persisted in TanStack Router search params (e.g. `?page=2`) so the URL is shareable. A shared `<Pagination>` component renders when `totalPages > 1`.
-- **Dashboard safety caps:** Inline dashboard widgets (`activeAssignments` on student dashboard, `assignmentOverview` on instructor dashboard) use a hardcoded `.limit(20)` safety cap since they cannot be independently paginated.
+- **Dashboard safety caps:** Inline dashboard widgets (`activeAssignments` on student dashboard, `assignmentOverview` on instructor dashboard) use a hardcoded `.limit(20)` safety cap since they cannot be independently paginated. Next Actions loads all eligible candidates before applying its five-primary and three-waiting-representative display caps so ranking and waiting counts are complete.
 - **Loading state**: skeleton rows while the next page loads. Prefetch next page on scroll near the bottom.
 - **Empty list conditional**: Pagination controls are hidden when the list is empty (`{items.length > 0 && <Pagination .../>}`). Prevents confusing empty-page navigation. Applied in `admin/users/index.tsx` and `student/assignments/index.tsx`.
 - **[v2]**: Migrate to cursor-based pagination for submission histories and audit logs (append-only data where offset pagination drifts).

@@ -2,7 +2,7 @@
 
 This document tracks moderate and minor accessibility violations identified by axe-core scans during E2E testing (TRACK-028).
 
-**Last scanned:** 2026-07-27  
+**Last scanned:** 2026-08-02 (targeted TRACK-053 dashboard scan; baseline page scans from 2026-07-27)
 **Scanner:** @axe-core/playwright 4.12.1  
 **Critical/serious violations:** 0 (all fixed)  
 **Moderate violations:** 0 (all fixed — remediated in TRACK-037 on 2026-07-28)  
@@ -12,7 +12,7 @@ This document tracks moderate and minor accessibility violations identified by a
 
 ## Remediated Moderate Violations (TRACK-037, 2026-07-28)
 
-All 4 moderate violations were remediated in TRACK-037. Unit tests verify the fixes at the DOM level. E2E axe-core scans are pending resolution of a pre-existing TanStack Router runtime issue in this worktree (see TRACK-037 spec, "Out of Scope").
+All 4 moderate violations were remediated in TRACK-037. Unit tests verify the fixes at the DOM level. The targeted TRACK-053 student-dashboard axe scan passed after adding the semantic Next Actions heading and accessible action links. The full E2E suite remains limited by a pre-existing TanStack Router hydration/runtime issue and an unrelated Firefox admin-template failure (see TRACK-037 spec, "Out of Scope").
 
 | Rule | Impact | Pages Affected | Root Cause | Fix |
 |------|--------|----------------|------------|-----|
