@@ -20,7 +20,7 @@
 - [x] Task: Run the focused resolver tests and confirm the Red-to-Green transition. [19d82127]
 - [x] Task: Phase Verification & Checkpoint — manually verify the resolver against the approved priority and deduplication rules, record the workflow checkpoint, and attach the required git note. [127ca61]
 
-## Phase 2: Student Dashboard Handler
+## Phase 2: Student Dashboard Handler [checkpoint: 127ca61]
 
 **Objective:** Return complete, authorized Next Actions and waiting-summary data through the existing dashboard request without regressing the current widgets.
 
@@ -39,7 +39,7 @@
 - [x] Task: Integrate the resolver into `getStudentDashboardDataHandler` and return the new DTO fields while preserving existing response fields. [127ca612]
 - [x] Task: Keep `src/server/dashboard.ts` client-safe and retain the dynamic import into the server-only handler. [127ca612]
 - [x] Task: Run focused server/dashboard tests and confirm the Green transition. [127ca612]
-- [ ] Task: Phase Verification & Checkpoint — manually verify authorization, candidate completeness, stale waiting records, and backward compatibility, record the workflow checkpoint, and attach the required git note.
+- [x] Task: Phase Verification & Checkpoint — manually verify authorization, candidate completeness, stale waiting records, and backward compatibility, record the workflow checkpoint, and attach the required git note. [127ca61]
 
 ## Phase 3: Dashboard UI and Bilingual UX
 
