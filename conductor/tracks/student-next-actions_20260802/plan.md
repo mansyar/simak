@@ -64,7 +64,7 @@
 - [x] Task: Run focused component and i18n tests and confirm the Green transition. [4a4cb97a]
 - [x] Task: Phase Verification & Checkpoint — manually verify English/Indonesian rendering, empty/waiting states, link destinations, keyboard access, and mobile layout, record the workflow checkpoint, and attach the required git note. [4a4cb97]
 
-## Phase 4: E2E, Accessibility, and Regression Gates
+## Phase 4: E2E, Accessibility, and Regression Gates [checkpoint: 94c4b84]
 
 **Objective:** Verify the complete student workflow and satisfy project quality gates.
 
@@ -74,14 +74,14 @@
   - [x] Add only the minimal deterministic fixture data needed for states absent from the existing E2E seed.
   - [x] Verify the mobile dashboard has no horizontal overflow.
 - [x] Task: Add or extend student dashboard axe-core coverage for critical and serious accessibility violations. [94c4b848]
-- [~] Task: Run focused unit, component, and E2E tests, then run the full required gates. [ae39e947, 94c4b848]
+- [x] Task: Run focused unit, component, and E2E tests, then run the full required gates, with the unrelated full-suite E2E limitation accepted and documented. [ae39e947, 94c4b848]
   - [x] Run `pnpm test` — 409 files and 4,089 tests passed.
   - [x] Run `pnpm test:coverage` — global thresholds passed: 87.92% statements, 80.96% branches, 83.91% functions, and 88.60% lines.
   - [x] Run `pnpm typecheck`.
   - [x] Run `pnpm lint` — 0 errors; four pre-existing warnings remain.
   - [x] Run `pnpm check:i18n` — locale parity passed.
-  - [~] Run `pnpm test:e2e` — the full 600-second run reached test 111 without a final summary; focused Next Actions coverage passed across Chromium, Firefox, and mobile-chrome, while existing hydration and Firefox admin-template axe failures were observed.
+  - [~] Run `pnpm test:e2e` — the full 600-second run reached test 111 without a final summary; focused Next Actions coverage passed across Chromium, Firefox, and mobile-chrome, while existing hydration and Firefox admin-template axe failures were observed. User accepted this documented limitation on 2026-08-02.
   - [x] Run `pnpm build`.
 - [x] Task: Review the final diff for authorization, file-size, i18n, accessibility, and backward-compatibility compliance. [94c4b848, ae39e947]
-- [ ] Task: Phase Verification & Checkpoint — complete the workflow manual verification, update plan checkpoint data, attach the verification git note, and confirm all acceptance criteria.
+- [x] Task: Phase Verification & Checkpoint — complete the workflow manual verification, update plan checkpoint data, attach the verification git note, and confirm all acceptance criteria. [94c4b84]
 - [x] Task: Prepare conventional commits following `conductor/workflow.md`.
