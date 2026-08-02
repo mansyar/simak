@@ -127,7 +127,7 @@
   - [x] Apply an appropriate authenticated mutation/read rate limit to the handlers.
   - **Evidence:** 7 lifecycle unit tests passed; `pnpm typecheck` and targeted oxlint passed with zero errors. Bearer plaintext is generated only in the response URL, while persisted values and audit details contain only the SHA-256 hash/metadata.
 
-- [x] **3.4 Add lifecycle integration tests (RED/GREEN)**
+- [x] **3.4 Add lifecycle integration tests (RED/GREEN)** [commit: 58cf555]
   - [x] Verify the full handler-to-database flow for enable, regenerate, revoke, and old-token invalidation.
   - [x] Verify unrelated settings and audit records remain correct when lifecycle operations succeed or fail.
   - **Evidence:** Both calendar lifecycle integration tests passed against the development database after applying migration 0020 directly; the migration runner remains blocked by the repository's pre-existing migration-ledger inconsistency.
