@@ -45,23 +45,23 @@
 
 **Objective:** Present prioritized actions and waiting work accessibly above the existing student dashboard widgets.
 
-- [ ] Task: Write failing component tests in `tests/unit/components/dashboard/StudentNextActions.test.tsx` and update dashboard regression tests.
-  - [ ] Verify the section appears above the existing widgets.
-  - [ ] Verify primary action labels, assignment/checkpoint context, due/overdue presentation, and direct destination links.
-  - [ ] Verify one rendered card per resolved action and a maximum of five cards.
-  - [ ] Verify separate Submitted and Under Review waiting groups, counts, and no more than three representative links total.
-  - [ ] Verify the always-visible localized empty state.
-  - [ ] Verify semantic headings, links, keyboard-accessible interaction, and accessible names.
-- [ ] Task: Add Next Actions translation keys to `locales/en.json` and matching Indonesian keys to `locales/id.json`.
-  - [ ] Add section, action, state, priority, waiting-summary, count, empty-state, and accessibility-label translations.
-  - [ ] Run `pnpm generate:i18n`.
-  - [ ] Run `pnpm check:i18n` and verify locale parity.
-- [ ] Task: Implement `src/components/dashboard/StudentNextActions.tsx` and integrate it into `StudentDashboard`.
-  - [ ] Use existing shadcn/ui, Radix, Link, badge, and empty-state patterns.
-  - [ ] Link submit/revise actions to checkpoint routes and consultation actions to assignment detail.
-  - [ ] Preserve responsive behavior from 320px through desktop widths.
-  - [ ] Keep user-visible strings localized and all files under 500 lines.
-- [ ] Task: Run focused component and i18n tests and confirm the Green transition.
+- [x] Task: Write failing component tests in `tests/unit/components/dashboard/StudentNextActions.test.tsx` and update dashboard regression tests. [55f291d8, 4a4cb97a]
+  - [x] Verify the section appears above the existing widgets.
+  - [x] Verify primary action labels, assignment/checkpoint context, due/overdue presentation, and direct destination links.
+  - [x] Verify one rendered card per resolved action and a maximum of five cards.
+  - [x] Verify separate Submitted and Under Review waiting groups, counts, and no more than three representative links total.
+  - [x] Verify the always-visible localized empty state.
+  - [x] Verify semantic headings, links, keyboard-accessible interaction, and accessible names.
+- [x] Task: Add Next Actions translation keys to `locales/en.json` and matching Indonesian keys to `locales/id.json`. [0a2c6f72]
+  - [x] Add section, action, state, priority, waiting-summary, count, empty-state, and accessibility-label translations.
+  - [x] Run `pnpm generate:i18n`.
+  - [x] Run `pnpm check:i18n` and verify locale parity.
+- [x] Task: Implement `src/components/dashboard/StudentNextActions.tsx` and integrate it into `StudentDashboard`. [0a2c6f72, 4a4cb97a]
+  - [x] Use existing shadcn/ui, Radix, Link, badge, and empty-state patterns.
+  - [x] Link submit/revise actions to checkpoint routes and consultation actions to assignment detail.
+  - [x] Preserve responsive behavior from 320px through desktop widths.
+  - [x] Keep user-visible strings localized and all files under 500 lines.
+- [x] Task: Run focused component and i18n tests and confirm the Green transition. [4a4cb97a]
 - [ ] Task: Phase Verification & Checkpoint — manually verify English/Indonesian rendering, empty/waiting states, link destinations, keyboard access, and mobile layout, record the workflow checkpoint, and attach the required git note.
 
 ## Phase 4: E2E, Accessibility, and Regression Gates
