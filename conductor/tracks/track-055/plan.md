@@ -20,10 +20,11 @@
 
 ### Tasks
 
-- [ ] **1.1 Establish the integration boundary**
-  - [ ] Review the current TRACK-013/053 date-display and student deadline surfaces on this branch.
-  - [ ] Record the explicit student deadline call sites that will change and the instructor/admin call sites that must remain unchanged.
-  - [ ] Confirm the canonical UTC-instant convention for `assignments.finalDeadline` and `checkpoints.dueDate` without changing stored data.
+- [x] **1.1 Establish the integration boundary**
+  - [x] Review the current TRACK-013/053 date-display and student deadline surfaces on this branch.
+  - [x] Record the explicit student deadline call sites that will change and the instructor/admin call sites that must remain unchanged.
+  - [x] Confirm the canonical UTC-instant convention for `assignments.finalDeadline` and `checkpoints.dueDate` without changing stored data.
+  - **Boundary notes:** Student deadline formatting is used by `StudentDashboard`, `StudentAssignmentCard`, `AssignmentDetailHeader`, and `CheckpointCard`. Consultation reminders, pending-review dates, instructor/admin surfaces, and reminder scanning remain unchanged. `assignments.finalDeadline` and `checkpoints.dueDate` are authoritative stored instants and are serialized with `toISOString()` at the dashboard boundary.
 
 - [ ] **1.2 Define timezone validation and fallback tests (RED)**
   - [ ] Create `tests/unit/lib/timezone.test.ts`.
