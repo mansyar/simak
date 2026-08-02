@@ -11,6 +11,7 @@ export const RATE_LIMITS = {
   heavyMutation: { window: 60, max: 10 },
   destructive: { window: 60, max: 5 },
   standardRead: { window: 60, max: 60 },
+  calendarFeed: { window: 60, max: 60 },
 } as const;
 
 interface RateLimitEntry {
@@ -65,4 +66,8 @@ export function createRateLimitMiddleware(config: RateLimitConfig) {
 
 export function resetRateLimitStoreForTests(): void {
   rateLimitStore.clear();
+}
+
+export function checkCalendarFeedRateLimit(key: string): boolean {
+  return checkRateLimit(rateLimitStore, `calendar-feed:${key}`, RATE_LIMITS.calendarFeed);
 }

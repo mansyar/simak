@@ -13,7 +13,7 @@ type CalendarFeedLifecycleInput = z.infer<typeof CalendarFeedLifecycleSchema>;
 type Transaction = Parameters<Parameters<Db['transaction']>[0]>[0];
 type QueryDb = Db | Transaction;
 
-const CALENDAR_FEED_PATH = '/api/calendar.ics';
+const CALENDAR_FEED_PATH = '/api/calendar/ics';
 
 function generateFeedToken(): string {
   return randomBytes(32).toString('base64url');

@@ -194,11 +194,12 @@
   - **RED evidence:** The focused suite failed before execution because `src/server/calendar-feed-route.server.ts` did not yet exist.
   - **Evidence:** 5 focused route-security tests passed after adding the route contract coverage.
 
-- [ ] **5.2 Implement the calendar route (GREEN)**
-  - [ ] Add a stable route-level GET endpoint under `src/routes/api/` using the project’s TanStack route-handler pattern.
-  - [ ] Extract the bearer credential, hash/lookup it, enforce token activity and student ownership, then call the selection and serializer helpers.
-  - [ ] Add a credential-authenticated rate-limit key that does not require a browser session.
-  - [ ] Set safe response headers and ensure credentials are never included in logs or error bodies.
+- [x] **5.2 Implement the calendar route (GREEN)**
+  - [x] Add a stable route-level GET endpoint under `src/routes/api/` using the project’s TanStack route-handler pattern.
+  - [x] Extract the bearer credential, hash/lookup it, enforce token activity and student ownership, then call the selection and serializer helpers.
+  - [x] Add a credential-authenticated rate-limit key that does not require a browser session.
+  - [x] Set safe response headers and ensure credentials are never included in logs or error bodies.
+  - **Evidence:** 5 route tests passed; the TanStack endpoint resolves to `/api/calendar/ics`, uses hashed opaque credentials, filters active student ownership in the database query, applies session-independent client rate limiting, and returns generic unauthorized/rate-limit responses with private/no-store, no-referrer, and `nosniff` headers. Typecheck and targeted oxlint passed.
 
 - [ ] **5.3 Define feed-management UI tests (RED)**
   - [ ] Create component tests for disabled, enabled, loading, success, empty, failure, regeneration-confirmation, and revoked states.
