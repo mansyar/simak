@@ -69,7 +69,7 @@
   - [x] Preserve all existing settings fields when saving timezone changes.
   - [x] Return the normalized settings shape needed by the student settings UI.
 
-- [x] **2.3 Add timezone settings component tests (RED)**
+- [x] **2.3 Add timezone settings component tests (RED)** [commit: dbe4701]
   - [x] Create a settings component test for hydration-safe placeholder rendering before browser detection.
   - [x] Test detected timezone persistence, manual IANA override, invalid selection feedback, UTC fallback, loading, save success, and save failure states.
   - [x] Test accessible labels, keyboard selection, focus behavior, and English/Indonesian key usage.
