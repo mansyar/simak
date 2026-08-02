@@ -41,7 +41,7 @@
 - [x] Task: Run focused server/dashboard tests and confirm the Green transition. [127ca612]
 - [x] Task: Phase Verification & Checkpoint — manually verify authorization, candidate completeness, stale waiting records, and backward compatibility, record the workflow checkpoint, and attach the required git note. [127ca61]
 
-## Phase 3: Dashboard UI and Bilingual UX
+## Phase 3: Dashboard UI and Bilingual UX [checkpoint: 4a4cb97]
 
 **Objective:** Present prioritized actions and waiting work accessibly above the existing student dashboard widgets.
 
@@ -62,7 +62,7 @@
   - [x] Preserve responsive behavior from 320px through desktop widths.
   - [x] Keep user-visible strings localized and all files under 500 lines.
 - [x] Task: Run focused component and i18n tests and confirm the Green transition. [4a4cb97a]
-- [ ] Task: Phase Verification & Checkpoint — manually verify English/Indonesian rendering, empty/waiting states, link destinations, keyboard access, and mobile layout, record the workflow checkpoint, and attach the required git note.
+- [x] Task: Phase Verification & Checkpoint — manually verify English/Indonesian rendering, empty/waiting states, link destinations, keyboard access, and mobile layout, record the workflow checkpoint, and attach the required git note. [4a4cb97]
 
 ## Phase 4: E2E, Accessibility, and Regression Gates
 
