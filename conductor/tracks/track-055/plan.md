@@ -246,7 +246,7 @@
   - [x] Run the unused-key check and remove or correct any new unused/mismatched keys.
   - [x] Confirm no generated i18n file was edited manually.
   - **Evidence:** `pnpm generate:i18n`, `pnpm check:i18n`, and `pnpm check:i18n:unused` passed. Both locales contain all 934 code-used keys; generated types were regenerated from `locales/en.json` without manual edits.
-  - **Commit:** `pending`
+  - **Commit:** `e53579c`
 
 - [ ] **6.4 Run final quality gates**
   - [ ] Run `pnpm format` and review the resulting diff for unrelated changes.
