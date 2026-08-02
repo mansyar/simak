@@ -134,9 +134,13 @@
 
 ### Phase Verification
 
-- [ ] Run server lifecycle tests with `pnpm vitest run tests/unit/server/calendar-feed.test.ts`.
-- [ ] Run the forward migration, validate the token constraints, execute the companion rollback in a disposable development database, and re-apply the migration.
-- [ ] Confirm no test output, audit row, or application log contains a plaintext token.
+- [x] Run server lifecycle tests with `pnpm vitest run tests/unit/server/calendar-feed.test.ts`.
+  - **Evidence:** 1 file and 7 tests passed.
+- [x] Run the forward migration, validate the token constraints, execute the companion rollback in a disposable development database, and re-apply the migration.
+  - **Evidence:** The disposable `simak-postgres-test` database reported 4 indexes and 3 constraints after forward application, reported the table absent after rollback, and reported the table/indexes restored after re-application. The repository `pnpm db:migrate` command remains blocked by its pre-existing migration-ledger inconsistency, so the SQL was applied directly for this verification.
+- [x] Confirm no test output, audit row, or application log contains a plaintext token.
+  - **Evidence:** Unit assertions found no plaintext in audit calls; the real-database lifecycle test found no plaintext in audit rows.
+  - **Checkpoint:** functional commit `a6e0b65`; user confirmed backend manual verification of hash-only storage, token rotation/revocation, audit/log redaction, and the migration-ledger caveat.
 
 ## Phase 4: Calendar Event Selection and RFC 5545 Serialization
 
