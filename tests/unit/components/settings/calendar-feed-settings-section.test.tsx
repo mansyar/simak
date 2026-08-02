@@ -80,7 +80,10 @@ describe('CalendarFeedSettingsSection', () => {
       return mutationResults[index] ?? { mutateAsync: vi.fn(), isPending: false };
     });
     mockInvalidateQueries.mockReset();
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    Object.defineProperty(window, 'confirm', {
+      configurable: true,
+      value: vi.fn(() => true),
+    });
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
       value: { writeText: vi.fn() },

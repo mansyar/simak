@@ -1167,6 +1167,25 @@
       "invalid": "Enter a valid IANA timezone.",
       "saveError": "Unable to save timezone. Please try again."
     },
+    "calendarFeed": {
+      "title": "Private calendar feed",
+      "description": "Subscribe to your student deadlines in a calendar app. The feed is read-only.",
+      "loading": "Loading calendar feed…",
+      "enable": "Enable calendar feed",
+      "enabled": "Calendar feed enabled.",
+      "empty": "No subscription URL is currently shown. Regenerate the URL to create a new one.",
+      "urlLabel": "Private calendar URL",
+      "copy": "Copy URL",
+      "copied": "Calendar URL copied.",
+      "copyError": "Unable to copy calendar URL.",
+      "regenerate": "Regenerate URL",
+      "revoke": "Disable calendar feed",
+      "confirmRegenerate": "Regenerate the private calendar URL? The previous URL will stop working.",
+      "confirmRevoke": "Disable the private calendar feed? The current URL will stop working.",
+      "regenerated": "Calendar URL regenerated.",
+      "revoked": "Calendar feed disabled.",
+      "error": "Calendar feed unavailable. Please try again."
+    },
     "notificationPreferences": {
       "title": "Notification Preferences",
       "description": "Choose how you want to be notified for each event type.",

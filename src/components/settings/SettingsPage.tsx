@@ -6,6 +6,7 @@ import { NotificationPreferencesSection } from './NotificationPreferencesSection
 import { TwoFactorSettings } from './TwoFactorSettings';
 import { SessionManagement } from './SessionManagement';
 import { TimezoneSettingsSection } from './TimezoneSettingsSection';
+import { CalendarFeedSettingsSection } from './CalendarFeedSettingsSection';
 
 export function SettingsPage({ studentOnly = false }: { studentOnly?: boolean }) {
   return (
@@ -17,7 +18,12 @@ export function SettingsPage({ studentOnly = false }: { studentOnly?: boolean })
       <AppearanceSection />
       <AccessibilitySection />
       <NotificationPreferencesSection />
-      {studentOnly && <TimezoneSettingsSection />}
+      {studentOnly && (
+        <>
+          <TimezoneSettingsSection />
+          <CalendarFeedSettingsSection />
+        </>
+      )}
     </div>
   );
 }

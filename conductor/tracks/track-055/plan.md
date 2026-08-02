@@ -208,11 +208,11 @@
   - [x] Test keyboard operation, focus/confirmation behavior, live status messaging, responsive layout, and both locales.
   - **RED evidence:** The focused suite failed before execution because `src/components/settings/CalendarFeedSettingsSection.tsx` did not yet exist.
 
-- [ ] **5.4 Implement feed-management UI (GREEN)**
-  - [ ] Add a focused calendar-feed settings component and wire it into the student settings page only.
-  - [ ] Provide explicit enable, copy URL, regenerate, and revoke/disable controls with confirmations for destructive actions.
-  - [ ] Invalidate/refetch settings/feed status after mutations and handle clipboard or network failures accessibly.
-  - [ ] Add matching English/Indonesian translations and regenerate i18n types.
+- [~] **5.4 Implement feed-management UI (GREEN)**
+  - [~] Add a focused calendar-feed settings component and wire it into the student settings page only.
+  - [~] Provide explicit enable, copy URL, regenerate, and revoke/disable controls with confirmations for destructive actions.
+  - [~] Invalidate/refetch settings/feed status after mutations and handle clipboard or network failures accessibly.
+  - [~] Add matching English/Indonesian translations and regenerate i18n types.
 
 ### Phase Verification
 

@@ -52,6 +52,7 @@ export const settingsKeys = {
   activeSessions: () => ['settings', 'activeSessions'] as const,
   twoFactorStatus: () => ['settings', 'twoFactorStatus'] as const,
   accessibility: () => ['settings', 'accessibility'] as const,
+  calendarFeed: () => ['settings', 'calendar-feed'] as const,
 };
 
 export const gradebookKeys = {
