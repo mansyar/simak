@@ -50,8 +50,9 @@
 
 ### Phase Verification
 
-- [ ] Run targeted timezone and formatter tests with `pnpm vitest run tests/unit/lib/timezone.test.ts tests/unit/lib/format-date.test.ts tests/unit/lib/format.test.ts`.
-- [ ] Confirm the new pure modules meet the project coverage target before proceeding.
+- [x] Run targeted timezone and formatter tests with `pnpm vitest run tests/unit/lib/timezone.test.ts tests/unit/lib/format-date.test.ts tests/unit/lib/format.test.ts`.
+- [x] Confirm the new pure modules meet the project coverage target before proceeding.
+- **Checkpoint:** [commit: 82f72df]. Automated verification passed 45 tests; targeted module coverage was above 80% for all new/changed formatter and timezone modules. The scoped coverage command's global threshold failure is deferred to the full-suite gate because it intentionally selected only three test files. Manual checkpoint confirmation was received before proceeding.
 
 ## Phase 2: Settings Persistence and Student Deadline Surfaces
 
