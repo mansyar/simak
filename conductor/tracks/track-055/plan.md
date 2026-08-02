@@ -64,7 +64,7 @@
   - [x] Test that stored settings do not alter deadline values or reminder preferences.
   - **RED evidence:** The invalid persisted-timezone normalization assertion failed before the settings handler implementation changed.
 
-- [x] **2.2 Implement timezone settings persistence (GREEN)**
+- [x] **2.2 Implement timezone settings persistence (GREEN)** [commit: 2772e37]
   - [x] Update `src/server/settings.ts` and `src/server/settings.server.ts` using the existing typed server-function pair.
   - [x] Preserve all existing settings fields when saving timezone changes.
   - [x] Return the normalized settings shape needed by the student settings UI.
