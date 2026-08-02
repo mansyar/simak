@@ -112,11 +112,12 @@
   - [x] Add database-backed integration cases for concurrent lifecycle requests and the database uniqueness invariant.
   - **RED evidence:** The unit suite initially failed because `src/server/calendar-feed.server.ts` did not yet exist; the integration case also references the not-yet-defined token table.
 
-- [ ] **3.2 Add the token schema and migration (GREEN)**
-  - [ ] Add a dedicated token table to `src/db/schema/` with student ownership, token hash, lifecycle timestamps, and appropriate foreign-key/index constraints.
-  - [ ] Enforce at most one active token per student at the database level.
-  - [ ] Register the schema in `src/db/schema/index.ts` and generate the next Drizzle migration.
-  - [ ] Add the required companion rollback SQL under `drizzle/migrations/rollback/` and verify it follows the SQL style guide.
+- [x] **3.2 Add the token schema and migration (GREEN)**
+  - [x] Add a dedicated token table to `src/db/schema/` with student ownership, token hash, lifecycle timestamps, and appropriate foreign-key/index constraints.
+  - [x] Enforce at most one active token per student at the database level.
+  - [x] Register the schema in `src/db/schema/index.ts` and generate the next Drizzle migration.
+  - [x] Add the required companion rollback SQL under `drizzle/migrations/rollback/` and verify it follows the SQL style guide.
+  - **Evidence:** `pnpm db:generate` produced migration `0020_white_spacker_dave.sql`; the schema and rollback passed targeted oxlint and `git diff --check`.
 
 - [ ] **3.3 Implement authenticated token handlers (GREEN)**
   - [ ] Add a client-safe `src/server/calendar-feed.ts` stub/schema file and a server-only handler file, splitting helpers if the 500-line limit requires it.
