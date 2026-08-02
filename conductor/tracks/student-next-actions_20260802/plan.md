@@ -4,27 +4,28 @@
 
 **Objective:** Define and implement the deterministic, pure action resolver and extend the student dashboard handler with the authoritative data it needs.
 
-- [ ] Task: Confirm the approved specification and workflow constraints before implementation.
-  - [ ] Review `spec.md` for action eligibility, priority, deduplication, waiting groups, and destination rules.
-  - [ ] Review `conductor/workflow.md` for Red/Green TDD order, task states, coverage, file limits, and checkpoint protocol.
-- [ ] Task: Write failing resolver tests in `tests/unit/lib/student-next-actions.test.ts`.
-  - [ ] Cover submit, revise, and required-consultation eligibility.
-  - [ ] Cover overdue, revision, consultation, absolute 168-hour, other-dated, and undated priority buckets.
-  - [ ] Cover injected reference time, null due dates, deterministic tie-breaking, and one-action-per-checkpoint deduplication.
-  - [ ] Cover loading all candidates before limiting to five primary actions.
-  - [ ] Cover exclusion of passed/locked work and separation of submitted/under-review waiting work.
-  - [ ] Cover all-age waiting counts and the three-representative-link limit.
-- [ ] Task: Implement the pure resolver and shared DTO types in `src/lib/student-next-actions.ts`.
-  - [ ] Keep the resolver free of database and client-incompatible imports.
-  - [ ] Normalize candidates, select one action per checkpoint, rank deterministically, and produce waiting groups.
-- [ ] Task: Run the focused resolver tests and confirm the Red-to-Green transition.
+- [x] Task: Confirm the approved specification and workflow constraints before implementation. [cb92ef3]
+  - [x] Review `spec.md` for action eligibility, priority, deduplication, waiting groups, and destination rules.
+  - [x] Review `conductor/workflow.md` for Red/Green TDD order, task states, coverage, file limits, and checkpoint protocol.
+- [x] Task: Write failing resolver tests in `tests/unit/lib/student-next-actions.test.ts`. [19d82127]
+  - [x] Cover submit, revise, and required-consultation eligibility.
+  - [x] Cover overdue, revision, consultation, absolute 168-hour, other-dated, and undated priority buckets.
+  - [x] Cover injected reference time, null due dates, deterministic tie-breaking, and one-action-per-checkpoint deduplication.
+  - [x] Cover loading all candidates before limiting to five primary actions.
+  - [x] Cover exclusion of passed/locked work and separation of submitted/under-review waiting work.
+  - [x] Cover all-age waiting counts and the three-representative-link limit.
+- [x] Task: Implement the pure resolver and shared DTO types in `src/lib/student-next-actions.ts`. [19d82127]
+  - [x] Keep the resolver free of database and client-incompatible imports.
+  - [x] Normalize candidates, select one action per checkpoint, rank deterministically, and produce waiting groups.
+- [x] Task: Run the focused resolver tests and confirm the Red-to-Green transition. [19d82127]
+- [~] Task: Write failing handler tests in `tests/unit/server/dashboard-student-next-actions.test.ts`.
 - [ ] Task: Phase Verification & Checkpoint — manually verify the resolver against the approved priority and deduplication rules, record the workflow checkpoint, and attach the required git note.
 
 ## Phase 2: Student Dashboard Handler
 
 **Objective:** Return complete, authorized Next Actions and waiting-summary data through the existing dashboard request without regressing the current widgets.
 
-- [ ] Task: Write failing handler tests in `tests/unit/server/dashboard-student-next-actions.test.ts`.
+- [~] Task: Write failing handler tests in `tests/unit/server/dashboard-student-next-actions.test.ts`.
   - [ ] Verify unauthenticated and non-student requests remain unauthorized.
   - [ ] Verify assignment, checkpoint, submission, review, consultation, state, due-date, and destination identifiers are returned.
   - [ ] Verify all eligible candidates reach the resolver before the five-item display limit.
