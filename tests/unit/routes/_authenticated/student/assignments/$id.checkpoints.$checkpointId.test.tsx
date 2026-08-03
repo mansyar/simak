@@ -11,10 +11,12 @@ const mocks = vi.hoisted(() => ({
     submissions: [],
     submissionTotal: 0,
     latestReview: null,
+    reviewHistory: [],
   },
   fileUploaderProps: {} as Record<string, any>,
   xhrInstances: [] as any[],
   discussionPanelProps: {} as Record<string, any>,
+  revisionPlanProps: [] as Record<string, any>[],
 }));
 
 // Mock XMLHttpRequest with instance tracking
@@ -80,6 +82,13 @@ vi.mock('@/components/discussions/discussion-panel', () => ({
   DiscussionPanel: (props: any) => {
     mocks.discussionPanelProps = props;
     return <div data-testid="discussion-panel" />;
+  },
+}));
+
+vi.mock('@/components/student/RevisionActionPlan', () => ({
+  RevisionActionPlan: (props: any) => {
+    mocks.revisionPlanProps.push(props);
+    return <div data-testid="revision-action-plan" />;
   },
 }));
 
@@ -233,6 +242,7 @@ describe('CheckpointSubmissionPage - discussion panel', () => {
   beforeEach(() => {
     cleanup();
     mocks.discussionPanelProps = {};
+    mocks.revisionPlanProps = [];
   });
 
   it('should render DiscussionPanel with checkpointId and assignmentId props', () => {
@@ -242,5 +252,30 @@ describe('CheckpointSubmissionPage - discussion panel', () => {
       checkpointId: 1,
       assignmentId: 1,
     });
+  });
+
+  it('passes current and historical revision plans to the student plan view', () => {
+    mocks.loaderData = {
+      ...mocks.loaderData,
+      reviewHistory: [
+        {
+          id: 20,
+          decision: 'revise',
+          actionItems: [{ id: 3, itemText: 'Current item', order: 0, addressedAt: null }],
+        },
+        {
+          id: 19,
+          decision: 'revise',
+          actionItems: [{ id: 2, itemText: 'Historical item', order: 0, addressedAt: new Date() }],
+        },
+      ],
+    } as any;
+
+    render(<CheckpointSubmissionPage />);
+
+    expect(mocks.revisionPlanProps).toEqual([
+      expect.objectContaining({ isCurrentPlan: true, items: expect.any(Array) }),
+      expect.objectContaining({ isCurrentPlan: false, items: expect.any(Array) }),
+    ]);
   });
 });

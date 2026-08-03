@@ -16,6 +16,12 @@ export interface StudentActionCandidate {
   minConsultations: number | null;
   verifiedConsultationCount: number;
   submissionId: number | null;
+  revisionActionItems?: StudentRevisionActionItem[];
+}
+
+export interface StudentRevisionActionItem {
+  itemText: string;
+  addressedAt: Date | null;
 }
 
 export type StudentActionKind = 'submit' | 'revise' | 'consultation';
@@ -38,6 +44,12 @@ export interface StudentNextAction {
   priority: StudentActionPriority;
   submissionId: number | null;
   href: string;
+  revisionActionPlan?: StudentRevisionActionPlan;
+}
+
+export interface StudentRevisionActionPlan {
+  unresolvedCount: number;
+  items: string[];
 }
 
 export interface StudentWaitingRepresentative {
@@ -65,6 +77,7 @@ export interface StudentNextActionsResult {
 
 const MAX_PRIMARY_ACTIONS = 5;
 const MAX_WAITING_REPRESENTATIVES = 3;
+const MAX_REVISION_CONTEXT_ITEMS = 3;
 const HOURS_168 = 168 * 60 * 60 * 1000;
 
 const priorityRank: Record<StudentActionPriority, number> = {
@@ -113,6 +126,11 @@ function toAction(candidate: StudentActionCandidate, now: Date): StudentNextActi
   const kind = getActionKind(candidate);
   if (kind === null) return null;
 
+  const unresolvedItems =
+    kind === 'revise'
+      ? (candidate.revisionActionItems ?? []).filter((item) => item.addressedAt === null)
+      : [];
+
   return {
     assignmentId: candidate.assignmentId,
     assignmentTitle: candidate.assignmentTitle,
@@ -126,6 +144,16 @@ function toAction(candidate: StudentActionCandidate, now: Date): StudentNextActi
       kind === 'consultation'
         ? `/student/assignments/${candidate.assignmentId}`
         : `/student/assignments/${candidate.assignmentId}/checkpoints/${candidate.checkpointId}`,
+    ...(unresolvedItems.length > 0
+      ? {
+          revisionActionPlan: {
+            unresolvedCount: unresolvedItems.length,
+            items: unresolvedItems
+              .slice(0, MAX_REVISION_CONTEXT_ITEMS)
+              .map((item) => item.itemText),
+          },
+        }
+      : {}),
   };
 }
 

@@ -219,6 +219,74 @@ describe('Review Schemas', () => {
       });
       expect(result.success).toBe(false);
     });
+
+    it('should accept a revise plan with no action items for backward compatibility', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'revise',
+        comment: 'Please revise the introduction',
+        revisionDeadline: '2026-06-01',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept exactly ten ordered action items with a 500-character item', () => {
+      const actionItems = Array.from({ length: 10 }, (_, index) => ({
+        itemText: index === 0 ? 'x'.repeat(500) : `Revision item ${index + 1}`,
+        criterionId: index === 0 ? 7 : undefined,
+      }));
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'revise',
+        revisionDeadline: '2026-06-01',
+        actionItems,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.actionItems).toHaveLength(10);
+        expect(result.data.actionItems?.map((item) => item.itemText)).toEqual(
+          actionItems.map((item) => item.itemText),
+        );
+      }
+    });
+
+    it('should reject more than ten action items', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'revise',
+        revisionDeadline: '2026-06-01',
+        actionItems: Array.from({ length: 11 }, () => ({ itemText: 'Revise this section' })),
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject empty, over-limit, and rich-text action items', () => {
+      const cases = [
+        { itemText: '   ' },
+        { itemText: 'x'.repeat(501) },
+        { itemText: '<strong>Use plain text</strong>' },
+      ];
+
+      for (const item of cases) {
+        const result = SubmitReviewSchema.safeParse({
+          submissionId: 1,
+          decision: 'revise',
+          revisionDeadline: '2026-06-01',
+          actionItems: [item],
+        });
+        expect(result.success).toBe(false);
+      }
+    });
+
+    it('should reject action items on a pass decision', () => {
+      const result = SubmitReviewSchema.safeParse({
+        submissionId: 1,
+        decision: 'pass',
+        actionItems: [{ itemText: 'This must not be attached to a pass' }],
+      });
+      expect(result.success).toBe(false);
+    });
   });
 
   describe('GetLatestReviewSchema', () => {

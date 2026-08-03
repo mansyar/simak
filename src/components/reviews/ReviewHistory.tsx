@@ -5,12 +5,22 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { CheckCircle2, RefreshCcw, User, MessageSquare, Clock } from 'lucide-react';
 import { formatDateShort } from '@/lib/format';
 
-interface ReviewHistoryEntry {
+export interface ReviewHistoryActionItem {
+  id: number;
+  itemText: string;
+  order: number;
+  criterionId?: number | null;
+  criterionTitle?: string | null;
+  addressedAt?: Date | null;
+}
+
+export interface ReviewHistoryEntry {
   id: number;
   decision: 'pass' | 'revise';
   comment?: string | null;
   instructorName: string;
   createdAt: Date;
+  actionItems?: ReviewHistoryActionItem[];
 }
 
 interface ReviewHistoryProps {
@@ -19,6 +29,9 @@ interface ReviewHistoryProps {
 
 export function ReviewHistory({ reviews }: ReviewHistoryProps) {
   const { t } = useI18n();
+  const currentPlanReviewId = reviews.find(
+    (review) => review.decision === 'revise' && (review.actionItems?.length ?? 0) > 0,
+  )?.id;
 
   return (
     <Card className="shadow-sm">
@@ -43,12 +56,19 @@ export function ReviewHistory({ reviews }: ReviewHistoryProps) {
                   )}
                 </div>
                 <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={review.decision === 'pass' ? 'success' : 'warning'}>
                       {review.decision === 'pass'
                         ? t('instructorReviews.passed')
                         : t('instructorReviews.revise')}
                     </Badge>
+                    {review.decision === 'revise' && (review.actionItems?.length ?? 0) > 0 && (
+                      <Badge variant="outline">
+                        {review.id === currentPlanReviewId
+                          ? t('instructorReviews.actionPlan.current')
+                          : t('instructorReviews.actionPlan.historical')}
+                      </Badge>
+                    )}
                     <span className="text-xs text-muted-foreground">
                       <Clock className="inline h-3 w-3 mr-1" />
                       {t('instructorReviews.reviewDateLabel', {
@@ -65,6 +85,34 @@ export function ReviewHistory({ reviews }: ReviewHistoryProps) {
                       <MessageSquare className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
                       <p>{review.comment}</p>
                     </div>
+                  )}
+                  {review.actionItems && review.actionItems.length > 0 && (
+                    <ol
+                      className="space-y-2 pt-2"
+                      aria-label={t('instructorReviews.actionPlan.listLabel')}
+                    >
+                      {[...review.actionItems]
+                        .sort((a, b) => a.order - b.order || a.id - b.id)
+                        .map((item) => (
+                          <li key={item.id} className="rounded-md border bg-background p-2 text-xs">
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="text-foreground">{item.itemText}</span>
+                              <span className="shrink-0 text-muted-foreground">
+                                {item.addressedAt
+                                  ? t('instructorReviews.actionPlan.addressed')
+                                  : t('instructorReviews.actionPlan.open')}
+                              </span>
+                            </div>
+                            {item.criterionTitle && (
+                              <span className="mt-1 block text-muted-foreground">
+                                {t('instructorReviews.actionPlan.criterion', {
+                                  title: item.criterionTitle,
+                                })}
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                    </ol>
                   )}
                 </div>
               </div>

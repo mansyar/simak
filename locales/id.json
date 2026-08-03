@@ -326,6 +326,29 @@
       "notInSubmittedState": "Checkpoint harus berstatus diserahkan untuk dibuka peninjauannya"
     },
     "reviewDateLabel": "Direview pada {date}",
+    "revisionActionPlan": "Rencana tindakan revisi (opsional)",
+    "actionPlan": {
+      "description": "Berikan item terurut yang jelas untuk ditindaklanjuti mahasiswa. Item tidak menghambat pengiriman ulang.",
+      "itemCount": "{count} dari 10 item",
+      "itemLabel": "Item tindakan {number}",
+      "criterionLabel": "Kriteria rubrik (opsional)",
+      "noCriterion": "Tanpa kriteria",
+      "addItem": "Tambah item tindakan",
+      "removeItem": "Hapus item tindakan",
+      "moveUp": "Pindahkan item tindakan ke atas",
+      "moveDown": "Pindahkan item tindakan ke bawah",
+      "reorderLabel": "Urutkan item tindakan",
+      "itemRequired": "Masukkan item tindakan",
+      "itemTooLong": "Item tindakan harus 500 karakter atau kurang",
+      "itemPlainText": "Item tindakan harus berupa teks biasa",
+      "invalidItems": "Lengkapi atau hapus item tindakan yang tidak valid sebelum mengirim",
+      "listLabel": "Item tindakan revisi",
+      "current": "Rencana saat ini",
+      "historical": "Rencana sebelumnya",
+      "addressed": "Sudah ditindaklanjuti",
+      "open": "Belum ditindaklanjuti",
+      "criterion": "Kriteria: {title}"
+    },
     "rubric": {
       "title": "Penilaian Rubrik",
       "weightedTotal": "Total Terbobot",
@@ -559,6 +582,17 @@
     "title": "Hasil Rubrik",
     "weightedTotal": "Total Terbobot"
   },
+  "studentRevisionActionPlan": {
+    "current": "Rencana revisi saat ini",
+    "historical": "Rencana revisi sebelumnya",
+    "currentDescription": "Tandai setiap item setelah ditindaklanjuti. Ini tidak menghambat pengiriman ulang.",
+    "historicalDescription": "Rencana ini berasal dari peninjauan sebelumnya dan tidak dapat diubah.",
+    "listLabel": "Item tindakan revisi",
+    "item": "Item tindakan {number}",
+    "addressed": "Sudah ditindaklanjuti",
+    "open": "Belum ditindaklanjuti",
+    "updateError": "Item tindakan tidak dapat diperbarui. Coba lagi."
+  },
   "studentAssignments": {
     "title": "Tugas Saya",
     "subtitle": "Lihat dan lacak kemajuan tugas akademik yang diberikan kepada Anda.",
@@ -629,6 +663,10 @@
       "reviseCheckpoint": "Perbaiki dan kumpulkan ulang {checkpoint} pada {assignment}",
       "requiredConsultation": "Selesaikan konsultasi yang diperlukan untuk {checkpoint} pada {assignment}",
       "openWaitingCheckpoint": "Buka {checkpoint} pada {assignment}",
+      "revisionPlan": {
+        "remaining": "{count} item revisi tersisa",
+        "itemsLabel": "Item revisi yang belum selesai"
+      },
       "waiting": {
         "title": "Pekerjaan yang Menunggu",
         "description": "Pekerjaan yang dikumpulkan tetap terlihat selama diproses.",

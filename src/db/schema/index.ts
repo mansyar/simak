@@ -18,6 +18,7 @@ export * from './discussions';
 export * from './interventions';
 export * from './feedback-snippets';
 export * from './calendar-feed-tokens';
+export * from './revision-action-items';
 
 // Import tables for relations
 import { users } from './users';
@@ -36,6 +37,7 @@ import { checkpointDiscussions } from './discussions';
 import { interventions } from './interventions';
 import { feedbackSnippets } from './feedback-snippets';
 import { calendarFeedTokens } from './calendar-feed-tokens';
+import { revisionActionItems } from './revision-action-items';
 
 // ---- Relations ----
 
@@ -172,6 +174,7 @@ export const reviewsRelations = relations(reviews, ({ one, many }) => ({
     references: [users.id],
   }),
   reviewScores: many(reviewScores),
+  revisionActionItems: many(revisionActionItems),
 }));
 
 export const rubricCriteriaRelations = relations(rubricCriteria, ({ one, many }) => ({
@@ -180,6 +183,18 @@ export const rubricCriteriaRelations = relations(rubricCriteria, ({ one, many })
     references: [templateCheckpoints.id],
   }),
   reviewScores: many(reviewScores),
+  revisionActionItems: many(revisionActionItems),
+}));
+
+export const revisionActionItemsRelations = relations(revisionActionItems, ({ one }) => ({
+  review: one(reviews, {
+    fields: [revisionActionItems.reviewId],
+    references: [reviews.id],
+  }),
+  criterion: one(rubricCriteria, {
+    fields: [revisionActionItems.criterionId],
+    references: [rubricCriteria.id],
+  }),
 }));
 
 export const rubricLevelsRelations = relations(rubricLevels, ({ one, many }) => ({

@@ -9,7 +9,9 @@ import { isServerError } from '@/lib/errors';
 import { getPresignedReviewFeedbackUploadUrl } from '@/server/files';
 import { RubricScoringSection, type ScoreInput } from '@/components/reviews/RubricScoringSection';
 import { FeedbackSnippetPicker } from '@/components/reviews/FeedbackSnippetPicker';
+import { RevisionActionPlanEditor } from '@/components/reviews/RevisionActionPlanEditor';
 import type { RubricData } from '@/server/rubrics';
+import type { RevisionActionItemInput } from '@/server/revision-action-items';
 import { Loader2, Upload } from 'lucide-react';
 
 interface ReviewFormProps {
@@ -29,6 +31,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingFeedback, setIsUploadingFeedback] = useState(false);
   const [scores, setScores] = useState<ScoreInput[]>([]);
+  const [actionItems, setActionItems] = useState<RevisionActionItemInput[]>([]);
 
   const rubricActive = !!rubric && rubric.gradingType !== null;
   const allScored =
@@ -96,6 +99,19 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
       return;
     }
 
+    if (
+      decision === 'revise' &&
+      actionItems.some(
+        (item) =>
+          item.itemText.trim().length === 0 ||
+          item.itemText.length > 500 ||
+          /[<>]/.test(item.itemText),
+      )
+    ) {
+      onError(t('instructorReviews.actionPlan.invalidItems'));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const result = await submitReview({
@@ -106,6 +122,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
           feedbackFileKey: feedbackFileKey || undefined,
           revisionDeadline: decision === 'revise' ? revisionDeadline : undefined,
           scores: rubricActive ? scores : undefined,
+          actionItems: decision === 'revise' && actionItems.length > 0 ? actionItems : undefined,
         },
       });
 
@@ -131,6 +148,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
     t,
     scores,
     rubricActive,
+    actionItems,
   ]);
 
   return (
@@ -207,16 +225,23 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
 
         {/* Revision deadline (only when revise selected) */}
         {decision === 'revise' && (
-          <div className="space-y-1.5">
-            <Label htmlFor="revisionDeadline">{t('instructorReviews.revisionDeadline')}</Label>
-            <input
-              id="revisionDeadline"
-              type="date"
-              value={revisionDeadline}
-              onChange={(e) => setRevisionDeadline(e.target.value)}
-              className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          <>
+            <div className="space-y-1.5">
+              <Label htmlFor="revisionDeadline">{t('instructorReviews.revisionDeadline')}</Label>
+              <input
+                id="revisionDeadline"
+                type="date"
+                value={revisionDeadline}
+                onChange={(e) => setRevisionDeadline(e.target.value)}
+                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              />
+            </div>
+            <RevisionActionPlanEditor
+              items={actionItems}
+              onChange={setActionItems}
+              rubric={rubricActive ? rubric : null}
             />
-          </div>
+          </>
         )}
 
         {/* Rubric scoring (when rubric is active) */}

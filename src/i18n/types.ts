@@ -331,6 +331,29 @@ export type Translation = {
       notInSubmittedState: string
     }
     reviewDateLabel: string
+    revisionActionPlan: string
+    actionPlan: {
+      description: string
+      itemCount: string
+      itemLabel: string
+      criterionLabel: string
+      noCriterion: string
+      addItem: string
+      removeItem: string
+      moveUp: string
+      moveDown: string
+      reorderLabel: string
+      itemRequired: string
+      itemTooLong: string
+      itemPlainText: string
+      invalidItems: string
+      listLabel: string
+      current: string
+      historical: string
+      addressed: string
+      open: string
+      criterion: string
+    }
     rubric: {
       title: string
       weightedTotal: string
@@ -564,6 +587,17 @@ export type Translation = {
     title: string
     weightedTotal: string
   }
+  studentRevisionActionPlan: {
+    current: string
+    historical: string
+    currentDescription: string
+    historicalDescription: string
+    listLabel: string
+    item: string
+    addressed: string
+    open: string
+    updateError: string
+  }
   studentAssignments: {
     title: string
     subtitle: string
@@ -634,6 +668,10 @@ export type Translation = {
       reviseCheckpoint: string
       requiredConsultation: string
       openWaitingCheckpoint: string
+      revisionPlan: {
+        remaining: string
+        itemsLabel: string
+      }
       waiting: {
         title: string
         description: string

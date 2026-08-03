@@ -178,6 +178,35 @@ describe('getStudentDashboardDataHandler — student next actions', () => {
           dueDate: new Date(now + 30 * 24 * 60 * 60 * 1000),
         },
       ],
+      [
+        {
+          id: 3,
+          checkpointId: 202,
+          reviewId: 501,
+          reviewCreatedAt: new Date(now - 1 * 24 * 60 * 60 * 1000),
+          itemText: 'Current unresolved item',
+          order: 0,
+          addressedAt: null,
+        },
+        {
+          id: 4,
+          checkpointId: 202,
+          reviewId: 500,
+          reviewCreatedAt: new Date(now - 2 * 24 * 60 * 60 * 1000),
+          itemText: 'Historical unresolved item',
+          order: 0,
+          addressedAt: null,
+        },
+        {
+          id: 5,
+          checkpointId: 207,
+          reviewId: 502,
+          reviewCreatedAt: new Date(now - 1 * 24 * 60 * 60 * 1000),
+          itemText: 'Waiting item',
+          order: 0,
+          addressedAt: null,
+        },
+      ],
     ]);
     vi.mocked(dbMod.getDb).mockReturnValue(mockDb as any);
 
@@ -191,6 +220,14 @@ describe('getStudentDashboardDataHandler — student next actions', () => {
         expect.objectContaining({ checkpointId: 203, kind: 'consultation' }),
       ]),
     );
+    expect(
+      result.nextActions.primaryActions.find((action: any) => action.checkpointId === 202),
+    ).toMatchObject({
+      revisionActionPlan: {
+        unresolvedCount: 1,
+        items: ['Current unresolved item'],
+      },
+    });
     expect(result.nextActions.primaryActions).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ checkpointId: 207 })]),
     );

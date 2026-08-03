@@ -8,6 +8,7 @@ import { FileUploader } from '@/components/files/file-uploader';
 import { FileList } from '@/components/files/file-list';
 import { SubmissionStatus } from '@/components/files/submission-status';
 import { RubricResultView } from '@/components/student/rubric-result-view';
+import { RevisionActionPlan } from '@/components/student/RevisionActionPlan';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Pagination } from '@/components/ui/pagination';
@@ -57,6 +58,12 @@ export const Route = createFileRoute(
               reviewedAt: reviewData.review.createdAt ?? null,
             } as const)
           : null;
+      const reviewHistory =
+        !isServerError(reviewData) && reviewData?.reviewHistory
+          ? reviewData.reviewHistory
+          : !isServerError(reviewData) && reviewData?.review
+            ? [{ ...reviewData.review, actionItems: reviewData.actionItems ?? [] }]
+            : [];
 
       return {
         assignmentId: Number(id),
@@ -66,6 +73,7 @@ export const Route = createFileRoute(
         submissionTotal: !isServerError(submissionsData) ? submissionsData.total : 0,
         latestReview,
         rubricScores: !isServerError(reviewData) ? (reviewData?.scores ?? []) : [],
+        reviewHistory,
       };
     } catch (err) {
       console.error('Failed to load submission page:', err);
@@ -253,6 +261,10 @@ function CheckpointSubmissionPage() {
   }
 
   const canSubmit = data.checkpoint.state === 'unlocked' || data.checkpoint.state === 'revise';
+  const revisionPlans = (data.reviewHistory ?? []).filter(
+    (review) => review.decision === 'revise' && review.actionItems.length > 0,
+  );
+  const currentPlanReviewId = revisionPlans[0]?.id;
 
   return (
     <div className="space-y-6">
@@ -288,6 +300,15 @@ function CheckpointSubmissionPage() {
 
       {/* Review status */}
       <SubmissionStatus review={data.latestReview} />
+
+      {/* Revision action plans */}
+      {revisionPlans.map((review) => (
+        <RevisionActionPlan
+          key={review.id}
+          items={review.actionItems}
+          isCurrentPlan={review.id === currentPlanReviewId}
+        />
+      ))}
 
       {/* Rubric results */}
       <RubricResultView scores={data.rubricScores ?? []} />

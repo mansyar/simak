@@ -1,5 +1,5 @@
 // Server-only handlers for review operations
-import { eq, and, desc, sql, inArray, isNull, gt } from 'drizzle-orm';
+import { eq, and, sql, inArray, isNull, gt } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews, uploadIntents } from '../db/schema/submissions';
@@ -7,7 +7,7 @@ import { users } from '../db/schema/users';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode, isServerError } from '../lib/errors';
-import { generatePresignedDownloadUrl, getObjectContentLength, r2SizeError } from '../lib/storage';
+import { getObjectContentLength, r2SizeError } from '../lib/storage';
 import { MAX_FILE_SIZE } from '../lib/file-validation';
 import { calculateBreachDuration } from '../lib/sla';
 import {
@@ -19,20 +19,18 @@ import { getNotificationKeys } from './notifications.server';
 import { sendReviewEmail } from '../lib/review-email';
 import { maybeFireReviewRiskAlert } from '../lib/review-risk-alert';
 import { maybeInsertNotification } from '../lib/notification-prefs';
-import { fetchRubric } from './rubrics.server';
 import { validateReviewScores, insertReviewScores } from './review-scores.server';
 import { advisoryRecomputeGrade } from './reviews-extras.server';
+import {
+  insertRevisionActionItems,
+  validateRevisionActionItems,
+} from './revision-action-items.server';
 import { isInstructor } from '../lib/session-guards';
 import { logger } from '../lib/logger';
 import type { z } from 'zod';
-import type {
-  ListPendingReviewsSchema,
-  GetReviewDetailSchema,
-  SubmitReviewSchema,
-} from './reviews';
+import type { ListPendingReviewsSchema, SubmitReviewSchema } from './reviews';
 
 type ListPendingReviewsInput = z.infer<typeof ListPendingReviewsSchema>;
-type GetReviewDetailInput = z.infer<typeof GetReviewDetailSchema>;
 type SubmitReviewInput = z.infer<typeof SubmitReviewSchema>;
 
 const REVIEWABLE_STATES = ['submitted', 'under_review'] as const;
@@ -131,88 +129,6 @@ export async function listPendingReviewsHandler(args: { data: ListPendingReviews
 }
 
 /**
- * Get review detail for a specific submission.
- * Pure GET — does NOT mutate state.
- * Returns submission info, presigned download URL, and past review history.
- */
-export async function getReviewDetailHandler(args: { data: GetReviewDetailInput }) {
-  const session = await getSessionFromHeaders();
-  if (!isInstructor(session)) {
-    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
-  }
-
-  const { submissionId } = args.data;
-  const db = getDb();
-
-  try {
-    // 1. Fetch submission with checkpoint, assignment, and user info
-    const [submission] = await db
-      .select({
-        submissionId: submissions.id,
-        checkpointId: checkpoints.id,
-        checkpointName: checkpoints.name,
-        assignmentId: assignments.id,
-        assignmentTitle: assignments.title,
-        instructorId: assignments.instructorId,
-        studentId: checkpoints.studentId,
-        studentName: users.name,
-        fileKey: submissions.fileKey,
-        fileName: submissions.fileName,
-        fileSize: submissions.fileSize,
-        version: submissions.version,
-        uploadedAt: submissions.uploadedAt,
-        checkpointState: checkpoints.state,
-        checkpointUpdatedAt: checkpoints.updatedAt,
-        templateCheckpointId: checkpoints.templateCheckpointId,
-      })
-      .from(submissions)
-      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
-      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-      .innerJoin(users, eq(checkpoints.studentId, users.id))
-      .where(
-        and(
-          eq(submissions.id, submissionId),
-          eq(assignments.instructorId, session.user.id),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .limit(1);
-
-    if (!submission) {
-      return serverError(ErrorCode.NOT_FOUND, 'Submission not found');
-    }
-
-    // 2. Generate presigned download URL
-    const downloadUrl = await generatePresignedDownloadUrl({ key: submission.fileKey });
-
-    // 3. Fetch past review history for this checkpoint
-    const reviewHistory = await db
-      .select({
-        id: reviews.id,
-        decision: reviews.decision,
-        comment: reviews.comment,
-        instructorName: users.name,
-        createdAt: reviews.createdAt,
-      })
-      .from(reviews)
-      .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
-      .innerJoin(users, eq(reviews.instructorId, users.id))
-      .where(eq(submissions.checkpointId, submission.checkpointId))
-      .orderBy(desc(reviews.createdAt));
-
-    const rubric = submission.templateCheckpointId
-      ? await fetchRubric(db, submission.templateCheckpointId)
-      : null;
-    return { submission: { ...submission, downloadUrl }, reviewHistory, rubric };
-  } catch (err) {
-    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
-      cause: err instanceof Error ? err.message : String(err),
-      handler: 'getReviewDetailHandler',
-    });
-  }
-}
-
-/**
  * Submit a review decision (pass/revise) for a submission.
  * Validates ownership, state, and handles checkpoint transitions.
  */
@@ -222,7 +138,15 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { submissionId, decision, comment, feedbackFileKey, revisionDeadline, scores } = args.data;
+  const {
+    submissionId,
+    decision,
+    comment,
+    feedbackFileKey,
+    revisionDeadline,
+    scores,
+    actionItems,
+  } = args.data;
   const db = getDb();
 
   try {
@@ -299,6 +223,19 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       const scoresError = await validateReviewScores(tx, submission.templateCheckpointId, scores);
       if (scoresError) return scoresError;
 
+      if (decision === 'pass' && actionItems?.length) {
+        return serverError(
+          ErrorCode.BAD_REQUEST,
+          'Action items are only allowed for revise decisions',
+        );
+      }
+      const actionItemsError = await validateRevisionActionItems(
+        tx,
+        submission.templateCheckpointId,
+        actionItems,
+      );
+      if (actionItemsError) return actionItemsError;
+
       let breachDays = 0;
       const slaFields: SLASubmissionFields = {
         checkpointId: submission.checkpointId,
@@ -364,6 +301,15 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
       // 2e. Insert rubric scores (reviewId captured above — no separate SELECT)
       if (submission.templateCheckpointId && scores && scores.length > 0) {
         await insertReviewScores(tx, review.id, submission.templateCheckpointId, scores);
+      }
+
+      if (decision === 'revise' && actionItems?.length) {
+        const actionItemsResult = await insertRevisionActionItems(tx, {
+          reviewId: review.id,
+          templateCheckpointId: submission.templateCheckpointId,
+          actionItems,
+        });
+        if (isServerError(actionItemsResult)) return actionItemsResult;
       }
 
       if (decision === 'pass') {
@@ -456,6 +402,18 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
             ? { checkpointName: submission.checkpointName, comment: comment || null }
             : { checkpointName: submission.checkpointName, revisionDeadline },
       });
+      if (decision === 'revise' && actionItems?.length) {
+        await logAuditEvent({
+          actorId: session.user.id,
+          action: 'revision_action_plan.created',
+          entityType: 'review',
+          entityId: String(submissionId),
+          details: {
+            checkpointId: submission.checkpointId,
+            itemCount: actionItems.length,
+          },
+        });
+      }
     } catch (advisoryErr) {
       const errMsg = advisoryErr instanceof Error ? advisoryErr.message : String(advisoryErr);
       logger.error({ event: 'advisory_failed', handler: 'submitReviewHandler', error: errMsg });
@@ -495,4 +453,8 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
  * Get the most recent review for a checkpoint.
  * Used by the student submission page to display review results.
  */
-export { openForReviewHandler, getLatestReviewHandler } from './reviews-extras.server';
+export {
+  getReviewDetailHandler,
+  openForReviewHandler,
+  getLatestReviewHandler,
+} from './reviews-extras.server';
