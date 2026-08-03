@@ -232,15 +232,15 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 - [x] Task: Run the complete automated quality gates [2330ee8]
   - [x] Run `pnpm test` — 423 files and 4,201 tests passed when run in isolation.
   - [x] Run `pnpm test:coverage` and confirm all thresholds remain at or above 80% — 87.80% statements, 80.93% branches, 83.79% functions, and 88.64% lines.
-  - [x] Run `pnpm test:integration` — Track-054 integration passed 3/3; two unrelated pre-existing suites remain failing (email-queue logger initialization and create-assignment deadline validation).
+   - [x] Run `pnpm test:integration` — Track-054 integration passed 5/5 after deterministic-ordering coverage; two unrelated pre-existing suites remain failing (email-queue logger initialization and create-assignment deadline validation).
   - [x] Run `pnpm typecheck`.
   - [x] Run `pnpm lint` — zero errors; four pre-existing warnings remain in unrelated files.
   - [x] Run `pnpm check:i18n` — all 985 used keys exist in both locales.
   - [x] Run the project formatter/check and verify no unintended formatting changes — `pnpm format` completed with no diff.
   - [x] Run `pnpm build`.
-  - [x] Confirm no later source changes require another focused Track-054 Playwright/accessibility run.
+   - [x] Confirm later source changes were covered by focused Track-054 PostgreSQL integration; no UI behavior changed, so another Playwright/accessibility run was unnecessary.
 
-- [x] Task: Perform final implementation review against the approved specification [b5dd9fb]
+- [x] Task: Perform final implementation review against the approved specification [b5dd9fb, 4ab02a7]
   - [x] Confirm every acceptance criterion is covered by implementation and tests.
   - [x] Confirm all server handlers enforce instructor/student authorization.
   - [x] Confirm action-item text/order/snapshots are immutable after review submission.
@@ -252,11 +252,13 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Confirm migrations and rollback artifacts are present and consistent.
   - [x] Review the final diff for secrets, hardcoded UI strings, unsafe rendering, N+1 queries, and `git diff --check`.
 
-  Final review finding fixed in `b5dd9fb`: a later comment-only Revise review must not supersede an existing action plan; the current-plan mutation query now requires a newer Revise review to contain action items, with PostgreSQL regression coverage.
+ Final review finding fixed in `b5dd9fb`: a later comment-only Revise review must not supersede an existing action plan; the current-plan mutation query now requires a newer Revise review to contain action items, with PostgreSQL regression coverage.
 
-- [x] Task: Phase Verification & Checkpoint — final quality and readiness [b5dd9fb]
+ Final review finding fixed in `4ab02a7`: latest and historical review reads now use review ID as a deterministic tie-breaker after creation time, with equal-timestamp PostgreSQL regression coverage.
+
+- [x] Task: Phase Verification & Checkpoint — final quality and readiness [4ab02a7]
   - [x] Complete the workflow’s manual verification plan and obtain explicit user confirmation.
-  - [x] Attach the final verification report as a git note to the functional commit.
+   - [x] Attach the final verification report as git notes to `b5dd9fb` and the follow-up ordering fix `4ab02a7`.
   - [x] Record the final phase checkpoint SHA in `plan.md`.
   - [x] Mark implementation tasks complete only after their corresponding commits and verification are recorded.
   - [x] Prepare the track for `conductor-review`.
