@@ -7,6 +7,8 @@ import { logAuditEvent } from '@/lib/audit';
 import { dispatchSLABreachNotifications } from '@/lib/review-sla';
 import { checkAndFireRiskAlert } from '@/lib/risk-alerts';
 import { logger } from '@/lib/logger';
+import { revisionActionItems } from '@/db/schema/revision-action-items';
+import { getObjectContentLength } from '@/lib/storage';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -26,6 +28,12 @@ vi.mock('@/lib/risk-alerts', () => ({
 
 vi.mock('@/lib/logger', () => ({
   logger: { error: vi.fn() },
+}));
+
+vi.mock('@/lib/storage', () => ({
+  getObjectContentLength: vi.fn().mockResolvedValue({ ok: true, size: 1024 }),
+  generatePresignedDownloadUrl: vi.fn(),
+  r2SizeError: vi.fn(),
 }));
 
 vi.mock('@/lib/review-sla', async (importOriginal) => {
@@ -133,6 +141,12 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
     );
   }
 
+  function setupReviewInsertResult() {
+    mockTx.returning.mockImplementationOnce(() => ({
+      then: (onfulfilled: any) => Promise.resolve([{ id: 55 }]).then(onfulfilled),
+    }));
+  }
+
   it('should return success true when logAuditEvent throws', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     vi.mocked(logAuditEvent).mockRejectedValueOnce(new Error('audit logging failed'));
@@ -212,6 +226,137 @@ describe('submitReviewHandler - post-commit advisory isolation', () => {
     expect(result).toEqual({ success: true });
     expect(logAuditEvent).toHaveBeenCalledTimes(1);
     expect(dispatchSLABreachNotifications).toHaveBeenCalledTimes(1);
+  });
+
+  it('should insert ordered action items for a Revise review', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    setupNoBreachSubmission();
+    setupReviewInsertResult();
+
+    const result = await submitReviewHandler({
+      data: {
+        submissionId: 1,
+        decision: 'revise',
+        revisionDeadline: '2026-08-15',
+        actionItems: [
+          { itemText: 'Rewrite the conclusion' },
+          { itemText: 'Add supporting evidence' },
+        ],
+      } as any,
+    });
+
+    expect(result).toEqual({ success: true });
+    expect(mockTx.insert).toHaveBeenCalledWith(revisionActionItems);
+    const actionItemValues = mockTx.values.mock.calls
+      .map((call: any[]) => call[0])
+      .find(
+        (values: unknown) =>
+          Array.isArray(values) &&
+          values.some((value) => value.itemText === 'Rewrite the conclusion'),
+      );
+    expect(actionItemValues).toEqual([
+      {
+        reviewId: 55,
+        itemText: 'Rewrite the conclusion',
+        order: 0,
+        criterionId: null,
+        criterionTitle: null,
+      },
+      {
+        reviewId: 55,
+        itemText: 'Add supporting evidence',
+        order: 1,
+        criterionId: null,
+        criterionTitle: null,
+      },
+    ]);
+  });
+
+  it('should reject action items on a Pass review before writing', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    setupNoBreachSubmission();
+
+    const result = await submitReviewHandler({
+      data: {
+        submissionId: 1,
+        decision: 'pass',
+        comment: 'Well done',
+        actionItems: [{ itemText: 'This must not be stored' }],
+      } as any,
+    });
+
+    expect(result).toMatchObject({ error: { code: 'BAD_REQUEST' } });
+    expect(mockTx.insert).not.toHaveBeenCalledWith(revisionActionItems);
+  });
+
+  it('should preserve comment-only Revise submissions without action items', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    setupNoBreachSubmission();
+
+    const result = await submitReviewHandler({
+      data: {
+        submissionId: 1,
+        decision: 'revise',
+        comment: 'Please clarify the methodology',
+        revisionDeadline: '2026-08-15',
+      },
+    });
+
+    expect(result).toEqual({ success: true });
+    expect(mockTx.insert).not.toHaveBeenCalledWith(revisionActionItems);
+  });
+
+  it('should preserve file-only Revise submissions without action items', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    setupNoBreachSubmission();
+    mockTx.then.mockImplementationOnce((onfulfilled: any) =>
+      Promise.resolve([
+        {
+          userId: 'instructor-1',
+          purpose: 'review_feedback',
+          checkpointId: null,
+          consumedAt: null,
+          expiresAt: new Date('2026-12-01'),
+        },
+      ]).then(onfulfilled),
+    );
+
+    const result = await submitReviewHandler({
+      data: {
+        submissionId: 1,
+        decision: 'revise',
+        comment: '',
+        feedbackFileKey: 'feedback/review.pdf',
+        revisionDeadline: '2026-08-15',
+      },
+    });
+
+    expect(result).toEqual({ success: true });
+    expect(getObjectContentLength).toHaveBeenCalledWith({ key: 'feedback/review.pdf' });
+    expect(mockTx.insert).not.toHaveBeenCalledWith(revisionActionItems);
+  });
+
+  it('should roll back the review transaction when action-item insertion fails', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    setupNoBreachSubmission();
+    setupReviewInsertResult();
+    mockTx.insert.mockImplementation((table: unknown) => {
+      if (table === revisionActionItems) throw new Error('action-item insert failed');
+      return mockTx;
+    });
+
+    const result = await submitReviewHandler({
+      data: {
+        submissionId: 1,
+        decision: 'revise',
+        revisionDeadline: '2026-08-15',
+        actionItems: [{ itemText: 'Rewrite the conclusion' }],
+      } as any,
+    });
+
+    expect(result).toMatchObject({ error: { code: 'INTERNAL' } });
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+    expect(mockTx.insert).toHaveBeenCalledWith(revisionActionItems);
   });
 
   // --- checkAndFireRiskAlert integration ---
