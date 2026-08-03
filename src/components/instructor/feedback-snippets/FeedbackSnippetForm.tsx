@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CreateFeedbackSnippetSchema } from '@/server/feedback-snippets';
-import type { FeedbackSnippet } from '@/server/feedback-snippets';
+import type { FeedbackSnippetListItem } from '@/server/feedback-snippets';
 import { useI18n } from '@/routes/__root';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,7 @@ type FeedbackSnippetFormValues = {
 };
 
 interface FeedbackSnippetFormProps {
-  snippet?: FeedbackSnippet;
+  snippet?: FeedbackSnippetListItem;
   isPending: boolean;
   onCancel: () => void;
   onSubmit: (values: FeedbackSnippetFormValues) => Promise<void>;

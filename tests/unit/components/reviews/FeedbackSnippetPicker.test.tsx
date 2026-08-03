@@ -57,7 +57,12 @@ describe('FeedbackSnippetPicker', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
-    mockListFeedbackSnippets.mockResolvedValue({ snippets: [activeSnippet] });
+    mockListFeedbackSnippets.mockResolvedValue({
+      snippets: [activeSnippet],
+      total: 1,
+      page: 1,
+      limit: 20,
+    });
     mockUseQuery.mockReturnValue({
       data: { snippets: [activeSnippet, archivedSnippet] },
       isPending: false,
@@ -80,7 +85,7 @@ describe('FeedbackSnippetPicker', () => {
     await queryOptions.queryFn();
 
     expect(mockListFeedbackSnippets).toHaveBeenCalledWith({
-      data: { archived: false, search: '' },
+      data: { archived: false, search: '', page: 1, limit: 20 },
     });
     expect(screen.getByText(activeSnippet.title)).toBeDefined();
     expect(screen.queryByText(archivedSnippet.title)).toBeNull();
@@ -103,7 +108,12 @@ describe('FeedbackSnippetPicker', () => {
     });
 
     const latestOptions = mockUseQuery.mock.calls.at(-1)?.[0] as { queryKey: unknown[] };
-    expect(latestOptions.queryKey).toContainEqual({ archived: false, search: 'rubric' });
+    expect(latestOptions.queryKey).toContainEqual({
+      archived: false,
+      search: 'rubric',
+      page: 1,
+      limit: 20,
+    });
   });
 
   it('retains the previous result while a committed search loads', () => {

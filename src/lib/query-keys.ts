@@ -62,6 +62,6 @@ export const gradebookKeys = {
 
 export const feedbackSnippetKeys = {
   all: () => ['feedbackSnippets'] as const,
-  list: (filters: { archived: boolean; search: string }) =>
+  list: (filters: { archived: boolean; search: string; page: number; limit: number }) =>
     ['feedbackSnippets', 'list', filters] as const,
 };

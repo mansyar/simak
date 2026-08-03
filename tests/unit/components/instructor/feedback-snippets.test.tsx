@@ -92,7 +92,7 @@ describe('FeedbackSnippetsPage', () => {
     });
 
     expect(feedbackFunctions.listFeedbackSnippets).toHaveBeenLastCalledWith({
-      data: { archived: false, search: 'rubric' },
+      data: { archived: false, search: 'rubric', page: 1, limit: 20 },
     });
     vi.useRealTimers();
   });
@@ -111,7 +111,7 @@ describe('FeedbackSnippetsPage', () => {
     expect(screen.getByTestId('feedback-snippets-archived-filter')).toBeTruthy();
     expect(screen.getByText('feedbackSnippets.restore')).toBeTruthy();
     expect(feedbackFunctions.listFeedbackSnippets).toHaveBeenLastCalledWith({
-      data: { archived: true, search: '' },
+      data: { archived: true, search: '', page: 1, limit: 20 },
     });
   });
 

@@ -4,6 +4,7 @@ import { Plus, Search } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import { isServerError } from '@/lib/errors';
 import { feedbackSnippetKeys } from '@/lib/query-keys';
 import {
@@ -13,13 +14,15 @@ import {
   restoreFeedbackSnippet,
   updateFeedbackSnippet,
 } from '@/server/feedback-snippets';
-import type { FeedbackSnippet } from '@/server/feedback-snippets';
+import type { FeedbackSnippetListItem } from '@/server/feedback-snippets';
 import { useI18n } from '@/routes/__root';
 import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { FeedbackSnippetCard } from './FeedbackSnippetCard';
 import { FeedbackSnippetForm, type FeedbackSnippetFormValues } from './FeedbackSnippetForm';
 
-type FormState = { mode: 'create' } | { mode: 'edit'; snippet: FeedbackSnippet };
+const FEEDBACK_SNIPPET_PAGE_SIZE = 20;
+
+type FormState = { mode: 'create' } | { mode: 'edit'; snippet: FeedbackSnippetListItem };
 
 function resultOrThrow<T>(result: T | { error: { message: string } }): T {
   if (isServerError(result)) {
@@ -34,6 +37,7 @@ function FeedbackSnippetsPage() {
   const [archived, setArchived] = useState(false);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [formState, setFormState] = useState<FormState | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [mutationError, setMutationError] = useState<string | null>(null);
@@ -41,11 +45,16 @@ function FeedbackSnippetsPage() {
   const updateDebouncedSearch = useDebouncedCallback(setDebouncedSearch, 300);
 
   const snippetsQuery = useQuery({
-    queryKey: feedbackSnippetKeys.list({ archived, search: debouncedSearch }),
+    queryKey: feedbackSnippetKeys.list({
+      archived,
+      search: debouncedSearch,
+      page,
+      limit: FEEDBACK_SNIPPET_PAGE_SIZE,
+    }),
     queryFn: async () =>
       resultOrThrow(
         await listFeedbackSnippets({
-          data: { archived, search: debouncedSearch },
+          data: { archived, search: debouncedSearch, page, limit: FEEDBACK_SNIPPET_PAGE_SIZE },
         }),
       ),
     placeholderData: (previousData) => previousData,
@@ -92,10 +101,10 @@ function FeedbackSnippetsPage() {
       setMutationError(error instanceof Error ? error.message : t('common.error')),
   });
 
-  const snippets: FeedbackSnippet[] =
-    snippetsQuery.data && 'snippets' in snippetsQuery.data
-      ? (snippetsQuery.data.snippets as FeedbackSnippet[])
-      : [];
+  const snippets: FeedbackSnippetListItem[] =
+    snippetsQuery.data && 'snippets' in snippetsQuery.data ? snippetsQuery.data.snippets : [];
+  const total = snippetsQuery.data && 'total' in snippetsQuery.data ? snippetsQuery.data.total : 0;
+  const totalPages = Math.ceil(total / FEEDBACK_SNIPPET_PAGE_SIZE);
   const isMutationPending =
     saveMutation.isPending || archiveMutation.isPending || restoreMutation.isPending;
 
@@ -104,7 +113,7 @@ function FeedbackSnippetsPage() {
     await saveMutation.mutateAsync({ id, values });
   };
 
-  const handleArchive = (snippet: FeedbackSnippet) => {
+  const handleArchive = (snippet: FeedbackSnippetListItem) => {
     if (window.confirm(t('feedbackSnippets.archiveConfirm'))) {
       archiveMutation.mutate(snippet.id);
     }
@@ -160,6 +169,7 @@ function FeedbackSnippetsPage() {
             onChange={(event) => {
               const value = event.target.value;
               setSearch(value);
+              setPage(1);
               if (value === '') {
                 updateDebouncedSearch.cancel();
                 setDebouncedSearch('');
@@ -178,7 +188,10 @@ function FeedbackSnippetsPage() {
         >
           <Button
             data-testid="feedback-snippets-active-filter"
-            onClick={() => setArchived(false)}
+            onClick={() => {
+              setArchived(false);
+              setPage(1);
+            }}
             size="sm"
             variant={archived ? 'ghost' : 'secondary'}
           >
@@ -186,7 +199,10 @@ function FeedbackSnippetsPage() {
           </Button>
           <Button
             data-testid="feedback-snippets-archived-filter"
-            onClick={() => setArchived(true)}
+            onClick={() => {
+              setArchived(true);
+              setPage(1);
+            }}
             size="sm"
             variant={archived ? 'secondary' : 'ghost'}
           >
@@ -242,6 +258,19 @@ function FeedbackSnippetsPage() {
           ))}
         </div>
       )}
+
+      {!snippetsQuery.isPending &&
+        !snippetsQuery.isError &&
+        snippets.length > 0 &&
+        totalPages > 1 && (
+          <Pagination
+            currentPage={page}
+            onPageChange={setPage}
+            showCounter
+            showPageNumbers
+            totalPages={totalPages}
+          />
+        )}
 
       {isMutationPending && (
         <span className="sr-only" role="status">
