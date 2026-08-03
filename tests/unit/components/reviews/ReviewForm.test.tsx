@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 // Mock @tanstack/react-start
 vi.mock('@tanstack/react-start', () => ({
@@ -66,6 +66,10 @@ vi.mock('@/components/ui/label', () => ({
 vi.mock('lucide-react', () => ({
   Loader2: () => <div data-testid="loader" />,
   Upload: () => <div data-testid="upload-icon" />,
+  ChevronDown: () => <div data-testid="chevron-down" />,
+  ChevronUp: () => <div data-testid="chevron-up" />,
+  Plus: () => <div data-testid="plus" />,
+  Trash2: () => <div data-testid="trash" />,
 }));
 
 import { ReviewForm } from '@/components/reviews/ReviewForm';
@@ -104,6 +108,17 @@ describe('ReviewForm', () => {
     fireEvent.click(screen.getByText('instructorReviews.pass'));
 
     expect(screen.queryByLabelText('instructorReviews.revisionDeadline')).toBeNull();
+  });
+
+  it('shows the action-plan editor only for Revise', () => {
+    render(<ReviewForm submissionId={1} onComplete={mockOnComplete} onError={mockOnError} />);
+
+    expect(screen.queryByText('instructorReviews.revisionActionPlan')).toBeNull();
+    fireEvent.click(screen.getByText('instructorReviews.revise'));
+    expect(screen.getByText('instructorReviews.revisionActionPlan')).toBeDefined();
+
+    fireEvent.click(screen.getByText('instructorReviews.pass'));
+    expect(screen.queryByText('instructorReviews.revisionActionPlan')).toBeNull();
   });
 
   it('should show error when submitting revise without deadline', async () => {
@@ -167,6 +182,41 @@ describe('ReviewForm', () => {
         },
       });
       expect(mockOnComplete).toHaveBeenCalled();
+    });
+  });
+
+  it('submits ordered action items for Revise and omits them for Pass', async () => {
+    vi.mocked(submitReview).mockResolvedValue({ success: true });
+
+    render(<ReviewForm submissionId={1} onComplete={mockOnComplete} onError={mockOnError} />);
+    fireEvent.click(screen.getByText('instructorReviews.revise'));
+    fireEvent.change(screen.getByLabelText('instructorReviews.revisionDeadline'), {
+      target: { value: '2026-06-01' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'instructorReviews.actionPlan.addItem' }));
+    fireEvent.change(screen.getAllByRole('textbox')[1], {
+      target: { value: 'Add a cited source' },
+    });
+    fireEvent.click(screen.getByText('instructorReviews.submitReview'));
+
+    await waitFor(() => {
+      expect(submitReview).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          decision: 'revise',
+          actionItems: [{ itemText: 'Add a cited source' }],
+        }),
+      });
+    });
+
+    vi.clearAllMocks();
+    cleanup();
+    render(<ReviewForm submissionId={1} onComplete={mockOnComplete} onError={mockOnError} />);
+    fireEvent.click(screen.getByText('instructorReviews.pass'));
+    fireEvent.click(screen.getByText('instructorReviews.submitReview'));
+    await waitFor(() => {
+      expect(submitReview).toHaveBeenCalledWith({
+        data: expect.not.objectContaining({ actionItems: expect.anything() }),
+      });
     });
   });
 

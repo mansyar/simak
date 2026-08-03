@@ -21,6 +21,16 @@ const reviseReview = {
   decision: 'revise' as const,
   instructorName: 'Prof. Jones',
   createdAt: new Date('2026-05-22'),
+  actionItems: [
+    {
+      id: 21,
+      itemText: 'Add a cited source',
+      order: 0,
+      criterionId: 7,
+      criterionTitle: 'Evidence',
+      addressedAt: null,
+    },
+  ],
 };
 
 describe('ReviewHistory', () => {
@@ -58,6 +68,38 @@ describe('ReviewHistory', () => {
   it('should render comment when present', () => {
     render(<ReviewHistory reviews={[passReview]} />);
     expect(screen.getByText('Great work!')).toBeDefined();
+  });
+
+  it('renders ordered action items with current-plan status and no instructor controls', () => {
+    render(<ReviewHistory reviews={[reviseReview]} />);
+
+    expect(screen.getByText('Add a cited source')).toBeDefined();
+    expect(screen.getByText('instructorReviews.actionPlan.criterion')).toBeDefined();
+    expect(screen.getByText('instructorReviews.actionPlan.current')).toBeDefined();
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
+  });
+
+  it('renders addressed status for historical plans', () => {
+    render(
+      <ReviewHistory
+        reviews={[
+          {
+            ...reviseReview,
+            id: 3,
+            actionItems: [
+              {
+                ...reviseReview.actionItems[0],
+                addressedAt: new Date('2026-05-23'),
+              },
+            ],
+          },
+          reviseReview,
+        ]}
+      />,
+    );
+
+    expect(screen.getByText('instructorReviews.actionPlan.historical')).toBeDefined();
+    expect(screen.getByText('instructorReviews.actionPlan.addressed')).toBeDefined();
   });
 
   it('should render multiple reviews', () => {
