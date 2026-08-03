@@ -188,11 +188,11 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Preserve the existing submit, revise, consultation, waiting, and empty-state behavior.
   - [x] Add only translated, accessible UI strings and retain responsive behavior.
 
-- [~] Task: Phase Verification & Checkpoint — Next Actions.
-  - [~] Run focused resolver, dashboard-handler, and dashboard-component tests.
-  - [~] Manually verify current-plan-only resolution, addressed filtering, repeated revisions, resubmission waiting behavior, and existing priority ordering.
-  - [~] Verify no duplicate task surface or notification behavior was introduced.
-  - [~] Attach the verification git note and record the phase checkpoint after confirmation.
+- [x] Task: Phase Verification & Checkpoint — Next Actions [4d626fd]
+  - [x] Run focused resolver, dashboard-handler, and dashboard-component tests.
+  - [x] Manually verify current-plan-only resolution, addressed filtering, repeated revisions, resubmission waiting behavior, and existing priority ordering.
+  - [x] Verify no duplicate task surface or notification behavior was introduced.
+  - [x] Attach the verification git note and record the phase checkpoint after confirmation.
 
 ## Phase 6: Integration, E2E, Accessibility & Regression Coverage
 
