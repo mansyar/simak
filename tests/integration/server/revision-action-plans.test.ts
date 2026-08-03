@@ -364,4 +364,29 @@ describe('revision action items against PostgreSQL', () => {
       error: { code: 'UNAUTHORIZED', message: 'Unauthorized' },
     });
   });
+
+  it('keeps an action plan current when a later revise review has no items', async () => {
+    const planReviewId = await createReview(
+      rubricSubmissionId,
+      new Date('2026-03-01T00:00:00Z'),
+      'Plan with follow-up comment',
+    );
+    const [planItem] = await db
+      .insert(revisionActionItems)
+      .values({ reviewId: planReviewId, itemText: 'Keep this plan current', order: 0 })
+      .returning({ id: revisionActionItems.id });
+    await createReview(
+      rubricSubmissionId,
+      new Date('2026-03-02T00:00:00Z'),
+      'Comment-only follow-up',
+    );
+
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+      user: { id: studentId, name: 'Revision Plan Student', role: 'student', locale: 'en' },
+      session: {} as any,
+    } as any);
+    expect(
+      await updateRevisionActionItemHandler({ data: { itemId: planItem.id, addressed: true } }),
+    ).toEqual({ success: true });
+  });
 });

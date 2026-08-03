@@ -174,6 +174,11 @@ export async function updateRevisionActionItemHandler({
                 ON newer_review.submission_id = newer_submission.id
               WHERE newer_submission.checkpoint_id = ${checkpoints.id}
                 AND newer_review.decision = 'revise'
+                AND EXISTS (
+                  SELECT 1
+                  FROM ${revisionActionItems} AS newer_action_item
+                  WHERE newer_action_item.review_id = newer_review.id
+                )
                 AND (
                   newer_review.created_at > ${reviews.createdAt}
                   OR (
