@@ -136,13 +136,13 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Present the current plan on the authorized checkpoint page and allow only the owning student to toggle current item status.
 
-- [ ] Task: Write failing student UI and route tests.
-  - [ ] Add `tests/unit/components/student/RevisionActionPlan.test.tsx`.
-  - [ ] Verify current-plan rendering in stable order, addressed/unaddressed states, and reversible toggles.
-  - [ ] Verify superseded plans are read-only and historical statuses remain visible.
-  - [ ] Verify loading, mutation-pending, success, error, empty, and no-plan states.
-  - [ ] Extend `tests/unit/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.test.tsx` for loader data, current plan, and prior-plan presentation.
-  - [ ] Verify existing submission upload, review status, rubric result, file history, discussion, and checkpoint gating behavior remains unchanged.
+- [~] Task: Write failing student UI and route tests.
+  - [~] Add `tests/unit/components/student/RevisionActionPlan.test.tsx`.
+  - [~] Verify current-plan rendering in stable order, addressed/unaddressed states, and reversible toggles.
+  - [~] Verify superseded plans are read-only and historical statuses remain visible.
+  - [~] Verify loading, mutation-pending, success, error, empty, and no-plan states.
+  - [~] Extend `tests/unit/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.test.tsx` for loader data, current plan, and prior-plan presentation.
+  - [~] Verify existing submission upload, review status, rubric result, file history, discussion, and checkpoint gating behavior remains unchanged.
 
 - [ ] Task: Implement the student action-plan components and page integration.
   - [ ] Create focused student components under `src/components/student/` for the current plan and historical plan display.
