@@ -136,26 +136,26 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Present the current plan on the authorized checkpoint page and allow only the owning student to toggle current item status.
 
-- [~] Task: Write failing student UI and route tests.
-  - [~] Add `tests/unit/components/student/RevisionActionPlan.test.tsx`.
-  - [~] Verify current-plan rendering in stable order, addressed/unaddressed states, and reversible toggles.
-  - [~] Verify superseded plans are read-only and historical statuses remain visible.
-  - [~] Verify loading, mutation-pending, success, error, empty, and no-plan states.
-  - [~] Extend `tests/unit/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.test.tsx` for loader data, current plan, and prior-plan presentation.
-  - [~] Verify existing submission upload, review status, rubric result, file history, discussion, and checkpoint gating behavior remains unchanged.
+- [x] Task: Write failing student UI and route tests [6871e47]
+  - [x] Add `tests/unit/components/student/RevisionActionPlan.test.tsx`.
+  - [x] Verify current-plan rendering in stable order, addressed/unaddressed states, and reversible toggles.
+  - [x] Verify superseded plans are read-only and historical statuses remain visible.
+  - [x] Verify loading, mutation-pending, success, error, empty, and no-plan states.
+  - [x] Extend `tests/unit/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.test.tsx` for loader data, current plan, and prior-plan presentation.
+  - [x] Verify existing submission upload, review status, rubric result, file history, discussion, and checkpoint gating behavior remains unchanged.
 
-- [ ] Task: Implement the student action-plan components and page integration.
-  - [ ] Create focused student components under `src/components/student/` for the current plan and historical plan display.
-  - [ ] Extend the checkpoint route loader to retain action-plan and review-history data from the existing review request.
-  - [ ] Render the current plan in the checkpoint page with progressive disclosure and a clear relationship to the latest Revise feedback.
-  - [ ] Add addressed-status mutation handling with immediate feedback and safe local/router refresh behavior.
-  - [ ] Disable mutation controls for superseded plans and during pending requests.
-  - [ ] Keep item text plain text and escaped.
+- [~] Task: Implement the student action-plan components and page integration.
+  - [~] Create focused student components under `src/components/student/` for the current plan and historical plan display.
+  - [~] Extend the checkpoint route loader to retain action-plan and review-history data from the existing review request.
+  - [~] Render the current plan in the checkpoint page with progressive disclosure and a clear relationship to the latest Revise feedback.
+  - [~] Add addressed-status mutation handling with immediate feedback and safe local/router refresh behavior.
+  - [~] Disable mutation controls for superseded plans and during pending requests.
+  - [~] Keep item text plain text and escaped.
 
-- [ ] Task: Add student translations and accessibility behavior.
-  - [ ] Add English and Indonesian current-plan, historical-plan, addressed-status, error, and accessibility labels.
-  - [ ] Regenerate i18n types and run locale parity checks.
-  - [ ] Verify keyboard and screen-reader operation, focus behavior, semantic checkbox/button state, live announcements, contrast, touch targets, and mobile layout.
+- [~] Task: Add student translations and accessibility behavior.
+  - [~] Add English and Indonesian current-plan, historical-plan, addressed-status, error, and accessibility labels.
+  - [~] Regenerate i18n types and run locale parity checks.
+  - [~] Verify keyboard and screen-reader operation, focus behavior, semantic checkbox/button state, live announcements, contrast, touch targets, and mobile layout.
 
 - [ ] Task: Phase Verification & Checkpoint — student experience.
   - [ ] Run focused component and checkpoint-route tests.
