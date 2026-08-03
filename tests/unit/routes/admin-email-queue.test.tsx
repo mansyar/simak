@@ -25,6 +25,7 @@ const mockSearch = vi.hoisted(() => ({
 
 const mockRetryEmail = vi.hoisted(() => vi.fn());
 const mockTriggerR2Cleanup = vi.hoisted(() => vi.fn());
+const mockQueryClient = vi.hoisted(() => ({ invalidateQueries: vi.fn() }));
 
 vi.mock('@tanstack/react-start/server', () => ({
   getRequestHeaders: vi.fn().mockReturnValue(new Headers()),
@@ -54,8 +55,14 @@ vi.mock('@tanstack/react-router', () => ({
   useRouter: vi.fn().mockReturnValue(mockRouter),
 }));
 
+vi.mock('@tanstack/react-query', () => ({
+  useQuery: vi.fn().mockImplementation(() => ({ data: mockData.summary })),
+  useQueryClient: vi.fn().mockReturnValue(mockQueryClient),
+}));
+
 vi.mock('@/server/email-queue', () => ({
   listEmailQueue: vi.fn(),
+  getEmailQueueSummary: vi.fn(),
   retryEmail: mockRetryEmail,
 }));
 

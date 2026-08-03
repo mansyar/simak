@@ -36,8 +36,14 @@ export const userKeys = {
 
 export const templateKeys = {
   all: () => ['templates'] as const,
+  types: () => ['templates', 'types'] as const,
   list: (filters?: { page?: number; limit?: number; search?: string; type?: string }) =>
     ['templates', 'list', filters ?? {}] as const,
+};
+
+export const emailQueueKeys = {
+  all: () => ['emailQueue'] as const,
+  summary: () => ['emailQueue', 'summary'] as const,
 };
 
 export const discussionKeys = {

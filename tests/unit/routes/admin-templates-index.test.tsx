@@ -5,6 +5,8 @@ import '@testing-library/jest-dom/vitest';
 // Hoisted mock for router
 const mockRouter = vi.hoisted(() => ({ invalidate: vi.fn() }));
 const mockNavigate = vi.hoisted(() => vi.fn());
+const mockTemplateTypes = vi.hoisted(() => ({ current: ['Thesis', 'Project', 'Dissertation'] }));
+const mockQueryClient = vi.hoisted(() => ({ invalidateQueries: vi.fn() }));
 
 // Hoisted mock for loader data (changeable per test)
 const mockLoaderData = vi.hoisted(() => ({
@@ -27,6 +29,11 @@ vi.mock('@tanstack/react-router', () => ({
   ),
 }));
 
+vi.mock('@tanstack/react-query', () => ({
+  useQuery: vi.fn().mockImplementation(() => ({ data: { types: mockTemplateTypes.current } })),
+  useQueryClient: vi.fn().mockReturnValue(mockQueryClient),
+}));
+
 // Mock @tanstack/react-start
 vi.mock('@tanstack/react-start', () => ({
   useServerFn: vi.fn().mockImplementation((fn: unknown) => fn),
@@ -35,6 +42,7 @@ vi.mock('@tanstack/react-start', () => ({
 // Mock server functions
 vi.mock('@/server/templates', () => ({
   listTemplates: vi.fn(),
+  listTemplateTypes: vi.fn(),
   createTemplate: vi.fn(),
   getTemplate: vi.fn(),
   deleteTemplate: vi.fn(),
@@ -161,19 +169,19 @@ describe('Admin Templates Index Route', () => {
   });
 
   it('should pass allTypes from server to TemplateFilters (not computed from templates)', async () => {
-    // Server returns 3 types but only 1 template (with only 1 type)
+    // The independently cached type query returns 3 types while the list has only 1 template.
+    mockTemplateTypes.current = ['Thesis', 'Project', 'Dissertation'];
     mockLoaderData.current = {
       templates: [{ type: 'Thesis' }],
       total: 1,
-      allTypes: ['Thesis', 'Project', 'Dissertation'],
     };
     const Component = await getComponent();
     render(<Component />);
     const filters = screen.getByTestId('template-filters');
     const types = JSON.parse(filters.getAttribute('data-types') || '[]');
-    // Should receive all 3 types from server, not just 1 from templates array
+    // Should receive all 3 types from the independent query, not from the templates array.
     expect(types).toEqual(['Thesis', 'Project', 'Dissertation']);
     // Reset
-    mockLoaderData.current = { templates: [], total: 0, allTypes: [] };
+    mockLoaderData.current = { templates: [], total: 0 };
   });
 });
