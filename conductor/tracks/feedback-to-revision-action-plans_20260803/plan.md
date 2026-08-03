@@ -42,22 +42,22 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Add validated action-plan submission, atomic persistence, historical reads, audit records, and student status mutation without regressing existing review behavior.
 
-- [~] Task: Write failing server and schema tests.
-  - [~] Extend `tests/unit/server/reviews-schemas.test.ts` for optional action items, exact 10-item and 500-character boundaries, empty/over-limit rejection, plain-text input, and Pass rejection.
-  - [~] Add `tests/unit/server/revision-action-items.test.ts` for criterion ownership, current-plan checks, addressed/unaddressed transitions, and authorization.
-  - [~] Extend review-handler tests for comment-only and feedback-file-only Revise compatibility.
-  - [~] Test rubric-linked and no-rubric submissions.
-  - [~] Test review/action-item transaction rollback when action-item persistence fails.
-  - [~] Test review detail/latest review responses include ordered action items and criterion snapshots.
-  - [~] Test repeated revisions preserve old rows without copying or merging.
-  - [~] Test notification reuse and audit details that omit full action-item text.
-  - [~] Test student, instructor, cross-student, and cross-instructor access boundaries.
+- [x] Task: Write failing server and schema tests [3e6818f]
+  - [x] Extend `tests/unit/server/reviews-schemas.test.ts` for optional action items, exact 10-item and 500-character boundaries, empty/over-limit rejection, plain-text input, and Pass rejection.
+  - [x] Add `tests/unit/server/revision-action-items.test.ts` for criterion ownership, current-plan checks, addressed/unaddressed transitions, and authorization.
+  - [x] Extend review-handler tests for comment-only and feedback-file-only Revise compatibility.
+  - [x] Test rubric-linked and no-rubric submissions.
+  - [x] Test review/action-item transaction rollback when action-item persistence fails.
+  - [x] Test review detail/latest review responses include ordered action items and criterion snapshots.
+  - [x] Test repeated revisions preserve old rows without copying or merging.
+  - [x] Test notification reuse and audit details that omit full action-item text.
+  - [x] Test student, instructor, cross-student, and cross-instructor access boundaries.
 
-- [ ] Task: Implement client-safe validation and status-function stubs.
-  - [ ] Extend `SubmitReviewSchema` in `src/server/reviews.ts` with the optional ordered action-item input.
-  - [ ] Preserve the existing dynamic import and typed server-function pattern.
-  - [ ] Create `src/server/revision-action-items.ts` with the addressed-status schema and client-safe mutation stub.
-  - [ ] Apply the project’s appropriate read/mutation rate-limit middleware.
+- [~] Task: Implement client-safe validation and status-function stubs.
+  - [~] Extend `SubmitReviewSchema` in `src/server/reviews.ts` with the optional ordered action-item input.
+  - [~] Preserve the existing dynamic import and typed server-function pattern.
+  - [~] Create `src/server/revision-action-items.ts` with the addressed-status schema and client-safe mutation stub.
+  - [~] Apply the project’s appropriate read/mutation rate-limit middleware.
 
 - [ ] Task: Implement server-only action-item helpers and addressed-status handler.
   - [ ] Create `src/server/revision-action-items.server.ts` for reusable action-item reads, transaction insertion, current-plan resolution, and status mutation.
