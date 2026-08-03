@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Users, Check, CheckSquare, Square } from 'lucide-react';
 
+const EMPTY_STUDENTS: never[] = [];
+
 interface StudentPickerProps {
   selectedStudentIds: string[];
   onToggleStudent: (id: string) => void;
@@ -42,7 +44,7 @@ export function StudentPicker({
     retry: false,
   });
 
-  const students = data?.users ?? [];
+  const students = data?.users ?? EMPTY_STUDENTS;
 
   useEffect(() => {
     if (isError) {

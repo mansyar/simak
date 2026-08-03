@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Clipboard, Search, Check, ChevronRight } from 'lucide-react';
 
+const EMPTY_TEMPLATES: never[] = [];
+
 interface Template {
   id: number;
   name: string;
@@ -40,7 +42,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
     retry: false,
   });
 
-  const templates = data?.templates ?? [];
+  const templates = data?.templates ?? EMPTY_TEMPLATES;
 
   useEffect(() => {
     if (isError) {
