@@ -240,17 +240,19 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Run `pnpm build`.
   - [x] Confirm no later source changes require another focused Track-054 Playwright/accessibility run.
 
-- [~] Task: Perform final implementation review against the approved specification.
-  - [~] Confirm every acceptance criterion is covered by implementation and tests.
-  - [~] Confirm all server handlers enforce instructor/student authorization.
-  - [~] Confirm action-item text/order/snapshots are immutable after review submission.
-  - [~] Confirm current-plan resolution and supersession never copy or merge historical items.
-  - [~] Confirm addressed updates cannot block resubmission or alter review decisions.
-  - [~] Confirm no new notification type or duplicate task system exists.
-  - [~] Confirm audit records omit full feedback text.
-  - [~] Confirm all governed files are under 500 lines and generated i18n files were not manually edited.
-  - [~] Confirm migrations and rollback artifacts are present and consistent.
-  - [~] Review the final diff for secrets, hardcoded UI strings, unsafe rendering, N+1 queries, and `git diff --check`.
+- [x] Task: Perform final implementation review against the approved specification [b5dd9fb]
+  - [x] Confirm every acceptance criterion is covered by implementation and tests.
+  - [x] Confirm all server handlers enforce instructor/student authorization.
+  - [x] Confirm action-item text/order/snapshots are immutable after review submission.
+  - [x] Confirm current-plan resolution and supersession never copy or merge historical items.
+  - [x] Confirm addressed updates cannot block resubmission or alter review decisions.
+  - [x] Confirm no new notification type or duplicate task system exists.
+  - [x] Confirm audit records omit full feedback text.
+  - [x] Confirm all governed files are under 500 lines and generated i18n files were not manually edited.
+  - [x] Confirm migrations and rollback artifacts are present and consistent.
+  - [x] Review the final diff for secrets, hardcoded UI strings, unsafe rendering, N+1 queries, and `git diff --check`.
+
+  Final review finding fixed in `b5dd9fb`: a later comment-only Revise review must not supersede an existing action plan; the current-plan mutation query now requires a newer Revise review to contain action items, with PostgreSQL regression coverage.
 
 - [ ] Task: Phase Verification & Checkpoint — final quality and readiness.
   - [ ] Complete the workflow’s manual verification plan and obtain explicit user confirmation.
