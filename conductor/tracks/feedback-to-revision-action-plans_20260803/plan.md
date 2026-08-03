@@ -229,16 +229,16 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Confirm the entire feature satisfies the approved specification and repository gates before implementation handoff/review.
 
-- [ ] Task: Run the complete automated quality gates.
-  - [ ] Run `pnpm test`.
-  - [ ] Run `pnpm test:coverage` and confirm all thresholds remain at or above 80%.
-  - [ ] Run `pnpm test:integration`.
-  - [ ] Run `pnpm typecheck`.
-  - [ ] Run `pnpm lint`.
-  - [ ] Run `pnpm check:i18n`.
-  - [ ] Run the project formatter/check and verify no unintended formatting changes.
-  - [ ] Run `pnpm build`.
-  - [ ] Run the focused Track-054 Playwright/accessibility suite again if later changes could affect it.
+- [~] Task: Run the complete automated quality gates.
+  - [~] Run `pnpm test`.
+  - [~] Run `pnpm test:coverage` and confirm all thresholds remain at or above 80%.
+  - [~] Run `pnpm test:integration`.
+  - [~] Run `pnpm typecheck`.
+  - [~] Run `pnpm lint`.
+  - [~] Run `pnpm check:i18n`.
+  - [~] Run the project formatter/check and verify no unintended formatting changes.
+  - [~] Run `pnpm build`.
+  - [~] Run the focused Track-054 Playwright/accessibility suite again if later changes could affect it.
 
 - [ ] Task: Perform final implementation review against the approved specification.
   - [ ] Confirm every acceptance criterion is covered by implementation and tests.
