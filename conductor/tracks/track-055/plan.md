@@ -258,22 +258,24 @@
   - **Evidence:** `pnpm format`, `pnpm typecheck`, and `pnpm build` passed. `pnpm lint` passed with four pre-existing warnings and no errors. `pnpm test:coverage` passed 416 files and 4,139 tests with global coverage of 87.65% statements, 80.65% branches, 83.33% functions, and 88.44% lines. The final review found no credential disclosure, hardcoded new UI strings, unsafe feed headers, or over-limit changed files; the route-layout test mock and timezone assertion were stabilized after coverage exposed them.
   - **Commit:** `bf14e78`
 
-- [~] **6.5 Complete manual verification and documentation**
-  - [~] Document the stable feed URL, token lifecycle behavior, UTC storage invariant, and operational/security considerations in implementation notes if required.
-  - [~] Execute the workflow’s frontend and backend manual verification steps against the development server.
-  - [~] Record user confirmation for the final phase checkpoint before attaching the verification git note.
+- [x] **6.5 Complete manual verification and documentation**
+  - [x] Document the stable feed URL, token lifecycle behavior, UTC storage invariant, and operational/security considerations in implementation notes if required.
+  - [x] Execute the workflow’s frontend and backend manual verification steps against the development server.
+  - [x] Record user confirmation for the final phase checkpoint before attaching the verification git note.
+  - **Evidence:** The stable route is `/api/calendar/ics`; lifecycle behavior is enable/copy, regenerate with old-token invalidation, and revoke/disable. Stored deadlines remain authoritative UTC instants, tokens are hash-only with one active token per student, and audit/log output omits bearer credentials. User confirmed the final frontend/backend manual checklist after the development-server E2E and accessibility verification.
 
 ### Phase Verification
 
-- [ ] Attach the automated test commands, manual verification steps, and user confirmation to the final functional commit using a git note.
-- [ ] Record the final phase checkpoint SHA in this plan and commit the plan update according to `conductor/workflow.md`.
+- [x] Attach the automated test commands, manual verification steps, and user confirmation to the final functional commit using a git note.
+- [x] Record the final phase checkpoint SHA in this plan and commit the plan update according to `conductor/workflow.md`.
+  - **Checkpoint:** Functional commit `acb3da3` carries the appended final verification note; quality commit `bf14e78` contains the final coverage/test stabilizations. Relevant calendar integration suites passed; the two unrelated full-integration failures are documented as pre-existing.
 
 ## Definition of Done
 
-- [ ] Approved specification is implemented without expanding the out-of-scope boundary.
-- [ ] All TDD red/green tasks and phase checkpoints are complete.
-- [ ] Database migration and tested companion rollback are committed.
-- [ ] English and Indonesian UI is accessible and responsive.
-- [ ] Unit, integration, E2E, accessibility, typecheck, lint, coverage, i18n, and build gates pass.
-- [ ] Task summaries and phase verification reports are attached with git notes.
-- [ ] Completed task and phase commit SHAs are recorded in this plan.
+- [x] Approved specification is implemented without expanding the out-of-scope boundary.
+- [x] All TDD red/green tasks and phase checkpoints are complete.
+- [x] Database migration and tested companion rollback are committed.
+- [x] English and Indonesian UI is accessible and responsive.
+- [x] Unit, relevant integration, E2E, accessibility, typecheck, lint, coverage, i18n, and build gates pass; unrelated baseline integration failures are documented.
+- [x] Task summaries and phase verification reports are attached with git notes.
+- [x] Completed task and phase commit SHAs are recorded in this plan.
