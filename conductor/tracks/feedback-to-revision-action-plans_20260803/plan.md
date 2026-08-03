@@ -74,19 +74,19 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Return the inserted review/action-plan metadata needed for post-commit audit logging.
   - [x] Keep `src/server/reviews.server.ts` under 500 lines; extract action-item logic to the handler-only helper if necessary.
 
-- [~] Task: Extend instructor and student review reads.
-  - [~] Extend `getReviewDetailHandler` to return action items grouped by review in stable order.
-  - [~] Extend `getLatestReviewHandler` with current/latest action items and the review-history action-item data needed by the student checkpoint page.
-  - [~] Batch-load action items by review IDs to avoid N+1 queries.
-  - [~] Preserve all existing response fields for current callers.
-  - [~] Preserve criterion/title snapshots when rubric criteria change.
+- [x] Task: Extend instructor and student review reads [b586158]
+  - [x] Extend `getReviewDetailHandler` to return action items grouped by review in stable order.
+  - [x] Extend `getLatestReviewHandler` with current/latest action items and the review-history action-item data needed by the student checkpoint page.
+  - [x] Batch-load action items by review IDs to avoid N+1 queries.
+  - [x] Preserve all existing response fields for current callers.
+  - [x] Preserve criterion/title snapshots when rubric criteria change.
 
-- [ ] Task: Add audit records and preserve notification behavior.
-  - [ ] Record action-plan creation with review/checkpoint references and item count, without full item text.
-  - [ ] Record addressed and unaddressed transitions with item/review references and new status.
-  - [ ] Use advisory audit logging conventions so audit failures do not fail a successful review or status mutation.
-  - [ ] Continue emitting the existing `revision_requested` notification exactly once for Revise reviews.
-  - [ ] Do not add a new notification event type or per-item notifications.
+- [~] Task: Add audit records and preserve notification behavior.
+  - [~] Record action-plan creation with review/checkpoint references and item count, without full item text.
+  - [~] Record addressed and unaddressed transitions with item/review references and new status.
+  - [~] Use advisory audit logging conventions so audit failures do not fail a successful review or status mutation.
+  - [~] Continue emitting the existing `revision_requested` notification exactly once for Revise reviews.
+  - [~] Do not add a new notification event type or per-item notifications.
 
 - [ ] Task: Phase Verification & Checkpoint — server and transaction layer.
   - [ ] Run focused schema, review-schema, review-handler, action-item, and review-extra tests.
