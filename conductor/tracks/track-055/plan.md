@@ -277,7 +277,7 @@
 - [x] Bound the process-local calendar rate-limit store and stop using client-supplied forwarding headers as rate-limit identity.
 - [x] Narrow nullable checkpoint due dates before creating checkpoint events.
 - **Evidence:** Targeted selection, route, and rate-limiter tests passed (3 files, 23 tests); targeted formatting, oxlint, and typecheck passed. The full unit run passed 415/416 files and 4,138/4,139 tests, with one instructor-route import test timing out.
-- **Review fix commit:** `pending`
+- **Review fix commit:** `19ff889`
 
 ## Definition of Done
 
