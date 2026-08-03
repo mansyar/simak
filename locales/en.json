@@ -582,6 +582,17 @@
     "title": "Rubric Results",
     "weightedTotal": "Weighted Total"
   },
+  "studentRevisionActionPlan": {
+    "current": "Current revision plan",
+    "historical": "Previous revision plan",
+    "currentDescription": "Mark each item addressed when you have completed it. This does not block resubmission.",
+    "historicalDescription": "This plan is from an earlier review and cannot be changed.",
+    "listLabel": "Revision action items",
+    "item": "Action item {number}",
+    "addressed": "Addressed",
+    "open": "Not yet addressed",
+    "updateError": "Unable to update this action item. Try again."
+  },
   "studentAssignments": {
     "title": "My Assignments",
     "subtitle": "View and track the progress of your assigned academic work.",

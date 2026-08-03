@@ -153,7 +153,63 @@ export async function getLatestReviewHandler(args: { data: GetLatestReviewInput 
           .orderBy(asc(revisionActionItems.order), asc(revisionActionItems.id))
       : [];
 
-    return { review: latestReview ?? null, scores, actionItems };
+    // Keep the full review history available to the student page so prior plans
+    // can remain visible without making a separate client request.
+    const reviewHistory = await db
+      .select({
+        id: reviews.id,
+        decision: reviews.decision,
+        comment: reviews.comment,
+        instructorName: users.name,
+        createdAt: reviews.createdAt,
+      })
+      .from(reviews)
+      .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
+      .innerJoin(users, eq(reviews.instructorId, users.id))
+      .where(eq(submissions.checkpointId, checkpointId))
+      .orderBy(desc(reviews.createdAt));
+
+    const historyActionItems = reviewHistory.length
+      ? await db
+          .select({
+            id: revisionActionItems.id,
+            reviewId: revisionActionItems.reviewId,
+            itemText: revisionActionItems.itemText,
+            order: revisionActionItems.order,
+            criterionId: revisionActionItems.criterionId,
+            criterionTitle: revisionActionItems.criterionTitle,
+            addressedAt: revisionActionItems.addressedAt,
+          })
+          .from(revisionActionItems)
+          .where(
+            inArray(
+              revisionActionItems.reviewId,
+              reviewHistory.map((review) => review.id),
+            ),
+          )
+          .orderBy(
+            asc(revisionActionItems.reviewId),
+            asc(revisionActionItems.order),
+            asc(revisionActionItems.id),
+          )
+      : [];
+    const historyItemsByReview = new Map<number, typeof historyActionItems>();
+    for (const actionItem of historyActionItems) {
+      const reviewItems = historyItemsByReview.get(actionItem.reviewId) ?? [];
+      reviewItems.push(actionItem);
+      historyItemsByReview.set(actionItem.reviewId, reviewItems);
+    }
+    const reviewHistoryWithItems = reviewHistory.map((review) => ({
+      ...review,
+      actionItems: historyItemsByReview.get(review.id) ?? [],
+    }));
+
+    return {
+      review: latestReview ?? null,
+      scores,
+      actionItems,
+      reviewHistory: reviewHistoryWithItems,
+    };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),

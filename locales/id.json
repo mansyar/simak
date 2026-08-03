@@ -582,6 +582,17 @@
     "title": "Hasil Rubrik",
     "weightedTotal": "Total Terbobot"
   },
+  "studentRevisionActionPlan": {
+    "current": "Rencana revisi saat ini",
+    "historical": "Rencana revisi sebelumnya",
+    "currentDescription": "Tandai setiap item setelah ditindaklanjuti. Ini tidak menghambat pengiriman ulang.",
+    "historicalDescription": "Rencana ini berasal dari peninjauan sebelumnya dan tidak dapat diubah.",
+    "listLabel": "Item tindakan revisi",
+    "item": "Item tindakan {number}",
+    "addressed": "Sudah ditindaklanjuti",
+    "open": "Belum ditindaklanjuti",
+    "updateError": "Item tindakan tidak dapat diperbarui. Coba lagi."
+  },
   "studentAssignments": {
     "title": "Tugas Saya",
     "subtitle": "Lihat dan lacak kemajuan tugas akademik yang diberikan kepada Anda.",

@@ -587,6 +587,17 @@ export type Translation = {
     title: string
     weightedTotal: string
   }
+  studentRevisionActionPlan: {
+    current: string
+    historical: string
+    currentDescription: string
+    historicalDescription: string
+    listLabel: string
+    item: string
+    addressed: string
+    open: string
+    updateError: string
+  }
   studentAssignments: {
     title: string
     subtitle: string
