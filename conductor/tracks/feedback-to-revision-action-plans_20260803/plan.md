@@ -126,11 +126,11 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Verify `pnpm check:i18n` parity.
   - [x] Verify keyboard operation, focus visibility, semantic labels, live mutation/validation feedback, dark mode, and 320px responsive layout.
 
-- [~] Task: Phase Verification & Checkpoint — instructor experience.
-  - [~] Run focused editor, ReviewForm, ReviewHistory, and route tests.
-  - [~] Manually verify Pass/Revise switching, ordered submission, rubric/no-rubric behavior, and read-only history.
-  - [~] Review i18n, accessibility, file-size, and backward-compatibility requirements.
-  - [~] Attach the verification git note and record the phase checkpoint after confirmation.
+- [x] Task: Phase Verification & Checkpoint — instructor experience [1939ec0]
+  - [x] Run focused editor, ReviewForm, ReviewHistory, and route tests.
+  - [x] Manually verify Pass/Revise switching, ordered submission, rubric/no-rubric behavior, and read-only history.
+  - [x] Review i18n, accessibility, file-size, and backward-compatibility requirements.
+  - [x] Attach the verification git note and record the phase checkpoint after confirmation.
 
 ## Phase 4: Student Current Plan, Status Updates & History
 
