@@ -221,6 +221,19 @@ describe('Admin Users index page', () => {
     expect(options.search({ page: 3, search: '' })).toMatchObject({ page: 1, search: 'draft' });
   });
 
+  it('retains the previous result while a committed search loads', async () => {
+    const Component = await getComponent();
+    renderWithQuery(<Component />);
+
+    const query = queryClient.getQueryCache().getAll()[0];
+    const placeholderData = (query?.options as { placeholderData?: unknown }).placeholderData as
+      | ((previousData: unknown) => unknown)
+      | undefined;
+    const previousData = { users: [{ id: '1' }], total: 1 };
+
+    expect(placeholderData?.(previousData)).toBe(previousData);
+  });
+
   describe('render', () => {
     it('should render the page title via PageHeader (text-3xl, not text-4xl)', async () => {
       const Component = await getComponent();

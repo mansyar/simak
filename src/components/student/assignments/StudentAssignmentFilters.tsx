@@ -38,6 +38,7 @@ export function StudentAssignmentFilters({
           <button
             type="button"
             onClick={() => {
+              debouncedSearchChange.cancel();
               setLocalSearch('');
               onSearchChange('');
             }}

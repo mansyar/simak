@@ -77,4 +77,19 @@ describe('StudentAssignmentFilters', () => {
 
     expect(handleChange).toHaveBeenCalledWith('');
   });
+
+  it('should cancel a pending search when the clear button is clicked', () => {
+    const handleChange = vi.fn();
+    render(<StudentAssignmentFilters search="" onSearchChange={handleChange} />);
+    const input = screen.getByPlaceholderText('studentAssignments.searchPlaceholder');
+
+    fireEvent.change(input, { target: { value: 'draft' } });
+    fireEvent.click(screen.getByLabelText('common.clearSearch'));
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenCalledWith('');
+  });
 });
