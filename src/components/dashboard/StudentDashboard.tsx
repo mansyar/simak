@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Progress } from '@/components/ui/progress';
 import { useStudentTimezone } from '@/hooks/use-student-timezone';
+import { StudentNextActions } from '@/components/dashboard/StudentNextActions';
+import type { StudentNextActionsResult } from '@/lib/student-next-actions';
 
 interface ActiveAssignment {
   id: number;
@@ -50,8 +52,17 @@ export interface StudentDashboardData {
   upcomingDeadlines: UpcomingDeadline[];
   pendingReviews: PendingReview[];
   consultationReminders: ConsultationReminder[];
+  nextActions?: StudentNextActionsResult;
   error?: string;
 }
+
+const emptyNextActions: StudentNextActionsResult = {
+  primaryActions: [],
+  waitingSummary: {
+    submitted: { count: 0, representatives: [] },
+    underReview: { count: 0, representatives: [] },
+  },
+};
 
 interface Props {
   data: StudentDashboardData;
@@ -73,6 +84,8 @@ export function StudentDashboard({ data }: Props) {
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
+      <StudentNextActions data={d.nextActions ?? emptyNextActions} />
+
       {/* Widget 1: Active Assignments Overview */}
       <Card className="md:col-span-2">
         <CardHeader>

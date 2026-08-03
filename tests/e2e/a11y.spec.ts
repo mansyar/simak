@@ -82,6 +82,7 @@ test.describe('Axe Accessibility Scans', () => {
 
   test('student dashboard has no critical/serious/moderate a11y violations', async ({ page }) => {
     await loginAsRole(page, 'student');
+    await expect(page.getByRole('heading', { name: 'Next Actions' })).toBeVisible();
 
     const results = await new AxeBuilder({ page }).analyze();
     expect(filterCriticalAndSerious(results.violations)).toEqual([]);

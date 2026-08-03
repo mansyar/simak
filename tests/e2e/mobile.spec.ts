@@ -21,6 +21,7 @@ test.describe('Mobile Responsive Tests', () => {
     await expect(page.locator('h1')).toHaveText('Dashboard');
 
     // Verify key widgets are visible (using exact match to avoid sidebar conflicts)
+    await expect(page.getByText('Next Actions', { exact: true })).toBeVisible();
     await expect(page.getByText('Active Assignments', { exact: true })).toBeVisible();
 
     // Verify no horizontal overflow (responsive layout)

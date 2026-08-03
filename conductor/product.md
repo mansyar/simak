@@ -205,7 +205,7 @@ Students and instructors lack a centralized system to:
 ### Track 7.2: Role-Based Dashboards (May 2026)
 
 - **Server functions** — `getStudentDashboardData`, `getInstructorDashboardData`, `getAdminDashboardData` with per-role handlers, Zod schemas, and session-based role verification
-- **Student dashboard** (`/student/dashboard`) — 4 widgets: Active Assignments (progress bars), Upcoming Deadlines (color-coded urgency, overdue badges), Pending Reviews (wait times), Consultation Reminders (pending badges)
+- **Student dashboard** (`/student/dashboard`) — A prioritized Next Actions section plus the four existing widgets: Active Assignments (progress bars), Upcoming Deadlines (color-coded urgency, overdue badges), Pending Reviews (wait times), and Consultation Reminders (pending badges). Next Actions derives one deterministic submit, revise, or required-consultation action per checkpoint, links to existing authorized surfaces, and groups submitted/under-review work as waiting summaries without a second persisted task system (TRACK-053).
 - **Instructor dashboard** (`/instructor/dashboard`) — 4 widgets: Pending Review Queue (SLA badges: On Time/Approaching/Breached), Recent Submissions (status badges), Assignment Overview (student count, progress), Quick Actions (CTA links)
 - **Admin dashboard** (`/admin/dashboard`) — 4 widgets: System Metrics (6 metric cards), Recent Activity Feed (last 10 events, 7 day window), Deadline Escalation Alerts (red styling for >3 days overdue), Quick Actions (CTA links)
 - **Route redirects** — Login and `_unauthenticated` redirect to role-specific dashboards; `requireRole` redirects unauthorized users to their own dashboard; old `/dashboard` route removed

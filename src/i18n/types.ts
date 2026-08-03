@@ -610,6 +610,38 @@ export type Translation = {
     underReview: string
     pending: string
     submittedAgo: string
+    nextActions: {
+      title: string
+      description: string
+      empty: string
+      emptyDescription: string
+      actions: {
+        submit: string
+        revise: string
+        consultation: string
+      }
+      priority: {
+        overdue: string
+        revise: string
+        consultation: string
+        within_168_hours: string
+        dated: string
+        undated: string
+      }
+      due: string
+      noDueDate: string
+      submitCheckpoint: string
+      reviseCheckpoint: string
+      requiredConsultation: string
+      openWaitingCheckpoint: string
+      waiting: {
+        title: string
+        description: string
+        submitted: string
+        underReview: string
+        count: string
+      }
+    }
   }
   instructorDashboard: {
     title: string
