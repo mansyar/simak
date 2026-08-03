@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 const mockRouter = vi.hoisted(() => ({
   invalidate: vi.fn(),
 }));
+const mockNavigate = vi.hoisted(() => vi.fn());
 
 const mockLoaderData = vi.hoisted(() => ({
   users: [] as Array<{
@@ -35,7 +36,7 @@ vi.mock('@tanstack/react-router', () => ({
       search: '',
       role: undefined,
     }),
-    useNavigate: vi.fn().mockReturnValue(vi.fn()),
+    useNavigate: vi.fn().mockReturnValue(mockNavigate),
   })),
   useRouter: vi.fn().mockReturnValue(mockRouter),
 }));
@@ -129,7 +130,13 @@ vi.mock('@/components/admin/users/UserTable', () => ({
   UserRow: undefined as any,
 }));
 vi.mock('@/components/admin/users/UserFilters', () => ({
-  UserFilters: () => null,
+  UserFilters: (props: { onSearchChange: (value: string) => void }) => (
+    <button
+      type="button"
+      data-testid="user-search-commit"
+      onClick={() => props.onSearchChange('draft')}
+    />
+  ),
 }));
 vi.mock('@/components/admin/users/CreateUserDialog', () => ({
   CreateUserDialog: () => null,
@@ -181,6 +188,7 @@ describe('Admin Users index page', () => {
     vi.mocked(listUsers).mockResolvedValue({ users: [], total: 0 } as any);
     vi.mocked(deleteUser).mockResolvedValue({ success: true } as any);
     mockRouter.invalidate.mockClear();
+    mockNavigate.mockClear();
   });
 
   it('should export a route component', async () => {
@@ -198,6 +206,19 @@ describe('Admin Users index page', () => {
   it('should use listUsers server function', async () => {
     const { listUsers } = await import('@/server/users');
     expect(typeof listUsers).toBe('function');
+  });
+
+  it('resets the page when the filter commits a search value', async () => {
+    const Component = await getComponent();
+    renderWithQuery(<Component />);
+
+    fireEvent.click(screen.getByTestId('user-search-commit'));
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    const options = mockNavigate.mock.calls[0]?.[0] as {
+      search: (previous: { page: number; search: string }) => { page: number; search: string };
+    };
+    expect(options.search({ page: 3, search: '' })).toMatchObject({ page: 1, search: 'draft' });
   });
 
   describe('render', () => {

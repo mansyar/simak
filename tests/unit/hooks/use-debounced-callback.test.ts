@@ -84,6 +84,19 @@ describe('useDebouncedCallback', () => {
     expect(callback).not.toHaveBeenCalled();
   });
 
+  it('should cancel a pending callback when requested', () => {
+    const callback = vi.fn();
+    const { result } = renderHook(() => useDebouncedCallback(callback, 300));
+
+    act(() => {
+      result.current('pending');
+      result.current.cancel();
+      vi.advanceTimersByTime(300);
+    });
+
+    expect(callback).not.toHaveBeenCalled();
+  });
+
   it('should return a stable function reference across re-renders', () => {
     const callback = vi.fn();
     const { result, rerender } = renderHook(() => useDebouncedCallback(callback, 300));

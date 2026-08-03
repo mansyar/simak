@@ -4,6 +4,7 @@ import '@testing-library/jest-dom/vitest';
 
 // Hoisted mock for router
 const mockRouter = vi.hoisted(() => ({ invalidate: vi.fn() }));
+const mockNavigate = vi.hoisted(() => vi.fn());
 
 // Hoisted mock for loader data (changeable per test)
 const mockLoaderData = vi.hoisted(() => ({
@@ -18,7 +19,7 @@ vi.mock('@tanstack/react-router', () => ({
       ...config,
       useLoaderData: vi.fn().mockImplementation(() => mockLoaderData.current),
       useSearch: vi.fn().mockReturnValue({ page: 1, limit: 20, search: '', type: '' }),
-      useNavigate: vi.fn().mockReturnValue(vi.fn()),
+      useNavigate: vi.fn().mockReturnValue(mockNavigate),
     })),
   useRouter: vi.fn().mockReturnValue(mockRouter),
   Link: ({ children, to }: { children: React.ReactNode; to?: string }) => (
@@ -53,7 +54,13 @@ vi.mock('@/components/admin/templates/TemplateCard', () => ({
 
 vi.mock('@/components/admin/templates/TemplateFilters', () => ({
   TemplateFilters: (props: any) => (
-    <div data-testid="template-filters" data-types={JSON.stringify(props.types)} />
+    <div data-testid="template-filters" data-types={JSON.stringify(props.types)}>
+      <button
+        type="button"
+        data-testid="template-search-commit"
+        onClick={() => props.onSearchChange('draft')}
+      />
+    </div>
   ),
 }));
 
@@ -86,6 +93,19 @@ describe('Admin Templates Index Route', () => {
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
+  });
+
+  it('resets the page when the filter commits a search value', async () => {
+    const Component = await getComponent();
+    render(<Component />);
+
+    fireEvent.click(screen.getByTestId('template-search-commit'));
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    const options = mockNavigate.mock.calls[0]?.[0] as {
+      search: (previous: { page: number; search: string }) => { page: number; search: string };
+    };
+    expect(options.search({ page: 3, search: '' })).toMatchObject({ page: 1, search: 'draft' });
   });
 
   it('should have Route defined', async () => {

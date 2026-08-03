@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { TemplateFilters } from '@/components/admin/templates/TemplateFilters';
 
 vi.mock('@/routes/__root', () => ({
@@ -41,7 +41,12 @@ describe('TemplateFilters', () => {
   const onTypeChange = vi.fn();
 
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should render search input with placeholder', () => {
@@ -89,7 +94,7 @@ describe('TemplateFilters', () => {
     expect(options[2].textContent).toBe('Research Paper');
   });
 
-  it('should call onSearchChange when search input changes', () => {
+  it('should update immediately but debounce onSearchChange after 300ms', () => {
     render(
       <TemplateFilters
         search=""
@@ -101,7 +106,47 @@ describe('TemplateFilters', () => {
     );
     const searchInput = screen.getByTestId('search-input');
     fireEvent.change(searchInput, { target: { value: 'thesis' } });
+
+    expect((searchInput as HTMLInputElement).value).toBe('thesis');
+    expect(onSearchChange).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(299);
+    });
+    expect(onSearchChange).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
     expect(onSearchChange).toHaveBeenCalledWith('thesis');
+  });
+
+  it('should synchronize from props and clear immediately', () => {
+    const { rerender } = render(
+      <TemplateFilters
+        search="old"
+        onSearchChange={onSearchChange}
+        type="all"
+        types={['Thesis']}
+        onTypeChange={onTypeChange}
+      />,
+    );
+    const searchInput = screen.getByTestId('search-input') as HTMLInputElement;
+
+    rerender(
+      <TemplateFilters
+        search="from-route"
+        onSearchChange={onSearchChange}
+        type="all"
+        types={['Thesis']}
+        onTypeChange={onTypeChange}
+      />,
+    );
+    expect(searchInput.value).toBe('from-route');
+
+    fireEvent.click(screen.getByLabelText('common.clearSearch'));
+    expect(searchInput.value).toBe('');
+    expect(onSearchChange).toHaveBeenCalledWith('');
   });
 
   it('should display selected type value when type is set', () => {

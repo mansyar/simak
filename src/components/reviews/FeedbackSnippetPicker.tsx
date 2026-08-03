@@ -7,6 +7,7 @@ import { isServerError } from '@/lib/errors';
 import { feedbackSnippetKeys } from '@/lib/query-keys';
 import { useI18n } from '@/routes/__root';
 import { listFeedbackSnippets, type FeedbackSnippet } from '@/server/feedback-snippets';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 
 interface FeedbackSnippetPickerProps {
   onInsert: (body: string) => void;
@@ -15,13 +16,15 @@ interface FeedbackSnippetPickerProps {
 function FeedbackSnippetPicker({ onInsert }: FeedbackSnippetPickerProps) {
   const { t } = useI18n();
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const updateDebouncedSearch = useDebouncedCallback(setDebouncedSearch, 300);
 
   const snippetsQuery = useQuery({
-    queryKey: feedbackSnippetKeys.list({ archived: false, search }),
+    queryKey: feedbackSnippetKeys.list({ archived: false, search: debouncedSearch }),
     queryFn: async () => {
       const result = await listFeedbackSnippets({
-        data: { archived: false, search },
+        data: { archived: false, search: debouncedSearch },
       });
 
       if (isServerError(result)) {
@@ -30,6 +33,7 @@ function FeedbackSnippetPicker({ onInsert }: FeedbackSnippetPickerProps) {
 
       return result;
     },
+    placeholderData: (previousData) => previousData,
   });
 
   const snippets: FeedbackSnippet[] =
@@ -59,7 +63,14 @@ function FeedbackSnippetPicker({ onInsert }: FeedbackSnippetPickerProps) {
           aria-label={t('feedbackSnippets.pickerSearchPlaceholder')}
           className="pl-9"
           onChange={(event) => {
-            setSearch(event.target.value);
+            const value = event.target.value;
+            setSearch(value);
+            if (value === '') {
+              updateDebouncedSearch.cancel();
+              setDebouncedSearch('');
+            } else {
+              updateDebouncedSearch(value);
+            }
             setSelectedId(null);
           }}
           placeholder={t('feedbackSnippets.pickerSearchPlaceholder')}

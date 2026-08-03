@@ -15,6 +15,7 @@ import {
 } from '@/server/feedback-snippets';
 import type { FeedbackSnippet } from '@/server/feedback-snippets';
 import { useI18n } from '@/routes/__root';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { FeedbackSnippetCard } from './FeedbackSnippetCard';
 import { FeedbackSnippetForm, type FeedbackSnippetFormValues } from './FeedbackSnippetForm';
 
@@ -32,18 +33,22 @@ function FeedbackSnippetsPage() {
   const queryClient = useQueryClient();
   const [archived, setArchived] = useState(false);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [formState, setFormState] = useState<FormState | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [mutationError, setMutationError] = useState<string | null>(null);
 
+  const updateDebouncedSearch = useDebouncedCallback(setDebouncedSearch, 300);
+
   const snippetsQuery = useQuery({
-    queryKey: feedbackSnippetKeys.list({ archived, search }),
+    queryKey: feedbackSnippetKeys.list({ archived, search: debouncedSearch }),
     queryFn: async () =>
       resultOrThrow(
         await listFeedbackSnippets({
-          data: { archived, search },
+          data: { archived, search: debouncedSearch },
         }),
       ),
+    placeholderData: (previousData) => previousData,
   });
 
   const saveMutation = useMutation({
@@ -152,7 +157,16 @@ function FeedbackSnippetsPage() {
             aria-label={t('feedbackSnippets.searchPlaceholder')}
             className="pl-9"
             maxLength={100}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => {
+              const value = event.target.value;
+              setSearch(value);
+              if (value === '') {
+                updateDebouncedSearch.cancel();
+                setDebouncedSearch('');
+              } else {
+                updateDebouncedSearch(value);
+              }
+            }}
             placeholder={t('feedbackSnippets.searchPlaceholder')}
             value={search}
           />

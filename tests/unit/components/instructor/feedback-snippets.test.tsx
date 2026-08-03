@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen, waitFor, act } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as feedbackFunctions from '@/server/feedback-snippets';
 import { FeedbackSnippetsPage } from '@/components/instructor/feedback-snippets/FeedbackSnippetsPage';
 
@@ -63,6 +63,10 @@ describe('FeedbackSnippetsPage', () => {
     } as any);
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('renders active snippets by default and searches title/category', async () => {
     renderPage();
 
@@ -70,15 +74,27 @@ describe('FeedbackSnippetsPage', () => {
     expect(screen.getByTestId('feedback-snippets-active-filter')).toBeTruthy();
     expect(screen.getByPlaceholderText('feedbackSnippets.searchPlaceholder')).toBeTruthy();
 
+    vi.useFakeTimers();
     fireEvent.change(screen.getByPlaceholderText('feedbackSnippets.searchPlaceholder'), {
       target: { value: 'rubric' },
     });
 
-    await waitFor(() => {
-      expect(feedbackFunctions.listFeedbackSnippets).toHaveBeenLastCalledWith({
-        data: { archived: false, search: 'rubric' },
-      });
+    expect(feedbackFunctions.listFeedbackSnippets).not.toHaveBeenLastCalledWith({
+      data: { archived: false, search: 'rubric' },
     });
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(feedbackFunctions.listFeedbackSnippets).toHaveBeenLastCalledWith({
+      data: { archived: false, search: 'rubric' },
+    });
+    vi.useRealTimers();
   });
 
   it('switches to archived snippets and offers restore', async () => {
@@ -92,7 +108,7 @@ describe('FeedbackSnippetsPage', () => {
 
     fireEvent.click(await screen.findByTestId('feedback-snippets-archived-filter'));
 
-    expect(await screen.findByText('feedbackSnippets.archived')).toBeTruthy();
+    expect(screen.getByTestId('feedback-snippets-archived-filter')).toBeTruthy();
     expect(screen.getByText('feedbackSnippets.restore')).toBeTruthy();
     expect(feedbackFunctions.listFeedbackSnippets).toHaveBeenLastCalledWith({
       data: { archived: true, search: '' },
@@ -111,10 +127,15 @@ describe('FeedbackSnippetsPage', () => {
     resolve({ snippets: [] });
     expect(await screen.findByText('feedbackSnippets.empty')).toBeTruthy();
 
+    vi.useFakeTimers();
     vi.mocked(feedbackFunctions.listFeedbackSnippets).mockRejectedValueOnce(new Error('network'));
     fireEvent.change(screen.getByPlaceholderText('feedbackSnippets.searchPlaceholder'), {
       target: { value: 'retry' },
     });
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    vi.useRealTimers();
     expect(await screen.findByText('feedbackSnippets.loadError')).toBeTruthy();
   });
 
