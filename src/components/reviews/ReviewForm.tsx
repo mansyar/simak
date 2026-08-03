@@ -101,7 +101,12 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
 
     if (
       decision === 'revise' &&
-      actionItems.some((item) => item.itemText.trim().length === 0 || item.itemText.length > 500)
+      actionItems.some(
+        (item) =>
+          item.itemText.trim().length === 0 ||
+          item.itemText.length > 500 ||
+          /[<>]/.test(item.itemText),
+      )
     ) {
       onError(t('instructorReviews.actionPlan.invalidItems'));
       return;

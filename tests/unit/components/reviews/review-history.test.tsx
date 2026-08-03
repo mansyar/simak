@@ -102,6 +102,13 @@ describe('ReviewHistory', () => {
     expect(screen.getByText('instructorReviews.actionPlan.addressed')).toBeDefined();
   });
 
+  it('does not label a comment-only Revise entry as an action plan', () => {
+    render(<ReviewHistory reviews={[{ ...reviseReview, actionItems: undefined }]} />);
+
+    expect(screen.queryByText('instructorReviews.actionPlan.current')).toBeNull();
+    expect(screen.queryByText('instructorReviews.actionPlan.historical')).toBeNull();
+  });
+
   it('should render multiple reviews', () => {
     render(<ReviewHistory reviews={[passReview, reviseReview]} />);
     expect(screen.getByText('Dr. Smith')).toBeDefined();

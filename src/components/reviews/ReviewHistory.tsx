@@ -29,7 +29,9 @@ interface ReviewHistoryProps {
 
 export function ReviewHistory({ reviews }: ReviewHistoryProps) {
   const { t } = useI18n();
-  const currentPlanReviewId = reviews.find((review) => review.decision === 'revise')?.id;
+  const currentPlanReviewId = reviews.find(
+    (review) => review.decision === 'revise' && (review.actionItems?.length ?? 0) > 0,
+  )?.id;
 
   return (
     <Card className="shadow-sm">
@@ -60,7 +62,7 @@ export function ReviewHistory({ reviews }: ReviewHistoryProps) {
                         ? t('instructorReviews.passed')
                         : t('instructorReviews.revise')}
                     </Badge>
-                    {review.decision === 'revise' && (
+                    {review.decision === 'revise' && (review.actionItems?.length ?? 0) > 0 && (
                       <Badge variant="outline">
                         {review.id === currentPlanReviewId
                           ? t('instructorReviews.actionPlan.current')
