@@ -99,12 +99,12 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Let instructors compose ordered action plans inside the existing ReviewForm and view current/historical statuses without mutating them.
 
-- [ ] Task: Write failing instructor UI tests.
-  - [ ] Add `tests/unit/components/reviews/RevisionActionPlanEditor.test.tsx`.
-  - [ ] Extend `tests/unit/components/reviews/ReviewForm.test.tsx` for Revise-only visibility, add/remove/reorder, exact limits, validation, criterion selection, and submitted payload ordering.
-  - [ ] Verify Pass submissions do not send action items and existing comment/file/rubric controls remain unchanged.
-  - [ ] Extend `tests/unit/components/reviews/review-history.test.tsx` for ordered action items, current-plan labeling, historical status display, and instructor read-only behavior.
-  - [ ] Extend the instructor review-detail route tests for action-plan data pass-through.
+- [~] Task: Write failing instructor UI tests.
+  - [~] Add `tests/unit/components/reviews/RevisionActionPlanEditor.test.tsx`.
+  - [~] Extend `tests/unit/components/reviews/ReviewForm.test.tsx` for Revise-only visibility, add/remove/reorder, exact limits, validation, criterion selection, and submitted payload ordering.
+  - [~] Verify Pass submissions do not send action items and existing comment/file/rubric controls remain unchanged.
+  - [~] Extend `tests/unit/components/reviews/review-history.test.tsx` for ordered action items, current-plan labeling, historical status display, and instructor read-only behavior.
+  - [~] Extend the instructor review-detail route tests for action-plan data pass-through.
 
 - [ ] Task: Implement the ReviewForm action-plan editor.
   - [ ] Create a focused component under `src/components/reviews/` for action-item editing.
