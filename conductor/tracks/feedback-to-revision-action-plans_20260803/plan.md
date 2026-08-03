@@ -219,11 +219,11 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Run focused axe-core coverage and inspect any serious/critical findings.
   - [x] Document unrelated pre-existing E2E limitations separately from Track-054 failures.
 
-- [~] Task: Phase Verification & Checkpoint — end-to-end behavior.
-  - [~] Confirm the complete review → plan → student status → resubmission → superseding review flow.
-  - [~] Confirm authorization isolation and audit/notification outcomes.
-  - [~] Confirm English/Indonesian rendering, keyboard operation, responsive behavior, and dark mode.
-  - [~] Attach the verification git note and record the phase checkpoint after confirmation.
+- [x] Task: Phase Verification & Checkpoint — end-to-end behavior [f923875]
+  - [x] Confirm the complete review → plan → student status → resubmission → superseding review flow.
+  - [x] Confirm authorization isolation and audit/notification outcomes.
+  - [x] Confirm English/Indonesian rendering, keyboard operation, responsive behavior, and dark mode.
+  - [x] Attach the verification git note and record the phase checkpoint after confirmation.
 
 ## Phase 7: Final Quality Gates & Track Readiness
 
