@@ -157,11 +157,11 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Regenerate i18n types and run locale parity checks.
   - [x] Verify keyboard and screen-reader operation, focus behavior, semantic checkbox/button state, live announcements, contrast, touch targets, and mobile layout.
 
-- [~] Task: Phase Verification & Checkpoint — student experience.
-  - [~] Run focused component and checkpoint-route tests.
-  - [~] Manually verify current-plan toggling, reversal, historical read-only behavior, resubmission non-blocking behavior, and no-plan backward compatibility.
-  - [~] Verify student authorization is enforced server-side rather than only hidden in the UI.
-  - [~] Attach the verification git note and record the phase checkpoint after confirmation.
+- [x] Task: Phase Verification & Checkpoint — student experience [e66ba16]
+  - [x] Run focused component and checkpoint-route tests.
+  - [x] Manually verify current-plan toggling, reversal, historical read-only behavior, resubmission non-blocking behavior, and no-plan backward compatibility.
+  - [x] Verify student authorization is enforced server-side rather than only hidden in the UI.
+  - [x] Attach the verification git note and record the phase checkpoint after confirmation.
 
 ## Phase 5: TRACK-053 Next Actions Integration
 
