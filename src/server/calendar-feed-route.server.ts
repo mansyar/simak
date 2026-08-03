@@ -36,24 +36,18 @@ function hashToken(token: string) {
   return createHash('sha256').update(token).digest('hex');
 }
 
-function rateLimitKey(request: Request) {
-  return (
-    request.headers.get('cf-connecting-ip') ??
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-    'anonymous'
-  );
+function rateLimitResponse() {
+  return new Response('Calendar feed temporarily unavailable', {
+    status: 429,
+    headers: { 'Cache-Control': 'no-store', 'Retry-After': '60' },
+  });
 }
 
 export async function handleCalendarFeedRequest(request: Request): Promise<Response> {
-  if (!checkCalendarFeedRateLimit(rateLimitKey(request))) {
-    return new Response('Calendar feed temporarily unavailable', {
-      status: 429,
-      headers: { 'Cache-Control': 'no-store', 'Retry-After': '60' },
-    });
-  }
-
   const token = extractToken(request);
-  if (!token) return unavailableResponse();
+  if (!token) {
+    return checkCalendarFeedRateLimit('anonymous') ? unavailableResponse() : rateLimitResponse();
+  }
 
   try {
     const db = getDb();
@@ -71,6 +65,8 @@ export async function handleCalendarFeedRequest(request: Request): Promise<Respo
       )
       .limit(1);
 
+    const rateLimitKey = credential ? `student:${credential.studentId}` : 'anonymous';
+    if (!checkCalendarFeedRateLimit(rateLimitKey)) return rateLimitResponse();
     if (!credential) return unavailableResponse();
 
     const events = await getCalendarFeedEvents(db, credential.studentId);

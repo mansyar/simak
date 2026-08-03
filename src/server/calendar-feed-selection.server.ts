@@ -1,6 +1,6 @@
-import { and, eq, isNull, isNotNull, sql } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import type { Db } from '@/db';
-import { assignments, checkpoints } from '@/db/schema/assignments';
+import { assignmentStudents, assignments, checkpoints } from '@/db/schema/assignments';
 
 export type CalendarFeedRow = {
   assignmentId: number;
@@ -9,6 +9,7 @@ export type CalendarFeedRow = {
   assignmentDeletedAt: Date | null;
   checkpointId: number;
   checkpointName: string;
+  assignmentStudentId: string;
   checkpointStudentId: string;
   checkpointState: string;
   checkpointDueDate: Date | null;
@@ -25,17 +26,24 @@ export function buildCalendarFeedEvents(rows: CalendarFeedRow[], studentId: stri
   const eligibleRows = rows.filter(
     (row) =>
       row.checkpointStudentId === studentId &&
+      row.assignmentStudentId === studentId &&
       row.assignmentDeletedAt === null &&
-      row.checkpointState !== 'passed' &&
-      row.checkpointDueDate !== null,
+      row.checkpointState !== 'passed',
   );
 
-  const events: CalendarFeedEvent[] = eligibleRows.map((row) => ({
-    uid: `checkpoint-${row.checkpointId}@simak`,
-    kind: 'checkpoint',
-    summary: `${row.assignmentTitle} — ${row.checkpointName}`,
-    startsAt: row.checkpointDueDate as Date,
-  }));
+  const events: CalendarFeedEvent[] = eligibleRows.flatMap((row) => {
+    const dueDate = row.checkpointDueDate;
+    if (dueDate === null) return [];
+
+    return [
+      {
+        uid: `checkpoint-${row.checkpointId}@simak`,
+        kind: 'checkpoint' as const,
+        summary: `${row.assignmentTitle} — ${row.checkpointName}`,
+        startsAt: dueDate,
+      },
+    ];
+  });
 
   const finalEvents = new Map<number, CalendarFeedEvent>();
   for (const row of eligibleRows) {
@@ -61,17 +69,24 @@ export async function getCalendarFeedEvents(db: Db, studentId: string) {
       assignmentDeletedAt: assignments.deletedAt,
       checkpointId: checkpoints.id,
       checkpointName: checkpoints.name,
+      assignmentStudentId: assignmentStudents.studentId,
       checkpointStudentId: checkpoints.studentId,
       checkpointState: checkpoints.state,
       checkpointDueDate: checkpoints.dueDate,
     })
     .from(checkpoints)
     .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+    .innerJoin(
+      assignmentStudents,
+      and(
+        eq(assignmentStudents.assignmentId, checkpoints.assignmentId),
+        eq(assignmentStudents.studentId, studentId),
+      ),
+    )
     .where(
       and(
         eq(checkpoints.studentId, studentId),
         isNull(assignments.deletedAt),
-        isNotNull(checkpoints.dueDate),
         sql`${checkpoints.state} <> 'passed'`,
       ),
     );

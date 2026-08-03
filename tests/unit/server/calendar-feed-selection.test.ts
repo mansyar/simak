@@ -15,6 +15,7 @@ function row(overrides: Partial<CalendarFeedRow> = {}): CalendarFeedRow {
     assignmentDeletedAt: null,
     checkpointId: 11,
     checkpointName: 'Proposal',
+    assignmentStudentId: studentId,
     checkpointStudentId: studentId,
     checkpointState: 'unlocked',
     checkpointDueDate: new Date('2026-08-05T12:00:00.000Z'),
@@ -30,6 +31,7 @@ describe('buildCalendarFeedEvents', () => {
         row({
           assignmentId: 2,
           checkpointId: 21,
+          assignmentStudentId: 'student-2',
           checkpointStudentId: 'student-2',
         }),
         row({
@@ -85,6 +87,22 @@ describe('buildCalendarFeedEvents', () => {
       uid: 'assignment-final-1@simak',
       startsAt: new Date('2026-08-10T12:00:00.000Z'),
     });
+  });
+
+  it('adds a final event when an unresolved checkpoint has no due date', () => {
+    const events = buildCalendarFeedEvents(
+      [row({ checkpointDueDate: null, checkpointState: 'locked' })],
+      studentId,
+    );
+
+    expect(events).toEqual([
+      {
+        uid: 'assignment-final-1@simak',
+        kind: 'assignment-final',
+        summary: 'Research Project — Final deadline',
+        startsAt: new Date('2026-08-10T12:00:00.000Z'),
+      },
+    ]);
   });
 
   it('keeps IDs stable when dates change and removes passed checkpoints on refresh', () => {

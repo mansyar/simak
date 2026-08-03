@@ -270,6 +270,15 @@
 - [x] Record the final phase checkpoint SHA in this plan and commit the plan update according to `conductor/workflow.md`.
   - **Checkpoint:** Functional commit `acb3da3` carries the appended final verification note; quality commit `bf14e78` contains the final coverage/test stabilizations. Relevant calendar integration suites passed; the two unrelated full-integration failures are documented as pre-existing.
 
+## Post-Review Follow-up
+
+- [x] Verify calendar events through the `assignment_students` membership join and retain the membership check in pure event construction.
+- [x] Include assignment final-deadline events for active assignments with any non-passed checkpoint, including checkpoints without due dates.
+- [x] Bound the process-local calendar rate-limit store and stop using client-supplied forwarding headers as rate-limit identity.
+- [x] Narrow nullable checkpoint due dates before creating checkpoint events.
+- **Evidence:** Targeted selection, route, and rate-limiter tests passed (3 files, 23 tests); targeted formatting, oxlint, and typecheck passed. The full unit run passed 415/416 files and 4,138/4,139 tests, with one instructor-route import test timing out.
+- **Review fix commit:** `pending`
+
 ## Definition of Done
 
 - [x] Approved specification is implemented without expanding the out-of-scope boundary.

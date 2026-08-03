@@ -87,6 +87,7 @@ describe('handleCalendarFeedRequest', () => {
     expect(await response.text()).toContain('BEGIN:VCALENDAR');
     expect(getCalendarFeedEvents).toHaveBeenCalledWith(expect.anything(), 'student-1');
     expect(serializeCalendarFeed).toHaveBeenCalled();
+    expect(checkCalendarFeedRateLimit).toHaveBeenCalledWith('student:student-1');
   });
 
   it('accepts an Authorization bearer token without changing credential ownership checks', async () => {
@@ -96,7 +97,7 @@ describe('handleCalendarFeedRequest', () => {
     );
 
     expect(response.status).toBe(200);
-    expect(checkCalendarFeedRateLimit).toHaveBeenCalledWith('203.0.113.10');
+    expect(checkCalendarFeedRateLimit).toHaveBeenCalledWith('student:student-1');
   });
 
   it('returns a generic rate-limit response without requiring a session', async () => {
@@ -108,6 +109,7 @@ describe('handleCalendarFeedRequest', () => {
     expect(response.status).toBe(429);
     expect(await response.text()).toBe('Calendar feed temporarily unavailable');
     expect(getCalendarFeedEvents).not.toHaveBeenCalled();
+    expect(checkCalendarFeedRateLimit).toHaveBeenCalledWith('anonymous');
   });
 
   it('serializes only the current selected events on each refresh', async () => {
