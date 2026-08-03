@@ -167,26 +167,26 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Enrich the existing Revise action with unresolved current-plan context without introducing a second task system or changing waiting-state behavior.
 
-- [~] Task: Write failing resolver and dashboard tests.
-  - [~] Extend `tests/unit/lib/student-next-actions.test.ts` for unresolved current-plan data on Revise candidates.
-  - [~] Verify addressed items are excluded from unresolved context.
-  - [~] Verify only the newest current plan contributes items; historical plans are ignored by the resolver.
-  - [~] Verify no-plan and all-addressed behavior preserves the existing Revise action contract.
-  - [~] Extend `tests/unit/server/dashboard-student-next-actions.test.ts` for authorized batch loading, repeated revisions, resubmission, and cross-student isolation.
-  - [~] Verify submitted and under-review checkpoints remain waiting summaries and do not expose action-plan items as primary actions.
-  - [~] Extend `tests/unit/components/dashboard/StudentNextActions.test.tsx` for localized unresolved-plan context, display limits, empty states, and accessible links.
+- [x] Task: Write failing resolver and dashboard tests [d5531dc]
+  - [x] Extend `tests/unit/lib/student-next-actions.test.ts` for unresolved current-plan data on Revise candidates.
+  - [x] Verify addressed items are excluded from unresolved context.
+  - [x] Verify only the newest current plan contributes items; historical plans are ignored by the resolver.
+  - [x] Verify no-plan and all-addressed behavior preserves the existing Revise action contract.
+  - [x] Extend `tests/unit/server/dashboard-student-next-actions.test.ts` for authorized batch loading, repeated revisions, resubmission, and cross-student isolation.
+  - [x] Verify submitted and under-review checkpoints remain waiting summaries and do not expose action-plan items as primary actions.
+  - [x] Extend `tests/unit/components/dashboard/StudentNextActions.test.tsx` for localized unresolved-plan context, display limits, empty states, and accessible links.
 
-- [ ] Task: Extend the resolver contract and dashboard query assembly.
-  - [ ] Add the smallest action-plan summary needed to `StudentActionCandidate` and `StudentNextAction`.
-  - [ ] Query unresolved items for current Revise plans in batch, scoped to the authenticated student.
-  - [ ] Preserve existing priority order, one-action-per-checkpoint deduplication, five-primary cap, waiting-summary cap, and destination links.
-  - [ ] Avoid per-checkpoint N+1 queries and do not persist dashboard task records.
-  - [ ] Keep `src/lib/student-next-actions.ts` pure and free of database/client-incompatible imports.
+- [x] Task: Extend the resolver contract and dashboard query assembly [4d626fd]
+  - [x] Add the smallest action-plan summary needed to `StudentActionCandidate` and `StudentNextAction`.
+  - [x] Query unresolved items for current Revise plans in batch, scoped to the authenticated student.
+  - [x] Preserve existing priority order, one-action-per-checkpoint deduplication, five-primary cap, waiting-summary cap, and destination links.
+  - [x] Avoid per-checkpoint N+1 queries and do not persist dashboard task records.
+  - [x] Keep `src/lib/student-next-actions.ts` pure and free of database/client-incompatible imports.
 
-- [ ] Task: Implement dashboard presentation.
-  - [ ] Update `src/components/dashboard/StudentNextActions.tsx` to show concise unresolved-plan context without turning each item into a separate action.
-  - [ ] Preserve the existing submit, revise, consultation, waiting, and empty-state behavior.
-  - [ ] Add only translated, accessible UI strings and retain responsive behavior.
+- [x] Task: Implement dashboard presentation [4d626fd]
+  - [x] Update `src/components/dashboard/StudentNextActions.tsx` to show concise unresolved-plan context without turning each item into a separate action.
+  - [x] Preserve the existing submit, revise, consultation, waiting, and empty-state behavior.
+  - [x] Add only translated, accessible UI strings and retain responsive behavior.
 
 - [ ] Task: Phase Verification & Checkpoint — Next Actions.
   - [ ] Run focused resolver, dashboard-handler, and dashboard-component tests.
