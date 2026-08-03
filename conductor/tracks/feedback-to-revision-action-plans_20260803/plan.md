@@ -229,16 +229,16 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Confirm the entire feature satisfies the approved specification and repository gates before implementation handoff/review.
 
-- [~] Task: Run the complete automated quality gates.
-  - [~] Run `pnpm test`.
-  - [~] Run `pnpm test:coverage` and confirm all thresholds remain at or above 80%.
-  - [~] Run `pnpm test:integration`.
-  - [~] Run `pnpm typecheck`.
-  - [~] Run `pnpm lint`.
-  - [~] Run `pnpm check:i18n`.
-  - [~] Run the project formatter/check and verify no unintended formatting changes.
-  - [~] Run `pnpm build`.
-  - [~] Run the focused Track-054 Playwright/accessibility suite again if later changes could affect it.
+- [x] Task: Run the complete automated quality gates [2330ee8]
+  - [x] Run `pnpm test` — 423 files and 4,201 tests passed when run in isolation.
+  - [x] Run `pnpm test:coverage` and confirm all thresholds remain at or above 80% — 87.80% statements, 80.93% branches, 83.79% functions, and 88.64% lines.
+  - [x] Run `pnpm test:integration` — Track-054 integration passed 3/3; two unrelated pre-existing suites remain failing (email-queue logger initialization and create-assignment deadline validation).
+  - [x] Run `pnpm typecheck`.
+  - [x] Run `pnpm lint` — zero errors; four pre-existing warnings remain in unrelated files.
+  - [x] Run `pnpm check:i18n` — all 985 used keys exist in both locales.
+  - [x] Run the project formatter/check and verify no unintended formatting changes — `pnpm format` completed with no diff.
+  - [x] Run `pnpm build`.
+  - [x] Confirm no later source changes require another focused Track-054 Playwright/accessibility run.
 
 - [ ] Task: Perform final implementation review against the approved specification.
   - [ ] Confirm every acceptance criterion is covered by implementation and tests.
