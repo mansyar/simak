@@ -57,13 +57,13 @@ Phase checkpoint: 51e1dbc (user-confirmed; verification note attached)
 
 ### 2.1 Bound feedback-snippet search results
 
-- [ ] Add failing server/component tests in `tests/unit/server/feedback-snippets.test.ts` and the relevant feedback-snippet component test for capped pagination, stable ordering, required filters, and a minimal list/picker projection.
-- [ ] Extend the schemas in `src/server/feedback-snippets.ts` with bounded page/limit inputs while preserving authorization and archived/instructor filters.
-- [ ] Update `src/server/feedback-snippets.server.ts` to apply a hard server-side limit, return pagination metadata, select only fields required by the list/picker, and preserve content insertion behavior without returning unrelated columns.
-- [ ] Update `src/lib/query-keys.ts`, `src/components/instructor/feedback-snippets/FeedbackSnippetsPage.tsx`, and `src/components/reviews/FeedbackSnippetPicker.tsx` to use committed search state, bounded results, retained previous data, and the existing loading/empty/error accessibility states.
-- [ ] Add any required i18n keys to both locale files, regenerate i18n types, run the focused tests, and commit with a git note and recorded SHA.
+- [x] Add failing server/component tests in `tests/unit/server/feedback-snippets.test.ts` and the relevant feedback-snippet component test for capped pagination, stable ordering, required filters, and a minimal list/picker projection.
+- [x] Extend the schemas in `src/server/feedback-snippets.ts` with bounded page/limit inputs while preserving authorization and archived/instructor filters.
+- [x] Update `src/server/feedback-snippets.server.ts` to apply a hard server-side limit, return pagination metadata, select only fields required by the list/picker, and preserve content insertion behavior without returning unrelated columns.
+- [x] Update `src/lib/query-keys.ts`, `src/components/instructor/feedback-snippets/FeedbackSnippetsPage.tsx`, and `src/components/reviews/FeedbackSnippetPicker.tsx` to use committed search state, bounded results, retained previous data, and the existing loading/empty/error accessibility states.
+- [x] Add any required i18n keys to both locale files, regenerate i18n types, run the focused tests, and commit with a git note and recorded SHA.
 
-Commit SHA: _pending_
+Commit SHA: c7c5ad2
 
 ### 2.2 Remove redundant template and email-queue search work
 
