@@ -99,38 +99,38 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Let instructors compose ordered action plans inside the existing ReviewForm and view current/historical statuses without mutating them.
 
-- [~] Task: Write failing instructor UI tests.
-  - [~] Add `tests/unit/components/reviews/RevisionActionPlanEditor.test.tsx`.
-  - [~] Extend `tests/unit/components/reviews/ReviewForm.test.tsx` for Revise-only visibility, add/remove/reorder, exact limits, validation, criterion selection, and submitted payload ordering.
-  - [~] Verify Pass submissions do not send action items and existing comment/file/rubric controls remain unchanged.
-  - [~] Extend `tests/unit/components/reviews/review-history.test.tsx` for ordered action items, current-plan labeling, historical status display, and instructor read-only behavior.
-  - [~] Extend the instructor review-detail route tests for action-plan data pass-through.
+- [x] Task: Write failing instructor UI tests [a9727f3]
+  - [x] Add `tests/unit/components/reviews/RevisionActionPlanEditor.test.tsx`.
+  - [x] Extend `tests/unit/components/reviews/ReviewForm.test.tsx` for Revise-only visibility, add/remove/reorder, exact limits, validation, criterion selection, and submitted payload ordering.
+  - [x] Verify Pass submissions do not send action items and existing comment/file/rubric controls remain unchanged.
+  - [x] Extend `tests/unit/components/reviews/review-history.test.tsx` for ordered action items, current-plan labeling, historical status display, and instructor read-only behavior.
+  - [x] Extend the instructor review-detail route tests for action-plan data pass-through.
 
-- [ ] Task: Implement the ReviewForm action-plan editor.
-  - [ ] Create a focused component under `src/components/reviews/` for action-item editing.
-  - [ ] Integrate it into `src/components/reviews/ReviewForm.tsx` only when Revise is selected.
-  - [ ] Support adding, removing, and keyboard-accessible reordering.
-  - [ ] Support plain-text entry, per-item validation, item count feedback, and optional rubric-criterion selection.
-  - [ ] Preserve existing feedback snippet insertion, feedback-file upload, revision deadline, rubric scoring, and submit behavior.
-  - [ ] Ensure user-visible strings use i18n keys and files remain under 500 lines.
+- [x] Task: Implement the ReviewForm action-plan editor [ed9e6c5]
+  - [x] Create a focused component under `src/components/reviews/` for action-item editing.
+  - [x] Integrate it into `src/components/reviews/ReviewForm.tsx` only when Revise is selected.
+  - [x] Support adding, removing, and keyboard-accessible reordering.
+  - [x] Support plain-text entry, per-item validation, item count feedback, and optional rubric-criterion selection.
+  - [x] Preserve existing feedback snippet insertion, feedback-file upload, revision deadline, rubric scoring, and submit behavior.
+  - [x] Ensure user-visible strings use i18n keys and files remain under 500 lines.
 
-- [ ] Task: Implement instructor history visibility.
-  - [ ] Extend `src/components/reviews/ReviewHistory.tsx` types and rendering for action items.
-  - [ ] Display current and historical plan status without providing instructor mutation controls.
-  - [ ] Keep comments, feedback files, decisions, dates, rubric results, and existing empty states intact.
-  - [ ] Use stable React keys and escaped plain-text rendering.
+- [x] Task: Implement instructor history visibility [ed9e6c5]
+  - [x] Extend `src/components/reviews/ReviewHistory.tsx` types and rendering for action items.
+  - [x] Display current and historical plan status without providing instructor mutation controls.
+  - [x] Keep comments, feedback files, decisions, dates, rubric results, and existing empty states intact.
+  - [x] Use stable React keys and escaped plain-text rendering.
 
-- [ ] Task: Add instructor translations and accessibility behavior.
-  - [ ] Add English and Indonesian labels, validation messages, count limits, reorder labels, status text, and announcements.
-  - [ ] Run `pnpm generate:i18n`.
-  - [ ] Verify `pnpm check:i18n` parity.
-  - [ ] Verify keyboard operation, focus visibility, semantic labels, live mutation/validation feedback, dark mode, and 320px responsive layout.
+- [x] Task: Add instructor translations and accessibility behavior [ed9e6c5]
+  - [x] Add English and Indonesian labels, validation messages, count limits, reorder labels, status text, and announcements.
+  - [x] Run `pnpm generate:i18n`.
+  - [x] Verify `pnpm check:i18n` parity.
+  - [x] Verify keyboard operation, focus visibility, semantic labels, live mutation/validation feedback, dark mode, and 320px responsive layout.
 
-- [ ] Task: Phase Verification & Checkpoint — instructor experience.
-  - [ ] Run focused editor, ReviewForm, ReviewHistory, and route tests.
-  - [ ] Manually verify Pass/Revise switching, ordered submission, rubric/no-rubric behavior, and read-only history.
-  - [ ] Review i18n, accessibility, file-size, and backward-compatibility requirements.
-  - [ ] Attach the verification git note and record the phase checkpoint after confirmation.
+- [~] Task: Phase Verification & Checkpoint — instructor experience.
+  - [~] Run focused editor, ReviewForm, ReviewHistory, and route tests.
+  - [~] Manually verify Pass/Revise switching, ordered submission, rubric/no-rubric behavior, and read-only history.
+  - [~] Review i18n, accessibility, file-size, and backward-compatibility requirements.
+  - [~] Attach the verification git note and record the phase checkpoint after confirmation.
 
 ## Phase 4: Student Current Plan, Status Updates & History
 
