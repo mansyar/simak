@@ -88,12 +88,12 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Continue emitting the existing `revision_requested` notification exactly once for Revise reviews.
   - [x] Do not add a new notification event type or per-item notifications.
 
-- [~] Task: Phase Verification & Checkpoint — server and transaction layer.
-  - [~] Run focused schema, review-schema, review-handler, action-item, and review-extra tests.
-  - [~] Run integration coverage for transaction rollback and authorization paths.
-  - [~] Inspect the code graph for accidental client imports of `.server.ts` handlers.
-  - [~] Verify file limits, audit redaction, query scoping, and `git diff --check`.
-  - [~] Complete manual verification, attach the verification git note, and record the phase checkpoint.
+- [x] Task: Phase Verification & Checkpoint — server and transaction layer [fce35be]
+  - [x] Run focused schema, review-schema, review-handler, action-item, and review-extra tests.
+  - [x] Run integration coverage for transaction rollback and authorization paths.
+  - [x] Inspect the code graph for accidental client imports of `.server.ts` handlers.
+  - [x] Verify file limits, audit redaction, query scoping, and `git diff --check`.
+  - [x] Complete manual verification, attach the verification git note, and record the phase checkpoint.
 
 ## Phase 3: Instructor Authoring & Review History
 
