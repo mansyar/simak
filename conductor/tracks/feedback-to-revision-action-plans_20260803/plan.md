@@ -144,24 +144,24 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Extend `tests/unit/routes/_authenticated/student/assignments/$id.checkpoints.$checkpointId.test.tsx` for loader data, current plan, and prior-plan presentation.
   - [x] Verify existing submission upload, review status, rubric result, file history, discussion, and checkpoint gating behavior remains unchanged.
 
-- [~] Task: Implement the student action-plan components and page integration.
-  - [~] Create focused student components under `src/components/student/` for the current plan and historical plan display.
-  - [~] Extend the checkpoint route loader to retain action-plan and review-history data from the existing review request.
-  - [~] Render the current plan in the checkpoint page with progressive disclosure and a clear relationship to the latest Revise feedback.
-  - [~] Add addressed-status mutation handling with immediate feedback and safe local/router refresh behavior.
-  - [~] Disable mutation controls for superseded plans and during pending requests.
-  - [~] Keep item text plain text and escaped.
+- [x] Task: Implement the student action-plan components and page integration [e66ba16]
+  - [x] Create focused student components under `src/components/student/` for the current plan and historical plan display.
+  - [x] Extend the checkpoint route loader to retain action-plan and review-history data from the existing review request.
+  - [x] Render the current plan in the checkpoint page with progressive disclosure and a clear relationship to the latest Revise feedback.
+  - [x] Add addressed-status mutation handling with immediate feedback and safe local/router refresh behavior.
+  - [x] Disable mutation controls for superseded plans and during pending requests.
+  - [x] Keep item text plain text and escaped.
 
-- [~] Task: Add student translations and accessibility behavior.
-  - [~] Add English and Indonesian current-plan, historical-plan, addressed-status, error, and accessibility labels.
-  - [~] Regenerate i18n types and run locale parity checks.
-  - [~] Verify keyboard and screen-reader operation, focus behavior, semantic checkbox/button state, live announcements, contrast, touch targets, and mobile layout.
+- [x] Task: Add student translations and accessibility behavior [e66ba16]
+  - [x] Add English and Indonesian current-plan, historical-plan, addressed-status, error, and accessibility labels.
+  - [x] Regenerate i18n types and run locale parity checks.
+  - [x] Verify keyboard and screen-reader operation, focus behavior, semantic checkbox/button state, live announcements, contrast, touch targets, and mobile layout.
 
-- [ ] Task: Phase Verification & Checkpoint — student experience.
-  - [ ] Run focused component and checkpoint-route tests.
-  - [ ] Manually verify current-plan toggling, reversal, historical read-only behavior, resubmission non-blocking behavior, and no-plan backward compatibility.
-  - [ ] Verify student authorization is enforced server-side rather than only hidden in the UI.
-  - [ ] Attach the verification git note and record the phase checkpoint after confirmation.
+- [~] Task: Phase Verification & Checkpoint — student experience.
+  - [~] Run focused component and checkpoint-route tests.
+  - [~] Manually verify current-plan toggling, reversal, historical read-only behavior, resubmission non-blocking behavior, and no-plan backward compatibility.
+  - [~] Verify student authorization is enforced server-side rather than only hidden in the UI.
+  - [~] Attach the verification git note and record the phase checkpoint after confirmation.
 
 ## Phase 5: TRACK-053 Next Actions Integration
 
