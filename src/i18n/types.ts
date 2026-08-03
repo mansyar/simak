@@ -331,6 +331,29 @@ export type Translation = {
       notInSubmittedState: string
     }
     reviewDateLabel: string
+    revisionActionPlan: string
+    actionPlan: {
+      description: string
+      itemCount: string
+      itemLabel: string
+      criterionLabel: string
+      noCriterion: string
+      addItem: string
+      removeItem: string
+      moveUp: string
+      moveDown: string
+      reorderLabel: string
+      itemRequired: string
+      itemTooLong: string
+      itemPlainText: string
+      invalidItems: string
+      listLabel: string
+      current: string
+      historical: string
+      addressed: string
+      open: string
+      criterion: string
+    }
     rubric: {
       title: string
       weightedTotal: string
