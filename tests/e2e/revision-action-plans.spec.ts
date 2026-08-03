@@ -80,37 +80,34 @@ async function createResubmission(checkpointId: number): Promise<number> {
   return submission.id;
 }
 
-async function getLatestFixture(): Promise<{
-  assignmentId: number;
-  checkpointId: number;
-  submissionId: number;
-}> {
+async function seedCurrentPlan(submissionId: number, itemText: string): Promise<void> {
   const sql = postgres(getDatabaseUrl());
-  const [fixture] = await sql`
-    SELECT c.assignment_id, c.id AS checkpoint_id, s.id AS submission_id
-    FROM checkpoints c
-    JOIN users u ON u.id = c.student_id
-    JOIN LATERAL (
-      SELECT id FROM submissions
-      WHERE checkpoint_id = c.id
-      ORDER BY version DESC
-      LIMIT 1
-    ) s ON true
-    WHERE c.name = 'Chapter 1' AND u.email = 'student@e2e.test'
+  const [instructor] = await sql`
+    SELECT id FROM users WHERE email = 'instructor@e2e.test'
+  `;
+  const [review] = await sql`
+    INSERT INTO reviews (submission_id, instructor_id, decision, comment, created_at, reviewed_at)
+    VALUES (
+      ${submissionId}, ${instructor.id}, 'revise', 'Current accessibility plan', NOW(), NOW()
+    )
+    RETURNING id
+  `;
+  await sql`
+    INSERT INTO revision_action_items (review_id, item_text, "order")
+    VALUES (${review.id}, ${itemText}, 0)
+  `;
+  await sql`
+    UPDATE checkpoints
+    SET state = 'revise'
+    WHERE id = (SELECT checkpoint_id FROM submissions WHERE id = ${submissionId})
   `;
   await sql.end();
-  if (!fixture) throw new Error('Revision checkpoint fixture was not found');
-  return {
-    assignmentId: fixture.assignment_id,
-    checkpointId: fixture.checkpoint_id,
-    submissionId: fixture.submission_id,
-  };
 }
 
 test.describe('Revision action plan lifecycle', () => {
   test.describe.configure({ mode: 'serial' });
 
-  test.beforeAll(async ({ browser }) => {
+  test.beforeEach(async ({ browser }) => {
     await resetDatabase();
     await Promise.all([ensureAuthFile(browser, 'instructor'), ensureAuthFile(browser, 'student')]);
   });
@@ -241,7 +238,8 @@ test.describe('Revision action plan lifecycle', () => {
   test('revision plan surfaces have no critical or serious accessibility violations', async ({
     browser,
   }) => {
-    const { assignmentId, checkpointId, submissionId } = await getLatestFixture();
+    const { assignmentId, checkpointId, submissionId } = await prepareRevisionCheckpoint();
+    await seedCurrentPlan(submissionId, 'Current accessibility item');
     const studentContext = await browser.newContext({ storageState: getAuthFilePath('student') });
     const studentPage = await studentContext.newPage();
     await studentPage.goto(`/student/assignments/${assignmentId}/checkpoints/${checkpointId}`);
@@ -261,7 +259,7 @@ test.describe('Revision action plan lifecycle', () => {
     const instructorPage = await instructorContext.newPage();
     await instructorPage.goto(`/instructor/reviews/${submissionId}`);
     await instructorPage.waitForLoadState('networkidle');
-    await expect(instructorPage.getByText('Add an experiment')).toBeVisible();
+    await expect(instructorPage.getByText('Current accessibility item')).toBeVisible();
     const instructorA11y = await new AxeBuilder({ page: instructorPage }).analyze();
     expect(
       instructorA11y.violations.filter((violation) =>
@@ -272,7 +270,8 @@ test.describe('Revision action plan lifecycle', () => {
   });
 
   test('current revision plan remains usable at a 320px viewport', async ({ browser }) => {
-    const { assignmentId, checkpointId } = await getLatestFixture();
+    const { assignmentId, checkpointId, submissionId } = await prepareRevisionCheckpoint();
+    await seedCurrentPlan(submissionId, 'Current mobile item');
     const context = await browser.newContext({
       storageState: getAuthFilePath('student'),
       viewport: { width: 320, height: 844 },

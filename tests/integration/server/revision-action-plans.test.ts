@@ -328,6 +328,16 @@ describe('revision action items against PostgreSQL', () => {
     ).toEqual({
       success: true,
     });
+    const statusAudits = await db
+      .select({ action: auditLog.action, details: auditLog.details })
+      .from(auditLog)
+      .where(and(eq(auditLog.actorId, studentId), eq(auditLog.entityId, String(currentItem.id))))
+      .orderBy(auditLog.id);
+    expect(statusAudits.map((audit) => audit.action)).toEqual([
+      'revision_action_item.addressed',
+      'revision_action_item.unaddressed',
+    ]);
+    expect(JSON.stringify(statusAudits)).not.toContain('Current item');
 
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
       user: { id: otherStudentId, name: 'Other Student', role: 'student', locale: 'en' },
