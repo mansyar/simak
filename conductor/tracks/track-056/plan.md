@@ -46,12 +46,12 @@ Commit SHA: c7c17a9 (follow-up: 8cff4ab)
 
 ### Phase 1 Verification Checkpoint
 
-- [ ] Run the complete affected component/route test set with `pnpm vitest run` using the relevant test paths.
-- [ ] Run `pnpm typecheck` for the phase changes.
-- [ ] Manually verify that each remote input remains responsive while typing, that clearing is immediate, and that local pickers issue no per-keystroke network request.
-- [ ] Present the phase manual-verification steps to the user, await explicit confirmation, attach the verification report as a git note, record the checkpoint SHA in this plan, and commit the plan update.
+- [x] Run the complete affected component/route test set with `pnpm vitest run` using the relevant test paths.
+- [x] Run `pnpm typecheck` for the phase changes.
+- [x] Manually verify that each remote input remains responsive while typing, that clearing is immediate, and that local pickers issue no per-keystroke network request.
+- [x] Present the phase manual-verification steps to the user, await explicit confirmation, attach the verification report as a git note, record the checkpoint SHA in this plan, and commit the plan update.
 
-Phase checkpoint: _pending_
+Phase checkpoint: 51e1dbc (user-confirmed; verification note attached)
 
 ## Phase 2: Server Workload and Result Contracts
 
