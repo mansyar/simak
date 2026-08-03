@@ -11,12 +11,12 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Confirm migration, rollback, TDD, coverage, file-size, commit, and git-note requirements.
   - [x] Inspect existing `reviews`, `review_scores`, `rubric_criteria`, audit, and migration conventions before changing schema code.
 
-- [ ] Task: Write failing schema tests in `tests/unit/db/schema/revision-action-items.test.ts`.
-  - [ ] Verify the `revisionActionItems` table export and required columns.
-  - [ ] Verify the review ownership foreign key and optional rubric-criterion foreign key.
-  - [ ] Verify nullable criterion/title snapshot and addressed timestamp fields.
-  - [ ] Verify stable ordering and indexes supporting review-history/current-plan reads.
-  - [ ] Verify the schema and relations are re-exported through `src/db/schema/index.ts`.
+- [~] Task: Write failing schema tests in `tests/unit/db/schema/revision-action-items.test.ts`.
+  - [~] Verify the `revisionActionItems` table export and required columns.
+  - [~] Verify the review ownership foreign key and optional rubric-criterion foreign key.
+  - [~] Verify nullable criterion/title snapshot and addressed timestamp fields.
+  - [~] Verify stable ordering and indexes supporting review-history/current-plan reads.
+  - [~] Verify the schema and relations are re-exported through `src/db/schema/index.ts`.
 
 - [ ] Task: Implement the revision action-item schema.
   - [ ] Create `src/db/schema/revision-action-items.ts` using the existing Drizzle conventions.
