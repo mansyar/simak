@@ -11,11 +11,15 @@ export const RATE_LIMITS = {
   heavyMutation: { window: 60, max: 10 },
   destructive: { window: 60, max: 5 },
   standardRead: { window: 60, max: 60 },
+  calendarFeed: { window: 60, max: 60 },
 } as const;
+
+export const MAX_RATE_LIMIT_ENTRIES = 10_000;
 
 interface RateLimitEntry {
   count: number;
   windowStart: number;
+  windowSeconds?: number;
 }
 
 const rateLimitStore = new Map<string, RateLimitEntry>();
@@ -26,9 +30,17 @@ export function checkRateLimit(
   config: RateLimitConfig,
 ): boolean {
   const now = Date.now();
+
+  for (const [entryKey, entry] of store) {
+    const windowSeconds = entry.windowSeconds ?? config.window;
+    if (now - entry.windowStart >= windowSeconds * 1000) {
+      store.delete(entryKey);
+    }
+  }
+
   const entry = store.get(key);
 
-  if (entry && now - entry.windowStart < config.window * 1000) {
+  if (entry && now - entry.windowStart < (entry.windowSeconds ?? config.window) * 1000) {
     if (entry.count >= config.max) {
       return false;
     }
@@ -36,7 +48,12 @@ export function checkRateLimit(
     return true;
   }
 
-  store.set(key, { count: 1, windowStart: now });
+  if (store.size >= MAX_RATE_LIMIT_ENTRIES) {
+    const oldestKey = store.keys().next().value;
+    if (oldestKey !== undefined) store.delete(oldestKey);
+  }
+
+  store.set(key, { count: 1, windowStart: now, windowSeconds: config.window });
   return true;
 }
 
@@ -65,4 +82,8 @@ export function createRateLimitMiddleware(config: RateLimitConfig) {
 
 export function resetRateLimitStoreForTests(): void {
   rateLimitStore.clear();
+}
+
+export function checkCalendarFeedRateLimit(key: string): boolean {
+  return checkRateLimit(rateLimitStore, `calendar-feed:${key}`, RATE_LIMITS.calendarFeed);
 }

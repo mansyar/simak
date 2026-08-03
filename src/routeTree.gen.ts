@@ -16,6 +16,7 @@ import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as AuthenticatedStudentRouteImport } from './routes/_authenticated/student'
 import { Route as AuthenticatedInstructorRouteImport } from './routes/_authenticated/instructor'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiCalendarIcsRouteImport } from './routes/api/calendar.ics'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as UnauthenticatedAuthVerifyBackupCodeRouteImport } from './routes/_unauthenticated/auth/verify-backup-code'
 import { Route as UnauthenticatedAuthVerify2faRouteImport } from './routes/_unauthenticated/auth/verify-2fa'
@@ -82,6 +83,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const ApiCalendarIcsRoute = ApiCalendarIcsRouteImport.update({
+  id: '/api/calendar/ics',
+  path: '/api/calendar/ics',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -305,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/auth/verify-2fa': typeof UnauthenticatedAuthVerify2faRoute
   '/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/calendar/ics': typeof ApiCalendarIcsRoute
   '/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
   '/admin/templates/import': typeof AuthenticatedAdminTemplatesImportRoute
   '/admin/users/import': typeof AuthenticatedAdminUsersImportRoute
@@ -345,6 +352,7 @@ export interface FileRoutesByTo {
   '/auth/verify-2fa': typeof UnauthenticatedAuthVerify2faRoute
   '/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/calendar/ics': typeof ApiCalendarIcsRoute
   '/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
   '/admin/templates/import': typeof AuthenticatedAdminTemplatesImportRoute
   '/admin/users/import': typeof AuthenticatedAdminUsersImportRoute
@@ -388,6 +396,7 @@ export interface FileRoutesById {
   '/_unauthenticated/auth/verify-2fa': typeof UnauthenticatedAuthVerify2faRoute
   '/_unauthenticated/auth/verify-backup-code': typeof UnauthenticatedAuthVerifyBackupCodeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/calendar/ics': typeof ApiCalendarIcsRoute
   '/_authenticated/admin/templates/$templateId': typeof AuthenticatedAdminTemplatesTemplateIdRoute
   '/_authenticated/admin/templates/import': typeof AuthenticatedAdminTemplatesImportRoute
   '/_authenticated/admin/users/import': typeof AuthenticatedAdminUsersImportRoute
@@ -430,6 +439,7 @@ export interface FileRouteTypes {
     | '/auth/verify-2fa'
     | '/auth/verify-backup-code'
     | '/api/auth/$'
+    | '/api/calendar/ics'
     | '/admin/templates/$templateId'
     | '/admin/templates/import'
     | '/admin/users/import'
@@ -470,6 +480,7 @@ export interface FileRouteTypes {
     | '/auth/verify-2fa'
     | '/auth/verify-backup-code'
     | '/api/auth/$'
+    | '/api/calendar/ics'
     | '/admin/templates/$templateId'
     | '/admin/templates/import'
     | '/admin/users/import'
@@ -512,6 +523,7 @@ export interface FileRouteTypes {
     | '/_unauthenticated/auth/verify-2fa'
     | '/_unauthenticated/auth/verify-backup-code'
     | '/api/auth/$'
+    | '/api/calendar/ics'
     | '/_authenticated/admin/templates/$templateId'
     | '/_authenticated/admin/templates/import'
     | '/_authenticated/admin/users/import'
@@ -535,6 +547,7 @@ export interface RootRouteChildren {
   UnauthenticatedRoute: typeof UnauthenticatedRouteWithChildren
   ApiHealthRoute: typeof ApiHealthRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiCalendarIcsRoute: typeof ApiCalendarIcsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -587,6 +600,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/calendar/ics': {
+      id: '/api/calendar/ics'
+      path: '/api/calendar/ics'
+      fullPath: '/api/calendar/ics'
+      preLoaderRoute: typeof ApiCalendarIcsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -989,6 +1009,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnauthenticatedRoute: UnauthenticatedRouteWithChildren,
   ApiHealthRoute: ApiHealthRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiCalendarIcsRoute: ApiCalendarIcsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

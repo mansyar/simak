@@ -166,7 +166,7 @@ export function NotificationPreferencesSection() {
       <CardContent className="space-y-6">
         {NOTIFICATION_PREF_GROUPS.map((group) => (
           <div key={group.labelKey} className="space-y-3">
-            <h3 className="text-sm font-semibold text-muted-foreground">{t(group.labelKey)}</h3>
+            <h2 className="text-sm font-semibold text-muted-foreground">{t(group.labelKey)}</h2>
             <div className="space-y-4">
               {group.types.map(({ type, labelKey, descKey, emailAlwaysOn }) => {
                 const typePrefs = prefs[type] ?? {};

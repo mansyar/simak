@@ -17,6 +17,7 @@ export * from './gradebook';
 export * from './discussions';
 export * from './interventions';
 export * from './feedback-snippets';
+export * from './calendar-feed-tokens';
 
 // Import tables for relations
 import { users } from './users';
@@ -34,6 +35,7 @@ import { assignmentGradeConfig, finalGrades, gradeReleaseSnapshots } from './gra
 import { checkpointDiscussions } from './discussions';
 import { interventions } from './interventions';
 import { feedbackSnippets } from './feedback-snippets';
+import { calendarFeedTokens } from './calendar-feed-tokens';
 
 // ---- Relations ----
 
@@ -72,6 +74,14 @@ export const usersRelations = relations(users, ({ many }) => ({
   gradeReleaseSnapshots: many(gradeReleaseSnapshots),
   interventions: many(interventions),
   feedbackSnippets: many(feedbackSnippets),
+  calendarFeedTokens: many(calendarFeedTokens),
+}));
+
+export const calendarFeedTokensRelations = relations(calendarFeedTokens, ({ one }) => ({
+  student: one(users, {
+    fields: [calendarFeedTokens.studentId],
+    references: [users.id],
+  }),
 }));
 
 export const feedbackSnippetsRelations = relations(feedbackSnippets, ({ one }) => ({

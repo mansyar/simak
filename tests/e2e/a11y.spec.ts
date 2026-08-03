@@ -89,6 +89,18 @@ test.describe('Axe Accessibility Scans', () => {
     expect(filterModerate(results.violations)).toEqual([]);
   });
 
+  test('student settings has no critical/serious/moderate a11y violations', async ({ page }) => {
+    await loginAsRole(page, 'student');
+    await page.goto('/student/settings');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByText('Student deadline timezone', { exact: true })).toBeVisible();
+    await expect(page.getByText('Private calendar feed', { exact: true })).toBeVisible();
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(filterCriticalAndSerious(results.violations)).toEqual([]);
+    expect(filterModerate(results.violations)).toEqual([]);
+  });
+
   test('student assignment detail has no critical/serious/moderate a11y violations', async ({
     page,
   }) => {

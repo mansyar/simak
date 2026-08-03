@@ -1,5 +1,6 @@
 import { format, parseISO, isValid, formatDistanceToNow } from 'date-fns';
 import { enUS, id } from 'date-fns/locale';
+import { formatDate } from '@/lib/format-date';
 
 type Locale = 'en' | 'id';
 
@@ -18,7 +19,13 @@ function toDate(date: Date | string): Date {
 /**
  * Format date as "Mar 5, 2026" (EN) or "5 Mar 2026" (ID)
  */
-export function formatDateShort(date: Date | string, locale: Locale = 'en'): string {
+export function formatDateShort(
+  date: Date | string,
+  locale: Locale = 'en',
+  timeZone?: string,
+): string {
+  if (timeZone !== undefined) return formatDate(date, locale, 'short', timeZone);
+
   const d = toDate(date);
   if (!isValid(d)) return 'Invalid Date';
   return format(d, locale === 'id' ? 'd MMM yyyy' : 'MMM d, yyyy', {
@@ -29,7 +36,13 @@ export function formatDateShort(date: Date | string, locale: Locale = 'en'): str
 /**
  * Format date as "March 5, 2026" (EN) or "5 Maret 2026" (ID)
  */
-export function formatDateLong(date: Date | string, locale: Locale = 'en'): string {
+export function formatDateLong(
+  date: Date | string,
+  locale: Locale = 'en',
+  timeZone?: string,
+): string {
+  if (timeZone !== undefined) return formatDate(date, locale, 'long', timeZone);
+
   const d = toDate(date);
   if (!isValid(d)) return 'Invalid Date';
   return format(d, locale === 'id' ? 'd MMMM yyyy' : 'MMMM d, yyyy', {
@@ -40,7 +53,13 @@ export function formatDateLong(date: Date | string, locale: Locale = 'en'): stri
 /**
  * Format date and time as "Mar 5, 2026 2:30 PM" (EN, 12h) or "5 Mar 2026 14:30" (ID, 24h)
  */
-export function formatDateTimeShort(date: Date | string, locale: Locale = 'en'): string {
+export function formatDateTimeShort(
+  date: Date | string,
+  locale: Locale = 'en',
+  timeZone?: string,
+): string {
+  if (timeZone !== undefined) return formatDate(date, locale, 'time', timeZone);
+
   const d = toDate(date);
   if (!isValid(d)) return 'Invalid Date';
   return format(d, locale === 'id' ? 'd MMM yyyy HH:mm' : 'MMM d, yyyy h:mm a', {

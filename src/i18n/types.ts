@@ -1192,6 +1192,37 @@ export type Translation = {
       reducedMotionLabel: string
       reducedMotionHint: string
     }
+    timezone: {
+      title: string
+      description: string
+      label: string
+      placeholder: string
+      hint: string
+      detecting: string
+      save: string
+      saved: string
+      invalid: string
+      saveError: string
+    }
+    calendarFeed: {
+      title: string
+      description: string
+      loading: string
+      enable: string
+      enabled: string
+      empty: string
+      urlLabel: string
+      copy: string
+      copied: string
+      copyError: string
+      regenerate: string
+      revoke: string
+      confirmRegenerate: string
+      confirmRevoke: string
+      regenerated: string
+      revoked: string
+      error: string
+    }
     notificationPreferences: {
       title: string
       description: string

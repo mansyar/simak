@@ -13,10 +13,14 @@ export function getR2Domain(): string | undefined {
   }
 }
 
-const securityHeadersMiddleware = createMiddleware().server(({ next }) => {
+const securityHeadersMiddleware = createMiddleware().server(({ request, next }) => {
   const nonce = generateNonce();
   const r2Domain = getR2Domain();
   const headers = buildSecurityHeaders(nonce, import.meta.env.PROD, r2Domain);
+
+  if (new URL(request.url).pathname === '/api/calendar/ics') {
+    headers['Referrer-Policy'] = 'no-referrer';
+  }
 
   for (const [name, value] of Object.entries(headers)) {
     setResponseHeader(name, value);

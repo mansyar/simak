@@ -21,6 +21,7 @@ vi.mock('@tanstack/react-router', () => ({
 
 // Mock @tanstack/react-query (needed by useKeyboardShortcuts)
 vi.mock('@tanstack/react-query', () => ({
+  useQuery: vi.fn().mockReturnValue({ data: undefined, isLoading: true }),
   useQueryClient: vi.fn().mockReturnValue({
     invalidateQueries: vi.fn(),
   }),

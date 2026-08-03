@@ -22,6 +22,7 @@ vi.mock('@/lib/logger', () => ({
 import { getSessionFromHeaders } from '@/server/auth';
 import {
   RATE_LIMITS,
+  MAX_RATE_LIMIT_ENTRIES,
   checkRateLimit,
   createRateLimitMiddleware,
   resetRateLimitStoreForTests,
@@ -105,6 +106,16 @@ describe('checkRateLimit', () => {
     expect(checkRateLimit(store, 'user2:fn1', cfg)).toBe(true);
     // user1:fn2 is independent
     expect(checkRateLimit(store, 'user1:fn2', cfg)).toBe(true);
+  });
+
+  it('bounds the number of stored keys', () => {
+    const cfg: RateLimitConfig = { window: 60, max: 1 };
+
+    for (let index = 0; index <= MAX_RATE_LIMIT_ENTRIES; index++) {
+      checkRateLimit(store, `key-${index}`, cfg);
+    }
+
+    expect(store.size).toBeLessThanOrEqual(MAX_RATE_LIMIT_ENTRIES);
   });
 });
 

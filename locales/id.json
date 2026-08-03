@@ -1187,6 +1187,37 @@
       "reducedMotionLabel": "Gerakan Dikurangi",
       "reducedMotionHint": "Kurangi animasi dan transisi di seluruh aplikasi"
     },
+    "timezone": {
+      "title": "Zona waktu tenggat mahasiswa",
+      "description": "Pilih zona waktu untuk menampilkan tenggat mahasiswa Anda. Tenggat tersimpan dan pengingat tidak berubah.",
+      "label": "Zona waktu IANA",
+      "placeholder": "contoh: America/New_York",
+      "hint": "Gunakan zona waktu IANA yang valid seperti Asia/Jakarta atau America/New_York.",
+      "detecting": "Mendeteksi zona waktu…",
+      "save": "Simpan zona waktu",
+      "saved": "Zona waktu berhasil disimpan.",
+      "invalid": "Masukkan zona waktu IANA yang valid.",
+      "saveError": "Zona waktu tidak dapat disimpan. Silakan coba lagi."
+    },
+    "calendarFeed": {
+      "title": "Feed kalender privat",
+      "description": "Berlangganan tenggat mahasiswa Anda di aplikasi kalender. Feed ini hanya dapat dibaca.",
+      "loading": "Memuat feed kalender…",
+      "enable": "Aktifkan feed kalender",
+      "enabled": "Feed kalender aktif.",
+      "empty": "URL langganan saat ini tidak ditampilkan. Buat ulang URL untuk membuat yang baru.",
+      "urlLabel": "URL kalender privat",
+      "copy": "Salin URL",
+      "copied": "URL kalender disalin.",
+      "copyError": "URL kalender tidak dapat disalin.",
+      "regenerate": "Buat ulang URL",
+      "revoke": "Nonaktifkan feed kalender",
+      "confirmRegenerate": "Buat ulang URL kalender privat? URL sebelumnya akan berhenti berfungsi.",
+      "confirmRevoke": "Nonaktifkan feed kalender privat? URL saat ini akan berhenti berfungsi.",
+      "regenerated": "URL kalender berhasil dibuat ulang.",
+      "revoked": "Feed kalender dinonaktifkan.",
+      "error": "Feed kalender tidak tersedia. Silakan coba lagi."
+    },
     "notificationPreferences": {
       "title": "Preferensi Notifikasi",
       "description": "Pilih bagaimana Anda ingin diberi tahu untuk setiap jenis peristiwa.",

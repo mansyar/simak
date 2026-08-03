@@ -1,7 +1,8 @@
-import { format } from 'date-fns/format';
 import { Calendar, User, Clipboard } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
 import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/format-date';
+import { useStudentTimezone } from '@/hooks/use-student-timezone';
 
 export interface AssignmentDetail {
   title: string;
@@ -18,7 +19,8 @@ interface AssignmentDetailHeaderProps {
 }
 
 export function AssignmentDetailHeader({ detail }: AssignmentDetailHeaderProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const { timezone, hydrated } = useStudentTimezone();
 
   return (
     <div className="space-y-4">
@@ -47,10 +49,14 @@ export function AssignmentDetailHeader({ detail }: AssignmentDetailHeaderProps) 
           <span className="font-medium text-foreground">
             {detail.effectiveDeadline
               ? t('studentAssignments.effectiveDeadline', {
-                  date: format(new Date(detail.effectiveDeadline), 'MMM d, yyyy'),
+                  date: hydrated
+                    ? formatDate(new Date(detail.effectiveDeadline), locale, 'short', timezone)
+                    : '—',
                 })
               : t('studentAssignments.finalDeadline', {
-                  date: format(new Date(detail.finalDeadline), 'MMM d, yyyy'),
+                  date: hydrated
+                    ? formatDate(new Date(detail.finalDeadline), locale, 'short', timezone)
+                    : '—',
                 })}
           </span>
         </div>

@@ -56,7 +56,7 @@ Throughout this document, features are tagged as:
 / (authenticated — student)
 ├── /student                              → Student sidebar layout
 │   ├── /student/dashboard                → Student dashboard with summary widgets [v1]
-│   ├── /student/settings                 → Settings hub (profile, password, appearance, accessibility) [v1]
+│   ├── /student/settings                 → Student settings hub plus timezone and private calendar-feed controls [v1]
 │   ├── /student/assignments              → Assignment list [v1]
 │   ├── /student/assignments/$id          → Assignment detail with checkpoints [v1]
 │   │   └── /student/assignments/$id/
@@ -133,7 +133,7 @@ simak/
 │   │   ├── files/            → File upload, preview, file list
 │   │   ├── notifications/    → Notification center, badge, notification-routes (type→route map)
 │   │   ├── analytics/        → Charts, metric cards, export
-│   │   ├── settings/         → SettingsPage, ProfileSection, PasswordSection, AppearanceSection, AccessibilitySection, NotificationPreferencesSection
+│   │   ├── settings/         → SettingsPage, ProfileSection, PasswordSection, AppearanceSection, AccessibilitySection, NotificationPreferencesSection, TimezoneSettingsSection, CalendarFeedSettingsSection
 │   │   ├── skeletons/        → Reusable loading skeletons (DashboardSkeleton, TableSkeleton, AssignmentDetailSkeleton)
 │   │   ├── admin/            → User table, template builder, template cards, pagination, filters, empty state, loading skeleton, email queue inspector subcomponents (summary cards, filters, table, retry dialog)
 │   │   └── keyboard-cheat-sheet.tsx → Popover showing all keyboard shortcuts (greys out review-specific J/K when not on review page)
@@ -169,8 +169,12 @@ simak/
 │   │   ├── files.ts          → Presigned URL generation
 │   │   ├── r2-cleanup.ts     → R2 cleanup stub (triggerR2Cleanup admin-only server fn + Zod schema)
 │   │   ├── r2-cleanup.server.ts → R2 cleanup handler (admin-only, calls processOrphanedR2Objects bypassing throttle, audit logs with admin userId)
-│   │   ├── settings.ts       → Settings hub stubs (UpdateProfileSchema, UpdateUserSettingsSchema, GetPresignedAvatarUploadUrlSchema)
-│   │   ├── settings.server.ts → Settings hub handlers (updateProfile, getPresignedAvatarUploadUrl, updateUserSettings)
+│   │   ├── settings.ts       → Settings hub stubs (including validated IANA timezone settings)
+│   │   ├── settings.server.ts → Settings hub handlers (including normalized timezone persistence)
+│   │   ├── calendar-feed.ts  → Client-safe calendar feed lifecycle stubs
+│   │   ├── calendar-feed.server.ts → Transactional token enable/status/regenerate/revoke handlers
+│   │   ├── calendar-feed-selection.server.ts → Membership-aware authoritative event selection
+│   │   ├── calendar-feed-route.server.ts → Bearer verification and private feed response handler
 │   │   ├── two-factor.ts     → 2FA stubs + Zod schemas
 │   │   ├── two-factor.server.ts → 2FA server handlers
 │   │   ├── sessions.ts       → Session management stubs + Zod schemas
@@ -223,12 +227,12 @@ simak/
     │   │   ├── session-guards.ts → Shared client-safe type-guard functions (isAdmin, isInstructor, isStudent, isAuthenticated) — accept `NonNullableSession | null`, return `session is NonNullableSession` (TRACK-031)
      │   │   ├── server-fn.ts     → Type-preserving `typedServerFn` alias for `createServerFn`, plus explicit `serverFnMiddlewares()` composition for request IDs and optional rate limiting. Client-safe stubs dynamically import server-only handlers inside callbacks.
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
-     │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys, discussionKeys, settingsKeys, gradebookKeys, feedbackSnippetKeys)
+      │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys, discussionKeys, settingsKeys including currentUser/accessibility/calendarFeed, gradebookKeys, feedbackSnippetKeys)
     │   │   ├── logger.ts         → Singleton `pino` logger instance — JSON to stdout in prod, `pino-pretty` in dev (lazy-loaded via `createRequire`). `LOG_LEVEL` env var (default `info`). A pino `mixin` adds the current AsyncLocalStorage request ID to every log entry. `createLogger(options?)` factory. Server-side only. (TRACK-040, TRACK-044)
     │   │   ├── request-context.ts → `requestIdMiddleware` (TanStack Start `createMiddleware`) + `createRequestLogger(context)` — reads `x-request-id` header or generates UUID, then scopes it through AsyncLocalStorage for automatic logger propagation. Wired globally by `typedServerFn`. (TRACK-040, TRACK-044)
     │   │   ├── request-context-store.ts → `AsyncLocalStorage<RequestContext>` and `getRequestId()` helper for request-scoped logging context. (TRACK-044)
     │   │   ├── security-headers.ts → Pure functions `generateNonce()` (`crypto.randomBytes(16).toString('base64')`) + `buildSecurityHeaders(nonce, isProd, r2Domain?)` (returns header name→value map). CSP directive assembly + Report-Only/enforce switching. (TRACK-041)
-     │   │   ├── rate-limiter.ts   → In-memory sliding window rate limiter. Exports `RateLimitConfig` type, `RATE_LIMITS` presets (4 tiers: presignedUrl 20/min, heavyMutation 10/min, destructive 5/min, standardRead 60/min), `checkRateLimit(store, key, config)` (sliding window: resets if expired, increments if under max, denies without incrementing at max), `createRateLimitMiddleware(config)` (TanStack Start function middleware — calls `getSessionFromHeaders()`, unauthenticated pass-through, throws a `RATE_LIMITED` server error when exceeded), `resetRateLimitStoreForTests()`. Module-level `Map<string, {count, windowStart}>` keyed by `userId:fnId`. (TRACK-043)
+     │   │   ├── rate-limiter.ts   → Bounded in-memory sliding-window limiter. Exports the four authenticated `RATE_LIMITS` tiers plus the public `calendarFeed` limit, session middleware, anonymous/student calendar keys, expiry cleanup, and `resetRateLimitStoreForTests()`. Public feed limiting does not trust forwarded client-IP headers. (TRACK-043, TRACK-055)
     │   │   ├── shutdown.ts       → `registerShutdownHandlers()` — SIGTERM/SIGINT handler (guarded by `import.meta.env.SSR`): clears `setInterval`, awaits in-flight `tick()` via `stopGracefully()` (drain), closes DB pool via `closeDb()`, then `process.exit(0)`. Second signal forces `process.exit(1)`. Configurable timeout via `SHUTDOWN_TIMEOUT_MS` (default 10000ms). (TRACK-045)
     │   │   └── utils.ts          → Shared utilities
 │   ├── hooks/               → Custom React hooks
@@ -245,7 +249,7 @@ simak/
 ├── tests/
 │   ├── unit/                 → Vitest unit tests
 │   ├── integration/          → Vitest integration tests
-│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 22 spec files including Student Next Actions, grade-release, feedback-snippet, and intervention workflow coverage, includes @axe-core/playwright a11y scans)
+│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 22 spec files including Student Next Actions, timezone/calendar, grade-release, feedback-snippet, and intervention workflow coverage, includes @axe-core/playwright a11y scans)
 ├── docker/
 │   └── Dockerfile
 ├── drizzle.config.ts
@@ -453,7 +457,7 @@ All 85 authenticated TanStack Start server functions are rate-limited through ex
 
 - **No handler changes** — Rate limiting is enforced at the middleware layer before the handler runs. Zero `.server.ts` handler files were modified. All annotations are in stub files (`.ts`).
 
-- **Testing:** 14 unit tests in `tests/unit/lib/rate-limiter.test.ts` (presets, sliding window, per-key isolation, fake-timer window expiry, middleware pass-through/deny/fnId isolation) + 5 new tests in `tests/unit/lib/server-fn.test.ts` (rateLimit calls `.middleware()`, no rateLimit is pass-through, builder chain preservation, regression tests). `rate-limiter.ts` and `server-fn.ts` at 100% coverage.
+- **Testing:** The rate-limiter suites cover presets, sliding-window expiry, per-key isolation, middleware pass-through/deny/function isolation, calendar-feed anonymous/student keying, forwarded-header rejection, and bounded-store cleanup. The server-function suite covers middleware composition and regression behavior. `rate-limiter.ts` and `server-fn.ts` remain covered above the project threshold.
 
 ---
 
@@ -461,7 +465,7 @@ All 85 authenticated TanStack Start server functions are rate-limited through ex
 
 ### Entity-Relationship Overview
 
-**User** (SuperAdmin, Admin, Instructor, Student) — core identity with role.
+**User** (SuperAdmin, Admin, Instructor, Student) — core identity with role and optional settings JSONB timezone preference.
 **AssignmentTemplate** — defines a type (e.g. Thesis) with ordered checkpoint names.
 **TemplateCheckpoint** — checkpoint definition within a template (name, order).
 **Assignment** — links a template to students with a title, description, and final deadline.
@@ -475,6 +479,7 @@ All 85 authenticated TanStack Start server functions are rate-limited through ex
 **NotificationPreference** — per-user, per-type, per-channel toggle stored in `users.settings` JSONB column (no separate table). Keyed by notification `type` string (e.g., `submission_received`), with `{ email?: boolean; inApp?: boolean }` values. Absent key or absent sub-field = default `true` (enabled). 12 types across 4 groups (Reviews, Consultations, Submissions, System). Security types (password_reset, invitation, two_factor, sla_alert) are exempt from email gating.
 **ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, the affected student's subsequent checkpoint `dueDate` values auto-extend. The assignment-wide `finalDeadline` is immutable after creation and never mutated by extensions.
 **DeadlineReminder** — dedup tracking table for proactive deadline reminders. Records `checkpointId` (FK, cascade delete), `studentId` (FK, cascade delete), `tier` (`'7d'`/`'3d'`/`'1d'`), and `sentAt`. Unique constraint on `(checkpointId, tier)` ensures at-most-once delivery per tier per checkpoint across multiple server instances. Used by the hourly background scanner (`processDeadlineReminders()`) to deduplicate via `INSERT ... ON CONFLICT DO NOTHING RETURNING *`.
+**CalendarFeedToken** — per-student private-feed credential record introduced by migration 0020. Stores a SHA-256 token hash, ownership and created/revoked timestamps; a partial unique index enforces one active token per student. The opaque token is returned only on enable/regenerate and is never persisted or logged in plaintext. The route is `GET /api/calendar/ics` and returns UTC RFC 5545 events.
 **AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v1] — admin viewer at `/admin/audit-log`.
 **EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, 2FA emails, SLA alerts, and **11 event notification types** (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, deadline reminder, student at risk, discussion reply). Event emails are dispatched as post-commit advisory work via `enqueueEventEmail()` (`src/lib/event-email.ts`) alongside existing in-app notifications — the primary operation always succeeds even if enqueue fails. `enqueueEventEmail` supports optional `subjectParams` for interpolating dynamic values into email subjects (e.g., `{assignmentTitle}` in deadline reminder subjects). A proactive deadline reminder scanner (`processDeadlineReminders()` in `src/lib/deadline-reminder-scanner.ts`) runs hourly alongside the email queue processor — it queries checkpoints with upcoming due dates, dispatches tiered (7d/3d/1d) in-app notifications + emails, and uses a `deadline_reminders` dedup table with `ON CONFLICT DO NOTHING` for at-most-once delivery per tier per checkpoint. The dedup insert and notification creation are wrapped in a single `db.transaction` (atomicity); email dispatch runs post-commit via `Promise.allSettled` (advisory). Scanner failure is isolated via `try/catch` and does not affect email processing. The scanner also calls `checkAndFireRiskAlert` for each reminder to surface at-risk students (advisory, `Promise.allSettled`). An orphaned R2 object cleanup scanner (`processOrphanedR2Objects()` in `src/lib/r2-cleanup.ts`) also runs in the tick loop — throttled to every 6 hours via in-memory `lastR2CleanupAt`, it deletes R2 objects whose upload intents expired without being consumed, using `Promise.allSettled` for parallel deletes with per-object error isolation. The R2 cleanup scanner accepts an `actorId` parameter (default `'system'`) for audit logging via `safeAuditLog`. Scanner failure is isolated via `try/catch` and does not affect email processing. Admins can manually trigger R2 cleanup via the "Trigger R2 Cleanup" button on `/admin/email-queue` (bypasses throttle, logs with admin userId). Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS. Admin queue inspector at `/admin/email-queue` provides observability — paginated list (20/page) with status filter, search (recipient email/subject), summary stats (pending/sent/failed), and manual retry of failed emails (idempotent: only `status='failed'` can be retried, resets to `pending` inside a `FOR UPDATE` transaction). Each row exposes a `resendMessageId` (populated from the Resend API `result.data.id` on successful send) displayed as a monospace truncated cell, enabling correlation with Resend's delivery dashboard. Processor sends emails in concurrent batches of 5 via `Promise.allSettled` (chunks run sequentially; partial failures don't abort the batch — cycle latency reduced from ~10× to ~2× single-send latency). Automatic retention cleanup prunes `sent` rows older than 90 days and `failed` rows older than 180 days on a tick-embedded 24-hour cycle (`lastPruneAt` timestamp in `email-queue-init.ts`); `pending`/`processing` rows are never deleted. Processor emits structured logs (`email_queue.cycle_start`, `email_queue.cycle_end`, `email_queue.reclaimed`, `email_queue.send_failed`, `email_queue.retention_pruned` — no PII). `EMAIL_FROM` is read from `getEnv().EMAIL_FROM` (Zod-validated in `src/config/env.ts` with default `'SIMAK <noreply@simak.app>'`).
 **TwoFactor** — TOTP configuration (secret, backup codes) managed by Better Auth's `twoFactor` plugin.
@@ -493,7 +498,7 @@ All 85 authenticated TanStack Start server functions are rate-limited through ex
 | email            | text, unique, not null | Login identifier                                                                    |
 | role             | enum, not null         | superadmin \| admin \| instructor \| student                                        |
 | locale           | text, default 'en'     | Language preference: 'en' \| 'id'. Used for UI, notifications, and email templates. |
-| settings         | jsonb                  | NULLABLE — `{ reducedMotion: boolean; notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }> }`. Profile, theme, accessibility, and notification preferences. |
+| settings         | jsonb                  | NULLABLE — `{ reducedMotion: boolean; timezone?: string; notificationPrefs?: Record<string, { email?: boolean; inApp?: boolean }> }`. Profile, theme, accessibility, timezone, and notification preferences. Timezone is runtime-validated as an IANA identifier and is used only for defined student deadline presentation. |
 | createdAt        | timestamp              |                                                                                     |
 | updatedAt        | timestamp              |                                                                                     |
 | deletedAt        | timestamp              | Soft delete                                                                         |
@@ -1574,7 +1579,7 @@ Server functions whose output crosses the network boundary to a route loader dec
 | **UI labels**       | Static translation keys                                                          | `t('button.submit')`                                       |
 | **Dynamic text**    | Interpolation with parameters                                                    | `t('checkpoint.passed', { name: checkpoint.name })`        |
 | **Notifications**   | Store i18n `titleKey`/`messageKey` + `params` in DB. Resolve display strings at read time using recipient's locale. | `{ titleKey: 'notifications.events.review_completed.title', messageKey: '...', params: { checkpointName } }` |
-| **Date formatting** | Shared `formatDate(date, locale, style)` helper (`src/lib/format-date.ts`) renders dates in the user's locale (`id-ID` or `en-US`); replaces all `toLocaleDateString('en-US')` and bare `toLocaleDateString()` calls (Track: Accessibility & i18n Compliance). A companion module `src/lib/format.ts` exports locale-aware formatters — `formatDateShort` / `formatDateLong` / `formatDateTimeShort` (absolute) and `formatRelativeTime` (relative, via `date-fns` `formatDistanceToNow` + `localeMap`) — used where relative context aids comprehension: checkpoint due dates and student-dashboard upcoming deadlines append parenthesized relative time (e.g., "Mar 5, 2026 (in 3 days)"), and SLA badges expose relative time as a `title` tooltip across all variants (Track: Empty States, Date Display & Mobile Polish). | `formatDate(item.createdAt, locale, 'short')`, `formatDateShort(checkpoint.dueDate, locale)`, `formatRelativeTime(date, locale)` |
+| **Date formatting** | Shared `formatDate(date, locale, style, timeZone?)` helper (`src/lib/format-date.ts`) renders dates in the user's locale (`id-ID` or `en-US`) with an optional validated IANA timezone; invalid explicit zones use UTC, while omitted-zone behavior remains unchanged. A companion module `src/lib/format.ts` exports locale-aware formatters — `formatDateShort` / `formatDateLong` / `formatDateTimeShort` (absolute) and `formatRelativeTime` (relative, via `date-fns` `formatDistanceToNow` + `localeMap`) — used where relative context aids comprehension: checkpoint due dates and student-dashboard upcoming deadlines append parenthesized relative time (e.g., "Mar 5, 2026 (in 3 days)"), and SLA badges expose relative time as a `title` tooltip across all variants. | `formatDate(item.createdAt, locale, 'short', timeZone)`, `formatDateShort(checkpoint.dueDate, locale, timeZone)`, `formatRelativeTime(date, locale)` |
 | **Email templates** | 8 localized HTML template builders in `src/lib/email-templates.ts` + shared header/footer helpers. All user input HTML-escaped. Subjects via i18n keys (`emails.subjects.*`) prefixed `[SIMAK]`. | Resend email body in `en` or `id` |
 
 ### Files

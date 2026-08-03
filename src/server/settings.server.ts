@@ -1,10 +1,11 @@
 // Server-only handlers for settings
 import { getSessionFromHeaders } from './auth';
 import { getDb } from '@/db/index';
-import { users } from '@/db/schema/users';
+import { users, type UserSettings } from '@/db/schema/users';
 import { eq } from 'drizzle-orm';
 import { generateFileKey, generatePresignedUploadUrl } from '@/lib/storage';
 import { serverError, ErrorCode } from '@/lib/errors';
+import { isValidTimeZone } from '@/lib/timezone';
 import type { z } from 'zod';
 import type {
   UpdateProfileSchema,
@@ -23,6 +24,17 @@ const SUPPORTED_IMAGE_TYPES: Record<string, string> = {
   gif: 'image/gif',
   webp: 'image/webp',
 };
+
+function normalizeUserSettings(settings: UserSettings | null | undefined): UserSettings | null {
+  if (!settings) return null;
+
+  const normalizedSettings = { ...settings };
+  if (normalizedSettings.timezone !== undefined && !isValidTimeZone(normalizedSettings.timezone)) {
+    delete normalizedSettings.timezone;
+  }
+
+  return normalizedSettings;
+}
 
 export async function updateProfileHandler(args: { data: UpdateProfileInput }) {
   const session = await getSessionFromHeaders();
@@ -93,7 +105,7 @@ export async function getCurrentUserHandler() {
 
     return {
       user: { id: user.id, name: record.name, email: record.email, image: record.image },
-      settings: record.settings ?? null,
+      settings: normalizeUserSettings(record.settings),
     };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
@@ -116,7 +128,7 @@ export async function updateUserSettingsHandler(args: { data: UpdateUserSettings
       .select({ settings: users.settings })
       .from(users)
       .where(eq(users.id, user.id));
-    const existingSettings = existing?.settings ?? { reducedMotion: false };
+    const existingSettings = normalizeUserSettings(existing?.settings) ?? { reducedMotion: false };
     const mergedSettings = { ...existingSettings, ...args.data };
 
     const [updated] = await db

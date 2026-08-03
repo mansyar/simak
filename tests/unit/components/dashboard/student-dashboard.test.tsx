@@ -154,7 +154,7 @@ describe('StudentDashboard - shared formatDate (UX-20)', () => {
         }}
       />,
     );
-    expect(mockFormatDate).toHaveBeenCalledWith(dueDate, 'en', 'short');
+    expect(mockFormatDate).toHaveBeenCalledWith(dueDate, 'en', 'short', 'UTC');
   });
 
   it('uses formatDate for consultation reminders with locale and short style', async () => {
