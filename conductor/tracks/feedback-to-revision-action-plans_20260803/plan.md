@@ -32,11 +32,11 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Run `pnpm db:push` against the development database.
   - [x] Verify the table and constraints exist in the database.
 
-- [ ] Task: Phase Verification & Checkpoint — database schema.
-  - [ ] Run the focused schema tests and confirm the Red-to-Green transition.
-  - [ ] Verify migration application and rollback SQL.
-  - [ ] Review changed schema files for file limits, formatting, and `git diff --check`.
-  - [ ] Complete the workflow’s manual verification and attach the required git note after the functional commit.
+- [~] Task: Phase Verification & Checkpoint — database schema.
+  - [~] Run the focused schema tests and confirm the Red-to-Green transition.
+  - [~] Verify migration application and rollback SQL.
+  - [~] Review changed schema files for file limits, formatting, and `git diff --check`.
+  - [~] Complete the workflow’s manual verification and attach the required git note after the functional commit.
 
 ## Phase 2: Validation, Review Transaction & Server Data
 
