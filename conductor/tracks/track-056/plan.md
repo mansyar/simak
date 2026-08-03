@@ -26,14 +26,14 @@ Commit SHA: b26cb61
 
 ### 1.2 Apply the consistent remote-search interaction
 
-- [ ] Update `src/components/admin/email-queue/EmailQueueFilters.tsx` and `src/components/admin/templates/TemplateFilters.tsx` to use local input state and the existing debounce pattern instead of navigating on every keystroke.
-- [ ] Verify and align `src/components/admin/users/UserFilters.tsx`, `src/components/instructor/assignments/AssignmentFilters.tsx`, `src/components/student/assignments/StudentAssignmentFilters.tsx`, and `src/routes/_authenticated/admin/audit-log.tsx` with the same 300 ms, immediate-clear, prop-sync, and page-reset contract.
-- [ ] Update the affected route loaders/navigation handlers in `src/routes/_authenticated/admin/users/index.tsx`, `src/routes/_authenticated/admin/templates/index.tsx`, `src/routes/_authenticated/admin/email-queue.tsx`, `src/routes/_authenticated/instructor/assignments/index.tsx`, and `src/routes/_authenticated/student/assignments/index.tsx` only as needed to consume committed search values and preserve existing filters.
-- [ ] Configure the affected TanStack Query consumers to retain the previous result while a settled search is loading where supported, without allowing an older result to replace the current key.
-- [ ] Run focused component and route tests, then verify the green phase and coverage before committing.
-- [ ] Commit the completed task, attach a git note, and record the seven-character SHA below.
+- [x] Update `src/components/admin/email-queue/EmailQueueFilters.tsx` and `src/components/admin/templates/TemplateFilters.tsx` to use local input state and the existing debounce pattern instead of navigating on every keystroke.
+- [x] Verify and align `src/components/admin/users/UserFilters.tsx`, `src/components/instructor/assignments/AssignmentFilters.tsx`, `src/components/student/assignments/StudentAssignmentFilters.tsx`, and `src/routes/_authenticated/admin/audit-log.tsx` with the same 300 ms, immediate-clear, prop-sync, and page-reset contract.
+- [x] Update the affected route loaders/navigation handlers in `src/routes/_authenticated/admin/users/index.tsx`, `src/routes/_authenticated/admin/templates/index.tsx`, `src/routes/_authenticated/admin/email-queue.tsx`, `src/routes/_authenticated/instructor/assignments/index.tsx`, and `src/routes/_authenticated/student/assignments/index.tsx` only as needed to consume committed search values and preserve existing filters.
+- [x] Configure the affected TanStack Query consumers to retain the previous result while a settled search is loading where supported, without allowing an older result to replace the current key.
+- [x] Run focused component and route tests, then verify the green phase and coverage before committing.
+- [x] Commit the completed task, attach a git note, and record the seven-character SHA below.
 
-Commit SHA: _pending_
+Commit SHA: 4613bea
 
 ### 1.3 Optimize local picker filtering without adding requests
 
