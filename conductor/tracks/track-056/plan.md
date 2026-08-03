@@ -1,0 +1,180 @@
+# TRACK-056 — Search Bar Performance Implementation Plan
+
+## Plan Rules
+
+- Execute tasks in the listed order; do not begin a later task while an earlier task is incomplete.
+- Before each task, change its status from `[ ]` to `[~]`.
+- For every behavior change, write focused failing tests first, run the red phase, implement the minimum change, run the green phase, and then refactor only when covered.
+- Complete the project's quality gates before marking a task complete.
+- After each task, commit the related changes using the required commit format, attach a git note with the task summary, record the first seven characters of the commit SHA here, and commit the plan update separately.
+- Keep the existing authorization, filters, ordering, pagination, i18n, accessibility behavior, and server-function split intact.
+- If implementation requires a tech-stack change, stop and update `conductor/tech-stack.md` with a dated rationale before continuing.
+
+## Phase 1: Client Search Interaction and Rendering
+
+### 1.1 Establish regression tests for the remote-search contract
+
+- [ ] Extend `tests/unit/hooks/use-debounced-callback.test.ts` with fake-timer coverage for the 300 ms delay, last-value-wins behavior, cleanup, and immediate clear/cancel behavior required by the search inputs.
+- [ ] Extend the existing filter tests and add focused tests for `EmailQueueFilters` and `TemplateFilters` covering immediate visible input updates, one parent callback after 300 ms of inactivity, prop-to-local synchronization, and immediate clearing.
+- [ ] Add or extend route/component tests for admin users, admin templates, admin email queue, admin audit log, instructor assignments, and student assignments to verify that search changes reset the page and do not navigate once per keystroke.
+- [ ] Add focused tests for `FeedbackSnippetsPage` and `FeedbackSnippetPicker` covering debounced query state, stale search values, retained prior results, loading, empty, and error states.
+- [ ] Run the focused tests and confirm the new tests fail before implementation (red phase).
+- [ ] Implement the smallest client changes needed for the tests to pass (green phase), then rerun focused coverage.
+- [ ] Commit the completed task with a `test(...)` or `fix(...)` message, attach the task git note, and record the seven-character SHA below.
+
+Commit SHA: _pending_
+
+### 1.2 Apply the consistent remote-search interaction
+
+- [ ] Update `src/components/admin/email-queue/EmailQueueFilters.tsx` and `src/components/admin/templates/TemplateFilters.tsx` to use local input state and the existing debounce pattern instead of navigating on every keystroke.
+- [ ] Verify and align `src/components/admin/users/UserFilters.tsx`, `src/components/instructor/assignments/AssignmentFilters.tsx`, `src/components/student/assignments/StudentAssignmentFilters.tsx`, and `src/routes/_authenticated/admin/audit-log.tsx` with the same 300 ms, immediate-clear, prop-sync, and page-reset contract.
+- [ ] Update the affected route loaders/navigation handlers in `src/routes/_authenticated/admin/users/index.tsx`, `src/routes/_authenticated/admin/templates/index.tsx`, `src/routes/_authenticated/admin/email-queue.tsx`, `src/routes/_authenticated/instructor/assignments/index.tsx`, and `src/routes/_authenticated/student/assignments/index.tsx` only as needed to consume committed search values and preserve existing filters.
+- [ ] Configure the affected TanStack Query consumers to retain the previous result while a settled search is loading where supported, without allowing an older result to replace the current key.
+- [ ] Run focused component and route tests, then verify the green phase and coverage before committing.
+- [ ] Commit the completed task, attach a git note, and record the seven-character SHA below.
+
+Commit SHA: _pending_
+
+### 1.3 Optimize local picker filtering without adding requests
+
+- [ ] Add failing component tests for `src/components/instructor/assignments/StudentPicker.tsx` and `src/components/instructor/assignments/TemplatePicker.tsx` proving that typing makes no server request, preserves current fetch caps and selection behavior, and avoids repeated normalization/membership work.
+- [ ] Memoize normalized student/template search fields and use efficient selection membership checks while preserving card layout, select-all behavior, keyboard behavior, and empty states.
+- [ ] Confirm `AssignmentWizard` continues to receive the same selected IDs/template data and that no user-facing strings are hardcoded.
+- [ ] Run focused picker and wizard tests, then commit the completed task with a git note and record the seven-character SHA below.
+
+Commit SHA: _pending_
+
+### Phase 1 Verification Checkpoint
+
+- [ ] Run the complete affected component/route test set with `pnpm vitest run` using the relevant test paths.
+- [ ] Run `pnpm typecheck` for the phase changes.
+- [ ] Manually verify that each remote input remains responsive while typing, that clearing is immediate, and that local pickers issue no per-keystroke network request.
+- [ ] Present the phase manual-verification steps to the user, await explicit confirmation, attach the verification report as a git note, record the checkpoint SHA in this plan, and commit the plan update.
+
+Phase checkpoint: _pending_
+
+## Phase 2: Server Workload and Result Contracts
+
+### 2.1 Bound feedback-snippet search results
+
+- [ ] Add failing server/component tests in `tests/unit/server/feedback-snippets.test.ts` and the relevant feedback-snippet component test for capped pagination, stable ordering, required filters, and a minimal list/picker projection.
+- [ ] Extend the schemas in `src/server/feedback-snippets.ts` with bounded page/limit inputs while preserving authorization and archived/instructor filters.
+- [ ] Update `src/server/feedback-snippets.server.ts` to apply a hard server-side limit, return pagination metadata, select only fields required by the list/picker, and preserve content insertion behavior without returning unrelated columns.
+- [ ] Update `src/lib/query-keys.ts`, `src/components/instructor/feedback-snippets/FeedbackSnippetsPage.tsx`, and `src/components/reviews/FeedbackSnippetPicker.tsx` to use committed search state, bounded results, retained previous data, and the existing loading/empty/error accessibility states.
+- [ ] Add any required i18n keys to both locale files, regenerate i18n types, run the focused tests, and commit with a git note and recorded SHA.
+
+Commit SHA: _pending_
+
+### 2.2 Remove redundant template and email-queue search work
+
+- [ ] Add failing handler/component tests covering query invocation boundaries, unchanged result shape, and independent type/status summaries in `tests/unit/server/templates.test.ts`, `tests/unit/server/email-queue.test.ts`, and the related route tests.
+- [ ] Refactor `src/server/templates.server.ts` and `src/server/templates.ts` so unrelated type options are cached/separated from search work and required checkpoint enrichment is performed in the minimum necessary query phases without changing the template result shape.
+- [ ] Refactor `src/server/email-queue.server.ts` and `src/server/email-queue.ts` so the unfiltered status summary is not recomputed for every search term; preserve status filtering, pagination, and summary values in `src/routes/_authenticated/admin/email-queue.tsx`.
+- [ ] Update `src/routes/_authenticated/admin/templates/index.tsx` and `src/lib/query-keys.ts` as needed to give stable data independent of the committed search value its own cache boundary.
+- [ ] Run focused server/route tests and verify that the red/green query-workload assertions pass before committing with a git note and recorded SHA.
+
+Commit SHA: _pending_
+
+### 2.3 Preserve and correct user, assignment, and audit search handlers
+
+- [ ] Add failing non-empty-search tests to the existing users, assignments, and audit-log server test suites, including authorization, filters, pagination, ordering, enrichment, and stale/empty result behavior.
+- [ ] Review `src/server/users.server.ts`, `src/server/assignments.server.ts`, `src/server/assignments-extras.server.ts`, and `src/server/audit-log.server.ts` for redundant fetch layers and preserve the existing response contracts while reducing avoidable work.
+- [ ] Make audit-log search type-correct by explicitly searching a text representation or targeted JSON fields for `details`, while retaining entity ID matching and existing action/date/entity/actor filters.
+- [ ] Ensure the admin users loader and React Query consumer do not cause redundant requests for the same committed search state, while retaining the current cache freshness behavior.
+- [ ] Run the focused server tests and commit the completed task with a git note and recorded SHA.
+
+Commit SHA: _pending_
+
+### Phase 2 Verification Checkpoint
+
+- [ ] Run all affected unit tests for server handlers, query keys, filters, routes, feedback snippets, and pickers.
+- [ ] Run `pnpm typecheck`, `pnpm lint`, and the relevant modularity check for changed files.
+- [ ] Verify representative responses preserve existing filters, authorization, ordering, pagination, empty states, and error states.
+- [ ] Present manual verification steps for network request counts and retained-result transitions, await explicit confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
+
+Phase checkpoint: _pending_
+
+## Phase 3: PostgreSQL Trigram Search Support
+
+### 3.1 Define migration and schema regression tests
+
+- [ ] Add failing database/schema tests for the `pg_trgm` extension and required search index names/definitions covering users, templates, email queue, assignments, feedback snippets, and audit-log entity/details text.
+- [ ] Verify the migration is compatible with the project's PostgreSQL 16 environment and does not alter existing data, permissions, or non-search indexes.
+- [ ] Commit the red-phase tests only if they form a separately useful test task; otherwise keep them with the migration task and document the red phase in the task note.
+
+Commit SHA: _pending_
+
+### 3.2 Add the reversible search-index migration
+
+- [ ] Create the next Drizzle migration and rollback under `drizzle/migrations/` to enable `pg_trgm` and add trigram support for `users.name`, `users.email`, `assignment_templates.name`, `email_queue.recipient_email`, `email_queue.subject`, `assignments.title`, `feedback_snippets.title`, `feedback_snippets.category`, `audit_log.entity_id`, and the searched text form of `audit_log.details`.
+- [ ] Represent index metadata in the Drizzle schema where supported; use explicit SQL for expression indexes such as JSONB-to-text search and document the reason for any schema limitation.
+- [ ] Add safe rollback statements for the indexes and extension, accounting for extension ownership/dependencies.
+- [ ] Run migration/schema tests, `pnpm db:generate` if schema declarations require generation, and the focused database tests before committing with a git note and recorded SHA.
+
+Commit SHA: _pending_
+
+### 3.3 Verify index-backed query plans
+
+- [ ] Add or extend an opt-in integration test/procedure under `tests/integration/` that runs representative `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` searches against a configured PostgreSQL database.
+- [ ] Verify non-empty searches for every indexed search family use the intended trigram indexes at realistic row counts and that the audit JSONB predicate is type-correct.
+- [ ] Record the query-plan evidence and any environment limitations in the plan and attach it to the task git note.
+- [ ] Commit the completed task and record the seven-character SHA below.
+
+Commit SHA: _pending_
+
+### Phase 3 Verification Checkpoint
+
+- [ ] Apply the migration to a configured PostgreSQL 16 database and verify both forward migration and rollback behavior.
+- [ ] Run the database/schema unit tests and opt-in integration/query-plan verification.
+- [ ] Confirm no existing non-search indexes or application data were changed.
+- [ ] Present the database verification results to the user, await explicit confirmation, attach the checkpoint report as a git note, record the checkpoint SHA, and commit the plan update.
+
+Phase checkpoint: _pending_
+
+## Phase 4: Full Regression, Browser Verification, and Completion
+
+### 4.1 Run project quality gates
+
+- [ ] Run `pnpm generate:i18n` and `pnpm check:i18n` after all locale/schema changes.
+- [ ] Run `pnpm typecheck`.
+- [ ] Run `pnpm lint`.
+- [ ] Run `pnpm test:coverage` and confirm the project thresholds and new-code coverage requirements are met.
+- [ ] Run the staged-file modularity check and confirm every changed file remains under the 500-line limit.
+- [ ] Run formatting with the repository's configured formatter and review the resulting diff.
+
+Commit SHA: _pending_
+
+### 4.2 Verify authenticated user flows
+
+- [ ] Run the relevant Playwright tests with the configured authenticated environment, or document the exact environment blocker if the required database/auth services are unavailable.
+- [ ] In an authenticated browser session, rapidly type into every remote search surface and confirm immediate input feedback, one settled update after 300 ms, no stale result replacement, and retained prior results while loading.
+- [ ] Confirm clearing each search immediately resets the visible value and page to 1.
+- [ ] Confirm StudentPicker and TemplatePicker remain local-only, preserve selected values, and remain usable on the supported responsive layouts.
+- [ ] Confirm loading, empty, error, labels, keyboard/focus behavior, i18n, and authorization behavior remain intact.
+- [ ] Attach the manual verification report to the last functional commit after explicit user confirmation.
+
+Commit SHA: _pending_
+
+### 4.3 Finalize the track
+
+- [ ] Review the complete diff against `spec.md`, including migration rollback, tests, i18n output, and query-plan evidence.
+- [ ] Update this plan with every completed task SHA, phase checkpoint SHA, implementation notes, and any approved deviations.
+- [ ] Ensure `metadata.json` status and `updatedAt` reflect the final track state only after implementation and review are complete.
+- [ ] Run `conductor-review` before marking the track complete.
+- [ ] Confirm the active registry entry remains linked to `conductor/tracks/track-056/index.md` until review/archive.
+
+Commit SHA: _pending_
+
+### Phase 4 Verification Checkpoint
+
+- [ ] Confirm all acceptance criteria in `spec.md` are satisfied.
+- [ ] Confirm all quality gates pass and all task/phase SHA references are recorded.
+- [ ] Present the final verification summary and await explicit user confirmation before final track status/archive changes.
+
+Phase checkpoint: _pending_
+
+## Implementation Notes
+
+- The expected database migration is the next migration after the current `0020` series; use the repository's migration generator/naming conventions rather than hard-coding a generated name in advance.
+- No new runtime dependency is planned. PostgreSQL `pg_trgm` is an extension supplied by the existing PostgreSQL deployment.
+- If query-plan verification cannot run because no representative database is available, stop before claiming completion and record the exact blocker and required command.
