@@ -18,12 +18,12 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Verify stable ordering and indexes supporting review-history/current-plan reads.
   - [x] Verify the schema and relations are re-exported through `src/db/schema/index.ts`.
 
-- [~] Task: Implement the revision action-item schema.
-  - [~] Create `src/db/schema/revision-action-items.ts` using the existing Drizzle conventions.
-  - [~] Add the review reference, plain-text item field, stable order, optional criterion link, criterion-title snapshot, addressed timestamp, and timestamps.
-  - [~] Add indexes for review/order and current status lookup.
-  - [~] Re-export the schema and any required relations from `src/db/schema/index.ts`.
-  - [~] Keep historical rows and snapshots valid when rubric definitions are later edited or soft-deleted.
+- [x] Task: Implement the revision action-item schema [be6c7a3]
+  - [x] Create `src/db/schema/revision-action-items.ts` using the existing Drizzle conventions.
+  - [x] Add the review reference, plain-text item field, stable order, optional criterion link, criterion-title snapshot, addressed timestamp, and timestamps.
+  - [x] Add indexes for review/order and current status lookup.
+  - [x] Re-export the schema and any required relations from `src/db/schema/index.ts`.
+  - [x] Keep historical rows and snapshots valid when rubric definitions are later edited or soft-deleted.
 
 - [ ] Task: Generate and apply the database migration.
   - [ ] Run `pnpm db:generate`.
