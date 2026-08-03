@@ -276,7 +276,7 @@
 - [x] Include assignment final-deadline events for active assignments with any non-passed checkpoint, including checkpoints without due dates.
 - [x] Bound the process-local calendar rate-limit store and stop using client-supplied forwarding headers as rate-limit identity.
 - [x] Narrow nullable checkpoint due dates before creating checkpoint events.
-- **Evidence:** Targeted selection, route, and rate-limiter tests passed (3 files, 23 tests); targeted formatting, oxlint, and typecheck passed. The full unit run passed 415/416 files and 4,138/4,139 tests, with one instructor-route import test timing out.
+- **Evidence:** Targeted selection, route, and rate-limiter tests passed (3 files, 23 tests); targeted formatting, oxlint, and typecheck passed. The post-review full unit run passed 416/416 files and 4,141/4,141 tests; an earlier run had one transient instructor-route import timeout.
 - **Review fix commit:** `19ff889`
 
 ## Definition of Done
