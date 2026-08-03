@@ -6,10 +6,10 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Persist immutable, review-owned action items with rubric snapshots and reversible addressed state.
 
-- [~] Task: Re-read the approved `spec.md` and `conductor/workflow.md`.
-  - [~] Confirm the optional Revise-only lifecycle, 10-item/500-character limits, immutable fields, current-plan rules, and authorization boundaries.
-  - [~] Confirm migration, rollback, TDD, coverage, file-size, commit, and git-note requirements.
-  - [~] Inspect existing `reviews`, `review_scores`, `rubric_criteria`, audit, and migration conventions before changing schema code.
+- [x] Task: Re-read the approved `spec.md` and `conductor/workflow.md` [82a671c]
+  - [x] Confirm the optional Revise-only lifecycle, 10-item/500-character limits, immutable fields, current-plan rules, and authorization boundaries.
+  - [x] Confirm migration, rollback, TDD, coverage, file-size, commit, and git-note requirements.
+  - [x] Inspect existing `reviews`, `review_scores`, `rubric_criteria`, audit, and migration conventions before changing schema code.
 
 - [ ] Task: Write failing schema tests in `tests/unit/db/schema/revision-action-items.test.ts`.
   - [ ] Verify the `revisionActionItems` table export and required columns.
