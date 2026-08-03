@@ -118,7 +118,7 @@ export async function getLatestReviewHandler(args: { data: GetLatestReviewInput 
       .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
       .innerJoin(users, eq(reviews.instructorId, users.id))
       .where(eq(submissions.checkpointId, checkpointId))
-      .orderBy(desc(reviews.createdAt))
+      .orderBy(desc(reviews.createdAt), desc(reviews.id))
       .limit(1);
 
     // Fetch review_scores (denormalized snapshot) for the latest review
@@ -167,7 +167,7 @@ export async function getLatestReviewHandler(args: { data: GetLatestReviewInput 
       .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
       .innerJoin(users, eq(reviews.instructorId, users.id))
       .where(eq(submissions.checkpointId, checkpointId))
-      .orderBy(desc(reviews.createdAt));
+      .orderBy(desc(reviews.createdAt), desc(reviews.id));
 
     const historyActionItems = reviewHistory.length
       ? await db
@@ -281,7 +281,7 @@ export async function getReviewDetailHandler(args: { data: GetReviewDetailInput 
       .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
       .innerJoin(users, eq(reviews.instructorId, users.id))
       .where(eq(submissions.checkpointId, submission.checkpointId))
-      .orderBy(desc(reviews.createdAt));
+      .orderBy(desc(reviews.createdAt), desc(reviews.id));
 
     const actionItems = reviewHistory.length
       ? await db

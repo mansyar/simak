@@ -389,4 +389,28 @@ describe('revision action items against PostgreSQL', () => {
       await updateRevisionActionItemHandler({ data: { itemId: planItem.id, addressed: true } }),
     ).toEqual({ success: true });
   });
+
+  it('uses review id as the newest-plan tie-breaker when timestamps match', async () => {
+    const createdAt = new Date('2026-04-01T00:00:00Z');
+    const firstReviewId = await createReview(rubricSubmissionId, createdAt, 'First same-time plan');
+    const secondReviewId = await createReview(
+      rubricSubmissionId,
+      createdAt,
+      'Second same-time plan',
+    );
+    await db.insert(revisionActionItems).values([
+      { reviewId: firstReviewId, itemText: 'Older same-time item', order: 0 },
+      { reviewId: secondReviewId, itemText: 'Newer same-time item', order: 0 },
+    ]);
+
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+      user: { id: studentId, name: 'Revision Plan Student', role: 'student', locale: 'en' },
+      session: {} as any,
+    } as any);
+    const latest = await getLatestReviewHandler({ data: { checkpointId: rubricCheckpointId } });
+    expect(latest).toMatchObject({
+      review: { id: secondReviewId, comment: 'Second same-time plan' },
+      actionItems: [{ itemText: 'Newer same-time item' }],
+    });
+  });
 });
