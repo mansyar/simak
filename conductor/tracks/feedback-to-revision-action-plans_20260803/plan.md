@@ -167,14 +167,14 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Enrich the existing Revise action with unresolved current-plan context without introducing a second task system or changing waiting-state behavior.
 
-- [ ] Task: Write failing resolver and dashboard tests.
-  - [ ] Extend `tests/unit/lib/student-next-actions.test.ts` for unresolved current-plan data on Revise candidates.
-  - [ ] Verify addressed items are excluded from unresolved context.
-  - [ ] Verify only the newest current plan contributes items; historical plans are ignored by the resolver.
-  - [ ] Verify no-plan and all-addressed behavior preserves the existing Revise action contract.
-  - [ ] Extend `tests/unit/server/dashboard-student-next-actions.test.ts` for authorized batch loading, repeated revisions, resubmission, and cross-student isolation.
-  - [ ] Verify submitted and under-review checkpoints remain waiting summaries and do not expose action-plan items as primary actions.
-  - [ ] Extend `tests/unit/components/dashboard/StudentNextActions.test.tsx` for localized unresolved-plan context, display limits, empty states, and accessible links.
+- [~] Task: Write failing resolver and dashboard tests.
+  - [~] Extend `tests/unit/lib/student-next-actions.test.ts` for unresolved current-plan data on Revise candidates.
+  - [~] Verify addressed items are excluded from unresolved context.
+  - [~] Verify only the newest current plan contributes items; historical plans are ignored by the resolver.
+  - [~] Verify no-plan and all-addressed behavior preserves the existing Revise action contract.
+  - [~] Extend `tests/unit/server/dashboard-student-next-actions.test.ts` for authorized batch loading, repeated revisions, resubmission, and cross-student isolation.
+  - [~] Verify submitted and under-review checkpoints remain waiting summaries and do not expose action-plan items as primary actions.
+  - [~] Extend `tests/unit/components/dashboard/StudentNextActions.test.tsx` for localized unresolved-plan context, display limits, empty states, and accessible links.
 
 - [ ] Task: Extend the resolver contract and dashboard query assembly.
   - [ ] Add the smallest action-plan summary needed to `StudentActionCandidate` and `StudentNextAction`.
