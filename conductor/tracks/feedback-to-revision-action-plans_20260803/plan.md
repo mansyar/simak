@@ -53,19 +53,19 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Test notification reuse and audit details that omit full action-item text.
   - [x] Test student, instructor, cross-student, and cross-instructor access boundaries.
 
-- [~] Task: Implement client-safe validation and status-function stubs.
-  - [~] Extend `SubmitReviewSchema` in `src/server/reviews.ts` with the optional ordered action-item input.
-  - [~] Preserve the existing dynamic import and typed server-function pattern.
-  - [~] Create `src/server/revision-action-items.ts` with the addressed-status schema and client-safe mutation stub.
-  - [~] Apply the project’s appropriate read/mutation rate-limit middleware.
+- [x] Task: Implement client-safe validation and status-function stubs [59767f9]
+  - [x] Extend `SubmitReviewSchema` in `src/server/reviews.ts` with the optional ordered action-item input.
+  - [x] Preserve the existing dynamic import and typed server-function pattern.
+  - [x] Create `src/server/revision-action-items.ts` with the addressed-status schema and client-safe mutation stub.
+  - [x] Apply the project’s appropriate read/mutation rate-limit middleware.
 
-- [ ] Task: Implement server-only action-item helpers and addressed-status handler.
-  - [ ] Create `src/server/revision-action-items.server.ts` for reusable action-item reads, transaction insertion, current-plan resolution, and status mutation.
-  - [ ] Validate that linked criteria belong to the reviewed checkpoint’s rubric and snapshot the criterion title.
-  - [ ] Insert items in the caller’s existing review transaction rather than opening a second transaction.
-  - [ ] For status changes, verify the authenticated student owns the checkpoint and the item belongs to the current non-superseded plan.
-  - [ ] Lock/recheck the relevant review/checkpoint state before updating `addressedAt` so a superseding review cannot race with a status mutation.
-  - [ ] Allow only the owning student to mark or unmark; make instructor reads read-only.
+- [~] Task: Implement server-only action-item helpers and addressed-status handler.
+  - [~] Create `src/server/revision-action-items.server.ts` for reusable action-item reads, transaction insertion, current-plan resolution, and status mutation.
+  - [~] Validate that linked criteria belong to the reviewed checkpoint’s rubric and snapshot the criterion title.
+  - [~] Insert items in the caller’s existing review transaction rather than opening a second transaction.
+  - [~] For status changes, verify the authenticated student owns the checkpoint and the item belongs to the current non-superseded plan.
+  - [~] Lock/recheck the relevant review/checkpoint state before updating `addressedAt` so a superseding review cannot race with a status mutation.
+  - [~] Allow only the owning student to mark or unmark; make instructor reads read-only.
 
 - [ ] Task: Extend review submission atomically.
   - [ ] Update `submitReviewHandler` to validate action-item rules before any write.
