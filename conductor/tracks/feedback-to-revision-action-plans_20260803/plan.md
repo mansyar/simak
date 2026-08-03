@@ -67,19 +67,19 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Lock/recheck the relevant review/checkpoint state before updating `addressedAt` so a superseding review cannot race with a status mutation.
   - [x] Allow only the owning student to mark or unmark; make instructor reads read-only.
 
-- [~] Task: Extend review submission atomically.
-  - [~] Update `submitReviewHandler` to validate action-item rules before any write.
-  - [~] Insert action items after the review ID is created and alongside rubric scores inside the existing transaction.
-  - [~] Reject structured items for Pass while preserving all existing Pass/Revise, deadline, file, score, state-transition, and resubmission behavior.
-  - [~] Return the inserted review/action-plan metadata needed for post-commit audit logging.
-  - [~] Keep `src/server/reviews.server.ts` under 500 lines; extract action-item logic to the handler-only helper if necessary.
+- [x] Task: Extend review submission atomically [1558ecb]
+  - [x] Update `submitReviewHandler` to validate action-item rules before any write.
+  - [x] Insert action items after the review ID is created and alongside rubric scores inside the existing transaction.
+  - [x] Reject structured items for Pass while preserving all existing Pass/Revise, deadline, file, score, state-transition, and resubmission behavior.
+  - [x] Return the inserted review/action-plan metadata needed for post-commit audit logging.
+  - [x] Keep `src/server/reviews.server.ts` under 500 lines; extract action-item logic to the handler-only helper if necessary.
 
-- [ ] Task: Extend instructor and student review reads.
-  - [ ] Extend `getReviewDetailHandler` to return action items grouped by review in stable order.
-  - [ ] Extend `getLatestReviewHandler` with current/latest action items and the review-history action-item data needed by the student checkpoint page.
-  - [ ] Batch-load action items by review IDs to avoid N+1 queries.
-  - [ ] Preserve all existing response fields for current callers.
-  - [ ] Preserve criterion/title snapshots when rubric criteria change.
+- [~] Task: Extend instructor and student review reads.
+  - [~] Extend `getReviewDetailHandler` to return action items grouped by review in stable order.
+  - [~] Extend `getLatestReviewHandler` with current/latest action items and the review-history action-item data needed by the student checkpoint page.
+  - [~] Batch-load action items by review IDs to avoid N+1 queries.
+  - [~] Preserve all existing response fields for current callers.
+  - [~] Preserve criterion/title snapshots when rubric criteria change.
 
 - [ ] Task: Add audit records and preserve notification behavior.
   - [ ] Record action-plan creation with review/checkpoint references and item count, without full item text.
