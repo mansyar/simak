@@ -254,9 +254,9 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
   Final review finding fixed in `b5dd9fb`: a later comment-only Revise review must not supersede an existing action plan; the current-plan mutation query now requires a newer Revise review to contain action items, with PostgreSQL regression coverage.
 
-- [ ] Task: Phase Verification & Checkpoint — final quality and readiness.
-  - [ ] Complete the workflow’s manual verification plan and obtain explicit user confirmation.
-  - [ ] Attach the final verification report as a git note to the functional commit.
-  - [ ] Record the final phase checkpoint SHA in `plan.md`.
-  - [ ] Mark implementation tasks complete only after their corresponding commits and verification are recorded.
-  - [ ] Prepare the track for `conductor-review`.
+- [~] Task: Phase Verification & Checkpoint — final quality and readiness.
+  - [~] Complete the workflow’s manual verification plan and obtain explicit user confirmation.
+  - [~] Attach the final verification report as a git note to the functional commit.
+  - [~] Record the final phase checkpoint SHA in `plan.md`.
+  - [~] Mark implementation tasks complete only after their corresponding commits and verification are recorded.
+  - [~] Prepare the track for `conductor-review`.
