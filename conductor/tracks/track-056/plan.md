@@ -14,15 +14,15 @@
 
 ### 1.1 Establish regression tests for the remote-search contract
 
-- [ ] Extend `tests/unit/hooks/use-debounced-callback.test.ts` with fake-timer coverage for the 300 ms delay, last-value-wins behavior, cleanup, and immediate clear/cancel behavior required by the search inputs.
-- [ ] Extend the existing filter tests and add focused tests for `EmailQueueFilters` and `TemplateFilters` covering immediate visible input updates, one parent callback after 300 ms of inactivity, prop-to-local synchronization, and immediate clearing.
-- [ ] Add or extend route/component tests for admin users, admin templates, admin email queue, admin audit log, instructor assignments, and student assignments to verify that search changes reset the page and do not navigate once per keystroke.
-- [ ] Add focused tests for `FeedbackSnippetsPage` and `FeedbackSnippetPicker` covering debounced query state, stale search values, retained prior results, loading, empty, and error states.
-- [ ] Run the focused tests and confirm the new tests fail before implementation (red phase).
-- [ ] Implement the smallest client changes needed for the tests to pass (green phase), then rerun focused coverage.
-- [ ] Commit the completed task with a `test(...)` or `fix(...)` message, attach the task git note, and record the seven-character SHA below.
+- [x] Extend `tests/unit/hooks/use-debounced-callback.test.ts` with fake-timer coverage for the 300 ms delay, last-value-wins behavior, cleanup, and immediate clear/cancel behavior required by the search inputs.
+- [x] Extend the existing filter tests and add focused tests for `EmailQueueFilters` and `TemplateFilters` covering immediate visible input updates, one parent callback after 300 ms of inactivity, prop-to-local synchronization, and immediate clearing.
+- [x] Add or extend route/component tests for admin users, admin templates, admin email queue, admin audit log, instructor assignments, and student assignments to verify that search changes reset the page and do not navigate once per keystroke.
+- [x] Add focused tests for `FeedbackSnippetsPage` and `FeedbackSnippetPicker` covering debounced query state, stale search values, retained prior results, loading, empty, and error states.
+- [x] Run the focused tests and confirm the new tests fail before implementation (red phase).
+- [x] Implement the smallest client changes needed for the tests to pass (green phase), then rerun focused coverage.
+- [x] Commit the completed task with a `test(...)` or `fix(...)` message, attach the task git note, and record the seven-character SHA below.
 
-Commit SHA: _pending_
+Commit SHA: b26cb61
 
 ### 1.2 Apply the consistent remote-search interaction
 
