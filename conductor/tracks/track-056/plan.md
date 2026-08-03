@@ -37,12 +37,12 @@ Commit SHA: 4613bea
 
 ### 1.3 Optimize local picker filtering without adding requests
 
-- [ ] Add failing component tests for `src/components/instructor/assignments/StudentPicker.tsx` and `src/components/instructor/assignments/TemplatePicker.tsx` proving that typing makes no server request, preserves current fetch caps and selection behavior, and avoids repeated normalization/membership work.
-- [ ] Memoize normalized student/template search fields and use efficient selection membership checks while preserving card layout, select-all behavior, keyboard behavior, and empty states.
-- [ ] Confirm `AssignmentWizard` continues to receive the same selected IDs/template data and that no user-facing strings are hardcoded.
-- [ ] Run focused picker and wizard tests, then commit the completed task with a git note and record the seven-character SHA below.
+- [x] Add failing component tests for `src/components/instructor/assignments/StudentPicker.tsx` and `src/components/instructor/assignments/TemplatePicker.tsx` proving that typing makes no server request, preserves current fetch caps and selection behavior, and avoids repeated normalization/membership work.
+- [x] Memoize normalized student/template search fields and use efficient selection membership checks while preserving card layout, select-all behavior, keyboard behavior, and empty states.
+- [x] Confirm `AssignmentWizard` continues to receive the same selected IDs/template data and that no user-facing strings are hardcoded.
+- [x] Run focused picker and wizard tests, then commit the completed task with a git note and record the seven-character SHA below.
 
-Commit SHA: _pending_
+Commit SHA: c7c17a9 (follow-up: 8cff4ab)
 
 ### Phase 1 Verification Checkpoint
 
