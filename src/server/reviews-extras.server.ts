@@ -1,9 +1,10 @@
 // Server-only handlers for review auxiliary operations
-import { eq, and, desc, isNull } from 'drizzle-orm';
+import { eq, and, asc, desc, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, checkpoints } from '../db/schema/assignments';
 import { submissions, reviews } from '../db/schema/submissions';
 import { reviewScores } from '../db/schema/rubrics';
+import { revisionActionItems } from '../db/schema/revision-action-items';
 import { templateCheckpoints } from '../db/schema/templates';
 import { finalGrades } from '../db/schema/gradebook';
 import { users } from '../db/schema/users';
@@ -16,11 +17,14 @@ import { serverError, ErrorCode } from '../lib/errors';
 import { translateKey } from '../lib/i18n-server';
 import { isInstructor, isStudent } from '../lib/session-guards';
 import { logger } from '../lib/logger';
+import { generatePresignedDownloadUrl } from '../lib/storage';
+import { fetchRubric } from './rubrics.server';
 import type { z } from 'zod';
-import type { OpenForReviewSchema, GetLatestReviewSchema } from './reviews';
+import type { GetLatestReviewSchema, GetReviewDetailSchema, OpenForReviewSchema } from './reviews';
 
 type OpenForReviewInput = z.infer<typeof OpenForReviewSchema>;
 type GetLatestReviewInput = z.infer<typeof GetLatestReviewSchema>;
+type GetReviewDetailInput = z.infer<typeof GetReviewDetailSchema>;
 
 export async function openForReviewHandler(args: { data: OpenForReviewInput }) {
   const session = await getSessionFromHeaders();
@@ -134,11 +138,142 @@ export async function getLatestReviewHandler(args: { data: GetLatestReviewInput 
           .where(eq(reviewScores.reviewId, latestReview.id))
       : [];
 
-    return { review: latestReview ?? null, scores };
+    const actionItems = latestReview
+      ? await db
+          .select({
+            id: revisionActionItems.id,
+            itemText: revisionActionItems.itemText,
+            order: revisionActionItems.order,
+            criterionId: revisionActionItems.criterionId,
+            criterionTitle: revisionActionItems.criterionTitle,
+            addressedAt: revisionActionItems.addressedAt,
+          })
+          .from(revisionActionItems)
+          .where(eq(revisionActionItems.reviewId, latestReview.id))
+          .orderBy(asc(revisionActionItems.order), asc(revisionActionItems.id))
+      : [];
+
+    return { review: latestReview ?? null, scores, actionItems };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
       handler: 'getLatestReviewHandler',
+    });
+  }
+}
+
+/**
+ * Get instructor review detail with submission metadata, rubric, and review history.
+ * Pure GET — does not mutate state.
+ */
+export async function getReviewDetailHandler(args: { data: GetReviewDetailInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isInstructor(session)) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const { submissionId } = args.data;
+  const db = getDb();
+
+  try {
+    const [submission] = await db
+      .select({
+        submissionId: submissions.id,
+        checkpointId: checkpoints.id,
+        checkpointName: checkpoints.name,
+        assignmentId: assignments.id,
+        assignmentTitle: assignments.title,
+        instructorId: assignments.instructorId,
+        studentId: checkpoints.studentId,
+        studentName: users.name,
+        fileKey: submissions.fileKey,
+        fileName: submissions.fileName,
+        fileSize: submissions.fileSize,
+        version: submissions.version,
+        uploadedAt: submissions.uploadedAt,
+        checkpointState: checkpoints.state,
+        checkpointUpdatedAt: checkpoints.updatedAt,
+        templateCheckpointId: checkpoints.templateCheckpointId,
+      })
+      .from(submissions)
+      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+      .innerJoin(users, eq(checkpoints.studentId, users.id))
+      .where(
+        and(
+          eq(submissions.id, submissionId),
+          eq(assignments.instructorId, session.user.id),
+          isNull(assignments.deletedAt),
+        ),
+      )
+      .limit(1);
+
+    if (!submission) {
+      return serverError(ErrorCode.NOT_FOUND, 'Submission not found');
+    }
+
+    const downloadUrl = await generatePresignedDownloadUrl({ key: submission.fileKey });
+    const reviewHistory = await db
+      .select({
+        id: reviews.id,
+        decision: reviews.decision,
+        comment: reviews.comment,
+        instructorName: users.name,
+        createdAt: reviews.createdAt,
+      })
+      .from(reviews)
+      .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
+      .innerJoin(users, eq(reviews.instructorId, users.id))
+      .where(eq(submissions.checkpointId, submission.checkpointId))
+      .orderBy(desc(reviews.createdAt));
+
+    const actionItems = reviewHistory.length
+      ? await db
+          .select({
+            id: revisionActionItems.id,
+            reviewId: revisionActionItems.reviewId,
+            itemText: revisionActionItems.itemText,
+            order: revisionActionItems.order,
+            criterionId: revisionActionItems.criterionId,
+            criterionTitle: revisionActionItems.criterionTitle,
+            addressedAt: revisionActionItems.addressedAt,
+          })
+          .from(revisionActionItems)
+          .where(
+            inArray(
+              revisionActionItems.reviewId,
+              reviewHistory.map((review) => review.id),
+            ),
+          )
+          .orderBy(
+            asc(revisionActionItems.reviewId),
+            asc(revisionActionItems.order),
+            asc(revisionActionItems.id),
+          )
+      : [];
+    const actionItemsByReview = new Map<number, typeof actionItems>();
+    for (const actionItem of actionItems) {
+      const items = actionItemsByReview.get(actionItem.reviewId) ?? [];
+      items.push(actionItem);
+      actionItemsByReview.set(actionItem.reviewId, items);
+    }
+    const reviewHistoryWithItems = reviewHistory.map((review) => ({
+      ...review,
+      actionItems: actionItemsByReview.get(review.id) ?? [],
+    }));
+
+    const rubric = submission.templateCheckpointId
+      ? await fetchRubric(db, submission.templateCheckpointId)
+      : null;
+    return {
+      submission: { ...submission, downloadUrl },
+      reviewHistory: reviewHistoryWithItems,
+      rubric,
+    };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getReviewDetailHandler',
     });
   }
 }
