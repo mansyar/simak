@@ -81,12 +81,12 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Preserve all existing response fields for current callers.
   - [x] Preserve criterion/title snapshots when rubric criteria change.
 
-- [~] Task: Add audit records and preserve notification behavior.
-  - [~] Record action-plan creation with review/checkpoint references and item count, without full item text.
-  - [~] Record addressed and unaddressed transitions with item/review references and new status.
-  - [~] Use advisory audit logging conventions so audit failures do not fail a successful review or status mutation.
-  - [~] Continue emitting the existing `revision_requested` notification exactly once for Revise reviews.
-  - [~] Do not add a new notification event type or per-item notifications.
+- [x] Task: Add audit records and preserve notification behavior [1558ecb, 36ea20d]
+  - [x] Record action-plan creation with review/checkpoint references and item count, without full item text.
+  - [x] Record addressed and unaddressed transitions with item/review references and new status.
+  - [x] Use advisory audit logging conventions so audit failures do not fail a successful review or status mutation.
+  - [x] Continue emitting the existing `revision_requested` notification exactly once for Revise reviews.
+  - [x] Do not add a new notification event type or per-item notifications.
 
 - [ ] Task: Phase Verification & Checkpoint — server and transaction layer.
   - [ ] Run focused schema, review-schema, review-handler, action-item, and review-extra tests.
