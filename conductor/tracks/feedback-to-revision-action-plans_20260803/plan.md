@@ -198,15 +198,15 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
 
 **Objective:** Verify complete instructor-to-student revision cycles and security boundaries against a real database and browser.
 
-- [ ] Task: Write failing integration and E2E tests.
-  - [ ] Add `tests/integration/server/revision-action-plans.test.ts` with the Node test environment.
-  - [ ] Cover migration-backed insert/read/update behavior, transaction rollback, rubric/no-rubric validation, repeated revisions, supersession, resubmission, and addressed reversal.
-  - [ ] Cover student/instructor ownership and cross-user denial through real handler calls.
-  - [ ] Add `tests/e2e/revision-action-plans.spec.ts`.
-  - [ ] Cover instructor creation of a Revise plan, student visibility/toggling, Next Actions context, resubmission, a later superseding plan, and historical display.
-  - [ ] Cover comment-only Revise compatibility, Pass rejection, rubric-linked items, no-rubric items, notification compatibility, and audit records.
-  - [ ] Add focused axe-core checks for instructor ReviewForm/review history and student checkpoint/current plan.
-  - [ ] Add mobile viewport checks for no horizontal overflow and usable touch targets.
+- [~] Task: Write failing integration and E2E tests.
+  - [~] Add `tests/integration/server/revision-action-plans.test.ts` with the Node test environment.
+  - [~] Cover migration-backed insert/read/update behavior, transaction rollback, rubric/no-rubric validation, repeated revisions, supersession, resubmission, and addressed reversal.
+  - [~] Cover student/instructor ownership and cross-user denial through real handler calls.
+  - [~] Add `tests/e2e/revision-action-plans.spec.ts`.
+  - [~] Cover instructor creation of a Revise plan, student visibility/toggling, Next Actions context, resubmission, a later superseding plan, and historical display.
+  - [~] Cover comment-only Revise compatibility, Pass rejection, rubric-linked items, no-rubric items, notification compatibility, and audit records.
+  - [~] Add focused axe-core checks for instructor ReviewForm/review history and student checkpoint/current plan.
+  - [~] Add mobile viewport checks for no horizontal overflow and usable touch targets.
 
 - [ ] Task: Add deterministic test fixtures and reset handling.
   - [ ] Add `revision_action_items` cleanup in `tests/e2e/helpers/db-reset.ts` with correct foreign-key ordering.
