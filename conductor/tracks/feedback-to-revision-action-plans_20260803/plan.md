@@ -25,12 +25,12 @@ This plan follows the approved specification and `conductor/workflow.md`: every 
   - [x] Re-export the schema and any required relations from `src/db/schema/index.ts`.
   - [x] Keep historical rows and snapshots valid when rubric definitions are later edited or soft-deleted.
 
-- [ ] Task: Generate and apply the database migration.
-  - [ ] Run `pnpm db:generate`.
-  - [ ] Inspect generated SQL for bounded text, foreign keys, nullability, indexes, and non-destructive behavior.
-  - [ ] Add the matching manual rollback under `drizzle/migrations/rollback/`.
-  - [ ] Run `pnpm db:push` against the development database.
-  - [ ] Verify the table and constraints exist in the database.
+- [~] Task: Generate and apply the database migration.
+  - [~] Run `pnpm db:generate`.
+  - [~] Inspect generated SQL for bounded text, foreign keys, nullability, indexes, and non-destructive behavior.
+  - [~] Add the matching manual rollback under `drizzle/migrations/rollback/`.
+  - [~] Run `pnpm db:push` against the development database.
+  - [~] Verify the table and constraints exist in the database.
 
 - [ ] Task: Phase Verification & Checkpoint — database schema.
   - [ ] Run the focused schema tests and confirm the Red-to-Green transition.
