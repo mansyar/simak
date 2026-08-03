@@ -12,7 +12,8 @@ vi.mock('@/server/revision-action-items', () => ({
 
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string, values?: { number?: string }) =>
+      values?.number ? `${key}.${values.number}` : key,
   }),
 }));
 
@@ -66,7 +67,7 @@ describe('RevisionActionPlan', () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByText('studentRevisionActionPlan.addressed')).toBeInTheDocument(),
+      expect(screen.getAllByText('studentRevisionActionPlan.addressed')).toHaveLength(2),
     );
 
     fireEvent.click(firstCheckbox);
