@@ -1,15 +1,20 @@
 // Server-only handler for student dashboard data
-import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
+import { eq, and, asc, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
 import { assignmentTemplates } from '../db/schema/templates';
-import { submissions } from '../db/schema/submissions';
+import { reviews, submissions } from '../db/schema/submissions';
+import { revisionActionItems } from '../db/schema/revision-action-items';
 import { consultations } from '../db/schema/consultations';
 import { getSessionFromHeaders } from './auth';
 import { computeEffectiveDeadline } from './due-dates.server';
 import { serverError, ErrorCode } from '@/lib/errors';
 import { isStudent } from '@/lib/session-guards';
-import { resolveStudentNextActions, type StudentActionCandidate } from '@/lib/student-next-actions';
+import {
+  resolveStudentNextActions,
+  type StudentActionCandidate,
+  type StudentRevisionActionItem,
+} from '@/lib/student-next-actions';
 
 /**
  * Get all data for the student dashboard.
@@ -133,6 +138,51 @@ export async function getStudentDashboardDataHandler() {
       });
     }
 
+    // Load all plan items in one scoped query, then retain only the newest
+    // review with items for each checkpoint. Historical items never carry
+    // forward into the current plan context.
+    const revisionActionItemRows = await db
+      .select({
+        checkpointId: checkpoints.id,
+        reviewId: reviews.id,
+        itemText: revisionActionItems.itemText,
+        addressedAt: revisionActionItems.addressedAt,
+      })
+      .from(revisionActionItems)
+      .innerJoin(reviews, eq(revisionActionItems.reviewId, reviews.id))
+      .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
+      .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
+      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+      .where(
+        and(
+          eq(checkpoints.studentId, studentId),
+          eq(reviews.decision, 'revise'),
+          isNull(assignments.deletedAt),
+        ),
+      )
+      .orderBy(
+        desc(reviews.createdAt),
+        desc(reviews.id),
+        asc(revisionActionItems.order),
+        asc(revisionActionItems.id),
+      );
+
+    const currentPlanReviewByCheckpoint = new Map<number, number>();
+    const currentPlanItemsByCheckpoint = new Map<number, StudentRevisionActionItem[]>();
+    for (const row of revisionActionItemRows) {
+      const currentReviewId = currentPlanReviewByCheckpoint.get(row.checkpointId);
+      if (currentReviewId === undefined) {
+        currentPlanReviewByCheckpoint.set(row.checkpointId, row.reviewId);
+        currentPlanItemsByCheckpoint.set(row.checkpointId, []);
+      }
+      if (currentPlanReviewByCheckpoint.get(row.checkpointId) === row.reviewId) {
+        currentPlanItemsByCheckpoint.get(row.checkpointId)!.push({
+          itemText: row.itemText,
+          addressedAt: row.addressedAt,
+        });
+      }
+    }
+
     const activeAssignmentsWithProgress = activeAssignments.map((a) => {
       const cps = checkpointsByAssignment.get(a.id) ?? [];
       const totalCount = cps.length;
@@ -203,6 +253,7 @@ export async function getStudentDashboardDataHandler() {
       minConsultations: candidate.minConsultations,
       verifiedConsultationCount: verifiedConsultationCounts.get(candidate.checkpointId) ?? 0,
       submissionId: latestSubmissionByCheckpoint.get(candidate.checkpointId) ?? null,
+      revisionActionItems: currentPlanItemsByCheckpoint.get(candidate.checkpointId),
     }));
 
     const nextActions = resolveStudentNextActions(actionCandidates, { now });

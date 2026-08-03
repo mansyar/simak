@@ -663,6 +663,10 @@
       "reviseCheckpoint": "Revise and resubmit {checkpoint} in {assignment}",
       "requiredConsultation": "Complete required consultation for {checkpoint} in {assignment}",
       "openWaitingCheckpoint": "Open {checkpoint} in {assignment}",
+      "revisionPlan": {
+        "remaining": "{count} revision item(s) remain",
+        "itemsLabel": "Unresolved revision items"
+      },
       "waiting": {
         "title": "Waiting work",
         "description": "Submitted work remains visible while it is being processed.",

@@ -668,6 +668,10 @@ export type Translation = {
       reviseCheckpoint: string
       requiredConsultation: string
       openWaitingCheckpoint: string
+      revisionPlan: {
+        remaining: string
+        itemsLabel: string
+      }
       waiting: {
         title: string
         description: string

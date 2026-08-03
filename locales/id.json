@@ -663,6 +663,10 @@
       "reviseCheckpoint": "Perbaiki dan kumpulkan ulang {checkpoint} pada {assignment}",
       "requiredConsultation": "Selesaikan konsultasi yang diperlukan untuk {checkpoint} pada {assignment}",
       "openWaitingCheckpoint": "Buka {checkpoint} pada {assignment}",
+      "revisionPlan": {
+        "remaining": "{count} item revisi tersisa",
+        "itemsLabel": "Item revisi yang belum selesai"
+      },
       "waiting": {
         "title": "Pekerjaan yang Menunggu",
         "description": "Pekerjaan yang dikumpulkan tetap terlihat selama diproses.",
