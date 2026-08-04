@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { toast } from 'sonner';
 import { MessageCircle, Send, Trash2, CornerDownRight, X } from 'lucide-react';
 
 import { useI18n } from '../../routes/__root';
@@ -25,6 +24,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { cn } from '@/lib/utils';
 import { ErrorState } from '@/components/ui/error-state';
+import { MutationFeedback } from '@/components/ui/mutation-feedback';
 
 interface DiscussionMessage {
   id: number;
@@ -52,6 +52,11 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
   const currentUser = sessionData?.user;
   const userRole = (currentUser as { role?: string } | undefined)?.role ?? 'student';
   const [replyTo, setReplyTo] = useState<number | null>(null);
+  const [deleteConfirmationId, setDeleteConfirmationId] = useState<number | null>(null);
+  const [postError, setPostError] = useState<string>();
+  const [postSuccess, setPostSuccess] = useState<string>();
+  const [deleteError, setDeleteError] = useState<string>();
+  const [deleteSuccess, setDeleteSuccess] = useState<string>();
 
   const formSchema = z.object({
     message: z
@@ -124,18 +129,23 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
       }
       return { previousEntries };
     },
-    onError: (error, _vars, context) => {
+    onError: (_error, _vars, context) => {
       if (context?.previousEntries) {
         for (const [key, data] of context.previousEntries) {
           queryClient.setQueryData(key, data);
         }
       }
-      toast.error(error.message);
+      setPostError(t('discussions.errors.postFailed'));
+      setPostSuccess(undefined);
+    },
+    onSuccess: () => {
+      setPostSuccess(t('discussions.success.posted'));
+      setPostError(undefined);
+      form.reset();
+      setReplyTo(null);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: discussionKeys.all() });
-      form.reset();
-      setReplyTo(null);
     },
   });
 
@@ -166,13 +176,19 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
       );
       return { previousEntries };
     },
-    onError: (error, _vars, context) => {
+    onError: (_error, _vars, context) => {
       if (context?.previousEntries) {
         for (const [key, data] of context.previousEntries) {
           queryClient.setQueryData(key, data);
         }
       }
-      toast.error(error.message);
+      setDeleteError(t('discussions.errors.deleteFailed'));
+      setDeleteSuccess(undefined);
+    },
+    onSuccess: () => {
+      setDeleteSuccess(t('discussions.success.deleted'));
+      setDeleteError(undefined);
+      setDeleteConfirmationId(null);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: discussionKeys.all() });
@@ -191,6 +207,10 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
   };
 
   const handleFormSubmit = (values: FormValues) => {
+    setPostError(undefined);
+    setPostSuccess(undefined);
+    setDeleteError(undefined);
+    setDeleteSuccess(undefined);
     postMutation.mutate(values);
   };
 
@@ -253,14 +273,19 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>{msg.createdAt ? formatRelativeTime(msg.createdAt, locale) : ''}</span>
             {canDelete(msg) && (
-              <button
+              <Button
                 type="button"
-                onClick={() => deleteMutation.mutate(msg.id)}
-                className="hover:text-destructive"
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setDeleteConfirmationId(msg.id);
+                  setDeleteError(undefined);
+                  setDeleteSuccess(undefined);
+                }}
                 aria-label={t('discussions.delete')}
               >
                 <Trash2 className="size-4" />
-              </button>
+              </Button>
             )}
             {windowExpired && <span>{t('discussions.deleteWindowExpired')}</span>}
             {!msg.deletedAt && (
@@ -274,6 +299,39 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
               </button>
             )}
           </div>
+          {deleteConfirmationId === msg.id && (
+            <div
+              role="alertdialog"
+              aria-labelledby={`delete-message-${msg.id}-title`}
+              className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm"
+            >
+              <p id={`delete-message-${msg.id}-title`} className="font-medium">
+                {t('discussions.deleteConfirm')}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDeleteConfirmationId(null)}
+                  disabled={deleteMutation.isPending}
+                >
+                  {t('discussions.cancel')}
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => {
+                    setDeleteError(undefined);
+                    setDeleteSuccess(undefined);
+                    deleteMutation.mutate(msg.id);
+                  }}
+                  loading={deleteMutation.isPending}
+                >
+                  {t('discussions.delete')}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -282,6 +340,8 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold">{t('discussions.title')}</h2>
+
+      <MutationFeedback error={postError ?? deleteError} success={postSuccess ?? deleteSuccess} />
 
       {messages.length === 0 ? (
         <EmptyState

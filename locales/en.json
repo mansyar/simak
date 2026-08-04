@@ -903,9 +903,14 @@
     "send": "Send",
     "reply": "Reply",
     "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this message?",
     "cancel": "Cancel",
     "deleted": "[deleted]",
     "deleteWindowExpired": "Deletion window expired",
+    "success": {
+      "posted": "Message posted.",
+      "deleted": "Message deleted."
+    },
     "loading": "Loading messages...",
     "empty": {
       "title": "No messages yet",
@@ -913,7 +918,9 @@
     },
     "errors": {
       "required": "Message cannot be empty",
-      "tooLong": "Message must be 2000 characters or less"
+      "tooLong": "Message must be 2000 characters or less",
+      "postFailed": "Unable to post the message. Please try again.",
+      "deleteFailed": "Unable to delete the message. Please try again."
     }
   },
   "landing": {

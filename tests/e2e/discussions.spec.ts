@@ -148,6 +148,8 @@ test.describe('Checkpoint Discussions', () => {
         .locator('[data-role="student"]')
         .filter({ hasText: 'E2E test discussion message' });
       await messageContainer.getByRole('button', { name: 'Delete' }).click();
+      await expect(page.getByRole('alertdialog')).toBeVisible();
+      await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click();
 
       // Verify message shows [deleted]
       await expect(page.getByText('[deleted]')).toBeVisible({ timeout: 10000 });

@@ -908,9 +908,14 @@ export type Translation = {
     send: string
     reply: string
     delete: string
+    deleteConfirm: string
     cancel: string
     deleted: string
     deleteWindowExpired: string
+    success: {
+      posted: string
+      deleted: string
+    }
     loading: string
     empty: {
       title: string
@@ -919,6 +924,8 @@ export type Translation = {
     errors: {
       required: string
       tooLong: string
+      postFailed: string
+      deleteFailed: string
     }
   }
   landing: {
