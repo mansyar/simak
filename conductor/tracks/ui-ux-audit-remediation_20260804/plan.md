@@ -12,9 +12,9 @@
   - [x] Add viewport helpers for 320px, 768px, and 1280px.
   - [x] Add reusable assertions for keyboard focus, accessible names, clipping, and live regions.
   - [x] Keep fixture setup isolated from production seed behavior.
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: 3a71472]
 
-## Phase 1 — Shared accessibility and responsive foundations
+## Phase 1 — Shared accessibility and responsive foundations [checkpoint: c82d3f7]
 
 - [x] Task: Repair file-input and dropzone interaction semantics [9005149]
   - [x] Write failing component tests for keyboard focus and file selection.
@@ -41,7 +41,7 @@
   - [x] Write failing tests for close-button names, max-height, scrolling, and narrow viewport behavior.
   - [x] Implement constrained content regions and accessible close controls.
   - [x] Verify notification, confirmation, and settings sheets.
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: c82d3f7]
 
 ## Phase 2 — Error states, action feedback, and runtime stability
 
