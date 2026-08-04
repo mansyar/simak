@@ -7,12 +7,12 @@
   - [x] Confirm available student, instructor, admin, and public test fixtures.
   - [x] Record current Playwright viewport, hydration-console, and axe failures.
   - [x] Identify existing tests that should be extended rather than duplicated.
-- [~] Task: Define shared test helpers
-  - [ ] Add or extend authenticated browser helpers for each available role.
-  - [ ] Add viewport helpers for 320px, 768px, and 1280px.
-  - [ ] Add reusable assertions for keyboard focus, accessible names, clipping, and live regions.
-  - [ ] Keep fixture setup isolated from production seed behavior.
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Define shared test helpers [3a71472]
+  - [x] Add or extend authenticated browser helpers for each available role.
+  - [x] Add viewport helpers for 320px, 768px, and 1280px.
+  - [x] Add reusable assertions for keyboard focus, accessible names, clipping, and live regions.
+  - [x] Keep fixture setup isolated from production seed behavior.
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 1 — Shared accessibility and responsive foundations
 
