@@ -112,7 +112,13 @@ export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }
 
         {grade.contributingCheckpoints.length > 0 && (
           <>
-            <Button variant="ghost" size="sm" onClick={() => setShowBreakdown(!showBreakdown)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-expanded={showBreakdown}
+              aria-controls="student-grade-breakdown"
+              onClick={() => setShowBreakdown(!showBreakdown)}
+            >
               {t('gradebook.student.breakdown')}
               {showBreakdown ? (
                 <ChevronUp className="ml-1 h-4 w-4" />
@@ -122,13 +128,16 @@ export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }
             </Button>
 
             {showBreakdown && (
-              <table className="w-full text-sm">
+              <table id="student-grade-breakdown" className="w-full text-sm">
+                <caption className="sr-only">{t('gradebook.student.breakdown')}</caption>
                 <thead>
                   <tr className="border-b">
-                    <th className="py-2 text-left font-medium">
+                    <th scope="col" className="py-2 text-left font-medium">
                       {t('gradebook.student.checkpoint')}
                     </th>
-                    <th className="py-2 text-right font-medium">{t('gradebook.student.score')}</th>
+                    <th scope="col" className="py-2 text-right font-medium">
+                      {t('gradebook.student.score')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -137,7 +146,7 @@ export function StudentFinalGradeCard({ assignmentId }: { assignmentId: number }
                       <td className="py-2">{cp.checkpointName}</td>
                       <td className="py-2 text-right">
                         {cp.isRubric
-                          ? (cp.score ?? '—')
+                          ? (cp.score ?? t('gradebook.student.scoreUnavailable'))
                           : cp.state === 'passed'
                             ? t('gradebook.passed')
                             : t('gradebook.notPassed')}

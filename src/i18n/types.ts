@@ -619,6 +619,8 @@ export type Translation = {
       revise: string
       overdue: string
     }
+    sectionsLabel: string
+    statusLabel: string
     timeline: string
     submit: string
     resubmit: string
@@ -626,6 +628,7 @@ export type Translation = {
     consultations: string
     blockedByPrevious: string
     blockedByConsultations: string
+    lockedNextStep: string
     notFound: string
     notFoundDescription: string
     checkpointTimeline: string
@@ -829,6 +832,7 @@ export type Translation = {
       uploadedAt: string
       action: string
     }
+    historyLabel: string
     review: {
       title: string
       passed: string
@@ -1507,6 +1511,7 @@ export type Translation = {
       breakdown: string
       checkpoint: string
       score: string
+      scoreUnavailable: string
       unavailable: string
       notYetReleased: string
       releaseVersion: string

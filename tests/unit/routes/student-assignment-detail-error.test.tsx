@@ -193,4 +193,28 @@ describe('StudentAssignmentDetailPage - side-data error handling', () => {
       expect(screen.queryByText('database failure')).toBeNull();
     });
   });
+
+  it('should expose assignment sections as keyboard-navigable tabs with a controlled panel', async () => {
+    mockListConsultations.mockResolvedValue({ items: [], total: 0 });
+    mockListVerifiedCounts.mockResolvedValue({ counts: [] });
+    mockListMyExtensionRequests.mockResolvedValue({ items: [], total: 0 });
+
+    const Component = (Route as any).component as React.FC;
+    render(<Component />);
+
+    const tablist = screen.getByRole('tablist', { name: 'studentAssignments.sectionsLabel' });
+    expect(tablist).toBeDefined();
+
+    const timelineTab = screen.getByRole('tab', { name: 'studentAssignments.checkpointTimeline' });
+    const consultationsTab = screen.getByRole('tab', { name: 'consultations.title' });
+    expect(timelineTab.getAttribute('aria-selected')).toBe('true');
+    expect(timelineTab.getAttribute('aria-controls')).toBe('student-assignment-tabpanel-timeline');
+    expect(screen.getByRole('tabpanel').getAttribute('aria-labelledby')).toBe(
+      'student-assignment-tab-timeline',
+    );
+
+    fireEvent.keyDown(timelineTab, { key: 'ArrowRight' });
+    expect(consultationsTab.getAttribute('aria-selected')).toBe('true');
+    expect(consultationsTab.getAttribute('tabindex')).toBe('0');
+  });
 });

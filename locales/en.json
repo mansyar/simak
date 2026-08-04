@@ -614,6 +614,8 @@
       "revise": "Revise",
       "overdue": "Overdue"
     },
+    "sectionsLabel": "Assignment sections",
+    "statusLabel": "Status",
     "timeline": "Checkpoint Timeline",
     "submit": "Submit",
     "resubmit": "Resubmit",
@@ -621,6 +623,7 @@
     "consultations": "Consultations: {current}/{required}",
     "blockedByPrevious": "Previous checkpoint not passed",
     "blockedByConsultations": "Insufficient consultations: {current}/{required} verified",
+    "lockedNextStep": "Complete the previous checkpoint and required consultations to unlock this checkpoint.",
     "notFound": "Assignment not found",
     "notFoundDescription": "This assignment does not exist or you don't have access to it.",
     "checkpointTimeline": "Checkpoint Timeline"
@@ -824,6 +827,7 @@
       "uploadedAt": "Uploaded At",
       "action": "Action"
     },
+    "historyLabel": "Submission file history",
     "review": {
       "title": "Review Result",
       "passed": "Passed",
@@ -1502,6 +1506,7 @@
       "breakdown": "Show Breakdown",
       "checkpoint": "Checkpoint",
       "score": "Score",
+      "scoreUnavailable": "Not available",
       "unavailable": "Final grade unavailable",
       "notYetReleased": "Your final grade has not been released yet.",
       "releaseVersion": "Release version",

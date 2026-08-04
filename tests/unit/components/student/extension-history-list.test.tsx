@@ -84,7 +84,7 @@ describe('ExtensionHistoryList', () => {
 
   it('should render the history title', () => {
     render(<ExtensionHistoryList items={mockItems} />);
-    expect(screen.getByText('Extension History')).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Extension History' })).toBeDefined();
   });
 
   it('should render table headers', () => {
@@ -94,6 +94,17 @@ describe('ExtensionHistoryList', () => {
     expect(screen.getByText('Duration')).toBeDefined();
     expect(screen.getByText('Status')).toBeDefined();
     expect(screen.getByText('Resolution')).toBeDefined();
+  });
+
+  it('should expose table context and column scopes', () => {
+    render(<ExtensionHistoryList items={mockItems} />);
+    expect(screen.getByRole('table').querySelector('caption')?.textContent).toBe(
+      'Extension History',
+    );
+    expect(screen.getAllByRole('columnheader')).toHaveLength(5);
+    expect(
+      screen.getAllByRole('columnheader').every((header) => header.getAttribute('scope') === 'col'),
+    ).toBe(true);
   });
 
   it('should render pending status badge', () => {

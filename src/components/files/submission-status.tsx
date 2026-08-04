@@ -43,7 +43,11 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
           <CardTitle className="text-base">{t('files.review.title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3"
+            role="status"
+            aria-label={t('files.review.awaiting')}
+          >
             <Clock className="h-5 w-5 text-muted-foreground" />
             <div>
               <p className="text-sm font-medium text-foreground">{t('files.review.awaiting')}</p>
@@ -65,7 +69,11 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
       </CardHeader>
       <CardContent className="space-y-3">
         {/* Decision badge */}
-        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center gap-2"
+          role="status"
+          aria-label={t(config.labelKey as TranslationKey)}
+        >
           <Icon className={`h-5 w-5 ${config.iconClass}`} />
           <Badge variant={config.badgeVariant}>{t(config.labelKey as TranslationKey)}</Badge>
         </div>

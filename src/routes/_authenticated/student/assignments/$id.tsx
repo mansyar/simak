@@ -11,6 +11,7 @@ import { ConsultationForm } from '@/components/consultations/ConsultationForm';
 import { ConsultationList } from '@/components/consultations/ConsultationList';
 import { ConsultationProgress } from '@/components/consultations/ConsultationProgress';
 import { Pagination } from '@/components/ui/pagination';
+import { Tabs } from '@/components/ui/tabs';
 import { ExtensionRequestForm } from '@/components/student/extensions/ExtensionRequestForm';
 import { ExtensionHistoryList } from '@/components/student/extensions/ExtensionHistoryList';
 import { Button } from '@/components/ui/button';
@@ -191,6 +192,12 @@ function AssignmentDetailPage() {
     templateType: assignment.templateType,
   };
 
+  const assignmentTabs = [
+    { id: 'timeline', label: t('studentAssignments.checkpointTimeline') },
+    { id: 'consultations', label: t('consultations.title') },
+    { id: 'extensions', label: t('extensions.requestTitle') },
+  ];
+
   const checkpoints = (
     (assignment.checkpoints as {
       id: number;
@@ -271,155 +278,126 @@ function AssignmentDetailPage() {
 
       <StudentFinalGradeCard assignmentId={assignment.id} />
 
-      {/* Tab Navigation */}
-      <div className="border-b border-border">
-        <div className="flex gap-1">
-          <button
-            type="button"
-            onClick={() => setActiveTab('timeline')}
-            data-state={activeTab === 'timeline' ? 'active' : 'inactive'}
-            className={`px-3 py-2 text-sm font-medium border-b-2 rounded-t-md transition-colors ${
-              activeTab === 'timeline'
-                ? 'border-primary text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-          >
-            {t('studentAssignments.checkpointTimeline')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('consultations')}
-            data-state={activeTab === 'consultations' ? 'active' : 'inactive'}
-            className={`px-3 py-2 text-sm font-medium border-b-2 rounded-t-md transition-colors ${
-              activeTab === 'consultations'
-                ? 'border-primary text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-          >
-            {t('consultations.title')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('extensions')}
-            data-state={activeTab === 'extensions' ? 'active' : 'inactive'}
-            className={`px-3 py-2 text-sm font-medium border-b-2 rounded-t-md transition-colors ${
-              activeTab === 'extensions'
-                ? 'border-primary text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
-            }`}
-          >
-            {t('extensions.requestTitle')}
-          </button>
-        </div>
-      </div>
+      <Tabs
+        tabs={assignmentTabs}
+        activeTab={activeTab}
+        onTabChange={(tabId) => setActiveTab(tabId as typeof activeTab)}
+        idPrefix="student-assignment"
+        ariaLabel={t('studentAssignments.sectionsLabel')}
+      />
 
-      {/* Tab Content */}
-      {activeTab === 'timeline' && (
-        <div className="border-t pt-6">
+      <div
+        id={`student-assignment-tabpanel-${activeTab}`}
+        role="tabpanel"
+        aria-labelledby={`student-assignment-tab-${activeTab}`}
+        tabIndex={0}
+        className="min-w-0 pt-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        {activeTab === 'timeline' && (
           <CheckpointTimeline checkpoints={checkpoints} assignmentId={assignment.id} />
-        </div>
-      )}
+        )}
 
-      {activeTab === 'consultations' && (
-        <div className="space-y-6">
-          {sideDataError === 'consultations' ? (
-            <ErrorState
-              title={t('errors.fetchFailed')}
-              retryLabel={t('common.refresh')}
-              onRetry={() => {
-                setSideDataError(null);
-                setRetryTrigger((c) => c + 1);
-              }}
-            />
-          ) : loadingConsultations ? (
-            <div className="space-y-6">
-              <div className="rounded-lg border bg-card p-5 shadow-sm">
-                <Skeleton data-testid="skeleton" className="h-6 w-48" />
-                <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
-              </div>
-              <div className="rounded-lg border bg-card p-5 shadow-sm">
-                <Skeleton data-testid="skeleton" className="h-6 w-48" />
-                <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
-              </div>
-            </div>
-          ) : (
-            <>
-              <ConsultationProgress counts={verifiedCounts} />
-
-              <div className="rounded-lg border bg-card p-5 shadow-sm">
-                <h2 className="text-lg font-semibold text-foreground mb-4">
-                  {t('consultations.logConsultation')}
-                </h2>
-                <ConsultationForm
-                  assignmentId={assignment.id}
-                  checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
-                  onSuccess={handleConsultationSuccess}
-                />
-              </div>
-
-              <div className="rounded-lg border bg-card p-5 shadow-sm">
-                <h2 className="text-lg font-semibold text-foreground mb-4">
-                  {t('consultations.previousSessions')}
-                </h2>
-                <ConsultationList consultations={consultations} />
-                <Pagination
-                  currentPage={consultationPage}
-                  totalPages={Math.max(1, Math.ceil(consultationTotal / 20))}
-                  onPageChange={setConsultationPage}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      )}
-
-      {activeTab === 'extensions' && (
-        <div className="space-y-6">
-          {sideDataError === 'extensions' ? (
-            <ErrorState
-              title={t('errors.fetchFailed')}
-              retryLabel={t('common.refresh')}
-              onRetry={() => {
-                setSideDataError(null);
-                setRetryTrigger((c) => c + 1);
-              }}
-            />
-          ) : loadingExtensions ? (
-            <div className="space-y-6">
-              <div className="rounded-lg border bg-card p-5 shadow-sm">
-                <Skeleton data-testid="skeleton" className="h-6 w-48" />
-                <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
-              </div>
-              <div className="rounded-lg border bg-card p-5 shadow-sm">
-                <Skeleton data-testid="skeleton" className="h-6 w-48" />
-                <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="rounded-lg border bg-card p-5 shadow-sm">
-                <h2 className="text-lg font-semibold text-foreground mb-4">
-                  {t('extensions.requestTitle')}
-                </h2>
-                <ExtensionRequestForm
-                  assignmentId={assignment.id}
-                  maxExtensionDays={assignment.maxExtensionDays ?? 7}
-                  maxTotalExtensions={assignment.maxTotalExtensions ?? 3}
-                  checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
-                  onSuccess={handleExtensionSuccess}
-                />
-              </div>
-
-              <ExtensionHistoryList items={extensionItems} />
-              <Pagination
-                currentPage={extensionPage}
-                totalPages={Math.max(1, Math.ceil(extensionTotal / 20))}
-                onPageChange={setExtensionPage}
+        {activeTab === 'consultations' && (
+          <div className="space-y-6">
+            {sideDataError === 'consultations' ? (
+              <ErrorState
+                title={t('errors.fetchFailed')}
+                retryLabel={t('common.refresh')}
+                onRetry={() => {
+                  setSideDataError(null);
+                  setRetryTrigger((c) => c + 1);
+                }}
               />
-            </>
-          )}
-        </div>
-      )}
+            ) : loadingConsultations ? (
+              <div className="space-y-6">
+                <div className="rounded-lg border bg-card p-5 shadow-sm">
+                  <Skeleton data-testid="skeleton" className="h-6 w-48" />
+                  <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
+                </div>
+                <div className="rounded-lg border bg-card p-5 shadow-sm">
+                  <Skeleton data-testid="skeleton" className="h-6 w-48" />
+                  <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
+                </div>
+              </div>
+            ) : (
+              <>
+                <ConsultationProgress counts={verifiedCounts} />
+
+                <div className="rounded-lg border bg-card p-5 shadow-sm">
+                  <h2 className="text-lg font-semibold text-foreground mb-4">
+                    {t('consultations.logConsultation')}
+                  </h2>
+                  <ConsultationForm
+                    assignmentId={assignment.id}
+                    checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
+                    onSuccess={handleConsultationSuccess}
+                  />
+                </div>
+
+                <div className="rounded-lg border bg-card p-5 shadow-sm">
+                  <h2 className="text-lg font-semibold text-foreground mb-4">
+                    {t('consultations.previousSessions')}
+                  </h2>
+                  <ConsultationList consultations={consultations} />
+                  <Pagination
+                    currentPage={consultationPage}
+                    totalPages={Math.max(1, Math.ceil(consultationTotal / 20))}
+                    onPageChange={setConsultationPage}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'extensions' && (
+          <div className="space-y-6">
+            {sideDataError === 'extensions' ? (
+              <ErrorState
+                title={t('errors.fetchFailed')}
+                retryLabel={t('common.refresh')}
+                onRetry={() => {
+                  setSideDataError(null);
+                  setRetryTrigger((c) => c + 1);
+                }}
+              />
+            ) : loadingExtensions ? (
+              <div className="space-y-6">
+                <div className="rounded-lg border bg-card p-5 shadow-sm">
+                  <Skeleton data-testid="skeleton" className="h-6 w-48" />
+                  <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
+                </div>
+                <div className="rounded-lg border bg-card p-5 shadow-sm">
+                  <Skeleton data-testid="skeleton" className="h-6 w-48" />
+                  <Skeleton data-testid="skeleton" className="mt-4 h-4 w-full" />
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="rounded-lg border bg-card p-5 shadow-sm">
+                  <h2 className="text-lg font-semibold text-foreground mb-4">
+                    {t('extensions.requestTitle')}
+                  </h2>
+                  <ExtensionRequestForm
+                    assignmentId={assignment.id}
+                    maxExtensionDays={assignment.maxExtensionDays ?? 7}
+                    maxTotalExtensions={assignment.maxTotalExtensions ?? 3}
+                    checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
+                    onSuccess={handleExtensionSuccess}
+                  />
+                </div>
+
+                <ExtensionHistoryList items={extensionItems} />
+                <Pagination
+                  currentPage={extensionPage}
+                  totalPages={Math.max(1, Math.ceil(extensionTotal / 20))}
+                  onPageChange={setExtensionPage}
+                />
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

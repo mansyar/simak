@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -69,13 +70,16 @@ export function FileList({ submissions, onDownload }: FileListProps) {
   return (
     <div className="rounded-lg border">
       <Table>
+        <TableCaption className="sr-only">{t('files.historyLabel')}</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>{t('files.table.version')}</TableHead>
-            <TableHead>{t('files.table.fileName')}</TableHead>
-            <TableHead>{t('files.table.fileSize')}</TableHead>
-            <TableHead>{t('files.table.uploadedAt')}</TableHead>
-            <TableHead className="w-20">{t('files.table.action')}</TableHead>
+            <TableHead scope="col">{t('files.table.version')}</TableHead>
+            <TableHead scope="col">{t('files.table.fileName')}</TableHead>
+            <TableHead scope="col">{t('files.table.fileSize')}</TableHead>
+            <TableHead scope="col">{t('files.table.uploadedAt')}</TableHead>
+            <TableHead scope="col" className="w-20">
+              {t('files.table.action')}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

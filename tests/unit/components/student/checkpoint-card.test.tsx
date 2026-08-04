@@ -77,6 +77,19 @@ describe('CheckpointCard', () => {
     expect(screen.getByText(/studentAssignments.blockedByConsultations/)).toBeDefined();
   });
 
+  it('should provide an explicit next-step message for locked checkpoints', () => {
+    render(<CheckpointCard checkpoint={lockedCheckpoint} assignmentId={101} />);
+    expect(screen.getByText('studentAssignments.lockedNextStep')).toBeDefined();
+  });
+
+  it('should expose checkpoint state as a status with an accessible label', () => {
+    render(<CheckpointCard checkpoint={passedCheckpoint} assignmentId={101} />);
+    const status = screen.getByRole('status');
+    expect(status.getAttribute('aria-label')).toBe(
+      'studentAssignments.statusLabel: studentAssignments.status.passed',
+    );
+  });
+
   it('should indicate overdue checkpoints', () => {
     render(<CheckpointCard checkpoint={overdueCheckpoint} assignmentId={101} />);
     expect(screen.getByText('studentAssignments.status.overdue')).toBeDefined();

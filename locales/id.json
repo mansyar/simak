@@ -614,6 +614,8 @@
       "revise": "Revisi",
       "overdue": "Terlambat"
     },
+    "sectionsLabel": "Bagian tugas",
+    "statusLabel": "Status",
     "timeline": "Linimasa Checkpoint",
     "submit": "Kumpulkan",
     "resubmit": "Kumpulkan Ulang",
@@ -621,6 +623,7 @@
     "consultations": "Konsultasi: {current}/{required}",
     "blockedByPrevious": "Checkpoint sebelumnya belum lulus",
     "blockedByConsultations": "Konsultasi tidak mencukupi: {current}/{required} terverifikasi",
+    "lockedNextStep": "Selesaikan checkpoint sebelumnya dan konsultasi yang diperlukan untuk membuka checkpoint ini.",
     "notFound": "Tugas tidak ditemukan",
     "notFoundDescription": "Tugas ini tidak ada atau Anda tidak memiliki akses ke tugas ini.",
     "checkpointTimeline": "Linimasa Checkpoint"
@@ -824,6 +827,7 @@
       "uploadedAt": "Diunggah Pada",
       "action": "Aksi"
     },
+    "historyLabel": "Riwayat file pengumpulan",
     "review": {
       "title": "Hasil Review",
       "passed": "Lulus",
@@ -1502,6 +1506,7 @@
       "breakdown": "Tampilkan Rincian",
       "checkpoint": "Checkpoint",
       "score": "Skor",
+      "scoreUnavailable": "Tidak tersedia",
       "unavailable": "Nilai akhir belum tersedia",
       "notYetReleased": "Nilai akhir Anda belum diterbitkan.",
       "releaseVersion": "Versi rilis",
