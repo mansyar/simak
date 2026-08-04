@@ -67,10 +67,10 @@
 
 ## Phase 3 — Student experience remediation
 
-- [~] Task: Improve student dashboard actionability
-  - [ ] Write failing tests for actionable deadline, review, consultation, and waiting-item rows.
-  - [ ] Add destinations and view-all affordances while preserving the five-action/three-waiting caps.
-  - [ ] Verify loading, empty, error, and retry states.
+- [x] Task: Improve student dashboard actionability [8340632]
+  - [x] Write failing tests for actionable deadline, review, consultation, and waiting-item rows. [8340632]
+  - [x] Add destinations and view-all affordances while preserving the five-action/three-waiting caps. [8340632]
+  - [x] Verify loading, empty, error, and retry states. [8340632]
 - [ ] Task: Standardize student date and timezone presentation
   - [ ] Write failing tests covering dashboard, assignment detail, consultation, submission, review, and extension dates.
   - [ ] Centralize locale-aware student timezone formatting.
