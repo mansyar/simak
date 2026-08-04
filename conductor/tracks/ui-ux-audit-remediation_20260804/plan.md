@@ -75,10 +75,10 @@
   - [x] Write failing tests covering dashboard, assignment detail, consultation, submission, review, and extension dates. [a244454]
   - [x] Centralize locale-aware student timezone formatting. [a244454]
   - [x] Verify English and Indonesian output around date boundaries. [a244454]
-- [~] Task: Repair student assignment detail and checkpoint UX
-  - [ ] Write failing tests for mobile tab access, locked-checkpoint guidance, status semantics, and responsive layout.
-  - [ ] Implement mobile-safe tabs and clear next-step guidance.
-  - [ ] Improve grade breakdown, consultation progress, and history semantics.
+- [x] Task: Repair student assignment detail and checkpoint UX [e509bff]
+  - [x] Write failing tests for mobile tab access, locked-checkpoint guidance, status semantics, and responsive layout. [e509bff]
+  - [x] Implement mobile-safe tabs and clear next-step guidance. [e509bff]
+  - [x] Improve grade breakdown, consultation progress, and history semantics. [e509bff]
 - [ ] Task: Improve student discussions and destructive actions
   - [ ] Write failing tests for discussion errors, deletion confirmation, announcements, and empty states.
   - [ ] Implement retryable error states, confirmation, and live feedback.
