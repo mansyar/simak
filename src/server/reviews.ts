@@ -2,6 +2,7 @@
 // Handler implementations are in reviews.server.ts (not bundled for client)
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
+import { RevisionActionItemsSchema } from './revision-action-items';
 import { z } from 'zod';
 
 export const ListPendingReviewsSchema = z.object({
@@ -18,23 +19,29 @@ export const OpenForReviewSchema = z.object({
   submissionId: z.coerce.number().int().positive('Submission ID must be a positive integer'),
 });
 
-export const SubmitReviewSchema = z.object({
-  submissionId: z.coerce.number().int().positive('Submission ID must be a positive integer'),
-  decision: z.enum(['pass', 'revise'], { message: 'Decision must be pass or revise' }),
-  comment: z.string().optional().default(''),
-  feedbackFileKey: z.string().optional(),
-  revisionDeadline: z.string().optional(),
-  scores: z
-    .array(
-      z.object({
-        criterionId: z.coerce.number().int().positive(),
-        score: z.coerce.number().int().min(0).max(100),
-        rubricLevelId: z.coerce.number().int().positive().optional(),
-        comment: z.string().optional(),
-      }),
-    )
-    .optional(),
-});
+export const SubmitReviewSchema = z
+  .object({
+    submissionId: z.coerce.number().int().positive('Submission ID must be a positive integer'),
+    decision: z.enum(['pass', 'revise'], { message: 'Decision must be pass or revise' }),
+    comment: z.string().optional().default(''),
+    feedbackFileKey: z.string().optional(),
+    revisionDeadline: z.string().optional(),
+    scores: z
+      .array(
+        z.object({
+          criterionId: z.coerce.number().int().positive(),
+          score: z.coerce.number().int().min(0).max(100),
+          rubricLevelId: z.coerce.number().int().positive().optional(),
+          comment: z.string().optional(),
+        }),
+      )
+      .optional(),
+    actionItems: RevisionActionItemsSchema.optional(),
+  })
+  .refine((data) => data.decision !== 'pass' || !data.actionItems?.length, {
+    path: ['actionItems'],
+    message: 'Action items are only allowed for revise decisions',
+  });
 
 export const GetLatestReviewSchema = z.object({
   checkpointId: z.coerce.number().int().positive('Checkpoint ID must be a positive integer'),

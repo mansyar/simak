@@ -121,11 +121,11 @@ simak/
 │   │   ├── layout/           → Sidebar (student, instructor, admin — dark navy variants), header (sticky, backdrop blur), language switcher, theme toggle
 │   │   ├── dashboard/        → Role-specific dashboard components (StudentDashboard, StudentNextActions, InstructorDashboard, AdminDashboard with metric cards)
 │   │   ├── student/
-│   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton
+│   │   │   └── assignments/  → Student assignment card, filters, checkpoint timeline, checkpoint card, detail header, empty state, loading skeleton; RevisionActionPlan on checkpoint detail
 │   │   ├── instructor/
 │   │   │   ├── assignments/  → Assignment wizard, template picker, student picker, progress table, card, filters, empty state, loading skeleton
 │   │   │   └── feedback-snippets/ → Private snippet management page, form, and cards (TRACK-049)
-│   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js), RubricScoringSection (instructor scoring UI), RubricResultView (student view)
+│   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js), RubricScoringSection (instructor scoring UI), RubricResultView (student view), RevisionActionPlanEditor, ReviewHistory action-plan display
 │   │   ├── gradebook/        → GradebookTable, GradeConfigSummary, GradeSettingsDialog, GradeReleaseControls, StudentFinalGradeCard, GradebookExportButtons, RecomputeGradesButton
 │   │   ├── consultations/    → Log form, consultation list, progress bar, verification queue item, verification dialog
 │   │   ├── interventions/    → Intervention list, filters, live-risk context, form, and loading skeleton
@@ -145,7 +145,9 @@ simak/
 │   │   ├── assignments.server.ts → Server-only assignment handlers (createAssignment, listInstructor, getDetail — re-exports handlers from extras + admin files)
 │   │   ├── assignments-admin.server.ts → Admin-only assignment handler (`reassignAssignmentHandler` — extracted to stay under 500-line limit, multi-handler pattern) (TRACK-040)
 │   │   ├── submissions.ts    → Upload, versioning
-│   │   ├── reviews.ts        → Review, pass/revise
+│   │   ├── reviews.ts        → Review, pass/revise, optional revision-action plan validation
+│   │   ├── revision-action-items.ts → Revision-action item schemas and client-safe mutation stub
+│   │   ├── revision-action-items.server.ts → Rubric snapshot insertion and student addressed-status handlers
 │   │   ├── feedback-snippets.ts → Private snippet schemas/stubs (TRACK-049)
 │   │   ├── feedback-snippets.server.ts → Instructor-owned snippet handlers (TRACK-049)
 │   │   ├── consultations.ts  → Log, list, verify, reject, detail, counts (split: .ts stubs + .server.ts handlers)
@@ -195,7 +197,7 @@ simak/
 │   │   ├── gradebook-extras.server.ts → Owner-locked release preflight, publication, withdrawal, versioning, and audit handlers
     │   │   └── health.server.ts    → Health check handler (runHealthChecks — DB, R2, email queue checks with 2s timeouts, generic error messages)
 │   ├── db/
-│   │   ├── schema/           → Drizzle schema (split by domain)
+│   │   ├── schema/           → Drizzle schema (split by domain, including revision action items)
 │   │   ├── index.ts          → Database client — postgres.js + Drizzle with explicit pool config (`max`/`idle_timeout`/`connect_timeout`/`max_lifetime`/`prepare`), `onnotice` routed through pino, `getDb()` uses `getEnv()`. `closeDb()` closes the pool via `client.end()` for graceful shutdown. (TRACK-042, TRACK-045)
 │   │   └── migrate.ts        → Migration runner
 │   ├── auth/
@@ -214,7 +216,7 @@ simak/
 │   │   ├── deadline-reminder-scanner.ts → `processDeadlineReminders()` — hourly background scanner for tiered deadline reminders (7d/3d/1d), dedup via `deadline_reminders` table
 │   │   ├── deadline-reminder-email.ts → `sendDeadlineReminderEmail()` helper (wraps `enqueueEventEmail` with `buildDeadlineReminderHtml`)
 │   │   ├── risk-scoring.ts   → Pure function `computeStudentRisk(data): RiskAssessment` — 5 risk signals (overdue, approaching deadline, insufficient consultations, repeated revise, stalled review); ephemeral, never persisted
-│   │   ├── student-next-actions.ts → Pure deterministic resolver for checkpoint action eligibility, priority/deduplication, precise destinations, and submitted/under-review waiting summaries (TRACK-053)
+│   │   ├── student-next-actions.ts → Pure deterministic resolver for checkpoint action eligibility, priority/deduplication, precise destinations, submitted/under-review waiting summaries, and unresolved current-plan context (TRACK-053, TRACK-054)
 │   │   ├── risk-alerts.ts    → `checkAndFireRiskAlert(db, opts)` — advisory post-commit alert with 7-day dedup via notifications table; fires in-app notification + email via `Promise.allSettled`
 │   │   ├── review-risk-alert.ts → `maybeFireReviewRiskAlert(db, decision, breachDays, slaFields, instructorId)` — wrapper called from `submitReviewHandler` when revise or SLA breach
 │   │   ├── at-risk-email.ts  → `sendStudentAtRiskEmail(opts)` helper (wraps `enqueueEventEmail` with `buildStudentAtRiskHtml`)
@@ -227,7 +229,7 @@ simak/
     │   │   ├── session-guards.ts → Shared client-safe type-guard functions (isAdmin, isInstructor, isStudent, isAuthenticated) — accept `NonNullableSession | null`, return `session is NonNullableSession` (TRACK-031)
      │   │   ├── server-fn.ts     → Type-preserving `typedServerFn` alias for `createServerFn`, plus explicit `serverFnMiddlewares()` composition for request IDs and optional rate limiting. Client-safe stubs dynamically import server-only handlers inside callbacks.
     │   │   ├── bulk-import/      → Client-side xlsx parsing (parse-users, parse-templates, samples)
-      │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys including types, emailQueueKeys including summary, discussionKeys, settingsKeys including currentUser/accessibility/calendarFeed, gradebookKeys, feedbackSnippetKeys)
+       │   │   ├── query-keys.ts      → Typed query-key factories (notificationKeys, consultationKeys, extensionKeys, assignmentKeys, userKeys, templateKeys including types, emailQueueKeys including summary, discussionKeys, settingsKeys including currentUser/accessibility/calendarFeed, gradebookKeys, feedbackSnippetKeys)
     │   │   ├── logger.ts         → Singleton `pino` logger instance — JSON to stdout in prod, `pino-pretty` in dev (lazy-loaded via `createRequire`). `LOG_LEVEL` env var (default `info`). A pino `mixin` adds the current AsyncLocalStorage request ID to every log entry. `createLogger(options?)` factory. Server-side only. (TRACK-040, TRACK-044)
     │   │   ├── request-context.ts → `requestIdMiddleware` (TanStack Start `createMiddleware`) + `createRequestLogger(context)` — reads `x-request-id` header or generates UUID, then scopes it through AsyncLocalStorage for automatic logger propagation. Wired globally by `typedServerFn`. (TRACK-040, TRACK-044)
     │   │   ├── request-context-store.ts → `AsyncLocalStorage<RequestContext>` and `getRequestId()` helper for request-scoped logging context. (TRACK-044)
@@ -249,7 +251,7 @@ simak/
 ├── tests/
 │   ├── unit/                 → Vitest unit tests
 │   ├── integration/          → Vitest integration tests
-│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 22 spec files including Student Next Actions, timezone/calendar, grade-release, feedback-snippet, and intervention workflow coverage, includes @axe-core/playwright a11y scans)
+│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, 23 spec files including Student Next Actions, revision action plans, timezone/calendar, grade-release, feedback-snippet, and intervention workflow coverage, includes @axe-core/playwright a11y scans)
 ├── docker/
 │   └── Dockerfile
 ├── drizzle.config.ts
@@ -268,11 +270,11 @@ Each role gets a dedicated dashboard page rendered within its role layout (`_stu
 
 | Role           | Dashboard Route         | Widgets                                                                                                                                                                                                                                                                                    |
 | -------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Student**    | `/student/dashboard`    | Next Actions (prioritized submit/revise/required-consultation actions, maximum 5, plus submitted/under-review waiting summaries with maximum 3 representative links), Active Assignments (card grid with progress bars), Upcoming Deadlines (next 5, color-coded urgency, overdue badges), Pending Reviews (submissions under review, wait times), Consultation Reminders (pending verifications) |
+| **Student**    | `/student/dashboard`    | Next Actions (prioritized submit/revise/required-consultation actions, maximum 5, plus up to 3 unresolved items from the current revision plan on revise actions and submitted/under-review waiting summaries with maximum 3 representative links), Active Assignments (card grid with progress bars), Upcoming Deadlines (next 5, color-coded urgency, overdue badges), Pending Reviews (submissions under review, wait times), Consultation Reminders (pending verifications) |
 | **Instructor** | `/instructor/dashboard` | Pending Review Queue (count + FIFO list with SLA badges: On Time/Approaching/Breached), Recent Submissions (last 5 with status badges), Assignment Overview (cards with student count, pending count, progress), At-Risk Students (sorted by severity: high/medium/low with colored Badges, factor descriptions via i18n, link to assignment detail, EmptyState when none), Quick Actions (Go to Review Queue, Manage Assignments)                    |
 | **Admin**      | `/admin/dashboard`      | System Metrics (6 cards: Total Users, Instructors, Students, Active Assignments, Pending Reviews, Active Consultations), Recent Activity Feed (last 10 events, 7 days), Deadline Escalation Alerts (SLA breaches >3 days with red styling), Quick Actions (Manage Users, Manage Templates) |
 
-Widget data is fetched via a single **aggregated server function** per role. Each handler verifies session + role, executes multiple Drizzle queries, and returns a pre-shaped payload. The student handler resolves Next Actions from authoritative checkpoint, submission, review, and consultation state in the same response; it loads candidates completely before applying display caps and does not persist a second task system. All widgets show appropriate empty states when no data is available.
+Widget data is fetched via a single **aggregated server function** per role. Each handler verifies session + role, executes multiple Drizzle queries, and returns a pre-shaped payload. The student handler resolves Next Actions from authoritative checkpoint, submission, review, consultation, and current revision-plan state in the same response; a student-scoped batch query loads only the newest action-item plan per checkpoint, filters addressed items, and applies the existing display caps without persisting a second task system. All widgets show appropriate empty states when no data is available.
 
 Query key: `['dashboard']` with role differentiation handled server-side.
 
@@ -436,7 +438,7 @@ A nonce-based Content-Security-Policy defends against XSS — the primary browse
 
 ### Application-Level Rate Limiting [v1] (Track: Application-Level Rate Limiting on Server Functions)
 
-All 85 authenticated TanStack Start server functions are rate-limited through explicit `serverFnMiddlewares` composition. Better Auth's built-in rate limiting only covers `/api/auth/*` endpoints — application server functions were previously unprotected against abuse (R2 cost exploitation, email queue flooding, data pollution, DB connection exhaustion).
+All 86 authenticated TanStack Start server functions are rate-limited through explicit `serverFnMiddlewares` composition. Better Auth's built-in rate limiting only covers `/api/auth/*` endpoints — application server functions were previously unprotected against abuse (R2 cost exploitation, email queue flooding, data pollution, DB connection exhaustion).
 
 - **`src/lib/rate-limiter.ts`** — In-memory sliding window rate limiter:
   - `RateLimitConfig` type: `{ window: number; max: number }` (window in seconds).
@@ -452,7 +454,7 @@ All 85 authenticated TanStack Start server functions are rate-limited through ex
 
 - **`src/lib/toast.ts`** — `RATE_LIMITED` added to `VALID_ERROR_CODES` and mapped to `error.rateLimited` i18n key ("Too many requests. Please wait a moment and try again." / "Terlalu banyak permintaan. Mohon tunggu sebentar dan coba lagi.").
 
-- **Server function annotations:** 85 functions across 22 stub files compose `serverFnMiddlewares(RATE_LIMITS.<tier>)` per the rate limit catalog. Tier 1 (presignedUrl): 4 functions (file presigned URLs, avatar upload). Tier 2 (heavyMutation): 3 functions (submitCheckpoint, submitReview, openForReview). Tier 3 (destructive): 36 functions (assignment/template/user CRUD, 2FA, sessions, consultations, extensions, discussions, email retry, R2 cleanup, grade config). Tier 4 (standardRead): 42 functions (dashboards, analytics, list/detail views, audit log, gradebook, rubrics).
+- **Server function annotations:** 86 functions across 23 stub files compose `serverFnMiddlewares(RATE_LIMITS.<tier>)` per the rate limit catalog. Tier 1 (presignedUrl): 4 functions (file presigned URLs, avatar upload). Tier 2 (heavyMutation): 4 functions (submitCheckpoint, submitReview, openForReview, updateRevisionActionItem). Tier 3 (destructive): 36 functions (assignment/template/user CRUD, 2FA, sessions, consultations, extensions, discussions, email retry, R2 cleanup, grade config). Tier 4 (standardRead): 42 functions (dashboards, analytics, list/detail views, audit log, gradebook, rubrics).
 
 - **Exempt functions** (no rateLimit): `_getSession` (internal session fetch — cascading/infinite-loop concern), `getUnreadCount` / `markRead` / `markAllRead` (high-frequency UX — 30s polling, instant interactions), `completePasswordSetup` (token-based, no session).
 
@@ -474,6 +476,7 @@ All 85 authenticated TanStack Start server functions are rate-limited through ex
 **Checkpoint** — one per assignment stage; copied from template at creation time.
 **Submission** — files uploaded by a student for a checkpoint.
 **Review** — instructor decision (pass/revise) with comments and optional feedback file.
+**RevisionActionItem** — optional ordered plain-text work item owned by a review, with an optional rubric criterion/title snapshot and reversible addressed timestamp for the current student-visible plan.
 **Consultation** — student-instructor meeting log, tied to a specific checkpoint.
 **CheckpointDiscussion** — lightweight async Q&A message tied to a specific checkpoint. Threaded via `parentMessageId` (self-referencing). Soft-deleted via `deletedAt` (deleted messages render as "[deleted]" placeholder, replies preserved). Denormalized `assignmentId` for efficient instructor queries.
 **Notification** — in-app event log.
@@ -481,7 +484,7 @@ All 85 authenticated TanStack Start server functions are rate-limited through ex
 **ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, the affected student's subsequent checkpoint `dueDate` values auto-extend. The assignment-wide `finalDeadline` is immutable after creation and never mutated by extensions.
 **DeadlineReminder** — dedup tracking table for proactive deadline reminders. Records `checkpointId` (FK, cascade delete), `studentId` (FK, cascade delete), `tier` (`'7d'`/`'3d'`/`'1d'`), and `sentAt`. Unique constraint on `(checkpointId, tier)` ensures at-most-once delivery per tier per checkpoint across multiple server instances. Used by the hourly background scanner (`processDeadlineReminders()`) to deduplicate via `INSERT ... ON CONFLICT DO NOTHING RETURNING *`.
 **CalendarFeedToken** — per-student private-feed credential record introduced by migration 0020. Stores a SHA-256 token hash, ownership and created/revoked timestamps; a partial unique index enforces one active token per student. The opaque token is returned only on enable/regenerate and is never persisted or logged in plaintext. The route is `GET /api/calendar/ics` and returns UTC RFC 5545 events.
-**AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details. [v1] — admin viewer at `/admin/audit-log`.
+**AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, revision-action plan creation/status changes, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details; revision-action entries omit full feedback text. [v1] — admin viewer at `/admin/audit-log`.
 **EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, 2FA emails, SLA alerts, and **11 event notification types** (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, deadline reminder, student at risk, discussion reply). Event emails are dispatched as post-commit advisory work via `enqueueEventEmail()` (`src/lib/event-email.ts`) alongside existing in-app notifications — the primary operation always succeeds even if enqueue fails. `enqueueEventEmail` supports optional `subjectParams` for interpolating dynamic values into email subjects (e.g., `{assignmentTitle}` in deadline reminder subjects). A proactive deadline reminder scanner (`processDeadlineReminders()` in `src/lib/deadline-reminder-scanner.ts`) runs hourly alongside the email queue processor — it queries checkpoints with upcoming due dates, dispatches tiered (7d/3d/1d) in-app notifications + emails, and uses a `deadline_reminders` dedup table with `ON CONFLICT DO NOTHING` for at-most-once delivery per tier per checkpoint. The dedup insert and notification creation are wrapped in a single `db.transaction` (atomicity); email dispatch runs post-commit via `Promise.allSettled` (advisory). Scanner failure is isolated via `try/catch` and does not affect email processing. The scanner also calls `checkAndFireRiskAlert` for each reminder to surface at-risk students (advisory, `Promise.allSettled`). An orphaned R2 object cleanup scanner (`processOrphanedR2Objects()` in `src/lib/r2-cleanup.ts`) also runs in the tick loop — throttled to every 6 hours via in-memory `lastR2CleanupAt`, it deletes R2 objects whose upload intents expired without being consumed, using `Promise.allSettled` for parallel deletes with per-object error isolation. The R2 cleanup scanner accepts an `actorId` parameter (default `'system'`) for audit logging via `safeAuditLog`. Scanner failure is isolated via `try/catch` and does not affect email processing. Admins can manually trigger R2 cleanup via the "Trigger R2 Cleanup" button on `/admin/email-queue` (bypasses throttle, logs with admin userId). Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS. Admin queue inspector at `/admin/email-queue` provides observability — paginated list (20/page) with status filter, search (recipient email/subject), summary stats (pending/sent/failed), and manual retry of failed emails (idempotent: only `status='failed'` can be retried, resets to `pending` inside a `FOR UPDATE` transaction). Each row exposes a `resendMessageId` (populated from the Resend API `result.data.id` on successful send) displayed as a monospace truncated cell, enabling correlation with Resend's delivery dashboard. Processor sends emails in concurrent batches of 5 via `Promise.allSettled` (chunks run sequentially; partial failures don't abort the batch — cycle latency reduced from ~10× to ~2× single-send latency). Automatic retention cleanup prunes `sent` rows older than 90 days and `failed` rows older than 180 days on a tick-embedded 24-hour cycle (`lastPruneAt` timestamp in `email-queue-init.ts`); `pending`/`processing` rows are never deleted. Processor emits structured logs (`email_queue.cycle_start`, `email_queue.cycle_end`, `email_queue.reclaimed`, `email_queue.send_failed`, `email_queue.retention_pruned` — no PII). `EMAIL_FROM` is read from `getEnv().EMAIL_FROM` (Zod-validated in `src/config/env.ts` with default `'SIMAK <noreply@simak.app>'`).
 **TwoFactor** — TOTP configuration (secret, backup codes) managed by Better Auth's `twoFactor` plugin.
 **Session** — Better-Auth session token, FK to users, expiresAt.
@@ -671,7 +674,23 @@ _Note: Each row represents one student's individual participation. Group assignm
 
 > **Atomic review submission (Track: review-atomic_20260704):** `submitReviewHandler` (`src/server/reviews.server.ts`) wraps the checkpoint state read, ownership validation, review insert, checkpoint state mutation, next-checkpoint unlock, SLA adjustment, and in-app notification inserts in a single `db.transaction(async (tx) => { ... })` block. The checkpoint row is locked with `FOR UPDATE OF checkpoints` and re-validated against `REVIEWABLE_STATES` post-lock. All error returns occur before any writes (safe empty-commit pattern). Post-commit advisory work (audit logging, SLA breach notifications) runs after the transaction commits, wrapped in try/catch. This follows SQL style guide §6.
 
-> **Rubric score validation (Track: Rubric-Based Grading):** For checkpoints with a rubric (`grading_type` is not `null`), `validateReviewScores` runs **before** the review INSERT (inside the transaction) — checking that all current criteria are scored, no duplicates exist, and `rubricLevelId` values belong to the correct rubric. Only after validation passes does the review INSERT execute with `.returning({ id: reviews.id })` (capturing the generated ID directly — no separate SELECT-after-INSERT per SQL styleguide §6.3). `insertReviewScores` then writes the denormalized snapshot rows using the captured `review.id`. This prevents the orphaned-review bug where a score-validation failure after the INSERT would commit the review row without transitioning the checkpoint.
+#### revision_action_items
+
+| Column        | Type                                  | Notes                                                                                         |
+| ------------- | ------------------------------------- | --------------------------------------------------------------------------------------------- |
+| id            | serial (PK)                           |                                                                                               |
+| reviewId      | integer (FK → reviews, cascade)       | Owning review; a later Revise plan never mutates prior rows                                          |
+| itemText      | varchar(500), not null                | Trimmed plain text; empty values and angle-bracket markup are rejected                        |
+| order         | integer, not null                     | Stable instructor-defined display order                                                       |
+| criterionId   | integer (FK → rubric_criteria)       | Nullable; must belong to the review checkpoint's active rubric when provided                  |
+| criterionTitle| text                                  | Nullable criterion-title snapshot preserved for historical guidance                          |
+| addressedAt   | timestamp                             | Nullable; only the owning student can set/unset it while the plan is current                 |
+| createdAt     | timestamp                             |                                                                                               |
+| updatedAt     | timestamp                             |                                                                                               |
+
+Migration `0021_round_mysterio.sql` creates the table and rollback `0021_round_mysterio.rollback.sql` drops it with the repository's irreversible-data warning. Action items are validated before writes and inserted after the review ID inside the existing transaction; non-empty items on `pass` are rejected. A later Revise review containing items becomes current without copying/merging prior rows. A later comment-only or feedback-file-only Revise review does not supersede the existing plan. Latest/history reads order by `createdAt DESC, id DESC` and action items by `reviewId, order, id` for deterministic snapshots. [TRACK-054]
+
+> **Rubric score and action-plan validation:** For checkpoints with a rubric (`grading_type` is not `null`), `validateReviewScores` and revision-action criterion validation run **before** the review INSERT (inside the transaction) — checking that all current criteria are scored, no duplicates exist, `rubricLevelId` values belong to the correct rubric, and linked action-item criteria belong to the checkpoint rubric. Only after validation passes does the review INSERT execute with `.returning({ id: reviews.id })` (capturing the generated ID directly — no separate SELECT-after-INSERT per SQL styleguide §6.3). `insertReviewScores` and `insertRevisionActionItems` then write denormalized score/criterion snapshots using the captured `review.id`. This prevents an orphaned review or partial action plan when validation or insertion fails.
 
 #### rubric_criteria
 
@@ -968,6 +987,7 @@ Unique constraint on `(assignmentId, releaseVersion, studentId)`. Indexes suppor
 | `notifications`      | `createdAt`              | b-tree           | Admin dashboard recentActivity query (TRACK-005) |
 | `template_checkpoints`| `templateId`, `order`   | composite b-tree | Template checkpoint ordering (TRACK-005)     |
 | `users`              | `role`, `deletedAt`      | composite b-tree | Admin user list filtering by role + active (TRACK-005) |
+| `users`              | `name`, `email`          | GIN trigram      | Contains-search filtering (TRACK-056, migration 0022) |
 | `verification`       | `value`                  | b-tree           | Token lookup on password setup/reset         |
 | `final_grades`       | `assignmentId`            | b-tree           | Gradebook query per assignment (TRACK-025)   |
 | `final_grades`       | `studentId`              | b-tree           | Student grade lookup (TRACK-025)             |
@@ -977,25 +997,26 @@ Unique constraint on `(assignmentId, releaseVersion, studentId)`. Indexes suppor
 | `audit_log`          | `action`                 | b-tree           | Type filtering                               |
 | `audit_log`          | `entityType`, `entityId` | composite b-tree | Entity-specific history                      |
 | `audit_log`          | `actorId`                | b-tree           | JOIN in listAuditLogsHandler (TRACK-005)     |
+| `audit_log`          | `entityId`               | GIN trigram      | Audit entity contains-search filtering (TRACK-056, migration 0022) |
+| `audit_log`          | `CAST(details AS text)`  | GIN trigram      | Audit JSONB detail contains-search filtering (TRACK-056, migration 0022) |
 | `extension_requests` | `assignmentId`, `status` | composite b-tree | Instructor queue queries                     |
 | `extension_requests` | `assignmentId`, `studentId` | composite b-tree | Per-student extension lookup (TRACK-005)  |
 | `email_queue`        | `status`                 | b-tree           | Pick pending emails for delivery             |
-| `users`              | `name`, `email`          | GIN trigram      | Contains-search filtering (TRACK-056, migration 0021) |
-| `assignment_templates` | `name`                 | GIN trigram      | Template contains-search filtering (TRACK-056, migration 0021) |
-| `assignments`        | `title`                  | GIN trigram      | Assignment contains-search filtering (TRACK-056, migration 0021) |
-| `email_queue`        | `recipientEmail`, `subject` | GIN trigram   | Email queue contains-search filtering (TRACK-056, migration 0021) |
-| `feedback_snippets`  | `title`, `category`      | GIN trigram      | Feedback snippet contains-search filtering (TRACK-056, migration 0021) |
-| `audit_log`          | `entityId`               | GIN trigram      | Audit entity contains-search filtering (TRACK-056, migration 0021) |
-| `audit_log`          | `CAST(details AS text)`  | GIN trigram      | Audit JSONB detail contains-search filtering (TRACK-056, migration 0021) |
+| `email_queue`        | `recipientEmail`, `subject` | GIN trigram   | Email queue contains-search filtering (TRACK-056, migration 0022) |
+| `assignment_templates` | `name`                 | GIN trigram      | Template contains-search filtering (TRACK-056, migration 0022) |
+| `assignments`        | `title`                  | GIN trigram      | Assignment contains-search filtering (TRACK-056, migration 0022) |
+| `feedback_snippets`  | `title`, `category`      | GIN trigram      | Feedback snippet contains-search filtering (TRACK-056, migration 0022) |
 | `upload_intents`     | `fileKey`                | b-tree (unique)  | Intent lookup at submit time                 |
 | `upload_intents`     | `userId`                 | b-tree           | User's pending upload intents                 |
 | `checkpoints`        | `templateCheckpointId`  | b-tree           | Rubric lookup via FK join (TRACK-020)         |
 | `review_scores`      | `criterionId`           | b-tree           | Analytics queries joining on criterion (TRACK-020) |
+| `revision_action_items` | `reviewId`, `order` | composite b-tree | Stable current/history action-plan reads (TRACK-054) |
+| `revision_action_items` | `reviewId`, `addressedAt` | composite b-tree | Current-plan addressed-status updates and filtering (TRACK-054) |
 | `checkpoint_discussions` | `checkpointId`, `createdAt` | composite b-tree | Message list queries ordered by createdAt ASC (TRACK-026) |
 | `checkpoint_discussions` | `assignmentId`, `createdAt` | composite b-tree | Instructor overview across all checkpoints (TRACK-026) |
 | `checkpoint_discussions` | `parentMessageId`       | b-tree           | Reply threading lookup (TRACK-026)            |
 
-All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Migrations `0010`–`0012` (TRACK-020) added rubric tables (`rubric_criteria`, `rubric_levels`, `review_scores`), `grading_type` pgEnum, `checkpoints.templateCheckpointId` FK + backfill, `template_checkpoints.deletedAt`, and the two rubric-related indexes. Migration `0014_sour_nightshade.sql` (TRACK-026) added the `checkpoint_discussions` table with 3 indexes. Migration `0016` (TRACK-039) added the `cleanedUpAt` timestamp column to `upload_intents`. Migration `0019_daffy_bulldozer.sql` (TRACK-051) added release state, immutable snapshots, indexes, and foreign keys; its companion rollback is `drizzle/migrations/rollback/0019_daffy_bulldozer.rollback.sql`. Migration `0021_search_trigram_indexes.sql` (TRACK-056) enables `pg_trgm` and adds ten GIN trigram indexes for contains-search fields, including the `CAST(details AS text)` audit expression. Its rollback drops only the migration's indexes and intentionally retains `pg_trgm` because `CREATE EXTENSION IF NOT EXISTS` cannot establish ownership. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
+All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Migrations `0010`–`0012` (TRACK-020) added rubric tables (`rubric_criteria`, `rubric_levels`, `review_scores`), `grading_type` pgEnum, `checkpoints.templateCheckpointId` FK + backfill, `template_checkpoints.deletedAt`, and the two rubric-related indexes. Migration `0014_sour_nightshade.sql` (TRACK-026) added the `checkpoint_discussions` table with 3 indexes. Migration `0016` (TRACK-039) added the `cleanedUpAt` timestamp column to `upload_intents`. Migration `0019_daffy_bulldozer.sql` (TRACK-051) added release state, immutable snapshots, indexes, and foreign keys; migration `0020_white_spacker_dave.sql` (TRACK-055) added the calendar feed token; migration `0021_round_mysterio.sql` (TRACK-054) added revision action items and its two composite indexes; migration `0022_search_trigram_indexes.sql` (TRACK-056) enables `pg_trgm` and adds ten GIN trigram indexes for contains-search fields, including the `CAST(details AS text)` audit expression. Its rollback drops only the migration's indexes and intentionally retains `pg_trgm` because `CREATE EXTENSION IF NOT EXISTS` cannot establish ownership. Companion rollbacks are kept in `drizzle/migrations/rollback/`. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
 
 ---
 
@@ -1326,7 +1347,7 @@ operational trade-offs are documented in
 
 ### E2E Tests (Playwright) [v1]
 
-E2E tests run against a dedicated test database (`simak_test` on a separate `postgres-test` Docker service, port 5433) to avoid polluting the dev database. The global setup (`tests/e2e/global-setup.ts`) migrates the test DB, truncates all tables, and seeds test users (SuperAdmin, Admin, Instructor, Instructor2, Student, Student2, Student3 — all with `emailVerified: true`) plus an assignment template (3 checkpoints, Thesis, `minConsultations: 1`), an assignment with the first checkpoint unlocked (Student + Student2 enrolled; Student3 not enrolled — for cross-student access denial tests), a pending consultation on the Proposal checkpoint, and TRACK-049 active, archived, and second-instructor-private feedback snippets. Each spec file resets the database (truncate + re-seed) via `resetDatabase()` before execution to ensure isolation.
+E2E tests run against a dedicated test database (`simak_test` on a separate `postgres-test` Docker service, port 5433) to avoid polluting the dev database. The global setup (`tests/e2e/global-setup.ts`) migrates the test DB, truncates all tables, and seeds test users (SuperAdmin, Admin, Instructor, Instructor2, Student, Student2, Student3 — all with `emailVerified: true`) plus an assignment template (3 checkpoints, Thesis, `minConsultations: 1`), an assignment with the first checkpoint unlocked (Student + Student2 enrolled; Student3 not enrolled — for cross-student access denial tests), a pending consultation on the Proposal checkpoint, and TRACK-049 active, archived, and second-instructor-private feedback snippets. TRACK-054 revision-action-plan specs add their own ordered Revise-plan and resubmission fixtures. Each spec file resets the database (truncate + re-seed) via `resetDatabase()` before execution to ensure isolation.
 
 **Configuration** (`playwright.config.ts`):
 
@@ -1362,6 +1383,7 @@ E2E tests run against a dedicated test database (`simak_test` on a separate `pos
 | `instructor-assignments.spec.ts` | 2 | Create assignment from template, checkpoint state transitions (locked → unlocked → submitted) |
 | `student-submission.spec.ts` | 5     | Upload form visible + version history, resubmit with "Latest" badge, notification assertion (`submission_received`), upload UI validation (file type + size), locked checkpoint + cross-student access denial |
 | `instructor-review.spec.ts`  | 5     | Review queue, Pass unlocks next checkpoint, Revise sets deadline, review history (4 tests decoupled — each sets up own state via `createSubmissionForCheckpoint`) + notification assertion (`review_completed`) |
+| `revision-action-plans.spec.ts` | 3 | Instructor ordered Revise-plan authoring, reused `revision_requested` notification, student current/history display, addressed toggle, Next Actions unresolved context, non-blocking resubmission, supersession, axe scans, and 320px mobile layout |
 | `consultation.spec.ts`       | 3     | Consultation lifecycle (log → verify → gating UI: "insufficient verified consultations (0/1)" → (1/1)), consultation rejection, notification assertion (`consultation_verified`) |
 | `instructor-interventions.spec.ts` | 2 | Pending-review-only students cannot create interventions; eligible instructors create an overdue discussion intervention, manage it to monitoring, see dashboard status, and student/admin access remains private |
 | `extension.spec.ts`          | 3     | Extension request → approve (checkpoint `dueDate` extended in DB), reject (deadline NOT extended), instructor bulk extension (all unfinished checkpoints extended) |

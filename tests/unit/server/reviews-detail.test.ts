@@ -171,6 +171,69 @@ describe('getReviewDetailHandler', () => {
     expect(result.rubric.levels).toHaveLength(2);
   });
 
+  it('should group ordered action items under each review in history', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
+    mockDb.then
+      // submission query
+      .mockImplementationOnce((onf: any) =>
+        Promise.resolve([
+          {
+            submissionId: 1,
+            checkpointId: 100,
+            templateCheckpointId: null,
+            fileKey: 'submissions/test.pdf',
+          },
+        ]).then(onf),
+      )
+      // review history query
+      .mockImplementationOnce((onf: any) =>
+        Promise.resolve([
+          {
+            id: 10,
+            decision: 'revise',
+            comment: 'Please revise',
+            instructorName: 'Instructor',
+            createdAt: new Date('2026-08-01'),
+          },
+        ]).then(onf),
+      )
+      // action-item batch query
+      .mockImplementationOnce((onf: any) =>
+        Promise.resolve([
+          {
+            id: 21,
+            reviewId: 10,
+            itemText: 'Rewrite the conclusion',
+            order: 0,
+            criterionId: 5,
+            criterionTitle: 'Content Quality',
+            addressedAt: null,
+          },
+          {
+            id: 22,
+            reviewId: 10,
+            itemText: 'Add supporting evidence',
+            order: 1,
+            criterionId: null,
+            criterionTitle: null,
+            addressedAt: new Date('2026-08-02'),
+          },
+        ]).then(onf),
+      );
+
+    const result = (await getReviewDetailHandler({ data: { submissionId: 1 } })) as any;
+
+    expect(result.reviewHistory[0].actionItems).toEqual([
+      expect.objectContaining({
+        id: 21,
+        reviewId: 10,
+        order: 0,
+        criterionTitle: 'Content Quality',
+      }),
+      expect.objectContaining({ id: 22, reviewId: 10, order: 1, criterionTitle: null }),
+    ]);
+  });
+
   it('should return null rubric when grading_type is null', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(instructorSession as any);
     mockDb.then

@@ -123,6 +123,55 @@ describe('resolveStudentNextActions', () => {
     });
   });
 
+  it('adds only unresolved current-plan items to a revise action', () => {
+    const result = resolveStudentNextActions(
+      [
+        candidate({
+          state: 'revise',
+          revisionActionItems: [
+            { itemText: 'Rewrite the conclusion', addressedAt: null },
+            { itemText: 'Already addressed', addressedAt: new Date('2026-08-01') },
+            { itemText: 'Add evidence', addressedAt: null },
+          ],
+        } as any),
+      ],
+      { now },
+    );
+
+    expect(result.primaryActions[0]).toMatchObject({
+      kind: 'revise',
+      revisionActionPlan: {
+        unresolvedCount: 2,
+        items: ['Rewrite the conclusion', 'Add evidence'],
+      },
+    });
+  });
+
+  it('preserves the existing revise action contract when there is no unresolved plan', () => {
+    const result = resolveStudentNextActions(
+      [
+        candidate({
+          state: 'revise',
+          revisionActionItems: [
+            { itemText: 'Already addressed', addressedAt: new Date('2026-08-01') },
+          ],
+        } as any),
+        candidate({
+          checkpointId: 2,
+          state: 'submitted',
+          revisionActionItems: [{ itemText: 'Waiting item', addressedAt: null }],
+        } as any),
+      ],
+      { now },
+    );
+
+    expect(result.primaryActions[0]).toMatchObject({ kind: 'revise' });
+    expect(result.primaryActions[0]).not.toHaveProperty('revisionActionPlan');
+    expect(result.waitingSummary.submitted.representatives[0]).not.toHaveProperty(
+      'revisionActionPlan',
+    );
+  });
+
   it('tie-breaks by due date and stable assignment/checkpoint identifiers', () => {
     const dueDate = new Date('2026-08-04T12:00:00.000Z');
     const result = resolveStudentNextActions(

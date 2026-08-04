@@ -99,6 +99,10 @@ describe('StudentNextActions', () => {
           checkpointName: 'Draft',
           priority: 'revise',
           href: '/student/assignments/1/checkpoints/11',
+          revisionActionPlan: {
+            unresolvedCount: 4,
+            items: ['Rewrite the conclusion', 'Add evidence', 'Clarify method'],
+          },
         }),
         action({
           kind: 'consultation',
@@ -123,6 +127,10 @@ describe('StudentNextActions', () => {
     expect(screen.getByText('studentDashboard.nextActions.actions.submit')).toBeDefined();
     expect(screen.getByText('studentDashboard.nextActions.actions.revise')).toBeDefined();
     expect(screen.getByText('studentDashboard.nextActions.actions.consultation')).toBeDefined();
+    expect(screen.getByText('Rewrite the conclusion')).toBeDefined();
+    expect(screen.getByText('Add evidence')).toBeDefined();
+    expect(screen.getByText('Clarify method')).toBeDefined();
+    expect(screen.getByText('studentDashboard.nextActions.revisionPlan.remaining')).toBeDefined();
     expect(
       screen.getByRole('link', { name: 'studentDashboard.nextActions.submitCheckpoint' }),
     ).toBeDefined();

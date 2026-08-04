@@ -24,6 +24,7 @@ export const TABLES_TO_TRUNCATE = [
   'consultations',
   'checkpoint_discussions',
   'upload_intents',
+  'revision_action_items',
   'review_scores',
   'reviews',
   'submissions',

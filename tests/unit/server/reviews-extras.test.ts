@@ -209,6 +209,26 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
               comment: null,
             },
           ]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: any) =>
+          Promise.resolve([
+            {
+              id: 21,
+              itemText: 'Rewrite the conclusion',
+              order: 0,
+              criterionId: 5,
+              criterionTitle: 'Content Quality',
+              addressedAt: null,
+            },
+            {
+              id: 22,
+              itemText: 'Add supporting evidence',
+              order: 1,
+              criterionId: null,
+              criterionTitle: null,
+              addressedAt: new Date('2026-05-24'),
+            },
+          ]).then(onfulfilled),
         );
       const result = (await getLatestReviewHandler({ data: { checkpointId: 100 } })) as any;
       expect(result.review).toBeDefined();
@@ -225,6 +245,26 @@ describe('Review handlers - Queries (getLatestReview, getReviewDetail)', () => {
         weight: 50,
         levelLabel: null,
       });
+      expect(result.actionItems).toMatchInlineSnapshot(`
+        [
+          {
+            "addressedAt": null,
+            "criterionId": 5,
+            "criterionTitle": "Content Quality",
+            "id": 21,
+            "itemText": "Rewrite the conclusion",
+            "order": 0,
+          },
+          {
+            "addressedAt": 2026-05-24T00:00:00.000Z,
+            "criterionId": null,
+            "criterionTitle": null,
+            "id": 22,
+            "itemText": "Add supporting evidence",
+            "order": 1,
+          },
+        ]
+      `);
     });
 
     it('should return scores for soft-deleted criteria via snapshot', async () => {

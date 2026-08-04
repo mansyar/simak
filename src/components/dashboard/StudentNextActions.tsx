@@ -102,6 +102,25 @@ function ActionCard({ action }: { action: StudentNextAction }) {
               })
             : t('studentDashboard.nextActions.noDueDate')}
         </span>
+        {action.revisionActionPlan && (
+          <span className="mt-3 block rounded-md bg-muted/60 p-2 text-xs text-muted-foreground">
+            <span className="font-medium text-foreground">
+              {t('studentDashboard.nextActions.revisionPlan.remaining', {
+                count: String(action.revisionActionPlan.unresolvedCount),
+              })}
+            </span>
+            <ul
+              aria-label={t('studentDashboard.nextActions.revisionPlan.itemsLabel')}
+              className="mt-1 list-inside list-disc space-y-0.5"
+            >
+              {action.revisionActionPlan.items.map((item, index) => (
+                <li key={`${item}-${index}`} className="truncate">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </span>
+        )}
       </span>
       <ArrowRight
         className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"

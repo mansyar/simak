@@ -326,6 +326,29 @@
       "notInSubmittedState": "Checkpoint must be in submitted state to open for review"
     },
     "reviewDateLabel": "Reviewed on {date}",
+    "revisionActionPlan": "Revision action plan (optional)",
+    "actionPlan": {
+      "description": "Give the student clear, ordered items to address. Items do not block resubmission.",
+      "itemCount": "{count} of 10 items",
+      "itemLabel": "Action item {number}",
+      "criterionLabel": "Rubric criterion (optional)",
+      "noCriterion": "No criterion",
+      "addItem": "Add action item",
+      "removeItem": "Remove action item",
+      "moveUp": "Move action item up",
+      "moveDown": "Move action item down",
+      "reorderLabel": "Reorder action item",
+      "itemRequired": "Enter an action item",
+      "itemTooLong": "Action items must be 500 characters or fewer",
+      "itemPlainText": "Action items must be plain text",
+      "invalidItems": "Complete or remove invalid action items before submitting",
+      "listLabel": "Revision action items",
+      "current": "Current plan",
+      "historical": "Historical plan",
+      "addressed": "Addressed",
+      "open": "Open",
+      "criterion": "Criterion: {title}"
+    },
     "rubric": {
       "title": "Rubric Scoring",
       "weightedTotal": "Weighted Total",
@@ -559,6 +582,17 @@
     "title": "Rubric Results",
     "weightedTotal": "Weighted Total"
   },
+  "studentRevisionActionPlan": {
+    "current": "Current revision plan",
+    "historical": "Previous revision plan",
+    "currentDescription": "Mark each item addressed when you have completed it. This does not block resubmission.",
+    "historicalDescription": "This plan is from an earlier review and cannot be changed.",
+    "listLabel": "Revision action items",
+    "item": "Action item {number}",
+    "addressed": "Addressed",
+    "open": "Not yet addressed",
+    "updateError": "Unable to update this action item. Try again."
+  },
   "studentAssignments": {
     "title": "My Assignments",
     "subtitle": "View and track the progress of your assigned academic work.",
@@ -629,6 +663,10 @@
       "reviseCheckpoint": "Revise and resubmit {checkpoint} in {assignment}",
       "requiredConsultation": "Complete required consultation for {checkpoint} in {assignment}",
       "openWaitingCheckpoint": "Open {checkpoint} in {assignment}",
+      "revisionPlan": {
+        "remaining": "{count} revision item(s) remain",
+        "itemsLabel": "Unresolved revision items"
+      },
       "waiting": {
         "title": "Waiting work",
         "description": "Submitted work remains visible while it is being processed.",

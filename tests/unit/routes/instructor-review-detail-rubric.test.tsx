@@ -42,10 +42,14 @@ vi.mock('@/components/discussions/discussion-panel', () => ({
   DiscussionPanel: () => null,
 }));
 vi.mock('@/components/reviews/ReviewHistory', () => ({
-  ReviewHistory: () => null,
+  ReviewHistory: (props: any) => {
+    Object.assign(capturedHistory, props);
+    return null;
+  },
 }));
 
 const capturedProps: any = {};
+const capturedHistory: any = {};
 vi.mock('@/components/reviews/ReviewForm', () => ({
   ReviewForm: (props: any) => {
     Object.assign(capturedProps, props);
@@ -130,5 +134,28 @@ describe('ReviewDetailPage - Rubric prop pass-through', () => {
     render(<Component />);
 
     expect(capturedProps.rubric).toBeNull();
+  });
+
+  it('passes action items through to review history', () => {
+    const actionItems = [
+      {
+        id: 5,
+        itemText: 'Add a cited source',
+        order: 0,
+        criterionId: 7,
+        criterionTitle: 'Evidence',
+        addressedAt: null,
+      },
+    ];
+    mockUseLoaderData.mockReturnValue({
+      ...mockReviewDetail,
+      reviewHistory: [{ id: 2, decision: 'revise', instructorName: 'Prof. Jones', actionItems }],
+      rubric: null,
+    });
+
+    const Component = (Route as any).component as React.FC;
+    render(<Component />);
+
+    expect(capturedHistory.reviews[0].actionItems).toEqual(actionItems);
   });
 });

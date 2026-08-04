@@ -1,0 +1,8 @@
+{
+  "track_id": "TRACK-054",
+  "type": "feature",
+  "status": "complete",
+  "created_at": "2026-08-03T00:00:00Z",
+  "updated_at": "2026-08-04T00:00:00Z",
+  "description": "Feedback-to-Revision Action Plans — optional structured revision items that connect instructor feedback to student-addressable work without changing review decisions or submission gates."
+}

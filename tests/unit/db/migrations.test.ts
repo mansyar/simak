@@ -79,14 +79,14 @@ describe('0013_deadline_reminders migration', () => {
   });
 });
 
-describe('0021_search_trigram_indexes migration', () => {
+describe('0022_search_trigram_indexes migration', () => {
   const migrationPath = resolve(
     process.cwd(),
-    'drizzle/migrations/0021_search_trigram_indexes.sql',
+    'drizzle/migrations/0022_search_trigram_indexes.sql',
   );
   const rollbackPath = resolve(
     process.cwd(),
-    'drizzle/migrations/rollback/0021_search_trigram_indexes.rollback.sql',
+    'drizzle/migrations/rollback/0022_search_trigram_indexes.rollback.sql',
   );
 
   it('enables pg_trgm and creates every contains-search index', () => {
