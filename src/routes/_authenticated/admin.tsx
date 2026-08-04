@@ -19,10 +19,11 @@ function AdminLayout() {
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden" data-app-content="true">
         <AppHeader
           onMenuToggle={() => setIsSidebarOpen(true)}
           onNotificationOpen={() => setIsNotificationOpen(true)}
+          isMenuOpen={isSidebarOpen}
         />
         <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto p-6">
           <Outlet />

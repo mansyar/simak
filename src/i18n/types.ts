@@ -63,6 +63,7 @@ export type Translation = {
     page: string
     openMenu: string
     closeMenu: string
+    navigation: string
     close: string
     copy: string
     skipToContent: string

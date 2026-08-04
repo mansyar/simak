@@ -106,6 +106,19 @@ describe('AppHeader', () => {
     expect(mockToggle).toHaveBeenCalled();
   });
 
+  it('should expose the mobile drawer state and controlled element', () => {
+    const { rerender } = render(
+      <AppHeader onMenuToggle={vi.fn()} onNotificationOpen={vi.fn()} isMenuOpen />,
+    );
+
+    const menuButton = screen.getByLabelText('common.openMenu');
+    expect(menuButton.getAttribute('aria-expanded')).toBe('true');
+    expect(menuButton.getAttribute('aria-controls')).toBe('mobile-navigation-drawer');
+
+    rerender(<AppHeader onMenuToggle={vi.fn()} onNotificationOpen={vi.fn()} isMenuOpen={false} />);
+    expect(menuButton.getAttribute('aria-expanded')).toBe('false');
+  });
+
   it('should render notification badge, theme toggle, and language switcher', () => {
     render(<AppHeader onMenuToggle={vi.fn()} onNotificationOpen={vi.fn()} />);
 

@@ -27,6 +27,7 @@ vi.mock('@tanstack/react-router', () => ({
     className,
     onClick,
     preload,
+    ...props
   }: {
     to: string;
     children: React.ReactNode;
@@ -40,6 +41,7 @@ vi.mock('@tanstack/react-router', () => ({
       data-testid={`sidebar-link-${to}`}
       data-preload={preload}
       onClick={onClick}
+      {...props}
     >
       {children}
     </a>
@@ -91,6 +93,37 @@ describe('StudentSidebar', () => {
     expect(dashboardLink.className).toContain('bg-sidebar-accent');
     expect(dashboardLink.className).toContain('text-sidebar-primary-foreground');
     expect(dashboardLink.className).not.toContain('border-l-[3px]');
+  });
+
+  it('should expose mobile drawer semantics, focus management, and active route state', () => {
+    const mockOnClose = vi.fn();
+    const trigger = document.createElement('button');
+    trigger.id = 'mobile-menu-trigger';
+    document.body.appendChild(trigger);
+    const content = document.createElement('div');
+    content.dataset.appContent = 'true';
+    document.body.appendChild(content);
+    mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
+
+    const { rerender } = render(<StudentSidebar isOpen onClose={mockOnClose} />);
+    const drawer = document.getElementById('mobile-navigation-drawer');
+    const dashboardLink = screen.getByTestId('sidebar-link-/student/dashboard');
+
+    expect(drawer?.getAttribute('aria-label')).toBe('common.navigation');
+    expect(drawer?.getAttribute('aria-hidden')).toBe('false');
+    expect(document.activeElement).toBe(screen.getByLabelText('common.closeMenu'));
+    expect(content.inert).toBe(true);
+    expect(dashboardLink.getAttribute('aria-current')).toBe('page');
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(mockOnClose).toHaveBeenCalled();
+
+    rerender(<StudentSidebar isOpen={false} onClose={mockOnClose} />);
+    expect(content.inert).toBe(false);
+    expect(document.activeElement).toBe(trigger);
+
+    trigger.remove();
+    content.remove();
   });
 
   it('should highlight active route with sub-paths', () => {

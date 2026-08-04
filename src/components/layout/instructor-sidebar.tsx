@@ -13,6 +13,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
+import { useMobileDrawer } from '../../hooks/use-mobile-drawer';
 
 interface InstructorSidebarProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
   const router = useRouter();
   const { data: sessionData } = authClient.useSession();
   const user = sessionData?.user;
+  const { drawerRef, closeButtonRef, isInactive } = useMobileDrawer({ isOpen, onClose });
 
   const mainLinks = [
     { to: '/instructor/dashboard', label: 'instructorSidebar.dashboard', icon: LayoutDashboard },
@@ -61,10 +63,21 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
   return (
     <>
       {/* Mobile overlay */}
-      {isOpen && <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={onClose} />}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          aria-hidden="true"
+          onClick={onClose}
+        />
+      )}
 
       {/* Sidebar */}
       <aside
+        ref={drawerRef}
+        id="mobile-navigation-drawer"
+        aria-label={t('common.navigation')}
+        aria-hidden={isInactive}
+        inert={isInactive ? true : undefined}
         className={`fixed inset-y-0 left-0 z-50 flex w-[272px] flex-col border-r border-sidebar-border bg-sidebar shadow-lg transition-transform duration-200 ease-in-out lg:sticky lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
@@ -80,6 +93,8 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
             </span>
           </div>
           <button
+            ref={closeButtonRef}
+            type="button"
             onClick={onClose}
             className="flex h-11 w-11 items-center justify-center rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring lg:hidden"
             aria-label={t('common.closeMenu')}
@@ -89,7 +104,10 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-4 pb-4">
+        <nav
+          aria-label={t('common.navigation')}
+          className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-4 pb-4"
+        >
           {/* MAIN section */}
           <span className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/90">
             {t('instructorSidebar.sectionMain')}
@@ -103,6 +121,7 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
                 to={link.to as unknown as '.'}
                 onClick={handleLinkClick}
                 preload="intent"
+                aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-sidebar-accent text-sidebar-primary-foreground'
@@ -128,6 +147,7 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
                 to={link.to as unknown as '.'}
                 onClick={handleLinkClick}
                 preload="intent"
+                aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   isActive
                     ? 'bg-sidebar-accent text-sidebar-primary-foreground'
@@ -161,8 +181,9 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
         {/* Logout */}
         <div className="border-t border-sidebar-border p-4">
           <button
+            type="button"
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-all hover:bg-destructive/10 hover:text-destructive"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-all hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
           >
             <LogOut className="h-4 w-4" />
             {t('auth.logout')}
