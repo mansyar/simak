@@ -124,12 +124,12 @@ Commit SHA: f00f87c
 
 ### Phase 3 Verification Checkpoint
 
-- [ ] Apply the migration to a configured PostgreSQL 16 database and verify both forward migration and rollback behavior.
-- [ ] Run the database/schema unit tests and opt-in integration/query-plan verification.
-- [ ] Confirm no existing non-search indexes or application data were changed.
-- [ ] Present the database verification results to the user, await explicit confirmation, attach the checkpoint report as a git note, record the checkpoint SHA, and commit the plan update.
+- [x] Apply the migration to a configured PostgreSQL 16 database and verify both forward migration and rollback behavior.
+- [x] Run the database/schema unit tests and opt-in integration/query-plan verification.
+- [x] Confirm no existing non-search indexes or application data were changed.
+- [x] Present the database verification results to the user, await explicit confirmation, attach the checkpoint report as a git note, record the checkpoint SHA, and commit the plan update.
 
-Phase checkpoint: _pending_
+Phase checkpoint: 0dd1e38 (user-confirmed; verification note attached)
 
 ## Phase 4: Full Regression, Browser Verification, and Completion
 
