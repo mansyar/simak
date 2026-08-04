@@ -50,10 +50,10 @@
   - [x] Implement explicit state models without converting failures into empty results. [057e34c]
   - [x] Add localized retry actions. [057e34c]
   - [x] Verify error content does not expose raw server messages. [057e34c]
-- [~] Task: Standardize mutation feedback
-  - [ ] Write failing tests for pending, success, failure, disabled, and input-preservation behavior.
-  - [ ] Implement consistent inline status and toast behavior for settings, submissions, reviews, imports, deletes, extensions, and notifications.
-  - [ ] Add `aria-live` announcements where state changes are not otherwise visible.
+- [x] Task: Standardize mutation feedback [3a2fcca]
+  - [x] Write failing tests for pending, success, failure, disabled, and input-preservation behavior. [3a2fcca]
+  - [x] Implement consistent inline status and toast behavior for settings, submissions, reviews, imports, deletes, extensions, and notifications. [3a2fcca]
+  - [x] Add `aria-live` announcements where state changes are not otherwise visible. [3a2fcca]
 - [ ] Task: Harden upload and submission state cleanup
   - [ ] Write failing tests for failed presigned URL, direct upload, and submission-record operations.
   - [ ] Ensure all upload paths reset state through `finally`.
