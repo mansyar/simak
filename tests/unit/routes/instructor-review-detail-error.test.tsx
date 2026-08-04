@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 
-const { mockUseLoaderData, mockNavigate, mockToastError, mockOpenForReview } = vi.hoisted(() => ({
-  mockUseLoaderData: vi.fn(),
-  mockNavigate: vi.fn(),
-  mockToastError: vi.fn(),
-  mockOpenForReview: vi.fn(),
-}));
+const { mockUseLoaderData, mockNavigate, mockToastError, mockOpenForReview, mockIsServerError } =
+  vi.hoisted(() => ({
+    mockUseLoaderData: vi.fn(),
+    mockNavigate: vi.fn(),
+    mockToastError: vi.fn(),
+    mockOpenForReview: vi.fn(),
+    mockIsServerError: vi.fn().mockReturnValue(false),
+  }));
 
 vi.mock('@tanstack/react-router', () => ({
   createFileRoute: vi.fn().mockReturnValue((config: any) => ({
@@ -23,7 +25,8 @@ vi.mock('@/server/reviews', () => ({
 }));
 
 vi.mock('@/lib/errors', () => ({
-  isServerError: vi.fn().mockReturnValue(false),
+  isServerError: mockIsServerError,
+  getErrorTranslationKey: vi.fn(() => 'errors.fetchFailed'),
   serverError: vi.fn(),
   ErrorCode: { INTERNAL: 'INTERNAL' },
 }));
@@ -52,6 +55,14 @@ vi.mock('@/components/reviews/ReviewQueueSkeleton', () => ({
 }));
 vi.mock('@/components/ui/empty-state', () => ({
   EmptyState: () => null,
+}));
+vi.mock('@/components/ui/error-state', () => ({
+  ErrorState: ({ title, retryLabel, onRetry }: any) => (
+    <div role="alert">
+      <span>{title}</span>
+      <button onClick={onRetry}>{retryLabel}</button>
+    </div>
+  ),
 }));
 vi.mock('lucide-react', () => ({
   AlertCircle: () => null,
@@ -93,6 +104,7 @@ describe('ReviewDetailPage - openForReview error handling', () => {
     vi.clearAllMocks();
     vi.spyOn(console, 'error').mockImplementation(() => {});
     mockUseLoaderData.mockReturnValue(mockReviewDetail);
+    mockIsServerError.mockReturnValue(false);
   });
 
   it('should show toast.error when openForReview fails', async () => {
@@ -117,5 +129,21 @@ describe('ReviewDetailPage - openForReview error handling', () => {
     });
 
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('shows a localized retryable error instead of the raw server message', () => {
+    mockIsServerError.mockReturnValue(true);
+    mockUseLoaderData.mockReturnValue({
+      error: { code: 'INTERNAL', message: 'database details' },
+    });
+
+    const Component = (Route as any).component as React.FC;
+    const { getByRole, getByText, queryByText } = render(<Component />);
+
+    expect(getByRole('alert')).toBeDefined();
+    expect(getByText('errors.fetchFailed')).toBeDefined();
+    expect(queryByText('database details')).toBeNull();
+    getByRole('button', { name: 'common.refresh' }).click();
+    expect(mockNavigate).toHaveBeenCalledWith({ replace: true });
   });
 });

@@ -15,8 +15,9 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { FileX, Download } from 'lucide-react';
 import { useI18n } from '../../../__root';
-import { isServerError } from '@/lib/errors';
+import { ErrorCode, getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { AssignmentDetailSkeleton } from '@/components/skeletons/assignment-detail-skeleton';
+import { ErrorState } from '@/components/ui/error-state';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id')({
   loader: async ({ params }) => {
@@ -43,6 +44,9 @@ function AssignmentDetailPage() {
   const { t } = useI18n();
   const loaderData = Route.useLoaderData();
   const assignment = loaderData && !isServerError(loaderData) ? loaderData : null;
+  const assignmentError = isServerError(loaderData) ? loaderData : null;
+  const navigate = Route.useNavigate();
+  const { id } = Route.useParams();
   const { exportCsv, isExporting } = useCsvDownload();
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -63,6 +67,21 @@ function AssignmentDetailPage() {
   }, []);
 
   if (!assignment) {
+    if (assignmentError && assignmentError.error.code !== ErrorCode.NOT_FOUND) {
+      return (
+        <ErrorState
+          title={t(getErrorTranslationKey(assignmentError.error.code))}
+          retryLabel={t('common.refresh')}
+          onRetry={() =>
+            navigate({
+              to: '/instructor/assignments/$id',
+              params: { id },
+            })
+          }
+        />
+      );
+    }
+
     return (
       <EmptyState
         icon={FileX}

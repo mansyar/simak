@@ -299,6 +299,27 @@ describe('Notification UI Components', () => {
       expect(screen.getByText('No notifications yet')).toBeDefined();
     });
 
+    it('shows a retryable error state when notifications fail to load', () => {
+      const refetch = vi.fn();
+      vi.mocked(hooks.useNotificationsList).mockReturnValue({
+        data: undefined,
+        isError: true,
+        isLoading: false,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+        fetchNextPage: vi.fn(),
+        refetch,
+      } as any);
+      vi.mocked(hooks.useMarkAllRead).mockReturnValue({ mutate: vi.fn() } as any);
+
+      render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+
+      expect(screen.getByRole('alert')).toBeDefined();
+      expect(screen.getByText('errors.fetchFailed')).toBeDefined();
+      fireEvent.click(screen.getByRole('button', { name: 'common.refresh' }));
+      expect(refetch).toHaveBeenCalledOnce();
+    });
+
     it('renders slide-over panel, groups by type, and supports mark all read', () => {
       const sampleItems = [
         {

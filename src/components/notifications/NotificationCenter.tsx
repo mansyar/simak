@@ -6,6 +6,7 @@ import { useNotificationsList, useMarkAllRead } from '@/hooks/use-notifications'
 import { NotificationItem, type Notification } from './NotificationItem';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Tabs } from '@/components/ui/tabs';
+import { ErrorState } from '@/components/ui/error-state';
 
 interface NotificationCenterProps {
   isOpen: boolean;
@@ -43,10 +44,11 @@ export const GROUP_CONFIGS = [
 export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps) {
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
-  const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useNotificationsList({
-    limit: 20,
-    unreadOnly: activeTab === 'unread',
-  });
+  const { data, isLoading, isError, refetch, hasNextPage, isFetchingNextPage, fetchNextPage } =
+    useNotificationsList({
+      limit: 20,
+      unreadOnly: activeTab === 'unread',
+    });
   const { mutate: markAllRead, isPending: isMarkingAll } = useMarkAllRead();
 
   const items = (data?.pages.flatMap((p) => p.items) ?? []) as Notification[];
@@ -121,6 +123,13 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
             <div className="flex h-64 items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
+          ) : isError ? (
+            <ErrorState
+              className="m-4"
+              title={t('errors.fetchFailed')}
+              retryLabel={t('common.refresh')}
+              onRetry={() => void refetch()}
+            />
           ) : !hasNotifications ? (
             <div className="flex h-64 flex-col items-center justify-center p-6 text-center">
               <div className="rounded-full bg-muted p-3 text-muted-foreground">

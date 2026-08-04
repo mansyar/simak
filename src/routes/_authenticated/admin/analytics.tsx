@@ -18,7 +18,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
 import {
   ShieldCheck,
@@ -90,9 +91,11 @@ function AdminAnalyticsPage() {
     return (
       <div className="space-y-6">
         <PageHeader title={t('adminAnalytics.title')} subtitle={t('adminAnalytics.subtitle')} />
-        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
-          {data.error.message}
-        </div>
+        <ErrorState
+          title={t(getErrorTranslationKey(data.error.code))}
+          retryLabel={t('common.refresh')}
+          onRetry={() => navigate({ search: searchParams })}
+        />
       </div>
     );
   }

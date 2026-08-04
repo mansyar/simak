@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { AlertCircle, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
-import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import { InterventionFilters } from '@/components/instructor/interventions/InterventionFilters';
@@ -20,6 +20,7 @@ import {
 import { useI18n } from '../../../__root';
 import { toast } from 'sonner';
 import { InterventionListSkeleton } from '@/components/instructor/interventions/InterventionListSkeleton';
+import { getErrorTranslationKey, type ErrorCode } from '@/lib/errors';
 
 const BooleanSearchSchema = z.preprocess(
   (value) => (value === 'true' ? true : value === 'false' ? false : value),
@@ -63,7 +64,7 @@ export const Route = createFileRoute('/_authenticated/instructor/interventions/'
   component: InstructorInterventionsPage,
 });
 
-function isError(value: unknown): value is { error: { message: string } } {
+function isError(value: unknown): value is { error: { code: ErrorCode; message: string } } {
   return typeof value === 'object' && value !== null && 'error' in value;
 }
 
@@ -136,10 +137,10 @@ function InstructorInterventionsPage() {
       />
 
       {isError(data.list) ? (
-        <EmptyState
-          icon={AlertCircle}
-          title={t('instructorInterventions.loadError')}
-          description={data.list.error.message}
+        <ErrorState
+          title={t(getErrorTranslationKey(data.list.error.code))}
+          retryLabel={t('common.refresh')}
+          onRetry={() => navigate({ search })}
         />
       ) : (
         <>

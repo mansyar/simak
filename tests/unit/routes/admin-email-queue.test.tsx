@@ -94,6 +94,7 @@ describe('Admin Email Queue page', () => {
     mockData.page = 1;
     mockData.limit = 20;
     mockData.summary = { pending: 0, sent: 0, failed: 0 };
+    delete (mockData as Record<string, unknown>).error;
     mockSearch.page = 1;
     mockSearch.status = 'all';
     mockSearch.search = '';
@@ -131,6 +132,21 @@ describe('Admin Email Queue page', () => {
       const refreshButton = screen.getByRole('button', { name: 'common.refresh' });
       mockRouter.invalidate.mockClear();
       fireEvent.click(refreshButton);
+      expect(mockRouter.invalidate).toHaveBeenCalledTimes(1);
+    });
+
+    it('should show a retryable error state instead of an empty email queue', async () => {
+      (mockData as Record<string, unknown>).error = {
+        code: 'INTERNAL',
+        message: 'queue details',
+      };
+      const Component = await getComponent();
+      render(<Component />);
+
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByText('error.internal')).toBeInTheDocument();
+      expect(screen.queryByText('queue details')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'common.refresh' }));
       expect(mockRouter.invalidate).toHaveBeenCalledTimes(1);
     });
 

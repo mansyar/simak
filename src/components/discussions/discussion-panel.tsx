@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { cn } from '@/lib/utils';
+import { ErrorState } from '@/components/ui/error-state';
 
 interface DiscussionMessage {
   id: number;
@@ -60,7 +61,7 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
   });
   type FormValues = z.infer<typeof formSchema>;
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: discussionKeys.list(checkpointId, 1),
     queryFn: async () => {
       const res = await listDiscussionMessages({
@@ -204,6 +205,16 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
         <Skeleton className="h-16 w-full" />
         <Skeleton className="h-16 w-full" />
       </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        title={t('errors.fetchFailed')}
+        retryLabel={t('common.refresh')}
+        onRetry={() => void refetch()}
+      />
     );
   }
 

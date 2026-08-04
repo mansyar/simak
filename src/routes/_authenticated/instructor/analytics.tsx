@@ -6,7 +6,8 @@ import { PageHeader } from '@/components/ui/page-header';
 import { MetricCard } from '@/components/ui/metric-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
 import {
   CheckCircle,
@@ -70,9 +71,11 @@ function InstructorAnalyticsPage() {
           title={t('instructorAnalytics.title')}
           subtitle={t('instructorAnalytics.subtitle')}
         />
-        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
-          {data.error.message}
-        </div>
+        <ErrorState
+          title={t(getErrorTranslationKey(data.error.code))}
+          retryLabel={t('common.refresh')}
+          onRetry={() => navigate({ search: searchParams })}
+        />
       </div>
     );
   }

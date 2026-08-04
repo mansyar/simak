@@ -13,9 +13,10 @@ import { EmailQueueFilters } from '@/components/admin/email-queue/EmailQueueFilt
 import { EmailQueueTable } from '@/components/admin/email-queue/EmailQueueTable';
 import { RetryEmailDialog } from '@/components/admin/email-queue/RetryEmailDialog';
 import { z } from 'zod';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { toast } from 'sonner';
 import { showErrorToast, parseServerError } from '@/lib/toast';
+import { ErrorState } from '@/components/ui/error-state';
 
 const EmailQueueSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -58,6 +59,16 @@ function EmailQueuePage() {
   const [retryTarget, setRetryTarget] = useState<EmailQueueEntry | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isCleaningR2, setIsCleaningR2] = useState(false);
+
+  if (isServerError(data)) {
+    return (
+      <ErrorState
+        title={t(getErrorTranslationKey(data.error.code))}
+        retryLabel={t('common.refresh')}
+        onRetry={() => void router.invalidate()}
+      />
+    );
+  }
 
   const totalPages = Math.ceil(listData.total / LIMIT);
 

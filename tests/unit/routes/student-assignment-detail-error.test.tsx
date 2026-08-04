@@ -3,11 +3,13 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 const {
   mockUseLoaderData,
+  mockIsServerError,
   mockListConsultations,
   mockListVerifiedCounts,
   mockListMyExtensionRequests,
 } = vi.hoisted(() => ({
   mockUseLoaderData: vi.fn().mockReturnValue(null),
+  mockIsServerError: vi.fn().mockReturnValue(false),
   mockListConsultations: vi.fn(),
   mockListVerifiedCounts: vi.fn(),
   mockListMyExtensionRequests: vi.fn(),
@@ -91,7 +93,8 @@ vi.mock('../../../__root', () => ({
   Route: {},
 }));
 vi.mock('@/lib/errors', () => ({
-  isServerError: () => false,
+  isServerError: mockIsServerError,
+  getErrorTranslationKey: vi.fn(() => 'errors.fetchFailed'),
 }));
 
 import { Route } from '@/routes/_authenticated/student/assignments/$id';
@@ -116,6 +119,7 @@ describe('StudentAssignmentDetailPage - side-data error handling', () => {
     vi.clearAllMocks();
     vi.spyOn(console, 'error').mockImplementation(() => {});
     mockUseLoaderData.mockReturnValue(mockAssignment);
+    mockIsServerError.mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -138,6 +142,20 @@ describe('StudentAssignmentDetailPage - side-data error handling', () => {
     );
   });
 
+  it('should distinguish a primary server failure from not found', () => {
+    mockUseLoaderData.mockReturnValue({
+      error: { code: 'INTERNAL', message: 'database failure' },
+    });
+    mockIsServerError.mockReturnValue(true);
+
+    const Component = (Route as any).component as React.FC;
+    render(<Component />);
+
+    expect(screen.getByRole('alert')).toBeDefined();
+    expect(screen.getByText('errors.fetchFailed')).toBeDefined();
+    expect(screen.queryByText('studentAssignments.notFound')).toBeNull();
+  });
+
   it('should show retry button when side data fails to load', async () => {
     mockListConsultations.mockRejectedValue(new Error('Network error'));
 
@@ -152,5 +170,27 @@ describe('StudentAssignmentDetailPage - side-data error handling', () => {
       },
       { timeout: 3000 },
     );
+  });
+
+  it('should show an error state when consultation data returns a server error', async () => {
+    mockIsServerError.mockImplementation((value: unknown) => {
+      return Boolean(value && typeof value === 'object' && 'error' in value);
+    });
+    mockListConsultations.mockResolvedValue({
+      error: { code: 'INTERNAL', message: 'database failure' },
+    });
+    mockListVerifiedCounts.mockResolvedValue({ counts: [] });
+    mockListMyExtensionRequests.mockResolvedValue({ items: [], total: 0 });
+
+    const Component = (Route as any).component as React.FC;
+    render(<Component />);
+
+    fireEvent.click(screen.getByText('consultations.title'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeDefined();
+      expect(screen.getByText('errors.fetchFailed')).toBeDefined();
+      expect(screen.queryByText('database failure')).toBeNull();
+    });
   });
 });

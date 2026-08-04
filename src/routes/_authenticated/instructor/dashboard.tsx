@@ -3,8 +3,9 @@ import { getInstructorDashboardData } from '@/server/dashboard';
 import { useI18n } from '../../__root';
 import { InstructorDashboard } from '@/components/dashboard/InstructorDashboard';
 import { PageHeader } from '@/components/ui/page-header';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton';
+import { ErrorState } from '@/components/ui/error-state';
 
 export const Route = createFileRoute('/_authenticated/instructor/dashboard')({
   loader: async () => {
@@ -17,6 +18,7 @@ export const Route = createFileRoute('/_authenticated/instructor/dashboard')({
 function InstructorDashboardPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData();
+  const navigate = Route.useNavigate();
 
   if (isServerError(data)) {
     return (
@@ -25,9 +27,11 @@ function InstructorDashboardPage() {
           title={t('instructorDashboard.title')}
           subtitle={t('instructorDashboard.subtitle')}
         />
-        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
-          {data.error.message}
-        </div>
+        <ErrorState
+          title={t(getErrorTranslationKey(data.error.code))}
+          retryLabel={t('common.refresh')}
+          onRetry={() => navigate({} as never)}
+        />
       </div>
     );
   }

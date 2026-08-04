@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useRouter } from '@tanstack/react-router';
 import {
   getTemplate,
   listTemplateAssignments,
@@ -8,11 +8,13 @@ import {
 import { TemplateDetailPage } from '@/components/admin/templates/TemplateDetailPage';
 import { TemplateDetailSkeleton } from '@/components/admin/templates/TemplateDetailSkeleton';
 import { TemplateNotFound } from '@/components/admin/templates/TemplateNotFound';
-import { isServerError } from '@/lib/errors';
+import { ErrorCode, getErrorTranslationKey, isServerError, type ServerError } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
+import { useI18n } from '../../../__root';
 
 interface TemplateRouteData {
   template: GetTemplateResult;
-  assignments: TemplateAssignment[];
+  assignments: TemplateAssignment[] | ServerError;
   assignmentsTotal: number;
 }
 
@@ -20,15 +22,18 @@ export const Route = createFileRoute('/_authenticated/admin/templates/$templateI
   loader: async ({ params }): Promise<TemplateRouteData> => {
     const templateId = Number(params.templateId);
     const templateResult = await getTemplate({ data: { id: templateId } });
-    const template = isServerError(templateResult) ? null : templateResult;
     const assignmentsResult = await listTemplateAssignments({
       data: { templateId, page: 1, limit: 20 },
     });
-    const assignments = isServerError(assignmentsResult)
-      ? []
-      : (assignmentsResult?.assignments ?? []);
-    const assignmentsTotal = isServerError(assignmentsResult) ? 0 : (assignmentsResult?.total ?? 0);
-    return { template, assignments, assignmentsTotal };
+    if (isServerError(assignmentsResult)) {
+      return { template: templateResult, assignments: assignmentsResult, assignmentsTotal: 0 };
+    }
+
+    return {
+      template: templateResult,
+      assignments: assignmentsResult?.assignments ?? [],
+      assignmentsTotal: assignmentsResult?.total ?? 0,
+    };
   },
   pendingComponent: () => <TemplateDetailSkeleton />,
   notFoundComponent: () => <TemplateNotFound />,
@@ -36,10 +41,38 @@ export const Route = createFileRoute('/_authenticated/admin/templates/$templateI
 });
 
 function TemplateDetailRoute() {
+  const { t } = useI18n();
   const data = Route.useLoaderData();
-  if (!data.template || isServerError(data.template)) {
+  const router = useRouter();
+
+  if (!data.template) {
     return <TemplateNotFound />;
   }
+
+  if (isServerError(data.template)) {
+    if (data.template.error.code === ErrorCode.NOT_FOUND) {
+      return <TemplateNotFound />;
+    }
+
+    return (
+      <ErrorState
+        title={t(getErrorTranslationKey(data.template.error.code))}
+        retryLabel={t('common.refresh')}
+        onRetry={() => router.invalidate()}
+      />
+    );
+  }
+
+  if (isServerError(data.assignments)) {
+    return (
+      <ErrorState
+        title={t(getErrorTranslationKey(data.assignments.error.code))}
+        retryLabel={t('common.refresh')}
+        onRetry={() => router.invalidate()}
+      />
+    );
+  }
+
   return (
     <TemplateDetailPage
       template={data.template}

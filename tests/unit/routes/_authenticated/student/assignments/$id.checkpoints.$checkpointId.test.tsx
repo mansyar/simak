@@ -44,6 +44,7 @@ vi.mock('@tanstack/react-router', () => ({
     useParams: () => ({ id: '1', checkpointId: '1' }),
     useNavigate: () => vi.fn(),
   }),
+  useNavigate: () => vi.fn(),
   Link: ({ children }: any) => children,
 }));
 

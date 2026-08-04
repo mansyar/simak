@@ -17,6 +17,7 @@ vi.mock('sonner', () => ({
 
 vi.mock('lucide-react', () => ({
   MessageCircle: (props: any) => <svg data-testid="message-circle-icon" {...props} />,
+  AlertCircle: (props: any) => <svg data-testid="alert-circle-icon" {...props} />,
   Send: (props: any) => <svg data-testid="send-icon" {...props} />,
   Trash2: (props: any) => <svg data-testid="trash-icon" {...props} />,
   CornerDownRight: (props: any) => <svg data-testid="reply-icon" {...props} />,
@@ -157,6 +158,19 @@ describe('DiscussionPanel', () => {
       const skeletons = document.querySelectorAll('[data-slot="skeleton"]');
       expect(skeletons.length).toBeGreaterThan(0);
     });
+  });
+
+  it('renders a retryable error state instead of the empty state when loading fails', async () => {
+    const mod = await import('@/server/discussions');
+    const refetchError = new Error('database failure');
+    (mod.listDiscussionMessages as any).mockRejectedValue(refetchError);
+    renderPanel();
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole('alert')).toBeDefined();
+    });
+    expect(screen.getByText('errors.fetchFailed')).toBeDefined();
+    expect(screen.queryByText('discussions.empty.title')).toBeNull();
   });
 
   it('aligns student messages left and instructor messages right', async () => {

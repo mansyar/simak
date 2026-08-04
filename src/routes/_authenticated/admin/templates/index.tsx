@@ -22,7 +22,8 @@ import { PageHeader } from '@/components/ui/page-header';
 import { RefreshButton } from '@/components/ui/refresh-button';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
 
 const TemplateSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -70,6 +71,16 @@ function TemplatesPage() {
   const duplicateTemplateFn = useServerFn(duplicateTemplate);
   const createTemplateFn = useServerFn(createTemplate);
   const getTemplateFn = useServerFn(getTemplate);
+
+  if (isServerError(data)) {
+    return (
+      <ErrorState
+        title={t(getErrorTranslationKey(data.error.code))}
+        retryLabel={t('common.refresh')}
+        onRetry={() => void router.invalidate()}
+      />
+    );
+  }
 
   type TemplateSearchParams = z.infer<typeof TemplateSearchSchema>;
 

@@ -29,11 +29,12 @@ import { AlertBanner } from '@/components/ui/alert-banner';
 import { Plus, Upload, Download } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
-import { isServerError, ErrorCode } from '@/lib/errors';
+import { ErrorCode, getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { userKeys } from '@/lib/query-keys';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 import { exportUsersCsv } from '@/server/analytics';
 import { useCsvDownload } from '@/hooks/use-csv-download';
+import { ErrorState } from '@/components/ui/error-state';
 
 const UserSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -241,6 +242,20 @@ function UsersPage() {
     }
     queryClient.invalidateQueries({ queryKey: userKeys.all() });
   };
+
+  if (isServerError(loaderData) || usersQuery.isError) {
+    return (
+      <ErrorState
+        title={t(
+          isServerError(loaderData)
+            ? getErrorTranslationKey(loaderData.error.code)
+            : 'errors.fetchFailed',
+        )}
+        retryLabel={t('common.refresh')}
+        onRetry={handleRefresh}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">

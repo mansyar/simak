@@ -1,5 +1,11 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+
+const { mockLoaderData, mockNavigate } = vi.hoisted(() => ({
+  mockLoaderData: { value: {} as unknown },
+  mockNavigate: vi.fn(),
+}));
 
 // Mock @tanstack/react-start/server
 vi.mock('@tanstack/react-start/server', () => ({
@@ -25,7 +31,8 @@ vi.mock('@tanstack/react-router', () => ({
   }),
   createFileRoute: vi.fn().mockReturnValue((config: any) => ({
     ...config,
-    useLoaderData: vi.fn().mockReturnValue({}),
+    useLoaderData: vi.fn().mockImplementation(() => mockLoaderData.value),
+    useNavigate: vi.fn().mockReturnValue(mockNavigate),
   })),
 }));
 
@@ -58,9 +65,37 @@ vi.mock('@/components/dashboard/StudentDashboard', () => ({
   StudentDashboard: vi.fn().mockReturnValue(null),
 }));
 
+vi.mock('@/components/ui/error-state', () => ({
+  ErrorState: ({ title, retryLabel, onRetry }: any) => (
+    <div role="alert">
+      <span>{title}</span>
+      <button onClick={onRetry}>{retryLabel}</button>
+    </div>
+  ),
+}));
+
 describe('Dashboard Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockLoaderData.value = {};
+  });
+
+  it.each([
+    ['Admin', '@/routes/_authenticated/admin/dashboard'],
+    ['Instructor', '@/routes/_authenticated/instructor/dashboard'],
+    ['Student', '@/routes/_authenticated/student/dashboard'],
+  ])('shows a localized retryable error for the %s dashboard', async (_role, routePath) => {
+    mockLoaderData.value = { error: { code: 'INTERNAL', message: 'secret details' } };
+    const { Route } = await import(routePath);
+    const Component = (Route as any).component as React.FC;
+
+    render(<Component />);
+
+    expect(screen.getByRole('alert')).toBeDefined();
+    expect(screen.getByText('error.internal')).toBeDefined();
+    expect(screen.queryByText('secret details')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'common.refresh' }));
+    expect(mockNavigate).toHaveBeenCalled();
   });
 
   describe('Admin Dashboard', () => {

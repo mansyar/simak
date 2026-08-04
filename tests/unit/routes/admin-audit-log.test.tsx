@@ -1,11 +1,15 @@
 /** @vitest-environment jsdom */
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import type { ComponentType } from 'react';
 
 const mockRouter = vi.hoisted(() => ({
   invalidate: vi.fn(),
+}));
+
+const mockLoaderData = vi.hoisted(() => ({
+  value: { entries: [], total: 100, page: 1, limit: 50 },
 }));
 
 // Mock @tanstack/react-start/server
@@ -32,12 +36,7 @@ vi.mock('@tanstack/react-router', () => ({
   }),
   createFileRoute: vi.fn().mockReturnValue((config: any) => ({
     ...config,
-    useLoaderData: vi.fn().mockReturnValue({
-      entries: [],
-      total: 100,
-      page: 1,
-      limit: 50,
-    }),
+    useLoaderData: vi.fn().mockImplementation(() => mockLoaderData.value),
     useSearch: vi.fn().mockReturnValue({
       page: 1,
       limit: 50,
@@ -72,6 +71,11 @@ async function getComponent(): Promise<ComponentType> {
 }
 
 describe('Admin Audit Log page', () => {
+  beforeEach(() => {
+    mockLoaderData.value = { entries: [], total: 100, page: 1, limit: 50 };
+    mockRouter.invalidate.mockClear();
+  });
+
   it('should export a route component', async () => {
     const mod = await import('@/routes/_authenticated/admin/audit-log');
     expect(mod).toBeDefined();
@@ -120,6 +124,20 @@ describe('Admin Audit Log page', () => {
       render(<Component />);
       const refreshButton = screen.getByRole('button', { name: 'common.refresh' });
       expect(refreshButton.textContent?.trim()).toBe('');
+    });
+
+    it('should show a retryable error state instead of an empty audit log', async () => {
+      mockLoaderData.value = {
+        error: { code: 'INTERNAL', message: 'database details' },
+      } as never;
+      const Component = await getComponent();
+      render(<Component />);
+
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByText('error.internal')).toBeInTheDocument();
+      expect(screen.queryByText('database details')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'common.refresh' }));
+      expect(mockRouter.invalidate).toHaveBeenCalledTimes(1);
     });
 
     it('should use Pagination component with common.back/common.next buttons and common.pageOf counter', async () => {

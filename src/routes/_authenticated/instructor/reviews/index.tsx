@@ -12,6 +12,8 @@ import { useRefreshSearch } from '@/hooks/use-refresh-search';
 import { z } from 'zod';
 import { PageHeader } from '@/components/ui/page-header';
 import { useI18n } from '../../../__root';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
 
 const ReviewSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -28,6 +30,7 @@ export const Route = createFileRoute('/_authenticated/instructor/reviews/')({
   }),
   loader: async ({ deps }) => {
     const reviewsResult = await listPendingReviews({ data: deps });
+    if (isServerError(reviewsResult)) return reviewsResult;
     const assignmentsResult = await listInstructorAssignmentsForFilter();
 
     return {
@@ -52,6 +55,16 @@ function ReviewsPage() {
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const { isRefreshing, refresh } = useRefreshSearch();
+
+  if (isServerError(data)) {
+    return (
+      <ErrorState
+        title={t(getErrorTranslationKey(data.error.code))}
+        retryLabel={t('common.refresh')}
+        onRetry={() => refresh(() => navigate({ search: searchParams }))}
+      />
+    );
+  }
 
   const handleAssignmentChange = (assignmentId: number | null) => {
     navigate({

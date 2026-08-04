@@ -287,7 +287,7 @@ describe('Client fetch error handling', () => {
   });
 
   describe('Student checkpoint route loader', () => {
-    it('returns null and shows a toast when assignment data fails to load', async () => {
+    it('returns a structured error when assignment data fails to load', async () => {
       vi.mocked(assignmentsApi.getStudentAssignmentDetail).mockRejectedValue(
         new Error('Network failure'),
       );
@@ -297,10 +297,8 @@ describe('Client fetch error handling', () => {
 
       const result = await loader({ params: { id: '1', checkpointId: '2' } });
 
-      expect(result).toBeNull();
-      await waitFor(() => {
-        expect(toastError).toHaveBeenCalledWith('Failed to load data. Please try again.');
-      });
+      expect(result).toMatchObject({ error: { code: 'INTERNAL' } });
+      expect(toastError).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,13 +1,21 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 
-const { mockUseLoaderData, mockUseParams, mockGetPresignedUploadUrl, mockXhrInstances } =
-  vi.hoisted(() => ({
-    mockUseLoaderData: vi.fn(),
-    mockUseParams: vi.fn().mockReturnValue({ id: '1', checkpointId: '1' }),
-    mockGetPresignedUploadUrl: vi.fn(),
-    mockXhrInstances: [] as any[],
-  }));
+const {
+  mockUseLoaderData,
+  mockUseParams,
+  mockGetStudentAssignmentDetail,
+  mockGetPresignedUploadUrl,
+  mockIsServerError,
+  mockXhrInstances,
+} = vi.hoisted(() => ({
+  mockUseLoaderData: vi.fn(),
+  mockUseParams: vi.fn().mockReturnValue({ id: '1', checkpointId: '1' }),
+  mockGetStudentAssignmentDetail: vi.fn(),
+  mockGetPresignedUploadUrl: vi.fn(),
+  mockIsServerError: vi.fn().mockReturnValue(false),
+  mockXhrInstances: [] as any[],
+}));
 
 // Mock XMLHttpRequest with instance tracking
 class MockXHR {
@@ -42,7 +50,7 @@ vi.mock('@tanstack/react-router', () => ({
 }));
 
 vi.mock('@/server/assignments', () => ({
-  getStudentAssignmentDetail: vi.fn(),
+  getStudentAssignmentDetail: mockGetStudentAssignmentDetail,
 }));
 vi.mock('@/server/submissions', () => ({
   listSubmissions: vi.fn(),
@@ -55,7 +63,8 @@ vi.mock('@/server/reviews', () => ({
   getLatestReview: vi.fn(),
 }));
 vi.mock('@/lib/errors', () => ({
-  isServerError: vi.fn().mockReturnValue(false),
+  getErrorTranslationKey: vi.fn(() => 'errors.fetchFailed'),
+  isServerError: mockIsServerError,
 }));
 vi.mock('@/i18n', () => ({
   detectLocale: vi.fn().mockReturnValue('en'),
@@ -183,5 +192,21 @@ describe('CheckpointSubmissionPage - upload error differentiation', () => {
     await waitFor(() => {
       expect(screen.getByTestId('upload-error').textContent).toBe('files.serverError');
     });
+  });
+
+  it('should preserve assignment server errors for an explicit error state', async () => {
+    const serverError = {
+      error: { code: 'INTERNAL', message: 'private database detail' },
+    };
+    mockIsServerError.mockImplementation((value: unknown) =>
+      Boolean(value && typeof value === 'object' && 'error' in value),
+    );
+    mockGetStudentAssignmentDetail.mockResolvedValue(serverError);
+
+    const result = await (Route as any).loader({
+      params: { id: '1', checkpointId: '1' },
+    });
+
+    expect(result).toEqual(serverError);
   });
 });

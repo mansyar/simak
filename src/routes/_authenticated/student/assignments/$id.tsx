@@ -17,7 +17,8 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
 
 export const Route = createFileRoute('/_authenticated/student/assignments/$id')({
   loader: async ({ params }) => {
@@ -61,6 +62,7 @@ function AssignmentDetailPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData();
   const assignment = data && !isServerError(data) ? data : null;
+  const navigate = Route.useNavigate();
   const matchRoute = useMatchRoute();
   const [consultations, setConsultations] = useState<
     {
@@ -86,7 +88,7 @@ function AssignmentDetailPage() {
   );
   const [loadingConsultations, setLoadingConsultations] = useState(true);
   const [loadingExtensions, setLoadingExtensions] = useState(true);
-  const [sideDataError, setSideDataError] = useState(false);
+  const [sideDataError, setSideDataError] = useState<'consultations' | 'extensions' | null>(null);
   const [retryTrigger, setRetryTrigger] = useState(0);
   const [consultationPage, setConsultationPage] = useState(1);
   const [consultationTotal, setConsultationTotal] = useState(0);
@@ -112,7 +114,8 @@ function AssignmentDetailPage() {
       const loadConsultations = async () => {
         setLoadingConsultations(true);
         setLoadingExtensions(true);
-        setSideDataError(false);
+        setSideDataError(null);
+        let failedSide: 'consultations' | 'extensions' = 'consultations';
         try {
           const consResult = await listConsultations({
             data: { assignmentId: assignment.id, page: consultationPage, limit: 20 },
@@ -120,6 +123,8 @@ function AssignmentDetailPage() {
           if (!isServerError(consResult)) {
             setConsultations(consResult.consultations);
             setConsultationTotal(consResult.total);
+          } else {
+            setSideDataError('consultations');
           }
 
           const countsResult = await listVerifiedCounts({
@@ -127,20 +132,25 @@ function AssignmentDetailPage() {
           });
           if (!isServerError(countsResult)) {
             setVerifiedCounts(countsResult.counts);
+          } else {
+            setSideDataError('consultations');
           }
           setLoadingConsultations(false);
 
           // Load extension requests
+          failedSide = 'extensions';
           const extResult = await listMyExtensionRequests({
             data: { assignmentId: assignment.id, page: extensionPage, limit: 20 },
           });
           if (!isServerError(extResult)) {
             setExtensionItems(extResult.items);
             setExtensionTotal(extResult.total);
+          } else {
+            setSideDataError('extensions');
           }
           setLoadingExtensions(false);
         } catch {
-          setSideDataError(true);
+          setSideDataError(failedSide);
           setLoadingConsultations(false);
           setLoadingExtensions(false);
         }
@@ -159,6 +169,15 @@ function AssignmentDetailPage() {
   }
 
   if (!assignment) {
+    if (isServerError(data)) {
+      return (
+        <ErrorState
+          title={t(getErrorTranslationKey(data.error.code))}
+          retryLabel={t('common.refresh')}
+          onRetry={() => navigate({} as never)}
+        />
+      );
+    }
     return <AssignmentNotFound />;
   }
 
@@ -303,20 +322,15 @@ function AssignmentDetailPage() {
 
       {activeTab === 'consultations' && (
         <div className="space-y-6">
-          {sideDataError ? (
-            <div className="flex items-center justify-between rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              <span>{t('errors.fetchFailed')}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSideDataError(false);
-                  setRetryTrigger((c) => c + 1);
-                }}
-              >
-                {t('common.refresh')}
-              </Button>
-            </div>
+          {sideDataError === 'consultations' ? (
+            <ErrorState
+              title={t('errors.fetchFailed')}
+              retryLabel={t('common.refresh')}
+              onRetry={() => {
+                setSideDataError(null);
+                setRetryTrigger((c) => c + 1);
+              }}
+            />
           ) : loadingConsultations ? (
             <div className="space-y-6">
               <div className="rounded-lg border bg-card p-5 shadow-sm">
@@ -361,20 +375,15 @@ function AssignmentDetailPage() {
 
       {activeTab === 'extensions' && (
         <div className="space-y-6">
-          {sideDataError ? (
-            <div className="flex items-center justify-between rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              <span>{t('errors.fetchFailed')}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSideDataError(false);
-                  setRetryTrigger((c) => c + 1);
-                }}
-              >
-                {t('common.refresh')}
-              </Button>
-            </div>
+          {sideDataError === 'extensions' ? (
+            <ErrorState
+              title={t('errors.fetchFailed')}
+              retryLabel={t('common.refresh')}
+              onRetry={() => {
+                setSideDataError(null);
+                setRetryTrigger((c) => c + 1);
+              }}
+            />
           ) : loadingExtensions ? (
             <div className="space-y-6">
               <div className="rounded-lg border bg-card p-5 shadow-sm">

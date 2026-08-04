@@ -11,7 +11,8 @@ import { GradeSettingsDialog } from '@/components/gradebook/GradeSettingsDialog'
 import { GradeReleaseControls } from '@/components/gradebook/GradeReleaseControls';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '../../../__root';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id/gradebook')({
   loader: async ({ params }) => {
@@ -31,6 +32,7 @@ function GradebookPage() {
   const router = useRouter();
   const loaderData = Route.useLoaderData();
   const data = loaderData && !isServerError(loaderData) ? loaderData : null;
+  const serverError = isServerError(loaderData) ? loaderData : null;
   const { id } = Route.useParams();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -59,8 +61,23 @@ function GradebookPage() {
   };
 
   if (!data) {
+    if (serverError) {
+      return (
+        <ErrorState
+          title={t(getErrorTranslationKey(serverError.error.code))}
+          retryLabel={t('common.refresh')}
+          onRetry={() => router.invalidate()}
+        />
+      );
+    }
+
     return (
       <div className="space-y-4">
+        <ErrorState
+          title={t('gradebook.loadError')}
+          retryLabel={t('common.refresh')}
+          onRetry={() => router.invalidate()}
+        />
         <Link
           to="/instructor/assignments/$id"
           params={{ id }}
@@ -69,7 +86,6 @@ function GradebookPage() {
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           {t('common.back')}
         </Link>
-        <p className="text-sm text-muted-foreground">{t('gradebook.loadError')}</p>
       </div>
     );
   }

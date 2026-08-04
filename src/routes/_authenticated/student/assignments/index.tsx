@@ -13,6 +13,8 @@ import { RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
 
 const AssignmentSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -38,12 +40,24 @@ function AssignmentsPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData() as
     | { assignments: StudentAssignmentRow[]; total: number }
+    | { error: { code: string; message: string } }
     | undefined;
-  const assignments = data?.assignments ?? [];
-  const total = data?.total ?? 0;
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  if (isServerError(data)) {
+    return (
+      <ErrorState
+        title={t(getErrorTranslationKey(data.error.code))}
+        retryLabel={t('common.refresh')}
+        onRetry={() => navigate({ search: searchParams })}
+      />
+    );
+  }
+
+  const assignments = data && 'assignments' in data ? data.assignments : [];
+  const total = data && 'total' in data ? data.total : 0;
 
   type StudentSearchParams = z.infer<typeof AssignmentSearchSchema>;
 

@@ -75,6 +75,7 @@ vi.mock('@tanstack/react-router', () => ({
     ...config,
     useLoaderData: () => mocks.loaderData,
     useParams: () => ({ id: '1' }),
+    useNavigate: () => vi.fn(),
   }),
   Link: ({ children }: any) => children,
   useMatchRoute: () => () => false,

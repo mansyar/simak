@@ -31,9 +31,10 @@ import { Search, X, Download } from 'lucide-react';
 import { z } from 'zod';
 import { getActionVisualProps, ACTION_TYPES } from '@/lib/admin/audit-actions';
 import { formatDate } from '@/lib/format-date';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { TableSkeleton } from '@/components/skeletons/table-skeleton';
 import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
+import { ErrorState } from '@/components/ui/error-state';
 
 interface AuditLogEntry {
   id: number;
@@ -107,6 +108,16 @@ function AuditLogPage() {
   useEffect(() => {
     setLocalSearch(searchParams.search);
   }, [searchParams.search]);
+
+  if (isServerError(data)) {
+    return (
+      <ErrorState
+        title={t(getErrorTranslationKey(data.error.code))}
+        retryLabel={t('common.refresh')}
+        onRetry={() => void router.invalidate()}
+      />
+    );
+  }
 
   const handleActionFilter = (value: string) => {
     navigate({ search: (prev: AuditLogSearchParams) => ({ ...prev, action: value, page: 1 }) });

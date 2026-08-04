@@ -13,6 +13,7 @@ import { Plus } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
 import { isServerError } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
 
 const AssignmentSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -37,11 +38,22 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/')(
 function AssignmentsPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData();
-  const assignments = isServerError(data) || !data ? [] : (data.assignments ?? []);
-  const total = isServerError(data) || !data ? 0 : (data.total ?? 0);
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const { isRefreshing, refresh } = useRefreshSearch();
+
+  if (isServerError(data)) {
+    return (
+      <ErrorState
+        title={t('errors.fetchFailed')}
+        retryLabel={t('common.refresh')}
+        onRetry={() => refresh(() => navigate({ search: searchParams }))}
+      />
+    );
+  }
+
+  const assignments = data?.assignments ?? [];
+  const total = data?.total ?? 0;
 
   const handleSearchChange = (value: string) => {
     navigate({
