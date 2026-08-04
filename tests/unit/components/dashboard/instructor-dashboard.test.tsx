@@ -60,6 +60,23 @@ describe('InstructorDashboard component', () => {
     expect(screen.getByText('instructorDashboard.quickActions')).toBeDefined();
   });
 
+  it('should give quick actions touch-safe focusable links', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    render(<InstructorDashboard data={emptyData} />);
+
+    const reviewLink = screen.getByRole('link', {
+      name: /instructorDashboard\.goToReviewQueue/i,
+    });
+    const assignmentsLink = screen.getByRole('link', {
+      name: /instructorDashboard\.manageAssignments/i,
+    });
+
+    expect(reviewLink.className).toContain('min-h-11');
+    expect(reviewLink.className).toContain('focus-visible');
+    expect(assignmentsLink.className).toContain('min-h-11');
+    expect(assignmentsLink.className).toContain('focus-visible');
+  });
+
   it('should show error state when data has error', async () => {
     const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
     render(<InstructorDashboard data={{ error: 'Unauthorized' } as any} />);
@@ -113,6 +130,29 @@ describe('InstructorDashboard component', () => {
     render(<InstructorDashboard data={dataWithSubs} />);
     expect(screen.getByText('Jane Smith')).toBeDefined();
     expect(screen.getByText('studentAssignments.status.submitted')).toBeDefined();
+  });
+
+  it('should link recent submissions directly to their review pages', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const dataWithSubs = {
+      ...emptyData,
+      recentSubmissions: [
+        {
+          submissionId: 42,
+          studentName: 'Jane Smith',
+          assignmentTitle: 'Assignment 2',
+          checkpointName: 'Checkpoint 1',
+          submittedAt: new Date().toISOString(),
+          status: 'Submitted',
+        },
+      ],
+    };
+
+    render(<InstructorDashboard data={dataWithSubs} />);
+
+    const submissionLink = screen.getByRole('link', { name: /Jane Smith/i });
+    expect(submissionLink.getAttribute('href')).toBe('/instructor/reviews/42');
+    expect(submissionLink.className).toContain('min-h-11');
   });
 
   it('should render assignment overview items', async () => {
@@ -323,6 +363,30 @@ describe('InstructorDashboard component', () => {
     expect(
       screen.getByText('instructorDashboard.atRisk.factors.insufficient_consultations'),
     ).toBeDefined();
+  });
+
+  it('should cap at-risk students and provide a view-all destination', async () => {
+    const { InstructorDashboard } = await import('@/components/dashboard/InstructorDashboard');
+    const dataWithManyRiskStudents = {
+      ...emptyData,
+      atRiskStudents: Array.from({ length: 6 }, (_, index) => ({
+        studentName: `Student ${index + 1}`,
+        studentId: `student-${index + 1}`,
+        assignmentTitle: `Assignment ${index + 1}`,
+        assignmentId: index + 1,
+        riskLevel: 'high' as const,
+        factors: [],
+      })),
+    };
+
+    const { container } = render(<InstructorDashboard data={dataWithManyRiskStudents} />);
+
+    expect(container.querySelectorAll('a[href^="/instructor/assignments/"]')).toHaveLength(5);
+    expect(
+      screen
+        .getAllByRole('link', { name: 'common.viewAll' })
+        .some((link) => link.getAttribute('href') === '/instructor/interventions'),
+    ).toBe(true);
   });
 
   it('should render intervention counts and active status on at-risk students', async () => {
