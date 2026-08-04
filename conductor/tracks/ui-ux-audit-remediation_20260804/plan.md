@@ -45,11 +45,11 @@
 
 ## Phase 2 — Error states, action feedback, and runtime stability
 
-- [~] Task: Separate loading, empty, not-found, authorization, and server-error states
-  - [ ] Write failing route/component tests for affected student, instructor, admin, notification, and discussion views.
-  - [ ] Implement explicit state models without converting failures into empty results.
-  - [ ] Add localized retry actions.
-  - [ ] Verify error content does not expose raw server messages.
+- [x] Task: Separate loading, empty, not-found, authorization, and server-error states [057e34c]
+  - [x] Write failing route/component tests for affected student, instructor, admin, notification, and discussion views. [057e34c]
+  - [x] Implement explicit state models without converting failures into empty results. [057e34c]
+  - [x] Add localized retry actions. [057e34c]
+  - [x] Verify error content does not expose raw server messages. [057e34c]
 - [ ] Task: Standardize mutation feedback
   - [ ] Write failing tests for pending, success, failure, disabled, and input-preservation behavior.
   - [ ] Implement consistent inline status and toast behavior for settings, submissions, reviews, imports, deletes, extensions, and notifications.
