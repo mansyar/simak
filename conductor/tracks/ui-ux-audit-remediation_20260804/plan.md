@@ -86,7 +86,7 @@
 
 ## Phase 4 — Instructor workflow remediation
 
-- [ ] Task: Repair instructor dashboard hierarchy and actionability
+- [~] Task: Repair instructor dashboard hierarchy and actionability
   - [ ] Write failing tests for dashboard error states, actionable lists, quick-action semantics, and mobile stacking.
   - [ ] Implement direct destinations for important review, risk, submission, and assignment information.
   - [ ] Reduce mobile density through prioritization or progressive disclosure where needed.
