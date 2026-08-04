@@ -94,8 +94,14 @@ describe('Pagination', () => {
 
   it('should have aria-labels on prev/next buttons', () => {
     render(<Pagination currentPage={2} totalPages={5} onPageChange={vi.fn()} />);
-    expect(screen.getByRole('button', { name: /previous page/i })).toBeDefined();
-    expect(screen.getByRole('button', { name: /next page/i })).toBeDefined();
+    const buttons = [
+      screen.getByRole('button', { name: /previous page/i }),
+      screen.getByRole('button', { name: /next page/i }),
+    ];
+    buttons.forEach((button) => {
+      expect(button).toBeDefined();
+      expect(button.className).toContain('min-h-11');
+    });
   });
 
   it('should disable prev button on first page', () => {

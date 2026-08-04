@@ -19,7 +19,10 @@ vi.mock('@/routes/__root', () => ({
 describe('RefreshButton', () => {
   it('should render with aria-label', () => {
     render(<RefreshButton isRefreshing={false} onClick={vi.fn()} />);
-    expect(screen.getByRole('button', { name: /refresh/i })).toBeDefined();
+    const button = screen.getByRole('button', { name: /refresh/i });
+    expect(button).toBeDefined();
+    expect(button.className).toContain('min-h-11');
+    expect(button.className).toContain('min-w-11');
   });
 
   it('should be disabled when isRefreshing is true', () => {
