@@ -209,7 +209,14 @@ export function FileUploader({
         >
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{uploadError}</span>
-          <Button variant="outline" size="sm" className="ml-auto" onClick={handleReset}>
+          <Button
+            variant="outline"
+            size="sm"
+            type="button"
+            className="ml-auto"
+            onClick={handleUpload}
+            disabled={!selectedFile || isUploading}
+          >
             {t('files.retry')}
           </Button>
         </div>

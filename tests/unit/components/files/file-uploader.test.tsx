@@ -174,6 +174,19 @@ describe('FileUploader', () => {
     expect(onUploadSuccess).toHaveBeenCalled();
   });
 
+  it('should retry the selected file without requiring it to be selected again', async () => {
+    const user = userEvent.setup();
+    const onUploadSuccess = vi.fn().mockResolvedValue(undefined);
+    render(<FileUploader onUploadSuccess={onUploadSuccess} uploadError="Upload failed" />);
+
+    const file = new File(['content'], 'retry-existing.pdf', { type: 'application/pdf' });
+    await user.upload(screen.getByTestId('file-input') as HTMLInputElement, file);
+    await user.click(screen.getByText('files.retry'));
+
+    expect(onUploadSuccess).toHaveBeenCalledWith(file);
+    expect(screen.getByText('retry-existing.pdf')).toBeDefined();
+  });
+
   it('should call handleReset when upload another button is clicked after success', async () => {
     const user = userEvent.setup();
     const onUploadSuccess = vi.fn().mockResolvedValue(undefined);

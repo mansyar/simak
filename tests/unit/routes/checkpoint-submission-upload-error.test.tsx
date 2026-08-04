@@ -6,6 +6,7 @@ const {
   mockUseParams,
   mockGetStudentAssignmentDetail,
   mockGetPresignedUploadUrl,
+  mockSubmitCheckpoint,
   mockIsServerError,
   mockXhrInstances,
 } = vi.hoisted(() => ({
@@ -13,6 +14,7 @@ const {
   mockUseParams: vi.fn().mockReturnValue({ id: '1', checkpointId: '1' }),
   mockGetStudentAssignmentDetail: vi.fn(),
   mockGetPresignedUploadUrl: vi.fn(),
+  mockSubmitCheckpoint: vi.fn(),
   mockIsServerError: vi.fn().mockReturnValue(false),
   mockXhrInstances: [] as any[],
 }));
@@ -54,7 +56,7 @@ vi.mock('@/server/assignments', () => ({
 }));
 vi.mock('@/server/submissions', () => ({
   listSubmissions: vi.fn(),
-  submitCheckpoint: vi.fn(),
+  submitCheckpoint: mockSubmitCheckpoint,
 }));
 vi.mock('@/server/files', () => ({
   getPresignedUploadUrl: mockGetPresignedUploadUrl,
@@ -77,11 +79,12 @@ vi.mock('sonner', () => ({
 }));
 
 vi.mock('@/components/files/file-uploader', () => ({
-  FileUploader: ({ onUploadSuccess, uploadError }: any) => (
+  FileUploader: ({ onUploadSuccess, uploadError, isUploading }: any) => (
     <div>
       {uploadError && <span data-testid="upload-error">{uploadError}</span>}
       <button
         data-testid="upload-trigger"
+        disabled={isUploading}
         onClick={() => onUploadSuccess(new File([''], 'test.pdf'))}
       >
         Upload
@@ -146,6 +149,10 @@ describe('CheckpointSubmissionPage - upload error differentiation', () => {
       uploadUrl: 'https://r2.example.com/upload',
       fileKey: 'test-key',
     });
+    mockSubmitCheckpoint.mockResolvedValue(undefined);
+    mockIsServerError.mockImplementation((value: unknown) =>
+      Boolean(value && typeof value === 'object' && 'error' in value),
+    );
     mockXhrInstances.length = 0;
   });
 
@@ -171,6 +178,7 @@ describe('CheckpointSubmissionPage - upload error differentiation', () => {
     await waitFor(() => {
       expect(screen.getByTestId('upload-error').textContent).toBe('files.networkError');
     });
+    expect(screen.getByTestId('upload-trigger').getAttribute('disabled')).toBeNull();
   });
 
   it('should show server error when xhr returns non-2xx status', async () => {
@@ -192,6 +200,45 @@ describe('CheckpointSubmissionPage - upload error differentiation', () => {
     await waitFor(() => {
       expect(screen.getByTestId('upload-error').textContent).toBe('files.serverError');
     });
+    expect(screen.getByTestId('upload-trigger').getAttribute('disabled')).toBeNull();
+  });
+
+  it('resets uploading state when presigned URL creation fails', async () => {
+    mockGetPresignedUploadUrl.mockResolvedValue({
+      error: { code: 'INTERNAL', message: 'private presign failure' },
+    });
+    const Component = (Route as any).component as React.FC;
+    render(<Component />);
+
+    fireEvent.click(screen.getByTestId('upload-trigger'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('upload-error').textContent).toBe('private presign failure'),
+    );
+    expect(screen.getByTestId('upload-trigger').getAttribute('disabled')).toBeNull();
+  });
+
+  it('resets uploading state when submission recording fails', async () => {
+    mockSubmitCheckpoint.mockResolvedValue({
+      error: { code: 'INTERNAL', message: 'private submission failure' },
+    });
+    const Component = (Route as any).component as React.FC;
+    render(<Component />);
+
+    fireEvent.click(screen.getByTestId('upload-trigger'));
+    const xhr = await waitFor(() => {
+      expect(mockXhrInstances).toHaveLength(1);
+      return mockXhrInstances[0];
+    });
+
+    await act(async () => {
+      xhr.onload!();
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId('upload-error').textContent).toBe('private submission failure'),
+    );
+    expect(screen.getByTestId('upload-trigger').getAttribute('disabled')).toBeNull();
   });
 
   it('should preserve assignment server errors for an explicit error state', async () => {

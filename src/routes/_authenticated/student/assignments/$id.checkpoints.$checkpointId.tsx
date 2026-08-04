@@ -225,7 +225,6 @@ function CheckpointSubmissionPage() {
         }
 
         setUploadSuccess(true);
-        setIsUploading(false);
 
         // Refresh submissions list
         await fetchSubmissions(submissionPage);
@@ -235,6 +234,7 @@ function CheckpointSubmissionPage() {
         } else {
           setUploadError(t('files.serverError'));
         }
+      } finally {
         setIsUploading(false);
         setUploadProgress(undefined);
       }
