@@ -230,7 +230,8 @@
     "selectInstructor": "Pilih instruktur",
     "createSuccess": "Pengguna berhasil dibuat",
     "updateSuccess": "Pengguna berhasil diperbarui",
-    "deleteSuccess": "Pengguna berhasil dihapus"
+    "deleteSuccess": "Pengguna berhasil dihapus",
+    "deleteError": "Pengguna tidak dapat dihapus. Silakan coba lagi."
   },
   "adminTemplates": {
     "title": "Templat",
@@ -270,6 +271,7 @@
     },
     "deleteConfirm": "Hapus templat ini?",
     "deleteInUse": "Templat ini digunakan oleh {count} tugas. Ketik DELETE untuk mengonfirmasi.",
+    "deleteError": "Templat tidak dapat dihapus. Silakan coba lagi.",
     "studentsCount": "{count} mahasiswa",
     "inUseBanner": "Templat ini digunakan oleh {count} tugas. Perubahan akan memengaruhi pembuatan tugas di masa mendatang.",
     "detail": {
@@ -1103,7 +1105,8 @@
       "categoryRequired": "Silakan pilih kategori",
       "reasonMin": "Alasan harus minimal 10 karakter",
       "durationMin": "Durasi harus minimal 1 hari",
-      "durationMax": "Durasi tidak boleh melebihi {max} hari"
+      "durationMax": "Durasi tidak boleh melebihi {max} hari",
+      "submitFailed": "Permintaan perpanjangan tidak dapat dikirim. Silakan coba lagi."
     },
     "queueTitle": "Permintaan Perpanjangan",
     "historyTitle": "Riwayat Perpanjangan",
@@ -1174,9 +1177,11 @@
       "verify": "Verifikasi",
       "setupError": "Gagal mengatur 2FA. Silakan coba lagi.",
       "verifyError": "Kode verifikasi tidak valid. Silakan coba lagi.",
+      "enableSuccess": "Autentikasi dua faktor berhasil diaktifkan.",
       "disableTitle": "Nonaktifkan Autentikasi Dua Faktor",
       "disableDescription": "Masukkan kata sandi Anda untuk menonaktifkan 2FA. Akun Anda akan kurang aman.",
       "disableError": "Gagal menonaktifkan 2FA. Silakan coba lagi.",
+      "disableSuccess": "Autentikasi dua faktor berhasil dinonaktifkan.",
       "saveBackupCodes": "Simpan Kode Cadangan"
     },
     "sessions": {
@@ -1190,7 +1195,11 @@
       "revokeAllTitle": "Cabut Semua Sesi Lain",
       "revokeAllDescription": "Ini akan logout {count} sesi lainnya. Sesi Anda saat ini akan tetap aktif.",
       "revokeAllOthers": "Cabut Semua Sesi Lain",
-      "revokeAll": "Cabut Semua"
+      "revokeAll": "Cabut Semua",
+      "revokeSuccess": "Sesi berhasil dicabut",
+      "revokeError": "Sesi tidak dapat dicabut. Silakan coba lagi.",
+      "revokeAllSuccess": "Sesi lain berhasil dicabut",
+      "revokeAllError": "Sesi lain tidak dapat dicabut. Silakan coba lagi."
     },
     "profile": {
       "title": "Profil",
@@ -1224,7 +1233,9 @@
       "title": "Aksesibilitas",
       "description": "Pengaturan aksesibilitas untuk pengalaman yang lebih baik",
       "reducedMotionLabel": "Gerakan Dikurangi",
-      "reducedMotionHint": "Kurangi animasi dan transisi di seluruh aplikasi"
+      "reducedMotionHint": "Kurangi animasi dan transisi di seluruh aplikasi",
+      "saveSuccess": "Pengaturan aksesibilitas berhasil disimpan",
+      "saveError": "Pengaturan aksesibilitas tidak dapat disimpan. Silakan coba lagi."
     },
     "timezone": {
       "title": "Zona waktu tenggat mahasiswa",
@@ -1260,6 +1271,8 @@
     "notificationPreferences": {
       "title": "Preferensi Notifikasi",
       "description": "Pilih bagaimana Anda ingin diberi tahu untuk setiap jenis peristiwa.",
+      "saveSuccess": "Preferensi notifikasi berhasil disimpan",
+      "saveError": "Preferensi notifikasi tidak dapat disimpan. Silakan coba lagi.",
       "channels": {
         "email": "Email",
         "inApp": "Di Aplikasi"

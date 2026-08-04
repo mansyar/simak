@@ -10,6 +10,7 @@ import { getPresignedReviewFeedbackUploadUrl } from '@/server/files';
 import { RubricScoringSection, type ScoreInput } from '@/components/reviews/RubricScoringSection';
 import { FeedbackSnippetPicker } from '@/components/reviews/FeedbackSnippetPicker';
 import { RevisionActionPlanEditor } from '@/components/reviews/RevisionActionPlanEditor';
+import { MutationFeedback } from '@/components/ui/mutation-feedback';
 import type { RubricData } from '@/server/rubrics';
 import type { RevisionActionItemInput } from '@/server/revision-action-items';
 import { Loader2, Upload } from 'lucide-react';
@@ -32,6 +33,15 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
   const [isUploadingFeedback, setIsUploadingFeedback] = useState(false);
   const [scores, setScores] = useState<ScoreInput[]>([]);
   const [actionItems, setActionItems] = useState<RevisionActionItemInput[]>([]);
+  const [formError, setFormError] = useState<string>();
+
+  const reportError = useCallback(
+    (message: string) => {
+      setFormError(message);
+      onError(message);
+    },
+    [onError],
+  );
 
   const rubricActive = !!rubric && rubric.gradingType !== null;
   const allScored =
@@ -51,6 +61,8 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
       const file = e.target.files?.[0];
       if (!file) return;
 
+      setFormError(undefined);
+
       const extension = file.name.split('.').pop()?.toLowerCase() ?? 'pdf';
       const contentType =
         extension === 'pdf'
@@ -64,7 +76,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
         });
 
         if (isServerError(uploadData)) {
-          onError(uploadData.error.message);
+          reportError(t('instructorReviews.errors.feedbackUploadFailed'));
           return;
         }
 
@@ -76,26 +88,28 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
         });
 
         if (!response.ok) {
-          onError(t('instructorReviews.errors.feedbackUploadFailed'));
+          reportError(t('instructorReviews.errors.feedbackUploadFailed'));
           return;
         }
 
         setFeedbackFile(file);
         setFeedbackFileKey(uploadData.fileKey);
       } catch {
-        onError(t('instructorReviews.errors.feedbackUploadFailed'));
+        reportError(t('instructorReviews.errors.feedbackUploadFailed'));
       } finally {
         setIsUploadingFeedback(false);
       }
     },
-    [onError, t],
+    [reportError, t],
   );
 
   const handleSubmit = useCallback(async () => {
     if (!decision) return;
 
+    setFormError(undefined);
+
     if (decision === 'revise' && !revisionDeadline) {
-      onError(t('instructorReviews.revisionDeadlineRequired'));
+      reportError(t('instructorReviews.revisionDeadlineRequired'));
       return;
     }
 
@@ -108,7 +122,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
           /[<>]/.test(item.itemText),
       )
     ) {
-      onError(t('instructorReviews.actionPlan.invalidItems'));
+      reportError(t('instructorReviews.actionPlan.invalidItems'));
       return;
     }
 
@@ -127,13 +141,13 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
       });
 
       if (isServerError(result)) {
-        onError(result.error.message);
+        reportError(t('instructorReviews.submitError'));
         return;
       }
 
       onComplete();
     } catch {
-      onError(t('instructorReviews.submitError'));
+      reportError(t('instructorReviews.submitError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -144,7 +158,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
     feedbackFileKey,
     submissionId,
     onComplete,
-    onError,
+    reportError,
     t,
     scores,
     rubricActive,
@@ -157,6 +171,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
         <CardTitle className="text-sm">{t('instructorReviews.decision')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <MutationFeedback error={formError} />
         {/* Pass/Revise radio */}
         <div className="flex gap-4">
           <label className="flex items-center gap-2 cursor-pointer">

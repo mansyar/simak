@@ -151,7 +151,10 @@ function TemplatesPage() {
         result.error.message === 'in_use')
     ) {
       navigate({ search: (prev: TemplateSearchParams) => prev }); // Refresh
+      return;
     }
+
+    throw new Error('Template deletion failed');
   };
 
   const handleDuplicate = async (template: TemplateRow) => {

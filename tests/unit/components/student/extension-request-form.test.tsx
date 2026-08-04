@@ -28,6 +28,7 @@ vi.mock('@/routes/__root', () => ({
         'extensions.errors.reasonMin': 'Reason must be at least 10 characters',
         'extensions.errors.durationMin': 'Duration must be at least 1 day',
         'extensions.errors.durationMax': 'Duration cannot exceed {max} days',
+        'extensions.errors.submitFailed': 'Failed to request extension',
         'common.loading': 'Loading...',
       };
       return translations[key] || key;

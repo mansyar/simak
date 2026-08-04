@@ -236,6 +236,7 @@ export type Translation = {
     createSuccess: string
     updateSuccess: string
     deleteSuccess: string
+    deleteError: string
   }
   adminTemplates: {
     title: string
@@ -275,6 +276,7 @@ export type Translation = {
     }
     deleteConfirm: string
     deleteInUse: string
+    deleteError: string
     studentsCount: string
     inUseBanner: string
     detail: {
@@ -1109,6 +1111,7 @@ export type Translation = {
       reasonMin: string
       durationMin: string
       durationMax: string
+      submitFailed: string
     }
     queueTitle: string
     historyTitle: string
@@ -1179,9 +1182,11 @@ export type Translation = {
       verify: string
       setupError: string
       verifyError: string
+      enableSuccess: string
       disableTitle: string
       disableDescription: string
       disableError: string
+      disableSuccess: string
       saveBackupCodes: string
     }
     sessions: {
@@ -1196,6 +1201,10 @@ export type Translation = {
       revokeAllDescription: string
       revokeAllOthers: string
       revokeAll: string
+      revokeSuccess: string
+      revokeError: string
+      revokeAllSuccess: string
+      revokeAllError: string
     }
     profile: {
       title: string
@@ -1230,6 +1239,8 @@ export type Translation = {
       description: string
       reducedMotionLabel: string
       reducedMotionHint: string
+      saveSuccess: string
+      saveError: string
     }
     timezone: {
       title: string
@@ -1265,6 +1276,8 @@ export type Translation = {
     notificationPreferences: {
       title: string
       description: string
+      saveSuccess: string
+      saveError: string
       channels: {
         email: string
         inApp: string

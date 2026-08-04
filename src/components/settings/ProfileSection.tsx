@@ -9,6 +9,7 @@ import { User, Loader2 } from 'lucide-react';
 import { getCurrentUser, updateProfile } from '@/server/settings';
 import { useI18n } from '@/routes/__root';
 import { settingsKeys } from '@/lib/query-keys';
+import { MutationFeedback } from '@/components/ui/mutation-feedback';
 
 export function ProfileSection() {
   const { t } = useI18n();
@@ -28,6 +29,7 @@ export function ProfileSection() {
 
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     if (data?.user?.name) {
@@ -47,8 +49,11 @@ export function ProfileSection() {
 
   const handleSaveName = async () => {
     setError('');
+    setSuccess('');
     try {
-      await updateNameMutation.mutateAsync({ name });
+      const result = await updateNameMutation.mutateAsync({ name });
+      if (result?.error) throw new Error(result.error);
+      setSuccess(t('settings.profile.nameSuccess'));
       toast.success(t('settings.profile.nameSuccess'));
     } catch {
       setError(t('settings.profile.nameError'));
@@ -119,9 +124,7 @@ export function ProfileSection() {
         </div>
 
         {/* Messages */}
-        {error && (
-          <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>
-        )}
+        <MutationFeedback error={error} success={success} />
       </CardContent>
     </Card>
   );

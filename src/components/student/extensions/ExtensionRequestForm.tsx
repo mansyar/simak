@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select';
 import { requestExtension } from '@/server/extensions';
 import { isServerError } from '@/lib/errors';
+import { MutationFeedback } from '@/components/ui/mutation-feedback';
 
 interface CheckpointOption {
   id: number;
@@ -88,30 +89,34 @@ export function ExtensionRequestForm({
     ) : null;
 
   const handleFormSubmit = async (values: FormValues) => {
-    const result = await requestExtension({
-      data: {
-        assignmentId,
-        category: values.category as 'personal' | 'research' | 'health' | 'other',
-        reason: values.reason,
-        extensionDays: Number(values.duration),
-        ...(values.checkpointId ? { checkpointId: Number(values.checkpointId) } : {}),
-      },
-    });
+    try {
+      const result = await requestExtension({
+        data: {
+          assignmentId,
+          category: values.category as 'personal' | 'research' | 'health' | 'other',
+          reason: values.reason,
+          extensionDays: Number(values.duration),
+          ...(values.checkpointId ? { checkpointId: Number(values.checkpointId) } : {}),
+        },
+      });
 
-    if (isServerError(result)) {
-      form.setError('root', { message: result.error.message });
-      return;
+      if (isServerError(result)) {
+        form.setError('root', { message: t('extensions.errors.submitFailed') });
+        return;
+      }
+
+      setSuccess(true);
+      form.reset();
+      onSuccess();
+    } catch {
+      form.setError('root', { message: t('extensions.errors.submitFailed') });
     }
-
-    setSuccess(true);
-    form.reset();
-    onSuccess();
   };
 
   if (success) {
     return (
       <div className="rounded-lg border bg-card p-5 shadow-sm">
-        <p className="text-sm text-success font-medium">{t('extensions.successMessage')}</p>
+        <MutationFeedback success={t('extensions.successMessage')} />
       </div>
     );
   }
@@ -211,9 +216,7 @@ export function ExtensionRequestForm({
         )}
 
         {form.formState.errors.root && (
-          <p className="text-sm text-destructive" aria-live="polite">
-            {form.formState.errors.root.message}
-          </p>
+          <MutationFeedback error={form.formState.errors.root.message} />
         )}
 
         <Button type="submit" disabled={form.formState.isSubmitting}>

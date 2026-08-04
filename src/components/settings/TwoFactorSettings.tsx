@@ -23,6 +23,7 @@ import {
 } from '@/server/two-factor';
 import { useI18n } from '@/routes/__root';
 import { settingsKeys } from '@/lib/query-keys';
+import { MutationFeedback } from '@/components/ui/mutation-feedback';
 
 export function TwoFactorSettings() {
   const { t } = useI18n();
@@ -35,6 +36,7 @@ export function TwoFactorSettings() {
   const [totpUri, setTotpUri] = useState('');
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [setupStep, setSetupStep] = useState<'password' | 'qr' | 'verify'>('password');
 
   const { data: statusData, isLoading: statusLoading } = useQuery({
@@ -52,7 +54,7 @@ export function TwoFactorSettings() {
     },
     onSuccess: (data) => {
       if (data.error) {
-        setError(data.error);
+        setError(t('settings.twoFactor.setupError'));
         return;
       }
       setTotpUri(data.totpURI ?? '');
@@ -72,12 +74,13 @@ export function TwoFactorSettings() {
     },
     onSuccess: (data) => {
       if (data.error) {
-        setError(data.error);
+        setError(t('settings.twoFactor.verifyError'));
         return;
       }
       queryClient.invalidateQueries({ queryKey: settingsKeys.twoFactorStatus() });
       setIsEnableDialogOpen(false);
       resetSetup();
+      setSuccess(t('settings.twoFactor.enableSuccess'));
     },
     onError: () => {
       setError(t('settings.twoFactor.verifyError'));
@@ -91,13 +94,14 @@ export function TwoFactorSettings() {
     },
     onSuccess: (data) => {
       if (data.error) {
-        setError(data.error);
+        setError(t('settings.twoFactor.disableError'));
         return;
       }
       queryClient.invalidateQueries({ queryKey: settingsKeys.twoFactorStatus() });
       setIsDisableDialogOpen(false);
       setPassword('');
       setError('');
+      setSuccess(t('settings.twoFactor.disableSuccess'));
     },
     onError: () => {
       setError(t('settings.twoFactor.disableError'));
@@ -171,6 +175,7 @@ export function TwoFactorSettings() {
                 </Button>
               )}
             </div>
+            <MutationFeedback success={success} className="mt-4" />
           </div>
         </CardContent>
       </Card>
@@ -189,9 +194,7 @@ export function TwoFactorSettings() {
             <DialogDescription>{t('settings.twoFactor.enableDescription')}</DialogDescription>
           </DialogHeader>
 
-          {error && (
-            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>
-          )}
+          {error && <MutationFeedback error={error} />}
 
           {setupStep === 'password' && (
             <div className="space-y-4">
@@ -306,9 +309,7 @@ export function TwoFactorSettings() {
             <DialogDescription>{t('settings.twoFactor.disableDescription')}</DialogDescription>
           </DialogHeader>
 
-          {error && (
-            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>
-          )}
+          {error && <MutationFeedback error={error} />}
 
           <div className="space-y-2">
             <Label htmlFor="disable-password">{t('settings.twoFactor.confirmPassword')}</Label>

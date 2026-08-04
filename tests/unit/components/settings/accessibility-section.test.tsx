@@ -105,6 +105,28 @@ describe('AccessibilitySection', () => {
     expect(mockMutateAsync).toHaveBeenCalledWith({ reducedMotion: true });
   });
 
+  it('should announce successful and failed accessibility updates', async () => {
+    mockUseQuery.mockReturnValue({
+      data: {
+        user: { id: '1', name: 'John', email: 'john@test.com', image: null },
+        settings: { reducedMotion: false },
+      },
+      isLoading: false,
+    });
+    mockMutateAsync.mockResolvedValueOnce({ reducedMotion: true });
+
+    const { rerender } = render(<AccessibilitySection />);
+    fireEvent.click(screen.getByRole('checkbox'));
+
+    expect(await screen.findByRole('status')).toBeDefined();
+
+    mockMutateAsync.mockRejectedValueOnce(new Error('update failed'));
+    rerender(<AccessibilitySection />);
+    fireEvent.click(screen.getByRole('checkbox'));
+
+    expect(await screen.findByRole('alert')).toBeDefined();
+  });
+
   it('should render loading state', () => {
     mockUseQuery.mockReturnValue({ data: null, isLoading: true });
 

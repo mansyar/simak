@@ -123,7 +123,7 @@ export function PasswordSection() {
             />
 
             {form.formState.errors.root && (
-              <p className="text-sm text-destructive" aria-live="polite">
+              <p className="text-sm text-destructive" role="alert" aria-live="assertive">
                 {form.formState.errors.root.message}
               </p>
             )}

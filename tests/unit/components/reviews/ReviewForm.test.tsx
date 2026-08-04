@@ -231,7 +231,7 @@ describe('ReviewForm', () => {
     fireEvent.click(screen.getByText('instructorReviews.submitReview'));
 
     await waitFor(() => {
-      expect(mockOnError).toHaveBeenCalledWith('Submission failed');
+      expect(mockOnError).toHaveBeenCalledWith('instructorReviews.submitError');
     });
   });
 

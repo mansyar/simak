@@ -230,7 +230,8 @@
     "selectInstructor": "Select an instructor",
     "createSuccess": "User created successfully",
     "updateSuccess": "User updated successfully",
-    "deleteSuccess": "User deleted successfully"
+    "deleteSuccess": "User deleted successfully",
+    "deleteError": "Unable to delete the user. Please try again."
   },
   "adminTemplates": {
     "title": "Templates",
@@ -270,6 +271,7 @@
     },
     "deleteConfirm": "Delete this template?",
     "deleteInUse": "This template is used by {count} assignment(s). Type DELETE to confirm.",
+    "deleteError": "Unable to delete the template. Please try again.",
     "studentsCount": "{count} students",
     "inUseBanner": "This template is used by {count} assignment(s). Changes will affect future assignment creation.",
     "detail": {
@@ -1103,7 +1105,8 @@
       "categoryRequired": "Please select a category",
       "reasonMin": "Reason must be at least 10 characters",
       "durationMin": "Duration must be at least 1 day",
-      "durationMax": "Duration cannot exceed {max} days"
+      "durationMax": "Duration cannot exceed {max} days",
+      "submitFailed": "Unable to submit the extension request. Please try again."
     },
     "queueTitle": "Extension Requests",
     "historyTitle": "Extension History",
@@ -1174,9 +1177,11 @@
       "verify": "Verify",
       "setupError": "Failed to set up 2FA. Please try again.",
       "verifyError": "Invalid verification code. Please try again.",
+      "enableSuccess": "Two-factor authentication enabled successfully.",
       "disableTitle": "Disable Two-Factor Authentication",
       "disableDescription": "Enter your password to disable 2FA. Your account will be less secure.",
       "disableError": "Failed to disable 2FA. Please try again.",
+      "disableSuccess": "Two-factor authentication disabled successfully.",
       "saveBackupCodes": "Save Backup Codes"
     },
     "sessions": {
@@ -1190,7 +1195,11 @@
       "revokeAllTitle": "Revoke All Other Sessions",
       "revokeAllDescription": "This will log out {count} other session(s). Your current session will remain active.",
       "revokeAllOthers": "Revoke All Other Sessions",
-      "revokeAll": "Revoke All"
+      "revokeAll": "Revoke All",
+      "revokeSuccess": "Session revoked successfully",
+      "revokeError": "Unable to revoke this session. Please try again.",
+      "revokeAllSuccess": "Other sessions revoked successfully",
+      "revokeAllError": "Unable to revoke other sessions. Please try again."
     },
     "profile": {
       "title": "Profile",
@@ -1224,7 +1233,9 @@
       "title": "Accessibility",
       "description": "Accessibility settings for a better experience",
       "reducedMotionLabel": "Reduced Motion",
-      "reducedMotionHint": "Reduce animations and transitions throughout the app"
+      "reducedMotionHint": "Reduce animations and transitions throughout the app",
+      "saveSuccess": "Accessibility settings saved successfully",
+      "saveError": "Unable to save accessibility settings. Please try again."
     },
     "timezone": {
       "title": "Student deadline timezone",
@@ -1260,6 +1271,8 @@
     "notificationPreferences": {
       "title": "Notification Preferences",
       "description": "Choose how you want to be notified for each event type.",
+      "saveSuccess": "Notification preferences saved successfully",
+      "saveError": "Unable to save notification preferences. Please try again.",
       "channels": {
         "email": "Email",
         "inApp": "In-app"

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { act, render, screen, fireEvent } from '@testing-library/react';
 import { toast } from 'sonner';
 import { ProfileSection } from '@/components/settings/ProfileSection';
 
@@ -118,11 +118,14 @@ describe('ProfileSection', () => {
 
     const input = screen.getByDisplayValue('John');
     fireEvent.change(input, { target: { value: 'John Updated' } });
-    fireEvent.click(screen.getByText('Save Name'));
+    await act(async () => {
+      fireEvent.click(screen.getByText('Save Name'));
+    });
 
     await vi.waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('Name updated successfully');
     });
+    expect(await screen.findByRole('status')).toBeDefined();
   });
 
   it('should show error message on failed name update', async () => {
@@ -142,6 +145,7 @@ describe('ProfileSection', () => {
     fireEvent.click(screen.getByText('Save Name'));
 
     expect(await screen.findByText('Failed to update name')).toBeDefined();
+    expect(screen.getByRole('alert')).toBeDefined();
   });
 
   it('should render initials fallback when no image', () => {
