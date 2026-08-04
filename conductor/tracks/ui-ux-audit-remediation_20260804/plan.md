@@ -41,7 +41,7 @@
   - [x] Write failing tests for close-button names, max-height, scrolling, and narrow viewport behavior.
   - [x] Implement constrained content regions and accessible close controls.
   - [x] Verify notification, confirmation, and settings sheets.
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Error states, action feedback, and runtime stability
 
