@@ -98,11 +98,11 @@ Phase checkpoint: 7aae157 (user-confirmed; verification note attached)
 
 ### 3.1 Define migration and schema regression tests
 
-- [ ] Add failing database/schema tests for the `pg_trgm` extension and required search index names/definitions covering users, templates, email queue, assignments, feedback snippets, and audit-log entity/details text.
-- [ ] Verify the migration is compatible with the project's PostgreSQL 16 environment and does not alter existing data, permissions, or non-search indexes.
-- [ ] Commit the red-phase tests only if they form a separately useful test task; otherwise keep them with the migration task and document the red phase in the task note.
+- [x] Add failing database/schema tests for the `pg_trgm` extension and required search index names/definitions covering users, templates, email queue, assignments, feedback snippets, and audit-log entity/details text.
+- [x] Verify the migration is compatible with the project's PostgreSQL 16 environment and does not alter existing data, permissions, or non-search indexes.
+- [x] Commit the red-phase tests only if they form a separately useful test task; otherwise keep them with the migration task and document the red phase in the task note.
 
-Commit SHA: _pending_
+Commit SHA: 18cde2f
 
 ### 3.2 Add the reversible search-index migration
 
