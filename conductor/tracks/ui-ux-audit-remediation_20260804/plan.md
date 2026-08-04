@@ -1,6 +1,6 @@
 # Implementation Plan: UI/UX Audit Remediation
 
-## Phase 0 — Baseline, fixtures, and regression matrix
+## Phase 0 — Baseline, fixtures, and regression matrix [checkpoint: 3a71472]
 
 - [x] Task: Establish the audit regression baseline [7722e22]
   - [x] Document affected routes and components by role.
