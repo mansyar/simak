@@ -40,6 +40,17 @@ describe('PageHeader', () => {
     expect(screen.getByText('Create')).toBeInTheDocument();
   });
 
+  it('makes the action slot responsive on narrow screens', () => {
+    render(
+      <PageHeader title="Assignments" action={<button data-testid="action-btn">Create</button>} />,
+    );
+
+    const actionSlot = screen.getByTestId('action-btn').parentElement;
+    expect(actionSlot?.className).toContain('w-full');
+    expect(actionSlot?.className).toContain('sm:w-auto');
+    expect(actionSlot?.className).toContain('min-w-0');
+  });
+
   it('renders back link when back prop is provided', () => {
     render(
       <PageHeader

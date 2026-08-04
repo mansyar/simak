@@ -480,6 +480,7 @@
     "averageProgress": "Rata-rata Progres",
     "newAssignment": "Tugas Baru",
     "searchPlaceholder": "Cari tugas berdasarkan judul...",
+    "searchLabel": "Cari tugas",
     "studentCount": "{count} Mahasiswa",
     "finalDeadline": "Tenggat: {date}",
     "empty": "Tidak ada tugas ditemukan",

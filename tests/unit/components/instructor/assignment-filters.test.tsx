@@ -11,6 +11,7 @@ vi.mock('@/routes/__root', () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         'instructorAssignments.searchPlaceholder': 'Search assignments by title...',
+        'instructorAssignments.searchLabel': 'Search assignments',
         'common.clearSearch': 'Clear search',
       };
       return translations[key] || key;
@@ -34,6 +35,11 @@ describe('AssignmentFilters', () => {
     render(<AssignmentFilters search="" onSearchChange={onSearchChange} />);
     const searchInput = screen.getByPlaceholderText('Search assignments by title...');
     expect(searchInput).toBeDefined();
+  });
+
+  it('should expose a label for the search input', () => {
+    render(<AssignmentFilters search="" onSearchChange={onSearchChange} />);
+    expect(screen.getByRole('textbox', { name: 'Search assignments' })).toBeDefined();
   });
 
   it('should debounce onSearchChange - rapid typing fires only 1 call after delay', () => {
@@ -65,7 +71,11 @@ describe('AssignmentFilters', () => {
 
   it('should show X clear button when search is not empty', () => {
     render(<AssignmentFilters search="test" onSearchChange={onSearchChange} />);
-    expect(screen.getByLabelText('Clear search')).toBeDefined();
+    const clearButton = screen.getByLabelText('Clear search');
+    expect(clearButton).toBeDefined();
+    expect(clearButton.className).toContain('min-h-11');
+    expect(clearButton.className).toContain('min-w-11');
+    expect(clearButton.className).toContain('focus-visible');
   });
 
   it('should hide X clear button when search is empty', () => {

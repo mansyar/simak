@@ -22,7 +22,11 @@ export function AssignmentFilters({ search, onSearchChange }: AssignmentFiltersP
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
       <div className="relative flex-1">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <label htmlFor="instructor-assignment-search" className="sr-only">
+          {t('instructorAssignments.searchLabel')}
+        </label>
         <Input
+          id="instructor-assignment-search"
           placeholder={t('instructorAssignments.searchPlaceholder')}
           value={localSearch}
           onChange={(e) => {
@@ -38,7 +42,7 @@ export function AssignmentFilters({ search, onSearchChange }: AssignmentFiltersP
               setLocalSearch('');
               onSearchChange('');
             }}
-            className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+            className="absolute right-1 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             aria-label={t('common.clearSearch')}
           >
             <X className="h-4 w-4" />

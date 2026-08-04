@@ -22,7 +22,11 @@ vi.mock('@/routes/__root', () => ({
 }));
 
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, to }: any) => <a href={to}>{children}</a>,
+  Link: ({ children, to, ...props }: any) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
+  ),
 }));
 
 describe('AssignmentCard', () => {
@@ -52,5 +56,14 @@ describe('AssignmentCard', () => {
     const noDesc = { ...assignment, description: null };
     render(<AssignmentCard assignment={noDesc} />);
     expect(screen.queryByText('This is the description for the final thesis project.')).toBeNull();
+  });
+
+  it('should make the assignment title a keyboard-visible primary link', () => {
+    render(<AssignmentCard assignment={assignment} />);
+
+    const titleLink = screen.getByRole('link', { name: 'Final Thesis Project' });
+    expect(titleLink.getAttribute('href')).toBe('/instructor/assignments/1');
+    expect(titleLink.className).toContain('min-h-11');
+    expect(titleLink.className).toContain('focus-visible');
   });
 });

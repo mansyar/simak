@@ -94,4 +94,30 @@ test.describe('Instructor Assignment Management', () => {
     await expect(page.locator('text=Unlocked').first()).toBeVisible();
     await expect(page.locator('text=Locked').first()).toBeVisible();
   });
+
+  test('assignment list remains actionable without mobile clipping', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto('/instructor/assignments');
+    await page.waitForLoadState('networkidle');
+
+    const hasHorizontalOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    );
+    expect(hasHorizontalOverflow).toBe(false);
+
+    const titleLink = page.getByRole('link', { name: 'E2E Test Assignment' });
+    await expect(titleLink).toBeVisible();
+    const titleBounds = await titleLink.boundingBox();
+    expect(titleBounds).not.toBeNull();
+    expect(titleBounds!.x + titleBounds!.width).toBeLessThanOrEqual(320);
+
+    const searchInput = page.getByRole('textbox', { name: 'Search assignments' });
+    await expect(searchInput).toBeVisible();
+
+    const newAssignment = page.getByRole('button', { name: 'New Assignment' });
+    await expect(newAssignment).toBeVisible();
+    const actionBounds = await newAssignment.boundingBox();
+    expect(actionBounds).not.toBeNull();
+    expect(actionBounds!.x + actionBounds!.width).toBeLessThanOrEqual(320);
+  });
 });

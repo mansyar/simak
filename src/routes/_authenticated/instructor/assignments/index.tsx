@@ -83,7 +83,7 @@ function AssignmentsPage() {
         title={t('instructorAssignments.title')}
         subtitle={t('instructorAssignments.subtitle')}
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <RefreshButton
               isRefreshing={isRefreshing}
               onClick={() =>
@@ -92,7 +92,7 @@ function AssignmentsPage() {
                 )
               }
             />
-            <Button onClick={handleCreateNew}>
+            <Button className="min-w-0 flex-1 sm:flex-none" onClick={handleCreateNew}>
               <Plus className="mr-2 h-4 w-4" />
               {t('instructorAssignments.newAssignment')}
             </Button>

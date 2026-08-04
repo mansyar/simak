@@ -485,6 +485,7 @@ export type Translation = {
     averageProgress: string
     newAssignment: string
     searchPlaceholder: string
+    searchLabel: string
     studentCount: string
     finalDeadline: string
     empty: string

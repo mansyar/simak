@@ -104,6 +104,20 @@ describe('Pagination', () => {
     });
   });
 
+  it('should allow pagination controls to wrap on narrow screens', () => {
+    const { container } = render(
+      <Pagination
+        currentPage={3}
+        totalPages={10}
+        onPageChange={vi.fn()}
+        showPageNumbers
+        showCounter
+      />,
+    );
+    expect(container.firstElementChild?.className).toContain('flex-wrap');
+    expect(container.querySelector('.flex.items-center.gap-1')?.className).toContain('flex-wrap');
+  });
+
   it('should disable prev button on first page', () => {
     render(<Pagination currentPage={1} totalPages={5} onPageChange={vi.fn()} />);
     const prevButton = screen.getByRole('button', { name: /previous page/i });

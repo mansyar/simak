@@ -480,6 +480,7 @@
     "averageProgress": "Average Progress",
     "newAssignment": "New Assignment",
     "searchPlaceholder": "Search assignments by title...",
+    "searchLabel": "Search assignments",
     "studentCount": "{count} Students",
     "finalDeadline": "Deadline: {date}",
     "empty": "No assignments found",
