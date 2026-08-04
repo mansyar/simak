@@ -77,13 +77,13 @@ Commit SHA: c8fb90d
 
 ### 2.3 Preserve and correct user, assignment, and audit search handlers
 
-- [ ] Add failing non-empty-search tests to the existing users, assignments, and audit-log server test suites, including authorization, filters, pagination, ordering, enrichment, and stale/empty result behavior.
-- [ ] Review `src/server/users.server.ts`, `src/server/assignments.server.ts`, `src/server/assignments-extras.server.ts`, and `src/server/audit-log.server.ts` for redundant fetch layers and preserve the existing response contracts while reducing avoidable work.
-- [ ] Make audit-log search type-correct by explicitly searching a text representation or targeted JSON fields for `details`, while retaining entity ID matching and existing action/date/entity/actor filters.
-- [ ] Ensure the admin users loader and React Query consumer do not cause redundant requests for the same committed search state, while retaining the current cache freshness behavior.
-- [ ] Run the focused server tests and commit the completed task with a git note and recorded SHA.
+- [x] Add failing non-empty-search tests to the existing users, assignments, and audit-log server test suites, including authorization, filters, pagination, ordering, enrichment, and stale/empty result behavior.
+- [x] Review `src/server/users.server.ts`, `src/server/assignments.server.ts`, `src/server/assignments-extras.server.ts`, and `src/server/audit-log.server.ts` for redundant fetch layers and preserve the existing response contracts while reducing avoidable work.
+- [x] Make audit-log search type-correct by explicitly searching a text representation or targeted JSON fields for `details`, while retaining entity ID matching and existing action/date/entity/actor filters.
+- [x] Ensure the admin users loader and React Query consumer do not cause redundant requests for the same committed search state, while retaining the current cache freshness behavior.
+- [x] Run the focused server tests and commit the completed task with a git note and recorded SHA.
 
-Commit SHA: _pending_
+Commit SHA: 1789d07
 
 ### Phase 2 Verification Checkpoint
 
