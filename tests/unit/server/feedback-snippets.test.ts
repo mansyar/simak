@@ -91,6 +91,8 @@ describe('Feedback snippet server functions', () => {
       'returning',
       'update',
       'set',
+      'limit',
+      'offset',
     ]) {
       query[method] = vi.fn().mockReturnValue(query);
     }
@@ -118,11 +120,19 @@ describe('Feedback snippet server functions', () => {
     });
 
     it('applies defaults and trims valid list input', () => {
-      expect(ListFeedbackSnippetsSchema.parse({})).toEqual({ archived: false, search: '' });
+      expect(ListFeedbackSnippetsSchema.parse({})).toEqual({
+        archived: false,
+        search: '',
+        page: 1,
+        limit: 20,
+      });
       expect(ListFeedbackSnippetsSchema.parse({ archived: true, search: '  rubric  ' })).toEqual({
         archived: true,
         search: 'rubric',
+        page: 1,
+        limit: 20,
       });
+      expect(ListFeedbackSnippetsSchema.safeParse({ limit: 51 }).success).toBe(false);
     });
 
     it('accepts exact field limits and normalizes text', () => {
@@ -221,30 +231,66 @@ describe('Feedback snippet server functions', () => {
     });
 
     it('returns only the current instructor active or archived results', async () => {
-      mockDb.then.mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
-        Promise.resolve([activeSnippet]).then(onfulfilled),
-      );
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+          Promise.resolve([activeSnippet]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+          Promise.resolve([{ count: 1 }]).then(onfulfilled),
+        );
 
       const result = await listFeedbackSnippetsHandler({
         data: { archived: false, search: '  explanation  ' },
       });
 
-      expect(result).toEqual({ snippets: [activeSnippet] });
-      expect(mockDb.select).toHaveBeenCalledOnce();
-      expect(mockDb.where).toHaveBeenCalledOnce();
+      expect(result).toEqual({ snippets: [activeSnippet], total: 1, page: 1, limit: 20 });
+      expect(mockDb.select).toHaveBeenCalledTimes(2);
+      expect(mockDb.where).toHaveBeenCalledTimes(2);
+    });
+
+    it('returns bounded pagination metadata and a minimal stable list projection', async () => {
+      const listSnippet = {
+        id: activeSnippet.id,
+        title: activeSnippet.title,
+        category: activeSnippet.category,
+        body: activeSnippet.body,
+        archivedAt: activeSnippet.archivedAt,
+      };
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+          Promise.resolve([listSnippet]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+          Promise.resolve([{ count: 21 }]).then(onfulfilled),
+        );
+
+      const result = await listFeedbackSnippetsHandler({
+        data: { archived: false, search: 'explanation', page: 2, limit: 10 },
+      });
+
+      expect(result).toEqual({ snippets: [listSnippet], total: 21, page: 2, limit: 10 });
+      expect(mockDb.select.mock.calls[0][0]).not.toHaveProperty('createdAt');
+      expect(mockDb.select.mock.calls[0][0]).not.toHaveProperty('updatedAt');
+      expect(mockDb.orderBy).toHaveBeenCalledWith(expect.anything(), expect.anything());
+      expect(mockDb.limit).toHaveBeenCalledWith(10);
+      expect(mockDb.offset).toHaveBeenCalledWith(10);
     });
 
     it('uses the archived filter to exclude archived rows from the active list', async () => {
-      mockDb.then.mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
-        Promise.resolve([]).then(onfulfilled),
-      );
+      mockDb.then
+        .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+          Promise.resolve([]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+          Promise.resolve([{ count: 0 }]).then(onfulfilled),
+        );
 
       const result = await listFeedbackSnippetsHandler({
         data: { archived: false, search: '' },
       });
 
-      expect(result).toEqual({ snippets: [] });
-      expect(mockDb.where).toHaveBeenCalledOnce();
+      expect(result).toEqual({ snippets: [], total: 0, page: 1, limit: 20 });
+      expect(mockDb.where).toHaveBeenCalledTimes(2);
     });
 
     it('does not reveal or mutate another instructor snippet by id', async () => {

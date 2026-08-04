@@ -155,6 +155,13 @@
       "when": 1785747710219,
       "tag": "0021_round_mysterio",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1785816706198,
+      "tag": "0022_search_trigram_indexes",
+      "breakpoints": true
     }
   ]
 }

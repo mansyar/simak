@@ -6,6 +6,7 @@ import {
   listEmailQueue,
   retryEmail,
 } from '@/server/email-queue';
+import { getEmailQueueSummaryHandler, listEmailQueueHandler } from '@/server/email-queue.server';
 import type { ListEmailQueueSuccess, RetryEmailSuccess } from '@/server/email-queue.server';
 import type { ServerError } from '@/lib/errors';
 import * as auth from '@/server/auth';
@@ -203,6 +204,20 @@ describe('listEmailQueueHandler', () => {
     expect(mockDb.offset).toHaveBeenCalledWith(0);
   });
 
+  it('does not execute the unfiltered summary query for each search', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+    mockDb.then
+      .mockImplementationOnce((onf: any) => Promise.resolve([{ total: 1 }]).then(onf))
+      .mockImplementationOnce((onf: any) => Promise.resolve([mockEmailEntries[0]]).then(onf));
+
+    const result = await listEmailQueueHandler({
+      data: { page: 1, status: 'all', search: 'user@example.com' },
+    });
+
+    expect(result).not.toHaveProperty('error');
+    expect(mockDb.select).toHaveBeenCalledTimes(2);
+  });
+
   it('paginates correctly for page > 1', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
 
@@ -284,22 +299,17 @@ describe('listEmailQueueHandler', () => {
     expect(mockDb.where).toHaveBeenCalled();
   });
 
-  it('returns summary counts (pending/sent/failed) for overall queue', async () => {
+  it('returns summary counts through an independent query', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
 
-    mockDb.then
-      .mockImplementationOnce((onf: any) => Promise.resolve([{ total: 15 }]).then(onf))
-      .mockImplementationOnce((onf: any) => Promise.resolve(mockEmailEntries).then(onf))
-      .mockImplementationOnce((onf: any) =>
-        Promise.resolve([{ pending: 5, sent: 8, failed: 2 }]).then(onf),
-      );
+    mockDb.then.mockImplementationOnce((onf: any) =>
+      Promise.resolve([{ pending: 5, sent: 8, failed: 2 }]).then(onf),
+    );
 
-    const { listEmailQueueHandler } = await import('@/server/email-queue.server');
-    const result = (await listEmailQueueHandler({
-      data: { page: 1, status: 'all', search: '' },
-    })) as ListEmailQueueSuccess;
+    const result = await getEmailQueueSummaryHandler();
 
-    expect(result.summary).toEqual({ pending: 5, sent: 8, failed: 2 });
+    expect(result).toEqual({ pending: 5, sent: 8, failed: 2 });
+    expect(mockDb.select).toHaveBeenCalledOnce();
   });
 
   it('includes resendMessageId in the SELECT query and result entries', async () => {
@@ -338,7 +348,7 @@ describe('listEmailQueueHandler', () => {
 
     expect(result.entries).toHaveLength(0);
     expect(result.total).toBe(0);
-    expect(result.summary).toEqual({ pending: 0, sent: 0, failed: 0 });
+    expect(result).not.toHaveProperty('summary');
   });
 
   it('handles DB error with INTERNAL server error', async () => {

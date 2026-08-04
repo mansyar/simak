@@ -26,5 +26,9 @@ export const users = pgTable(
     twoFactorEnabled: boolean('two_factor_enabled').default(false),
     settings: jsonb('settings').$type<UserSettings>(),
   },
-  (table) => [index('users_role_deleted_at_idx').on(table.role, table.deletedAt)],
+  (table) => [
+    index('users_role_deleted_at_idx').on(table.role, table.deletedAt),
+    index('users_name_trgm_idx').using('gin', table.name.op('gin_trgm_ops')),
+    index('users_email_trgm_idx').using('gin', table.email.op('gin_trgm_ops')),
+  ],
 );

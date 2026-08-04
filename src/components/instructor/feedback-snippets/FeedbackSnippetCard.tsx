@@ -1,14 +1,14 @@
 import { Archive, Edit3, RotateCcw } from 'lucide-react';
-import type { FeedbackSnippet } from '@/server/feedback-snippets';
+import type { FeedbackSnippetListItem } from '@/server/feedback-snippets';
 import { useI18n } from '@/routes/__root';
 import { Button } from '@/components/ui/button';
 
 interface FeedbackSnippetCardProps {
-  snippet: FeedbackSnippet;
+  snippet: FeedbackSnippetListItem;
   archived: boolean;
-  onArchive: (snippet: FeedbackSnippet) => void;
-  onEdit: (snippet: FeedbackSnippet) => void;
-  onRestore: (snippet: FeedbackSnippet) => void;
+  onArchive: (snippet: FeedbackSnippetListItem) => void;
+  onEdit: (snippet: FeedbackSnippetListItem) => void;
+  onRestore: (snippet: FeedbackSnippetListItem) => void;
 }
 
 function FeedbackSnippetCard({

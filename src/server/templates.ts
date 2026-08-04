@@ -31,6 +31,8 @@ export const ListTemplatesSchema = z.object({
   type: z.string().optional().default(''),
 });
 
+export const ListTemplateTypesSchema = z.object({});
+
 export const TemplateIdParamSchema = z.object({
   id: z.coerce.number().int().positive('Template ID must be a positive integer'),
 });
@@ -47,6 +49,14 @@ export const listTemplates = typedServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const { listTemplatesHandler } = await import('./templates.server');
     return listTemplatesHandler({ data });
+  });
+
+export const listTemplateTypes = typedServerFn({ method: 'GET' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
+  .inputValidator(ListTemplateTypesSchema)
+  .handler(async ({ data }) => {
+    const { listTemplateTypesHandler } = await import('./templates-extras.server');
+    return listTemplateTypesHandler({ data });
   });
 
 export const getTemplate = typedServerFn({ method: 'GET' })
@@ -140,6 +150,8 @@ export interface TemplateAssignment {
   studentCount: number;
   createdAt: Date | null;
 }
+
+export type ListTemplateTypesResult = { types: string[] } | ServerError;
 
 export type GetTemplateResult = TemplateDetail | null | ServerError;
 

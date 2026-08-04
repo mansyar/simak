@@ -78,3 +78,46 @@ describe('0013_deadline_reminders migration', () => {
     expect(sql).toContain('DROP INDEX IF EXISTS "checkpoints_state_due_date_idx"');
   });
 });
+
+describe('0022_search_trigram_indexes migration', () => {
+  const migrationPath = resolve(
+    process.cwd(),
+    'drizzle/migrations/0022_search_trigram_indexes.sql',
+  );
+  const rollbackPath = resolve(
+    process.cwd(),
+    'drizzle/migrations/rollback/0022_search_trigram_indexes.rollback.sql',
+  );
+
+  it('enables pg_trgm and creates every contains-search index', () => {
+    const sql = readFileSync(migrationPath, 'utf8');
+
+    expect(sql).toContain('CREATE EXTENSION IF NOT EXISTS pg_trgm');
+    for (const indexName of [
+      'users_name_trgm_idx',
+      'users_email_trgm_idx',
+      'assignment_templates_name_trgm_idx',
+      'email_queue_recipient_email_trgm_idx',
+      'email_queue_subject_trgm_idx',
+      'assignments_title_trgm_idx',
+      'feedback_snippets_title_trgm_idx',
+      'feedback_snippets_category_trgm_idx',
+      'audit_log_entity_id_trgm_idx',
+      'audit_log_details_trgm_idx',
+    ]) {
+      expect(sql).toContain(indexName);
+    }
+
+    expect(sql).toMatch(/USING gin[\s\S]*gin_trgm_ops/i);
+    expect(sql).toMatch(/CAST\(\s*"details"\s+AS\s+text\s*\)/i);
+    expect(sql).not.toMatch(/ALTER TABLE|DROP TABLE|DELETE FROM|UPDATE\s+/i);
+  });
+
+  it('has a safe rollback for indexes without dropping a shared extension', () => {
+    const sql = readFileSync(rollbackPath, 'utf8');
+
+    expect(sql).toContain('DROP INDEX IF EXISTS');
+    expect(sql).not.toContain('DROP EXTENSION');
+    expect(sql).not.toContain('CASCADE');
+  });
+});

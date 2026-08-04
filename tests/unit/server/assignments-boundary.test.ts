@@ -6,6 +6,7 @@ import {
   listInstructorAssignmentsHandler,
   getAssignmentDetailHandler,
 } from '@/server/assignments.server';
+import { listStudentAssignmentsHandler } from '@/server/assignments-extras.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 
@@ -222,6 +223,38 @@ describe('Assignment handlers — boundary date serialization', () => {
 
       const result = await getAssignmentDetailHandler({ data: { id: 42 } });
       expect(result).toBeNull();
+    });
+  });
+
+  describe('listStudentAssignmentsHandler', () => {
+    it('starts the count query without waiting for searched assignment rows', async () => {
+      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+        user: { id: 'student-1', role: 'student' } as any,
+        session: {} as any,
+      });
+
+      let releaseRows: (() => void) | undefined;
+      let countStarted = false;
+      mockDb.then
+        .mockImplementationOnce(
+          (onfulfilled: any) =>
+            new Promise((resolve) => {
+              releaseRows = () => resolve(onfulfilled([]));
+            }),
+        )
+        .mockImplementationOnce((onfulfilled: any) => {
+          countStarted = true;
+          return Promise.resolve([{ count: 0 }]).then(onfulfilled);
+        });
+
+      const pending = listStudentAssignmentsHandler({
+        data: { page: 2, limit: 20, search: 'needle' },
+      });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(countStarted).toBe(true);
+      releaseRows?.();
+      await pending;
     });
   });
 });

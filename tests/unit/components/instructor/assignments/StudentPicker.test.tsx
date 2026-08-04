@@ -122,4 +122,49 @@ describe('StudentPicker', () => {
     expect(screen.getByText('Alice Johnson')).toBeInTheDocument();
     expect(screen.queryByText('Bob Smith')).not.toBeInTheDocument();
   });
+
+  it('does not change the fixed server query when typing locally', () => {
+    render(<StudentPicker {...mockProps} />);
+    const searchInput = screen.getByPlaceholderText('instructorAssignments.wizard.searchStudents');
+
+    fireEvent.change(searchInput, { target: { value: 'Alice' } });
+
+    expect(useQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        queryKey: userKeys.list({ page: 1, limit: 200, search: '', role: 'student' }),
+      }),
+    );
+  });
+
+  it('memoizes searchable student fields when selection changes', () => {
+    let nameReads = 0;
+    let emailReads = 0;
+    const trackedStudents = [
+      {
+        id: '1',
+        get name() {
+          nameReads += 1;
+          return 'Alice Johnson';
+        },
+        get email() {
+          emailReads += 1;
+          return 'alice@example.com';
+        },
+      },
+    ];
+    vi.mocked(useQuery).mockReturnValue({
+      data: { users: trackedStudents },
+      isLoading: false,
+      isError: false,
+    } as never);
+
+    const { rerender } = render(<StudentPicker {...mockProps} />);
+    const initialNameReads = nameReads;
+    const initialEmailReads = emailReads;
+
+    rerender(<StudentPicker {...mockProps} selectedStudentIds={['1']} />);
+
+    expect(nameReads).toBe(initialNameReads + 2);
+    expect(emailReads).toBe(initialEmailReads + 1);
+  });
 });

@@ -7,6 +7,7 @@ import type { ComponentType } from 'react';
 const mockRouter = vi.hoisted(() => ({
   invalidate: vi.fn(),
 }));
+const mockNavigate = vi.hoisted(() => vi.fn());
 
 const mockData = vi.hoisted(() => ({
   entries: [] as Array<Record<string, unknown>>,
@@ -24,6 +25,7 @@ const mockSearch = vi.hoisted(() => ({
 
 const mockRetryEmail = vi.hoisted(() => vi.fn());
 const mockTriggerR2Cleanup = vi.hoisted(() => vi.fn());
+const mockQueryClient = vi.hoisted(() => ({ invalidateQueries: vi.fn() }));
 
 vi.mock('@tanstack/react-start/server', () => ({
   getRequestHeaders: vi.fn().mockReturnValue(new Headers()),
@@ -48,13 +50,19 @@ vi.mock('@tanstack/react-router', () => ({
     ...config,
     useLoaderData: vi.fn().mockReturnValue(mockData),
     useSearch: vi.fn().mockReturnValue(mockSearch),
-    useNavigate: vi.fn().mockReturnValue(vi.fn()),
+    useNavigate: vi.fn().mockReturnValue(mockNavigate),
   })),
   useRouter: vi.fn().mockReturnValue(mockRouter),
 }));
 
+vi.mock('@tanstack/react-query', () => ({
+  useQuery: vi.fn().mockImplementation(() => ({ data: mockData.summary })),
+  useQueryClient: vi.fn().mockReturnValue(mockQueryClient),
+}));
+
 vi.mock('@/server/email-queue', () => ({
   listEmailQueue: vi.fn(),
+  getEmailQueueSummary: vi.fn(),
   retryEmail: mockRetryEmail,
 }));
 
@@ -87,6 +95,7 @@ async function getComponent(): Promise<ComponentType> {
 describe('Admin Email Queue page', () => {
   beforeEach(() => {
     mockRouter.invalidate.mockClear();
+    mockNavigate.mockClear();
     mockRetryEmail.mockClear();
     mockTriggerR2Cleanup.mockClear();
     mockData.entries = [];
@@ -108,6 +117,28 @@ describe('Admin Email Queue page', () => {
   it('should use listEmailQueue server function', async () => {
     const { listEmailQueue } = await import('@/server/email-queue');
     expect(typeof listEmailQueue).toBe('function');
+  });
+
+  it('resets the page when the filter commits a search value', async () => {
+    vi.useFakeTimers();
+    try {
+      const Component = await getComponent();
+      render(<Component />);
+      fireEvent.change(screen.getByPlaceholderText('adminEmailQueue.searchPlaceholder'), {
+        target: { value: 'draft' },
+      });
+
+      expect(mockNavigate).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(300);
+
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+      const options = mockNavigate.mock.calls[0]?.[0] as {
+        search: (previous: { page: number; search: string }) => { page: number; search: string };
+      };
+      expect(options.search({ page: 3, search: '' })).toMatchObject({ page: 1, search: 'draft' });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   describe('render', () => {

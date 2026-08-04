@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -6,8 +7,9 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 
 interface EmailQueueFiltersProps {
   search: string;
@@ -23,6 +25,12 @@ export function EmailQueueFilters({
   onStatusChange,
 }: EmailQueueFiltersProps) {
   const { t } = useI18n();
+  const [localSearch, setLocalSearch] = useState(search);
+  const debouncedSearchChange = useDebouncedCallback(onSearchChange, 300);
+
+  useEffect(() => {
+    setLocalSearch(search);
+  }, [search]);
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -31,10 +39,27 @@ export function EmailQueueFilters({
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={t('adminEmailQueue.searchPlaceholder')}
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={localSearch}
+            onChange={(e) => {
+              setLocalSearch(e.target.value);
+              debouncedSearchChange(e.target.value);
+            }}
             className="pl-9"
           />
+          {localSearch !== '' && (
+            <button
+              type="button"
+              onClick={() => {
+                debouncedSearchChange.cancel();
+                setLocalSearch('');
+                onSearchChange('');
+              }}
+              className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+              aria-label={t('common.clearSearch')}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
       <Select value={status} onValueChange={(value) => onStatusChange(value ?? 'all')}>

@@ -156,4 +156,29 @@ describe('AuditLogPage - search debounce & clear', () => {
     expect(result.search).toBe('');
     expect(result.page).toBe(1);
   });
+
+  it('should cancel the pending search when clearing the input', () => {
+    mocks.search = { ...mocks.search, search: '' };
+    render(<AuditLogPage />);
+    const searchInput = screen.getByPlaceholderText('adminAuditLog.searchPlaceholder');
+
+    fireEvent.change(searchInput, { target: { value: 'draft' } });
+    fireEvent.click(screen.getByLabelText('common.clearSearch'));
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    expect(mocks.navigate).toHaveBeenCalledTimes(1);
+    const call = mocks.navigate.mock.calls[0][0];
+    expect(
+      call.search({
+        page: 1,
+        limit: 50,
+        action: '',
+        dateFrom: '',
+        dateTo: '',
+        search: '',
+      }).search,
+    ).toBe('');
+  });
 });

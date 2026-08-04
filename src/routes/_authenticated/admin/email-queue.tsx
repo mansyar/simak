@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { listEmailQueue, retryEmail } from '@/server/email-queue';
+import { getEmailQueueSummary, listEmailQueue, retryEmail } from '@/server/email-queue';
 import { triggerR2Cleanup } from '@/server/r2-cleanup';
 import type { EmailQueueEntry } from '@/server/email-queue';
 import { useI18n } from '../../__root';
@@ -16,6 +17,7 @@ import { z } from 'zod';
 import { isServerError } from '@/lib/errors';
 import { toast } from 'sonner';
 import { showErrorToast, parseServerError } from '@/lib/toast';
+import { emailQueueKeys } from '@/lib/query-keys';
 
 const EmailQueueSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -42,17 +44,21 @@ function EmailQueuePage() {
   const { t } = useI18n();
   const data = Route.useLoaderData();
   const listData = isServerError(data)
-    ? { entries: [], total: 0, page: 1, limit: LIMIT, summary: { pending: 0, sent: 0, failed: 0 } }
-    : (data ?? {
-        entries: [],
-        total: 0,
-        page: 1,
-        limit: LIMIT,
-        summary: { pending: 0, sent: 0, failed: 0 },
-      });
+    ? { entries: [], total: 0, page: 1, limit: LIMIT }
+    : (data ?? { entries: [], total: 0, page: 1, limit: LIMIT });
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const summaryQuery = useQuery({
+    queryKey: emailQueueKeys.summary(),
+    queryFn: () => getEmailQueueSummary({ data: {} }),
+    staleTime: 30_000,
+  });
+  const summary =
+    summaryQuery.data && !isServerError(summaryQuery.data)
+      ? summaryQuery.data
+      : { pending: 0, sent: 0, failed: 0 };
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [retryTarget, setRetryTarget] = useState<EmailQueueEntry | null>(null);
@@ -66,6 +72,7 @@ function EmailQueuePage() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await router.invalidate();
+    await queryClient.invalidateQueries({ queryKey: emailQueueKeys.summary() });
     setIsRefreshing(false);
   };
 
@@ -114,6 +121,7 @@ function EmailQueuePage() {
       toast.success(t('adminEmailQueue.retrySuccess'));
       setRetryTarget(null);
       await router.invalidate();
+      await queryClient.invalidateQueries({ queryKey: emailQueueKeys.summary() });
     }
     setIsRetrying(false);
   };
@@ -138,7 +146,7 @@ function EmailQueuePage() {
         }
       />
 
-      <EmailQueueSummaryCards summary={listData.summary} />
+      <EmailQueueSummaryCards summary={summary} />
 
       <EmailQueueFilters
         search={searchParams.search}

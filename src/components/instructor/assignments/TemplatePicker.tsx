@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listTemplates } from '@/server/templates';
 import { templateKeys } from '@/lib/query-keys';
@@ -9,6 +9,8 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Clipboard, Search, Check, ChevronRight } from 'lucide-react';
+
+const EMPTY_TEMPLATES: never[] = [];
 
 interface Template {
   id: number;
@@ -40,7 +42,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
     retry: false,
   });
 
-  const templates = data?.templates ?? [];
+  const templates = data?.templates ?? EMPTY_TEMPLATES;
 
   useEffect(() => {
     if (isError) {
@@ -49,13 +51,30 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
     }
   }, [isError, error, t]);
 
-  const filteredTemplates = templates.filter(
-    (tpl) =>
-      tpl.name.toLowerCase().includes(search.toLowerCase()) ||
-      tpl.type.toLowerCase().includes(search.toLowerCase()),
+  const normalizedTemplates = useMemo(
+    () =>
+      templates.map((template) => ({
+        template,
+        name: template.name.toLowerCase(),
+        type: template.type.toLowerCase(),
+      })),
+    [templates],
+  );
+  const normalizedSearch = search.toLowerCase();
+  const filteredTemplates = useMemo(
+    () =>
+      normalizedTemplates
+        .filter(
+          ({ name, type }) => name.includes(normalizedSearch) || type.includes(normalizedSearch),
+        )
+        .map(({ template }) => template),
+    [normalizedSearch, normalizedTemplates],
   );
 
-  const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
+  const selectedTemplate = useMemo(
+    () => templates.find((template) => template.id === selectedTemplateId),
+    [selectedTemplateId, templates],
+  );
 
   return (
     <div className="space-y-6">

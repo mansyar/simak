@@ -140,10 +140,6 @@ describe('Template server functions - Logic & Security', () => {
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ count: 1 }]).then(onfulfilled),
         )
-        .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
-        )
         .mockImplementationOnce((onfulfilled: any) =>
           Promise.resolve([{ templateId: 1, name: 'Proposal', order: 1 }]).then(onfulfilled),
         );
@@ -154,7 +150,7 @@ describe('Template server functions - Logic & Security', () => {
       };
 
       expect(result.templates).toHaveLength(1);
-      expect(result.templates[0].checkpointCount).toBe(3);
+      expect(result.templates[0].checkpointCount).toBe(1);
       expect(result.total).toBe(1);
     });
 
@@ -204,10 +200,10 @@ describe('Template server functions - Logic & Security', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession);
 
       const result = await listTemplatesHandler({ data: listData });
-      expect(result).toEqual({ templates: [], total: 0, allTypes: [] });
+      expect(result).toEqual({ templates: [], total: 0 });
     });
 
-    it('should return allTypes array of distinct types', async () => {
+    it('should run data, count, and checkpoint queries without type discovery (PERF-25)', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
 
       mockDb.then
@@ -218,53 +214,19 @@ describe('Template server functions - Logic & Security', () => {
           Promise.resolve([{ count: 1 }]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ type: 'Thesis' }, { type: 'Project' }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ templateId: 1, count: 3 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ templateId: 1, name: 'Proposal', order: 1 }]).then(onfulfilled),
-        );
-
-      const result = (await listTemplatesHandler({ data: listData })) as {
-        allTypes: string[];
-      };
-
-      expect(result.allTypes).toBeDefined();
-      expect(result.allTypes).toEqual(['Thesis', 'Project']);
-    });
-
-    it('should run data, count, and types queries in parallel via Promise.all (PERF-25)', async () => {
-      vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession);
-
-      mockDb.then
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ id: 1, name: 'Template 1', type: 'Thesis' }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ count: 1 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ type: 'Thesis' }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ templateId: 1, count: 2 }]).then(onfulfilled),
-        )
-        .mockImplementationOnce((onfulfilled: any) =>
-          Promise.resolve([{ templateId: 1, name: 'Ch 1', order: 1 }]).then(onfulfilled),
+          Promise.resolve([
+            { templateId: 1, name: 'Ch 1', order: 1 },
+            { templateId: 1, name: 'Ch 2', order: 2 },
+          ]).then(onfulfilled),
         );
 
       const result = (await listTemplatesHandler({ data: listData })) as {
         templates: { checkpointCount: number }[];
         total: number;
-        allTypes: string[];
       };
 
-      // With Promise.all, count query (2nd call) runs before checkpoint queries (4th+5th calls)
-      expect(mockDb.then).toHaveBeenCalledTimes(5);
+      expect(mockDb.then).toHaveBeenCalledTimes(3);
       expect(result.total).toBe(1);
-      expect(result.allTypes).toEqual(['Thesis']);
       expect(result.templates[0].checkpointCount).toBe(2);
     });
   });

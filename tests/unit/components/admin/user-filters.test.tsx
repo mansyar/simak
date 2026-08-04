@@ -231,4 +231,25 @@ describe('UserFilters', () => {
 
     expect(onSearchChange).toHaveBeenCalledWith('');
   });
+
+  it('should cancel a pending search when the clear button is clicked', () => {
+    render(
+      <UserFilters
+        search=""
+        onSearchChange={onSearchChange}
+        role="all"
+        onRoleChange={onRoleChange}
+      />,
+    );
+    const searchInput = screen.getByPlaceholderText('Search users by name or email...');
+
+    fireEvent.change(searchInput, { target: { value: 'draft' } });
+    fireEvent.click(screen.getByLabelText('Clear search'));
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    expect(onSearchChange).toHaveBeenCalledTimes(1);
+    expect(onSearchChange).toHaveBeenCalledWith('');
+  });
 });

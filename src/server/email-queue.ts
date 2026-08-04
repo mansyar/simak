@@ -10,6 +10,8 @@ export const ListEmailQueueSchema = z.object({
   search: z.string().default(''),
 });
 
+export const GetEmailQueueSummarySchema = z.object({});
+
 export type ListEmailQueueInput = z.infer<typeof ListEmailQueueSchema>;
 
 export const RetryEmailSchema = z.object({
@@ -47,6 +49,14 @@ export const listEmailQueue = typedServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const { listEmailQueueHandler } = await import('./email-queue.server');
     return listEmailQueueHandler({ data });
+  });
+
+export const getEmailQueueSummary = typedServerFn({ method: 'GET' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
+  .inputValidator(GetEmailQueueSummarySchema)
+  .handler(async () => {
+    const { getEmailQueueSummaryHandler } = await import('./email-queue.server');
+    return getEmailQueueSummaryHandler();
   });
 
 export const retryEmail = typedServerFn({ method: 'POST' })
