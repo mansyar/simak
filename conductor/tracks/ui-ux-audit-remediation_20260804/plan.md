@@ -82,7 +82,7 @@
 - [x] Task: Improve student discussions and destructive actions [0589eb7]
   - [x] Write failing tests for discussion errors, deletion confirmation, announcements, and empty states. [0589eb7]
   - [x] Implement retryable error states, confirmation, and live feedback. [0589eb7]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4 — Instructor workflow remediation
 
