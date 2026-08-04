@@ -22,11 +22,11 @@
   - [x] Implement native label/button semantics and accessible input associations.
   - [x] Implement keyboard activation, focus styling, and drag-and-drop enhancement behavior.
   - [x] Verify upload validation and retry behavior remains bilingual.
-- [~] Task: Repair mobile navigation drawer behavior
-  - [ ] Write failing tests for expanded state, controlled drawer, Escape, focus transfer, focus return, and inert background.
-  - [ ] Implement semantic drawer behavior for all role sidebars.
-  - [ ] Add navigation landmark labels and active-route semantics.
-  - [ ] Verify desktop sidebar behavior is unchanged.
+- [x] Task: Repair mobile navigation drawer behavior [a08f5ca]
+  - [x] Write failing tests for expanded state, controlled drawer, Escape, focus transfer, focus return, and inert background.
+  - [x] Implement semantic drawer behavior for all role sidebars.
+  - [x] Add navigation landmark labels and active-route semantics.
+  - [x] Verify desktop sidebar behavior is unchanged.
 - [ ] Task: Standardize shared control hit areas
   - [ ] Write failing tests for button, input, icon-button, pagination, close, refresh, filter, and notification controls.
   - [ ] Implement a 44px interaction baseline while preserving compact visual variants where appropriate.
