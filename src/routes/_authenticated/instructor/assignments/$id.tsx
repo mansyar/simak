@@ -8,7 +8,7 @@ import { AssignmentConsultationsTab } from '@/components/instructor/assignments/
 import { AssignmentExtensionsTab } from '@/components/instructor/assignments/AssignmentExtensionsTab';
 import { AssignmentInterventionsTab } from '@/components/instructor/assignments/AssignmentInterventionsTab';
 import { AssignmentDetailTabs } from '@/components/instructor/assignments/AssignmentDetailTabs';
-import { DiscussionPanel } from '@/components/discussions/discussion-panel';
+import { InstructorDiscussionBrowser } from '@/components/instructor/assignments/InstructorDiscussionBrowser';
 import { useAssignmentTabs } from '@/hooks/use-assignment-tabs';
 import { useCsvDownload } from '@/hooks/use-csv-download';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -198,22 +198,10 @@ function AssignmentDetailPage() {
           />
         )}
         {activeTab === 'discussions' && (
-          <div className="space-y-6">
-            {assignment.students.map((student) =>
-              student.checkpoints.map((cp) => (
-                <div key={cp.id} className="space-y-2">
-                  <h3 className="text-sm font-medium text-muted-foreground">
-                    {student.name} — {cp.name}
-                  </h3>
-                  <DiscussionPanel
-                    checkpointId={cp.id}
-                    assignmentId={assignment.id}
-                    instructorView
-                  />
-                </div>
-              )),
-            )}
-          </div>
+          <InstructorDiscussionBrowser
+            assignmentId={assignment.id}
+            students={assignment.students}
+          />
         )}
         {activeTab === 'interventions' && (
           <AssignmentInterventionsTab assignmentId={assignment.id} students={assignment.students} />

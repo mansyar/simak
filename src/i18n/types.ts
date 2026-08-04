@@ -590,6 +590,14 @@ export type Translation = {
     selectTemplateHint: string
     selectAll: string
     deselectAll: string
+    discussions: {
+      searchLabel: string
+      searchPlaceholder: string
+      studentFilterLabel: string
+      allStudents: string
+      threadListLabel: string
+      noMatches: string
+    }
   }
   studentSidebar: {
     dashboard: string

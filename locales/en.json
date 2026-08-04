@@ -583,9 +583,17 @@
     "milestonesCheckpoints": "{count} Milestones / Checkpoints",
     "initiallyUnlocked": "Initially Unlocked",
     "selectTemplateHint": "Select a template to view its milestones roadmap.",
-    "selectAll": "Select All",
-    "deselectAll": "Deselect All"
-  },
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "discussions": {
+        "searchLabel": "Search discussions",
+        "searchPlaceholder": "Search by student or checkpoint...",
+        "studentFilterLabel": "Filter by student",
+        "allStudents": "All students",
+        "threadListLabel": "Discussion threads",
+        "noMatches": "No discussions match your filters."
+      }
+    },
   "studentSidebar": {
     "dashboard": "Dashboard",
     "assignments": "Assignments",
