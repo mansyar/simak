@@ -98,7 +98,7 @@
   - [x] Implement responsive queue cards or prioritized columns. [b317ba3]
   - [x] Improve review form field grouping, disabled-state explanation, feedback upload, and status feedback. [b317ba3]
   - [x] Verify PDF/DOCX preview fallback and mobile download behavior. [b317ba3]
-- [ ] Task: Repair assignment wizard semantics
+- [~] Task: Repair assignment wizard semantics
   - [ ] Write failing tests for template/student selection keyboard behavior and current-step semantics.
   - [ ] Implement buttons/listbox/checkbox semantics as appropriate.
   - [ ] Expose current step and total step count.
