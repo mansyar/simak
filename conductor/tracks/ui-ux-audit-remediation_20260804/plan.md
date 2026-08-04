@@ -58,11 +58,11 @@
   - [x] Write failing tests for failed presigned URL, direct upload, and submission-record operations. [416177a]
   - [x] Ensure all upload paths reset state through `finally`. [416177a]
   - [x] Preserve selected files and expose retry actions. [416177a]
-- [~] Task: Resolve SSR hydration mismatch
-  - [ ] Write a browser regression check that fails on ThemeScript nonce mismatch.
-  - [ ] Trace server/client nonce generation and propagation.
-  - [ ] Implement the minimal fix within the existing security-header and router architecture.
-  - [ ] Verify no new hydration errors on public and authenticated routes.
+- [x] Task: Resolve SSR hydration mismatch [e127c5e]
+  - [x] Write a browser regression check that fails on ThemeScript nonce mismatch. [e127c5e]
+  - [x] Trace server/client nonce generation and propagation. [e127c5e]
+  - [x] Implement the minimal fix within the existing security-header and router architecture. [e127c5e]
+  - [x] Verify no new hydration errors on public and authenticated routes. [e127c5e]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — Student experience remediation
