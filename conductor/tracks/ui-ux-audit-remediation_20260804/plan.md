@@ -71,7 +71,7 @@
   - [x] Write failing tests for actionable deadline, review, consultation, and waiting-item rows. [8340632]
   - [x] Add destinations and view-all affordances while preserving the five-action/three-waiting caps. [8340632]
   - [x] Verify loading, empty, error, and retry states. [8340632]
-- [ ] Task: Standardize student date and timezone presentation
+- [~] Task: Standardize student date and timezone presentation
   - [ ] Write failing tests covering dashboard, assignment detail, consultation, submission, review, and extension dates.
   - [ ] Centralize locale-aware student timezone formatting.
   - [ ] Verify English and Indonesian output around date boundaries.
