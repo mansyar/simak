@@ -50,7 +50,7 @@
   - [x] Implement explicit state models without converting failures into empty results. [057e34c]
   - [x] Add localized retry actions. [057e34c]
   - [x] Verify error content does not expose raw server messages. [057e34c]
-- [ ] Task: Standardize mutation feedback
+- [~] Task: Standardize mutation feedback
   - [ ] Write failing tests for pending, success, failure, disabled, and input-preservation behavior.
   - [ ] Implement consistent inline status and toast behavior for settings, submissions, reviews, imports, deletes, extensions, and notifications.
   - [ ] Add `aria-live` announcements where state changes are not otherwise visible.
