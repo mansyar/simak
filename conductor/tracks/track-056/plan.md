@@ -158,6 +158,10 @@ Commit SHA: 75b42dc (manual verification note attached)
 
 ### 4.3 Finalize the track
 
+- [~] Resolve the conductor-review findings before finalization.
+  - [ ] Make the pg_trgm rollback safe when the extension is shared or pre-existing.
+  - [ ] Add explicit unauthorized-path coverage for independent type and email-summary handlers.
+  - [ ] Verify trigram plans with representative data and normal planner scan selection.
 - [ ] Review the complete diff against `spec.md`, including migration rollback, tests, i18n output, and query-plan evidence.
 - [ ] Update this plan with every completed task SHA, phase checkpoint SHA, implementation notes, and any approved deviations.
 - [ ] Ensure `metadata.json` status and `updatedAt` reflect the final track state only after implementation and review are complete.
