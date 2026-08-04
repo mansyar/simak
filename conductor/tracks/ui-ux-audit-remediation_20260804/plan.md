@@ -103,9 +103,9 @@
   - [x] Implement buttons/listbox/checkbox semantics as appropriate. [85f9725]
   - [x] Expose current step and total step count. [85f9725]
   - [x] Add inline retry for template and student loading failures. [85f9725]
-- [~] Task: Improve instructor discussions and secondary tabs
-  - [ ] Write failing tests for large discussion sets, filtering, disclosure, and error recovery.
-  - [ ] Implement progressive disclosure and useful filtering.
+- [x] Task: Improve instructor discussions and secondary tabs [d45f8eb]
+  - [x] Write failing tests for large discussion sets, filtering, disclosure, and error recovery. [d45f8eb]
+  - [x] Implement progressive disclosure and useful filtering. [d45f8eb]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 5 — Admin, public, settings, and notification remediation
