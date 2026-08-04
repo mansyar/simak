@@ -93,7 +93,7 @@
 - [x] Task: Fix assignment list, cards, filters, and header actions [9518e1b]
   - [x] Write failing tests for card click affordances, labeled search/clear controls, responsive actions, and pagination. [9518e1b]
   - [x] Implement full-card/title links, accessible filters, larger controls, and wrapping page-header actions. [9518e1b]
-- [ ] Task: Improve review queue and review detail
+- [~] Task: Improve review queue and review detail
   - [ ] Write failing tests for filter naming, mobile queue presentation, localized wait times, error retry, and success announcements.
   - [ ] Implement responsive queue cards or prioritized columns.
   - [ ] Improve review form field grouping, disabled-state explanation, feedback upload, and status feedback.
