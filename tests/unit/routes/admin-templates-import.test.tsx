@@ -164,6 +164,37 @@ describe('BulkTemplateImportPage', () => {
     });
   });
 
+  it('should expose grouped preview expansion as an accessible disclosure button', async () => {
+    vi.mocked(parseTemplatesXlsx).mockResolvedValueOnce({
+      groups: [
+        {
+          templateName: 'Assignment',
+          type: 'Assignment Type',
+          checkpoints: [{ name: 'Research', minConsultations: 0, estimatedDuration: 14 }],
+          status: 'valid',
+        },
+      ],
+      errors: [],
+    });
+    const Component = await getComponent();
+    render(<Component />);
+    const input = screen.getByTestId('bulk-import-dropzone-input');
+    const file = buildXlsx([
+      'templateName',
+      'type',
+      'checkpointName',
+      'minConsultations',
+      'estimatedDuration',
+    ]);
+    fireEvent.change(input, { target: { files: [file] } });
+
+    const expandButton = await screen.findByRole('button', { name: 'Assignment' });
+    expect(expandButton.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(expandButton);
+    expect(expandButton.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByText('Research')).toBeInTheDocument();
+  });
+
   it('should show invalid group status', async () => {
     vi.mocked(parseTemplatesXlsx).mockResolvedValueOnce({
       groups: [

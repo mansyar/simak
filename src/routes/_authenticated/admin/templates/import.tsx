@@ -243,37 +243,47 @@ function BulkTemplateImportPage() {
                   <th className="p-2 text-left">{t('bulkImport.common.status')}</th>
                 </tr>
               </thead>
-              <tbody>
-                {parsedGroups.map((group, i) => (
+              {parsedGroups.map((group, i) => {
+                const isExpanded = expandedGroups.has(group.templateName);
+                const detailsId = `template-group-${i}-details`;
+                return (
                   <React.Fragment key={i}>
-                    <tr
-                      className="border-t cursor-pointer"
-                      onClick={() => toggleGroup(group.templateName)}
-                    >
-                      <td className="p-2">
-                        {expandedGroups.has(group.templateName) ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
-                      </td>
-                      <td className="p-2 font-medium">{group.templateName}</td>
-                      <td className="p-2">{group.type || '—'}</td>
-                      <td className="p-2">{group.checkpoints.length}</td>
-                      <td className="p-2">
-                        <span
-                          data-testid={`group-status-${i}`}
-                          className={group.status === 'valid' ? 'text-green-600' : 'text-red-600'}
-                        >
-                          {group.status === 'valid'
-                            ? t('bulkImport.common.valid')
-                            : t('bulkImport.common.invalid')}
-                          {group.error ? ` — ${group.error}` : ''}
-                        </span>
-                      </td>
-                    </tr>
-                    {expandedGroups.has(group.templateName) &&
-                      group.checkpoints.map((cp, j) => (
+                    <tbody>
+                      <tr className="border-t">
+                        <td className="p-1">
+                          <button
+                            type="button"
+                            className="flex min-h-11 min-w-11 items-center justify-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            aria-label={group.templateName}
+                            aria-expanded={isExpanded}
+                            aria-controls={detailsId}
+                            onClick={() => toggleGroup(group.templateName)}
+                          >
+                            {isExpanded ? (
+                              <ChevronDown className="h-4 w-4" aria-hidden="true" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                            )}
+                          </button>
+                        </td>
+                        <td className="p-2 font-medium">{group.templateName}</td>
+                        <td className="p-2">{group.type || '—'}</td>
+                        <td className="p-2">{group.checkpoints.length}</td>
+                        <td className="p-2">
+                          <span
+                            data-testid={`group-status-${i}`}
+                            className={group.status === 'valid' ? 'text-green-600' : 'text-red-600'}
+                          >
+                            {group.status === 'valid'
+                              ? t('bulkImport.common.valid')
+                              : t('bulkImport.common.invalid')}
+                            {group.error ? ` — ${group.error}` : ''}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <tbody id={detailsId} hidden={!isExpanded}>
+                      {group.checkpoints.map((cp, j) => (
                         <tr key={`cp-${j}`} className="border-t bg-muted/50">
                           <td className="p-2"></td>
                           <td className="p-2 pl-8" colSpan={2}>
@@ -288,9 +298,10 @@ function BulkTemplateImportPage() {
                           <td className="p-2"></td>
                         </tr>
                       ))}
+                    </tbody>
                   </React.Fragment>
-                ))}
-              </tbody>
+                );
+              })}
             </table>
           </div>
 

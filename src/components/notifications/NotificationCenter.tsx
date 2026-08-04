@@ -101,6 +101,8 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
               { id: 'unread', label: t('notifications.filterUnread') },
             ]}
             activeTab={activeTab}
+            idPrefix="notifications"
+            ariaLabel={t('notifications.title')}
             onTabChange={(tabId) => {
               setActiveTab(tabId as 'all' | 'unread');
             }}
@@ -108,7 +110,13 @@ export function NotificationCenter({ isOpen, onClose }: NotificationCenterProps)
         </div>
 
         {/* Content area */}
-        <div className="flex-1 overflow-y-auto">
+        <div
+          id={`notifications-tabpanel-${activeTab}`}
+          role="tabpanel"
+          aria-labelledby={`notifications-tab-${activeTab}`}
+          tabIndex={0}
+          className="flex-1 overflow-y-auto"
+        >
           {isLoading ? (
             <div className="flex h-64 items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

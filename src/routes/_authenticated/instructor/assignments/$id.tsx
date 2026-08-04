@@ -150,45 +150,56 @@ function AssignmentDetailPage() {
         }
       />
       <AssignmentDetailTabs tabs={tabList} activeTab={activeTab} onTabChange={setActiveTab} />
-      {activeTab === 'overview' && <AssignmentOverviewTab assignment={assignment} />}
-      {activeTab === 'consultations' && (
-        <AssignmentConsultationsTab
-          pendingConsultations={tabs.pendingConsultations}
-          selectedConsultationId={selectedConsultationId}
-          setSelectedConsultationId={setSelectedConsultationId}
-          dialogOpen={dialogOpen}
-          setDialogOpen={setDialogOpen}
-          pendingPage={tabs.pendingPage}
-          pendingTotal={tabs.pendingTotal}
-          onPageChange={tabs.setPendingPage}
-          onRefresh={tabs.refreshPendingConsultations}
-        />
-      )}
-      {activeTab === 'extensions' && (
-        <AssignmentExtensionsTab
-          requests={tabs.extensionRequests}
-          loading={tabs.extensionsLoading}
-          onApprove={tabs.handleApproveExtension}
-          onReject={tabs.handleRejectExtension}
-        />
-      )}
-      {activeTab === 'discussions' && (
-        <div className="space-y-6">
-          {assignment.students.map((student) =>
-            student.checkpoints.map((cp) => (
-              <div key={cp.id} className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground">
-                  {student.name} — {cp.name}
-                </h3>
-                <DiscussionPanel checkpointId={cp.id} assignmentId={assignment.id} instructorView />
-              </div>
-            )),
-          )}
-        </div>
-      )}
-      {activeTab === 'interventions' && (
-        <AssignmentInterventionsTab assignmentId={assignment.id} students={assignment.students} />
-      )}
+      <div
+        id={`assignment-detail-tabpanel-${activeTab}`}
+        role="tabpanel"
+        aria-labelledby={`assignment-detail-tab-${activeTab}`}
+        tabIndex={0}
+      >
+        {activeTab === 'overview' && <AssignmentOverviewTab assignment={assignment} />}
+        {activeTab === 'consultations' && (
+          <AssignmentConsultationsTab
+            pendingConsultations={tabs.pendingConsultations}
+            selectedConsultationId={selectedConsultationId}
+            setSelectedConsultationId={setSelectedConsultationId}
+            dialogOpen={dialogOpen}
+            setDialogOpen={setDialogOpen}
+            pendingPage={tabs.pendingPage}
+            pendingTotal={tabs.pendingTotal}
+            onPageChange={tabs.setPendingPage}
+            onRefresh={tabs.refreshPendingConsultations}
+          />
+        )}
+        {activeTab === 'extensions' && (
+          <AssignmentExtensionsTab
+            requests={tabs.extensionRequests}
+            loading={tabs.extensionsLoading}
+            onApprove={tabs.handleApproveExtension}
+            onReject={tabs.handleRejectExtension}
+          />
+        )}
+        {activeTab === 'discussions' && (
+          <div className="space-y-6">
+            {assignment.students.map((student) =>
+              student.checkpoints.map((cp) => (
+                <div key={cp.id} className="space-y-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    {student.name} — {cp.name}
+                  </h3>
+                  <DiscussionPanel
+                    checkpointId={cp.id}
+                    assignmentId={assignment.id}
+                    instructorView
+                  />
+                </div>
+              )),
+            )}
+          </div>
+        )}
+        {activeTab === 'interventions' && (
+          <AssignmentInterventionsTab assignmentId={assignment.id} students={assignment.students} />
+        )}
+      </div>
     </div>
   );
 }
