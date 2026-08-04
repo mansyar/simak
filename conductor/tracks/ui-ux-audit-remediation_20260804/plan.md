@@ -63,7 +63,7 @@
   - [x] Trace server/client nonce generation and propagation. [e127c5e]
   - [x] Implement the minimal fix within the existing security-header and router architecture. [e127c5e]
   - [x] Verify no new hydration errors on public and authenticated routes. [e127c5e]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — Student experience remediation
 
