@@ -2,12 +2,12 @@
 
 ## Phase 0 — Baseline, fixtures, and regression matrix
 
-- [ ] Task: Establish the audit regression baseline
-  - [ ] Document affected routes and components by role.
-  - [ ] Confirm available student, instructor, admin, and public test fixtures.
-  - [ ] Record current Playwright viewport, hydration-console, and axe failures.
-  - [ ] Identify existing tests that should be extended rather than duplicated.
-- [ ] Task: Define shared test helpers
+- [x] Task: Establish the audit regression baseline [7722e22]
+  - [x] Document affected routes and components by role.
+  - [x] Confirm available student, instructor, admin, and public test fixtures.
+  - [x] Record current Playwright viewport, hydration-console, and axe failures.
+  - [x] Identify existing tests that should be extended rather than duplicated.
+- [~] Task: Define shared test helpers
   - [ ] Add or extend authenticated browser helpers for each available role.
   - [ ] Add viewport helpers for 320px, 768px, and 1280px.
   - [ ] Add reusable assertions for keyboard focus, accessible names, clipping, and live regions.
