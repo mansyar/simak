@@ -27,11 +27,11 @@
   - [x] Implement semantic drawer behavior for all role sidebars.
   - [x] Add navigation landmark labels and active-route semantics.
   - [x] Verify desktop sidebar behavior is unchanged.
-- [~] Task: Standardize shared control hit areas
-  - [ ] Write failing tests for button, input, icon-button, pagination, close, refresh, filter, and notification controls.
-  - [ ] Implement a 44px interaction baseline while preserving compact visual variants where appropriate.
-  - [ ] Add visible focus states to shared and app-level controls.
-  - [ ] Verify no affected controls regress at 320px.
+- [x] Task: Standardize shared control hit areas [b1ba0c0]
+  - [x] Write failing tests for button, input, icon-button, pagination, close, refresh, filter, and notification controls.
+  - [x] Implement a 44px interaction baseline while preserving compact visual variants where appropriate.
+  - [x] Add visible focus states to shared and app-level controls.
+  - [x] Verify no affected controls regress at 320px.
 - [ ] Task: Replace or repair tab and disclosure primitives
   - [ ] Write failing accessibility tests for tabs, tab panels, expansion buttons, and clickable rows/cards.
   - [ ] Implement correct ARIA tab semantics and keyboard navigation.
