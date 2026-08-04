@@ -3,7 +3,6 @@ import '@testing-library/jest-dom/vitest';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { TemplatePicker } from '@/components/instructor/assignments/TemplatePicker';
 import { templateKeys } from '@/lib/query-keys';
 
@@ -26,10 +25,6 @@ vi.mock('@tanstack/react-query', () => ({
 
 vi.mock('@/server/templates', () => ({
   listTemplates: vi.fn(),
-}));
-
-vi.mock('sonner', () => ({
-  toast: { error: vi.fn() },
 }));
 
 const mockTemplates = [
@@ -81,16 +76,31 @@ describe('TemplatePicker', () => {
     expect(screen.queryByText('Final Project')).not.toBeInTheDocument();
   });
 
-  it('fires toast.error on query error', () => {
+  it('renders an inline retryable error state when templates fail to load', () => {
+    const refetch = vi.fn();
     vi.mocked(useQuery).mockReturnValue({
       data: undefined,
       isLoading: false,
       isError: true,
       error: new Error('Network failure'),
+      refetch,
     } as never);
+
     render(<TemplatePicker {...mockProps} />);
-    expect(toast.error).toHaveBeenCalledWith('errors.fetchFailed');
-    expect(console.error).toHaveBeenCalledWith('Failed to load templates', expect.any(Error));
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText('errors.fetchFailed')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'common.retry' }));
+    expect(refetch).toHaveBeenCalledOnce();
+  });
+
+  it('makes template options keyboard-focusable selection buttons', () => {
+    render(<TemplatePicker {...mockProps} />);
+    const option = screen.getByRole('button', { name: /Final Project/ });
+    expect(option.getAttribute('aria-pressed')).toBe('false');
+    expect(option.className).toContain('min-h-11');
+    option.focus();
+    expect(document.activeElement).toBe(option);
   });
 
   it('triggers onSelectTemplate when a template card is clicked', () => {

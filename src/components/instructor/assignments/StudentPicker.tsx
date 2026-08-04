@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listUsers } from '@/server/users';
 import { userKeys } from '@/lib/query-keys';
 import { isServerError } from '@/lib/errors';
 import { useI18n } from '../../../routes/__root';
-import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorState } from '@/components/ui/error-state';
 import { Search, Users, Check, CheckSquare, Square } from 'lucide-react';
 
 interface StudentPickerProps {
@@ -28,7 +28,7 @@ export function StudentPicker({
   const { t } = useI18n();
   const [search, setSearch] = useState('');
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: userKeys.list({ page: 1, limit: 200, search: '', role: 'student' }),
     queryFn: async () => {
       const response = await listUsers({
@@ -43,13 +43,6 @@ export function StudentPicker({
   });
 
   const students = data?.users ?? [];
-
-  useEffect(() => {
-    if (isError) {
-      console.error('Failed to load students', error);
-      toast.error(t('errors.fetchFailed'));
-    }
-  }, [isError, error, t]);
 
   const filteredStudents = students.filter(
     (s) =>
@@ -108,6 +101,8 @@ export function StudentPicker({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
+            id="student-search"
+            aria-label={t('instructorAssignments.wizard.searchStudents')}
             placeholder={t('instructorAssignments.wizard.searchStudents')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -120,7 +115,8 @@ export function StudentPicker({
           <button
             type="button"
             onClick={handleSelectAllToggle}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-input bg-background px-4 text-sm font-semibold shadow-sm transition-all hover:bg-accent hover:text-accent-foreground select-none"
+            aria-pressed={areAllFilteredSelected}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-input bg-background px-4 text-sm font-semibold shadow-sm transition-all hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring select-none"
           >
             {areAllFilteredSelected ? (
               <>
@@ -138,10 +134,18 @@ export function StudentPicker({
       </div>
 
       {errors.studentIds && (
-        <p className="text-xs font-bold text-destructive animate-slide-down">{errors.studentIds}</p>
+        <p className="text-xs font-bold text-destructive animate-slide-down" role="alert">
+          {errors.studentIds}
+        </p>
       )}
 
-      {isLoading ? (
+      {isError ? (
+        <ErrorState
+          title={t('errors.fetchFailed')}
+          retryLabel={t('common.retry')}
+          onRetry={() => refetch()}
+        />
+      ) : isLoading ? (
         <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <Card key={n} className="p-4 border-dashed animate-pulse flex items-center gap-3">
@@ -172,10 +176,14 @@ export function StudentPicker({
               .toUpperCase();
 
             return (
-              <div
+              <button
+                type="button"
                 key={student.id}
                 onClick={() => onToggleStudent(student.id)}
-                className={`group flex items-center justify-between p-4 rounded-xl border bg-card cursor-pointer transition-all duration-200 select-none ${
+                role="checkbox"
+                aria-checked={isSelected}
+                aria-labelledby={`student-${student.id}-label`}
+                className={`group flex min-h-11 w-full items-center justify-between p-4 text-left rounded-xl border bg-card transition-all duration-200 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   isSelected
                     ? 'border-primary ring-2 ring-primary/20 bg-primary/5 shadow-sm'
                     : 'border-border hover:border-primary/40 hover:bg-accent/40'
@@ -194,7 +202,10 @@ export function StudentPicker({
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                    <p
+                      id={`student-${student.id}-label`}
+                      className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors"
+                    >
                       {student.name}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">{student.email}</p>
@@ -210,7 +221,7 @@ export function StudentPicker({
                     <div className="h-4.5 w-4.5 rounded-full border border-muted-foreground/30 group-hover:border-primary/50 transition-colors" />
                   )}
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>

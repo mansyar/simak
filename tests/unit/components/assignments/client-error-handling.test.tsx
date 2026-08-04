@@ -153,7 +153,7 @@ beforeEach(() => {
 
 describe('Client fetch error handling', () => {
   describe('TemplatePicker', () => {
-    it('shows a toast when templates fail to load', async () => {
+    it('shows an inline retryable error when templates fail to load', async () => {
       vi.mocked(templatesApi.listTemplates).mockRejectedValue(new Error('Network failure'));
 
       render(<TemplatePicker selectedTemplateId={null} onSelectTemplate={vi.fn()} />, {
@@ -164,14 +164,13 @@ describe('Client fetch error handling', () => {
         expect(templatesApi.listTemplates).toHaveBeenCalled();
       });
 
-      await waitFor(() => {
-        expect(toastError).toHaveBeenCalledWith('Failed to load data. Please try again.');
-      });
+      await waitFor(() => expect(screen.getByRole('alert')).toBeDefined());
+      expect(toastError).not.toHaveBeenCalled();
     });
   });
 
   describe('StudentPicker', () => {
-    it('shows a toast when students fail to load', async () => {
+    it('shows an inline retryable error when students fail to load', async () => {
       vi.mocked(usersApi.listUsers).mockRejectedValue(new Error('Network failure'));
 
       render(
@@ -189,9 +188,8 @@ describe('Client fetch error handling', () => {
         expect(usersApi.listUsers).toHaveBeenCalled();
       });
 
-      await waitFor(() => {
-        expect(toastError).toHaveBeenCalledWith('Failed to load data. Please try again.');
-      });
+      await waitFor(() => expect(screen.getByRole('alert')).toBeDefined());
+      expect(toastError).not.toHaveBeenCalled();
     });
   });
 
@@ -222,7 +220,7 @@ describe('Client fetch error handling', () => {
       } as any);
     });
 
-    it('shows a toast when the initial student list fails to load', async () => {
+    it('shows an inline retryable error when the initial student list fails to load', async () => {
       vi.mocked(usersApi.listUsers).mockRejectedValue(new Error('Network failure'));
 
       render(<AssignmentWizard />, { wrapper: createWrapper() });
@@ -231,12 +229,11 @@ describe('Client fetch error handling', () => {
         expect(usersApi.listUsers).toHaveBeenCalled();
       });
 
-      await waitFor(() => {
-        expect(toastError).toHaveBeenCalledWith('Failed to load data. Please try again.');
-      });
+      await waitFor(() => expect(screen.getByRole('alert')).toBeDefined());
+      expect(toastError).not.toHaveBeenCalled();
     });
 
-    it('shows a toast when template details fail to load on select', async () => {
+    it('shows an inline retryable error when template details fail to load on select', async () => {
       vi.mocked(usersApi.listUsers).mockResolvedValue({ users: mockStudents, total: 2 } as any);
       vi.mocked(templatesApi.getTemplate).mockRejectedValue(new Error('Network failure'));
 
@@ -252,9 +249,8 @@ describe('Client fetch error handling', () => {
         expect(templatesApi.getTemplate).toHaveBeenCalled();
       });
 
-      await waitFor(() => {
-        expect(toastError).toHaveBeenCalledWith('Failed to load data. Please try again.');
-      });
+      await waitFor(() => expect(screen.getByRole('alert')).toBeDefined());
+      expect(toastError).toHaveBeenCalledWith('Failed to load data. Please try again.');
     });
 
     it('shows a toast when assignment creation fails to submit', async () => {

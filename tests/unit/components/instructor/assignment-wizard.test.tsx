@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { AssignmentWizard } from '@/components/instructor/assignments/AssignmentWizard';
 
-// Mock navigation
 const mockNavigate = vi.fn();
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => mockNavigate,
@@ -21,6 +20,8 @@ vi.mock('@/routes/__root', () => ({
         'instructorAssignments.wizard.stepStudents': 'Assign Students',
         'instructorAssignments.wizard.stepDueDates': 'Due Dates',
         'instructorAssignments.wizard.stepConfirm': 'Review & Confirm',
+        'instructorAssignments.wizard.progressLabel': 'Assignment creation progress',
+        'instructorAssignments.wizard.currentStep': 'Step {current} of {total}: {label}',
         'instructorAssignments.wizard.reviewPrompt': 'Please review before submitting',
         'instructorAssignments.wizard.dueDatesPrompt': 'Review and adjust due dates',
         'instructorAssignments.wizard.next': 'Next',
@@ -305,7 +306,6 @@ describe('AssignmentWizard', () => {
       render(<AssignmentWizard />, { wrapper: createWrapper() });
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       fireEvent.click(screen.getByText('Next'));
-      // Step 2 label is 'Step 2: Assignment Details'
       const matches = screen.getAllByText('Step 2: Assignment Details');
       const mobileLabel = matches.find((el) => /\bsm:hidden\b/.test(el.className));
       expect(mobileLabel).toBeDefined();
@@ -313,11 +313,22 @@ describe('AssignmentWizard', () => {
 
     it('should not render mobile label for non-current steps', () => {
       render(<AssignmentWizard />, { wrapper: createWrapper() });
-      // On step 1, step 2 label should NOT have sm:hidden (only progress bar version exists)
       const step2Matches = screen.getAllByText('Step 2: Assignment Details');
       const mobileLabel = step2Matches.find((el) => /\bsm:hidden\b/.test(el.className));
       expect(mobileLabel).toBeUndefined();
     });
+  });
+
+  it('exposes the current wizard step and total step count', () => {
+    render(<AssignmentWizard />, { wrapper: createWrapper() });
+
+    const progress = screen.getByRole('list', {
+      name: 'Assignment creation progress',
+    });
+    expect(progress).toBeDefined();
+    expect(screen.getByRole('listitem', { current: 'step' }).getAttribute('aria-label')).toBe(
+      'Step 1 of 5: Select Template',
+    );
   });
 
   describe('Step 2 - Assignment Details Validation', () => {

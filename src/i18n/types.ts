@@ -56,6 +56,7 @@ export type Translation = {
     previous: string
     submit: string
     refresh: string
+    retry: string
     hide: string
     view: string
     noResults: string
@@ -559,6 +560,8 @@ export type Translation = {
       noStudentsSelected: string
       checkpointsPreview: string
       stepDueDates: string
+      progressLabel: string
+      currentStep: string
       dueDatesPrompt: string
       daysLabel: string
       dueDateFor: string

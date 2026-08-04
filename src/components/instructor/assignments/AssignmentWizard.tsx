@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
@@ -14,6 +14,7 @@ import { StudentPicker } from './StudentPicker';
 import { DueDatePreview } from './DueDatePreview';
 import { ReviewStep } from './ReviewStep';
 import { Button } from '@/components/ui/button';
+import { ErrorState } from '@/components/ui/error-state';
 import { CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 
 interface Template {
@@ -56,8 +57,8 @@ export function AssignmentWizard() {
 
   const {
     data: studentsData,
-    isError,
-    error,
+    isError: isStudentsError,
+    refetch: refetchStudents,
   } = useQuery({
     queryKey: userKeys.list({ page: 1, limit: 200, search: '', role: 'student' }),
     queryFn: async () => {
@@ -72,15 +73,9 @@ export function AssignmentWizard() {
     retry: false,
   });
 
-  useEffect(() => {
-    if (isError) {
-      console.error('Failed to load students', error);
-      toast.error(t('errors.fetchFailed'));
-    }
-  }, [isError, error, t]);
-
   const handleSelectTemplate = async (tpl: Template) => {
     setSelectedTemplate(tpl);
+    setErrors((prev) => ({ ...prev, templateDetail: '' }));
     // Suggest a default title if not set
     if (!title) {
       setTitle(`${tpl.name} - Cohort ${new Date().getFullYear()}`);
@@ -106,6 +101,7 @@ export function AssignmentWizard() {
     } catch (err) {
       console.error('Failed to fetch template details', err);
       toast.error(t('errors.fetchFailed'));
+      setErrors((prev) => ({ ...prev, templateDetail: t('errors.fetchFailed') }));
     }
   };
 
@@ -223,18 +219,36 @@ export function AssignmentWizard() {
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto">
       {/* Wizard Header Progress Bar */}
-      <div className="relative flex items-center justify-between border-b pb-6 select-none">
-        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-muted z-0" />
+      <div
+        className="relative flex items-center justify-between border-b pb-6 select-none"
+        role="list"
+        aria-label={t('instructorAssignments.wizard.progressLabel')}
+      >
+        <div
+          className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-muted z-0"
+          aria-hidden="true"
+        />
         <div
           className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-primary transition-all duration-300 z-0"
           style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
+          aria-hidden="true"
         />
 
         {steps.map((s) => {
           const isCompleted = currentStep > s.num;
           const isActive = currentStep === s.num;
           return (
-            <div key={s.num} className="relative z-10 flex flex-col items-center gap-2">
+            <div
+              key={s.num}
+              className="relative z-10 flex flex-col items-center gap-2"
+              role="listitem"
+              aria-current={isActive ? 'step' : undefined}
+              aria-label={t('instructorAssignments.wizard.currentStep', {
+                current: String(s.num),
+                total: String(steps.length),
+                label: s.label,
+              })}
+            >
               <div
                 className={`h-9 w-9 rounded-full flex items-center justify-center border font-bold text-sm shadow-sm transition-all duration-300 ${
                   isCompleted
@@ -259,17 +273,37 @@ export function AssignmentWizard() {
       </div>
 
       {/* Mobile Step Label (UX-35) - shows current step name on mobile only */}
-      <p className="sm:hidden text-sm font-semibold tracking-wide uppercase text-primary">
+      <p
+        className="sm:hidden text-sm font-semibold tracking-wide uppercase text-primary"
+        aria-live="polite"
+      >
         {steps[currentStep - 1].label}
       </p>
+
+      {isStudentsError && currentStep !== 3 && (
+        <ErrorState
+          title={t('errors.fetchFailed')}
+          retryLabel={t('common.retry')}
+          onRetry={() => refetchStudents()}
+        />
+      )}
 
       {/* Step Components */}
       <div className="min-h-[300px]">
         {currentStep === 1 && (
-          <TemplatePicker
-            selectedTemplateId={selectedTemplate?.id ?? null}
-            onSelectTemplate={handleSelectTemplate}
-          />
+          <div className="space-y-4">
+            <TemplatePicker
+              selectedTemplateId={selectedTemplate?.id ?? null}
+              onSelectTemplate={handleSelectTemplate}
+            />
+            {errors.templateDetail && selectedTemplate && (
+              <ErrorState
+                title={errors.templateDetail}
+                retryLabel={t('common.retry')}
+                onRetry={() => handleSelectTemplate(selectedTemplate)}
+              />
+            )}
+          </div>
         )}
 
         {currentStep === 2 && (
