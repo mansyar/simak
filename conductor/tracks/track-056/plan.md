@@ -67,13 +67,13 @@ Commit SHA: c7c5ad2
 
 ### 2.2 Remove redundant template and email-queue search work
 
-- [ ] Add failing handler/component tests covering query invocation boundaries, unchanged result shape, and independent type/status summaries in `tests/unit/server/templates.test.ts`, `tests/unit/server/email-queue.test.ts`, and the related route tests.
-- [ ] Refactor `src/server/templates.server.ts` and `src/server/templates.ts` so unrelated type options are cached/separated from search work and required checkpoint enrichment is performed in the minimum necessary query phases without changing the template result shape.
-- [ ] Refactor `src/server/email-queue.server.ts` and `src/server/email-queue.ts` so the unfiltered status summary is not recomputed for every search term; preserve status filtering, pagination, and summary values in `src/routes/_authenticated/admin/email-queue.tsx`.
-- [ ] Update `src/routes/_authenticated/admin/templates/index.tsx` and `src/lib/query-keys.ts` as needed to give stable data independent of the committed search value its own cache boundary.
-- [ ] Run focused server/route tests and verify that the red/green query-workload assertions pass before committing with a git note and recorded SHA.
+- [x] Add failing handler/component tests covering query invocation boundaries, unchanged result shape, and independent type/status summaries in `tests/unit/server/templates.test.ts`, `tests/unit/server/email-queue.test.ts`, and the related route tests.
+- [x] Refactor `src/server/templates.server.ts` and `src/server/templates.ts` so unrelated type options are cached/separated from search work and required checkpoint enrichment is performed in the minimum necessary query phases without changing the template result shape.
+- [x] Refactor `src/server/email-queue.server.ts` and `src/server/email-queue.ts` so the unfiltered status summary is not recomputed for every search term; preserve status filtering, pagination, and summary values in `src/routes/_authenticated/admin/email-queue.tsx`.
+- [x] Update `src/routes/_authenticated/admin/templates/index.tsx` and `src/lib/query-keys.ts` as needed to give stable data independent of the committed search value its own cache boundary.
+- [x] Run focused server/route tests and verify that the red/green query-workload assertions pass before committing with a git note and recorded SHA.
 
-Commit SHA: _pending_
+Commit SHA: c8fb90d
 
 ### 2.3 Preserve and correct user, assignment, and audit search handlers
 
