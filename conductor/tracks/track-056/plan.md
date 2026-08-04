@@ -106,12 +106,12 @@ Commit SHA: 18cde2f
 
 ### 3.2 Add the reversible search-index migration
 
-- [ ] Create the next Drizzle migration and rollback under `drizzle/migrations/` to enable `pg_trgm` and add trigram support for `users.name`, `users.email`, `assignment_templates.name`, `email_queue.recipient_email`, `email_queue.subject`, `assignments.title`, `feedback_snippets.title`, `feedback_snippets.category`, `audit_log.entity_id`, and the searched text form of `audit_log.details`.
-- [ ] Represent index metadata in the Drizzle schema where supported; use explicit SQL for expression indexes such as JSONB-to-text search and document the reason for any schema limitation.
-- [ ] Add safe rollback statements for the indexes and extension, accounting for extension ownership/dependencies.
-- [ ] Run migration/schema tests, `pnpm db:generate` if schema declarations require generation, and the focused database tests before committing with a git note and recorded SHA.
+- [x] Create the next Drizzle migration and rollback under `drizzle/migrations/` to enable `pg_trgm` and add trigram support for `users.name`, `users.email`, `assignment_templates.name`, `email_queue.recipient_email`, `email_queue.subject`, `assignments.title`, `feedback_snippets.title`, `feedback_snippets.category`, `audit_log.entity_id`, and the searched text form of `audit_log.details`.
+- [x] Represent index metadata in the Drizzle schema where supported; use explicit SQL for expression indexes such as JSONB-to-text search and document the reason for any schema limitation.
+- [x] Add safe rollback statements for the indexes and extension, accounting for extension ownership/dependencies.
+- [x] Run migration/schema tests, `pnpm db:generate` if schema declarations require generation, and the focused database tests before committing with a git note and recorded SHA.
 
-Commit SHA: _pending_
+Commit SHA: 75b42dc
 
 ### 3.3 Verify index-backed query plans
 
