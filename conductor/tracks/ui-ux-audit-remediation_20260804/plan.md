@@ -16,7 +16,7 @@
 
 ## Phase 1 — Shared accessibility and responsive foundations
 
-- [ ] Task: Repair file-input and dropzone interaction semantics
+- [~] Task: Repair file-input and dropzone interaction semantics
   - [ ] Write failing component tests for keyboard focus and file selection.
   - [ ] Write failing tests for student, feedback, user-import, and template-import upload states.
   - [ ] Implement native label/button semantics and accessible input associations.
