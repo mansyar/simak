@@ -14,7 +14,10 @@ vi.mock('@/components/ui/select', () => ({
   ),
   SelectContent: ({ children }: any) => <>{children}</>,
   SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
-  SelectTrigger: ({ children }: any) => <div>{children}</div>,
+  SelectTrigger: ({ children, ...props }: any) => {
+    const { 'data-testid': _testId, ...rest } = props;
+    return <div {...rest}>{children}</div>;
+  },
   SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
 }));
 
@@ -106,5 +109,18 @@ describe('ReviewQueueFilters', () => {
     expect(screen.getAllByText('instructorReviews.allAssignments').length).toBeGreaterThanOrEqual(
       1,
     );
+  });
+
+  it('should expose an accessible assignment filter with a full hit area', () => {
+    render(
+      <ReviewQueueFilters
+        assignments={assignments}
+        selectedAssignmentId={null}
+        onAssignmentChange={() => {}}
+      />,
+    );
+
+    const filter = screen.getByLabelText('instructorReviews.assignmentFilterLabel');
+    expect(filter.className).toContain('min-h-11');
   });
 });

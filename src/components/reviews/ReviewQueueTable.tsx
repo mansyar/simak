@@ -5,6 +5,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableCaption,
   TableHead,
   TableHeader,
   TableRow,
@@ -14,20 +15,10 @@ import { Button } from '@/components/ui/button';
 import { SLABadge } from './SLABadge';
 import { useI18n } from '../../routes/__root';
 import type { ReviewQueueItemData } from './ReviewQueueItem';
+import { formatReviewWaitTime } from './review-wait-time';
 
 interface ReviewQueueTableProps {
   data: ReviewQueueItemData[];
-}
-
-function getWaitTime(uploadedAt: Date): string {
-  const now = Date.now();
-  const diff = now - new Date(uploadedAt).getTime();
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const days = Math.floor(hours / 24);
-
-  if (days > 0) return `${days}d ${hours % 24}h`;
-  if (hours > 0) return `${hours}h`;
-  return '< 1h';
 }
 
 export function ReviewQueueTable({ data }: ReviewQueueTableProps) {
@@ -58,7 +49,7 @@ export function ReviewQueueTable({ data }: ReviewQueueTableProps) {
       accessorKey: 'uploadedAt',
       header: t('instructorReviews.table.waitTime'),
       cell: ({ row }) => {
-        const waitTime = getWaitTime(row.original.uploadedAt);
+        const waitTime = formatReviewWaitTime(row.original.uploadedAt, t);
         return (
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Clock className="h-3.5 w-3.5 shrink-0" />
@@ -79,7 +70,7 @@ export function ReviewQueueTable({ data }: ReviewQueueTableProps) {
     },
     {
       id: 'actions',
-      header: '',
+      header: t('instructorReviews.table.actions'),
       cell: ({ row }) => (
         <Link
           to="/instructor/reviews/$submissionId"
@@ -103,33 +94,69 @@ export function ReviewQueueTable({ data }: ReviewQueueTableProps) {
   return (
     <Card>
       <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length &&
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+        <div className="hidden sm:block">
+          <Table>
+            <TableCaption className="sr-only">{t('instructorReviews.table.caption')}</TableCaption>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} scope="col">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
                   ))}
                 </TableRow>
               ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length &&
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="space-y-3 p-4 sm:hidden">
+          {data.map((item) => (
+            <article
+              key={item.submissionId}
+              className="space-y-3 rounded-md border p-4"
+              data-testid="review-queue-mobile-card"
+            >
+              <div>
+                <p className="font-medium">{item.studentName}</p>
+                <p className="text-sm text-muted-foreground">{item.checkpointName}</p>
+              </div>
+              <p className="text-sm text-muted-foreground">{item.assignmentTitle}</p>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm text-muted-foreground">
+                  {formatReviewWaitTime(item.uploadedAt, t)}
+                </span>
+                <SLABadge
+                  state={item.checkpointState}
+                  updatedAt={item.checkpointUpdatedAt ?? item.uploadedAt}
+                />
+              </div>
+              <Link
+                to="/instructor/reviews/$submissionId"
+                params={{ submissionId: String(item.submissionId) }}
+                data-testid="review-queue-mobile-link"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-md border border-input px-3 py-2 text-sm font-medium hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {t('common.viewAll')}
+              </Link>
+            </article>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

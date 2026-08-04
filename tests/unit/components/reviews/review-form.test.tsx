@@ -38,7 +38,14 @@ describe('ReviewForm', () => {
 
   it('should render decision label', () => {
     render(<ReviewForm {...baseProps} />);
-    expect(screen.getByText('instructorReviews.decision')).toBeDefined();
+    expect(document.querySelector('[data-slot="card-title"]')?.textContent).toBe(
+      'instructorReviews.decision',
+    );
+  });
+
+  it('should group the review decision controls accessibly', () => {
+    render(<ReviewForm {...baseProps} />);
+    expect(screen.getByRole('group', { name: 'instructorReviews.decision' })).toBeDefined();
   });
 
   it('should render pass radio option', () => {
@@ -85,6 +92,7 @@ describe('ReviewForm', () => {
     render(<ReviewForm {...baseProps} />);
     const button = screen.getByText('instructorReviews.submitReview').closest('button');
     expect(button).toHaveProperty('disabled', true);
+    expect(screen.getByText('instructorReviews.decisionRequired')).toBeDefined();
   });
 
   it('should enable submit button when decision is selected', () => {
@@ -139,5 +147,16 @@ describe('ReviewForm', () => {
       data: { scores?: unknown };
     };
     expect(callArgs.data.scores).toBeUndefined();
+  });
+
+  it('should announce successful review submission', async () => {
+    vi.mocked(submitReview).mockResolvedValue({ success: true } as never);
+    render(<ReviewForm {...baseProps} />);
+    fireEvent.click(screen.getByDisplayValue('pass'));
+    fireEvent.click(screen.getByText('instructorReviews.submitReview'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toBeDefined();
+    });
   });
 });

@@ -290,11 +290,19 @@
     "title": "Antrean Review",
     "subtitle": "Review pengumpulan mahasiswa yang menunggu di semua tugas Anda",
     "allAssignments": "Semua Tugas",
+    "assignmentFilterLabel": "Filter review berdasarkan tugas",
     "table": {
       "student": "Mahasiswa",
       "assignment": "Tugas",
       "waitTime": "Waktu Tunggu",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Aksi",
+      "caption": "Antrean review tertunda"
+    },
+    "waitTime": {
+      "daysHours": "{days}h {hours}j",
+      "hours": "{hours}j",
+      "lessThanHour": "< 1 jam"
     },
     "empty": "Tidak ada review tertunda",
     "emptyPrompt": "Ketika mahasiswa mengumpulkan pekerjaan untuk direview, akan muncul di sini.",
@@ -311,6 +319,7 @@
     "passed": "Lulus",
     "revise": "Revisi",
     "decision": "Keputusan",
+    "decisionRequired": "Pilih Lulus atau Revisi sebelum mengirim",
     "pass": "Lulus",
     "comment": "Komentar",
     "commentPlaceholder": "Tambahkan umpan balik atau komentar untuk mahasiswa...",

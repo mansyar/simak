@@ -295,11 +295,19 @@ export type Translation = {
     title: string
     subtitle: string
     allAssignments: string
+    assignmentFilterLabel: string
     table: {
       student: string
       assignment: string
       waitTime: string
       status: string
+      actions: string
+      caption: string
+    }
+    waitTime: {
+      daysHours: string
+      hours: string
+      lessThanHour: string
     }
     empty: string
     emptyPrompt: string
@@ -316,6 +324,7 @@ export type Translation = {
     passed: string
     revise: string
     decision: string
+    decisionRequired: string
     pass: string
     comment: string
     commentPlaceholder: string

@@ -34,10 +34,12 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
   const [scores, setScores] = useState<ScoreInput[]>([]);
   const [actionItems, setActionItems] = useState<RevisionActionItemInput[]>([]);
   const [formError, setFormError] = useState<string>();
+  const [formSuccess, setFormSuccess] = useState<string>();
 
   const reportError = useCallback(
     (message: string) => {
       setFormError(message);
+      setFormSuccess(undefined);
       onError(message);
     },
     [onError],
@@ -62,6 +64,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
       if (!file) return;
 
       setFormError(undefined);
+      setFormSuccess(undefined);
 
       const extension = file.name.split('.').pop()?.toLowerCase() ?? 'pdf';
       const contentType =
@@ -107,6 +110,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
     if (!decision) return;
 
     setFormError(undefined);
+    setFormSuccess(undefined);
 
     if (decision === 'revise' && !revisionDeadline) {
       reportError(t('instructorReviews.revisionDeadlineRequired'));
@@ -145,6 +149,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
         return;
       }
 
+      setFormSuccess(t('instructorReviews.reviewSubmitted'));
       onComplete();
     } catch {
       reportError(t('instructorReviews.submitError'));
@@ -171,9 +176,10 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
         <CardTitle className="text-sm">{t('instructorReviews.decision')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <MutationFeedback error={formError} />
+        <MutationFeedback error={formError} success={formSuccess} />
         {/* Pass/Revise radio */}
-        <div className="flex gap-4">
+        <fieldset className="flex gap-4">
+          <legend className="sr-only">{t('instructorReviews.decision')}</legend>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
@@ -198,7 +204,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
               {t('instructorReviews.revise')}
             </span>
           </label>
-        </div>
+        </fieldset>
 
         {/* Comment textarea */}
         <div className="space-y-1.5">
@@ -283,6 +289,9 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
             t('instructorReviews.submitReview')
           )}
         </Button>
+        {!decision && (
+          <p className="text-sm text-muted-foreground">{t('instructorReviews.decisionRequired')}</p>
+        )}
       </CardContent>
     </Card>
   );

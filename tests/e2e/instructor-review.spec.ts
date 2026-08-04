@@ -129,8 +129,26 @@ test.describe('Instructor Review Flow', () => {
 
     // Verify the submission appears in the review queue
     // The table shows student name ("Student") and assignment title ("E2E Test Assignment")
-    await expect(page.locator('text=E2E Test Assignment')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('table').getByText('E2E Test Assignment')).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.locator('[data-testid="review-queue-link"]').first()).toBeVisible();
+  });
+
+  test('review queue remains usable on a narrow viewport', async ({ page }) => {
+    await createSubmissionForCheckpoint('Proposal');
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto('/instructor/reviews');
+    await page.waitForLoadState('networkidle');
+
+    const dimensions = await page.evaluate(() => ({
+      documentWidth: document.documentElement.scrollWidth,
+      viewportWidth: window.innerWidth,
+    }));
+
+    expect(dimensions.documentWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
+    await expect(page.getByTestId('review-queue-mobile-card').first()).toBeVisible();
+    await expect(page.getByTestId('review-queue-mobile-link').first()).toBeVisible();
   });
 
   test('instructor reviews with Pass → next checkpoint unlocks', async ({ page }) => {

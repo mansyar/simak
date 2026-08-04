@@ -47,6 +47,7 @@ describe('ReviewFilePreview', () => {
     expect(link?.getAttribute('href')).toBe('https://example.com/file.pdf');
     expect(link?.getAttribute('target')).toBe('_blank');
     expect(link?.getAttribute('rel')).toBe('noopener noreferrer');
+    expect(link?.className).toContain('min-h-11');
   });
 
   it('should render PDF embed when file is PDF', () => {
@@ -130,6 +131,7 @@ describe('ReviewFilePreview', () => {
 
     await waitFor(() => {
       expect(screen.getByText('files.previewNotAvailable')).toBeDefined();
+      expect(screen.getByText('files.previewNotAvailable').closest('[role="alert"]')).toBeDefined();
     });
   });
 

@@ -290,11 +290,19 @@
     "title": "Review Queue",
     "subtitle": "Review pending student submissions across your assignments",
     "allAssignments": "All Assignments",
+    "assignmentFilterLabel": "Filter reviews by assignment",
     "table": {
       "student": "Student",
       "assignment": "Assignment",
       "waitTime": "Wait Time",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Actions",
+      "caption": "Pending review queue"
+    },
+    "waitTime": {
+      "daysHours": "{days}d {hours}h",
+      "hours": "{hours}h",
+      "lessThanHour": "< 1h"
     },
     "empty": "No pending reviews",
     "emptyPrompt": "When students submit work for review, it will appear here.",
@@ -311,6 +319,7 @@
     "passed": "Passed",
     "revise": "Revise",
     "decision": "Decision",
+    "decisionRequired": "Choose Pass or Revise before submitting",
     "pass": "Pass",
     "comment": "Comment",
     "commentPlaceholder": "Add feedback or comments for the student...",
