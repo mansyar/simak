@@ -3,7 +3,7 @@ import type { TranslationKey } from '../../i18n/index';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { MessageSquare } from 'lucide-react';
-import { formatDate } from '@/lib/format-date';
+import { useStudentDateFormatter } from '@/hooks/use-student-date';
 
 interface ConsultationItem {
   id: number;
@@ -34,6 +34,7 @@ function getStatusBadgeVariant(status: string): 'warning' | 'success' | 'destruc
 
 export function ConsultationList({ consultations }: ConsultationListProps) {
   const { t, locale } = useI18n();
+  const { format } = useStudentDateFormatter(locale);
 
   if (consultations.length === 0) {
     return <EmptyState icon={MessageSquare} title={t('consultations.noConsultations')} compact />;
@@ -56,7 +57,7 @@ export function ConsultationList({ consultations }: ConsultationListProps) {
                 ? `${t('consultations.external')}: ${item.externalConsultantName}`
                 : t('consultations.internal')}
             </span>
-            <span>{formatDate(item.createdAt, locale, 'short')}</span>
+            <span>{format(item.createdAt, 'short')}</span>
           </div>
         </div>
       ))}

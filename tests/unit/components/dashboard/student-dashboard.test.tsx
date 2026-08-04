@@ -177,7 +177,7 @@ describe('StudentDashboard - shared formatDate (UX-20)', () => {
         }}
       />,
     );
-    expect(mockFormatDate).toHaveBeenCalledWith(consultationDate, 'en', 'short');
+    expect(mockFormatDate).toHaveBeenCalledWith(consultationDate, 'en', 'short', 'UTC');
   });
 
   it('does not call formatDate when dueDate is null', async () => {

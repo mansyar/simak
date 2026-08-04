@@ -167,9 +167,9 @@ describe('ExtensionHistoryList', () => {
 
     it('uses shared formatDate from @/lib/format-date with locale and short style', () => {
       render(<ExtensionHistoryList items={mockItems} />);
-      expect(mockFormatDate).toHaveBeenCalledWith(mockItems[0].createdAt, 'en', 'short');
-      expect(mockFormatDate).toHaveBeenCalledWith(mockItems[1].createdAt, 'en', 'short');
-      expect(mockFormatDate).toHaveBeenCalledWith(mockItems[2].createdAt, 'en', 'short');
+      expect(mockFormatDate).toHaveBeenCalledWith(mockItems[0].createdAt, 'en', 'short', 'UTC');
+      expect(mockFormatDate).toHaveBeenCalledWith(mockItems[1].createdAt, 'en', 'short', 'UTC');
+      expect(mockFormatDate).toHaveBeenCalledWith(mockItems[2].createdAt, 'en', 'short', 'UTC');
     });
 
     it('calls shared formatDate once per item', () => {

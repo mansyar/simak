@@ -105,7 +105,7 @@ describe('ConsultationList', () => {
 
   it('should render date', () => {
     render(<ConsultationList consultations={[baseConsultation]} />);
-    expect(mockFormatDate).toHaveBeenCalledWith(baseConsultation.createdAt, 'en', 'short');
+    expect(mockFormatDate).toHaveBeenCalledWith(baseConsultation.createdAt, 'en', 'short', 'UTC');
   });
 
   it('should render dash for null notes', () => {
@@ -142,7 +142,7 @@ describe('ConsultationList - shared formatDate (UX-20)', () => {
 
   it('uses formatDate from @/lib/format-date with locale and short style', () => {
     render(<ConsultationList consultations={[baseConsultation]} />);
-    expect(mockFormatDate).toHaveBeenCalledWith(baseConsultation.createdAt, 'en', 'short');
+    expect(mockFormatDate).toHaveBeenCalledWith(baseConsultation.createdAt, 'en', 'short', 'UTC');
   });
 
   it('calls formatDate once per consultation item', () => {

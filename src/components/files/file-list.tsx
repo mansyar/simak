@@ -13,6 +13,7 @@ import {
 import { Download, FileText, FileQuestion } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
+import { useStudentDateFormatter } from '@/hooks/use-student-date';
 
 interface Submission {
   id: number;
@@ -40,19 +41,9 @@ function formatFileSize(
   return `${bytes} bytes`;
 }
 
-function formatDate(date: Date | null, locale: string): string {
-  if (!date) return '';
-  return new Intl.DateTimeFormat(locale, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(date));
-}
-
 export function FileList({ submissions, onDownload }: FileListProps) {
   const { t, locale } = useI18n();
+  const { format } = useStudentDateFormatter(locale);
 
   const handleDownload = useCallback(
     async (submissionId: number) => {
@@ -108,7 +99,7 @@ export function FileList({ submissions, onDownload }: FileListProps) {
                 {formatFileSize(submission.fileSize, t)}
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {formatDate(submission.uploadedAt, locale)}
+                {format(submission.uploadedAt, 'time')}
               </TableCell>
               <TableCell>
                 <Button

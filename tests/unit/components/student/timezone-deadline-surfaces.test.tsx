@@ -1,13 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-const { mockFormatDate, mockFormatDateShort, mockFormatRelativeTime, mockUseStudentTimezone } =
-  vi.hoisted(() => ({
-    mockFormatDate: vi.fn(() => 'formatted date'),
-    mockFormatDateShort: vi.fn(() => 'formatted short date'),
-    mockFormatRelativeTime: vi.fn(() => 'relative time'),
-    mockUseStudentTimezone: vi.fn(() => ({ timezone: 'America/Los_Angeles', hydrated: true })),
-  }));
+const {
+  mockFormatDate,
+  mockFormatDateShort,
+  mockFormatRelativeTime,
+  mockUseStudentTimezone,
+  mockLocale,
+} = vi.hoisted(() => ({
+  mockFormatDate: vi.fn(() => 'formatted date'),
+  mockFormatDateShort: vi.fn(() => 'formatted short date'),
+  mockFormatRelativeTime: vi.fn(() => 'relative time'),
+  mockUseStudentTimezone: vi.fn(() => ({ timezone: 'America/Los_Angeles', hydrated: true })),
+  mockLocale: { value: 'en' as 'en' | 'id' },
+}));
 
 vi.mock('@/lib/format-date', () => ({ formatDate: mockFormatDate }));
 vi.mock('@/lib/format', () => ({
@@ -20,7 +26,9 @@ vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
     t: (key: string, params?: Record<string, string>) =>
       params ? `${key} ${JSON.stringify(params)}` : key,
-    locale: 'en' as const,
+    get locale() {
+      return mockLocale.value;
+    },
   }),
 }));
 
@@ -35,10 +43,16 @@ import { StudentDashboard } from '@/components/dashboard/StudentDashboard';
 import { CheckpointCard } from '@/components/student/assignments/CheckpointCard';
 import { AssignmentDetailHeader } from '@/components/student/assignments/AssignmentDetailHeader';
 import { StudentAssignmentCard } from '@/components/student/assignments/StudentAssignmentCard';
+import { StudentNextActions } from '@/components/dashboard/StudentNextActions';
+import { ConsultationList } from '@/components/consultations/ConsultationList';
+import { FileList } from '@/components/files/file-list';
+import { SubmissionStatus } from '@/components/files/submission-status';
+import { ExtensionHistoryList } from '@/components/student/extensions/ExtensionHistoryList';
 
 describe('student deadline timezone surfaces', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockLocale.value = 'en';
     mockUseStudentTimezone.mockReturnValue({ timezone: 'America/Los_Angeles', hydrated: true });
   });
 
@@ -116,7 +130,12 @@ describe('student deadline timezone surfaces', () => {
     );
 
     expect(screen.getByText('studentDashboard.noDeadline')).toBeDefined();
-    expect(mockFormatDate).toHaveBeenCalledWith(consultationDate, 'en', 'short');
+    expect(mockFormatDate).toHaveBeenCalledWith(
+      consultationDate,
+      'en',
+      'short',
+      'America/Los_Angeles',
+    );
     expect(mockFormatDate).not.toHaveBeenCalledWith(null, 'en', 'short', 'America/Los_Angeles');
   });
 
@@ -205,6 +224,111 @@ describe('student deadline timezone surfaces', () => {
     );
 
     expect(mockFormatDateShort).toHaveBeenCalledWith(dueDate, 'en', 'UTC');
+  });
+
+  it('passes the student timezone to consultation, submission, review, and extension dates', () => {
+    const date = new Date('2026-03-08T09:30:00.000Z');
+
+    render(
+      <StudentNextActions
+        data={{
+          primaryActions: [
+            {
+              assignmentId: 1,
+              assignmentTitle: 'Thesis',
+              checkpointId: 10,
+              checkpointName: 'Proposal',
+              dueDate: new Date(date),
+              kind: 'submit',
+              priority: 'dated',
+              submissionId: null,
+              href: '/student/assignments/1/checkpoints/10',
+            },
+          ],
+          waitingSummary: {
+            submitted: { count: 0, representatives: [] },
+            underReview: { count: 0, representatives: [] },
+          },
+        }}
+      />,
+    );
+    render(
+      <ConsultationList
+        consultations={[
+          {
+            id: 1,
+            checkpointName: 'Proposal',
+            sessionType: 'internal',
+            externalConsultantName: null,
+            notes: null,
+            status: 'pending',
+            createdAt: date,
+          },
+        ]}
+      />,
+    );
+    render(
+      <FileList
+        submissions={[
+          { id: 1, version: 1, fileName: 'proposal.pdf', fileSize: 100, uploadedAt: date },
+        ]}
+      />,
+    );
+    render(
+      <SubmissionStatus
+        review={{ decision: 'revise', revisionDeadline: date, reviewedAt: date }}
+      />,
+    );
+    render(
+      <ExtensionHistoryList
+        items={[
+          {
+            id: 1,
+            category: 'research',
+            extensionDays: 3,
+            status: 'pending',
+            reason: null,
+            createdAt: date,
+            resolvedAt: null,
+            resolutionReason: null,
+            checkpointName: 'Proposal',
+          },
+        ]}
+      />,
+    );
+
+    expect(mockFormatDate).toHaveBeenCalledWith(date, 'en', 'short', 'America/Los_Angeles');
+  });
+
+  it('passes the active locale and timezone together at a date boundary', () => {
+    mockLocale.value = 'id';
+    const date = new Date('2026-03-08T00:30:00.000Z');
+
+    render(
+      <StudentNextActions
+        data={{
+          primaryActions: [
+            {
+              assignmentId: 1,
+              assignmentTitle: 'Thesis',
+              checkpointId: 10,
+              checkpointName: 'Proposal',
+              dueDate: date,
+              kind: 'submit',
+              priority: 'dated',
+              submissionId: null,
+              href: '/student/assignments/1/checkpoints/10',
+            },
+          ],
+          waitingSummary: {
+            submitted: { count: 0, representatives: [] },
+            underReview: { count: 0, representatives: [] },
+          },
+        }}
+      />,
+    );
+
+    expect(mockFormatDate).toHaveBeenCalledWith(date, 'id', 'short', 'America/Los_Angeles');
   });
 
   it('uses a neutral placeholder until timezone detection has hydrated', () => {

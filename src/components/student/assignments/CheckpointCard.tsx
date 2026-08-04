@@ -2,11 +2,11 @@ import { isPast } from 'date-fns/isPast';
 import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
 import type { TranslationKey } from '../../../i18n/index';
-import { formatRelativeTime, formatDateShort } from '@/lib/format';
+import { formatRelativeTime } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, AlertCircle, Users, ExternalLink } from 'lucide-react';
-import { useStudentTimezone } from '@/hooks/use-student-timezone';
+import { useStudentDateFormatter } from '@/hooks/use-student-date';
 
 export interface CheckpointData {
   id: number;
@@ -83,7 +83,7 @@ function getTranslatedBlockingReason(
 
 export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps) {
   const { t, locale } = useI18n();
-  const { timezone, hydrated } = useStudentTimezone();
+  const { formatShort } = useStudentDateFormatter(locale);
   const navigate = useNavigate();
   const config = stateConfig[checkpoint.state] ?? stateConfig.locked;
   const isOverdue =
@@ -113,8 +113,7 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
             >
               <Clock className="h-3 w-3" />
               <span>
-                {hydrated ? formatDateShort(checkpoint.dueDate, locale, timezone) : '—'} (
-                {formatRelativeTime(checkpoint.dueDate, locale)})
+                {formatShort(checkpoint.dueDate)} ({formatRelativeTime(checkpoint.dueDate, locale)})
               </span>
             </div>
           )}
