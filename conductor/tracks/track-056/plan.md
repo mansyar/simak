@@ -135,14 +135,14 @@ Phase checkpoint: 0dd1e38 (user-confirmed; verification note attached)
 
 ### 4.1 Run project quality gates
 
-- [ ] Run `pnpm generate:i18n` and `pnpm check:i18n` after all locale/schema changes.
-- [ ] Run `pnpm typecheck`.
-- [ ] Run `pnpm lint`.
-- [ ] Run `pnpm test:coverage` and confirm the project thresholds and new-code coverage requirements are met.
-- [ ] Run the staged-file modularity check and confirm every changed file remains under the 500-line limit.
-- [ ] Run formatting with the repository's configured formatter and review the resulting diff.
+- [x] Run `pnpm generate:i18n` and `pnpm check:i18n` after all locale/schema changes.
+- [x] Run `pnpm typecheck`.
+- [x] Run `pnpm lint`.
+- [x] Run `pnpm test:coverage` and confirm the project thresholds and new-code coverage requirements are met.
+- [x] Run the staged-file modularity check and confirm every changed file remains under the 500-line limit.
+- [x] Run formatting with the repository's configured formatter and review the resulting diff.
 
-Commit SHA: _pending_
+Commit SHA: b11c165 (verification baseline; no source changes)
 
 ### 4.2 Verify authenticated user flows
 
