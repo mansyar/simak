@@ -158,17 +158,17 @@ Commit SHA: 75b42dc (manual verification note attached)
 
 ### 4.3 Finalize the track
 
-- [~] Resolve the conductor-review findings before finalization.
-  - [ ] Make the pg_trgm rollback safe when the extension is shared or pre-existing.
-  - [ ] Add explicit unauthorized-path coverage for independent type and email-summary handlers.
-  - [ ] Verify trigram plans with representative data and normal planner scan selection.
+- [x] Resolve the conductor-review findings before finalization.
+  - [x] Make the pg_trgm rollback safe when the extension is shared or pre-existing.
+  - [x] Add explicit unauthorized-path coverage for independent type and email-summary handlers.
+  - [x] Verify trigram plans with representative data and normal planner scan selection.
 - [ ] Review the complete diff against `spec.md`, including migration rollback, tests, i18n output, and query-plan evidence.
 - [ ] Update this plan with every completed task SHA, phase checkpoint SHA, implementation notes, and any approved deviations.
 - [ ] Ensure `metadata.json` status and `updatedAt` reflect the final track state only after implementation and review are complete.
 - [ ] Run `conductor-review` before marking the track complete.
 - [ ] Confirm the active registry entry remains linked to `conductor/tracks/track-056/index.md` until review/archive.
 
-Commit SHA: _pending_
+Commit SHA: 0941085
 
 ### Phase 4 Verification Checkpoint
 
@@ -183,3 +183,5 @@ Phase checkpoint: _pending_
 - The expected database migration is the next migration after the current `0020` series; use the repository's migration generator/naming conventions rather than hard-coding a generated name in advance.
 - No new runtime dependency is planned. PostgreSQL `pg_trgm` is an extension supplied by the existing PostgreSQL deployment.
 - If query-plan verification cannot run because no representative database is available, stop before claiming completion and record the exact blocker and required command.
+- The review-safe rollback intentionally retains `pg_trgm`; `CREATE EXTENSION IF NOT EXISTS` cannot prove extension ownership, so dropping it could affect other database objects.
+- Query-plan integration seeds representative rows inside a transaction and deliberately rolls the transaction back after assertions, preserving the shared test database.
