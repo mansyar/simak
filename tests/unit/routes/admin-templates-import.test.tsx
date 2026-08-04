@@ -67,6 +67,18 @@ describe('BulkTemplateImportPage', () => {
     vi.clearAllMocks();
   });
 
+  it('should expose a keyboard-accessible native label for the file picker', async () => {
+    const Component = await getComponent();
+    render(<Component />);
+
+    const dropzone = screen.getByTestId('bulk-import-dropzone');
+    const input = screen.getByTestId('bulk-import-dropzone-input');
+
+    expect(dropzone.tagName).toBe('LABEL');
+    expect(input).toHaveAttribute('id');
+    expect(screen.getByLabelText(/bulkImport\.common\.dropzoneText/)).toBe(input);
+  });
+
   it('should render the dropzone with upload text', async () => {
     const Component = await getComponent();
     render(<Component />);

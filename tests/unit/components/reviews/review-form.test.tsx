@@ -68,6 +68,14 @@ describe('ReviewForm', () => {
     expect(screen.getByText('instructorReviews.feedbackFile')).toBeDefined();
   });
 
+  it('should associate the feedback file input with its visible label', () => {
+    render(<ReviewForm {...baseProps} />);
+
+    const input = screen.getByLabelText('instructorReviews.feedbackFile');
+    expect(input.getAttribute('id')).toBe('feedback-file');
+    expect(input.getAttribute('accept')).toBe('.pdf,.docx');
+  });
+
   it('should render submit button', () => {
     render(<ReviewForm {...baseProps} />);
     expect(screen.getByText('instructorReviews.submitReview')).toBeDefined();

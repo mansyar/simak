@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, type ChangeEvent, type DragEvent } from 'react';
+import { useState, useRef, useCallback, useId, type ChangeEvent, type DragEvent } from 'react';
 import { useI18n } from '../../routes/__root';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -26,6 +26,7 @@ export function FileUploader({
 }: FileUploaderProps) {
   const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputId = useId();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -102,62 +103,64 @@ export function FileUploader({
   return (
     <div className="space-y-4">
       {/* Drop zone */}
-      <div
-        data-testid="drop-zone"
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
-        className={`
-          relative flex cursor-pointer flex-col items-center justify-center
-          rounded-lg border-2 border-dashed p-8 transition-colors
-          ${
-            isDragOver
-              ? 'border-primary bg-primary/5'
-              : 'border-muted-foreground/25 hover:border-muted-foreground/50'
-          }
-          ${uploadSuccess ? 'border-green-500 bg-green-50 dark:bg-green-950/20' : ''}
-          ${uploadError ? 'border-red-500 bg-red-50 dark:bg-red-950/20' : ''}
-        `}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".docx,.pdf"
-          data-testid="file-input"
-          onChange={handleInputChange}
-          className="hidden"
-        />
-
-        {uploadSuccess ? (
+      {uploadSuccess ? (
+        <div
+          data-testid="drop-zone"
+          className="relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-green-500 bg-green-50 p-8 dark:bg-green-950/20"
+        >
           <div className="flex flex-col items-center gap-2 text-center">
             <CheckCircle2 className="h-10 w-10 text-green-500" />
             <p className="text-sm font-medium text-green-700 dark:text-green-300">
               {t('files.uploadSuccess')}
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleReset();
-              }}
-            >
+            <Button variant="outline" size="sm" type="button" onClick={handleReset}>
               {t('files.uploadAnother')}
             </Button>
           </div>
-        ) : (
-          <>
-            <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
-            <p className="text-sm font-medium text-foreground">{t('files.dropzone.title')}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{t('files.dropzone.subtitle')}</p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              .docx, .pdf &middot; {t('files.maxSize')}
-            </p>
-          </>
-        )}
-      </div>
+        </div>
+      ) : (
+        <label
+          htmlFor={fileInputId}
+          data-testid="drop-zone"
+          onClick={(event) => {
+            if (event.target !== fileInputRef.current) {
+              event.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={`
+            relative flex cursor-pointer flex-col items-center justify-center
+            rounded-lg border-2 border-dashed p-8 transition-colors
+            focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2
+            ${
+              isDragOver
+                ? 'border-primary bg-primary/5'
+                : 'border-muted-foreground/25 hover:border-muted-foreground/50'
+            }
+            ${uploadError ? 'border-red-500 bg-red-50 dark:bg-red-950/20' : ''}
+          `}
+        >
+          <input
+            ref={fileInputRef}
+            id={fileInputId}
+            type="file"
+            accept=".docx,.pdf"
+            data-testid="file-input"
+            aria-label={t('files.dropzone.title')}
+            onChange={handleInputChange}
+            className="sr-only"
+          />
+          <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
+          <p className="text-sm font-medium text-foreground">{t('files.dropzone.title')}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{t('files.dropzone.subtitle')}</p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            .docx, .pdf &middot; {t('files.maxSize')}
+          </p>
+        </label>
+      )}
 
       {/* Selected file info */}
       {selectedFile && !uploadSuccess && (

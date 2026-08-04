@@ -201,13 +201,17 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
 
         {/* Feedback file upload */}
         <div className="space-y-1.5">
-          <Label>{t('instructorReviews.feedbackFile')}</Label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <Label htmlFor="feedback-file">{t('instructorReviews.feedbackFile')}</Label>
+          <label
+            htmlFor="feedback-file"
+            className="flex cursor-pointer items-center gap-2 rounded-md focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+          >
             <input
+              id="feedback-file"
               type="file"
               accept=".pdf,.docx"
               onChange={handleFeedbackFileChange}
-              className="hidden"
+              className="sr-only"
               disabled={isUploadingFeedback}
             />
             <div className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent transition-colors">

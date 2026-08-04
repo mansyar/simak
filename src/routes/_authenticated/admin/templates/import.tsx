@@ -1,6 +1,6 @@
 import React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useRef, useCallback, type ChangeEvent, type DragEvent } from 'react';
+import { useState, useRef, useCallback, useId, type ChangeEvent, type DragEvent } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { bulkCreateTemplates } from '@/server/bulk-import';
 import { parseTemplatesXlsx } from '@/lib/bulk-import/parse-templates';
@@ -35,6 +35,7 @@ interface TemplateGroup {
 function BulkTemplateImportPage() {
   const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputId = useId();
   const bulkCreateTemplatesFn = useServerFn(bulkCreateTemplates);
 
   const [isDragOver, setIsDragOver] = useState(false);
@@ -181,28 +182,29 @@ function BulkTemplateImportPage() {
       </div>
 
       {/* Dropzone */}
-      <div
+      <label
+        htmlFor={fileInputId}
         data-testid="bulk-import-dropzone"
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
           isDragOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        onClick={() => fileInputRef.current?.click()}
       >
         <input
           ref={fileInputRef}
+          id={fileInputId}
           data-testid="bulk-import-dropzone-input"
           type="file"
           accept=".xlsx"
-          className="hidden"
+          className="sr-only"
           onChange={handleFileChange}
         />
         <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
         <p className="mt-2 text-sm text-muted-foreground">{t('bulkImport.common.dropzoneText')}</p>
         <p className="mt-1 text-xs text-muted-foreground">{t('bulkImport.common.dropzoneHint')}</p>
-      </div>
+      </label>
 
       {/* Validation error */}
       {validationError && (
