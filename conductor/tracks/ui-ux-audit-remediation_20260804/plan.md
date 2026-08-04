@@ -79,7 +79,7 @@
   - [x] Write failing tests for mobile tab access, locked-checkpoint guidance, status semantics, and responsive layout. [e509bff]
   - [x] Implement mobile-safe tabs and clear next-step guidance. [e509bff]
   - [x] Improve grade breakdown, consultation progress, and history semantics. [e509bff]
-- [ ] Task: Improve student discussions and destructive actions
+- [~] Task: Improve student discussions and destructive actions
   - [ ] Write failing tests for discussion errors, deletion confirmation, announcements, and empty states.
   - [ ] Implement retryable error states, confirmation, and live feedback.
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
