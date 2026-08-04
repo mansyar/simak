@@ -166,7 +166,39 @@ describe('StudentNextActions', () => {
 
     render(<StudentNextActions data={data} />);
 
-    expect(screen.getAllByRole('link')).toHaveLength(3);
+    expect(
+      screen.getAllByRole('link', { name: 'studentDashboard.nextActions.openWaitingCheckpoint' }),
+    ).toHaveLength(3);
+  });
+
+  it('offers a view-all destination when waiting representatives are capped', async () => {
+    const { StudentNextActions } = await import('@/components/dashboard/StudentNextActions');
+    const data: StudentNextActionsResult = {
+      primaryActions: [],
+      waitingSummary: {
+        submitted: {
+          count: 5,
+          representatives: [
+            {
+              assignmentId: 1,
+              assignmentTitle: 'Thesis',
+              checkpointId: 10,
+              checkpointName: 'Proposal',
+              dueDate: null,
+              submissionId: 100,
+              href: '/student/assignments/1/checkpoints/10',
+            },
+          ],
+        },
+        underReview: { count: 0, representatives: [] },
+      },
+    };
+
+    render(<StudentNextActions data={data} />);
+
+    expect(screen.getByRole('link', { name: /common\.viewAll/ }).getAttribute('href')).toBe(
+      '/student/assignments',
+    );
   });
 
   it('renders no more than five primary action cards', async () => {

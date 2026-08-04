@@ -4,7 +4,11 @@ import { render, screen } from '@testing-library/react';
 
 // Mock @tanstack/react-router
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({ children, ...props }: any) => <a {...props}>{children}</a>,
+  Link: ({ children, to, ...props }: any) => (
+    <a href={to || '#'} {...props}>
+      {children}
+    </a>
+  ),
 }));
 
 // Mock __root
@@ -162,6 +166,52 @@ describe('StudentDashboard', () => {
 
     expect(screen.getByText('Chapter 1')).toBeDefined();
     expect(screen.getByText('Thesis Assignment')).toBeDefined();
+  });
+
+  it('should make deadline, review, and consultation rows actionable', () => {
+    const data = {
+      activeAssignments: [],
+      upcomingDeadlines: [
+        {
+          assignmentId: 1,
+          checkpointId: 10,
+          assignmentTitle: 'Thesis Assignment',
+          checkpointName: 'Chapter 1',
+          dueDate: '2026-06-01',
+          state: 'unlocked',
+          isOverdue: false,
+          daysRemaining: 30,
+        },
+      ],
+      pendingReviews: [
+        {
+          submissionId: 20,
+          assignmentId: 1,
+          checkpointId: 10,
+          assignmentTitle: 'Thesis Assignment',
+          checkpointName: 'Chapter 1',
+          submittedAt: new Date('2026-05-20'),
+          waitTimeDays: 3,
+        },
+      ],
+      consultationReminders: [
+        {
+          consultationId: 30,
+          assignmentId: 1,
+          checkpointId: 10,
+          assignmentTitle: 'Thesis Assignment',
+          checkpointName: 'Chapter 1',
+          consultationDate: new Date('2026-05-25'),
+        },
+      ],
+    };
+
+    render(<StudentDashboard data={data} />);
+
+    expect(screen.getAllByRole('link').map((link) => link.getAttribute('href'))).toContain(
+      '/student/assignments/1/checkpoints/10',
+    );
+    expect(screen.getAllByRole('link')).toHaveLength(3);
   });
 
   it('should display relative time in parentheses after due date in upcoming deadlines', () => {

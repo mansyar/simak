@@ -233,6 +233,7 @@ export async function getStudentDashboardDataHandler() {
       .filter((d) => d.state !== 'passed')
       .map((d) => ({
         assignmentId: d.assignmentId,
+        checkpointId: d.checkpointId,
         assignmentTitle: d.assignmentTitle,
         checkpointName: d.checkpointName,
         dueDate: d.dueDate ? d.dueDate.toISOString() : null,
@@ -270,6 +271,8 @@ export async function getStudentDashboardDataHandler() {
       upcomingDeadlines: deadlines.slice(0, 5),
       pendingReviews: pendingReviewRows.map((pr) => ({
         submissionId: pr.submissionId,
+        assignmentId: pr.assignmentId,
+        checkpointId: pr.checkpointId,
         assignmentTitle: pr.assignmentTitle,
         checkpointName: pr.checkpointName,
         submittedAt: pr.submittedAt,
@@ -281,6 +284,8 @@ export async function getStudentDashboardDataHandler() {
         .filter((cr) => cr.status === 'pending' || cr.status === undefined)
         .map((cr) => ({
           consultationId: cr.consultationId,
+          assignmentId: cr.assignmentId,
+          checkpointId: cr.checkpointId,
           assignmentTitle: cr.assignmentTitle,
           checkpointName: cr.checkpointName,
           consultationDate: cr.consultationDate,

@@ -240,6 +240,15 @@ export function StudentNextActions({ data }: Props) {
                       </li>
                     ))}
                   </ul>
+                  {group.count > group.representatives.length && (
+                    <Link
+                      to={'/student/assignments' as never}
+                      aria-label={`${t('common.viewAll')}: ${t(label)}`}
+                      className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                      {t('common.viewAll')}
+                    </Link>
+                  )}
                 </div>
               ))}
             </div>
