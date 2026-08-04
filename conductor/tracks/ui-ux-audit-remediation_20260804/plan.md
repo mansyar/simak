@@ -65,7 +65,7 @@
   - [x] Verify no new hydration errors on public and authenticated routes. [e127c5e]
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: e127c5e]
 
-## Phase 3 — Student experience remediation
+## Phase 3 — Student experience remediation [checkpoint: 0589eb7]
 
 - [x] Task: Improve student dashboard actionability [8340632]
   - [x] Write failing tests for actionable deadline, review, consultation, and waiting-item rows. [8340632]
@@ -82,7 +82,7 @@
 - [x] Task: Improve student discussions and destructive actions [0589eb7]
   - [x] Write failing tests for discussion errors, deletion confirmation, announcements, and empty states. [0589eb7]
   - [x] Implement retryable error states, confirmation, and live feedback. [0589eb7]
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: 0589eb7]
 
 ## Phase 4 — Instructor workflow remediation
 
