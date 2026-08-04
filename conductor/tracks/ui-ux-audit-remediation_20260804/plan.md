@@ -32,11 +32,11 @@
   - [x] Implement a 44px interaction baseline while preserving compact visual variants where appropriate.
   - [x] Add visible focus states to shared and app-level controls.
   - [x] Verify no affected controls regress at 320px.
-- [~] Task: Replace or repair tab and disclosure primitives
-  - [ ] Write failing accessibility tests for tabs, tab panels, expansion buttons, and clickable rows/cards.
-  - [ ] Implement correct ARIA tab semantics and keyboard navigation.
-  - [ ] Implement accessible expansion controls for admin imports and other disclosure surfaces.
-  - [ ] Provide mobile overflow or alternative selection behavior.
+- [x] Task: Replace or repair tab and disclosure primitives [3fc938e]
+  - [x] Write failing accessibility tests for tabs, tab panels, expansion buttons, and clickable rows/cards.
+  - [x] Implement correct ARIA tab semantics and keyboard navigation.
+  - [x] Implement accessible expansion controls for admin imports and other disclosure surfaces.
+  - [x] Provide mobile overflow or alternative selection behavior.
 - [ ] Task: Make dialog and sheet primitives mobile-safe
   - [ ] Write failing tests for close-button names, max-height, scrolling, and narrow viewport behavior.
   - [ ] Implement constrained content regions and accessible close controls.
