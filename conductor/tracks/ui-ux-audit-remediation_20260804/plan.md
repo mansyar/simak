@@ -37,10 +37,10 @@
   - [x] Implement correct ARIA tab semantics and keyboard navigation.
   - [x] Implement accessible expansion controls for admin imports and other disclosure surfaces.
   - [x] Provide mobile overflow or alternative selection behavior.
-- [~] Task: Make dialog and sheet primitives mobile-safe
-  - [ ] Write failing tests for close-button names, max-height, scrolling, and narrow viewport behavior.
-  - [ ] Implement constrained content regions and accessible close controls.
-  - [ ] Verify notification, confirmation, and settings sheets.
+- [x] Task: Make dialog and sheet primitives mobile-safe [c82d3f7]
+  - [x] Write failing tests for close-button names, max-height, scrolling, and narrow viewport behavior.
+  - [x] Implement constrained content regions and accessible close controls.
+  - [x] Verify notification, confirmation, and settings sheets.
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Error states, action feedback, and runtime stability
