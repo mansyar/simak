@@ -90,9 +90,9 @@
   - [x] Write failing tests for dashboard error states, actionable lists, quick-action semantics, and mobile stacking. [c5503a2]
   - [x] Implement direct destinations for important review, risk, submission, and assignment information. [c5503a2]
   - [x] Reduce mobile density through prioritization or progressive disclosure where needed. [c5503a2]
-- [~] Task: Fix assignment list, cards, filters, and header actions
-  - [ ] Write failing tests for card click affordances, labeled search/clear controls, responsive actions, and pagination.
-  - [ ] Implement full-card/title links, accessible filters, larger controls, and wrapping page-header actions.
+- [x] Task: Fix assignment list, cards, filters, and header actions [9518e1b]
+  - [x] Write failing tests for card click affordances, labeled search/clear controls, responsive actions, and pagination. [9518e1b]
+  - [x] Implement full-card/title links, accessible filters, larger controls, and wrapping page-header actions. [9518e1b]
 - [ ] Task: Improve review queue and review detail
   - [ ] Write failing tests for filter naming, mobile queue presentation, localized wait times, error retry, and success announcements.
   - [ ] Implement responsive queue cards or prioritized columns.
