@@ -43,7 +43,7 @@
   - [x] Verify notification, confirmation, and settings sheets.
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: c82d3f7]
 
-## Phase 2 — Error states, action feedback, and runtime stability
+## Phase 2 — Error states, action feedback, and runtime stability [checkpoint: e127c5e]
 
 - [x] Task: Separate loading, empty, not-found, authorization, and server-error states [057e34c]
   - [x] Write failing route/component tests for affected student, instructor, admin, notification, and discussion views. [057e34c]
@@ -63,7 +63,7 @@
   - [x] Trace server/client nonce generation and propagation. [e127c5e]
   - [x] Implement the minimal fix within the existing security-header and router architecture. [e127c5e]
   - [x] Verify no new hydration errors on public and authenticated routes. [e127c5e]
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: e127c5e]
 
 ## Phase 3 — Student experience remediation
 
