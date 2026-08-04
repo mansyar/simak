@@ -96,20 +96,97 @@ describe('search query plans', () => {
     },
   ];
 
-  it.each(cases)(
-    'uses the intended trigram index for $description',
-    async ({ indexName, query }) => {
-      await db.transaction(async (transaction) => {
-        // Small local fixtures often prefer a sequential scan. Disable it only for this
-        // eligibility check so the test verifies that each operator-class index is usable.
-        await transaction.execute(sql`SET LOCAL enable_seqscan = off`);
-        await transaction.execute(sql`SET LOCAL enable_indexscan = off`);
-        await transaction.execute(sql`SET LOCAL enable_indexonlyscan = off`);
-        const result = await transaction.execute(query);
-        const plan = parseExplainPlan(result[0] as Record<string, unknown>);
+  it('uses the intended trigram index with representative data', async () => {
+    const rollbackMarker = 'ROLLBACK_SEARCH_QUERY_PLAN_FIXTURES';
 
-        expect(containsIndex(plan, indexName), JSON.stringify(plan, null, 2)).toBe(true);
+    try {
+      await db.transaction(async (transaction) => {
+        await transaction.execute(sql`
+        INSERT INTO "users" ("id", "name", "email", "role", "locale", "email_verified")
+        VALUES ('query-plan-instructor', 'Query Plan Instructor', 'query-plan-instructor@example.com', 'instructor', 'en', false)
+        ON CONFLICT ("id") DO NOTHING
+      `);
+        await transaction.execute(sql`
+        INSERT INTO "users" ("id", "name", "email", "role", "locale", "email_verified")
+        SELECT
+          'query-plan-user-' || series,
+          CASE WHEN series % 100 = 0 THEN 'performance user ' || series ELSE 'ordinary user ' || series END,
+          'query-plan-' || series || '@example.com',
+          'student',
+          'en',
+          false
+        FROM generate_series(1, 100000) AS series
+      `);
+        await transaction.execute(sql`
+        INSERT INTO "assignment_templates" ("type", "name")
+        SELECT
+          'Research',
+          CASE WHEN series % 100 = 0 THEN 'performance template ' || series ELSE 'ordinary template ' || series END
+        FROM generate_series(1, 100000) AS series
+      `);
+        await transaction.execute(sql`
+        INSERT INTO "email_queue" ("recipient_email", "subject", "body_html", "template_type", "status")
+        SELECT
+          'query-plan-' || series || '@example.com',
+          CASE WHEN series % 100 = 0 THEN 'performance subject ' || series ELSE 'ordinary subject ' || series END,
+          '<p>Query-plan fixture</p>',
+          'password_reset',
+          'sent'
+        FROM generate_series(1, 100000) AS series
+      `);
+        await transaction.execute(sql`
+        INSERT INTO "assignments" ("template_id", "title", "final_deadline", "instructor_id")
+        SELECT
+          (SELECT "id" FROM "assignment_templates" WHERE "name" LIKE 'performance template %' LIMIT 1),
+          CASE WHEN series % 100 = 0 THEN 'performance assignment ' || series ELSE 'ordinary assignment ' || series END,
+          NOW() + INTERVAL '30 days',
+          'query-plan-instructor'
+        FROM generate_series(1, 100000) AS series
+      `);
+        await transaction.execute(sql`
+        INSERT INTO "feedback_snippets" ("id", "instructor_id", "title", "category", "body")
+        SELECT
+          'query-plan-snippet-' || series,
+          'query-plan-instructor',
+          CASE WHEN series % 100 = 0 THEN 'performance title ' || series ELSE 'ordinary title ' || series END,
+          CASE WHEN series % 100 = 0 THEN 'performance category' ELSE 'ordinary category' END,
+          'Query-plan fixture body'
+        FROM generate_series(1, 100000) AS series
+      `);
+        await transaction.execute(sql`
+        INSERT INTO "audit_log" ("actor_id", "action", "entity_type", "entity_id", "details")
+        SELECT
+          'query-plan-instructor',
+          'query_plan',
+          'assignment',
+          'query-plan-entity-' || series,
+          jsonb_build_object(
+            'message', CASE WHEN series % 100 = 0 THEN 'performance details' ELSE 'ordinary details' END
+          )
+        FROM generate_series(1, 100000) AS series
+      `);
+        await transaction.execute(sql`
+        ANALYZE "users", "assignment_templates", "email_queue", "assignments",
+          "feedback_snippets", "audit_log"
+      `);
+        // Match the low random I/O cost commonly used for SSD-backed production databases
+        // while keeping the planner's normal scan selection enabled.
+        await transaction.execute(sql`SET LOCAL random_page_cost = 1.1`);
+
+        for (const { description, indexName, query } of cases) {
+          const result = await transaction.execute(query);
+          const plan = parseExplainPlan(result[0] as Record<string, unknown>);
+
+          expect(containsIndex(plan, indexName), `${description}: ${JSON.stringify(plan)}`).toBe(
+            true,
+          );
+        }
+
+        throw new Error(rollbackMarker);
       });
-    },
-  );
+    } catch (error) {
+      if (error instanceof Error && error.message === rollbackMarker) return;
+      throw error;
+    }
+  });
 });

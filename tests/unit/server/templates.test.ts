@@ -233,4 +233,11 @@ describe('Template list workload', () => {
     });
     expect(mockDb.select).toHaveBeenCalledOnce();
   });
+
+  it('does not query type options for an unauthorized session', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+
+    await expect(listTemplateTypesHandler({ data: {} })).resolves.toEqual({ types: [] });
+    expect(mockDb.select).not.toHaveBeenCalled();
+  });
 });

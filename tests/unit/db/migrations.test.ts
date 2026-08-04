@@ -113,11 +113,11 @@ describe('0021_search_trigram_indexes migration', () => {
     expect(sql).not.toMatch(/ALTER TABLE|DROP TABLE|DELETE FROM|UPDATE\s+/i);
   });
 
-  it('has a safe rollback for indexes and the pg_trgm extension', () => {
+  it('has a safe rollback for indexes without dropping a shared extension', () => {
     const sql = readFileSync(rollbackPath, 'utf8');
 
     expect(sql).toContain('DROP INDEX IF EXISTS');
-    expect(sql).toContain('DROP EXTENSION IF EXISTS pg_trgm');
+    expect(sql).not.toContain('DROP EXTENSION');
     expect(sql).not.toContain('CASCADE');
   });
 });
