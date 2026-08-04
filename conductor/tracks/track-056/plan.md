@@ -146,14 +146,15 @@ Commit SHA: b11c165 (verification baseline; no source changes)
 
 ### 4.2 Verify authenticated user flows
 
-- [ ] Run the relevant Playwright tests with the configured authenticated environment, or document the exact environment blocker if the required database/auth services are unavailable.
-- [ ] In an authenticated browser session, rapidly type into every remote search surface and confirm immediate input feedback, one settled update after 300 ms, no stale result replacement, and retained prior results while loading.
-- [ ] Confirm clearing each search immediately resets the visible value and page to 1.
-- [ ] Confirm StudentPicker and TemplatePicker remain local-only, preserve selected values, and remain usable on the supported responsive layouts.
-- [ ] Confirm loading, empty, error, labels, keyboard/focus behavior, i18n, and authorization behavior remain intact.
-- [ ] Attach the manual verification report to the last functional commit after explicit user confirmation.
+- [x] Run the relevant Playwright tests with the configured authenticated environment, or document the exact environment blocker if the required database/auth services are unavailable.
+- Evidence: authenticated Chromium coverage passed 18 relevant admin/template/user/feedback/assignment tests. The serial smoke suite reached the audit-log page and verified its heading/search placeholder, but its console-error assertion is blocked by the pre-existing ThemeScript nonce hydration mismatch (`nonce=""` in SSR versus a random client nonce); four subsequent smoke cases were not run.
+- [x] In an authenticated browser session, rapidly type into every remote search surface and confirm immediate input feedback, one settled update after 300 ms, no stale result replacement, and retained prior results while loading.
+- [x] Confirm clearing each search immediately resets the visible value and page to 1.
+- [x] Confirm StudentPicker and TemplatePicker remain local-only, preserve selected values, and remain usable on the supported responsive layouts.
+- [x] Confirm loading, empty, error, labels, keyboard/focus behavior, i18n, and authorization behavior remain intact.
+- [x] Attach the manual verification report to the last functional commit after explicit user confirmation.
 
-Commit SHA: _pending_
+Commit SHA: 75b42dc (manual verification note attached)
 
 ### 4.3 Finalize the track
 
