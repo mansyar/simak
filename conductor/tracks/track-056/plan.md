@@ -115,12 +115,12 @@ Commit SHA: 75b42dc
 
 ### 3.3 Verify index-backed query plans
 
-- [ ] Add or extend an opt-in integration test/procedure under `tests/integration/` that runs representative `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` searches against a configured PostgreSQL database.
-- [ ] Verify non-empty searches for every indexed search family use the intended trigram indexes at realistic row counts and that the audit JSONB predicate is type-correct.
-- [ ] Record the query-plan evidence and any environment limitations in the plan and attach it to the task git note.
-- [ ] Commit the completed task and record the seven-character SHA below.
+- [x] Add or extend an opt-in integration test/procedure under `tests/integration/` that runs representative `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` searches against a configured PostgreSQL database.
+- [x] Verify non-empty searches for every indexed search family use the intended trigram indexes at realistic row counts and that the audit JSONB predicate is type-correct.
+- [x] Record the query-plan evidence and any environment limitations in the plan and attach it to the task git note.
+- [x] Commit the completed task and record the seven-character SHA below.
 
-Commit SHA: _pending_
+Commit SHA: f00f87c
 
 ### Phase 3 Verification Checkpoint
 
