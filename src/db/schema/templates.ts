@@ -3,15 +3,21 @@ import { users } from './users';
 
 export const gradingType = pgEnum('grading_type', ['numeric', 'qualitative']);
 
-export const assignmentTemplates = pgTable('assignment_templates', {
-  id: serial('id').primaryKey(),
-  type: text('type').notNull(),
-  name: text('name').notNull(),
-  createdBy: text('created_by').references(() => users.id),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-  deletedAt: timestamp('deleted_at'),
-});
+export const assignmentTemplates = pgTable(
+  'assignment_templates',
+  {
+    id: serial('id').primaryKey(),
+    type: text('type').notNull(),
+    name: text('name').notNull(),
+    createdBy: text('created_by').references(() => users.id),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
+    deletedAt: timestamp('deleted_at'),
+  },
+  (table) => [
+    index('assignment_templates_name_trgm_idx').using('gin', table.name.op('gin_trgm_ops')),
+  ],
+);
 
 export const templateCheckpoints = pgTable(
   'template_checkpoints',

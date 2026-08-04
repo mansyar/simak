@@ -33,5 +33,12 @@ export const emailQueue = pgTable(
     resendMessageId: text('resend_message_id'),
     createdAt: timestamp('created_at').defaultNow(),
   },
-  (table) => [index('email_queue_status_created_at_idx').on(table.status, table.createdAt)],
+  (table) => [
+    index('email_queue_status_created_at_idx').on(table.status, table.createdAt),
+    index('email_queue_recipient_email_trgm_idx').using(
+      'gin',
+      table.recipientEmail.op('gin_trgm_ops'),
+    ),
+    index('email_queue_subject_trgm_idx').using('gin', table.subject.op('gin_trgm_ops')),
+  ],
 );

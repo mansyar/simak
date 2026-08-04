@@ -19,5 +19,7 @@ export const feedbackSnippets = pgTable(
   },
   (table) => [
     index('feedback_snippets_instructor_archived_idx').on(table.instructorId, table.archivedAt),
+    index('feedback_snippets_title_trgm_idx').using('gin', table.title.op('gin_trgm_ops')),
+    index('feedback_snippets_category_trgm_idx').using('gin', table.category.op('gin_trgm_ops')),
   ],
 );

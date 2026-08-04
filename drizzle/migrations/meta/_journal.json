@@ -148,6 +148,13 @@
       "when": 1785663027743,
       "tag": "0020_white_spacker_dave",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1785802747450,
+      "tag": "0021_search_trigram_indexes",
+      "breakpoints": true
     }
   ]
 }

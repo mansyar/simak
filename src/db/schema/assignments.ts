@@ -42,6 +42,7 @@ export const assignments = pgTable(
   },
   (table) => [
     index('assignments_instructor_id_idx').on(table.instructorId),
+    index('assignments_title_trgm_idx').using('gin', table.title.op('gin_trgm_ops')),
     check(
       'assignments_max_extension_days_range',
       sql`${table.maxExtensionDays} >= 1 AND ${table.maxExtensionDays} <= 30`,
