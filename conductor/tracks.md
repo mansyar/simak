@@ -10,4 +10,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active Tracks
 
-- [~] [TRACK-056: Search Bar Performance](./tracks/track-056/index.md) — bug/performance remediation — in progress
+- [x] [TRACK-056: Search Bar Performance](./tracks/track-056/index.md) — bug/performance remediation — complete

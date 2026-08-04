@@ -164,7 +164,7 @@ Commit SHA: 75b42dc (manual verification note attached)
   - [x] Verify trigram plans with representative data and normal planner scan selection.
 - [x] Review the complete diff against `spec.md`, including migration rollback, tests, i18n output, and query-plan evidence.
 - [x] Update this plan with every completed task SHA, phase checkpoint SHA, implementation notes, and any approved deviations.
-- [ ] Ensure `metadata.json` status and `updatedAt` reflect the final track state after final confirmation.
+- [x] Ensure `metadata.json` status and `updatedAt` reflect the final track state after final confirmation.
 - [x] Run `conductor-review` before marking the track complete.
 - [x] Confirm the active registry entry remains linked to `conductor/tracks/track-056/index.md` until review/archive.
 
@@ -176,11 +176,11 @@ Final automated verification: `pnpm test:coverage` passed 423 files and 4187 tes
 
 ### Phase 4 Verification Checkpoint
 
-- [ ] Confirm all acceptance criteria in `spec.md` are satisfied.
-- [ ] Confirm all quality gates pass and all task/phase SHA references are recorded.
-- [ ] Present the final verification summary and await explicit user confirmation before final track status/archive changes.
+- [x] Confirm all acceptance criteria in `spec.md` are satisfied.
+- [x] Confirm all quality gates pass and all task/phase SHA references are recorded.
+- [x] Present the final verification summary and receive explicit user confirmation before final track status/archive changes.
 
-Phase checkpoint: _pending_
+Phase checkpoint: 8bf866a (user-confirmed)
 
 ## Implementation Notes
 
