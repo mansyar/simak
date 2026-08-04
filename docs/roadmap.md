@@ -536,6 +536,14 @@ All tracks must adhere to the following project constraints:
 - **Execution result:** Implemented the student settings/context and explicit deadline formatting, migration `0020_white_spacker_dave.sql` with rollback, transactional hashed-token lifecycle and redacted audits, authoritative membership-aware feed selection, RFC 5545 serializer, `/api/calendar/ics` route, bounded anonymous/student rate limiting, safe headers, bilingual UI, E2E/axe coverage, and post-review authorization/null-due regression fixes. Full unit verification passed 416 files and 4,141 tests; typecheck, build, i18n, accessibility, and coverage gates passed. The migration runner's pre-existing ledger issue was documented; disposable forward/rollback/reapply validation passed.
 - **Definition of Done:** A student can explicitly enable the feed, save or persist a valid timezone, and see that timezone applied to the defined student deadline surfaces without mutating stored deadlines; the neutral pre-detection state and UTC fallback are deterministic and tested; existing deadline values are verified as canonical UTC instants; the private feed contains only that student's authorized non-passed checkpoint deadlines with dates and final deadlines for active assignments with unresolved checkpoints, including locked future checkpoints and assignments whose unresolved checkpoints lack dates; event UIDs remain stable across refreshes, deadline updates are reflected, and passed/inactive events disappear on refresh; the single credential can be regenerated or revoked, plaintext credentials are never stored or logged, and invalid credentials cannot expose data; feed output is valid across DST boundaries and supported calendar clients; reminder behavior, checkpoint gating, grade visibility, and non-student date surfaces are unchanged; and unit/integration/E2E/accessibility, typecheck, lint, i18n, coverage, and build gates pass.
 
+## Milestone 19: Search Performance & UX
+
+### TRACK-056: Search Bar Performance
+
+- **Status:** ✅ Complete and archived in `conductor/archive/track-056_20260804/` · **Deps:** TRACK-005, TRACK-006, TRACK-011, TRACK-049
+- **Decision:** Keep contains-search semantics while making remote search inputs responsive: update local input immediately, commit one cancelable request after 300ms, cancel and clear immediately, retain prior results during loading, and protect against stale responses. Bound feedback-snippet pagination, separate template type and email summary queries, parallelize independent list work, and add PostgreSQL `pg_trgm` GIN indexes. Keep StudentPicker and TemplatePicker local-only with memoized normalization and Set membership.
+- **Outcome:** Applied the client interaction contract across admin, instructor, student, and feedback-snippet searches; added bounded feedback list/picker results; moved template type discovery and email summaries to independent cached queries; optimized users, assignment, and audit handlers; added migration `0021_search_trigram_indexes.sql` plus rollback and normal-planner query-plan verification. Full unit coverage, typecheck, i18n, formatting, modularity, and authenticated-flow verification passed; the known ThemeScript nonce hydration issue remains a pre-existing smoke-test limitation.
+
 ## Track Dependency Graph
 
 ```
@@ -629,6 +637,9 @@ Milestone 18: Student Workflow Enhancements
 ├── TRACK-053: Student Next Actions [✅ Complete — archived — coordinate with 013, 021, 022]
 ├── TRACK-054: Feedback-to-Revision Action Plans [📋 Planned — depends on 020, 053 — coordinate with 049]
 └── TRACK-055: Student Timezone & iCalendar Support [✅ Complete — archived — depends on 013, 053]
+
+Milestone 19: Search Performance & UX
+└── TRACK-056: Search Bar Performance [✅ Complete — archived — depends on 005, 006, 011, 049]
 ```
 
 ### Parallelization Strategy
@@ -664,6 +675,7 @@ The following track groups can be worked on simultaneously:
 | **Y** | TRACK-047 → TRACK-048 | TRACK-047 is complete and archived; any broader backup/restore follow-up can now build on the verified seven-copy pilot baseline before wider onboarding. |
 | **Z** | TRACK-049 (complete — archived), TRACK-050 (complete — archived), TRACK-051 (complete — archived) | Independently implemented after their dependencies. TRACK-049 touches review UI and a new snippet domain; TRACK-050 touched risk, dashboard, assignment-reassignment, and instructor intervention paths; TRACK-051 touches gradebook and student-grade visibility. Future work should coordinate if it overlaps shared instructor dashboard or gradebook files. |
 | **AA** | TRACK-053 (complete — archived) → TRACK-054; TRACK-055 complete — archived | Deliberate student-workflow sequence: TRACK-053 established the student action surface, TRACK-054 handles revision action plans, and TRACK-055 followed TRACK-053 operationally with a separate calendar/date surface. TRACK-055 does not depend on TRACK-054. |
+| **AB** | TRACK-056 | Sequential performance follow-up: search behavior and database indexes were implemented together so the 300ms client contract, bounded server workloads, and `pg_trgm` query plans could be verified as one change. |
 
 ---
 
@@ -689,7 +701,8 @@ The following track groups can be worked on simultaneously:
 | 16: Student Support Workflows | 1 | ~5–8 Days |
 | 17: Academic Governance | 1 | ~8–12 Days |
 | 18: Student Workflow Enhancements | 3 | ~27–42 Days |
-| **Total** | **55** | **~200–230 Days** |
+| 19: Search Performance & UX | 1 | Not separately estimated |
+| **Total** | **56** | **~200–230 Days + unestimated TRACK-056** |
 
 > Effort estimates assume a single developer. Tracks within the same parallelization group can be distributed across developers to reduce wall-clock time.
 
