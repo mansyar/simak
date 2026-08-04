@@ -58,7 +58,7 @@ export async function listAuditLogsHandler(input: ListAuditLogsInput) {
     if (search) {
       conditions.push(
         or(
-          like(auditLog.details, sql`'%' || ${search} || '%'`),
+          sql`CAST(${auditLog.details} AS text) LIKE ${'%' + search + '%'}`,
           like(auditLog.entityId, `%${search}%`),
         )!,
       );

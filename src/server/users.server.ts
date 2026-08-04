@@ -70,28 +70,28 @@ export async function listUsersHandler(args: { data: ListUsersInput }) {
       conditions.push(eq(users.role, role));
     }
 
-    const allUsers = await db
-      .select({
-        id: users.id,
-        name: users.name,
-        email: users.email,
-        role: users.role,
-        locale: users.locale,
-        emailVerified: users.emailVerified,
-        createdAt: users.createdAt,
-        deletedAt: users.deletedAt,
-      })
-      .from(users)
-      .where(and(...conditions))
-      .orderBy(users.createdAt)
-      .limit(limit)
-      .offset((page - 1) * limit);
-
-    // Get total count for pagination
-    const [{ count }] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(users)
-      .where(and(...conditions));
+    const [allUsers, [{ count }]] = await Promise.all([
+      db
+        .select({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          locale: users.locale,
+          emailVerified: users.emailVerified,
+          createdAt: users.createdAt,
+          deletedAt: users.deletedAt,
+        })
+        .from(users)
+        .where(and(...conditions))
+        .orderBy(users.createdAt)
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(users)
+        .where(and(...conditions)),
+    ]);
 
     return {
       users: allUsers,
