@@ -54,7 +54,7 @@
   - [x] Write failing tests for pending, success, failure, disabled, and input-preservation behavior. [3a2fcca]
   - [x] Implement consistent inline status and toast behavior for settings, submissions, reviews, imports, deletes, extensions, and notifications. [3a2fcca]
   - [x] Add `aria-live` announcements where state changes are not otherwise visible. [3a2fcca]
-- [ ] Task: Harden upload and submission state cleanup
+- [~] Task: Harden upload and submission state cleanup
   - [ ] Write failing tests for failed presigned URL, direct upload, and submission-record operations.
   - [ ] Ensure all upload paths reset state through `finally`.
   - [ ] Preserve selected files and expose retry actions.
