@@ -163,4 +163,4 @@
 - [x] Public and authenticated browser checks pass at all agreed viewport sizes.
 - [x] Keyboard, focus, screen-reader semantics, bilingual behavior, and reduced-motion behavior are verified.
 - [x] No unresolved P0/P1 audit findings remain.
-- [ ] Conductor review is completed.
+- [x] Conductor review is completed. [fa87b03]
