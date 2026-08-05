@@ -319,10 +319,13 @@ test.describe('Extension Request Lifecycle', () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     const dateStr = tomorrow.toISOString().split('T')[0];
     await dateInput.fill(dateStr);
+    await expect(dateInput).toHaveValue(dateStr);
 
     // Click "Extend" button
-    await instructorPage.locator('button:has-text("Extend")').first().click();
-    await instructorPage.waitForLoadState('networkidle');
+    await dateInput.locator('xpath=..').getByRole('button', { name: 'Extend' }).click();
+    await expect(instructorPage.getByText('Deadline extended successfully')).toBeVisible({
+      timeout: 10_000,
+    });
 
     // Verify DB: checkpoint dueDate updated
     const newDueDate = await getCheckpointDueDate('Proposal');

@@ -50,7 +50,7 @@ function ResetPasswordPage() {
     try {
       const result = await authClient.resetPassword({ token, newPassword: password });
       if (result.error) {
-        setError(t('common.error'));
+        setError(t('auth.linkExpired'));
       } else {
         setSuccess(true);
       }

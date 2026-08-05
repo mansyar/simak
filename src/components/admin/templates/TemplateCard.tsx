@@ -35,7 +35,7 @@ export function TemplateCard({ template, onEdit, onDuplicate, onDelete }: Templa
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-lg">{template.name}</h3>
+              <h2 className="font-semibold text-lg">{template.name}</h2>
               <TemplateTypeBadge type={template.type} />
             </div>
             <p className="text-sm text-muted-foreground">
