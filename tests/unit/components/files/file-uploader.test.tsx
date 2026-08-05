@@ -25,6 +25,21 @@ describe('FileUploader', () => {
     expect(fileInput.getAttribute('accept')).toBe('.docx,.pdf');
   });
 
+  it('should expose a keyboard-accessible native label for the file picker', async () => {
+    const user = userEvent.setup();
+    render(<FileUploader onUploadSuccess={vi.fn()} />);
+
+    const dropZone = screen.getByTestId('drop-zone');
+    const fileInput = screen.getByTestId('file-input');
+
+    expect(dropZone.tagName).toBe('LABEL');
+    expect(fileInput.getAttribute('id')).toBeTruthy();
+    expect(screen.getByLabelText(/files\.dropzone\.title/)).toBe(fileInput);
+
+    await user.tab();
+    expect(document.activeElement).toBe(fileInput);
+  });
+
   it('should show file type validation error for invalid file type', () => {
     render(<FileUploader onUploadSuccess={vi.fn()} />);
 
@@ -157,6 +172,19 @@ describe('FileUploader', () => {
     // Click the upload button
     await user.click(screen.getByText('files.upload'));
     expect(onUploadSuccess).toHaveBeenCalled();
+  });
+
+  it('should retry the selected file without requiring it to be selected again', async () => {
+    const user = userEvent.setup();
+    const onUploadSuccess = vi.fn().mockResolvedValue(undefined);
+    render(<FileUploader onUploadSuccess={onUploadSuccess} uploadError="Upload failed" />);
+
+    const file = new File(['content'], 'retry-existing.pdf', { type: 'application/pdf' });
+    await user.upload(screen.getByTestId('file-input') as HTMLInputElement, file);
+    await user.click(screen.getByText('files.retry'));
+
+    expect(onUploadSuccess).toHaveBeenCalledWith(file);
+    expect(screen.getByText('retry-existing.pdf')).toBeDefined();
   });
 
   it('should call handleReset when upload another button is clicked after success', async () => {

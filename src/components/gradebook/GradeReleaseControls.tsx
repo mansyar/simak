@@ -88,7 +88,7 @@ export function GradeReleaseControls({
     enabled: false,
     queryFn: async () => {
       const result = await getGradeReleasePreflight({ data: { assignmentId } });
-      if (isServerError(result)) throw new Error(result.error.message);
+      if (isServerError(result)) throw new Error(t('errors.fetchFailed'));
       return result;
     },
   });
@@ -101,7 +101,7 @@ export function GradeReleaseControls({
   const publishMutation = useMutation({
     mutationFn: async () => {
       const result = await publishGradeRelease({ data: { assignmentId, confirmed: true } });
-      if (isServerError(result)) throw new Error(result.error.message);
+      if (isServerError(result)) throw new Error(t('errors.fetchFailed'));
       return result;
     },
     onSuccess: async () => {
@@ -120,7 +120,7 @@ export function GradeReleaseControls({
   const withdrawMutation = useMutation({
     mutationFn: async (reason: string) => {
       const result = await withdrawGradeRelease({ data: { assignmentId, reason } });
-      if (isServerError(result)) throw new Error(result.error.message);
+      if (isServerError(result)) throw new Error(t('errors.fetchFailed'));
       return result;
     },
     onSuccess: async () => {
@@ -206,7 +206,7 @@ export function GradeReleaseControls({
       </div>
 
       {feedback && (
-        <p role="status" className="text-sm text-emerald-700 dark:text-emerald-400">
+        <p role="status" className="text-sm text-success">
           {t(feedback)}
         </p>
       )}

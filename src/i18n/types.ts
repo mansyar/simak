@@ -11,8 +11,12 @@ export type Translation = {
     login: string
     logout: string
     email: string
+    emailRequired: string
+    invalidEmail: string
     password: string
+    passwordRequired: string
     signIn: string
+    signingIn: string
     forgotPassword: string
     resetPassword: string
     invalidCredentials: string
@@ -28,6 +32,7 @@ export type Translation = {
     verifyTwoFactor: string
     verifyTwoFactorDescription: string
     totpCode: string
+    totpPlaceholder: string
     invalidCode: string
     useBackupCode: string
     verifyBackupCode: string
@@ -56,6 +61,7 @@ export type Translation = {
     previous: string
     submit: string
     refresh: string
+    retry: string
     hide: string
     view: string
     noResults: string
@@ -63,6 +69,7 @@ export type Translation = {
     page: string
     openMenu: string
     closeMenu: string
+    navigation: string
     close: string
     copy: string
     skipToContent: string
@@ -80,6 +87,7 @@ export type Translation = {
     pageOf: string
     done: string
     clearSearch: string
+    unknownUser: string
     exportCsv: string
     exportExcel: string
     exportStudentProgress: string
@@ -123,12 +131,15 @@ export type Translation = {
     title: string
     subtitle: string
     searchPlaceholder: string
+    searchLabel: string
+    actionFilterLabel: string
     allActions: string
     dateFrom: string
     dateTo: string
     empty: string
     showing: string
     auditTable: {
+      caption: string
       timestamp: string
       action: string
       actor: string
@@ -159,12 +170,15 @@ export type Translation = {
     title: string
     subtitle: string
     searchPlaceholder: string
+    searchLabel: string
+    statusFilterLabel: string
     statusAll: string
     statusPending: string
     statusProcessing: string
     statusSent: string
     statusFailed: string
     table: {
+      caption: string
       recipient: string
       subject: string
       template: string
@@ -195,7 +209,11 @@ export type Translation = {
     emptyFiltered: string
     r2Cleanup: {
       trigger: string
+      confirmTitle: string
+      confirmDescription: string
+      confirm: string
       success: string
+      error: string
     }
   }
   adminUsers: {
@@ -203,6 +221,7 @@ export type Translation = {
     subtitle: string
     newUser: string
     table: {
+      caption: string
       name: string
       role: string
       createdAt: string
@@ -225,6 +244,7 @@ export type Translation = {
     role_student: string
     allRoles: string
     searchPlaceholder: string
+    searchLabel: string
     emailVerified: string
     notVerified: string
     showing: string
@@ -235,6 +255,7 @@ export type Translation = {
     createSuccess: string
     updateSuccess: string
     deleteSuccess: string
+    deleteError: string
   }
   adminTemplates: {
     title: string
@@ -274,6 +295,7 @@ export type Translation = {
     }
     deleteConfirm: string
     deleteInUse: string
+    deleteError: string
     studentsCount: string
     inUseBanner: string
     detail: {
@@ -292,11 +314,19 @@ export type Translation = {
     title: string
     subtitle: string
     allAssignments: string
+    assignmentFilterLabel: string
     table: {
       student: string
       assignment: string
       waitTime: string
       status: string
+      actions: string
+      caption: string
+    }
+    waitTime: {
+      daysHours: string
+      hours: string
+      lessThanHour: string
     }
     empty: string
     emptyPrompt: string
@@ -313,6 +343,7 @@ export type Translation = {
     passed: string
     revise: string
     decision: string
+    decisionRequired: string
     pass: string
     comment: string
     commentPlaceholder: string
@@ -482,6 +513,7 @@ export type Translation = {
     averageProgress: string
     newAssignment: string
     searchPlaceholder: string
+    searchLabel: string
     studentCount: string
     finalDeadline: string
     empty: string
@@ -546,6 +578,8 @@ export type Translation = {
       noStudentsSelected: string
       checkpointsPreview: string
       stepDueDates: string
+      progressLabel: string
+      currentStep: string
       dueDatesPrompt: string
       daysLabel: string
       dueDateFor: string
@@ -574,6 +608,14 @@ export type Translation = {
     selectTemplateHint: string
     selectAll: string
     deselectAll: string
+    discussions: {
+      searchLabel: string
+      searchPlaceholder: string
+      studentFilterLabel: string
+      allStudents: string
+      threadListLabel: string
+      noMatches: string
+    }
   }
   studentSidebar: {
     dashboard: string
@@ -616,6 +658,8 @@ export type Translation = {
       revise: string
       overdue: string
     }
+    sectionsLabel: string
+    statusLabel: string
     timeline: string
     submit: string
     resubmit: string
@@ -623,6 +667,7 @@ export type Translation = {
     consultations: string
     blockedByPrevious: string
     blockedByConsultations: string
+    lockedNextStep: string
     notFound: string
     notFoundDescription: string
     checkpointTimeline: string
@@ -787,6 +832,9 @@ export type Translation = {
     subtitle: string
     reviewsCompleted: string
     avgResponseTime: string
+    notAvailable: string
+    responseHours: string
+    averageResponseTimeHours: string
     slaBreachCount: string
     studentsSupervised: string
     assignmentsActive: string
@@ -826,6 +874,7 @@ export type Translation = {
       uploadedAt: string
       action: string
     }
+    historyLabel: string
     review: {
       title: string
       passed: string
@@ -901,9 +950,14 @@ export type Translation = {
     send: string
     reply: string
     delete: string
+    deleteConfirm: string
     cancel: string
     deleted: string
     deleteWindowExpired: string
+    success: {
+      posted: string
+      deleted: string
+    }
     loading: string
     empty: {
       title: string
@@ -912,9 +966,16 @@ export type Translation = {
     errors: {
       required: string
       tooLong: string
+      postFailed: string
+      deleteFailed: string
     }
   }
   landing: {
+    nav: {
+      label: string
+      features: string
+      howItWorks: string
+    }
     hero: {
       headline: string
       subheadline: string
@@ -999,6 +1060,13 @@ export type Translation = {
     unreadCount: string
     filterAll: string
     filterUnread: string
+    filterLabel: string
+    loading: string
+    loadingMore: string
+    emptyDescription: string
+    justNow: string
+    read: string
+    unread: string
     loadMore: string
     toasterLabel: string
     groups: {
@@ -1006,6 +1074,7 @@ export type Translation = {
       consultations: string
       submissions: string
       system: string
+      other: string
     }
     events: {
       review_completed: {
@@ -1096,8 +1165,10 @@ export type Translation = {
     reason: string
     reasonPlaceholder: string
     reasonMinChars: string
+    reasonCharacterCount: string
     duration: string
     durationHint: string
+    durationMaxHint: string
     checkpoint: string
     checkpointHint: string
     submit: string
@@ -1108,6 +1179,7 @@ export type Translation = {
       reasonMin: string
       durationMin: string
       durationMax: string
+      submitFailed: string
     }
     queueTitle: string
     historyTitle: string
@@ -1160,6 +1232,18 @@ export type Translation = {
   }
   settings: {
     title: string
+    navigation: {
+      label: string
+      profile: string
+      password: string
+      twoFactor: string
+      sessions: string
+      appearance: string
+      accessibility: string
+      notifications: string
+      timezone: string
+      calendar: string
+    }
     twoFactor: {
       title: string
       description: string
@@ -1178,9 +1262,11 @@ export type Translation = {
       verify: string
       setupError: string
       verifyError: string
+      enableSuccess: string
       disableTitle: string
       disableDescription: string
       disableError: string
+      disableSuccess: string
       saveBackupCodes: string
     }
     sessions: {
@@ -1195,6 +1281,13 @@ export type Translation = {
       revokeAllDescription: string
       revokeAllOthers: string
       revokeAll: string
+      revokeSuccess: string
+      revokeError: string
+      revokeAllSuccess: string
+      revokeAllError: string
+      unknownIp: string
+      unknownDevice: string
+      deviceOn: string
     }
     profile: {
       title: string
@@ -1229,6 +1322,8 @@ export type Translation = {
       description: string
       reducedMotionLabel: string
       reducedMotionHint: string
+      saveSuccess: string
+      saveError: string
     }
     timezone: {
       title: string
@@ -1264,6 +1359,8 @@ export type Translation = {
     notificationPreferences: {
       title: string
       description: string
+      saveSuccess: string
+      saveError: string
       channels: {
         email: string
         inApp: string
@@ -1337,6 +1434,7 @@ export type Translation = {
       validationErrorsFoundGroups: string
       invalidFormat: string
       fileTooLarge: string
+      parsing: string
       parseFailed: string
       importFailed: string
       importComplete: string
@@ -1348,6 +1446,8 @@ export type Translation = {
     }
     users: {
       title: string
+      previewCaption: string
+      resultCaption: string
       subtitle: string
       button: string
       name: string
@@ -1368,6 +1468,8 @@ export type Translation = {
       }
     }
     templates: {
+      previewCaption: string
+      resultCaption: string
       title: string
       subtitle: string
       button: string
@@ -1493,6 +1595,7 @@ export type Translation = {
       breakdown: string
       checkpoint: string
       score: string
+      scoreUnavailable: string
       unavailable: string
       notYetReleased: string
       releaseVersion: string

@@ -84,6 +84,7 @@ vi.mock('../../../__root', () => ({
   Route: {},
 }));
 vi.mock('@/lib/errors', () => ({
+  getErrorTranslationKey: vi.fn(() => 'errors.fetchFailed'),
   isServerError: () => false,
 }));
 

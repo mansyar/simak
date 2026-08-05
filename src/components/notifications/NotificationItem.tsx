@@ -9,9 +9,10 @@ import {
   Bell,
   MessageCircle,
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 import { useMarkRead } from '@/hooks/use-notifications';
 import { getNotificationRoute } from './notification-routes';
+import { useI18n } from '@/routes/__root';
+import { formatRelativeTime } from '@/lib/format';
 
 export interface Notification {
   id: number;
@@ -35,21 +36,22 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
 };
 
 function NotificationItemComponent({ item }: { item: Notification }) {
+  const { locale, t } = useI18n();
   const { mutate: markAsRead } = useMarkRead();
 
   const IconComponent = TYPE_ICONS[item.type] || Bell;
 
   const getRelativeTime = (dateInput: Date | string | null | undefined) => {
-    if (!dateInput) return '';
+    if (!dateInput) return t('notifications.justNow');
     try {
-      const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-      return formatDistanceToNow(date, { addSuffix: true });
+      const relativeTime = formatRelativeTime(dateInput, locale);
+      return relativeTime === 'Invalid Date' ? t('notifications.justNow') : relativeTime;
     } catch {
-      return '';
+      return t('notifications.justNow');
     }
   };
 
-  const relativeTimeStr = getRelativeTime(item.createdAt) || 'just now';
+  const relativeTimeStr = getRelativeTime(item.createdAt);
 
   const handleClick = useCallback(() => {
     if (!item.read) {
@@ -59,7 +61,7 @@ function NotificationItemComponent({ item }: { item: Notification }) {
 
   const route = getNotificationRoute(item.type, item.metadata);
 
-  const className = `group flex w-full items-start gap-3 border-b border-border/40 p-4 text-left transition-all duration-200 cursor-pointer ${
+  const className = `group flex min-h-11 w-full items-start gap-3 border-b border-border/40 p-4 text-left transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset ${
     !item.read ? 'bg-blue-50/50 dark:bg-blue-950/20 font-medium' : 'hover:bg-accent/30'
   }`;
 
@@ -91,9 +93,14 @@ function NotificationItemComponent({ item }: { item: Notification }) {
             {item.message}
           </p>
         )}
+        <span className="sr-only">
+          {item.read ? t('notifications.read') : t('notifications.unread')}
+        </span>
       </div>
 
-      {!item.read && <span className="mt-1.5 h-2 w-2 rounded-full bg-blue-500 shrink-0" />}
+      {!item.read && (
+        <span aria-hidden="true" className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+      )}
     </>
   );
 

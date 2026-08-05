@@ -1,13 +1,16 @@
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accessibility } from 'lucide-react';
 import { getCurrentUser, updateUserSettings } from '@/server/settings';
 import { useI18n } from '@/routes/__root';
 import { settingsKeys } from '@/lib/query-keys';
+import { MutationFeedback } from '@/components/ui/mutation-feedback';
 
 export function AccessibilitySection() {
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const [feedback, setFeedback] = useState<{ error?: string; success?: string }>({});
 
   const { data, isLoading } = useQuery({
     queryKey: settingsKeys.accessibility(),
@@ -23,6 +26,20 @@ export function AccessibilitySection() {
 
   const reducedMotion = data?.settings?.reducedMotion ?? false;
 
+  useEffect(() => {
+    const root = document.documentElement;
+
+    if (reducedMotion) {
+      root.dataset.reducedMotion = 'true';
+    } else {
+      delete root.dataset.reducedMotion;
+    }
+
+    return () => {
+      delete root.dataset.reducedMotion;
+    };
+  }, [reducedMotion]);
+
   const updateSettingsMutation = useMutation({
     mutationFn: async (args: { reducedMotion: boolean }) => {
       const result = await updateUserSettings({ data: { reducedMotion: args.reducedMotion } });
@@ -33,8 +50,15 @@ export function AccessibilitySection() {
     },
   });
 
-  const handleToggle = () => {
-    updateSettingsMutation.mutateAsync({ reducedMotion: !reducedMotion });
+  const handleToggle = async () => {
+    setFeedback({});
+    try {
+      const result = await updateSettingsMutation.mutateAsync({ reducedMotion: !reducedMotion });
+      if (result?.error) throw new Error(result.error);
+      setFeedback({ success: t('settings.accessibility.saveSuccess') });
+    } catch {
+      setFeedback({ error: t('settings.accessibility.saveError') });
+    }
   };
 
   if (isLoading) {
@@ -57,6 +81,7 @@ export function AccessibilitySection() {
         <CardDescription>{t('settings.accessibility.description')}</CardDescription>
       </CardHeader>
       <CardContent>
+        <MutationFeedback {...feedback} className="mb-4" />
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <label

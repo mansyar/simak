@@ -1,6 +1,6 @@
 import React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useRef, useCallback, type ChangeEvent, type DragEvent } from 'react';
+import { useState, useRef, useCallback, useId, type ChangeEvent, type DragEvent } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { bulkCreateTemplates } from '@/server/bulk-import';
 import { parseTemplatesXlsx } from '@/lib/bulk-import/parse-templates';
@@ -35,12 +35,15 @@ interface TemplateGroup {
 function BulkTemplateImportPage() {
   const { t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputId = useId();
   const bulkCreateTemplatesFn = useServerFn(bulkCreateTemplates);
 
   const [isDragOver, setIsDragOver] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [parsedGroups, setParsedGroups] = useState<TemplateGroup[]>([]);
   const [parseErrors, setParseErrors] = useState<string[]>([]);
+  const [isParsing, setIsParsing] = useState(false);
+  const [retryFile, setRetryFile] = useState<File | null>(null);
   const [isCommitting, setIsCommitting] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
@@ -66,9 +69,12 @@ function BulkTemplateImportPage() {
         setValidationError(error);
         setParsedGroups([]);
         setParseErrors([]);
+        setRetryFile(null);
         return;
       }
       setValidationError(null);
+      setRetryFile(null);
+      setIsParsing(true);
 
       try {
         const parsed = await parseTemplatesXlsx(file);
@@ -80,6 +86,9 @@ function BulkTemplateImportPage() {
         setParsedGroups(parsed.groups);
       } catch {
         setValidationError(t('bulkImport.common.parseFailed'));
+        setRetryFile(file);
+      } finally {
+        setIsParsing(false);
       }
     },
     [validateFile, t],
@@ -151,7 +160,7 @@ function BulkTemplateImportPage() {
     try {
       const response = await bulkCreateTemplatesFn({ data: { rows } });
       if (isServerError(response)) {
-        setValidationError(response.error.message);
+        setValidationError(t('bulkImport.common.importFailed'));
       } else {
         setResult(response);
       }
@@ -181,34 +190,48 @@ function BulkTemplateImportPage() {
       </div>
 
       {/* Dropzone */}
-      <div
+      <label
+        htmlFor={fileInputId}
         data-testid="bulk-import-dropzone"
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
           isDragOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        onClick={() => fileInputRef.current?.click()}
       >
         <input
           ref={fileInputRef}
+          id={fileInputId}
           data-testid="bulk-import-dropzone-input"
           type="file"
           accept=".xlsx"
-          className="hidden"
+          className="sr-only"
           onChange={handleFileChange}
+          disabled={isParsing}
         />
         <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
         <p className="mt-2 text-sm text-muted-foreground">{t('bulkImport.common.dropzoneText')}</p>
         <p className="mt-1 text-xs text-muted-foreground">{t('bulkImport.common.dropzoneHint')}</p>
-      </div>
+      </label>
+
+      {isParsing && (
+        <div role="status" aria-live="polite" aria-busy="true">
+          {t('bulkImport.common.parsing')}
+        </div>
+      )}
 
       {/* Validation error */}
       {validationError && (
         <AlertBanner variant="error" title={t('bulkImport.common.error')}>
           {validationError}
         </AlertBanner>
+      )}
+
+      {retryFile && !isParsing && (
+        <Button type="button" variant="outline" onClick={() => processFile(retryFile)}>
+          {t('common.retry')}
+        </Button>
       )}
 
       {/* Parse errors */}
@@ -221,57 +244,76 @@ function BulkTemplateImportPage() {
       {/* Preview grouped table */}
       {parsedGroups.length > 0 && !result && (
         <div className="space-y-4">
-          <div className="flex items-center gap-4 text-sm">
-            <span className="text-green-600">
+          <div role="status" aria-live="polite" className="flex items-center gap-4 text-sm">
+            <span className="text-success">
               {validCount} {t('bulkImport.common.valid')}
             </span>
-            <span className="text-red-600">
+            <span className="text-error">
               {invalidCount} {t('bulkImport.common.invalid')}
             </span>
           </div>
 
           <div className="border rounded-lg overflow-auto max-h-96">
             <table className="w-full text-sm">
+              <caption className="sr-only">{t('bulkImport.templates.previewCaption')}</caption>
               <thead className="bg-muted sticky top-0">
                 <tr>
-                  <th className="p-2 text-left w-8"></th>
-                  <th className="p-2 text-left">{t('bulkImport.templates.templateName')}</th>
-                  <th className="p-2 text-left">{t('bulkImport.templates.type')}</th>
-                  <th className="p-2 text-left">{t('bulkImport.templates.checkpoints')}</th>
-                  <th className="p-2 text-left">{t('bulkImport.common.status')}</th>
+                  <th scope="col" className="p-2 text-left w-8"></th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.templates.templateName')}
+                  </th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.templates.type')}
+                  </th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.templates.checkpoints')}
+                  </th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.common.status')}
+                  </th>
                 </tr>
               </thead>
-              <tbody>
-                {parsedGroups.map((group, i) => (
+              {parsedGroups.map((group, i) => {
+                const isExpanded = expandedGroups.has(group.templateName);
+                const detailsId = `template-group-${i}-details`;
+                return (
                   <React.Fragment key={i}>
-                    <tr
-                      className="border-t cursor-pointer"
-                      onClick={() => toggleGroup(group.templateName)}
-                    >
-                      <td className="p-2">
-                        {expandedGroups.has(group.templateName) ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
-                      </td>
-                      <td className="p-2 font-medium">{group.templateName}</td>
-                      <td className="p-2">{group.type || '—'}</td>
-                      <td className="p-2">{group.checkpoints.length}</td>
-                      <td className="p-2">
-                        <span
-                          data-testid={`group-status-${i}`}
-                          className={group.status === 'valid' ? 'text-green-600' : 'text-red-600'}
-                        >
-                          {group.status === 'valid'
-                            ? t('bulkImport.common.valid')
-                            : t('bulkImport.common.invalid')}
-                          {group.error ? ` — ${group.error}` : ''}
-                        </span>
-                      </td>
-                    </tr>
-                    {expandedGroups.has(group.templateName) &&
-                      group.checkpoints.map((cp, j) => (
+                    <tbody>
+                      <tr className="border-t">
+                        <td className="p-1">
+                          <button
+                            type="button"
+                            className="flex min-h-11 min-w-11 items-center justify-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            aria-label={group.templateName}
+                            aria-expanded={isExpanded}
+                            aria-controls={detailsId}
+                            onClick={() => toggleGroup(group.templateName)}
+                          >
+                            {isExpanded ? (
+                              <ChevronDown className="h-4 w-4" aria-hidden="true" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                            )}
+                          </button>
+                        </td>
+                        <td className="p-2 font-medium">{group.templateName}</td>
+                        <td className="p-2">{group.type || '—'}</td>
+                        <td className="p-2">{group.checkpoints.length}</td>
+                        <td className="p-2">
+                          <span
+                            data-testid={`group-status-${i}`}
+                            className={group.status === 'valid' ? 'text-success' : 'text-error'}
+                          >
+                            {group.status === 'valid'
+                              ? t('bulkImport.common.valid')
+                              : t('bulkImport.common.invalid')}
+                            {group.error ? ` — ${group.error}` : ''}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <tbody id={detailsId} hidden={!isExpanded}>
+                      {group.checkpoints.map((cp, j) => (
                         <tr key={`cp-${j}`} className="border-t bg-muted/50">
                           <td className="p-2"></td>
                           <td className="p-2 pl-8" colSpan={2}>
@@ -286,9 +328,10 @@ function BulkTemplateImportPage() {
                           <td className="p-2"></td>
                         </tr>
                       ))}
+                    </tbody>
                   </React.Fragment>
-                ))}
-              </tbody>
+                );
+              })}
             </table>
           </div>
 
@@ -316,10 +359,15 @@ function BulkTemplateImportPage() {
           {result.errors.length > 0 && (
             <div className="border rounded-lg overflow-auto">
               <table className="w-full text-sm">
+                <caption className="sr-only">{t('bulkImport.templates.resultCaption')}</caption>
                 <thead className="bg-muted">
                   <tr>
-                    <th className="p-2 text-left">{t('bulkImport.templates.templateName')}</th>
-                    <th className="p-2 text-left">{t('bulkImport.common.reason')}</th>
+                    <th scope="col" className="p-2 text-left">
+                      {t('bulkImport.templates.templateName')}
+                    </th>
+                    <th scope="col" className="p-2 text-left">
+                      {t('bulkImport.common.reason')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>

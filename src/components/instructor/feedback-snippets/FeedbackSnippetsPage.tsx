@@ -24,9 +24,9 @@ const FEEDBACK_SNIPPET_PAGE_SIZE = 20;
 
 type FormState = { mode: 'create' } | { mode: 'edit'; snippet: FeedbackSnippetListItem };
 
-function resultOrThrow<T>(result: T | { error: { message: string } }): T {
+function resultOrThrow<T>(result: T | { error: unknown }, message: string): T {
   if (isServerError(result)) {
-    throw new Error(result.error.message);
+    throw new Error(message);
   }
   return result as T;
 }
@@ -56,6 +56,7 @@ function FeedbackSnippetsPage() {
         await listFeedbackSnippets({
           data: { archived, search: debouncedSearch, page, limit: FEEDBACK_SNIPPET_PAGE_SIZE },
         }),
+        t('errors.fetchFailed'),
       ),
     placeholderData: (previousData) => previousData,
   });
@@ -65,7 +66,7 @@ function FeedbackSnippetsPage() {
       const result = id
         ? await updateFeedbackSnippet({ data: { id, ...values } })
         : await createFeedbackSnippet({ data: values });
-      return resultOrThrow(result);
+      return resultOrThrow(result, t('errors.fetchFailed'));
     },
     onSuccess: (_result, variables) => {
       setFormState(null);
@@ -73,32 +74,32 @@ function FeedbackSnippetsPage() {
       setNotice(variables.id ? t('feedbackSnippets.updated') : t('feedbackSnippets.created'));
       void queryClient.invalidateQueries({ queryKey: feedbackSnippetKeys.all() });
     },
-    onError: (error) => {
-      setMutationError(error instanceof Error ? error.message : t('common.error'));
+    onError: () => {
+      setMutationError(t('errors.fetchFailed'));
       setNotice(null);
     },
   });
 
   const archiveMutation = useMutation({
-    mutationFn: async (id: string) => resultOrThrow(await archiveFeedbackSnippet({ data: { id } })),
+    mutationFn: async (id: string) =>
+      resultOrThrow(await archiveFeedbackSnippet({ data: { id } }), t('errors.fetchFailed')),
     onSuccess: () => {
       setNotice(t('feedbackSnippets.archivedSuccess'));
       setMutationError(null);
       void queryClient.invalidateQueries({ queryKey: feedbackSnippetKeys.all() });
     },
-    onError: (error) =>
-      setMutationError(error instanceof Error ? error.message : t('common.error')),
+    onError: () => setMutationError(t('errors.fetchFailed')),
   });
 
   const restoreMutation = useMutation({
-    mutationFn: async (id: string) => resultOrThrow(await restoreFeedbackSnippet({ data: { id } })),
+    mutationFn: async (id: string) =>
+      resultOrThrow(await restoreFeedbackSnippet({ data: { id } }), t('errors.fetchFailed')),
     onSuccess: () => {
       setNotice(t('feedbackSnippets.restoredSuccess'));
       setMutationError(null);
       void queryClient.invalidateQueries({ queryKey: feedbackSnippetKeys.all() });
     },
-    onError: (error) =>
-      setMutationError(error instanceof Error ? error.message : t('common.error')),
+    onError: () => setMutationError(t('errors.fetchFailed')),
   });
 
   const snippets: FeedbackSnippetListItem[] =

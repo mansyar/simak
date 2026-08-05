@@ -86,7 +86,7 @@ describe('RevisionActionPlan', () => {
     fireEvent.click(checkbox);
 
     await waitFor(() => expect(checkbox).not.toBeChecked());
-    expect(screen.getByRole('alert')).toHaveTextContent('Unable to update action item');
+    expect(screen.getByRole('alert')).toHaveTextContent('error.internal');
   });
 
   it('shows historical statuses without mutation controls', () => {

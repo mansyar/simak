@@ -106,7 +106,10 @@ export function ReviewFilePreview({
 
         {/* DOCX error state */}
         {isDocx && !isDocxTooLarge && docxState === 'error' && (
-          <div className="rounded-md border bg-muted/30 p-6 flex flex-col items-center gap-2 text-center">
+          <div
+            className="rounded-md border bg-muted/30 p-6 flex flex-col items-center gap-2 text-center"
+            role="alert"
+          >
             <FileText className="h-8 w-8 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">{t('files.previewNotAvailable')}</p>
           </div>
@@ -133,7 +136,7 @@ export function ReviewFilePreview({
           href={downloadUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="inline-flex min-h-11 items-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <Download className="h-4 w-4" />
           {isPdf ? t('instructorReviews.downloadPdf') : t('instructorReviews.downloadFile')}

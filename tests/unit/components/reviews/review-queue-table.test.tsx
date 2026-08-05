@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { ReviewQueueTable } from '@/components/reviews/ReviewQueueTable';
 import type { ReviewQueueItemData } from '@/components/reviews/ReviewQueueItem';
 
@@ -72,36 +72,49 @@ describe('ReviewQueueTable', () => {
 
   it('should render student names', () => {
     render(<ReviewQueueTable data={items} />);
-    expect(screen.getByText('Alice')).toBeDefined();
-    expect(screen.getByText('Bob')).toBeDefined();
+    const table = document.querySelector('table');
+    expect(table).toBeDefined();
+    expect(within(table as HTMLElement).getByText('Alice')).toBeDefined();
+    expect(within(table as HTMLElement).getByText('Bob')).toBeDefined();
   });
 
   it('should render checkpoint names', () => {
     render(<ReviewQueueTable data={items} />);
-    expect(screen.getByText('Chapter 1')).toBeDefined();
-    expect(screen.getByText('Chapter 2')).toBeDefined();
+    const table = document.querySelector('table');
+    expect(table).toBeDefined();
+    expect(within(table as HTMLElement).getByText('Chapter 1')).toBeDefined();
+    expect(within(table as HTMLElement).getByText('Chapter 2')).toBeDefined();
   });
 
   it('should render assignment titles', () => {
     render(<ReviewQueueTable data={items} />);
-    expect(screen.getAllByText('Thesis 2026').length).toBe(2);
+    const table = document.querySelector('table');
+    expect(table).toBeDefined();
+    expect(within(table as HTMLElement).getAllByText('Thesis 2026').length).toBe(2);
   });
 
   it('should render wait times', () => {
     render(<ReviewQueueTable data={items} />);
-    expect(screen.getByText(/3d/)).toBeDefined();
-    expect(screen.getByText(/1d/)).toBeDefined();
+    const table = document.querySelector('table');
+    expect(table).toBeDefined();
+    expect(
+      within(table as HTMLElement).getAllByText('instructorReviews.waitTime.daysHours').length,
+    ).toBeGreaterThan(0);
   });
 
   it('should render SLA badges', () => {
     render(<ReviewQueueTable data={items} />);
-    const badges = screen.getAllByTestId('sla-badge');
+    const table = document.querySelector('table');
+    expect(table).toBeDefined();
+    const badges = within(table as HTMLElement).getAllByTestId('sla-badge');
     expect(badges.length).toBe(2);
   });
 
   it('should render view links for each row', () => {
     render(<ReviewQueueTable data={items} />);
-    const links = screen.getAllByTestId('review-queue-link');
+    const table = document.querySelector('table');
+    expect(table).toBeDefined();
+    const links = within(table as HTMLElement).getAllByTestId('review-queue-link');
     expect(links.length).toBe(2);
     expect(links[0].getAttribute('href')).toContain('/instructor/reviews/10');
     expect(links[1].getAttribute('href')).toContain('/instructor/reviews/11');
@@ -114,5 +127,20 @@ describe('ReviewQueueTable', () => {
     expect(screen.getByText('instructorReviews.table.waitTime')).toBeDefined();
     expect(screen.getByText('instructorReviews.table.status')).toBeDefined();
     expect(screen.queryByTestId('review-queue-link')).toBeNull();
+  });
+
+  it('should expose table caption and scoped column headers', () => {
+    render(<ReviewQueueTable data={items} />);
+
+    expect(screen.getByText('instructorReviews.table.caption')).toBeDefined();
+    const headers = Array.from(document.querySelectorAll('thead th'));
+    expect(headers.length).toBeGreaterThan(0);
+    expect(headers.every((header) => header.getAttribute('scope') === 'col')).toBe(true);
+  });
+
+  it('should provide a prioritized mobile review-card presentation', () => {
+    render(<ReviewQueueTable data={items} />);
+
+    expect(screen.getAllByTestId('review-queue-mobile-card')).toHaveLength(2);
   });
 });

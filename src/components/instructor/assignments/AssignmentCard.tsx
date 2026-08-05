@@ -33,8 +33,13 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
           <div className="flex items-start justify-between gap-2">
             <div>
               <TemplateTypeBadge type={assignment.templateType} />
-              <h3 className="mt-1.5 text-lg font-semibold text-foreground leading-snug group-hover:text-primary transition-colors">
-                {assignment.title}
+              <h3 className="mt-1.5 text-lg font-semibold leading-snug transition-colors">
+                <Link
+                  to={`/instructor/assignments/${assignment.id}` as never}
+                  className="inline-flex min-h-11 items-center rounded-md text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  {assignment.title}
+                </Link>
               </h3>
             </div>
           </div>
@@ -73,7 +78,7 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
 
           <Link
             to={`/instructor/assignments/${assignment.id}` as never}
-            className="inline-flex items-center justify-center rounded-md text-xs font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:bg-accent hover:text-accent-foreground px-2.5 py-1.5 text-primary"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2.5 py-1.5 text-xs font-semibold text-primary ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             {t('common.viewAll')} &rarr;
           </Link>

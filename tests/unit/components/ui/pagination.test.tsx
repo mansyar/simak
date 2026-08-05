@@ -94,8 +94,28 @@ describe('Pagination', () => {
 
   it('should have aria-labels on prev/next buttons', () => {
     render(<Pagination currentPage={2} totalPages={5} onPageChange={vi.fn()} />);
-    expect(screen.getByRole('button', { name: /previous page/i })).toBeDefined();
-    expect(screen.getByRole('button', { name: /next page/i })).toBeDefined();
+    const buttons = [
+      screen.getByRole('button', { name: /previous page/i }),
+      screen.getByRole('button', { name: /next page/i }),
+    ];
+    buttons.forEach((button) => {
+      expect(button).toBeDefined();
+      expect(button.className).toContain('min-h-11');
+    });
+  });
+
+  it('should allow pagination controls to wrap on narrow screens', () => {
+    const { container } = render(
+      <Pagination
+        currentPage={3}
+        totalPages={10}
+        onPageChange={vi.fn()}
+        showPageNumbers
+        showCounter
+      />,
+    );
+    expect(container.firstElementChild?.className).toContain('flex-wrap');
+    expect(container.querySelector('.flex.items-center.gap-1')?.className).toContain('flex-wrap');
   });
 
   it('should disable prev button on first page', () => {

@@ -67,6 +67,64 @@ describe('BulkTemplateImportPage', () => {
     vi.clearAllMocks();
   });
 
+  it('announces parsing progress', async () => {
+    let resolveParse: (value: any) => void = () => undefined;
+    vi.mocked(parseTemplatesXlsx).mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveParse = resolve;
+      }),
+    );
+    const Component = await getComponent();
+    render(<Component />);
+    const input = screen.getByTestId('bulk-import-dropzone-input');
+    const file = buildXlsx([
+      'templateName',
+      'type',
+      'checkpointName',
+      'minConsultations',
+      'estimatedDuration',
+    ]);
+
+    fireEvent.change(input, { target: { files: [file] } });
+
+    await waitFor(() => expect(screen.getByRole('status')).toBeDefined());
+    resolveParse({ groups: [], errors: [] });
+  });
+
+  it('allows retrying a failed parse without selecting the file again', async () => {
+    vi.mocked(parseTemplatesXlsx)
+      .mockRejectedValueOnce(new Error('parse failed'))
+      .mockResolvedValueOnce({ groups: [], errors: [] });
+    const Component = await getComponent();
+    render(<Component />);
+    const input = screen.getByTestId('bulk-import-dropzone-input');
+    const file = buildXlsx([
+      'templateName',
+      'type',
+      'checkpointName',
+      'minConsultations',
+      'estimatedDuration',
+    ]);
+
+    fireEvent.change(input, { target: { files: [file] } });
+    const retryButton = await screen.findByRole('button', { name: 'common.retry' });
+    fireEvent.click(retryButton);
+
+    await waitFor(() => expect(parseTemplatesXlsx).toHaveBeenCalledTimes(2));
+  });
+
+  it('should expose a keyboard-accessible native label for the file picker', async () => {
+    const Component = await getComponent();
+    render(<Component />);
+
+    const dropzone = screen.getByTestId('bulk-import-dropzone');
+    const input = screen.getByTestId('bulk-import-dropzone-input');
+
+    expect(dropzone.tagName).toBe('LABEL');
+    expect(input).toHaveAttribute('id');
+    expect(screen.getByLabelText(/bulkImport\.common\.dropzoneText/)).toBe(input);
+  });
+
   it('should render the dropzone with upload text', async () => {
     const Component = await getComponent();
     render(<Component />);
@@ -149,7 +207,46 @@ describe('BulkTemplateImportPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Assignment')).toBeInTheDocument();
       expect(screen.getByText(/1 bulkImport\.common\.valid/)).toBeInTheDocument();
+
+      const previewTable = screen.getByRole('table');
+      expect(previewTable.querySelector('caption')).toBeDefined();
+      expect(
+        Array.from(previewTable.querySelectorAll('th')).every(
+          (header) => header.getAttribute('scope') === 'col',
+        ),
+      ).toBe(true);
     });
+  });
+
+  it('should expose grouped preview expansion as an accessible disclosure button', async () => {
+    vi.mocked(parseTemplatesXlsx).mockResolvedValueOnce({
+      groups: [
+        {
+          templateName: 'Assignment',
+          type: 'Assignment Type',
+          checkpoints: [{ name: 'Research', minConsultations: 0, estimatedDuration: 14 }],
+          status: 'valid',
+        },
+      ],
+      errors: [],
+    });
+    const Component = await getComponent();
+    render(<Component />);
+    const input = screen.getByTestId('bulk-import-dropzone-input');
+    const file = buildXlsx([
+      'templateName',
+      'type',
+      'checkpointName',
+      'minConsultations',
+      'estimatedDuration',
+    ]);
+    fireEvent.change(input, { target: { files: [file] } });
+
+    const expandButton = await screen.findByRole('button', { name: 'Assignment' });
+    expect(expandButton.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(expandButton);
+    expect(expandButton.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByText('Research')).toBeInTheDocument();
   });
 
   it('should show invalid group status', async () => {

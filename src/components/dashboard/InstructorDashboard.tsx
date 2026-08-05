@@ -225,7 +225,7 @@ export function InstructorDashboard({ data }: Props) {
                 <Link
                   key={item.submissionId}
                   to={('/instructor/reviews/' + item.submissionId) as never}
-                  className="flex items-center justify-between rounded-lg border p-3 hover:bg-accent/50 transition-colors"
+                  className="flex min-h-11 items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-foreground truncate">
@@ -270,11 +270,11 @@ export function InstructorDashboard({ data }: Props) {
             />
           ) : (
             <div className="space-y-2">
-              {d.atRiskStudents.map((student) => (
+              {d.atRiskStudents.slice(0, 5).map((student) => (
                 <Link
                   key={`${student.studentId}-${student.assignmentId}`}
                   to={`/instructor/assignments/${student.assignmentId}` as never}
-                  className="block rounded-lg border p-3 hover:bg-accent/50 transition-colors"
+                  className="block min-h-11 rounded-lg border p-3 transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-sm font-medium text-foreground truncate">
@@ -312,6 +312,15 @@ export function InstructorDashboard({ data }: Props) {
                   )}
                 </Link>
               ))}
+              {d.atRiskStudents.length > 5 && (
+                <Link
+                  to={'/instructor/interventions' as never}
+                  className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  {t('common.viewAll')}
+                  <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+                </Link>
+              )}
             </div>
           )}
         </CardContent>
@@ -333,19 +342,27 @@ export function InstructorDashboard({ data }: Props) {
             ) : (
               <ul className="space-y-3">
                 {d.recentSubmissions.map((sub) => (
-                  <li key={sub.submissionId} className="flex items-start gap-3">
-                    <FileText className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {sub.studentName}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {sub.assignmentTitle} — {sub.checkpointName}
-                      </p>
-                    </div>
-                    <Badge variant={getStatusBadgeVariant(sub.status)}>
-                      {getStatusBadgeText(sub.status, t)}
-                    </Badge>
+                  <li key={sub.submissionId}>
+                    <Link
+                      to={`/instructor/reviews/${sub.submissionId}` as never}
+                      className="flex min-h-11 items-start gap-3 rounded-lg p-2 transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                      <FileText
+                        className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                        aria-hidden="true"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {sub.studentName}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {sub.assignmentTitle} — {sub.checkpointName}
+                        </p>
+                      </div>
+                      <Badge variant={getStatusBadgeVariant(sub.status)}>
+                        {getStatusBadgeText(sub.status, t)}
+                      </Badge>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -371,7 +388,7 @@ export function InstructorDashboard({ data }: Props) {
                   <Link
                     key={assignment.id}
                     to={`/instructor/assignments/${assignment.id}` as never}
-                    className="block rounded-lg border p-3 hover:bg-accent/50 transition-colors"
+                    className="block min-h-11 rounded-lg border p-3 transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="text-sm font-medium text-foreground truncate">
@@ -416,7 +433,7 @@ export function InstructorDashboard({ data }: Props) {
           <div className="grid gap-3 sm:grid-cols-2">
             <Link
               to={'/instructor/reviews' as never}
-              className="flex items-center gap-3 rounded-lg border p-4 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
+              className="flex min-h-11 items-center gap-3 rounded-lg border p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <div className="flex size-11 items-center justify-center rounded-md bg-primary/10">
                 <ClipboardCheck className="h-5 w-5 text-primary" />
@@ -432,7 +449,7 @@ export function InstructorDashboard({ data }: Props) {
             </Link>
             <Link
               to={'/instructor/assignments' as never}
-              className="flex items-center gap-3 rounded-lg border p-4 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
+              className="flex min-h-11 items-center gap-3 rounded-lg border p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <div className="flex size-11 items-center justify-center rounded-md bg-success/10">
                 <ClipboardList className="h-5 w-5 text-success" />

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useRef, useCallback, type ChangeEvent, type DragEvent } from 'react';
+import { useState, useRef, useCallback, useId, type ChangeEvent, type DragEvent } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { bulkCreateUsers } from '@/server/bulk-import';
 import { getSessionFromHeaders } from '@/server/auth';
@@ -37,6 +37,7 @@ function BulkUserImportPage() {
   const { t } = useI18n();
   const { userRole } = Route.useLoaderData();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputId = useId();
   const bulkCreateUsersFn = useServerFn(bulkCreateUsers);
 
   const [isDragOver, setIsDragOver] = useState(false);
@@ -45,6 +46,8 @@ function BulkUserImportPage() {
     { name: string; email: string; role: string; status: 'valid' | 'invalid'; error?: string }[]
   >([]);
   const [parseErrors, setParseErrors] = useState<string[]>([]);
+  const [isParsing, setIsParsing] = useState(false);
+  const [retryFile, setRetryFile] = useState<File | null>(null);
   const [isCommitting, setIsCommitting] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
 
@@ -69,9 +72,12 @@ function BulkUserImportPage() {
         setValidationError(error);
         setParsedRows([]);
         setParseErrors([]);
+        setRetryFile(null);
         return;
       }
       setValidationError(null);
+      setRetryFile(null);
+      setIsParsing(true);
 
       try {
         const parsed = await parseUsersXlsx(file, userRole);
@@ -83,6 +89,9 @@ function BulkUserImportPage() {
         setParsedRows(parsed.rows);
       } catch {
         setValidationError(t('bulkImport.common.parseFailed'));
+        setRetryFile(file);
+      } finally {
+        setIsParsing(false);
       }
     },
     [validateFile, t, userRole],
@@ -140,7 +149,7 @@ function BulkUserImportPage() {
     try {
       const response = await bulkCreateUsersFn({ data: { rows: validRows } });
       if (isServerError(response)) {
-        setValidationError(response.error.message);
+        setValidationError(t('bulkImport.common.importFailed'));
       } else {
         setResult(response);
       }
@@ -167,34 +176,48 @@ function BulkUserImportPage() {
       </div>
 
       {/* Dropzone */}
-      <div
+      <label
+        htmlFor={fileInputId}
         data-testid="bulk-import-dropzone"
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+        className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
           isDragOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        onClick={() => fileInputRef.current?.click()}
       >
         <input
           ref={fileInputRef}
+          id={fileInputId}
           data-testid="bulk-import-dropzone-input"
           type="file"
           accept=".xlsx"
-          className="hidden"
+          className="sr-only"
           onChange={handleFileChange}
+          disabled={isParsing}
         />
         <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
         <p className="mt-2 text-sm text-muted-foreground">{t('bulkImport.common.dropzoneText')}</p>
         <p className="mt-1 text-xs text-muted-foreground">{t('bulkImport.common.dropzoneHint')}</p>
-      </div>
+      </label>
+
+      {isParsing && (
+        <div role="status" aria-live="polite" aria-busy="true">
+          {t('bulkImport.common.parsing')}
+        </div>
+      )}
 
       {/* Validation error */}
       {validationError && (
         <AlertBanner variant="error" title={t('bulkImport.common.error')}>
           {validationError}
         </AlertBanner>
+      )}
+
+      {retryFile && !isParsing && (
+        <Button type="button" variant="outline" onClick={() => processFile(retryFile)}>
+          {t('common.retry')}
+        </Button>
       )}
 
       {/* Parse errors */}
@@ -207,24 +230,35 @@ function BulkUserImportPage() {
       {/* Preview table */}
       {parsedRows.length > 0 && !result && (
         <div className="space-y-4">
-          <div className="flex items-center gap-4 text-sm">
-            <span className="text-green-600">
+          <div role="status" aria-live="polite" className="flex items-center gap-4 text-sm">
+            <span className="text-success">
               {validCount} {t('bulkImport.common.valid')}
             </span>
-            <span className="text-red-600">
+            <span className="text-error">
               {invalidCount} {t('bulkImport.common.invalid')}
             </span>
           </div>
 
           <div className="border rounded-lg overflow-auto max-h-96">
             <table className="w-full text-sm">
+              <caption className="sr-only">{t('bulkImport.users.previewCaption')}</caption>
               <thead className="bg-muted sticky top-0">
                 <tr>
-                  <th className="p-2 text-left">#</th>
-                  <th className="p-2 text-left">{t('bulkImport.users.name')}</th>
-                  <th className="p-2 text-left">{t('bulkImport.users.email')}</th>
-                  <th className="p-2 text-left">{t('bulkImport.users.role')}</th>
-                  <th className="p-2 text-left">{t('bulkImport.common.status')}</th>
+                  <th scope="col" className="p-2 text-left">
+                    #
+                  </th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.users.name')}
+                  </th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.users.email')}
+                  </th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.users.role')}
+                  </th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.common.status')}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -237,7 +271,7 @@ function BulkUserImportPage() {
                     <td className="p-2">
                       <span
                         data-testid={`row-status-${i}`}
-                        className={row.status === 'valid' ? 'text-green-600' : 'text-red-600'}
+                        className={row.status === 'valid' ? 'text-success' : 'text-error'}
                       >
                         {row.status === 'valid'
                           ? t('bulkImport.common.valid')
@@ -273,11 +307,18 @@ function BulkUserImportPage() {
           {result.errors.length > 0 && (
             <div className="border rounded-lg overflow-auto">
               <table className="w-full text-sm">
+                <caption className="sr-only">{t('bulkImport.users.resultCaption')}</caption>
                 <thead className="bg-muted">
                   <tr>
-                    <th className="p-2 text-left">{t('bulkImport.common.row')}</th>
-                    <th className="p-2 text-left">{t('bulkImport.users.email')}</th>
-                    <th className="p-2 text-left">{t('bulkImport.common.reason')}</th>
+                    <th scope="col" className="p-2 text-left">
+                      {t('bulkImport.common.row')}
+                    </th>
+                    <th scope="col" className="p-2 text-left">
+                      {t('bulkImport.users.email')}
+                    </th>
+                    <th scope="col" className="p-2 text-left">
+                      {t('bulkImport.common.reason')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>

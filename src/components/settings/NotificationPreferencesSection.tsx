@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell } from 'lucide-react';
@@ -5,6 +6,7 @@ import { getCurrentUser, updateUserSettings } from '@/server/settings';
 import { useI18n } from '@/routes/__root';
 import { settingsKeys } from '@/lib/query-keys';
 import type { TranslationKey } from '@/i18n/index';
+import { MutationFeedback } from '@/components/ui/mutation-feedback';
 
 type NotificationChannel = 'email' | 'inApp';
 type NotificationPrefs = Record<string, { email?: boolean; inApp?: boolean }>;
@@ -108,6 +110,7 @@ const NOTIFICATION_PREF_GROUPS: NotificationPrefGroup[] = [
 export function NotificationPreferencesSection() {
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const [feedback, setFeedback] = useState<{ error?: string; success?: string }>({});
 
   const { data, isLoading } = useQuery({
     queryKey: settingsKeys.currentUser(),
@@ -138,10 +141,17 @@ export function NotificationPreferencesSection() {
     },
   });
 
-  const handleToggle = (type: string, channel: NotificationChannel, current: boolean) => {
+  const handleToggle = async (type: string, channel: NotificationChannel, current: boolean) => {
     const newPrefs: NotificationPrefs = { ...prefs };
     newPrefs[type] = { ...newPrefs[type], [channel]: !current };
-    updateSettingsMutation.mutateAsync({ notificationPrefs: newPrefs }).catch(() => {});
+    setFeedback({});
+    try {
+      const result = await updateSettingsMutation.mutateAsync({ notificationPrefs: newPrefs });
+      if (result?.error) throw new Error(result.error);
+      setFeedback({ success: t('settings.notificationPreferences.saveSuccess') });
+    } catch {
+      setFeedback({ error: t('settings.notificationPreferences.saveError') });
+    }
   };
 
   if (isLoading) {
@@ -164,6 +174,7 @@ export function NotificationPreferencesSection() {
         <CardDescription>{t('settings.notificationPreferences.description')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        <MutationFeedback {...feedback} />
         {NOTIFICATION_PREF_GROUPS.map((group) => (
           <div key={group.labelKey} className="space-y-3">
             <h2 className="text-sm font-semibold text-muted-foreground">{t(group.labelKey)}</h2>

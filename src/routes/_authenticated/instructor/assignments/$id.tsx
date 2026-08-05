@@ -8,15 +8,16 @@ import { AssignmentConsultationsTab } from '@/components/instructor/assignments/
 import { AssignmentExtensionsTab } from '@/components/instructor/assignments/AssignmentExtensionsTab';
 import { AssignmentInterventionsTab } from '@/components/instructor/assignments/AssignmentInterventionsTab';
 import { AssignmentDetailTabs } from '@/components/instructor/assignments/AssignmentDetailTabs';
-import { DiscussionPanel } from '@/components/discussions/discussion-panel';
+import { InstructorDiscussionBrowser } from '@/components/instructor/assignments/InstructorDiscussionBrowser';
 import { useAssignmentTabs } from '@/hooks/use-assignment-tabs';
 import { useCsvDownload } from '@/hooks/use-csv-download';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { FileX, Download } from 'lucide-react';
 import { useI18n } from '../../../__root';
-import { isServerError } from '@/lib/errors';
+import { ErrorCode, getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { AssignmentDetailSkeleton } from '@/components/skeletons/assignment-detail-skeleton';
+import { ErrorState } from '@/components/ui/error-state';
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/$id')({
   loader: async ({ params }) => {
@@ -43,6 +44,9 @@ function AssignmentDetailPage() {
   const { t } = useI18n();
   const loaderData = Route.useLoaderData();
   const assignment = loaderData && !isServerError(loaderData) ? loaderData : null;
+  const assignmentError = isServerError(loaderData) ? loaderData : null;
+  const navigate = Route.useNavigate();
+  const { id } = Route.useParams();
   const { exportCsv, isExporting } = useCsvDownload();
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -63,6 +67,21 @@ function AssignmentDetailPage() {
   }, []);
 
   if (!assignment) {
+    if (assignmentError && assignmentError.error.code !== ErrorCode.NOT_FOUND) {
+      return (
+        <ErrorState
+          title={t(getErrorTranslationKey(assignmentError.error.code))}
+          retryLabel={t('common.refresh')}
+          onRetry={() =>
+            navigate({
+              to: '/instructor/assignments/$id',
+              params: { id },
+            })
+          }
+        />
+      );
+    }
+
     return (
       <EmptyState
         icon={FileX}
@@ -150,45 +169,44 @@ function AssignmentDetailPage() {
         }
       />
       <AssignmentDetailTabs tabs={tabList} activeTab={activeTab} onTabChange={setActiveTab} />
-      {activeTab === 'overview' && <AssignmentOverviewTab assignment={assignment} />}
-      {activeTab === 'consultations' && (
-        <AssignmentConsultationsTab
-          pendingConsultations={tabs.pendingConsultations}
-          selectedConsultationId={selectedConsultationId}
-          setSelectedConsultationId={setSelectedConsultationId}
-          dialogOpen={dialogOpen}
-          setDialogOpen={setDialogOpen}
-          pendingPage={tabs.pendingPage}
-          pendingTotal={tabs.pendingTotal}
-          onPageChange={tabs.setPendingPage}
-          onRefresh={tabs.refreshPendingConsultations}
-        />
-      )}
-      {activeTab === 'extensions' && (
-        <AssignmentExtensionsTab
-          requests={tabs.extensionRequests}
-          loading={tabs.extensionsLoading}
-          onApprove={tabs.handleApproveExtension}
-          onReject={tabs.handleRejectExtension}
-        />
-      )}
-      {activeTab === 'discussions' && (
-        <div className="space-y-6">
-          {assignment.students.map((student) =>
-            student.checkpoints.map((cp) => (
-              <div key={cp.id} className="space-y-2">
-                <h3 className="text-sm font-medium text-muted-foreground">
-                  {student.name} — {cp.name}
-                </h3>
-                <DiscussionPanel checkpointId={cp.id} assignmentId={assignment.id} instructorView />
-              </div>
-            )),
-          )}
-        </div>
-      )}
-      {activeTab === 'interventions' && (
-        <AssignmentInterventionsTab assignmentId={assignment.id} students={assignment.students} />
-      )}
+      <div
+        id={`assignment-detail-tabpanel-${activeTab}`}
+        role="tabpanel"
+        aria-labelledby={`assignment-detail-tab-${activeTab}`}
+        tabIndex={0}
+      >
+        {activeTab === 'overview' && <AssignmentOverviewTab assignment={assignment} />}
+        {activeTab === 'consultations' && (
+          <AssignmentConsultationsTab
+            pendingConsultations={tabs.pendingConsultations}
+            selectedConsultationId={selectedConsultationId}
+            setSelectedConsultationId={setSelectedConsultationId}
+            dialogOpen={dialogOpen}
+            setDialogOpen={setDialogOpen}
+            pendingPage={tabs.pendingPage}
+            pendingTotal={tabs.pendingTotal}
+            onPageChange={tabs.setPendingPage}
+            onRefresh={tabs.refreshPendingConsultations}
+          />
+        )}
+        {activeTab === 'extensions' && (
+          <AssignmentExtensionsTab
+            requests={tabs.extensionRequests}
+            loading={tabs.extensionsLoading}
+            onApprove={tabs.handleApproveExtension}
+            onReject={tabs.handleRejectExtension}
+          />
+        )}
+        {activeTab === 'discussions' && (
+          <InstructorDiscussionBrowser
+            assignmentId={assignment.id}
+            students={assignment.students}
+          />
+        )}
+        {activeTab === 'interventions' && (
+          <AssignmentInterventionsTab assignmentId={assignment.id} students={assignment.students} />
+        )}
+      </div>
     </div>
   );
 }

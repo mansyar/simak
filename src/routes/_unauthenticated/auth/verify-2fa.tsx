@@ -33,7 +33,7 @@ function Verify2FAPage() {
       });
 
       if (result.error) {
-        setError(result.error.message ?? t('auth.invalidCode'));
+        setError(t('auth.invalidCode'));
       } else {
         router.invalidate();
       }
@@ -73,7 +73,7 @@ function Verify2FAPage() {
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
               required
-              placeholder="000000"
+              placeholder={t('auth.totpPlaceholder')}
               autoComplete="one-time-code"
               autoFocus
             />
@@ -89,16 +89,23 @@ function Verify2FAPage() {
             type="submit"
             disabled={isSubmitting || code.length < 6}
             loading={isSubmitting}
+            aria-busy={isSubmitting}
             className="w-full"
           >
             {t('common.verify')}
           </Button>
 
           <div className="flex flex-col items-center gap-2 text-center">
-            <Link to="/auth/verify-backup-code" className="text-sm text-primary hover:underline">
+            <Link
+              to="/auth/verify-backup-code"
+              className="inline-flex min-h-11 items-center text-sm text-primary hover:underline"
+            >
               {t('auth.useBackupCode')}
             </Link>
-            <Link to="/auth/login" className="text-sm text-muted-foreground hover:underline">
+            <Link
+              to="/auth/login"
+              className="inline-flex min-h-11 items-center text-sm text-muted-foreground hover:underline"
+            >
               {t('common.back')}
             </Link>
           </div>

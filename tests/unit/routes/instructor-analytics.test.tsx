@@ -97,7 +97,7 @@ describe('Instructor Analytics Page', () => {
     const Page = await getAnalyticsPage();
     render(<Page />);
     expect(screen.getByText('42')).toBeDefined();
-    expect(screen.getByText('3.5h')).toBeDefined();
+    expect(screen.getByText('instructorAnalytics.responseHours')).toBeDefined();
     expect(screen.getByText('3')).toBeDefined();
     expect(screen.getByText('15')).toBeDefined();
     expect(screen.getByText('8')).toBeDefined();
@@ -108,14 +108,14 @@ describe('Instructor Analytics Page', () => {
     expect(screen.getByText('instructorAnalytics.assignmentsActive')).toBeDefined();
   });
 
-  it('renders N/A for null average response time', async () => {
+  it('renders localized not-available text for null average response time', async () => {
     mocks.loaderData = {
       analytics: { ...mockAnalyticsData, averageResponseTimeHours: null },
       rubric: { ...mockRubricData },
     };
     const Page = await getAnalyticsPage();
     render(<Page />);
-    expect(screen.getByText('N/A')).toBeDefined();
+    expect(screen.getByText('instructorAnalytics.notAvailable')).toBeDefined();
   });
 
   it('renders date range selector buttons', async () => {
@@ -153,7 +153,7 @@ describe('Instructor Analytics Page', () => {
     };
     const Page = await getAnalyticsPage();
     render(<Page />);
-    expect(screen.getByText('Internal Server Error')).toBeDefined();
+    expect(screen.getByText('error.internal')).toBeDefined();
   });
 
   it('renders Export Excel button', async () => {

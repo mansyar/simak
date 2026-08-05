@@ -13,6 +13,7 @@ import { Plus } from 'lucide-react';
 import { z } from 'zod';
 import { useI18n } from '../../../__root';
 import { isServerError } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
 
 const AssignmentSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -37,11 +38,22 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/')(
 function AssignmentsPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData();
-  const assignments = isServerError(data) || !data ? [] : (data.assignments ?? []);
-  const total = isServerError(data) || !data ? 0 : (data.total ?? 0);
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const { isRefreshing, refresh } = useRefreshSearch();
+
+  if (isServerError(data)) {
+    return (
+      <ErrorState
+        title={t('errors.fetchFailed')}
+        retryLabel={t('common.refresh')}
+        onRetry={() => refresh(() => navigate({ search: searchParams }))}
+      />
+    );
+  }
+
+  const assignments = data?.assignments ?? [];
+  const total = data?.total ?? 0;
 
   const handleSearchChange = (value: string) => {
     navigate({
@@ -71,7 +83,7 @@ function AssignmentsPage() {
         title={t('instructorAssignments.title')}
         subtitle={t('instructorAssignments.subtitle')}
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             <RefreshButton
               isRefreshing={isRefreshing}
               onClick={() =>
@@ -80,7 +92,7 @@ function AssignmentsPage() {
                 )
               }
             />
-            <Button onClick={handleCreateNew}>
+            <Button className="min-w-0 flex-1 sm:flex-none" onClick={handleCreateNew}>
               <Plus className="mr-2 h-4 w-4" />
               {t('instructorAssignments.newAssignment')}
             </Button>

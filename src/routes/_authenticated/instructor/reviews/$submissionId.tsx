@@ -11,7 +11,8 @@ import { DiscussionPanel } from '@/components/discussions/discussion-panel';
 import { useI18n } from '../../../__root';
 import { AlertCircle, CheckCircle2, SearchX } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
-import { isServerError, serverError, ErrorCode } from '@/lib/errors';
+import { ErrorState } from '@/components/ui/error-state';
+import { ErrorCode, getErrorTranslationKey, isServerError, serverError } from '@/lib/errors';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/_authenticated/instructor/reviews/$submissionId')({
@@ -68,12 +69,17 @@ function ReviewDetailPage() {
     nextIdx < pendingList.length ? pendingList[nextIdx].submissionId : null;
 
   if (!detail) {
-    return (
-      <EmptyState
-        icon={AlertCircle}
-        title={data && isServerError(data) ? data.error.message : t('common.error')}
-      />
-    );
+    if (data && isServerError(data)) {
+      return (
+        <ErrorState
+          title={t(getErrorTranslationKey(data.error.code))}
+          retryLabel={t('common.refresh')}
+          onRetry={() => navigate({ replace: true })}
+        />
+      );
+    }
+
+    return <EmptyState icon={AlertCircle} title={t('common.error')} />;
   }
 
   if (!detail?.submission) {

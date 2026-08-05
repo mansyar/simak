@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -13,6 +14,7 @@ import {
 import { Download, FileText, FileQuestion } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
+import { useStudentDateFormatter } from '@/hooks/use-student-date';
 
 interface Submission {
   id: number;
@@ -40,19 +42,9 @@ function formatFileSize(
   return `${bytes} bytes`;
 }
 
-function formatDate(date: Date | null, locale: string): string {
-  if (!date) return '';
-  return new Intl.DateTimeFormat(locale, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(date));
-}
-
 export function FileList({ submissions, onDownload }: FileListProps) {
   const { t, locale } = useI18n();
+  const { format } = useStudentDateFormatter(locale);
 
   const handleDownload = useCallback(
     async (submissionId: number) => {
@@ -78,13 +70,16 @@ export function FileList({ submissions, onDownload }: FileListProps) {
   return (
     <div className="rounded-lg border">
       <Table>
+        <TableCaption className="sr-only">{t('files.historyLabel')}</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>{t('files.table.version')}</TableHead>
-            <TableHead>{t('files.table.fileName')}</TableHead>
-            <TableHead>{t('files.table.fileSize')}</TableHead>
-            <TableHead>{t('files.table.uploadedAt')}</TableHead>
-            <TableHead className="w-20">{t('files.table.action')}</TableHead>
+            <TableHead scope="col">{t('files.table.version')}</TableHead>
+            <TableHead scope="col">{t('files.table.fileName')}</TableHead>
+            <TableHead scope="col">{t('files.table.fileSize')}</TableHead>
+            <TableHead scope="col">{t('files.table.uploadedAt')}</TableHead>
+            <TableHead scope="col" className="w-20">
+              {t('files.table.action')}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -108,7 +103,7 @@ export function FileList({ submissions, onDownload }: FileListProps) {
                 {formatFileSize(submission.fileSize, t)}
               </TableCell>
               <TableCell className="text-muted-foreground">
-                {formatDate(submission.uploadedAt, locale)}
+                {format(submission.uploadedAt, 'time')}
               </TableCell>
               <TableCell>
                 <Button

@@ -2,6 +2,9 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { useI18n } from './__root';
 import { Layers, MessageSquare, Users, Clock, Globe, Shield } from 'lucide-react';
+import { LanguageSwitcher } from '../components/layout/language-switcher';
+import { ThemeToggle } from '../components/layout/theme-toggle';
+import { useTheme } from '../hooks/use-theme';
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -19,18 +22,51 @@ const features = [
 const steps = ['step1', 'step2', 'step3'] as const;
 
 export function HomePage() {
-  const { t } = useI18n();
+  const { t, locale, setLocale } = useI18n();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <main id="main-content" tabIndex={-1} className="flex min-h-screen flex-col">
+      <header className="flex flex-wrap items-center gap-3 border-b px-6 py-4">
+        <Link to="/" className="inline-flex min-h-11 items-center font-display text-lg font-bold">
+          {t('app.name')}
+        </Link>
+        <div className="ml-auto flex items-center gap-2">
+          <LanguageSwitcher currentLocale={locale} onSwitch={setLocale} />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+        </div>
+        <nav
+          aria-label={t('landing.nav.label')}
+          className="order-3 flex w-full items-center gap-1 overflow-x-auto md:order-none md:w-auto md:flex-1 md:justify-center"
+        >
+          <a
+            href="#features"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-md px-3 text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {t('landing.nav.features')}
+          </a>
+          <a
+            href="#how-it-works"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-md px-3 text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {t('landing.nav.howItWorks')}
+          </a>
+          <Link
+            to="/auth/login"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-md px-3 text-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {t('landing.footer.links.login')}
+          </Link>
+        </nav>
+      </header>
       {/* Hero */}
       <section
         id="hero"
         className="relative flex flex-col items-center justify-center px-6 py-24 text-center"
       >
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-[#6B5CE7]/10 blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-[#34D399]/10 blur-3xl" />
+          <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-success/10 blur-3xl" />
         </div>
         <div className="relative z-10 mx-auto max-w-3xl">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
@@ -42,7 +78,7 @@ export function HomePage() {
           <div className="mt-8">
             <Link
               to="/auth/login"
-              className="inline-flex h-12 items-center rounded-lg bg-[#6B5CE7] px-8 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-[#5a4bd6]"
+              className="inline-flex min-h-11 items-center rounded-lg bg-primary px-8 text-sm font-semibold text-primary-foreground shadow-lg transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               {t('landing.hero.cta')}
             </Link>
@@ -63,8 +99,8 @@ export function HomePage() {
                 key={key}
                 className="rounded-xl border bg-background p-6 shadow-sm transition-shadow hover:shadow-md"
               >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#6B5CE7]/10">
-                  <Icon className="h-5 w-5 text-[#6B5CE7]" />
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <Icon className="h-5 w-5 text-primary" />
                 </div>
                 <h3 className="font-semibold text-foreground">
                   {t(`landing.features.${key}.title`)}
@@ -88,7 +124,7 @@ export function HomePage() {
           <div className="mt-12 grid gap-8 sm:grid-cols-3">
             {steps.map((step, i) => (
               <div key={step} className="text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#34D399] text-lg font-bold text-white">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success text-lg font-bold text-success-foreground">
                   {i + 1}
                 </div>
                 <h3 className="mt-4 text-lg font-semibold text-foreground">
@@ -114,10 +150,16 @@ export function HomePage() {
             </p>
           </div>
           <nav className="flex gap-6 text-sm text-muted-foreground">
-            <Link to="/auth/login" className="hover:text-foreground">
+            <Link
+              to="/auth/login"
+              className="inline-flex min-h-11 items-center hover:text-foreground"
+            >
               {t('landing.footer.links.login')}
             </Link>
-            <a href="#how-it-works" className="hover:text-foreground">
+            <a
+              href="#how-it-works"
+              className="inline-flex min-h-11 items-center hover:text-foreground"
+            >
               {t('landing.footer.links.about')}
             </a>
           </nav>

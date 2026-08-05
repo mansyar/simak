@@ -87,7 +87,7 @@ describe('ReviewForm', () => {
   it('should render the review form', () => {
     render(<ReviewForm submissionId={1} onComplete={mockOnComplete} onError={mockOnError} />);
 
-    expect(screen.getByText('instructorReviews.decision')).toBeDefined();
+    expect(screen.getAllByText('instructorReviews.decision').length).toBeGreaterThan(0);
     expect(screen.getByText('instructorReviews.pass')).toBeDefined();
     expect(screen.getByText('instructorReviews.revise')).toBeDefined();
     expect(screen.getByLabelText('instructorReviews.comment')).toBeDefined();
@@ -231,7 +231,7 @@ describe('ReviewForm', () => {
     fireEvent.click(screen.getByText('instructorReviews.submitReview'));
 
     await waitFor(() => {
-      expect(mockOnError).toHaveBeenCalledWith('Submission failed');
+      expect(mockOnError).toHaveBeenCalledWith('instructorReviews.submitError');
     });
   });
 

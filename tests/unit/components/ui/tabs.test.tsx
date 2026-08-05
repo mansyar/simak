@@ -29,6 +29,37 @@ describe('Tabs', () => {
     expect(activeButton.getAttribute('data-state')).toBe('active');
   });
 
+  it('should expose tablist semantics and controlled tab relationships', () => {
+    render(<Tabs tabs={tabs} activeTab="students" onTabChange={vi.fn()} idPrefix="assignment" />);
+
+    expect(screen.getByRole('tablist')).toBeInTheDocument();
+    const activeTab = screen.getByRole('tab', { name: 'Students' });
+    const inactiveTab = screen.getByRole('tab', { name: 'Overview' });
+    expect(activeTab.getAttribute('aria-selected')).toBe('true');
+    expect(activeTab.getAttribute('aria-controls')).toBe('assignment-tabpanel-students');
+    expect(activeTab.getAttribute('tabindex')).toBe('0');
+    expect(inactiveTab.getAttribute('aria-selected')).toBe('false');
+    expect(inactiveTab.getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('should support arrow, Home, and End keyboard navigation', () => {
+    const onTabChange = vi.fn();
+    render(<Tabs tabs={tabs} activeTab="overview" onTabChange={onTabChange} />);
+    const overviewTab = screen.getByRole('tab', { name: 'Overview' });
+
+    fireEvent.keyDown(overviewTab, { key: 'ArrowRight' });
+    expect(onTabChange).toHaveBeenCalledWith('students');
+    expect(document.activeElement).toBe(screen.getByRole('tab', { name: 'Students' }));
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'End' });
+    expect(onTabChange).toHaveBeenCalledWith('settings');
+    expect(document.activeElement).toBe(screen.getByRole('tab', { name: 'Settings' }));
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Home' });
+    expect(onTabChange).toHaveBeenCalledWith('overview');
+    expect(document.activeElement).toBe(overviewTab);
+  });
+
   it('should set inactive state on non-active tabs', () => {
     render(<Tabs tabs={tabs} activeTab="students" onTabChange={vi.fn()} />);
     const inactiveButton = screen.getByText('Overview');

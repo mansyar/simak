@@ -84,6 +84,8 @@ vi.mock('@/routes/__root', () => ({
         'settings.twoFactor.setupError': 'Failed to generate setup',
         'settings.twoFactor.verifyError': 'Failed to verify code',
         'settings.twoFactor.disableError': 'Failed to disable',
+        'settings.twoFactor.enableSuccess': 'Two-factor enabled',
+        'settings.twoFactor.disableSuccess': 'Two-factor disabled',
         'settings.twoFactor.saveBackupCodes': 'Save these backup codes in a secure place.',
       };
       return translations[key] || key;
@@ -147,7 +149,7 @@ describe('TwoFactorSettings', () => {
     });
     fireEvent.click(screen.getByText('Set up'));
 
-    expect(await screen.findByText('Password incorrect')).toBeDefined();
+    expect(await screen.findByText('Failed to generate setup')).toBeDefined();
   });
 
   // ---------- 6. Enable Dialog: Password Step -> QR Step ----------
@@ -216,7 +218,7 @@ describe('TwoFactorSettings', () => {
     });
     fireEvent.click(screen.getByText('Verify'));
 
-    expect(await screen.findByText('Invalid code')).toBeDefined();
+    expect(await screen.findByText('Failed to verify code')).toBeDefined();
   });
 
   // ---------- 9. Enable Dialog: Verify Step -> Complete ----------
@@ -268,7 +270,7 @@ describe('TwoFactorSettings', () => {
     const dialogDisableButton = disableButtons[disableButtons.length - 1];
     fireEvent.click(dialogDisableButton);
 
-    expect(await screen.findByText('Wrong password')).toBeDefined();
+    expect(await screen.findByText('Failed to disable')).toBeDefined();
   });
 
   // ---------- 11. Disable Dialog: Complete ----------

@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { FileText, Clock } from 'lucide-react';
 import { useI18n } from '../../routes/__root';
 import { SLABadge } from './SLABadge';
+import { formatReviewWaitTime } from './review-wait-time';
 
 export interface ReviewQueueItemData {
   submissionId: number;
@@ -26,7 +27,7 @@ interface ReviewQueueItemProps {
 export function ReviewQueueItem({ item }: ReviewQueueItemProps) {
   const { t } = useI18n();
 
-  const waitTime = getWaitTime(item.uploadedAt);
+  const waitTime = formatReviewWaitTime(item.uploadedAt, t);
 
   return (
     <div className="flex items-center justify-between rounded-lg border bg-card p-4 shadow-sm transition-all hover:shadow-md hover:border-primary/30">
@@ -43,7 +44,7 @@ export function ReviewQueueItem({ item }: ReviewQueueItemProps) {
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
-            <span>{waitTime}</span>
+            <span data-testid="review-queue-wait-time">{waitTime}</span>
           </div>
         </div>
       </div>
@@ -56,22 +57,11 @@ export function ReviewQueueItem({ item }: ReviewQueueItemProps) {
           to="/instructor/reviews/$submissionId"
           params={{ submissionId: String(item.submissionId) }}
           data-testid="review-queue-link"
-          className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="inline-flex min-h-11 items-center rounded-md px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {t('common.viewAll')}
         </Link>
       </div>
     </div>
   );
-}
-
-function getWaitTime(uploadedAt: Date): string {
-  const now = Date.now();
-  const diff = now - new Date(uploadedAt).getTime();
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const days = Math.floor(hours / 24);
-
-  if (days > 0) return `${days}d ${hours % 24}h`;
-  if (hours > 0) return `${hours}h`;
-  return '< 1h';
 }

@@ -1,7 +1,7 @@
 import { useI18n } from '../../../routes/__root';
 import type { TranslationKey } from '../../../i18n/index';
 import { Badge } from '@/components/ui/badge';
-import { formatDate } from '@/lib/format-date';
+import { useStudentDateFormatter } from '@/hooks/use-student-date';
 
 interface ExtensionHistoryItem {
   id: number;
@@ -44,6 +44,7 @@ function getCategoryLabel(category: string): string {
 
 export function ExtensionHistoryList({ items }: ExtensionHistoryListProps) {
   const { t, locale } = useI18n();
+  const { format } = useStudentDateFormatter(locale);
 
   if (items.length === 0) {
     return (
@@ -58,21 +59,22 @@ export function ExtensionHistoryList({ items }: ExtensionHistoryListProps) {
       <h2 className="text-lg font-semibold text-foreground mb-4">{t('extensions.historyTitle')}</h2>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
+          <caption className="sr-only">{t('extensions.historyTitle')}</caption>
           <thead>
             <tr className="border-b border-border">
-              <th className="text-left pb-2 font-medium text-muted-foreground">
+              <th scope="col" className="text-left pb-2 font-medium text-muted-foreground">
                 {t('extensions.tableDate')}
               </th>
-              <th className="text-left pb-2 font-medium text-muted-foreground">
+              <th scope="col" className="text-left pb-2 font-medium text-muted-foreground">
                 {t('extensions.tableCategory')}
               </th>
-              <th className="text-left pb-2 font-medium text-muted-foreground">
+              <th scope="col" className="text-left pb-2 font-medium text-muted-foreground">
                 {t('extensions.tableDuration')}
               </th>
-              <th className="text-left pb-2 font-medium text-muted-foreground">
+              <th scope="col" className="text-left pb-2 font-medium text-muted-foreground">
                 {t('extensions.tableStatus')}
               </th>
-              <th className="text-left pb-2 font-medium text-muted-foreground">
+              <th scope="col" className="text-left pb-2 font-medium text-muted-foreground">
                 {t('extensions.tableResolution')}
               </th>
             </tr>
@@ -80,9 +82,7 @@ export function ExtensionHistoryList({ items }: ExtensionHistoryListProps) {
           <tbody>
             {items.map((item) => (
               <tr key={item.id} className="border-b border-border last:border-b-0">
-                <td className="py-3 pr-4 text-foreground">
-                  {formatDate(item.createdAt, locale, 'short')}
-                </td>
+                <td className="py-3 pr-4 text-foreground">{format(item.createdAt, 'short')}</td>
                 <td className="py-3 pr-4 text-foreground">
                   {t(getCategoryLabel(item.category) as TranslationKey)}
                 </td>

@@ -15,6 +15,7 @@ import { Monitor, Smartphone, Tablet, RefreshCw, LogOut, LogOutIcon } from 'luci
 import { listActiveSessions, revokeSession, revokeAllOtherSessions } from '@/server/sessions';
 import { useI18n } from '@/routes/__root';
 import { settingsKeys } from '@/lib/query-keys';
+import { MutationFeedback } from '@/components/ui/mutation-feedback';
 
 type SessionDevice = { browser: string; os: string; device: string };
 type SessionItem = {
@@ -47,6 +48,7 @@ export function SessionManagement() {
   const queryClient = useQueryClient();
   const [revokeTarget, setRevokeTarget] = useState<SessionItem | null>(null);
   const [isRevokeAllOpen, setIsRevokeAllOpen] = useState(false);
+  const [feedback, setFeedback] = useState<{ error?: string; success?: string }>({});
 
   const { data: sessionsData, isLoading } = useQuery({
     queryKey: settingsKeys.activeSessions(),
@@ -59,29 +61,49 @@ export function SessionManagement() {
   const revokeMutation = useMutation({
     mutationFn: async (sessionId: string) => {
       const result = await revokeSession({ data: { sessionId } });
-      return result as { success?: boolean; error?: string };
+      const typedResult = result as { success?: boolean; error?: string };
+      if (typedResult.error) throw new Error(typedResult.error);
+      return typedResult;
     },
-    onSuccess: (data) => {
-      if (data.error) return;
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: settingsKeys.activeSessions() });
       setRevokeTarget(null);
+      setFeedback({ success: t('settings.sessions.revokeSuccess') });
+    },
+    onError: () => {
+      setFeedback({ error: t('settings.sessions.revokeError') });
     },
   });
 
   const revokeAllMutation = useMutation({
     mutationFn: async () => {
       const result = await revokeAllOtherSessions({ data: {} });
-      return result as { success?: boolean; revokedCount?: number; error?: string };
+      const typedResult = result as { success?: boolean; revokedCount?: number; error?: string };
+      if (typedResult.error) throw new Error(typedResult.error);
+      return typedResult;
     },
-    onSuccess: (data) => {
-      if (data.error) return;
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: settingsKeys.activeSessions() });
       setIsRevokeAllOpen(false);
+      setFeedback({ success: t('settings.sessions.revokeAllSuccess') });
+    },
+    onError: () => {
+      setFeedback({ error: t('settings.sessions.revokeAllError') });
     },
   });
 
   const sessions = sessionsData?.sessions ?? [];
   const otherSessions = sessions.filter((s) => !s.isCurrent);
+
+  const formatDevice = (session: SessionItem) => {
+    const browser =
+      session.device.browser === 'Unknown'
+        ? t('settings.sessions.unknownDevice')
+        : session.device.browser;
+    const os =
+      session.device.os === 'Unknown' ? t('settings.sessions.unknownDevice') : session.device.os;
+    return t('settings.sessions.deviceOn', { browser, os });
+  };
 
   if (isLoading) {
     return (
@@ -104,6 +126,7 @@ export function SessionManagement() {
           <CardDescription>{t('settings.sessions.description')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
+          <MutationFeedback {...feedback} />
           {sessions.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t('settings.sessions.noSessions')}</p>
           ) : (
@@ -113,9 +136,7 @@ export function SessionManagement() {
                   <DeviceIcon device={s.device} />
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">
-                        {s.device.browser} on {s.device.os}
-                      </span>
+                      <span className="text-sm font-medium">{formatDevice(s)}</span>
                       {s.isCurrent && (
                         <Badge variant="default" className="text-xs">
                           {t('settings.sessions.current')}
@@ -123,12 +144,18 @@ export function SessionManagement() {
                       )}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {s.ipAddress ?? 'Unknown IP'} &middot; {formatDate(s.createdAt)}
+                      {s.ipAddress ?? t('settings.sessions.unknownIp')} &middot;{' '}
+                      {formatDate(s.createdAt)}
                     </div>
                   </div>
                 </div>
                 {!s.isCurrent && (
-                  <Button variant="ghost" size="sm" onClick={() => setRevokeTarget(s)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={t('settings.sessions.revoke')}
+                    onClick={() => setRevokeTarget(s)}
+                  >
                     <LogOut className="h-4 w-4" />
                   </Button>
                 )}
@@ -158,10 +185,11 @@ export function SessionManagement() {
             <DialogTitle>{t('settings.sessions.revokeTitle')}</DialogTitle>
             <DialogDescription>{t('settings.sessions.revokeDescription')}</DialogDescription>
           </DialogHeader>
+          <MutationFeedback error={feedback.error} />
           {revokeTarget && (
             <p className="text-sm">
-              {revokeTarget.device.browser} on {revokeTarget.device.os} &middot;{' '}
-              {revokeTarget.ipAddress ?? 'Unknown IP'}
+              {formatDevice(revokeTarget)} &middot;{' '}
+              {revokeTarget.ipAddress ?? t('settings.sessions.unknownIp')}
             </p>
           )}
           <DialogFooter>
@@ -189,6 +217,7 @@ export function SessionManagement() {
               {t('settings.sessions.revokeAllDescription', { count: String(otherSessions.length) })}
             </DialogDescription>
           </DialogHeader>
+          <MutationFeedback error={feedback.error} />
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsRevokeAllOpen(false)}>
               {t('common.cancel')}

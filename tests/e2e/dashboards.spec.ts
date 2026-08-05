@@ -94,6 +94,20 @@ test.describe('Role Dashboard Smoke Tests', () => {
       // No console errors
       expect(consoleErrors).toEqual([]);
     });
+
+    test('stacks dashboard actions without mobile overflow', async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await page.goto('/instructor/dashboard');
+      await page.waitForLoadState('networkidle');
+
+      const hasHorizontalOverflow = await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+      );
+
+      expect(hasHorizontalOverflow).toBe(false);
+      await expect(page.getByRole('link', { name: /Go to Review Queue/ })).toBeVisible();
+      await expect(page.getByRole('link', { name: /Manage Assignments/ })).toBeVisible();
+    });
   });
 
   // ─── Admin Dashboard ─────────────────────────────────────────────

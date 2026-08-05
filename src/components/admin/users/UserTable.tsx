@@ -3,6 +3,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableCaption,
   TableHead,
   TableHeader,
   TableRow,
@@ -102,7 +103,10 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                <Button variant="ghost" className="h-8 w-8 p-0">
+                <Button
+                  variant="ghost"
+                  className="h-8 min-h-11 min-w-11 w-8 p-0 focus-visible:ring-2"
+                >
                   <span className="sr-only">{t('common.openMenu')}</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -146,12 +150,13 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
   return (
     <Card>
       <CardContent className="p-0">
-        <Table>
-          <TableHeader>
+        <Table className="block md:table">
+          <TableCaption className="sr-only">{t('adminUsers.table.caption')}</TableCaption>
+          <TableHeader className="hidden md:table-header-group">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="block md:table-row">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} scope="col">
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -163,9 +168,21 @@ export function UserTable({ data, onEdit, onDelete, onGenerateLink }: UserTableP
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  className="block border-b p-4 md:table-row md:border-b-0 md:p-0"
+                  data-state={row.getIsSelected() && 'selected'}
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className="block md:table-cell"
+                      data-label={
+                        typeof cell.column.columnDef.header === 'string'
+                          ? cell.column.columnDef.header
+                          : undefined
+                      }
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

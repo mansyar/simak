@@ -126,6 +126,24 @@ describe('Accessibility Attributes', () => {
       expect(input!.className).toContain('focus-visible:ring-3');
       expect(input!.className).toContain('focus-visible:ring-ring/50');
     });
+
+    it('shared buttons and inputs have 44px interaction targets', () => {
+      const { container } = render(
+        <div>
+          <Button size="sm">Small action</Button>
+          <Button size="icon-sm" aria-label="Icon action" />
+          <Input placeholder="Input" />
+        </div>,
+      );
+      const buttons = container.querySelectorAll('button');
+      const input = container.querySelector('input');
+
+      expect(buttons[0].className).toContain('min-h-11');
+      expect(buttons[0].className).not.toContain('min-w-11');
+      expect(buttons[1].className).toContain('min-h-11');
+      expect(buttons[1].className).toContain('min-w-11');
+      expect(input?.className).toContain('min-h-11');
+    });
   });
 
   describe('Heading hierarchy', () => {

@@ -9,6 +9,10 @@ const mockRouter = vi.hoisted(() => ({
 }));
 const mockNavigate = vi.hoisted(() => vi.fn());
 
+const mockLoaderData = vi.hoisted(() => ({
+  value: { entries: [], total: 100, page: 1, limit: 50 },
+}));
+
 // Mock @tanstack/react-start/server
 vi.mock('@tanstack/react-start/server', () => ({
   getRequestHeaders: vi.fn().mockReturnValue(new Headers()),
@@ -33,12 +37,7 @@ vi.mock('@tanstack/react-router', () => ({
   }),
   createFileRoute: vi.fn().mockReturnValue((config: any) => ({
     ...config,
-    useLoaderData: vi.fn().mockReturnValue({
-      entries: [],
-      total: 100,
-      page: 1,
-      limit: 50,
-    }),
+    useLoaderData: vi.fn().mockImplementation(() => mockLoaderData.value),
     useSearch: vi.fn().mockReturnValue({
       page: 1,
       limit: 50,
@@ -74,6 +73,8 @@ async function getComponent(): Promise<ComponentType> {
 
 describe('Admin Audit Log page', () => {
   beforeEach(() => {
+    mockLoaderData.value = { entries: [], total: 100, page: 1, limit: 50 };
+    mockRouter.invalidate.mockClear();
     mockNavigate.mockClear();
   });
 
@@ -131,6 +132,20 @@ describe('Admin Audit Log page', () => {
       expect(refreshButton.textContent?.trim()).toBe('');
     });
 
+    it('should show a retryable error state instead of an empty audit log', async () => {
+      mockLoaderData.value = {
+        error: { code: 'INTERNAL', message: 'database details' },
+      } as never;
+      const Component = await getComponent();
+      render(<Component />);
+
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByText('error.internal')).toBeInTheDocument();
+      expect(screen.queryByText('database details')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'common.refresh' }));
+      expect(mockRouter.invalidate).toHaveBeenCalledTimes(1);
+    });
+
     it('should use Pagination component with common.back/common.next buttons and common.pageOf counter', async () => {
       const Component = await getComponent();
       render(<Component />);
@@ -153,6 +168,28 @@ describe('Admin Audit Log page', () => {
       expect(selectTrigger).toBeTruthy();
       // Raw <select> should not be present
       expect(container.querySelector('select')).toBeNull();
+    });
+
+    it('should expose labeled filters and mobile-safe table semantics', async () => {
+      const Component = await getComponent();
+      const { container } = render(<Component />);
+      expect(
+        screen.getByRole('textbox', { name: 'adminAuditLog.searchLabel' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('combobox', { name: 'adminAuditLog.actionFilterLabel' }),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText('adminAuditLog.dateFrom')).toBeInTheDocument();
+      expect(screen.getByLabelText('adminAuditLog.dateTo')).toBeInTheDocument();
+      const table = container.querySelector('table');
+      expect(table?.querySelector('caption')?.textContent).toContain(
+        'adminAuditLog.auditTable.caption',
+      );
+      expect(
+        Array.from(table?.querySelectorAll('th') ?? []).every((head) => head.scope === 'col'),
+      ).toBe(true);
+      expect(table?.className).toMatch(/block/);
+      expect(table?.querySelector('tbody tr')?.className).toMatch(/md:table-row/);
     });
 
     it('should wrap the audit log table in a Card primitive', async () => {

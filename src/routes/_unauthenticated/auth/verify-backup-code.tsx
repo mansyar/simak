@@ -33,7 +33,7 @@ function VerifyBackupCodePage() {
       });
 
       if (result.error) {
-        setError(result.error.message ?? t('auth.invalidBackupCode'));
+        setError(t('auth.invalidBackupCode'));
       } else {
         router.invalidate();
       }
@@ -86,16 +86,23 @@ function VerifyBackupCodePage() {
             type="submit"
             disabled={isSubmitting || code.length < 1}
             loading={isSubmitting}
+            aria-busy={isSubmitting}
             className="w-full"
           >
             {t('common.verify')}
           </Button>
 
           <div className="flex flex-col items-center gap-2 text-center">
-            <Link to="/auth/verify-2fa" className="text-sm text-primary hover:underline">
+            <Link
+              to="/auth/verify-2fa"
+              className="inline-flex min-h-11 items-center text-sm text-primary hover:underline"
+            >
               {t('auth.useTotpCode')}
             </Link>
-            <Link to="/auth/login" className="text-sm text-muted-foreground hover:underline">
+            <Link
+              to="/auth/login"
+              className="inline-flex min-h-11 items-center text-sm text-muted-foreground hover:underline"
+            >
               {t('common.back')}
             </Link>
           </div>

@@ -12,11 +12,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertTriangle } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
+import { MutationFeedback } from '@/components/ui/mutation-feedback';
 
 interface DeleteTemplateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   usageCount: number;
 }
 
@@ -28,21 +29,32 @@ export function DeleteTemplateDialog({
 }: DeleteTemplateDialogProps) {
   const { t } = useI18n();
   const [deleteText, setDeleteText] = useState('');
+  const [error, setError] = useState<string>();
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const isInUse = usageCount > 0;
   const canConfirm = !isInUse || deleteText === t('common.deleteConfirmationWord');
 
-  const handleConfirm = () => {
-    if (canConfirm) {
-      onConfirm();
+  const handleConfirm = async () => {
+    if (!canConfirm) return;
+
+    setError(undefined);
+    setIsConfirming(true);
+    try {
+      await onConfirm();
       setDeleteText('');
       onOpenChange(false);
+    } catch {
+      setError(t('adminTemplates.deleteError'));
+    } finally {
+      setIsConfirming(false);
     }
   };
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       setDeleteText('');
+      setError(undefined);
     }
     onOpenChange(newOpen);
   };
@@ -66,6 +78,8 @@ export function DeleteTemplateDialog({
           </DialogDescription>
         </DialogHeader>
 
+        <MutationFeedback error={error} />
+
         {isInUse && (
           <div className="py-2 space-y-2">
             <Label htmlFor="delete-confirm-input">{t('common.typeDeleteToConfirm')}</Label>
@@ -87,7 +101,7 @@ export function DeleteTemplateDialog({
             type="button"
             variant="destructive"
             onClick={handleConfirm}
-            disabled={!canConfirm}
+            disabled={!canConfirm || isConfirming}
           >
             {t('adminTemplates.actions.delete')}
           </Button>

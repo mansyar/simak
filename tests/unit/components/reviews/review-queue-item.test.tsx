@@ -62,7 +62,9 @@ describe('ReviewQueueItem', () => {
 
   it('should render wait time', () => {
     render(<ReviewQueueItem item={item} />);
-    expect(screen.getByText(/3d/)).toBeDefined();
+    expect(screen.getByTestId('review-queue-wait-time').textContent).toBe(
+      'instructorReviews.waitTime.daysHours',
+    );
   });
 
   it('should link to review detail page', () => {

@@ -6,8 +6,12 @@
     "login": "Masuk",
     "logout": "Keluar",
     "email": "Email",
+    "emailRequired": "Email wajib diisi",
+    "invalidEmail": "Masukkan alamat email yang valid",
     "password": "Kata Sandi",
+    "passwordRequired": "Kata sandi wajib diisi",
     "signIn": "Masuk",
+    "signingIn": "Sedang masuk...",
     "forgotPassword": "Lupa Kata Sandi?",
     "resetPassword": "Atur Ulang Kata Sandi",
     "invalidCredentials": "Email atau kata sandi tidak valid",
@@ -23,6 +27,7 @@
     "verifyTwoFactor": "Verifikasi Autentikasi Dua Faktor",
     "verifyTwoFactorDescription": "Masukkan kode 6 digit dari aplikasi autentikator Anda",
     "totpCode": "Kode Verifikasi",
+    "totpPlaceholder": "000000",
     "invalidCode": "Kode verifikasi tidak valid. Silakan coba lagi.",
     "useBackupCode": "Gunakan kode cadangan",
     "verifyBackupCode": "Verifikasi Kode Cadangan",
@@ -51,6 +56,7 @@
     "previous": "Sebelumnya",
     "submit": "Kirim",
     "refresh": "Muat Ulang",
+    "retry": "Coba Lagi",
     "hide": "Sembunyikan",
     "view": "Lihat",
     "noResults": "Tidak ada hasil",
@@ -58,6 +64,7 @@
     "page": "Halaman",
     "openMenu": "Buka menu",
     "closeMenu": "Tutup menu",
+    "navigation": "Navigasi utama",
     "close": "Tutup",
     "copy": "Salin",
     "skipToContent": "Lompat ke konten",
@@ -75,6 +82,7 @@
     "pageOf": "Halaman {current} dari {total}",
     "done": "Selesai",
     "clearSearch": "Hapus pencarian",
+    "unknownUser": "Pengguna tidak dikenal",
     "exportCsv": "Ekspor CSV",
     "exportExcel": "Ekspor Excel",
     "exportStudentProgress": "Ekspor Progres Siswa",
@@ -118,12 +126,15 @@
     "title": "Log Audit",
     "subtitle": "Lihat dan cari jejak audit sistem dari semua tindakan penting.",
     "searchPlaceholder": "Cari berdasarkan ID entitas atau detail...",
+    "searchLabel": "Cari log audit",
+    "actionFilterLabel": "Filter berdasarkan tindakan",
     "allActions": "Semua Tindakan",
     "dateFrom": "Dari",
     "dateTo": "Sampai",
     "empty": "Tidak ada entri log audit ditemukan",
     "showing": "Menampilkan {from}-{to} dari {total} entri",
     "auditTable": {
+      "caption": "Entri log audit",
       "timestamp": "Waktu",
       "action": "Tindakan",
       "actor": "Pelaku",
@@ -154,12 +165,15 @@
     "title": "Antrian Email",
     "subtitle": "Pantau dan kelola antrian pengiriman email",
     "searchPlaceholder": "Cari berdasarkan penerima atau subjek...",
+    "searchLabel": "Cari antrian email",
+    "statusFilterLabel": "Filter berdasarkan status email",
     "statusAll": "Semua Status",
     "statusPending": "Tertunda",
     "statusProcessing": "Memproses",
     "statusSent": "Terkirim",
     "statusFailed": "Gagal",
     "table": {
+      "caption": "Entri antrian email",
       "recipient": "Penerima",
       "subject": "Subjek",
       "template": "Templat",
@@ -190,7 +204,11 @@
     "emptyFiltered": "Tidak ada email yang cocok dengan filter",
     "r2Cleanup": {
       "trigger": "Memicu Pembersihan R2",
-      "success": "Pembersihan R2 selesai: {{deleted}} dihapus, {{failed}} gagal, {{batchSize}} diproses"
+      "confirmTitle": "Jalankan Pembersihan R2?",
+      "confirmDescription": "Ini akan menghapus file yang memenuhi syarat dari penyimpanan R2 secara permanen.",
+      "confirm": "Jalankan Pembersihan",
+      "success": "Pembersihan R2 selesai: {{deleted}} dihapus, {{failed}} gagal, {{batchSize}} diproses",
+      "error": "Pembersihan R2 gagal. Silakan coba lagi."
     }
   },
   "adminUsers": {
@@ -198,6 +216,7 @@
     "subtitle": "Kelola pengguna, peran, dan izin organisasi Anda.",
     "newUser": "Pengguna Baru",
     "table": {
+      "caption": "Akun pengguna",
       "name": "Nama",
       "role": "Peran",
       "createdAt": "Dibuat Pada",
@@ -220,6 +239,7 @@
     "role_student": "Mahasiswa",
     "allRoles": "Semua Peran",
     "searchPlaceholder": "Cari pengguna berdasarkan nama atau email...",
+    "searchLabel": "Cari pengguna",
     "emailVerified": "Email Terverifikasi",
     "notVerified": "Belum Terverifikasi",
     "showing": "Menampilkan {count} dari {total} pengguna",
@@ -229,7 +249,8 @@
     "selectInstructor": "Pilih instruktur",
     "createSuccess": "Pengguna berhasil dibuat",
     "updateSuccess": "Pengguna berhasil diperbarui",
-    "deleteSuccess": "Pengguna berhasil dihapus"
+    "deleteSuccess": "Pengguna berhasil dihapus",
+    "deleteError": "Pengguna tidak dapat dihapus. Silakan coba lagi."
   },
   "adminTemplates": {
     "title": "Templat",
@@ -269,6 +290,7 @@
     },
     "deleteConfirm": "Hapus templat ini?",
     "deleteInUse": "Templat ini digunakan oleh {count} tugas. Ketik DELETE untuk mengonfirmasi.",
+    "deleteError": "Templat tidak dapat dihapus. Silakan coba lagi.",
     "studentsCount": "{count} mahasiswa",
     "inUseBanner": "Templat ini digunakan oleh {count} tugas. Perubahan akan memengaruhi pembuatan tugas di masa mendatang.",
     "detail": {
@@ -287,11 +309,19 @@
     "title": "Antrean Review",
     "subtitle": "Review pengumpulan mahasiswa yang menunggu di semua tugas Anda",
     "allAssignments": "Semua Tugas",
+    "assignmentFilterLabel": "Filter review berdasarkan tugas",
     "table": {
       "student": "Mahasiswa",
       "assignment": "Tugas",
       "waitTime": "Waktu Tunggu",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Aksi",
+      "caption": "Antrean review tertunda"
+    },
+    "waitTime": {
+      "daysHours": "{days}h {hours}j",
+      "hours": "{hours}j",
+      "lessThanHour": "< 1 jam"
     },
     "empty": "Tidak ada review tertunda",
     "emptyPrompt": "Ketika mahasiswa mengumpulkan pekerjaan untuk direview, akan muncul di sini.",
@@ -308,6 +338,7 @@
     "passed": "Lulus",
     "revise": "Revisi",
     "decision": "Keputusan",
+    "decisionRequired": "Pilih Lulus atau Revisi sebelum mengirim",
     "pass": "Lulus",
     "comment": "Komentar",
     "commentPlaceholder": "Tambahkan umpan balik atau komentar untuk mahasiswa...",
@@ -477,6 +508,7 @@
     "averageProgress": "Rata-rata Progres",
     "newAssignment": "Tugas Baru",
     "searchPlaceholder": "Cari tugas berdasarkan judul...",
+    "searchLabel": "Cari tugas",
     "studentCount": "{count} Mahasiswa",
     "finalDeadline": "Tenggat: {date}",
     "empty": "Tidak ada tugas ditemukan",
@@ -541,6 +573,8 @@
       "noStudentsSelected": "Belum ada mahasiswa terpilih",
       "checkpointsPreview": "Pratinjau Tahapan",
       "stepDueDates": "Tenggat Waktu",
+      "progressLabel": "Progres pembuatan tugas",
+      "currentStep": "Langkah {current} dari {total}: {label}",
       "dueDatesPrompt": "Tinjau dan sesuaikan tenggat waktu untuk setiap tahapan.",
       "daysLabel": "{count} hari",
       "dueDateFor": "Tenggat waktu untuk",
@@ -568,7 +602,15 @@
     "initiallyUnlocked": "Awalnya Terbuka",
     "selectTemplateHint": "Pilih templat untuk melihat peta jalan tahapannya.",
     "selectAll": "Pilih Semua",
-    "deselectAll": "Batalkan Semua Pilihan"
+    "deselectAll": "Batalkan Semua Pilihan",
+    "discussions": {
+      "searchLabel": "Cari diskusi",
+      "searchPlaceholder": "Cari berdasarkan mahasiswa atau checkpoint...",
+      "studentFilterLabel": "Filter berdasarkan mahasiswa",
+      "allStudents": "Semua mahasiswa",
+      "threadListLabel": "Daftar utas diskusi",
+      "noMatches": "Tidak ada diskusi yang sesuai dengan filter."
+    }
   },
   "studentSidebar": {
     "dashboard": "Dasbor",
@@ -611,6 +653,8 @@
       "revise": "Revisi",
       "overdue": "Terlambat"
     },
+    "sectionsLabel": "Bagian tugas",
+    "statusLabel": "Status",
     "timeline": "Linimasa Checkpoint",
     "submit": "Kumpulkan",
     "resubmit": "Kumpulkan Ulang",
@@ -618,6 +662,7 @@
     "consultations": "Konsultasi: {current}/{required}",
     "blockedByPrevious": "Checkpoint sebelumnya belum lulus",
     "blockedByConsultations": "Konsultasi tidak mencukupi: {current}/{required} terverifikasi",
+    "lockedNextStep": "Selesaikan checkpoint sebelumnya dan konsultasi yang diperlukan untuk membuka checkpoint ini.",
     "notFound": "Tugas tidak ditemukan",
     "notFoundDescription": "Tugas ini tidak ada atau Anda tidak memiliki akses ke tugas ini.",
     "checkpointTimeline": "Linimasa Checkpoint"
@@ -782,6 +827,9 @@
     "subtitle": "Analitik performa pengajaran dan review Anda",
     "reviewsCompleted": "Review Selesai",
     "avgResponseTime": "Rata-rata Waktu Respons",
+    "notAvailable": "Tidak tersedia",
+    "responseHours": "{value} jam",
+    "averageResponseTimeHours": "Rata-rata Waktu Respons (Jam)",
     "slaBreachCount": "Pelanggaran SLA (>3 hari)",
     "studentsSupervised": "Mahasiswa Bimbingan",
     "assignmentsActive": "Tugas Aktif",
@@ -821,6 +869,7 @@
       "uploadedAt": "Diunggah Pada",
       "action": "Aksi"
     },
+    "historyLabel": "Riwayat file pengumpulan",
     "review": {
       "title": "Hasil Review",
       "passed": "Lulus",
@@ -896,9 +945,14 @@
     "send": "Kirim",
     "reply": "Balas",
     "delete": "Hapus",
+    "deleteConfirm": "Apakah Anda yakin ingin menghapus pesan ini?",
     "cancel": "Batal",
     "deleted": "[dihapus]",
     "deleteWindowExpired": "Jendela penghapusan berakhir",
+    "success": {
+      "posted": "Pesan berhasil dikirim.",
+      "deleted": "Pesan berhasil dihapus."
+    },
     "loading": "Memuat pesan...",
     "empty": {
       "title": "Belum ada pesan",
@@ -906,10 +960,17 @@
     },
     "errors": {
       "required": "Pesan tidak boleh kosong",
-      "tooLong": "Pesan harus 2000 karakter atau kurang"
+      "tooLong": "Pesan harus 2000 karakter atau kurang",
+      "postFailed": "Pesan tidak dapat dikirim. Silakan coba lagi.",
+      "deleteFailed": "Pesan tidak dapat dihapus. Silakan coba lagi."
     }
   },
   "landing": {
+    "nav": {
+      "label": "Navigasi publik",
+      "features": "Fitur",
+      "howItWorks": "Cara kerja"
+    },
     "hero": {
       "headline": "Kelola Tugas Akademik dengan Percaya Diri",
       "subheadline": "SIMAK membantu mahasiswa dan dosen melacak kemajuan, mengelola checkpoint, dan memastikan pengumpulan tepat waktu melalui alur kerja yang terstruktur.",
@@ -994,13 +1055,21 @@
     "unreadCount": "{count} notifikasi belum dibaca",
     "filterAll": "Semua",
     "filterUnread": "Belum Dibaca",
+    "filterLabel": "Filter notifikasi",
+    "loading": "Memuat notifikasi...",
+    "loadingMore": "Memuat lebih banyak notifikasi...",
+    "emptyDescription": "Semua notifikasi sudah ditinjau.",
+    "justNow": "Baru saja",
+    "read": "Notifikasi sudah dibaca",
+    "unread": "Notifikasi belum dibaca",
     "loadMore": "Muat Lainnya",
     "toasterLabel": "Notifikasi",
     "groups": {
       "newReviews": "Ulasan Baru",
       "consultations": "Pembaruan Konsultasi",
       "submissions": "Unggahan",
-      "system": "Notifikasi Sistem"
+      "system": "Notifikasi Sistem",
+      "other": "Notifikasi lainnya"
     },
     "events": {
       "review_completed": {
@@ -1091,8 +1160,10 @@
     "reason": "Alasan",
     "reasonPlaceholder": "Jelaskan mengapa Anda memerlukan perpanjangan...",
     "reasonMinChars": "Minimal {count} karakter diperlukan",
+    "reasonCharacterCount": "{count} karakter",
     "duration": "Durasi (hari)",
     "durationHint": "Berapa hari tambahan yang Anda butuhkan?",
+    "durationMaxHint": "Maksimal {max} hari",
     "checkpoint": "Checkpoint",
     "checkpointHint": "Pilih checkpoint yang akan diperpanjang (default: checkpoint aktif)",
     "submit": "Kirim Permintaan",
@@ -1102,7 +1173,8 @@
       "categoryRequired": "Silakan pilih kategori",
       "reasonMin": "Alasan harus minimal 10 karakter",
       "durationMin": "Durasi harus minimal 1 hari",
-      "durationMax": "Durasi tidak boleh melebihi {max} hari"
+      "durationMax": "Durasi tidak boleh melebihi {max} hari",
+      "submitFailed": "Permintaan perpanjangan tidak dapat dikirim. Silakan coba lagi."
     },
     "queueTitle": "Permintaan Perpanjangan",
     "historyTitle": "Riwayat Perpanjangan",
@@ -1155,6 +1227,18 @@
   },
   "settings": {
     "title": "Pengaturan",
+    "navigation": {
+      "label": "Bagian pengaturan",
+      "profile": "Profil",
+      "password": "Kata sandi",
+      "twoFactor": "Autentikasi dua faktor",
+      "sessions": "Sesi aktif",
+      "appearance": "Tampilan",
+      "accessibility": "Aksesibilitas",
+      "notifications": "Preferensi notifikasi",
+      "timezone": "Zona waktu",
+      "calendar": "Feed kalender"
+    },
     "twoFactor": {
       "title": "Autentikasi Dua Faktor",
       "description": "Tambahkan lapisan keamanan ekstra ke akun Anda dengan mewajibkan kode verifikasi dari aplikasi autentikator.",
@@ -1173,9 +1257,11 @@
       "verify": "Verifikasi",
       "setupError": "Gagal mengatur 2FA. Silakan coba lagi.",
       "verifyError": "Kode verifikasi tidak valid. Silakan coba lagi.",
+      "enableSuccess": "Autentikasi dua faktor berhasil diaktifkan.",
       "disableTitle": "Nonaktifkan Autentikasi Dua Faktor",
       "disableDescription": "Masukkan kata sandi Anda untuk menonaktifkan 2FA. Akun Anda akan kurang aman.",
       "disableError": "Gagal menonaktifkan 2FA. Silakan coba lagi.",
+      "disableSuccess": "Autentikasi dua faktor berhasil dinonaktifkan.",
       "saveBackupCodes": "Simpan Kode Cadangan"
     },
     "sessions": {
@@ -1189,7 +1275,14 @@
       "revokeAllTitle": "Cabut Semua Sesi Lain",
       "revokeAllDescription": "Ini akan logout {count} sesi lainnya. Sesi Anda saat ini akan tetap aktif.",
       "revokeAllOthers": "Cabut Semua Sesi Lain",
-      "revokeAll": "Cabut Semua"
+      "revokeAll": "Cabut Semua",
+      "revokeSuccess": "Sesi berhasil dicabut",
+      "revokeError": "Sesi tidak dapat dicabut. Silakan coba lagi.",
+      "revokeAllSuccess": "Sesi lain berhasil dicabut",
+      "revokeAllError": "Sesi lain tidak dapat dicabut. Silakan coba lagi.",
+      "unknownIp": "Alamat IP tidak diketahui",
+      "unknownDevice": "Perangkat tidak diketahui",
+      "deviceOn": "{browser} di {os}"
     },
     "profile": {
       "title": "Profil",
@@ -1223,7 +1316,9 @@
       "title": "Aksesibilitas",
       "description": "Pengaturan aksesibilitas untuk pengalaman yang lebih baik",
       "reducedMotionLabel": "Gerakan Dikurangi",
-      "reducedMotionHint": "Kurangi animasi dan transisi di seluruh aplikasi"
+      "reducedMotionHint": "Kurangi animasi dan transisi di seluruh aplikasi",
+      "saveSuccess": "Pengaturan aksesibilitas berhasil disimpan",
+      "saveError": "Pengaturan aksesibilitas tidak dapat disimpan. Silakan coba lagi."
     },
     "timezone": {
       "title": "Zona waktu tenggat mahasiswa",
@@ -1259,6 +1354,8 @@
     "notificationPreferences": {
       "title": "Preferensi Notifikasi",
       "description": "Pilih bagaimana Anda ingin diberi tahu untuk setiap jenis peristiwa.",
+      "saveSuccess": "Preferensi notifikasi berhasil disimpan",
+      "saveError": "Preferensi notifikasi tidak dapat disimpan. Silakan coba lagi.",
       "channels": {
         "email": "Email",
         "inApp": "Di Aplikasi"
@@ -1332,6 +1429,7 @@
       "validationErrorsFoundGroups": "ditemukan kesalahan validasi. Grup yang tidak valid akan dilewati.",
       "invalidFormat": "Hanya file .xlsx yang diterima",
       "fileTooLarge": "Ukuran file harus kurang dari 5MB",
+      "parsing": "Mengurai file...",
       "parseFailed": "Gagal mengurai file xlsx",
       "importFailed": "Gagal mengimpor. Silakan coba lagi.",
       "importComplete": "Impor Selesai",
@@ -1343,6 +1441,8 @@
     },
     "users": {
       "title": "Impor Massal Pengguna",
+      "previewCaption": "Pratinjau impor pengguna",
+      "resultCaption": "Kesalahan impor pengguna",
       "subtitle": "Unggah file .xlsx untuk mengimpor pengguna secara massal",
       "button": "Impor Massal",
       "name": "Nama",
@@ -1363,6 +1463,8 @@
       }
     },
     "templates": {
+      "previewCaption": "Pratinjau impor template",
+      "resultCaption": "Kesalahan impor template",
       "title": "Impor Massal Template",
       "subtitle": "Unggah file .xlsx untuk mengimpor template secara massal",
       "button": "Impor Massal",
@@ -1488,6 +1590,7 @@
       "breakdown": "Tampilkan Rincian",
       "checkpoint": "Checkpoint",
       "score": "Skor",
+      "scoreUnavailable": "Tidak tersedia",
       "unavailable": "Nilai akhir belum tersedia",
       "notYetReleased": "Nilai akhir Anda belum diterbitkan.",
       "releaseVersion": "Versi rilis",

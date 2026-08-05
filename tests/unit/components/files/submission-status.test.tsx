@@ -46,6 +46,12 @@ describe('SubmissionStatus', () => {
   it('should show awaiting review when no review exists', () => {
     render(<SubmissionStatus review={null} />);
     expect(screen.getByText('files.review.awaiting')).toBeDefined();
+    expect(screen.getByRole('status').getAttribute('aria-label')).toBe('files.review.awaiting');
+  });
+
+  it('should expose the review decision as a status', () => {
+    render(<SubmissionStatus review={{ decision: 'pass' }} />);
+    expect(screen.getByRole('status').getAttribute('aria-label')).toBe('files.review.passed');
   });
 
   it('should show reviewer name when available', () => {

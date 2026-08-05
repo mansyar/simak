@@ -185,6 +185,7 @@ describe('Admin Users index page', () => {
     });
     mockLoaderData.users = [];
     mockLoaderData.total = 0;
+    delete (mockLoaderData as Record<string, unknown>).error;
     vi.mocked(listUsers).mockResolvedValue({ users: [], total: 0 } as any);
     vi.mocked(deleteUser).mockResolvedValue({ success: true } as any);
     mockRouter.invalidate.mockClear();
@@ -235,6 +236,19 @@ describe('Admin Users index page', () => {
   });
 
   describe('render', () => {
+    it('should show a retryable error state instead of an empty user table', async () => {
+      (mockLoaderData as Record<string, unknown>).error = {
+        code: 'INTERNAL',
+        message: 'user query details',
+      };
+      const Component = await getComponent();
+      renderWithQuery(<Component />);
+
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByText('error.internal')).toBeInTheDocument();
+      expect(screen.queryByText('user query details')).not.toBeInTheDocument();
+    });
+
     it('should render the page title via PageHeader (text-3xl, not text-4xl)', async () => {
       const Component = await getComponent();
       renderWithQuery(<Component />);
@@ -431,7 +445,7 @@ describe('Admin Users index page', () => {
       fireEvent.click(screen.getByTestId('delete-confirm'));
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Server error');
+        expect(toast.error).toHaveBeenCalledWith('error.internal');
       });
       const data = queryClient.getQueryData<{ users: { id: string }[]; total: number }>(key);
       expect(data?.users.find((u) => u.id === '1')).toBeDefined();

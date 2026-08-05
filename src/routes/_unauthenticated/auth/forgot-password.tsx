@@ -24,6 +24,10 @@ function ForgotPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!email.trim()) {
+      setError(t('auth.emailRequired'));
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -44,7 +48,11 @@ function ForgotPasswordPage() {
   if (sent) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
-        <div className="w-full max-w-sm rounded-xl border bg-card p-8 text-center shadow-lg">
+        <div
+          role="status"
+          aria-live="polite"
+          className="w-full max-w-sm rounded-xl border bg-card p-8 text-center shadow-lg"
+        >
           <div className="mb-6 flex items-center justify-between">
             <LanguageSwitcher currentLocale={locale} onSwitch={setLocale} />
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
@@ -54,7 +62,7 @@ function ForgotPasswordPage() {
           </h1>
           <p className="mb-6 text-sm text-muted-foreground">{t('auth.forgotPasswordSent')}</p>
           <Link to="/auth/login">
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full min-h-11">
               {t('common.back')}
             </Button>
           </Link>
@@ -78,7 +86,7 @@ function ForgotPasswordPage() {
           <p className="mt-1 text-sm text-muted-foreground">{t('auth.forgotPassword')}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="email">{t('auth.email')}</Label>
             <Input
@@ -87,23 +95,38 @@ function ForgotPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              aria-invalid={error ? 'true' : undefined}
+              aria-describedby={error ? 'forgot-password-error' : undefined}
               placeholder={t('common.emailPlaceholder')}
               autoComplete="email"
             />
           </div>
 
           {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive" role="alert">
+            <div
+              id="forgot-password-error"
+              className="rounded-md bg-destructive/10 p-3 text-sm text-destructive"
+              role="alert"
+            >
               {error}
             </div>
           )}
 
-          <Button type="submit" disabled={isSubmitting} loading={isSubmitting} className="w-full">
-            {t('common.submit')}
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            loading={isSubmitting}
+            aria-busy={isSubmitting}
+            className="w-full"
+          >
+            {isSubmitting ? t('common.loading') : t('common.submit')}
           </Button>
 
           <div className="text-center">
-            <Link to="/auth/login" className="text-sm text-primary hover:underline">
+            <Link
+              to="/auth/login"
+              className="inline-flex min-h-11 items-center text-sm text-primary hover:underline"
+            >
               {t('common.back')}
             </Link>
           </div>

@@ -40,6 +40,7 @@ vi.mock('@/routes/__root', () => ({
           ? `This template is used by ${params.count} assignment(s). Type DELETE to confirm.`
           : key,
         'adminTemplates.actions.delete': 'Delete',
+        'adminTemplates.deleteError': 'Unable to delete the template. Please try again.',
         'common.cancel': 'Cancel',
         'common.deleteConfirmationWord': 'DELETE',
       };
@@ -188,6 +189,27 @@ describe('DeleteTemplateDialog', () => {
     const confirmBtn = buttons.find((btn) => btn.textContent === 'Delete');
     fireEvent.click(confirmBtn!);
     expect(onConfirm).toHaveBeenCalledOnce();
+  });
+
+  it('should keep the dialog open and announce a failed deletion', async () => {
+    const rejectedConfirm = vi.fn().mockRejectedValue(new Error('delete failed'));
+    const onOpenChange = vi.fn();
+
+    render(
+      <DeleteTemplateDialog
+        open={true}
+        onOpenChange={onOpenChange}
+        onConfirm={rejectedConfirm}
+        usageCount={0}
+      />,
+    );
+
+    const buttons = screen.getAllByTestId('dialog-btn');
+    const confirmBtn = buttons.find((btn) => btn.textContent === 'Delete');
+    fireEvent.click(confirmBtn!);
+
+    expect(await screen.findByRole('alert')).toBeDefined();
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
   });
 
   it('should call onCancel when cancel clicked', () => {

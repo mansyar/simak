@@ -23,7 +23,9 @@ test.describe('Settings Hub', () => {
 
     await page.getByRole('button', { name: 'Save Name' }).click();
 
-    await expect(page.getByText('Name updated successfully')).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.getByLabel('Profile', { exact: true }).getByText('Name updated successfully'),
+    ).toBeVisible({ timeout: 10000 });
 
     await page.reload();
     await page.waitForLoadState('networkidle');
@@ -87,11 +89,32 @@ test.describe('Settings Hub', () => {
     await page.goto('/admin/settings');
     await page.waitForLoadState('networkidle');
 
-    await expect(page.getByText('Appearance', { exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Appearance', exact: true })).toBeVisible();
 
     await page.getByRole('button', { name: 'ID', exact: true }).click();
 
-    await expect(page.getByText('Tampilan', { exact: true })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('link', { name: 'Tampilan', exact: true })).toBeVisible({
+      timeout: 10000,
+    });
+  });
+
+  test('settings sections remain navigable at mobile width', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto('/admin/settings');
+    await page.waitForLoadState('networkidle');
+
+    const navigation = page.getByRole('navigation', { name: 'Settings sections' });
+    await expect(navigation).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBeTruthy();
+
+    const notificationLink = navigation.getByRole('link', {
+      name: 'Notification preferences',
+    });
+    await expect(notificationLink).toBeVisible();
+    await notificationLink.click();
+    await expect(page.locator('#settings-notifications')).toBeInViewport();
   });
 
   test('theme toggle applies dark class to html', async ({ page }) => {
@@ -108,6 +131,23 @@ test.describe('Settings Hub', () => {
       document.documentElement.classList.contains('dark'),
     );
     expect(afterToggle).toBe(!initialDark);
+  });
+
+  test('reduced motion setting applies to the document root', async ({ page }) => {
+    await page.goto('/admin/settings');
+    await page.waitForLoadState('networkidle');
+
+    const reducedMotion = page.getByRole('checkbox', { name: 'Reduced Motion' });
+    const initiallyEnabled = await reducedMotion.isChecked();
+    await reducedMotion.click();
+    await expect
+      .poll(() => page.locator('html').getAttribute('data-reduced-motion'))
+      .toBe(initiallyEnabled ? null : 'true');
+
+    await reducedMotion.click();
+    await expect
+      .poll(() => page.locator('html').getAttribute('data-reduced-motion'))
+      .toBe(initiallyEnabled ? 'true' : null);
   });
 
   test('notification preferences toggle persists after reload', async ({ page }) => {

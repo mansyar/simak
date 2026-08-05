@@ -238,6 +238,7 @@ describe('getStudentDashboardDataHandler — parallel query execution', () => {
         result: [
           {
             assignmentId: 1,
+            checkpointId: 10,
             assignmentTitle: 'Thesis',
             checkpointName: 'Ch 1',
             dueDate: now,
@@ -250,6 +251,8 @@ describe('getStudentDashboardDataHandler — parallel query execution', () => {
         result: [
           {
             submissionId: 100,
+            assignmentId: 1,
+            checkpointId: 10,
             assignmentTitle: 'Thesis',
             checkpointName: 'Ch 1',
             submittedAt,
@@ -261,6 +264,7 @@ describe('getStudentDashboardDataHandler — parallel query execution', () => {
         result: [
           {
             assignmentId: 1,
+            checkpointId: 10,
             assignmentTitle: 'Thesis',
             checkpointName: 'Ch 1',
             consultationDate,
@@ -276,9 +280,14 @@ describe('getStudentDashboardDataHandler — parallel query execution', () => {
     const result = (await getStudentDashboardDataHandler()) as any;
     expect(result.upcomingDeadlines).toHaveLength(1);
     expect(result.upcomingDeadlines[0].assignmentTitle).toBe('Thesis');
+    expect(result.upcomingDeadlines[0].checkpointId).toBe(10);
     expect(result.pendingReviews).toHaveLength(1);
+    expect(result.pendingReviews[0].assignmentId).toBe(1);
+    expect(result.pendingReviews[0].checkpointId).toBe(10);
     expect(result.pendingReviews[0].waitTimeDays).toBeGreaterThanOrEqual(0);
     expect(result.consultationReminders).toHaveLength(1);
+    expect(result.consultationReminders[0].assignmentId).toBe(1);
+    expect(result.consultationReminders[0].checkpointId).toBe(10);
     expect(result.consultationReminders[0].consultationId).toBe(50);
   });
 });

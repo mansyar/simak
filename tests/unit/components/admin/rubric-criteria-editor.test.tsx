@@ -358,7 +358,7 @@ describe('RubricCriteriaEditor', () => {
     });
     fireEvent.click(screen.getByTestId('save-rubric'));
     await waitFor(() => {
-      expect(screen.getByText('Invalid weights')).toBeDefined();
+      expect(screen.getByText('error.validation')).toBeDefined();
     });
   });
 

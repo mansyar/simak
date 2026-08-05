@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, cleanup, fireEvent } from '@testing-library/react';
+import { render, cleanup, fireEvent, screen } from '@testing-library/react';
 import type { ComponentType } from 'react';
 
 const mocks = vi.hoisted(() => ({
@@ -75,6 +75,7 @@ vi.mock('@tanstack/react-router', () => ({
     ...config,
     useLoaderData: () => mocks.loaderData,
     useParams: () => ({ id: '1' }),
+    useNavigate: () => vi.fn(),
   }),
   Link: ({ children }: any) => children,
   useMatchRoute: () => () => false,
@@ -213,45 +214,43 @@ describe('AssignmentDetailPage - Discussions tab', () => {
     expect(getByTestId('interventions-tab')).toBeTruthy();
   });
 
-  it('should render DiscussionPanel for each checkpoint when Discussions tab is active', () => {
+  it('should render one selected DiscussionPanel and disclose other threads on demand', () => {
     const { getByTestId } = render(<AssignmentDetailPage />);
 
-    // Before clicking, no DiscussionPanels should be rendered
     expect(mocks.discussionPanelCalls).toHaveLength(0);
 
-    // Click the Discussions tab
     fireEvent.click(getByTestId('tab-discussions'));
 
-    // Should render DiscussionPanel for each checkpoint (3 total: 2 for Alice, 1 for Bob)
-    expect(mocks.discussionPanelCalls).toHaveLength(3);
+    expect(mocks.discussionPanelCalls).toHaveLength(1);
     expect(mocks.discussionPanelCalls[0]).toEqual({
       checkpointId: 1,
       assignmentId: 1,
       instructorView: true,
     });
-    expect(mocks.discussionPanelCalls[1]).toEqual({
+
+    fireEvent.click(screen.getByRole('button', { name: 'Alice — Checkpoint 2' }));
+    expect(mocks.discussionPanelCalls.at(-1)).toEqual({
       checkpointId: 2,
       assignmentId: 1,
       instructorView: true,
     });
-    expect(mocks.discussionPanelCalls[2]).toEqual({
+
+    fireEvent.click(screen.getByRole('button', { name: 'Bob — Checkpoint 1' }));
+    expect(mocks.discussionPanelCalls.at(-1)).toEqual({
       checkpointId: 3,
       assignmentId: 1,
       instructorView: true,
     });
   });
 
-  it('should show student name and checkpoint name as headers for each DiscussionPanel', () => {
+  it('should show the selected student and checkpoint as the discussion heading', () => {
     const { getByTestId } = render(<AssignmentDetailPage />);
 
     fireEvent.click(getByTestId('tab-discussions'));
 
-    // Each header shows "StudentName — CheckpointName"
-    const headers = document.querySelectorAll('h3');
-    const headerTexts = Array.from(headers).map((h) => h.textContent);
+    expect(document.querySelector('h3')?.textContent).toBe('Alice — Checkpoint 1');
 
-    expect(headerTexts).toContain('Alice — Checkpoint 1');
-    expect(headerTexts).toContain('Alice — Checkpoint 2');
-    expect(headerTexts).toContain('Bob — Checkpoint 1');
+    fireEvent.click(screen.getByRole('button', { name: 'Bob — Checkpoint 1' }));
+    expect(document.querySelector('h3')?.textContent).toBe('Bob — Checkpoint 1');
   });
 });

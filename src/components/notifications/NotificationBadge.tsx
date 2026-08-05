@@ -23,8 +23,8 @@ export function NotificationBadge({ onOpen }: { onOpen: () => void }) {
     >
       {hasUnread ? (
         <>
-          <BellDot className="h-5 w-5 text-red-500" aria-hidden="true" />
-          <span className="absolute top-1 right-1 inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[9px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4">
+          <BellDot className="h-5 w-5 text-error" aria-hidden="true" />
+          <span className="absolute top-1 right-1 inline-flex items-center justify-center rounded-full bg-error px-1.5 py-0.5 text-[9px] font-bold leading-none text-foreground transform translate-x-1/4 -translate-y-1/4">
             {count}
           </span>
         </>

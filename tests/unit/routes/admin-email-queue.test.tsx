@@ -103,6 +103,7 @@ describe('Admin Email Queue page', () => {
     mockData.page = 1;
     mockData.limit = 20;
     mockData.summary = { pending: 0, sent: 0, failed: 0 };
+    delete (mockData as Record<string, unknown>).error;
     mockSearch.page = 1;
     mockSearch.status = 'all';
     mockSearch.search = '';
@@ -162,6 +163,21 @@ describe('Admin Email Queue page', () => {
       const refreshButton = screen.getByRole('button', { name: 'common.refresh' });
       mockRouter.invalidate.mockClear();
       fireEvent.click(refreshButton);
+      expect(mockRouter.invalidate).toHaveBeenCalledTimes(1);
+    });
+
+    it('should show a retryable error state instead of an empty email queue', async () => {
+      (mockData as Record<string, unknown>).error = {
+        code: 'INTERNAL',
+        message: 'queue details',
+      };
+      const Component = await getComponent();
+      render(<Component />);
+
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByText('error.internal')).toBeInTheDocument();
+      expect(screen.queryByText('queue details')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'common.refresh' }));
       expect(mockRouter.invalidate).toHaveBeenCalledTimes(1);
     });
 
@@ -364,7 +380,37 @@ describe('Admin Email Queue page', () => {
     it('should render search input', async () => {
       const Component = await getComponent();
       render(<Component />);
-      expect(screen.getByPlaceholderText('adminEmailQueue.searchPlaceholder')).toBeInTheDocument();
+      expect(
+        screen.getByRole('textbox', { name: 'adminEmailQueue.searchLabel' }),
+      ).toBeInTheDocument();
+    });
+
+    it('should expose a caption and mobile-safe email rows', async () => {
+      mockData.entries = [
+        {
+          id: 1,
+          recipientEmail: 'user@example.com',
+          subject: 'Password Reset',
+          templateType: 'password_reset',
+          status: 'sent',
+          attempts: 1,
+          lastAttemptAt: null,
+          errorMessage: null,
+          resendMessageId: null,
+          createdAt: null,
+        },
+      ];
+      const Component = await getComponent();
+      const { container } = render(<Component />);
+      const table = container.querySelector('table');
+      expect(table?.querySelector('caption')?.textContent).toContain(
+        'adminEmailQueue.table.caption',
+      );
+      expect(
+        Array.from(table?.querySelectorAll('th') ?? []).every((head) => head.scope === 'col'),
+      ).toBe(true);
+      expect(table?.className).toMatch(/block/);
+      expect(table?.querySelector('tbody tr')?.className).toMatch(/md:table-row/);
     });
 
     it('should render empty state when no entries', async () => {
@@ -407,12 +453,27 @@ describe('Admin Email Queue page', () => {
       const Component = await getComponent();
       render(<Component />);
       fireEvent.click(screen.getByRole('button', { name: 'adminEmailQueue.r2Cleanup.trigger' }));
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'adminEmailQueue.r2Cleanup.confirm' }));
       await waitFor(() => {
         expect(mockTriggerR2Cleanup).toHaveBeenCalledWith({ data: {} });
       });
       await waitFor(() => {
         expect(toast.success).toHaveBeenCalledWith('adminEmailQueue.r2Cleanup.success');
       });
+    });
+
+    it('should keep cleanup confirmation open when cleanup fails', async () => {
+      mockTriggerR2Cleanup.mockResolvedValueOnce({
+        error: { code: 'INTERNAL', message: 'private cleanup details' },
+      });
+      const Component = await getComponent();
+      render(<Component />);
+      fireEvent.click(screen.getByRole('button', { name: 'adminEmailQueue.r2Cleanup.trigger' }));
+      fireEvent.click(screen.getByRole('button', { name: 'adminEmailQueue.r2Cleanup.confirm' }));
+      await waitFor(() => expect(mockTriggerR2Cleanup).toHaveBeenCalled());
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+      expect(screen.queryByText('private cleanup details')).not.toBeInTheDocument();
     });
   });
 });

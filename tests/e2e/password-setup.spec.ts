@@ -143,7 +143,7 @@ test.describe('Password Setup Lifecycle', () => {
     await ctx.close();
   });
 
-  test('token reuse after setup → Invalid or expired token error', async ({ browser }) => {
+  test('token reuse after setup → expired-link error', async ({ browser }) => {
     const testEmail = 'reuse-token@e2e.test';
     const testPassword = 'NewPass123!';
 
@@ -169,13 +169,16 @@ test.describe('Password Setup Lifecycle', () => {
     await fillPasswordFormAndSubmit(page, testPassword);
 
     // Verify error message appears
-    await expect(page.getByRole('alert')).toContainText('Invalid or expired token', {
-      timeout: 10_000,
-    });
+    await expect(page.getByRole('alert')).toContainText(
+      'This link has expired or is invalid. Please request a new one.',
+      {
+        timeout: 10_000,
+      },
+    );
     await ctx.close();
   });
 
-  test('expired token → Invalid or expired token error', async ({ browser }) => {
+  test('expired token → expired-link error', async ({ browser }) => {
     const testEmail = 'expired-token@e2e.test';
     const testPassword = 'NewPass123!';
 
@@ -196,9 +199,12 @@ test.describe('Password Setup Lifecycle', () => {
     await fillPasswordFormAndSubmit(page, testPassword);
 
     // Verify error message appears
-    await expect(page.getByRole('alert')).toContainText('Invalid or expired token', {
-      timeout: 10_000,
-    });
+    await expect(page.getByRole('alert')).toContainText(
+      'This link has expired or is invalid. Please request a new one.',
+      {
+        timeout: 10_000,
+      },
+    );
     await ctx.close();
   });
 });

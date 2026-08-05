@@ -168,7 +168,7 @@ describe('Admin Analytics Page', () => {
     };
     const Page = await getAnalyticsPage();
     render(<Page />);
-    expect(screen.getByText('Internal Server Error')).toBeDefined();
+    expect(screen.getByText('error.internal')).toBeDefined();
   });
 
   it('renders empty state for trends with no data', async () => {

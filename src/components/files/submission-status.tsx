@@ -3,6 +3,7 @@ import type { TranslationKey } from '../../i18n/index';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, RefreshCcw, Clock, User, MessageSquare } from 'lucide-react';
+import { useStudentDateFormatter } from '@/hooks/use-student-date';
 
 interface ReviewData {
   decision: 'pass' | 'revise';
@@ -16,32 +17,24 @@ interface SubmissionStatusProps {
   review: ReviewData | null;
 }
 
-function formatDate(date: Date | string | null | undefined, locale: string): string {
-  if (!date) return '';
-  return new Intl.DateTimeFormat(locale, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }).format(new Date(date));
-}
-
 const statusConfig = {
   pass: {
     badgeVariant: 'success' as const,
     icon: CheckCircle2,
-    iconClass: 'text-green-500',
+    iconClass: 'text-success',
     labelKey: 'files.review.passed',
   },
   revise: {
     badgeVariant: 'destructive' as const,
     icon: RefreshCcw,
-    iconClass: 'text-orange-500',
+    iconClass: 'text-warning',
     labelKey: 'files.review.revise',
   },
 };
 
 export function SubmissionStatus({ review }: SubmissionStatusProps) {
   const { t, locale } = useI18n();
+  const { format } = useStudentDateFormatter(locale);
 
   if (!review) {
     return (
@@ -50,7 +43,11 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
           <CardTitle className="text-base">{t('files.review.title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3"
+            role="status"
+            aria-label={t('files.review.awaiting')}
+          >
             <Clock className="h-5 w-5 text-muted-foreground" />
             <div>
               <p className="text-sm font-medium text-foreground">{t('files.review.awaiting')}</p>
@@ -66,13 +63,17 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
   const Icon = config.icon;
 
   return (
-    <Card className={review.decision === 'pass' ? 'border-l-green-500' : 'border-l-orange-500'}>
+    <Card className={review.decision === 'pass' ? 'border-l-success' : 'border-l-warning'}>
       <CardHeader>
         <CardTitle className="text-base">{t('files.review.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {/* Decision badge */}
-        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center gap-2"
+          role="status"
+          aria-label={t(config.labelKey as TranslationKey)}
+        >
           <Icon className={`h-5 w-5 ${config.iconClass}`} />
           <Badge variant={config.badgeVariant}>{t(config.labelKey as TranslationKey)}</Badge>
         </div>
@@ -98,7 +99,7 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
             <span>
-              {t('files.revisionDeadline', { date: formatDate(review.revisionDeadline, locale) })}
+              {t('files.revisionDeadline', { date: format(review.revisionDeadline, 'short') })}
             </span>
           </div>
         )}
@@ -106,7 +107,7 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
         {/* Review date */}
         {review.reviewedAt && (
           <p className="text-xs text-muted-foreground">
-            {t('files.review.reviewedOn', { date: formatDate(review.reviewedAt, locale) })}
+            {t('files.review.reviewedOn', { date: format(review.reviewedAt, 'short') })}
           </p>
         )}
       </CardContent>

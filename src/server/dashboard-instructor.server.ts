@@ -308,9 +308,12 @@ export async function getInstructorDashboardDataHandler(): Promise<
         assignmentTitle: item.assignmentTitle,
         studentName: item.studentName,
         submittedAt: item.submittedAt ? item.submittedAt.toISOString() : null,
-        waitTimeDays: Math.floor(
-          (Date.now() - (item.submittedAt?.getTime() ?? Date.now())) / (1000 * 60 * 60 * 24),
-        ),
+        waitTimeDays: item.submittedAt
+          ? Math.max(
+              0,
+              Math.floor((Date.now() - item.submittedAt.getTime()) / (1000 * 60 * 60 * 24)),
+            )
+          : 0,
       })),
       recentSubmissions: recentSubmissions.map((rs) => ({
         submissionId: rs.submissionId,

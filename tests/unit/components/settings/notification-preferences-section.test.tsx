@@ -269,6 +269,21 @@ describe('NotificationPreferencesSection', () => {
     });
   });
 
+  it('should announce a failed notification preference update', async () => {
+    mockUseQuery.mockReturnValue({
+      data: { user: { id: '1' }, settings: null },
+      isLoading: false,
+    });
+    mockMutateAsync.mockRejectedValue(new Error('update failed'));
+
+    const { container } = render(<NotificationPreferencesSection />);
+    const checkbox = container.querySelector<HTMLElement>('#notif-review_completed-email');
+    if (!checkbox) throw new Error('Expected notification preference checkbox');
+    fireEvent.click(checkbox);
+
+    expect(await screen.findByRole('alert')).toBeDefined();
+  });
+
   it('should use settingsKeys.currentUser() as query key', () => {
     mockUseQuery.mockReturnValue({
       data: { user: { id: '1' }, settings: null },

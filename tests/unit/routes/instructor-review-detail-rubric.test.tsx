@@ -23,6 +23,7 @@ vi.mock('@/server/reviews', () => ({
 }));
 
 vi.mock('@/lib/errors', () => ({
+  getErrorTranslationKey: vi.fn(() => 'errors.fetchFailed'),
   isServerError: vi.fn().mockReturnValue(false),
   serverError: vi.fn(),
   ErrorCode: { INTERNAL: 'INTERNAL' },

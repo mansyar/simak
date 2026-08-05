@@ -1,13 +1,13 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listTemplates } from '@/server/templates';
 import { templateKeys } from '@/lib/query-keys';
 import { isServerError } from '@/lib/errors';
 import { useI18n } from '../../../routes/__root';
-import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorState } from '@/components/ui/error-state';
 import { Clipboard, Search, Check, ChevronRight } from 'lucide-react';
 
 const EMPTY_TEMPLATES: never[] = [];
@@ -28,14 +28,14 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
   const { t } = useI18n();
   const [search, setSearch] = useState('');
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: templateKeys.list({ page: 1, limit: 100, search: '' }),
     queryFn: async () => {
       const response = await listTemplates({
         data: { page: 1, limit: 100, search: '' },
       });
       if (isServerError(response)) {
-        throw new Error(response.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return response;
     },
@@ -43,13 +43,6 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
   });
 
   const templates = data?.templates ?? EMPTY_TEMPLATES;
-
-  useEffect(() => {
-    if (isError) {
-      console.error('Failed to load templates', error);
-      toast.error(t('errors.fetchFailed'));
-    }
-  }, [isError, error, t]);
 
   const normalizedTemplates = useMemo(
     () =>
@@ -90,6 +83,8 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
+          id="template-search"
+          aria-label={t('common.searchByName')}
           placeholder={t('common.searchByName')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -97,7 +92,13 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
         />
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <ErrorState
+          title={t('errors.fetchFailed')}
+          retryLabel={t('common.retry')}
+          onRetry={() => refetch()}
+        />
+      ) : isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {[1, 2, 3, 4].map((n) => (
             <Card key={n} className="p-5 border-dashed animate-pulse space-y-3">
@@ -124,10 +125,12 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
             {filteredTemplates.map((tpl) => {
               const isSelected = tpl.id === selectedTemplateId;
               return (
-                <div
+                <button
+                  type="button"
                   key={tpl.id}
                   onClick={() => onSelectTemplate(tpl)}
-                  className={`group relative flex items-center justify-between p-4 rounded-xl border bg-card cursor-pointer transition-all duration-200 select-none ${
+                  aria-pressed={isSelected}
+                  className={`group relative flex min-h-11 w-full items-center justify-between p-4 text-left rounded-xl border bg-card transition-all duration-200 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                     isSelected
                       ? 'border-primary ring-2 ring-primary/20 bg-primary/5 shadow-sm'
                       : 'border-border hover:border-primary/40 hover:bg-accent/40'
@@ -158,7 +161,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
                       <ChevronRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                     )}
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -193,7 +196,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
                           {cp}
                         </p>
                         {idx === 0 && (
-                          <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                          <span className="rounded-full bg-success/10 px-1.5 py-0.5 text-[10px] font-medium tracking-wider text-success uppercase">
                             {t('instructorAssignments.initiallyUnlocked')}
                           </span>
                         )}

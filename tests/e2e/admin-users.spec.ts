@@ -166,10 +166,8 @@ test.describe('Admin User Management', () => {
     await deleteDialog.getByRole('button', { name: 'Delete' }).click();
 
     // Wait for ReassignmentDialog to appear (contains assignment title)
-    await expect(page.getByRole('dialog').getByText('E2E Test Assignment')).toBeVisible({
-      timeout: 15_000,
-    });
-    const reassignDialog = page.getByRole('dialog');
+    const reassignDialog = page.getByRole('dialog').filter({ hasText: 'E2E Test Assignment' });
+    await expect(reassignDialog).toBeVisible({ timeout: 15_000 });
 
     // Select replacement instructor from the dropdown
     await reassignDialog.locator('[data-slot="select-trigger"]').click();
@@ -201,7 +199,7 @@ test.describe('Admin User Management', () => {
     await reassignDialog.getByRole('button', { name: 'Delete' }).click();
 
     // Wait for ReassignmentDialog to close (only happens on successful deletion)
-    await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 15_000 });
+    await expect(reassignDialog).not.toBeVisible({ timeout: 15_000 });
 
     // Check DB directly: is the instructor soft-deleted?
     const sql2 = postgres(getDatabaseUrl());

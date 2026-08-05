@@ -5,6 +5,7 @@ import {
   serverError,
   logError,
   isServerError,
+  getErrorTranslationKey,
   type ServerError,
   type ErrorContext,
 } from '@/lib/errors';
@@ -35,6 +36,12 @@ describe('ErrorCode', () => {
 
   it('includes RATE_LIMITED', () => {
     expect(ErrorCode.RATE_LIMITED).toBe('RATE_LIMITED');
+  });
+
+  it('maps server error codes to localized UI message keys', () => {
+    expect(getErrorTranslationKey(ErrorCode.FORBIDDEN)).toBe('error.forbidden');
+    expect(getErrorTranslationKey(ErrorCode.NOT_FOUND)).toBe('error.notFound');
+    expect(getErrorTranslationKey(ErrorCode.INTERNAL)).toBe('error.internal');
   });
 });
 

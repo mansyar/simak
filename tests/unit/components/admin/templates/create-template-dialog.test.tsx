@@ -376,7 +376,7 @@ describe('CreateTemplateDialog', () => {
       fireEvent.submit(formEl);
     }
     await vi.waitFor(() => {
-      expect(screen.getByText(/Name already taken/)).toBeDefined();
+      expect(screen.getByText(/error\.badRequest/)).toBeDefined();
     });
   });
 
@@ -397,11 +397,11 @@ describe('CreateTemplateDialog', () => {
       fireEvent.submit(formEl);
     }
     await vi.waitFor(() => {
-      expect(screen.getByText(/Name already taken/)).toBeDefined();
+      expect(screen.getByText(/error\.badRequest/)).toBeDefined();
     });
     fireEvent.click(screen.getByText('Cancel'));
     expect(onOpenChange).toHaveBeenCalledWith(false);
-    expect(screen.queryByText(/Name already taken/)).toBeNull();
+    expect(screen.queryByText(/error\.badRequest/)).toBeNull();
   });
 
   it('handleFormSubmit calls onSuccess on successful create', async () => {

@@ -46,6 +46,10 @@ function ThemeScript() {
   return (
     <script
       nonce={nonce}
+      // Browsers intentionally expose nonce attributes as empty to DOM reads;
+      // suppress the expected React hydration mismatch while preserving the
+      // server-rendered nonce used by the CSP.
+      suppressHydrationWarning
       dangerouslySetInnerHTML={{
         __html: `
           (function() {

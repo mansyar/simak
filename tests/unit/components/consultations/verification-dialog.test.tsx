@@ -178,7 +178,7 @@ describe('VerificationDialog', () => {
     renderDialog();
 
     await vi.waitFor(() => {
-      expect(screen.getByText('Failed to load')).toBeDefined();
+      expect(screen.getByText('error.internal')).toBeDefined();
     });
   });
 
@@ -227,7 +227,7 @@ describe('VerificationDialog', () => {
     fireEvent.click(findBtn('Verify'));
 
     await vi.waitFor(() => {
-      expect(screen.getByText('Already verified')).toBeDefined();
+      expect(screen.getByText('errors.fetchFailed')).toBeDefined();
     });
     expect(onActionComplete).not.toHaveBeenCalled();
   });
@@ -292,7 +292,7 @@ describe('VerificationDialog', () => {
     fireEvent.click(findBtn('Confirm Reject'));
 
     await vi.waitFor(() => {
-      expect(screen.getByText('Already verified')).toBeDefined();
+      expect(screen.getByText('errors.fetchFailed')).toBeDefined();
     });
     expect(onActionComplete).not.toHaveBeenCalled();
   });
@@ -319,7 +319,7 @@ describe('VerificationDialog', () => {
     renderDialog({ consultationId: 999 });
 
     await vi.waitFor(() => {
-      expect(screen.getByText('Consultation not found')).toBeDefined();
+      expect(screen.getByText('error.internal')).toBeDefined();
     });
   });
 
@@ -451,7 +451,7 @@ describe('VerificationDialog', () => {
       await loadDetail();
       clickVerify();
       await vi.waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Already verified');
+        expect(toast.error).toHaveBeenCalledWith('errors.fetchFailed');
       });
     });
 
@@ -492,7 +492,7 @@ describe('VerificationDialog', () => {
       await loadDetail();
       rejectWithReason();
       await vi.waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Already rejected');
+        expect(toast.error).toHaveBeenCalledWith('errors.fetchFailed');
       });
     });
   });

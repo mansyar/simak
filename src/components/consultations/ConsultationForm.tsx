@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { logConsultation } from '@/server/consultations';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
@@ -86,7 +86,7 @@ export function ConsultationForm({
     });
 
     if (isServerError(result)) {
-      form.setError('root', { message: result.error.message });
+      form.setError('root', { message: t(getErrorTranslationKey(result.error.code)) });
       return;
     }
 

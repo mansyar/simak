@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { updateTemplate, deleteTemplate, listTemplateAssignments } from '@/server/templates';
 import { saveRubric } from '@/server/rubrics';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { TemplateMetadata } from './TemplateMetadata';
 import { TemplateCheckpointSection } from './TemplateCheckpointSection';
 import { TemplateLinkedAssignments } from './TemplateLinkedAssignments';
@@ -137,8 +137,8 @@ export function TemplateDetailPage({
               levels: [],
             },
           });
-          if (result && 'error' in result) {
-            setSaveError(result.error.message);
+          if (isServerError(result)) {
+            setSaveError(t(getErrorTranslationKey(result.error.code)));
             setCheckpoints((prev) => {
               const updated = [...prev];
               updated[index] = { ...updated[index], gradingType: prevGradingType };
@@ -186,7 +186,7 @@ export function TemplateDetailPage({
         data: { id: template.id, name, type, checkpoints },
       });
       if (isServerError(result)) {
-        setSaveError(result.error.message);
+        setSaveError(t(getErrorTranslationKey(result.error.code)));
       } else {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 3000);

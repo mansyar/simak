@@ -36,6 +36,7 @@ vi.mock('@/routes/__root', () => ({
 describe('AccessibilitySection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    document.documentElement.removeAttribute('data-reduced-motion');
     mockUseMutation.mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: false,
@@ -87,6 +88,20 @@ describe('AccessibilitySection', () => {
     expect(checkbox.checked).toBe(true);
   });
 
+  it('should apply the reduced-motion preference to the document root', () => {
+    mockUseQuery.mockReturnValue({
+      data: {
+        user: { id: '1', name: 'John', email: 'john@test.com', image: null },
+        settings: { reducedMotion: true },
+      },
+      isLoading: false,
+    });
+
+    render(<AccessibilitySection />);
+
+    expect(document.documentElement.getAttribute('data-reduced-motion')).toBe('true');
+  });
+
   it('should call updateUserSettings mutation when toggle is clicked', async () => {
     mockUseQuery.mockReturnValue({
       data: {
@@ -103,6 +118,28 @@ describe('AccessibilitySection', () => {
     fireEvent.click(checkbox);
 
     expect(mockMutateAsync).toHaveBeenCalledWith({ reducedMotion: true });
+  });
+
+  it('should announce successful and failed accessibility updates', async () => {
+    mockUseQuery.mockReturnValue({
+      data: {
+        user: { id: '1', name: 'John', email: 'john@test.com', image: null },
+        settings: { reducedMotion: false },
+      },
+      isLoading: false,
+    });
+    mockMutateAsync.mockResolvedValueOnce({ reducedMotion: true });
+
+    const { rerender } = render(<AccessibilitySection />);
+    fireEvent.click(screen.getByRole('checkbox'));
+
+    expect(await screen.findByRole('status')).toBeDefined();
+
+    mockMutateAsync.mockRejectedValueOnce(new Error('update failed'));
+    rerender(<AccessibilitySection />);
+    fireEvent.click(screen.getByRole('checkbox'));
+
+    expect(await screen.findByRole('alert')).toBeDefined();
   });
 
   it('should render loading state', () => {

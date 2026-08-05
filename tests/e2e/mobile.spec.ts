@@ -62,4 +62,34 @@ test.describe('Mobile Responsive Tests', () => {
 
     await ctx.close();
   });
+
+  test('student navigation drawer manages focus and background state', async ({ browser }) => {
+    const ctx = await browser.newContext({ viewport: { width: 320, height: 640 } });
+    const page = await ctx.newPage();
+    await loginAsRole(page, 'student');
+
+    const menuButton = page.getByRole('button', { name: 'Open menu' });
+    const drawer = page.locator('#mobile-navigation-drawer');
+    const appContent = page.locator('[data-app-content]');
+
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+    await menuButton.click();
+
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'true');
+    await expect(drawer).toHaveAttribute('aria-hidden', 'false');
+    await expect(page.getByRole('button', { name: 'Close menu' })).toBeFocused();
+    await expect
+      .poll(() => appContent.evaluate((element) => (element as HTMLElement).inert))
+      .toBe(true);
+
+    await page.keyboard.press('Escape');
+
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+    await expect(menuButton).toBeFocused();
+    await expect
+      .poll(() => appContent.evaluate((element) => (element as HTMLElement).inert))
+      .toBe(false);
+
+    await ctx.close();
+  });
 });

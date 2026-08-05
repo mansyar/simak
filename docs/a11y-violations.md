@@ -2,17 +2,19 @@
 
 This document tracks moderate and minor accessibility violations identified by axe-core scans during E2E testing (TRACK-028).
 
-**Last scanned:** 2026-08-02 (targeted TRACK-053 dashboard scan; baseline page scans from 2026-07-27)
+**Last scanned:** 2026-08-05 (full UI/UX audit remediation verification)
 **Scanner:** @axe-core/playwright 4.12.1  
 **Critical/serious violations:** 0 (all fixed)  
-**Moderate violations:** 0 (all fixed — remediated in TRACK-037 on 2026-07-28)  
-**Pages scanned:** Login, Student Dashboard, Student Assignment Detail, Instructor Review Detail, Admin Users, Admin Templates
+**Moderate violations:** 0 reported by the current targeted scans (historical violations are documented below)
+**Pages/scenarios scanned:** Full Chromium suite (104 tests), including public/authentication, student, instructor, admin, mobile, settings, imports, reviews, discussions, and security-header flows
+
+The completed `ui-ux-audit-remediation_20260804` track extended the earlier TRACK-037 fixes across all product roles and responsive surfaces. The final browser verification reported no serious/critical axe violations, no hydration mismatch, and no unexpected application console errors. The only retained browser warning is the known TanStack Router `HomePage` code-splitting warning.
 
 ---
 
 ## Remediated Moderate Violations (TRACK-037, 2026-07-28)
 
-All 4 moderate violations were remediated in TRACK-037. Unit tests verify the fixes at the DOM level. The targeted TRACK-053 student-dashboard axe scan passed after adding the semantic Next Actions heading and accessible action links. The full E2E suite remains limited by a pre-existing TanStack Router hydration/runtime issue and an unrelated Firefox admin-template failure (see TRACK-037 spec, "Out of Scope").
+All 4 historical moderate violations were remediated in TRACK-037. Unit tests verify the fixes at the DOM level. The targeted TRACK-053 student-dashboard axe scan passed after adding the semantic Next Actions heading and accessible action links. The later full-surface remediation removed the previously documented hydration/runtime and admin-template verification limitations; current status is recorded above.
 
 | Rule | Impact | Pages Affected | Root Cause | Fix |
 |------|--------|----------------|------------|-----|

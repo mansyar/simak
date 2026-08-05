@@ -14,6 +14,7 @@ import {
 import { Plus, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { RubricLevelsEditor, type LevelInput } from './RubricLevelsEditor';
 import { useI18n } from '../../../routes/__root';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 
 interface CriterionInput {
   id?: number;
@@ -54,8 +55,8 @@ export function RubricCriteriaEditor({
       try {
         const result = await getRubricFn({ data: { templateCheckpointId } });
         if (cancelled) return;
-        if (result && 'error' in result) {
-          setError(result.error.message);
+        if (isServerError(result)) {
+          setError(t(getErrorTranslationKey(result.error.code)));
         } else if (result) {
           setCriteria(
             result.criteria.map((c) => ({
@@ -143,8 +144,8 @@ export function RubricCriteriaEditor({
           levels,
         },
       });
-      if (result && 'error' in result) {
-        setError(result.error.message);
+      if (isServerError(result)) {
+        setError(t(getErrorTranslationKey(result.error.code)));
       } else {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 3000);
@@ -160,8 +161,8 @@ export function RubricCriteriaEditor({
     if (!isValid || isSaving) return;
     try {
       const countResult = await countPendingReviewsFn({ data: { templateCheckpointId } });
-      if (countResult && 'error' in countResult) {
-        setError(countResult.error.message);
+      if (isServerError(countResult)) {
+        setError(t(getErrorTranslationKey(countResult.error.code)));
         return;
       }
       if (countResult.count > 0) {

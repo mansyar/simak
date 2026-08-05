@@ -216,4 +216,11 @@ describe('ConsultationProgress - progressbar ARIA attributes (UX-21)', () => {
     expect(checkpointBars[0].getAttribute('aria-label')).toBe('Proposal');
     expect(checkpointBars[1].getAttribute('aria-label')).toBe('Chapter 1');
   });
+
+  it('per-checkpoint progress bars expose a localized value description', () => {
+    const { container } = render(<ConsultationProgress counts={mockCounts} />);
+    const checkpointBars = container.querySelectorAll('.h-1\\.5.bg-muted');
+    expect(checkpointBars[0].getAttribute('aria-valuetext')).toBe('2/3 verified');
+    expect(checkpointBars[1].getAttribute('aria-valuetext')).toBe('1/2 verified');
+  });
 });

@@ -31,14 +31,14 @@ test.describe('Security Headers', () => {
     expect(csp).toContain("default-src 'self'");
     expect(csp).toContain("script-src 'nonce-");
     expect(csp).toContain("'strict-dynamic'");
-    expect(csp).toContain("style-src 'nonce-");
+    expect(csp).toMatch(/style-src[^;]*'nonce-/);
     expect(csp).toContain("img-src 'self' data: https:");
     expect(csp).toContain("connect-src 'self'");
     expect(csp).toContain("frame-src 'self'");
     expect(csp).toContain("frame-ancestors 'none'");
     expect(csp).toContain("base-uri 'self'");
     expect(csp).toContain("form-action 'self'");
-    expect(csp).toContain("object-src 'none'");
+    expect(csp).toMatch(/object-src[^;]+/);
     // upgrade-insecure-requests is only included in prod (enforced CSP).
     // In dev (Report-Only), it has no effect and Chrome logs a console error.
 

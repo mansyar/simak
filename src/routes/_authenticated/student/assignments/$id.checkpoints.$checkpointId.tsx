@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { getStudentAssignmentDetail } from '@/server/assignments';
 import { listSubmissions, submitCheckpoint } from '@/server/submissions';
 import { getPresignedUploadUrl } from '@/server/files';
-import { isServerError } from '@/lib/errors';
+import { ErrorCode, getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { getLatestReview } from '@/server/reviews';
 import { FileUploader } from '@/components/files/file-uploader';
 import { FileList } from '@/components/files/file-list';
@@ -17,9 +17,7 @@ import { DiscussionPanel } from '@/components/discussions/discussion-panel';
 import { SearchX, ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { useState, useCallback } from 'react';
-import { detectLocale } from '@/i18n';
-import { translateKey } from '@/lib/i18n-server';
-import { toast } from 'sonner';
+import { ErrorState } from '@/components/ui/error-state';
 
 export const Route = createFileRoute(
   '/_authenticated/student/assignments/$id/checkpoints/$checkpointId',
@@ -28,6 +26,8 @@ export const Route = createFileRoute(
     try {
       const { id, checkpointId } = params;
       const assignmentData = await getStudentAssignmentDetail({ data: { id: Number(id) } });
+
+      if (isServerError(assignmentData)) return assignmentData;
 
       if (!assignmentData) return null;
 
@@ -44,41 +44,47 @@ export const Route = createFileRoute(
         data: { checkpointId: Number(checkpointId), page: 1, limit: 20 },
       });
 
+      if (isServerError(submissionsData)) return submissionsData;
+
       // Find the latest review (from the reviews table)
       const reviewData = await getLatestReview({
         data: { checkpointId: Number(checkpointId) },
       });
-      const latestReview =
-        !isServerError(reviewData) && reviewData?.review
-          ? ({
-              decision: reviewData.review.decision as 'pass' | 'revise',
-              comment: reviewData.review.comment ?? null,
-              reviewerName: reviewData.review.instructorName ?? null,
-              revisionDeadline: reviewData.review.revisionDeadline ?? null,
-              reviewedAt: reviewData.review.createdAt ?? null,
-            } as const)
-          : null;
-      const reviewHistory =
-        !isServerError(reviewData) && reviewData?.reviewHistory
-          ? reviewData.reviewHistory
-          : !isServerError(reviewData) && reviewData?.review
-            ? [{ ...reviewData.review, actionItems: reviewData.actionItems ?? [] }]
-            : [];
+      if (isServerError(reviewData)) return reviewData;
+
+      const latestReview = reviewData?.review
+        ? ({
+            decision: reviewData.review.decision as 'pass' | 'revise',
+            comment: reviewData.review.comment ?? null,
+            reviewerName: reviewData.review.instructorName ?? null,
+            revisionDeadline: reviewData.review.revisionDeadline ?? null,
+            reviewedAt: reviewData.review.createdAt ?? null,
+          } as const)
+        : null;
+      const reviewHistory = reviewData?.reviewHistory
+        ? reviewData.reviewHistory
+        : reviewData?.review
+          ? [{ ...reviewData.review, actionItems: reviewData.actionItems ?? [] }]
+          : [];
 
       return {
         assignmentId: Number(id),
         assignmentTitle: (assignmentData as { title: string }).title,
         checkpoint,
-        submissions: !isServerError(submissionsData) ? submissionsData.submissions : [],
-        submissionTotal: !isServerError(submissionsData) ? submissionsData.total : 0,
+        submissions: submissionsData.submissions,
+        submissionTotal: submissionsData.total,
         latestReview,
-        rubricScores: !isServerError(reviewData) ? (reviewData?.scores ?? []) : [],
+        rubricScores: reviewData?.scores ?? [],
         reviewHistory,
       };
     } catch (err) {
       console.error('Failed to load submission page:', err);
-      toast.error(translateKey('errors.fetchFailed', detectLocale()));
-      return null;
+      return {
+        error: {
+          code: ErrorCode.INTERNAL,
+          message: 'Failed to load checkpoint submission',
+        },
+      };
     }
   },
   pendingComponent: () => (
@@ -116,11 +122,14 @@ function SubmissionNotFound() {
 function CheckpointSubmissionPage() {
   const { t } = useI18n();
   const data = Route.useLoaderData();
+  const contentData = isServerError(data) ? undefined : data;
   const params = Route.useParams();
+  const navigate = useNavigate();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | undefined>(undefined);
+
   const [submissions, setSubmissions] = useState<
     {
       id: number;
@@ -129,9 +138,9 @@ function CheckpointSubmissionPage() {
       fileSize: number;
       uploadedAt: Date | null;
     }[]
-  >(data?.submissions ?? []);
+  >(contentData?.submissions ?? []);
   const [submissionPage, setSubmissionPage] = useState(1);
-  const [submissionTotal, setSubmissionTotal] = useState(data?.submissionTotal ?? 0);
+  const [submissionTotal, setSubmissionTotal] = useState(contentData?.submissionTotal ?? 0);
 
   const fetchSubmissions = useCallback(
     async (page: number) => {
@@ -170,7 +179,7 @@ function CheckpointSubmissionPage() {
         });
 
         if (isServerError(uploadData)) {
-          setUploadError(uploadData.error.message);
+          setUploadError(t(getErrorTranslationKey(uploadData.error.code)));
           return;
         }
 
@@ -211,12 +220,11 @@ function CheckpointSubmissionPage() {
         });
 
         if (isServerError(result)) {
-          setUploadError(result.error.message);
+          setUploadError(t(getErrorTranslationKey(result.error.code)));
           return;
         }
 
         setUploadSuccess(true);
-        setIsUploading(false);
 
         // Refresh submissions list
         await fetchSubmissions(submissionPage);
@@ -226,6 +234,7 @@ function CheckpointSubmissionPage() {
         } else {
           setUploadError(t('files.serverError'));
         }
+      } finally {
         setIsUploading(false);
         setUploadProgress(undefined);
       }
@@ -242,6 +251,21 @@ function CheckpointSubmissionPage() {
       window.open(result.downloadUrl, '_blank');
     }
   }, []);
+
+  if (isServerError(data)) {
+    return (
+      <ErrorState
+        title={t(getErrorTranslationKey(data.error.code))}
+        retryLabel={t('common.refresh')}
+        onRetry={() =>
+          navigate({
+            to: '/student/assignments/$id/checkpoints/$checkpointId',
+            params,
+          })
+        }
+      />
+    );
+  }
 
   if (!data) {
     return (

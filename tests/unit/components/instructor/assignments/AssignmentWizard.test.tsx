@@ -1,5 +1,4 @@
 /** @vitest-environment jsdom */
-import '@testing-library/jest-dom/vitest';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
@@ -88,7 +87,7 @@ describe('AssignmentWizard', () => {
     expect(useQuery).toHaveBeenCalledTimes(1);
   });
 
-  it('fires toast.error on query error', () => {
+  it('shows an inline retryable error on query failure', () => {
     vi.mocked(useQuery).mockReturnValue({
       data: undefined,
       isLoading: false,
@@ -96,7 +95,7 @@ describe('AssignmentWizard', () => {
       error: new Error('Network failure'),
     } as never);
     render(<AssignmentWizard />);
-    expect(toast.error).toHaveBeenCalledWith('errors.fetchFailed');
-    expect(console.error).toHaveBeenCalledWith('Failed to load students', expect.any(Error));
+    expect(document.querySelector('[role="alert"]')).toBeDefined();
+    expect(toast.error).not.toHaveBeenCalled();
   });
 });

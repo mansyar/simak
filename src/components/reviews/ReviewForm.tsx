@@ -10,6 +10,7 @@ import { getPresignedReviewFeedbackUploadUrl } from '@/server/files';
 import { RubricScoringSection, type ScoreInput } from '@/components/reviews/RubricScoringSection';
 import { FeedbackSnippetPicker } from '@/components/reviews/FeedbackSnippetPicker';
 import { RevisionActionPlanEditor } from '@/components/reviews/RevisionActionPlanEditor';
+import { MutationFeedback } from '@/components/ui/mutation-feedback';
 import type { RubricData } from '@/server/rubrics';
 import type { RevisionActionItemInput } from '@/server/revision-action-items';
 import { Loader2, Upload } from 'lucide-react';
@@ -32,6 +33,17 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
   const [isUploadingFeedback, setIsUploadingFeedback] = useState(false);
   const [scores, setScores] = useState<ScoreInput[]>([]);
   const [actionItems, setActionItems] = useState<RevisionActionItemInput[]>([]);
+  const [formError, setFormError] = useState<string>();
+  const [formSuccess, setFormSuccess] = useState<string>();
+
+  const reportError = useCallback(
+    (message: string) => {
+      setFormError(message);
+      setFormSuccess(undefined);
+      onError(message);
+    },
+    [onError],
+  );
 
   const rubricActive = !!rubric && rubric.gradingType !== null;
   const allScored =
@@ -51,6 +63,9 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
       const file = e.target.files?.[0];
       if (!file) return;
 
+      setFormError(undefined);
+      setFormSuccess(undefined);
+
       const extension = file.name.split('.').pop()?.toLowerCase() ?? 'pdf';
       const contentType =
         extension === 'pdf'
@@ -64,7 +79,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
         });
 
         if (isServerError(uploadData)) {
-          onError(uploadData.error.message);
+          reportError(t('instructorReviews.errors.feedbackUploadFailed'));
           return;
         }
 
@@ -76,26 +91,29 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
         });
 
         if (!response.ok) {
-          onError(t('instructorReviews.errors.feedbackUploadFailed'));
+          reportError(t('instructorReviews.errors.feedbackUploadFailed'));
           return;
         }
 
         setFeedbackFile(file);
         setFeedbackFileKey(uploadData.fileKey);
       } catch {
-        onError(t('instructorReviews.errors.feedbackUploadFailed'));
+        reportError(t('instructorReviews.errors.feedbackUploadFailed'));
       } finally {
         setIsUploadingFeedback(false);
       }
     },
-    [onError, t],
+    [reportError, t],
   );
 
   const handleSubmit = useCallback(async () => {
     if (!decision) return;
 
+    setFormError(undefined);
+    setFormSuccess(undefined);
+
     if (decision === 'revise' && !revisionDeadline) {
-      onError(t('instructorReviews.revisionDeadlineRequired'));
+      reportError(t('instructorReviews.revisionDeadlineRequired'));
       return;
     }
 
@@ -108,7 +126,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
           /[<>]/.test(item.itemText),
       )
     ) {
-      onError(t('instructorReviews.actionPlan.invalidItems'));
+      reportError(t('instructorReviews.actionPlan.invalidItems'));
       return;
     }
 
@@ -127,13 +145,14 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
       });
 
       if (isServerError(result)) {
-        onError(result.error.message);
+        reportError(t('instructorReviews.submitError'));
         return;
       }
 
+      setFormSuccess(t('instructorReviews.reviewSubmitted'));
       onComplete();
     } catch {
-      onError(t('instructorReviews.submitError'));
+      reportError(t('instructorReviews.submitError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -144,7 +163,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
     feedbackFileKey,
     submissionId,
     onComplete,
-    onError,
+    reportError,
     t,
     scores,
     rubricActive,
@@ -157,8 +176,10 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
         <CardTitle className="text-sm">{t('instructorReviews.decision')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <MutationFeedback error={formError} success={formSuccess} />
         {/* Pass/Revise radio */}
-        <div className="flex gap-4">
+        <fieldset className="flex gap-4">
+          <legend className="sr-only">{t('instructorReviews.decision')}</legend>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
@@ -183,7 +204,7 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
               {t('instructorReviews.revise')}
             </span>
           </label>
-        </div>
+        </fieldset>
 
         {/* Comment textarea */}
         <div className="space-y-1.5">
@@ -201,13 +222,17 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
 
         {/* Feedback file upload */}
         <div className="space-y-1.5">
-          <Label>{t('instructorReviews.feedbackFile')}</Label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <Label htmlFor="feedback-file">{t('instructorReviews.feedbackFile')}</Label>
+          <label
+            htmlFor="feedback-file"
+            className="flex cursor-pointer items-center gap-2 rounded-md focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+          >
             <input
+              id="feedback-file"
               type="file"
               accept=".pdf,.docx"
               onChange={handleFeedbackFileChange}
-              className="hidden"
+              className="sr-only"
               disabled={isUploadingFeedback}
             />
             <div className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-accent transition-colors">
@@ -264,6 +289,9 @@ export function ReviewForm({ submissionId, onComplete, onError, rubric }: Review
             t('instructorReviews.submitReview')
           )}
         </Button>
+        {!decision && (
+          <p className="text-sm text-muted-foreground">{t('instructorReviews.decisionRequired')}</p>
+        )}
       </CardContent>
     </Card>
   );

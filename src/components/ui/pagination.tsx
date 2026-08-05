@@ -39,9 +39,9 @@ export function Pagination({
   const pageNumbers = showPageNumbers ? getPageNumbers(currentPage, totalPages) : [];
 
   return (
-    <div className="flex items-center justify-between py-4">
+    <div className="flex flex-wrap items-center justify-between gap-2 py-4">
       {showCounter ? <p className="text-sm text-muted-foreground">{counterText}</p> : <div />}
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1">
         <Button
           variant="outline"
           size="sm"

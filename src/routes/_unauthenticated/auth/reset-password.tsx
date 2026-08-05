@@ -50,7 +50,7 @@ function ResetPasswordPage() {
     try {
       const result = await authClient.resetPassword({ token, newPassword: password });
       if (result.error) {
-        setError(result.error.message ?? t('auth.linkExpired'));
+        setError(t('auth.linkExpired'));
       } else {
         setSuccess(true);
       }
@@ -64,7 +64,11 @@ function ResetPasswordPage() {
   if (success) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
-        <div className="w-full max-w-sm rounded-xl border bg-card p-8 text-center shadow-lg">
+        <div
+          role="status"
+          aria-live="polite"
+          className="w-full max-w-sm rounded-xl border bg-card p-8 text-center shadow-lg"
+        >
           <div className="mb-6 flex items-center justify-between">
             <LanguageSwitcher currentLocale={locale} onSwitch={setLocale} />
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
@@ -74,7 +78,7 @@ function ResetPasswordPage() {
           </h1>
           <p className="mb-6 text-sm text-muted-foreground">{t('auth.resetSuccess')}</p>
           <Link to="/auth/login">
-            <Button className="w-full">{t('auth.login')}</Button>
+            <Button className="w-full min-h-11">{t('auth.login')}</Button>
           </Link>
         </div>
       </div>
@@ -131,13 +135,17 @@ function ResetPasswordPage() {
             type="submit"
             disabled={isSubmitting || !token}
             loading={isSubmitting}
+            aria-busy={isSubmitting}
             className="w-full"
           >
-            {t('common.submit')}
+            {isSubmitting ? t('common.loading') : t('common.submit')}
           </Button>
 
           <div className="text-center">
-            <Link to="/auth/login" className="text-sm text-primary hover:underline">
+            <Link
+              to="/auth/login"
+              className="inline-flex min-h-11 items-center text-sm text-primary hover:underline"
+            >
               {t('common.back')}
             </Link>
           </div>

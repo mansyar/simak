@@ -98,7 +98,7 @@ test.describe('Instructor Intervention Workflow', () => {
     await expect(page).toHaveURL(/\/instructor\/assignments\/\d+/);
     await page.waitForLoadState('networkidle');
 
-    const interventionTab = page.getByRole('button', { name: 'At-Risk Interventions' });
+    const interventionTab = page.getByRole('tab', { name: 'At-Risk Interventions' });
     await expect(interventionTab).toHaveAttribute('data-state', 'inactive');
     await interventionTab.click();
     await page.waitForLoadState('networkidle');
@@ -171,9 +171,8 @@ test.describe('Instructor Intervention Workflow', () => {
         } else {
           await expect(page).toHaveURL(/\/instructor\/interventions/);
           await expect(
-            page.getByText('Unable to load interventions', { exact: true }),
+            page.getByText('You are not authorized to perform this action', { exact: true }),
           ).toBeVisible();
-          await expect(page.getByText('Unauthorized', { exact: true })).toBeVisible();
           await expect(page.getByRole('list', { name: 'Instructor interventions' })).toHaveCount(0);
         }
       } finally {

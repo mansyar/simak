@@ -52,6 +52,7 @@ export function ConsultationProgress({ counts }: ConsultationProgressProps) {
               aria-valuenow={totalVerified}
               aria-valuemin={0}
               aria-valuemax={totalRequired}
+              aria-valuetext={`${totalVerified}/${totalRequired} ${t('consultations.verified')}`}
               aria-label={t('consultations.consultationProgress')}
             >
               <div
@@ -97,6 +98,7 @@ export function ConsultationProgress({ counts }: ConsultationProgressProps) {
               aria-valuenow={cp.verifiedCount}
               aria-valuemin={0}
               aria-valuemax={cp.minConsultations}
+              aria-valuetext={`${cp.verifiedCount}/${cp.minConsultations} ${t('consultations.verified')}`}
               aria-label={cp.checkpointName}
             >
               <div

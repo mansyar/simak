@@ -11,6 +11,38 @@ export const ErrorCode = {
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 
+export type ErrorTranslationKey =
+  | 'error.unauthorized'
+  | 'error.forbidden'
+  | 'error.notFound'
+  | 'error.validation'
+  | 'error.badRequest'
+  | 'error.conflict'
+  | 'error.internal'
+  | 'error.rateLimited';
+
+export function getErrorTranslationKey(code: ErrorCode): ErrorTranslationKey {
+  switch (code) {
+    case ErrorCode.UNAUTHORIZED:
+      return 'error.unauthorized';
+    case ErrorCode.FORBIDDEN:
+      return 'error.forbidden';
+    case ErrorCode.NOT_FOUND:
+      return 'error.notFound';
+    case ErrorCode.VALIDATION:
+      return 'error.validation';
+    case ErrorCode.BAD_REQUEST:
+      return 'error.badRequest';
+    case ErrorCode.CONFLICT:
+      return 'error.conflict';
+    case ErrorCode.RATE_LIMITED:
+      return 'error.rateLimited';
+    case ErrorCode.INTERNAL:
+    default:
+      return 'error.internal';
+  }
+}
+
 export type ServerError = {
   error: {
     code: ErrorCode;

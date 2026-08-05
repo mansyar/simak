@@ -152,9 +152,23 @@ describe('StudentFinalGradeCard', () => {
     expect(screen.queryByText('Checkpoint 1')).toBeNull();
     expect(screen.queryByText('Checkpoint 2')).toBeNull();
     // Click show breakdown
-    fireEvent.click(screen.getByText('gradebook.student.breakdown'));
+    const breakdownButton = screen.getByRole('button', { name: 'gradebook.student.breakdown' });
+    fireEvent.click(breakdownButton);
+    expect(breakdownButton.getAttribute('aria-expanded')).toBe('true');
+    expect(breakdownButton.getAttribute('aria-controls')).toBe('student-grade-breakdown');
     expect(screen.getByText('Checkpoint 1')).toBeDefined();
     expect(screen.getByText('Checkpoint 2')).toBeDefined();
+  });
+
+  it('gives the breakdown table a caption and column scopes', async () => {
+    (getStudentFinalGrade as any).mockResolvedValue(completeGrade);
+    renderWithQuery(<StudentFinalGradeCard assignmentId={1} />);
+    await waitFor(() => expect(screen.getByText('gradebook.student.finalGrade')).toBeDefined());
+
+    fireEvent.click(screen.getByRole('button', { name: 'gradebook.student.breakdown' }));
+    expect(screen.getByText('gradebook.student.breakdown', { selector: 'caption' })).toBeDefined();
+    expect(screen.getAllByRole('columnheader')).toHaveLength(2);
+    expect(screen.getAllByRole('columnheader')[0].getAttribute('scope')).toBe('col');
   });
 
   it('shows pass/fail label for non-rubric and numeric score for rubric in breakdown', async () => {

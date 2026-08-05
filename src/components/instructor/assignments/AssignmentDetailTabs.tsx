@@ -13,5 +13,12 @@ interface AssignmentDetailTabsProps {
 }
 
 export function AssignmentDetailTabs({ tabs, activeTab, onTabChange }: AssignmentDetailTabsProps) {
-  return <Tabs tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />;
+  return (
+    <Tabs
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={onTabChange}
+      idPrefix="assignment-detail"
+    />
+  );
 }

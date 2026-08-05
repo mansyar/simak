@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { ArrowRight, ClipboardList, Clock, FileText, MessageSquare } from 'lucide-react';
 import { useI18n } from '../../routes/__root';
-import { formatDate } from '@/lib/format-date';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -11,6 +10,7 @@ import type {
   StudentNextAction,
   StudentNextActionsResult,
 } from '@/lib/student-next-actions';
+import { useStudentDateFormatter } from '@/hooks/use-student-date';
 
 interface Props {
   data: StudentNextActionsResult;
@@ -45,6 +45,7 @@ function getActionBadgeVariant(priority: StudentActionPriority) {
 
 function ActionCard({ action }: { action: StudentNextAction }) {
   const { t, locale } = useI18n();
+  const { format } = useStudentDateFormatter(locale);
   const ActionIcon = getActionIcon(action.kind);
   const priorityLabel =
     action.priority === 'overdue'
@@ -98,7 +99,7 @@ function ActionCard({ action }: { action: StudentNextAction }) {
           <Clock className="size-3.5" aria-hidden="true" />
           {action.dueDate
             ? t('studentDashboard.nextActions.due', {
-                date: formatDate(action.dueDate, locale, 'short'),
+                date: format(action.dueDate, 'short'),
               })
             : t('studentDashboard.nextActions.noDueDate')}
         </span>
@@ -240,6 +241,15 @@ export function StudentNextActions({ data }: Props) {
                       </li>
                     ))}
                   </ul>
+                  {group.count > group.representatives.length && (
+                    <Link
+                      to={'/student/assignments' as never}
+                      aria-label={`${t('common.viewAll')}: ${t(label)}`}
+                      className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                      {t('common.viewAll')}
+                    </Link>
+                  )}
                 </div>
               ))}
             </div>

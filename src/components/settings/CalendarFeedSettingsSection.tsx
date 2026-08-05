@@ -203,22 +203,22 @@ export function CalendarFeedSettingsSection() {
         )}
 
         {feedback === 'copied' && (
-          <p role="status" className="text-sm text-green-600">
+          <p role="status" className="text-sm text-success">
             {t('settings.calendarFeed.copied')}
           </p>
         )}
         {feedback === 'enabled' && (
-          <p role="status" className="text-sm text-green-600">
+          <p role="status" className="text-sm text-success">
             {t('settings.calendarFeed.enabled')}
           </p>
         )}
         {feedback === 'regenerated' && (
-          <p role="status" className="text-sm text-green-600">
+          <p role="status" className="text-sm text-success">
             {t('settings.calendarFeed.regenerated')}
           </p>
         )}
         {feedback === 'revoked' && (
-          <p role="status" className="text-sm text-green-600">
+          <p role="status" className="text-sm text-success">
             {t('settings.calendarFeed.revoked')}
           </p>
         )}

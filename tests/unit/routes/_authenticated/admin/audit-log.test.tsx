@@ -37,12 +37,13 @@ vi.mock('@/components/ui/card', () => ({
 }));
 
 vi.mock('@/components/ui/table', () => ({
-  Table: ({ children }: any) => <table>{children}</table>,
-  TableBody: ({ children }: any) => <tbody>{children}</tbody>,
-  TableCell: ({ children }: any) => <td>{children}</td>,
-  TableHead: ({ children }: any) => <th>{children}</th>,
-  TableHeader: ({ children }: any) => <thead>{children}</thead>,
-  TableRow: ({ children }: any) => <tr>{children}</tr>,
+  Table: ({ children, ...props }: any) => <table {...props}>{children}</table>,
+  TableBody: ({ children, ...props }: any) => <tbody {...props}>{children}</tbody>,
+  TableCaption: ({ children, ...props }: any) => <caption {...props}>{children}</caption>,
+  TableCell: ({ children, ...props }: any) => <td {...props}>{children}</td>,
+  TableHead: ({ children, ...props }: any) => <th {...props}>{children}</th>,
+  TableHeader: ({ children, ...props }: any) => <thead {...props}>{children}</thead>,
+  TableRow: ({ children, ...props }: any) => <tr {...props}>{children}</tr>,
 }));
 
 vi.mock('@/components/ui/page-header', () => ({

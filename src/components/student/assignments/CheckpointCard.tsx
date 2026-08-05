@@ -2,11 +2,11 @@ import { isPast } from 'date-fns/isPast';
 import { useNavigate } from '@tanstack/react-router';
 import { useI18n } from '../../../routes/__root';
 import type { TranslationKey } from '../../../i18n/index';
-import { formatRelativeTime, formatDateShort } from '@/lib/format';
+import { formatRelativeTime } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, AlertCircle, Users, ExternalLink } from 'lucide-react';
-import { useStudentTimezone } from '@/hooks/use-student-timezone';
+import { useStudentDateFormatter } from '@/hooks/use-student-date';
 
 export interface CheckpointData {
   id: number;
@@ -83,21 +83,36 @@ function getTranslatedBlockingReason(
 
 export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps) {
   const { t, locale } = useI18n();
-  const { timezone, hydrated } = useStudentTimezone();
+  const { formatShort } = useStudentDateFormatter(locale);
   const navigate = useNavigate();
   const config = stateConfig[checkpoint.state] ?? stateConfig.locked;
+  const stateLabel = t(config.label as TranslationKey);
   const isOverdue =
     checkpoint.dueDate && isPast(new Date(checkpoint.dueDate)) && checkpoint.state !== 'passed';
   const minConsults = checkpoint.minConsultations ?? 0;
   const isSatisfied = minConsults === 0 || checkpoint.verifiedConsultationCount >= minConsults;
 
   return (
-    <div className={`relative rounded-lg border-l-4 p-4 shadow-sm ${config.containerClass}`}>
+    <article
+      className={`relative rounded-lg border-l-4 p-4 shadow-sm ${config.containerClass}`}
+      aria-labelledby={`checkpoint-${checkpoint.id}-name`}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-sm font-semibold text-foreground">{checkpoint.name}</h3>
-            <Badge variant={config.badgeVariant}>{t(config.label as TranslationKey)}</Badge>
+            <h3
+              id={`checkpoint-${checkpoint.id}-name`}
+              className="text-sm font-semibold text-foreground"
+            >
+              {checkpoint.name}
+            </h3>
+            <Badge
+              role="status"
+              aria-label={`${t('studentAssignments.statusLabel')}: ${stateLabel}`}
+              variant={config.badgeVariant}
+            >
+              {stateLabel}
+            </Badge>
             {isOverdue && (
               <Badge variant="destructive" className="gap-1">
                 <AlertCircle className="h-3 w-3" />
@@ -113,8 +128,7 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
             >
               <Clock className="h-3 w-3" />
               <span>
-                {hydrated ? formatDateShort(checkpoint.dueDate, locale, timezone) : '—'} (
-                {formatRelativeTime(checkpoint.dueDate, locale)})
+                {formatShort(checkpoint.dueDate)} ({formatRelativeTime(checkpoint.dueDate, locale)})
               </span>
             </div>
           )}
@@ -147,6 +161,11 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
                 );
               })}
             </div>
+          )}
+          {checkpoint.state === 'locked' && (
+            <p className="mt-2 text-xs font-medium text-muted-foreground">
+              {t('studentAssignments.lockedNextStep')}
+            </p>
           )}
         </div>
 
@@ -199,6 +218,6 @@ export function CheckpointCard({ checkpoint, assignmentId }: CheckpointCardProps
           </Button>
         )}
       </div>
-    </div>
+    </article>
   );
 }

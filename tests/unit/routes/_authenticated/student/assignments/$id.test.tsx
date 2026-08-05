@@ -25,6 +25,7 @@ vi.mock('@tanstack/react-router', () => ({
     ...config,
     useLoaderData: () => mockAssignmentData,
     useParams: () => ({ submissionId: '1' }),
+    useNavigate: () => vi.fn(),
   })),
   useMatchRoute: vi.fn().mockReturnValue(() => false),
   Link: ({ children, to, ...props }: any) => (

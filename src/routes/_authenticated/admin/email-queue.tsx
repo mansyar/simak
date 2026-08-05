@@ -14,9 +14,10 @@ import { EmailQueueFilters } from '@/components/admin/email-queue/EmailQueueFilt
 import { EmailQueueTable } from '@/components/admin/email-queue/EmailQueueTable';
 import { RetryEmailDialog } from '@/components/admin/email-queue/RetryEmailDialog';
 import { z } from 'zod';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { toast } from 'sonner';
 import { showErrorToast, parseServerError } from '@/lib/toast';
+import { ErrorState } from '@/components/ui/error-state';
 import { emailQueueKeys } from '@/lib/query-keys';
 
 const EmailQueueSearchSchema = z.object({
@@ -64,6 +65,18 @@ function EmailQueuePage() {
   const [retryTarget, setRetryTarget] = useState<EmailQueueEntry | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isCleaningR2, setIsCleaningR2] = useState(false);
+  const [isCleanupDialogOpen, setIsCleanupDialogOpen] = useState(false);
+  const [cleanupError, setCleanupError] = useState<string | undefined>();
+
+  if (isServerError(data)) {
+    return (
+      <ErrorState
+        title={t(getErrorTranslationKey(data.error.code))}
+        retryLabel={t('common.refresh')}
+        onRetry={() => void router.invalidate()}
+      />
+    );
+  }
 
   const totalPages = Math.ceil(listData.total / LIMIT);
 
@@ -78,10 +91,15 @@ function EmailQueuePage() {
 
   const handleR2Cleanup = async () => {
     setIsCleaningR2(true);
-    const result = await triggerR2Cleanup({ data: {} });
-    if (isServerError(result)) {
-      showErrorToast(parseServerError(result).code, t);
-    } else {
+    setCleanupError(undefined);
+    try {
+      const result = await triggerR2Cleanup({ data: {} });
+      if (isServerError(result)) {
+        showErrorToast(parseServerError(result).code, t);
+        setCleanupError(t('adminEmailQueue.r2Cleanup.error'));
+        return;
+      }
+
       toast.success(
         t('adminEmailQueue.r2Cleanup.success', {
           deleted: String(result.deleted),
@@ -89,8 +107,12 @@ function EmailQueuePage() {
           batchSize: String(result.batchSize),
         }),
       );
+      setIsCleanupDialogOpen(false);
+    } catch {
+      setCleanupError(t('adminEmailQueue.r2Cleanup.error'));
+    } finally {
+      setIsCleaningR2(false);
     }
-    setIsCleaningR2(false);
   };
 
   const handleSearchChange = (value: string) => {
@@ -137,7 +159,14 @@ function EmailQueuePage() {
         subtitle={t('adminEmailQueue.subtitle')}
         action={
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handleR2Cleanup} disabled={isCleaningR2}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCleanupError(undefined);
+                setIsCleanupDialogOpen(true);
+              }}
+              disabled={isCleaningR2}
+            >
               {isCleaningR2 && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t('adminEmailQueue.r2Cleanup.trigger')}
             </Button>
@@ -170,6 +199,51 @@ function EmailQueuePage() {
         onConfirm={handleRetryConfirm}
         isRetrying={isRetrying}
       />
+
+      {isCleanupDialogOpen && (
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="r2-cleanup-title"
+          aria-describedby="r2-cleanup-description"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        >
+          <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg">
+            <h2 id="r2-cleanup-title" className="font-display text-xl">
+              {t('adminEmailQueue.r2Cleanup.confirmTitle')}
+            </h2>
+            <p id="r2-cleanup-description" className="mt-2 text-sm text-muted-foreground">
+              {t('adminEmailQueue.r2Cleanup.confirmDescription')}
+            </p>
+            {cleanupError && (
+              <p role="alert" aria-live="assertive" className="mt-4 text-sm text-destructive">
+                {cleanupError}
+              </p>
+            )}
+            <div className="mt-6 flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11"
+                onClick={() => setIsCleanupDialogOpen(false)}
+                disabled={isCleaningR2}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                className="min-h-11"
+                onClick={() => void handleR2Cleanup()}
+                disabled={isCleaningR2}
+              >
+                {isCleaningR2 && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {t('adminEmailQueue.r2Cleanup.confirm')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

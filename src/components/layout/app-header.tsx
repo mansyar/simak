@@ -19,9 +19,14 @@ import {
 interface AppHeaderProps {
   onMenuToggle: () => void;
   onNotificationOpen: () => void;
+  isMenuOpen?: boolean;
 }
 
-export function AppHeader({ onMenuToggle, onNotificationOpen }: AppHeaderProps) {
+export function AppHeader({
+  onMenuToggle,
+  onNotificationOpen,
+  isMenuOpen = false,
+}: AppHeaderProps) {
   const { t, locale, setLocale } = useI18n();
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
@@ -50,11 +55,15 @@ export function AppHeader({ onMenuToggle, onNotificationOpen }: AppHeaderProps) 
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/80 px-6 backdrop-blur-md">
       {/* Left: hamburger menu (mobile only) */}
       <button
+        id="mobile-menu-trigger"
+        type="button"
         onClick={onMenuToggle}
         className="rounded-md p-2 min-h-11 min-w-11 text-muted-foreground hover:bg-accent hover:text-accent-foreground lg:hidden"
         aria-label={t('common.openMenu')}
+        aria-expanded={isMenuOpen}
+        aria-controls="mobile-navigation-drawer"
       >
-        <Menu className="h-5 w-5" />
+        <Menu className="h-5 w-5" aria-hidden="true" />
       </button>
 
       {/* Spacer on desktop so right-aligned items stay right */}
@@ -76,7 +85,9 @@ export function AppHeader({ onMenuToggle, onNotificationOpen }: AppHeaderProps) 
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <div className="px-2 py-1.5">
-                <p className="text-sm font-medium text-foreground">{user.name || 'User'}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {user.name || t('common.unknownUser')}
+                </p>
                 <p className="truncate text-xs text-muted-foreground">{user.email || ''}</p>
               </div>
               <DropdownMenuSeparator />

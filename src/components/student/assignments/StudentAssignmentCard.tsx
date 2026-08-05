@@ -3,8 +3,7 @@ import { Calendar, Clipboard } from 'lucide-react';
 import { useI18n } from '../../../routes/__root';
 import { Progress } from '../../ui/progress';
 import { Badge } from '../../ui/badge';
-import { formatDate } from '@/lib/format-date';
-import { useStudentTimezone } from '@/hooks/use-student-timezone';
+import { useStudentDateFormatter } from '@/hooks/use-student-date';
 
 export interface StudentAssignmentRow {
   id: number;
@@ -22,7 +21,7 @@ interface StudentAssignmentCardProps {
 
 export function StudentAssignmentCard({ assignment }: StudentAssignmentCardProps) {
   const { t, locale } = useI18n();
-  const { timezone, hydrated } = useStudentTimezone();
+  const { format } = useStudentDateFormatter(locale);
 
   return (
     <div className="group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-primary/30">
@@ -59,14 +58,10 @@ export function StudentAssignmentCard({ assignment }: StudentAssignmentCardProps
           <span>
             {assignment.effectiveDeadline
               ? t('studentAssignments.effectiveDeadline', {
-                  date: hydrated
-                    ? formatDate(new Date(assignment.effectiveDeadline), locale, 'short', timezone)
-                    : '—',
+                  date: format(new Date(assignment.effectiveDeadline), 'short') || '—',
                 })
               : t('studentAssignments.finalDeadline', {
-                  date: hydrated
-                    ? formatDate(new Date(assignment.finalDeadline), locale, 'short', timezone)
-                    : '—',
+                  date: format(new Date(assignment.finalDeadline), 'short') || '—',
                 })}
           </span>
         </div>

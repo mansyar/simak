@@ -1,22 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom/vitest';
 import React from 'react';
-import { toast } from 'sonner';
 import { discussionKeys } from '@/lib/query-keys';
 import { authClient } from '@/lib/auth-client';
 import { DiscussionPanel } from '@/components/discussions/discussion-panel';
 
-vi.mock('sonner', () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}));
-
 vi.mock('lucide-react', () => ({
   MessageCircle: (props: any) => <svg data-testid="message-circle-icon" {...props} />,
+  AlertCircle: (props: any) => <svg data-testid="alert-circle-icon" {...props} />,
   Send: (props: any) => <svg data-testid="send-icon" {...props} />,
   Trash2: (props: any) => <svg data-testid="trash-icon" {...props} />,
   CornerDownRight: (props: any) => <svg data-testid="reply-icon" {...props} />,
@@ -157,6 +150,19 @@ describe('DiscussionPanel', () => {
       const skeletons = document.querySelectorAll('[data-slot="skeleton"]');
       expect(skeletons.length).toBeGreaterThan(0);
     });
+  });
+
+  it('renders a retryable error state instead of the empty state when loading fails', async () => {
+    const mod = await import('@/server/discussions');
+    const refetchError = new Error('database failure');
+    (mod.listDiscussionMessages as any).mockRejectedValue(refetchError);
+    renderPanel();
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole('alert')).toBeDefined();
+    });
+    expect(screen.getByText('errors.fetchFailed')).toBeDefined();
+    expect(screen.queryByText('discussions.empty.title')).toBeNull();
   });
 
   it('aligns student messages left and instructor messages right', async () => {
@@ -306,6 +312,9 @@ describe('DiscussionPanel', () => {
 
     const deleteButton = screen.getByTestId('trash-icon').closest('button');
     fireEvent.click(deleteButton!);
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'discussions.delete' }),
+    );
 
     await vi.waitFor(() => {
       const cache = queryClient.getQueryData<{ messages: any[] }>(discussionKeys.list(1, 1));
@@ -329,8 +338,10 @@ describe('DiscussionPanel', () => {
     fireEvent.submit(input.closest('form')!);
 
     await vi.waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Server error');
+      expect(screen.getByRole('alert')).toBeDefined();
+      expect(screen.getByText('discussions.errors.postFailed')).toBeDefined();
     });
+    expect(input).toHaveValue('New message');
     // Cache should be restored — no temp message
     const cache = queryClient.getQueryData<{ messages: any[] }>(discussionKeys.list(1, 1));
     expect(cache?.messages.some((m) => m.message === 'New message')).toBe(false);
@@ -348,14 +359,56 @@ describe('DiscussionPanel', () => {
 
     const deleteButton = screen.getByTestId('trash-icon').closest('button');
     fireEvent.click(deleteButton!);
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'discussions.delete' }),
+    );
 
     await vi.waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith('Deletion window expired');
+      expect(screen.getByRole('alert')).toBeDefined();
+      expect(screen.getByText('discussions.errors.deleteFailed')).toBeDefined();
     });
+    expect(screen.getByRole('alertdialog')).toBeDefined();
     // Cache should be restored — message not soft-deleted
     const cache = queryClient.getQueryData<{ messages: any[] }>(discussionKeys.list(1, 1));
     const msg = cache?.messages.find((m) => m.id === 1);
     expect(msg?.deletedAt).toBeNull();
+  });
+
+  it('requires confirmation before deleting an own message', async () => {
+    await resolveList();
+    renderPanel();
+    await waitForMessages();
+
+    fireEvent.click(screen.getByTestId('trash-icon').closest('button')!);
+
+    expect(screen.getByRole('alertdialog')).toBeDefined();
+    expect(screen.getByText('discussions.deleteConfirm')).toBeDefined();
+  });
+
+  it('shows a success status after posting a message', async () => {
+    await resolveList();
+    const mod = await import('@/server/discussions');
+    (mod.postDiscussionMessage as any).mockResolvedValue({
+      id: 3,
+      message: 'New message',
+      userId: 'student-1',
+      authorName: 'John Doe',
+      authorRole: 'student',
+      parentMessageId: null,
+      createdAt: new Date(),
+      deletedAt: null,
+    });
+    renderPanel();
+    await waitForMessages();
+
+    const input = screen.getByTestId('discussion-input');
+    fireEvent.change(input, { target: { value: 'New message' } });
+    fireEvent.submit(input.closest('form')!);
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole('status')).toBeDefined();
+      expect(screen.getByText('discussions.success.posted')).toBeDefined();
+    });
   });
 
   it('renders discussions title as h2 (not h3) for proper heading order', async () => {

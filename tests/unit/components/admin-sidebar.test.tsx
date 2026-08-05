@@ -27,6 +27,7 @@ vi.mock('@tanstack/react-router', () => ({
     className,
     onClick,
     preload,
+    ...props
   }: {
     to: string;
     children: React.ReactNode;
@@ -40,6 +41,7 @@ vi.mock('@tanstack/react-router', () => ({
       data-testid={`sidebar-link-${to}`}
       data-preload={preload}
       onClick={onClick}
+      {...props}
     >
       {children}
     </a>
@@ -102,6 +104,7 @@ describe('AdminSidebar', () => {
     expect(dashboardLink.className).toContain('bg-sidebar-accent');
     expect(dashboardLink.className).toContain('text-sidebar-primary-foreground');
     expect(dashboardLink.className).not.toContain('border-l-[3px]');
+    expect(dashboardLink.getAttribute('aria-current')).toBe('page');
   });
 
   it('should not apply the active class to inactive routes', () => {

@@ -3,7 +3,6 @@ import '@testing-library/jest-dom/vitest';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { StudentPicker } from '@/components/instructor/assignments/StudentPicker';
 import { userKeys } from '@/lib/query-keys';
 
@@ -26,10 +25,6 @@ vi.mock('@tanstack/react-query', () => ({
 
 vi.mock('@/server/users', () => ({
   listUsers: vi.fn(),
-}));
-
-vi.mock('sonner', () => ({
-  toast: { error: vi.fn() },
 }));
 
 const mockStudents = [
@@ -84,16 +79,30 @@ describe('StudentPicker', () => {
     expect(screen.queryByText('Alice Johnson')).not.toBeInTheDocument();
   });
 
-  it('fires toast.error on query error', () => {
+  it('renders an inline retryable error state when students fail to load', () => {
+    const refetch = vi.fn();
     vi.mocked(useQuery).mockReturnValue({
       data: undefined,
       isLoading: false,
       isError: true,
       error: new Error('Network failure'),
+      refetch,
     } as never);
+
     render(<StudentPicker {...mockProps} />);
-    expect(toast.error).toHaveBeenCalledWith('errors.fetchFailed');
-    expect(console.error).toHaveBeenCalledWith('Failed to load students', expect.any(Error));
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText('errors.fetchFailed')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'common.retry' }));
+    expect(refetch).toHaveBeenCalledOnce();
+  });
+
+  it('exposes students as keyboard-operable checkbox options', () => {
+    render(<StudentPicker {...mockProps} />);
+    const option = screen.getByRole('checkbox', { name: /Alice Johnson/ });
+    expect(option.getAttribute('aria-checked')).toBe('false');
+    option.focus();
+    expect(document.activeElement).toBe(option);
   });
 
   it('triggers onToggleStudent when a student card is clicked', () => {

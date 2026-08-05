@@ -23,7 +23,11 @@ export function ReviewQueueFilters({
           value={value}
           onValueChange={(val) => onAssignmentChange(val === 'all' ? null : Number(val))}
         >
-          <SelectTrigger data-testid="assignment-filter">
+          <SelectTrigger
+            aria-label={t('instructorReviews.assignmentFilterLabel')}
+            className="min-h-11 focus-visible:ring-2 focus-visible:ring-ring"
+            data-testid="assignment-filter"
+          >
             <span>
               {value === 'all'
                 ? t('instructorReviews.allAssignments')

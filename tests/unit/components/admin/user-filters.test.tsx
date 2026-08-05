@@ -43,6 +43,7 @@ vi.mock('@/routes/__root', () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         'adminUsers.searchPlaceholder': 'Search users by name or email...',
+        'adminUsers.searchLabel': 'Search users',
         'adminUsers.allRoles': 'All Roles',
         'adminUsers.role_superadmin': 'Super Admin',
         'adminUsers.role_admin': 'Admin',
@@ -80,6 +81,23 @@ describe('UserFilters', () => {
 
     const searchInput = screen.getByPlaceholderText('Search users by name or email...');
     expect(searchInput).toBeDefined();
+  });
+
+  it('should expose a labeled search input and a touch-safe clear control', () => {
+    render(
+      <UserFilters
+        search="test"
+        onSearchChange={onSearchChange}
+        role="all"
+        onRoleChange={onRoleChange}
+      />,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Search users' })).toBeDefined();
+    const clearButton = screen.getByRole('button', { name: 'Clear search' });
+    expect(clearButton.className).toMatch(/min-h-11/);
+    expect(clearButton.className).toMatch(/min-w-11/);
+    expect(clearButton.className).toMatch(/focus-visible/);
   });
 
   it('should render role filter select', () => {

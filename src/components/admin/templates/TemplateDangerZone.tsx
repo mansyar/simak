@@ -7,7 +7,7 @@ import { useI18n } from '../../../routes/__root';
 
 interface TemplateDangerZoneProps {
   assignmentCount: number;
-  onDelete: () => void;
+  onDelete: () => void | Promise<void>;
 }
 
 export function TemplateDangerZone({ assignmentCount, onDelete }: TemplateDangerZoneProps) {

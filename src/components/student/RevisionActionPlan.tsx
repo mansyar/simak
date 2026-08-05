@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import {
   updateRevisionActionItem,
   type UpdateRevisionActionItemInput,
@@ -61,7 +61,7 @@ export function RevisionActionPlan({ items, isCurrentPlan }: RevisionActionPlanP
       const result = await updateRevisionActionItem({ data: input });
       if (isServerError(result)) {
         setLocalItems(previousItems);
-        setError(result.error.message);
+        setError(t(getErrorTranslationKey(result.error.code)));
       }
     } catch {
       setLocalItems(previousItems);

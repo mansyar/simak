@@ -7,13 +7,21 @@ import { NotificationItem } from '@/components/notifications/NotificationItem';
 import { NotificationCenter } from '@/components/notifications/NotificationCenter';
 import * as hooks from '@/hooks/use-notifications';
 
-// Mock the i18n context hook
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
+    locale: 'en',
     t: (key: string, params?: Record<string, string>) => {
       if (key === 'notifications.title') return 'Notifications';
       if (key === 'notifications.markAllRead') return 'Mark all read';
       if (key === 'notifications.empty') return 'No notifications yet';
+      if (key === 'notifications.emptyDescription') return "You're all caught up.";
+      if (key === 'notifications.filterLabel') return 'Notification filter';
+      if (key === 'notifications.loading') return 'Loading notifications...';
+      if (key === 'notifications.loadingMore') return 'Loading more notifications...';
+      if (key === 'notifications.justNow') return 'Just now';
+      if (key === 'notifications.read') return 'Read notification';
+      if (key === 'notifications.unread') return 'Unread notification';
+      if (key === 'notifications.groups.other') return 'Other notifications';
       if (key === 'notifications.groups.newReviews') return 'New Reviews';
       if (key === 'notifications.groups.consultations') return 'Consultation Updates';
       if (key === 'notifications.unreadCount') return `${params?.count ?? ''} unread notifications`;
@@ -23,7 +31,6 @@ vi.mock('@/routes/__root', () => ({
   }),
 }));
 
-// Mock TanStack Router Link
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, className, onClick, ...props }: any) => (
     <a href={to} className={className} onClick={onClick} {...props}>
@@ -32,7 +39,6 @@ vi.mock('@tanstack/react-router', () => ({
   ),
 }));
 
-// Mock the hooks
 vi.mock('@/hooks/use-notifications', () => ({
   useUnreadCount: vi.fn(),
   useNotificationsList: vi.fn(),
@@ -40,13 +46,11 @@ vi.mock('@/hooks/use-notifications', () => ({
   useMarkAllRead: vi.fn(),
 }));
 
-// Capture Sheet props for testing (onOpenChange wiring, side prop)
 const sheetState = vi.hoisted(() => ({
   onOpenChange: null as ((open: boolean) => void) | null,
   lastSide: null as string | null,
 }));
 
-// Mock the Sheet component (UX-15 refactor)
 vi.mock('@/components/ui/sheet', () => {
   const Sheet = ({ children, open, onOpenChange }: any) => {
     sheetState.onOpenChange = onOpenChange;
@@ -88,11 +92,9 @@ describe('Notification UI Components', () => {
       const onOpen = vi.fn();
       render(<NotificationBadge onOpen={onOpen} />);
 
-      // Should render bell button
       const btn = screen.getByRole('button', { name: /notification/i });
       expect(btn).toBeDefined();
 
-      // Unread count badge should not be in the document
       expect(screen.queryByText('0')).toBeNull();
     });
 
@@ -105,11 +107,9 @@ describe('Notification UI Components', () => {
       const onOpen = vi.fn();
       render(<NotificationBadge onOpen={onOpen} />);
 
-      // Unread count badge should display "5"
       const badge = screen.getByText('5');
       expect(badge).toBeDefined();
 
-      // Clicking opens the panel
       const btn = screen.getByRole('button', { name: /notification/i });
       fireEvent.click(btn);
       expect(onOpen).toHaveBeenCalled();
@@ -189,10 +189,8 @@ describe('Notification UI Components', () => {
       expect(screen.getByText('Review Passed')).toBeDefined();
       expect(screen.getByText('Your thesis chapter has been approved.')).toBeDefined();
 
-      // Relative time (5m ago / 5 mins ago)
       expect(screen.getByText(/5m|5 min/i)).toBeDefined();
 
-      // Click to mark as read
       const itemRow = screen.getByText('Review Passed').closest('div');
       expect(itemRow).not.toBeNull();
       fireEvent.click(itemRow!);
@@ -299,6 +297,75 @@ describe('Notification UI Components', () => {
       expect(screen.getByText('No notifications yet')).toBeDefined();
     });
 
+    it('shows a retryable error state when notifications fail to load', () => {
+      const refetch = vi.fn();
+      vi.mocked(hooks.useNotificationsList).mockReturnValue({
+        data: undefined,
+        isError: true,
+        isLoading: false,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+        fetchNextPage: vi.fn(),
+        refetch,
+      } as any);
+      vi.mocked(hooks.useMarkAllRead).mockReturnValue({ mutate: vi.fn() } as any);
+
+      render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+
+      expect(screen.getByRole('alert')).toBeDefined();
+      expect(screen.getByText('errors.fetchFailed')).toBeDefined();
+      fireEvent.click(screen.getByRole('button', { name: 'common.refresh' }));
+      expect(refetch).toHaveBeenCalledOnce();
+    });
+
+    it('announces loading and renders unknown notification types in a fallback group', () => {
+      vi.mocked(hooks.useNotificationsList).mockReturnValue({
+        data: undefined,
+        isLoading: true,
+        isError: false,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+        fetchNextPage: vi.fn(),
+      } as any);
+      vi.mocked(hooks.useMarkAllRead).mockReturnValue({ mutate: vi.fn() } as any);
+      const { rerender } = render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+
+      expect(screen.getByRole('status')).toBeDefined();
+      expect(screen.getByText('Loading notifications...')).toBeDefined();
+
+      vi.mocked(hooks.useNotificationsList).mockReturnValue({
+        data: {
+          pages: [
+            {
+              items: [
+                {
+                  id: 99,
+                  type: 'future_notification',
+                  title: 'Future notification',
+                  message: null,
+                  read: false,
+                  createdAt: null,
+                },
+              ],
+              total: 1,
+            },
+          ],
+          pageParams: [1],
+        },
+        isLoading: false,
+        isError: false,
+        hasNextPage: false,
+        isFetchingNextPage: false,
+        fetchNextPage: vi.fn(),
+      } as any);
+      vi.mocked(hooks.useMarkRead).mockReturnValue({ mutate: vi.fn() } as any);
+      rerender(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+
+      expect(screen.getByText('Other notifications')).toBeDefined();
+      expect(screen.getByText('Future notification')).toBeDefined();
+      expect(screen.getByText('Unread notification')).toBeDefined();
+    });
+
     it('renders slide-over panel, groups by type, and supports mark all read', () => {
       const sampleItems = [
         {
@@ -333,22 +400,18 @@ describe('Notification UI Components', () => {
       vi.mocked(hooks.useMarkAllRead).mockReturnValue({
         mutate: mockMarkAllRead,
       } as any);
-
       vi.mocked(hooks.useMarkRead).mockReturnValue({
         mutate: vi.fn(),
       } as any);
 
       render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
 
-      // Verify group headers
       expect(screen.getByText('New Reviews')).toBeDefined();
       expect(screen.getByText('Consultation Updates')).toBeDefined();
 
-      // Verify items
       expect(screen.getByText('Pass Decision')).toBeDefined();
       expect(screen.getByText('Consultation Approved')).toBeDefined();
 
-      // Mark all read button
       const markBtn = screen.getByText('Mark all read');
       fireEvent.click(markBtn);
       expect(mockMarkAllRead).toHaveBeenCalled();
@@ -403,7 +466,6 @@ describe('Notification UI Components', () => {
     it('has no custom backdrop div or manual X close button', () => {
       setupMocks();
       const { container } = render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
-      // After refactor, Sheet handles the backdrop — no manual close button with closePanel aria-label
       expect(container.querySelector('[aria-label="notifications.closePanel"]')).toBeNull();
     });
 
@@ -411,7 +473,6 @@ describe('Notification UI Components', () => {
       setupMocks();
       const onClose = vi.fn();
       render(<NotificationCenter isOpen={true} onClose={onClose} />);
-      // Simulate Sheet calling onOpenChange(false) — which happens on Escape/backdrop click
       sheetState.onOpenChange?.(false);
       expect(onClose).toHaveBeenCalledWith(false);
     });
