@@ -134,7 +134,7 @@
 
 ## Phase 6 — Visual system, i18n, motion, and final quality gates
 
-- [ ] Task: Complete visual-token consistency pass
+- [~] Task: Complete visual-token consistency pass
   - [ ] Write regression tests or assertions for changed semantic color and typography usage.
   - [ ] Replace direct brand/status colors in affected surfaces.
   - [ ] Remove misleading hover affordances from static cards.
