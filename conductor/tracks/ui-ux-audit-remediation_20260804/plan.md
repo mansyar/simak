@@ -147,20 +147,20 @@
   - [x] Write failing tests for reduced-motion behavior on affected transitions and animations. [be8c7aa]
   - [x] Implement a shared reduced-motion state/class or equivalent. [4eb1e39]
   - [x] Verify skeletons, sidebars, progress indicators, hover transitions, and toasts. [be8c7aa]
-- [~] Task: Execute complete automated verification
+- [x] Task: Execute complete automated verification [2f11776]
   - [x] Run unit/component tests and coverage. [be8c7aa]
   - [x] Run typecheck, lint, format validation, and modularity checks. [be8c7aa]
   - [x] Run authenticated Playwright checks for public, student, instructor, and admin routes. [2f11776]
   - [x] Run keyboard interaction checks at 320px, 768px, and 1280px. [2f11776]
   - [x] Run axe checks and confirm no new serious/critical violations. [2f11776]
   - [x] Confirm no hydration or unexpected console errors. [2f11776]
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint [checkpoint: 2f11776]
 
 ## Final Definition of Done
 
-- [ ] All plan tasks are complete and linked to commits.
-- [ ] Tests and coverage meet project thresholds.
-- [ ] Public and authenticated browser checks pass at all agreed viewport sizes.
-- [ ] Keyboard, focus, screen-reader semantics, bilingual behavior, and reduced-motion behavior are verified.
-- [ ] No unresolved P0/P1 audit findings remain.
+- [x] All plan tasks are complete and linked to commits.
+- [x] Tests and coverage meet project thresholds.
+- [x] Public and authenticated browser checks pass at all agreed viewport sizes.
+- [x] Keyboard, focus, screen-reader semantics, bilingual behavior, and reduced-motion behavior are verified.
+- [x] No unresolved P0/P1 audit findings remain.
 - [ ] Conductor review is completed.
