@@ -150,7 +150,7 @@
 - [~] Task: Execute complete automated verification
   - [x] Run unit/component tests and coverage. [be8c7aa]
   - [x] Run typecheck, lint, format validation, and modularity checks. [be8c7aa]
-  - [ ] Run authenticated Playwright checks for public, student, instructor, and admin routes.
+  - [~] Run authenticated Playwright checks for public, student, instructor, and admin routes.
   - [ ] Run keyboard interaction checks at 320px, 768px, and 1280px.
   - [ ] Run axe checks and confirm no new serious/critical violations.
   - [ ] Confirm no hydration or unexpected console errors.
