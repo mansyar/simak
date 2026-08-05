@@ -148,7 +148,7 @@
   - [x] Implement a shared reduced-motion state/class or equivalent. [4eb1e39]
   - [x] Verify skeletons, sidebars, progress indicators, hover transitions, and toasts. [be8c7aa]
 - [~] Task: Execute complete automated verification
-  - [~] Run unit/component tests and coverage.
+  - [x] Run unit/component tests and coverage. [be8c7aa]
   - [ ] Run typecheck, lint, format validation, and modularity checks.
   - [ ] Run authenticated Playwright checks for public, student, instructor, and admin routes.
   - [ ] Run keyboard interaction checks at 320px, 768px, and 1280px.
