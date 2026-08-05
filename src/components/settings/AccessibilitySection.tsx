@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accessibility } from 'lucide-react';
@@ -25,6 +25,20 @@ export function AccessibilitySection() {
   });
 
   const reducedMotion = data?.settings?.reducedMotion ?? false;
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    if (reducedMotion) {
+      root.dataset.reducedMotion = 'true';
+    } else {
+      delete root.dataset.reducedMotion;
+    }
+
+    return () => {
+      delete root.dataset.reducedMotion;
+    };
+  }, [reducedMotion]);
 
   const updateSettingsMutation = useMutation({
     mutationFn: async (args: { reducedMotion: boolean }) => {

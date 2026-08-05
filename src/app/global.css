@@ -169,10 +169,13 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-sonner-toast],
-  [data-sonner-toast] * {
-    animation: none !important;
-    transition: none !important;
+@media (prefers-reduced-motion: reduce), :root[data-reduced-motion='true'] {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

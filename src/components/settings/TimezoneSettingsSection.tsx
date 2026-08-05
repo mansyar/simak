@@ -149,7 +149,7 @@ export function TimezoneSettingsSection() {
             {t('settings.timezone.save')}
           </button>
           {status === 'saved' && (
-            <p role="status" className="text-sm text-green-600">
+            <p role="status" className="text-sm text-success">
               {t('settings.timezone.saved')}
             </p>
           )}

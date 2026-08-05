@@ -177,7 +177,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
                           {cp}
                         </p>
                         {idx === 0 && (
-                          <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                          <span className="rounded-full bg-success/10 px-1.5 py-0.5 text-[10px] font-medium tracking-wider text-success uppercase">
                             {t('instructorAssignments.initiallyUnlocked')}
                           </span>
                         )}

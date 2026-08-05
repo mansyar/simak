@@ -21,13 +21,13 @@ const statusConfig = {
   pass: {
     badgeVariant: 'success' as const,
     icon: CheckCircle2,
-    iconClass: 'text-green-500',
+    iconClass: 'text-success',
     labelKey: 'files.review.passed',
   },
   revise: {
     badgeVariant: 'destructive' as const,
     icon: RefreshCcw,
-    iconClass: 'text-orange-500',
+    iconClass: 'text-warning',
     labelKey: 'files.review.revise',
   },
 };
@@ -63,7 +63,7 @@ export function SubmissionStatus({ review }: SubmissionStatusProps) {
   const Icon = config.icon;
 
   return (
-    <Card className={review.decision === 'pass' ? 'border-l-green-500' : 'border-l-orange-500'}>
+    <Card className={review.decision === 'pass' ? 'border-l-success' : 'border-l-warning'}>
       <CardHeader>
         <CardTitle className="text-base">{t('files.review.title')}</CardTitle>
       </CardHeader>

@@ -244,7 +244,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
 
       {/* Error banner */}
       {error && (
-        <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-3 text-sm text-red-700 dark:text-red-400">
+        <div className="rounded-lg bg-error/10 border border-error/20 p-3 text-sm text-error">
           {error}
         </div>
       )}
@@ -267,9 +267,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
                 <span className="font-medium text-foreground">{student.name}</span>
                 <span className="text-xs text-muted-foreground">{student.email}</span>
                 {lockedCheckpoints.length > 0 && (
-                  <span className="text-xs text-red-500 dark:text-red-400">
-                    ({lockedCheckpoints.length} locked)
-                  </span>
+                  <span className="text-xs text-error">({lockedCheckpoints.length} locked)</span>
                 )}
               </div>
               {isExpanded ? (

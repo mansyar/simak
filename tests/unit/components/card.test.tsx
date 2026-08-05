@@ -37,6 +37,13 @@ describe('Card', () => {
     expect(card).toBeDefined();
     expect(card?.className).toContain('custom-class');
   });
+
+  it('does not imply interactivity for static cards', () => {
+    const { container } = render(<Card>Static content</Card>);
+    const card = container.querySelector('[data-slot="card"]');
+
+    expect(card?.className).not.toContain('hover:bg-muted/50');
+  });
 });
 
 describe('CardHeader', () => {

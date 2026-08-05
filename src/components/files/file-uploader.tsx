@@ -106,13 +106,11 @@ export function FileUploader({
       {uploadSuccess ? (
         <div
           data-testid="drop-zone"
-          className="relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-green-500 bg-green-50 p-8 dark:bg-green-950/20"
+          className="relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-success bg-success/10 p-8"
         >
           <div className="flex flex-col items-center gap-2 text-center">
-            <CheckCircle2 className="h-10 w-10 text-green-500" />
-            <p className="text-sm font-medium text-green-700 dark:text-green-300">
-              {t('files.uploadSuccess')}
-            </p>
+            <CheckCircle2 className="h-10 w-10 text-success" />
+            <p className="text-sm font-medium text-success">{t('files.uploadSuccess')}</p>
             <Button variant="outline" size="sm" type="button" onClick={handleReset}>
               {t('files.uploadAnother')}
             </Button>
@@ -140,7 +138,7 @@ export function FileUploader({
                 ? 'border-primary bg-primary/5'
                 : 'border-muted-foreground/25 hover:border-muted-foreground/50'
             }
-            ${uploadError ? 'border-red-500 bg-red-50 dark:bg-red-950/20' : ''}
+            ${uploadError ? 'border-error bg-error/10' : ''}
           `}
         >
           <input
@@ -194,7 +192,7 @@ export function FileUploader({
       {validationError && (
         <div
           role="alert"
-          className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400"
+          className="flex items-center gap-2 rounded-lg border border-error/20 bg-error/10 p-3 text-sm text-error"
         >
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{validationError}</span>
@@ -205,7 +203,7 @@ export function FileUploader({
       {uploadError && (
         <div
           role="alert"
-          className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400"
+          className="flex items-center gap-2 rounded-lg border border-error/20 bg-error/10 p-3 text-sm text-error"
         >
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{uploadError}</span>

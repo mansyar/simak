@@ -54,12 +54,12 @@ describe('MetricCard color variants', () => {
   }
 });
 
-describe('MetricCard hover styles', () => {
-  it('has hover transform and shadow classes', () => {
+describe('MetricCard interaction styling', () => {
+  it('does not imply interactivity for static metrics', () => {
     const { container } = render(<MetricCard label="Test" value={0} icon={Users} />);
     const card = container.firstChild as HTMLElement;
-    expect(card.className).toContain('hover:-translate-y-0.5');
-    expect(card.className).toContain('hover:shadow-md');
+    expect(card.className).not.toContain('hover:-translate-y-0.5');
+    expect(card.className).not.toContain('hover:shadow-md');
   });
 });
 

@@ -48,8 +48,7 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-lg border bg-card p-6 transition-all duration-200',
-        'hover:-translate-y-0.5 hover:shadow-md',
+        'relative overflow-hidden rounded-lg border bg-card p-6',
         'border-t-[3px]',
         colors.border,
         className,

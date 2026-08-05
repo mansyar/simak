@@ -36,6 +36,7 @@ vi.mock('@/routes/__root', () => ({
 describe('AccessibilitySection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    document.documentElement.removeAttribute('data-reduced-motion');
     mockUseMutation.mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: false,
@@ -85,6 +86,20 @@ describe('AccessibilitySection', () => {
 
     const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
     expect(checkbox.checked).toBe(true);
+  });
+
+  it('should apply the reduced-motion preference to the document root', () => {
+    mockUseQuery.mockReturnValue({
+      data: {
+        user: { id: '1', name: 'John', email: 'john@test.com', image: null },
+        settings: { reducedMotion: true },
+      },
+      isLoading: false,
+    });
+
+    render(<AccessibilitySection />);
+
+    expect(document.documentElement.getAttribute('data-reduced-motion')).toBe('true');
   });
 
   it('should call updateUserSettings mutation when toggle is clicked', async () => {

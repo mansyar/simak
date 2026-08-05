@@ -231,10 +231,10 @@ function BulkUserImportPage() {
       {parsedRows.length > 0 && !result && (
         <div className="space-y-4">
           <div role="status" aria-live="polite" className="flex items-center gap-4 text-sm">
-            <span className="text-green-600">
+            <span className="text-success">
               {validCount} {t('bulkImport.common.valid')}
             </span>
-            <span className="text-red-600">
+            <span className="text-error">
               {invalidCount} {t('bulkImport.common.invalid')}
             </span>
           </div>
@@ -271,7 +271,7 @@ function BulkUserImportPage() {
                     <td className="p-2">
                       <span
                         data-testid={`row-status-${i}`}
-                        className={row.status === 'valid' ? 'text-green-600' : 'text-red-600'}
+                        className={row.status === 'valid' ? 'text-success' : 'text-error'}
                       >
                         {row.status === 'valid'
                           ? t('bulkImport.common.valid')

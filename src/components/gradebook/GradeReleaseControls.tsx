@@ -206,7 +206,7 @@ export function GradeReleaseControls({
       </div>
 
       {feedback && (
-        <p role="status" className="text-sm text-emerald-700 dark:text-emerald-400">
+        <p role="status" className="text-sm text-success">
           {t(feedback)}
         </p>
       )}
