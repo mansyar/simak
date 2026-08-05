@@ -411,7 +411,7 @@ describe('Admin Users index page', () => {
       fireEvent.click(screen.getByTestId('delete-confirm'));
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Server error');
+        expect(toast.error).toHaveBeenCalledWith('error.internal');
       });
       const data = queryClient.getQueryData<{ users: { id: string }[]; total: number }>(key);
       expect(data?.users.find((u) => u.id === '1')).toBeDefined();

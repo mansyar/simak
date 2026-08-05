@@ -93,7 +93,6 @@ const mockStudents = [
 ];
 
 function expandAllStudents() {
-  // Click on all student section headers to expand them
   const sections = screen.getAllByTestId('student-section');
   sections.forEach((section) => {
     const btn = section.querySelector('button');
@@ -121,7 +120,6 @@ describe('DeadlineManager', () => {
     renderWithQuery(<DeadlineManager students={mockStudents} assignmentId={1} />);
     expandAllStudents();
 
-    // Bob has 2 locked checkpoints — 2 Unlock buttons
     const unlockButtons = screen.getAllByText('instructorAssignments.deadlineManager.unlock');
     expect(unlockButtons.length).toBe(2);
   });
@@ -433,7 +431,9 @@ describe('DeadlineManager', () => {
       clickUnlock();
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Unlock failed');
+        expect(toast.error).toHaveBeenCalledWith(
+          'instructorAssignments.deadlineManager.unlockError',
+        );
       });
       expect(screen.getAllByText('instructorAssignments.status.locked').length).toBe(2);
     });
@@ -457,7 +457,9 @@ describe('DeadlineManager', () => {
       clickExtend();
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Extend failed');
+        expect(toast.error).toHaveBeenCalledWith(
+          'instructorAssignments.deadlineManager.extendError',
+        );
       });
       expect(screen.getAllByText('May 20, 2026').length).toBe(2);
     });
@@ -471,7 +473,9 @@ describe('DeadlineManager', () => {
       clickUnlock();
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Server rejected');
+        expect(toast.error).toHaveBeenCalledWith(
+          'instructorAssignments.deadlineManager.unlockError',
+        );
       });
       expect(screen.getAllByText('instructorAssignments.status.locked').length).toBe(2);
     });
@@ -485,7 +489,9 @@ describe('DeadlineManager', () => {
       clickExtend();
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Server rejected');
+        expect(toast.error).toHaveBeenCalledWith(
+          'instructorAssignments.deadlineManager.extendError',
+        );
       });
       expect(screen.getAllByText('May 20, 2026').length).toBe(2);
     });

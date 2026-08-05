@@ -101,7 +101,7 @@ function InstructorInterventionsPage() {
     const result = activeIntervention
       ? await updateIntervention({ data: values as never })
       : await createIntervention({ data: values as never });
-    if (isError(result)) throw new Error(result.error.message);
+    if (isError(result)) throw new Error(t('errors.fetchFailed'));
 
     toast.success(t('instructorInterventions.saveSuccess'));
     await navigate({

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -6,7 +6,7 @@ import {
   verifyConsultation,
   rejectConsultation,
 } from '@/server/consultations';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { consultationKeys } from '@/lib/query-keys';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,10 +51,24 @@ export function VerificationDialog({
   const [error, setError] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectInput, setShowRejectInput] = useState(false);
+  const tRef = useRef(t);
+  tRef.current = t;
 
   useEffect(() => {
+    const loadDetail = async (id: number) => {
+      setLoading(true);
+      setError(null);
+      const result = await getConsultationDetail({ data: { consultationId: id } });
+      if (isServerError(result)) {
+        setError(tRef.current(getErrorTranslationKey(result.error.code)));
+      } else {
+        setDetail(result.consultation);
+      }
+      setLoading(false);
+    };
+
     if (open && consultationId) {
-      loadDetail(consultationId);
+      void loadDetail(consultationId);
     } else {
       setDetail(null);
       setError(null);
@@ -63,24 +77,12 @@ export function VerificationDialog({
     }
   }, [open, consultationId]);
 
-  const loadDetail = async (id: number) => {
-    setLoading(true);
-    setError(null);
-    const result = await getConsultationDetail({ data: { consultationId: id } });
-    if (isServerError(result)) {
-      setError(result.error.message);
-    } else {
-      setDetail(result.consultation);
-    }
-    setLoading(false);
-  };
-
   const verifyMutation = useMutation({
     mutationFn: async () => {
       if (!consultationId) throw new Error('No consultation selected');
       const result = await verifyConsultation({ data: { consultationId } });
       if (isServerError(result)) {
-        throw new Error(result.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return result;
     },
@@ -107,14 +109,14 @@ export function VerificationDialog({
       onOpenChange(false);
       onActionComplete();
     },
-    onError: (error: Error, _variables, context) => {
+    onError: (_error: Error, _variables, context) => {
       if (context?.previousEntries) {
         for (const [queryKey, data] of context.previousEntries) {
           queryClient.setQueryData(queryKey, data);
         }
       }
-      toast.error(error.message);
-      setError(error.message);
+      toast.error(t('errors.fetchFailed'));
+      setError(t('errors.fetchFailed'));
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: consultationKeys.all() });
@@ -128,7 +130,7 @@ export function VerificationDialog({
         data: { consultationId, reason: rejectReason.trim() },
       });
       if (isServerError(result)) {
-        throw new Error(result.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return result;
     },
@@ -155,14 +157,14 @@ export function VerificationDialog({
       onOpenChange(false);
       onActionComplete();
     },
-    onError: (error: Error, _variables, context) => {
+    onError: (_error: Error, _variables, context) => {
       if (context?.previousEntries) {
         for (const [queryKey, data] of context.previousEntries) {
           queryClient.setQueryData(queryKey, data);
         }
       }
-      toast.error(error.message);
-      setError(error.message);
+      toast.error(t('errors.fetchFailed'));
+      setError(t('errors.fetchFailed'));
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: consultationKeys.all() });

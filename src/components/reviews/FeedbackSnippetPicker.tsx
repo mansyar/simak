@@ -25,7 +25,7 @@ function FeedbackSnippetPicker({ onInsert }: FeedbackSnippetPickerProps) {
       });
 
       if (isServerError(result)) {
-        throw new Error(result.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
 
       return result;

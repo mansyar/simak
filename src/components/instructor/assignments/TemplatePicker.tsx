@@ -33,7 +33,7 @@ export function TemplatePicker({ selectedTemplateId, onSelectTemplate }: Templat
         data: { page: 1, limit: 100, search: '' },
       });
       if (isServerError(response)) {
-        throw new Error(response.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return response;
     },

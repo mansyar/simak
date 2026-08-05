@@ -84,7 +84,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
     mutationFn: async (checkpointId: number) => {
       const result = await unlockCheckpoint({ data: { checkpointId } });
       if (isServerError(result)) {
-        throw new Error(result.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return result;
     },
@@ -107,14 +107,14 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       setError(null);
       toast.success(t('instructorAssignments.deadlineManager.unlockSuccess'));
     },
-    onError: (error, _variables, context) => {
+    onError: (_error, _variables, context) => {
       if (context?.previousStudents) setLocalStudents(context.previousStudents);
       if (context?.previousEntries) {
         for (const [queryKey, data] of context.previousEntries) {
           queryClient.setQueryData(queryKey, data);
         }
       }
-      toast.error(error.message);
+      toast.error(t('instructorAssignments.deadlineManager.unlockError'));
       setError(t('instructorAssignments.deadlineManager.unlockError'));
     },
     onSettled: () => {
@@ -133,7 +133,7 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
     }) => {
       const result = await extendDeadline({ data: { checkpointId, newDueDate } });
       if (isServerError(result)) {
-        throw new Error(result.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return result;
     },
@@ -160,14 +160,14 @@ export function DeadlineManager({ students, assignmentId: _assignmentId }: Deadl
       setError(null);
       toast.success(t('instructorAssignments.deadlineManager.extendSuccess'));
     },
-    onError: (error, _variables, context) => {
+    onError: (_error, _variables, context) => {
       if (context?.previousStudents) setLocalStudents(context.previousStudents);
       if (context?.previousEntries) {
         for (const [queryKey, data] of context.previousEntries) {
           queryClient.setQueryData(queryKey, data);
         }
       }
-      toast.error(error.message);
+      toast.error(t('instructorAssignments.deadlineManager.extendError'));
       setError(t('instructorAssignments.deadlineManager.extendError'));
     },
     onSettled: () => {

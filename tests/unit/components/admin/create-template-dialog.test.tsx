@@ -237,7 +237,7 @@ describe('CreateTemplateDialog', () => {
     }
 
     await vi.waitFor(() => {
-      expect(screen.getByText(/Server error/)).toBeDefined();
+      expect(screen.getByText(/error\.badRequest/)).toBeDefined();
     });
     expect(onSucceed).not.toHaveBeenCalled();
   });

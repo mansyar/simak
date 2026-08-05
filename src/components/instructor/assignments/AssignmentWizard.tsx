@@ -7,7 +7,7 @@ import { createAssignment } from '@/server/assignments';
 import { getTemplate } from '@/server/templates';
 import { listUsers } from '@/server/users';
 import { userKeys } from '@/lib/query-keys';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { TemplatePicker } from './TemplatePicker';
 import { AssignmentDetailsForm } from './AssignmentDetailsForm';
 import { StudentPicker } from './StudentPicker';
@@ -66,7 +66,7 @@ export function AssignmentWizard() {
         data: { page: 1, limit: 200, search: '', role: 'student' },
       });
       if (isServerError(response)) {
-        throw new Error(response.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return response;
     },
@@ -86,7 +86,7 @@ export function AssignmentWizard() {
     try {
       const response = await getTemplate({ data: { id: tpl.id } });
       if (isServerError(response)) {
-        throw new Error(response.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       if (response && response.checkpoints) {
         const details: CheckpointDetail[] = response.checkpoints.map((cp) => ({
@@ -190,7 +190,7 @@ export function AssignmentWizard() {
       });
 
       if (isServerError(res)) {
-        setErrors({ submit: res.error.message });
+        setErrors({ submit: t(getErrorTranslationKey(res.error.code)) });
       } else {
         navigate({ to: ('/instructor/assignments/' + res.assignmentId) as never });
       }

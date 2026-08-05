@@ -35,7 +35,7 @@ export function StudentPicker({
         data: { page: 1, limit: 200, search: '', role: 'student' },
       });
       if (isServerError(response)) {
-        throw new Error(response.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return response;
     },

@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { CheckpointListEditor } from './CheckpointListEditor';
 import { CreateTemplateSchema, type CreateTemplateResult } from '@/server/templates';
 import { useI18n } from '../../../routes/__root';
-import { isServerError } from '@/lib/errors';
+import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 
 type CreateTemplateFormValues = z.infer<typeof CreateTemplateSchema>;
 
@@ -133,7 +133,7 @@ export function CreateTemplateDialog({
       return;
     }
     if (isServerError(result)) {
-      setServerError(result.error.message);
+      setServerError(t(getErrorTranslationKey(result.error.code)));
     } else if ('template' in result && result.template) {
       const templateId = result.template.id;
       form.reset();

@@ -179,7 +179,7 @@ function CheckpointSubmissionPage() {
         });
 
         if (isServerError(uploadData)) {
-          setUploadError(uploadData.error.message);
+          setUploadError(t(getErrorTranslationKey(uploadData.error.code)));
           return;
         }
 
@@ -220,7 +220,7 @@ function CheckpointSubmissionPage() {
         });
 
         if (isServerError(result)) {
-          setUploadError(result.error.message);
+          setUploadError(t(getErrorTranslationKey(result.error.code)));
           return;
         }
 

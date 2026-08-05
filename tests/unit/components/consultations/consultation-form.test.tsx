@@ -208,7 +208,7 @@ describe('ConsultationForm', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(screen.getByText('Failed to log consultation')).toBeDefined();
+      expect(screen.getByText('error.internal')).toBeDefined();
     });
     expect(onSuccess).not.toHaveBeenCalled();
   });

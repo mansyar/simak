@@ -213,7 +213,7 @@ describe('CheckpointSubmissionPage - upload error differentiation', () => {
     fireEvent.click(screen.getByTestId('upload-trigger'));
 
     await waitFor(() =>
-      expect(screen.getByTestId('upload-error').textContent).toBe('private presign failure'),
+      expect(screen.getByTestId('upload-error').textContent).toBe('errors.fetchFailed'),
     );
     expect(screen.getByTestId('upload-trigger').getAttribute('disabled')).toBeNull();
   });
@@ -236,7 +236,7 @@ describe('CheckpointSubmissionPage - upload error differentiation', () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByTestId('upload-error').textContent).toBe('private submission failure'),
+      expect(screen.getByTestId('upload-error').textContent).toBe('errors.fetchFailed'),
     );
     expect(screen.getByTestId('upload-trigger').getAttribute('disabled')).toBeNull();
   });

@@ -73,7 +73,7 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
         data: { checkpointId, page: 1, limit: 100 },
       });
       if (isServerError(res)) {
-        throw new Error(res.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return res;
     },
@@ -97,7 +97,7 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
         },
       });
       if (isServerError(res)) {
-        throw new Error(res.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return res;
     },
@@ -155,7 +155,7 @@ export function DiscussionPanel({ checkpointId, instructorView = false }: Discus
         data: { messageId },
       });
       if (isServerError(res)) {
-        throw new Error(res.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return res;
     },

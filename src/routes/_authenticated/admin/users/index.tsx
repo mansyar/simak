@@ -107,7 +107,7 @@ function UsersPage() {
         },
       });
       if (isServerError(result)) {
-        throw new Error(result.error.message);
+        throw new Error(t('errors.fetchFailed'));
       }
       return result;
     },
@@ -147,7 +147,7 @@ function UsersPage() {
         }
       }
       if (isServerError(error)) {
-        toast.error(error.error.message);
+        toast.error(t(getErrorTranslationKey(error.error.code)));
       }
     },
     onSettled: () => {
@@ -218,7 +218,7 @@ function UsersPage() {
   const handleGenerateLink = async (user: UserRow) => {
     const result = await generateSetupLinkFn({ data: { id: user.id } });
     if (isServerError(result)) {
-      setInlineError(result.error.message);
+      setInlineError(t(getErrorTranslationKey(result.error.code)));
     } else {
       setSetupLinkUrl(result.url ?? '');
       setSetupLinkUser(user);
@@ -228,8 +228,8 @@ function UsersPage() {
   const handleCreateUser = async (values: z.infer<typeof CreateUserSchema>) => {
     const result = await createUserFn({ data: values });
     if (isServerError(result)) {
-      setInlineError(`${t('common.error')}: ${result.error.message}`);
-      throw new Error(result.error.message);
+      setInlineError(`${t('common.error')}: ${t(getErrorTranslationKey(result.error.code))}`);
+      throw new Error(t(getErrorTranslationKey(result.error.code)));
     }
     queryClient.invalidateQueries({ queryKey: userKeys.all() });
   };
@@ -237,8 +237,8 @@ function UsersPage() {
   const handleUpdateUser = async (id: string, values: z.infer<typeof UpdateUserSchema>) => {
     const result = await updateUserFn({ data: { ...values, id } });
     if (isServerError(result)) {
-      setInlineError(`${t('common.error')}: ${result.error.message}`);
-      throw new Error(result.error.message);
+      setInlineError(`${t('common.error')}: ${t(getErrorTranslationKey(result.error.code))}`);
+      throw new Error(t(getErrorTranslationKey(result.error.code)));
     }
     queryClient.invalidateQueries({ queryKey: userKeys.all() });
   };
@@ -352,7 +352,7 @@ function UsersPage() {
               setReassignmentUser(null);
             } catch (e) {
               if (isServerError(e)) {
-                setInlineError(e.error.message);
+                setInlineError(t(getErrorTranslationKey(e.error.code)));
               }
             }
           }

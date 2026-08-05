@@ -479,9 +479,7 @@ describe('AssignmentWizard', () => {
       navigateToStep5();
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));
-      await waitFor(() =>
-        expect(screen.getByText('Template is no longer available')).toBeDefined(),
-      );
+      await waitFor(() => expect(screen.getByText('error.internal')).toBeDefined());
       expect(mockNavigate).not.toHaveBeenCalled();
     });
 
