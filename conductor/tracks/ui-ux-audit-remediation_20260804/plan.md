@@ -147,7 +147,7 @@
   - [x] Write failing tests for reduced-motion behavior on affected transitions and animations. [be8c7aa]
   - [x] Implement a shared reduced-motion state/class or equivalent. [4eb1e39]
   - [x] Verify skeletons, sidebars, progress indicators, hover transitions, and toasts. [be8c7aa]
-- [ ] Task: Execute complete automated verification
+- [~] Task: Execute complete automated verification
   - [ ] Run unit/component tests and coverage.
   - [ ] Run typecheck, lint, format validation, and modularity checks.
   - [ ] Run authenticated Playwright checks for public, student, instructor, and admin routes.
