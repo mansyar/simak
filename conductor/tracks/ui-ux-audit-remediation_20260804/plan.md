@@ -118,10 +118,10 @@
   - [x] Write failing tests for mobile table presentation, filter labels, cleanup confirmation, delete pending states, and session revoke names. [1c0134a]
   - [x] Implement mobile-priority layouts and accessible detail expansion. [1c0134a]
   - [x] Ensure destructive dialogs remain open until confirmed success. [1c0134a]
-- [~] Task: Improve settings information architecture and feedback
-  - [ ] Write failing tests for section navigation and mutation outcome announcements.
-  - [ ] Group settings into discoverable sections.
-  - [ ] Implement consistent pending/success/failure behavior for profile, password, 2FA, sessions, accessibility, notifications, timezone, and calendar settings.
+- [x] Task: Improve settings information architecture and feedback [45ecb05]
+  - [x] Write failing tests for section navigation and mutation outcome announcements. [45ecb05]
+  - [x] Group settings into discoverable sections. [45ecb05]
+  - [x] Implement consistent pending/success/failure behavior for profile, password, 2FA, sessions, accessibility, notifications, timezone, and calendar settings. [45ecb05]
 - [ ] Task: Improve notification center
   - [ ] Write failing tests for sheet overflow, tab semantics, unread announcements, localized relative time, unknown notification types, and load-more feedback.
   - [ ] Implement a mobile-safe notification panel with explicit state announcements.
