@@ -110,7 +110,7 @@
 
 ## Phase 5 — Admin, public, settings, and notification remediation
 
-- [ ] Task: Repair admin import and preview workflows
+- [~] Task: Repair admin import and preview workflows
   - [ ] Write failing tests for keyboard upload, parsing errors, retry, expansion semantics, and progress announcements.
   - [ ] Implement accessible import controls and expandable preview rows.
   - [ ] Preserve row-level errors and successful-row summaries.
