@@ -170,7 +170,7 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-sidebar-primary-foreground">
-                  {user.name || 'User'}
+                  {user.name || t('common.unknownUser')}
                 </p>
                 <p className="truncate text-xs text-sidebar-foreground">{user.email || ''}</p>
               </div>

@@ -95,6 +95,16 @@ export function SessionManagement() {
   const sessions = sessionsData?.sessions ?? [];
   const otherSessions = sessions.filter((s) => !s.isCurrent);
 
+  const formatDevice = (session: SessionItem) => {
+    const browser =
+      session.device.browser === 'Unknown'
+        ? t('settings.sessions.unknownDevice')
+        : session.device.browser;
+    const os =
+      session.device.os === 'Unknown' ? t('settings.sessions.unknownDevice') : session.device.os;
+    return t('settings.sessions.deviceOn', { browser, os });
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -126,9 +136,7 @@ export function SessionManagement() {
                   <DeviceIcon device={s.device} />
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">
-                        {s.device.browser} on {s.device.os}
-                      </span>
+                      <span className="text-sm font-medium">{formatDevice(s)}</span>
                       {s.isCurrent && (
                         <Badge variant="default" className="text-xs">
                           {t('settings.sessions.current')}
@@ -136,7 +144,8 @@ export function SessionManagement() {
                       )}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {s.ipAddress ?? 'Unknown IP'} &middot; {formatDate(s.createdAt)}
+                      {s.ipAddress ?? t('settings.sessions.unknownIp')} &middot;{' '}
+                      {formatDate(s.createdAt)}
                     </div>
                   </div>
                 </div>
@@ -179,8 +188,8 @@ export function SessionManagement() {
           <MutationFeedback error={feedback.error} />
           {revokeTarget && (
             <p className="text-sm">
-              {revokeTarget.device.browser} on {revokeTarget.device.os} &middot;{' '}
-              {revokeTarget.ipAddress ?? 'Unknown IP'}
+              {formatDevice(revokeTarget)} &middot;{' '}
+              {revokeTarget.ipAddress ?? t('settings.sessions.unknownIp')}
             </p>
           )}
           <DialogFooter>

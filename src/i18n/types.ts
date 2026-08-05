@@ -87,6 +87,7 @@ export type Translation = {
     pageOf: string
     done: string
     clearSearch: string
+    unknownUser: string
     exportCsv: string
     exportExcel: string
     exportStudentProgress: string
@@ -831,6 +832,9 @@ export type Translation = {
     subtitle: string
     reviewsCompleted: string
     avgResponseTime: string
+    notAvailable: string
+    responseHours: string
+    averageResponseTimeHours: string
     slaBreachCount: string
     studentsSupervised: string
     assignmentsActive: string
@@ -1161,8 +1165,10 @@ export type Translation = {
     reason: string
     reasonPlaceholder: string
     reasonMinChars: string
+    reasonCharacterCount: string
     duration: string
     durationHint: string
+    durationMaxHint: string
     checkpoint: string
     checkpointHint: string
     submit: string
@@ -1279,6 +1285,9 @@ export type Translation = {
       revokeError: string
       revokeAllSuccess: string
       revokeAllError: string
+      unknownIp: string
+      unknownDevice: string
+      deviceOn: string
     }
     profile: {
       title: string

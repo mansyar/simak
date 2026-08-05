@@ -86,11 +86,17 @@ vi.mock('@/routes/__root', () => ({
         'settings.sessions.revokeAllError': 'Failed to revoke sessions',
         'settings.sessions.revokeSuccess': 'Session revoked',
         'settings.sessions.revokeAllSuccess': 'Sessions revoked',
+        'settings.sessions.unknownIp': 'Unknown IP address',
+        'settings.sessions.unknownDevice': 'Unknown device',
+        'settings.sessions.deviceOn': '{browser} on {os}',
         'common.cancel': 'Cancel',
       };
       if (params) {
-        const value = translations[key] || key;
-        return value.replace('{{count}}', params.count ?? '');
+        return Object.entries(params).reduce(
+          (value, [name, replacement]) =>
+            value.replace(`{{${name}}}`, replacement).replace(`{${name}}`, replacement),
+          translations[key] || key,
+        );
       }
       return translations[key] || key;
     },

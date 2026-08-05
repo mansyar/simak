@@ -84,7 +84,7 @@ export function ExtensionRequestForm({
       <p className="text-xs text-muted-foreground mt-1 text-right">
         {reasonValue.length < 10
           ? t('extensions.reasonMinChars').replace('{count}', '10')
-          : `${reasonValue.length} characters`}
+          : t('extensions.reasonCharacterCount', { count: String(reasonValue.length) })}
       </p>
     ) : null;
 
@@ -181,7 +181,8 @@ export function ExtensionRequestForm({
                 <Input type="number" min={1} max={maxExtensionDays} placeholder="1" {...field} />
               </FormControl>
               <p className="text-xs text-muted-foreground">
-                {t('extensions.durationHint')} (max {maxExtensionDays})
+                {t('extensions.durationHint')} (
+                {t('extensions.durationMaxHint', { max: String(maxExtensionDays) })})
               </p>
               <FormMessage />
             </FormItem>

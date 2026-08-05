@@ -144,31 +144,34 @@ function AdminAnalyticsPage() {
 
   const handleExportExcel = () => {
     const rows: Record<string, unknown>[] = [
-      { Metric: 'Consultation Verification Rate', Value: `${data.consultationVerificationRate}%` },
-      { Metric: 'Deadline Breach Rate', Value: `${data.deadlineBreachRate}%` },
-      { Metric: 'Reviews Completed', Value: data.reviewsCompleted },
+      {
+        Metric: t('adminAnalytics.verificationRate'),
+        Value: `${data.consultationVerificationRate}%`,
+      },
+      { Metric: t('adminAnalytics.breachRate'), Value: `${data.deadlineBreachRate}%` },
+      { Metric: t('adminAnalytics.reviewsCompleted'), Value: data.reviewsCompleted },
       ...data.statusDistribution.map((s) => ({
-        Category: 'Status Distribution',
+        Category: t('adminAnalytics.statusDistribution'),
         State: s.state,
         Count: s.count,
       })),
       ...data.submissionTrend.map((r) => ({
-        Category: 'Submission Trend',
+        Category: t('adminAnalytics.submissionTrend'),
         Date: r.date,
         Count: r.count,
       })),
       ...data.reviewTrend.map((r) => ({
-        Category: 'Review Trend',
+        Category: t('adminAnalytics.reviewTrend'),
         Date: r.date,
         Count: r.count,
       })),
       ...data.dauTrend.map((r) => ({
-        Category: 'DAU',
+        Category: t('adminAnalytics.dauTrend'),
         Date: r.date,
         Count: r.activeUsers,
       })),
       ...data.wauTrend.map((r) => ({
-        Category: 'WAU',
+        Category: t('adminAnalytics.wauTrend'),
         Date: r.date,
         Count: r.activeUsers,
       })),

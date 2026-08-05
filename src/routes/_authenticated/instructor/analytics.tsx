@@ -105,14 +105,19 @@ function InstructorAnalyticsPage() {
 
   const handleExportExcel = () => {
     const rows: Record<string, unknown>[] = [
-      { Metric: 'Reviews Completed', Value: data.reviewsCompleted },
+      { Metric: t('instructorAnalytics.reviewsCompleted'), Value: data.reviewsCompleted },
       {
-        Metric: 'Average Response Time (Hours)',
-        Value: data.averageResponseTimeHours ?? 'N/A',
+        Metric: t('instructorAnalytics.averageResponseTimeHours'),
+        Value:
+          data.averageResponseTimeHours === null
+            ? t('instructorAnalytics.notAvailable')
+            : t('instructorAnalytics.responseHours', {
+                value: String(data.averageResponseTimeHours),
+              }),
       },
-      { Metric: 'SLA Breach Count', Value: data.slaBreachCount },
-      { Metric: 'Students Supervised', Value: data.studentsSupervised },
-      { Metric: 'Assignments Active', Value: data.assignmentsActive },
+      { Metric: t('instructorAnalytics.slaBreachCount'), Value: data.slaBreachCount },
+      { Metric: t('instructorAnalytics.studentsSupervised'), Value: data.studentsSupervised },
+      { Metric: t('instructorAnalytics.assignmentsActive'), Value: data.assignmentsActive },
     ];
     exportToExcel(rows, 'Instructor Analytics', 'instructor-analytics.xlsx');
   };
@@ -169,7 +174,11 @@ function InstructorAnalyticsPage() {
         <MetricCard
           label={t('instructorAnalytics.avgResponseTime')}
           value={
-            data.averageResponseTimeHours !== null ? `${data.averageResponseTimeHours}h` : 'N/A'
+            data.averageResponseTimeHours !== null
+              ? t('instructorAnalytics.responseHours', {
+                  value: String(data.averageResponseTimeHours),
+                })
+              : t('instructorAnalytics.notAvailable')
           }
           icon={Clock}
           color="info"
