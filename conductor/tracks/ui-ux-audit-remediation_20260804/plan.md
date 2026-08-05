@@ -106,7 +106,7 @@
 - [x] Task: Improve instructor discussions and secondary tabs [d45f8eb]
   - [x] Write failing tests for large discussion sets, filtering, disclosure, and error recovery. [d45f8eb]
   - [x] Implement progressive disclosure and useful filtering. [d45f8eb]
-- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) [checkpoint: d45f8eb]
 
 ## Phase 5 — Admin, public, settings, and notification remediation
 
