@@ -110,10 +110,10 @@
 
 ## Phase 5 — Admin, public, settings, and notification remediation
 
-- [~] Task: Repair admin import and preview workflows
-  - [ ] Write failing tests for keyboard upload, parsing errors, retry, expansion semantics, and progress announcements.
-  - [ ] Implement accessible import controls and expandable preview rows.
-  - [ ] Preserve row-level errors and successful-row summaries.
+- [x] Task: Repair admin import and preview workflows [ba3bd47]
+  - [x] Write failing tests for keyboard upload, parsing errors, retry, expansion semantics, and progress announcements. [ba3bd47]
+  - [x] Implement accessible import controls and expandable preview rows. [ba3bd47]
+  - [x] Preserve row-level errors and successful-row summaries. [ba3bd47]
 - [ ] Task: Improve admin tables, filters, and destructive actions
   - [ ] Write failing tests for mobile table presentation, filter labels, cleanup confirmation, delete pending states, and session revoke names.
   - [ ] Implement mobile-priority layouts and accessible detail expansion.
