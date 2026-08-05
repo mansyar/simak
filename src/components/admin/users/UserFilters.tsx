@@ -47,6 +47,7 @@ export function UserFilters({ search, onSearchChange, role, onRoleChange }: User
           <button
             type="button"
             onClick={() => {
+              debouncedSearchChange.cancel();
               setLocalSearch('');
               onSearchChange('');
             }}

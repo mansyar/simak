@@ -36,6 +36,8 @@ const optionalCategory = z.preprocess(
 export const ListFeedbackSnippetsSchema = z.object({
   archived: z.boolean().default(false),
   search: z.string().trim().max(100).default(''),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 
 export const CreateFeedbackSnippetSchema = z.object({
@@ -105,5 +107,15 @@ export interface FeedbackSnippet {
   updatedAt: Date | null;
 }
 
-export type ListFeedbackSnippetsResult = { snippets: FeedbackSnippet[] } | ServerError;
+export interface FeedbackSnippetListItem {
+  id: string;
+  title: string;
+  category: string | null;
+  body: string;
+  archivedAt: Date | null;
+}
+
+export type ListFeedbackSnippetsResult =
+  | { snippets: FeedbackSnippetListItem[]; total: number; page: number; limit: number }
+  | ServerError;
 export type FeedbackSnippetMutationResult = { snippet: FeedbackSnippet } | ServerError;

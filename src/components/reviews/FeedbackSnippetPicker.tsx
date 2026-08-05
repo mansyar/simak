@@ -3,10 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Pagination } from '@/components/ui/pagination';
 import { isServerError } from '@/lib/errors';
 import { feedbackSnippetKeys } from '@/lib/query-keys';
 import { useI18n } from '@/routes/__root';
-import { listFeedbackSnippets, type FeedbackSnippet } from '@/server/feedback-snippets';
+import { listFeedbackSnippets, type FeedbackSnippetListItem } from '@/server/feedback-snippets';
+import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 
 interface FeedbackSnippetPickerProps {
   onInsert: (body: string) => void;
@@ -15,13 +17,21 @@ interface FeedbackSnippetPickerProps {
 function FeedbackSnippetPicker({ onInsert }: FeedbackSnippetPickerProps) {
   const { t } = useI18n();
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const updateDebouncedSearch = useDebouncedCallback(setDebouncedSearch, 300);
 
   const snippetsQuery = useQuery({
-    queryKey: feedbackSnippetKeys.list({ archived: false, search }),
+    queryKey: feedbackSnippetKeys.list({
+      archived: false,
+      search: debouncedSearch,
+      page,
+      limit: 20,
+    }),
     queryFn: async () => {
       const result = await listFeedbackSnippets({
-        data: { archived: false, search },
+        data: { archived: false, search: debouncedSearch, page, limit: 20 },
       });
 
       if (isServerError(result)) {
@@ -30,11 +40,14 @@ function FeedbackSnippetPicker({ onInsert }: FeedbackSnippetPickerProps) {
 
       return result;
     },
+    placeholderData: (previousData) => previousData,
   });
 
-  const snippets: FeedbackSnippet[] =
+  const snippets: FeedbackSnippetListItem[] =
     snippetsQuery.data?.snippets.filter((snippet) => !snippet.archivedAt) ?? [];
   const selectedSnippet = snippets.find((snippet) => snippet.id === selectedId) ?? null;
+  const total = snippetsQuery.data?.total ?? snippets.length;
+  const totalPages = Math.ceil(total / 20);
 
   return (
     <section
@@ -59,7 +72,15 @@ function FeedbackSnippetPicker({ onInsert }: FeedbackSnippetPickerProps) {
           aria-label={t('feedbackSnippets.pickerSearchPlaceholder')}
           className="pl-9"
           onChange={(event) => {
-            setSearch(event.target.value);
+            const value = event.target.value;
+            setSearch(value);
+            setPage(1);
+            if (value === '') {
+              updateDebouncedSearch.cancel();
+              setDebouncedSearch('');
+            } else {
+              updateDebouncedSearch(value);
+            }
             setSelectedId(null);
           }}
           placeholder={t('feedbackSnippets.pickerSearchPlaceholder')}
@@ -82,36 +103,47 @@ function FeedbackSnippetPicker({ onInsert }: FeedbackSnippetPickerProps) {
       ) : snippets.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t('feedbackSnippets.pickerEmpty')}</p>
       ) : (
-        <div
-          aria-label={t('feedbackSnippets.pickerTitle')}
-          className="grid gap-2 sm:grid-cols-2"
-          role="group"
-        >
-          {snippets.map((snippet) => {
-            const isSelected = selectedId === snippet.id;
+        <>
+          <div
+            aria-label={t('feedbackSnippets.pickerTitle')}
+            className="grid gap-2 sm:grid-cols-2"
+            role="group"
+          >
+            {snippets.map((snippet) => {
+              const isSelected = selectedId === snippet.id;
 
-            return (
-              <Button
-                key={snippet.id}
-                aria-pressed={isSelected}
-                className="h-auto justify-start whitespace-normal text-left"
-                data-testid={`feedback-snippet-option-${snippet.id}`}
-                onClick={() => setSelectedId(snippet.id)}
-                type="button"
-                variant={isSelected ? 'secondary' : 'outline'}
-              >
-                <span>
-                  <span className="block font-medium">{snippet.title}</span>
-                  {snippet.category && (
-                    <span className="mt-1 block text-xs text-muted-foreground">
-                      {snippet.category}
-                    </span>
-                  )}
-                </span>
-              </Button>
-            );
-          })}
-        </div>
+              return (
+                <Button
+                  key={snippet.id}
+                  aria-pressed={isSelected}
+                  className="h-auto justify-start whitespace-normal text-left"
+                  data-testid={`feedback-snippet-option-${snippet.id}`}
+                  onClick={() => setSelectedId(snippet.id)}
+                  type="button"
+                  variant={isSelected ? 'secondary' : 'outline'}
+                >
+                  <span>
+                    <span className="block font-medium">{snippet.title}</span>
+                    {snippet.category && (
+                      <span className="mt-1 block text-xs text-muted-foreground">
+                        {snippet.category}
+                      </span>
+                    )}
+                  </span>
+                </Button>
+              );
+            })}
+          </div>
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={page}
+              onPageChange={setPage}
+              showCounter
+              showPageNumbers
+              totalPages={totalPages}
+            />
+          )}
+        </>
       )}
 
       {selectedSnippet && (

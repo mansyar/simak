@@ -90,4 +90,18 @@ describe('AssignmentFilters', () => {
 
     expect(onSearchChange).toHaveBeenCalledWith('');
   });
+
+  it('should cancel a pending search when the clear button is clicked', () => {
+    render(<AssignmentFilters search="" onSearchChange={onSearchChange} />);
+    const searchInput = screen.getByPlaceholderText('Search assignments by title...');
+
+    fireEvent.change(searchInput, { target: { value: 'draft' } });
+    fireEvent.click(screen.getByLabelText('Clear search'));
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    expect(onSearchChange).toHaveBeenCalledTimes(1);
+    expect(onSearchChange).toHaveBeenCalledWith('');
+  });
 });

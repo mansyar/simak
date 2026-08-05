@@ -1,8 +1,10 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import {
   listTemplates,
+  listTemplateTypes,
   createTemplate,
   getTemplate,
   deleteTemplate,
@@ -24,6 +26,7 @@ import { z } from 'zod';
 import { useI18n } from '../../../__root';
 import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { ErrorState } from '@/components/ui/error-state';
+import { templateKeys } from '@/lib/query-keys';
 
 const TemplateSearchSchema = z.object({
   page: z.number().optional().default(1),
@@ -52,11 +55,17 @@ function TemplatesPage() {
   const router = useRouter();
   const data = Route.useLoaderData();
   const listData = isServerError(data)
-    ? { templates: [], total: 0, allTypes: [] }
-    : (data ?? { templates: [], total: 0, allTypes: [] });
+    ? { templates: [], total: 0 }
+    : (data ?? { templates: [], total: 0 });
   const templates: TemplateRow[] = listData.templates;
   const total = listData.total;
-  const allTypes: string[] = listData.allTypes;
+  const queryClient = useQueryClient();
+  const typesQuery = useQuery({
+    queryKey: templateKeys.types(),
+    queryFn: () => listTemplateTypes({ data: {} }),
+    staleTime: 300_000,
+  });
+  const allTypes = typesQuery.data && !isServerError(typesQuery.data) ? typesQuery.data.types : [];
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -87,6 +96,7 @@ function TemplatesPage() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await router.invalidate();
+    await queryClient.invalidateQueries({ queryKey: templateKeys.types() });
     setIsRefreshing(false);
   };
 
@@ -118,6 +128,7 @@ function TemplatesPage() {
   };
 
   const handleCreateSuccess = (templateId?: number) => {
+    void queryClient.invalidateQueries({ queryKey: templateKeys.types() });
     if (templateId) {
       navigate({ to: `/admin/templates/$templateId`, params: { templateId: String(templateId) } });
     } else {

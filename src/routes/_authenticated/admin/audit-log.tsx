@@ -196,6 +196,7 @@ function AuditLogPage() {
               <button
                 type="button"
                 onClick={() => {
+                  debouncedHandleSearchChange.cancel();
                   setLocalSearch('');
                   handleSearchChange('');
                 }}

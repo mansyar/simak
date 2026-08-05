@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listUsers } from '@/server/users';
 import { userKeys } from '@/lib/query-keys';
@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorState } from '@/components/ui/error-state';
 import { Search, Users, Check, CheckSquare, Square } from 'lucide-react';
+
+const EMPTY_STUDENTS: never[] = [];
 
 interface StudentPickerProps {
   selectedStudentIds: string[];
@@ -42,22 +44,41 @@ export function StudentPicker({
     retry: false,
   });
 
-  const students = data?.users ?? [];
+  const students = data?.users ?? EMPTY_STUDENTS;
 
-  const filteredStudents = students.filter(
-    (s) =>
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.email.toLowerCase().includes(search.toLowerCase()),
+  const normalizedStudents = useMemo(
+    () =>
+      students.map((student) => ({
+        student,
+        name: student.name.toLowerCase(),
+        email: student.email.toLowerCase(),
+      })),
+    [students],
+  );
+  const normalizedSearch = search.toLowerCase();
+  const filteredStudents = useMemo(
+    () =>
+      normalizedStudents
+        .filter(
+          ({ name, email }) => name.includes(normalizedSearch) || email.includes(normalizedSearch),
+        )
+        .map(({ student }) => student),
+    [normalizedSearch, normalizedStudents],
   );
 
-  const allFilteredIds = filteredStudents.map((s) => s.id);
+  const selectedStudentIdSet = useMemo(() => new Set(selectedStudentIds), [selectedStudentIds]);
+  const allFilteredIds = useMemo(
+    () => filteredStudents.map((student) => student.id),
+    [filteredStudents],
+  );
+  const allFilteredIdSet = useMemo(() => new Set(allFilteredIds), [allFilteredIds]);
   const areAllFilteredSelected =
-    allFilteredIds.length > 0 && allFilteredIds.every((id) => selectedStudentIds.includes(id));
+    allFilteredIds.length > 0 && allFilteredIds.every((id) => selectedStudentIdSet.has(id));
 
   const handleSelectAllToggle = () => {
     if (areAllFilteredSelected) {
       // Deselect only the currently filtered students
-      const newSelected = selectedStudentIds.filter((id) => !allFilteredIds.includes(id));
+      const newSelected = selectedStudentIds.filter((id) => !allFilteredIdSet.has(id));
       onSelectAll(newSelected); // actually this updates selection state
     } else {
       // Select all filtered students (merge with pre-selected)
@@ -167,7 +188,7 @@ export function StudentPicker({
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 max-h-[380px] overflow-y-auto pr-1">
           {filteredStudents.map((student) => {
-            const isSelected = selectedStudentIds.includes(student.id);
+            const isSelected = selectedStudentIdSet.has(student.id);
             const initials = student.name
               .split(' ')
               .map((n) => n[0])

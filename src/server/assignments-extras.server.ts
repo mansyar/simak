@@ -208,30 +208,31 @@ export async function listStudentAssignmentsHandler(args: { data: ListStudentAss
       conditions.push(sql`${assignments.title} ILIKE ${'%' + search + '%'}`);
     }
 
-    const rawAssignments = await db
-      .select({
-        id: assignments.id,
-        title: assignments.title,
-        description: assignments.description,
-        finalDeadline: assignments.finalDeadline,
-        createdAt: assignments.createdAt,
-        templateName: assignmentTemplates.name,
-        templateType: assignmentTemplates.type,
-        studentId: assignmentStudents.studentId,
-      })
-      .from(assignmentStudents)
-      .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
-      .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-      .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions))
-      .orderBy(assignments.createdAt)
-      .limit(limit)
-      .offset((page - 1) * limit);
-
-    const [{ count }] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(assignmentStudents)
-      .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
-      .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions));
+    const [rawAssignments, [{ count }]] = await Promise.all([
+      db
+        .select({
+          id: assignments.id,
+          title: assignments.title,
+          description: assignments.description,
+          finalDeadline: assignments.finalDeadline,
+          createdAt: assignments.createdAt,
+          templateName: assignmentTemplates.name,
+          templateType: assignmentTemplates.type,
+          studentId: assignmentStudents.studentId,
+        })
+        .from(assignmentStudents)
+        .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
+        .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
+        .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions))
+        .orderBy(assignments.createdAt)
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(assignmentStudents)
+        .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
+        .where(and(eq(assignmentStudents.studentId, session.user.id), ...conditions)),
+    ]);
 
     // Calculate progress and effective deadline per assignment from checkpoint states
     const assignmentIds = rawAssignments.map((a) => a.id);

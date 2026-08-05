@@ -1,5 +1,7 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   ListAuditLogsSchema,
   GetAuditLogDetailSchema,
@@ -228,6 +230,14 @@ describe('Audit log handlers', () => {
 
       expect(result.entries).toHaveLength(0);
       expect(result.total).toBe(0);
+    });
+
+    it('searches JSONB details through an explicit text representation', () => {
+      const source = readFileSync(
+        resolve(__dirname, '../../../src/server/audit-log.server.ts'),
+        'utf8',
+      );
+      expect(source).toContain('CAST(${auditLog.details} AS text)');
     });
   });
 

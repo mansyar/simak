@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { beforeEach, describe, it, expect, vi } from 'vitest';
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import type { ComponentType } from 'react';
@@ -7,6 +7,7 @@ import type { ComponentType } from 'react';
 const mockRouter = vi.hoisted(() => ({
   invalidate: vi.fn(),
 }));
+const mockNavigate = vi.hoisted(() => vi.fn());
 
 const mockLoaderData = vi.hoisted(() => ({
   value: { entries: [], total: 100, page: 1, limit: 50 },
@@ -45,7 +46,7 @@ vi.mock('@tanstack/react-router', () => ({
       dateTo: '',
       search: '',
     }),
-    useNavigate: vi.fn().mockReturnValue(vi.fn()),
+    useNavigate: vi.fn().mockReturnValue(mockNavigate),
   })),
   useRouter: vi.fn().mockReturnValue(mockRouter),
 }));
@@ -74,6 +75,11 @@ describe('Admin Audit Log page', () => {
   beforeEach(() => {
     mockLoaderData.value = { entries: [], total: 100, page: 1, limit: 50 };
     mockRouter.invalidate.mockClear();
+    mockNavigate.mockClear();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should export a route component', async () => {
@@ -203,5 +209,23 @@ describe('Admin Audit Log page', () => {
       const mod = await import('@/routes/_authenticated/admin/audit-log');
       expect(mod.Route).toHaveProperty('pendingComponent');
     });
+  });
+
+  it('does not navigate per keystroke and resets the page after the debounce', async () => {
+    vi.useFakeTimers();
+    const Component = await getComponent();
+    render(<Component />);
+    const searchInput = screen.getByPlaceholderText('adminAuditLog.searchPlaceholder');
+
+    fireEvent.change(searchInput, { target: { value: 'draft' } });
+    expect(mockNavigate).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(300);
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    const options = mockNavigate.mock.calls[0]?.[0] as {
+      search: (previous: { page: number; search: string }) => { page: number; search: string };
+    };
+    expect(options.search({ page: 3, search: '' })).toMatchObject({ page: 1, search: 'draft' });
   });
 });

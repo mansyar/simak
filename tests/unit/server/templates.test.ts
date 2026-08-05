@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import {
   CreateTemplateSchema,
   UpdateTemplateSchema,
@@ -7,6 +7,18 @@ import {
   TemplateIdParamSchema,
   ListTemplateAssignmentsSchema,
 } from '@/server/templates';
+import { listTemplatesHandler } from '@/server/templates.server';
+import { listTemplateTypesHandler } from '@/server/templates-extras.server';
+import * as auth from '@/server/auth';
+import * as dbMod from '@/db/index';
+
+vi.mock('@/server/auth', () => ({
+  getSessionFromHeaders: vi.fn(),
+}));
+
+vi.mock('@/db/index', () => ({
+  getDb: vi.fn(),
+}));
 
 describe('Template server functions - Schemas', () => {
   describe('CreateTemplateSchema', () => {
@@ -156,5 +168,76 @@ describe('Template server functions - Schemas', () => {
       const result = ListTemplateAssignmentsSchema.safeParse({ templateId: 0 });
       expect(result.success).toBe(false);
     });
+  });
+});
+
+describe('Template list workload', () => {
+  let mockDb: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb = {};
+    for (const method of ['select', 'from', 'where', 'orderBy', 'limit', 'offset', 'groupBy']) {
+      mockDb[method] = vi.fn().mockReturnValue(mockDb);
+    }
+    mockDb.then = vi.fn((onfulfilled: (value: unknown[]) => unknown) =>
+      Promise.resolve([]).then(onfulfilled),
+    );
+    vi.mocked(dbMod.getDb).mockReturnValue(mockDb);
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+      user: { id: 'admin-1', role: 'admin' },
+      session: {},
+    } as any);
+  });
+
+  it('does not run type discovery or duplicate checkpoint queries for a search', async () => {
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+        Promise.resolve([
+          {
+            id: 1,
+            name: 'Draft template',
+            type: 'Thesis',
+            createdBy: 'admin-1',
+            createdAt: null,
+            updatedAt: null,
+          },
+        ]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+        Promise.resolve([{ count: 1 }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+        Promise.resolve([{ templateId: 1, name: 'Introduction' }]).then(onfulfilled),
+      );
+
+    const result = await listTemplatesHandler({
+      data: { page: 1, limit: 20, search: 'draft', type: '' },
+    });
+
+    expect(result).toMatchObject({ total: 1 });
+    expect(mockDb.select).toHaveBeenCalledTimes(3);
+    expect(mockDb.groupBy).not.toHaveBeenCalled();
+    expect(result).toMatchObject({
+      templates: [{ checkpointCount: 1, checkpoints: ['Introduction'] }],
+    });
+  });
+
+  it('loads type options through an independent query', async () => {
+    mockDb.then.mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+      Promise.resolve([{ type: 'Thesis' }, { type: 'Project' }]).then(onfulfilled),
+    );
+
+    await expect(listTemplateTypesHandler({ data: {} })).resolves.toEqual({
+      types: ['Thesis', 'Project'],
+    });
+    expect(mockDb.select).toHaveBeenCalledOnce();
+  });
+
+  it('does not query type options for an unauthorized session', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
+
+    await expect(listTemplateTypesHandler({ data: {} })).resolves.toEqual({ types: [] });
+    expect(mockDb.select).not.toHaveBeenCalled();
   });
 });

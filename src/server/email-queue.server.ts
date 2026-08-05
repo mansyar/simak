@@ -21,7 +21,6 @@ export type ListEmailQueueSuccess = {
   total: number;
   page: number;
   limit: number;
-  summary: EmailQueueSummary;
 };
 
 export type RetryEmailSuccess = {
@@ -96,20 +95,7 @@ export async function listEmailQueueHandler(args: {
       .from(emailQueue)
       .where(combined);
 
-    // Summary query (NOT filtered — overall queue counts)
-    const summaryQuery = db
-      .select({
-        pending: sql<number>`count(*) filter (where ${emailQueue.status} = 'pending')::int`,
-        sent: sql<number>`count(*) filter (where ${emailQueue.status} = 'sent')::int`,
-        failed: sql<number>`count(*) filter (where ${emailQueue.status} = 'failed')::int`,
-      })
-      .from(emailQueue);
-
-    const [countResult, entries, summaryResult] = await Promise.all([
-      countQuery,
-      dataQuery,
-      summaryQuery,
-    ]);
+    const [countResult, entries] = await Promise.all([countQuery, dataQuery]);
 
     return {
       entries: entries.map((e) => ({
@@ -127,16 +113,40 @@ export async function listEmailQueueHandler(args: {
       total: countResult[0]?.total ?? 0,
       page,
       limit,
-      summary: {
-        pending: Number(summaryResult[0]?.pending ?? 0),
-        sent: Number(summaryResult[0]?.sent ?? 0),
-        failed: Number(summaryResult[0]?.failed ?? 0),
-      },
     };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: err instanceof Error ? err.message : String(err),
       handler: 'listEmailQueueHandler',
+    });
+  }
+}
+
+export async function getEmailQueueSummaryHandler(): Promise<EmailQueueSummary | ServerError> {
+  const session = await getSessionFromHeaders();
+  if (!session || !isAdminRole(session.user.role)) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
+
+  const db = getDb();
+  try {
+    const [summary] = await db
+      .select({
+        pending: sql<number>`count(*) filter (where ${emailQueue.status} = 'pending')::int`,
+        sent: sql<number>`count(*) filter (where ${emailQueue.status} = 'sent')::int`,
+        failed: sql<number>`count(*) filter (where ${emailQueue.status} = 'failed')::int`,
+      })
+      .from(emailQueue);
+
+    return {
+      pending: Number(summary?.pending ?? 0),
+      sent: Number(summary?.sent ?? 0),
+      failed: Number(summary?.failed ?? 0),
+    };
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'getEmailQueueSummaryHandler',
     });
   }
 }

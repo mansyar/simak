@@ -1,4 +1,3 @@
-// Server-only helpers (not imported by client code)
 import { eq, inArray, and, isNull, sql } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates';
@@ -34,7 +33,7 @@ function isInstructorOrAdmin(session: NonNullableSession | null): session is Non
 export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructorOrAdmin(session)) {
-    return { templates: [], total: 0, allTypes: [] };
+    return { templates: [], total: 0 };
   }
 
   const { search, type, page, limit } = args.data;
@@ -51,7 +50,7 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
       conditions.push(eq(assignmentTemplates.type, type));
     }
 
-    const [templatesData, [{ count }], typeRows] = await Promise.all([
+    const [templatesData, [{ count }]] = await Promise.all([
       db
         .select({
           id: assignmentTemplates.id,
@@ -70,35 +69,13 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
         .select({ count: sql<number>`count(*)::int` })
         .from(assignmentTemplates)
         .where(and(...conditions)),
-      db
-        .select({ type: assignmentTemplates.type })
-        .from(assignmentTemplates)
-        .where(isNull(assignmentTemplates.deletedAt))
-        .groupBy(assignmentTemplates.type),
     ]);
 
-    // Enrich with checkpoints and counts in a separate query
     const templateIds = templatesData.map((t) => t.id);
-    let checkpointCounts: Map<number, number> = new Map();
+    const checkpointCounts: Map<number, number> = new Map();
     const checkpointsMap: Map<number, string[]> = new Map();
 
     if (templateIds.length > 0) {
-      const counts = await db
-        .select({
-          templateId: templateCheckpoints.templateId,
-          count: sql<number>`count(*)::int`,
-        })
-        .from(templateCheckpoints)
-        .where(
-          and(
-            inArray(templateCheckpoints.templateId, templateIds),
-            isNull(templateCheckpoints.deletedAt),
-          ),
-        )
-        .groupBy(templateCheckpoints.templateId);
-
-      checkpointCounts = new Map(counts.map((c) => [c.templateId, Number(c.count)]));
-
       const allCheckpoints = await db
         .select({
           templateId: templateCheckpoints.templateId,
@@ -117,6 +94,7 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
         const list = checkpointsMap.get(cp.templateId) ?? [];
         list.push(cp.name);
         checkpointsMap.set(cp.templateId, list);
+        checkpointCounts.set(cp.templateId, (checkpointCounts.get(cp.templateId) ?? 0) + 1);
       });
     }
 
@@ -129,7 +107,6 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
     return {
       templates: templatesWithCounts,
       total: Number(count),
-      allTypes: typeRows.map((r) => r.type),
     };
   } catch (err) {
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
@@ -138,6 +115,7 @@ export async function listTemplatesHandler(args: { data: ListTemplatesInput }) {
     });
   }
 }
+
 export async function getTemplateHandler(args: { data: TemplateIdParam }) {
   const session = await getSessionFromHeaders();
   if (!isInstructorOrAdmin(session)) {

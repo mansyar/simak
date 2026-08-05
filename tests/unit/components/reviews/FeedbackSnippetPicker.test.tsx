@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest';
+import { fireEvent, render, screen, act } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
 import { listFeedbackSnippets } from '@/server/feedback-snippets';
 import { FeedbackSnippetPicker } from '@/components/reviews/FeedbackSnippetPicker';
@@ -55,14 +55,24 @@ const mockListFeedbackSnippets = vi.mocked(listFeedbackSnippets);
 
 describe('FeedbackSnippetPicker', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.clearAllMocks();
-    mockListFeedbackSnippets.mockResolvedValue({ snippets: [activeSnippet] });
+    mockListFeedbackSnippets.mockResolvedValue({
+      snippets: [activeSnippet],
+      total: 1,
+      page: 1,
+      limit: 20,
+    });
     mockUseQuery.mockReturnValue({
       data: { snippets: [activeSnippet, archivedSnippet] },
       isPending: false,
       isError: false,
       refetch: vi.fn(),
     } as never);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('loads only active snippets through the instructor-scoped query', async () => {
@@ -75,7 +85,7 @@ describe('FeedbackSnippetPicker', () => {
     await queryOptions.queryFn();
 
     expect(mockListFeedbackSnippets).toHaveBeenCalledWith({
-      data: { archived: false, search: '' },
+      data: { archived: false, search: '', page: 1, limit: 20 },
     });
     expect(screen.getByText(activeSnippet.title)).toBeDefined();
     expect(screen.queryByText(archivedSnippet.title)).toBeNull();
@@ -86,10 +96,35 @@ describe('FeedbackSnippetPicker', () => {
 
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'rubric' } });
 
-    await waitFor(() => {
-      const latestOptions = mockUseQuery.mock.calls.at(-1)?.[0] as { queryKey: unknown[] };
-      expect(latestOptions.queryKey).toContainEqual({ archived: false, search: 'rubric' });
+    const immediateOptions = mockUseQuery.mock.calls.at(-1)?.[0] as { queryKey: unknown[] };
+    expect(immediateOptions.queryKey).not.toContainEqual({ archived: false, search: 'rubric' });
+
+    act(() => {
+      vi.advanceTimersByTime(300);
     });
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    const latestOptions = mockUseQuery.mock.calls.at(-1)?.[0] as { queryKey: unknown[] };
+    expect(latestOptions.queryKey).toContainEqual({
+      archived: false,
+      search: 'rubric',
+      page: 1,
+      limit: 20,
+    });
+  });
+
+  it('retains the previous result while a committed search loads', () => {
+    render(<FeedbackSnippetPicker onInsert={vi.fn()} />);
+
+    const queryOptions = mockUseQuery.mock.calls[0][0] as unknown as {
+      placeholderData?: (previousData: { snippets: unknown[] }) => { snippets: unknown[] };
+    };
+    const previousData = { snippets: [activeSnippet] };
+
+    expect(queryOptions.placeholderData?.(previousData)).toBe(previousData);
   });
 
   it('renders an empty state when no active snippets are available', () => {

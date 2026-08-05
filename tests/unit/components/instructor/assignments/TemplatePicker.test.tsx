@@ -123,4 +123,50 @@ describe('TemplatePicker', () => {
     expect(screen.getByText('Lab Report')).toBeInTheDocument();
     expect(screen.queryByText('Final Project')).not.toBeInTheDocument();
   });
+
+  it('does not change the fixed server query when typing locally', () => {
+    render(<TemplatePicker {...mockProps} />);
+    const searchInput = screen.getByPlaceholderText('common.searchByName');
+
+    fireEvent.change(searchInput, { target: { value: 'Lab' } });
+
+    expect(useQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        queryKey: templateKeys.list({ page: 1, limit: 100, search: '' }),
+      }),
+    );
+  });
+
+  it('memoizes searchable template fields when selection changes', () => {
+    let nameReads = 0;
+    let typeReads = 0;
+    const trackedTemplates = [
+      {
+        id: 1,
+        get name() {
+          nameReads += 1;
+          return 'Final Project';
+        },
+        get type() {
+          typeReads += 1;
+          return 'project';
+        },
+        checkpoints: ['Proposal'],
+      },
+    ];
+    vi.mocked(useQuery).mockReturnValue({
+      data: { templates: trackedTemplates },
+      isLoading: false,
+      isError: false,
+    } as never);
+
+    const { rerender } = render(<TemplatePicker {...mockProps} />);
+    const initialNameReads = nameReads;
+    const initialTypeReads = typeReads;
+
+    rerender(<TemplatePicker {...mockProps} selectedTemplateId={1} />);
+
+    expect(nameReads).toBe(initialNameReads + 2);
+    expect(typeReads).toBe(initialTypeReads + 1);
+  });
 });

@@ -39,6 +39,7 @@ export function AssignmentFilters({ search, onSearchChange }: AssignmentFiltersP
           <button
             type="button"
             onClick={() => {
+              debouncedSearchChange.cancel();
               setLocalSearch('');
               onSearchChange('');
             }}

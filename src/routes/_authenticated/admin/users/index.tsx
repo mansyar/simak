@@ -112,6 +112,7 @@ function UsersPage() {
       return result;
     },
     initialData: isServerError(loaderData) ? undefined : loaderData,
+    placeholderData: (previousData) => previousData,
     staleTime: 30_000,
   });
 
