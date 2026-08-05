@@ -117,8 +117,8 @@
 - [x] Task: Improve admin tables, filters, and destructive actions [1c0134a]
   - [x] Write failing tests for mobile table presentation, filter labels, cleanup confirmation, delete pending states, and session revoke names. [1c0134a]
   - [x] Implement mobile-priority layouts and accessible detail expansion. [1c0134a]
-  - [ ] Ensure destructive dialogs remain open until confirmed success.
-- [ ] Task: Improve settings information architecture and feedback
+  - [x] Ensure destructive dialogs remain open until confirmed success. [1c0134a]
+- [~] Task: Improve settings information architecture and feedback
   - [ ] Write failing tests for section navigation and mutation outcome announcements.
   - [ ] Group settings into discoverable sections.
   - [ ] Implement consistent pending/success/failure behavior for profile, password, 2FA, sessions, accessibility, notifications, timezone, and calendar settings.
