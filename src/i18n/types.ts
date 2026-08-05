@@ -1208,6 +1208,18 @@ export type Translation = {
   }
   settings: {
     title: string
+    navigation: {
+      label: string
+      profile: string
+      password: string
+      twoFactor: string
+      sessions: string
+      appearance: string
+      accessibility: string
+      notifications: string
+      timezone: string
+      calendar: string
+    }
     twoFactor: {
       title: string
       description: string

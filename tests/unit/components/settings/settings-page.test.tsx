@@ -62,6 +62,16 @@ vi.mock('@/routes/__root', () => ({
         'settings.profile.emailLabel': 'Email',
         'settings.profile.avatarLabel': 'Profile Picture',
         'settings.profile.saveName': 'Save Name',
+        'settings.navigation.label': 'Settings sections',
+        'settings.navigation.profile': 'Profile',
+        'settings.navigation.password': 'Password',
+        'settings.navigation.twoFactor': 'Two-factor authentication',
+        'settings.navigation.sessions': 'Active sessions',
+        'settings.navigation.appearance': 'Appearance',
+        'settings.navigation.accessibility': 'Accessibility',
+        'settings.navigation.notifications': 'Notification preferences',
+        'settings.navigation.timezone': 'Timezone',
+        'settings.navigation.calendar': 'Calendar feed',
         'settings.password.title': 'Password',
         'settings.password.description': 'Change your current password',
         'settings.password.currentPassword': 'Current Password',
@@ -146,5 +156,18 @@ describe('SettingsPage', () => {
 
     const mainContainer = container.firstChild as HTMLElement;
     expect(mainContainer.className).toContain('space-y-6');
+  });
+
+  it('should provide navigable links for every settings section', () => {
+    const { container } = render(<SettingsPage />);
+
+    expect(screen.getByRole('navigation', { name: 'Settings sections' })).toBeDefined();
+    expect(screen.getByRole('link', { name: 'Profile' }).getAttribute('href')).toBe(
+      '#settings-profile',
+    );
+    expect(
+      screen.getByRole('link', { name: 'Notification preferences' }).getAttribute('href'),
+    ).toBe('#settings-notifications');
+    expect(container.querySelector('#settings-notifications')).toBeDefined();
   });
 });

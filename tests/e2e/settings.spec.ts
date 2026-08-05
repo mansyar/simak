@@ -94,6 +94,25 @@ test.describe('Settings Hub', () => {
     await expect(page.getByText('Tampilan', { exact: true })).toBeVisible({ timeout: 10000 });
   });
 
+  test('settings sections remain navigable at mobile width', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto('/admin/settings');
+    await page.waitForLoadState('networkidle');
+
+    const navigation = page.getByRole('navigation', { name: 'Settings sections' });
+    await expect(navigation).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBeTruthy();
+
+    const notificationLink = navigation.getByRole('link', {
+      name: 'Notification preferences',
+    });
+    await expect(notificationLink).toBeVisible();
+    await notificationLink.click();
+    await expect(page.locator('#settings-notifications')).toBeInViewport();
+  });
+
   test('theme toggle applies dark class to html', async ({ page }) => {
     await page.goto('/admin/settings');
     await page.waitForLoadState('networkidle');

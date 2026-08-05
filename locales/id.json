@@ -1203,6 +1203,18 @@
   },
   "settings": {
     "title": "Pengaturan",
+    "navigation": {
+      "label": "Bagian pengaturan",
+      "profile": "Profil",
+      "password": "Kata sandi",
+      "twoFactor": "Autentikasi dua faktor",
+      "sessions": "Sesi aktif",
+      "appearance": "Tampilan",
+      "accessibility": "Aksesibilitas",
+      "notifications": "Preferensi notifikasi",
+      "timezone": "Zona waktu",
+      "calendar": "Feed kalender"
+    },
     "twoFactor": {
       "title": "Autentikasi Dua Faktor",
       "description": "Tambahkan lapisan keamanan ekstra ke akun Anda dengan mewajibkan kode verifikasi dari aplikasi autentikator.",
