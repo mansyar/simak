@@ -164,6 +164,28 @@ describe('Admin Audit Log page', () => {
       expect(container.querySelector('select')).toBeNull();
     });
 
+    it('should expose labeled filters and mobile-safe table semantics', async () => {
+      const Component = await getComponent();
+      const { container } = render(<Component />);
+      expect(
+        screen.getByRole('textbox', { name: 'adminAuditLog.searchLabel' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('combobox', { name: 'adminAuditLog.actionFilterLabel' }),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText('adminAuditLog.dateFrom')).toBeInTheDocument();
+      expect(screen.getByLabelText('adminAuditLog.dateTo')).toBeInTheDocument();
+      const table = container.querySelector('table');
+      expect(table?.querySelector('caption')?.textContent).toContain(
+        'adminAuditLog.auditTable.caption',
+      );
+      expect(
+        Array.from(table?.querySelectorAll('th') ?? []).every((head) => head.scope === 'col'),
+      ).toBe(true);
+      expect(table?.className).toMatch(/block/);
+      expect(table?.querySelector('tbody tr')?.className).toMatch(/md:table-row/);
+    });
+
     it('should wrap the audit log table in a Card primitive', async () => {
       const Component = await getComponent();
       const { container } = render(<Component />);

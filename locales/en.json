@@ -120,12 +120,15 @@
     "title": "Audit Log",
     "subtitle": "View and search system-wide audit trail of all meaningful actions.",
     "searchPlaceholder": "Search by entity ID or details...",
+    "searchLabel": "Search audit log",
+    "actionFilterLabel": "Filter by action",
     "allActions": "All Actions",
     "dateFrom": "From",
     "dateTo": "To",
     "empty": "No audit log entries found",
     "showing": "Showing {from}-{to} of {total} entries",
     "auditTable": {
+      "caption": "Audit log entries",
       "timestamp": "Timestamp",
       "action": "Action",
       "actor": "Actor",
@@ -156,12 +159,15 @@
     "title": "Email Queue",
     "subtitle": "Monitor and manage email delivery queue",
     "searchPlaceholder": "Search by recipient or subject...",
+    "searchLabel": "Search email queue",
+    "statusFilterLabel": "Filter by email status",
     "statusAll": "All Statuses",
     "statusPending": "Pending",
     "statusProcessing": "Processing",
     "statusSent": "Sent",
     "statusFailed": "Failed",
     "table": {
+      "caption": "Email queue entries",
       "recipient": "Recipient",
       "subject": "Subject",
       "template": "Template",
@@ -192,7 +198,11 @@
     "emptyFiltered": "No emails match your filters",
     "r2Cleanup": {
       "trigger": "Trigger R2 Cleanup",
-      "success": "R2 cleanup complete: {{deleted}} deleted, {{failed}} failed, {{batchSize}} processed"
+      "confirmTitle": "Run R2 Cleanup?",
+      "confirmDescription": "This will permanently remove eligible files from R2 storage.",
+      "confirm": "Run Cleanup",
+      "success": "R2 cleanup complete: {{deleted}} deleted, {{failed}} failed, {{batchSize}} processed",
+      "error": "R2 cleanup failed. Please try again."
     }
   },
   "adminUsers": {
@@ -200,6 +210,7 @@
     "subtitle": "Manage your organization's users, roles, and permissions.",
     "newUser": "New User",
     "table": {
+      "caption": "User accounts",
       "name": "Name",
       "role": "Role",
       "createdAt": "Created At",
@@ -222,6 +233,7 @@
     "role_student": "Student",
     "allRoles": "All Roles",
     "searchPlaceholder": "Search users by name or email...",
+    "searchLabel": "Search users",
     "emailVerified": "Email Verified",
     "notVerified": "Not Verified",
     "showing": "Showing {count} of {total} users",

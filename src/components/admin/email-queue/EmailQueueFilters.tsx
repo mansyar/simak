@@ -30,6 +30,8 @@ export function EmailQueueFilters({
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
+            id="admin-email-queue-search"
+            aria-label={t('adminEmailQueue.searchLabel')}
             placeholder={t('adminEmailQueue.searchPlaceholder')}
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -38,7 +40,10 @@ export function EmailQueueFilters({
         </div>
       </div>
       <Select value={status} onValueChange={(value) => onStatusChange(value ?? 'all')}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger
+          aria-label={t('adminEmailQueue.statusFilterLabel')}
+          className="min-h-11 w-[180px]"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

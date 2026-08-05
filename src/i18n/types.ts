@@ -125,12 +125,15 @@ export type Translation = {
     title: string
     subtitle: string
     searchPlaceholder: string
+    searchLabel: string
+    actionFilterLabel: string
     allActions: string
     dateFrom: string
     dateTo: string
     empty: string
     showing: string
     auditTable: {
+      caption: string
       timestamp: string
       action: string
       actor: string
@@ -161,12 +164,15 @@ export type Translation = {
     title: string
     subtitle: string
     searchPlaceholder: string
+    searchLabel: string
+    statusFilterLabel: string
     statusAll: string
     statusPending: string
     statusProcessing: string
     statusSent: string
     statusFailed: string
     table: {
+      caption: string
       recipient: string
       subject: string
       template: string
@@ -197,7 +203,11 @@ export type Translation = {
     emptyFiltered: string
     r2Cleanup: {
       trigger: string
+      confirmTitle: string
+      confirmDescription: string
+      confirm: string
       success: string
+      error: string
     }
   }
   adminUsers: {
@@ -205,6 +215,7 @@ export type Translation = {
     subtitle: string
     newUser: string
     table: {
+      caption: string
       name: string
       role: string
       createdAt: string
@@ -227,6 +238,7 @@ export type Translation = {
     role_student: string
     allRoles: string
     searchPlaceholder: string
+    searchLabel: string
     emailVerified: string
     notVerified: string
     showing: string

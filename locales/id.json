@@ -120,12 +120,15 @@
     "title": "Log Audit",
     "subtitle": "Lihat dan cari jejak audit sistem dari semua tindakan penting.",
     "searchPlaceholder": "Cari berdasarkan ID entitas atau detail...",
+    "searchLabel": "Cari log audit",
+    "actionFilterLabel": "Filter berdasarkan tindakan",
     "allActions": "Semua Tindakan",
     "dateFrom": "Dari",
     "dateTo": "Sampai",
     "empty": "Tidak ada entri log audit ditemukan",
     "showing": "Menampilkan {from}-{to} dari {total} entri",
     "auditTable": {
+      "caption": "Entri log audit",
       "timestamp": "Waktu",
       "action": "Tindakan",
       "actor": "Pelaku",
@@ -156,12 +159,15 @@
     "title": "Antrian Email",
     "subtitle": "Pantau dan kelola antrian pengiriman email",
     "searchPlaceholder": "Cari berdasarkan penerima atau subjek...",
+    "searchLabel": "Cari antrian email",
+    "statusFilterLabel": "Filter berdasarkan status email",
     "statusAll": "Semua Status",
     "statusPending": "Tertunda",
     "statusProcessing": "Memproses",
     "statusSent": "Terkirim",
     "statusFailed": "Gagal",
     "table": {
+      "caption": "Entri antrian email",
       "recipient": "Penerima",
       "subject": "Subjek",
       "template": "Templat",
@@ -192,7 +198,11 @@
     "emptyFiltered": "Tidak ada email yang cocok dengan filter",
     "r2Cleanup": {
       "trigger": "Memicu Pembersihan R2",
-      "success": "Pembersihan R2 selesai: {{deleted}} dihapus, {{failed}} gagal, {{batchSize}} diproses"
+      "confirmTitle": "Jalankan Pembersihan R2?",
+      "confirmDescription": "Ini akan menghapus file yang memenuhi syarat dari penyimpanan R2 secara permanen.",
+      "confirm": "Jalankan Pembersihan",
+      "success": "Pembersihan R2 selesai: {{deleted}} dihapus, {{failed}} gagal, {{batchSize}} diproses",
+      "error": "Pembersihan R2 gagal. Silakan coba lagi."
     }
   },
   "adminUsers": {
@@ -200,6 +210,7 @@
     "subtitle": "Kelola pengguna, peran, dan izin organisasi Anda.",
     "newUser": "Pengguna Baru",
     "table": {
+      "caption": "Akun pengguna",
       "name": "Nama",
       "role": "Peran",
       "createdAt": "Dibuat Pada",
@@ -222,6 +233,7 @@
     "role_student": "Mahasiswa",
     "allRoles": "Semua Peran",
     "searchPlaceholder": "Cari pengguna berdasarkan nama atau email...",
+    "searchLabel": "Cari pengguna",
     "emailVerified": "Email Terverifikasi",
     "notVerified": "Belum Terverifikasi",
     "showing": "Menampilkan {count} dari {total} pengguna",

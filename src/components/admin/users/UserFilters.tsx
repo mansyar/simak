@@ -33,6 +33,8 @@ export function UserFilters({ search, onSearchChange, role, onRoleChange }: User
       <div className="relative flex-1">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
+          id="admin-users-search"
+          aria-label={t('adminUsers.searchLabel')}
           placeholder={t('adminUsers.searchPlaceholder')}
           value={localSearch}
           onChange={(e) => {
@@ -48,7 +50,7 @@ export function UserFilters({ search, onSearchChange, role, onRoleChange }: User
               setLocalSearch('');
               onSearchChange('');
             }}
-            className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+            className="absolute right-1 top-1 inline-flex min-h-11 min-w-11 items-center justify-center text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             aria-label={t('common.clearSearch')}
           >
             <X className="h-4 w-4" />

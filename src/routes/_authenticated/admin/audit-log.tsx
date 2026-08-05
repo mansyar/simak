@@ -8,6 +8,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableCaption,
   TableHead,
   TableHeader,
   TableRow,
@@ -181,6 +182,8 @@ function AuditLogPage() {
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
+              id="admin-audit-search"
+              aria-label={t('adminAuditLog.searchLabel')}
               placeholder={t('adminAuditLog.searchPlaceholder')}
               value={localSearch}
               onChange={(e) => {
@@ -196,7 +199,7 @@ function AuditLogPage() {
                   setLocalSearch('');
                   handleSearchChange('');
                 }}
-                className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                className="absolute right-1 top-1 inline-flex min-h-11 min-w-11 items-center justify-center text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 aria-label={t('common.clearSearch')}
               >
                 <X className="h-4 w-4" />
@@ -208,7 +211,10 @@ function AuditLogPage() {
           value={searchParams.action || 'all'}
           onValueChange={(value) => handleActionFilter(value === 'all' ? '' : (value ?? ''))}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger
+            aria-label={t('adminAuditLog.actionFilterLabel')}
+            className="min-h-11 w-[180px]"
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -220,20 +226,22 @@ function AuditLogPage() {
             ))}
           </SelectContent>
         </Select>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Input
             type="date"
+            aria-label={t('adminAuditLog.dateFrom')}
             value={searchParams.dateFrom}
             onChange={(e) => handleDateFromChange(e.target.value)}
-            className="w-[160px]"
+            className="w-full sm:w-[160px]"
             placeholder={t('adminAuditLog.dateFrom')}
           />
           <span className="text-muted-foreground">-</span>
           <Input
             type="date"
+            aria-label={t('adminAuditLog.dateTo')}
             value={searchParams.dateTo}
             onChange={(e) => handleDateToChange(e.target.value)}
-            className="w-[160px]"
+            className="w-full sm:w-[160px]"
             placeholder={t('adminAuditLog.dateTo')}
           />
         </div>
@@ -243,31 +251,46 @@ function AuditLogPage() {
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('adminAuditLog.auditTable.timestamp')}</TableHead>
-                  <TableHead>{t('adminAuditLog.auditTable.action')}</TableHead>
-                  <TableHead>{t('adminAuditLog.auditTable.actor')}</TableHead>
-                  <TableHead>{t('adminAuditLog.auditTable.entityType')}</TableHead>
-                  <TableHead>{t('adminAuditLog.auditTable.entityId')}</TableHead>
-                  <TableHead>{t('adminAuditLog.auditTable.details')}</TableHead>
+            <Table className="block md:table">
+              <TableCaption className="sr-only">
+                {t('adminAuditLog.auditTable.caption')}
+              </TableCaption>
+              <TableHeader className="hidden md:table-header-group">
+                <TableRow className="block md:table-row">
+                  <TableHead scope="col">{t('adminAuditLog.auditTable.timestamp')}</TableHead>
+                  <TableHead scope="col">{t('adminAuditLog.auditTable.action')}</TableHead>
+                  <TableHead scope="col">{t('adminAuditLog.auditTable.actor')}</TableHead>
+                  <TableHead scope="col">{t('adminAuditLog.auditTable.entityType')}</TableHead>
+                  <TableHead scope="col">{t('adminAuditLog.auditTable.entityId')}</TableHead>
+                  <TableHead scope="col">{t('adminAuditLog.auditTable.details')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {entries.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="p-8 text-center text-muted-foreground">
+                  <TableRow className="block md:table-row">
+                    <TableCell
+                      colSpan={6}
+                      className="block p-8 text-center text-muted-foreground md:table-cell"
+                    >
                       {t('adminAuditLog.empty')}
                     </TableCell>
                   </TableRow>
                 ) : (
                   entries.map((entry: AuditLogEntry) => (
-                    <TableRow key={entry.id}>
-                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                    <TableRow
+                      key={entry.id}
+                      className="block border-b p-4 md:table-row md:border-b-0 md:p-0"
+                    >
+                      <TableCell
+                        className="block whitespace-nowrap text-xs text-muted-foreground before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                        data-label={t('adminAuditLog.auditTable.timestamp')}
+                      >
                         {formatTimestamp(entry.createdAt)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell
+                        className="block before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                        data-label={t('adminAuditLog.auditTable.action')}
+                      >
                         <Badge variant={getActionVisualProps(entry.action).badgeVariant}>
                           {t(
                             (ACTION_TYPES.find((a) => a.value === entry.action)?.label ??
@@ -275,14 +298,32 @@ function AuditLogPage() {
                           )}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs">{entry.actorName ?? entry.actorId}</TableCell>
-                      <TableCell className="text-xs">{entry.entityType}</TableCell>
-                      <TableCell className="text-xs font-mono">{entry.entityId}</TableCell>
-                      <TableCell className="text-xs">
+                      <TableCell
+                        className="block text-xs before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                        data-label={t('adminAuditLog.auditTable.actor')}
+                      >
+                        {entry.actorName ?? entry.actorId}
+                      </TableCell>
+                      <TableCell
+                        className="block text-xs before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                        data-label={t('adminAuditLog.auditTable.entityType')}
+                      >
+                        {entry.entityType}
+                      </TableCell>
+                      <TableCell
+                        className="block font-mono text-xs before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                        data-label={t('adminAuditLog.auditTable.entityId')}
+                      >
+                        {entry.entityId}
+                      </TableCell>
+                      <TableCell
+                        className="block text-xs before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                        data-label={t('adminAuditLog.auditTable.details')}
+                      >
                         {entry.details ? (
                           <button
                             onClick={() => toggleDetails(entry.id)}
-                            className="text-primary hover:underline"
+                            className="inline-flex min-h-11 items-center text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             aria-expanded={expandedId === entry.id}
                             aria-controls={`details-${entry.id}`}
                           >

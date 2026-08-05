@@ -6,6 +6,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableCaption,
   TableHead,
   TableHeader,
   TableRow,
@@ -58,25 +59,29 @@ export function EmailQueueTable({
     <Card>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('adminEmailQueue.table.recipient')}</TableHead>
-                <TableHead>{t('adminEmailQueue.table.subject')}</TableHead>
-                <TableHead>{t('adminEmailQueue.table.template')}</TableHead>
-                <TableHead>{t('adminEmailQueue.table.status')}</TableHead>
-                <TableHead>{t('adminEmailQueue.table.attempts')}</TableHead>
-                <TableHead>{t('adminEmailQueue.table.createdAt')}</TableHead>
-                <TableHead>{t('adminEmailQueue.table.lastAttemptAt')}</TableHead>
-                <TableHead>{t('adminEmailQueue.table.errorMessage')}</TableHead>
-                <TableHead>{t('adminEmailQueue.table.resendMessageId')}</TableHead>
-                <TableHead>{t('adminEmailQueue.table.actions')}</TableHead>
+          <Table className="block md:table">
+            <TableCaption className="sr-only">{t('adminEmailQueue.table.caption')}</TableCaption>
+            <TableHeader className="hidden md:table-header-group">
+              <TableRow className="block md:table-row">
+                <TableHead scope="col">{t('adminEmailQueue.table.recipient')}</TableHead>
+                <TableHead scope="col">{t('adminEmailQueue.table.subject')}</TableHead>
+                <TableHead scope="col">{t('adminEmailQueue.table.template')}</TableHead>
+                <TableHead scope="col">{t('adminEmailQueue.table.status')}</TableHead>
+                <TableHead scope="col">{t('adminEmailQueue.table.attempts')}</TableHead>
+                <TableHead scope="col">{t('adminEmailQueue.table.createdAt')}</TableHead>
+                <TableHead scope="col">{t('adminEmailQueue.table.lastAttemptAt')}</TableHead>
+                <TableHead scope="col">{t('adminEmailQueue.table.errorMessage')}</TableHead>
+                <TableHead scope="col">{t('adminEmailQueue.table.resendMessageId')}</TableHead>
+                <TableHead scope="col">{t('adminEmailQueue.table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {entries.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={10} className="p-8 text-center text-muted-foreground">
+                <TableRow className="block md:table-row">
+                  <TableCell
+                    colSpan={10}
+                    className="block p-8 text-center text-muted-foreground md:table-cell"
+                  >
                     {hasActiveFilters
                       ? t('adminEmailQueue.emptyFiltered')
                       : t('adminEmailQueue.empty')}
@@ -84,37 +89,78 @@ export function EmailQueueTable({
                 </TableRow>
               ) : (
                 entries.map((entry: EmailQueueEntry) => (
-                  <TableRow key={entry.id}>
-                    <TableCell className="text-xs">{entry.recipientEmail}</TableCell>
-                    <TableCell className="text-xs max-w-[200px] truncate" title={entry.subject}>
+                  <TableRow
+                    key={entry.id}
+                    className="block border-b p-4 md:table-row md:border-b-0 md:p-0"
+                  >
+                    <TableCell
+                      className="block text-xs before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                      data-label={t('adminEmailQueue.table.recipient')}
+                    >
+                      {entry.recipientEmail}
+                    </TableCell>
+                    <TableCell
+                      className="block max-w-[200px] truncate text-xs before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                      data-label={t('adminEmailQueue.table.subject')}
+                      title={entry.subject}
+                    >
                       {entry.subject}
                     </TableCell>
-                    <TableCell className="text-xs">
+                    <TableCell
+                      className="block text-xs before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                      data-label={t('adminEmailQueue.table.template')}
+                    >
                       {t(`adminEmailQueue.template.${entry.templateType}` as TranslationKey)}
                     </TableCell>
-                    <TableCell>{getStatusBadge(entry.status)}</TableCell>
-                    <TableCell className="text-xs">{entry.attempts}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                    <TableCell
+                      className="block before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                      data-label={t('adminEmailQueue.table.status')}
+                    >
+                      {getStatusBadge(entry.status)}
+                    </TableCell>
+                    <TableCell
+                      className="block text-xs before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                      data-label={t('adminEmailQueue.table.attempts')}
+                    >
+                      {entry.attempts}
+                    </TableCell>
+                    <TableCell
+                      className="block whitespace-nowrap text-xs text-muted-foreground before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                      data-label={t('adminEmailQueue.table.createdAt')}
+                    >
                       {formatTimestamp(entry.createdAt)}
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                    <TableCell
+                      className="block whitespace-nowrap text-xs text-muted-foreground before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                      data-label={t('adminEmailQueue.table.lastAttemptAt')}
+                    >
                       {formatTimestamp(entry.lastAttemptAt)}
                     </TableCell>
                     <TableCell
-                      className="text-xs text-muted-foreground max-w-[200px] truncate"
+                      className="block max-w-[200px] truncate text-xs text-muted-foreground before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                      data-label={t('adminEmailQueue.table.errorMessage')}
                       title={entry.errorMessage ?? ''}
                     >
                       {entry.errorMessage ?? '-'}
                     </TableCell>
                     <TableCell
-                      className="text-xs font-mono max-w-[150px] truncate"
+                      className="block max-w-[150px] truncate font-mono text-xs before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                      data-label={t('adminEmailQueue.table.resendMessageId')}
                       title={entry.resendMessageId ?? ''}
                     >
                       {entry.resendMessageId ?? '-'}
                     </TableCell>
-                    <TableCell>
+                    <TableCell
+                      className="block before:mr-2 before:font-medium before:content-[attr(data-label)] md:table-cell md:before:content-none"
+                      data-label={t('adminEmailQueue.table.actions')}
+                    >
                       {entry.status === 'failed' && (
-                        <Button size="sm" variant="outline" onClick={() => onRetry(entry)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="min-h-11 focus-visible:ring-2"
+                          onClick={() => onRetry(entry)}
+                        >
                           {t('adminEmailQueue.retry')}
                         </Button>
                       )}

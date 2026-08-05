@@ -107,6 +107,26 @@ describe('UserTable', () => {
     expect(screen.getByText('Jane Smith')).toBeDefined();
   });
 
+  it('should provide table semantics and a mobile-safe row presentation', () => {
+    const { container } = render(
+      <UserTable
+        data={mockUsers}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onGenerateLink={onGenerateLink}
+      />,
+    );
+
+    const table = container.querySelector('table');
+    expect(table).toBeTruthy();
+    expect(table?.querySelector('caption')?.textContent).toContain('adminUsers.table.caption');
+    expect(
+      Array.from(table?.querySelectorAll('th') ?? []).every((head) => head.scope === 'col'),
+    ).toBe(true);
+    expect(table?.className).toMatch(/block/);
+    expect(table?.querySelector('tbody tr')?.className).toMatch(/md:table-row/);
+  });
+
   it('should render role badges for each user', () => {
     render(
       <UserTable
