@@ -122,10 +122,10 @@
   - [x] Write failing tests for section navigation and mutation outcome announcements. [45ecb05]
   - [x] Group settings into discoverable sections. [45ecb05]
   - [x] Implement consistent pending/success/failure behavior for profile, password, 2FA, sessions, accessibility, notifications, timezone, and calendar settings. [45ecb05]
-- [~] Task: Improve notification center
-  - [ ] Write failing tests for sheet overflow, tab semantics, unread announcements, localized relative time, unknown notification types, and load-more feedback.
-  - [ ] Implement a mobile-safe notification panel with explicit state announcements.
-  - [ ] Add a meaningful empty state and non-color unread indicator.
+- [x] Task: Improve notification center [f3ffc9b]
+  - [x] Write failing tests for sheet overflow, tab semantics, unread announcements, localized relative time, unknown notification types, and load-more feedback. [f3ffc9b]
+  - [x] Implement a mobile-safe notification panel with explicit state announcements. [f3ffc9b]
+  - [x] Add a meaningful empty state and non-color unread indicator. [f3ffc9b]
 - [ ] Task: Improve public and authentication surfaces
   - [ ] Write failing tests for landing navigation, locale/theme access, login field errors, loading feedback, and narrow control sizing.
   - [ ] Implement public navigation controls and localized field-level authentication errors.
