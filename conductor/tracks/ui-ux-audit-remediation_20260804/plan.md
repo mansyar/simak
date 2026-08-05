@@ -114,9 +114,9 @@
   - [x] Write failing tests for keyboard upload, parsing errors, retry, expansion semantics, and progress announcements. [ba3bd47]
   - [x] Implement accessible import controls and expandable preview rows. [ba3bd47]
   - [x] Preserve row-level errors and successful-row summaries. [ba3bd47]
-- [~] Task: Improve admin tables, filters, and destructive actions
-  - [ ] Write failing tests for mobile table presentation, filter labels, cleanup confirmation, delete pending states, and session revoke names.
-  - [ ] Implement mobile-priority layouts and accessible detail expansion.
+- [x] Task: Improve admin tables, filters, and destructive actions [1c0134a]
+  - [x] Write failing tests for mobile table presentation, filter labels, cleanup confirmation, delete pending states, and session revoke names. [1c0134a]
+  - [x] Implement mobile-priority layouts and accessible detail expansion. [1c0134a]
   - [ ] Ensure destructive dialogs remain open until confirmed success.
 - [ ] Task: Improve settings information architecture and feedback
   - [ ] Write failing tests for section navigation and mutation outcome announcements.
