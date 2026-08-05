@@ -154,7 +154,7 @@
   - [x] Run keyboard interaction checks at 320px, 768px, and 1280px. [2f11776]
   - [x] Run axe checks and confirm no new serious/critical violations. [2f11776]
   - [x] Confirm no hydration or unexpected console errors. [2f11776]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Final Definition of Done
 
