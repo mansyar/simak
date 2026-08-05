@@ -133,6 +133,23 @@ test.describe('Settings Hub', () => {
     expect(afterToggle).toBe(!initialDark);
   });
 
+  test('reduced motion setting applies to the document root', async ({ page }) => {
+    await page.goto('/admin/settings');
+    await page.waitForLoadState('networkidle');
+
+    const reducedMotion = page.getByRole('checkbox', { name: 'Reduced Motion' });
+    const initiallyEnabled = await reducedMotion.isChecked();
+    await reducedMotion.click();
+    await expect
+      .poll(() => page.locator('html').getAttribute('data-reduced-motion'))
+      .toBe(initiallyEnabled ? null : 'true');
+
+    await reducedMotion.click();
+    await expect
+      .poll(() => page.locator('html').getAttribute('data-reduced-motion'))
+      .toBe(initiallyEnabled ? 'true' : null);
+  });
+
   test('notification preferences toggle persists after reload', async ({ page }) => {
     await page.goto('/admin/settings');
     await page.waitForLoadState('networkidle');
