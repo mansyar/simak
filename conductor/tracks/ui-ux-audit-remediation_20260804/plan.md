@@ -126,7 +126,7 @@
   - [x] Write failing tests for sheet overflow, tab semantics, unread announcements, localized relative time, unknown notification types, and load-more feedback. [f3ffc9b]
   - [x] Implement a mobile-safe notification panel with explicit state announcements. [f3ffc9b]
   - [x] Add a meaningful empty state and non-color unread indicator. [f3ffc9b]
-- [ ] Task: Improve public and authentication surfaces
+- [~] Task: Improve public and authentication surfaces
   - [ ] Write failing tests for landing navigation, locale/theme access, login field errors, loading feedback, and narrow control sizing.
   - [ ] Implement public navigation controls and localized field-level authentication errors.
   - [ ] Align landing and login controls with the shared visual system.
