@@ -143,10 +143,10 @@
   - [x] Write i18n parity and hardcoded-string regression tests for affected surfaces. [f31986c]
   - [x] Localize relative times, technical fallback values, wait durations, raw error codes, and status text. [f31986c]
   - [x] Run generated i18n checks for English/Indonesian parity and unused keys. [f31986c]
-- [~] Task: Apply reduced-motion behavior globally
-  - [ ] Write failing tests for reduced-motion behavior on affected transitions and animations.
-  - [ ] Implement a shared reduced-motion state/class or equivalent.
-  - [ ] Verify skeletons, sidebars, progress indicators, hover transitions, and toasts.
+- [x] Task: Apply reduced-motion behavior globally [be8c7aa]
+  - [x] Write failing tests for reduced-motion behavior on affected transitions and animations. [be8c7aa]
+  - [x] Implement a shared reduced-motion state/class or equivalent. [4eb1e39]
+  - [x] Verify skeletons, sidebars, progress indicators, hover transitions, and toasts. [be8c7aa]
 - [ ] Task: Execute complete automated verification
   - [ ] Run unit/component tests and coverage.
   - [ ] Run typecheck, lint, format validation, and modularity checks.
