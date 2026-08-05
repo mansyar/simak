@@ -38,6 +38,34 @@ test.describe('Smoke Route Tests', () => {
       expect(consoleErrors).toEqual([]);
     });
 
+    test('landing navigation and authentication controls are mobile-safe', async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+      await page.goto('/');
+      await page.waitForLoadState('networkidle');
+
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        320,
+      );
+      await expect(page.getByRole('navigation', { name: 'Public navigation' })).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Features' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Switch to Bahasa Indonesia' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Dark Mode' })).toBeVisible();
+    });
+
+    test('login exposes field-level validation feedback', async ({ page }) => {
+      await page.goto('/auth/login');
+      await page.waitForLoadState('networkidle');
+      await page.getByRole('button', { name: 'Sign In' }).click();
+
+      await expect(page.getByText('Email is required')).toBeVisible();
+      await expect(page.getByText('Password is required')).toBeVisible();
+      await expect(page.getByLabel('Email')).toHaveAttribute('aria-describedby', 'email-error');
+      await expect(page.getByLabel('Password')).toHaveAttribute(
+        'aria-describedby',
+        'password-error',
+      );
+    });
+
     test('forgot password page renders form', async ({ page }) => {
       const consoleErrors = captureConsoleErrors(page);
       await page.goto('/auth/forgot-password');

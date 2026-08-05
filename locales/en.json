@@ -6,8 +6,12 @@
     "login": "Login",
     "logout": "Logout",
     "email": "Email",
+    "emailRequired": "Email is required",
+    "invalidEmail": "Enter a valid email address",
     "password": "Password",
+    "passwordRequired": "Password is required",
     "signIn": "Sign In",
+    "signingIn": "Signing in...",
     "forgotPassword": "Forgot Password?",
     "resetPassword": "Reset Password",
     "invalidCredentials": "Invalid email or password",
@@ -23,6 +27,7 @@
     "verifyTwoFactor": "Verify Two-Factor Authentication",
     "verifyTwoFactorDescription": "Enter the 6-digit code from your authenticator app",
     "totpCode": "Verification Code",
+    "totpPlaceholder": "000000",
     "invalidCode": "Invalid verification code. Please try again.",
     "useBackupCode": "Use a backup code instead",
     "verifyBackupCode": "Verify Backup Code",
@@ -957,6 +962,11 @@
     }
   },
   "landing": {
+    "nav": {
+      "label": "Public navigation",
+      "features": "Features",
+      "howItWorks": "How it works"
+    },
     "hero": {
       "headline": "Manage Academic Assignments with Confidence",
       "subheadline": "SIMAK helps students and instructors track progress, manage checkpoints, and ensure timely submissions through a structured workflow.",

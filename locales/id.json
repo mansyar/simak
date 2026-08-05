@@ -6,8 +6,12 @@
     "login": "Masuk",
     "logout": "Keluar",
     "email": "Email",
+    "emailRequired": "Email wajib diisi",
+    "invalidEmail": "Masukkan alamat email yang valid",
     "password": "Kata Sandi",
+    "passwordRequired": "Kata sandi wajib diisi",
     "signIn": "Masuk",
+    "signingIn": "Sedang masuk...",
     "forgotPassword": "Lupa Kata Sandi?",
     "resetPassword": "Atur Ulang Kata Sandi",
     "invalidCredentials": "Email atau kata sandi tidak valid",
@@ -23,6 +27,7 @@
     "verifyTwoFactor": "Verifikasi Autentikasi Dua Faktor",
     "verifyTwoFactorDescription": "Masukkan kode 6 digit dari aplikasi autentikator Anda",
     "totpCode": "Kode Verifikasi",
+    "totpPlaceholder": "000000",
     "invalidCode": "Kode verifikasi tidak valid. Silakan coba lagi.",
     "useBackupCode": "Gunakan kode cadangan",
     "verifyBackupCode": "Verifikasi Kode Cadangan",
@@ -957,6 +962,11 @@
     }
   },
   "landing": {
+    "nav": {
+      "label": "Navigasi publik",
+      "features": "Fitur",
+      "howItWorks": "Cara kerja"
+    },
     "hero": {
       "headline": "Kelola Tugas Akademik dengan Percaya Diri",
       "subheadline": "SIMAK membantu mahasiswa dan dosen melacak kemajuan, mengelola checkpoint, dan memastikan pengumpulan tepat waktu melalui alur kerja yang terstruktur.",

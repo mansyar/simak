@@ -50,7 +50,7 @@ function SetupPasswordPage() {
     try {
       const result = await completePasswordSetup({ data: { token, password } });
       if ('error' in result) {
-        setError(result.error.message);
+        setError(t('common.error'));
       } else {
         setSuccess(true);
       }
@@ -64,7 +64,11 @@ function SetupPasswordPage() {
   if (success) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
-        <div className="w-full max-w-sm rounded-xl border bg-card p-8 text-center shadow-lg">
+        <div
+          role="status"
+          aria-live="polite"
+          className="w-full max-w-sm rounded-xl border bg-card p-8 text-center shadow-lg"
+        >
           <div className="mb-6 flex items-center justify-between">
             <LanguageSwitcher currentLocale={locale} onSwitch={setLocale} />
             <ThemeToggle theme={theme} onToggle={toggleTheme} />
@@ -74,7 +78,7 @@ function SetupPasswordPage() {
           </h1>
           <p className="mb-6 text-sm text-muted-foreground">{t('auth.setupSuccess')}</p>
           <Link to="/auth/login">
-            <Button className="w-full">{t('auth.login')}</Button>
+            <Button className="w-full min-h-11">{t('auth.login')}</Button>
           </Link>
         </div>
       </div>
@@ -94,7 +98,7 @@ function SetupPasswordPage() {
           </h1>
           <p className="mb-6 text-sm text-muted-foreground">{t('auth.linkExpired')}</p>
           <Link to="/auth/login">
-            <Button className="w-full">{t('auth.login')}</Button>
+            <Button className="w-full min-h-11">{t('auth.login')}</Button>
           </Link>
         </div>
       </div>
@@ -147,12 +151,21 @@ function SetupPasswordPage() {
             </div>
           )}
 
-          <Button type="submit" disabled={isSubmitting} loading={isSubmitting} className="w-full">
-            {t('common.submit')}
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            loading={isSubmitting}
+            aria-busy={isSubmitting}
+            className="w-full"
+          >
+            {isSubmitting ? t('common.loading') : t('common.submit')}
           </Button>
 
           <div className="text-center">
-            <Link to="/auth/login" className="text-sm text-primary hover:underline">
+            <Link
+              to="/auth/login"
+              className="inline-flex min-h-11 items-center text-sm text-primary hover:underline"
+            >
               {t('common.back')}
             </Link>
           </div>

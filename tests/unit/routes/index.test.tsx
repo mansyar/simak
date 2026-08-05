@@ -10,6 +10,9 @@ const mockT = (key: string, params?: Record<string, string>) => {
     'landing.hero.subheadline':
       'SIMAK helps students and instructors track progress, manage checkpoints, and ensure timely submissions through a structured workflow.',
     'landing.hero.cta': 'Get Started',
+    'landing.nav.label': 'Public navigation',
+    'landing.nav.features': 'Features',
+    'landing.nav.howItWorks': 'How it works',
     'landing.features.title': 'Everything You Need',
     'landing.features.subtitle':
       'A complete platform for managing academic assignments from start to finish.',
@@ -56,7 +59,19 @@ const mockT = (key: string, params?: Record<string, string>) => {
 };
 
 vi.mock('@/routes/__root', () => ({
-  useI18n: () => ({ t: mockT, locale: 'en' }),
+  useI18n: () => ({ t: mockT, locale: 'en', setLocale: vi.fn() }),
+}));
+
+vi.mock('@/hooks/use-theme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: vi.fn() }),
+}));
+
+vi.mock('@/components/layout/language-switcher', () => ({
+  LanguageSwitcher: () => <button aria-label="Switch language">Language</button>,
+}));
+
+vi.mock('@/components/layout/theme-toggle', () => ({
+  ThemeToggle: () => <button aria-label="Toggle theme">Theme</button>,
 }));
 
 vi.mock('@tanstack/react-router', async (importOriginal) => {
@@ -103,6 +118,25 @@ describe('Landing Page', () => {
       const ctaLink = screen.getByText('Get Started').closest('a');
       expect(ctaLink).toBeDefined();
       expect(ctaLink?.getAttribute('href')).toBe('/auth/login');
+    });
+  });
+
+  describe('Public navigation', () => {
+    it('provides labeled section navigation and public controls', () => {
+      render(<HomePage />);
+
+      expect(screen.getByRole('navigation', { name: 'Public navigation' })).toBeDefined();
+      expect(screen.getByRole('link', { name: 'Features' })).toBeDefined();
+      expect(screen.getByRole('link', { name: 'How it works' })).toBeDefined();
+      expect(screen.getByRole('button', { name: 'Switch language' })).toBeDefined();
+      expect(screen.getByRole('button', { name: 'Toggle theme' })).toBeDefined();
+    });
+
+    it('keeps public navigation links touch-safe', () => {
+      render(<HomePage />);
+
+      expect(screen.getByRole('link', { name: 'Features' }).className).toContain('min-h-11');
+      expect(screen.getByRole('link', { name: 'How it works' }).className).toContain('min-h-11');
     });
   });
 
@@ -171,7 +205,7 @@ describe('Landing Page', () => {
   describe('Footer', () => {
     it('renders app name', () => {
       render(<HomePage />);
-      expect(screen.getByText('SIMAK')).toBeDefined();
+      expect(screen.getAllByText('SIMAK').length).toBeGreaterThan(0);
     });
 
     it('renders footer description', () => {
@@ -181,7 +215,7 @@ describe('Landing Page', () => {
 
     it('renders Login and About footer links but NOT Contact', () => {
       render(<HomePage />);
-      expect(screen.getByText('Login')).toBeDefined();
+      expect(screen.getAllByText('Login').length).toBeGreaterThan(0);
       expect(screen.getByText('About')).toBeDefined();
       expect(screen.queryByText('Contact')).toBeNull();
     });

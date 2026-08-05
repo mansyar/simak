@@ -11,8 +11,12 @@ export type Translation = {
     login: string
     logout: string
     email: string
+    emailRequired: string
+    invalidEmail: string
     password: string
+    passwordRequired: string
     signIn: string
+    signingIn: string
     forgotPassword: string
     resetPassword: string
     invalidCredentials: string
@@ -28,6 +32,7 @@ export type Translation = {
     verifyTwoFactor: string
     verifyTwoFactorDescription: string
     totpCode: string
+    totpPlaceholder: string
     invalidCode: string
     useBackupCode: string
     verifyBackupCode: string
@@ -962,6 +967,11 @@ export type Translation = {
     }
   }
   landing: {
+    nav: {
+      label: string
+      features: string
+      howItWorks: string
+    }
     hero: {
       headline: string
       subheadline: string

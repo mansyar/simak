@@ -7,7 +7,9 @@ import { LanguageSwitcher } from '../../../components/layout/language-switcher';
 import { useTheme } from '../../../hooks/use-theme';
 import { Input } from '../../../components/ui/input';
 import { Label } from '../../../components/ui/label';
-import { Button } from '../../../components/ui/button';
+import { buttonVariants } from '../../../components/ui/button';
+import { RefreshCcw } from 'lucide-react';
+import { cn } from '../../../lib/utils';
 
 export const Route = createFileRoute('/_unauthenticated/auth/login')({
   component: LoginPage,
@@ -20,17 +22,36 @@ function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setError(null);
+    setEmailError(null);
+    setPasswordError(null);
+
+    let hasValidationError = false;
+    if (!email.trim()) {
+      setEmailError(t('auth.emailRequired'));
+      hasValidationError = true;
+    } else if (!email.includes('@')) {
+      setEmailError(t('auth.invalidEmail'));
+      hasValidationError = true;
+    }
+    if (!password) {
+      setPasswordError(t('auth.passwordRequired'));
+      hasValidationError = true;
+    }
+    if (hasValidationError) return;
+
     setIsSubmitting(true);
 
     try {
       const result = await authClient.signIn.email({ email, password });
       if (result.error) {
-        setError(result.error.message ?? t('auth.invalidCredentials'));
+        setError(t('auth.invalidCredentials'));
       } else {
         // Check if 2FA redirect is required
         const data = result.data as { twoFactorRedirect?: boolean } | undefined;
@@ -70,10 +91,16 @@ function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               aria-required="true"
-              aria-describedby={error ? 'login-error' : undefined}
+              aria-describedby={emailError ? 'email-error' : error ? 'login-error' : undefined}
+              aria-invalid={emailError ? 'true' : undefined}
               placeholder={t('common.emailPlaceholder')}
               autoComplete="email"
             />
+            {emailError && (
+              <p id="email-error" className="text-sm text-destructive" role="alert">
+                {emailError}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -85,9 +112,18 @@ function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               aria-required="true"
+              aria-describedby={
+                passwordError ? 'password-error' : error ? 'login-error' : undefined
+              }
+              aria-invalid={passwordError ? 'true' : undefined}
               placeholder={t('auth.password')}
               autoComplete="current-password"
             />
+            {passwordError && (
+              <p id="password-error" className="text-sm text-destructive" role="alert">
+                {passwordError}
+              </p>
+            )}
           </div>
 
           {error && (
@@ -100,12 +136,24 @@ function LoginPage() {
             </div>
           )}
 
-          <Button type="submit" disabled={isSubmitting} loading={isSubmitting} className="w-full">
-            {t('auth.signIn')}
-          </Button>
+          <button
+            type="button"
+            onClick={() => void handleSubmit()}
+            disabled={isSubmitting}
+            aria-busy={isSubmitting}
+            className={cn(buttonVariants(), 'w-full')}
+          >
+            {isSubmitting && (
+              <RefreshCcw className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+            )}
+            {isSubmitting ? t('auth.signingIn') : t('auth.signIn')}
+          </button>
 
           <div className="text-center">
-            <a href="/auth/forgot-password" className="text-sm text-primary hover:underline">
+            <a
+              href="/auth/forgot-password"
+              className="inline-flex min-h-11 items-center text-sm text-primary hover:underline"
+            >
               {t('auth.forgotPassword')}
             </a>
           </div>
