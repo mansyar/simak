@@ -23,7 +23,9 @@ test.describe('Settings Hub', () => {
 
     await page.getByRole('button', { name: 'Save Name' }).click();
 
-    await expect(page.getByText('Name updated successfully')).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.getByLabel('Profile', { exact: true }).getByText('Name updated successfully'),
+    ).toBeVisible({ timeout: 10000 });
 
     await page.reload();
     await page.waitForLoadState('networkidle');
@@ -87,11 +89,13 @@ test.describe('Settings Hub', () => {
     await page.goto('/admin/settings');
     await page.waitForLoadState('networkidle');
 
-    await expect(page.getByText('Appearance', { exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Appearance', exact: true })).toBeVisible();
 
     await page.getByRole('button', { name: 'ID', exact: true }).click();
 
-    await expect(page.getByText('Tampilan', { exact: true })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('link', { name: 'Tampilan', exact: true })).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test('settings sections remain navigable at mobile width', async ({ page }) => {
