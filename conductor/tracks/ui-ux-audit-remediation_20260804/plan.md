@@ -130,7 +130,7 @@
   - [x] Write failing tests for landing navigation, locale/theme access, login field errors, loading feedback, and narrow control sizing. [1872ed7]
   - [x] Implement public navigation controls and localized field-level authentication errors. [1872ed7]
   - [x] Align landing and login controls with the shared visual system. [1872ed7]
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [~] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 6 — Visual system, i18n, motion, and final quality gates
 
